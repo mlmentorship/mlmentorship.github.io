@@ -1,0 +1,10 @@
+---
+layout: archive
+title: {{ title }}
+modified:
+excerpt:
+image:
+  feature:
+  teaser:
+  thumb:
+---

@@ -1,0 +1,12 @@
+# Site navigation links
+
+- title:
+  url:
+  excerpt:
+  image:
+
+- title: About
+  url: /about/
+
+- title: Mentees
+  url: /mentees/
