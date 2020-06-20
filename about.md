@@ -5,7 +5,7 @@ permalink: /about/
 ---
 
 
-Machine learning mentorship program and this blog have been established in order to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in what to focus on in terms of learning,  direct participants' efforts toward projects with more return on invested time, and advise on ML problem formulation and problem solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor [More details comming soon]. Here's a video from our first introduction session:
+Machine learning mentorship program and this blog have been established to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in terms of what to focus in the learning path, direct participants’ efforts toward projects with more return on invested time, and advice on ML problem formulation and solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor [More details comming soon]. Here's a video from our first introduction session:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ifTIbTdy880" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
