@@ -5,11 +5,9 @@ permalink: /about/
 ---
 
 
-## ML Mentorship program
-
 Machine learning mentorship program and this blog have been established in order to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in what to focus on in terms of learning,  direct participants' efforts toward projects with more return on invested time, and advise on ML problem formulation and problem solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor. [More details comming soon]
 
-#### Program focus on writing and sharing
+##### Program focus on writing and sharing
 
 Writing is consistently a very big part of the process of learning, finding a job, and career growth especially in ML/DS as it can solidify your learnings, and get visibility to your work. I encourage everyone in the program to take personal notes in your learning journey. These notes will become handy when it's time to prepare for interviews and help your think about ideas for writing helpful blog post.
 
