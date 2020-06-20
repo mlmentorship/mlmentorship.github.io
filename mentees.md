@@ -5,7 +5,7 @@ permalink: /mentees/
 ---
 
 
-
-1- John Doe
-<picture>
+[picture]
+John Doe
+- [blog]()
 - bio
