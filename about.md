@@ -1,13 +1,20 @@
 ---
 layout: media
-title: About
+title: ML mentorship program
 permalink: /about/
 ---
 
 
 ## ML Mentorship program
 
-Machine learning mentorship program and this blog have been established in order to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in what to focus on in terms of learning,  direct participants' efforts toward projects with more return on invested time, and advise on ML problem formulation and problem solving. The program is structured in a funnel of three streams listed below all of which will be provided with support from a community of peers and a advisorship from a mentor. [More details comming soon]
+Machine learning mentorship program and this blog have been established in order to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in what to focus on in terms of learning,  direct participants' efforts toward projects with more return on invested time, and advise on ML problem formulation and problem solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor. [More details comming soon]
+
+### Program focus on writing and sharing
+
+Writing is consistently a very big part of the process of learning, finding a job, and career growth especially in ML/DS as it can solidify your learnings, and get visibility to your work. I encourage everyone in the program to take personal notes in your learning journey. These notes will become handy when it's time to prepare for interviews and help your think about ideas for writing helpful blog post.
+
+Google is your best friend in your learning journey, and you have to constantly google things to learn and understand them. As you are searching, make note of the things where you haven't found a good resource for. Those are great candidates for writing helpful blog posts. When you think you have an idea for a blog post or enough content, discuss with me and I’ll try help guide you in writing your post. If you are intersted in getting more visibility for your post, we can discuss editing your blog post and cross-posting it on the MLmentorship blog. This will give your work visibility.you’ll also also learn how to work with github, submit a PR request, and contribute to another repository. You’ll be building your portfolio along the way which helps your job searchLet’s aim for everyone writing at least 1 blog-post in the first 2 months. I’ll help you edit and will cross-post on [MLmentoship blog](http://mlmentorship.github.io) to further promote your work and profileI’ll invite DS/ML professionals in my network to share their experience with you.
+
 
 ### Stream 1 (Starting out in ML)
 
@@ -38,6 +45,9 @@ You don’t need to know everything about everything. At the beginning, focus on
 
 ### Stream 2 (Getting first ML job)
 In stream two, the most important thing for job seekers is obtaining experience in doing projects that would be similar to what a Data scientist/ML engineer will do on the job. This will be achieved through doing multiple individual projects to gain experience with various data modalities and algorithms. The capstone group projects' goal is to simulate the actual work that you'll do as a data scientist/ML engineer in your actual job.
+- Intermediate ML algorithms
+    - more sophisticated classifiers and clustering algorithms
+    - neural networks
 - Project 2 [Kaggle]
     - replicate others existing solutions
     - provide 1 additional solution to the problem
@@ -67,3 +77,19 @@ This stream is mostly relevant to people that are currently in a ML/DS role and 
     - write up the project in the form of a conference paper
 
 - Interview prep
+
+
+
+
+## FAQ
+
+- What programming language should we start with?
+    - I suggest python. It's the de facto language in the industry and unless you have a very strong opinion about another programming language, I suggest everyone start with python so that group projects are done easier. 
+- How many projects do we need to do to get a job?
+    - It's hard to put a number on such a thing because everyone learns differently. However, if I were forced to pick a number, I'd say 4 projects. 3 strong individual [kaggle-like](https://www.kaggle.com/) projects and 1 larger-scale group project that's more similar to the actual work happening in the industry. 
+- Where do we get data?
+    - Kaggle is a good candidate for individual projects, but I suggest going beyond that in the group project and source data by e.g. scarping the web or alternative data sources.
+- Should we use jupyter notebooks?
+    - [Jupyter notebooks](https://jupyter.org/) are a great tool to use for doing data science and ML projects since you can write your explanations, code, and results in the same doc. You'll also get the benefit of easily converting your work to a blog post by converting a jupyter notebook to [markdown](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
+- How do we prepare for interviews?
+    - I will introduce resources, and you can form sub-groups for mock-interview preparation when it comes the time to do that.
