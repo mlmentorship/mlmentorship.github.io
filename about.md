@@ -8,9 +8,9 @@ Machine learning mentorship program and this blog have been established to help 
 
 - [**Stream 1 (Starting out in ML)**]({{ site.baseurl }}{% link stream1.md %})
 
-- [**Stream 2 (Getting first ML job)**]({{ site.baseurl }}{% link stream1.md %})
+- [**Stream 2 (Getting first ML job)**]({{ site.baseurl }}{% link stream2.md %})
 
-- [**Stream 3 ( ML Career progress)**]({{ site.baseurl }}{% link stream1.md %})
+- [**Stream 3 ( ML Career progress)**]({{ site.baseurl }}{% link stream3.md %})
 
 Here's a video from our first introduction session where more details are explained:
 
