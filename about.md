@@ -5,127 +5,46 @@ permalink: /about/
 ---
 
 
-Machine learning mentorship program and this blog have been established to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in terms of what to focus in the learning path, direct participants’ efforts toward projects with more return on invested time, and advice on ML problem formulation and solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor [More details coming soon]. Additionally, I’ll also invite DS/ML professionals in my network to share their experience with you. Here's a video from our first introduction session:
+Machine learning mentorship program and this blog have been established to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in terms of what to focus in the learning path, direct participants’ efforts toward projects with more return on invested time, and advice on ML problem formulation and solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor [More details coming soon]. 
+
+- [Stream 1 (Starting out in ML)]({{ site.baseurl }}{% link stream1.md %})
+
+- [Stream 2 (Getting first ML job)]({{ site.baseurl }}{% link stream1.md %})
+
+- [Stream 3 ( ML Career progress)]({{ site.baseurl }}{% link stream1.md %})
+
+Additionally, I’ll also invite DS/ML professionals in my network to share their experience with you. Here's a video from our first introduction session:
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/ifTIbTdy880" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+##### Organization and logistics
+
+In order for the mentorship program to be scalable, we need to organize in a way that everyone gets support without all the burden of mentorship falling on a single person (We all have a full-time job afterall). What I'd like to see is that you help mentor the people that have entered the field after you, so I am using the terms mentor to refer to all of you. Here is a suggestion for an organizational structure that can help everyone to get support from their peers and also contribute to the group.
+
+- Within Stream sessions
+    - The group within a stream will meet bi-weekly.
+    - Aim: Develop the community within that stream and support each other.
+    - Agenda: 
+        - Discuss progress and challenges of the members
+        - share resources
+        - ask and answer questions.
+        - Get guidance from the mentor from the upper stream.
+        - Find areas where help and support is needed.
+
+- Each stream will have a coordinator that rotates between members after each session and is responsible for:
+    - Coordinate and run the next bi-weekly session for their stream (1.5 hour at most)
+    - Make sure meeting notes (minutes) are taken.
+    - Invite a rotating mentor from an upper stream.
+    - Make sure the coordinator for next meeting is chosen.
+    - Share meeting notes and action items with the group and myself.
+
+- I will read the meeting minutes from all three streams and if required have a monthly meeting with the rotating coordinators from each stream to discuss challenges, resources, projects, and how to help.
 
 ##### Program focus on writing and sharing
 
 Writing is consistently a very big part of the process of learning, finding a job, and career growth especially in ML/DS as it can solidify your learnings, and get visibility to your work. I encourage everyone in the program to take personal notes in your learning journey. These notes will become handy when it's time to prepare for interviews and help your think about ideas for writing helpful blog post.
 
 Google is your best friend in your learning journey, and you have to constantly google things to learn and understand them. As you are searching, make note of the things where you haven't found a good resource for. Those are great candidates for writing helpful blog posts. When you think you have an idea for a blog post or enough content, discuss with me and I’ll try help guide you in writing your post. If you are interested in getting more visibility for your post, we can discuss editing your blog post and cross-posting it on the MLmentorship blog. This will give your work visibility. You’ll also also learn how to work with github, submit a PR request, and contribute to another repository. You’ll be building your portfolio along the way which helps your job search. Let’s aim for everyone writing at least 1 blog-post in the first 2 months. I’ll help you edit and will cross-post on [MLmentoship blog](http://mlmentorship.github.io) to further promote your work.
-
-### Stream 1 (Starting out in ML)
-
-This stream is suitable for participant that do not have any ML experience and are interested in a curriculum for self-learning. The following curriculum along with a support group of peers going through the same journey will prepare participants for stream two.
-
-You don’t need to know everything about everything. At the beginning, focus on learning a few things really well.
-
-- Machine learning basics: how to formulate a machine learning problem
-    + [Introduction](https://www.deeplearningbook.org/contents/intro.html), and [Chapter 5](https://www.deeplearningbook.org/contents/ml.html) of the deep learning book 
-        + *Note*: if you need a refresher on [Linear Algebra](https://www.deeplearningbook.org/contents/prob.html),  [probability theory](https://www.deeplearningbook.org/contents/prob.html), and [numerical computation](https://www.deeplearningbook.org/contents/prob.html), chapters 2-4 in the deep learning book are a great resource. 
-    + [optional] [Chapter 1](https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/) of Hands-on machine learning book
-- Learn theory of 5 basic algorithms, how to evaluate them and how to use them in practice (sklearn):
-    - regression:
-        - Linear regression 
-    - Clustering:
-        - K-means clustering
-    - classification:
-        - logistic regression
-        - SVMs
-        - Random forests
-- Model evaluation
-    - Cross-validation, over-fitting, 
-    - accuracy, recall, precision, F1 score, ROC curve, loss functions
-- Project 1 [Kaggle]
-    - study problem formulation
-    - follow others' solutions with various algorithms
-    - replicate existing solutions and understand various aspects of data preparation and modelling
-
-### Stream 2 (Getting first ML job)
-In stream two, the most important thing for job seekers is obtaining experience in doing projects that would be similar to what a Data scientist/ML engineer will do on the job. This will be achieved through doing multiple individual projects to gain experience with various data modalities and algorithms. The capstone group projects' goal is to simulate the actual work that you'll do as a data scientist/ML engineer in your actual job.
-- Intermediate ML algorithms
-    - more sophisticated classifiers and clustering algorithms
-    - neural networks
-- Project 2 [Kaggle]
-    - replicate others existing solutions
-    - provide 1 additional solution to the problem
-- Project 3 [Kaggle]
-    - replicate others existing solutions
-    - provide 1 additional solution to the problem
-- Project 4 [Capstone group project]
-    - ML problem formulation
-    - data collection / preparation
-    - modelling
-    - team work
-
-- Interview prep
-
-### Stream 3 ( ML Career progress)
-This stream is mostly relevant to people that are currently in a ML/DS role and are seeking ways to advance their technical careers. This can be achieved by learning more advanced ML topics, replicating state of the art machine learning papers, and building on top of these works to make new contribution to the field.  
-- Advanced ML topics
-    - learn basics of a sub-field (e.g. NLP)
-- Advanced project 1 [replicating a paper from github code]
-    - replicate the building of baselines methodologies
-    - replicate the papers' proposed method and understand insights, details of implementation, and the pros and cons.
-- Advanced project 2 [build on top of project Advanced project 1]
-    - read and review relevant literature
-    - list a set of ideas to improve upon the paper from advanced project 1
-    - design a set of experiments
-    - implement and experiment with a subset ideas
-    - write up the project in the form of a conference paper
-
-- Interview prep
-
-## Guidance on picking Projects 
-- project 1 (Stream 1):
-    - should be doable in a span of a week (estimated 40-60 hours),
-    - focus is on learning by example, how a data problem is formulated, how others solved the problem.
-        - Test: the main question to be able to answer everywhere is "WHY"?
-    - What business problem does solving this problem tries to meet? What is the value of the project if solved?
-        - Test: Think about the business, is this problem worth solving?
-    - Understand the data, how to pre-process, explore, normalize similar datasets, why? and what tools are used?
-        - Test: Can you do the data preparation on a similar dataset?]
-    - why have a specific algorithm been used to model the dataset? How were the hyper-parameters chosen?
-        - Test: Can you compare the algorithms, what are pros and cons?
-        - Test: Can you apply the algorithms you studied on a different but similar problem?
-    - How is each solution evaluated? what is the evaluation metric?
-        - Test: Why does that metric make sense? Can you justify it? what are the alternatives?
-        - Test: How did you make sure the model didn't overfit? Can you justify why the solution is correct?
-    - Can you write about the problem, and the solutions you studied, and the tools you used in a blog post?
-        - Test: Find gaps in your knowledge while writing you blog post.
-        - Test: what did you learn? What did you find very useful? What are the caveats?
-
-- Project 2, 3 (Stream 2):
-    - should be doable in a span of a 10 days of full time work (estimated 80-100 hours),
-        - If it's the same project as project 1, then only (estimated 40-60 hours).
-    - Repeat process from project 1, can you answer all the tests?
-    - Focus is on adding a new solution. What other algorithms can be used to solve this problem? why? 
-        - Test: apply it to the problem, and evaluate
-        - Test: Why is your new solution giving better or worse results? Can you discuss it?
-        - Test: Putting all solutions together, can you discuss the merits of each solution, and contextualize all results?
-        - Test: Can you write a blog post about your solution? Where are the gaps in your knowledge?
-
-- Project 4 (Stream 2):
-    - Should be doable in a span of a 5-10 days by a team of 3-4 (estimated 200-300 man-hours).
-    - focus is on showing the ability to formulate a new problem as a machine learning problem, source, clean, and model data.
-        - Test: why did you choose that problem? why does it make sense to use machine learning there?
-        - Test: Why and how did you source your data? What is the data size? Why does that data make sense for the problem? How did you clean and prepare the data?
-        - Test: What algorithms did you pick for modeling the problem? Why do they make sense for the dataset?
-        - Test: Can you discuss the various solutions? What are the pros and cons? Can you recommend one solution?
-        - Test: Which part of the project did each individual contribute to? How did the team work together? What tools did you use to stay productive? What were the problems?
-        - Test: Can you write a blog post about your work? What were the problems you faced? how did you solve them? what did you learn?
-
-- Advanced Project 1 (Stream 3):
-    - Should be doable in a span of a week (estimated 40-60 hours)
-    - Focus is on learning by example by reading the paper and code, and understanding various parts
-        - Test: Can you run the code? Can you change a minor thing and still run the code (e.g. converting an LSTM to a ConvNet)? 
-        - Test: Can you write a blog post explaining the task, the model, and how it's implemented in code? [Here](https://nlp.seas.harvard.edu/2018/04/03/attention.html) is an example of how this would ideally look like. 
-        - Test: Can you discuss why the model is getting a good or bad performance? Where are the gains/losses coming from?
-
-- Advanced Project 2 (Stream 3):
-    - TBD
-
 
 ## FAQ
 
