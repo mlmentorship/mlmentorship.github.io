@@ -4,7 +4,7 @@ title: Stream 2 program
 permalink: /stream2/
 ---
 
-### Stream 2 (Getting first ML job)
+#### Stream 2 (Getting first ML job)
 In stream two, the most important thing for job seekers is obtaining experience in doing projects that would be similar to what a Data scientist/ML engineer will do on the job. This will be achieved through doing multiple individual projects to gain experience with various data modalities and algorithms. The capstone group projects' goal is to simulate the actual work that you'll do as a data scientist/ML engineer in your actual job.
 - Intermediate ML algorithms
     - more sophisticated classifiers and clustering algorithms
@@ -23,7 +23,7 @@ In stream two, the most important thing for job seekers is obtaining experience 
 
 - Interview prep
 
-## Guidance on picking Projects 
+##### Guidance on picking Projects 
 - project 1 (Stream 1):
     - should be doable in a span of a week (estimated 40-60 hours),
     - focus is on learning by example, how a data problem is formulated, how others solved the problem.
@@ -62,12 +62,8 @@ In stream two, the most important thing for job seekers is obtaining experience 
         - Test: Which part of the project did each individual contribute to? How did the team work together? What tools did you use to stay productive? What were the problems?
         - Test: Can you write a blog post about your work? What were the problems you faced? how did you solve them? what did you learn?
 
-- Advanced Project 1 (Stream 3):
-    - Should be doable in a span of a week (estimated 40-60 hours)
-    - Focus is on learning by example by reading the paper and code, and understanding various parts
-        - Test: Can you run the code? Can you change a minor thing and still run the code (e.g. converting an LSTM to a ConvNet)? 
-        - Test: Can you write a blog post explaining the task, the model, and how it's implemented in code? [Here](https://nlp.seas.harvard.edu/2018/04/03/attention.html) is an example of how this would ideally look like. 
-        - Test: Can you discuss why the model is getting a good or bad performance? Where are the gains/losses coming from?
 
-- Advanced Project 2 (Stream 3):
-    - TBD
+
+#### Sign up sheet
+
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSccREeVKWR_udZwYdYI7Yz3REgzun1vENVqr5w_S8mEf105uQ/viewform?embedded=true" width="640" height="1423" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>        

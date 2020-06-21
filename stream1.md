@@ -4,7 +4,7 @@ title: Stream 1 program
 permalink: /stream1/
 ---
 
-### Stream 1 (Starting out in ML)
+#### Stream 1 (Starting out in ML)
 
 This stream is suitable for participant that do not have any ML experience and are interested in a curriculum for self-learning. The following curriculum along with a support group of peers going through the same journey will prepare participants for stream two.
 
@@ -32,7 +32,7 @@ You don’t need to know everything about everything. At the beginning, focus on
     - replicate existing solutions and understand various aspects of data preparation and modeling
 
 
-## Guidance on picking Projects 
+##### Guidance on picking Projects 
 - project 1 (Stream 1):
     - should be doable in a span of a week (estimated 40-60 hours),
     - focus is on learning by example, how a data problem is formulated, how others solved the problem.
@@ -50,3 +50,9 @@ You don’t need to know everything about everything. At the beginning, focus on
     - Can you write about the problem, and the solutions you studied, and the tools you used in a blog post?
         - Test: Find gaps in your knowledge while writing you blog post.
         - Test: what did you learn? What did you find very useful? What are the caveats?
+
+
+
+#### Sign up sheet
+
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSccREeVKWR_udZwYdYI7Yz3REgzun1vENVqr5w_S8mEf105uQ/viewform?embedded=true" width="640" height="1423" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>

@@ -4,7 +4,7 @@ title: Stream 3 program
 permalink: /stream3/
 ---
 
-### Stream 3 ( ML Career progress)
+#### Stream 3 ( ML Career progress)
 This stream is mostly relevant to people that are currently in a ML/DS role and are seeking ways to advance their technical careers. This can be achieved by learning more advanced ML topics, replicating state of the art machine learning papers, and building on top of these works to make new contribution to the field.  
 - Advanced ML topics
     - learn basics of a sub-field (e.g. NLP)
@@ -21,7 +21,7 @@ This stream is mostly relevant to people that are currently in a ML/DS role and 
 - Interview prep
 
 
-## Guidance on picking Projects 
+##### Guidance on picking Projects 
 - project 1 (Stream 1):
     - should be doable in a span of a week (estimated 40-60 hours),
     - focus is on learning by example, how a data problem is formulated, how others solved the problem.
@@ -69,3 +69,9 @@ This stream is mostly relevant to people that are currently in a ML/DS role and 
 
 - Advanced Project 2 (Stream 3):
     - TBD
+
+
+
+#### Sign up sheet
+
+<iframe src="https://docs.google.com/forms/d/e/1FAIpQLSccREeVKWR_udZwYdYI7Yz3REgzun1vENVqr5w_S8mEf105uQ/viewform?embedded=true" width="640" height="1423" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
