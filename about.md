@@ -82,6 +82,10 @@ This stream is mostly relevant to people that are currently in a ML/DS role and 
 
 ## FAQ
 
+- Is it worth it to start in DS/ML?
+    - I personally think the field of DS/ML has a lot of opportunity and it's only starting. There's always hype when a new technology becomes hot which tends to calm down after a few years but that doesn't mean there isn't actual merit in the technology's potential. ML has a lot of potential for adding business value to many industries and that only grows with the ever-growing amount of data in various industries. But at the end of the day, it's your decision whether you want to invest the time and energy for entering a new the field. I made this choice for myself and am happy with my decision. 
+- Do I need a degree in ML/DS to get a job in this industry?
+    - You are welcome to invest in getting a degree in ML if you are interested but my personal opinion and the empirical evidence of many people that have made the switch from STEM to ML/DS, suggests that a degree is not required. However, what is required is the skills. I believe that more and more we are living in an skill-oriented world, where not many care about your degree if you can do the job and have some evidence to show that. This is even more true for data science, since many data scientist are actual people with advanced degrees from other STEM fields. 
 - What programming language should we start with?
     - I suggest python. It's the de facto language in the industry and unless you have a very strong opinion about another programming language, I suggest everyone start with python so that group projects are done easier. 
 - How many projects do we need to do to get a job?
