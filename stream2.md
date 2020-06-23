@@ -8,21 +8,21 @@ permalink: /stream2/
 In stream two, the most important thing for job seekers is obtaining experience in doing projects that would be similar to what a Data scientist/ML engineer will do on the job. This will be achieved through doing multiple individual projects to gain experience with various data modalities and algorithms. The capstone group projects' goal is to simulate the actual work that you'll do as a data scientist/ML engineer in your actual job.
 - Intermediate ML algorithms
     - more sophisticated classifiers and clustering algorithms
-    - neural networks
-- Project 2 [Kaggle]
+        - Random Forests, Gradient boosting , LightGBM
+        - Neural Networks (ConvNets, LSTMS, AutoEncoders)
+- Project 2 [e.g. Kaggle]
     - replicate others existing solutions
     - provide 1 additional solution to the problem
-- Project 3 [Kaggle]
+- Project 3 [e.g. Kaggle]
     - replicate others existing solutions
     - provide 1 additional solution to the problem
 - Project 4 [Capstone group project]
     - ML problem formulation
     - data collection / preparation
-    - modelling
+    - modeling
     - team work
 
 - Interview prep
-
 ##### Guidance on picking Projects 
 - project 1 (Stream 1):
     - should be doable in a span of a week (estimated 40-60 hours),

@@ -4,7 +4,7 @@ title: ML mentorship program
 permalink: /about/
 ---
 
-Machine learning mentorship program and this blog have been established to help people that are trying to enter machine learning / data science from STEM fields. The aim of ML mentorship is to provide guidance in terms of what to focus in the learning path, direct participants’ efforts toward projects with more return on invested time, and advice on ML problem formulation and solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. Additionally, I’ll also invite DS/ML professionals in my network to share their experience with you. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor.
+Machine learning mentorship program and this blog have been established to help people that are trying to enter machine learning and data science from other STEM fields. The aim of ML mentorship is to provide guidance in terms of what to focus in the learning path, direct participants’ efforts toward projects with more return on invested time, and advice on ML problem formulation and solving. The ultimate goal is for participants to find a ML/DS related job in the industry and advance their careers. Additionally, we’ll also invite DS/ML professionals in our network to share their experience with mentees. The program is structured in three streams listed below, all of which will be provided with support from a community of peers and advisorship from a mentor. You can read more about each stream and sign up on their respective pages.
 
 - [**Stream 1 (Starting out in ML)**]({{ site.baseurl }}{% link stream1.md %})
 
@@ -12,9 +12,9 @@ Machine learning mentorship program and this blog have been established to help 
 
 - [**Stream 3 ( ML Career progress)**]({{ site.baseurl }}{% link stream3.md %})
 
-Here's a video from our first introduction session where more details are explained:
+Here's a summary video from our introduction session where more details are explained:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/ifTIbTdy880" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/HsPRlgtLm58" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ##### Program Charter
 
@@ -27,7 +27,7 @@ Here's a video from our first introduction session where more details are explai
 
 ##### Organization and logistics
 
-In order for the mentorship program to be scalable, we need to organize in a way that everyone gets support without all the burden of mentorship falling on a single person (We all have a full-time job afterall). What I'd like to see is that you help mentor the people that have entered the field after you, so I am using the terms mentor to refer to all of you. Here is a suggestion for an organizational structure that can help everyone to get support from their peers and also contribute to the group.
+In order for the mentorship program to be scalable, we need to organize in a way that everyone gets support without all the burden of mentorship falling on a single person (we all have a full-time job afterall). What I'd like to see is that you help mentor the people that have entered the field after you, so I am using the term mentor to refer to all of you. Here is a suggestion for an organizational structure that can help everyone to get support from their peers and also contribute to the group.
 
 - Shared Slack channel
     - Everyone joins slack as a communication channel for asking and answering questions, and posting relevant resources.
