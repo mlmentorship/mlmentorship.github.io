@@ -64,6 +64,10 @@ Writing is consistently a very big part of the process of learning, finding a jo
 
 Google is your best friend in your learning journey, and you have to constantly google things to learn and understand them. As you are searching, make note of the things where you haven't found a good resource for. Those are great candidates for writing helpful blog posts. When you think you have an idea for a blog post or enough content, discuss with me and I’ll try help guide you in writing your post. If you are interested in getting more visibility for your post, we can discuss editing your blog post and cross-posting it on the MLmentorship blog. This will give your work visibility. You’ll also also learn how to work with github, submit a PR request, and contribute to another repository. You’ll be building your portfolio along the way which helps your job search. Let’s aim for everyone writing at least 1 blog-post in the first 2 months. I’ll help you edit and will cross-post on [MLmentoship blog](http://mlmentorship.github.io) to further promote your work.
 
+## Resources for learning
+
+I found [this](https://medium.com/machine-learning-in-practice/over-150-of-the-best-machine-learning-nlp-and-python-tutorials-ive-found-ffce2939bd78#hn) list of tutorials and resources very useful. It's broken down by topics and all resources are free. It may be a great starting point.
+
 ## FAQ
 
 - Who are you? Why are you doing this?
