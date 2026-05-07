@@ -1,0 +1,402 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { SITE, HSAGHIR_URL, LOOPLET_URL } from '../consts';
+import readingTime from 'reading-time';
+import { formatDate } from '../utils/date';
+
+const all = await getCollection('posts', ({ data }) => !data.draft);
+const counts = {
+  essays: all.filter((p) => p.data.category === 'essays').length,
+  interviews: all.filter((p) => p.data.category === 'interviews').length,
+  reference: all.filter((p) => p.data.category === 'reference').length,
+};
+
+// Latest essays — top 3 by date.
+const latestEssays = all
+  .filter((p) => p.data.category === 'essays')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3)
+  .map((p) => ({
+    slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
+    title: p.data.title,
+    description: p.data.description,
+    date: p.data.date,
+    minutes: Math.max(1, Math.round(readingTime(p.body).minutes)),
+  }));
+
+const startPaths = [
+  { label: 'Preparing for a senior ML interview loop', href: '/start-here/#preparing-for-a-senior-ml-interview-loop' },
+  { label: 'PhD or postdoc moving to industry', href: '/start-here/#phd-or-postdoc-transitioning-to-industry' },
+  { label: 'Building deep technical foundations', href: '/start-here/#building-deep-technical-foundations' },
+  { label: 'Hiring or evaluating an ML team', href: '/start-here/#engineering-leader-hiring-manager' },
+];
+---
+<BaseLayout title={SITE.title} description={SITE.description}>
+  <main class="home">
+    <!-- HERO -->
+    <section class="block hero">
+      <h1 class="display">
+        Senior&nbsp;ML interviews,<br/>distilled.
+      </h1>
+      <p class="lede">
+        Opinionated notes for engineers preparing for L5+ Applied Scientist,
+        MLE, and Research Engineer loops.
+      </p>
+      <p class="byline">
+        By <a href={HSAGHIR_URL} rel="noopener"><span class="byline-name">Hamidreza Saghir</span></a>
+        <span class="byline-sep" aria-hidden="true">·</span>
+        Principal Applied Scientist at <span class="nowrap">Microsoft</span>
+        <span class="byline-sep" aria-hidden="true">·</span>
+        previously <span class="nowrap">X (Twitter)</span>, Amazon, Borealis AI
+      </p>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- LATEST -->
+    <section class="block">
+      <p class="block-eyebrow">Latest</p>
+      <ol class="post-list">
+        {latestEssays.map((p) => (
+          <li>
+            <a class="post-row" href={`/essays/${p.slug}/`}>
+              <span class="post-row-arrow" aria-hidden="true">›</span>
+              <div>
+                <h3 class="post-row-title">{p.title}</h3>
+                {p.description && <p class="post-row-desc">{p.description}</p>}
+                <p class="post-row-meta">{p.minutes} min read · {formatDate(p.date)}</p>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <p class="block-foot">
+        <a href="/essays/">All essays <span aria-hidden="true">→</span></a>
+      </p>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- WHERE TO START -->
+    <section class="block">
+      <p class="block-eyebrow">Where to start</p>
+      <h2 class="block-headline">What brought you here?</h2>
+      <ul class="path-list">
+        {startPaths.map((p) => (
+          <li>
+            <a href={p.href}>
+              <span class="path-bullet" aria-hidden="true"></span>
+              <span class="path-label">{p.label}</span>
+              <span class="path-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- COUNTS -->
+    <section class="block counts">
+      <p class="block-eyebrow">The library</p>
+      <p class="counts-line">
+        <a href="/interviews/"><strong>{counts.interviews}</strong> interview questions</a>
+        <span class="counts-sep" aria-hidden="true">·</span>
+        <a href="/essays/"><strong>{counts.essays}</strong> essays</a>
+        <span class="counts-sep" aria-hidden="true">·</span>
+        <a href="/reference/"><strong>{counts.reference}</strong> reference posts</a>
+      </p>
+      <p class="counts-foot">
+        Press <kbd>/</kbd> anywhere on the site to search across all of them.
+      </p>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- CONSULTING / PERSONAL -->
+    <section class="block consulting">
+      <p class="block-eyebrow">Beyond interviews</p>
+      <p class="consulting-headline">
+        I write opinion essays and consult on LLMs and agents at
+        <a href={HSAGHIR_URL} rel="noopener"><strong>hsaghir.com</strong></a>.
+      </p>
+      <p class="consulting-body">
+        For applied LLM systems, agent architectures, evals, post-training,
+        and inference cost. I open-sourced
+        <a href={LOOPLET_URL} rel="noopener">Looplet</a>, an iterator-first
+        agent framework, in the same vein.
+      </p>
+      <p class="consulting-cta">
+        <a href={HSAGHIR_URL} rel="noopener">Visit hsaghir.com <span aria-hidden="true">↗</span></a>
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .home {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4rem) var(--gutter) clamp(3rem, 8vw, 6rem);
+  }
+
+  .block {
+    padding: clamp(1.8rem, 4vw, 2.6rem) 0;
+  }
+  .hero {
+    padding-top: clamp(2.5rem, 7vw, 5rem);
+    padding-bottom: clamp(2rem, 5vw, 3rem);
+  }
+
+  .rule {
+    border: 0;
+    border-top: 1px solid var(--c-rule);
+    margin: 0;
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.6rem, 8vw, 5.2rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+    color: var(--c-text);
+    margin: 0 0 1.4rem;
+  }
+
+  .lede {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+    line-height: 1.4;
+    color: var(--c-text-soft);
+    margin: 0 0 1.8rem;
+    max-width: 36rem;
+    letter-spacing: -0.005em;
+  }
+
+  .byline {
+    font-family: var(--font-ui);
+    font-size: 0.92rem;
+    color: var(--c-muted);
+    margin: 0;
+    line-height: 1.7;
+  }
+  .byline-name {
+    color: var(--c-text);
+    font-weight: 600;
+  }
+  .byline-sep {
+    margin: 0 0.55rem;
+    color: var(--c-rule);
+  }
+  .byline a {
+    color: var(--c-text-soft);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    text-decoration-color: var(--c-rule);
+    transition: color var(--transition), text-decoration-color var(--transition);
+  }
+  .byline a:hover {
+    color: var(--c-accent);
+    text-decoration-color: var(--c-accent);
+  }
+  .nowrap { white-space: nowrap; }
+
+  .block-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--c-muted);
+    margin: 0 0 1.4rem;
+  }
+  .block-headline {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    font-weight: 600;
+    color: var(--c-text);
+    margin: 0 0 1.6rem;
+    letter-spacing: -0.018em;
+    line-height: 1.2;
+  }
+  .block-foot {
+    margin: 1.6rem 0 0;
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+  }
+  .block-foot a {
+    color: var(--c-accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .block-foot a:hover { text-decoration: underline; }
+
+  /* Latest essays as a vertical list */
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .post-row {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    gap: 0.4rem;
+    padding: 1rem 0.6rem 1rem 0.4rem;
+    margin: 0 -0.6rem 0 -0.4rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: background var(--transition);
+  }
+  .post-row:hover { background: var(--c-bg-tint); }
+  .post-row-arrow {
+    color: var(--c-muted);
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    transition: color var(--transition), transform var(--transition);
+  }
+  .post-row:hover .post-row-arrow {
+    color: var(--c-accent);
+    transform: translateX(3px);
+  }
+  .post-row-title {
+    font-family: var(--font-display);
+    font-size: 1.18rem;
+    font-weight: 600;
+    color: var(--c-text);
+    margin: 0 0 0.35rem;
+    line-height: 1.3;
+    letter-spacing: -0.012em;
+  }
+  .post-row-desc {
+    font-size: 0.95rem;
+    color: var(--c-text-soft);
+    margin: 0 0 0.55rem;
+    line-height: 1.55;
+  }
+  .post-row-meta {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--c-muted);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* Reading paths as bullet list */
+  .path-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .path-list a {
+    display: grid;
+    grid-template-columns: 0.8rem 1fr auto;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.75rem 0.6rem 0.75rem 0.4rem;
+    margin: 0 -0.6rem 0 -0.4rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--c-text);
+    font-size: 1.02rem;
+    transition: background var(--transition);
+  }
+  .path-list a:hover { background: var(--c-bg-tint); }
+  .path-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    display: inline-block;
+  }
+  .path-arrow {
+    color: var(--c-muted);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    transition: color var(--transition), transform var(--transition);
+  }
+  .path-list a:hover .path-arrow {
+    color: var(--c-accent);
+    transform: translateX(3px);
+  }
+
+  /* Counts as a single quiet line */
+  .counts-line {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--c-text-soft);
+    margin: 0 0 0.7rem;
+    line-height: 1.7;
+  }
+  .counts-line a {
+    color: var(--c-text-soft);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .counts-line a:hover { color: var(--c-accent); }
+  .counts-line strong {
+    color: var(--c-text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .counts-sep {
+    margin: 0 0.6rem;
+    color: var(--c-rule);
+  }
+  .counts-foot {
+    font-size: 0.92rem;
+    color: var(--c-muted);
+    margin: 0;
+  }
+  .counts-foot kbd {
+    font-family: var(--font-mono);
+    background: var(--c-kbd-bg);
+    border: 1px solid var(--c-rule);
+    padding: 0.05rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+
+  /* Quiet consulting close */
+  .consulting-headline {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+    font-weight: 600;
+    color: var(--c-text);
+    margin: 0 0 0.8rem;
+    letter-spacing: -0.012em;
+    line-height: 1.3;
+  }
+  .consulting-body {
+    font-size: 1rem;
+    color: var(--c-text-soft);
+    line-height: 1.6;
+    margin: 0 0 1.2rem;
+    max-width: 40rem;
+  }
+  .consulting-cta {
+    margin: 0;
+    font-family: var(--font-ui);
+  }
+  .consulting-cta a {
+    color: var(--c-accent);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1rem;
+  }
+  .consulting-cta a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .byline-sep { display: block; height: 0; margin: 0.1rem 0; }
+  }
+</style>

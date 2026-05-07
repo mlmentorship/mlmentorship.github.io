@@ -1,0 +1,95 @@
+---
+import DocsIndexLayout from '../../layouts/DocsIndexLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatDateShort } from '../../utils/date';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft && data.category === 'essays'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+<DocsIndexLayout
+  category="essays"
+  title="Essays"
+  description="Long-form opinion pieces on senior ML interviews, system design, and applied ML practice."
+>
+  <header class="head">
+    <p class="kicker">Essays</p>
+    <h1>Long-form pieces</h1>
+    <p class="lede">{posts.length} {posts.length === 1 ? 'essay' : 'essays'}, newest first. Opinionated notes on senior ML interviews, system design, and applied practice.</p>
+  </header>
+
+  <ul class="post-list">
+    {posts.map((post) => {
+      const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
+      return (
+        <li>
+          <time datetime={post.data.date.toISOString()}>{formatDateShort(post.data.date)}</time>
+          <div class="entry">
+            <a href={`/essays/${slug}/`}>{post.data.title}</a>
+            {post.data.description && <p class="desc">{post.data.description}</p>}
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+</DocsIndexLayout>
+
+<style>
+  .head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
+  .kicker {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--c-accent);
+    background: var(--c-accent-soft);
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    margin: 0 0 1rem;
+  }
+  .head h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.6rem;
+  }
+  .lede { color: var(--c-text-soft); margin: 0; max-width: 42rem; }
+
+  .post-list { list-style: none; padding: 0; margin: 0; }
+  .post-list li {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 1.2rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--c-rule-soft);
+    align-items: baseline;
+  }
+  .post-list li:last-child { border-bottom: 0; }
+  .post-list time {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+    white-space: nowrap;
+  }
+  .post-list .entry a {
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .post-list .entry a:hover { color: var(--c-accent); text-decoration: underline; }
+  .post-list .desc {
+    font-size: 0.9rem;
+    color: var(--c-text-soft);
+    margin: 0.3rem 0 0;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 560px) {
+    .post-list li { grid-template-columns: 1fr; gap: 0.15rem; }
+  }
+</style>

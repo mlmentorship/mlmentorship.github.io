@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Book a Mock Interview" description="Real signal from a real interviewer. Limited slots; high-fidelity feedback. $300 USD per session.">
+  <section class="container prose">
+    <h1>Book a mock interview</h1>
+    <p class="lede">Real signal from a real interviewer. Limited slots; high-fidelity feedback.</p>
+
+    <h2>What you get</h2>
+    <ul>
+      <li><strong>45-minute mock interview</strong> mirroring a real round at the level you're targeting (L4 / L5 / L6).</li>
+      <li><strong>30-minute structured feedback session</strong> immediately after, covering technical signal, level calibration, communication, and the specific changes that would move you up a level.</li>
+      <li><strong>Written feedback notes</strong> within 48 hours.</li>
+    </ul>
+
+    <h2>Pricing</h2>
+    <p><strong>$300 USD</strong> per session (interview + feedback + written notes). Refund if the session doesn't deliver actionable signal.</p>
+
+    <h2>Which interview type</h2>
+    <ul>
+      <li><strong>ML Breadth</strong>: best for early-stage prep.</li>
+      <li><strong>ML Depth / Project Deep-Dive</strong>: best around two weeks before a loop.</li>
+      <li><strong>ML System Design</strong>: best the week before a loop.</li>
+    </ul>
+    <p>No coding / LeetCode mocks. Better resources exist for that (<a href="https://interview.io">interview.io</a>, Pramp).</p>
+
+    <h2>Who this is for</h2>
+    <ul>
+      <li>Mid-to-senior ML practitioners (3 to 10 years) preparing for L5+ Applied Scientist, Senior MLE, or Research Engineer roles.</li>
+      <li>PhDs / postdocs transitioning to industry, especially for AS roles.</li>
+      <li>Senior ICs targeting promotion or a lateral move into LLM-team roles.</li>
+    </ul>
+
+    <h2>Who this is not for</h2>
+    <ul>
+      <li>New grads or first-job seekers. Use <a href="https://interview.io">interview.io</a>, Pramp, or free content.</li>
+      <li>People who haven't started prep yet. Read the <a href="/essays/">essays</a> and work through some <a href="/interviews/">interview questions</a> first.</li>
+      <li>People wanting a tutor for ML basics.</li>
+    </ul>
+
+    <h2>How to book</h2>
+    <p>Email <strong>ml.mentorship [at] gmail [dot] com</strong> with:</p>
+    <ul>
+      <li>Role and level you're targeting (and the company if narrowed down).</li>
+      <li>Round (breadth / depth / system design).</li>
+      <li>One-paragraph summary of your background.</li>
+      <li>Your timezone and a few times that work in the next two weeks.</li>
+    </ul>
+    <p>Reply within 48 hours with available slots.</p>
+
+    <h2>Background</h2>
+    <p>Hamidreza Saghir, Principal Applied Scientist at Microsoft. PhD, University of Toronto. Prior roles at Twitter (Senior MLE Lead), Amazon (Applied Scientist), Borealis AI (ML Researcher). Publications at ACL, InterSpeech, WWW, TASLP. See <a href="/about/">About</a>.</p>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+  }
+  .lede {
+    font-size: 1.15rem;
+    color: var(--c-text-soft);
+    margin-bottom: 2rem;
+  }
+</style>

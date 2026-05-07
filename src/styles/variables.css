@@ -1,0 +1,102 @@
+/* =======================================================================
+   Design tokens, "Technical Reference" system
+   -----------------------------------------------------------------------
+   Clinical, documentation-style palette. Inter for body and UI;
+   Inter Tight for display headings; JetBrains Mono for code.
+   Cool blue accent for links and emphasis.
+   ======================================================================= */
+
+:root {
+  /* ---------- Typography ---------- */
+  --font-display: 'Inter Tight', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Inter', system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-ui:      'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  /* Legacy alias for components that still reference --font-head */
+  --font-head: var(--font-display);
+
+  --text-size:  16px;             /* sans-serif body, slightly tighter than the editorial site */
+  --text-line:  1.62;             /* still readable for long technical reading */
+  --measure:    42rem;            /* ~ 75 characters; technical pages benefit from more width for code */
+
+  /* ---------- Light palette (clinical white) ---------- */
+  --c-bg:         #ffffff;
+  --c-bg-tint:    #f7f8fa;
+  --c-surface:    #ffffff;
+  --c-text:       #0f172a;
+  --c-text-soft:  #334155;
+  --c-muted:      #64748b;
+  --c-rule:       #e2e8f0;
+  --c-rule-soft:  #eef2f7;
+  --c-link:       #ea580c;
+  --c-link-hover: #9a3412;
+  --c-accent:     #ea580c;
+  --c-accent-soft:#ffedd5;
+  --c-code-bg:    #f3f5f9;
+  --c-kbd-bg:     #eef2f7;
+  --c-highlight:  #fef9c3;
+
+  /* ---------- Radii / shadow / motion ---------- */
+  --radius:     6px;
+  --radius-lg:  10px;
+  --shadow-sm:  0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md:  0 4px 16px -4px rgba(15, 23, 42, 0.08);
+  --shadow-lg:  0 16px 40px -12px rgba(15, 23, 42, 0.18);
+
+  --transition:      180ms cubic-bezier(.2,.7,.2,1);
+  --transition-slow: 360ms cubic-bezier(.2,.7,.2,1);
+
+  /* ---------- Layout ---------- */
+  --container:        72rem;
+  --container-narrow: 44rem;
+  --gutter:           clamp(1rem, 3vw, 2rem);
+}
+
+:root[data-theme='dark'] {
+  --c-bg:         #0b0d12;
+  --c-bg-tint:    #11141b;
+  --c-surface:    #11141b;
+  --c-text:       #e6edf6;
+  --c-text-soft:  #c1cad6;
+  --c-muted:      #8a95a5;
+  --c-rule:       #1e2330;
+  --c-rule-soft:  #171b25;
+  --c-link:       #fb923c;
+  --c-link-hover: #fdba74;
+  --c-accent:     #fb923c;
+  --c-accent-soft:rgba(251, 146, 60, 0.16);
+  --c-code-bg:    #131722;
+  --c-kbd-bg:     #1a1f2c;
+  --c-highlight:  #3f3a14;
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-md:    0 6px 24px -6px rgba(0, 0, 0, 0.55);
+  --shadow-lg:    0 20px 50px -14px rgba(0, 0, 0, 0.65);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --c-bg:         #0b0d12;
+    --c-bg-tint:    #11141b;
+    --c-surface:    #11141b;
+    --c-text:       #e6edf6;
+    --c-text-soft:  #c1cad6;
+    --c-muted:      #8a95a5;
+    --c-rule:       #1e2330;
+    --c-rule-soft:  #171b25;
+    --c-link:       #fb923c;
+    --c-link-hover: #fdba74;
+    --c-accent:     #fb923c;
+    --c-accent-soft:rgba(251, 146, 60, 0.16);
+    --c-code-bg:    #131722;
+    --c-kbd-bg:     #1a1f2c;
+    --c-highlight:  #3f3a14;
+    --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.45);
+    --shadow-md:    0 6px 24px -6px rgba(0, 0, 0, 0.55);
+    --shadow-lg:    0 20px 50px -14px rgba(0, 0, 0, 0.65);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --transition: 0ms; --transition-slow: 0ms; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

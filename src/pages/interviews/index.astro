@@ -1,0 +1,109 @@
+---
+import DocsIndexLayout from '../../layouts/DocsIndexLayout.astro';
+import { getCollection } from 'astro:content';
+import { INTERVIEW_SUBCATEGORY as SUBCATEGORY, INTERVIEW_ORDER as ORDER } from '../../utils/subcategories';
+
+
+
+const all = await getCollection('posts', ({ data }) => !data.draft && data.category === 'interviews');
+const posts = all.map((p) => ({
+  slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
+  title: p.data.title,
+  description: p.data.description,
+}));
+
+const groups = new Map<string, typeof posts>();
+for (const sub of ORDER) groups.set(sub, []);
+const ungrouped: typeof posts = [];
+for (const p of posts) {
+  const sub = SUBCATEGORY[p.slug];
+  if (sub && groups.has(sub)) groups.get(sub)!.push(p);
+  else ungrouped.push(p);
+}
+for (const [, list] of groups) list.sort((a, b) => a.title.localeCompare(b.title));
+ungrouped.sort((a, b) => a.title.localeCompare(b.title));
+---
+<DocsIndexLayout
+  category="interviews"
+  title="Interview Questions"
+  description="The senior ML interview canon, with leveled answers (L4 / L5 / L6) and what the interviewer is actually checking."
+>
+  <header class="head">
+    <p class="kicker">Interviews</p>
+    <h1>The senior ML interview canon</h1>
+    <p class="lede">
+      {posts.length} questions across {ORDER.length} categories. Each with what L4 / L5 / L6 answers actually sound like, the tells that get a strong-hire vote, and the tells that get you down-leveled. Press <kbd>/</kbd> to search.
+    </p>
+  </header>
+
+  {ORDER.map((sub) => {
+    const list = groups.get(sub) ?? [];
+    if (list.length === 0) return null;
+    return (
+      <section class="group">
+        <h2 class="group-title">{sub} <span class="group-count">{list.length}</span></h2>
+        <ul class="post-list">
+          {list.map((p) => (
+            <li>
+              <a href={`/interviews/${p.slug}/`} class="entry-title">{p.title}</a>
+              {p.description && <p class="desc">{p.description}</p>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  })}
+
+  {ungrouped.length > 0 && (
+    <section class="group">
+      <h2 class="group-title">Other</h2>
+      <ul class="post-list">
+        {ungrouped.map((p) => (
+          <li>
+            <a href={`/interviews/${p.slug}/`} class="entry-title">{p.title}</a>
+            {p.description && <p class="desc">{p.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+</DocsIndexLayout>
+
+<style>
+  .head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
+  .kicker {
+    font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--c-accent); background: var(--c-accent-soft);
+    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; margin: 0 0 1rem;
+  }
+  .head h1 {
+    font-family: var(--font-display); font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    font-weight: 700; line-height: 1.18; letter-spacing: -0.02em; margin: 0 0 0.6rem;
+  }
+  .lede { color: var(--c-text-soft); margin: 0; max-width: 42rem; }
+  .lede kbd {
+    font-family: var(--font-mono); background: var(--c-kbd-bg);
+    border: 1px solid var(--c-rule); padding: 0.05rem 0.35rem;
+    border-radius: 4px; font-size: 0.78em;
+  }
+
+  .group { margin-bottom: 2.2rem; }
+  .group-title {
+    font-size: 1.05rem; font-weight: 600; color: var(--c-text);
+    border-bottom: 1px solid var(--c-rule); padding-bottom: 0.4rem;
+    margin: 0 0 0.8rem; display: flex; align-items: baseline; gap: 0.6rem;
+  }
+  .group-count {
+    font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-muted); font-weight: 400;
+  }
+  .post-list { list-style: none; padding: 0; margin: 0; }
+  .post-list li { padding: 0.7rem 0; border-bottom: 1px solid var(--c-rule-soft); }
+  .post-list li:last-child { border-bottom: 0; }
+  .entry-title {
+    font-weight: 500; font-size: 1rem; line-height: 1.4;
+    color: var(--c-text); text-decoration: none;
+  }
+  .entry-title:hover { color: var(--c-accent); text-decoration: underline; }
+  .desc { font-size: 0.9rem; color: var(--c-text-soft); margin: 0.25rem 0 0; line-height: 1.5; }
+</style>

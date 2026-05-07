@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts', ({ data }) => !data.draft);
+---
+<BaseLayout
+  title="Start here"
+  description="Where to start on mlmentorship by what you're trying to do. Curated reading paths for senior ML interviews, applied LLM work, and agent systems."
+>
+  <section class="container prose">
+    <p class="kicker">Start here</p>
+    <h1>Where to start, by what you're trying to do.</h1>
+    <p class="lede">
+      {posts.length} essays, interview questions, references, and case studies
+      can be a lot. Pick the path that matches why you're here. Each item links
+      directly; come back to this page when you finish a path.
+    </p>
+
+    <section class="path" id="preparing-for-a-senior-ml-interview-loop">
+      <header>
+        <h2>1. Preparing for a senior ML interview loop</h2>
+        <p>You have a loop in 2-8 weeks. You want to know what's actually tested at L5/L6 vs. what showed up on your old prep material.</p>
+      </header>
+      <ol>
+        <li><a href="/essays/five-things-as-interview-tests/">The 5 things AS interviews test for</a></li>
+        <li><a href="/essays/l5-vs-l6-faang-ml/">L5 vs L6 calibration: what's the difference</a></li>
+        <li><a href="/interviews/most-ambitious-project/">Tell me about your most ambitious project</a></li>
+        <li><a href="/interviews/how-would-you-evaluate-an-llm-application/">How would you evaluate an LLM application</a></li>
+        <li><a href="/interviews/reduce-llm-inference-cost-10x/">Reduce LLM inference cost 10x</a></li>
+        <li>Browse <a href="/interviews/">all 50 interview questions</a></li>
+      </ol>
+    </section>
+
+    <section class="path" id="shipping-an-llm-product-right-now">
+      <header>
+        <h2>2. Shipping LLM products or building agents</h2>
+        <p>You're building a real LLM application or agent system. mlmentorship is interview-focused; my opinion writing on applied LLMs and agents lives on my personal site.</p>
+      </header>
+      <ol>
+        <li>Browse essays at <a href="https://hsaghir.com/blog/" rel="noopener">hsaghir.com/blog</a> (verification asymmetry, similarity-is-all-you-need, the-loop-is-the-product, under-specified coding agents).</li>
+        <li>Skim <a href="https://github.com/hsaghir/looplet" rel="noopener">Looplet</a>, my iterator-first agent framework.</li>
+        <li>For consulting on agents/evals/post-training: <a href="https://hsaghir.com/work-together/" rel="noopener">hsaghir.com/work-together</a>.</li>
+      </ol>
+    </section>
+
+    <section class="path" id="phd-or-postdoc-transitioning-to-industry">
+      <header>
+        <h2>3. PhD or postdoc transitioning to industry</h2>
+        <p>You have research credentials. You want to know what industry interviews look like and how research projects translate to "ambitious project" stories.</p>
+      </header>
+      <ol>
+        <li><a href="/essays/as-vs-mle-vs-re/">Applied Scientist vs MLE vs Research Engineer</a></li>
+        <li><a href="/essays/five-things-as-interview-tests/">The 5 things AS interviews test for</a></li>
+        <li><a href="/interviews/most-ambitious-project/">Tell me about your most ambitious project</a></li>
+        <li><a href="/interviews/disagreed-with-senior/">When you disagreed with a senior person</a></li>
+        <li><a href="/interviews/scope-ambiguous-problem/">Scoping an ambiguous problem</a></li>
+      </ol>
+    </section>
+
+    <section class="path" id="building-deep-technical-foundations">
+      <header>
+        <h2>4. Building deep technical foundations</h2>
+        <p>You want the canonical ML/DL reference, organized so you can study for breadth and depth in parallel.</p>
+      </header>
+      <ol>
+        <li>Foundations: <a href="/reference/matrices-as-linear-maps/">matrices as linear maps</a> → <a href="/reference/svd-and-pca/">SVD and PCA</a> → <a href="/reference/eigenvalues-and-spectral-theorem/">eigenvalues</a></li>
+        <li>Probability: <a href="/reference/maximum-likelihood-estimation/">MLE</a> → <a href="/reference/kl-divergence/">KL divergence</a> → <a href="/reference/bayes-rule-and-posterior/">Bayes rule</a></li>
+        <li>Deep learning: <a href="/reference/backpropagation/">backprop</a> → <a href="/reference/attention-mechanism/">attention</a> → <a href="/reference/transformer-architecture/">transformers</a></li>
+        <li>LLM internals: <a href="/reference/flashattention/">FlashAttention</a> → <a href="/reference/kv-cache/">KV cache</a> → <a href="/reference/speculative-decoding/">speculative decoding</a></li>
+        <li>Browse <a href="/reference/">all 99 reference posts</a> by sub-category</li>
+      </ol>
+    </section>
+
+    <section class="path" id="engineering-leader-hiring-manager">
+      <header>
+        <h2>5. Engineering leader / hiring manager</h2>
+        <p>You're not preparing for an interview. You want to calibrate what good looks like, what to test for, or who to hire.</p>
+      </header>
+      <ol>
+        <li><a href="/essays/five-things-as-interview-tests/">What senior ML interviews actually test</a></li>
+        <li><a href="/essays/l5-vs-l6-faang-ml/">L5 vs L6 calibration</a></li>
+        <li><a href="/essays/as-vs-mle-vs-re/">AS vs MLE vs Research Engineer (which role to hire)</a></li>
+        <li><a href="/essays/llm-evals-the-hardest-part/">Why your team's eval pipeline is probably broken</a></li>
+        <li><a href="https://hsaghir.com/work-together/" rel="noopener">If you'd like a senior sounding board on a specific decision</a></li>
+      </ol>
+    </section>
+
+    <p class="closer">
+      Lost? Press <kbd>/</kbd> to search. Or browse the three sections from the top
+      nav: <a href="/interviews/">Interviews</a>, <a href="/essays/">Essays</a>,
+      <a href="/reference/">Reference</a>.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--c-accent);
+    margin: 0 0 1rem;
+  }
+  .lede {
+    font-size: 1.1rem;
+    color: var(--c-text-soft);
+    margin-bottom: 2.5rem;
+  }
+  .path {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--c-rule-soft);
+  }
+  .path:last-of-type { border-bottom: 0; }
+  .path header h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    color: var(--c-text);
+  }
+  .path header p {
+    color: var(--c-text-soft);
+    font-size: 0.95rem;
+    margin: 0 0 1rem;
+  }
+  .path ol {
+    padding-left: 1.4rem;
+    color: var(--c-text-soft);
+  }
+  .path ol li { margin: 0.4rem 0; }
+  .path ol a { color: var(--c-link); }
+  .closer {
+    margin-top: 3rem;
+    color: var(--c-muted);
+    font-size: 0.95rem;
+  }
+  .closer kbd {
+    font-family: var(--font-mono);
+    background: var(--c-kbd-bg);
+    border: 1px solid var(--c-rule);
+    padding: 0.05rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+</style>

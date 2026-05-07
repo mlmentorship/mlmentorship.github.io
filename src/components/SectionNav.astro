@@ -1,0 +1,303 @@
+---
+// SectionNav.astro: persistent left sidebar.
+// Top: global category strip (jump between Essays / Interviews / Reference / System Design).
+// Body: list of all posts in the current category, grouped by subcategory where one is
+// defined (Interviews, Reference). Essays and System Design stay flat.
+// On mobile, the body collapses behind a <details> summary so it doesn't dominate the page.
+import { getCollection } from 'astro:content';
+import { getSubcategoryMap, type Category } from '../utils/subcategories';
+
+interface Props {
+  category: Category;
+  currentSlug?: string;
+}
+const { category, currentSlug } = Astro.props;
+
+const labels: Record<string, string> = {
+  essays: 'Essays',
+  interviews: 'Interviews',
+  reference: 'Reference',
+};
+
+const all = await getCollection('posts', ({ data }) => !data.draft);
+const counts = {
+  essays: all.filter((p) => p.data.category === 'essays').length,
+  interviews: all.filter((p) => p.data.category === 'interviews').length,
+  reference: all.filter((p) => p.data.category === 'reference').length,
+} as const;
+
+const posts = all
+  .filter((p) => p.data.category === category)
+  .map((p) => ({
+    slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
+    title: p.data.title,
+    date: p.data.date,
+  }))
+  .sort((a, b) => {
+    if (category === 'essays') return b.date.getTime() - a.date.getTime();
+    return a.title.localeCompare(b.title);
+  });
+
+// Group posts by subcategory if one is defined for this category.
+const sub = getSubcategoryMap(category);
+let groups: Array<{ name: string; items: typeof posts }> = [];
+if (sub) {
+  const buckets = new Map<string, typeof posts>();
+  for (const name of sub.order) buckets.set(name, []);
+  const other: typeof posts = [];
+  for (const p of posts) {
+    const name = sub.map[p.slug];
+    if (name && buckets.has(name)) buckets.get(name)!.push(p);
+    else other.push(p);
+  }
+  groups = sub.order
+    .map((name) => ({ name, items: buckets.get(name)! }))
+    .filter((g) => g.items.length > 0);
+  if (other.length > 0) groups.push({ name: 'Other', items: other });
+}
+
+const cats: Array<keyof typeof labels> = ['essays', 'interviews', 'reference'];
+const currentLabel = labels[category];
+---
+<aside class="section-nav" aria-label={`${currentLabel} navigation`} data-section-nav data-category={category}>
+  <nav class="cat-strip" aria-label="Sections">
+    <ul>
+      {cats.map((c) => (
+        <li>
+          <a href={`/${c}/`} class:list={[{ active: c === category }]}>
+            {labels[c]}
+            <span class="cat-count">{counts[c]}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  {groups.length > 0 ? (
+    <div class="section-nav-groups">
+      {groups.map((g) => {
+        return (
+          <details class="section-nav-group" data-group={g.name} open>
+            <summary class="section-nav-group-title">
+              <span class="section-nav-group-label">{g.name}</span>
+              <span class="section-nav-group-count">{g.items.length}</span>
+            </summary>
+            <ol class="section-nav-list">
+              {g.items.map((p) => (
+                <li>
+                  <a
+                    href={`/${category}/${p.slug}/`}
+                    class:list={[{ active: p.slug === currentSlug }]}
+                  >
+                    {p.title}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </details>
+        );
+      })}
+    </div>
+  ) : (
+    <ol class="section-nav-list">
+      {posts.map((p) => (
+        <li>
+          <a
+            href={`/${category}/${p.slug}/`}
+            class:list={[{ active: p.slug === currentSlug }]}
+          >
+            {p.title}
+          </a>
+        </li>
+      ))}
+    </ol>
+  )}
+</aside>
+
+<style>
+  .section-nav { font-family: var(--font-ui); font-size: 0.85rem; }
+
+  .cat-strip {
+    margin-bottom: 1.2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .cat-strip ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.15rem; }
+  .cat-strip a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.32rem 0.55rem;
+    color: var(--c-text-soft);
+    text-decoration: none;
+    border-radius: var(--radius);
+    font-weight: 500;
+    transition: background var(--transition), color var(--transition);
+  }
+  .cat-strip a:hover { background: var(--c-bg-tint); color: var(--c-text); }
+  .cat-strip a.active {
+    background: var(--c-accent-soft);
+    color: var(--c-accent);
+    font-weight: 600;
+  }
+  .cat-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--c-muted);
+  }
+  .cat-strip a.active .cat-count { color: var(--c-accent); }
+
+  .section-nav-list-wrap > summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0 0.55rem;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--c-muted);
+  }
+  .section-nav-list-wrap > summary::-webkit-details-marker { display: none; }
+  .summary-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--c-muted);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .section-nav-list { list-style: none; padding: 0; margin: 0; }
+  .section-nav-list li { margin: 0; padding: 0; }
+  .section-nav-list a {
+    display: block;
+    padding: 0.3rem 0.6rem 0.3rem 0.7rem;
+    color: var(--c-text-soft);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+    font-weight: 400;
+    line-height: 1.35;
+  }
+  .section-nav-list a:hover {
+    color: var(--c-text);
+    background: var(--c-bg-tint);
+  }
+  .section-nav-list a.active {
+    color: var(--c-accent);
+    border-left-color: var(--c-accent);
+    font-weight: 600;
+    background: var(--c-bg-tint);
+  }
+
+  /* Subcategory groups (collapsible) */
+  .section-nav-groups { display: flex; flex-direction: column; gap: 0.5rem; }
+  .section-nav-group { display: block; }
+  .section-nav-group-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0 0 0.25rem;
+    padding: 0.25rem 0.55rem 0.25rem 0;
+    border-radius: var(--radius);
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--c-muted);
+    transition: background var(--transition), color var(--transition);
+  }
+  .section-nav-group-title::-webkit-details-marker { display: none; }
+  .section-nav-group-title:hover { background: var(--c-bg-tint); color: var(--c-text-soft); }
+  .section-nav-group-title::before {
+    content: '\25B8'; /* right-pointing triangle */
+    flex: 0 0 auto;
+    width: 0.9rem;
+    text-align: center;
+    font-size: 0.7em;
+    opacity: 0.55;
+    transition: transform var(--transition);
+  }
+  .section-nav-group[open] > .section-nav-group-title::before {
+    transform: rotate(90deg);
+  }
+  .section-nav-group-label { flex: 1 1 auto; }
+  .section-nav-group-count {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--c-muted);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* On mobile, default the section list to closed so the cat strip stays prominent. */
+  @media (max-width: 800px) {
+    .section-nav-list-wrap[open] > summary { margin-bottom: 0.6rem; }
+    .section-nav-list-wrap:not([open]) > summary::after { content: '\25BE'; opacity: 0.6; }
+  }
+</style>
+
+<script is:inline>
+  // On mobile, default the post list to collapsed so the page leads with the cat strip + content.
+  (function () {
+    const apply = () => {
+      const el = document.querySelector('details.section-nav-list-wrap');
+      if (!el) return;
+      if (window.matchMedia('(max-width: 800px)').matches) {
+        if (el.open) el.removeAttribute('open');
+      } else {
+        if (!el.open) el.setAttribute('open', '');
+      }
+    };
+    apply();
+    window.addEventListener('resize', apply);
+  })();
+
+  // Persist sidebar state across navigation: per-category collapsed groups
+  // and scroll position, stored in sessionStorage (per-tab, no leakage).
+  (function () {
+    const nav = document.querySelector('aside[data-section-nav]');
+    if (!nav) return;
+    const cat = nav.getAttribute('data-category') || 'default';
+    const collapsedKey = 'sidebar:collapsed:' + cat;
+    const scrollKey = 'sidebar:scroll:' + cat;
+
+    let collapsed = new Set();
+    try {
+      const raw = sessionStorage.getItem(collapsedKey);
+      if (raw) collapsed = new Set(JSON.parse(raw));
+    } catch (_) { /* ignore */ }
+
+    const groups = nav.querySelectorAll('details.section-nav-group');
+    groups.forEach((g) => {
+      const name = g.getAttribute('data-group');
+      if (!name) return;
+      if (collapsed.has(name)) g.removeAttribute('open');
+      g.addEventListener('toggle', () => {
+        if (g.open) collapsed.delete(name); else collapsed.add(name);
+        try { sessionStorage.setItem(collapsedKey, JSON.stringify([...collapsed])); } catch (_) {}
+      });
+    });
+
+    // Restore scroll, then save on scroll. Use the scrollable ancestor (nav or its parent).
+    const scroller = nav.closest('.docs-sidebar') || nav;
+    try {
+      const y = sessionStorage.getItem(scrollKey);
+      if (y) scroller.scrollTop = parseInt(y, 10) || 0;
+    } catch (_) {}
+    let saveTimer = 0;
+    scroller.addEventListener('scroll', () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try { sessionStorage.setItem(scrollKey, String(scroller.scrollTop)); } catch (_) {}
+      }, 100);
+    }, { passive: true });
+  })();
+</script>

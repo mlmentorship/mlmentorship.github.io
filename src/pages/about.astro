@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="About" description="About mlmentorship and Hamidreza Saghir.">
+  <section class="container prose">
+    <p class="kicker">About</p>
+    <h1>mlmentorship</h1>
+    <p class="lede">
+      Senior ML interview prep, by
+      <a href="https://hsaghir.com" rel="noopener">Hamidreza Saghir</a>.
+    </p>
+
+    <h2>Author</h2>
+    <p>
+      <strong>Hamidreza Saghir</strong>, Principal Applied Scientist at Microsoft.
+      Earlier roles include Senior MLE Lead at X (Twitter), Applied Scientist at
+      Amazon, and ML Researcher at Borealis AI (RBC). PhD from the University of
+      Toronto, M.Sc. from Sharif University of Technology. Publications at ACL,
+      InterSpeech, The Web Conference, IEEE TASLP, and Physical Review E.
+    </p>
+    <p>
+      I keep my opinion writing, consulting, and Looplet (an iterator-first
+      agent framework) under my own name at
+      <a href="https://hsaghir.com" rel="noopener"><strong>hsaghir.com</strong></a>.
+      mlmentorship is the focused interview-prep companion.
+    </p>
+
+    <h2>Why this site exists</h2>
+    <p>
+      Public ML interview prep is calibrated for new grads and bootcamp-to-FAANG
+      transitions. Free content for that audience is abundant.
+    </p>
+    <p>
+      Less common is content for <strong>mid-career ML practitioners targeting L5+
+      roles</strong>. The questions are different, the bar is different, and the
+      signal interviewers read is different.
+    </p>
+    <p>
+      This site is opinionated, specific notes on what senior Applied Scientist,
+      MLE, and Research Engineer interviews actually test for, and on the topics
+      that come up most often.
+    </p>
+
+    <h2>What's here</h2>
+    <ul>
+      <li><a href="/start-here/">Start here</a>: curated reading paths by what you're trying to do.</li>
+      <li><a href="/interviews/">Interview Questions</a>: the senior ML canon, with what L4 / L5 / L6 answers sound like.</li>
+      <li><a href="/essays/">Essays</a>: long-form pieces on senior ML interviews, system design, and patterns from teams that ship.</li>
+      <li><a href="/reference/">Reference</a>: 99 concise notes on attention, normalization, LLM internals, optimization.</li>
+    </ul>
+
+    <h2>What's not here</h2>
+    <ul>
+      <li>Generic ML basics. The internet has this covered.</li>
+      <li>New-grad / bootcamp / "break into ML" content.</li>
+      <li>Promises about landing a specific job in a specific timeframe.</li>
+    </ul>
+
+    <h2>Reach me</h2>
+    <ul>
+      <li>Personal site: <a href="https://hsaghir.com" rel="noopener">hsaghir.com</a> (essays, consulting, Looplet)</li>
+      <li>LinkedIn: <a href="https://www.linkedin.com/in/hamidrezasaghir" rel="noopener">linkedin.com/in/hamidrezasaghir</a></li>
+      <li>GitHub: <a href="https://github.com/hsaghir" rel="noopener">github.com/hsaghir</a></li>
+      <li>Email: ml.mentorship [at] gmail [dot] com</li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .prose {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--c-accent);
+    margin: 0 0 1rem;
+  }
+  .lede {
+    font-size: 1.15rem;
+    color: var(--c-text-soft);
+    margin-bottom: 2rem;
+  }
+</style>

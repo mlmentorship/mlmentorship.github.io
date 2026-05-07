@@ -1,0 +1,88 @@
+---
+// AuthorCard.astro: small author block shown at the bottom of every essay
+// and reference post. Anchors identity, light cross-link to personal site.
+import { HSAGHIR_URL, LOOPLET_URL } from '../consts';
+---
+<aside class="author-card" data-pagefind-ignore="all">
+  <div class="author-mark" aria-hidden="true">HS</div>
+  <div class="author-body">
+    <p class="author-name">Hamidreza Saghir</p>
+    <p class="author-bio">
+      Principal Applied Scientist at Microsoft. Previously Senior MLE Lead at
+      X (Twitter), Applied Scientist at Amazon, ML Researcher at Borealis AI.
+      I write opinion essays on agents and applied LLMs, and consult selectively,
+      at <a href={HSAGHIR_URL} rel="noopener"><strong>hsaghir.com</strong></a>.
+      I open-sourced <a href={LOOPLET_URL} rel="noopener">Looplet</a>,
+      an iterator-first agent framework.
+    </p>
+    <p class="author-links">
+      <a href={HSAGHIR_URL} rel="noopener" class="author-cta">hsaghir.com <span aria-hidden="true">↗</span></a>
+      <span class="author-sep" aria-hidden="true">·</span>
+      <a href="https://www.linkedin.com/in/hamidrezasaghir" rel="noopener">LinkedIn</a>
+      <span class="author-sep" aria-hidden="true">·</span>
+      <a href="https://github.com/hsaghir" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</aside>
+
+<style>
+  .author-card {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding: 1.5rem 1.6rem;
+    background: var(--c-bg-tint);
+    border: 1px solid var(--c-rule-soft);
+    border-radius: var(--radius-lg);
+    align-items: start;
+  }
+  .author-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--c-accent);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.04em;
+  }
+  .author-body { min-width: 0; }
+  .author-name {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.3rem;
+    color: var(--c-text);
+  }
+  .author-bio {
+    font-size: 0.92rem;
+    color: var(--c-text-soft);
+    margin: 0 0 0.6rem;
+    line-height: 1.55;
+  }
+  .author-links {
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    color: var(--c-muted);
+    margin: 0;
+  }
+  .author-cta {
+    color: var(--c-accent);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .author-cta:hover { text-decoration: underline; }
+  .author-links a { color: var(--c-text-soft); text-decoration: none; }
+  .author-links a:hover { color: var(--c-accent); }
+  .author-sep { margin: 0 0.4rem; color: var(--c-rule); }
+
+  @media (max-width: 640px) {
+    .author-card { grid-template-columns: 1fr; }
+    .author-mark { display: none; }
+  }
+</style>

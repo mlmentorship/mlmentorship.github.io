@@ -1,0 +1,161 @@
+---
+import type { MarkdownHeading } from 'astro';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import SectionNav from '../components/SectionNav.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import MockCTA from '../components/MockCTA.astro';
+import AuthorCard from '../components/AuthorCard.astro';
+import { formatDate } from '../utils/date';
+import readingTime from 'reading-time';
+import { SITE } from '../consts';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  headings: MarkdownHeading[];
+  rawContent: string;
+}
+const { post, headings, rawContent } = Astro.props;
+const { title, description, date, updated } = post.data;
+const stats = readingTime(rawContent);
+const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
+---
+<BaseLayout
+  title={title}
+  description={description}
+  image={`/og/${post.slug}.png`}
+  article
+  publishedTime={date}
+  modifiedTime={updated}
+>
+  <div class="docs-layout">
+    <nav class="docs-sidebar" aria-label="Section navigation" data-pagefind-ignore="all">
+      <SectionNav category={post.data.category} currentSlug={slug} />
+    </nav>
+
+    <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
+      <header class="docs-head">
+        <p class="kicker">
+          <a href={`/${post.data.category}/`}>{post.data.category.replace(/-/g, ' ')}</a>
+        </p>
+        <h1 itemprop="headline">{title}</h1>
+        {description && <p class="lede" itemprop="description">{description}</p>}
+        <div class="docs-meta">
+          <span>Reviewed <time itemprop="dateModified" datetime={(updated ?? date).toISOString()}>{formatDate(updated ?? date)}</time></span>
+          <span class="dot">·</span>
+          <span>{Math.max(1, Math.round(stats.minutes))} min read</span>
+        </div>
+      </header>
+
+      <div class="prose docs-body" itemprop="articleBody">
+        <slot />
+      </div>
+
+      {SITE.features.bookingCTA && post.data.category === 'interviews' && <MockCTA />}
+      <AuthorCard />
+    </article>
+
+    <aside class="docs-toc" aria-label="On this page" data-pagefind-ignore="all">
+      <TableOfContents headings={headings} />
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .docs-layout {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr) 14rem;
+    gap: 2.5rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 2rem var(--gutter) 4rem;
+  }
+
+  .docs-sidebar {
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  .docs-sidebar::-webkit-scrollbar { width: 6px; }
+  .docs-sidebar::-webkit-scrollbar-thumb { background: var(--c-rule); border-radius: 3px; }
+
+  .docs-article { min-width: 0; }
+  .docs-head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
+  .kicker {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--c-accent);
+    background: var(--c-accent-soft);
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    margin: 0 0 1rem;
+  }
+  .kicker a { color: inherit; text-decoration: none; }
+  .docs-head h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.6rem;
+  }
+  .lede {
+    font-size: 1.05rem;
+    color: var(--c-text-soft);
+    line-height: 1.55;
+    margin: 0 0 1rem;
+  }
+  .docs-meta {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+  }
+  .dot { margin: 0 0.4rem; opacity: 0.5; }
+
+  .docs-body { font-size: 1rem; line-height: 1.65; }
+  .docs-body :global(h2) { margin-top: 2.2rem; }
+  .docs-body :global(h3) { margin-top: 1.6rem; }
+
+  .docs-toc {
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    font-size: 0.85rem;
+  }
+  .docs-toc :global(.toc) {
+    border-left: 2px solid var(--c-rule);
+    padding-left: 0.8rem;
+    margin: 0;
+  }
+
+  @media (max-width: 1100px) {
+    .docs-layout {
+      grid-template-columns: 14rem minmax(0, 1fr);
+      gap: 2rem;
+    }
+    .docs-toc { display: none; }
+  }
+  @media (max-width: 800px) {
+    .docs-layout {
+      grid-template-columns: 1fr;
+      padding: 1rem var(--gutter) 3rem;
+    }
+    .docs-sidebar {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--c-rule);
+    }
+  }
+</style>

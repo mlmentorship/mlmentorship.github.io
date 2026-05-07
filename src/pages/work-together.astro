@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { HSAGHIR_URL } from '../consts';
+---
+<BaseLayout
+  title="Work with me — moved"
+  description="The author's consulting page lives at hsaghir.com/work-together."
+>
+  <section class="container prose">
+    <p class="kicker">Work with me</p>
+    <h1>This lives on my personal site now.</h1>
+    <p class="lede">
+      I keep my consulting and opinion writing under my own name at
+      <a href={HSAGHIR_URL}><strong>hsaghir.com</strong></a>. mlmentorship is
+      focused on senior-ML interview prep.
+    </p>
+    <p>
+      For advisory engagements on LLM systems, agents, evals, post-training, or
+      inference cost, head to
+      <a href={`${HSAGHIR_URL}/work-together/`}>hsaghir.com/work-together/</a>.
+      For my opinion essays on agents, applied LLMs, and unified views of ML,
+      see <a href={`${HSAGHIR_URL}/blog/`}>hsaghir.com/blog/</a>.
+    </p>
+    <p class="redirect">
+      Redirecting in <span id="redirect-counter">3</span> seconds&hellip;
+    </p>
+  </section>
+</BaseLayout>
+
+<meta http-equiv="refresh" content={`3; url=${HSAGHIR_URL}/work-together/`} slot="head" />
+
+<script is:inline define:vars={{ url: `${HSAGHIR_URL}/work-together/` }}>
+  let n = 3;
+  const el = document.getElementById('redirect-counter');
+  const tick = () => {
+    n -= 1;
+    if (el) el.textContent = String(Math.max(n, 0));
+    if (n <= 0) {
+      window.location.replace(url);
+      return;
+    }
+    setTimeout(tick, 1000);
+  };
+  setTimeout(tick, 1000);
+</script>
+
+<style>
+  .prose {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+  }
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--c-accent);
+    margin: 0 0 1rem;
+  }
+  .lede {
+    font-size: 1.15rem;
+    color: var(--c-text-soft);
+    margin-bottom: 2rem;
+  }
+  .redirect {
+    margin-top: 2.5rem;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: 0.9rem;
+  }
+</style>

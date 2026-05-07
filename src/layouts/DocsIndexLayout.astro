@@ -1,0 +1,64 @@
+---
+// DocsIndexLayout: section-archive page styled like a docs page,
+// with the persistent left sidebar and global category strip.
+// Mirrors DocsLayout but takes raw content as a slot rather than a post.
+import BaseLayout from './BaseLayout.astro';
+import SectionNav from '../components/SectionNav.astro';
+
+interface Props {
+  category: 'essays' | 'interviews' | 'reference';
+  title: string;
+  description?: string;
+}
+const { category, title, description } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <div class="docs-layout">
+    <nav class="docs-sidebar" aria-label="Section navigation" data-pagefind-ignore="all">
+      <SectionNav category={category} />
+    </nav>
+
+    <main class="docs-article">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .docs-layout {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    gap: 2.5rem;
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem var(--gutter) 4rem;
+  }
+
+  .docs-sidebar {
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  .docs-sidebar::-webkit-scrollbar { width: 6px; }
+  .docs-sidebar::-webkit-scrollbar-thumb { background: var(--c-rule); border-radius: 3px; }
+
+  .docs-article { min-width: 0; }
+
+  @media (max-width: 800px) {
+    .docs-layout {
+      grid-template-columns: 1fr;
+      padding: 1rem var(--gutter) 3rem;
+    }
+    .docs-sidebar {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--c-rule);
+    }
+  }
+</style>
