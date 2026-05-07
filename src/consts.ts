@@ -44,15 +44,14 @@ export const SITE = {
     // is reachable from /about/ for anyone who lands directly.
     bookingCTA: false,
   },
-  // Navigation (top of every page). Kept to 5 items by convention; About
-  // lives in the footer. Mock-interview link is appended dynamically when
-  // features.bookingCTA is enabled.
+  // Navigation (top of every page). About lives in nav AND footer.
+  // Mock-interview link is appended dynamically when features.bookingCTA is enabled.
   nav: [
     { label: 'Start here', href: '/start-here/' },
     { label: 'Interviews', href: '/interviews/' },
     { label: 'Essays', href: '/essays/' },
     { label: 'Reference', href: '/reference/' },
-    { label: 'Hamidreza Saghir', href: HSAGHIR_URL, external: true },
+    { label: 'About', href: '/about/' },
   ],
   postsPerPage: 30,
 } as const;

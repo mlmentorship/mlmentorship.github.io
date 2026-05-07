@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { SITE, HSAGHIR_URL, LOOPLET_URL } from '../consts';
+import { SITE, HSAGHIR_URL } from '../consts';
 import readingTime from 'reading-time';
 import { formatDate } from '../utils/date';
 
@@ -41,14 +41,8 @@ const startPaths = [
       </h1>
       <p class="lede">
         Opinionated notes for engineers preparing for L5+ Applied Scientist,
-        MLE, and Research Engineer loops.
-      </p>
-      <p class="byline">
-        By <a href={HSAGHIR_URL} rel="noopener"><span class="byline-name">Hamidreza Saghir</span></a>
-        <span class="byline-sep" aria-hidden="true">·</span>
-        Principal Applied Scientist at <span class="nowrap">Microsoft</span>
-        <span class="byline-sep" aria-hidden="true">·</span>
-        previously <span class="nowrap">X (Twitter)</span>, Amazon, Borealis AI
+        MLE, and Research Engineer loops. Built around the questions that
+        actually get asked at senior bars.
       </p>
     </section>
 
@@ -58,10 +52,10 @@ const startPaths = [
     <section class="block">
       <p class="block-eyebrow">Latest</p>
       <ol class="post-list">
-        {latestEssays.map((p) => (
+        {latestEssays.map((p, i) => (
           <li>
             <a class="post-row" href={`/essays/${p.slug}/`}>
-              <span class="post-row-arrow" aria-hidden="true">›</span>
+              <span class="post-row-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <div>
                 <h3 class="post-row-title">{p.title}</h3>
                 {p.description && <p class="post-row-desc">{p.description}</p>}
@@ -116,19 +110,14 @@ const startPaths = [
 
     <!-- CONSULTING / PERSONAL -->
     <section class="block consulting">
-      <p class="block-eyebrow">Beyond interviews</p>
+      <p class="block-eyebrow">Adjacent</p>
       <p class="consulting-headline">
-        I write opinion essays and consult on LLMs and agents at
+        For opinion essays on agents and applied LLMs, see
         <a href={HSAGHIR_URL} rel="noopener"><strong>hsaghir.com</strong></a>.
       </p>
       <p class="consulting-body">
-        For applied LLM systems, agent architectures, evals, post-training,
-        and inference cost. I open-sourced
-        <a href={LOOPLET_URL} rel="noopener">Looplet</a>, an iterator-first
-        agent framework, in the same vein.
-      </p>
-      <p class="consulting-cta">
-        <a href={HSAGHIR_URL} rel="noopener">Visit hsaghir.com <span aria-hidden="true">↗</span></a>
+        Same author. Different audience: practitioners shipping LLM systems
+        rather than engineers preparing for interviews.
       </p>
     </section>
   </main>
@@ -176,34 +165,19 @@ const startPaths = [
     letter-spacing: -0.005em;
   }
 
-  .byline {
-    font-family: var(--font-ui);
-    font-size: 0.92rem;
-    color: var(--c-muted);
-    margin: 0;
-    line-height: 1.7;
+  /* Small accent stripe above the hero title — quiet design signature */
+  .hero {
+    position: relative;
   }
-  .byline-name {
-    color: var(--c-text);
-    font-weight: 600;
+  .hero::before {
+    content: '';
+    display: block;
+    width: 2.4rem;
+    height: 3px;
+    background: var(--c-accent);
+    margin-bottom: 1.6rem;
+    border-radius: 1.5px;
   }
-  .byline-sep {
-    margin: 0 0.55rem;
-    color: var(--c-rule);
-  }
-  .byline a {
-    color: var(--c-text-soft);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-    text-decoration-color: var(--c-rule);
-    transition: color var(--transition), text-decoration-color var(--transition);
-  }
-  .byline a:hover {
-    color: var(--c-accent);
-    text-decoration-color: var(--c-accent);
-  }
-  .nowrap { white-space: nowrap; }
 
   .block-eyebrow {
     font-family: var(--font-mono);
@@ -245,8 +219,8 @@ const startPaths = [
   }
   .post-row {
     display: grid;
-    grid-template-columns: 1.5rem 1fr;
-    gap: 0.4rem;
+    grid-template-columns: 2.4rem 1fr;
+    gap: 0.6rem;
     padding: 1rem 0.6rem 1rem 0.4rem;
     margin: 0 -0.6rem 0 -0.4rem;
     border-radius: var(--radius);
@@ -254,16 +228,18 @@ const startPaths = [
     transition: background var(--transition);
   }
   .post-row:hover { background: var(--c-bg-tint); }
-  .post-row-arrow {
-    color: var(--c-muted);
+  .post-row-num {
     font-family: var(--font-mono);
-    font-size: 1.2rem;
-    line-height: 1.5rem;
-    transition: color var(--transition), transform var(--transition);
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    line-height: 1.55;
+    padding-top: 0.25rem;
+    letter-spacing: 0.04em;
+    transition: color var(--transition);
   }
-  .post-row:hover .post-row-arrow {
+  .post-row:hover .post-row-num {
     color: var(--c-accent);
-    transform: translateX(3px);
   }
   .post-row-title {
     font-family: var(--font-display);
@@ -397,6 +373,6 @@ const startPaths = [
   .consulting-cta a:hover { text-decoration: underline; }
 
   @media (max-width: 600px) {
-    .byline-sep { display: block; height: 0; margin: 0.1rem 0; }
+    .post-row { grid-template-columns: 2rem 1fr; }
   }
 </style>
