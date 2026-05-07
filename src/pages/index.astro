@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { SITE, HSAGHIR_URL } from '../consts';
+import { SITE } from '../consts';
 import readingTime from 'reading-time';
 import { formatDate } from '../utils/date';
 
@@ -24,13 +24,6 @@ const latestEssays = all
     date: p.data.date,
     minutes: Math.max(1, Math.round(readingTime(p.body).minutes)),
   }));
-
-const startPaths = [
-  { label: 'Preparing for a senior ML interview loop', href: '/start-here/#preparing-for-a-senior-ml-interview-loop' },
-  { label: 'PhD or postdoc moving to industry', href: '/start-here/#phd-or-postdoc-transitioning-to-industry' },
-  { label: 'Building deep technical foundations', href: '/start-here/#building-deep-technical-foundations' },
-  { label: 'Hiring or evaluating an ML team', href: '/start-here/#engineering-leader-hiring-manager' },
-];
 ---
 <BaseLayout title={SITE.title} description={SITE.description}>
   <main class="home">
@@ -92,25 +85,6 @@ const startPaths = [
 
     <hr class="rule" />
 
-    <!-- WHERE TO START -->
-    <section class="block">
-      <p class="block-eyebrow">Where to start</p>
-      <h2 class="block-headline">What brought you here?</h2>
-      <ul class="path-list">
-        {startPaths.map((p) => (
-          <li>
-            <a href={p.href}>
-              <span class="path-bullet" aria-hidden="true"></span>
-              <span class="path-label">{p.label}</span>
-              <span class="path-arrow" aria-hidden="true">→</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-
-    <hr class="rule" />
-
     <!-- LATEST -->
     <section class="block">
       <p class="block-eyebrow">Latest</p>
@@ -133,37 +107,16 @@ const startPaths = [
       </p>
     </section>
 
-    <hr class="rule" />
-
-    <!-- COUNTS -->
-    <section class="block counts">
-      <p class="block-eyebrow">The library</p>
-      <p class="counts-line">
-        <a href="/interviews/"><strong>{counts.interviews}</strong> interview questions</a>
-        <span class="counts-sep" aria-hidden="true">·</span>
-        <a href="/essays/"><strong>{counts.essays}</strong> essays</a>
-        <span class="counts-sep" aria-hidden="true">·</span>
-        <a href="/reference/"><strong>{counts.reference}</strong> reference posts</a>
-      </p>
-      <p class="counts-foot">
-        Press <kbd>/</kbd> anywhere on the site to search across all of them.
-      </p>
-    </section>
-
-    <hr class="rule" />
-
-    <!-- CONSULTING / PERSONAL -->
-    <section class="block consulting">
-      <p class="block-eyebrow">Adjacent</p>
-      <p class="consulting-headline">
-        For opinion essays on agents and applied LLMs, see
-        <a href={HSAGHIR_URL} rel="noopener"><strong>hsaghir.com</strong></a>.
-      </p>
-      <p class="consulting-body">
-        Same author. Different audience: practitioners shipping LLM systems
-        rather than engineers preparing for interviews.
-      </p>
-    </section>
+    <!-- QUIET FOOTNOTE -->
+    <p class="footnote">
+      <a href="/interviews/">{counts.interviews} interview questions</a>
+      <span class="footnote-sep" aria-hidden="true">·</span>
+      <a href="/essays/">{counts.essays} essays</a>
+      <span class="footnote-sep" aria-hidden="true">·</span>
+      <a href="/reference/">{counts.reference} reference posts</a>
+      <span class="footnote-sep" aria-hidden="true">·</span>
+      <span>press <kbd>/</kbd> to search</span>
+    </p>
   </main>
 </BaseLayout>
 
@@ -341,6 +294,36 @@ const startPaths = [
     font-weight: 500;
   }
   .block-foot a:hover { text-decoration: underline; }
+
+  /* Quiet footnote at the very bottom of the home page */
+  .footnote {
+    margin-top: 3rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--c-rule);
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    color: var(--c-muted);
+    text-align: center;
+  }
+  .footnote a {
+    color: var(--c-text-soft);
+    text-decoration: none;
+    transition: color var(--transition);
+  }
+  .footnote a:hover { color: var(--c-accent); }
+  .footnote-sep {
+    margin: 0 0.6rem;
+    color: var(--c-rule);
+  }
+  .footnote kbd {
+    font-family: var(--font-mono);
+    background: var(--c-kbd-bg);
+    border: 1px solid var(--c-rule);
+    padding: 0.05rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+    margin: 0 0.15rem;
+  }
 
   /* Latest essays as a vertical list */
   .post-list {
