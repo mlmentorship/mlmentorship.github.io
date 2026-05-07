@@ -66,8 +66,8 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
     <ul>
       <li>
         <a href="/start-here/" class:list={[{ active: startHereActive }]}>
-          <span class="pinned-icon" aria-hidden="true">→</span>
           Start here
+          <span class="pinned-hint" aria-hidden="true">overview</span>
         </a>
       </li>
     </ul>
@@ -138,28 +138,29 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
   .pinned-strip ul { list-style: none; padding: 0; margin: 0; }
   .pinned-strip a {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.55rem;
-    padding: 0.36rem 0.55rem;
+    padding: 0.4rem 0.55rem;
     color: var(--c-text-soft);
     text-decoration: none;
     border-radius: var(--radius);
-    font-weight: 500;
+    font-weight: 600;
     transition: background var(--transition), color var(--transition);
   }
   .pinned-strip a:hover { background: var(--c-bg-tint); color: var(--c-text); }
   .pinned-strip a.active {
     background: var(--c-accent-soft);
     color: var(--c-accent);
-    font-weight: 600;
   }
-  .pinned-icon {
+  .pinned-hint {
     font-family: var(--font-mono);
-    font-size: 0.95em;
-    opacity: 0.6;
+    font-size: 0.68rem;
+    color: var(--c-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
   }
-  .pinned-strip a:hover .pinned-icon,
-  .pinned-strip a.active .pinned-icon { opacity: 1; }
+  .pinned-strip a.active .pinned-hint { color: var(--c-accent); opacity: 0.7; }
 
   .cat-strip {
     margin-bottom: 1.2rem;
@@ -265,8 +266,9 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
     flex: 0 0 auto;
     width: 0.9rem;
     text-align: center;
-    font-size: 0.7em;
-    opacity: 0.55;
+    font-size: 0.85em;
+    color: var(--c-accent);
+    opacity: 0.85;
     transition: transform var(--transition);
   }
   .section-nav-group[open] > .section-nav-group-title::before {
