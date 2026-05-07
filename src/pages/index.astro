@@ -40,10 +40,75 @@ const startPaths = [
         Senior&nbsp;ML interviews,<br/>distilled.
       </h1>
       <p class="lede">
-        Opinionated notes for engineers preparing for L5+ Applied Scientist,
-        MLE, and Research Engineer loops. Built around the questions that
-        actually get asked at senior bars.
+        Most ML interview prep is calibrated for new grads. This isn't.
       </p>
+      <p class="sub-lede">
+        {counts.interviews + counts.essays + counts.reference} questions,
+        essays, and reference notes for engineers preparing for L5+ Applied
+        Scientist, MLE, and Research Engineer loops.
+      </p>
+      <p class="hero-ctas">
+        <a class="btn-primary" href="/start-here/">Start here <span aria-hidden="true">→</span></a>
+        <a class="btn-secondary" href="/interviews/">Browse {counts.interviews} questions</a>
+      </p>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- WHY -->
+    <section class="block why">
+      <p class="block-eyebrow">What makes this different</p>
+      <ul class="why-list">
+        <li>
+          <div>
+            <h3 class="why-title">Leveled answers, every question.</h3>
+            <p class="why-body">
+              Every interview question shows what a passing answer sounds like
+              at L4, L5, and L6 separately, so you can calibrate to the bar you're
+              targeting instead of guessing.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3 class="why-title">Senior canon, not bootcamp content.</h3>
+            <p class="why-body">
+              Built around questions actually asked at senior bars: distributed training,
+              LLM evals, agent design, RAG, inference cost. Not "explain bias and
+              variance" intro material.
+            </p>
+          </div>
+        </li>
+        <li>
+          <div>
+            <h3 class="why-title">Reference and opinion, side by side.</h3>
+            <p class="why-body">
+              99 lookup-style references for breadth (attention, KV-cache, FlashAttention,
+              paged attention, the math underneath) sit next to essays that take an
+              opinion on contested topics like fine-tune-vs-RAG.
+            </p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <hr class="rule" />
+
+    <!-- WHERE TO START -->
+    <section class="block">
+      <p class="block-eyebrow">Where to start</p>
+      <h2 class="block-headline">What brought you here?</h2>
+      <ul class="path-list">
+        {startPaths.map((p) => (
+          <li>
+            <a href={p.href}>
+              <span class="path-bullet" aria-hidden="true"></span>
+              <span class="path-label">{p.label}</span>
+              <span class="path-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
 
     <hr class="rule" />
@@ -68,25 +133,6 @@ const startPaths = [
       <p class="block-foot">
         <a href="/essays/">All essays <span aria-hidden="true">→</span></a>
       </p>
-    </section>
-
-    <hr class="rule" />
-
-    <!-- WHERE TO START -->
-    <section class="block">
-      <p class="block-eyebrow">Where to start</p>
-      <h2 class="block-headline">What brought you here?</h2>
-      <ul class="path-list">
-        {startPaths.map((p) => (
-          <li>
-            <a href={p.href}>
-              <span class="path-bullet" aria-hidden="true"></span>
-              <span class="path-label">{p.label}</span>
-              <span class="path-arrow" aria-hidden="true">→</span>
-            </a>
-          </li>
-        ))}
-      </ul>
     </section>
 
     <hr class="rule" />
@@ -177,6 +223,88 @@ const startPaths = [
     background: var(--c-accent);
     margin-bottom: 1.6rem;
     border-radius: 1.5px;
+  }
+
+  .sub-lede {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--c-muted);
+    margin: 0 0 1.8rem;
+    max-width: 38rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin: 2rem 0 0;
+  }
+  .btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: var(--radius);
+    font-family: var(--font-ui);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  }
+  .btn-primary {
+    background: var(--c-accent);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--c-link-hover);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--c-text);
+    border: 1px solid var(--c-rule);
+  }
+  .btn-secondary:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+
+  /* WHY block: 3 differentiators */
+  .why-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.7rem;
+  }
+  .why-list > li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.9rem;
+    padding-left: 0.2rem;
+  }
+  .why-list > li::before {
+    content: '\25B8';
+    color: var(--c-accent);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding-top: 0.32rem;
+  }
+  .why-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--c-text);
+    margin: 0 0 0.4rem;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .why-body {
+    font-size: 0.97rem;
+    line-height: 1.6;
+    color: var(--c-text-soft);
+    margin: 0;
   }
 
   .block-eyebrow {
