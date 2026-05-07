@@ -42,8 +42,11 @@ const latestEssays = all
         practitioner.
       </p>
       <p class="hero-ctas">
-        <a class="btn-primary" href="/start-here/">Start here <span aria-hidden="true">→</span></a>
+        <a class="btn-primary" href="/interviews/">Browse the {counts.interviews} questions <span aria-hidden="true">→</span></a>
         <a class="btn-secondary" href="/interviews/fine-tune-vs-prompt-vs-rag/">See a sample question</a>
+      </p>
+      <p class="hero-foot">
+        New here? Try the <a href="/start-here/">curated reading paths</a> by what you're trying to do.
       </p>
     </section>
 
@@ -221,6 +224,25 @@ const latestEssays = all
     color: var(--c-accent);
     background: var(--c-surface);
     transform: translateY(-1px);
+  }
+
+  .hero-foot {
+    margin: 1.2rem 0 0;
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    color: var(--c-muted);
+  }
+  .hero-foot a {
+    color: var(--c-text-soft);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    text-decoration-color: var(--c-rule);
+    transition: color var(--transition), text-decoration-color var(--transition);
+  }
+  .hero-foot a:hover {
+    color: var(--c-accent);
+    text-decoration-color: var(--c-accent);
   }
 
   /* WHY block: 3-column card grid */

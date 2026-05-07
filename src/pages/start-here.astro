@@ -1,21 +1,23 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import DocsIndexLayout from '../layouts/DocsIndexLayout.astro';
 import { getCollection } from 'astro:content';
 
 const posts = await getCollection('posts', ({ data }) => !data.draft);
 ---
-<BaseLayout
+<DocsIndexLayout
+  category="interviews"
   title="Start here"
   description="Where to start on mlmentorship by what you're trying to do. Curated reading paths for senior ML interviews, applied LLM work, and agent systems."
 >
-  <section class="container prose">
+  <header class="head">
     <p class="kicker">Start here</p>
     <h1>Where to start, by what you're trying to do.</h1>
     <p class="lede">
-      {posts.length} essays, interview questions, references, and case studies
-      can be a lot. Pick the path that matches why you're here. Each item links
-      directly; come back to this page when you finish a path.
+      {posts.length} essays, interview questions, and reference posts
+      can be a lot. Pick the path that matches why you're here. Each item
+      links directly; come back to this page when you finish a path.
     </p>
+  </header>
 
     <section class="path" id="preparing-for-a-senior-ml-interview-loop">
       <header>
@@ -91,14 +93,20 @@ const posts = await getCollection('posts', ({ data }) => !data.draft);
       nav: <a href="/interviews/">Interviews</a>, <a href="/essays/">Essays</a>,
       <a href="/reference/">Reference</a>.
     </p>
-  </section>
-</BaseLayout>
+  </DocsIndexLayout>
 
 <style>
-  .prose {
-    max-width: var(--measure);
-    margin-inline: auto;
-    padding: clamp(2.5rem, 5vw, 4rem) var(--gutter);
+  .head {
+    margin-bottom: 2rem;
+    max-width: 42rem;
+  }
+  .head h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
   }
   .kicker {
     font-family: var(--font-mono);
