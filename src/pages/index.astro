@@ -37,7 +37,7 @@ const startPaths = [
     <!-- HERO -->
     <section class="block hero">
       <h1 class="display">
-        Senior&nbsp;ML interviews,<br/>distilled.
+        Senior ML &amp; AI<br/>interviews, distilled.
       </h1>
       <p class="lede">
         Most ML interview prep is calibrated for new grads. This isn't.
@@ -45,11 +45,12 @@ const startPaths = [
       <p class="sub-lede">
         {counts.interviews + counts.essays + counts.reference} questions,
         essays, and reference notes for engineers preparing for L5+ Applied
-        Scientist, MLE, and Research Engineer loops.
+        Scientist, MLE, and Research Engineer loops. Free, by a senior
+        practitioner.
       </p>
       <p class="hero-ctas">
         <a class="btn-primary" href="/start-here/">Start here <span aria-hidden="true">→</span></a>
-        <a class="btn-secondary" href="/interviews/">Browse {counts.interviews} questions</a>
+        <a class="btn-secondary" href="/interviews/fine-tune-vs-prompt-vs-rag/">See a sample question</a>
       </p>
     </section>
 
@@ -58,38 +59,35 @@ const startPaths = [
     <!-- WHY -->
     <section class="block why">
       <p class="block-eyebrow">What makes this different</p>
-      <ul class="why-list">
-        <li>
-          <div>
-            <h3 class="why-title">Leveled answers, every question.</h3>
-            <p class="why-body">
-              Every interview question shows what a passing answer sounds like
-              at L4, L5, and L6 separately, so you can calibrate to the bar you're
-              targeting instead of guessing.
-            </p>
-          </div>
-        </li>
-        <li>
-          <div>
-            <h3 class="why-title">Senior canon, not bootcamp content.</h3>
-            <p class="why-body">
-              Built around questions actually asked at senior bars: distributed training,
-              LLM evals, agent design, RAG, inference cost. Not "explain bias and
-              variance" intro material.
-            </p>
-          </div>
-        </li>
-        <li>
-          <div>
-            <h3 class="why-title">Reference and opinion, side by side.</h3>
-            <p class="why-body">
-              99 lookup-style references for breadth (attention, KV-cache, FlashAttention,
-              paged attention, the math underneath) sit next to essays that take an
-              opinion on contested topics like fine-tune-vs-RAG.
-            </p>
-          </div>
-        </li>
-      </ul>
+      <div class="why-grid">
+        <article class="why-card">
+          <p class="why-num" aria-hidden="true">01</p>
+          <h3 class="why-title">Leveled answers, every question.</h3>
+          <p class="why-body">
+            Every interview question shows what a passing answer sounds like
+            at L4, L5, and L6 separately, so you can calibrate to the bar
+            you're targeting.
+          </p>
+        </article>
+        <article class="why-card">
+          <p class="why-num" aria-hidden="true">02</p>
+          <h3 class="why-title">Senior canon, not bootcamp content.</h3>
+          <p class="why-body">
+            Built around questions actually asked at senior bars: distributed
+            training, LLM evals, agent design, RAG, inference cost. Not
+            "explain bias and variance" intro material.
+          </p>
+        </article>
+        <article class="why-card">
+          <p class="why-num" aria-hidden="true">03</p>
+          <h3 class="why-title">Reference and opinion, side by side.</h3>
+          <p class="why-body">
+            99 lookup-style references for breadth (attention, KV-cache,
+            FlashAttention, the math underneath) sit next to essays that
+            take an opinion on contested topics.
+          </p>
+        </article>
+      </div>
     </section>
 
     <hr class="rule" />
@@ -171,7 +169,7 @@ const startPaths = [
 
 <style>
   .home {
-    max-width: 44rem;
+    max-width: 52rem;
     margin: 0 auto;
     padding: clamp(2rem, 5vw, 4rem) var(--gutter) clamp(3rem, 8vw, 6rem);
   }
@@ -260,49 +258,57 @@ const startPaths = [
     transform: translateY(-1px);
   }
   .btn-secondary {
-    background: transparent;
+    background: var(--c-bg-tint);
     color: var(--c-text);
     border: 1px solid var(--c-rule);
+    font-weight: 600;
   }
   .btn-secondary:hover {
     border-color: var(--c-accent);
     color: var(--c-accent);
+    background: var(--c-surface);
+    transform: translateY(-1px);
   }
 
-  /* WHY block: 3 differentiators */
-  .why-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.7rem;
-  }
-  .why-list > li {
+  /* WHY block: 3-column card grid */
+  .why-grid {
     display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.9rem;
-    padding-left: 0.2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
   }
-  .why-list > li::before {
-    content: '\25B8';
+  @media (max-width: 720px) {
+    .why-grid { grid-template-columns: 1fr; }
+  }
+  .why-card {
+    padding: 1.4rem 1.4rem 1.5rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition), transform var(--transition);
+  }
+  .why-card:hover {
+    border-color: var(--c-accent);
+    transform: translateY(-2px);
+  }
+  .why-num {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
     color: var(--c-accent);
-    font-size: 0.9rem;
-    line-height: 1.5;
-    padding-top: 0.32rem;
+    margin: 0 0 0.7rem;
+    letter-spacing: 0.06em;
   }
   .why-title {
     font-family: var(--font-display);
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     font-weight: 600;
     color: var(--c-text);
-    margin: 0 0 0.4rem;
-    line-height: 1.35;
+    margin: 0 0 0.55rem;
+    line-height: 1.3;
     letter-spacing: -0.01em;
   }
   .why-body {
-    font-size: 0.97rem;
-    line-height: 1.6;
+    font-size: 0.92rem;
+    line-height: 1.55;
     color: var(--c-text-soft);
     margin: 0;
   }

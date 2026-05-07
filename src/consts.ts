@@ -4,7 +4,7 @@ export const LOOPLET_URL = 'https://github.com/hsaghir/looplet';
 
 export const SITE = {
   title: 'mlmentorship',
-  description: 'Senior ML interview prep. Essays, interview questions with leveled answers (L4/L5/L6), reference notes, system design case studies.',
+  description: 'Senior ML & AI interview prep. Essays, interview questions with leveled answers (L4/L5/L6), reference notes, system design case studies. Free.',
   author: 'Hamidreza Saghir',
   authorBio: 'Notes on senior ML interviews, system design, and applied ML practice.',
   email: 'ml.mentorship@gmail.com',
