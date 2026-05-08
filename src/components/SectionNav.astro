@@ -88,9 +88,13 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
 
   {groups.length > 0 ? (
     <div class="section-nav-groups">
-      {groups.map((g) => {
+      {groups.map((g, gi) => {
+        const containsCurrent = !!currentSlug && g.items.some((it) => it.slug === currentSlug);
+        // Default: only the group containing the current page is open.
+        // On index pages (no currentSlug), open the first group only.
+        const defaultOpen = containsCurrent || (!currentSlug && gi === 0);
         return (
-          <details class="section-nav-group" data-group={g.name} open>
+          <details class="section-nav-group" data-group={g.name} open={defaultOpen}>
             <summary class="section-nav-group-title">
               <span class="section-nav-group-label">{g.name}</span>
               <span class="section-nav-group-count">{g.items.length}</span>

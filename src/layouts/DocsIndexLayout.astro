@@ -42,12 +42,8 @@ const { category, title, description } = Astro.props;
     position: sticky;
     top: 5rem;
     align-self: start;
-    max-height: calc(100vh - 6rem);
-    overflow-y: auto;
-    padding-right: 0.5rem;
+    /* No overflow / max-height: rely on the single page scroll. */
   }
-  .docs-sidebar::-webkit-scrollbar { width: 6px; }
-  .docs-sidebar::-webkit-scrollbar-thumb { background: var(--c-rule); border-radius: 3px; }
 
   .docs-article { min-width: 0; }
 
@@ -58,8 +54,6 @@ const { category, title, description } = Astro.props;
     }
     .docs-sidebar {
       position: static;
-      max-height: none;
-      overflow: visible;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--c-rule);
