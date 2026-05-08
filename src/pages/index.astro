@@ -2,8 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '../consts';
-import readingTime from 'reading-time';
-import { formatDate } from '../utils/date';
 
 const all = await getCollection('posts', ({ data }) => !data.draft);
 const counts = {
@@ -11,19 +9,6 @@ const counts = {
   interviews: all.filter((p) => p.data.category === 'questions').length,
   reference: all.filter((p) => p.data.category === 'concepts').length,
 };
-
-// Latest essays — top 3 by date.
-const latestEssays = all
-  .filter((p) => p.data.category === 'guides')
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 3)
-  .map((p) => ({
-    slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
-    title: p.data.title,
-    description: p.data.description,
-    date: p.data.date,
-    minutes: Math.max(1, Math.round(readingTime(p.body).minutes)),
-  }));
 ---
 <BaseLayout title={SITE.title} description={SITE.description}>
   <main class="home">
@@ -88,25 +73,34 @@ const latestEssays = all
 
     <hr class="rule" />
 
-    <!-- LATEST -->
+    <!-- THREE SECTIONS -->
     <section class="block">
-      <p class="block-eyebrow">Latest</p>
-      <ol class="post-list">
-        {latestEssays.map((p, i) => (
-          <li>
-            <a class="post-row" href={`/guides/${p.slug}/`}>
-              <span class="post-row-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <div>
-                <h3 class="post-row-title">{p.title}</h3>
-                {p.description && <p class="post-row-desc">{p.description}</p>}
-                <p class="post-row-meta">{p.minutes} min read · {formatDate(p.date)}</p>
-              </div>
-            </a>
-          </li>
-        ))}
-      </ol>
+      <p class="block-eyebrow">Where to look</p>
+      <ul class="sections-grid">
+        <li>
+          <a href="/questions/">
+            <h3>Questions <span class="sections-count">{counts.interviews}</span></h3>
+            <p>The senior ML interview canon. Each one with what L4 / L5 / L6 answers actually sound like.</p>
+            <p class="sections-when"><strong>Best when:</strong> you have a specific question and want a level-calibrated answer.</p>
+          </a>
+        </li>
+        <li>
+          <a href="/guides/">
+            <h3>Guides <span class="sections-count">{counts.essays}</span></h3>
+            <p>Long-form opinion pieces on senior ML interviews, system design, and applied practice. Take a position and defend it.</p>
+            <p class="sections-when"><strong>Best when:</strong> you want a senior-IC point of view on something contested.</p>
+          </a>
+        </li>
+        <li>
+          <a href="/concepts/">
+            <h3>Concepts <span class="sections-count">{counts.reference}</span></h3>
+            <p>Concise notes on attention, normalization, LLM internals, optimization, and the math underneath.</p>
+            <p class="sections-when"><strong>Best when:</strong> you need to look up or refresh a specific concept fast.</p>
+          </a>
+        </li>
+      </ul>
       <p class="block-foot">
-        <a href="/guides/">All guides <span aria-hidden="true">→</span></a>
+        Or follow a <a href="/start-here/">curated reading path</a> by what you're trying to do.
       </p>
     </section>
 
@@ -286,6 +280,66 @@ const latestEssays = all
     line-height: 1.55;
     color: var(--c-text-soft);
     margin: 0;
+  }
+
+  /* WHERE TO LOOK: three section cards */
+  .sections-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 720px) {
+    .sections-grid { grid-template-columns: 1fr; }
+  }
+  .sections-grid > li { margin: 0; padding: 0; }
+  .sections-grid a {
+    display: block;
+    padding: 1.3rem 1.4rem 1.4rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+  .sections-grid a:hover {
+    border-color: var(--c-accent);
+    transform: translateY(-2px);
+  }
+  .sections-grid h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--c-text);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+  .sections-count {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--c-accent);
+    font-weight: 500;
+  }
+  .sections-grid > li > a > p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--c-text-soft);
+    margin: 0 0 0.6rem;
+  }
+  .sections-when {
+    font-size: 0.85rem !important;
+    color: var(--c-muted) !important;
+    margin: 0.8rem 0 0 !important;
+  }
+  .sections-when strong {
+    color: var(--c-text-soft);
+    font-weight: 600;
   }
 
   .block-eyebrow {
