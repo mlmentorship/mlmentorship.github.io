@@ -15,7 +15,7 @@ A **graph neural network** (GNN) updates each node's features by aggregating its
 
 A CNN exploits regular grid structure with shared local filters. A GNN does the same on graphs: shared parameters, local aggregation, but the neighborhood is defined by graph edges instead of pixel proximity. This unlocks ML on social networks, molecules, knowledge graphs, code ASTs, and recommender bipartite graphs.
 
-GNNs power drug-discovery pipelines (AlphaFold's Evoformer, DeepMind's GNoME), large-scale recommenders (Pinterest's PinSAGE, Uber's GraphSAGE), and protein structure prediction. Modern transformers are arguably a special case (full bipartite graph with attention as edge weighting).
+GNNs power drug-discovery pipelines (AlphaFold's Evoformer, DeepMind's GNoME), large-scale recommenders (Pinterest's PinSAGE, Uber's GraphSAGE), and protein structure prediction. Modern transformers are arguably a special case (complete graph with attention as edge weighting).
 
 ## The mechanism: GCN
 

@@ -37,7 +37,7 @@ A multi-layer proximity graph ([Malkov & Yashunin, 2018](https://arxiv.org/abs/1
 
 ### IVF (Inverted File Index)
 
-Cluster the vectors with k-means into $K$ partitions ([Jégou et al., 2011](https://hal.inria.fr/inria-00514462)). At query time, find the nearest $\text{nprobe}$ centroids and only compare against vectors in those partitions.
+Cluster the vectors with k-means into $K$ partitions ([Jégou et al., 2011](https://hal.inria.fr/inria-00514462/document)). At query time, find the nearest $\text{nprobe}$ centroids and only compare against vectors in those partitions.
 
 | | |
 |---|---|
@@ -48,7 +48,7 @@ Cluster the vectors with k-means into $K$ partitions ([Jégou et al., 2011](http
 
 ### PQ (Product Quantization)
 
-Compress each vector by splitting it into $m$ subvectors of dimension $d / m$ and quantizing each subvector independently to one of $2^b$ codewords ([Jégou et al., 2011](https://hal.inria.fr/inria-00514462)).
+Compress each vector by splitting it into $m$ subvectors of dimension $d / m$ and quantizing each subvector independently to one of $2^b$ codewords ([Jégou et al., 2011](https://hal.inria.fr/inria-00514462/document)).
 
 A 1024-dim float32 vector (4096 bytes) becomes $m$ codes of $b$ bits each. With $m = 64, b = 8$: 64 bytes. 64x memory reduction.
 
