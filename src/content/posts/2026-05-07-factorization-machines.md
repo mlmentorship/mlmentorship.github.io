@@ -9,7 +9,7 @@ category: "concepts"
 
 ## One-line definition
 
-A **factorization machine** ([Rendle, 2010](https://www.csie.ntu.edu.tw/~b97053/paper/Rendle2010FM.pdf)) models pairwise feature interactions as $\langle v_i, v_j \rangle$ where each feature $i$ has an embedding $v_i \in \mathbb{R}^k$. The full prediction is
+A **factorization machine** ([Rendle, 2010](https://cseweb.ucsd.edu/classes/fa17/cse291-b/reading/Rendle2010FM.pdf)) models pairwise feature interactions as $\langle v_i, v_j \rangle$ where each feature $i$ has an embedding $v_i \in \mathbb{R}^k$. The full prediction is
 
 $$
 \hat{y}(x) = w_0 + \sum_i w_i x_i + \sum_{i < j} \langle v_i, v_j \rangle x_i x_j.
