@@ -114,13 +114,14 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
     </div>
   ) : (
     <ol class="section-nav-list">
-      {posts.map((p) => (
+      {posts.map((p, i) => (
         <li>
           <a
             href={`/${category}/${p.slug}/`}
             class:list={[{ active: p.slug === currentSlug }]}
           >
-            {p.title}
+            <span class="section-nav-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="section-nav-text">{p.title}</span>
           </a>
         </li>
       ))}
@@ -221,7 +222,7 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
   .section-nav-list li { margin: 0; padding: 0; }
   .section-nav-list a {
     display: grid;
-    grid-template-columns: 1.7rem 1fr;
+    grid-template-columns: 1.7rem minmax(0, 1fr);
     gap: 0.5rem;
     align-items: baseline;
     padding: 0.42rem 0.6rem 0.42rem 0.7rem;
@@ -234,11 +235,11 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
        Active state uses text-shadow to fake bold without changing layout. */
     font-weight: 500;
     line-height: 1.4;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
   .section-nav-num {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 500;
     color: var(--c-muted);
     letter-spacing: 0.04em;
@@ -246,6 +247,7 @@ const startHereActive = pathname === '/start-here/' || pathname === '/start-here
   }
   .section-nav-text {
     min-width: 0;
+    overflow-wrap: break-word;
   }
   .section-nav-list a:hover {
     color: var(--c-text);

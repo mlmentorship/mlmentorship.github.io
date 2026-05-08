@@ -6,7 +6,7 @@ interface Props { headings: MarkdownHeading[]; }
 const { headings } = Astro.props;
 const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
-{items.length > 2 && (
+{items.length > 2 ? (
   <aside class="toc" aria-label="Table of contents">
     <p class="toc-title">Contents</p>
     <ol>
@@ -17,6 +17,8 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
       ))}
     </ol>
   </aside>
+) : (
+  <aside class="toc toc-empty" aria-hidden="true"></aside>
 )}
 
 <style>

@@ -21,15 +21,19 @@ const { category, title, description } = Astro.props;
     <main class="docs-article">
       <slot />
     </main>
+
+    {/* Empty placeholder so the 3-column grid matches DocsLayout and the
+        sidebar position stays stable when navigating between index and post. */}
+    <aside class="docs-toc-placeholder" aria-hidden="true"></aside>
   </div>
 </BaseLayout>
 
 <style>
   .docs-layout {
     display: grid;
-    grid-template-columns: 16rem minmax(0, 1fr);
+    grid-template-columns: 16rem minmax(0, 1fr) 14rem;
     gap: 2.5rem;
-    max-width: 72rem;
+    max-width: 80rem;
     margin: 0 auto;
     padding: 2rem var(--gutter) 4rem;
   }
