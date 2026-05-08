@@ -3,8 +3,8 @@ title: "Lessons from Marin 8B: what an open pretraining log actually teaches you
 description: "Marin trained the first open-source 8B model to beat Llama 3.1 8B and published every mistake. The transferable lessons aren't about TPUs. They're about how to run pretraining like a science."
 date: "2026-01-21"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 **The most useful pretraining writeup of the last year is the [Marin 8B retrospective](https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/), and it's useful precisely because it isn't sanitized.** Marin is Stanford CRFM's open lab. Every experiment is a preregistered GitHub issue, every run is a reproducible PR, and the retrospective walks through the mistakes alongside the wins. The team trained the first open-source 8B base model to beat Llama 3.1 8B on 14 of 19 standard benchmarks, and they did it reactively, changing the data mix, optimizer, and schedule mid-run.
@@ -12,13 +12,13 @@ category: "essays"
 If you read only one thing on practical pretraining in 2026, read that retrospective. The rest of this post is the six transferable lessons from it that show up in interviews and design docs:
 
 1. Reactive pretraining beats the master plan, if you instrument well enough to react.
-2. Z-loss is a regularizer on logit scale, not a stability hack. (See [reference](/reference/z-loss/).)
+2. Z-loss is a regularizer on logit scale, not a stability hack. (See [reference](/concepts/z-loss/).)
 3. "High-quality data" without format diversity hurts downstream tasks.
 4. Perplexity is mostly a measurement of preprocessing, not capability.
-5. Microannealing is the right way to evaluate a candidate dataset. (See [reference](/reference/microannealing/).)
+5. Microannealing is the right way to evaluate a candidate dataset. (See [reference](/concepts/microannealing/).)
 6. SFT degrades base capabilities, and the fix is to mix pretraining data back in.
 
-The technical mechanisms behind a few of these are heavy enough that they live in their own reference pages: [z-loss](/reference/z-loss/), [WSD and WSD-S schedules](/reference/wsd-and-wsd-s/), and [microannealing](/reference/microannealing/). The essay below is the narrative.
+The technical mechanisms behind a few of these are heavy enough that they live in their own reference pages: [z-loss](/concepts/z-loss/), [WSD and WSD-S schedules](/concepts/wsd-and-wsd-s/), and [microannealing](/concepts/microannealing/). The essay below is the narrative.
 
 ## 1. Reactive pretraining beats the master plan
 
@@ -26,7 +26,7 @@ Marin's internal name for their process was the "Tootsie Roll": keep training, k
 
 The transferable lesson is that the decision to keep training and fold in changes is itself a hyperparameter. Models that look done at 4T tokens often have a lot more headroom if you're willing to rewarm and change the mix. Marin's Phoenix phase rewarmed from a finished cooldown back to peak LR on a new data mixture, saw essentially no loss spike, and continued to roughly 12.7T tokens.
 
-The prerequisite is observability. You can only react if you can see. Marin had per-domain eval losses, per-layer norm tracking, and a checkpoint cadence that let them roll back. Without those, the same reactive style would have produced a worse model, not a better one. This is also why their schedule choice matters: WSD-S (see [reference](/reference/wsd-and-wsd-s/)) is designed for reactive pretraining, because you can probe the model's quality with short cooldowns without committing to a final schedule.
+The prerequisite is observability. You can only react if you can see. Marin had per-domain eval losses, per-layer norm tracking, and a checkpoint cadence that let them roll back. Without those, the same reactive style would have produced a worse model, not a better one. This is also why their schedule choice matters: WSD-S (see [reference](/concepts/wsd-and-wsd-s/)) is designed for reactive pretraining, because you can probe the model's quality with short cooldowns without committing to a final schedule.
 
 ## 2. Z-loss is a regularizer on logit scale, not a stability hack
 
@@ -34,7 +34,7 @@ Standard advice says "use z-loss if you see logit blowup." Marin's actual findin
 
 The evidence came from a deep cooldown ("Raccoon") where they decayed LR from 1.7e-3 to 1.7e-5 to improve SFT-ability. Training loss started slowly creeping up at the deepest end. Resetting the optimizer didn't help. Removing weight decay didn't help. Eventually they tracked per-layer norms and found the `lm_head` was exploding. A z-loss penalty of 1e-4 on the final logits fixed it cleanly, and z-loss is now a Marin default.
 
-The mechanism (full version on the [z-loss reference page](/reference/z-loss/)) is that layer norms are typically excluded from weight decay. At very low LR with no other regularization, the final layer norm and `lm_head` can drift in pathological ways even when nothing is technically diverging. If you're doing any kind of long deep cooldown, turn z-loss on by default.
+The mechanism (full version on the [z-loss reference page](/concepts/z-loss/)) is that layer norms are typically excluded from weight decay. At very low LR with no other regularization, the final layer norm and `lm_head` can drift in pathological ways even when nothing is technically diverging. If you're doing any kind of long deep cooldown, turn z-loss on by default.
 
 ## 3. "High-quality data" without format diversity hurts downstream tasks
 
@@ -58,7 +58,7 @@ Don't trust a single perplexity number. If your eval loss moved a lot after a da
 
 The Marin (and Olmo 2, and Llama 3) recipe for "is this dataset worth including?" is to take a checkpoint that's already mostly trained, run a short cooldown with a small fraction of the candidate data, and compare against a control on 100% of the normal mix. Cost: less than 1% of a full run. Signal: real downstream task impact, not just per-domain loss.
 
-The full procedure, including how to set the mixing fraction and the common failure modes, is on the [microannealing reference page](/reference/microannealing/). The interview-ready summary is that "run an ablation" is the L5 answer and "run a microannealing study at the late-training low-LR regime where data choices actually matter" is the L6 answer.
+The full procedure, including how to set the mixing fraction and the common failure modes, is on the [microannealing reference page](/concepts/microannealing/). The interview-ready summary is that "run an ablation" is the L5 answer and "run a microannealing study at the late-training low-LR regime where data choices actually matter" is the L6 answer.
 
 ## 6. SFT degrades base capabilities, and the fix is to mix pretraining data back in
 
@@ -78,4 +78,4 @@ If you want to learn pretraining as a non-frontier-lab person in 2026, the actua
 
 ---
 
-*Related reference pages: [z-loss](/reference/z-loss/), [WSD and WSD-S schedules](/reference/wsd-and-wsd-s/), [microannealing and midtraining](/reference/microannealing/).*
+*Related reference pages: [z-loss](/concepts/z-loss/), [WSD and WSD-S schedules](/concepts/wsd-and-wsd-s/), [microannealing and midtraining](/concepts/microannealing/).*

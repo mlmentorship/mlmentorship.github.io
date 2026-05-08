@@ -3,8 +3,8 @@ title: "Ranking metrics: NDCG, MAP, MRR"
 description: "Beyond binary precision-recall: how to measure ranking quality when order matters and labels are graded."
 date: "2025-10-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -96,5 +96,5 @@ $$
 
 ## Related
 
-- [Precision, recall, F1](/reference/precision-recall-f1/). Binary classification metrics.
-- [Two-tower retrieval](/reference/two-tower-retrieval/). What gets evaluated with these metrics in production.
+- [Precision, recall, F1](/concepts/precision-recall-f1/). Binary classification metrics.
+- [Two-tower retrieval](/concepts/two-tower-retrieval/). What gets evaluated with these metrics in production.

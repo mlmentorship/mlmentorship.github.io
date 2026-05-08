@@ -3,8 +3,8 @@ title: "Cross-entropy and softmax"
 description: "The pairing isn't arbitrary. Cross-entropy is the negative log-likelihood under a categorical distribution, and the softmax+CE gradient simplifies to (p − y), which is why it's stable."
 date: "2025-09-05"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -70,4 +70,4 @@ This is why no one uses MSE for classification despite the textbook deriving it 
 
 ---
 
-*Related: [BatchNorm vs LayerNorm](/reference/batchnorm-vs-layernorm/). Related interview: [Why does dropout work?](/interviews/why-does-dropout-work/).*
+*Related: [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/). Related interview: [Why does dropout work?](/questions/why-does-dropout-work/).*

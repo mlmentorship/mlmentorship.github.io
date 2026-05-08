@@ -3,8 +3,8 @@ title: "Decision trees"
 description: "Recursively split the feature space along axis-aligned thresholds chosen to maximize a purity criterion. The base learner of GBDT and random forests."
 date: "2026-04-19"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -87,5 +87,5 @@ Two main approaches:
 
 ## Related
 
-- [Random forests](/reference/random-forests/). Bagged ensembles of trees.
-- [Gradient boosting](/reference/gradient-boosting/). Boosted ensembles of trees.
+- [Random forests](/concepts/random-forests/). Bagged ensembles of trees.
+- [Gradient boosting](/concepts/gradient-boosting/). Boosted ensembles of trees.

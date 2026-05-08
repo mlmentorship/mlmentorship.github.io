@@ -3,8 +3,8 @@ title: "Transformer architecture: a senior-level mental model"
 description: "Strip away the diagram clutter. A transformer is a stack of (residual + LayerNorm + (attention or FFN)) blocks. Understanding why each piece is there is more important than memorizing the diagram."
 date: "2025-11-05"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -67,7 +67,7 @@ Two reasons. (1) Gradient flow: residuals create direct paths from any layer to 
 
 ### Why LayerNorm (not BatchNorm)?
 
-BatchNorm normalizes across the batch dimension, which doesn't work for variable-length sequences and breaks at small batch sizes. LayerNorm normalizes per-token across the feature dimension, independently of other tokens or other examples. This works for transformers because tokens within a sequence are already a "batch" of features for normalization purposes. See [BatchNorm vs LayerNorm](/reference/batchnorm-vs-layernorm/).
+BatchNorm normalizes across the batch dimension, which doesn't work for variable-length sequences and breaks at small batch sizes. LayerNorm normalizes per-token across the feature dimension, independently of other tokens or other examples. This works for transformers because tokens within a sequence are already a "batch" of features for normalization purposes. See [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/).
 
 ### Why pre-norm vs post-norm?
 
@@ -124,4 +124,4 @@ If you describe a "transformer" in 2026 using only the 2017 paper, you're behind
 
 ---
 
-*Related: [BatchNorm vs LayerNorm](/reference/batchnorm-vs-layernorm/), [FlashAttention](/reference/flashattention/), [KV cache](/reference/kv-cache/).*
+*Related: [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/), [FlashAttention](/concepts/flashattention/), [KV cache](/concepts/kv-cache/).*

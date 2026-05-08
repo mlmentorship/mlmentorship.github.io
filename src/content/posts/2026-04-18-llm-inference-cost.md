@@ -3,8 +3,8 @@ title: "How to think about LLM inference cost"
 description: "Most teams calculate inference cost by multiplying token price by token count. The actual cost structure has five layers and most of the optimization wins are in the bottom four."
 date: "2026-04-18"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 
@@ -134,4 +134,4 @@ Cost regressions compound too. Adding 1K tokens to the system prompt becomes 1K 
 
 ---
 
-*Related: [Designing a RAG system that actually works](/essays/designing-rag-that-works/), [When would you fine-tune vs prompt vs RAG?](/interviews/fine-tune-vs-prompt-vs-rag/).*
+*Related: [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/).*

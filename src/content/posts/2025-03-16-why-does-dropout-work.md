@@ -3,8 +3,8 @@ title: "Why does dropout work?"
 description: "The trick is that there are three valid explanations and they all matter. Which ones you reach for tells the interviewer your level."
 date: "2025-03-16"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -69,4 +69,4 @@ If you can have this exchange fluently, you're solidly at the senior bar.
 
 ---
 
-*Related reference: [Regularization, L1, L2, dropout, early stopping](/reference/regularization/) (coming soon), [BatchNorm vs LayerNorm](/reference/batchnorm-vs-layernorm/).*
+*Related reference: [Regularization, L1, L2, dropout, early stopping](/concepts/regularization/) (coming soon), [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/).*

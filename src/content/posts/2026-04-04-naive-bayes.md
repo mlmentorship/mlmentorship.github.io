@@ -3,8 +3,8 @@ title: "Naive Bayes"
 description: "A trivially simple generative classifier that assumes features are conditionally independent given the class. Fast, parameter-light, surprisingly hard to beat on text."
 date: "2026-04-04"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

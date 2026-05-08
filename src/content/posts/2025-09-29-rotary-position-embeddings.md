@@ -3,8 +3,8 @@ title: "Rotary position embeddings (RoPE)"
 description: "The dominant position encoding for modern LLMs. Encodes relative position by rotating Q and K in 2D subspaces, enabling clean context extrapolation."
 date: "2025-09-29"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

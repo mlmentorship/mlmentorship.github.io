@@ -3,8 +3,8 @@ title: "BatchNorm vs LayerNorm (and the transformer wrinkle)"
 description: "These look similar and aren't. Mixing them up in interviews is one of the cheapest ways to lose level points. Here's the right mental model."
 date: "2025-12-28"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -120,4 +120,4 @@ Easy to fumble; easy to ace. Worth memorizing.
 
 ---
 
-*Related: [FlashAttention](/reference/flashattention/) for the other transformer-specific optimization that's often paired with this in questions.*
+*Related: [FlashAttention](/concepts/flashattention/) for the other transformer-specific optimization that's often paired with this in questions.*

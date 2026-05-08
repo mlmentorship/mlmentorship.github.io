@@ -3,8 +3,8 @@ title: "Why does Adam sometimes generalize worse than SGD?"
 description: "Adam usually trains faster but in some settings finds sharper minima with worse generalization. The senior answer names the regimes where this happens and the modern fixes."
 date: "2026-04-29"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related: [Adam, AdamW, and the modern optimizer landscape](/reference/adam-and-adamw/), [How do you choose a learning rate?](/interviews/how-to-choose-learning-rate/), [Regularization](/reference/regularization/).*
+*Related: [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/), [Regularization](/concepts/regularization/).*

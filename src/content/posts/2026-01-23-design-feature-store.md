@@ -3,8 +3,8 @@ title: "Design a feature store from scratch"
 description: "A feature store solves training-serving skew, feature reuse, and lineage. The senior answer explains why each property matters and what minimum viable looks like."
 date: "2026-01-23"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -81,4 +81,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design real-time personalization](/interviews/real-time-personalization/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/), [A/B testing for ML systems](/reference/ab-testing-for-ml/).*
+*Related: [Design real-time personalization](/questions/real-time-personalization/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

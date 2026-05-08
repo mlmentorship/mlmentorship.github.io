@@ -3,8 +3,8 @@ title: "Implement KNN efficiently"
 description: "The naive solution is one line. The interview is about scaling: when does naive fail, and what do you do?"
 date: "2025-08-17"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -102,4 +102,4 @@ The L6 answer:
 
 ---
 
-*Related: [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [Designing a RAG system that actually works](/essays/designing-rag-that-works/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*
+*Related: [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*

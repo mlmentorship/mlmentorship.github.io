@@ -3,8 +3,8 @@ title: "Continuous batching for LLM serving"
 description: "Let new requests join an in-flight batch at every decode step instead of waiting for the slowest one. The other half of why vLLM is fast."
 date: "2026-04-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -17,7 +17,7 @@ LLM decoding is memory-bound: the cost is dominated by reading model weights fro
 
 With **static batching**, you wait for the longest request in the batch before reusing GPU. If one request generates 1000 tokens and another generates 50, the second request's GPU slot sits idle for 950 steps.
 
-Continuous batching keeps the GPU saturated. Combined with PagedAttention (see [paged attention](/reference/paged-attention/)), it is the foundation of vLLM, TGI, and other modern LLM servers. Throughput improvements over static batching are 2–10× depending on the request mix.
+Continuous batching keeps the GPU saturated. Combined with PagedAttention (see [paged attention](/concepts/paged-attention/)), it is the foundation of vLLM, TGI, and other modern LLM servers. Throughput improvements over static batching are 2–10× depending on the request mix.
 
 ## The mechanism
 

@@ -3,8 +3,8 @@ title: "Weight initialization (Kaiming, Xavier)"
 description: "Set the initial variance of each layer's weights so that activations and gradients neither explode nor vanish through depth. The single most impactful one-line decision in deep nets."
 date: "2026-05-05"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

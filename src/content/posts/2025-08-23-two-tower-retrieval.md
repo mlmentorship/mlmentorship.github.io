@@ -3,8 +3,8 @@ title: "Two-tower retrieval"
 description: "Encode queries and items with separate networks into a shared embedding space; retrieve by approximate nearest neighbors. The default architecture for industrial recommenders and search."
 date: "2025-08-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -27,7 +27,7 @@ score  = q · i  (or cosine)
 
 - **Towers**: typically transformers, MLPs, or a mix. Towers usually do **not** share weights (different input modalities or feature sets).
 - **Embedding dim $d$**: 64–512 in production. Higher $d$ is more expressive; lower $d$ is faster to index and more cache-friendly.
-- **Output normalization**: L2-normalize so dot product equals cosine; lets the index use Inner Product mode (see [embedding spaces](/reference/embedding-spaces-and-similarity/)).
+- **Output normalization**: L2-normalize so dot product equals cosine; lets the index use Inner Product mode (see [embedding spaces](/concepts/embedding-spaces-and-similarity/)).
 
 ## Training
 
@@ -73,5 +73,5 @@ In production systems, two-tower is almost always the **retrieval** stage, follo
 
 ## Related
 
-- [Embedding spaces](/reference/embedding-spaces-and-similarity/). Vector representations and indexing.
-- [RAG overview](/reference/rag-overview/). Retrieval-augmented generation uses two-tower for the retrieval step.
+- [Embedding spaces](/concepts/embedding-spaces-and-similarity/). Vector representations and indexing.
+- [RAG overview](/concepts/rag-overview/). Retrieval-augmented generation uses two-tower for the retrieval step.

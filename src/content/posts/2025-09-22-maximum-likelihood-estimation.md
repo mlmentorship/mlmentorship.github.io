@@ -3,8 +3,8 @@ title: "Maximum likelihood estimation"
 description: "The dominant statistical principle: pick parameters that make the observed data most probable. Reduces to minimizing cross-entropy for classification and MSE for Gaussian regression."
 date: "2025-09-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

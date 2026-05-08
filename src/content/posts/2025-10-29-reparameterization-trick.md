@@ -3,8 +3,8 @@ title: "Explain the reparameterization trick"
 description: "How VAEs propagate gradients through a sampling step. The senior answer explains the why (you can't differentiate through a sample) and the how (move the randomness outside the parameters)."
 date: "2025-10-29"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -83,4 +83,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [RLHF and DPO](/reference/rlhf-and-dpo/), [Cross-entropy and softmax](/reference/cross-entropy-softmax/), [Bayesian vs frequentist](/interviews/bayesian-vs-frequentist/).*
+*Related reference: [RLHF and DPO](/concepts/rlhf-and-dpo/), [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Bayesian vs frequentist](/questions/bayesian-vs-frequentist/).*

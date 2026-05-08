@@ -3,8 +3,8 @@ title: "Matrices as linear maps"
 description: "A matrix is a linear function from one vector space to another. Every operation in ML. Projection, rotation, basis change, gradient flow. Is matrix multiplication."
 date: "2025-09-15"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

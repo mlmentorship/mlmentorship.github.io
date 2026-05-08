@@ -3,8 +3,8 @@ title: "SVM and the kernel trick"
 description: "Maximum-margin classifier with a kernel that lets it operate in implicit high-dimensional feature spaces. Beautiful theory; less common in 2026 production."
 date: "2025-11-16"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -77,5 +77,5 @@ For most 2026 production work, SVMs have been displaced. Their main uses are ped
 
 ## Related
 
-- [Calibration](/reference/calibration/). SVM scores need Platt scaling for probabilities.
-- [Linear regression](/reference/linear-regression/). Kernel ridge regression is the regression analog.
+- [Calibration](/concepts/calibration/). SVM scores need Platt scaling for probabilities.
+- [Linear regression](/concepts/linear-regression/). Kernel ridge regression is the regression analog.

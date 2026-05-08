@@ -3,8 +3,8 @@ title: "RAG: retrieval-augmented generation"
 description: "The standard pattern for grounding LLMs in your own data. Reference page; the full essay is linked at the bottom."
 date: "2025-09-02"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -94,4 +94,4 @@ RAG questions test:
 
 ---
 
-*Related essay: [Designing a RAG system that actually works](/essays/designing-rag-that-works/) for the long form. Related interview: [When would you fine-tune vs prompt vs RAG?](/interviews/fine-tune-vs-prompt-vs-rag/).*
+*Related essay: [Designing a RAG system that actually works](/guides/designing-rag-that-works/) for the long form. Related interview: [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/).*

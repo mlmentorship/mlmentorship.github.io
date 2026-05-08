@@ -5,7 +5,7 @@ import { REFERENCE_SUBCATEGORY as SUBCATEGORY, REFERENCE_ORDER as ORDER } from '
 
 
 
-const all = await getCollection('posts', ({ data }) => !data.draft && data.category === 'reference');
+const all = await getCollection('posts', ({ data }) => !data.draft && data.category === 'concepts');
 const posts = all.map((p) => ({
   slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
   title: p.data.title,
@@ -24,15 +24,15 @@ for (const [, list] of groups) list.sort((a, b) => a.title.localeCompare(b.title
 ungrouped.sort((a, b) => a.title.localeCompare(b.title));
 ---
 <DocsIndexLayout
-  category="reference"
-  title="Reference"
+  category="concepts"
+  title="Concepts"
   description="Concise notes on attention, normalization, LLM internals, optimization, and scaling. Built for fast lookup."
 >
   <header class="head">
-    <p class="kicker">Reference</p>
-    <h1>Concise notes</h1>
+    <p class="kicker">Concepts</p>
+    <h1>Concept notes</h1>
     <p class="lede">
-      {posts.length} reference pages, alphabetical within each category. Each follows the same template: one-line definition, why it matters, the mechanism, what an interviewer expects, common confusions. Press <kbd>/</kbd> to search.
+      {posts.length} concept notes, alphabetical within each subcategory. Each follows the same template: one-line definition, why it matters, the mechanism, what an interviewer expects, common confusions. Press <kbd>/</kbd> to search.
     </p>
   </header>
 
@@ -45,7 +45,7 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
         <ul class="post-list">
           {list.map((p) => (
             <li>
-              <a href={`/reference/${p.slug}/`} class="entry-title">{p.title}</a>
+              <a href={`/concepts/${p.slug}/`} class="entry-title">{p.title}</a>
               {p.description && <p class="desc">{p.description}</p>}
             </li>
           ))}
@@ -60,7 +60,7 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
       <ul class="post-list">
         {ungrouped.map((p) => (
           <li>
-            <a href={`/reference/${p.slug}/`} class="entry-title">{p.title}</a>
+            <a href={`/concepts/${p.slug}/`} class="entry-title">{p.title}</a>
             {p.description && <p class="desc">{p.description}</p>}
           </li>
         ))}

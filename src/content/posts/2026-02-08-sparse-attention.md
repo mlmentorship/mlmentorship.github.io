@@ -3,8 +3,8 @@ title: "Sparse attention (BigBird, Longformer)"
 description: "Replace the dense n×n attention mask with a sparse pattern that has O(n) non-zeros while preserving information flow across the full sequence."
 date: "2026-02-08"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -42,5 +42,5 @@ Cost: $O(n \cdot (w + r + g)) = O(n)$ for fixed $w, r, g$. BigBird proves that t
 ## Common pitfalls
 
 - **Assuming sparsity automatically means speed.** Without a kernel that exploits the structure, you'll be slower than dense FlashAttention.
-- **Confusing sparse with low-rank.** Sparse keeps the softmax exact but on fewer pairs; low-rank methods (Linformer, Performer. See [linear attention](/reference/linear-attention/)) approximate the softmax matrix itself.
+- **Confusing sparse with low-rank.** Sparse keeps the softmax exact but on fewer pairs; low-rank methods (Linformer, Performer. See [linear attention](/concepts/linear-attention/)) approximate the softmax matrix itself.
 - **Picking $w$ too small.** With window 32 and 24 layers, information at position 0 cannot reach position 5000 in one forward pass. Either widen the window or add global tokens.

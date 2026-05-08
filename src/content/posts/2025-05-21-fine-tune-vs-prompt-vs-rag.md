@@ -3,8 +3,8 @@ title: "When would you fine-tune vs prompt vs RAG?"
 description: "The most-asked LLM design question of 2026. The answer is a decision tree, not a preference."
 date: "2025-05-21"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -74,4 +74,4 @@ A candidate who pushes back on the implicit premise of the question (that you sh
 
 ---
 
-*Related: ["How would you evaluate an LLM application you've built?"](/interviews/how-would-you-evaluate-an-llm-application/), because this decision is downstream of having an eval.*
+*Related: ["How would you evaluate an LLM application you've built?"](/questions/how-would-you-evaluate-an-llm-application/), because this decision is downstream of having an eval.*

@@ -3,8 +3,8 @@ title: "SGD with momentum"
 description: "Add a moving average of past gradients to the update. Smoother trajectories, faster convergence in narrow valleys, and the foundation of Adam's first moment."
 date: "2026-04-18"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

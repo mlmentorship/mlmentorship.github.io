@@ -3,8 +3,8 @@ title: "Perplexity and bits per token"
 description: "The standard intrinsic metric for language models. What it measures, what units to use, and why it's a poor end-product evaluation."
 date: "2025-10-02"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -78,5 +78,5 @@ Production model evaluation always requires task evals.
 
 ## Related
 
-- [Tokenization](/reference/tokenization/). Affects how perplexity is computed.
-- [LLM evals: the hardest part](/essays/llm-evals-the-hardest-part/). Why intrinsic metrics fail for production LLMs.
+- [Tokenization](/concepts/tokenization/). Affects how perplexity is computed.
+- [LLM evals: the hardest part](/guides/llm-evals-the-hardest-part/). Why intrinsic metrics fail for production LLMs.

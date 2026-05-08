@@ -3,14 +3,14 @@ title: "Designing a RAG system that actually works"
 description: "RAG fails most often at retrieval, not generation. A practitioner's guide to the architecture, the failure modes, and what production teams actually do in 2026."
 date: "2026-05-07"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 
 **RAG quality is dominated by retrieval, not by the LLM.** Most production RAG systems that underperform have the same root cause: the team treated it as a generation problem when it is actually a retrieval problem with a generation step at the end.
 
-This essay assumes RAG is the right tool for the problem (see [When would you fine-tune vs prompt vs RAG?](/interviews/fine-tune-vs-prompt-vs-rag/) for that decision). What follows is the architecture and operational discipline that separate "we have a RAG system" from "our RAG system works."
+This essay assumes RAG is the right tool for the problem (see [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/) for that decision). What follows is the architecture and operational discipline that separate "we have a RAG system" from "our RAG system works."
 
 ## The mental model
 
@@ -35,7 +35,7 @@ A production RAG system in 2026 has roughly seven components:
 6. **Reranking.** Re-order top ~50-200 retrieval candidates down to top ~5-10 for the LLM.
 7. **Generation.** The LLM, with the retrieved chunks in context, produces the final answer with citations.
 
-Plus the operational layer: an eval pipeline (see [LLM Evals](/essays/llm-evals-the-hardest-part/)), monitoring, and a feedback loop from production traffic back into the eval set.
+Plus the operational layer: an eval pipeline (see [LLM Evals](/guides/llm-evals-the-hardest-part/)), monitoring, and a feedback loop from production traffic back into the eval set.
 
 Skipping components 4-6 is the single most common failure.
 
@@ -117,7 +117,7 @@ In rough frequency order:
 
 4. **No lexical retrieval.** Team relies entirely on embeddings and fails on exact-match queries. **Fix**: add BM25, fuse with reciprocal rank fusion.
 
-5. **Eval set is too small or doesn't reflect real queries.** Team has 30 hand-crafted Q&A pairs, none of which look like real user queries. **Fix**: build the eval set from production traffic samples (see [LLM Evals](/essays/llm-evals-the-hardest-part/)).
+5. **Eval set is too small or doesn't reflect real queries.** Team has 30 hand-crafted Q&A pairs, none of which look like real user queries. **Fix**: build the eval set from production traffic samples (see [LLM Evals](/guides/llm-evals-the-hardest-part/)).
 
 6. **Citations don't actually verify.** Model cites passages that don't support its claims. **Fix**: add a citation-verification step where you check each citation against the retrieved passage; flag ungrounded claims.
 
@@ -162,4 +162,4 @@ Build these habits before you build anything fancy. The fancy parts are easy; th
 
 ---
 
-*Related: [LLM Evals: The hardest part of shipping LLMs](/essays/llm-evals-the-hardest-part/), [When would you fine-tune vs prompt vs RAG?](/interviews/fine-tune-vs-prompt-vs-rag/).*
+*Related: [LLM Evals: The hardest part of shipping LLMs](/guides/llm-evals-the-hardest-part/), [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/).*

@@ -3,8 +3,8 @@ title: "Backpropagation"
 description: "Reverse-mode automatic differentiation applied to a computation graph. The algorithm that computes gradients for every parameter in one backward pass."
 date: "2025-11-06"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -47,7 +47,7 @@ Backprop must store all forward activations until the backward pass uses them. M
 
 Mitigations:
 
-- **[Activation checkpointing](/reference/activation-checkpointing/)**: recompute selected activations during backward instead of storing.
+- **[Activation checkpointing](/concepts/activation-checkpointing/)**: recompute selected activations during backward instead of storing.
 - **Mixed precision**: store activations in BF16 instead of FP32.
 - **Sequence packing** + smaller batch.
 
@@ -71,5 +71,5 @@ Backprop is reverse-mode autodiff applied to scalar-output, vector-input functio
 
 ## Related
 
-- [Matrix calculus](/reference/matrix-calculus/). The chain rule formalism.
-- [Activation checkpointing](/reference/activation-checkpointing/). Memory optimization for backprop.
+- [Matrix calculus](/concepts/matrix-calculus/). The chain rule formalism.
+- [Activation checkpointing](/concepts/activation-checkpointing/). Memory optimization for backprop.

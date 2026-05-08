@@ -3,8 +3,8 @@ title: "Vision transformers (ViT)"
 description: "Apply a standard transformer to a sequence of image patches. Beats CNNs at scale; the dominant backbone for foundation vision models in 2026."
 date: "2025-12-10"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -86,6 +86,6 @@ ViT became the default vision backbone partly because of self-supervised pretrai
 
 ## Related
 
-- [Attention mechanism](/reference/attention-mechanism/). The core operation.
-- [Transformer architecture](/reference/transformer-architecture/). Block structure.
-- [CNN architecture](/reference/cnn-architecture/). Alternative paradigm.
+- [Attention mechanism](/concepts/attention-mechanism/). The core operation.
+- [Transformer architecture](/concepts/transformer-architecture/). Block structure.
+- [CNN architecture](/concepts/cnn-architecture/). Alternative paradigm.

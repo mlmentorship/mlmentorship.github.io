@@ -3,8 +3,8 @@ title: "Q-learning"
 description: "Learn the action-value function Q(s, a) by Bellman backups. The foundation of value-based RL. DQN, Rainbow, and the original Atari breakthroughs."
 date: "2026-02-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -97,5 +97,5 @@ In practice for continuous control: SAC (combines Q-learning with stochastic pol
 
 ## Related
 
-- [Policy gradient](/reference/policy-gradient/). Alternative paradigm.
-- [Markov chains](/reference/markov-chains/). MDP background.
+- [Policy gradient](/concepts/policy-gradient/). Alternative paradigm.
+- [Markov chains](/concepts/markov-chains/). MDP background.

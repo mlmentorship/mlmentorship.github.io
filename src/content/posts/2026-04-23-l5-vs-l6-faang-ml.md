@@ -3,8 +3,8 @@ title: "What L5 vs L6 actually means at FAANG ML"
 description: "Level lines are mostly invisible from the outside but sharp on the inside. A practical calibration of L4 through L7 in ML / Applied Scientist tracks."
 date: "2026-04-23"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 
@@ -119,4 +119,4 @@ The goal is not "be L6." The goal is to be hired at the level that matches the w
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/essays/five-things-as-interview-tests/). For calibration on which level your stories actually land at, [a mock interview](/interview/) is the fastest way to find out.*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/). For calibration on which level your stories actually land at, [a mock interview](/interview/) is the fastest way to find out.*

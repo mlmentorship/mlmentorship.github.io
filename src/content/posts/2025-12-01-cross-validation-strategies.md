@@ -3,8 +3,8 @@ title: "Cross-validation strategies"
 description: "Hold-out, k-fold, stratified, grouped, and time-series CV. And when each one is and isn't appropriate."
 date: "2025-12-01"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -68,5 +68,5 @@ Use when: hyperparameter tuning matters and you need an unbiased estimate of gen
 
 ## Related
 
-- [A/B testing for ML](/reference/ab-testing-for-ml/). Online evaluation, complementary to offline CV.
-- [Calibration](/reference/calibration/). Also evaluated on held-out data.
+- [A/B testing for ML](/concepts/ab-testing-for-ml/). Online evaluation, complementary to offline CV.
+- [Calibration](/concepts/calibration/). Also evaluated on held-out data.

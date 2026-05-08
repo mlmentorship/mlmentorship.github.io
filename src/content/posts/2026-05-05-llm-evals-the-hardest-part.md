@@ -3,8 +3,8 @@ title: "LLM Evals: The hardest part of shipping LLMs, and why most teams get it 
 description: "Your model is only as good as your eval. Your eval is a product. Treat it like one. The patterns that separate teams that ship from teams that thrash."
 date: "2026-05-05"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 
@@ -160,4 +160,4 @@ Senior practitioners share this habit. It's not glamorous or scalable, but it's 
 
 ---
 
-*Related: ["How would you evaluate an LLM application you've built?"](/interviews/how-would-you-evaluate-an-llm-application/), an interview question with leveled answers covering this material.*
+*Related: ["How would you evaluate an LLM application you've built?"](/questions/how-would-you-evaluate-an-llm-application/), an interview question with leveled answers covering this material.*

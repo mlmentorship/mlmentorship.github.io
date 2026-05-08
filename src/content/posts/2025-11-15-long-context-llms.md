@@ -3,8 +3,8 @@ title: "Long-context LLMs: training and serving techniques"
 description: "What makes a 1M-token context model work. Position-encoding extension, attention kernels, KV-cache management, and the tradeoffs."
 date: "2025-11-15"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -19,7 +19,7 @@ Frontier models in 2026 advertise 128K–2M-token context windows. The headline 
 
 ### 1. Position encoding has to extrapolate
 
-Trained absolute or learned positions don't work past the training length. Modern decoder LLMs use [RoPE](/reference/rotary-position-embeddings/) and extend it via:
+Trained absolute or learned positions don't work past the training length. Modern decoder LLMs use [RoPE](/concepts/rotary-position-embeddings/) and extend it via:
 
 - **Position interpolation** [(Chen et al., 2023)](https://arxiv.org/abs/2306.15595): linearly compress positions.
 - **NTK-aware scaling**: increase the RoPE frequency base so high-frequency components don't alias.
@@ -31,19 +31,19 @@ Most production long-context models use YaRN or NTK scaling, often combined with
 
 Dense attention is $O(n^2)$ in memory; at $n = 128{,}000$ the $n \times n$ matrix alone is 16 GB at FP32. Solutions:
 
-- **[FlashAttention](/reference/flashattention/)**: exact, tiled streaming softmax in SRAM. Memory drops to $O(n)$. Standard for both training and serving.
-- **[Sparse attention](/reference/sparse-attention/)** (BigBird, Longformer): mask is sparse. Used for some encoder long-context models.
-- **[Linear attention](/reference/linear-attention/)** (Performer, Linformer): low-rank approximation. Used in research and a few production niches; quality lags dense at chat-model scale.
+- **[FlashAttention](/concepts/flashattention/)**: exact, tiled streaming softmax in SRAM. Memory drops to $O(n)$. Standard for both training and serving.
+- **[Sparse attention](/concepts/sparse-attention/)** (BigBird, Longformer): mask is sparse. Used for some encoder long-context models.
+- **[Linear attention](/concepts/linear-attention/)** (Performer, Linformer): low-rank approximation. Used in research and a few production niches; quality lags dense at chat-model scale.
 
 Production decoder LLMs at long context use dense FlashAttention plus aggressive KV-cache compression rather than sparse / linear approximations.
 
 ### 3. KV cache becomes the cost driver
 
-KV cache size scales linearly with context (see [KV cache](/reference/kv-cache/)). A 70B model at 128K context: ~40 GB of KV per request. Solutions:
+KV cache size scales linearly with context (see [KV cache](/concepts/kv-cache/)). A 70B model at 128K context: ~40 GB of KV per request. Solutions:
 
-- **[GQA / MQA](/reference/grouped-query-attention/)**: share K/V heads. 4–8× cache reduction.
-- **[PagedAttention](/reference/paged-attention/)**: eliminate cache fragmentation, share prefixes across requests.
-- **[Quantization](/reference/quantization/)**: int8 or int4 KV cache. 2–4× cache reduction.
+- **[GQA / MQA](/concepts/grouped-query-attention/)**: share K/V heads. 4–8× cache reduction.
+- **[PagedAttention](/concepts/paged-attention/)**: eliminate cache fragmentation, share prefixes across requests.
+- **[Quantization](/concepts/quantization/)**: int8 or int4 KV cache. 2–4× cache reduction.
 - **Sliding-window attention** (Mistral): keep only the last $w$ KV positions per layer; lose strict global attention.
 - **KV cache eviction**: heuristics like H2O [(Zhang et al., 2023)](https://arxiv.org/abs/2306.14048) keep only "heavy hitter" tokens.
 

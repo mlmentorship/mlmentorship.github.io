@@ -3,8 +3,8 @@ title: "Build an LLM coding assistant from scratch"
 description: "The architecture decision space is large: model choice, context retrieval, IDE integration, evals. The senior answer scopes the use case before any of it."
 date: "2025-04-12"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -84,4 +84,4 @@ The L6 answer:
 
 ---
 
-*Related: [How would you build evals for a coding assistant?](/interviews/evals-for-coding-assistant/), [How would you reduce LLM inference cost by 10x?](/interviews/reduce-llm-inference-cost-10x/), [KV cache](/reference/kv-cache/).*
+*Related: [How would you build evals for a coding assistant?](/questions/evals-for-coding-assistant/), [How would you reduce LLM inference cost by 10x?](/questions/reduce-llm-inference-cost-10x/), [KV cache](/concepts/kv-cache/).*

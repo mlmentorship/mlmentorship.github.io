@@ -3,8 +3,8 @@ title: "Design ML monitoring"
 description: "Most ML systems fail silently. Monitoring is what tells you. The senior answer monitors data, model, and outcome layers separately."
 date: "2025-03-17"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -87,4 +87,4 @@ The L6 answer:
 
 ---
 
-*Related: [A/B testing for ML systems](/reference/ab-testing-for-ml/), [Design real-time personalization](/interviews/real-time-personalization/), [LLM Evals essay](/essays/llm-evals-the-hardest-part/).*
+*Related: [A/B testing for ML systems](/concepts/ab-testing-for-ml/), [Design real-time personalization](/questions/real-time-personalization/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/).*

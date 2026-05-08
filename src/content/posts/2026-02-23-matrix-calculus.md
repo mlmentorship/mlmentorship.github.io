@@ -3,8 +3,8 @@ title: "Matrix calculus for ML"
 description: "Gradients, Jacobians, and Hessians for vector- and matrix-valued functions. The minimum needed to derive backprop and second-order methods."
 date: "2026-02-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

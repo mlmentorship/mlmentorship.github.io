@@ -3,8 +3,8 @@ title: "How would you evaluate a search ranker?"
 description: "Search ranking eval is offline metrics for development, A/B for shipping, and human raters for absolute calibration. The senior answer uses all three and respects what each measures."
 date: "2025-04-09"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -71,4 +71,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [A/B testing for ML systems](/reference/ab-testing-for-ml/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*

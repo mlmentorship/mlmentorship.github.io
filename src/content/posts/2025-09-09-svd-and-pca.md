@@ -3,8 +3,8 @@ title: "SVD and PCA"
 description: "The singular value decomposition factorizes any matrix into rotation × stretching × rotation. PCA is SVD applied to mean-centered data."
 date: "2025-09-09"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -60,5 +60,5 @@ Equivalent formulation: PCA = eigendecomposition of the sample covariance $\tild
 
 ## Related
 
-- [Matrices as linear maps](/reference/matrices-as-linear-maps/). The geometry.
-- [Eigenvalues and the spectral theorem](/reference/eigenvalues-and-spectral-theorem/). For symmetric matrices.
+- [Matrices as linear maps](/concepts/matrices-as-linear-maps/). The geometry.
+- [Eigenvalues and the spectral theorem](/concepts/eigenvalues-and-spectral-theorem/). For symmetric matrices.

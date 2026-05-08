@@ -3,8 +3,8 @@ title: "Policy gradient methods"
 description: "Directly optimize the policy by following the gradient of expected return. REINFORCE, actor-critic, and the foundation of modern RL."
 date: "2025-11-20"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -103,6 +103,6 @@ For sample efficiency in continuous control, use a replay buffer with importance
 
 ## Related
 
-- [Q-learning](/reference/q-learning/). Value-based alternative.
-- [RLHF and DPO](/reference/rlhf-and-dpo/). PPO applied to LLM alignment.
-- [PPO](/reference/ppo/). Algorithm-level details.
+- [Q-learning](/concepts/q-learning/). Value-based alternative.
+- [RLHF and DPO](/concepts/rlhf-and-dpo/). PPO applied to LLM alignment.
+- [PPO](/concepts/ppo/). Algorithm-level details.

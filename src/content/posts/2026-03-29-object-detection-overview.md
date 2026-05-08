@@ -3,8 +3,8 @@ title: "Object detection: Faster R-CNN, YOLO, DETR"
 description: "Localize and classify objects in an image. The three main architectural families: two-stage proposal-based, one-stage grid-based, and transformer-based."
 date: "2026-03-29"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -100,5 +100,5 @@ The standard evaluation: average precision per class, then mean across classes (
 
 ## Related
 
-- [CNN architecture](/reference/cnn-architecture/). Backbone.
-- [Vision transformers](/reference/vision-transformers/). Alternative backbone.
+- [CNN architecture](/concepts/cnn-architecture/). Backbone.
+- [Vision transformers](/concepts/vision-transformers/). Alternative backbone.

@@ -3,8 +3,8 @@ title: "Exploding and vanishing gradients"
 description: "Why deep networks were untrainable before residuals, normalization, and ReLU. The math of gradient magnitudes through depth and the standard fixes."
 date: "2026-03-24"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -43,7 +43,7 @@ For $\rho = 1.1$ and $n = 50$: factor of ~117 (gradients explode). For $\rho = 0
 ## The fixes (and what they actually do)
 
 ### Weight initialization
-Scale initial weights so that per-layer activation variance is preserved on the forward pass and gradient variance is preserved on the backward. **Kaiming / He init** (for ReLU) and **Xavier / Glorot init** (for tanh) achieve this. Without it, gradients vanish or explode at step 0. See [weight initialization](/reference/weight-initialization/).
+Scale initial weights so that per-layer activation variance is preserved on the forward pass and gradient variance is preserved on the backward. **Kaiming / He init** (for ReLU) and **Xavier / Glorot init** (for tanh) achieve this. Without it, gradients vanish or explode at step 0. See [weight initialization](/concepts/weight-initialization/).
 
 ### Non-saturating activations
 **ReLU** has gradient exactly 1 in the active region; doesn't shrink gradients through depth (unlike sigmoid / tanh which max out at 0.25). Modern alternatives: GELU, swish (smooth, non-saturating).
@@ -55,7 +55,7 @@ Scale initial weights so that per-layer activation variance is preserved on the 
 **Skip connections** ($f(x) + x$) provide a "highway" for gradients to flow back without being attenuated through every layer's Jacobian. Enabled deep ResNets (152+ layers) and made deep transformers practical. The gradient now contains an "identity" term that bypasses each block.
 
 ### Gradient clipping
-Cap the gradient norm at a fixed threshold ($c = 1.0$ standard for transformers). Doesn't prevent exploding gradients structurally, but keeps any single optimizer step from causing divergence. See [gradient clipping](/reference/gradient-clipping/).
+Cap the gradient norm at a fixed threshold ($c = 1.0$ standard for transformers). Doesn't prevent exploding gradients structurally, but keeps any single optimizer step from causing divergence. See [gradient clipping](/concepts/gradient-clipping/).
 
 ### Better optimizers
 Adam-family optimizers normalize per-parameter gradients by their running variance, partially counteracting magnitude differences across layers.

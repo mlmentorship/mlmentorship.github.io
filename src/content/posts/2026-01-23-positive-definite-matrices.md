@@ -3,8 +3,8 @@ title: "Positive (semi-)definite matrices"
 description: "Matrices that define inner products and proper covariances. The geometry of PSD: ellipsoids, not arbitrary shapes."
 date: "2026-01-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

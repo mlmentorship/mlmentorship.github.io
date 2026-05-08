@@ -3,8 +3,8 @@ title: "Label smoothing"
 description: "Replace one-hot targets with a softened distribution that puts ε mass on the wrong classes. Improves calibration, sometimes hurts retrieval."
 date: "2026-02-24"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

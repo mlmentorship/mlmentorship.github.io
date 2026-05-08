@@ -3,8 +3,8 @@ title: "The 5 things every applied scientist interview is actually testing for"
 description: "Strip away the questions and the role-specific jargon. Every senior AS loop is checking the same five things. If you know what they are, the prep gets sharper."
 date: "2026-03-20"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 
@@ -94,4 +94,4 @@ If you're transitioning from a pure-MLE role to AS, your prep should disproporti
 
 ---
 
-*Related: [What L5 vs L6 actually means at FAANG ML](/essays/l5-vs-l6-faang-ml/) for the level calibration. [Applied Scientist vs MLE vs Research Engineer](/essays/as-vs-mle-vs-re/) for the role taxonomy.*
+*Related: [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/) for the level calibration. [Applied Scientist vs MLE vs Research Engineer](/guides/as-vs-mle-vs-re/) for the role taxonomy.*

@@ -3,8 +3,8 @@ title: "WSD and WSD-S learning rate schedules"
 description: "Warmup-Stable-Decay holds the LR flat for most of training and decays at the end. WSD-S adds cyclic decay-and-rewarm probes. Both are designed for pretraining where you don't know the total token budget upfront."
 date: "2025-08-31"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -71,7 +71,7 @@ For SFT or fine-tuning, the standard remains cosine decay over the planned epoch
 ## Common pitfalls
 
 - **Choosing too high a peak LR.** Because WSD spends almost all of training at the peak, instability that would have been masked by cosine's quick descent is exposed. Marin used $1.0 \times 10^{-3}$ for the 8B run, lower than the DCLM paper's recommended $2.0 \times 10^{-3}$ which they found unstable.
-- **Forgetting to use z-loss.** During deep WSD or WSD-S cooldowns, the `lm_head` can slowly explode. See the [z-loss reference](/reference/z-loss/).
+- **Forgetting to use z-loss.** During deep WSD or WSD-S cooldowns, the `lm_head` can slowly explode. See the [z-loss reference](/concepts/z-loss/).
 - **Comparing WSD-S decay-cycle losses to cosine end-of-training losses.** WSD-S decay cycles show the model partway through training; cosine end-of-training losses show the final model. The numbers are not directly comparable.
 
 ## What an interviewer expects you to say
@@ -89,4 +89,4 @@ If asked about WSD or WSD-S:
 - [Hu et al., 2024 (MiniCPM)](https://arxiv.org/abs/2404.06395) introduced WSD.
 - [Wen et al., 2024](https://arxiv.org/abs/2410.05192) introduced WSD-S and provided the river-and-hill loss decomposition.
 - [Marin 8B retrospective](https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/) for a full case study of WSD-S used in production.
-- [Cosine decay reference](/reference/learning-rate-schedules/) for the default it replaces.
+- [Cosine decay reference](/concepts/learning-rate-schedules/) for the default it replaces.

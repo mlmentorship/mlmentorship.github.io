@@ -3,8 +3,8 @@ title: "GPU memory hierarchy: HBM, SRAM, and why I/O matters more than FLOPs"
 description: "Modern GPUs are memory-bound for almost everything except big matmuls. Understanding HBM vs. SRAM bandwidth is the prerequisite for FlashAttention, KV-cache reasoning, and inference cost models."
 date: "2026-04-27"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

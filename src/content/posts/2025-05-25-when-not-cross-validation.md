@@ -3,8 +3,8 @@ title: "When would you not use cross-validation?"
 description: "Cross-validation is a tool, not a default. The senior answer names the cases where it's wrong, expensive, or misleading."
 date: "2025-05-25"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -66,4 +66,4 @@ The L6 answer:
 
 ---
 
-*Related: [Walk me through the bias-variance tradeoff](/interviews/bias-variance-tradeoff/), [A/B testing for ML systems](/reference/ab-testing-for-ml/).*
+*Related: [Walk me through the bias-variance tradeoff](/questions/bias-variance-tradeoff/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

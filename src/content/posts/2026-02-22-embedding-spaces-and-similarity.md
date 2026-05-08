@@ -3,8 +3,8 @@ title: "Embedding spaces and similarity metrics"
 description: "How learned vector representations encode meaning, and why cosine similarity is the default metric for retrieval and recsys."
 date: "2026-02-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

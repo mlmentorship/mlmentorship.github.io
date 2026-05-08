@@ -3,8 +3,8 @@ title: "Universal approximation theorem"
 description: "A neural network with one hidden layer and enough units can approximate any continuous function on a bounded domain. What it does and doesn't say about deep learning."
 date: "2025-12-29"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

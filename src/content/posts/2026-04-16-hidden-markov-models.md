@@ -3,8 +3,8 @@ title: "Hidden Markov models"
 description: "A latent Markov chain emits observations through a per-state distribution. Forward-backward, Viterbi, Baum-Welch. The classical sequence model toolkit."
 date: "2026-04-16"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -99,5 +99,5 @@ Forward-backward is the HMM analog of message passing on a chain. Exact in $O(T 
 
 ## Related
 
-- [Markov chains](/reference/markov-chains/). The latent dynamics.
-- [Expectation-Maximization](/reference/expectation-maximization/). Baum-Welch is EM for HMMs.
+- [Markov chains](/concepts/markov-chains/). The latent dynamics.
+- [Expectation-Maximization](/concepts/expectation-maximization/). Baum-Welch is EM for HMMs.

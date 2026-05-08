@@ -3,8 +3,8 @@ title: "How do you handle hallucinations in production?"
 description: "There is no single solution. The senior answer is a layered system that catches different hallucination types at different stages."
 date: "2025-04-25"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -96,4 +96,4 @@ If you can have this conversation fluently, you're at the senior bar.
 
 ---
 
-*Related: [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [Designing a RAG system that actually works](/essays/designing-rag-that-works/), [LLM Evals essay](/essays/llm-evals-the-hardest-part/).*
+*Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/).*

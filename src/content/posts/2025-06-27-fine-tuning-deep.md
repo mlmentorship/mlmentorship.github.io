@@ -3,14 +3,14 @@ title: "Fine-tuning vs prompting: the deep version"
 description: "Past the basic decision tree. The senior answer covers SFT, LoRA, DPO, continued pretraining, and the operational trade-offs each introduces."
 date: "2025-06-27"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
 > *Asked in: LLM-team interviews; deeper variant of the standard question.*
 
-The basic question ([fine-tune vs prompt vs RAG](/interviews/fine-tune-vs-prompt-vs-rag/)) covers when to choose each. The deep version drills into *which kind* of fine-tuning, why, and what each costs operationally.
+The basic question ([fine-tune vs prompt vs RAG](/questions/fine-tune-vs-prompt-vs-rag/)) covers when to choose each. The deep version drills into *which kind* of fine-tuning, why, and what each costs operationally.
 
 ## What the L4 candidate misses
 
@@ -79,4 +79,4 @@ The L6 answer:
 
 ---
 
-*Related: [When would you fine-tune vs prompt vs RAG?](/interviews/fine-tune-vs-prompt-vs-rag/), [RLHF and DPO](/reference/rlhf-and-dpo/), [Mixed precision training](/reference/mixed-precision-training/).*
+*Related: [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/), [RLHF and DPO](/concepts/rlhf-and-dpo/), [Mixed precision training](/concepts/mixed-precision-training/).*

@@ -51,9 +51,9 @@ export const SITE = {
   // Order: most-clicked first (Questions > Guides > Concepts).
   // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
-    { label: 'Questions', href: '/interviews/' },
-    { label: 'Guides', href: '/essays/' },
-    { label: 'Concepts', href: '/reference/' },
+    { label: 'Questions', href: '/questions/' },
+    { label: 'Guides', href: '/guides/' },
+    { label: 'Concepts', href: '/concepts/' },
     { label: 'About', href: '/about/' },
   ],
   postsPerPage: 30,

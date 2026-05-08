@@ -3,8 +3,8 @@ title: "Debug this training loop"
 description: "A live coding question with a paste of buggy training code. The senior signal is the order in which you find bugs and what your debugging procedure looks like."
 date: "2025-12-01"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -109,8 +109,8 @@ What's wrong (in order of severity):
 
 "You've fixed all the bugs. The model still isn't training. What now?"
 
-The L6 answer is the same as the [debug a model that's not learning](/interviews/debug-model-not-learning/) procedure: overfit a single batch, check gradient norms, LR sweep, look at predictions, etc.
+The L6 answer is the same as the [debug a model that's not learning](/questions/debug-model-not-learning/) procedure: overfit a single batch, check gradient norms, LR sweep, look at predictions, etc.
 
 ---
 
-*Related: [How would you debug a model that's not learning?](/interviews/debug-model-not-learning/), [Implement attention from scratch](/interviews/implement-attention-from-scratch/), [How do you choose a learning rate?](/interviews/how-to-choose-learning-rate/).*
+*Related: [How would you debug a model that's not learning?](/questions/debug-model-not-learning/), [Implement attention from scratch](/questions/implement-attention-from-scratch/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/).*

@@ -3,8 +3,8 @@ title: "Mixture of Experts (MoE)"
 description: "Replace one large feed-forward block with N smaller experts and a router that activates only k of them per token. Trades parameter count for compute."
 date: "2026-03-27"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

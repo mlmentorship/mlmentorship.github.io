@@ -3,8 +3,8 @@ title: "Implement attention from scratch"
 description: "The coding question that doubles as a depth check. The code is short; the conversation around it tells the level."
 date: "2025-11-27"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -140,4 +140,4 @@ The code is the entry ticket. The conversation around it is the interview.
 
 ---
 
-*Related reference: [FlashAttention](/reference/flashattention/), [BatchNorm vs LayerNorm](/reference/batchnorm-vs-layernorm/).*
+*Related reference: [FlashAttention](/concepts/flashattention/), [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/).*

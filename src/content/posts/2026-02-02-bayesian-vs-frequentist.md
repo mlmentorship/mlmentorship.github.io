@@ -3,8 +3,8 @@ title: "Bayesian vs frequentist: a practitioner's framing"
 description: "The textbook distinction is philosophical. The practitioner distinction is whether you can sample from a posterior cheaply, and whether you need uncertainty for downstream decisions."
 date: "2026-02-02"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -68,4 +68,4 @@ The L6 answer:
 
 ---
 
-*Related: [Calibration](/reference/calibration/), [A/B testing for ML systems](/reference/ab-testing-for-ml/).*
+*Related: [Calibration](/concepts/calibration/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

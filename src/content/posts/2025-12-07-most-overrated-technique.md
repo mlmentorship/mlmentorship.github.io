@@ -3,8 +3,8 @@ title: "What's the most over-rated technique in ML right now?"
 description: "A trap question that rewards taste. Strong opinions, defended with reasoning, are the senior signal. Weak opinions or 'I don't know' both lose."
 date: "2025-12-07"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -85,4 +85,4 @@ The L6 answer:
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/essays/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/essays/l5-vs-l6-faang-ml/).*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/).*

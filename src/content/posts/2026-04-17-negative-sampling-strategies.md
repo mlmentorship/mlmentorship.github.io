@@ -3,8 +3,8 @@ title: "Negative sampling strategies: what actually matters"
 description: "Choice of negatives often matters more than choice of model. The senior answer ranks the strategies (in-batch, hard, BM25-mined, model-mined) and explains the trade-offs."
 date: "2026-04-17"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -81,4 +81,4 @@ The L6 answer:
 
 ---
 
-*Related: [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [Designing a RAG system that actually works](/essays/designing-rag-that-works/), [Cross-entropy and softmax](/reference/cross-entropy-softmax/).*
+*Related: [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [Cross-entropy and softmax](/concepts/cross-entropy-softmax/).*

@@ -3,8 +3,8 @@ title: "Gradient clipping"
 description: "Cap the norm of the gradient before each optimizer step. The simplest and most reliable defense against training instability."
 date: "2025-08-17"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

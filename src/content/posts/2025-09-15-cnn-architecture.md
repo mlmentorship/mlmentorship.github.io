@@ -3,8 +3,8 @@ title: "CNN architecture"
 description: "Convolutions encode translation equivariance and locality. The structural inductive bias that powered the deep learning revolution in vision."
 date: "2025-09-15"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -84,6 +84,6 @@ Result: matches or beats ViT on ImageNet at the same compute. CNNs are not obsol
 
 ## Related
 
-- [Residual connections](/reference/residual-connections/). What made deep CNNs trainable.
-- [BatchNorm vs LayerNorm](/reference/batchnorm-vs-layernorm/). Normalization for vision.
-- [Vision transformers](/reference/vision-transformers/). Alternative paradigm.
+- [Residual connections](/concepts/residual-connections/). What made deep CNNs trainable.
+- [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/). Normalization for vision.
+- [Vision transformers](/concepts/vision-transformers/). Alternative paradigm.

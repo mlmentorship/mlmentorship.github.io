@@ -3,8 +3,8 @@ title: "Diffusion models"
 description: "Learn to invert a fixed noising process. The dominant generative paradigm for images, audio, video, and molecules in 2026."
 date: "2025-11-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -102,5 +102,5 @@ A useful rule: 30–50 DDIM steps with a modern sampler matches 1000-step DDPM q
 
 ## Related
 
-- [Variational autoencoders](/reference/variational-autoencoders/). VAEs are the latent compressor in latent diffusion.
-- [Autoregressive vs. diffusion](/reference/autoregressive-vs-diffusion/). Broader paradigm comparison.
+- [Variational autoencoders](/concepts/variational-autoencoders/). VAEs are the latent compressor in latent diffusion.
+- [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Broader paradigm comparison.

@@ -3,8 +3,8 @@ title: "Applied Scientist vs MLE vs Research Engineer: what these roles actually
 description: "The role taxonomy is confusing because companies use the same titles to mean different things. Here's the actual decomposition, and which one you should target."
 date: "2026-02-28"
 draft: false
-tags: ["essays"]
-category: "essays"
+tags: ["guides"]
+category: "guides"
 ---
 
 
@@ -149,4 +149,4 @@ Two people with the same title at the same company often do very different jobs 
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/essays/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/essays/l5-vs-l6-faang-ml/).*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/).*

@@ -3,8 +3,8 @@ title: "Encoder-decoder architectures"
 description: "An encoder summarizes the input into a representation; a decoder generates the output conditioned on it. The structure behind translation, T5, summarization, and many multimodal models."
 date: "2025-09-06"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -84,5 +84,5 @@ Cross-attention from decoder to encoder is $O(n_\text{out} \cdot n_\text{in})$. 
 
 ## Related
 
-- [Transformer architecture](/reference/transformer-architecture/). Block-level structure.
-- [Attention mechanism](/reference/attention-mechanism/). Both self- and cross-attention.
+- [Transformer architecture](/concepts/transformer-architecture/). Block-level structure.
+- [Attention mechanism](/concepts/attention-mechanism/). Both self- and cross-attention.

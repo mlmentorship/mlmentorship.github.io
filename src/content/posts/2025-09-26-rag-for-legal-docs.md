@@ -3,8 +3,8 @@ title: "Design a RAG system for legal documents"
 description: "Legal RAG amplifies every standard RAG concern: precise citations, no hallucinations, regulated domain, dense documents with structure. The senior answer addresses each."
 date: "2025-09-26"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -79,4 +79,4 @@ The L6 answer:
 
 ---
 
-*Related: [Designing a RAG system that actually works](/essays/designing-rag-that-works/), [How do you handle hallucinations in production?](/interviews/handle-hallucinations-in-production/), [LLM Evals essay](/essays/llm-evals-the-hardest-part/).*
+*Related: [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/).*

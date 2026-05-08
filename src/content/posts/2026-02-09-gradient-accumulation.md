@@ -3,8 +3,8 @@ title: "Gradient accumulation"
 description: "Run several forward-backward passes before each optimizer step to simulate a larger effective batch size without the memory cost."
 date: "2026-02-09"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -68,6 +68,6 @@ Key points:
 
 ## Related
 
-- [Activation checkpointing](/reference/activation-checkpointing/). Independent memory reduction.
-- [FSDP and ZeRO](/reference/fsdp-and-zero/). Distributed memory reduction.
-- [Mixed precision training](/reference/mixed-precision-training/). Orthogonal memory reduction.
+- [Activation checkpointing](/concepts/activation-checkpointing/). Independent memory reduction.
+- [FSDP and ZeRO](/concepts/fsdp-and-zero/). Distributed memory reduction.
+- [Mixed precision training](/concepts/mixed-precision-training/). Orthogonal memory reduction.

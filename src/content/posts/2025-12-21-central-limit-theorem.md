@@ -3,8 +3,8 @@ title: "Central limit theorem"
 description: "Sums of many independent random variables become Gaussian. Why nearly every error bar in ML and statistics is computed from a normal distribution."
 date: "2025-12-21"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

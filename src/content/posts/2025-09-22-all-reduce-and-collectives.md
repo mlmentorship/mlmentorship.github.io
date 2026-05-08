@@ -3,8 +3,8 @@ title: "All-reduce and other collectives"
 description: "The communication primitives behind every distributed training job. All-reduce, all-gather, reduce-scatter, broadcast. What they do, costs, and when each is used."
 date: "2025-09-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -106,6 +106,6 @@ For a 7B parameter model in BF16 (14 GB per copy) on 32 GPUs with 200 GB/s effec
 
 ## Related
 
-- [Tensor parallelism](/reference/tensor-parallelism/). Heavy collective user.
-- [FSDP and ZeRO](/reference/fsdp-and-zero/). Uses all-gather and reduce-scatter.
-- [Pipeline parallelism](/reference/pipeline-parallelism/). Uses point-to-point, not collectives.
+- [Tensor parallelism](/concepts/tensor-parallelism/). Heavy collective user.
+- [FSDP and ZeRO](/concepts/fsdp-and-zero/). Uses all-gather and reduce-scatter.
+- [Pipeline parallelism](/concepts/pipeline-parallelism/). Uses point-to-point, not collectives.

@@ -7,14 +7,14 @@ import { formatDate } from '../utils/date';
 
 const all = await getCollection('posts', ({ data }) => !data.draft);
 const counts = {
-  essays: all.filter((p) => p.data.category === 'essays').length,
-  interviews: all.filter((p) => p.data.category === 'interviews').length,
-  reference: all.filter((p) => p.data.category === 'reference').length,
+  essays: all.filter((p) => p.data.category === 'guides').length,
+  interviews: all.filter((p) => p.data.category === 'questions').length,
+  reference: all.filter((p) => p.data.category === 'concepts').length,
 };
 
 // Latest essays — top 3 by date.
 const latestEssays = all
-  .filter((p) => p.data.category === 'essays')
+  .filter((p) => p.data.category === 'guides')
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 3)
   .map((p) => ({
@@ -45,7 +45,7 @@ const latestEssays = all
         <a class="btn-primary" href="/start-here/">Browse the library <span aria-hidden="true">→</span></a>
       </p>
       <p class="hero-foot">
-        Or jump in: <a href="/interviews/fine-tune-vs-prompt-vs-rag/">read a sample question</a>
+        Or jump in: <a href="/questions/fine-tune-vs-prompt-vs-rag/">read a sample question</a>
         · <a href="/start-here/">curated reading paths</a>
       </p>
     </section>
@@ -94,7 +94,7 @@ const latestEssays = all
       <ol class="post-list">
         {latestEssays.map((p, i) => (
           <li>
-            <a class="post-row" href={`/essays/${p.slug}/`}>
+            <a class="post-row" href={`/guides/${p.slug}/`}>
               <span class="post-row-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <div>
                 <h3 class="post-row-title">{p.title}</h3>
@@ -106,17 +106,17 @@ const latestEssays = all
         ))}
       </ol>
       <p class="block-foot">
-        <a href="/essays/">All guides <span aria-hidden="true">→</span></a>
+        <a href="/guides/">All guides <span aria-hidden="true">→</span></a>
       </p>
     </section>
 
     <!-- QUIET FOOTNOTE -->
     <p class="footnote">
-      <a href="/interviews/">{counts.interviews} questions</a>
+      <a href="/questions/">{counts.interviews} questions</a>
       <span class="footnote-sep" aria-hidden="true">·</span>
-      <a href="/essays/">{counts.essays} guides</a>
+      <a href="/guides/">{counts.essays} guides</a>
       <span class="footnote-sep" aria-hidden="true">·</span>
-      <a href="/reference/">{counts.reference} concepts</a>
+      <a href="/concepts/">{counts.reference} concepts</a>
       <span class="footnote-sep" aria-hidden="true">·</span>
       <span>press <kbd>/</kbd> to search</span>
     </p>

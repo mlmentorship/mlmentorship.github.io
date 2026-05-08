@@ -3,8 +3,8 @@ title: "Walk me through the bias-variance tradeoff"
 description: "The classic warm-up question. The L4 answer is the formula; the L6 answer is what it tells you about model selection in production."
 date: "2025-07-27"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -67,4 +67,4 @@ The right move when asked this question: give the textbook decomposition in 30 s
 
 ---
 
-*Related reference: [Regularization, L1, L2, dropout, early stopping](/reference/regularization/).*
+*Related reference: [Regularization, L1, L2, dropout, early stopping](/concepts/regularization/).*

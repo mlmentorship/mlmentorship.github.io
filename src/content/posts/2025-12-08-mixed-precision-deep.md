@@ -3,8 +3,8 @@ title: "Mixed precision: what's actually happening?"
 description: "Beyond 'use BF16'. The senior answer explains what stays in FP32, why loss scaling exists for FP16, and the memory split."
 date: "2025-12-08"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -77,4 +77,4 @@ The L6 answer:
 
 ---
 
-*Related: [Mixed precision training](/reference/mixed-precision-training/), [Walk me through how you'd train a 100B parameter model](/interviews/train-100b-model/), [Quantization](/reference/quantization/).*
+*Related: [Mixed precision training](/concepts/mixed-precision-training/), [Walk me through how you'd train a 100B parameter model](/questions/train-100b-model/), [Quantization](/concepts/quantization/).*

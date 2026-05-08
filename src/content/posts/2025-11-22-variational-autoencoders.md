@@ -3,8 +3,8 @@ title: "Variational autoencoders (VAE)"
 description: "Encode inputs to a latent distribution, decode samples back, optimize evidence lower bound. The cleanest gateway to deep generative models."
 date: "2025-11-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -80,5 +80,5 @@ To backprop through sampling, write $z = \mu_\phi(x) + \sigma_\phi(x) \odot \var
 
 ## Related
 
-- [Reparameterization trick](/interviews/reparameterization-trick/). The gradient enabler.
-- [Autoregressive vs. diffusion](/reference/autoregressive-vs-diffusion/). Alternative generative paradigms.
+- [Reparameterization trick](/questions/reparameterization-trick/). The gradient enabler.
+- [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Alternative generative paradigms.

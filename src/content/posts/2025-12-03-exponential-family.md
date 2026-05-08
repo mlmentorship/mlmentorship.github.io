@@ -3,8 +3,8 @@ title: "Exponential family"
 description: "A unified family of distributions (Gaussian, Bernoulli, Poisson, Beta, Gamma, etc.) with shared properties: sufficient statistics, conjugate priors, simple MLE."
 date: "2025-12-03"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

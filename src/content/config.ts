@@ -9,8 +9,8 @@ const posts = defineCollection({
     updated: z.coerce.date().optional(),
     draft: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
-    // One of: 'essays' | 'interviews' | 'reference'
-    category: z.enum(['essays', 'interviews', 'reference']),
+    // One of: 'guides' | 'questions' | 'concepts'
+    category: z.enum(['questions', 'guides', 'concepts']),
     cover: z.string().optional(),
     coverAlt: z.string().optional(),
     featured: z.boolean().default(false),

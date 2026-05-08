@@ -3,8 +3,8 @@ title: "Quantization: INT8, INT4, FP8, and the inference cost picture"
 description: "Reduce model precision to shrink memory and speed up inference. The trade-offs are real but increasingly small with modern techniques."
 date: "2025-08-21"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -105,8 +105,8 @@ Quantization questions test:
 3. Whether you've measured quality loss in production (vs trusting published numbers).
 4. Whether you can prioritize: which quantization technique for which problem.
 
-In senior LLM-team interviews, quantization comes up most often inside the cost-reduction question. See [How would you reduce LLM inference cost by 10x?](/interviews/reduce-llm-inference-cost-10x/).
+In senior LLM-team interviews, quantization comes up most often inside the cost-reduction question. See [How would you reduce LLM inference cost by 10x?](/questions/reduce-llm-inference-cost-10x/).
 
 ---
 
-*Related: [Mixed precision training](/reference/mixed-precision-training/), [KV cache](/reference/kv-cache/), [How to think about LLM inference cost](/essays/llm-inference-cost/).*
+*Related: [Mixed precision training](/concepts/mixed-precision-training/), [KV cache](/concepts/kv-cache/), [How to think about LLM inference cost](/guides/llm-inference-cost/).*

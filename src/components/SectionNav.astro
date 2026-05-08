@@ -1,45 +1,50 @@
 ---
 // SectionNav.astro: persistent left sidebar.
-// Top: global category strip (jump between Essays / Interviews / Reference / System Design).
+// Top: pinned 'Start here' link.
+// Middle: global category strip (jump between Questions / Guides / Concepts).
 // Body: list of all posts in the current category, grouped by subcategory where one is
-// defined (Interviews, Reference). Essays and System Design stay flat.
+// defined (Questions, Concepts). Guides stay flat.
 // On mobile, the body collapses behind a <details> summary so it doesn't dominate the page.
 import { getCollection } from 'astro:content';
 import { getSubcategoryMap, type Category } from '../utils/subcategories';
 
 interface Props {
-  category: Category;
+  // Optional: when omitted (e.g. on /start-here/), no category is highlighted
+  // and no body list is rendered.
+  category?: Category;
   currentSlug?: string;
 }
 const { category, currentSlug } = Astro.props;
 
-const labels: Record<string, string> = {
-  interviews: 'Questions',
-  essays: 'Guides',
-  reference: 'Concepts',
+const labels: Record<Category, string> = {
+  questions: 'Questions',
+  guides: 'Guides',
+  concepts: 'Concepts',
 };
 
 const all = await getCollection('posts', ({ data }) => !data.draft);
-const counts = {
-  essays: all.filter((p) => p.data.category === 'essays').length,
-  interviews: all.filter((p) => p.data.category === 'interviews').length,
-  reference: all.filter((p) => p.data.category === 'reference').length,
-} as const;
+const counts: Record<Category, number> = {
+  questions: all.filter((p) => p.data.category === 'questions').length,
+  guides: all.filter((p) => p.data.category === 'guides').length,
+  concepts: all.filter((p) => p.data.category === 'concepts').length,
+};
 
-const posts = all
-  .filter((p) => p.data.category === category)
-  .map((p) => ({
-    slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
-    title: p.data.title,
-    date: p.data.date,
-  }))
-  .sort((a, b) => {
-    if (category === 'essays') return b.date.getTime() - a.date.getTime();
-    return a.title.localeCompare(b.title);
-  });
+const posts = category
+  ? all
+      .filter((p) => p.data.category === category)
+      .map((p) => ({
+        slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
+        title: p.data.title,
+        date: p.data.date,
+      }))
+      .sort((a, b) => {
+        if (category === 'guides') return b.date.getTime() - a.date.getTime();
+        return a.title.localeCompare(b.title);
+      })
+  : [];
 
 // Group posts by subcategory if one is defined for this category.
-const sub = getSubcategoryMap(category);
+const sub = category ? getSubcategoryMap(category) : null;
 let groups: Array<{ name: string; items: typeof posts }> = [];
 if (sub) {
   const buckets = new Map<string, typeof posts>();
@@ -56,12 +61,12 @@ if (sub) {
   if (other.length > 0) groups.push({ name: 'Other', items: other });
 }
 
-const cats: Array<keyof typeof labels> = ['interviews', 'essays', 'reference'];
-const currentLabel = labels[category];
+const cats: Category[] = ['questions', 'guides', 'concepts'];
+const currentLabel = category ? labels[category] : 'Site';
 const pathname = Astro.url.pathname;
 const startHereActive = pathname === '/start-here/' || pathname === '/start-here';
 ---
-<aside class="section-nav" aria-label={`${currentLabel} navigation`} data-section-nav data-category={category}>
+<aside class="section-nav" aria-label={`${currentLabel} navigation`} data-section-nav data-category={category ?? 'none'}>
   <nav class="pinned-strip" aria-label="Site navigation">
     <ul>
       <li>

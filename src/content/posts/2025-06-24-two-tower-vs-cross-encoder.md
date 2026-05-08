@@ -3,8 +3,8 @@ title: "Two-tower vs cross-encoder: when to use which?"
 description: "The recsys / search architecture decision that comes up in every retrieval interview. The right answer is 'both, in sequence.'"
 date: "2025-06-24"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -84,4 +84,4 @@ If you can have this conversation fluently, you're at strong-senior depth.
 
 ---
 
-*Related: [Designing a RAG system that actually works](/essays/designing-rag-that-works/), [Design YouTube's recommender](/interviews/design-youtube-recommender/).*
+*Related: [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [Design YouTube's recommender](/questions/design-youtube-recommender/).*

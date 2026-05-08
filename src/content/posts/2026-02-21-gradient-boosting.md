@@ -3,8 +3,8 @@ title: "Gradient boosting (xgboost, lightgbm, catboost)"
 description: "Train trees sequentially, each one fitting the gradient of the loss with respect to the current ensemble's prediction. The dominant tabular learner in 2026."
 date: "2026-02-21"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

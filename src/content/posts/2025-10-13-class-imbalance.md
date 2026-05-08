@@ -3,8 +3,8 @@ title: "How do you deal with class imbalance in 2026?"
 description: "Class weighting and SMOTE are the textbook answers and often the wrong ones. The senior answer matches the technique to the imbalance ratio, the cost asymmetry, and the metric you actually care about."
 date: "2025-10-13"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -70,4 +70,4 @@ The L6 answer:
 
 ---
 
-*Related: [Calibration](/reference/calibration/), [How to choose a loss function](/interviews/how-to-choose-loss-function/), [Walk me through bias-variance tradeoff](/interviews/bias-variance-tradeoff/).*
+*Related: [Calibration](/concepts/calibration/), [How to choose a loss function](/questions/how-to-choose-loss-function/), [Walk me through bias-variance tradeoff](/questions/bias-variance-tradeoff/).*

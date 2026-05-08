@@ -3,8 +3,8 @@ title: "Design YouTube's recommender"
 description: "The canonical recsys design question. The real test is whether you'll dive into model architecture or scope the problem first."
 date: "2025-10-20"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -126,4 +126,4 @@ This is a senior probe. The L6 answer:
 
 ---
 
-*Related: [What L5 vs L6 actually means at FAANG ML](/essays/l5-vs-l6-faang-ml/) for the level dynamics in system design specifically.*
+*Related: [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/) for the level dynamics in system design specifically.*

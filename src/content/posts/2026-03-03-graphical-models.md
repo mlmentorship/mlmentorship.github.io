@@ -3,8 +3,8 @@ title: "Probabilistic graphical models"
 description: "Express joint distributions as graphs whose structure encodes conditional independence. Bayesian networks (directed) and Markov random fields (undirected)."
 date: "2026-03-03"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -105,5 +105,5 @@ PGM as a framework is less central than it was in 2010, replaced by neural netwo
 
 ## Related
 
-- [Markov chains](/reference/markov-chains/). Simplest sequential PGM.
-- [Bayes' rule and the posterior](/reference/bayes-rule-and-posterior/). Foundation for PGM inference.
+- [Markov chains](/concepts/markov-chains/). Simplest sequential PGM.
+- [Bayes' rule and the posterior](/concepts/bayes-rule-and-posterior/). Foundation for PGM inference.

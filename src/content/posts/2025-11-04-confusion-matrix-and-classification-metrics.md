@@ -3,8 +3,8 @@ title: "Confusion matrix and classification metrics"
 description: "The 2x2 (or KxK) table of predictions vs. truth that every classification metric is computed from. The Rosetta stone of binary classification."
 date: "2025-11-04"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -103,5 +103,5 @@ scikit-learn's `classification_report` and `confusion_matrix` produce most of th
 
 ## Related
 
-- [Precision, recall, F1](/reference/precision-recall-f1/). Single-metric details.
-- [ROC, PR, AUC](/reference/roc-pr-auc/). Threshold-free metrics.
+- [Precision, recall, F1](/concepts/precision-recall-f1/). Single-metric details.
+- [ROC, PR, AUC](/concepts/roc-pr-auc/). Threshold-free metrics.

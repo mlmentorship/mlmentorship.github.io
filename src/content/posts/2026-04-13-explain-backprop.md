@@ -3,8 +3,8 @@ title: "Explain backprop in your own words"
 description: "The textbook answer is the chain rule. The senior answer is what backprop is doing as a system: a reverse-mode auto-diff pass that reuses intermediate computations to get all gradients in one extra forward-cost pass."
 date: "2026-04-13"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -65,4 +65,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Adam, AdamW, and the modern optimizer landscape](/reference/adam-and-adamw/). Related interview: [How would you debug a model that's not learning?](/interviews/debug-model-not-learning/).*
+*Related reference: [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/). Related interview: [How would you debug a model that's not learning?](/questions/debug-model-not-learning/).*

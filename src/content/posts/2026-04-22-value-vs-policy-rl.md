@@ -3,8 +3,8 @@ title: "Value-based vs. policy-based RL"
 description: "Two paradigms in reinforcement learning. Value-based learns Q(s, a) and acts greedily; policy-based directly parametrizes the policy. When to use which."
 date: "2026-04-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -96,6 +96,6 @@ A third paradigm: learn a dynamics model $p(s' \mid s, a)$ and plan with it. Exa
 
 ## Related
 
-- [Q-learning](/reference/q-learning/). Canonical value-based.
-- [Policy gradient](/reference/policy-gradient/). Canonical policy-based.
-- [PPO](/reference/ppo/). Modern actor-critic.
+- [Q-learning](/concepts/q-learning/). Canonical value-based.
+- [Policy gradient](/concepts/policy-gradient/). Canonical policy-based.
+- [PPO](/concepts/ppo/). Modern actor-critic.

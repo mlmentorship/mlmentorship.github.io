@@ -3,8 +3,8 @@ title: "Precision, recall, and F1"
 description: "The three metrics every classifier interview asks about. Their definitions, when to optimize which, and the F-beta generalization."
 date: "2025-09-20"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -79,7 +79,7 @@ For threshold-independent comparison, report:
 
 - **PR-AUC** (area under the precision-recall curve).
 - **ROC-AUC** (separability metric, threshold-free).
-- See [ROC, PR, and AUC](/reference/roc-pr-auc/).
+- See [ROC, PR, and AUC](/concepts/roc-pr-auc/).
 
 ## Common pitfalls
 
@@ -92,6 +92,6 @@ For threshold-independent comparison, report:
 
 ## Related
 
-- [ROC, PR, and AUC](/reference/roc-pr-auc/). Threshold-independent metrics.
-- [Confusion matrix](/reference/confusion-matrix-and-classification-metrics/). Full classification metric reference.
-- [Class imbalance](/interviews/class-imbalance/). How class skew affects metric choice.
+- [ROC, PR, and AUC](/concepts/roc-pr-auc/). Threshold-independent metrics.
+- [Confusion matrix](/concepts/confusion-matrix-and-classification-metrics/). Full classification metric reference.
+- [Class imbalance](/questions/class-imbalance/). How class skew affects metric choice.

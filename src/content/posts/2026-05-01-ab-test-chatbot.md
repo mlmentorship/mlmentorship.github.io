@@ -3,8 +3,8 @@ title: "How do you A/B test a chatbot?"
 description: "Chatbot A/B testing has all the hard parts of regular A/B testing plus delayed feedback, conversational state, and metrics that are hard to define."
 date: "2026-05-01"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -74,4 +74,4 @@ The L6 answer:
 
 ---
 
-*Related: [A/B testing for ML systems](/reference/ab-testing-for-ml/), [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/).*
+*Related: [A/B testing for ML systems](/concepts/ab-testing-for-ml/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/).*

@@ -5,7 +5,7 @@ import { INTERVIEW_SUBCATEGORY as SUBCATEGORY, INTERVIEW_ORDER as ORDER } from '
 
 
 
-const all = await getCollection('posts', ({ data }) => !data.draft && data.category === 'interviews');
+const all = await getCollection('posts', ({ data }) => !data.draft && data.category === 'questions');
 const posts = all.map((p) => ({
   slug: p.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
   title: p.data.title,
@@ -24,12 +24,12 @@ for (const [, list] of groups) list.sort((a, b) => a.title.localeCompare(b.title
 ungrouped.sort((a, b) => a.title.localeCompare(b.title));
 ---
 <DocsIndexLayout
-  category="interviews"
-  title="Interview Questions"
+  category="questions"
+  title="Questions"
   description="The senior ML interview canon, with leveled answers (L4 / L5 / L6) and what the interviewer is actually checking."
 >
   <header class="head">
-    <p class="kicker">Interviews</p>
+    <p class="kicker">Questions</p>
     <h1>The senior ML interview canon</h1>
     <p class="lede">
       {posts.length} questions across {ORDER.length} categories. Each with what L4 / L5 / L6 answers actually sound like, the tells that get a strong-hire vote, and the tells that get you down-leveled. Press <kbd>/</kbd> to search.
@@ -45,7 +45,7 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
         <ul class="post-list">
           {list.map((p) => (
             <li>
-              <a href={`/interviews/${p.slug}/`} class="entry-title">{p.title}</a>
+              <a href={`/questions/${p.slug}/`} class="entry-title">{p.title}</a>
               {p.description && <p class="desc">{p.description}</p>}
             </li>
           ))}
@@ -60,7 +60,7 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
       <ul class="post-list">
         {ungrouped.map((p) => (
           <li>
-            <a href={`/interviews/${p.slug}/`} class="entry-title">{p.title}</a>
+            <a href={`/questions/${p.slug}/`} class="entry-title">{p.title}</a>
             {p.description && <p class="desc">{p.description}</p>}
           </li>
         ))}

@@ -3,8 +3,8 @@ title: "Normalizing flows"
 description: "Generative models built from invertible transformations. Compute exact likelihoods and sample efficiently. At the cost of architectural restrictions."
 date: "2025-10-26"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -82,5 +82,5 @@ Stack many coupling layers, alternating which half passes through, with shuffles
 
 ## Related
 
-- [Variational autoencoders](/reference/variational-autoencoders/). Alternative latent-variable generative model.
-- [Autoregressive vs. diffusion](/reference/autoregressive-vs-diffusion/). Broader paradigm comparison.
+- [Variational autoencoders](/concepts/variational-autoencoders/). Alternative latent-variable generative model.
+- [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Broader paradigm comparison.

@@ -3,8 +3,8 @@ title: "Random forests"
 description: "Bag deep decision trees plus random feature subsets per split. Variance averaging beats any single tree; the dominant out-of-the-box ensemble before GBDT."
 date: "2026-01-27"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -76,5 +76,5 @@ As $T \to \infty$, variance approaches $\rho \sigma^2$. The two randomizations w
 
 ## Related
 
-- [Decision trees](/reference/decision-trees/). The base learner.
-- [Gradient boosting](/reference/gradient-boosting/). Sequential boosting alternative.
+- [Decision trees](/concepts/decision-trees/). The base learner.
+- [Gradient boosting](/concepts/gradient-boosting/). Sequential boosting alternative.

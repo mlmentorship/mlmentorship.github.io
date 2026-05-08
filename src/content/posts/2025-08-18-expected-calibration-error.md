@@ -3,8 +3,8 @@ title: "Expected Calibration Error (ECE)"
 description: "How well do predicted probabilities match empirical frequencies? Bin predictions by confidence, compare bin-mean confidence to bin-accuracy."
 date: "2025-08-18"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -84,5 +84,5 @@ Calibration is **lossless on accuracy** (monotonic transformations preserve argm
 
 ## Related
 
-- [Calibration](/reference/calibration/). Broader treatment of calibration methods.
-- [Confusion matrix](/reference/confusion-matrix-and-classification-metrics/). Accuracy-based metrics.
+- [Calibration](/concepts/calibration/). Broader treatment of calibration methods.
+- [Confusion matrix](/concepts/confusion-matrix-and-classification-metrics/). Accuracy-based metrics.

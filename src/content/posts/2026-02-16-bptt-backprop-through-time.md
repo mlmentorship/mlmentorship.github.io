@@ -3,8 +3,8 @@ title: "Explain backprop through time"
 description: "BPTT is just backprop on the unrolled computation graph of a recurrent network. The interview signal is whether you understand truncation and what it costs."
 date: "2026-02-16"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related: [Transformer architecture](/reference/transformer-architecture/), [FlashAttention](/reference/flashattention/), [Explain backprop](/interviews/explain-backprop/).*
+*Related: [Transformer architecture](/concepts/transformer-architecture/), [FlashAttention](/concepts/flashattention/), [Explain backprop](/questions/explain-backprop/).*

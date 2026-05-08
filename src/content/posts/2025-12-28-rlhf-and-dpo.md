@@ -3,8 +3,8 @@ title: "RLHF, DPO, and the alignment training stack"
 description: "How LLMs get from 'next-token predictor' to 'helpful assistant.' The post-training pipeline in 2026."
 date: "2025-12-28"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -125,4 +125,4 @@ Senior LLM-team interviews often probe deeply on this, because it's where the in
 
 ---
 
-*Related: [Transformer architecture](/reference/transformer-architecture/), [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [Calibration](/reference/calibration/).*
+*Related: [Transformer architecture](/concepts/transformer-architecture/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Calibration](/concepts/calibration/).*

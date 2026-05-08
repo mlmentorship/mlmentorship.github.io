@@ -3,8 +3,8 @@ title: "Bias and variance of estimators"
 description: "An estimator has bias (systematic error) and variance (sample-to-sample wobble). Mean-squared error decomposes into the two."
 date: "2026-01-13"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -13,7 +13,7 @@ For an estimator $\hat\theta$ of a parameter $\theta$, **bias** is $\mathbb{E}[\
 
 ## Why it matters
 
-This decomposition is the statistical version of the [bias–variance tradeoff](/interviews/bias-variance-tradeoff/) familiar from ML: complex models have low bias but high variance; simple models have high bias but low variance. The same accounting applies to any estimator. Sample mean, regularized regression coefficient, importance sampling weight.
+This decomposition is the statistical version of the [bias–variance tradeoff](/questions/bias-variance-tradeoff/) familiar from ML: complex models have low bias but high variance; simple models have high bias but low variance. The same accounting applies to any estimator. Sample mean, regularized regression coefficient, importance sampling weight.
 
 ## The decomposition
 

@@ -3,8 +3,8 @@ title: "Design a system for safe LLM deployment in healthcare"
 description: "Healthcare adds three constraints on top of normal LLM deployment: regulatory compliance, low tolerance for harm, and a workflow that already has clinicians as the final decision-maker."
 date: "2026-03-07"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -83,4 +83,4 @@ The L6 answer:
 
 ---
 
-*Related: [How do you handle hallucinations in production?](/interviews/handle-hallucinations-in-production/), [LLM Evals essay](/essays/llm-evals-the-hardest-part/), [RAG for legal documents](/interviews/rag-for-legal-docs/).*
+*Related: [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/), [RAG for legal documents](/questions/rag-for-legal-docs/).*

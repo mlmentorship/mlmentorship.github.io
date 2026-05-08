@@ -3,8 +3,8 @@ title: "Linear regression"
 description: "Predict a continuous target as a linear combination of features by minimizing squared error. Closed-form solution, MLE under Gaussian noise, and the foundation everything else builds on."
 date: "2025-09-18"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

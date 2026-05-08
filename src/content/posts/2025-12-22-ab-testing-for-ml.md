@@ -3,8 +3,8 @@ title: "A/B testing for ML systems"
 description: "The framework for proving a model change actually helps. Statistical power, novelty effects, network effects, all the things people get wrong."
 date: "2025-12-22"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -127,4 +127,4 @@ A common follow-up: "What would make you not ship a model with a positive primar
 
 ---
 
-*Related: [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Calibration](/reference/calibration/).*
+*Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Design YouTube's recommender](/questions/design-youtube-recommender/), [Calibration](/concepts/calibration/).*

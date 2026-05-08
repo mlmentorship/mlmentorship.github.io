@@ -3,8 +3,8 @@ title: "L1 vs L2 regularization, beyond the formula"
 description: "The math is identical to most candidates: penalty terms in the loss. The senior signal is the Bayesian interpretation, the optimization geometry, and when each is the right choice."
 date: "2025-12-04"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Regularization](/reference/regularization/), [Adam, AdamW, and the modern optimizer landscape](/reference/adam-and-adamw/).*
+*Related reference: [Regularization](/concepts/regularization/), [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/).*

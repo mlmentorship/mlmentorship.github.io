@@ -3,8 +3,8 @@ title: "Gaussian mixture models"
 description: "Model data as a weighted sum of K Gaussians. Soft clustering, density estimation, and the canonical EM example."
 date: "2026-04-20"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -98,5 +98,5 @@ For high-dimensional data: pure GMMs struggle (covariance estimation requires $O
 
 ## Related
 
-- [Expectation-Maximization](/reference/expectation-maximization/). The training algorithm.
-- [k-means clustering](/reference/k-means-clustering/). Special case of GMM.
+- [Expectation-Maximization](/concepts/expectation-maximization/). The training algorithm.
+- [k-means clustering](/concepts/k-means-clustering/). Special case of GMM.

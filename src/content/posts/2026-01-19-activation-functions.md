@@ -3,8 +3,8 @@ title: "Activation functions"
 description: "ReLU, GELU, swish, sigmoid, tanh. What each does, why GELU/swish replaced ReLU in transformers, and when to use which."
 date: "2026-01-19"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -73,5 +73,5 @@ Two parallel linear projections, one passed through swish, then elementwise prod
 
 ## Related
 
-- [Weight initialization](/reference/weight-initialization/). Initialization is activation-dependent.
-- [Exploding and vanishing gradients](/reference/exploding-vanishing-gradients/). What motivates ReLU and gated activations.
+- [Weight initialization](/concepts/weight-initialization/). Initialization is activation-dependent.
+- [Exploding and vanishing gradients](/concepts/exploding-vanishing-gradients/). What motivates ReLU and gated activations.

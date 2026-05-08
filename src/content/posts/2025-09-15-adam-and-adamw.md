@@ -3,8 +3,8 @@ title: "Adam, AdamW, and the modern optimizer landscape"
 description: "Why Adam works, why AdamW is the version you actually want, and what's changed in the optimizer landscape since 2018."
 date: "2025-09-15"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -106,4 +106,4 @@ Easy to ace; easy to fumble.
 
 ---
 
-*Related interview: [How do you choose a learning rate?](/interviews/how-to-choose-learning-rate/), [How would you debug a model that's not learning?](/interviews/debug-model-not-learning/).*
+*Related interview: [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/), [How would you debug a model that's not learning?](/questions/debug-model-not-learning/).*

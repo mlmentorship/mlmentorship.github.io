@@ -3,8 +3,8 @@ title: "Calibration: when your model says 80% it should be right 80% of the time
 description: "Accuracy isn't enough; you also want predictions to mean what they say. Calibration is the difference."
 date: "2026-03-01"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -117,4 +117,4 @@ A common follow-up: "When does calibration *not* matter?" The senior answer: whe
 
 ---
 
-*Related: [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [How do you handle hallucinations in production?](/interviews/handle-hallucinations-in-production/).*
+*Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/).*

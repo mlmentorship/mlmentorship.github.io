@@ -3,8 +3,8 @@ title: "Weight decay vs. L2 regularization"
 description: "L2 adds ½λ‖θ‖² to the loss; weight decay shrinks θ multiplicatively at each step. They are equivalent under SGD but not under Adam. Which is why AdamW exists."
 date: "2026-02-27"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -66,5 +66,5 @@ Common practice: do not decay biases, LayerNorm parameters, or embeddings. These
 
 ## Related
 
-- [Adam and AdamW](/reference/adam-and-adamw/). For the optimizer-side derivation.
-- [Regularization](/reference/regularization/). Broader survey of regularization techniques.
+- [Adam and AdamW](/concepts/adam-and-adamw/). For the optimizer-side derivation.
+- [Regularization](/concepts/regularization/). Broader survey of regularization techniques.

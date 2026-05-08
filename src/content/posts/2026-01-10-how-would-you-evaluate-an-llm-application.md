@@ -3,8 +3,8 @@ title: "How would you evaluate an LLM application you've built?"
 description: "A level-defining question. The same words elicit a junior, senior, or staff answer. The rubric below shows the differences."
 date: "2026-01-10"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -97,4 +97,4 @@ Answer the third one and the first two come along for free.
 
 ---
 
-*Read the long-form essay this distills: ["LLM Evals: The hardest part of shipping LLMs"](/essays/llm-evals-the-hardest-part/).*
+*Read the long-form essay this distills: ["LLM Evals: The hardest part of shipping LLMs"](/guides/llm-evals-the-hardest-part/).*

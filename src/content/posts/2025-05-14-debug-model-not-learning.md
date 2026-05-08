@@ -3,8 +3,8 @@ title: "How would you debug a model that's not learning?"
 description: "The 'tell me how you'd debug' question is a behavioral round in disguise. The interviewer is probing your debugging instinct, not testing facts."
 date: "2025-05-14"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -84,4 +84,4 @@ If you have this conversation fluently, you're at the senior bar.
 
 ---
 
-*Related: [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [Walk me through bias-variance tradeoff](/interviews/bias-variance-tradeoff/).*
+*Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Walk me through bias-variance tradeoff](/questions/bias-variance-tradeoff/).*

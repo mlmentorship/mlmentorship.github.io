@@ -3,8 +3,8 @@ title: "Eigenvalues and the spectral theorem"
 description: "Eigenvectors are directions a matrix only stretches. The spectral theorem says symmetric matrices have a full orthogonal eigenbasis with real eigenvalues."
 date: "2025-08-21"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -60,5 +60,5 @@ For symmetric positive semi-definite $A$: SVD and eigendecomposition coincide ($
 
 ## Related
 
-- [SVD and PCA](/reference/svd-and-pca/). Generalization to all matrices.
-- [Positive definite matrices](/reference/positive-definite-matrices/). The cone of PSD matrices.
+- [SVD and PCA](/concepts/svd-and-pca/). Generalization to all matrices.
+- [Positive definite matrices](/concepts/positive-definite-matrices/). The cone of PSD matrices.

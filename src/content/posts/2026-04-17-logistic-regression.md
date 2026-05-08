@@ -3,8 +3,8 @@ title: "Logistic regression"
 description: "Linear regression for binary classification: pass a linear combination through a sigmoid, train by maximum likelihood. Still the strongest non-trivial baseline for tabular classification."
 date: "2026-04-17"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -15,7 +15,7 @@ Logistic regression models $p(y = 1 \mid x) = \sigma(w^\top x + b)$ where $\sigm
 
 Logistic regression is the **first model you should try** on any tabular classification problem. It is interpretable, calibrated by default (when trained on representative data), fast to fit, and competitive with much fancier methods on high-quality features. Most "production tabular models" at large companies have a strong logistic baseline they need to beat.
 
-It is also the canonical example of a [generalized linear model](/reference/exponential-family/) and the building block for softmax regression, neural network output layers, and many fairness / calibration analyses.
+It is also the canonical example of a [generalized linear model](/concepts/exponential-family/) and the building block for softmax regression, neural network output layers, and many fairness / calibration analyses.
 
 ## The model
 

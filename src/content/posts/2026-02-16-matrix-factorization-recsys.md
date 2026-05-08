@@ -3,8 +3,8 @@ title: "Matrix factorization for recsys"
 description: "Decompose the user-item interaction matrix into user and item embeddings whose dot product approximates the rating. The original collaborative filtering."
 date: "2026-02-16"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -58,7 +58,7 @@ This is why two-tower models displaced pure MF for production: they handle cold 
 
 ## Connection to two-tower models
 
-Two-tower retrieval (see [two-tower retrieval](/reference/two-tower-retrieval/)) is exactly MF generalized to neural encoders:
+Two-tower retrieval (see [two-tower retrieval](/concepts/two-tower-retrieval/)) is exactly MF generalized to neural encoders:
 
 - MF: $u_u, v_i$ are free embedding parameters.
 - Two-tower: $u_u = f_\theta(\text{user features})$, $v_i = g_\phi(\text{item features})$.
@@ -83,5 +83,5 @@ For most production systems: two-tower neural models or transformer-based rankin
 
 ## Related
 
-- [Two-tower retrieval](/reference/two-tower-retrieval/). Neural generalization.
-- [Embedding spaces](/reference/embedding-spaces-and-similarity/). How the latent factors are used.
+- [Two-tower retrieval](/concepts/two-tower-retrieval/). Neural generalization.
+- [Embedding spaces](/concepts/embedding-spaces-and-similarity/). How the latent factors are used.

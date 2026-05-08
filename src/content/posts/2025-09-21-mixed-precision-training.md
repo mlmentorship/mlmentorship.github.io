@@ -3,8 +3,8 @@ title: "Mixed precision training: FP16, BF16, and FP8"
 description: "How modern transformers train at 2-4× the throughput of FP32 without quality loss. The bit layouts matter; the loss-scaling recipe matters more."
 date: "2025-09-21"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -120,4 +120,4 @@ If asked about mixed precision:
 
 ---
 
-*Related: [Adam, AdamW, and the modern optimizer landscape](/reference/adam-and-adamw/), [Transformer architecture](/reference/transformer-architecture/).*
+*Related: [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/), [Transformer architecture](/concepts/transformer-architecture/).*

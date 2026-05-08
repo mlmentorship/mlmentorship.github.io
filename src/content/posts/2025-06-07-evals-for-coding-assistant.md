@@ -3,8 +3,8 @@ title: "How would you build evals for a coding assistant?"
 description: "Code is one of the few LLM domains where ground truth is verifiable. Use that. The senior answer combines verifiable metrics with human review for what verification can't catch."
 date: "2025-06-07"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -75,4 +75,4 @@ The L6 answer:
 
 ---
 
-*Related: [LLM Evals essay](/essays/llm-evals-the-hardest-part/), [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [Evaluate an agent](/interviews/evaluate-an-agent/).*
+*Related: [LLM Evals essay](/guides/llm-evals-the-hardest-part/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Evaluate an agent](/questions/evaluate-an-agent/).*

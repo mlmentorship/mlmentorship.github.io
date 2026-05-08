@@ -3,8 +3,8 @@ title: "How would you do cold-start for a new user?"
 description: "Cold-start is solved by combining minimal explicit signal, demographic and contextual fallbacks, and aggressive exploration in the first few sessions."
 date: "2025-11-30"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -73,4 +73,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Design Spotify's homepage](/interviews/design-spotify-homepage/), [System design case study: building personalized search ranking](/system-design/personalized-search-ranking/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Design Spotify's homepage](/questions/design-spotify-homepage/), [System design case study: building personalized search ranking](/system-design/personalized-search-ranking/).*

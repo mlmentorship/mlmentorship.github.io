@@ -3,8 +3,8 @@ title: "Sequence packing with block-diagonal masks"
 description: "Concatenate multiple short examples into one fixed-length sequence to eliminate padding waste. The single largest throughput win for training on skewed-length corpora."
 date: "2026-01-25"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -56,5 +56,5 @@ Most modern training stacks pack by default. Llama, Mistral, Qwen, and major SFT
 
 ## Related
 
-- [FlashAttention](/reference/flashattention/). The underlying kernel that makes varlen attention efficient.
-- [Gradient accumulation](/reference/gradient-accumulation/). Orthogonal way to grow effective batch size.
+- [FlashAttention](/concepts/flashattention/). The underlying kernel that makes varlen attention efficient.
+- [Gradient accumulation](/concepts/gradient-accumulation/). Orthogonal way to grow effective batch size.

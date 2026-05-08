@@ -3,8 +3,8 @@ title: "Bayes' rule and the posterior"
 description: "How to update beliefs given evidence: posterior ∝ likelihood × prior. The foundation of Bayesian inference, naive Bayes, and probabilistic graphical models."
 date: "2025-11-15"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

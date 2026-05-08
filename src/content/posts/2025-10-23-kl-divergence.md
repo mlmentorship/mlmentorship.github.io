@@ -3,8 +3,8 @@ title: "KL divergence"
 description: "Asymmetric distance between probability distributions. Cross-entropy minus entropy. The mathematical glue holding most of probabilistic ML together."
 date: "2025-10-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

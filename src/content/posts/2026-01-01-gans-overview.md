@@ -3,8 +3,8 @@ title: "Generative adversarial networks (GANs)"
 description: "Two networks compete: a generator produces samples, a discriminator distinguishes them from real data. Sharp samples, training instability, mostly displaced by diffusion in 2026."
 date: "2026-01-01"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -83,5 +83,5 @@ Diffusion's training stability and conditioning flexibility (especially text-to-
 
 ## Related
 
-- [Autoregressive vs. diffusion](/reference/autoregressive-vs-diffusion/). Broader generative paradigm map.
-- [Variational autoencoders](/reference/variational-autoencoders/). Earlier alternative.
+- [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Broader generative paradigm map.
+- [Variational autoencoders](/concepts/variational-autoencoders/). Earlier alternative.

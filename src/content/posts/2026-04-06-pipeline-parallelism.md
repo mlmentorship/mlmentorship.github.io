@@ -3,8 +3,8 @@ title: "Pipeline parallelism"
 description: "Split the model across GPUs by layer; pipeline mini-batches through the stages. The way to scale across slow interconnects when TP isn't viable."
 date: "2026-04-06"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -86,6 +86,6 @@ For a 405B-parameter model on 1024 GPUs: TP=8, PP=16, DP=8 is a typical configur
 
 ## Related
 
-- [Tensor parallelism](/reference/tensor-parallelism/). Orthogonal sharding within nodes.
-- [FSDP and ZeRO](/reference/fsdp-and-zero/). Orthogonal sharding for memory.
-- [Activation checkpointing](/reference/activation-checkpointing/). Reduce per-stage activation memory.
+- [Tensor parallelism](/concepts/tensor-parallelism/). Orthogonal sharding within nodes.
+- [FSDP and ZeRO](/concepts/fsdp-and-zero/). Orthogonal sharding for memory.
+- [Activation checkpointing](/concepts/activation-checkpointing/). Reduce per-stage activation memory.

@@ -3,8 +3,8 @@ title: "Determinant and volume"
 description: "The determinant of a matrix is the signed volume scaling factor of the linear map. Zero determinant means the map collapses dimensions."
 date: "2025-12-02"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

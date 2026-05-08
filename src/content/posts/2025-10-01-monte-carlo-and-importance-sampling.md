@@ -3,8 +3,8 @@ title: "Monte Carlo and importance sampling"
 description: "Estimate expectations by averaging over random samples. The simplest way to compute integrals you can't compute analytically."
 date: "2025-10-01"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

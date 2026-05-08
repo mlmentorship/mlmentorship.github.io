@@ -3,8 +3,8 @@ title: "Autoregressive vs. diffusion generation"
 description: "Two paradigms for generative modeling: predict the next element step-by-step (autoregressive) or iteratively denoise from pure noise (diffusion). Different costs, different strengths."
 date: "2026-04-02"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -36,7 +36,7 @@ A neural net (transformer, RNN) parameterizes each $p(x_t \mid x_{<t})$. Trainin
 
 **Strengths**: exact likelihood, simple training, parallel teacher-forced loss, strong on discrete sequences.
 
-**Weakness**: serial sampling. Each step waits for the previous. This is the bottleneck that motivates [speculative decoding](/reference/speculative-decoding/).
+**Weakness**: serial sampling. Each step waits for the previous. This is the bottleneck that motivates [speculative decoding](/concepts/speculative-decoding/).
 
 ## Diffusion
 

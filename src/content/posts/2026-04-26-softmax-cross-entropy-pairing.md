@@ -3,8 +3,8 @@ title: "Why is softmax + cross-entropy the right pairing?"
 description: "The gradient simplifies to (p - y), and that's not a coincidence. The senior answer derives this and connects to GLMs and numerical stability."
 date: "2026-04-26"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -95,4 +95,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Cross-entropy and softmax](/reference/cross-entropy-softmax/), [Derive logistic regression from MLE](/interviews/derive-logistic-regression/), [How to choose a loss function](/interviews/how-to-choose-loss-function/).*
+*Related reference: [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Derive logistic regression from MLE](/questions/derive-logistic-regression/), [How to choose a loss function](/questions/how-to-choose-loss-function/).*

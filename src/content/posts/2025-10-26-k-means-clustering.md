@@ -3,8 +3,8 @@ title: "k-means clustering"
 description: "Partition n points into k clusters by minimizing within-cluster variance. Lloyd's algorithm: alternate assigning points to nearest center and recomputing centers."
 date: "2025-10-26"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

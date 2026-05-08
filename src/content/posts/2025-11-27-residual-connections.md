@@ -3,8 +3,8 @@ title: "Residual connections"
 description: "Add the input of a block to its output. Lets gradients flow unimpeded through depth and made networks deeper than 30 layers practical for the first time."
 date: "2025-11-27"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -81,5 +81,5 @@ Almost no modern architecture omits residuals.
 
 ## Related
 
-- [Exploding and vanishing gradients](/reference/exploding-vanishing-gradients/). The problem residuals solve.
-- [Transformer architecture](/reference/transformer-architecture/). The canonical user.
+- [Exploding and vanishing gradients](/concepts/exploding-vanishing-gradients/). The problem residuals solve.
+- [Transformer architecture](/concepts/transformer-architecture/). The canonical user.

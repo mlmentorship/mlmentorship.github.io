@@ -3,8 +3,8 @@ title: "Design Amazon's people also bought"
 description: "A simple-sounding feature with deep recsys ground underneath. The senior answer chooses between item-item collaborative filtering, embedding similarity, and learned co-purchase models, with explicit handling of feedback loops."
 date: "2026-02-13"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -77,4 +77,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*

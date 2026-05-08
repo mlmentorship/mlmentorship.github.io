@@ -3,8 +3,8 @@ title: "System design case study: building personalized search ranking"
 description: "An end-to-end design of a personalized search ranking system at scale, from problem framing through deployment and monitoring. The same template works for most ML system design interviews."
 date: "2026-04-14"
 draft: false
-tags: ["essays", "system-design"]
-category: "essays"
+tags: ["guides", "system-design"]
+category: "guides"
 ---
 
 
@@ -279,4 +279,4 @@ If you can structure a 45-minute conversation around these 14 layers and answer 
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [A/B testing for ML systems](/reference/ab-testing-for-ml/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

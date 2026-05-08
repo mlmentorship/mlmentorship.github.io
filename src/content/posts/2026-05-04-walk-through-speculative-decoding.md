@@ -3,8 +3,8 @@ title: "Walk me through speculative decoding"
 description: "The interview signal is whether you understand why decoding is memory-bound and why the verify pass is essentially free."
 date: "2026-05-04"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -79,4 +79,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Speculative decoding](/reference/speculative-decoding/), [KV cache](/reference/kv-cache/), [How would you reduce LLM inference cost by 10x?](/interviews/reduce-llm-inference-cost-10x/).*
+*Related reference: [Speculative decoding](/concepts/speculative-decoding/), [KV cache](/concepts/kv-cache/), [How would you reduce LLM inference cost by 10x?](/questions/reduce-llm-inference-cost-10x/).*

@@ -3,8 +3,8 @@ title: "Prefill vs. decode: the two phases of LLM inference"
 description: "LLM inference has two cost regimes with very different bottlenecks. Mixing them up leads to wrong cost models and bad serving decisions."
 date: "2025-12-14"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -33,7 +33,7 @@ Bottleneck: compute-bound at any reasonable prompt length.
 For each subsequent generated token:
 
 - One forward pass with sequence length 1 (just the new token).
-- Q is a single vector; K and V come from the [KV cache](/reference/kv-cache/).
+- Q is a single vector; K and V come from the [KV cache](/concepts/kv-cache/).
 - FLOPs: $\approx 2 \cdot N_\text{params}$. One multiply-add per parameter for the matmul.
 - Bytes moved from HBM: at least $N_\text{params} \cdot \text{dtype\_bytes}$ (must read all weights).
 - Arithmetic intensity: $\sim 2$ FLOPs/byte at batch 1.
@@ -70,6 +70,6 @@ For a 1000-token output, TPOT dominates. For a search query that gets a 50-token
 
 ## Related
 
-- [GPU memory hierarchy](/reference/gpu-memory-hierarchy/). Why decode is bandwidth-bound.
-- [Continuous batching](/reference/continuous-batching/). How servers exploit decode batching.
-- [Speculative decoding](/reference/speculative-decoding/). The main lever for decode speedup.
+- [GPU memory hierarchy](/concepts/gpu-memory-hierarchy/). Why decode is bandwidth-bound.
+- [Continuous batching](/concepts/continuous-batching/). How servers exploit decode batching.
+- [Speculative decoding](/concepts/speculative-decoding/). The main lever for decode speedup.

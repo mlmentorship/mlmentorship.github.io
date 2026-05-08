@@ -3,8 +3,8 @@ title: "PagedAttention and the vLLM serving model"
 description: "Treat the KV cache like virtual memory: allocate in fixed-size pages, share pages across sequences, eliminate fragmentation. The reason vLLM is the default LLM server."
 date: "2025-08-13"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -39,7 +39,7 @@ For systems with long shared prefixes (chat with a long system prompt; structure
 
 ## Continuous batching pairs naturally with paging
 
-PagedAttention enables **continuous batching**: requests of different lengths can be batched together because the kernel reads each sequence's KV through its own block table. New requests can join an in-flight batch at any step (instead of waiting for the slowest request in a static batch to finish). See [continuous batching](/reference/continuous-batching/).
+PagedAttention enables **continuous batching**: requests of different lengths can be batched together because the kernel reads each sequence's KV through its own block table. New requests can join an in-flight batch at any step (instead of waiting for the slowest request in a static batch to finish). See [continuous batching](/concepts/continuous-batching/).
 
 ## Tradeoffs
 

@@ -3,8 +3,8 @@ title: "Regularization: L1, L2, dropout, early stopping, and the modern view"
 description: "The classical regularizers + the modern reality that SGD's noise is itself a regularizer. The hierarchy of choices when your model is overfitting."
 date: "2026-01-30"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -104,4 +104,4 @@ Regularization questions test:
 
 ---
 
-*Related: [Why does dropout work?](/interviews/why-does-dropout-work/), [Adam, AdamW, and the modern optimizer landscape](/reference/adam-and-adamw/).*
+*Related: [Why does dropout work?](/questions/why-does-dropout-work/), [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/).*

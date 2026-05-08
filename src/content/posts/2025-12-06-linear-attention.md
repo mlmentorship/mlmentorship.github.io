@@ -3,8 +3,8 @@ title: "Linear attention (Linformer, Performer, kernel methods)"
 description: "Approximate the softmax attention matrix with a low-rank or kernel factorization so cost is linear in sequence length."
 date: "2025-12-06"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -13,7 +13,7 @@ Linear attention replaces the $n \times n$ softmax matrix with an explicit facto
 
 ## Why it matters
 
-Sparse attention (see [sparse attention](/reference/sparse-attention/)) keeps the softmax exact but on fewer pairs. Linear attention approximates the softmax itself, exploiting the empirical observation that the $n \times n$ attention matrix is approximately low-rank.
+Sparse attention (see [sparse attention](/concepts/sparse-attention/)) keeps the softmax exact but on fewer pairs. Linear attention approximates the softmax itself, exploiting the empirical observation that the $n \times n$ attention matrix is approximately low-rank.
 
 In practice, modern decoder LLMs do not use linear attention. Quality drops are non-trivial at scale and FlashAttention has made dense attention competitive in wall-clock. Linear attention is most relevant in domains with extreme $n$ (genomics, time series of millions of steps) or in research on sub-quadratic alternatives.
 

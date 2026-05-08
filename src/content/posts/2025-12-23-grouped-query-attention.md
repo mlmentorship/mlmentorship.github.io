@@ -3,8 +3,8 @@ title: "Grouped-query and multi-query attention (GQA, MQA)"
 description: "Share K and V heads across query heads to shrink the KV cache 4-8x with negligible quality loss. Standard in modern decoder LLMs."
 date: "2025-12-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -13,7 +13,7 @@ GQA and MQA reduce the number of distinct K/V projection heads while keeping the
 
 ## Why it matters
 
-The KV cache dominates LLM serving memory at long contexts (see [KV cache](/reference/kv-cache/)). Cutting the number of K/V heads cuts cache size proportionally:
+The KV cache dominates LLM serving memory at long contexts (see [KV cache](/concepts/kv-cache/)). Cutting the number of K/V heads cuts cache size proportionally:
 
 - **MHA** (standard, e.g. GPT-3): K and V have the same number of heads as Q.
 - **MQA** [(Shazeer, 2019)](https://arxiv.org/abs/1911.02150): 1 K and 1 V head shared across all Q heads. ~`num_heads`× smaller cache.

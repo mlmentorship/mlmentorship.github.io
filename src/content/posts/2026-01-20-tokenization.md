@@ -3,8 +3,8 @@ title: "Tokenization: BPE, WordPiece, and the LLM era"
 description: "The critical input layer between text and model. Tokenization mismatch is a frequent source of production LLM bugs."
 date: "2026-01-20"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -97,4 +97,4 @@ A common follow-up: "How would you handle a domain where the standard tokenizer 
 
 ---
 
-*Related: [Transformer architecture](/reference/transformer-architecture/), [LLM Evals essay](/essays/llm-evals-the-hardest-part/).*
+*Related: [Transformer architecture](/concepts/transformer-architecture/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/).*

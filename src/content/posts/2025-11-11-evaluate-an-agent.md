@@ -3,8 +3,8 @@ title: "How do you evaluate an agent?"
 description: "Agent eval is harder than chat eval because there are intermediate steps, tool calls, and long-horizon outcomes. The senior answer evaluates trajectories, not just final outputs."
 date: "2025-11-11"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -75,4 +75,4 @@ The L6 answer:
 
 ---
 
-*Related: [LLM Evals essay](/essays/llm-evals-the-hardest-part/), [How would you evaluate an LLM application?](/interviews/how-would-you-evaluate-an-llm-application/), [How do you handle hallucinations in production?](/interviews/handle-hallucinations-in-production/).*
+*Related: [LLM Evals essay](/guides/llm-evals-the-hardest-part/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/).*

@@ -3,8 +3,8 @@ title: "Design fraud detection for a payment company"
 description: "Fraud has the worst data of any ML problem: heavily imbalanced, biased labels, adversarial actors, and direct money on the line. The senior answer respects all four."
 date: "2025-12-25"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -87,4 +87,4 @@ The L6 answer:
 
 ---
 
-*Related: [How do you deal with class imbalance in 2026?](/interviews/class-imbalance/), [Calibration](/reference/calibration/), [A/B testing for ML systems](/reference/ab-testing-for-ml/).*
+*Related: [How do you deal with class imbalance in 2026?](/questions/class-imbalance/), [Calibration](/concepts/calibration/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

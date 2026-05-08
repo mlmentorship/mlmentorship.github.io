@@ -3,8 +3,8 @@ title: "Tensor parallelism"
 description: "Split a single matrix multiplication across multiple GPUs. The way to fit one transformer layer that doesn't fit on a single device."
 date: "2025-12-23"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -81,6 +81,6 @@ A complement to TP that shards the **sequence dimension** for operations not par
 
 ## Related
 
-- [FSDP and ZeRO](/reference/fsdp-and-zero/). Orthogonal sharding.
-- [Pipeline parallelism](/reference/pipeline-parallelism/). Alternative cross-device split.
-- [All-reduce and collectives](/reference/all-reduce-and-collectives/). The underlying primitives.
+- [FSDP and ZeRO](/concepts/fsdp-and-zero/). Orthogonal sharding.
+- [Pipeline parallelism](/concepts/pipeline-parallelism/). Alternative cross-device split.
+- [All-reduce and collectives](/concepts/all-reduce-and-collectives/). The underlying primitives.

@@ -3,8 +3,8 @@ title: "Design real-time personalization"
 description: "Real-time personalization fails most often at the data infrastructure, not the model. The senior answer designs the feature freshness and serving stack first."
 date: "2026-04-28"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -85,4 +85,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/), [How do you choose a learning rate?](/interviews/how-to-choose-learning-rate/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/).*

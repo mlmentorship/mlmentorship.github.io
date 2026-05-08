@@ -3,8 +3,8 @@ title: "The attention mechanism"
 description: "Compute a weighted sum of values, weights derived from query-key similarity. The single operation that powers transformers, retrieval, and most of modern ML."
 date: "2025-10-12"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -49,7 +49,7 @@ The $\sqrt{d}$ scaling is critical: without it, dot products grow linearly in $d
 
 Run attention $H$ times in parallel with different learned $Q, K, V$ projections (each of dimension $d / H$), concatenate the outputs, project back. Each "head" can specialize to different relationships (syntactic, semantic, positional). Standard transformer uses 8–96 heads.
 
-In modern LLMs, heads are reduced via [grouped-query attention](/reference/grouped-query-attention/) where multiple Q heads share K/V heads.
+In modern LLMs, heads are reduced via [grouped-query attention](/concepts/grouped-query-attention/) where multiple Q heads share K/V heads.
 
 ## Causal (autoregressive) masking
 
@@ -66,7 +66,7 @@ Dot-product attention with a single query against many keys is mathematically id
 - Forward: $O(n_q \cdot n_k \cdot d) + O(n_q \cdot n_k \cdot d_v)$ FLOPs.
 - Memory: $O(n_q \cdot n_k)$ for the attention matrix. The dominant cost at long context.
 
-[FlashAttention](/reference/flashattention/) reorders the computation to never materialize the full matrix, dropping memory to $O(n)$.
+[FlashAttention](/concepts/flashattention/) reorders the computation to never materialize the full matrix, dropping memory to $O(n)$.
 
 ## Common pitfalls
 
@@ -77,6 +77,6 @@ Dot-product attention with a single query against many keys is mathematically id
 
 ## Related
 
-- [Transformer architecture](/reference/transformer-architecture/). Full assembly.
-- [FlashAttention](/reference/flashattention/). Efficient implementation.
-- [Grouped-query attention](/reference/grouped-query-attention/). Modern KV-cache optimization.
+- [Transformer architecture](/concepts/transformer-architecture/). Full assembly.
+- [FlashAttention](/concepts/flashattention/). Efficient implementation.
+- [Grouped-query attention](/concepts/grouped-query-attention/). Modern KV-cache optimization.

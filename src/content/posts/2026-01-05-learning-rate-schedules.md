@@ -3,8 +3,8 @@ title: "Learning rate schedules: warmup and cosine decay"
 description: "Why almost every modern training run linearly warms up the LR over a few hundred steps and then decays it on a cosine to near zero."
 date: "2026-01-05"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition

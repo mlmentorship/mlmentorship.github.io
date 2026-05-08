@@ -3,8 +3,8 @@ title: "FSDP and ZeRO: sharding optimizer state, gradients, and parameters"
 description: "How modern training scales beyond a single GPU's memory by partitioning the optimizer state, gradients, and parameters across the data-parallel group."
 date: "2025-11-14"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -61,6 +61,6 @@ PyTorch FSDP is the standard implementation of Stage 3 and is what most modern o
 
 ## Common pitfalls
 
-- **Activation memory is not sharded.** FSDP shards parameters and optimizer state but each GPU still holds the activations for its data-parallel slice. Use [activation checkpointing](/reference/activation-checkpointing/) to reduce that.
+- **Activation memory is not sharded.** FSDP shards parameters and optimizer state but each GPU still holds the activations for its data-parallel slice. Use [activation checkpointing](/concepts/activation-checkpointing/) to reduce that.
 - **All-gather overhead at small layer size.** Wrapping every linear layer separately can dominate runtime; wrap at transformer-block granularity instead.
 - **Confusing sharding with tensor parallelism.** Sharding (FSDP) splits state across data-parallel ranks and reconstructs it for compute. Tensor parallelism splits the *compute* of a single layer; the math is different.

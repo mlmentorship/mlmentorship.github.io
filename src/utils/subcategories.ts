@@ -216,10 +216,10 @@ export const REFERENCE_ORDER = [
   'ML Systems & Evaluation',
 ];
 
-export type Category = 'essays' | 'interviews' | 'reference';
+export type Category = 'guides' | 'questions' | 'concepts';
 
 export function getSubcategoryMap(category: Category): { map: Record<string, string>; order: string[] } | null {
-  if (category === 'interviews') return { map: INTERVIEW_SUBCATEGORY, order: INTERVIEW_ORDER };
-  if (category === 'reference') return { map: REFERENCE_SUBCATEGORY, order: REFERENCE_ORDER };
+  if (category === 'questions') return { map: INTERVIEW_SUBCATEGORY, order: INTERVIEW_ORDER };
+  if (category === 'concepts') return { map: REFERENCE_SUBCATEGORY, order: REFERENCE_ORDER };
   return null; // essays stay flat (small + naturally chronological)
 }

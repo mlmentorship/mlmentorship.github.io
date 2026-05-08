@@ -3,8 +3,8 @@ title: "How do you choose a loss function?"
 description: "The loss is the objective. Picking the wrong one means optimizing for the wrong thing, no matter how well you train. The senior answer derives the loss from the problem, not from a list."
 date: "2026-03-09"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related: [Cross-entropy and softmax](/reference/cross-entropy-softmax/), [Regularization](/reference/regularization/), [Calibration](/reference/calibration/).*
+*Related: [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Regularization](/concepts/regularization/), [Calibration](/concepts/calibration/).*

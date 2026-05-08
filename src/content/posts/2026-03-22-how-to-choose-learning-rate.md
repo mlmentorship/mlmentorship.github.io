@@ -3,8 +3,8 @@ title: "How do you choose a learning rate?"
 description: "The right answer is a procedure, not a number. The wrong answers are 'use the default' and 'try a few values.'"
 date: "2026-03-22"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -70,4 +70,4 @@ This is L6. You're past the recipe and into the operational reality.
 
 ---
 
-*Related: [How would you debug a model that's not learning?](/interviews/debug-model-not-learning/), [Walk me through the bias-variance tradeoff](/interviews/bias-variance-tradeoff/).*
+*Related: [How would you debug a model that's not learning?](/questions/debug-model-not-learning/), [Walk me through the bias-variance tradeoff](/questions/bias-variance-tradeoff/).*

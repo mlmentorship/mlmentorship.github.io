@@ -58,7 +58,7 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
         <slot />
       </div>
 
-      {SITE.features.bookingCTA && post.data.category === 'interviews' && <MockCTA />}
+      {SITE.features.bookingCTA && post.data.category === 'questions' && <MockCTA />}
       <AuthorCard />
     </article>
 

@@ -3,8 +3,8 @@ title: "Recsys in the LLM era: what changes?"
 description: "Most of recsys hasn't changed; LLMs add new capabilities at specific stages. The senior answer names which stages benefit and which don't."
 date: "2025-12-12"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -83,4 +83,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [How would you do cold-start for a new user?](/interviews/cold-start-new-user/), [Designing a RAG system that actually works](/essays/designing-rag-that-works/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [How would you do cold-start for a new user?](/questions/cold-start-new-user/), [Designing a RAG system that actually works](/guides/designing-rag-that-works/).*

@@ -3,8 +3,8 @@ title: "Activation checkpointing"
 description: "Trade compute for memory: drop activations during the forward pass and recompute them during the backward pass. The cheapest way to fit a larger model on the same GPU."
 date: "2026-05-01"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -42,7 +42,7 @@ For a transformer, the natural segment is one transformer block. PyTorch provide
 
 - **Always** when training would OOM otherwise.
 - **Selectively** for the most memory-intensive blocks (FFN > attention typically). Selective checkpointing recovers most memory at lower compute cost.
-- **Less useful** when peak memory is dominated by optimizer state (use [FSDP / ZeRO](/reference/fsdp-and-zero/) instead).
+- **Less useful** when peak memory is dominated by optimizer state (use [FSDP / ZeRO](/concepts/fsdp-and-zero/) instead).
 - **Less useful** at inference (no backward pass).
 
 ## Combined with other techniques
@@ -60,6 +60,6 @@ For a transformer, the natural segment is one transformer block. PyTorch provide
 
 ## Related
 
-- [FSDP and ZeRO](/reference/fsdp-and-zero/). For sharding optimizer state and parameters.
-- [Mixed precision training](/reference/mixed-precision-training/). Independent memory reduction.
-- [Gradient accumulation](/reference/gradient-accumulation/). Simulate larger batches without growing per-step activation memory.
+- [FSDP and ZeRO](/concepts/fsdp-and-zero/). For sharding optimizer state and parameters.
+- [Mixed precision training](/concepts/mixed-precision-training/). Independent memory reduction.
+- [Gradient accumulation](/concepts/gradient-accumulation/). Simulate larger batches without growing per-step activation memory.

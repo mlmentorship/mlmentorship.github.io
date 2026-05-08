@@ -3,8 +3,8 @@ title: "Design a content moderation system"
 description: "Moderation is a multi-policy classification problem at scale, with appeals, human review, and adversarial users. The senior answer separates policy from model and treats human review as part of the system."
 date: "2025-05-29"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -85,4 +85,4 @@ The L6 answer:
 
 ---
 
-*Related: [How do you handle hallucinations in production?](/interviews/handle-hallucinations-in-production/), [How do you deal with class imbalance in 2026?](/interviews/class-imbalance/), [A/B testing for ML systems](/reference/ab-testing-for-ml/).*
+*Related: [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/), [How do you deal with class imbalance in 2026?](/questions/class-imbalance/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

@@ -3,8 +3,8 @@ title: "Mixup and CutMix"
 description: "Two data-augmentation schemes that train on convex combinations of pairs of inputs and their labels. Strong regularization for image classification; sometimes used in audio and tabular."
 date: "2025-10-17"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -65,6 +65,6 @@ $\alpha \to 0$ gives near-original samples (almost no mixing); $\alpha \to \inft
 
 ## Related
 
-- [Label smoothing](/reference/label-smoothing/). Another way to soften targets.
-- [Dropout](/reference/dropout/). Stochastic activation regularization.
-- [Regularization](/reference/regularization/). Overview.
+- [Label smoothing](/concepts/label-smoothing/). Another way to soften targets.
+- [Dropout](/concepts/dropout/). Stochastic activation regularization.
+- [Regularization](/concepts/regularization/). Overview.

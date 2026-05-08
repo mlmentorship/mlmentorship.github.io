@@ -3,8 +3,8 @@ title: "Design Spotify's homepage"
 description: "A multi-shelf, multi-objective recommendation surface. The senior answer scopes the shelves first, then designs each as its own ranker with a meta-layer above."
 date: "2025-12-12"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -80,4 +80,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/interviews/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/interviews/two-tower-vs-cross-encoder/), [System design case study: building personalized search ranking](/system-design/personalized-search-ranking/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [System design case study: building personalized search ranking](/system-design/personalized-search-ranking/).*

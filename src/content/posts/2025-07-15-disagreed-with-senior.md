@@ -3,8 +3,8 @@ title: "Tell me about a time you disagreed with someone senior"
 description: "The standard behavioral question. The interviewer is checking whether you can hold technical positions, push back productively, and update on new information."
 date: "2025-07-15"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -82,4 +82,4 @@ The L6 answer:
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/essays/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/essays/l5-vs-l6-faang-ml/).*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/).*

@@ -3,8 +3,8 @@ title: "Derive logistic regression from MLE"
 description: "Standard math-screen question. The senior signal is whether you can derive it cleanly and connect MLE to cross-entropy."
 date: "2025-12-23"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -89,4 +89,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Cross-entropy and softmax](/reference/cross-entropy-softmax/), [Regularization](/reference/regularization/), [Bayesian vs frequentist](/interviews/bayesian-vs-frequentist/).*
+*Related reference: [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Regularization](/concepts/regularization/), [Bayesian vs frequentist](/questions/bayesian-vs-frequentist/).*

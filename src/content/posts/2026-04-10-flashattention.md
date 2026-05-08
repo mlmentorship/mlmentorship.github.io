@@ -3,8 +3,8 @@ title: "FlashAttention"
 description: "I/O-aware exact attention. Replaces the O(n²) HBM traffic with a tiled streaming softmax in SRAM. The single most important kernel-level optimization in modern transformers."
 date: "2026-04-10"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -105,4 +105,4 @@ Foundational for large-model training/inference work. Explains KV-cache, paged a
 
 ---
 
-*Related reference: [Speculative decoding](/reference/speculative-decoding/), [LayerNorm vs BatchNorm](/reference/layernorm-vs-batchnorm/). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/interviews/) (coming soon).*
+*Related reference: [Speculative decoding](/concepts/speculative-decoding/), [LayerNorm vs BatchNorm](/concepts/layernorm-vs-batchnorm/). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/questions/) (coming soon).*

@@ -3,8 +3,8 @@ title: "Expectation-Maximization (EM)"
 description: "Iterate between estimating latent variables given parameters (E-step) and updating parameters given latents (M-step). The standard tool for latent-variable MLE when the latents are unobserved."
 date: "2025-11-09"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -107,5 +107,5 @@ Iterate until log-likelihood stabilizes.
 
 ## Related
 
-- [Gaussian mixture models](/reference/gaussian-mixture-models/). The canonical EM application.
-- [Hidden Markov models](/reference/hidden-markov-models/). Sequential model trained by EM (Baum-Welch).
+- [Gaussian mixture models](/concepts/gaussian-mixture-models/). The canonical EM application.
+- [Hidden Markov models](/concepts/hidden-markov-models/). Sequential model trained by EM (Baum-Welch).

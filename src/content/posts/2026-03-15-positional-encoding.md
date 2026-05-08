@@ -3,8 +3,8 @@ title: "RoPE, ALiBi, and the modern positional encoding landscape"
 description: "Sinusoidal positional encoding is in the original transformer paper and not in any modern LLM. Here's what replaced it and why."
 date: "2026-03-15"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -122,4 +122,4 @@ A senior follow-up: "How would you extend a RoPE-trained model from 8K to 128K c
 
 ---
 
-*Related: [Transformer architecture](/reference/transformer-architecture/), [FlashAttention](/reference/flashattention/), [KV cache](/reference/kv-cache/).*
+*Related: [Transformer architecture](/concepts/transformer-architecture/), [FlashAttention](/concepts/flashattention/), [KV cache](/concepts/kv-cache/).*

@@ -3,8 +3,8 @@ title: "Speculative decoding"
 description: "Break the autoregressive serial bottleneck without changing the output distribution. 2-3× inference speedup, free."
 date: "2026-02-13"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 
@@ -101,4 +101,4 @@ If you can also discuss how speculative decoding interacts with KV-cache, batchi
 
 ---
 
-*Related: [FlashAttention](/reference/flashattention/) (the other big inference optimization). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/interviews/) (coming soon).*
+*Related: [FlashAttention](/concepts/flashattention/) (the other big inference optimization). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/questions/) (coming soon).*

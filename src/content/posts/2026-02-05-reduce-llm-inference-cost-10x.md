@@ -3,8 +3,8 @@ title: "How would you reduce LLM inference cost by 10x?"
 description: "The cost-engineering question. The L6 answer doesn't pick a technique, it diagnoses where the cost is, then picks five."
 date: "2026-02-05"
 draft: false
-tags: ["interviews"]
-category: "interviews"
+tags: ["questions"]
+category: "questions"
 ---
 
 
@@ -94,4 +94,4 @@ If you can have this conversation, you're at the senior bar.
 
 ---
 
-*Related: [How to think about LLM inference cost](/essays/llm-inference-cost/) for the long-form treatment, [Designing a RAG system that actually works](/essays/designing-rag-that-works/).*
+*Related: [How to think about LLM inference cost](/guides/llm-inference-cost/) for the long-form treatment, [Designing a RAG system that actually works](/guides/designing-rag-that-works/).*

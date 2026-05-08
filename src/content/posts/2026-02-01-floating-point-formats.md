@@ -3,8 +3,8 @@ title: "Floating-point formats: FP32, FP16, BF16, FP8, TF32"
 description: "How modern accelerators trade precision for speed. The bit layouts of every numeric format that appears in deep learning."
 date: "2026-02-01"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -89,6 +89,6 @@ Typical quality loss: 0.5–2% on benchmarks; serving cost drops 2–4× on memo
 
 ## Related
 
-- [Mixed precision training](/reference/mixed-precision-training/). Practical training in FP16/BF16.
-- [Quantization](/reference/quantization/). Inference quantization in depth.
-- [GPU memory hierarchy](/reference/gpu-memory-hierarchy/). Why bandwidth matters.
+- [Mixed precision training](/concepts/mixed-precision-training/). Practical training in FP16/BF16.
+- [Quantization](/concepts/quantization/). Inference quantization in depth.
+- [GPU memory hierarchy](/concepts/gpu-memory-hierarchy/). Why bandwidth matters.

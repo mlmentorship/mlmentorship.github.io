@@ -3,8 +3,8 @@ title: "Microannealing and midtraining"
 description: "A short cooldown applied to a mostly-trained checkpoint with a small fraction of candidate data mixed in. The standard mid-training probe for whether a new dataset is worth including."
 date: "2025-11-11"
 draft: false
-tags: ["reference"]
-category: "reference"
+tags: ["concepts"]
+category: "concepts"
 ---
 
 ## One-line definition
@@ -21,7 +21,7 @@ This is the technique behind decisions like "include FineMath in the mix," "drop
 
 ## The procedure
 
-1. Take a checkpoint that's already trained on most of your token budget, ideally one near the end of the stable phase of a WSD or WSD-S schedule. (See the [WSD reference](/reference/wsd-and-wsd-s/).)
+1. Take a checkpoint that's already trained on most of your token budget, ideally one near the end of the stable phase of a WSD or WSD-S schedule. (See the [WSD reference](/concepts/wsd-and-wsd-s/).)
 2. Define a candidate data mix: typically 70% of your normal pretraining distribution and 30% of the data source you want to evaluate. (Olmo 2 uses 50/50; Marin found 70/30 worked better in their setting.)
 3. Run a short cooldown on this mix, on the order of 1-10B tokens, decaying LR from the current operating point down to the planned final LR.
 4. Run a parallel control: same starting checkpoint, same cooldown shape, same number of tokens, but using 100% of your normal mix.
