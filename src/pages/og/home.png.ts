@@ -1,5 +1,4 @@
 import type { APIRoute } from 'astro';
-import { getCollection } from 'astro:content';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { readFileSync } from 'node:fs';
@@ -8,19 +7,7 @@ import { resolve } from 'node:path';
 const fontBold = readFileSync(resolve(process.cwd(), 'src/og-fonts/InterTight-Bold.ttf'));
 const fontRegular = readFileSync(resolve(process.cwd(), 'src/og-fonts/Inter-Regular.ttf'));
 
-const categoryLabel: Record<string, string> = {
-  essays: 'Guide',
-  interviews: 'Question',
-  reference: 'Concept',
-};
-
-export async function getStaticPaths() {
-  const posts = await getCollection('posts', ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
-}
-
-export const GET: APIRoute = async ({ props }) => {
-  const post = (props as any).post;
+export const GET: APIRoute = async () => {
   const svg = await satori(
     {
       type: 'div',
@@ -57,7 +44,7 @@ export const GET: APIRoute = async ({ props }) => {
                       padding: '6px 14px',
                       borderRadius: '999px',
                     },
-                    children: categoryLabel[post.data.category] ?? post.data.category,
+                    children: 'mlmentorship.com',
                   },
                 },
               ],
@@ -67,19 +54,40 @@ export const GET: APIRoute = async ({ props }) => {
             type: 'div',
             props: {
               style: {
-                fontFamily: 'Inter Tight',
-                fontWeight: 700,
-                fontSize: '60px',
-                lineHeight: 1.1,
-                letterSpacing: '-0.025em',
-                color: '#0f172a',
-                maxWidth: '1060px',
-                display: '-webkit-box',
-                WebkitLineClamp: 4,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '18px',
               },
-              children: post.data.title,
+              children: [
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontFamily: 'Inter Tight',
+                      fontWeight: 700,
+                      fontSize: '64px',
+                      lineHeight: 1.1,
+                      letterSpacing: '-0.025em',
+                      color: '#0f172a',
+                      maxWidth: '1060px',
+                    },
+                    children: 'Senior ML interviews, calibrated.',
+                  },
+                },
+                {
+                  type: 'div',
+                  props: {
+                    style: {
+                      fontSize: '28px',
+                      lineHeight: 1.35,
+                      color: '#475569',
+                      maxWidth: '1000px',
+                    },
+                    children:
+                      'Questions, guides, and concept notes for L5+ Applied Scientist, MLE, and Research Engineer loops.',
+                  },
+                },
+              ],
             },
           },
           {
@@ -105,7 +113,7 @@ export const GET: APIRoute = async ({ props }) => {
                 },
                 {
                   type: 'div',
-                  props: { style: { fontSize: '20px', color: '#64748b' }, children: 'Senior ML interview prep' },
+                  props: { style: { fontSize: '20px', color: '#64748b' }, children: 'by Hamid Saghir' },
                 },
               ],
             },
