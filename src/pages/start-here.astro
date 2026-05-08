@@ -3,6 +3,11 @@ import DocsIndexLayout from '../layouts/DocsIndexLayout.astro';
 import { getCollection } from 'astro:content';
 
 const posts = await getCollection('posts', ({ data }) => !data.draft);
+const counts = {
+  questions: posts.filter((p) => p.data.category === 'questions').length,
+  guides: posts.filter((p) => p.data.category === 'guides').length,
+  concepts: posts.filter((p) => p.data.category === 'concepts').length,
+};
 ---
 <DocsIndexLayout
   title="Start here"
@@ -29,7 +34,7 @@ const posts = await getCollection('posts', ({ data }) => !data.draft);
         <li><a href="/questions/most-ambitious-project/">Tell me about your most ambitious project</a></li>
         <li><a href="/questions/how-would-you-evaluate-an-llm-application/">How would you evaluate an LLM application</a></li>
         <li><a href="/questions/reduce-llm-inference-cost-10x/">Reduce LLM inference cost 10x</a></li>
-        <li>Browse <a href="/questions/">all 50 interview questions</a></li>
+        <li>Browse <a href="/questions/">all {counts.questions} questions</a></li>
       </ol>
     </section>
 
@@ -69,7 +74,7 @@ const posts = await getCollection('posts', ({ data }) => !data.draft);
         <li>Probability: <a href="/concepts/maximum-likelihood-estimation/">MLE</a> → <a href="/concepts/kl-divergence/">KL divergence</a> → <a href="/concepts/bayes-rule-and-posterior/">Bayes rule</a></li>
         <li>Deep learning: <a href="/concepts/backpropagation/">backprop</a> → <a href="/concepts/attention-mechanism/">attention</a> → <a href="/concepts/transformer-architecture/">transformers</a></li>
         <li>LLM internals: <a href="/concepts/flashattention/">FlashAttention</a> → <a href="/concepts/kv-cache/">KV cache</a> → <a href="/concepts/speculative-decoding/">speculative decoding</a></li>
-        <li>Browse <a href="/concepts/">all 99 reference posts</a> by sub-category</li>
+        <li>Browse <a href="/concepts/">all {counts.concepts} concepts</a> by sub-category</li>
       </ol>
     </section>
 
