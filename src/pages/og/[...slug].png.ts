@@ -9,9 +9,9 @@ const fontBold = readFileSync(resolve(process.cwd(), 'src/og-fonts/InterTight-Bo
 const fontRegular = readFileSync(resolve(process.cwd(), 'src/og-fonts/Inter-Regular.ttf'));
 
 const categoryLabel: Record<string, string> = {
-  essays: 'Essay',
-  interviews: 'Interview Question',
-  reference: 'Reference',
+  essays: 'Guide',
+  interviews: 'Question',
+  reference: 'Concept',
 };
 
 export async function getStaticPaths() {

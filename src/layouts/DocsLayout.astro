@@ -19,6 +19,13 @@ const { post, headings, rawContent } = Astro.props;
 const { title, description, date, updated } = post.data;
 const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
+
+const CATEGORY_LABELS: Record<string, string> = {
+  interviews: 'Question',
+  essays: 'Guide',
+  reference: 'Concept',
+};
+const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
 ---
 <BaseLayout
   title={title}
@@ -36,7 +43,7 @@ const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
     <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
       <header class="docs-head">
         <p class="kicker">
-          <a href={`/${post.data.category}/`}>{post.data.category.replace(/-/g, ' ')}</a>
+          <a href={`/${post.data.category}/`}>{categoryLabel}</a>
         </p>
         <h1 itemprop="headline">{title}</h1>
         {description && <p class="lede" itemprop="description">{description}</p>}

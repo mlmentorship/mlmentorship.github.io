@@ -13,7 +13,7 @@ const posts = await getCollection('posts', ({ data }) => !data.draft);
     <p class="kicker">Start here</p>
     <h1>Where to start, by what you're trying to do.</h1>
     <p class="lede">
-      {posts.length} essays, interview questions, and reference posts
+      {posts.length} questions, guides, and concept notes
       can be a lot. Pick the path that matches why you're here. Each item
       links directly; come back to this page when you finish a path.
     </p>
@@ -90,8 +90,8 @@ const posts = await getCollection('posts', ({ data }) => !data.draft);
 
     <p class="closer">
       Lost? Press <kbd>/</kbd> to search. Or browse the three sections from the top
-      nav: <a href="/interviews/">Interviews</a>, <a href="/essays/">Essays</a>,
-      <a href="/reference/">Reference</a>.
+      nav: <a href="/interviews/">Questions</a>, <a href="/essays/">Guides</a>,
+      <a href="/reference/">Concepts</a>.
     </p>
   </DocsIndexLayout>
 

@@ -48,10 +48,12 @@ export const SITE = {
   // since it's a navigation aid, not a content section. About lives in
   // both nav and footer. Mock-interview link is appended dynamically when
   // features.bookingCTA is enabled.
+  // Order: most-clicked first (Questions > Guides > Concepts).
+  // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
-    { label: 'Interviews', href: '/interviews/' },
-    { label: 'Essays', href: '/essays/' },
-    { label: 'Reference', href: '/reference/' },
+    { label: 'Questions', href: '/interviews/' },
+    { label: 'Guides', href: '/essays/' },
+    { label: 'Concepts', href: '/reference/' },
     { label: 'About', href: '/about/' },
   ],
   postsPerPage: 30,
