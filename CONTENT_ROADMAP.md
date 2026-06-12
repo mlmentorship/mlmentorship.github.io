@@ -11,9 +11,9 @@ This file is for internal planning; it isn't published as a site page.
 |---|---|---|---|
 | Essays | 6 | 8 | 15 |
 | Interview Q&A | 50 | 50 | 50 |
-| Reference | 15 | 60 | 100 |
+| Reference | 27 | 60 | 100 |
 | System Design | 1 | 4 | 8 |
-| **Total** | **72** | **122** | **174** |
+| **Total** | **84** | **122** | **174** |
 
 **Interview Q&A target hit at launch.** Remaining roadmap focuses on essays, reference pages, and system-design case studies.
 
@@ -115,6 +115,30 @@ This file is for internal planning; it isn't published as a site page.
 
 ### System Design (1 / 8)
 - [x] Personalized search ranking (end-to-end)
+
+### Reference — gap-analysis batch (12 / 100, added 2026-05-31)
+
+Written to close gaps found by diffing the CS/ML interview deck against published posts.
+
+**Speech / sequence transduction**
+- [x] Connectionist temporal classification (CTC)
+- [x] RNN-Transducer (RNN-T)
+- [x] Automatic speech recognition (ASR)
+
+**Probabilistic graphical models**
+- [x] Conditional random fields
+- [x] Belief propagation
+- [x] Factor analysis and probabilistic PCA
+
+**Interpretability & training**
+- [x] Model interpretability (LIME, SHAP, Grad-CAM)
+- [x] Discrete gradient estimators (REINFORCE, Gumbel-Softmax, straight-through)
+- [x] Neural network training recipe
+
+**Retrieval & recsys**
+- [x] TF-IDF and BM25
+- [x] Knowledge-graph embeddings
+- [x] Content-based filtering
 
 ---
 
