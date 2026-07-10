@@ -6,6 +6,7 @@ import SectionNav from '../components/SectionNav.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import MockCTA from '../components/MockCTA.astro';
 import AuthorCard from '../components/AuthorCard.astro';
+import Subscribe from '../components/Subscribe.astro';
 import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
 import { SITE } from '../consts';
@@ -59,6 +60,7 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
       </div>
 
       {SITE.features.bookingCTA && post.data.category === 'questions' && <MockCTA />}
+      <Subscribe variant="inline" heading="Get new posts" />
       <AuthorCard />
     </article>
 

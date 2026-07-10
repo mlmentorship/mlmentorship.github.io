@@ -19,13 +19,19 @@ export const SITE = {
     mastodon: '',
   },
   newsletter: {
-    provider: 'none' as 'mailerlite' | 'none',
-    accountId: '',
-    formId: '',
+    // Shares hsaghir.com's MailerLite account so both sites feed one subscriber
+    // base. Reuses hsaghir's form for now; create a dedicated MailerLite group/form
+    // for the interview audience and swap in its formId to segment.
+    provider: 'mailerlite' as 'mailerlite' | 'none',
+    accountId: '2284644',
+    formId: '7ohleY',
     blurb: 'Occasional notes on senior ML interviews. No spam, unsubscribe any time.',
   },
   analytics: {
-    provider: 'none' as 'goatcounter' | 'none',
+    // Use the same analytics code on hsaghir.com and here so referrers reveal the
+    // cross-site funnel. Claim a GoatCounter code (or a Plausible account covering
+    // both domains) and paste it below to activate.
+    provider: 'goatcounter' as 'goatcounter' | 'none',
     code: '',
   },
   giscus: {
