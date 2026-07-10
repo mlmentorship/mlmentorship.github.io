@@ -81,5 +81,5 @@ DETR-style detectors output a fixed-size set of predictions (typically 100) and 
 
 ## Related
 
-- [Object detection: Faster R-CNN, YOLO, DETR](/concepts/object-detection-faster-r-cnn-yolo-detr/).
+- [Object detection: Faster R-CNN, YOLO, DETR](/concepts/object-detection-overview/).
 - [Convolution as matrix multiplication](/concepts/convolution-as-matmul/).

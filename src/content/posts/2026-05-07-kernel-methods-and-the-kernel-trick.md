@@ -80,6 +80,6 @@ Kernels remain useful when:
 
 ## Related
 
-- [SVM and the kernel trick](/concepts/svm-and-the-kernel-trick/).
+- [SVM and the kernel trick](/concepts/svm-and-kernels/).
 - [Gaussian processes](/concepts/gaussian-processes/).
-- [The attention mechanism](/concepts/the-attention-mechanism/).
+- [The attention mechanism](/concepts/attention-mechanism/).

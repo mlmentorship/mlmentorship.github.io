@@ -81,4 +81,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design real-time personalization](/questions/real-time-personalization/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*
+*Related: [Design real-time personalization](/questions/real-time-personalization/), [System design case study: personalized search ranking](/guides/personalized-search-ranking/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/).*

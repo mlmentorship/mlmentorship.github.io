@@ -84,4 +84,4 @@ The math is more involved (it involves Riemannian metrics and category theory in
 ## Related
 
 - [SVD and PCA](/concepts/svd-and-pca/).
-- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity-metrics/).
+- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity/).

@@ -1,6 +1,6 @@
 ---
 import type { MarkdownHeading } from 'astro';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import SectionNav from '../components/SectionNav.astro';
 import TableOfContents from '../components/TableOfContents.astro';
@@ -10,6 +10,7 @@ import Subscribe from '../components/Subscribe.astro';
 import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
 import { SITE } from '../consts';
+import { getSubcategoryMap, type Category } from '../utils/subcategories';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -20,13 +21,41 @@ const { post, headings, rawContent } = Astro.props;
 const { title, description, date, updated } = post.data;
 const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
+const category = post.data.category as Category;
 
-const CATEGORY_LABELS: Record<string, string> = {
-  interviews: 'Question',
-  essays: 'Guide',
-  reference: 'Concept',
+const CATEGORY_META: Record<Category, { singular: string; plural: string }> = {
+  questions: { singular: 'Question', plural: 'Questions' },
+  guides: { singular: 'Guide', plural: 'Guides' },
+  concepts: { singular: 'Concept', plural: 'Concepts' },
 };
-const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
+const categoryMeta = CATEGORY_META[category];
+const subcategoryConfig = getSubcategoryMap(category);
+const currentSubcategory = subcategoryConfig?.map[slug];
+
+const categoryPosts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category))
+  .map((entry) => ({
+    slug: entry.slug.replace(/^\d{4}-\d{2}-\d{2}-/, ''),
+    title: entry.data.title,
+    date: entry.data.date,
+    subcategory: subcategoryConfig?.map[entry.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '')] ?? 'Other',
+  }))
+  .sort((a, b) => {
+    if (category === 'guides') return b.date.getTime() - a.date.getTime();
+    if (subcategoryConfig) {
+      const aRank = subcategoryConfig.order.indexOf(a.subcategory);
+      const bRank = subcategoryConfig.order.indexOf(b.subcategory);
+      const normalizedARank = aRank === -1 ? subcategoryConfig.order.length : aRank;
+      const normalizedBRank = bRank === -1 ? subcategoryConfig.order.length : bRank;
+      if (normalizedARank !== normalizedBRank) return normalizedARank - normalizedBRank;
+    }
+    return a.title.localeCompare(b.title);
+  });
+
+const currentIndex = categoryPosts.findIndex((entry) => entry.slug === slug);
+const previousPost = currentIndex > 0 ? categoryPosts[currentIndex - 1] : undefined;
+const nextPost = currentIndex >= 0 && currentIndex < categoryPosts.length - 1
+  ? categoryPosts[currentIndex + 1]
+  : undefined;
 ---
 <BaseLayout
   title={title}
@@ -43,15 +72,29 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
 
     <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
       <header class="docs-head">
-        <p class="kicker">
-          <a href={`/${post.data.category}/`}>{categoryLabel}</a>
-        </p>
+        <nav class="breadcrumbs" aria-label="Breadcrumb" data-pagefind-ignore="all">
+          <a href="/start-here/">Start here</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/${category}/`}>{categoryMeta.plural}</a>
+          {currentSubcategory && (
+            <>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{currentSubcategory}</span>
+            </>
+          )}
+        </nav>
         <h1 itemprop="headline">{title}</h1>
         {description && <p class="lede" itemprop="description">{description}</p>}
         <div class="docs-meta">
           <span>Reviewed <time itemprop="dateModified" datetime={(updated ?? date).toISOString()}>{formatDate(updated ?? date)}</time></span>
           <span class="dot">·</span>
           <span>{Math.max(1, Math.round(stats.minutes))} min read</span>
+          {currentIndex >= 0 && (
+            <>
+              <span class="dot">·</span>
+              <span>{currentIndex + 1} of {categoryPosts.length}</span>
+            </>
+          )}
         </div>
       </header>
 
@@ -59,7 +102,28 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
         <slot />
       </div>
 
-      {SITE.features.bookingCTA && post.data.category === 'questions' && <MockCTA />}
+      <nav class="journey-nav" aria-label={`Continue through ${categoryMeta.plural}`} data-pagefind-ignore="all">
+        <div class="journey-context">
+          <span>{currentSubcategory ?? categoryMeta.plural}</span>
+          <a href={`/${category}/`}>View all {categoryPosts.length} {categoryMeta.plural.toLowerCase()}</a>
+        </div>
+        <div class="journey-links">
+          {previousPost ? (
+            <a class="journey-link journey-link--previous" href={`/${category}/${previousPost.slug}/`}>
+              <span>← Previous {categoryMeta.singular.toLowerCase()}</span>
+              <strong>{previousPost.title}</strong>
+            </a>
+          ) : <span></span>}
+          {nextPost ? (
+            <a class="journey-link journey-link--next" href={`/${category}/${nextPost.slug}/`}>
+              <span>Next {categoryMeta.singular.toLowerCase()} →</span>
+              <strong>{nextPost.title}</strong>
+            </a>
+          ) : <span></span>}
+        </div>
+      </nav>
+
+      {SITE.features.bookingCTA && category === 'questions' && <MockCTA />}
       <Subscribe variant="inline" heading="Get new posts" />
       <AuthorCard />
     </article>
@@ -89,20 +153,21 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
 
   .docs-article { min-width: 0; }
   .docs-head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
-  .kicker {
+  .breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
     font-family: var(--font-ui);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--c-accent);
-    background: var(--c-accent-soft);
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
+    letter-spacing: 0.1em;
+    color: var(--c-muted);
     margin: 0 0 1rem;
   }
-  .kicker a { color: inherit; text-decoration: none; }
+  .breadcrumbs a { color: var(--c-accent); text-decoration: none; }
+  .breadcrumbs a:hover { color: var(--c-link-hover); text-decoration: underline; }
   .docs-head h1 {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 3.2vw, 2.2rem);
@@ -127,6 +192,61 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
   .docs-body { font-size: 1rem; line-height: 1.65; }
   .docs-body :global(h2) { margin-top: 2.2rem; }
   .docs-body :global(h3) { margin-top: 1.6rem; }
+
+  .journey-nav {
+    margin: 3rem 0 0;
+    padding: 1rem 0 0;
+    border-top: 1px solid var(--c-rule);
+  }
+  .journey-context {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    color: var(--c-muted);
+  }
+  .journey-context > span {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .journey-context a { color: var(--c-text-soft); }
+  .journey-context a:hover { color: var(--c-accent); }
+  .journey-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+  }
+  .journey-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    color: var(--c-text);
+    text-decoration: none;
+    transition: border-color var(--transition), background var(--transition);
+  }
+  .journey-link:hover { border-color: var(--c-accent); background: var(--c-bg-tint); }
+  .journey-link > span {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-muted);
+  }
+  .journey-link strong {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .journey-link--next { text-align: right; }
 
   .docs-toc {
     position: sticky;
@@ -153,5 +273,7 @@ const categoryLabel = CATEGORY_LABELS[post.data.category] ?? post.data.category;
       padding: 1rem var(--gutter) 3rem;
     }
     .docs-sidebar { display: none; }
+    .journey-links { grid-template-columns: 1fr; }
+    .journey-link--next { text-align: left; }
   }
 </style>

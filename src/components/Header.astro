@@ -11,9 +11,9 @@ function isActive(href: string) {
 }
 
 // Append the mock-interview link only when the booking CTA feature flag is on.
-const navItems = SITE.features.bookingCTA
+const navItems: Array<{ label: string; href: string; external?: boolean }> = SITE.features.bookingCTA
   ? [...SITE.nav.slice(0, -1), { label: 'Mock', href: '/interview/' }, SITE.nav[SITE.nav.length - 1]]
-  : SITE.nav;
+  : [...SITE.nav];
 ---
 
 <header class="masthead" data-pagefind-ignore="all">
@@ -42,7 +42,7 @@ const navItems = SITE.features.bookingCTA
     <div class="bar-end">
       <Search />
       <ThemeToggle />
-      <button id="menu-trigger" class="menu-trigger" aria-label="Open menu" aria-expanded="false">
+      <button id="menu-trigger" class="menu-trigger" aria-label="Open menu" aria-controls="mobile-menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -97,8 +97,8 @@ const navItems = SITE.features.bookingCTA
     height: 28px;
     padding: 0 6px;
     border-radius: 6px;
-    background: var(--c-accent);
-    color: white;
+    background: var(--c-accent-fill);
+    color: var(--c-on-accent);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 15px;
@@ -214,10 +214,29 @@ const navItems = SITE.features.bookingCTA
     const trigger = document.getElementById('menu-trigger');
     const menu = document.getElementById('mobile-menu');
     if (!trigger || !menu) return;
-    trigger.addEventListener('click', () => {
-      const open = menu.classList.toggle('is-open');
+
+    const setOpen = (open: boolean) => {
+      menu.classList.toggle('is-open', open);
       trigger.setAttribute('aria-expanded', String(open));
+      trigger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       if (open) menu.removeAttribute('inert'); else menu.setAttribute('inert', '');
+    };
+
+    trigger.addEventListener('click', () => {
+      const open = trigger.getAttribute('aria-expanded') !== 'true';
+      setOpen(open);
+      if (open) menu.querySelector('a')?.focus();
+    });
+
+    menu.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && trigger.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        trigger.focus();
+      }
     });
   }
   bindMenu();

@@ -10,13 +10,16 @@ export async function GET(context) {
     title: SITE.title,
     description: SITE.description,
     site: context.site,
-    items: posts.map((post) => ({
-      title: post.data.title,
-      description: post.data.description ?? '',
-      pubDate: post.data.date,
-      link: `/blog/${post.slug}/`,
-      categories: post.data.tags,
-    })),
+    items: posts.map((post) => {
+      const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
+      return {
+        title: post.data.title,
+        description: post.data.description ?? '',
+        pubDate: post.data.date,
+        link: `/${post.data.category}/${slug}/`,
+        categories: post.data.tags,
+      };
+    }),
     customData: `<language>${SITE.locale}</language>`,
   });
 }

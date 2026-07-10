@@ -85,6 +85,6 @@ Modern alternatives (DPO, IPO, KTO) bypass the actor-critic step entirely; they 
 
 ## Related
 
-- [Policy gradient methods](/concepts/policy-gradient-methods/).
-- [Proximal Policy Optimization](/concepts/proximal-policy-optimization-ppo/).
+- [Policy gradient methods](/concepts/policy-gradient/).
+- [Proximal Policy Optimization](/concepts/ppo/).
 - [Advantage estimation and GAE](/concepts/advantage-estimation-and-gae/).

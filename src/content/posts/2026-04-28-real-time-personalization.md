@@ -85,4 +85,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/).*
+*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [System design case study: personalized search ranking](/guides/personalized-search-ranking/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/).*

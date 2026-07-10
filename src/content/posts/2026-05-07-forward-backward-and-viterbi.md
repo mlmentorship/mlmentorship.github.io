@@ -125,5 +125,5 @@ The `logsumexp` trick (subtract the max before exponentiating) keeps everything 
 ## Related
 
 - [Hidden Markov models](/concepts/hidden-markov-models/).
-- [Expectation-Maximization](/concepts/expectation-maximization-em/).
+- [Expectation-Maximization](/concepts/expectation-maximization/).
 - [Decoding strategies](/concepts/decoding-strategies/).

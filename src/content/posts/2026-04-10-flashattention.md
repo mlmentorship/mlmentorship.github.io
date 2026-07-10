@@ -105,4 +105,4 @@ Foundational for large-model training/inference work. Explains KV-cache, paged a
 
 ---
 
-*Related reference: [Speculative decoding](/concepts/speculative-decoding/), [LayerNorm vs BatchNorm](/concepts/layernorm-vs-batchnorm/). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/questions/) (coming soon).*
+*Related reference: [Speculative decoding](/concepts/speculative-decoding/), [LayerNorm vs BatchNorm](/concepts/batchnorm-vs-layernorm/). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/questions/) (coming soon).*

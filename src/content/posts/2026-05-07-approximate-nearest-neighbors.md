@@ -97,5 +97,5 @@ You pick two. Examples:
 ## Related
 
 - [Two-tower retrieval](/concepts/two-tower-retrieval/).
-- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity-metrics/).
-- [RAG: retrieval-augmented generation](/concepts/rag-retrieval-augmented-generation/).
+- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity/).
+- [RAG: retrieval-augmented generation](/concepts/rag-overview/).

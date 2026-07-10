@@ -87,6 +87,6 @@ PPO trains an actor and a value critic jointly. At each rollout:
 
 ## Related
 
-- [Proximal Policy Optimization](/concepts/proximal-policy-optimization-ppo/).
-- [Policy gradient methods](/concepts/policy-gradient-methods/).
+- [Proximal Policy Optimization](/concepts/ppo/).
+- [Policy gradient methods](/concepts/policy-gradient/).
 - [Actor-critic methods](/concepts/actor-critic-methods/).

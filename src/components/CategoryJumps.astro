@@ -1,0 +1,102 @@
+---
+interface JumpItem {
+  label: string;
+  id: string;
+  count: number;
+}
+
+interface Props {
+  items: JumpItem[];
+  label?: string;
+}
+
+const { items, label = 'Jump to topic' } = Astro.props;
+---
+
+<nav class="category-jumps" aria-label={label} data-pagefind-ignore="all">
+  <span class="category-jumps-label">Jump to</span>
+  <ul>
+    {items.map((item) => (
+      <li>
+        <a href={`#${item.id}`}>
+          <span>{item.label}</span>
+          <span class="category-jumps-count" aria-label={`${item.count} items`}>{item.count}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .category-jumps {
+    margin: 0 0 2rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    background: var(--c-bg-tint);
+  }
+  .category-jumps-label {
+    display: block;
+    margin: 0 0 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .category-jumps ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .category-jumps li { margin: 0; padding: 0; }
+  .category-jumps a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.38rem 0.65rem;
+    border: 1px solid var(--c-rule);
+    border-radius: 999px;
+    background: var(--c-surface);
+    color: var(--c-text-soft);
+    text-decoration: none;
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+  }
+  .category-jumps a:hover {
+    border-color: var(--c-accent);
+    color: var(--c-text);
+    background: var(--c-accent-soft);
+  }
+  .category-jumps-count {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--c-muted);
+  }
+  @media (max-width: 560px) {
+    .category-jumps {
+      margin-left: calc(-1 * var(--gutter));
+      margin-right: calc(-1 * var(--gutter));
+      padding-left: var(--gutter);
+      padding-right: var(--gutter);
+      border-left: 0;
+      border-right: 0;
+      border-radius: 0;
+    }
+    .category-jumps ul {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+      scrollbar-width: thin;
+    }
+    .category-jumps a { white-space: nowrap; }
+  }
+</style>

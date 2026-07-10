@@ -15,7 +15,7 @@ category: "concepts"
 
 Hard labels say "this is a 7." Teacher logits say "94 percent 7, 4 percent 1, 1 percent 9, everything else 0.01." That extra structure tells the student that 7 looks more like 1 than like 9. A small model trained against this signal usually beats the same model trained from scratch on hard labels at matched compute.
 
-Distillation is the dominant technique for shrinking large models in production. DistilBERT, TinyBERT, MobileBERT, and most production LLMs ship distilled variants. Often combined with [pruning](/concepts/pruning/) and [quantization](/concepts/quantization-int8-int4-fp8-and-the-inference-cost-picture/).
+Distillation is the dominant technique for shrinking large models in production. DistilBERT, TinyBERT, MobileBERT, and most production LLMs ship distilled variants. Often combined with [pruning](/concepts/pruning/) and [quantization](/concepts/quantization/).
 
 ## The mechanism
 
@@ -65,5 +65,5 @@ Fails when:
 ## Related
 
 - [Pruning](/concepts/pruning/).
-- [Quantization](/concepts/quantization-int8-int4-fp8-and-the-inference-cost-picture/).
-- [Cross-entropy loss](/concepts/cross-entropy-and-negative-log-likelihood/).
+- [Quantization](/concepts/quantization/).
+- [Cross-entropy loss](/concepts/cross-entropy-softmax/).

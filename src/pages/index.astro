@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '../consts';
+import Subscribe from '../components/Subscribe.astro';
 
 const all = await getCollection('posts', ({ data }) => !data.draft);
 const counts = {
@@ -39,21 +40,21 @@ const counts = {
       <ul class="sections-grid">
         <li>
           <a href="/questions/">
-            <h3>Questions <span class="sections-count">{counts.interviews}</span></h3>
+            <h2>Questions <span class="sections-count">{counts.interviews}</span></h2>
             <p>The senior ML interview canon. Each one with what L4 / L5 / L6 answers actually sound like.</p>
             <p class="sections-when"><strong>Best when:</strong> you have a specific question and want a level-calibrated answer.</p>
           </a>
         </li>
         <li>
           <a href="/guides/">
-            <h3>Guides <span class="sections-count">{counts.essays}</span></h3>
+            <h2>Guides <span class="sections-count">{counts.essays}</span></h2>
             <p>Long-form opinion pieces on senior ML interviews, system design, and applied practice. Take a position and defend it.</p>
             <p class="sections-when"><strong>Best when:</strong> you want a senior-IC point of view on something contested.</p>
           </a>
         </li>
         <li>
           <a href="/concepts/">
-            <h3>Concepts <span class="sections-count">{counts.reference}</span></h3>
+            <h2>Concepts <span class="sections-count">{counts.reference}</span></h2>
             <p>Concise notes on attention, normalization, LLM internals, optimization, and the math underneath.</p>
             <p class="sections-when"><strong>Best when:</strong> you need to look up or refresh a specific concept fast.</p>
           </a>
@@ -62,6 +63,10 @@ const counts = {
       <p class="block-foot">
         Or follow a <a href="/start-here/">curated reading path</a> by what you're trying to do.
       </p>
+    </section>
+
+    <section class="home-subscribe" aria-label="Newsletter">
+      <Subscribe heading="Get the next senior ML note" />
     </section>
   </main>
 </BaseLayout>
@@ -149,8 +154,8 @@ const counts = {
     transition: background var(--transition), border-color var(--transition), transform var(--transition);
   }
   .btn-primary {
-    background: var(--c-accent);
-    color: white;
+    background: var(--c-accent-fill);
+    color: var(--c-on-accent);
   }
   .btn-primary:hover {
     background: var(--c-link-hover);
@@ -258,7 +263,7 @@ const counts = {
     border-color: var(--c-accent);
     transform: translateY(-2px);
   }
-  .sections-grid h3 {
+  .sections-grid h2 {
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 600;
@@ -319,6 +324,9 @@ const counts = {
     font-weight: 500;
   }
   .block-foot a:hover { text-decoration: underline; }
+
+  .home-subscribe { padding: 0 0 clamp(1.8rem, 4vw, 2.6rem); }
+  .home-subscribe :global(.subscribe) { margin-top: 0; }
 
   /* Quiet footnote at the very bottom of the home page */
   .footnote {

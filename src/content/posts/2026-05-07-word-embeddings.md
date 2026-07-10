@@ -68,6 +68,6 @@ Contextualized embeddings: ELMo, BERT, every modern LLM. The same word gets diff
 
 ## Related
 
-- [Tokenization](/concepts/tokenization-bpe-wordpiece-and-the-llm-era/).
-- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity-metrics/).
+- [Tokenization](/concepts/tokenization/).
+- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity/).
 - [Approximate nearest neighbors](/concepts/approximate-nearest-neighbors/).

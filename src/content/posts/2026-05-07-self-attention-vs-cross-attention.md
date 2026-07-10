@@ -90,6 +90,6 @@ The decoder reads its own past tokens (self-attention) and the encoder's output 
 
 ## Related
 
-- [The attention mechanism](/concepts/the-attention-mechanism/).
+- [The attention mechanism](/concepts/attention-mechanism/).
 - [Multi-head attention](/concepts/multi-head-attention/).
-- [Transformer architecture](/concepts/transformer-architecture-a-senior-level-mental-model/).
+- [Transformer architecture](/concepts/transformer-architecture/).

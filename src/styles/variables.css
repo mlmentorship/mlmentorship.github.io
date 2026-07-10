@@ -32,6 +32,8 @@
   --c-link-hover: #9a3412;
   --c-accent:     #ea580c;
   --c-accent-soft:#ffedd5;
+  --c-accent-fill: #c2410c;
+    --c-on-accent: #ffffff;
   --c-code-bg:    #f3f5f9;
   --c-kbd-bg:     #eef2f7;
   --c-highlight:  #fef9c3;
@@ -65,6 +67,8 @@
   --c-link-hover: #fdba74;
   --c-accent:     #fb923c;
   --c-accent-soft:rgba(251, 146, 60, 0.16);
+  --c-accent-fill: #fdba74;
+    --c-on-accent: #1c1917;
   --c-code-bg:    #131722;
   --c-kbd-bg:     #1a1f2c;
   --c-highlight:  #3f3a14;
@@ -87,6 +91,8 @@
     --c-link-hover: #fdba74;
     --c-accent:     #fb923c;
     --c-accent-soft:rgba(251, 146, 60, 0.16);
+    --c-accent-fill: #fdba74;
+      --c-on-accent: #1c1917;
     --c-code-bg:    #131722;
     --c-kbd-bg:     #1a1f2c;
     --c-highlight:  #3f3a14;

@@ -48,13 +48,12 @@ export const SITE = {
     // is reachable from /about/ for anyone who lands directly.
     bookingCTA: false,
   },
-  // Navigation (top of every page). 'Start here' lives in the docs sidebar
-  // since it's a navigation aid, not a content section. About lives in
-  // both nav and footer. Mock-interview link is appended dynamically when
-  // features.bookingCTA is enabled.
-  // Order: most-clicked first (Questions > Guides > Concepts).
+  // Navigation (top of every page). Start here stays globally available because
+  // deep-linked and mobile visitors do not see the desktop docs sidebar.
+  // Mock-interview link is appended dynamically when bookingCTA is enabled.
   // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
+    { label: 'Start here', href: '/start-here/' },
     { label: 'Questions', href: '/questions/' },
     { label: 'Guides', href: '/guides/' },
     { label: 'Concepts', href: '/concepts/' },

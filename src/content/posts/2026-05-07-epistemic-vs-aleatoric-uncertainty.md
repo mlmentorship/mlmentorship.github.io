@@ -86,6 +86,6 @@ where $\bar{p} = \frac{1}{M} \sum_m p_m$ is the ensemble average. Predictive ent
 
 ## Related
 
-- [Expected Calibration Error](/concepts/expected-calibration-error-ece/).
+- [Expected Calibration Error](/concepts/expected-calibration-error/).
 - [Calibration](/concepts/calibration/).
-- [Bayes' rule and the posterior](/concepts/bayes-rule-and-the-posterior/).
+- [Bayes' rule and the posterior](/concepts/bayes-rule-and-posterior/).

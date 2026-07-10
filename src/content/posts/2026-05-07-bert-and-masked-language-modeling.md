@@ -91,5 +91,5 @@ When to skip: anything generative. Use a decoder-only LLM.
 ## Related
 
 - [Self-attention vs cross-attention](/concepts/self-attention-vs-cross-attention/).
-- [Transformer architecture](/concepts/transformer-architecture-a-senior-level-mental-model/).
+- [Transformer architecture](/concepts/transformer-architecture/).
 - [Two-tower retrieval](/concepts/two-tower-retrieval/).

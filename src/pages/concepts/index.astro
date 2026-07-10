@@ -2,8 +2,8 @@
 import DocsIndexLayout from '../../layouts/DocsIndexLayout.astro';
 import { getCollection } from 'astro:content';
 import { REFERENCE_SUBCATEGORY as SUBCATEGORY, REFERENCE_ORDER as ORDER } from '../../utils/subcategories';
-
-
+import CategoryJumps from '../../components/CategoryJumps.astro';
+import { toAnchor } from '../../utils/anchors';
 
 const all = await getCollection('posts', ({ data }) => !data.draft && data.category === 'concepts');
 const posts = all.map((p) => ({
@@ -22,6 +22,10 @@ for (const p of posts) {
 }
 for (const [, list] of groups) list.sort((a, b) => a.title.localeCompare(b.title));
 ungrouped.sort((a, b) => a.title.localeCompare(b.title));
+const jumpItems = ORDER
+  .map((sub) => ({ label: sub, id: toAnchor(sub), count: groups.get(sub)?.length ?? 0 }))
+  .filter((item) => item.count > 0);
+if (ungrouped.length > 0) jumpItems.push({ label: 'Other', id: 'other', count: ungrouped.length });
 ---
 <DocsIndexLayout
   category="concepts"
@@ -36,11 +40,13 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
     </p>
   </header>
 
+  <CategoryJumps items={jumpItems} label="Jump to concept category" />
+
   {ORDER.map((sub) => {
     const list = groups.get(sub) ?? [];
     if (list.length === 0) return null;
     return (
-      <section class="group">
+      <section class="group" id={toAnchor(sub)}>
         <h2 class="group-title">{sub} <span class="group-count">{list.length}</span></h2>
         <ul class="post-list">
           {list.map((p) => (
@@ -55,7 +61,7 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
   })}
 
   {ungrouped.length > 0 && (
-    <section class="group">
+    <section class="group" id="other">
       <h2 class="group-title">Other</h2>
       <ul class="post-list">
         {ungrouped.map((p) => (
@@ -88,7 +94,7 @@ ungrouped.sort((a, b) => a.title.localeCompare(b.title));
     border-radius: 4px; font-size: 0.78em;
   }
 
-  .group { margin-bottom: 2.2rem; }
+  .group { margin-bottom: 2.2rem; scroll-margin-top: 5.5rem; }
   .group-title {
     font-size: 1.05rem; font-weight: 600; color: var(--c-text);
     border-bottom: 1px solid var(--c-rule); padding-bottom: 0.4rem;

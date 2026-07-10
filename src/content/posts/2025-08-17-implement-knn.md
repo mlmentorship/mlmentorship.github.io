@@ -102,4 +102,4 @@ The L6 answer:
 
 ---
 
-*Related: [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [System design case study: personalized search ranking](/system-design/personalized-search-ranking/).*
+*Related: [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [System design case study: personalized search ranking](/guides/personalized-search-ranking/).*

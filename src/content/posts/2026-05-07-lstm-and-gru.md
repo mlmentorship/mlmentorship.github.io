@@ -76,5 +76,5 @@ Single hidden state, no separate cell. Slightly fewer parameters. Empirically co
 ## Related
 
 - [Backpropagation](/concepts/backpropagation/).
-- [The attention mechanism](/concepts/the-attention-mechanism/).
-- [Vanishing and exploding gradients](/concepts/vanishing-and-exploding-gradients/).
+- [The attention mechanism](/concepts/attention-mechanism/).
+- [Vanishing and exploding gradients](/concepts/exploding-vanishing-gradients/).

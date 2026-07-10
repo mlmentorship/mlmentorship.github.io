@@ -73,4 +73,4 @@ A standard transformer is a GNN on the complete graph with attention as the edge
 ## Related
 
 - [Convolution as matrix multiplication](/concepts/convolution-as-matmul/).
-- [The attention mechanism](/concepts/the-attention-mechanism/).
+- [The attention mechanism](/concepts/attention-mechanism/).

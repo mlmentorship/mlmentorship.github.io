@@ -76,6 +76,6 @@ For tabular click-through-rate prediction with high-cardinality categoricals, an
 
 ## Related
 
-- [Matrix factorization for recsys](/concepts/matrix-factorization-for-recsys/).
+- [Matrix factorization for recsys](/concepts/matrix-factorization-recsys/).
 - [Alternating least squares](/concepts/alternating-least-squares/).
-- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity-metrics/).
+- [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity/).

@@ -9,7 +9,7 @@ interface Props {
   variant?: 'row' | 'feature';
 }
 const { post, variant = 'row' } = Astro.props;
-const { title, description, date, tags, cover, coverAlt } = post.data;
+const { title, description, date, cover, coverAlt } = post.data;
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 const href = `/${post.data.category}/${slug}/`;
 ---

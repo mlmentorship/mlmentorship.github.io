@@ -94,6 +94,7 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'exponential-family': 'Probability & Statistics',
   'markov-chains': 'Probability & Statistics',
   'monte-carlo-and-importance-sampling': 'Probability & Statistics',
+  'epistemic-vs-aleatoric-uncertainty': 'Probability & Statistics',
 
   // Classical ML
   'logistic-regression': 'Classical ML',
@@ -105,7 +106,8 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'naive-bayes': 'Classical ML',
   'k-means-clustering': 'Classical ML',
   'dbscan': 'Classical ML',
-  'matrix-factorization-recsys': 'Classical ML',
+  'kernel-methods-and-the-kernel-trick': 'Classical ML',
+  'tsne-and-umap': 'Classical ML',
 
   // Deep Learning Foundations
   'activation-functions': 'Deep Learning Foundations',
@@ -116,30 +118,61 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'attention-mechanism': 'Deep Learning Foundations',
   'encoder-decoder-architectures': 'Deep Learning Foundations',
   'autoregressive-vs-diffusion': 'Deep Learning Foundations',
+  'graph-neural-networks': 'Deep Learning Foundations',
 
   // Generative Models
   'variational-autoencoders': 'Generative Models',
   'normalizing-flows': 'Generative Models',
   'gans-overview': 'Generative Models',
   'diffusion-models': 'Generative Models',
+  'discrete-gradient-estimators': 'Generative Models',
 
   // Probabilistic Models
   'expectation-maximization': 'Probabilistic Models',
   'hidden-markov-models': 'Probabilistic Models',
   'gaussian-mixture-models': 'Probabilistic Models',
   'graphical-models': 'Probabilistic Models',
+  'belief-propagation': 'Probabilistic Models',
+  'factor-analysis-and-ppca': 'Probabilistic Models',
+  'forward-backward-and-viterbi': 'Probabilistic Models',
+  'gaussian-processes': 'Probabilistic Models',
 
   // Reinforcement Learning
   'q-learning': 'Reinforcement Learning',
   'policy-gradient': 'Reinforcement Learning',
   'ppo': 'Reinforcement Learning',
   'value-vs-policy-rl': 'Reinforcement Learning',
+  'actor-critic-methods': 'Reinforcement Learning',
+  'advantage-estimation-and-gae': 'Reinforcement Learning',
+  'exploration-vs-exploitation': 'Reinforcement Learning',
 
   // Computer Vision
   'cnn-architecture': 'Computer Vision',
   'resnet': 'Computer Vision',
   'vision-transformers': 'Computer Vision',
   'object-detection-overview': 'Computer Vision',
+  'anchor-boxes-and-nms': 'Computer Vision',
+  'convolution-as-matmul': 'Computer Vision',
+
+  // NLP & Speech
+  'automatic-speech-recognition': 'NLP & Speech',
+  'bert-and-masked-language-modeling': 'NLP & Speech',
+  'conditional-random-fields': 'NLP & Speech',
+  'connectionist-temporal-classification': 'NLP & Speech',
+  'lstm-and-gru': 'NLP & Speech',
+  'rnn-transducer': 'NLP & Speech',
+  'word-embeddings': 'NLP & Speech',
+
+  // Retrieval & Recommenders
+  'alternating-least-squares': 'Retrieval & Recommenders',
+  'approximate-nearest-neighbors': 'Retrieval & Recommenders',
+  'content-based-filtering': 'Retrieval & Recommenders',
+  'embedding-spaces-and-similarity': 'Retrieval & Recommenders',
+  'factorization-machines': 'Retrieval & Recommenders',
+  'knowledge-graph-embeddings': 'Retrieval & Recommenders',
+  'matrix-factorization-recsys': 'Retrieval & Recommenders',
+  'tf-idf-and-bm25': 'Retrieval & Recommenders',
+  'two-tower-retrieval': 'Retrieval & Recommenders',
 
   // LLM Internals
   'flashattention': 'LLM Internals',
@@ -160,6 +193,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'continuous-batching': 'LLM Internals',
   'long-context-llms': 'LLM Internals',
   'prefill-vs-decode': 'LLM Internals',
+  'decoding-strategies': 'LLM Internals',
+  'multi-head-attention': 'LLM Internals',
+  'self-attention-vs-cross-attention': 'LLM Internals',
 
   // Training Fundamentals
   'cross-entropy-softmax': 'Training Fundamentals',
@@ -178,6 +214,10 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'gradient-accumulation': 'Training Fundamentals',
   'weight-decay-vs-l2': 'Training Fundamentals',
   'mixup-and-cutmix': 'Training Fundamentals',
+  'microannealing': 'Training Fundamentals',
+  'neural-network-training-recipe': 'Training Fundamentals',
+  'wsd-and-wsd-s': 'Training Fundamentals',
+  'z-loss': 'Training Fundamentals',
 
   // Systems & Infrastructure
   'gpu-memory-hierarchy': 'Systems & Infrastructure',
@@ -187,11 +227,11 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'tensor-parallelism': 'Systems & Infrastructure',
   'pipeline-parallelism': 'Systems & Infrastructure',
   'all-reduce-and-collectives': 'Systems & Infrastructure',
+  'knowledge-distillation': 'Systems & Infrastructure',
+  'pruning': 'Systems & Infrastructure',
 
   // ML Systems & Evaluation
   'ab-testing-for-ml': 'ML Systems & Evaluation',
-  'embedding-spaces-and-similarity': 'ML Systems & Evaluation',
-  'two-tower-retrieval': 'ML Systems & Evaluation',
   'cross-validation-strategies': 'ML Systems & Evaluation',
   'roc-pr-auc': 'ML Systems & Evaluation',
   'perplexity-and-bits-per-token': 'ML Systems & Evaluation',
@@ -199,6 +239,7 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'ranking-metrics-ndcg-map-mrr': 'ML Systems & Evaluation',
   'confusion-matrix-and-classification-metrics': 'ML Systems & Evaluation',
   'expected-calibration-error': 'ML Systems & Evaluation',
+  'model-interpretability': 'ML Systems & Evaluation',
 };
 
 export const REFERENCE_ORDER = [
@@ -210,6 +251,8 @@ export const REFERENCE_ORDER = [
   'Probabilistic Models',
   'Reinforcement Learning',
   'Computer Vision',
+  'NLP & Speech',
+  'Retrieval & Recommenders',
   'LLM Internals',
   'Training Fundamentals',
   'Systems & Infrastructure',

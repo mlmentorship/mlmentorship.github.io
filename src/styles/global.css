@@ -248,14 +248,17 @@ mark {
   transition: all var(--transition);
 }
 .tag:hover {
-  color: var(--c-bg);
-  background: var(--c-accent);
-  border-color: var(--c-accent);
+  color: var(--c-on-accent);
+    background: var(--c-accent-fill);
+    border-color: var(--c-accent-fill);
   text-decoration: none;
 }
 
 /* Selection + focus */
-::selection { background: var(--c-accent); color: var(--c-bg); }
+::selection {
+  background: var(--c-accent-fill);
+  color: var(--c-on-accent);
+}
 :focus-visible {
   outline: 2px solid var(--c-accent);
   outline-offset: 3px;

@@ -82,5 +82,5 @@ For most large-scale supervised learning, deep nets with bootstrapping or deep e
 ## Related
 
 - [Kernel methods and the kernel trick](/concepts/kernel-methods-and-the-kernel-trick/).
-- [Bayes' rule and the posterior](/concepts/bayes-rule-and-the-posterior/).
+- [Bayes' rule and the posterior](/concepts/bayes-rule-and-posterior/).
 - [Maximum likelihood estimation](/concepts/maximum-likelihood-estimation/).

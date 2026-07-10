@@ -86,6 +86,6 @@ For a fresh recsys project at moderate scale: ALS first, two-tower if you need c
 
 ## Related
 
-- [Matrix factorization for recsys](/concepts/matrix-factorization-for-recsys/).
+- [Matrix factorization for recsys](/concepts/matrix-factorization-recsys/).
 - [Two-tower retrieval](/concepts/two-tower-retrieval/).
 - [SVD and PCA](/concepts/svd-and-pca/).

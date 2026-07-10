@@ -37,7 +37,7 @@ If you keep $d_h = d$ per head and run $h$ heads, you multiply parameters and co
 
 ## Variants
 
-- **Multi-query attention (MQA)**: share $K$ and $V$ across all heads; only $Q$ is per-head. KV-cache shrinks by $h$x. See [GQA and MQA](/concepts/grouped-query-and-multi-query-attention-gqa-mqa/).
+- **Multi-query attention (MQA)**: share $K$ and $V$ across all heads; only $Q$ is per-head. KV-cache shrinks by $h$x. See [GQA and MQA](/concepts/grouped-query-attention/).
 - **Grouped-query attention (GQA)**: share $K, V$ across groups of heads. Compromise between full MHA and MQA. The Llama 2/3 default.
 - **Cross-attention**: $Q$ from one sequence, $K, V$ from another. See [self-attention vs cross-attention](/concepts/self-attention-vs-cross-attention/).
 - **Sliding-window / sparse**: restrict each head to a local window or learned sparse pattern.
@@ -55,6 +55,6 @@ If you keep $d_h = d$ per head and run $h$ heads, you multiply parameters and co
 
 ## Related
 
-- [The attention mechanism](/concepts/the-attention-mechanism/).
-- [GQA and MQA](/concepts/grouped-query-and-multi-query-attention-gqa-mqa/).
+- [The attention mechanism](/concepts/attention-mechanism/).
+- [GQA and MQA](/concepts/grouped-query-attention/).
 - [Self-attention vs cross-attention](/concepts/self-attention-vs-cross-attention/).
