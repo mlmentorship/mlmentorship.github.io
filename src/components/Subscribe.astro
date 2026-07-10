@@ -62,6 +62,8 @@ const hasEmail =
     margin: 0 0 1rem;
     line-height: 1.5;
   }
+  /* MailerLite's form copy duplicates the site-owned title and blurb above. */
+  .subscribe :global(.ml-form-embedContent) { display: none; }
   .form {
     display: flex;
     gap: .5rem;
