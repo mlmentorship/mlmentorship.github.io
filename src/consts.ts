@@ -19,12 +19,11 @@ export const SITE = {
     mastodon: '',
   },
   newsletter: {
-    // Shares hsaghir.com's MailerLite account so both sites feed one subscriber
-    // base. Reuses hsaghir's form for now; create a dedicated MailerLite group/form
-    // for the interview audience and swap in its formId to segment.
+    // Dedicated form for the mlmentorship audience, under the shared MailerLite
+    // account. This keeps source attribution and audience segmentation explicit.
     provider: 'mailerlite' as 'mailerlite' | 'none',
     accountId: '2284644',
-    formId: '7ohleY',
+    formId: 'rgOeEV',
     blurb: 'Occasional notes on senior ML interviews. No spam, unsubscribe any time.',
   },
   analytics: {
