@@ -28,11 +28,10 @@ export const SITE = {
     blurb: 'Occasional notes on senior ML interviews. No spam, unsubscribe any time.',
   },
   analytics: {
-    // Use the same analytics code on hsaghir.com and here so referrers reveal the
-    // cross-site funnel. Claim a GoatCounter code (or a Plausible account covering
-    // both domains) and paste it below to activate.
+    // Shared with hsaghir.com; BaseHead prefixes paths with the hostname so the
+    // dashboard can distinguish the two sites and reveal the cross-site funnel.
     provider: 'goatcounter' as 'goatcounter' | 'none',
-    code: '',
+    code: 'hsaghir',
   },
   giscus: {
     repo: '',
