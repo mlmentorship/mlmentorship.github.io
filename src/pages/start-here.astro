@@ -1,6 +1,7 @@
 ---
 import DocsIndexLayout from '../layouts/DocsIndexLayout.astro';
 import { getCollection } from 'astro:content';
+import { SITE } from '../consts';
 
 const posts = await getCollection('posts', ({ data }) => !data.draft);
 const counts = {
@@ -22,21 +23,6 @@ const counts = {
       links directly; come back to this page when you finish a path.
     </p>
   </header>
-
-  <section class="tools-overview" aria-labelledby="prep-tools-heading">
-    <div>
-      <p class="sections-eyebrow">Before you browse</p>
-      <h2 id="prep-tools-heading">Use the library as a practice system</h2>
-      <p>Choose a focus, attempt questions before reading, and work from a realistic cadence. These tools require no account and collect no answer content.</p>
-    </div>
-    <ul>
-      <li><a href="/readiness/"><strong>Readiness check</strong><span>Find three focus areas</span></a></li>
-      <li><a href="/practice/"><strong>Practice method</strong><span>Attempt, score, retry</span></a></li>
-      <li><a href="/plans/"><strong>Prep plans</strong><span>Choose 2, 4, or 8 weeks</span></a></li>
-      <li><a href="/story-bank/"><strong>Story bank</strong><span>Build behavioral evidence</span></a></li>
-      <li><a href="/final-week/"><strong>Final week</strong><span>Simulate, repair, taper</span></a></li>
-    </ul>
-  </section>
 
   <section class="sections-overview">
     <p class="sections-eyebrow">The three sections</p>
@@ -65,14 +51,29 @@ const counts = {
     </ul>
   </section>
 
+  {SITE.features.prepTools && <section class="tools-overview" aria-labelledby="prep-tools-heading">
+    <div>
+      <p class="sections-eyebrow">Use what you read</p>
+      <h2 id="prep-tools-heading">Turn the core library into an executable plan</h2>
+      <p>Choose a workload, attempt before reading, diagnose weak dimensions, and prove improvement with spaced retrieval and simulation.</p>
+    </div>
+    <ul>
+      <li><a href="/prep/readiness/"><strong>Readiness check</strong><span>Estimate gaps and workload</span></a></li>
+      <li><a href="/prep/plans/"><strong>Prep plans</strong><span>Choose weeks and hours</span></a></li>
+      <li><a href="/prep/role-paths/"><strong>Role paths</strong><span>AS, MLE, and RE sequences</span></a></li>
+      <li><a href="/prep/practice/"><strong>Practice method</strong><span>Attempt, diagnose, retry</span></a></li>
+      <li><a href="/prep/simulations/"><strong>Simulations</strong><span>Test the integrated loop</span></a></li>
+    </ul>
+  </section>}
+
     <section class="path" id="preparing-for-a-senior-ml-interview-loop">
       <header>
         <h2>1. Preparing for a senior ML interview loop</h2>
         <p>You have a loop in 2-8 weeks. You want to know what's actually tested at L5/L6 vs. what showed up on your old prep material.</p>
       </header>
       <ol>
-        <li>Start with the <a href="/readiness/">private readiness check</a>, then choose a <a href="/plans/">2-, 4-, or 8-week plan</a></li>
-        <li>Use the <a href="/practice/">closed-book practice method</a> on every question</li>
+        {SITE.features.prepTools && <li>Start with the <a href="/prep/readiness/">private readiness check</a>, then choose an <a href="/prep/plans/">hours-based 2-, 4-, or 8-week plan</a></li>}
+        {SITE.features.prepTools && <li>Use the <a href="/prep/practice/">round-specific practice method</a> on every question</li>}
         <li><a href="/guides/five-things-as-interview-tests/">The 5 things AS interviews test for</a></li>
         <li><a href="/guides/l5-vs-l6-faang-ml/">L5 vs L6 calibration: what's the difference</a></li>
         <li><a href="/questions/most-ambitious-project/">Tell me about your most ambitious project</a></li>

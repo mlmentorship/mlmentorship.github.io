@@ -12,6 +12,7 @@ import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
 import { SITE } from '../consts';
 import { getSubcategoryMap, type Category } from '../utils/subcategories';
+import { getPracticeMode } from '../data/prepCurriculum';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -32,6 +33,7 @@ const CATEGORY_META: Record<Category, { singular: string; plural: string }> = {
 const categoryMeta = CATEGORY_META[category];
 const subcategoryConfig = getSubcategoryMap(category);
 const currentSubcategory = subcategoryConfig?.map[slug];
+const practiceMode = getPracticeMode(slug, currentSubcategory);
 
 const categoryPosts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category))
   .map((entry) => ({
@@ -99,7 +101,7 @@ const nextPost = currentIndex >= 0 && currentIndex < categoryPosts.length - 1
         </div>
       </header>
 
-      {category === 'questions' && <PracticeMode title={title} slug={slug} />}
+      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
 
       <div id="answer" class="prose docs-body" itemprop="articleBody">
         <slot />

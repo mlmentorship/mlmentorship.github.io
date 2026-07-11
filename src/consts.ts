@@ -47,6 +47,10 @@ export const SITE = {
     // Default off until the site has traction; the /interview/ page itself stays live and
     // is reachable from /about/ for anyone who lands directly.
     bookingCTA: false,
+    // Build and expose the browser-only preparation subsystem. When false,
+    // navigation and Practice Mode disappear and /prep/* routes redirect to
+    // the core Questions library.
+    prepTools: import.meta.env.PUBLIC_PREP_TOOLS === undefined || import.meta.env.PUBLIC_PREP_TOOLS === 'true',
   },
   // Navigation (top of every page). Start here stays globally available because
   // deep-linked and mobile visitors do not see the desktop docs sidebar.
@@ -54,10 +58,10 @@ export const SITE = {
   // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
     { label: 'Start here', href: '/start-here/' },
-    { label: 'Prep', href: '/prep/' },
     { label: 'Questions', href: '/questions/' },
     { label: 'Guides', href: '/guides/' },
     { label: 'Concepts', href: '/concepts/' },
+    { label: 'Prep', href: '/prep/' },
     { label: 'About', href: '/about/' },
   ],
   postsPerPage: 30,

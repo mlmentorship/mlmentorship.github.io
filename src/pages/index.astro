@@ -29,7 +29,7 @@ const counts = {
       </p>
       <p class="hero-ctas">
         <a class="btn-primary" href="/start-here/">Browse the library <span aria-hidden="true">→</span></a>
-        <a class="btn-secondary" href="/readiness/">Check readiness</a>
+        {SITE.features.prepTools && <a class="btn-secondary" href="/prep/readiness/">Check readiness</a>}
       </p>
     </section>
 
@@ -66,18 +66,18 @@ const counts = {
       </p>
     </section>
 
-    <hr class="rule" />
+    {SITE.features.prepTools && <hr class="rule" />}
 
-    <section class="block">
+    {SITE.features.prepTools && <section class="block">
       <p class="block-eyebrow">Free prep tools</p>
-      <h2 class="block-headline">Turn the library into deliberate practice.</h2>
+      <h2 class="block-headline">Use the library with an executable practice plan.</h2>
       <div class="tools-grid">
-        <a href="/readiness/"><strong>Find your focus</strong><span>Private browser-only readiness check</span></a>
-        <a href="/practice/"><strong>Practice closed-book</strong><span>Timer, rubric, and delayed-retry method</span></a>
-        <a href="/plans/"><strong>Choose a cadence</strong><span>Generic 2-, 4-, and 8-week plans</span></a>
+        <a href="/prep/readiness/"><strong>Find your focus</strong><span>Evidence-based workload and gap check</span></a>
+        <a href="/prep/practice/"><strong>Practice by round</strong><span>Round timers, diagnostic rubrics, and retries</span></a>
+        <a href="/prep/plans/"><strong>Choose a workload</strong><span>Executable 2-, 4-, and 8-week plans</span></a>
       </div>
       <p class="block-foot"><a href="/prep/">See all preparation tools →</a></p>
-    </section>
+    </section>}
 
     <section class="home-subscribe" aria-label="Newsletter">
       <Subscribe heading="Get the next senior ML note" />

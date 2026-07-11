@@ -7,16 +7,15 @@ import Search from './Search.astro';
 const pathname = Astro.url.pathname;
 function isActive(href: string) {
   if (href === '/') return pathname === '/';
-  if (href === '/prep/') {
-    return ['/prep/', '/readiness/', '/practice/', '/story-bank/', '/plans/', '/final-week/'].includes(pathname);
-  }
+  if (href === '/prep/') return pathname.startsWith('/prep/');
   return pathname === href || pathname.startsWith(href);
 }
 
+const visibleNav = SITE.nav.filter((item) => item.href !== '/prep/' || SITE.features.prepTools);
 // Append the mock-interview link only when the booking CTA feature flag is on.
 const navItems: Array<{ label: string; href: string; external?: boolean }> = SITE.features.bookingCTA
-  ? [...SITE.nav.slice(0, -1), { label: 'Mock', href: '/interview/' }, SITE.nav[SITE.nav.length - 1]]
-  : [...SITE.nav];
+  ? [...visibleNav.slice(0, -1), { label: 'Mock', href: '/interview/' }, visibleNav[visibleNav.length - 1]]
+  : [...visibleNav];
 ---
 
 <header class="masthead" data-pagefind-ignore="all">

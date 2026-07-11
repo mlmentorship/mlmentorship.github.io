@@ -14,6 +14,10 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  # Repository variable PUBLIC_PREP_TOOLS=false hides the entire prep subsystem.
+  PUBLIC_PREP_TOOLS: ${{ vars.PUBLIC_PREP_TOOLS || 'true' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
