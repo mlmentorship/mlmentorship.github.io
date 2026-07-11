@@ -76,12 +76,12 @@ export async function generatePlaybook(options: {
   const parsedIntake = parseIntake(JSON.parse(fs.readFileSync(intakePath, 'utf8')));
   const intake = options.anonymize
     ? {
-        ...parsedIntake,
-        candidateName: 'Candidate',
-        experienceSummary: undefined,
-        constraints: [],
-        priorities: [],
-      }
+      ...parsedIntake,
+      candidateName: 'Candidate',
+      experienceSummary: undefined,
+      constraints: [],
+      priorities: [],
+    }
     : parsedIntake;
   const catalog = buildCatalog(repoRoot);
   const playbook = buildPersonalizedPlaybook(intake, catalog);
