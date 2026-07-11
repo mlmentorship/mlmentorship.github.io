@@ -23,6 +23,21 @@ const counts = {
     </p>
   </header>
 
+  <section class="tools-overview" aria-labelledby="prep-tools-heading">
+    <div>
+      <p class="sections-eyebrow">Before you browse</p>
+      <h2 id="prep-tools-heading">Use the library as a practice system</h2>
+      <p>Choose a focus, attempt questions before reading, and work from a realistic cadence. These tools require no account and collect no answer content.</p>
+    </div>
+    <ul>
+      <li><a href="/readiness/"><strong>Readiness check</strong><span>Find three focus areas</span></a></li>
+      <li><a href="/practice/"><strong>Practice method</strong><span>Attempt, score, retry</span></a></li>
+      <li><a href="/plans/"><strong>Prep plans</strong><span>Choose 2, 4, or 8 weeks</span></a></li>
+      <li><a href="/story-bank/"><strong>Story bank</strong><span>Build behavioral evidence</span></a></li>
+      <li><a href="/final-week/"><strong>Final week</strong><span>Simulate, repair, taper</span></a></li>
+    </ul>
+  </section>
+
   <section class="sections-overview">
     <p class="sections-eyebrow">The three sections</p>
     <ul class="sections-grid">
@@ -56,6 +71,8 @@ const counts = {
         <p>You have a loop in 2-8 weeks. You want to know what's actually tested at L5/L6 vs. what showed up on your old prep material.</p>
       </header>
       <ol>
+        <li>Start with the <a href="/readiness/">private readiness check</a>, then choose a <a href="/plans/">2-, 4-, or 8-week plan</a></li>
+        <li>Use the <a href="/practice/">closed-book practice method</a> on every question</li>
         <li><a href="/guides/five-things-as-interview-tests/">The 5 things AS interviews test for</a></li>
         <li><a href="/guides/l5-vs-l6-faang-ml/">L5 vs L6 calibration: what's the difference</a></li>
         <li><a href="/questions/most-ambitious-project/">Tell me about your most ambitious project</a></li>
@@ -151,6 +168,29 @@ const counts = {
     font-size: 1.1rem;
     color: var(--c-text-soft);
     margin-bottom: 2.5rem;
+  }
+
+  .tools-overview {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 1fr);
+    gap: 1.5rem;
+    margin: 0 0 2.5rem;
+    padding: 1.3rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    background: var(--c-bg-tint);
+  }
+  .tools-overview h2 { margin: 0 0 .5rem; font-size: 1.25rem; }
+  .tools-overview > div > p:last-child { margin: 0; color: var(--c-text-soft); font-size: .9rem; }
+  .tools-overview ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; list-style: none; padding: 0; margin: 0; }
+  .tools-overview a { display: block; height: 100%; padding: .65rem .7rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); color: inherit; text-decoration: none; }
+  .tools-overview a:hover { border-color: var(--c-accent); }
+  .tools-overview strong, .tools-overview span { display: block; }
+  .tools-overview strong { font-size: .82rem; }
+  .tools-overview span { color: var(--c-muted); font-size: .72rem; }
+  @media (max-width: 700px) {
+    .tools-overview { grid-template-columns: 1fr; }
+    .tools-overview ul { grid-template-columns: 1fr; }
   }
 
   /* The three sections overview */

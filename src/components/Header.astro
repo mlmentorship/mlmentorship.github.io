@@ -7,6 +7,9 @@ import Search from './Search.astro';
 const pathname = Astro.url.pathname;
 function isActive(href: string) {
   if (href === '/') return pathname === '/';
+  if (href === '/prep/') {
+    return ['/prep/', '/readiness/', '/practice/', '/story-bank/', '/plans/', '/final-week/'].includes(pathname);
+  }
   return pathname === href || pathname.startsWith(href);
 }
 

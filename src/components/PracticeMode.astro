@@ -1,0 +1,232 @@
+---
+interface Props {
+  title: string;
+  slug: string;
+}
+
+const { title, slug } = Astro.props;
+---
+
+<section class="practice-launch" data-practice data-slug={slug} data-title={title} data-pagefind-ignore="all">
+  <div>
+    <p class="practice-eyebrow">Active recall</p>
+    <h2>Practice before you read</h2>
+    <p>Give yourself eight minutes, answer aloud, then reveal the scoring rubric and compare with the leveled answer below.</p>
+    <p class="practice-last" data-practice-last hidden></p>
+  </div>
+  <div class="practice-actions">
+    <button class="practice-start" type="button" data-practice-start>Practice this question</button>
+    <a href="/practice/">How the method works</a>
+  </div>
+
+  <dialog class="practice-dialog" data-practice-dialog aria-labelledby={`practice-title-${slug}`}>
+    <div class="practice-dialog-inner">
+      <header class="dialog-head">
+        <div>
+          <p class="practice-eyebrow">Closed-book attempt</p>
+          <h2 id={`practice-title-${slug}`}>{title}</h2>
+        </div>
+        <button class="dialog-close" type="button" data-practice-close aria-label="Close practice mode">×</button>
+      </header>
+
+      <section data-practice-phase>
+        <div class="timer-row">
+          <p><strong data-practice-timer>08:00</strong><span>recommended time</span></p>
+          <button class="secondary-button" type="button" data-practice-pause>Pause</button>
+        </div>
+        <label class="scratchpad-label" for={`scratchpad-${slug}`}>Private scratchpad</label>
+        <textarea id={`scratchpad-${slug}`} data-practice-notes rows="9" placeholder="Outline your answer. This text stays in this dialog and is never sent or saved."></textarea>
+        <p class="local-note">No answer text leaves your browser. Closing or reloading clears the scratchpad.</p>
+        <button class="reveal-button" type="button" data-practice-reveal>Reveal scoring rubric</button>
+      </section>
+
+      <section class="rubric-phase" data-rubric-phase hidden>
+        <p class="rubric-intro" tabindex="-1">Score the attempt before reading the reference answer.</p>
+        <dl class="rubric-grid">
+          <div><dt>Problem framing</dt><dd>Did you clarify objective, user, constraints, and failure cost?</dd></div>
+          <div><dt>Technical depth</dt><dd>Did you explain mechanisms and handle a follow-up one level deeper?</dd></div>
+          <div><dt>Trade-offs</dt><dd>Did you compare alternatives and name what would reverse your choice?</dd></div>
+          <div><dt>Evidence</dt><dd>Did you use specific experience, metrics, or realistic failure modes?</dd></div>
+          <div><dt>Communication</dt><dd>Was the answer structured, concise, and collaborative?</dd></div>
+        </dl>
+        <fieldset class="self-score">
+          <legend>How did this attempt feel?</legend>
+          <button type="button" data-practice-score="Weak">Weak · retry in 2 days</button>
+          <button type="button" data-practice-score="Review">Review · retry in 1 week</button>
+          <button type="button" data-practice-score="Confident">Confident · final-week check</button>
+        </fieldset>
+        <p class="score-status" data-score-status aria-live="polite"></p>
+        <button class="compare-button" type="button" data-practice-compare>Close and compare with the answer</button>
+      </section>
+    </div>
+  </dialog>
+</section>
+
+<script>
+  import { trackPublicEvent } from '../utils/publicEvents';
+
+  const STORAGE_PREFIX = 'mlm:practice:';
+
+  document.querySelectorAll<HTMLElement>('[data-practice]').forEach((root) => {
+    const slug = root.dataset.slug ?? 'question';
+    const dialog = root.querySelector<HTMLDialogElement>('[data-practice-dialog]');
+    const practicePhase = root.querySelector<HTMLElement>('[data-practice-phase]');
+    const rubricPhase = root.querySelector<HTMLElement>('[data-rubric-phase]');
+    const timer = root.querySelector<HTMLElement>('[data-practice-timer]');
+    const pause = root.querySelector<HTMLButtonElement>('[data-practice-pause]');
+    const notes = root.querySelector<HTMLTextAreaElement>('[data-practice-notes]');
+    const last = root.querySelector<HTMLElement>('[data-practice-last]');
+    const scoreStatus = root.querySelector<HTMLElement>('[data-score-status]');
+    let remaining = 8 * 60;
+    let interval: number | undefined;
+    let paused = false;
+
+    const updateTimer = () => {
+      if (!timer) return;
+      const minutes = Math.floor(remaining / 60).toString().padStart(2, '0');
+      const seconds = (remaining % 60).toString().padStart(2, '0');
+      timer.textContent = `${minutes}:${seconds}`;
+    };
+
+    const stopTimer = () => {
+      if (interval !== undefined) window.clearInterval(interval);
+      interval = undefined;
+    };
+
+    const startTimer = () => {
+      stopTimer();
+      interval = window.setInterval(() => {
+        if (!paused && remaining > 0) {
+          remaining -= 1;
+          updateTimer();
+        }
+        if (remaining === 0) stopTimer();
+      }, 1000);
+    };
+
+    const reset = () => {
+      remaining = 8 * 60;
+      paused = false;
+      if (pause) pause.textContent = 'Pause';
+      if (notes) notes.value = '';
+      if (scoreStatus) scoreStatus.textContent = '';
+      if (practicePhase) practicePhase.hidden = false;
+      if (rubricPhase) rubricPhase.hidden = true;
+      updateTimer();
+    };
+
+    const showLast = () => {
+      if (!last) return;
+      try {
+        const saved = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${slug}`) ?? 'null');
+        if (saved?.score) {
+          last.textContent = `Last self-score on this device: ${saved.score}.`;
+          last.hidden = false;
+        }
+      } catch {
+        last.hidden = true;
+      }
+    };
+
+    root.querySelector('[data-practice-start]')?.addEventListener('click', () => {
+      if (!dialog) return;
+      reset();
+      dialog.showModal();
+      notes?.focus();
+      startTimer();
+      trackPublicEvent('practice_started');
+    });
+
+    root.querySelector('[data-practice-pause]')?.addEventListener('click', () => {
+      paused = !paused;
+      if (pause) pause.textContent = paused ? 'Resume' : 'Pause';
+    });
+
+    root.querySelector('[data-practice-reveal]')?.addEventListener('click', () => {
+      stopTimer();
+      if (practicePhase) practicePhase.hidden = true;
+      if (rubricPhase) rubricPhase.hidden = false;
+      root.querySelector<HTMLElement>('.rubric-intro')?.focus();
+      trackPublicEvent('rubric_revealed');
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-practice-score]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const score = button.dataset.practiceScore;
+        if (!score) return;
+        try {
+          localStorage.setItem(`${STORAGE_PREFIX}${slug}`, JSON.stringify({ score }));
+        } catch {
+          // Self-score persistence is optional; the practice flow still works.
+        }
+        if (scoreStatus) scoreStatus.textContent = `Saved on this device: ${score}.`;
+        showLast();
+        trackPublicEvent('self_score_selected');
+      });
+    });
+
+    const close = () => {
+      stopTimer();
+      reset();
+      dialog?.close();
+    };
+
+    root.querySelector('[data-practice-close]')?.addEventListener('click', close);
+    root.querySelector('[data-practice-compare]')?.addEventListener('click', () => {
+      close();
+      document.querySelector('#answer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    dialog?.addEventListener('cancel', () => {
+      stopTimer();
+      reset();
+    });
+    dialog?.addEventListener('click', (event) => {
+      if (event.target === dialog) close();
+    });
+
+    showLast();
+    updateTimer();
+  });
+</script>
+
+<style>
+  .practice-launch { display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; margin: 0 0 2rem; padding: 1.2rem 1.3rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-bg-tint); }
+  .practice-launch h2 { margin: 0 0 .35rem; font-size: 1.2rem; }
+  .practice-launch p { margin: 0; color: var(--c-text-soft); font-size: .9rem; }
+  .practice-eyebrow { margin: 0 0 .3rem !important; font-family: var(--font-mono); font-size: .66rem !important; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent) !important; }
+  .practice-last { margin-top: .45rem !important; color: var(--c-muted) !important; }
+  .practice-actions { display: flex; flex-direction: column; align-items: flex-end; gap: .45rem; flex: 0 0 auto; }
+  .practice-actions a { font-size: .78rem; }
+  .practice-start, .reveal-button, .compare-button { padding: .68rem .85rem; border: 0; border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font: inherit; font-weight: 700; cursor: pointer; }
+  .practice-dialog { width: min(44rem, 94vw); max-height: 90vh; padding: 0; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-lg); }
+  .practice-dialog::backdrop { background: rgba(15, 23, 42, .62); backdrop-filter: blur(3px); }
+  .practice-dialog-inner { padding: clamp(1.1rem, 4vw, 2rem); overflow-y: auto; max-height: 90vh; }
+  .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--c-rule); }
+  .dialog-head h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.7rem); }
+  .dialog-close { width: 2rem; height: 2rem; border: 1px solid var(--c-rule); border-radius: 50%; background: var(--c-bg); color: var(--c-text); font-size: 1.2rem; cursor: pointer; }
+  .timer-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .timer-row p { display: flex; align-items: baseline; gap: .55rem; margin: 0; }
+  .timer-row strong { font-family: var(--font-mono); font-size: 1.65rem; }
+  .timer-row span { color: var(--c-muted); font-size: .78rem; }
+  .secondary-button { padding: .5rem .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; cursor: pointer; }
+  .scratchpad-label { display: block; margin-bottom: .35rem; font-weight: 600; }
+  textarea { width: 100%; padding: .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; line-height: 1.5; resize: vertical; }
+  .local-note { margin: .4rem 0 1rem !important; color: var(--c-muted) !important; font-size: .76rem !important; }
+  .rubric-phase[hidden] { display: none; }
+  .rubric-intro { color: var(--c-text-soft); }
+  .rubric-grid { display: grid; gap: .55rem; margin: 1rem 0; }
+  .rubric-grid div { display: grid; grid-template-columns: 9rem 1fr; gap: .8rem; padding: .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .rubric-grid dt { font-weight: 700; }
+  .rubric-grid dd { margin: 0; color: var(--c-text-soft); }
+  .self-score { margin: 1.2rem 0; padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .self-score legend { padding: 0 .4rem; font-weight: 700; }
+  .self-score button { display: block; width: 100%; margin: .45rem 0 0; padding: .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); text-align: left; cursor: pointer; }
+  .self-score button:hover { border-color: var(--c-accent); background: var(--c-accent-soft); }
+  .score-status { min-height: 1.5rem; color: var(--c-muted); }
+  @media (max-width: 680px) {
+    .practice-launch { align-items: stretch; flex-direction: column; }
+    .practice-actions { align-items: stretch; }
+    .practice-actions a { text-align: center; }
+    .rubric-grid div { grid-template-columns: 1fr; gap: .2rem; }
+  }
+</style>
