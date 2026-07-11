@@ -7,69 +7,50 @@ tags: ["questions"]
 category: "questions"
 ---
 
-This question is common wherever ML failures can harm users, trust, security, fairness, or regulatory posture. The interviewer is not looking for a story where you heroically blocked reckless colleagues. They want judgment: when to push, how hard, using what evidence, and how to preserve delivery.
+> *Asked in: behavioral rounds wherever ML failures can harm users, trust, or regulatory standing.*
 
-## A strong opening
+The L4 story ends with "I blocked a reckless launch and I was right." The L6 story ends with a proportionate mitigation that shipped close to the original date, plus a decision system that makes the next call easier. The signal is judgment: when to push, how hard, on what evidence, and how you protected delivery while you did it.
 
-In 90–120 seconds, establish:
+## What a strong answer covers
 
-1. The delivery pressure and why it was legitimate
-2. The specific risk—not “AI safety” in the abstract
-3. What you personally measured or proposed
-4. The proportional mitigation or staged path
-5. The decision and measurable outcome
-6. What you learned about escalation and uncertainty
+In 90 to 120 seconds, land six things: the delivery pressure and why it was legitimate; the specific risk (a concrete user harm, not "AI safety" in the abstract); what you personally measured or proposed; the proportional mitigation or staged path; the decision and its measurable outcome; and what you learned about escalating under uncertainty.
 
 ## What an L4 answer sounds like
 
-> “I noticed accuracy was low and told my manager we should test more before launch. We delayed and fixed it.”
+> "I noticed accuracy was low and told my manager we should test more before launch. We delayed and fixed it."
 
-Responsible, but the candidate has not shown how they assessed severity, influenced the decision, or balanced delay cost.
+Responsible, but it never shows how you judged severity, moved the decision, or weighed the cost of delay.
 
 ## What an L5 answer adds
 
-An L5 candidate identifies a concrete failure mode, quantifies exposure, and proposes the smallest action that resolves the uncertainty. Examples:
-
-- Add a launch-blocking slice and a rollback threshold
-- Run a targeted red-team or shadow evaluation
-- Limit the first launch to a lower-risk segment
-- Add human review for high-consequence outputs
-- Preserve the date while reducing scope
-
-They show how product, legal, operations, or leadership reached the decision—not just that they were “right.”
+An L5 answer names a concrete failure mode, quantifies the exposure, and proposes the smallest action that resolves the uncertainty: a launch-blocking slice with a rollback threshold, a targeted red-team or shadow evaluation, a first launch limited to a lower-risk segment, human review on high-consequence outputs, or a scope cut that preserves the date. It shows how product, legal, or leadership reached the decision, not just that you were right.
 
 ## What an L6 answer adds
 
-An L6 candidate changes the decision system, not only one launch:
+An L6 answer changes the decision system rather than one launch: a recurring risk review tied to severity and reversibility, quality gates that fix the incentive rewarding speed without consequences, and influence across teams without centralizing every call. The strongest version admits where an earlier safety concern was too conservative and updates the framework accordingly.
 
-- Establishes a recurring risk review or ownership model
-- Connects quality gates to severity and reversibility
-- Resolves incentives that rewarded speed without consequences
-- Influences multiple teams without centralizing every decision
-- Admits where an earlier safety concern was too conservative and updates the framework
+## Tells that get you a strong-hire vote
 
-## Strong-hire signals
-
-- You respect the stakeholder’s delivery constraint.
-- The risk is specific, testable, and proportional.
-- You bring evidence before escalating rhetoric.
+- You respect the stakeholder's delivery constraint.
+- The risk is specific, testable, and proportional to the mitigation.
+- You bring evidence before you escalate rhetoric.
 - You propose a reversible path, not an indefinite veto.
-- You explain what would have changed your own position.
+- You can say what would have changed your own position.
 
-## Down-leveling tells
+## Tells that get you down-leveled
 
-- Everyone else is portrayed as careless.
-- “Safety” is invoked without a concrete user harm.
-- The candidate escalates before attempting collaboration.
-- No cost of delay is acknowledged.
-- The story ends with “leadership agreed I was right.”
+- Everyone else is careless and you are the lone adult.
+- "Safety" is invoked with no concrete user harm behind it.
+- You escalate before you try to collaborate.
+- You never acknowledge the cost of delay.
+- The story ends with "leadership agreed I was right."
 
-## Likely follow-ups
+## Common follow-ups
 
 - What if leadership had chosen to launch anyway?
 - How did you decide the risk was severe enough to block?
-- What evidence would have made you support launch?
-- Did your mitigation actually reduce harm?
-- When have you been too conservative?
+- What evidence would have made you support the launch?
+- Did your mitigation actually reduce harm, or just delay it?
+- Tell me about a time you were too conservative.
 
 *Related: [when you disagreed with someone senior](/questions/disagreed-with-senior/), [LLM deployment in healthcare](/questions/llm-deployment-healthcare/), and the [story-bank worksheet](/prep/story-bank/).*

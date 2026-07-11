@@ -7,43 +7,39 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Definition
+## Why it matters
 
-Reward shaping adds auxiliary feedback to make sparse or delayed reinforcement-learning problems easier to learn. A shaped reward often has the form
+Sparse or delayed rewards (robotics, games, long-horizon agents, recommender objectives) make credit assignment hard: the agent rarely sees a signal, so it rarely learns. Reward shaping adds auxiliary feedback to densify that signal. The danger is that changing the reward can change the optimal policy, and a badly shaped reward produces confident, well-optimized behavior that does the wrong thing: circling near a waypoint, farming easy interactions, or maximizing proxy engagement while destroying long-term value.
+
+A shaped reward has the form
 
 $$r'(s,a,s') = r(s,a,s') + F(s,a,s').$$
 
-The danger is that changing reward can change the optimal policy.
-
 ## Potential-based shaping
 
-A policy-invariant form uses a potential function $\Phi$:
+The safe construction makes $F$ a difference of a potential function $\Phi$:
 
 $$F(s,a,s') = \gamma \Phi(s') - \Phi(s).$$
 
-This shifts value estimates while preserving optimal policies under standard assumptions. It rewards progress toward useful states without redefining the final objective.
-
-## Why it matters
-
-Sparse-reward robotics, games, agents, and recommender objectives often need denser learning signals. Poor shaping creates shortcuts: circling near a waypoint, farming easy interactions, or optimizing proxy engagement while harming long-term value.
+This shifts value estimates while preserving the set of optimal policies under standard assumptions. It rewards progress toward useful states without redefining the final objective, which is why it is the default when you must shape at all.
 
 ## Design procedure
 
-1. Write the true objective and unacceptable behavior.
-2. Identify why credit assignment is difficult.
+1. Write down the true objective and the behavior you will not accept.
+2. Identify why credit assignment is hard.
 3. Prefer state potentials or demonstrations over arbitrary event bonuses.
-4. Test whether a policy can maximize the shaped reward without accomplishing the task.
+4. Check whether a policy can maximize the shaped reward without doing the task.
 5. Evaluate on the original reward and independent guardrails.
-6. Anneal or remove shaping when possible.
+6. Anneal or remove the shaping once it is no longer needed.
 
-## Interview answer
+## In an interview
 
-Explain sparse credit assignment, potential-based shaping, reward hacking, and how you would red-team the proxy. Senior answers distinguish optimization failure from specification failure: a perfectly optimized bad reward is not an RL algorithm bug.
+Explain sparse credit assignment, potential-based shaping, reward hacking, and how you would red-team the proxy. The senior move is to separate optimization failure from specification failure: a perfectly optimized bad reward is not an algorithm bug, it is a spec bug.
 
 ## Common confusions
 
-- **“More detailed reward is always better.”** More terms create more loopholes and unstable scales.
-- **“Human preference solves specification.”** Preference data has annotator, coverage, and manipulation limits.
-- **“The training reward is the evaluation.”** Evaluate against independent task outcomes and safety constraints.
+- **"More detailed reward is always better."** More terms mean more loopholes and unstable scales.
+- **"Human preference solves specification."** Preference data still has annotator, coverage, and manipulation limits.
+- **"The training reward is the evaluation."** Evaluate against independent task outcomes and safety constraints.
 
 *Related: [policy gradient](/concepts/policy-gradient/), [PPO](/concepts/ppo/), and [RLHF and DPO](/concepts/rlhf-and-dpo/).*

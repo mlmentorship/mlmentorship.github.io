@@ -54,7 +54,6 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'design-ml-ab-test': 'Product & Experimentation',
   'debug-offline-online-metric-gap': 'Product & Experimentation',
   'choose-ml-product-metrics': 'Product & Experimentation',
-  'analyze-experiment-sql': 'Product & Experimentation',
 
   'decide-what-to-work-on': 'Behavioral',
   'disagreed-with-senior': 'Behavioral',
@@ -70,17 +69,17 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'design-ablation-study': 'Math & Research',
   'critique-ml-paper': 'Math & Research',
 
-  'implement-knn': 'Coding',
-  'debug-training-loop': 'Coding',
-  'implement-attention-from-scratch': 'Coding',
-  'implement-batched-top-k': 'Coding',
-  'implement-streaming-classification-metrics': 'Coding',
+  'implement-knn': 'ML Implementation',
+  'debug-training-loop': 'ML Implementation',
+  'implement-attention-from-scratch': 'ML Implementation',
+  'implement-batched-top-k': 'ML Implementation',
+  'implement-streaming-classification-metrics': 'ML Implementation',
 };
 
 export const INTERVIEW_ORDER = [
   'ML Fundamentals',
   'Math & Research',
-  'Coding',
+  'ML Implementation',
   'ML System Design',
   'Product & Experimentation',
   'Deep Learning Production',

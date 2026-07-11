@@ -19,7 +19,7 @@ const stories = [
   title="Senior ML interview story-bank and rehearsal worksheet"
   description="A private, level-calibrated worksheet for building, rehearsing, saving, and exporting senior ML interview stories."
   heading="Build stories that survive three layers of follow-up."
-  lede="A senior story needs a direct answer, bounded ownership, a consequential decision, evidence, and reflection. Prepare a 90-second opening and a deeper version—never a memorized script."
+  lede="A senior story needs a direct answer, bounded ownership, a consequential decision, evidence, and reflection. Prepare a 90-second opening and a deeper version, never a memorized script."
 >
   <section class="privacy-strip">
     <div><p><strong>Not submitted anywhere.</strong> Entries stay in this page unless you explicitly save or export. Saved text may contain sensitive details; use anonymized shorthand and a trusted device.</p><p class="save-status" data-save-status aria-live="polite"></p></div>
@@ -38,7 +38,7 @@ const stories = [
       <section class="story-card" data-story={story.id}>
         <header><span>{String(index + 1).padStart(2, '0')}</span><div><h2>{story.label}</h2><p>{story.prompt}</p><ul>{story.coverage.map((item) => <li>{item}</li>)}</ul></div></header>
         <div class="story-fields">
-          <label><span>Private shorthand</span><input data-field="shorthand" type="text" placeholder="A memorable label—not a company or person name" /></label>
+          <label><span>Private shorthand</span><input data-field="shorthand" type="text" placeholder="A memorable label, not a company or person name" /></label>
           <label><span>Target level this story proves</span><select data-field="level"><option value="l4">L4 · bounded execution</option><option value="l5" selected>L5 · autonomous project ownership</option><option value="l6">L6 · strategy and cross-team influence</option></select></label>
           <label class="wide"><span>90–120 second opening</span><textarea data-field="opening" rows="4" placeholder="Answer the exact question: stakes → your decision/actions → evidence → reflection"></textarea></label>
           <label><span>Situation and stakes</span><textarea data-field="situation" rows="3" placeholder="Who was affected? What was at risk? Why was this hard at the target level?"></textarea></label>
@@ -68,10 +68,10 @@ const stories = [
   </ul>
 
   <h2>Coverage matrix</h2>
-  <p>Before the loop, make sure the bank—not every single story—covers these signals.</p>
+  <p>Before the loop, make sure the bank, not every single story, covers these signals.</p>
   <div class="coverage-grid">{['Ambiguous scoping', 'Technical depth', 'Production failure', 'Prioritization', 'Conflict', 'Cross-team influence', 'Mentoring', 'Wrong bet / killed work', 'Quality or safety pushback', 'Measurable impact'].map((item) => <label><input type="checkbox" /> {item}</label>)}</div>
 
-  <section class="callout"><h2>Rehearsal sequence</h2><ol><li>Record the 90-second opening.</li><li>Check whether it answered the exact prompt.</li><li>Ask a peer to choose three follow-ups and challenge one assumption.</li><li>Score ownership, evidence, and response to pushback—not eloquence.</li><li>Rewrite only the outline, then retell without memorizing prose.</li></ol><p><a href="/questions/most-ambitious-project/">Practice the ambitious-project deep-dive →</a></p></section>
+  <section class="callout"><h2>Rehearsal sequence</h2><ol><li>Record the 90-second opening.</li><li>Check whether it answered the exact prompt.</li><li>Ask a peer to choose three follow-ups and challenge one assumption.</li><li>Score ownership, evidence, and response to pushback, not eloquence.</li><li>Rewrite only the outline, then retell without memorizing prose.</li></ol><p><a href="/questions/most-ambitious-project/">Practice the ambitious-project deep-dive →</a></p></section>
 </PrepLayout>
 
 <script>

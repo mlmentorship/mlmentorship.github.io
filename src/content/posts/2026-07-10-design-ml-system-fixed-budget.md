@@ -9,77 +9,70 @@ category: "questions"
 
 > Design a personalized ranking system for 20 million daily users. The serving budget is $3 million per year and p95 latency must stay below 80 ms. What do you ship?
 
-The constraint is the question. A candidate who proposes the best model without estimating cost has not designed the requested system.
+The constraint is the question. A candidate who names the best model without estimating its cost has not designed the requested system, so do the arithmetic before picking hardware.
 
 ## Clarify before calculating
 
-- Requests per user per day and peak-to-average traffic
-- Candidate set size and ranking stages
-- Existing infrastructure and hardware prices
-- Quality target and minimum worthwhile gain
+- Requests per user per day, and peak-to-average traffic
+- Candidate-set size and how many ranking stages
+- Existing infrastructure and current hardware prices
+- Quality target and the minimum gain worth shipping
 - Batchability, cacheability, and freshness requirements
 - Availability target and fallback behavior
-- Whether the budget includes feature storage, logging, retraining, and on-call overhead
+- Whether the budget includes feature storage, logging, retraining, and on-call
 
 ## Build an order-of-magnitude model
 
-Suppose there are 100 million ranking requests per day:
+Suppose 100 million ranking requests per day:
 
 - Average QPS: roughly 1,160
 - At a 5× peak factor: roughly 5,800 peak QPS
 - Annual serving budget: about $8,200 per day
 - Cost ceiling: roughly $0.08 per thousand requests before non-serving costs
 
-The exact estimates will change. Writing them down prevents an architecture whose cost is off by an order of magnitude.
+The exact numbers will move. Writing them down is what stops you from proposing an architecture whose cost is off by an order of magnitude.
 
-## A strong architecture progression
+## A defensible architecture progression
 
-1. Establish a cheap heuristic or linear/tree baseline.
-2. Use a multi-stage system: retrieval, light pre-ranker, expensive ranker only on a small set.
+1. Start from a cheap heuristic or linear/tree baseline.
+2. Go multi-stage: retrieval, a light pre-ranker, then the expensive ranker on a small set.
 3. Precompute stable embeddings and cache popular candidates.
-4. Batch where latency allows and quantize only after measuring the bottleneck.
+4. Batch where latency allows; quantize only after measuring the bottleneck.
 5. Distill or simplify the expensive model if quality per dollar is poor.
-6. Add graceful fallback and cost/latency monitoring by stage.
-7. Run an experiment that includes incremental value **and** incremental cost.
+6. Add graceful fallback and per-stage cost/latency monitoring.
+7. Run an experiment that reports incremental value and incremental cost together.
 
 ## What an L4 answer sounds like
 
-> “Use a two-tower model and autoscale GPUs.”
+> "Use a two-tower model and autoscale GPUs."
 
-This is plausible technology but does not prove the design fits traffic, latency, or budget.
+Plausible technology, but nothing here proves the design fits the traffic, latency, or budget.
 
 ## What an L5 answer adds
 
-An L5 candidate estimates traffic and unit economics, proposes a baseline, allocates latency and cost across stages, and defines a quality-versus-cost experiment. They know which values must be measured before committing.
+An L5 answer estimates traffic and unit economics, proposes a baseline, allocates latency and cost across stages, and defines a quality-versus-cost experiment. It knows which numbers must be measured before committing.
 
 ## What an L6 answer adds
 
-An L6 candidate treats cost as a product portfolio decision:
+An L6 answer treats cost as a portfolio decision: which user segments justify expensive ranking, whether spend can be dynamic by request value or uncertainty, whether better candidate generation beats a larger ranker, what keeps cost from drifting upward, where the marginal-value curve flattens past the chosen operating point, and whether to build infrastructure or buy capacity.
 
-- Which user segments justify expensive ranking?
-- Can spend be dynamic by request value or uncertainty?
-- Would better candidate generation beat a larger ranker?
-- What organizational incentives prevent cost from drifting upward?
-- What is the marginal value curve beyond the selected operating point?
-- Should the team build infrastructure or buy capacity?
-
-## Strong-hire signals
+## Tells that get you a strong-hire vote
 
 - Order-of-magnitude math before naming hardware.
 - Cost per successful outcome, not cost per request alone.
-- Quality/cost/latency frontier rather than one “best” model.
+- A quality/cost/latency frontier rather than one "best" model.
 - Explicit fallback and overload behavior.
 - Monitoring that attributes spend to stage, model, and traffic segment.
 
-## Down-leveling tells
+## Tells that get you down-leveled
 
 - Ignoring peak traffic.
 - Assuming quantization always improves latency.
-- Spending the entire budget on model inference while omitting features and logging.
-- No baseline or staged rollout.
-- Treating annual budget as someone else’s problem.
+- Spending the whole budget on model inference while omitting features and logging.
+- No baseline and no staged rollout.
+- Treating the annual budget as someone else's problem.
 
-## Likely follow-ups
+## Common follow-ups
 
 - Traffic doubles with no budget increase. What changes first?
 - The largest model adds 1% conversion but triples cost. Do you ship it?

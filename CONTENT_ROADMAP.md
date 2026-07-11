@@ -29,7 +29,7 @@ This file is for internal planning; it isn't published as a site page.
 - [x] How to think about LLM inference cost
 - [x] Applied Scientist vs MLE vs Research Engineer
 
-### Interview Q&A (50 / 50 — TARGET HIT)
+### Interview Q&A (50 / 50, TARGET HIT)
 
 **ML Fundamentals (8)**
 - [x] How would you evaluate an LLM application you've built?
@@ -116,7 +116,7 @@ This file is for internal planning; it isn't published as a site page.
 ### System Design (1 / 8)
 - [x] Personalized search ranking (end-to-end)
 
-### Reference — gap-analysis batch (12 / 100, added 2026-05-31)
+### Reference: gap-analysis batch (12 / 100, added 2026-05-31)
 
 Written to close gaps found by diffing the CS/ML interview deck against published posts.
 

@@ -7,43 +7,41 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Definition
+## Why it matters
 
-Multi-agent RL studies environments where multiple learning agents act simultaneously. Each agent’s reward and transition distribution depend on other agents’ policies, which may also be changing.
+Single-agent RL assumes a stationary environment. The moment other learning agents share it, that assumption breaks: markets, game-playing, traffic, negotiation, ad auctions, and self-play training are all multi-agent. Multi-agent RL studies environments where several agents act at once, and each agent's reward and transitions depend on the other agents' policies, which are themselves changing.
 
 ## Why it is harder than single-agent RL
 
-- **Non-stationarity:** from one agent’s view, the environment changes as others learn.
-- **Credit assignment:** a team reward does not reveal which action helped.
-- **Partial observability:** agents often see local information.
-- **Coordination equilibria:** several stable conventions may exist.
-- **Opponent modeling:** competitive agents adapt strategically.
-- **Evaluation:** performance against one opponent set may not generalize.
+- **Non-stationarity:** from one agent's view, the environment shifts as the others learn.
+- **Credit assignment:** a shared team reward does not say whose action helped.
+- **Partial observability:** agents usually see only local information.
+- **Coordination equilibria:** several stable conventions can coexist.
+- **Opponent modeling:** competitive agents adapt strategically to you.
+- **Evaluation:** doing well against one set of opponents need not generalize.
 
 ## Centralized training, decentralized execution
 
-A common pattern trains critics or value functions with global state and all agents’ actions, while each deployed policy uses only local observations. MADDPG and value-decomposition methods use this principle differently.
+The common pattern trains critics or value functions with global state and all agents' actions, while each deployed policy acts on its local observation only. MADDPG and value-decomposition methods apply this idea differently.
 
-## Cooperative methods
+## Cooperative and competitive methods
 
-Value decomposition represents a team value from per-agent values. VDN sums them; QMIX uses a monotonic mixing network so decentralized greedy actions remain consistent with the joint value.
+**Cooperative.** Value decomposition builds a team value from per-agent values: VDN sums them; QMIX uses a monotonic mixing network so decentralized greedy actions stay consistent with the joint value.
 
-## Competitive and mixed settings
+**Competitive and mixed.** Self-play, population-based training, opponent sampling, and league systems reduce overfitting to a single opponent. Nash equilibrium is a useful reference point but hard to compute in large stochastic games.
 
-Self-play, population-based training, opponent sampling, and league systems reduce overfitting to one policy. Nash equilibrium is a useful concept but difficult to compute in large stochastic games.
+## In an interview
 
-## Interview answer
-
-1. Define the source of non-stationarity.
+1. Name the source of non-stationarity.
 2. Clarify cooperative, competitive, or mixed incentives.
-3. Explain centralized training and decentralized execution.
+3. Explain centralized training with decentralized execution.
 4. Address credit assignment and communication.
 5. Evaluate against diverse policies, unseen partners, and exploiters.
 
 ## Common confusions
 
-- **“Treat other agents as environment state.”** Their policies change and respond strategically.
-- **“Self-play guarantees robustness.”** It can cycle or overfit to its own population.
-- **“Team reward creates teamwork.”** It can create free-riding and poor credit assignment.
+- **"Just treat other agents as part of the environment."** Their policies change and respond strategically.
+- **"Self-play guarantees robustness."** It can cycle or overfit to its own population.
+- **"A team reward creates teamwork."** It can also create free-riding and muddy credit assignment.
 
-*Related: [actor–critic methods](/concepts/actor-critic-methods/), [exploration versus exploitation](/concepts/exploration-vs-exploitation/), and [PPO](/concepts/ppo/).*
+*Related: [actor-critic methods](/concepts/actor-critic-methods/), [exploration versus exploitation](/concepts/exploration-vs-exploitation/), and [PPO](/concepts/ppo/).*

@@ -9,7 +9,7 @@ category: "questions"
 
 > Implement a streaming binary-classification metric accumulator. It receives batches of labels and predictions, uses bounded memory, supports merging across workers, and reports precision, recall, F1, accuracy, and the confusion matrix.
 
-The important design is to store sufficient statistics rather than every prediction.
+This is distributed model evaluation in miniature: score a stream too large to hold in memory, then merge per-worker accumulators into one global result. The design hinges on storing sufficient statistics (the four confusion-matrix counts) rather than every prediction, because those counts are exactly what makes the metric mergeable across shards.
 
 ## Contract
 
@@ -106,7 +106,7 @@ TP, FP, TN, and FN are additive sufficient statistics for metrics at a fixed thr
 - Merging workers with different thresholds.
 - Confusing macro, micro, and weighted multiclass averages.
 
-## Likely follow-ups
+## Common follow-ups
 
 - Extend this to multiclass classification.
 - Add sample weights.

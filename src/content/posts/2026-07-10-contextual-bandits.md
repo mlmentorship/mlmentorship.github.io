@@ -7,41 +7,35 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Definition
-
-A contextual bandit observes context $x_t$, chooses action $a_t$, and receives reward only for that action. The goal is to maximize cumulative reward while learning which actions work for which contexts.
-
-Unlike full reinforcement learning, the action does not change a persistent state transition model. Unlike supervised learning, labels for unchosen actions are missing by design.
-
 ## Why it matters
 
-Bandits appear in recommendation, notifications, ranking, treatment selection, and adaptive experiments. They formalize the exploration cost hidden by logged production data: the system knows what happened under the old policy, not what would have happened under alternatives.
+Bandits show up everywhere a system chooses an action and only learns about the action it took: recommendation, notifications, ranking, treatment selection, adaptive experiments. They formalize the cost that logged production data hides: you know what happened under the policy you ran, not what would have happened under the alternatives you never tried.
+
+Formally, a contextual bandit sees context $x_t$, chooses action $a_t$, and receives a reward only for that action, maximizing cumulative reward while learning which actions work for which contexts. It sits between two neighbors: unlike full reinforcement learning, the action does not drive a persistent state transition; unlike supervised learning, the labels for the actions you did not choose are missing by design.
 
 ## Core approaches
 
-- **Epsilon-greedy:** exploit most of the time; choose randomly with probability $\epsilon$.
-- **UCB:** choose high estimated reward plus an uncertainty bonus.
-- **Thompson sampling:** sample model parameters from the posterior and act greedily under that sample.
-- **LinUCB / linear Thompson sampling:** assume expected reward is linear in context features.
+- **Epsilon-greedy:** exploit most of the time; pick randomly with probability $\epsilon$.
+- **UCB:** choose the highest estimated reward plus an uncertainty bonus.
+- **Thompson sampling:** sample parameters from the posterior and act greedily under that sample.
+- **LinUCB / linear Thompson sampling:** assume expected reward is linear in the context features.
 
-## Evaluation
+## Off-policy evaluation
 
-Logged data requires propensities. Inverse propensity scoring estimates a target policy using reward weighted by the probability of the logged action. Doubly robust estimators combine a reward model with propensity correction.
+Logged data needs propensities. Inverse propensity scoring estimates a target policy by weighting reward by the probability of the logged action; doubly robust estimators combine a reward model with that correction. Without exploration support, a policy that chooses actions absent from the log is not identifiable offline: you have no evidence about what they would have returned.
 
-Without exploration support, a new policy that chooses actions absent from the log is not identifiable offline.
+## In an interview
 
-## Interview answer
-
-1. Distinguish contextual bandits from supervised learning and MDPs.
-2. Define regret and the exploration–exploitation trade-off.
+1. Separate contextual bandits from supervised learning and MDPs.
+2. Define regret and the exploration-exploitation trade-off.
 3. Describe UCB or Thompson sampling.
 4. Explain logging propensities and off-policy evaluation.
-5. Discuss delayed rewards, non-stationarity, safety constraints, and feedback loops.
+5. Cover delayed rewards, non-stationarity, safety constraints, and feedback loops.
 
 ## Common confusions
 
-- **“A/B testing is a bandit.”** A fixed A/B test explores with a static policy; a bandit adapts assignment over time.
-- **“Bandits always beat experiments.”** Adaptive policies complicate inference and can optimize short-term proxies.
-- **“Use historical clicks as labels.”** Only actions chosen by the logging policy receive outcomes; selection bias matters.
+- **"An A/B test is a bandit."** A fixed A/B test explores with a static policy; a bandit adapts assignment over time.
+- **"Bandits always beat experiments."** Adaptive policies complicate inference and can chase short-term proxies.
+- **"Use historical clicks as labels."** Only the actions the logging policy chose have outcomes; selection bias is the whole problem.
 
 *Related: [exploration versus exploitation](/concepts/exploration-vs-exploitation/), [A/B testing for ML](/concepts/ab-testing-for-ml/), and [policy gradient](/concepts/policy-gradient/).*

@@ -1,6 +1,6 @@
 ---
 title: "RNN-Transducer (RNN-T)"
-description: "The streaming-ASR workhorse. RNN-T fixes CTC's biggest weakness — its frame-independence assumption — by adding a prediction network that conditions on previously emitted tokens, while staying naturally streamable."
+description: "The streaming-ASR workhorse. RNN-T fixes CTC's biggest weakness (its frame-independence assumption) by adding a prediction network that conditions on previously emitted tokens, while staying naturally streamable."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
@@ -18,13 +18,13 @@ RNN-T is the model behind most **on-device, streaming** speech recognition (Goog
 The key selling points:
 
 - **Streaming by construction.** Unlike attention encoder-decoder models, RNN-T emits tokens left-to-right as audio arrives, with bounded latency.
-- **No frame-independence assumption.** The prediction network conditions on output history, so RNN-T has a built-in language model — the thing CTC lacks.
+- **No frame-independence assumption.** The prediction network conditions on output history, so RNN-T has a built-in language model, the thing CTC lacks.
 - **Still alignment-free.** Like CTC, it marginalizes over all valid alignments during training.
 
 ## The three components
 
 | Component | Input | Role |
-|-----------|-------|------|
+| --- | --- | --- |
 | **Encoder (transcription net)** | Acoustic frames $x_{1:t}$ | Acoustic representation $f_t$ (the "audio" tower) |
 | **Prediction net** | Previously emitted non-blank tokens $y_{1:u-1}$ | Label-history representation $g_u$ (an internal LM) |
 | **Joint net** | $f_t, g_u$ | Combine → distribution over $V \cup \{\varnothing\}$ |
@@ -48,12 +48,12 @@ $$
 p(\mathbf{y} \mid X) = \sum_{\text{paths}} \prod p(\cdot),
 $$
 
-computed exactly with a forward-backward DP over the $T \times U$ lattice (cost $O(T \cdot U)$ — heavier than CTC's $O(T)$ and notoriously memory-hungry, which is why fused/streaming RNN-T loss kernels exist).
+computed exactly with a forward-backward DP over the $T \times U$ lattice (cost $O(T \cdot U)$, heavier than CTC's $O(T)$ and notoriously memory-hungry, which is why fused/streaming RNN-T loss kernels exist).
 
 ## RNN-T vs CTC vs attention seq2seq
 
 | | Internal LM? | Streamable? | Alignment | Training cost |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | **CTC** | No (frame-independent) | Yes | Monotonic, marginalized | $O(T)$ |
 | **RNN-T** | Yes (prediction net) | Yes | Monotonic, marginalized | $O(T \cdot U)$ |
 | **Attention enc-dec (LAS / Whisper)** | Yes (decoder) | Hard (needs full utterance) | Soft, learned attention | $O(T \cdot U)$ |
@@ -63,7 +63,7 @@ The mental model: **RNN-T = CTC + an internal language model, at the cost of a 2
 ## Practical notes
 
 - The encoder is usually the largest component; modern systems use **Conformer** (convolution-augmented transformer) encoders.
-- The prediction network can be surprisingly small — even **stateless** (one-token context) variants work well, because the joint acoustic+text signal carries most of the information.
+- The prediction network can be surprisingly small: even **stateless** (one-token context) variants work well, because the joint acoustic+text signal carries most of the information.
 - RNN-T loss is memory-heavy; production training uses **function-merging / pruned RNN-T** losses to fit the $T \times U \times |V|$ tensor.
 - Latency is tuned by limiting the encoder's right-context (how far into the future it looks).
 
@@ -77,7 +77,7 @@ The mental model: **RNN-T = CTC + an internal language model, at the cost of a 2
 
 ## Common confusions
 
-- **"The prediction network sees audio."** It does not. It only sees previously emitted *labels* — it is a language model. The joint net fuses it with the encoder's audio features.
+- **"The prediction network sees audio."** It does not. It only sees previously emitted *labels*; it is a language model. The joint net fuses it with the encoder's audio features.
 - **"RNN-T is just CTC with an LSTM."** The architectural difference is the label-conditioned prediction net and the 2D lattice; that's what removes frame independence.
 - **"Attention models can't beat RNN-T."** Offline, full-context attention models (Whisper) are typically more accurate. RNN-T wins on streaming latency and on-device deployment.
 - **"Blank means silence."** As in CTC, blank is a structural token meaning "advance to the next frame," not acoustic silence.

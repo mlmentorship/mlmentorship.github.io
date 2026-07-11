@@ -183,8 +183,8 @@ for await (const file of walk(SRC)) {
   };
 
   const warnings = [];
-  if (body.includes('sites.google.com')) warnings.push('Google Sites image URLs — replace with local images');
-  if (/{%|{{/.test(body)) warnings.push('Contains Liquid tags — rewrite to MDX/plain markdown');
+  if (body.includes('sites.google.com')) warnings.push('Google Sites image URLs: replace with local images');
+  if (/{%|{{/.test(body)) warnings.push('Contains Liquid tags: rewrite to MDX/plain markdown');
   if (warnings.length) flagged++;
 
   const header = warnings.length

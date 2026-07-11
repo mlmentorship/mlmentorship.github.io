@@ -13,7 +13,7 @@ Belief propagation is a **message-passing** algorithm for computing marginal dis
 
 ## Why it matters
 
-Inference — computing $p(x_i \mid \text{evidence})$ — is the central operation in probabilistic models, and the naive sum over all configurations is exponential. Belief propagation is *the* algorithm that exploits the graph's factorization to make it tractable. It's the engine behind:
+Inference (computing $p(x_i \mid \text{evidence})$) is the central operation in probabilistic models, and the naive sum over all configurations is exponential. Belief propagation is *the* algorithm that exploits the graph's factorization to make it tractable. It's the engine behind:
 
 - **HMM forward-backward** and **CRF** training/decoding (these are BP on a chain).
 - Decoding **LDPC / turbo codes** (loopy BP, the reason your phone's error correction works).
@@ -29,7 +29,7 @@ $$
 p(\mathbf{x}) = \frac{1}{Z}\prod_{a} \psi_a(\mathbf{x}_a).
 $$
 
-To get a marginal $p(x_i)$ you must sum out every other variable — exponential in general. BP avoids the blow-up by noticing that on a **tree**, the sum **distributes**: you can push summations inside products and reuse partial sums. Each "message" is exactly one of those reusable partial sums, flowing along an edge.
+To get a marginal $p(x_i)$ you must sum out every other variable, which is exponential in general. BP avoids the blow-up by noticing that on a **tree**, the sum **distributes**: you can push summations inside products and reuse partial sums. Each "message" is exactly one of those reusable partial sums, flowing along an edge.
 
 ## The sum-product algorithm (factor graphs)
 
@@ -53,13 +53,13 @@ $$
 p(x_i) \propto \prod_{a \in N(x_i)} \mu_{a \to x_i}(x_i).
 $$
 
-Replace the inner $\sum$ with a $\max$ and you get **max-product** (a.k.a. max-sum in log space), which finds the MAP configuration — the general version of **Viterbi**.
+Replace the inner $\sum$ with a $\max$ and you get **max-product** (a.k.a. max-sum in log space), which finds the MAP configuration, the general version of **Viterbi**.
 
 ## Exact vs approximate
 
 | Graph structure | BP behavior | Cost |
-|-----------------|-------------|------|
-| **Tree / chain** | Exact marginals in two passes (leaves→root→leaves) | $O(\text{edges} \cdot |V|^2)$ |
+| --- | --- | --- |
+| **Tree / chain** | Exact marginals in two passes (leaves→root→leaves) | $O(\text{edges} \cdot \lvert V \rvert^2)$ |
 | **General graph** | **Loopy BP**: iterate messages until (hopefully) convergence; approximate | per-iteration linear in edges |
 | **Treewidth-$k$ graph** | Exact via the **junction-tree** algorithm | exponential in treewidth $k$ |
 
@@ -67,7 +67,7 @@ The deep fact: **exact inference is exponential in the graph's treewidth**, not 
 
 ## Loopy BP
 
-Run the same message updates on a graph with cycles, iterating until messages stop changing. There's **no guarantee of convergence or correctness**, yet it works remarkably well in practice — it's how modern error-correcting codes are decoded and is closely connected to variational (Bethe free energy) approximations.
+Run the same message updates on a graph with cycles, iterating until messages stop changing. There's **no guarantee of convergence or correctness**, yet it works remarkably well in practice: it's how modern error-correcting codes are decoded and is closely connected to variational (Bethe free energy) approximations.
 
 ## What an interviewer expects you to say
 

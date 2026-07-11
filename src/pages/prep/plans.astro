@@ -7,7 +7,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 const workloads = [
   { hours: 5, label: 'Minimum', newAttempts: '1 short', longRounds: '1 alternating long round', retries: '2', stories: '1 rehearsal', note: 'Reduce new topics first; keep retries and simulation.' },
   { hours: 8, label: 'Standard', newAttempts: '2 short', longRounds: '1 long round', retries: '3', stories: '1–2 rehearsals', note: 'The weekly schedules below assume this workload.' },
-  { hours: 12, label: 'Intensive', newAttempts: '3 short', longRounds: '2 long rounds', retries: '4', stories: '2 rehearsals', note: 'Add depth and feedback—not indiscriminate topic coverage.' },
+  { hours: 12, label: 'Intensive', newAttempts: '3 short', longRounds: '2 long rounds', retries: '4', stories: '2 rehearsals', note: 'Add depth and feedback, not indiscriminate topic coverage.' },
 ];
 
 const plans = [
@@ -18,13 +18,13 @@ const plans = [
       {
         title: 'Week 1 · Diagnose and repair', focus: 'Prove the baseline, choose three gaps, and begin delayed retrieval.',
         blocks: [
-          '2 × 45 min — timed short-form baselines from different critical rounds, including rubric review',
-          '1 × 90 min — one full-length coding, design, research, or project deep-dive baseline',
-          '2 × 45 min — delayed retries of the weakest dimensions, at least 48 hours later',
-          '1 × 90 min — draft six story outlines; rehearse the two most level-relevant stories',
-          '1 × 60 min — repair only mechanisms or evidence exposed by attempts',
-          '1 × 30 min — update the retry queue and schedule Week 2',
-          '1 × 30 min — flex, spillover, or an extra due retry',
+          '2 × 45 min: timed short-form baselines from different critical rounds, including rubric review',
+          '1 × 90 min: one full-length ML implementation, design, research, or project deep-dive baseline',
+          '2 × 45 min: delayed retries of the weakest dimensions, at least 48 hours later',
+          '1 × 90 min: draft six story outlines; rehearse the two most level-relevant stories',
+          '1 × 60 min: repair only mechanisms or evidence exposed by attempts',
+          '1 × 30 min: update the retry queue and schedule Week 2',
+          '1 × 30 min: flex, spillover, or an extra due retry',
         ],
         links: [
           { label: 'Run the readiness check', href: '/prep/readiness/' },
@@ -35,21 +35,21 @@ const plans = [
         gate: 'Each critical round has a recent baseline. If any round is still unattempted, do not call the plan “on track.”',
       },
       {
-        title: 'Week 2 · Simulate, repair, taper', focus: 'Integrate the loop early enough to repair evidence—not feelings.',
+        title: 'Week 2 · Simulate, repair, taper', focus: 'Integrate the loop early enough to repair evidence, not feelings.',
         blocks: [
-          '1 × 210 min — full role-specific simulation, including short breaks; complete it early',
-          '2 × 45 min — repair the two highest-impact simulation failures',
-          '2 × 30 min — final delayed retries; no answer graduates after one good repetition',
-          '1 × 45 min — rehearse three stories in 90–120 second form with skeptical follow-ups',
-          '1 × 30 min — concise outlines, formulas, and known failure points only',
-          '1 × 45 min — logistics, spillover, and recovery; no new topic sprint',
+          '1 × 210 min: full role-specific simulation, including short breaks; complete it early',
+          '2 × 45 min: repair the two highest-impact simulation failures',
+          '2 × 30 min: final delayed retries; no answer graduates after one good repetition',
+          '1 × 45 min: rehearse three stories in 90–120 second form with skeptical follow-ups',
+          '1 × 30 min: concise outlines, formulas, and known failure points only',
+          '1 × 45 min: logistics, spillover, and recovery; no new topic sprint',
         ],
         links: [
           { label: 'Open simulation packets', href: '/prep/simulations/' },
           { label: 'Review retry queue', href: '/prep/progress/' },
           { label: 'Use the final-week checklist', href: '/prep/final-week/' },
         ],
-        output: 'One scored simulation, two repaired failures, and a final list of known—not hidden—risks.',
+        output: 'One scored simulation, two repaired failures, and a final list of known (not hidden) risks.',
         gate: 'Proceed confidently only if every critical round has a workable recent attempt and the simulation exposes no unbounded failure.',
       },
     ],
@@ -66,15 +66,15 @@ const plans = [
         gate: 'No “unknown” critical round. Untested is a result and remains the highest risk.',
       },
       {
-        title: 'Week 2 · Build depth without dropping other lanes', focus: 'Make the primary domain follow-up ready while continuing coding, design, and story repetitions.',
-        blocks: ['2 domain-specific short attempts with one unfamiliar follow-up each', '1 long round selected by role: coding, system design, research, or experimentation', '3 retries from Week 1 before adding optional topics', '1 project or behavioral rehearsal with ownership partition', 'One mechanism-level repair block, weekly review, and flex'],
+        title: 'Week 2 · Build depth without dropping other lanes', focus: 'Make the primary domain follow-up ready while continuing ML implementation, design, and story repetitions.',
+        blocks: ['2 domain-specific short attempts with one unfamiliar follow-up each', '1 long round selected by role: ML implementation, system design, research, or experimentation', '3 retries from Week 1 before adding optional topics', '1 project or behavioral rehearsal with ownership partition', 'One mechanism-level repair block, weekly review, and flex'],
         links: [{ label: 'Practice method', href: '/prep/practice/' }, { label: 'Question categories', href: '/questions/' }, { label: 'Concept reference', href: '/concepts/' }],
-        output: 'One deep answer per primary technical domain and a shrinking—not merely changing—retry queue.',
+        output: 'One deep answer per primary technical domain and a shrinking (not merely changing) retry queue.',
         gate: 'A strong headline answer that fails the first “why?” follow-up is not ready.',
       },
       {
         title: 'Week 3 · Interleave systems, decisions, and evidence', focus: 'Remove predictable cues and pressure-test senior judgment.',
-        blocks: ['1 short breadth attempt selected at random', '1 product/experiment or transfer drill in an unfamiliar domain', '1 full coding, system design, research, or project deep-dive round', '3 delayed retries, including at least one previously improved answer', '2 behavioral stories under skeptical pushback', 'Weekly review and flex'],
+        blocks: ['1 short breadth attempt selected at random', '1 product/experiment or transfer drill in an unfamiliar domain', '1 full ML implementation, system design, research, or project deep-dive round', '3 delayed retries, including at least one previously improved answer', '2 behavioral stories under skeptical pushback', 'Weekly review and flex'],
         links: [{ label: 'Experiment questions', href: '/questions/#product-and-experimentation' }, { label: 'Story bank', href: '/prep/story-bank/' }, { label: 'Progress queue', href: '/prep/progress/' }],
         output: 'Mixed-round performance, four rehearsed stories, and evidence that prior repairs survived spacing.',
         gate: 'At least 70% of critical rubric dimensions are solid across a mixed session; no single round is consistently Weak.',
@@ -94,10 +94,10 @@ const plans = [
     weeks: [
       { title: 'Week 1 · Diagnose and bound', focus: 'Baseline actual rounds; choose three priorities; start six stories.', blocks: ['2 short baselines', '1 long-round baseline', '2 first retries', '2 story outlines and one rehearsal', 'Role/level calibration, review, and flex'], links: [{ label: 'Readiness', href: '/prep/readiness/' }, { label: 'Role guide', href: '/guides/as-vs-mle-vs-re/' }], output: 'Round map, three priorities, six story candidates.', gate: 'Every critical round is either attempted or explicitly scheduled for Week 2.' },
       { title: 'Week 2 · Repair foundations', focus: 'Fix mechanisms that block higher-level reasoning while maintaining delivery practice.', blocks: ['2 fundamentals or math attempts', '1 role-specific long round', '3 Week 1 retries', '1 project/behavioral rehearsal', 'Targeted concept repair, review, and flex'], links: [{ label: 'ML fundamentals', href: '/questions/#ml-fundamentals' }, { label: 'Math & research', href: '/questions/#math-and-research' }], output: 'Mechanism-level answers for the highest-impact prerequisites.', gate: 'You can explain why the method works and one condition where it fails.' },
-      { title: 'Week 3 · Primary domain depth', focus: 'Connect mechanisms, metrics, failure modes, and operational decisions.', blocks: ['2 primary-domain attempts', '1 long coding/design/research round', '3 spaced retries', '1 story rehearsal with technical follow-ups', 'Reference repair, review, and flex'], links: [{ label: 'All question domains', href: '/questions/' }, { label: 'Reference library', href: '/concepts/' }], output: 'Two follow-up-ready domain answers and one defensible project decision.', gate: 'One unfamiliar follow-up does not collapse the answer into memorized phrases.' },
+      { title: 'Week 3 · Primary domain depth', focus: 'Connect mechanisms, metrics, failure modes, and operational decisions.', blocks: ['2 primary-domain attempts', '1 long ML implementation, design, or research round', '3 spaced retries', '1 story rehearsal with technical follow-ups', 'Reference repair, review, and flex'], links: [{ label: 'All question domains', href: '/questions/' }, { label: 'Reference library', href: '/concepts/' }], output: 'Two follow-up-ready domain answers and one defensible project decision.', gate: 'One unfamiliar follow-up does not collapse the answer into memorized phrases.' },
       { title: 'Week 4 · Design and experimentation', focus: 'Build end-to-end judgment from objective through launch and monitoring.', blocks: ['1 ML design attempt', '1 experimentation or transfer drill', '1 role-specific long round', '3 retries', '1 behavioral rehearsal', 'Review and flex'], links: [{ label: 'ML system design', href: '/questions/#ml-system-design' }, { label: 'Product & experimentation', href: '/questions/#product-and-experimentation' }], output: 'A coherent architecture and an explicit ship/iterate/stop rule.', gate: 'The answer links offline evidence, online outcomes, guardrails, cost, and rollback.' },
-      { title: 'Week 5 · Production and implementation', focus: 'Turn models into reliable systems while preserving all other lanes.', blocks: ['1 debugging or production attempt', '1 short breadth attempt', '1 full coding or infrastructure round', '3 retries', '1 project story about failure/recovery', 'Review and flex'], links: [{ label: 'Production questions', href: '/questions/#deep-learning-production' }, { label: 'Coding questions', href: '/questions/#coding' }], output: 'A systematic debugging procedure and a tested implementation under time.', gate: 'You can identify the bottleneck or next diagnostic before proposing random fixes.' },
-      { title: 'Week 6 · Project and leadership depth', focus: 'Pressure-test level, ownership, influence, wrong bets, and killed work.', blocks: ['1 short technical maintenance attempt', '1 long project deep-dive', '3 retries', '3 behavioral stories in 90–120 seconds', 'One instructed pushback drill', 'Review and flex'], links: [{ label: 'Story bank', href: '/prep/story-bank/' }, { label: 'L5 vs L6', href: '/guides/l5-vs-l6-faang-ml/' }], output: 'Six complete stories and one 20-minute project deep-dive.', gate: 'Ownership is bounded, target-level scope is visible, and skeptical follow-ups reveal more—not less—specificity.' },
+      { title: 'Week 5 · Production and implementation', focus: 'Turn models into reliable systems while preserving all other lanes.', blocks: ['1 debugging or production attempt', '1 short breadth attempt', '1 full ML implementation or infrastructure round', '3 retries', '1 project story about failure/recovery', 'Review and flex'], links: [{ label: 'Production questions', href: '/questions/#deep-learning-production' }, { label: 'ML implementation questions', href: '/questions/#ml-implementation' }], output: 'A systematic debugging procedure and a tested implementation under time.', gate: 'You can identify the bottleneck or next diagnostic before proposing random fixes.' },
+      { title: 'Week 6 · Project and leadership depth', focus: 'Pressure-test level, ownership, influence, wrong bets, and killed work.', blocks: ['1 short technical maintenance attempt', '1 long project deep-dive', '3 retries', '3 behavioral stories in 90–120 seconds', 'One instructed pushback drill', 'Review and flex'], links: [{ label: 'Story bank', href: '/prep/story-bank/' }, { label: 'L5 vs L6', href: '/guides/l5-vs-l6-faang-ml/' }], output: 'Six complete stories and one 20-minute project deep-dive.', gate: 'Ownership is bounded, target-level scope is visible, and skeptical follow-ups reveal more (not less) specificity.' },
       { title: 'Week 7 · Mixed simulation and repair', focus: 'Remove domain blocks and test the integrated loop.', blocks: ['1 full role-specific simulation', '2 high-impact repairs', '2 delayed retries', '1 recorded story review', 'One short random transfer drill', 'Risk review and flex'], links: [{ label: 'Simulation packets', href: '/prep/simulations/' }, { label: 'Progress queue', href: '/prep/progress/' }], output: 'A scored simulation and no more than three bounded repair tasks.', gate: 'If more than one critical round remains Weak, extend the plan when possible.' },
       { title: 'Week 8 · Consolidate and taper', focus: 'Finish evidence, avoid new-topic overload, and protect interview execution.', blocks: ['2 final due retries', '1 short mixed confidence session', '2 concise story rehearsals', 'Role narrative and interviewer questions', 'Final-week checklist, logistics, rest, and flex'], links: [{ label: 'Final-week checklist', href: '/prep/final-week/' }, { label: 'Readiness gates', href: '#readiness-gates' }], output: 'Known risks, stable retrieval, tested logistics, and preserved energy.', gate: 'No critical round is unattempted; every graduated gap has two spaced successes.' },
     ],
@@ -119,13 +119,13 @@ const plans = [
   <div class="workload-table" role="region" aria-label="Weekly workload options" tabindex="0">
     <table><thead><tr><th>Capacity</th><th>New attempts</th><th>Long rounds</th><th>Retries</th><th>Stories</th><th>Rule</th></tr></thead><tbody>{workloads.map((workload) => <tr><th>{workload.hours}h · {workload.label}</th><td>{workload.newAttempts}</td><td>{workload.longRounds}</td><td>{workload.retries}</td><td>{workload.stories}</td><td>{workload.note}</td></tr>)}</tbody></table>
   </div>
-  <p class="table-note">A “short attempt” includes the timed answer, rubric diagnosis, targeted reading, and a rewritten outline—usually 45–60 minutes. A “long round” is a 35–45 minute coding, design, research, experiment, or project session plus review.</p>
+  <p class="table-note">A “short attempt” includes the timed answer, rubric diagnosis, targeted reading, and a rewritten outline, usually 45–60 minutes. A “long round” is a 35–45 minute ML implementation, design, research, experiment, or project session plus review.</p>
 
   <h2>Standard eight-hour weekly template</h2>
   <div class="calendar-grid">
     <article><span>Mon · 60m</span><h3>New short attempt</h3><p>Use one high-priority question. Score before reading.</p></article>
     <article><span>Tue · 45m</span><h3>Due retry</h3><p>Change the follow-up; repair one observable weak dimension.</p></article>
-    <article><span>Wed · 90m</span><h3>Full long round</h3><p>Rotate coding, system design, research, experiment, or project deep-dive by role.</p></article>
+    <article><span>Wed · 90m</span><h3>Full long round</h3><p>Rotate ML implementation, system design, research, experiment, or project deep-dive by role.</p></article>
     <article><span>Thu · 60m</span><h3>New short attempt</h3><p>Interleave a different category from Monday.</p></article>
     <article><span>Fri · 45m</span><h3>Due retry</h3><p>Test whether earlier repair survived spacing.</p></article>
     <article><span>Sat · 90m</span><h3>Story + pushback</h3><p>One 90-second opening, three follow-ups, and one recording review.</p></article>
@@ -152,7 +152,7 @@ const plans = [
     <div class="gate-grid">
       <article><h3>Graduate one gap</h3><ul><li>Two successful closed-book attempts separated in time</li><li>No critical rubric dimension still marked weak</li><li>One unfamiliar follow-up handled without notes</li><li>The answer survives a later mixed session</li></ul></article>
       <article><h3>Call the loop ready</h3><ul><li>Every expected round has a recent full attempt</li><li>No critical round remains consistently Weak</li><li>One role-specific simulation completed under realistic timing</li><li>Six stories are concise, specific, and defensible</li></ul></article>
-      <article><h3>Extend or move when possible</h3><ul><li>A critical round remains unattempted one week before the loop</li><li>More than one critical round remains Weak after simulation repair</li><li>Coding/design cannot finish a correct baseline in the round time</li><li>Stories lose ownership or specificity under follow-up</li></ul></article>
+      <article><h3>Extend or move when possible</h3><ul><li>A critical round remains unattempted one week before the loop</li><li>More than one critical round remains Weak after simulation repair</li><li>ML implementation or design cannot finish a correct baseline in the round time</li><li>Stories lose ownership or specificity under follow-up</li></ul></article>
     </div>
   </section>
 

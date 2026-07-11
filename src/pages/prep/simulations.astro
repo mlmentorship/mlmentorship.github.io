@@ -18,7 +18,7 @@ const packets = [
   {
     id: 'ml-engineer', role: 'Machine Learning Engineer', duration: '3h 40m including breaks', observer: 'Prefer a strong software engineer or MLE who will inspect correctness and operational detail.',
     rounds: [
-      { time: '45 min', title: 'Coding', prompt: 'Use a medium implementation problem. Require examples, tests, complexity, and working code.' },
+      { time: '45 min', title: 'ML implementation', prompt: 'Use an ML primitive, evaluation, or debugging problem. Require examples, tests, complexity, and working code.' },
       { time: '45 min', title: 'ML system design', prompt: 'Design data, training, serving, monitoring, rollback, and iteration for a product ML system.' },
       { time: '45 min', title: 'Systems / production', prompt: 'Diagnose a training or serving bottleneck from incomplete symptoms; require a measurement plan.' },
       { time: '35 min', title: 'ML breadth', prompt: 'Use two mechanism questions plus one model-choice trade-off.' },
@@ -28,7 +28,7 @@ const packets = [
   {
     id: 'research-engineer', role: 'Research Engineer', duration: '3h 50m including breaks', observer: 'Prefer an RE, systems engineer, or researcher who can test both implementation and evidence quality.',
     rounds: [
-      { time: '45 min', title: 'Coding / implementation', prompt: 'Implement an ML primitive or debugging task with tests and complexity analysis.' },
+      { time: '45 min', title: 'ML implementation', prompt: 'Implement an ML primitive or debugging task with tests and complexity analysis.' },
       { time: '45 min', title: 'Training / inference systems', prompt: 'Quantify a workload, identify the bottleneck, select parallelism, and design recovery.' },
       { time: '45 min', title: 'Research depth', prompt: 'Critique a claim, identify alternative explanations, and design discriminating ablations.' },
       { time: '35 min', title: 'ML breadth', prompt: 'Test mechanisms that connect algorithms to training or systems behavior.' },
@@ -71,7 +71,7 @@ const unfamiliarPrompts = [
   ))}
 
   <h2>Unfamiliar transfer prompt pool</h2>
-  <p>Use one prompt the candidate has not seen. The goal is transfer of framing, evaluation, and trade-off patterns—not recall of a memorized architecture.</p>
+  <p>Use one prompt the candidate has not seen. The goal is transfer of framing, evaluation, and trade-off patterns, not recall of a memorized architecture.</p>
   <ol class="prompt-pool">{unfamiliarPrompts.map((prompt) => <li>{prompt}</li>)}</ol>
 
   <section class="scorecard">
@@ -93,11 +93,11 @@ const unfamiliarPrompts = [
     <div class="gate-grid">
       <article><h3>Green</h3><p>No critical dimension scores 0; every round has a workable structure; follow-ups reveal real depth; remaining misses are bounded.</p></article>
       <article><h3>Amber</h3><p>One critical round is inconsistent but responds to targeted repair. Keep the loop only if there is time for a spaced retry before it.</p></article>
-      <article><h3>Red</h3><p>More than one critical round scores 0, coding/design cannot reach a baseline in time, or stories lose ownership under follow-up. Extend or move the loop when possible.</p></article>
+      <article><h3>Red</h3><p>More than one critical round scores 0, ML implementation or design cannot reach a baseline in time, or stories lose ownership under follow-up. Extend or move the loop when possible.</p></article>
     </div>
   </section>
 
-  <section class="callout"><h2>After the simulation</h2><ol><li>Write the failure as an observable behavior—not “study systems more.”</li><li>Choose one corrective drill and a due date.</li><li>Retry closed-book after spacing.</li><li>Graduate only after the repair survives a mixed session.</li></ol><p><a href="/prep/progress/">Open the local progress and retry queue →</a></p></section>
+  <section class="callout"><h2>After the simulation</h2><ol><li>Write the failure as an observable behavior, not “study systems more.”</li><li>Choose one corrective drill and a due date.</li><li>Retry closed-book after spacing.</li><li>Graduate only after the repair survives a mixed session.</li></ol><p><a href="/prep/progress/">Open the local progress and retry queue →</a></p></section>
 </PrepLayout>
 
 <script>

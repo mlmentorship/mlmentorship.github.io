@@ -52,7 +52,7 @@ export const KNOWLEDGE_AREAS: Array<{
   description: string;
   starterLinks: Array<{ label: string; href: string }>;
 }> = [
-  { id: 'fundamentals', label: 'ML fundamentals', link: '/questions/#ml-fundamentals', description: 'Explain mechanisms, assumptions, and failure modes—not just formulas.', starterLinks: [{ label: 'Bias–variance', href: '/questions/bias-variance-tradeoff/' }, { label: 'Choose a loss', href: '/questions/how-to-choose-loss-function/' }] },
+  { id: 'fundamentals', label: 'ML fundamentals', link: '/questions/#ml-fundamentals', description: 'Explain mechanisms, assumptions, and failure modes, not just formulas.', starterLinks: [{ label: 'Bias–variance', href: '/questions/bias-variance-tradeoff/' }, { label: 'Choose a loss', href: '/questions/how-to-choose-loss-function/' }] },
   { id: 'production', label: 'Production & debugging', link: '/questions/#deep-learning-production', description: 'Diagnose data, training, serving, monitoring, and operational failures.', starterLinks: [{ label: 'Model not learning', href: '/questions/debug-model-not-learning/' }, { label: 'ML monitoring', href: '/questions/design-ml-monitoring/' }] },
   { id: 'llm-systems', label: 'LLM systems', link: '/questions/#llm-systems', description: 'Reason about evals, retrieval, serving cost, reliability, and safety.', starterLinks: [{ label: 'Evaluate an LLM app', href: '/questions/how-would-you-evaluate-an-llm-application/' }, { label: 'Fine-tune vs RAG', href: '/questions/fine-tune-vs-prompt-vs-rag/' }] },
   { id: 'recsys-search', label: 'Retrieval, search & recommendations', link: '/questions/#recsys-and-search', description: 'Connect retrieval and ranking choices to metrics and feedback loops.', starterLinks: [{ label: 'YouTube recommender', href: '/questions/design-youtube-recommender/' }, { label: 'Evaluate a ranker', href: '/questions/evaluate-search-ranker/' }] },
@@ -60,7 +60,7 @@ export const KNOWLEDGE_AREAS: Array<{
   { id: 'experimentation', label: 'Product & experimentation', link: '/questions/#product-and-experimentation', description: 'Choose success metrics, guardrails, experiment units, and decision rules.', starterLinks: [{ label: 'Design an A/B test', href: '/questions/design-ml-ab-test/' }, { label: 'Offline–online gap', href: '/questions/debug-offline-online-metric-gap/' }] },
   { id: 'behavioral', label: 'Behavioral & leadership', link: '/questions/#behavioral', description: 'Use specific decisions and evidence that hold up under skeptical follow-up.', starterLinks: [{ label: 'Ambitious project', href: '/questions/most-ambitious-project/' }, { label: 'Disagreement', href: '/questions/disagreed-with-senior/' }] },
   { id: 'math-research', label: 'Math & research depth', link: '/questions/#math-and-research', description: 'Derive, critique evidence, and design experiments from first principles.', starterLinks: [{ label: 'Design an ablation', href: '/questions/design-ablation-study/' }, { label: 'Critique a paper', href: '/questions/critique-ml-paper/' }] },
-  { id: 'coding', label: 'Coding & implementation', link: '/questions/#coding', description: 'Produce correct, testable code while explaining complexity and edge cases.', starterLinks: [{ label: 'Debug training loop', href: '/questions/debug-training-loop/' }, { label: 'Batched top-k', href: '/questions/implement-batched-top-k/' }] },
+  { id: 'coding', label: 'ML implementation', link: '/questions/#ml-implementation', description: 'Implement ML primitives and evaluation systems with correct, testable, resource-aware code.', starterLinks: [{ label: 'Debug training loop', href: '/questions/debug-training-loop/' }, { label: 'Batched top-k retrieval', href: '/questions/implement-batched-top-k/' }] },
 ];
 
 export const INTERVIEW_ROUNDS: Array<{
@@ -84,14 +84,15 @@ export const INTERVIEW_ROUNDS: Array<{
   },
   {
     id: 'coding',
-    label: 'Coding / implementation',
-    description: 'Algorithms, data handling, ML implementation, or debugging under time pressure.',
+    label: 'ML implementation / coding',
+    description: 'ML primitives, evaluation systems, debugging, and resource-aware implementation under time pressure.',
     minutes: 45,
     areaWeights: { coding: .8, fundamentals: .1, production: .1 },
     starterLinks: [
-      { label: 'Implement KNN', href: '/questions/implement-knn/' },
       { label: 'Debug a training loop', href: '/questions/debug-training-loop/' },
       { label: 'Implement attention', href: '/questions/implement-attention-from-scratch/' },
+      { label: 'Memory-bounded top-k retrieval', href: '/questions/implement-batched-top-k/' },
+      { label: 'Mergeable model metrics', href: '/questions/implement-streaming-classification-metrics/' },
     ],
   },
   {
@@ -193,7 +194,7 @@ export const ROLE_OVERLAYS: Record<RoleId, {
     summary: 'Prioritize coding and dependable systems while retaining enough ML depth to make sound modeling decisions.',
     defaultRounds: ['coding', 'ml-system-design', 'systems-infrastructure', 'ml-breadth', 'behavioral'],
     allocation: [
-      { label: 'Coding / implementation', percent: 30 },
+      { label: 'ML implementation / coding', percent: 30 },
       { label: 'ML system design', percent: 25 },
       { label: 'Production & infrastructure', percent: 20 },
       { label: 'ML breadth', percent: 15 },
@@ -211,7 +212,7 @@ export const ROLE_OVERLAYS: Record<RoleId, {
     summary: 'Combine strong implementation and systems reasoning with enough research depth to critique and operationalize ideas.',
     defaultRounds: ['coding', 'systems-infrastructure', 'research-depth', 'ml-breadth', 'project-deep-dive'],
     allocation: [
-      { label: 'Coding / implementation', percent: 30 },
+      { label: 'ML implementation / coding', percent: 30 },
       { label: 'Training & inference systems', percent: 25 },
       { label: 'Research depth', percent: 20 },
       { label: 'ML breadth', percent: 15 },
@@ -279,7 +280,7 @@ export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeDefinition> = {
     ],
   },
   coding: {
-    id: 'coding', label: 'Coding / implementation', minutes: 40,
+    id: 'coding', label: 'ML implementation', minutes: 40,
     instruction: 'Clarify the contract, implement a correct baseline, test edge cases, then optimize.',
     rubric: [
       { id: 'contract', label: 'Contract & examples', question: 'Did you clarify inputs, outputs, constraints, and a small example?', coaching: 'Before coding, write one normal example, one edge case, and the expected output.' },

@@ -19,7 +19,7 @@ CTC matters because:
 
 - It removes the need for a separate alignment model (the old HMM-GMM pipeline forced-aligned audio to phones first).
 - It is the foundation that RNN-T and many streaming ASR systems build on or contrast against.
-- The forward-backward dynamic program is the same idea as the HMM forward-backward algorithm — a clean way to show you understand marginalization over latent structure.
+- The forward-backward dynamic program is the same idea as the HMM forward-backward algorithm, a clean way to show you understand marginalization over latent structure.
 
 ## The setup
 
@@ -31,12 +31,13 @@ $$
 
 A **path** (or alignment) $\pi$ is one label per frame, e.g. for target `CAT`:
 
-```
+```text
 C C ∅ A ∅ T T   →  collapse  →  CAT
 ∅ C A A ∅ T ∅   →  collapse  →  CAT
 ```
 
 The **collapse function** $\mathcal{B}$ does two things, in order:
+
 1. Merge consecutive repeated labels.
 2. Remove all blanks.
 
@@ -62,14 +63,14 @@ where the $s-2$ term is only allowed when moving between two distinct non-blank 
 
 ## The conditional-independence assumption
 
-CTC factorizes $p(\mathbf{l} \mid X) = \sum_\pi \prod_t y_t^{\pi_t}$ — each frame's output depends only on $X$, **not on previously emitted labels**. There is no internal language model. This is CTC's defining limitation and the main reason RNN-T exists.
+CTC factorizes $p(\mathbf{l} \mid X) = \sum_\pi \prod_t y_t^{\pi_t}$: each frame's output depends only on $X$, **not on previously emitted labels**. There is no internal language model. This is CTC's defining limitation and the main reason RNN-T exists.
 
 Practically, CTC ASR systems are decoded with an **external language model** (shallow fusion / beam search with a KenLM or neural LM) to recover the linguistic dependencies CTC ignores.
 
 ## Decoding
 
 | Method | What it does | When |
-|--------|--------------|------|
+| --- | --- | --- |
 | **Greedy / best-path** | argmax per frame, then collapse | Fast, approximate; no LM |
 | **Prefix beam search** | Beam over collapsed prefixes, merging paths | Standard with an external LM |
 | **CTC + LM (shallow fusion)** | Add $\lambda \log p_{LM}$ during beam search | Production ASR |
@@ -80,7 +81,7 @@ Greedy decoding is *not* the argmax over label sequences (best path ≠ best lab
 
 1. Frame the problem: unknown alignment between $T$ frames and a shorter label sequence.
 2. Introduce the **blank** symbol and the **collapse rule** (merge repeats, then drop blanks).
-3. State that the loss **marginalizes over all alignments** via forward-backward DP — exact, not sampled.
+3. State that the loss **marginalizes over all alignments** via forward-backward DP (exact, not sampled).
 4. Name the **conditional-independence-across-frames** assumption and its consequence: CTC has no built-in LM, so you fuse an external one.
 5. Bonus: contrast with attention-based seq2seq (no monotonicity assumption, but harder to stream) and RNN-T (adds a label-dependent prediction network).
 
@@ -88,7 +89,7 @@ Greedy decoding is *not* the argmax over label sequences (best path ≠ best lab
 
 - **"The blank means silence."** No. Blank means "emit nothing / no label transition here." Silence is just a region the acoustic model maps to blanks, but blank is a structural token, not a phoneme.
 - **"Greedy decoding gives the most likely transcript."** It gives the most likely *path*, which after collapsing may not be the most likely *transcript*.
-- **"CTC needs aligned data."** The whole point is that it doesn't — it learns the alignment implicitly.
+- **"CTC needs aligned data."** The whole point is that it doesn't; it learns the alignment implicitly.
 - **"CTC models language."** It doesn't; it is conditionally independent across frames. Linguistic structure comes from an external LM at decode time.
 - **"CTC only works for speech."** It works for any monotonic alignment task: handwriting recognition, OCR, lip reading, keyword spotting.
 
