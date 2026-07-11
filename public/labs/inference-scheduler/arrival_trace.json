@@ -1,0 +1,7 @@
+[
+  {"at_ms": 0, "request_id": "a-1", "tenant": "alpha", "prompt_tokens": 1200, "max_new_tokens": 80},
+  {"at_ms": 4, "request_id": "b-1", "tenant": "beta", "prompt_tokens": 64, "max_new_tokens": 180},
+  {"at_ms": 7, "request_id": "a-2", "tenant": "alpha", "prompt_tokens": 32000, "max_new_tokens": 24},
+  {"at_ms": 12, "request_id": "c-1", "tenant": "gamma", "prompt_tokens": 180, "max_new_tokens": 32},
+  {"at_ms": 15, "request_id": "b-2", "tenant": "beta", "prompt_tokens": 90, "max_new_tokens": 400}
+]

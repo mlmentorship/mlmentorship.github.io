@@ -1,0 +1,78 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { FRONTIER_LAB_PROCESSES } from '../../data/frontierLabProcesses';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+---
+
+<PrepLayout
+  title="Current frontier AI lab interview processes"
+  description="A source-labeled OpenAI, Anthropic, Google DeepMind, Meta AI, and xAI interview format guide mapped to focused ML practice."
+  heading="Trust the format evidence, not the question rumor."
+  lede="Frontier-lab loops vary by team and change quickly. This guide separates official process, method-based reports, and first-person experience, then turns only the confirmed format into a practice decision."
+>
+  <section class="verification"><div><span>Last verified</span><strong>July 11, 2026</strong></div><div><span>Coverage</span><strong>OpenAI, Anthropic, DeepMind, Meta, xAI</strong></div><div><span>Rule</span><strong>Recruiter instructions override this page</strong></div></section>
+
+  <section class="callout"><h2>Ask these six questions first</h2><ol><li>What are the exact round names and durations?</li><li>Is coding in a blank editor, an existing codebase, a notebook, or a take-home?</li><li>Which AI tools are allowed in each round?</li><li>Is there a project presentation, research discussion, or work-sample review?</li><li>Which domain will the technical depth target?</li><li>What artifact or behavior does each interviewer score?</li></ol></section>
+
+  <nav class="lab-jumps" aria-label="Jump to lab process">{FRONTIER_LAB_PROCESSES.map((lab) => <a href={`#${lab.id}`}>{lab.lab}</a>)}</nav>
+
+  {FRONTIER_LAB_PROCESSES.map((lab) => (
+    <section id={lab.id} class="lab-process">
+      <header><p>Current process evidence</p><h2>{lab.lab}</h2><strong>{lab.bottomLine}</strong></header>
+      <div class="evidence-columns">
+        <div><h3>Officially confirmed</h3><ul>{lab.confirmed.map((item) => <li>{item}</li>)}</ul></div>
+        <div><h3>Currently reported</h3><ul>{lab.reported.map((item) => <li>{item}</li>)}</ul></div>
+      </div>
+      <div class="ai-policy"><h3>AI policy</h3><p>{lab.aiPolicy}</p></div>
+      <h3>Practice only what matches</h3>
+      <div class="prep-links">{lab.prep.map((item) => <a href={item.href}>{item.label}</a>)}</div>
+      <p class="caution"><strong>Caution:</strong> {lab.caution}</p>
+      <details><summary>Sources and evidence level</summary><ul class="source-list">{lab.sources.map((source) => <li><a href={source.href} rel="noopener">{source.label} ↗</a><span>{source.tier}</span><small>Checked {source.checkedOn}. {source.supports}</small></li>)}</ul></details>
+    </section>
+  ))}
+
+  <h2>Cross-lab changes worth preparing for</h2>
+  <div class="trend-grid">
+    <article><h3>Work samples are replacing trivia</h3><p>Expect existing code, failing tests, traces, notebooks, or multi-stage specifications. The task is longer, and the scoring surface includes judgment and verification.</p></article>
+    <article><h3>AI policy is now part of the format</h3><p>Meta explicitly expects its authorized assistant in many rounds. Anthropic prohibits AI unless a round says otherwise. OpenAI reports include an agentic pilot. Never infer permission.</p></article>
+    <article><h3>Senior candidates defend artifacts</h3><p>Technical presentations, project depth, research discussions, exceptional-work statements, and references test whether the claimed scope is real.</p></article>
+    <article><h3>Questions probe one level deeper</h3><p>Practical coding still needs algorithms. ML theory still needs derivation. Design still needs failure behavior. AI-generated surface fluency raises the value of follow-up depth.</p></article>
+  </div>
+
+  <section class="callout"><h2>Maintenance and corrections</h2><p>The internal source registry is reviewed quarterly. Company pages and recruiter instructions outrank summaries. Method-based and first-person reports are labeled because they are not policy.</p><p><a href="/guides/frontier-lab-interview-processes-2026/">Read the full field guide →</a> · <a href="/prep/labs/">Open executable labs →</a></p></section>
+</PrepLayout>
+
+<style>
+  .verification { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .6rem; margin-bottom: 1.4rem; }
+  .verification div { padding: .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .verification span, .verification strong { display: block; }
+  .verification span { color: var(--c-muted); font-family: var(--font-mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; }
+  .verification strong { margin-top: .25rem; font-size: .82rem; }
+  .lab-jumps, .prep-links { display: flex; flex-wrap: wrap; gap: .45rem; }
+  .lab-jumps a, .prep-links a { padding: .45rem .65rem; border: 1px solid var(--c-rule); border-radius: 999px; color: inherit; font-size: .8rem; text-decoration: none; }
+  .lab-jumps a:hover, .prep-links a:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .lab-process { margin: 2.8rem 0; scroll-margin-top: 5.5rem; }
+  .lab-process > header { padding-bottom: .8rem; border-bottom: 2px solid var(--c-text); }
+  .lab-process > header p { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
+  .lab-process > header h2 { margin: .15rem 0 .35rem !important; }
+  .lab-process > header strong { color: var(--c-text-soft); font-size: .9rem; }
+  .evidence-columns { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; }
+  .evidence-columns > div { padding: .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .evidence-columns h3 { margin-top: 0 !important; }
+  .evidence-columns li { margin-bottom: .5rem; font-size: .84rem; }
+  .ai-policy, .caution { padding: .8rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); }
+  .ai-policy h3 { margin-top: 0 !important; }
+  .caution { margin-top: 1rem; font-size: .84rem; }
+  details { margin-top: 1rem; padding: .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  summary { cursor: pointer; font-weight: 700; }
+  .source-list { padding: 0; list-style: none; }
+  .source-list li { display: grid; grid-template-columns: 1fr auto; gap: .2rem .7rem; padding: .65rem 0; border-top: 1px solid var(--c-rule); }
+  .source-list span { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; }
+  .source-list small { grid-column: 1 / -1; color: var(--c-text-soft); }
+  .trend-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .trend-grid article { padding: .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .trend-grid h3 { margin-top: 0 !important; }
+  .trend-grid p { margin-bottom: 0; font-size: .84rem; }
+  @media (max-width: 720px) { .verification, .evidence-columns, .trend-grid { grid-template-columns: 1fr; } }
+</style>

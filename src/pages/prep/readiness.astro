@@ -10,6 +10,9 @@ const domains = [
   { id: 'recsys', label: 'Recommendations, search, and ranking' },
   { id: 'platform', label: 'ML platform, training, and serving' },
   { id: 'research', label: 'Research and modeling' },
+  { id: 'post-training', label: 'Post-training, RL, and agent environments' },
+  { id: 'alignment', label: 'Alignment, safety, and model behavior' },
+  { id: 'multimodal', label: 'Multimodal, vision, speech, or robotics' },
   { id: 'product', label: 'General product ML' },
 ];
 const defaultRounds = new Set(ROLE_OVERLAYS['applied-scientist'].defaultRounds);
@@ -82,14 +85,22 @@ const defaultRounds = new Set(ROLE_OVERLAYS['applied-scientist'].defaultRounds);
   import { INTERVIEW_ROUNDS, KNOWLEDGE_AREAS, ROLE_OVERLAYS, type AreaId, type RoleId, type RoundId } from '../../data/prepCurriculum';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
-  type Domain = 'general' | 'llm' | 'recsys' | 'platform' | 'research' | 'product';
+  type Domain = 'general' | 'llm' | 'recsys' | 'platform' | 'research' | 'post-training' | 'alignment' | 'multimodal' | 'product';
   const roleAreaWeights: Record<RoleId, Record<AreaId, number>> = {
     'applied-scientist': { fundamentals: 1.2, production: .8, 'llm-systems': .8, 'recsys-search': .8, 'system-design': 1.2, experimentation: 1.25, behavioral: 1.15, 'math-research': 1, coding: .65 },
     'ml-engineer': { fundamentals: .9, production: 1.3, 'llm-systems': .8, 'recsys-search': .75, 'system-design': 1.25, experimentation: .75, behavioral: .75, 'math-research': .55, coding: 1.4 },
     'research-engineer': { fundamentals: 1.05, production: 1.25, 'llm-systems': .9, 'recsys-search': .55, 'system-design': .85, experimentation: .65, behavioral: .65, 'math-research': 1.25, coding: 1.4 },
   };
   const domainWeights: Record<Domain, Partial<Record<AreaId, number>>> = {
-    general: {}, llm: { 'llm-systems': .8, production: .2 }, recsys: { 'recsys-search': .8, experimentation: .2 }, platform: { production: .8, coding: .25 }, research: { 'math-research': .7, fundamentals: .25 }, product: { experimentation: .55, 'system-design': .35, behavioral: .15 },
+    general: {},
+    llm: { 'llm-systems': .8, production: .2 },
+    recsys: { 'recsys-search': .8, experimentation: .2 },
+    platform: { production: .8, coding: .25 },
+    research: { 'math-research': .7, fundamentals: .25 },
+    'post-training': { 'llm-systems': .55, 'math-research': .45, experimentation: .25, coding: .15 },
+    alignment: { 'llm-systems': .45, 'math-research': .5, behavioral: .25, experimentation: .2 },
+    multimodal: { fundamentals: .45, 'math-research': .35, production: .25, 'system-design': .2 },
+    product: { experimentation: .55, 'system-design': .35, behavioral: .15 },
   };
 
   const form = document.querySelector<HTMLFormElement>('#readiness-form');

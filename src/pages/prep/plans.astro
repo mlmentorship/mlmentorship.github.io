@@ -137,6 +137,17 @@ const plans = [
   <p>Apply the allocation before choosing questions. The same four-week calendar should not look identical for AS, MLE, and RE candidates.</p>
   <div class="overlay-grid">{Object.values(ROLE_OVERLAYS).map((role) => <article><h3>{role.label}</h3><p>{role.summary}</p><ul>{role.allocation.map((item) => <li><strong>{item.percent}%</strong> {item.label}</li>)}</ul><p class="warning">{role.warning}</p><p>{role.priorityLinks.map((link, index) => <><a href={link.href}>{link.label}</a>{index < role.priorityLinks.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
 
+  <h2>Frontier format substitution</h2>
+  <p>Do not add a frontier work sample on top of the weekly contract. Replace the closest long round only when recruiting confirms the format.</p>
+  <div class="overlay-grid">
+    <article><h3>Agentic codebase</h3><p>Replace one ML implementation session with the <a href="/prep/labs/agentic-codebase/">agentic codebase lab</a>. Keep the later unaided implementation session if the loop has both formats.</p></article>
+    <article><h3>Technical presentation</h3><p>Replace one project rehearsal with the <a href="/prep/presentation/">30-minute presentation and 15-minute Q&A</a>. Use a new observer for the final attempt.</p></article>
+    <article><h3>Research work sample</h3><p>Replace one research-depth session with the <a href="/prep/labs/black-box/">black-box investigation</a>. Preserve a separate paper or ablation drill if both rounds exist.</p></article>
+    <article><h3>Performance systems</h3><p>Replace one infrastructure round with the <a href="/prep/labs/accelerator/">accelerator</a> or <a href="/prep/labs/inference-scheduler/">inference scheduler</a> lab, based on team scope.</p></article>
+    <article><h3>Values and mission</h3><p>Replace one generic behavioral rehearsal with the <a href="/prep/values/">values packet</a>. Keep stories grounded in actual decisions.</p></article>
+    <article><h3>Oral math</h3><p>Replace one breadth block with two prompts from the <a href="/prep/labs/math-oral/">math oral</a>, including a changed-assumption follow-up.</p></article>
+  </div>
+
   <h2>Target-level evidence</h2>
   <div class="overlay-grid levels">{Object.values(LEVEL_OVERLAYS).map((level) => <article><h3>{level.label}</h3><p><strong>Bar:</strong> {level.bar}</p><ul>{level.evidence.map((item) => <li>{item}</li>)}</ul><p class="warning"><strong>Common failure:</strong> {level.commonFailure}</p></article>)}</div>
 

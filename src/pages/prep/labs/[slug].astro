@@ -1,0 +1,65 @@
+---
+import PrepLayout from '../../../layouts/PrepLayout.astro';
+import { FRONTIER_LABS, type FrontierLab } from '../../../data/frontierLabs';
+import { SITE } from '../../../consts';
+
+export function getStaticPaths() {
+  return FRONTIER_LABS.map((lab) => ({ params: { slug: lab.slug }, props: { lab } }));
+}
+
+interface Props { lab: FrontierLab }
+const { lab } = Astro.props;
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+---
+
+<PrepLayout
+  title={lab.title}
+  description={lab.description}
+  heading={lab.title}
+  lede={lab.bottomLine}
+  eyebrow={lab.eyebrow}
+>
+  <div class="lab-meta"><span>{lab.duration}</span><span>{lab.format}</span></div>
+
+  <section class="callout"><h2>Do this only if the format matches</h2><p>Confirm the round with recruiting first. This is an original practice exercise, not a claim that a specific company uses this exact prompt.</p></section>
+
+  <h2>Protocol</h2>
+  <ol class="step-list">{lab.protocol.map((step) => <li>{step}</li>)}</ol>
+
+  <h2>Deliverables</h2>
+  <ul class="check-list">{lab.deliverables.map((item) => <li>{item}</li>)}</ul>
+
+  <h2>Graduation gates</h2>
+  <div class="gate-grid">{lab.gates.map((gate, index) => <article><span>{String(index + 1).padStart(2, '0')}</span><p>{gate}</p></article>)}</div>
+
+  <h2>Starter files</h2>
+  <div class="file-list">
+    {lab.files.map((file) => <a href={file.href}><strong>{file.label}</strong><span>{file.note}</span><small>Open file →</small></a>)}
+  </div>
+
+  {lab.externalSource && <section class="source-card"><h2>External practice artifact</h2><p><a href={lab.externalSource.href} rel="noopener">{lab.externalSource.label} ↗</a></p><p>{lab.externalSource.note}</p></section>}
+
+  <section class="next-step"><h2>Answer key is a rubric, not a solution dump</h2><p>The linked question explains what strong performance looks like, common failure modes, and senior follow-ups. Attempt the lab before reading it.</p><a href={lab.questionHref}>{lab.questionLabel} →</a></section>
+
+  <p><a href="/prep/labs/">← All executable labs</a></p>
+</PrepLayout>
+
+<style>
+  .lab-meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+  .lab-meta span { padding: .4rem .6rem; border: 1px solid var(--c-rule); border-radius: 999px; color: var(--c-text-soft); font-family: var(--font-mono); font-size: .72rem; }
+  .check-list { padding: 0; list-style: none; }
+  .check-list li { position: relative; padding: .55rem 0 .55rem 1.7rem; border-bottom: 1px solid var(--c-rule); }
+  .check-list li::before { content: '✓'; position: absolute; left: .25rem; color: var(--c-accent); font-weight: 800; }
+  .gate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .gate-grid article { display: grid; grid-template-columns: 2rem 1fr; gap: .5rem; padding: .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .gate-grid span { color: var(--c-accent); font-family: var(--font-mono); font-size: .72rem; }
+  .gate-grid p { margin: 0; font-size: .84rem; }
+  .file-list { display: grid; gap: .55rem; }
+  .file-list a { display: grid; grid-template-columns: 11rem 1fr auto; gap: .8rem; align-items: center; padding: .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); color: inherit; text-decoration: none; }
+  .file-list a:hover { border-color: var(--c-accent); }
+  .file-list span { color: var(--c-text-soft); font-size: .82rem; }
+  .file-list small { color: var(--c-accent); }
+  .source-card, .next-step { margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); }
+  .source-card h2, .next-step h2 { margin-top: 0 !important; }
+  @media (max-width: 680px) { .gate-grid { grid-template-columns: 1fr; } .file-list a { grid-template-columns: 1fr; gap: .25rem; } }
+</style>

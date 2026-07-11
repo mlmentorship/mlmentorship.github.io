@@ -1,0 +1,45 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+---
+
+<PrepLayout
+  title="Frontier AI values and mission interview practice"
+  description="A grounded practice protocol for ethical tensions, changed beliefs, safety decisions, mission alignment, and principled disagreement."
+  heading="Bring judgment, not a mission-statement recital."
+  lede="Values rounds test whether you can hold competing goods in view, make a costly decision, expose uncertainty, and update. Agreement without evidence is not alignment."
+  eyebrow="Values and mission round"
+>
+  <section class="callout"><h2>The strongest answer contains a sacrifice</h2><p>If your choice protected safety, speed, users, truth, or team trust without costing anything, it was not a real tension. State what the other side reasonably valued and what your decision gave up.</p></section>
+
+  <h2>Prepare four experiences, not 20 slogans</h2>
+  <div class="experience-grid">
+    <article><span>01</span><h3>Competing values</h3><p>A decision where reasonable people protected different legitimate outcomes.</p></article>
+    <article><span>02</span><h3>Changed belief</h3><p>A belief that changed because evidence contradicted it, followed by a behavioral change.</p></article>
+    <article><span>03</span><h3>Responsible pushback</h3><p>A quality, safety, privacy, or user-harm concern raised under real delivery pressure.</p></article>
+    <article><span>04</span><h3>Right process, bad outcome</h3><p>A decision you still defend despite an unfavorable result, with uncertainty acknowledged.</p></article>
+  </div>
+
+  <h2>Answer in this order</h2>
+  <ol class="step-list"><li><strong>Name the tension.</strong> Lead with the two values and the decision, not the setup.</li><li><strong>Ground it.</strong> Give the minimum context needed to understand stakes and incentives.</li><li><strong>Explain your choice.</strong> Use evidence available then, not hindsight.</li><li><strong>State the cost.</strong> Name what the decision sacrificed and who bore it.</li><li><strong>Show the update.</strong> Explain what changed in your judgment or process.</li><li><strong>Invite the hard follow-up.</strong> State uncertainty and what evidence would reverse your position.</li></ol>
+
+  <div class="resource-grid"><a class="resource-card" href="/labs/values/worksheet.md"><h3>Values worksheet</h3><p>Four experience prompts, pressure questions, and failure conditions.</p></a><a class="resource-card" href="/questions/defend-values-under-ethical-pressure/"><h3>Leveled interview answer</h3><p>What L4, L5, and L6 judgment sound like under ethical pressure.</p></a></div>
+
+  <h2>What not to optimize</h2>
+  <ul class="avoid-list"><li>Agreement with every public company position.</li><li>A perfect framework that removes emotional or ethical discomfort.</li><li>A story where the other party is obviously irrational.</li><li>A changed belief with no changed action.</li><li>A safety claim with no user, threat model, or cost.</li><li>A mission answer that could be sent unchanged to five labs.</li></ul>
+
+  <section class="callout"><h2>Observed practice</h2><p>Have the observer challenge the premise, not just ask for more detail. Score whether you answer directly, preserve independent judgment, and update without becoming evasive. Repeat with a different tension before graduation.</p></section>
+</PrepLayout>
+
+<style>
+  .experience-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .experience-grid article { padding: .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .experience-grid span { color: var(--c-accent); font-family: var(--font-mono); font-size: .72rem; }
+  .experience-grid h3 { margin: .2rem 0 .35rem !important; }
+  .experience-grid p { margin: 0; color: var(--c-text-soft); font-size: .84rem; }
+  .avoid-list { padding: 0; list-style: none; }
+  .avoid-list li { padding: .65rem 0; border-bottom: 1px solid var(--c-rule); }
+  .avoid-list li::before { content: 'Not: '; color: var(--c-accent); font-weight: 700; }
+  @media (max-width: 680px) { .experience-grid { grid-template-columns: 1fr; } }
+</style>

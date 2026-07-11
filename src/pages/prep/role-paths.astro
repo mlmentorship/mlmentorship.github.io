@@ -48,8 +48,19 @@ const rolePaths = [
   },
 ];
 
+const frontierFormats = [
+  { title: 'Agentic codebase', when: 'The recruiter names an existing repository or authorized coding agent.', action: 'Replace one implementation repetition with the agentic evaluation-service lab. Practice mapping, bounded delegation, diff review, and proof.', href: '/prep/labs/agentic-codebase/' },
+  { title: 'Technical presentation', when: 'The loop includes a project presentation, job talk, or artifact defense.', action: 'Prepare 30 minutes around three decisions and reserve 15 minutes for interrupted questions.', href: '/prep/presentation/' },
+  { title: 'Research work sample', when: 'The assessment uses a notebook, API, paper, model, or open-ended investigation.', action: 'Run the black-box lab and produce a five-minute claim, evidence, uncertainty, and next experiment readout.', href: '/prep/labs/black-box/' },
+  { title: 'Values and mission', when: 'The loop includes a dedicated values, safety, mission, or senior-leadership discussion.', action: 'Prepare four real tensions and practice independent judgment under principled pushback.', href: '/prep/values/' },
+  { title: 'Performance trace', when: 'The role centers on kernels, accelerators, training throughput, inference, or systems performance.', action: 'Use the released accelerator challenge or inference scheduler and keep an experiment ledger.', href: '/prep/labs/accelerator/' },
+];
+
 const domains = [
-  { title: 'LLM and agents', do: ['LLM evals and failure taxonomy', 'RAG versus fine-tuning decisions', 'Inference workload and cost', 'Agent reliability and tool-use evaluation'], links: [['Evaluate an LLM application', '/questions/how-would-you-evaluate-an-llm-application/'], ['Evaluate an agent', '/questions/evaluate-an-agent/'], ['Reduce inference cost', '/questions/reduce-llm-inference-cost-10x/']] },
+  { title: 'LLM and agents', do: ['LLM evals and failure taxonomy', 'RAG versus fine-tuning decisions', 'Inference workload and cost', 'Agent reliability and tool-use evaluation'], links: [['Evaluate an LLM application', '/questions/how-would-you-evaluate-an-llm-application/'], ['Inference service', '/questions/design-production-llm-inference-service/'], ['Evaluate an agent', '/questions/evaluate-an-agent/']] },
+  { title: 'Post-training and environments', do: ['Preference data and reward models', 'RL environments and evidence-bearing graders', 'Synthetic data and held-out behavioral families', 'Reward hacking and online product validation'], links: [['Post-training design', '/questions/design-post-training-data-and-rl-environment/'], ['Preference data', '/concepts/preference-data-and-reward-models/'], ['Environment lab', '/prep/labs/post-training-environment/']] },
+  { title: 'Alignment and model behavior', do: ['Scalable oversight and control', 'Mechanistic interpretability', 'Monitorability and model behavior', 'Adaptive red-team and LLM security'], links: [['Scalable oversight', '/concepts/scalable-oversight-and-ai-control/'], ['Mechanistic interpretability', '/concepts/mechanistic-interpretability/'], ['Red-team design', '/questions/design-llm-red-team-program/']] },
+  { title: 'Multimodal and robotics', do: ['Cross-modal alignment and fusion', 'Image, audio, and video token budgets', 'Grounding and modality-conflict evaluation', 'Observation, action, safety, and sim-to-real'], links: [['Multimodal models', '/concepts/multimodal-foundation-models/'], ['Robotics policies', '/concepts/robotics-policy-learning/'], ['Vision transformers', '/concepts/vision-transformers/']] },
   { title: 'Recommendations and search', do: ['Candidate generation and ranking', 'Offline ranking metrics and position bias', 'Exploration and feedback loops', 'Cold start and ecosystem health'], links: [['YouTube recommender', '/questions/design-youtube-recommender/'], ['Evaluate a ranker', '/questions/evaluate-search-ranker/'], ['Cold start', '/questions/cold-start-new-user/']] },
   { title: 'ML platform and infrastructure', do: ['Training and serving workload models', 'Distributed communication and memory', 'Feature/data reliability', 'Monitoring, fallback, and cost ownership'], links: [['Train a 100B model', '/questions/train-100b-model/'], ['Feature store', '/questions/design-feature-store/'], ['Fixed-budget system', '/questions/design-ml-system-fixed-budget/']] },
   { title: 'General product ML', do: ['Problem framing and baseline', 'Experiment and metric hierarchy', 'Delayed labels and feedback', 'Cross-functional decision evidence'], links: [['Choose product metrics', '/questions/choose-ml-product-metrics/'], ['Design an A/B test', '/questions/design-ml-ab-test/'], ['Fraud detection', '/questions/design-fraud-detection/']] },
@@ -68,6 +79,10 @@ const domains = [
   <nav class="path-jumps" aria-label="Jump to role path">{rolePaths.map((role) => <a href={`#${role.id}`}>{role.title}</a>)}</nav>
 
   {rolePaths.map((role) => <section id={role.id} class="role-path"><header><p>Ordered core path</p><h2>{role.title}</h2><span>{role.rule}</span></header><ol>{role.sequence.map(([label, href, detail]) => <li><h3><a href={href}>{label}</a></h3><p>{detail}</p></li>)}</ol></section>)}
+
+  <h2>Frontier format overlays</h2>
+  <p>Do not add these because the company is fashionable. Add one only when recruiting confirms the format.</p>
+  <div class="format-grid">{frontierFormats.map((format) => <article><h3>{format.title}</h3><p><strong>Use when:</strong> {format.when}</p><p>{format.action}</p><a href={format.href}>Open practice →</a></article>)}</div>
 
   <h2 id="domain-supplements">Domain supplements</h2>
   <p>A domain supplement changes examples and technical depth. It does not replace ML implementation, project evidence, behavioral judgment, or the actual round formats.</p>
@@ -97,9 +112,13 @@ const domains = [
   .role-path h3 { font-size: .95rem !important; }
   .role-path p { color: var(--c-text-soft); font-size: .82rem; }
   .domain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .format-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .format-grid article { padding: .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .format-grid h3 { margin-top: 0 !important; }
+  .format-grid p { font-size: .82rem; }
   .domain-grid article { padding: .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
   .domain-grid h3 { margin-top: 0 !important; }
   .domain-grid li, .domain-grid p { font-size: .82rem; }
   .boundary { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); }
-  @media (max-width: 700px) { .domain-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .domain-grid, .format-grid { grid-template-columns: 1fr; } }
 </style>

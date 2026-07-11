@@ -1,0 +1,50 @@
+[
+  {
+    "id": "kl-gaussians",
+    "minutes": 12,
+    "prompt": "Derive KL divergence from one univariate Gaussian to another, then explain the asymmetric terms.",
+    "checks": ["defines direction", "handles variance ratio", "checks equality case", "interprets asymmetry"]
+  },
+  {
+    "id": "cross-entropy-gradient",
+    "minutes": 10,
+    "prompt": "Derive the gradient of softmax cross-entropy with respect to logits.",
+    "checks": ["uses stable notation", "gets p minus y", "checks dimensions", "connects to learning signal"]
+  },
+  {
+    "id": "l1-sparsity",
+    "minutes": 8,
+    "prompt": "Explain mathematically why L1 regularization creates exact zeros more readily than L2.",
+    "checks": ["subgradient at zero", "constant pull", "contrast with proportional L2 gradient", "optimization caveat"]
+  },
+  {
+    "id": "elbo",
+    "minutes": 15,
+    "prompt": "Derive the ELBO from log marginal likelihood and identify the gap.",
+    "checks": ["introduces q", "uses Jensen or KL identity", "identifies posterior KL gap", "interprets both terms"]
+  },
+  {
+    "id": "expected-retries",
+    "minutes": 8,
+    "prompt": "A verifier accepts an independent sample with probability p. Derive expected attempts and the probability of success within k attempts.",
+    "checks": ["geometric distribution", "expected value 1 over p", "one minus failure power", "independence caveat"]
+  },
+  {
+    "id": "all-reduce-error",
+    "minutes": 15,
+    "prompt": "Workers send unbiased noisy scalar estimates with variance sigma squared. Derive the variance of their mean and discuss correlated noise.",
+    "checks": ["variance sum", "one over n reduction", "covariance terms", "connection to distributed aggregation"]
+  },
+  {
+    "id": "attention-scale",
+    "minutes": 10,
+    "prompt": "Assume independent zero-mean unit-variance query and key coordinates. Derive the variance of their dot product and motivate attention scaling.",
+    "checks": ["variance grows with d", "square-root scaling", "softmax saturation", "assumption caveat"]
+  },
+  {
+    "id": "importance-sampling",
+    "minutes": 15,
+    "prompt": "Derive an importance-sampling estimator and explain when its variance becomes unusable.",
+    "checks": ["support condition", "density ratio", "unbiased estimator", "effective sample size"]
+  }
+]

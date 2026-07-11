@@ -62,18 +62,36 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'most-ambitious-project': 'Behavioral',
   'advocated-quality-over-speed': 'Behavioral',
   'killed-ml-project': 'Behavioral',
+  'present-technical-ml-project': 'Behavioral',
+  'defend-values-under-ethical-pressure': 'Behavioral',
 
   'derive-logistic-regression': 'Math & Research',
   'softmax-cross-entropy-pairing': 'Math & Research',
   'reparameterization-trick': 'Math & Research',
   'design-ablation-study': 'Math & Research',
   'critique-ml-paper': 'Math & Research',
+  'investigate-black-box-model-behavior': 'Math & Research',
+  'derive-ml-math-under-pressure': 'Math & Research',
 
   'implement-knn': 'ML Implementation',
   'debug-training-loop': 'ML Implementation',
   'implement-attention-from-scratch': 'ML Implementation',
   'implement-batched-top-k': 'ML Implementation',
   'implement-streaming-classification-metrics': 'ML Implementation',
+  'agentic-ml-codebase-interview': 'ML Implementation',
+  'debug-frontier-llm-training-run': 'ML Implementation',
+  'optimize-accelerator-workload': 'ML Implementation',
+  'implement-transformer-decoder': 'ML Implementation',
+  'implement-kv-cache-decode': 'ML Implementation',
+  'implement-beam-search': 'ML Implementation',
+  'implement-lora-adapter': 'ML Implementation',
+  'implement-reverse-mode-autograd': 'ML Implementation',
+
+  'design-production-llm-inference-service': 'ML System Design',
+  'design-fault-tolerant-distributed-training': 'ML System Design',
+
+  'design-post-training-data-and-rl-environment': 'LLM Systems',
+  'design-llm-red-team-program': 'LLM Systems',
 };
 
 export const INTERVIEW_ORDER = [
@@ -160,6 +178,8 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'contextual-bandits': 'Reinforcement Learning',
   'reward-shaping': 'Reinforcement Learning',
   'multi-agent-reinforcement-learning': 'Reinforcement Learning',
+  'rl-environments-and-graders': 'Reinforcement Learning',
+  'robotics-policy-learning': 'Reinforcement Learning',
 
   // Computer Vision
   'cnn-architecture': 'Computer Vision',
@@ -171,6 +191,7 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'semantic-segmentation': 'Computer Vision',
   'domain-adaptation': 'Computer Vision',
   'adversarial-robustness': 'Computer Vision',
+  'multimodal-foundation-models': 'Computer Vision',
 
   // NLP & Speech
   'automatic-speech-recognition': 'NLP & Speech',
@@ -217,6 +238,12 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'decoding-strategies': 'LLM Internals',
   'multi-head-attention': 'LLM Internals',
   'self-attention-vs-cross-attention': 'LLM Internals',
+  'mechanistic-interpretability': 'LLM Internals',
+  'chain-of-thought-monitorability': 'LLM Internals',
+  'scalable-oversight-and-ai-control': 'LLM Internals',
+  'model-organisms-of-misalignment': 'LLM Internals',
+  'llm-security-threat-models': 'LLM Internals',
+  'preference-data-and-reward-models': 'LLM Internals',
 
   // Training Fundamentals
   'cross-entropy-softmax': 'Training Fundamentals',
@@ -239,6 +266,8 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'neural-network-training-recipe': 'Training Fundamentals',
   'wsd-and-wsd-s': 'Training Fundamentals',
   'z-loss': 'Training Fundamentals',
+  'foundation-model-data-curation': 'Training Fundamentals',
+  'loss-spikes-at-scale': 'Training Fundamentals',
 
   // Systems & Infrastructure
   'gpu-memory-hierarchy': 'Systems & Infrastructure',
@@ -250,6 +279,7 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'all-reduce-and-collectives': 'Systems & Infrastructure',
   'knowledge-distillation': 'Systems & Infrastructure',
   'pruning': 'Systems & Infrastructure',
+  'fault-tolerant-collectives': 'Systems & Infrastructure',
 
   // ML Systems & Evaluation
   'ab-testing-for-ml': 'ML Systems & Evaluation',
