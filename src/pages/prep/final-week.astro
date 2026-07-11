@@ -1,0 +1,77 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+
+const groups = [
+  { title: '7–5 days before · Simulate early', items: ['Run one realistic role-specific simulation.', 'Write the three highest-impact failures as observable behaviors.', 'Freeze the topic list unless simulation evidence reveals a critical omission.', 'Schedule final retries with at least one day between attempts.', 'Confirm every expected round has a recent full attempt.', 'Confirm six stories cover ambiguity, failure, impact, conflict, prioritization, and leadership.'] },
+  { title: '4–3 days before · Repair narrowly', items: ['Retry the weakest critical answer before reviewing notes.', 'Repair one rubric dimension at a time—not an entire domain.', 'Practice one long round at full timing if it was weak in simulation.', 'Rehearse story openings and ownership boundaries, not memorized prose.', 'Prepare two thoughtful questions about the role, team, or technical environment.'] },
+  { title: '2 days before · Reduce volume', items: ['Run one short mixed session; stop while retrieval is sharp.', 'Review concise outlines, formulas, and known failure points only.', 'Avoid a second full-loop simulation or an all-night question sprint.', 'Confirm interview time, time zone, format, contacts, and required links.', 'Test camera, microphone, screen sharing, editor, and backup connection if remote.'] },
+  { title: '1 day before · Protect performance', items: ['Do at most two light confidence-building answers.', 'Set up a quiet space, water, charger, notebook, and permitted materials.', 'Prepare a concise role narrative: why this work, why this level, why now.', 'Stop preparation at a defined time and protect sleep.', 'Treat nervousness as activation—not a signal to add content.'] },
+  { title: 'Interview day · Execute the process', items: ['Join or arrive early enough to resolve logistics without rushing.', 'Clarify the objective and constraints before solving.', 'State an outline, make decisions explicit, and invite alignment.', 'When stuck, expose assumptions and reason forward instead of going silent.', 'After each round, write only essential notes and reset for the next one.'] },
+];
+---
+
+<PrepLayout
+  title="Final-week senior ML interview checklist"
+  description="A role-aware final-week checklist for consolidating ML interview preparation without cramming."
+  heading="Consolidate. Simulate. Then taper."
+  lede="The final week should improve retrieval and execution—not maximize new coverage. Use one early simulation, narrow repairs, explicit risk gates, and protected recovery."
+>
+  <div class="checklist-controls"><p><strong data-complete-count>0</strong> of <span>{groups.reduce((sum, group) => sum + group.items.length, 0)}</span> complete</p><div><button class="print-button" type="button" data-print>Print checklist</button><button class="print-button" type="button" data-reset>Reset</button></div></div>
+  <div class="progress-track" aria-hidden="true"><span data-progress></span></div>
+  <form class="final-checklist">{groups.map((group) => <fieldset><legend>{group.title}</legend>{group.items.map((item) => <label><input type="checkbox" /><span>{item}</span></label>)}</fieldset>)}</form>
+
+  <h2>Role-specific final checks</h2>
+  <div class="role-grid">
+    <article><h3>Applied Scientist</h3><ul><li>One ML design answer connects product decision, metrics, and operational reality.</li><li>Project evidence shows both scientific depth and shipping judgment.</li><li>Experiment answers include guardrails and practical ship criteria.</li></ul></article>
+    <article><h3>Machine Learning Engineer</h3><ul><li>At least one full coding attempt compiles or runs correctly under time.</li><li>Design answers cover rollback, monitoring, ownership, and cost.</li><li>Debugging starts with measurements and a systematic isolation order.</li></ul></article>
+    <article><h3>Research Engineer</h3><ul><li>Implementation and systems answers quantify bottlenecks.</li><li>Research critique distinguishes claims from evidence and alternatives.</li><li>Project deep-dive connects experiments to reliable infrastructure.</li></ul></article>
+  </div>
+
+  <section class="risk-gate">
+    <h2>Make the risk decision explicitly</h2>
+    <div><article><h3>Proceed</h3><p>Every critical round is attempted; no critical round remains consistently Weak; remaining misses are bounded.</p></article><article><h3>Proceed with known risk</h3><p>One inconsistent area has a concrete repair and spaced retry before the loop. Do not pretend the risk is gone.</p></article><article><h3>Extend or move when possible</h3><p>More than one critical round remains Weak, coding/design cannot reach a baseline in time, or story ownership collapses under follow-up.</p></article></div>
+  </section>
+
+  <section class="callout"><h2>Three things not to do</h2><ul><li>Do not replace sleep with low-quality coverage.</li><li>Do not memorize full scripts that break under follow-up.</li><li>Do not reinterpret one weak attempt as evidence that everything is weak—or one fluent repetition as proof of readiness.</li></ul></section>
+
+  <h2>If time collapses</h2>
+  <p>Keep four actions: one mixed simulation, repair its two largest failures, rehearse the six-story bank, and verify logistics. Remove new topics first.</p>
+  <p><a href="/prep/simulations/">Open simulations →</a> · <a href="/prep/progress/">Review due retries →</a> · <a href="/prep/practice/">Practice method →</a></p>
+</PrepLayout>
+
+<script>
+  const checklist = document.querySelector<HTMLFormElement>('.final-checklist');
+  const boxes = [...document.querySelectorAll<HTMLInputElement>('.final-checklist input[type="checkbox"]')];
+  const complete = document.querySelector('[data-complete-count]');
+  const progress = document.querySelector<HTMLElement>('[data-progress]');
+  const update = () => { const checked = boxes.filter((box) => box.checked).length; if (complete) complete.textContent = String(checked); if (progress) progress.style.width = `${boxes.length ? checked / boxes.length * 100 : 0}%`; };
+  checklist?.addEventListener('change', update);
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+  document.querySelector('[data-reset]')?.addEventListener('click', () => { checklist?.reset(); update(); });
+  update();
+</script>
+
+<style>
+  .checklist-controls { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .checklist-controls p { margin: 0; color: var(--c-text-soft); }
+  .checklist-controls > div { display: flex; gap: .5rem; }
+  .progress-track { height: .35rem; margin: .8rem 0 1.5rem; overflow: hidden; border-radius: 999px; background: var(--c-rule); }
+  .progress-track span { display: block; width: 0; height: 100%; background: var(--c-accent-fill); transition: width 180ms ease; }
+  .final-checklist { display: grid; gap: .8rem; }
+  fieldset { margin: 0; padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); break-inside: avoid; }
+  legend { padding: 0 .4rem; font-family: var(--font-display); font-weight: 700; }
+  fieldset label { display: flex; align-items: flex-start; gap: .65rem; padding: .5rem 0; border-bottom: 1px solid var(--c-rule-soft); }
+  fieldset label:last-child { border-bottom: 0; }
+  fieldset input { margin-top: .35rem; accent-color: var(--c-accent-fill); }
+  fieldset span { color: var(--c-text-soft); }
+  .role-grid, .risk-gate > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .role-grid article, .risk-gate article { padding: .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .role-grid h3, .risk-gate h3 { margin-top: 0 !important; }
+  .role-grid ul { padding-left: 1rem; }
+  .role-grid li, .risk-gate p { font-size: .84rem; }
+  .risk-gate article:last-child { border-color: var(--c-accent); }
+  @media (max-width: 720px) { .role-grid, .risk-gate > div { grid-template-columns: 1fr; } .checklist-controls { align-items: stretch; flex-direction: column; } .checklist-controls > div, .checklist-controls button { width: 100%; } }
+  @media print { .checklist-controls, .progress-track { display: none; } fieldset { margin-bottom: .6rem; } }
+</style>

@@ -1,0 +1,159 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+
+const stories = [
+  { id: 'ambiguity', label: 'Ambiguous problem', prompt: 'You created clarity when the goal, owner, or path was unclear.', coverage: ['scoping', 'ownership', 'product judgment'] },
+  { id: 'failure', label: 'Technical failure', prompt: 'A model, experiment, or system failed and you changed the outcome.', coverage: ['failure', 'debugging', 'recovery'] },
+  { id: 'impact', label: 'High-impact project', prompt: 'Your decisions produced a measurable result across meaningful scope.', coverage: ['project deep-dive', 'impact', 'technical depth'] },
+  { id: 'disagreement', label: 'Disagreement', prompt: 'You challenged a decision, handled conflict, or changed your own position.', coverage: ['conflict', 'influence', 'low ego'] },
+  { id: 'constraint', label: 'Trade-off under constraint', prompt: 'You balanced quality, time, cost, risk, or organizational limits.', coverage: ['judgment', 'prioritization', 'trade-offs'] },
+  { id: 'leadership', label: 'Leadership and mentoring', prompt: 'You raised the effectiveness or judgment of people beyond your own work.', coverage: ['mentoring', 'leadership', 'influence'] },
+  { id: 'wrong-bet', label: 'Wrong bet or killed project', prompt: 'You recognized that a strategy was wrong, stopped work, or redirected investment.', coverage: ['L6 strategy', 'recovery', 'decision not to build'] },
+  { id: 'quality-risk', label: 'Quality or safety versus speed', prompt: 'You argued for evidence, reliability, or user protection under delivery pressure.', coverage: ['responsibility', 'pushback', 'risk'] },
+];
+---
+
+<PrepLayout
+  title="Senior ML interview story-bank and rehearsal worksheet"
+  description="A private, level-calibrated worksheet for building, rehearsing, saving, and exporting senior ML interview stories."
+  heading="Build stories that survive three layers of follow-up."
+  lede="A senior story needs a direct answer, bounded ownership, a consequential decision, evidence, and reflection. Prepare a 90-second opening and a deeper version—never a memorized script."
+>
+  <section class="privacy-strip">
+    <div><p><strong>Not submitted anywhere.</strong> Entries stay in this page unless you explicitly save or export. Saved text may contain sensitive details; use anonymized shorthand and a trusted device.</p><p class="save-status" data-save-status aria-live="polite"></p></div>
+    <div class="story-actions"><button class="print-button" type="button" data-save>Save on this device</button><button class="print-button" type="button" data-export>Export JSON</button><button class="print-button" type="button" data-print>Print</button><button class="print-button danger" type="button" data-clear>Clear</button></div>
+  </section>
+
+  <h2>Level calibration before drafting</h2>
+  <div class="level-grid">
+    <article><h3>L4</h3><p>Reliable execution in bounded scope. Show correctness, debugging, and learning.</p></article>
+    <article><h3>L5</h3><p>Autonomous decisions across a project area. Show alternatives, end-to-end ownership, and operational outcome.</p></article>
+    <article><h3>L6</h3><p>Problem and strategy selection across teams. Show influence, wrong bets, killed work, and hands-on technical depth.</p></article>
+  </div>
+
+  <form class="story-form" autocomplete="off">
+    {stories.map((story, index) => (
+      <section class="story-card" data-story={story.id}>
+        <header><span>{String(index + 1).padStart(2, '0')}</span><div><h2>{story.label}</h2><p>{story.prompt}</p><ul>{story.coverage.map((item) => <li>{item}</li>)}</ul></div></header>
+        <div class="story-fields">
+          <label><span>Private shorthand</span><input data-field="shorthand" type="text" placeholder="A memorable label—not a company or person name" /></label>
+          <label><span>Target level this story proves</span><select data-field="level"><option value="l4">L4 · bounded execution</option><option value="l5" selected>L5 · autonomous project ownership</option><option value="l6">L6 · strategy and cross-team influence</option></select></label>
+          <label class="wide"><span>90–120 second opening</span><textarea data-field="opening" rows="4" placeholder="Answer the exact question: stakes → your decision/actions → evidence → reflection"></textarea></label>
+          <label><span>Situation and stakes</span><textarea data-field="situation" rows="3" placeholder="Who was affected? What was at risk? Why was this hard at the target level?"></textarea></label>
+          <label><span>The consequential decision</span><textarea data-field="decision" rows="3" placeholder="Alternatives, evidence available at the time, your choice, and why"></textarea></label>
+          <label><span>I personally owned</span><textarea data-field="owned" rows="3" placeholder="Use bounded I-verbs: scoped, decided, designed, changed, stopped, influenced"></textarea></label>
+          <label><span>Others owned</span><textarea data-field="others" rows="3" placeholder="Credit collaborators precisely; avoid inflating your role"></textarea></label>
+          <label><span>Failure, conflict, or changed belief</span><textarea data-field="failure" rows="3" placeholder="What assumption broke? What signal changed your mind? How did you respond?"></textarea></label>
+          <label><span>Result and defensible evidence</span><textarea data-field="result" rows="3" placeholder="Output versus outcome, scale or direction, guardrails, and what you cannot attribute"></textarea></label>
+          <label><span>Reflection</span><textarea data-field="reflection" rows="3" placeholder="A principle you now use and one thing you would do differently"></textarea></label>
+          <label><span>Three skeptical follow-ups</span><textarea data-field="followups" rows="3" placeholder="What exactly did you decide? Why not the alternative? How do you know your action caused the outcome?"></textarea></label>
+          <label class="wide"><span>Five-minute deep-dive map</span><textarea data-field="deepDive" rows="4" placeholder="Technical mechanism → failed path → evidence → trade-off → influence → deeper metrics/details"></textarea></label>
+        </div>
+      </section>
+    ))}
+  </form>
+
+  <h2>Delivery rubric</h2>
+  <ul class="checklist">
+    <li><label><input type="checkbox" /> The first sentence directly answers the question asked.</label></li>
+    <li><label><input type="checkbox" /> The opening finishes in 90–120 seconds and leaves room for follow-ups.</label></li>
+    <li><label><input type="checkbox" /> “I owned” and “others owned” remain precise three follow-ups deep.</label></li>
+    <li><label><input type="checkbox" /> Scope matches the target level without vague strategic language.</label></li>
+    <li><label><input type="checkbox" /> At least one concrete failure, disagreement, or changed belief is visible.</label></li>
+    <li><label><input type="checkbox" /> Evidence is defensible and distinguishes output, outcome, and attribution.</label></li>
+    <li><label><input type="checkbox" /> The story remains collaborative when an observer pushes back.</label></li>
+    <li><label><input type="checkbox" /> No confidential names, unreleased details, customer data, or exact protected metrics appear.</label></li>
+  </ul>
+
+  <h2>Coverage matrix</h2>
+  <p>Before the loop, make sure the bank—not every single story—covers these signals.</p>
+  <div class="coverage-grid">{['Ambiguous scoping', 'Technical depth', 'Production failure', 'Prioritization', 'Conflict', 'Cross-team influence', 'Mentoring', 'Wrong bet / killed work', 'Quality or safety pushback', 'Measurable impact'].map((item) => <label><input type="checkbox" /> {item}</label>)}</div>
+
+  <section class="callout"><h2>Rehearsal sequence</h2><ol><li>Record the 90-second opening.</li><li>Check whether it answered the exact prompt.</li><li>Ask a peer to choose three follow-ups and challenge one assumption.</li><li>Score ownership, evidence, and response to pushback—not eloquence.</li><li>Rewrite only the outline, then retell without memorizing prose.</li></ol><p><a href="/questions/most-ambitious-project/">Practice the ambitious-project deep-dive →</a></p></section>
+</PrepLayout>
+
+<script>
+  const STORAGE_KEY = 'mlm:story-bank:v1';
+  const cards = () => Array.from(document.querySelectorAll<HTMLElement>('[data-story]'));
+  const status = document.querySelector<HTMLElement>('[data-save-status]');
+  let priorHeights: string[] = [];
+
+  type StoryData = { id: string; fields: Record<string, string> };
+  function collect(): StoryData[] {
+    return cards().map((card) => ({
+      id: card.dataset.story ?? '',
+      fields: Object.fromEntries([...card.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[data-field]')].map((field) => [field.dataset.field ?? '', field.value])),
+    }));
+  }
+  function restore(stories: StoryData[]): void {
+    stories.forEach((story) => {
+      const card = document.querySelector<HTMLElement>(`[data-story="${CSS.escape(story.id)}"]`);
+      if (!card) return;
+      Object.entries(story.fields).forEach(([name, value]) => {
+        const field = card.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`[data-field="${CSS.escape(name)}"]`);
+        if (field) field.value = value;
+      });
+    });
+  }
+  function clearForm(): void {
+    document.querySelector<HTMLFormElement>('.story-form')?.reset();
+    document.querySelectorAll<HTMLInputElement>('.checklist input, .coverage-grid input').forEach((input) => { input.checked = false; });
+  }
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+    if (Array.isArray(saved?.stories)) { restore(saved.stories); if (status) status.textContent = 'Restored a locally saved story bank.'; }
+  } catch { if (status) status.textContent = 'Saved story data could not be read.'; }
+
+  document.querySelector('[data-save]')?.addEventListener('click', () => {
+    if (!window.confirm('Save this potentially sensitive story text in local browser storage on this device?')) return;
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, stories: collect() })); if (status) status.textContent = 'Saved on this device only.'; }
+    catch { if (status) status.textContent = 'Could not save locally. Export a private copy instead.'; }
+  });
+  document.querySelector('[data-export]')?.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), stories: collect() }, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'mlmentorship-story-bank.json'; link.click(); URL.revokeObjectURL(link.href);
+  });
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+  document.querySelector('[data-clear]')?.addEventListener('click', () => {
+    if (!window.confirm('Clear the form and remove the locally saved story bank?')) return;
+    localStorage.removeItem(STORAGE_KEY); clearForm(); if (status) status.textContent = 'Story bank cleared.';
+  });
+  window.addEventListener('beforeprint', () => { const textareas = [...document.querySelectorAll<HTMLTextAreaElement>('.story-form textarea')]; priorHeights = textareas.map((textarea) => textarea.style.height); textareas.forEach((textarea) => { textarea.style.height = `${textarea.scrollHeight}px`; }); });
+  window.addEventListener('afterprint', () => { document.querySelectorAll<HTMLTextAreaElement>('.story-form textarea').forEach((textarea, index) => { textarea.style.height = priorHeights[index] ?? ''; }); });
+</script>
+
+<style>
+  .privacy-strip { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); }
+  .privacy-strip p { margin: 0; color: var(--c-text-soft); font-size: .84rem; }
+  .save-status { min-height: 1.25rem; margin-top: .25rem !important; color: var(--c-accent) !important; }
+  .story-actions { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: flex-end; }
+  .danger { color: #b91c1c !important; }
+  .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; }
+  .level-grid article { padding: .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .level-grid h3, .level-grid p { margin: 0; }
+  .level-grid p { margin-top: .3rem; color: var(--c-text-soft); font-size: .82rem; }
+  .story-form { display: grid; gap: 1rem; margin-top: 1.2rem; }
+  .story-card { padding: clamp(1rem, 3vw, 1.4rem); border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); break-inside: avoid; }
+  .story-card > header { display: grid; grid-template-columns: 2rem 1fr; gap: .7rem; margin-bottom: .9rem; }
+  .story-card > header > span { font-family: var(--font-mono); color: var(--c-accent); font-size: .75rem; }
+  .story-card h2, .story-card header p { margin: 0 !important; }
+  .story-card header p { color: var(--c-text-soft); font-size: .84rem; }
+  .story-card header ul { display: flex; flex-wrap: wrap; gap: .3rem; list-style: none; margin: .45rem 0 0; padding: 0; }
+  .story-card header li { padding: .15rem .35rem; border-radius: 999px; background: var(--c-bg-tint); font-size: .68rem; }
+  .story-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+  .story-fields .wide { grid-column: 1 / -1; }
+  .story-fields label > span { display: block; margin-bottom: .3rem; font-size: .78rem; font-weight: 700; }
+  input[type='text'], textarea, select { width: 100%; padding: .65rem .7rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; line-height: 1.45; }
+  textarea { resize: vertical; }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding: .5rem 0; border-bottom: 1px solid var(--c-rule-soft); }
+  .checklist label, .coverage-grid label { display: flex; align-items: flex-start; gap: .55rem; }
+  .checklist input, .coverage-grid input { margin-top: .3rem; accent-color: var(--c-accent-fill); }
+  .coverage-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+  .coverage-grid label { padding: .6rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  @media (max-width: 760px) { .privacy-strip { align-items: stretch; flex-direction: column; } .story-actions, .story-actions button { width: 100%; } .level-grid, .story-fields, .coverage-grid { grid-template-columns: 1fr; } .story-fields .wide { grid-column: auto; } }
+  @media print { .privacy-strip { display: none; } .story-card { break-inside: avoid-page; margin-bottom: .6rem; } input, textarea, select { border-color: #aaa; background: #fff; color: #111; } }
+</style>

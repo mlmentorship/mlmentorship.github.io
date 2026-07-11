@@ -13,11 +13,14 @@ const { title, description, heading, lede, eyebrow = 'Free prep resources' } = A
 const pathname = Astro.url.pathname;
 const resources = [
   { href: '/prep/', label: 'Overview' },
-  { href: '/readiness/', label: 'Readiness check' },
-  { href: '/practice/', label: 'Practice method' },
-  { href: '/story-bank/', label: 'Story bank' },
-  { href: '/plans/', label: '2 / 4 / 8 week plans' },
-  { href: '/final-week/', label: 'Final week' },
+  { href: '/prep/readiness/', label: 'Readiness' },
+  { href: '/prep/plans/', label: 'Plans' },
+  { href: '/prep/role-paths/', label: 'Role paths' },
+  { href: '/prep/practice/', label: 'Practice' },
+  { href: '/prep/progress/', label: 'Progress' },
+  { href: '/prep/story-bank/', label: 'Story bank' },
+  { href: '/prep/simulations/', label: 'Simulations' },
+  { href: '/prep/final-week/', label: 'Final week' },
 ];
 ---
 
@@ -28,6 +31,13 @@ const resources = [
       <h1>{heading}</h1>
       <p>{lede}</p>
     </header>
+
+    <nav class="library-strip" aria-label="Core interview library">
+      <span>Core library</span>
+      <a href="/questions/">Questions</a>
+      <a href="/guides/">Guides</a>
+      <a href="/concepts/">Concepts</a>
+    </nav>
 
     <nav class="prep-nav" aria-label="Preparation resources">
       {resources.map((resource) => (
@@ -47,6 +57,10 @@ const resources = [
   .prep-eyebrow { margin: 0 0 .75rem !important; font-family: var(--font-mono); font-size: .7rem !important; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--c-accent) !important; }
   .prep-hero h1 { margin: 0 0 1rem; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -.035em; }
   .prep-hero > p:last-child { max-width: 43rem; margin: 0; font-size: 1.08rem; line-height: 1.6; color: var(--c-text-soft); }
+  .library-strip { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem .9rem; margin-bottom: 1rem; padding: .7rem .85rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); font-family: var(--font-ui); font-size: .82rem; }
+  .library-strip span { color: var(--c-muted); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .library-strip a { color: var(--c-text); font-weight: 700; text-decoration: none; }
+  .library-strip a:hover { color: var(--c-accent); text-decoration: underline; }
   .prep-nav { display: flex; gap: .45rem; margin: 0 calc(-1 * var(--gutter)) 2.5rem; padding: 0 var(--gutter) .8rem; overflow-x: auto; border-bottom: 1px solid var(--c-rule); scrollbar-width: thin; }
   .prep-nav a { flex: 0 0 auto; padding: .45rem .65rem; border: 1px solid var(--c-rule); border-radius: 999px; color: var(--c-text-soft); font-family: var(--font-ui); font-size: .78rem; font-weight: 600; text-decoration: none; }
   .prep-nav a:hover { border-color: var(--c-accent); color: var(--c-accent); }
@@ -72,7 +86,7 @@ const resources = [
     .prep-content :global(.resource-grid) { grid-template-columns: 1fr; }
   }
   @media print {
-    :global(.masthead), :global(footer), .prep-nav, .prep-content :global(.print-button) { display: none !important; }
+    :global(.masthead), :global(footer), .library-strip, .prep-nav, .prep-content :global(.print-button) { display: none !important; }
     .prep-page { max-width: none; padding: 0; }
     .prep-hero { margin-bottom: 1rem; }
   }

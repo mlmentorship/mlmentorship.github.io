@@ -5,6 +5,8 @@ export const PUBLIC_EVENT_NAMES = [
   'rubric_revealed',
   'self_score_selected',
   'generic_plan_opened',
+  'simulation_opened',
+  'progress_opened',
 ] as const;
 
 export type PublicEventName = (typeof PUBLIC_EVENT_NAMES)[number];

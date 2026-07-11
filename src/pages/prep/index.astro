@@ -1,50 +1,79 @@
 ---
 import PrepLayout from '../../layouts/PrepLayout.astro';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 ---
 
 <PrepLayout
   title="Free ML interview prep tools"
   description="Private, browser-only tools and practical worksheets for senior ML interview preparation."
-  heading="Turn the library into a practice system."
-  lede="Use these free tools to choose a focus, practice closed-book, organize experience stories, and structure the time you have. No account or personal profile required."
+  heading="A practice system built around the core library."
+  lede="Start with the Questions, Guides, and Concepts library. Use the tools here only to choose what matters, schedule retrieval, inspect failures, and decide whether you are ready."
 >
+  <section class="library-primary" aria-labelledby="library-primary-heading">
+    <p class="section-kicker">Start here</p>
+    <h2 id="library-primary-heading">The library remains the source of truth</h2>
+    <div class="resource-grid">
+      <a class="resource-card" href="/questions/"><h3>Questions</h3><p>Level-calibrated interview prompts with strong-hire and down-leveling signals.</p></a>
+      <a class="resource-card" href="/guides/"><h3>Guides</h3><p>Senior-IC positions on role calibration, system design, evaluation, and applied practice.</p></a>
+      <a class="resource-card" href="/concepts/"><h3>Concepts</h3><p>Fast reference notes for mechanisms, math, training, systems, and LLM internals.</p></a>
+    </div>
+  </section>
+
+  <h2>Preparation workflow</h2>
   <div class="resource-grid">
-    <a class="resource-card" href="/readiness/">
+    <a class="resource-card" href="/prep/readiness/">
       <h2>Readiness check</h2>
-      <p>Identify three broad focus areas and choose a 2-, 4-, or 8-week starting plan.</p>
+      <p>Separate real round formats from domains, estimate workload, and identify three evidence-based gaps.</p>
     </a>
-    <a class="resource-card" href="/practice/">
+    <a class="resource-card" href="/prep/plans/">
+      <h2>Executable plans</h2>
+      <p>Choose 2, 4, or 8 weeks with explicit 5/8/12-hour workloads, outputs, links, and exit gates.</p>
+    </a>
+    <a class="resource-card" href="/prep/role-paths/">
+      <h2>Role and domain paths</h2>
+      <p>Follow an ordered AS, MLE, or RE core sequence, then add only the domain supplement in your actual loop.</p>
+    </a>
+    <a class="resource-card" href="/prep/practice/">
       <h2>Practice method</h2>
-      <p>Use closed-book attempts, a five-part rubric, and delayed retries instead of rereading.</p>
+      <p>Use round-specific timers and rubrics, diagnose weak dimensions, and schedule retries.</p>
     </a>
-    <a class="resource-card" href="/story-bank/">
+    <a class="resource-card" href="/prep/progress/">
+      <h2>Progress & retry queue</h2>
+      <p>See what is due on this device, repeated weak dimensions, and whether gaps truly graduated.</p>
+    </a>
+    <a class="resource-card" href="/prep/story-bank/">
       <h2>Story-bank worksheet</h2>
-      <p>Build a compact set of evidence-rich behavioral and project stories.</p>
+      <p>Build, save locally, export, rehearse, and level-calibrate evidence-rich stories.</p>
     </a>
-    <a class="resource-card" href="/plans/">
-      <h2>Generic prep plans</h2>
-      <p>Pick a realistic 2-, 4-, or 8-week cadence and adapt it to your interview loop.</p>
+    <a class="resource-card" href="/prep/simulations/">
+      <h2>Simulation packets</h2>
+      <p>Run realistic AS, MLE, or RE loops with prompt pools, observers, scoring, and go/no-go gates.</p>
     </a>
-    <a class="resource-card" href="/final-week/">
+    <a class="resource-card" href="/prep/final-week/">
       <h2>Final-week checklist</h2>
       <p>Consolidate, simulate, and protect retrieval quality without cramming new topics.</p>
-    </a>
-    <a class="resource-card" href="/questions/">
-      <h2>Question library</h2>
-      <p>Start Practice Mode directly from any of the level-calibrated interview questions.</p>
     </a>
   </div>
 
   <section class="callout">
     <h2>Privacy by design</h2>
-    <p>The readiness calculation runs in your browser. Practice scratchpad text is never saved or sent. Story-bank and checklist text stays on the current page unless you print it. Anonymous analytics record only coarse actions such as starting a practice attempt—not selections or written content.</p>
+    <p>The readiness calculation runs in your browser. Scratchpad text is never saved or sent. Optional local progress contains only question IDs, rubric dimensions, scores, and due dates. Story text is stored only if you explicitly choose “Save on this device.” Anonymous analytics record coarse actions—not selections or written content.</p>
   </section>
 
   <h2>A simple sequence</h2>
   <ol class="step-list">
     <li><strong>Choose a focus.</strong> Take the readiness check once; do not keep retaking it to chase a better result.</li>
-    <li><strong>Choose a horizon.</strong> Use the shortest plan that still leaves room for retries and one full-loop simulation.</li>
+    <li><strong>Choose a horizon and workload.</strong> Use the shortest plan that fits your actual weekly hours and still leaves room for retries and simulation.</li>
     <li><strong>Practice before reading.</strong> Attempt questions aloud, reveal the rubric, then compare against the reference.</li>
-    <li><strong>Consolidate.</strong> Revisit weak attempts after two days and finish with the final-week checklist.</li>
+    <li><strong>Prove improvement.</strong> Graduate a critical gap only after two spaced successful attempts and one unfamiliar follow-up.</li>
   </ol>
 </PrepLayout>
+
+<style>
+  .library-primary { margin: 0 0 2.5rem; padding: 1.2rem; border: 2px solid var(--c-text); border-radius: var(--radius-lg); }
+  .library-primary h2 { margin: .15rem 0 1rem !important; }
+  .library-primary :global(.resource-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 0; }
+  .section-kicker { margin: 0; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
+  @media (max-width: 720px) { .library-primary :global(.resource-grid) { grid-template-columns: 1fr; } }
+</style>

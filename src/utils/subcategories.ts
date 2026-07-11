@@ -27,12 +27,10 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'fine-tuning-deep': 'LLM Systems',
   'handle-hallucinations-in-production': 'LLM Systems',
   'reduce-llm-inference-cost-10x': 'LLM Systems',
-  'implement-attention-from-scratch': 'LLM Systems',
   'walk-through-speculative-decoding': 'LLM Systems',
   'rag-for-legal-docs': 'LLM Systems',
   'evaluate-an-agent': 'LLM Systems',
   'evals-for-coding-assistant': 'LLM Systems',
-  'ab-test-chatbot': 'LLM Systems',
   'llm-deployment-healthcare': 'LLM Systems',
   'build-llm-coding-assistant': 'LLM Systems',
 
@@ -50,30 +48,45 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'real-time-personalization': 'ML System Design',
   'design-feature-store': 'ML System Design',
   'design-ml-monitoring': 'ML System Design',
+  'design-ml-system-fixed-budget': 'ML System Design',
+
+  'ab-test-chatbot': 'Product & Experimentation',
+  'design-ml-ab-test': 'Product & Experimentation',
+  'debug-offline-online-metric-gap': 'Product & Experimentation',
+  'choose-ml-product-metrics': 'Product & Experimentation',
+  'analyze-experiment-sql': 'Product & Experimentation',
 
   'decide-what-to-work-on': 'Behavioral',
   'disagreed-with-senior': 'Behavioral',
   'most-overrated-technique': 'Behavioral',
   'scope-ambiguous-problem': 'Behavioral',
   'most-ambitious-project': 'Behavioral',
+  'advocated-quality-over-speed': 'Behavioral',
+  'killed-ml-project': 'Behavioral',
 
-  'derive-logistic-regression': 'Math',
-  'softmax-cross-entropy-pairing': 'Math',
-  'reparameterization-trick': 'Math',
+  'derive-logistic-regression': 'Math & Research',
+  'softmax-cross-entropy-pairing': 'Math & Research',
+  'reparameterization-trick': 'Math & Research',
+  'design-ablation-study': 'Math & Research',
+  'critique-ml-paper': 'Math & Research',
 
   'implement-knn': 'Coding',
   'debug-training-loop': 'Coding',
+  'implement-attention-from-scratch': 'Coding',
+  'implement-batched-top-k': 'Coding',
+  'implement-streaming-classification-metrics': 'Coding',
 };
 
 export const INTERVIEW_ORDER = [
   'ML Fundamentals',
+  'Math & Research',
+  'Coding',
+  'ML System Design',
+  'Product & Experimentation',
   'Deep Learning Production',
   'LLM Systems',
   'Recsys & Search',
-  'ML System Design',
   'Behavioral',
-  'Math',
-  'Coding',
 ];
 
 export const REFERENCE_SUBCATEGORY: Record<string, string> = {
@@ -145,6 +158,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'actor-critic-methods': 'Reinforcement Learning',
   'advantage-estimation-and-gae': 'Reinforcement Learning',
   'exploration-vs-exploitation': 'Reinforcement Learning',
+  'contextual-bandits': 'Reinforcement Learning',
+  'reward-shaping': 'Reinforcement Learning',
+  'multi-agent-reinforcement-learning': 'Reinforcement Learning',
 
   // Computer Vision
   'cnn-architecture': 'Computer Vision',
@@ -153,6 +169,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'object-detection-overview': 'Computer Vision',
   'anchor-boxes-and-nms': 'Computer Vision',
   'convolution-as-matmul': 'Computer Vision',
+  'semantic-segmentation': 'Computer Vision',
+  'domain-adaptation': 'Computer Vision',
+  'adversarial-robustness': 'Computer Vision',
 
   // NLP & Speech
   'automatic-speech-recognition': 'NLP & Speech',
@@ -162,6 +181,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'lstm-and-gru': 'NLP & Speech',
   'rnn-transducer': 'NLP & Speech',
   'word-embeddings': 'NLP & Speech',
+  'streaming-asr': 'NLP & Speech',
+  'speaker-recognition': 'NLP & Speech',
+  'hybrid-vs-end-to-end-asr': 'NLP & Speech',
 
   // Retrieval & Recommenders
   'alternating-least-squares': 'Retrieval & Recommenders',

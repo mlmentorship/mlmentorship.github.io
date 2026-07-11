@@ -1,0 +1,209 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { LEVEL_OVERLAYS, ROLE_OVERLAYS } from '../../data/prepCurriculum';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+
+const workloads = [
+  { hours: 5, label: 'Minimum', newAttempts: '1 short', longRounds: '1 alternating long round', retries: '2', stories: '1 rehearsal', note: 'Reduce new topics first; keep retries and simulation.' },
+  { hours: 8, label: 'Standard', newAttempts: '2 short', longRounds: '1 long round', retries: '3', stories: '1–2 rehearsals', note: 'The weekly schedules below assume this workload.' },
+  { hours: 12, label: 'Intensive', newAttempts: '3 short', longRounds: '2 long rounds', retries: '4', stories: '2 rehearsals', note: 'Add depth and feedback—not indiscriminate topic coverage.' },
+];
+
+const plans = [
+  {
+    id: 'plan-2-week', title: '2-week plan', eyebrow: 'Fast consolidation · 16 standard hours', bestFor: 'A candidate whose important rounds already produce workable timed answers.',
+    warning: 'This is not a foundation-building plan. If three critical areas are at 0–2 evidence, use four or eight weeks when possible.',
+    weeks: [
+      {
+        title: 'Week 1 · Diagnose and repair', focus: 'Prove the baseline, choose three gaps, and begin delayed retrieval.',
+        blocks: [
+          '2 × 45 min — timed short-form baselines from different critical rounds, including rubric review',
+          '1 × 90 min — one full-length coding, design, research, or project deep-dive baseline',
+          '2 × 45 min — delayed retries of the weakest dimensions, at least 48 hours later',
+          '1 × 90 min — draft six story outlines; rehearse the two most level-relevant stories',
+          '1 × 60 min — repair only mechanisms or evidence exposed by attempts',
+          '1 × 30 min — update the retry queue and schedule Week 2',
+          '1 × 30 min — flex, spillover, or an extra due retry',
+        ],
+        links: [
+          { label: 'Run the readiness check', href: '/prep/readiness/' },
+          { label: 'Choose a question', href: '/questions/' },
+          { label: 'Build the story bank', href: '/prep/story-bank/' },
+        ],
+        output: 'Three bounded gaps, six story outlines, one long-round baseline, and every Weak result scheduled.',
+        gate: 'Each critical round has a recent baseline. If any round is still unattempted, do not call the plan “on track.”',
+      },
+      {
+        title: 'Week 2 · Simulate, repair, taper', focus: 'Integrate the loop early enough to repair evidence—not feelings.',
+        blocks: [
+          '1 × 210 min — full role-specific simulation, including short breaks; complete it early',
+          '2 × 45 min — repair the two highest-impact simulation failures',
+          '2 × 30 min — final delayed retries; no answer graduates after one good repetition',
+          '1 × 45 min — rehearse three stories in 90–120 second form with skeptical follow-ups',
+          '1 × 30 min — concise outlines, formulas, and known failure points only',
+          '1 × 45 min — logistics, spillover, and recovery; no new topic sprint',
+        ],
+        links: [
+          { label: 'Open simulation packets', href: '/prep/simulations/' },
+          { label: 'Review retry queue', href: '/prep/progress/' },
+          { label: 'Use the final-week checklist', href: '/prep/final-week/' },
+        ],
+        output: 'One scored simulation, two repaired failures, and a final list of known—not hidden—risks.',
+        gate: 'Proceed confidently only if every critical round has a workable recent attempt and the simulation exposes no unbounded failure.',
+      },
+    ],
+  },
+  {
+    id: 'plan-4-week', title: '4-week plan', eyebrow: 'Focused rebuild · 32 standard hours', bestFor: 'A candidate with a foundation but inconsistent retrieval or a small number of important gaps.',
+    warning: 'Do not spend four weeks reading. Every week contains new attempts, delayed retries, one long round, and behavioral/project evidence.',
+    weeks: [
+      {
+        title: 'Week 1 · Baseline the actual loop', focus: 'Replace confidence estimates with timed evidence.',
+        blocks: ['2 short-form baselines from distinct rounds', '1 full-length baseline from the highest-weight long round', '3 delayed retries or follow-up drills', '2 story outlines plus one spoken rehearsal', 'Targeted concept repair, weekly review, and flex'],
+        links: [{ label: 'Read role calibration', href: '/guides/as-vs-mle-vs-re/' }, { label: 'Open readiness', href: '/prep/readiness/' }, { label: 'Browse questions', href: '/questions/' }],
+        output: 'A ranked gap list, evidence for every expected round, and a role-specific allocation.',
+        gate: 'No “unknown” critical round. Untested is a result and remains the highest risk.',
+      },
+      {
+        title: 'Week 2 · Build depth without dropping other lanes', focus: 'Make the primary domain follow-up ready while continuing coding, design, and story repetitions.',
+        blocks: ['2 domain-specific short attempts with one unfamiliar follow-up each', '1 long round selected by role: coding, system design, research, or experimentation', '3 retries from Week 1 before adding optional topics', '1 project or behavioral rehearsal with ownership partition', 'One mechanism-level repair block, weekly review, and flex'],
+        links: [{ label: 'Practice method', href: '/prep/practice/' }, { label: 'Question categories', href: '/questions/' }, { label: 'Concept reference', href: '/concepts/' }],
+        output: 'One deep answer per primary technical domain and a shrinking—not merely changing—retry queue.',
+        gate: 'A strong headline answer that fails the first “why?” follow-up is not ready.',
+      },
+      {
+        title: 'Week 3 · Interleave systems, decisions, and evidence', focus: 'Remove predictable cues and pressure-test senior judgment.',
+        blocks: ['1 short breadth attempt selected at random', '1 product/experiment or transfer drill in an unfamiliar domain', '1 full coding, system design, research, or project deep-dive round', '3 delayed retries, including at least one previously improved answer', '2 behavioral stories under skeptical pushback', 'Weekly review and flex'],
+        links: [{ label: 'Experiment questions', href: '/questions/#product-and-experimentation' }, { label: 'Story bank', href: '/prep/story-bank/' }, { label: 'Progress queue', href: '/prep/progress/' }],
+        output: 'Mixed-round performance, four rehearsed stories, and evidence that prior repairs survived spacing.',
+        gate: 'At least 70% of critical rubric dimensions are solid across a mixed session; no single round is consistently Weak.',
+      },
+      {
+        title: 'Week 4 · Simulate and consolidate', focus: 'Expose integrated failure early, repair narrowly, then protect execution.',
+        blocks: ['1 full role-specific simulation in the first half of the week', '2 bounded repairs from simulation evidence', '2 final delayed retries', '2 concise story rehearsals plus role narrative', 'Final-week checklist, logistics, taper, and recovery'],
+        links: [{ label: 'Simulation packets', href: '/prep/simulations/' }, { label: 'Readiness gates', href: '#readiness-gates' }, { label: 'Final-week checklist', href: '/prep/final-week/' }],
+        output: 'A scored loop, an explicit risk decision, and no surprise unattempted round.',
+        gate: 'If a critical round remains Weak after repair, extend or move the loop when possible; do not hide it with more reading.',
+      },
+    ],
+  },
+  {
+    id: 'plan-8-week', title: '8-week plan', eyebrow: 'Breadth plus depth · 64 standard hours', bestFor: 'Role transitions, broad loops, several critical gaps, or candidates rebuilding retrieval from passive knowledge.',
+    warning: 'The focus changes by week, but the lanes do not. Every week maintains retrieval, a long round, project/behavioral evidence, and review.',
+    weeks: [
+      { title: 'Week 1 · Diagnose and bound', focus: 'Baseline actual rounds; choose three priorities; start six stories.', blocks: ['2 short baselines', '1 long-round baseline', '2 first retries', '2 story outlines and one rehearsal', 'Role/level calibration, review, and flex'], links: [{ label: 'Readiness', href: '/prep/readiness/' }, { label: 'Role guide', href: '/guides/as-vs-mle-vs-re/' }], output: 'Round map, three priorities, six story candidates.', gate: 'Every critical round is either attempted or explicitly scheduled for Week 2.' },
+      { title: 'Week 2 · Repair foundations', focus: 'Fix mechanisms that block higher-level reasoning while maintaining delivery practice.', blocks: ['2 fundamentals or math attempts', '1 role-specific long round', '3 Week 1 retries', '1 project/behavioral rehearsal', 'Targeted concept repair, review, and flex'], links: [{ label: 'ML fundamentals', href: '/questions/#ml-fundamentals' }, { label: 'Math & research', href: '/questions/#math-and-research' }], output: 'Mechanism-level answers for the highest-impact prerequisites.', gate: 'You can explain why the method works and one condition where it fails.' },
+      { title: 'Week 3 · Primary domain depth', focus: 'Connect mechanisms, metrics, failure modes, and operational decisions.', blocks: ['2 primary-domain attempts', '1 long coding/design/research round', '3 spaced retries', '1 story rehearsal with technical follow-ups', 'Reference repair, review, and flex'], links: [{ label: 'All question domains', href: '/questions/' }, { label: 'Reference library', href: '/concepts/' }], output: 'Two follow-up-ready domain answers and one defensible project decision.', gate: 'One unfamiliar follow-up does not collapse the answer into memorized phrases.' },
+      { title: 'Week 4 · Design and experimentation', focus: 'Build end-to-end judgment from objective through launch and monitoring.', blocks: ['1 ML design attempt', '1 experimentation or transfer drill', '1 role-specific long round', '3 retries', '1 behavioral rehearsal', 'Review and flex'], links: [{ label: 'ML system design', href: '/questions/#ml-system-design' }, { label: 'Product & experimentation', href: '/questions/#product-and-experimentation' }], output: 'A coherent architecture and an explicit ship/iterate/stop rule.', gate: 'The answer links offline evidence, online outcomes, guardrails, cost, and rollback.' },
+      { title: 'Week 5 · Production and implementation', focus: 'Turn models into reliable systems while preserving all other lanes.', blocks: ['1 debugging or production attempt', '1 short breadth attempt', '1 full coding or infrastructure round', '3 retries', '1 project story about failure/recovery', 'Review and flex'], links: [{ label: 'Production questions', href: '/questions/#deep-learning-production' }, { label: 'Coding questions', href: '/questions/#coding' }], output: 'A systematic debugging procedure and a tested implementation under time.', gate: 'You can identify the bottleneck or next diagnostic before proposing random fixes.' },
+      { title: 'Week 6 · Project and leadership depth', focus: 'Pressure-test level, ownership, influence, wrong bets, and killed work.', blocks: ['1 short technical maintenance attempt', '1 long project deep-dive', '3 retries', '3 behavioral stories in 90–120 seconds', 'One instructed pushback drill', 'Review and flex'], links: [{ label: 'Story bank', href: '/prep/story-bank/' }, { label: 'L5 vs L6', href: '/guides/l5-vs-l6-faang-ml/' }], output: 'Six complete stories and one 20-minute project deep-dive.', gate: 'Ownership is bounded, target-level scope is visible, and skeptical follow-ups reveal more—not less—specificity.' },
+      { title: 'Week 7 · Mixed simulation and repair', focus: 'Remove domain blocks and test the integrated loop.', blocks: ['1 full role-specific simulation', '2 high-impact repairs', '2 delayed retries', '1 recorded story review', 'One short random transfer drill', 'Risk review and flex'], links: [{ label: 'Simulation packets', href: '/prep/simulations/' }, { label: 'Progress queue', href: '/prep/progress/' }], output: 'A scored simulation and no more than three bounded repair tasks.', gate: 'If more than one critical round remains Weak, extend the plan when possible.' },
+      { title: 'Week 8 · Consolidate and taper', focus: 'Finish evidence, avoid new-topic overload, and protect interview execution.', blocks: ['2 final due retries', '1 short mixed confidence session', '2 concise story rehearsals', 'Role narrative and interviewer questions', 'Final-week checklist, logistics, rest, and flex'], links: [{ label: 'Final-week checklist', href: '/prep/final-week/' }, { label: 'Readiness gates', href: '#readiness-gates' }], output: 'Known risks, stable retrieval, tested logistics, and preserved energy.', gate: 'No critical round is unattempted; every graduated gap has two spaced successes.' },
+    ],
+  },
+];
+---
+
+<PrepLayout
+  title="Executable 2, 4, and 8-week ML interview plans"
+  description="Time-budgeted, role-aware 2-, 4-, and 8-week plans for senior ML interview preparation."
+  heading="Choose hours, not just weeks."
+  lede="A plan is executable only when it states the weekly workload, recurring practice lanes, outputs, and conditions for extending or stopping. The schedules below assume eight hours per week and show how to scale."
+>
+  <section class="plan-chooser" aria-label="Choose plan horizon">{plans.map((plan) => <a href={`#${plan.id}`}><strong>{plan.title}</strong><span>{plan.eyebrow}</span></a>)}</section>
+
+  <section class="callout"><h2>Start from evidence</h2><p>Use the <a href="/prep/readiness/">readiness and workload check</a>. Two weeks is for consolidation, four for bounded repair, and eight for transitions or several critical gaps. If your runway is shorter than the evidence suggests, triage to actual rounds or consider moving the loop.</p></section>
+
+  <h2>Weekly workload contract</h2>
+  <div class="workload-table" role="region" aria-label="Weekly workload options" tabindex="0">
+    <table><thead><tr><th>Capacity</th><th>New attempts</th><th>Long rounds</th><th>Retries</th><th>Stories</th><th>Rule</th></tr></thead><tbody>{workloads.map((workload) => <tr><th>{workload.hours}h · {workload.label}</th><td>{workload.newAttempts}</td><td>{workload.longRounds}</td><td>{workload.retries}</td><td>{workload.stories}</td><td>{workload.note}</td></tr>)}</tbody></table>
+  </div>
+  <p class="table-note">A “short attempt” includes the timed answer, rubric diagnosis, targeted reading, and a rewritten outline—usually 45–60 minutes. A “long round” is a 35–45 minute coding, design, research, experiment, or project session plus review.</p>
+
+  <h2>Standard eight-hour weekly template</h2>
+  <div class="calendar-grid">
+    <article><span>Mon · 60m</span><h3>New short attempt</h3><p>Use one high-priority question. Score before reading.</p></article>
+    <article><span>Tue · 45m</span><h3>Due retry</h3><p>Change the follow-up; repair one observable weak dimension.</p></article>
+    <article><span>Wed · 90m</span><h3>Full long round</h3><p>Rotate coding, system design, research, experiment, or project deep-dive by role.</p></article>
+    <article><span>Thu · 60m</span><h3>New short attempt</h3><p>Interleave a different category from Monday.</p></article>
+    <article><span>Fri · 45m</span><h3>Due retry</h3><p>Test whether earlier repair survived spacing.</p></article>
+    <article><span>Sat · 90m</span><h3>Story + pushback</h3><p>One 90-second opening, three follow-ups, and one recording review.</p></article>
+    <article><span>Sun · 60m</span><h3>Mixed session</h3><p>Random prompt or transfer drill with no category cue.</p></article>
+    <article><span>Sun · 30m</span><h3>Review and flex</h3><p>Update due dates, drop optional topics, and protect spillover capacity.</p></article>
+  </div>
+
+  <h2>Role overlays</h2>
+  <p>Apply the allocation before choosing questions. The same four-week calendar should not look identical for AS, MLE, and RE candidates.</p>
+  <div class="overlay-grid">{Object.values(ROLE_OVERLAYS).map((role) => <article><h3>{role.label}</h3><p>{role.summary}</p><ul>{role.allocation.map((item) => <li><strong>{item.percent}%</strong> {item.label}</li>)}</ul><p class="warning">{role.warning}</p><p>{role.priorityLinks.map((link, index) => <><a href={link.href}>{link.label}</a>{index < role.priorityLinks.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
+
+  <h2>Target-level evidence</h2>
+  <div class="overlay-grid levels">{Object.values(LEVEL_OVERLAYS).map((level) => <article><h3>{level.label}</h3><p><strong>Bar:</strong> {level.bar}</p><ul>{level.evidence.map((item) => <li>{item}</li>)}</ul><p class="warning"><strong>Common failure:</strong> {level.commonFailure}</p></article>)}</div>
+
+  {plans.map((plan) => (
+    <section id={plan.id} class="plan-section">
+      <header><p>{plan.eyebrow}</p><h2>{plan.title}</h2><span><strong>Best for:</strong> {plan.bestFor}</span><p class="plan-warning">{plan.warning}</p></header>
+      <div class="weeks">{plan.weeks.map((week) => <article class="week"><h3>{week.title}</h3><p class="week-focus">{week.focus}</p><p class="week-total">Standard workload: about 8 hours, including review and flex.</p><h4>Standard 8-hour blocks</h4><ul>{week.blocks.map((block) => <li>{block}</li>)}</ul><p class="week-links">{week.links.map((link, index) => <><a href={link.href}>{link.label}</a>{index < week.links.length - 1 ? ' · ' : ''}</>)}</p><p><strong>Required output:</strong> {week.output}</p><p class="gate"><strong>Exit gate:</strong> {week.gate}</p></article>)}</div>
+    </section>
+  ))}
+
+  <section id="readiness-gates" class="gate-section">
+    <h2>Readiness and extension gates</h2>
+    <div class="gate-grid">
+      <article><h3>Graduate one gap</h3><ul><li>Two successful closed-book attempts separated in time</li><li>No critical rubric dimension still marked weak</li><li>One unfamiliar follow-up handled without notes</li><li>The answer survives a later mixed session</li></ul></article>
+      <article><h3>Call the loop ready</h3><ul><li>Every expected round has a recent full attempt</li><li>No critical round remains consistently Weak</li><li>One role-specific simulation completed under realistic timing</li><li>Six stories are concise, specific, and defensible</li></ul></article>
+      <article><h3>Extend or move when possible</h3><ul><li>A critical round remains unattempted one week before the loop</li><li>More than one critical round remains Weak after simulation repair</li><li>Coding/design cannot finish a correct baseline in the round time</li><li>Stories lose ownership or specificity under follow-up</li></ul></article>
+    </div>
+  </section>
+
+  <section class="callout"><h2>If you fall behind</h2><p>Remove optional new topics first. Then reduce the number of new attempts. Preserve high-priority retries, one realistic simulation, behavioral/project evidence, and recovery. A smaller set of durable answers is better than shallow completion.</p></section>
+</PrepLayout>
+
+<script>
+  import { trackPublicEvent } from '../../utils/publicEvents';
+  trackPublicEvent('generic_plan_opened');
+</script>
+
+<style>
+  .plan-chooser { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-bottom: 1.5rem; }
+  .plan-chooser a { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); color: inherit; text-decoration: none; }
+  .plan-chooser a:hover { border-color: var(--c-accent); }
+  .plan-chooser strong, .plan-chooser span { display: block; }
+  .plan-chooser span { margin-top: .2rem; color: var(--c-muted); font-size: .78rem; }
+  .workload-table { overflow-x: auto; }
+  table { width: 100%; min-width: 48rem; border-collapse: collapse; font-size: .84rem; }
+  th, td { padding: .7rem; border: 1px solid var(--c-rule); text-align: left; vertical-align: top; }
+  thead th { background: var(--c-bg-tint); }
+  .table-note { color: var(--c-muted); font-size: .83rem; }
+  .overlay-grid, .gate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; }
+  .calendar-grid article { padding: .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); }
+  .calendar-grid span { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; }
+  .calendar-grid h3 { margin: .25rem 0 !important; font-size: .9rem !important; }
+  .calendar-grid p { margin: 0; color: var(--c-text-soft); font-size: .76rem; }
+  .overlay-grid article, .gate-grid article { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); }
+  .overlay-grid h3, .gate-grid h3 { margin-top: 0 !important; }
+  .overlay-grid p, .overlay-grid li, .gate-grid li { font-size: .86rem; }
+  .overlay-grid ul, .gate-grid ul { padding-left: 1.1rem; }
+  .warning { color: var(--c-text-soft); }
+  .plan-section { padding-top: .5rem; scroll-margin-top: 5.5rem; }
+  .plan-section > header { margin: 3rem 0 1rem; padding-bottom: 1rem; border-bottom: 2px solid var(--c-text); }
+  .plan-section > header > p:first-child { margin: 0; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
+  .plan-section > header h2 { margin: .2rem 0 !important; font-size: 1.75rem !important; }
+  .plan-section > header span { color: var(--c-text-soft); font-size: .88rem; }
+  .plan-warning { margin-bottom: 0; padding: .65rem .75rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); font-size: .85rem; }
+  .weeks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+  .week { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); break-inside: avoid; }
+  .week h3 { margin-top: 0 !important; }
+  .week h4 { margin: 1rem 0 .35rem; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--c-muted); }
+  .week ul { padding-left: 1.1rem; }
+  .week li, .week p { font-size: .87rem; }
+  .week-focus { color: var(--c-text-soft); }
+  .week-total { padding: .4rem .55rem; border-radius: var(--radius); background: var(--c-accent-soft); color: var(--c-text) !important; font-weight: 700; }
+  .week-links { padding: .6rem; border-radius: var(--radius); background: var(--c-bg-tint); }
+  .gate { margin-bottom: 0; padding-top: .65rem; border-top: 1px solid var(--c-rule); color: var(--c-text-soft); }
+  .gate-section { scroll-margin-top: 5.5rem; }
+  @media (max-width: 800px) { .overlay-grid, .gate-grid { grid-template-columns: 1fr; } .calendar-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 700px) { .plan-chooser, .weeks { grid-template-columns: 1fr; } }
+  @media print { .plan-section { break-before: page; } .overlay-grid, .gate-grid, .weeks { grid-template-columns: 1fr 1fr; } }
+</style>

@@ -16,9 +16,12 @@ function builtTarget(href) {
   const cleanHref = decodeURIComponent(href.split('#')[0].split('?')[0]);
   if (!cleanHref) return null;
 
-  let target = path.join(root, cleanHref);
-  if (cleanHref.endsWith('/')) target = path.join(target, 'index.html');
-  else if (!path.extname(target)) target += '.html';
+  const target = path.join(root, cleanHref);
+  if (cleanHref.endsWith('/')) return path.join(target, 'index.html');
+  if (!path.extname(target)) {
+    const fileTarget = `${target}.html`;
+    return fs.existsSync(fileTarget) ? fileTarget : path.join(target, 'index.html');
+  }
   return target;
 }
 

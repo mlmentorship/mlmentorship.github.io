@@ -1,0 +1,170 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { SITE } from '../../consts';
+import { ROLE_OVERLAYS } from '../../data/prepCurriculum';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+
+const packets = [
+  {
+    id: 'applied-scientist', role: 'Applied Scientist', duration: '3h 35m including breaks', observer: 'Prefer an experienced scientist, MLE, product partner, or interviewer.',
+    rounds: [
+      { time: '45 min', title: 'ML breadth', prompt: 'Choose three unseen breadth questions. Require mechanism, failure mode, and one alternative on each.' },
+      { time: '45 min', title: 'ML system design', prompt: 'Design an ML system under explicit user, latency, cost, and delayed-label constraints.' },
+      { time: '40 min', title: 'Project deep-dive', prompt: 'Probe ownership, the hardest decision, one failure, evidence, and what the candidate would change.' },
+      { time: '35 min', title: 'Product & experimentation', prompt: 'Define a ship decision, primary metric, guardrails, experiment unit, and validity threats.' },
+      { time: '30 min', title: 'Behavioral / leadership', prompt: 'Ask one conflict and one prioritization question; push back on at least two claims.' },
+    ],
+  },
+  {
+    id: 'ml-engineer', role: 'Machine Learning Engineer', duration: '3h 40m including breaks', observer: 'Prefer a strong software engineer or MLE who will inspect correctness and operational detail.',
+    rounds: [
+      { time: '45 min', title: 'Coding', prompt: 'Use a medium implementation problem. Require examples, tests, complexity, and working code.' },
+      { time: '45 min', title: 'ML system design', prompt: 'Design data, training, serving, monitoring, rollback, and iteration for a product ML system.' },
+      { time: '45 min', title: 'Systems / production', prompt: 'Diagnose a training or serving bottleneck from incomplete symptoms; require a measurement plan.' },
+      { time: '35 min', title: 'ML breadth', prompt: 'Use two mechanism questions plus one model-choice trade-off.' },
+      { time: '30 min', title: 'Behavioral / project', prompt: 'Probe a production failure, ownership boundaries, and influence during incident recovery.' },
+    ],
+  },
+  {
+    id: 'research-engineer', role: 'Research Engineer', duration: '3h 50m including breaks', observer: 'Prefer an RE, systems engineer, or researcher who can test both implementation and evidence quality.',
+    rounds: [
+      { time: '45 min', title: 'Coding / implementation', prompt: 'Implement an ML primitive or debugging task with tests and complexity analysis.' },
+      { time: '45 min', title: 'Training / inference systems', prompt: 'Quantify a workload, identify the bottleneck, select parallelism, and design recovery.' },
+      { time: '45 min', title: 'Research depth', prompt: 'Critique a claim, identify alternative explanations, and design discriminating ablations.' },
+      { time: '35 min', title: 'ML breadth', prompt: 'Test mechanisms that connect algorithms to training or systems behavior.' },
+      { time: '40 min', title: 'Project deep-dive', prompt: 'Probe research-to-production translation, a failed experiment, and the candidate’s personal decisions.' },
+    ],
+  },
+];
+
+const unfamiliarPrompts = [
+  'A company has historical project documents and wants to predict which future ML projects will succeed. Scope the problem before proposing a model.',
+  'Your model improves the offline metric by 8% but hurts the online primary metric by 2%. Decide what to do next.',
+  'Inference quality is fixed; cut annual serving cost by 60% without violating the p95 latency SLO.',
+  'A new policy forbids storing raw labels after 24 hours. Redesign training, evaluation, and auditability.',
+  'Two teams report opposite experiment results for the same model. Design the investigation.',
+  'The strongest paper baseline is missing and the reported gain is within seed variance. Decide what evidence you need.',
+];
+---
+
+<PrepLayout
+  title="Senior ML interview simulation packets"
+  description="Role-specific Applied Scientist, MLE, and Research Engineer mock-loop packets with timing, rubrics, and readiness gates."
+  heading="Simulate the loop, not a favorite question."
+  lede="A useful mock removes predictable cues, preserves real round timing, and produces bounded repair tasks. Run one early enough to improve and one only if the first exposed broad uncertainty."
+>
+  <section class="callout"><h2>Simulation rules</h2><ol><li>Use prompts the candidate has not rehearsed verbatim.</li><li>The observer must interrupt, clarify, and push back as a real interviewer would.</li><li>Score each round before discussing it; do not coach during the round.</li><li>Take 5–10 minute breaks, but do not read notes between rounds.</li><li>Turn misses into at most three repair tasks. A list of 20 problems is not a diagnosis.</li></ol></section>
+
+  <div class="packet-actions"><button class="print-button" type="button" data-print>Print simulation packets</button></div>
+
+  <section class="simulation-builder">
+    <div><p class="builder-kicker">Quick builder</p><h2>Generate a concrete prompt set</h2><p>Select a role to draw one core-library prompt for each typical round. Regenerate to change prompts; replace any question the candidate rehearsed recently.</p></div>
+    <div class="builder-controls"><label>Role<select data-builder-role>{Object.entries(ROLE_OVERLAYS).map(([id, role]) => <option value={id}>{role.label}</option>)}</select></label><button class="print-button" type="button" data-build-simulation>Build prompt set</button></div>
+    <ol class="builder-output" data-builder-output hidden></ol>
+  </section>
+
+  {packets.map((packet) => (
+    <section id={packet.id} class="packet">
+      <header><p>Role-specific packet</p><h2>{packet.role}</h2><span>{packet.duration}</span><p>{packet.observer}</p></header>
+      <ol class="round-list">{packet.rounds.map((round, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><div><h3>{round.title} <small>{round.time}</small></h3><p>{round.prompt}</p></div></li>)}</ol>
+    </section>
+  ))}
+
+  <h2>Unfamiliar transfer prompt pool</h2>
+  <p>Use one prompt the candidate has not seen. The goal is transfer of framing, evaluation, and trade-off patterns—not recall of a memorized architecture.</p>
+  <ol class="prompt-pool">{unfamiliarPrompts.map((prompt) => <li>{prompt}</li>)}</ol>
+
+  <section class="scorecard">
+    <h2>Round scorecard</h2>
+    <p>Score 0–2 before giving feedback: <strong>0 = missing or unsafe</strong>, <strong>1 = workable but inconsistent</strong>, <strong>2 = strong under follow-up</strong>.</p>
+    <div class="score-grid">
+      <label>Problem framing <select><option>0</option><option selected>1</option><option>2</option></select></label>
+      <label>Technical correctness <select><option>0</option><option selected>1</option><option>2</option></select></label>
+      <label>Depth under follow-up <select><option>0</option><option selected>1</option><option>2</option></select></label>
+      <label>Trade-off judgment <select><option>0</option><option selected>1</option><option>2</option></select></label>
+      <label>Evidence / testing <select><option>0</option><option selected>1</option><option>2</option></select></label>
+      <label>Communication <select><option>0</option><option selected>1</option><option>2</option></select></label>
+    </div>
+    <label class="notes-label">Bounded feedback (keep private; never submitted)<textarea rows="5" placeholder="One strength, one highest-impact failure, one concrete retry instruction"></textarea></label>
+  </section>
+
+  <section class="gate-section">
+    <h2>Go / risk / extend decision</h2>
+    <div class="gate-grid">
+      <article><h3>Green</h3><p>No critical dimension scores 0; every round has a workable structure; follow-ups reveal real depth; remaining misses are bounded.</p></article>
+      <article><h3>Amber</h3><p>One critical round is inconsistent but responds to targeted repair. Keep the loop only if there is time for a spaced retry before it.</p></article>
+      <article><h3>Red</h3><p>More than one critical round scores 0, coding/design cannot reach a baseline in time, or stories lose ownership under follow-up. Extend or move the loop when possible.</p></article>
+    </div>
+  </section>
+
+  <section class="callout"><h2>After the simulation</h2><ol><li>Write the failure as an observable behavior—not “study systems more.”</li><li>Choose one corrective drill and a due date.</li><li>Retry closed-book after spacing.</li><li>Graduate only after the repair survives a mixed session.</li></ol><p><a href="/prep/progress/">Open the local progress and retry queue →</a></p></section>
+</PrepLayout>
+
+<script>
+  import { INTERVIEW_ROUNDS, ROLE_OVERLAYS, type RoleId } from '../../data/prepCurriculum';
+  import { trackPublicEvent } from '../../utils/publicEvents';
+  trackPublicEvent('simulation_opened');
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+  document.querySelector('[data-build-simulation]')?.addEventListener('click', () => {
+    const select = document.querySelector<HTMLSelectElement>('[data-builder-role]');
+    const output = document.querySelector<HTMLOListElement>('[data-builder-output]');
+    if (!select || !output) return;
+    const role = ROLE_OVERLAYS[select.value as RoleId];
+    const rounds = role.defaultRounds.map((roundId) => INTERVIEW_ROUNDS.find((round) => round.id === roundId)).filter((round): round is (typeof INTERVIEW_ROUNDS)[number] => Boolean(round));
+    output.replaceChildren(...rounds.map((round) => {
+      const item = document.createElement('li');
+      const heading = document.createElement('strong');
+      heading.textContent = `${round.label} · ${round.minutes} min`;
+      const starter = round.starterLinks[Math.floor(Math.random() * round.starterLinks.length)];
+      const link = document.createElement('a');
+      link.href = starter.href;
+      link.textContent = starter.label;
+      const description = document.createElement('span');
+      description.textContent = round.description;
+      item.append(heading, link, description);
+      return item;
+    }));
+    output.hidden = false;
+  });
+</script>
+
+<style>
+  .packet-actions { display: flex; justify-content: flex-end; }
+  .simulation-builder { margin: 1rem 0 2rem; padding: 1rem; border: 2px solid var(--c-text); border-radius: var(--radius-lg); }
+  .simulation-builder h2 { margin: .15rem 0 .4rem !important; }
+  .simulation-builder > div > p:last-child { color: var(--c-text-soft); font-size: .85rem; }
+  .builder-kicker { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; }
+  .builder-controls { display: flex; align-items: flex-end; gap: .7rem; }
+  .builder-controls label { flex: 1; font-size: .8rem; font-weight: 700; }
+  .builder-controls select { display: block; width: 100%; margin-top: .3rem; padding: .58rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; }
+  .builder-output { margin: 1rem 0 0; padding: 0; list-style: none; }
+  .builder-output li { display: grid; grid-template-columns: 12rem 1fr; gap: .2rem .7rem; padding: .65rem 0; border-top: 1px solid var(--c-rule); }
+  .builder-output strong, .builder-output a, .builder-output span { display: block; }
+  .builder-output span { grid-column: 2; color: var(--c-muted); font-size: .78rem; }
+  .packet { margin: 2.5rem 0; scroll-margin-top: 5.5rem; }
+  .packet > header { padding-bottom: .8rem; border-bottom: 2px solid var(--c-text); }
+  .packet > header > p:first-child { margin: 0; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
+  .packet > header h2 { margin: .2rem 0 !important; }
+  .packet > header span, .packet > header p:last-child { color: var(--c-muted); font-size: .85rem; }
+  .round-list { list-style: none; padding: 0; }
+  .round-list li { display: grid; grid-template-columns: 2rem 1fr; gap: .7rem; padding: .9rem 0; border-bottom: 1px solid var(--c-rule); }
+  .round-list > li > span { font-family: var(--font-mono); color: var(--c-accent); font-size: .75rem; }
+  .round-list h3, .round-list p { margin: 0; }
+  .round-list h3 small { margin-left: .4rem; color: var(--c-muted); font-size: .75rem; font-weight: 500; }
+  .round-list p { color: var(--c-text-soft); font-size: .88rem; }
+  .prompt-pool { padding-left: 1.4rem; }
+  .prompt-pool li { margin: .65rem 0; padding-left: .3rem; }
+  .scorecard { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); }
+  .scorecard h2 { margin-top: 0 !important; }
+  .score-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+  .score-grid label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); font-weight: 700; }
+  .score-grid select { padding: .35rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); }
+  .notes-label { display: block; margin-top: .9rem; font-weight: 700; }
+  textarea { width: 100%; margin-top: .35rem; padding: .7rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; resize: vertical; }
+  .gate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+  .gate-grid article { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .gate-grid h3 { margin-top: 0 !important; }
+  .gate-grid p { margin-bottom: 0; font-size: .87rem; }
+  @media (max-width: 700px) { .score-grid, .gate-grid { grid-template-columns: 1fr; } .builder-controls { align-items: stretch; flex-direction: column; } .builder-controls button { width: 100%; } .builder-output li { grid-template-columns: 1fr; } .builder-output span { grid-column: auto; } }
+  @media print { .packet { break-before: page; } .scorecard { break-before: page; } }
+</style>
