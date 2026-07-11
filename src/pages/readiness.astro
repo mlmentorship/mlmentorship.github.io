@@ -1,0 +1,284 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const areas = [
+  { id: 'fundamentals', label: 'ML fundamentals', link: '/questions/#ml-fundamentals' },
+  { id: 'production', label: 'Production & debugging', link: '/questions/#deep-learning-production' },
+  { id: 'llm-systems', label: 'LLM systems', link: '/questions/#llm-systems' },
+  { id: 'recsys-search', label: 'Retrieval, search & recommendations', link: '/questions/#recsys-and-search' },
+  { id: 'system-design', label: 'ML system design', link: '/questions/#ml-system-design' },
+  { id: 'behavioral', label: 'Behavioral & leadership', link: '/questions/#behavioral' },
+  { id: 'math-research', label: 'Math & research depth', link: '/questions/#math' },
+  { id: 'coding', label: 'Coding & implementation', link: '/questions/#coding' },
+];
+
+const rounds = areas.map(({ id, label }) => ({ id, label }));
+---
+
+<BaseLayout
+  title="ML interview readiness check"
+  description="A private, browser-only readiness check for senior Applied Scientist, MLE, and Research Engineer interviews."
+>
+  <div class="readiness-page">
+    <header class="readiness-hero">
+      <p class="eyebrow">Free prep tool</p>
+      <h1>Where should you focus your interview prep?</h1>
+      <p class="lede">Choose the role, level, rounds, and your current confidence. The check runs entirely in your browser and recommends three focus areas plus a generic preparation horizon.</p>
+      <p class="privacy-note"><strong>No account. No email. No answer text.</strong> Your selections are not stored or sent anywhere.</p>
+    </header>
+
+    <form id="readiness-form" class="readiness-form">
+      <section class="panel target-panel" aria-labelledby="target-heading">
+        <h2 id="target-heading">1. Target</h2>
+        <div class="field-grid">
+          <label>
+            <span>Role</span>
+            <select name="role" required>
+              <option value="applied-scientist">Applied Scientist</option>
+              <option value="ml-engineer">Machine Learning Engineer</option>
+              <option value="research-engineer">Research Engineer</option>
+            </select>
+          </label>
+          <label>
+            <span>Level</span>
+            <select name="level" required>
+              <option value="l4">L4 / mid-level</option>
+              <option value="l5" selected>L5 / senior</option>
+              <option value="l6">L6 / staff</option>
+            </select>
+          </label>
+          <label>
+            <span>Primary domain</span>
+            <select name="domain" required>
+              <option value="general">General / not sure</option>
+              <option value="llm">LLM and agent systems</option>
+              <option value="recsys">Recommendations, search, and ranking</option>
+              <option value="platform">ML platform, training, and serving</option>
+              <option value="research">Research and modeling</option>
+              <option value="product">General product ML</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="rounds-heading">
+        <h2 id="rounds-heading">2. Expected rounds</h2>
+        <p class="help">Select at least two. If the company has not shared a loop, choose the rounds most likely for the role.</p>
+        <div class="choice-grid">
+          {rounds.map((round, index) => (
+            <label class="choice">
+              <input type="checkbox" name="rounds" value={round.id} checked={index < 6} />
+              <span>{round.label}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="ratings-heading">
+        <h2 id="ratings-heading">3. Current confidence</h2>
+        <p class="help">Rate what you can explain and apply under interview pressure—not what you recognize while reading.</p>
+        <div class="rating-grid">
+          {areas.map((area) => (
+            <label class="rating-field">
+              <span>{area.label}</span>
+              <select name={`rating:${area.id}`} aria-label={`${area.label} confidence`}>
+                <option value="1">1 · weak</option>
+                <option value="2">2 · shaky</option>
+                <option value="3" selected>3 · workable</option>
+                <option value="4">4 · strong</option>
+                <option value="5">5 · interview-ready</option>
+              </select>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button class="primary-button" type="submit">Show my focus areas</button>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+      </div>
+    </form>
+
+    <section id="readiness-results" class="results" aria-live="polite" tabindex="-1" hidden>
+      <header class="results-head">
+        <div>
+          <p class="eyebrow">Your starting point</p>
+          <h2 id="result-title">Recommended focus</h2>
+        </div>
+        <a id="plan-link" class="plan-link" href="/plans/">Open the generic plan <span aria-hidden="true">→</span></a>
+      </header>
+      <p id="result-summary" class="result-summary"></p>
+      <ol id="focus-list" class="focus-list" data-pagefind-ignore="all">
+        {[0, 1, 2].map((index) => (
+          <li data-focus-item>
+            <span class="focus-rank">{String(index + 1).padStart(2, '0')}</span>
+            <div><h3><a data-focus-link></a></h3><p data-focus-description></p></div>
+          </li>
+        ))}
+      </ol>
+      <div class="results-next">
+        <h3>Use this result</h3>
+        <ul>
+          <li>Open each focus area and pick one question to answer before reading.</li>
+          <li>Use the <a href="/practice/">practice method and scoring rubric</a> after every attempt.</li>
+          <li>Repeat weak answers after two days; repeat workable answers after one week.</li>
+        </ul>
+      </div>
+      <button id="reset-readiness" class="text-button" type="button">Run the check again</button>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { trackPublicEvent } from '../utils/publicEvents';
+
+  type AreaId = 'fundamentals' | 'production' | 'llm-systems' | 'recsys-search' | 'system-design' | 'behavioral' | 'math-research' | 'coding';
+  type Role = 'applied-scientist' | 'ml-engineer' | 'research-engineer';
+  type Domain = 'general' | 'llm' | 'recsys' | 'platform' | 'research' | 'product';
+
+  const areaMeta: Record<AreaId, { label: string; link: string; description: string }> = {
+    fundamentals: { label: 'ML fundamentals', link: '/questions/#ml-fundamentals', description: 'Build precise explanations before adding system complexity.' },
+    production: { label: 'Production & debugging', link: '/questions/#deep-learning-production', description: 'Practice procedures, failure isolation, and operational trade-offs.' },
+    'llm-systems': { label: 'LLM systems', link: '/questions/#llm-systems', description: 'Prioritize evaluation, architecture, serving cost, and failure handling.' },
+    'recsys-search': { label: 'Retrieval, search & recommendations', link: '/questions/#recsys-and-search', description: 'Practice retrieval/ranking choices, metrics, and feedback loops.' },
+    'system-design': { label: 'ML system design', link: '/questions/#ml-system-design', description: 'Scope users and constraints before proposing models or infrastructure.' },
+    behavioral: { label: 'Behavioral & leadership', link: '/questions/#behavioral', description: 'Prepare evidence-rich stories that survive senior-level follow-up.' },
+    'math-research': { label: 'Math & research depth', link: '/questions/#math', description: 'Derive from first principles and connect equations to decisions.' },
+    coding: { label: 'Coding & implementation', link: '/questions/#coding', description: 'Practice clean implementation and explain complexity while coding.' },
+  };
+
+  const roleWeights: Record<Role, Record<AreaId, number>> = {
+    'applied-scientist': { fundamentals: 1.15, production: .85, 'llm-systems': 1.1, 'recsys-search': 1, 'system-design': 1.35, behavioral: 1.2, 'math-research': 1.15, coding: .65 },
+    'ml-engineer': { fundamentals: 1, production: 1.35, 'llm-systems': 1.25, 'recsys-search': 1.05, 'system-design': 1.25, behavioral: .9, 'math-research': .7, coding: 1.25 },
+    'research-engineer': { fundamentals: 1.2, production: 1.25, 'llm-systems': 1.15, 'recsys-search': .75, 'system-design': .9, behavioral: .85, 'math-research': 1.35, coding: 1.25 },
+  };
+
+  const domainWeights: Record<Domain, Partial<Record<AreaId, number>>> = {
+    general: {},
+    llm: { 'llm-systems': .65, production: .2, 'system-design': .2 },
+    recsys: { 'recsys-search': .65, 'system-design': .2, production: .15 },
+    platform: { production: .65, coding: .25, 'system-design': .25 },
+    research: { 'math-research': .55, fundamentals: .35, coding: .15 },
+    product: { 'system-design': .4, fundamentals: .25, behavioral: .2 },
+  };
+
+  const form = document.querySelector<HTMLFormElement>('#readiness-form');
+  const results = document.querySelector<HTMLElement>('#readiness-results');
+  const error = document.querySelector<HTMLElement>('#form-error');
+  const focusList = document.querySelector<HTMLOListElement>('#focus-list');
+  const summary = document.querySelector<HTMLElement>('#result-summary');
+  const title = document.querySelector<HTMLElement>('#result-title');
+  const planLink = document.querySelector<HTMLAnchorElement>('#plan-link');
+  let started = false;
+
+  form?.addEventListener('input', () => {
+    if (!started) {
+      started = true;
+      trackPublicEvent('readiness_started');
+    }
+  }, { once: true });
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!form || !results || !focusList || !summary || !title || !planLink) return;
+    const data = new FormData(form);
+    const selectedRounds = new Set(data.getAll('rounds').map(String) as AreaId[]);
+    if (selectedRounds.size < 2) {
+      if (error) {
+        error.textContent = 'Select at least two expected rounds.';
+        error.hidden = false;
+      }
+      return;
+    }
+    if (error) error.hidden = true;
+
+    const role = String(data.get('role')) as Role;
+    const domain = String(data.get('domain')) as Domain;
+    const level = String(data.get('level'));
+    const scored = (Object.keys(areaMeta) as AreaId[]).map((area) => {
+      const rating = Number(data.get(`rating:${area}`));
+      const weight = roleWeights[role][area] + (domainWeights[domain][area] ?? 0) + (selectedRounds.has(area) ? .45 : 0);
+      return { area, rating, score: (6 - rating) * weight };
+    }).sort((a, b) => b.score - a.score || areaMeta[a.area].label.localeCompare(areaMeta[b.area].label));
+
+    const weakCount = scored.filter((item) => item.rating <= 2).length;
+    const average = scored.reduce((total, item) => total + item.rating, 0) / scored.length;
+    const horizon = level === 'l6' || weakCount >= 3 ? 8 : weakCount >= 1 || average < 3.6 ? 4 : 2;
+    const roleSelect = form.elements.namedItem('role');
+    const roleLabel = roleSelect instanceof HTMLSelectElement
+      ? roleSelect.selectedOptions[0]?.textContent ?? 'senior ML'
+      : 'senior ML';
+
+    title.textContent = `${horizon}-week starting plan`;
+    summary.textContent = `For a ${roleLabel} loop, put your first preparation hours into the three areas below. This is a broad readiness signal—not a personalized curriculum.`;
+    planLink.href = `/plans/#plan-${horizon}-week`;
+    planLink.dataset.plan = `${horizon}-week`;
+    const focusItems = focusList.querySelectorAll<HTMLElement>('[data-focus-item]');
+    scored.slice(0, 3).forEach((item, index) => {
+      const meta = areaMeta[item.area];
+      const focusItem = focusItems[index];
+      const link = focusItem?.querySelector<HTMLAnchorElement>('[data-focus-link]');
+      const description = focusItem?.querySelector<HTMLElement>('[data-focus-description]');
+      if (link) {
+        link.href = meta.link;
+        link.textContent = meta.label;
+      }
+      if (description) description.textContent = `${meta.description} Current confidence: ${item.rating}/5.`;
+    });
+
+    results.hidden = false;
+    results.focus();
+    trackPublicEvent('readiness_completed');
+  });
+
+  document.querySelector('#reset-readiness')?.addEventListener('click', () => {
+    if (results) results.hidden = true;
+    form?.querySelector<HTMLSelectElement>('select')?.focus({ preventScroll: true });
+    form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+</script>
+
+<style>
+  .readiness-page { max-width: 62rem; margin: 0 auto; padding: clamp(2rem, 6vw, 5rem) var(--gutter) 5rem; }
+  .readiness-hero { max-width: 48rem; margin-bottom: 2.5rem; }
+  .eyebrow { margin: 0 0 .75rem; font-family: var(--font-mono); font-size: .72rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--c-accent); }
+  .readiness-hero h1 { font-size: clamp(2.1rem, 6vw, 4rem); margin: 0 0 1rem; }
+  .lede { font-size: 1.12rem; color: var(--c-text-soft); max-width: 44rem; }
+  .privacy-note { display: inline-block; padding: .65rem .85rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); font-size: .86rem; color: var(--c-muted); }
+  .readiness-form { display: grid; gap: 1rem; }
+  .panel { padding: clamp(1.2rem, 3vw, 1.8rem); border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); }
+  .panel h2 { margin: 0 0 .6rem; font-size: 1.25rem; }
+  .help { margin: 0 0 1rem; color: var(--c-muted); font-size: .9rem; }
+  .field-grid, .rating-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem 1rem; }
+  label > span { display: block; margin-bottom: .35rem; font-family: var(--font-ui); font-size: .86rem; font-weight: 600; }
+  select { width: 100%; padding: .68rem .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; }
+  .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+  .choice { display: flex; align-items: flex-start; gap: .55rem; min-height: 3rem; padding: .7rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); cursor: pointer; }
+  .choice input { margin-top: .25rem; accent-color: var(--c-accent-fill); }
+  .choice span { margin: 0; font-weight: 500; }
+  .rating-field { display: grid; grid-template-columns: minmax(0, 1fr) 10.5rem; align-items: center; gap: .75rem; }
+  .rating-field span { margin: 0; }
+  .form-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: .4rem 0 1.5rem; }
+  .primary-button, .plan-link { display: inline-flex; align-items: center; justify-content: center; padding: .75rem 1rem; border: 0; border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font: inherit; font-weight: 700; text-decoration: none; cursor: pointer; }
+  .form-error { margin: 0; color: #b91c1c; font-weight: 600; }
+  .results { margin-top: 2rem; padding: clamp(1.2rem, 3vw, 2rem); border: 2px solid var(--c-accent); border-radius: var(--radius-lg); background: var(--c-surface); outline: none; }
+  .results[hidden] { display: none; }
+  .results-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .results-head h2 { margin: 0; }
+  .result-summary { color: var(--c-text-soft); }
+  .focus-list { list-style: none; margin: 1.5rem 0; padding: 0; }
+  .focus-list li { display: grid; grid-template-columns: 2rem 1fr; gap: .8rem; padding: 1rem 0; border-top: 1px solid var(--c-rule); }
+  .focus-rank { font-family: var(--font-mono); color: var(--c-accent); font-size: .78rem; }
+  .focus-list h3 { margin: 0 0 .25rem; }
+  .focus-list p { margin: 0; color: var(--c-text-soft); font-size: .92rem; }
+  .results-next { padding: 1rem; border-radius: var(--radius); background: var(--c-bg-tint); }
+  .results-next h3 { margin-top: 0; }
+  .results-next ul { margin-bottom: 0; }
+  .text-button { padding: .6rem 0; border: 0; background: none; color: var(--c-link); font: inherit; text-decoration: underline; cursor: pointer; }
+  @media (max-width: 700px) {
+    .field-grid, .choice-grid, .rating-grid { grid-template-columns: 1fr; }
+    .rating-field { grid-template-columns: 1fr; gap: .25rem; }
+    .results-head { flex-direction: column; }
+    .plan-link { width: 100%; }
+  }
+</style>

@@ -29,6 +29,7 @@ const counts = {
       </p>
       <p class="hero-ctas">
         <a class="btn-primary" href="/start-here/">Browse the library <span aria-hidden="true">→</span></a>
+        <a class="btn-secondary" href="/readiness/">Check readiness</a>
       </p>
     </section>
 
@@ -63,6 +64,19 @@ const counts = {
       <p class="block-foot">
         Or follow a <a href="/start-here/">curated reading path</a> by what you're trying to do.
       </p>
+    </section>
+
+    <hr class="rule" />
+
+    <section class="block">
+      <p class="block-eyebrow">Free prep tools</p>
+      <h2 class="block-headline">Turn the library into deliberate practice.</h2>
+      <div class="tools-grid">
+        <a href="/readiness/"><strong>Find your focus</strong><span>Private browser-only readiness check</span></a>
+        <a href="/practice/"><strong>Practice closed-book</strong><span>Timer, rubric, and delayed-retry method</span></a>
+        <a href="/plans/"><strong>Choose a cadence</strong><span>Generic 2-, 4-, and 8-week plans</span></a>
+      </div>
+      <p class="block-foot"><a href="/prep/">See all preparation tools →</a></p>
     </section>
 
     <section class="home-subscribe" aria-label="Newsletter">
@@ -324,6 +338,26 @@ const counts = {
     font-weight: 500;
   }
   .block-foot a:hover { text-decoration: underline; }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.7rem;
+  }
+  .tools-grid a {
+    padding: 1rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius);
+    background: var(--c-surface);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+  .tools-grid a:hover { border-color: var(--c-accent); transform: translateY(-2px); }
+  .tools-grid strong, .tools-grid span { display: block; }
+  .tools-grid strong { margin-bottom: 0.25rem; font-size: 0.92rem; }
+  .tools-grid span { color: var(--c-text-soft); font-size: 0.78rem; line-height: 1.45; }
+  @media (max-width: 720px) { .tools-grid { grid-template-columns: 1fr; } }
 
   .home-subscribe { padding: 0 0 clamp(1.8rem, 4vw, 2.6rem); }
   .home-subscribe :global(.subscribe) { margin-top: 0; }

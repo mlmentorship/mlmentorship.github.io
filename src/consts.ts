@@ -54,6 +54,7 @@ export const SITE = {
   // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
     { label: 'Start here', href: '/start-here/' },
+    { label: 'Prep', href: '/prep/' },
     { label: 'Questions', href: '/questions/' },
     { label: 'Guides', href: '/guides/' },
     { label: 'Concepts', href: '/concepts/' },
