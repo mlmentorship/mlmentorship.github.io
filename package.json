@@ -11,7 +11,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "check:links": "node scripts/check-links.mjs"
+    "check:links": "node scripts/check-links.mjs",
+    "playbook:generate": "tsx scripts/playbook/generate.ts",
+    "playbook:sample": "tsx scripts/playbook/generate.ts --intake examples/playbook/sample-intake.json --out artifacts/playbooks/sample",
+    "test:playbook": "tsx --test scripts/playbook/*.test.ts",
+    "playbook:validate": "npm run test:playbook && npm run playbook:sample -- --html-only",
+    "playbook:review": "zsh scripts/playbook/validate-review.sh"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
@@ -29,8 +34,11 @@
     "@astrojs/check": "^0.9.8",
     "@resvg/resvg-js": "^2.6.2",
     "astro-mermaid": "^2.0.1",
+    "gray-matter": "^4.0.3",
     "pagefind": "^1.5.2",
     "satori": "^0.26.0",
-    "typescript": "^5.6.3"
+    "tsx": "^4.23.0",
+    "typescript": "^5.6.3",
+    "zod": "^4.4.3"
   }
 }

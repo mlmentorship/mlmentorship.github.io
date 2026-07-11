@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playbook intake builder · mlmentorship internal</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#111827; --soft:#475569; --rule:#dbe2ea; --tint:#f7f8fa; --orange:#c2410c; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--tint); color: var(--ink); }
+    main { max-width: 62rem; margin: 0 auto; padding: 3rem 1.2rem 5rem; }
+    header { margin-bottom: 2rem; }
+    h1 { margin: .4rem 0 .8rem; font-size: clamp(2rem, 5vw, 3.4rem); letter-spacing: -.04em; line-height: 1; }
+    h2 { margin: 0 0 1rem; font-size: 1.2rem; }
+    p { color: var(--soft); line-height: 1.6; }
+    .eyebrow { margin: 0; color: var(--orange); font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    section { margin-bottom: 1rem; padding: 1.4rem; border: 1px solid var(--rule); border-radius: .75rem; background: white; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    label, legend { font-weight: 650; font-size: .9rem; }
+    label span { display: block; margin-bottom: .35rem; }
+    input, select, textarea { width: 100%; margin-top: .35rem; padding: .7rem .75rem; border: 1px solid #cbd5e1; border-radius: .4rem; font: inherit; color: inherit; background: white; }
+    input:focus, select:focus, textarea:focus { outline: 2px solid #fb923c; outline-offset: 1px; }
+    textarea { min-height: 6rem; resize: vertical; }
+    fieldset { margin: 0; padding: 0; border: 0; }
+    legend { margin-bottom: .8rem; }
+    .choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .55rem; }
+    .choice { display: flex; gap: .6rem; align-items: flex-start; padding: .65rem; border: 1px solid var(--rule); border-radius: .45rem; font-weight: 500; }
+    .choice input { width: auto; margin: .15rem 0 0; }
+    .ratings { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .8rem 1rem; }
+    .rating { display: grid; grid-template-columns: 1fr 4.5rem; align-items: center; gap: .8rem; }
+    .actions { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; padding: 1rem; border: 1px solid var(--rule); border-radius: .75rem; background: rgba(255,255,255,.96); box-shadow: 0 -8px 30px rgba(15,23,42,.08); }
+    button { padding: .72rem 1rem; border: 0; border-radius: .45rem; background: var(--orange); color: white; font: inherit; font-weight: 700; cursor: pointer; }
+    button.secondary { background: #e2e8f0; color: var(--ink); }
+    output { color: var(--soft); font-size: .85rem; }
+    .internal { display: inline-block; padding: .2rem .5rem; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: .72rem; font-weight: 700; }
+    @media(max-width:700px){ .grid,.grid-3,.choices,.ratings{grid-template-columns:1fr;} main{padding-top:1.5rem;} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="internal">Local internal tool · not deployed</span>
+    <p class="eyebrow">mlmentorship playbook</p>
+    <h1>Candidate intake builder</h1>
+    <p>Collect the planning inputs, validate them in the browser, and download the JSON used by the deterministic playbook generator. No data leaves this page. The downloaded intake contains personal data; store it privately and never commit it to the repository.</p>
+  </header>
+
+  <form id="intake-form">
+    <section>
+      <h2>Candidate and target</h2>
+      <div class="grid">
+        <label><span>Candidate name</span><input name="candidateName" required maxlength="80" autocomplete="name"></label>
+        <label><span>Target role</span><select name="role" required><option value="applied-scientist">Applied Scientist</option><option value="ml-engineer">Machine Learning Engineer</option><option value="research-engineer">Research Engineer</option></select></label>
+        <label><span>Target level</span><select name="targetLevel" required><option value="l4">L4 / mid-level</option><option value="l5">L5 / senior</option><option value="l6">L6 / staff</option></select></label>
+        <label><span>Current experience summary</span><textarea name="experienceSummary" maxlength="1200" placeholder="Role, years, product/research domain, strongest shipped work"></textarea></label>
+      </div>
+    </section>
+
+    <section>
+      <h2>Time and constraints</h2>
+      <div class="grid grid-3">
+        <label><span>Plan start</span><input name="startDate" type="date" required></label>
+        <label><span>Interview date (optional)</span><input name="interviewDate" type="date"></label>
+        <label><span>Preparation weeks</span><input name="weeks" type="number" min="2" max="8" value="4" required></label>
+        <label><span>Available hours/week</span><input name="hoursPerWeek" type="number" min="3" max="20" step="0.5" value="8" required></label>
+        <label><span>Constraints (one per line)</span><textarea name="constraints" placeholder="Weekday sessions must fit into 90 minutes."></textarea></label>
+        <label><span>Candidate priorities (one per line)</span><textarea name="priorities" placeholder="Improve staff-level system framing."></textarea></label>
+      </div>
+    </section>
+
+    <section>
+      <fieldset>
+        <legend>Expected interview rounds</legend>
+        <div class="choices" id="rounds"></div>
+      </fieldset>
+    </section>
+
+    <section>
+      <fieldset>
+        <legend>Relevant domains</legend>
+        <div class="choices" id="domains"></div>
+      </fieldset>
+    </section>
+
+    <section>
+      <fieldset>
+        <legend>Self-rating by preparation area (1 = weak, 5 = strong)</legend>
+        <div class="ratings" id="ratings"></div>
+      </fieldset>
+    </section>
+
+    <div class="actions">
+      <button type="submit">Validate and download JSON</button>
+      <button type="button" class="secondary" id="copy">Copy JSON</button>
+      <button type="button" class="secondary" id="load-sample">Load sample</button>
+      <output id="status" aria-live="polite">Complete all required fields.</output>
+    </div>
+  </form>
+</main>
+<script>
+  const rounds = {
+    'ml-fundamentals':'ML fundamentals', 'production-debugging':'Production & debugging', 'llm-systems':'LLM systems',
+    'recsys-search':'Retrieval / search / recommendations', 'ml-system-design':'ML system design', behavioral:'Behavioral & leadership',
+    'math-research':'Math & research depth', coding:'Coding & implementation'
+  };
+  const domains = {'llm':'LLMs','recsys-search':'Retrieval / search / recommendations','classical-ml':'Classical ML','deep-learning':'Deep learning','nlp-speech':'NLP & speech','computer-vision':'Computer vision'};
+  const areas = {fundamentals:'ML fundamentals',production:'Production & debugging','llm-systems':'LLM systems','recsys-search':'Retrieval, search & recommendations','system-design':'ML system design',behavioral:'Behavioral & leadership','math-research':'Math & research depth',coding:'Coding & implementation'};
+  const form = document.querySelector('#intake-form');
+  const status = document.querySelector('#status');
+  const checkboxes = (target, name, values, checked=[]) => {
+    document.querySelector(target).innerHTML = Object.entries(values).map(([value,label]) => `<label class="choice"><input type="checkbox" name="${name}" value="${value}" ${checked.includes(value)?'checked':''}><span>${label}</span></label>`).join('');
+  };
+  checkboxes('#rounds','rounds',rounds,['ml-fundamentals','production-debugging','llm-systems','ml-system-design','behavioral','coding']);
+  checkboxes('#domains','domainTracks',domains,['llm','deep-learning']);
+  document.querySelector('#ratings').innerHTML = Object.entries(areas).map(([name,label]) => `<label class="rating"><span>${label}</span><select name="rating:${name}" required>${[1,2,3,4,5].map(v=>`<option value="${v}" ${v===3?'selected':''}>${v}/5</option>`).join('')}</select></label>`).join('');
+  form.startDate.value = new Date().toISOString().slice(0,10);
+
+  function lines(value){ return value.split('\n').map(s=>s.trim()).filter(Boolean); }
+  function intake(){
+    const data = new FormData(form);
+    return {
+      version:1,
+      candidateName:String(data.get('candidateName')||'').trim(),
+      role:data.get('role'), targetLevel:data.get('targetLevel'), startDate:data.get('startDate'),
+      ...(data.get('interviewDate') ? {interviewDate:data.get('interviewDate')} : {}),
+      weeks:Number(data.get('weeks')), hoursPerWeek:Number(data.get('hoursPerWeek')),
+      rounds:data.getAll('rounds'), domainTracks:data.getAll('domainTracks'),
+      selfRatings:Object.fromEntries(Object.keys(areas).map(area=>[area,Number(data.get(`rating:${area}`))])),
+      ...(data.get('experienceSummary') ? {experienceSummary:String(data.get('experienceSummary')).trim()} : {}),
+      constraints:lines(String(data.get('constraints')||'')), priorities:lines(String(data.get('priorities')||''))
+    };
+  }
+  function validate(value){
+    if(!value.candidateName) throw new Error('Candidate name is required.');
+    if(value.weeks<2||value.weeks>8) throw new Error('Weeks must be 2–8.');
+    if(value.hoursPerWeek<3||value.hoursPerWeek>20) throw new Error('Hours/week must be 3–20.');
+    if(value.rounds.length<2) throw new Error('Select at least two interview rounds.');
+    if(value.interviewDate && value.interviewDate<=value.startDate) throw new Error('Interview date must be after the start date.');
+    if(value.interviewDate){
+      const start=new Date(`${value.startDate}T00:00:00Z`),interview=new Date(`${value.interviewDate}T00:00:00Z`);
+      const finalWeekStart=new Date(start); finalWeekStart.setUTCDate(start.getUTCDate()+(value.weeks-1)*7);
+      const planEnd=new Date(start); planEnd.setUTCDate(start.getUTCDate()+value.weeks*7);
+      if(interview<finalWeekStart||interview>planEnd) throw new Error('Interview date must fall within the final week of the selected plan horizon.');
+    }
+    return value;
+  }
+  let latest = null;
+  function build(){ latest=validate(intake()); status.value='Valid intake ready.'; return JSON.stringify(latest,null,2)+'\n'; }
+  form.addEventListener('submit',event=>{event.preventDefault();try{const json=build(),blob=new Blob([json],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${latest.candidateName.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'candidate'}-intake.json`;a.click();URL.revokeObjectURL(a.href);}catch(error){status.value=error.message;}});
+  document.querySelector('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(build());status.value='Validated JSON copied.';}catch(error){status.value=error.message;}});
+  document.querySelector('#load-sample').addEventListener('click',()=>{
+    form.candidateName.value='Sample Candidate'; form.role.value='ml-engineer'; form.targetLevel.value='l6'; form.weeks.value=4; form.hoursPerWeek.value=8;
+    form.experienceSummary.value='Senior MLE with production ranking and model-serving experience, targeting a staff-level role on an applied LLM platform team.';
+    form.constraints.value='Weekday sessions must fit into 90 minutes.\nOne weekend day must remain completely free.';
+    form.priorities.value='Improve staff-level system framing.\nBuild concise evidence-backed behavioral stories.\nStrengthen LLM evaluation and inference-cost depth.';
+    const values={fundamentals:4,production:3,'llm-systems':2,'recsys-search':4,'system-design':3,behavioral:2,'math-research':4,coding:3};
+    for(const [area,value] of Object.entries(values)) form.querySelector(`[name="rating:${area}"]`).value=value;
+    status.value='Sample loaded; choose dates before exporting.';
+  });
+</script>
+</body>
+</html>

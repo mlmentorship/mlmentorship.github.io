@@ -1,0 +1,65 @@
+MLMENTORSHIP PERSONALIZED PLAYBOOK — INTERNAL OPERATIONS
+
+STATUS
+This is an internal product engine on the product/personalized-playbook review
+branch. It adds no public Astro route, sales copy, checkout, or customer form.
+
+1. COLLECT INTAKE
+Open scripts/playbook/intake-form.html locally in a browser. The form makes no
+network requests and downloads a JSON intake. Never place a real customer intake
+inside the repository. Store it in a private customer-order folder.
+
+2. GENERATE
+From the repository root:
+
+  npm run playbook:generate -- \
+    --intake /private/path/candidate-intake.json \
+    --out /private/path/order-id
+
+Outputs:
+- plan.json: structured source of truth and future app payload
+- playbook.html: self-contained print preview
+- playbook.pdf: customer deliverable with clickable library links
+- delivery-manifest.json: plan ID, PII flag, hashes, and file sizes
+
+Use --anonymize for an internal review copy. It strips the candidate name and all
+free-text intake fields. Use --html-only when Chrome is unavailable. Set
+CHROME_PATH or PLAYBOOK_PDF_TIMEOUT_MS if needed.
+
+3. MANUAL QUALITY REVIEW
+Before delivery, confirm:
+- role, level, dates, rounds, domains, and time budget match the intake
+- the top three priorities are plausible
+- no unrelated domain track appears
+- each retry happens after its original attempt
+- weekly scheduled time stays below stated availability
+- the final week contains a simulation and avoids new-topic overload
+- all links open the intended mlmentorship resource
+- the PDF has no clipped, blank, or sparse pages
+- any candidate-specific phrasing is respectful and factually grounded
+
+Run the complete automated review with:
+
+  npm run playbook:review
+
+4. DELIVERY AND EVIDENCE
+Email the PDF to the payer's confirmed address. Preserve, outside the repo:
+- order/payment transaction ID
+- intake submission timestamp
+- delivered PDF SHA-256 from delivery-manifest.json
+- delivery email timestamp and recipient
+- any receipt/access confirmation
+
+This creates evidence for digital-goods disputes. Do not expose PDFs at public or
+predictable URLs.
+
+5. RETENTION
+Choose and disclose a retention period before selling. A reasonable pilot policy:
+- delete raw intake and generated plan/HTML 30 days after delivery
+- retain transaction ID, delivery timestamp, and PDF hash for accounting/disputes
+- delete or anonymize free-text notes when no longer needed
+
+6. REVIEW BRANCH POLICY
+Do not merge this branch or add website sales copy until product, sample PDF,
+intake questions, price, refund policy, privacy language, delivery SLA, and
+payment workflow have been reviewed together.
