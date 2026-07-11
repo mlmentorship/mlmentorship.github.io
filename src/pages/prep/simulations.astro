@@ -37,6 +37,42 @@ const packets = [
   },
 ];
 
+const frontierPackets = [
+  {
+    id: 'frontier-engineering',
+    title: 'Agentic engineering loop',
+    rule: 'Use only when the confirmed loop includes an authorized coding agent, an existing codebase, or a technical presentation.',
+    rounds: [
+      ['60 min', 'Agentic ML codebase', 'Run the evaluation-service lab. Score codebase mapping, bounded delegation, diff review, tests, and explanation.'],
+      ['45 min', 'LLM inference design', 'Design admission, batching, KV capacity, fairness, overload, and quality-preserving degradation.'],
+      ['45 min', 'Technical presentation', 'Present for 30 minutes and reserve 15 for interrupted questions on ownership, evidence, and counterfactuals.'],
+      ['30 min', 'Collaboration and values', 'Probe one cross-functional conflict and one decision with a real safety, quality, or user-cost tension.'],
+    ],
+  },
+  {
+    id: 'frontier-research',
+    title: 'Research work-sample loop',
+    rule: 'Use only when the confirmed loop includes a notebook, API investigation, research brainstorm, paper discussion, or experiment review.',
+    rounds: [
+      ['90 min', 'Black-box investigation', 'Produce competing hypotheses, discriminating probes, a boundary condition, and a five-minute readout.'],
+      ['45 min', 'Research depth', 'Critique one claim and design an ablation that separates it from the strongest alternative.'],
+      ['30 min', 'Math oral', 'Draw two derivations and change one assumption in follow-up.'],
+      ['45 min', 'Technical project defense', 'Defend one research-to-system project with failures, evidence, ownership, and transfer.'],
+    ],
+  },
+  {
+    id: 'frontier-performance',
+    title: 'Performance and training-systems loop',
+    rule: 'Use only for roles that name accelerators, kernels, distributed training, inference performance, or ML infrastructure.',
+    rounds: [
+      ['120 min', 'Accelerator work sample', 'Use the public challenge and experiment ledger. Require a trace-based hypothesis, measurement, and unchanged correctness tests.'],
+      ['45 min', 'Fault-tolerant training design', 'Classify failures, define state consistency, and choose recovery scope.'],
+      ['45 min', 'Frontier training incident', 'Diagnose a loss spike from rank-local evidence and preserve experimental validity.'],
+      ['40 min', 'Project deep-dive', 'Probe one bottleneck, one failed optimization, and the candidate’s instrumentation choices.'],
+    ],
+  },
+];
+
 const unfamiliarPrompts = [
   'A company has historical project documents and wants to predict which future ML projects will succeed. Scope the problem before proposing a model.',
   'Your model improves the offline metric by 8% but hurts the online primary metric by 2%. Decide what to do next.',
@@ -69,6 +105,12 @@ const unfamiliarPrompts = [
       <ol class="round-list">{packet.rounds.map((round, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><div><h3>{round.title} <small>{round.time}</small></h3><p>{round.prompt}</p></div></li>)}</ol>
     </section>
   ))}
+
+  <h2>Frontier format overlays</h2>
+  <p>These are not company packets. They model public, current work-sample formats and should be used only when recruiting confirms the corresponding round.</p>
+  <div class="frontier-packets">
+    {frontierPackets.map((packet) => <section id={packet.id} class="frontier-packet"><header><p>Format-specific packet</p><h3>{packet.title}</h3><span>{packet.rule}</span></header><ol>{packet.rounds.map(([time, title, prompt]) => <li><strong>{title}</strong><small>{time}</small><p>{prompt}</p></li>)}</ol></section>)}
+  </div>
 
   <h2>Unfamiliar transfer prompt pool</h2>
   <p>Use one prompt the candidate has not seen. The goal is transfer of framing, evaluation, and trade-off patterns, not recall of a memorized architecture.</p>
@@ -165,6 +207,15 @@ const unfamiliarPrompts = [
   .gate-grid article { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
   .gate-grid h3 { margin-top: 0 !important; }
   .gate-grid p { margin-bottom: 0; font-size: .87rem; }
+  .frontier-packets { display: grid; gap: 1rem; }
+  .frontier-packet { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); scroll-margin-top: 5.5rem; }
+  .frontier-packet header p { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; }
+  .frontier-packet header h3 { margin: .15rem 0 .35rem !important; }
+  .frontier-packet header span { color: var(--c-text-soft); font-size: .82rem; }
+  .frontier-packet ol { padding: 0; list-style: none; }
+  .frontier-packet li { display: grid; grid-template-columns: 1fr auto; gap: .2rem .8rem; padding: .7rem 0; border-top: 1px solid var(--c-rule); }
+  .frontier-packet small { color: var(--c-accent); font-family: var(--font-mono); }
+  .frontier-packet li p { grid-column: 1 / -1; margin: 0; color: var(--c-text-soft); font-size: .82rem; }
   @media (max-width: 700px) { .score-grid, .gate-grid { grid-template-columns: 1fr; } .builder-controls { align-items: stretch; flex-direction: column; } .builder-controls button { width: 100%; } .builder-output li { grid-template-columns: 1fr; } .builder-output span { grid-column: auto; } }
   @media print { .packet { break-before: page; } .scorecard { break-before: page; } }
 </style>

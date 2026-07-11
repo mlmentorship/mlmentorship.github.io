@@ -2,10 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const scanRoots = ['.github', 'docs', 'scripts', 'src'];
+const scanRoots = ['.github', 'docs', 'public', 'scripts', 'src'];
 const rootFiles = ['CONTENT_ROADMAP.md', '.env.example', 'astro.config.mjs', 'package.json'];
 const textExtensions = new Set([
-  '.astro', '.css', '.html', '.js', '.json', '.md', '.mjs', '.ts', '.txt', '.yaml', '.yml',
+  '.astro', '.css', '.html', '.js', '.json', '.md', '.mjs', '.py', '.toml', '.ts', '.txt', '.yaml', '.yml',
 ]);
 const forbidden = String.fromCodePoint(0x2014);
 const violations = [];

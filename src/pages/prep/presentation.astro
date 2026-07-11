@@ -1,0 +1,46 @@
+---
+import PrepLayout from '../../layouts/PrepLayout.astro';
+import { SITE } from '../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+---
+
+<PrepLayout
+  title="Senior ML technical project presentation practice"
+  description="A 30-minute decision narrative, 15-minute adversarial Q&A, slide architecture, observer prompts, and senior-level scorecard."
+  heading="Present the decisions, not the project diary."
+  lede="A strong technical presentation proves ownership, judgment, and depth in one artifact. Use 30 minutes to establish the decision spine, then reserve 15 minutes for the part that actually calibrates level: skeptical questions."
+  eyebrow="Technical project presentation"
+>
+  <section class="callout"><h2>The governing rule</h2><p>Choose a project with three consequential decisions, one failed approach, defensible evidence, and an outcome you can bound. A famous project you barely owned is weaker than a smaller project whose hard calls were yours.</p></section>
+
+  <h2>Build the deck around three decisions</h2>
+  <ol class="step-list">
+    <li><strong>Open with the thesis.</strong> State the problem, stakes, your ownership, and measured outcome in four sentences.</li>
+    <li><strong>Give only necessary context.</strong> The audience needs users, constraints, prior behavior, and failure cost, not a company history.</li>
+    <li><strong>Defend each decision.</strong> Show alternatives, evidence available at the time, the choice, and what would have changed it.</li>
+    <li><strong>Descend once.</strong> Move from architecture into one model, bottleneck, failure trace, or derivation that proves hands-on depth.</li>
+    <li><strong>Show the wrong turn.</strong> Name the assumption, disconfirming signal, and response.</li>
+    <li><strong>Bound the impact.</strong> Separate observed outcome, estimated contribution, team output, and second-order effects.</li>
+  </ol>
+
+  <div class="resource-grid">
+    <a class="resource-card" href="/labs/presentation/deck-outline.md"><h3>12-slide outline</h3><p>A decision-centered deck structure and slides to delete.</p></a>
+    <a class="resource-card" href="/labs/presentation/question-bank.md"><h3>Challenge bank</h3><p>Twenty skeptical follow-ups across evidence, implementation, ownership, and counterfactuals.</p></a>
+  </div>
+
+  <h2>Run the simulation</h2>
+  <div class="timeline"><span>00–02</span><p>Thesis and ownership</p><span>02–07</span><p>Problem, constraints, prior state</p><span>07–23</span><p>Three decisions and one technical descent</p><span>23–27</span><p>Failure, evaluation, operations</p><span>27–30</span><p>Impact, changed judgment, summary</p><span>30–45</span><p>Interrupted Q&A</p></div>
+
+  <section class="scorecard"><h2>Score before coaching</h2><ul><li><strong>Thesis:</strong> the opening establishes stakes, claim, ownership, and result.</li><li><strong>Decision spine:</strong> alternatives and evidence organize the narrative.</li><li><strong>Technical depth:</strong> one implementation detail survives expert follow-up.</li><li><strong>Evidence:</strong> metrics, slices, uncertainty, and attribution are honest.</li><li><strong>Defense:</strong> direct answers come before context; the candidate updates when warranted.</li><li><strong>Level:</strong> scope and influence match the target without replacing hands-on credibility.</li></ul></section>
+
+  <section class="callout"><h2>Practice gate</h2><p>Run the presentation twice. The second observer must not have seen the deck, must interrupt, and must ask at least one counterfactual. Do not graduate if the story loses ownership, evidence, or technical credibility under questions.</p><p><a href="/questions/present-technical-ml-project/">Read the leveled answer and failure modes →</a></p></section>
+</PrepLayout>
+
+<style>
+  .timeline { display: grid; grid-template-columns: 4.5rem 1fr; gap: .4rem .8rem; padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .timeline span { color: var(--c-accent); font-family: var(--font-mono); font-size: .75rem; }
+  .timeline p { margin: 0; }
+  .scorecard { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); }
+  .scorecard h2 { margin-top: 0 !important; }
+  .scorecard li { margin-bottom: .55rem; }
+</style>

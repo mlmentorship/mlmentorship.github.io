@@ -13,18 +13,26 @@ export type AreaId =
 export type RoundId =
   | 'ml-breadth'
   | 'coding'
+  | 'agentic-codebase'
   | 'ml-system-design'
   | 'project-deep-dive'
+  | 'technical-presentation'
   | 'behavioral'
+  | 'values-mission'
   | 'product-experimentation'
   | 'research-depth'
+  | 'research-work-sample'
+  | 'math-oral'
   | 'systems-infrastructure';
 export type PracticeModeId =
   | 'breadth'
   | 'coding'
+  | 'agentic'
   | 'system-design'
   | 'project'
+  | 'presentation'
   | 'behavioral'
+  | 'values'
   | 'experimentation'
   | 'research'
   | 'infrastructure'
@@ -96,6 +104,17 @@ export const INTERVIEW_ROUNDS: Array<{
     ],
   },
   {
+    id: 'agentic-codebase',
+    label: 'Agentic codebase',
+    description: 'Navigate an unfamiliar ML codebase, direct an AI coding agent, review its work, and ship a tested change.',
+    minutes: 60,
+    areaWeights: { coding: .55, production: .3, 'system-design': .15 },
+    starterLinks: [
+      { label: 'Extend an ML evaluation codebase', href: '/questions/agentic-ml-codebase-interview/' },
+      { label: 'Debug a frontier training run', href: '/questions/debug-frontier-llm-training-run/' },
+    ],
+  },
+  {
     id: 'ml-system-design',
     label: 'ML system design',
     description: 'Requirements, data, modeling, evaluation, serving, monitoring, and iteration.',
@@ -118,6 +137,17 @@ export const INTERVIEW_ROUNDS: Array<{
     ],
   },
   {
+    id: 'technical-presentation',
+    label: 'Technical project presentation',
+    description: 'Present one consequential ML project, then defend its decisions, evidence, failures, and impact under interruption.',
+    minutes: 45,
+    areaWeights: { behavioral: .45, production: .2, 'system-design': .2, experimentation: .15 },
+    starterLinks: [
+      { label: 'Present a technical ML project', href: '/questions/present-technical-ml-project/' },
+      { label: 'Most ambitious project', href: '/questions/most-ambitious-project/' },
+    ],
+  },
+  {
     id: 'behavioral',
     label: 'Behavioral / leadership',
     description: 'Conflict, prioritization, failure, influence, mentoring, and collaboration.',
@@ -126,6 +156,17 @@ export const INTERVIEW_ROUNDS: Array<{
     starterLinks: [
       { label: 'Disagreement with a senior person', href: '/questions/disagreed-with-senior/' },
       { label: 'Decide what to work on', href: '/questions/decide-what-to-work-on/' },
+    ],
+  },
+  {
+    id: 'values-mission',
+    label: 'Values & mission',
+    description: 'Reason through a real ethical tension, explain a changed belief, and show principled disagreement without slogans.',
+    minutes: 45,
+    areaWeights: { behavioral: .7, experimentation: .15, 'system-design': .15 },
+    starterLinks: [
+      { label: 'Defend values under pressure', href: '/questions/defend-values-under-ethical-pressure/' },
+      { label: 'Quality or safety over speed', href: '/questions/advocated-quality-over-speed/' },
     ],
   },
   {
@@ -148,6 +189,28 @@ export const INTERVIEW_ROUNDS: Array<{
     starterLinks: [
       { label: 'Design an ablation study', href: '/questions/design-ablation-study/' },
       { label: 'Critique an ML paper', href: '/questions/critique-ml-paper/' },
+    ],
+  },
+  {
+    id: 'research-work-sample',
+    label: 'Research work sample',
+    description: 'Turn a black-box observation into hypotheses, discriminating probes, measured evidence, and a short readout.',
+    minutes: 90,
+    areaWeights: { 'math-research': .5, experimentation: .25, coding: .15, fundamentals: .1 },
+    starterLinks: [
+      { label: 'Investigate black-box model behavior', href: '/questions/investigate-black-box-model-behavior/' },
+      { label: 'Critique an ML paper', href: '/questions/critique-ml-paper/' },
+    ],
+  },
+  {
+    id: 'math-oral',
+    label: 'Math & statistics oral',
+    description: 'Rapid derivations, assumptions, sanity checks, interpretation, and changed-assumption follow-ups.',
+    minutes: 45,
+    areaWeights: { 'math-research': .8, fundamentals: .2 },
+    starterLinks: [
+      { label: 'Derive ML math under pressure', href: '/questions/derive-ml-math-under-pressure/' },
+      { label: 'Derive logistic regression', href: '/questions/derive-logistic-regression/' },
     ],
   },
   {
@@ -290,6 +353,17 @@ export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeDefinition> = {
       sharedCommunication,
     ],
   },
+  agentic: {
+    id: 'agentic', label: 'Agentic ML implementation', minutes: 60,
+    instruction: 'Map the codebase, state the plan, delegate bounded changes, review every diff, and prove the result with tests and measurements.',
+    rubric: [
+      { id: 'map', label: 'Codebase map', question: 'Did you identify the execution path, invariants, tests, and likely change surface before editing?', coaching: 'Write a five-line codebase map: entry point, data flow, core invariant, test command, and files likely to change.' },
+      { id: 'delegation', label: 'Delegation', question: 'Did prompts give the agent bounded context, constraints, and a verifiable outcome?', coaching: 'Delegate one function or failing behavior at a time and state what must remain unchanged.' },
+      { id: 'review', label: 'Critical review', question: 'Could you explain and challenge every generated change rather than accepting it wholesale?', coaching: 'Inspect the diff line by line and reject one unnecessary, unsafe, or overly broad change before continuing.' },
+      { id: 'verification', label: 'Verification', question: 'Did you run focused tests, add an edge case, and measure the relevant behavior?', coaching: 'Run the narrowest failing test first, then the full suite, then one benchmark or invariant check.' },
+      sharedCommunication,
+    ],
+  },
   'system-design': {
     id: 'system-design', label: 'ML system design', minutes: 40,
     instruction: 'Scope first; then cover data, baseline, model, evaluation, serving, monitoring, and iteration.',
@@ -312,6 +386,17 @@ export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeDefinition> = {
       { id: 'impact', label: 'Impact & reflection', question: 'Was the outcome measurable, attributable, and honestly bounded?', coaching: 'Separate output from outcome, quantify direction or scale, and state what you would change now.' },
     ],
   },
+  presentation: {
+    id: 'presentation', label: 'Technical presentation', minutes: 45,
+    instruction: 'Deliver a 30-minute decision narrative, then defend assumptions, alternatives, failures, ownership, and impact for 15 minutes.',
+    rubric: [
+      { id: 'thesis', label: 'Opening thesis', question: 'Did the first two minutes establish the problem, your claim, your role, and why the outcome mattered?', coaching: 'Rewrite the opening as four sentences: problem, stakes, your ownership, and result.' },
+      { id: 'decisions', label: 'Decision spine', question: 'Did the presentation center on consequential decisions rather than chronology?', coaching: 'Choose three decisions and put rejected alternatives and evidence beside each one.' },
+      { id: 'technical-depth', label: 'Technical depth', question: 'Could you descend from architecture to one implementation detail without losing the audience?', coaching: 'Prepare one architecture view, one bottleneck calculation, and one failure trace.' },
+      { id: 'defense', label: 'Defense under questions', question: 'Did you answer challenges directly, update when warranted, and preserve a clear position?', coaching: 'Practice a two-sentence direct answer before adding context or caveats.' },
+      { id: 'impact', label: 'Impact & attribution', question: 'Were outcomes measured and your contribution separated from team output?', coaching: 'Label each outcome as observed, estimated, or influenced, then state exactly what you owned.' },
+    ],
+  },
   behavioral: {
     id: 'behavioral', label: 'Behavioral / leadership', minutes: 3,
     instruction: 'Answer the exact question in 90–120 seconds, then reserve detail for follow-ups.',
@@ -321,6 +406,17 @@ export const PRACTICE_MODES: Record<PracticeModeId, PracticeModeDefinition> = {
       { id: 'stakes', label: 'Stakes & conflict', question: 'Was there a real decision, tension, or consequence?', coaching: 'Cut setup that does not establish the decision, disagreement, risk, or cost.' },
       { id: 'evidence', label: 'Evidence & result', question: 'Did the outcome include concrete evidence without exaggeration?', coaching: 'Use defensible metrics, scale, or observed behavior and distinguish correlation from your contribution.' },
       { id: 'reflection', label: 'Reflection', question: 'Did you show how the experience changed your judgment?', coaching: 'State one principle you now use and one thing you would do differently.' },
+    ],
+  },
+  values: {
+    id: 'values', label: 'Values & mission', minutes: 12,
+    instruction: 'Take a position on a real tension, ground it in experience, expose uncertainty, and respond honestly to principled pushback.',
+    rubric: [
+      { id: 'tension', label: 'Real tension', question: 'Did the answer identify competing values and a real cost on both sides?', coaching: 'Name what a reasonable person on the other side is protecting and what your choice sacrifices.' },
+      { id: 'evidence', label: 'Grounded evidence', question: 'Did you use an experience or decision rather than mission slogans?', coaching: 'Replace one abstract principle with a concrete decision, consequence, and lesson.' },
+      { id: 'independence', label: 'Independent judgment', question: 'Did you disagree or qualify a premise where the evidence required it?', coaching: 'State one company or industry position you would challenge and the evidence that would change your mind.' },
+      { id: 'update', label: 'Ability to update', question: 'Could you explain a belief that changed and what caused the update?', coaching: 'Name the old belief, disconfirming evidence, and the behavior you changed afterward.' },
+      sharedCommunication,
     ],
   },
   experimentation: {
@@ -378,7 +474,7 @@ const MODE_BY_SUBCATEGORY: Record<string, PracticeModeId> = {
   'Product & Experimentation': 'experimentation',
   'Behavioral': 'behavioral',
   'Math & Research': 'research',
-  'Coding': 'coding',
+  'ML Implementation': 'coding',
 };
 
 const QUESTION_MODE_OVERRIDES: Record<string, PracticeModeId> = {
@@ -398,6 +494,22 @@ const QUESTION_MODE_OVERRIDES: Record<string, PracticeModeId> = {
   'reparameterization-trick': 'math',
   'design-ablation-study': 'research',
   'critique-ml-paper': 'research',
+  'agentic-ml-codebase-interview': 'agentic',
+  'present-technical-ml-project': 'presentation',
+  'debug-frontier-llm-training-run': 'coding',
+  'design-production-llm-inference-service': 'system-design',
+  'investigate-black-box-model-behavior': 'research',
+  'defend-values-under-ethical-pressure': 'values',
+  'optimize-accelerator-workload': 'infrastructure',
+  'design-fault-tolerant-distributed-training': 'infrastructure',
+  'design-post-training-data-and-rl-environment': 'research',
+  'design-llm-red-team-program': 'system-design',
+  'implement-transformer-decoder': 'coding',
+  'implement-kv-cache-decode': 'coding',
+  'implement-beam-search': 'coding',
+  'implement-lora-adapter': 'coding',
+  'implement-reverse-mode-autograd': 'coding',
+  'derive-ml-math-under-pressure': 'math',
 };
 
 export function getPracticeMode(slug: string, subcategory?: string): PracticeModeDefinition {
