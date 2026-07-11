@@ -9,7 +9,7 @@ category: "concepts"
 
 ## One-line definition
 
-Content-based filtering recommends items whose **features** (genre, text, tags, embeddings) match a **profile built from the items a user already engaged with** — it scores item–profile similarity, using **no other users' behavior**.
+Content-based filtering recommends items whose **features** (genre, text, tags, embeddings) match a **profile built from the items a user already engaged with**: it scores item–profile similarity, using **no other users' behavior**.
 
 ## Why it matters
 
@@ -18,7 +18,7 @@ Content-based filtering is the standard answer to the **item cold-start** proble
 ## The mechanism
 
 1. **Item representation.** Turn each item into a feature vector: structured attributes (genre, brand, price), TF-IDF / embeddings of text, image/audio embeddings, or learned content encoders.
-2. **User profile.** Aggregate the representations of items the user engaged with — e.g. the (weighted) average of liked-item vectors, or a learned user encoder.
+2. **User profile.** Aggregate the representations of items the user engaged with, e.g. the (weighted) average of liked-item vectors, or a learned user encoder.
 3. **Score and rank.** Recommend items with the highest similarity (cosine / dot product) to the profile, excluding already-seen items.
 
 This is structurally a **two-tower** idea (a user/profile tower and an item/content tower) when both sides are learned, which is why content features feed naturally into modern retrieval models.
@@ -26,7 +26,7 @@ This is structurally a **two-tower** idea (a user/profile tower and an item/cont
 ## Content-based vs collaborative filtering
 
 | | **Content-based** | **Collaborative filtering** |
-|---|---|---|
+| --- | --- | --- |
 | Signal | item **features** + this user's history | the **user–item interaction matrix** |
 | New item (item cold-start) | **works** (has features) | fails (no interactions) |
 | New user | needs a little history | fails (no interactions) |
@@ -42,9 +42,10 @@ The crisp summary: **content-based asks "what is this item like?"; collaborative
 **Strengths**: handles item cold-start, needs no other users, recommendations are explainable, works for unique tastes.
 
 **Weaknesses**:
-- **Limited serendipity** — recommendations cluster around what the user already likes (the **filter-bubble / over-specialization** problem).
-- **Feature-bound** — quality is capped by how good your item features are; it can't discover preferences your features don't encode.
-- **Still has user cold-start** — a brand-new user with no history has no profile.
+
+- **Limited serendipity**: recommendations cluster around what the user already likes (the **filter-bubble / over-specialization** problem).
+- **Feature-bound**: quality is capped by how good your item features are; it can't discover preferences your features don't encode.
+- **Still has user cold-start**: a brand-new user with no history has no profile.
 
 ## Hybrid systems (what's actually deployed)
 
@@ -54,7 +55,7 @@ Production recommenders blend both:
 - **Feature-rich two-tower / wide-and-deep models** that take both content features *and* collaborative IDs as input, learning a single ranker.
 - **Knowledge-graph and embedding side-information** layered onto collaborative factors.
 
-So "content-based vs collaborative" is rarely a real either/or in 2026 — the design question is *how* to fuse them.
+So "content-based vs collaborative" is rarely a real either/or in 2026: the design question is *how* to fuse them.
 
 ## What an interviewer expects you to say
 
@@ -67,9 +68,9 @@ So "content-based vs collaborative" is rarely a real either/or in 2026 — the d
 ## Common confusions
 
 - **"Content-based solves all cold-start."** It solves **item** cold-start; a brand-new **user** still has no profile.
-- **"It's just collaborative filtering with features."** It uses *no* cross-user signal — that's the defining difference and the source of both its cold-start strength and its serendipity weakness.
-- **"It's more accurate than collaborative filtering."** Usually the opposite once interaction data exists — collaborative filtering learns latent preferences content features can't capture. Content shines specifically when behavioral data is sparse.
-- **"Two-tower retrieval is collaborative filtering."** Two-tower can be either or both — with content features in the item tower it's content-based; with pure ID embeddings it's collaborative.
+- **"It's just collaborative filtering with features."** It uses *no* cross-user signal; that's the defining difference and the source of both its cold-start strength and its serendipity weakness.
+- **"It's more accurate than collaborative filtering."** Usually the opposite once interaction data exists: collaborative filtering learns latent preferences content features can't capture. Content shines specifically when behavioral data is sparse.
+- **"Two-tower retrieval is collaborative filtering."** Two-tower can be either or both: with content features in the item tower it's content-based; with pure ID embeddings it's collaborative.
 
 ---
 

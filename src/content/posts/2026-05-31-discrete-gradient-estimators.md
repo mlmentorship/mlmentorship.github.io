@@ -9,11 +9,11 @@ category: "concepts"
 
 ## One-line definition
 
-Discrete gradient estimators approximate $\nabla_\theta \mathbb{E}_{z \sim p_\theta}[f(z)]$ when $z$ is **discrete** — the case where you cannot reparameterize the sample as a smooth function of $\theta$ and noise. The three you must know: **REINFORCE** (score function), **Gumbel-Softmax** (continuous relaxation), and the **straight-through estimator**.
+Discrete gradient estimators approximate $\nabla_\theta \mathbb{E}_{z \sim p_\theta}[f(z)]$ when $z$ is **discrete**, the case where you cannot reparameterize the sample as a smooth function of $\theta$ and noise. The three you must know: **REINFORCE** (score function), **Gumbel-Softmax** (continuous relaxation), and the **straight-through estimator**.
 
 ## Why it matters
 
-The [reparameterization trick](/questions/reparameterization-trick/) handles continuous latents (Gaussian VAEs). But many models sample **discrete** objects — categorical latents, hard attention, tokens, architecture choices, RL actions. You can't push a gradient through `argmax` or a categorical sample, so you need an estimator. This is the deep-DL follow-up to "explain the reparameterization trick," and it underpins RLHF (which uses the score-function estimator) and discrete latent-variable models.
+The [reparameterization trick](/questions/reparameterization-trick/) handles continuous latents (Gaussian VAEs). But many models sample **discrete** objects: categorical latents, hard attention, tokens, architecture choices, RL actions. You can't push a gradient through `argmax` or a categorical sample, so you need an estimator. This is the deep-DL follow-up to "explain the reparameterization trick," and it underpins RLHF (which uses the score-function estimator) and discrete latent-variable models.
 
 ## The core problem
 
@@ -27,7 +27,7 @@ $$
 \nabla_\theta \mathbb{E}_{z}[f(z)] = \mathbb{E}_{z \sim p_\theta}\big[\, f(z)\, \nabla_\theta \log p_\theta(z)\,\big].
 $$
 
-**Unbiased**, requires only that you can sample $z$ and evaluate $\log p_\theta(z)$ — $f$ can be a black box (non-differentiable, even an environment reward).
+**Unbiased**, requires only that you can sample $z$ and evaluate $\log p_\theta(z)$; $f$ can be a black box (non-differentiable, even an environment reward).
 
 The catch is **high variance**. Mitigations:
 
@@ -60,12 +60,12 @@ $$
 \text{forward: } z = \text{one\_hot}(\arg\max), \qquad \text{backward: } \frac{\partial z}{\partial \text{logits}} \approx \frac{\partial \,\text{softmax}}{\partial \text{logits}}.
 $$
 
-**Straight-Through Gumbel-Softmax** combines both: hard one-hot forward, soft Gumbel-Softmax gradient backward — so the rest of the network sees a genuine discrete sample. STE is **biased** (the backward op isn't the true derivative) but cheap and empirically effective; it is the workhorse behind **VQ-VAE** codebook training and binarized/quantized networks.
+**Straight-Through Gumbel-Softmax** combines both: hard one-hot forward, soft Gumbel-Softmax gradient backward, so the rest of the network sees a genuine discrete sample. STE is **biased** (the backward op isn't the true derivative) but cheap and empirically effective; it is the workhorse behind **VQ-VAE** codebook training and binarized/quantized networks.
 
 ## The bias-variance tradeoff
 
 | Estimator | Bias | Variance | Needs differentiable $f$? | Typical use |
-|-----------|------|----------|---------------------------|-------------|
+| --- | --- | --- | --- | --- |
 | **Score function (REINFORCE)** | Unbiased | High | No | RL, RLHF, black-box reward |
 | **Gumbel-Softmax** | Biased ($\tau>0$) | Low | Yes | Discrete latents (categorical VAE) |
 | **Straight-through** | Biased | Low | Yes (via surrogate) | VQ-VAE, quantization, hard attention |
@@ -76,7 +76,7 @@ The dividing question: **can you differentiate $f$?** If not (an environment, a 
 
 1. State *why* reparameterization fails for discrete $z$ (you can't write a discrete sample as a smooth function of noise and $\theta$).
 2. Give the **score-function estimator** with the $\nabla \log p$ identity, that it's **unbiased but high-variance**, and that **baselines** reduce variance without adding bias.
-3. Explain **Gumbel-Softmax** as the reparameterizable relaxation with a temperature you anneal — **biased, low variance**.
+3. Explain **Gumbel-Softmax** as the reparameterizable relaxation with a temperature you anneal (**biased, low variance**).
 4. Describe the **straight-through estimator** (hard forward, soft/identity backward) and that it trains **VQ-VAE** and quantized nets.
 5. Connect to practice: **RLHF uses score-function (PPO)** because text is discrete and a 50K-way Gumbel-Softmax is impractical; **DPO** sidesteps sampling entirely.
 
@@ -85,7 +85,7 @@ The dividing question: **can you differentiate $f$?** If not (an environment, a 
 - **"You can just backprop through argmax."** Its gradient is zero almost everywhere; that's the whole problem.
 - **"REINFORCE is biased."** It's unbiased; its issue is variance. Baselines fix variance, not bias.
 - **"Gumbel-Softmax is exact."** It's biased for any $\tau > 0$; only the $\tau \to 0$ limit is exact, and there the gradient is uselessly high-variance.
-- **"Straight-through has a principled gradient."** It doesn't — it's a useful heuristic (the backward op deliberately mismatches the forward op).
+- **"Straight-through has a principled gradient."** It doesn't; it's a useful heuristic (the backward op deliberately mismatches the forward op).
 - **"These are RL-only / VAE-only tricks."** They're general: hard attention, neural architecture search, discrete communication, and quantization all use them.
 
 ---

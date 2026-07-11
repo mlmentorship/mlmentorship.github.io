@@ -9,7 +9,7 @@ category: "questions"
 
 > Implement exact top-k cosine retrieval for query matrix `Q` and item matrix `X`. The full `Q @ X.T` matrix does not fit in memory.
 
-This tests implementation, vectorization, numerical hygiene, and whether you can reason about memory—not whether you know a particular ANN library.
+This is the retrieval stage of an embedding system (two-tower recsys, semantic search, RAG) written by hand: score a batch of query embeddings against the item matrix and keep the top-k neighbors when the full score matrix will not fit in memory. It tests vectorization, numerical hygiene, and memory reasoning, not knowledge of a particular ANN library.
 
 ## Contract
 
@@ -28,7 +28,7 @@ Handle zero vectors explicitly. State whether they produce score zero or an erro
 Normalize rows once, then process item blocks:
 
 1. Score `Q_normalized @ X_block_normalized.T`.
-2. Take each query’s top-k within the block.
+2. Take each query's top-k within the block.
 3. Merge those candidates with the running top-k.
 4. Repeat until all items are consumed.
 

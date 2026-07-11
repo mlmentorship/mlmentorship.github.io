@@ -21,15 +21,15 @@ const rolePaths = [
   {
     id: 'ml-engineer', title: 'Machine Learning Engineer', rule: 'Do not substitute ML reading for software execution. Code, debug, and design reliable systems repeatedly.',
     sequence: [
-      ['01 · Confirm the loop', '/guides/as-vs-mle-vs-re/', 'Ask whether coding is algorithms, practical implementation, ML coding, or all three.'],
-      ['02 · Establish coding baseline', '/questions/implement-knn/', 'Produce correct code, tests, and complexity under time.'],
+      ['01 · Confirm the loop', '/guides/as-vs-mle-vs-re/', 'Ask whether implementation means general algorithms, ML primitives, debugging, or all three. Use other resources for general algorithms.'],
+      ['02 · Establish an ML implementation baseline', '/questions/implement-streaming-classification-metrics/', 'Build mergeable model-evaluation logic with tests, edge cases, and explicit metric semantics.'],
       ['03 · Add bounded-memory implementation', '/questions/implement-batched-top-k/', 'Reason about vectorization, memory, and exact-versus-ANN trade-offs.'],
       ['04 · Debug systematically', '/questions/debug-training-loop/', 'State the diagnostic order before editing code.'],
       ['05 · Design reliable serving', '/questions/design-ml-monitoring/', 'Cover data, model, outcome, alerts, ownership, and rollback.'],
       ['06 · Make cost explicit', '/questions/design-ml-system-fixed-budget/', 'Quantify workload and quality/cost/latency frontiers.'],
-      ['07 · Analyze experiment data', '/questions/analyze-experiment-sql/', 'Protect user grain, exposure, windows, and sample ratio.'],
+      ['07 · Debug offline and online disagreement', '/questions/debug-offline-online-metric-gap/', 'Separate experiment integrity, serving skew, proxy mismatch, and feedback effects.'],
       ['08 · Prepare production failure and recovery stories', '/prep/story-bank/', 'Use failure, incident recovery, trade-off, and cross-team stories.'],
-      ['09 · Simulate the loop', '/prep/simulations/#ml-engineer', 'Run coding, design, production, breadth, and project rounds.'],
+      ['09 · Simulate the loop', '/prep/simulations/#ml-engineer', 'Run ML implementation, design, production, breadth, and project rounds.'],
     ],
   },
   {
@@ -37,13 +37,13 @@ const rolePaths = [
     sequence: [
       ['01 · Confirm role mix', '/guides/as-vs-mle-vs-re/', 'Map research, modeling, engineering, and product expectations.'],
       ['02 · Implement a core primitive', '/questions/implement-attention-from-scratch/', 'Build the mechanism correctly and explain dimensions and complexity.'],
-      ['03 · Add systems coding', '/questions/implement-batched-top-k/', 'Handle memory and performance without hiding behind a library.'],
+      ['03 · Add systems implementation', '/questions/implement-batched-top-k/', 'Handle memory and performance without hiding behind a library.'],
       ['04 · Model the workload', '/questions/train-100b-model/', 'Reason about memory, parallelism, communication, failures, and checkpoints.'],
       ['05 · Reason about inference', '/questions/reduce-llm-inference-cost-10x/', 'Use measurement and cost models rather than a list of optimizations.'],
       ['06 · Design discriminating evidence', '/questions/design-ablation-study/', 'Control compute, tuning, variance, and alternative explanations.'],
       ['07 · Critique research fairly', '/questions/critique-ml-paper/', 'Prioritize the threat that most changes the central claim.'],
       ['08 · Prepare translation stories', '/prep/story-bank/', 'Show failed experiments, implementation decisions, and research-to-production impact.'],
-      ['09 · Simulate the loop', '/prep/simulations/#research-engineer', 'Run coding, systems, research depth, breadth, and project rounds.'],
+      ['09 · Simulate the loop', '/prep/simulations/#research-engineer', 'Run ML implementation, systems, research depth, breadth, and project rounds.'],
     ],
   },
 ];
@@ -60,24 +60,24 @@ const domains = [
 <PrepLayout
   title="Applied Scientist, MLE, and Research Engineer prep paths"
   description="Ordered role-specific and domain-specific interview preparation paths using the mlmentorship core library."
-  heading="Prepare for the role and loop—not the title alone."
+  heading="Prepare for the role and loop, not the title alone."
   lede="Follow one ordered role path, then add only the domain supplement that appears in the actual job and recruiter-provided round breakdown. Everything else is optional breadth."
 >
-  <section class="callout"><h2>Before choosing a path</h2><p>Company titles are inconsistent. Ask for round formats, coding style, project expectations, and the day-to-day research/modeling/engineering/product mix. If the recruiter cannot provide detail, use the typical rounds in the <a href="/prep/readiness/">readiness check</a> and mark uncertainty as risk.</p></section>
+  <section class="callout"><h2>Before choosing a path</h2><p>Company titles are inconsistent. Ask for round formats, implementation style, project expectations, and the day-to-day research/modeling/engineering/product mix. If the recruiter cannot provide detail, use the typical rounds in the <a href="/prep/readiness/">readiness check</a> and mark uncertainty as risk.</p></section>
 
   <nav class="path-jumps" aria-label="Jump to role path">{rolePaths.map((role) => <a href={`#${role.id}`}>{role.title}</a>)}</nav>
 
   {rolePaths.map((role) => <section id={role.id} class="role-path"><header><p>Ordered core path</p><h2>{role.title}</h2><span>{role.rule}</span></header><ol>{role.sequence.map(([label, href, detail]) => <li><h3><a href={href}>{label}</a></h3><p>{detail}</p></li>)}</ol></section>)}
 
   <h2 id="domain-supplements">Domain supplements</h2>
-  <p>A domain supplement changes examples and technical depth. It does not replace coding, project evidence, behavioral judgment, or the actual round formats.</p>
+  <p>A domain supplement changes examples and technical depth. It does not replace ML implementation, project evidence, behavioral judgment, or the actual round formats.</p>
   <div class="domain-grid">{domains.map((domain) => <article><h3>{domain.title}</h3><ul>{domain.do.map((item) => <li>{item}</li>)}</ul><p>{domain.links.map(([label, href], index) => <><a href={href}>{label}</a>{index < domain.links.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
 
   <h2>Specialist-domain boundary</h2>
   <section class="boundary"><p>The core library is deepest in LLMs, recommendations, general ML, training, and systems. For specialized CV, speech, or RL loops, use the concept collections below for foundations, but obtain a domain-specific paper/project mock from someone current in that field.</p><ul><li><a href="/concepts/#computer-vision">Computer Vision concepts</a></li><li><a href="/concepts/#nlp-and-speech">NLP & Speech concepts</a></li><li><a href="/concepts/#reinforcement-learning">Reinforcement Learning concepts</a></li></ul></section>
 
   <h2>What the core library does not yet cover deeply</h2>
-  <section class="boundary"><p>Use external, current material when the role explicitly tests framework internals (PyTorch/TensorFlow compilation and autograd), general streaming-data infrastructure, privacy/compliance implementation, causal inference beyond experiment fundamentals, or a specialist research frontier. The prep system should expose these boundaries rather than turn a few reference notes into false readiness.</p></section>
+  <section class="boundary"><p>This site does not attempt to replace general algorithms or SQL interview preparation. The implementation questions stay here only when the task is fundamentally about ML: attention, training-loop diagnosis, memory-bounded retrieval, or mergeable evaluation metrics. Use external, current material for general data structures, framework internals, streaming-data infrastructure, privacy/compliance implementation, advanced causal inference, or a specialist research frontier.</p></section>
 
   <section class="callout"><h2>How to use the sequence</h2><p>Do not merely read from 01 to 09. Attempt each linked question first, diagnose with its round-specific rubric, schedule retries, and move forward while due items continue in parallel. Run the simulation only after every expected round has a baseline.</p></section>
 </PrepLayout>

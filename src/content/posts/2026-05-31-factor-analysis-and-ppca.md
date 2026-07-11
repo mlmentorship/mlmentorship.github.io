@@ -31,10 +31,10 @@ $$
 
 The whole model is the claim: *the correlations between observed variables are explained by a few shared latent factors; whatever is left is independent per-feature noise.*
 
-## FA vs PPCA vs PCA — it's all about $\Psi$
+## FA vs PPCA vs PCA: it's all about $\Psi$
 
 | Model | Noise covariance $\Psi$ | Consequence |
-|-------|------------------------|-------------|
+| --- | --- | --- |
 | **Factor analysis** | **diagonal** $\text{diag}(\psi_1,\dots,\psi_d)$ | per-feature noise; **scale-invariant**; models unique variances |
 | **Probabilistic PCA** | **isotropic** $\sigma^2 I$ | one shared noise level; MLE has closed form via eigendecomposition |
 | **Classical PCA** | $\sigma^2 \to 0$ limit | deterministic projection onto top-$k$ eigenvectors |
@@ -68,7 +68,7 @@ Recasting PCA as a model buys you things plain PCA can't do:
 
 - **"FA and PCA are the same."** FA models per-feature (diagonal) noise and explains *covariance*; PCA maximizes *retained variance* and assumes isotropic/zero noise. They give different loadings unless noise is uniform.
 - **"PPCA is fancier PCA with no payoff."** The payoff is the likelihood: model selection, missing data, sampling, mixtures.
-- **"The factors are unique."** $W$ is only identifiable up to rotation (you can rotate $\mathbf{z}$ and absorb it into $W$) — hence "factor rotation" (varimax) for interpretability.
+- **"The factors are unique."** $W$ is only identifiable up to rotation (you can rotate $\mathbf{z}$ and absorb it into $W$), hence "factor rotation" (varimax) for interpretability.
 - **"FA needs scaling like PCA."** FA is invariant to per-feature rescaling because its diagonal noise absorbs scale; PCA is not.
 
 ---

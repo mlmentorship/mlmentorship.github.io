@@ -9,7 +9,7 @@ category: "concepts"
 
 ## One-line definition
 
-ASR maps an audio waveform to a text transcript. Modern systems are **end-to-end neural models** — CTC, RNN-T, or attention encoder-decoders — trained directly on (audio, text) pairs, replacing the old multi-stage HMM-GMM + pronunciation-lexicon + n-gram pipeline.
+ASR maps an audio waveform to a text transcript. Modern systems are **end-to-end neural models** (CTC, RNN-T, or attention encoder-decoders) trained directly on (audio, text) pairs, replacing the old multi-stage HMM-GMM + pronunciation-lexicon + n-gram pipeline.
 
 ## Why it matters
 
@@ -17,7 +17,7 @@ ASR is the canonical "sequence in, sequence out, unknown alignment" problem, and
 
 ## The pipeline
 
-```
+```text
 waveform → features → acoustic model → (decoder + LM) → text
 ```
 
@@ -36,7 +36,7 @@ Raw audio is ~16 kHz samples. Models rarely consume raw samples directly; they u
 The three end-to-end paradigms:
 
 | Paradigm | Idea | Streams? | Built-in LM? |
-|----------|------|----------|--------------|
+| --- | --- | --- | --- |
 | **CTC** | Frame classifier + blank, marginalize alignments | Yes | No |
 | **RNN-T** | CTC + label-conditioned prediction net | Yes | Yes |
 | **Attention enc-dec** (LAS, Whisper) | Decoder attends over encoded audio | Hard | Yes |
@@ -55,7 +55,7 @@ Acoustic models benefit from an external LM, especially CTC (which has no intern
 
 The classical pipeline was **HMM-GMM** (later HMM-DNN): a pronunciation lexicon mapped words → phones, an HMM modeled phone-state transitions, a GMM/DNN modeled acoustics, and a separate n-gram LM handled language. It required **forced alignment** and lots of expert-built components.
 
-End-to-end models collapse all of this into one network trained on (audio, text) pairs. They win on simplicity and, with enough data, on accuracy — at the cost of needing more data and giving up some modularity.
+End-to-end models collapse all of this into one network trained on (audio, text) pairs. They win on simplicity and, with enough data, on accuracy, though at the cost of needing more data and giving up some modularity.
 
 ## Evaluation
 
@@ -78,7 +78,7 @@ where $S, D, I$ are substitutions, deletions, insertions (via edit distance to t
 ## Common confusions
 
 - **"Models eat raw waveforms."** Usually log-mel spectrogram frames; raw-waveform front-ends (wav2vec 2.0, SincNet) exist but features are still the norm.
-- **"WER ≤ 100%."** False — insertions can push it above 100%.
+- **"WER ≤ 100%."** False. Insertions can push it above 100%.
 - **"Whisper streams."** It's an offline attention encoder-decoder; it needs (chunks of) the full utterance. Streaming use requires chunking hacks. RNN-T is the native streaming choice.
 - **"Self-supervised pretraining is irrelevant."** wav2vec 2.0 / HuBERT-style self-supervised pretraining on unlabeled audio is now standard for low-resource ASR.
 

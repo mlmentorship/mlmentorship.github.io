@@ -7,67 +7,50 @@ tags: ["questions"]
 category: "questions"
 ---
 
-Launching is not the only form of impact. Senior candidates should have evidence that they can stop work when the strategy is wrong, even after investment and attachment.
+> *Asked in: staff-level behavioral and project rounds.*
 
-## A strong structure
+The L4 story is "the model missed its accuracy bar so the team cancelled it." The L6 story is a project you stopped on evidence, against sunk cost and your own attachment, then redirected the people and infrastructure to something higher-leverage. Killing the right project on time is a senior signal; treating only launches as impact is a junior one.
 
-1. **Original thesis:** why the project was rational when started
-2. **Disconfirming evidence:** what changed or what assumption failed
-3. **Decision threshold:** why iteration was no longer the best use of resources
-4. **Your action:** analysis, proposal, stakeholder work, and transition plan
-5. **Outcome:** avoided cost, redirected effort, protected users, or learned capability
-6. **Reflection:** what earlier signal you would instrument next time
+## What a strong answer covers
+
+Walk the decision, not just the outcome: why the project was rational when it started; the disconfirming evidence or the assumption that failed; why iteration was no longer the best use of resources; what you did (the discriminating experiment, the proposal, the stakeholder and transition work); the payoff (cost avoided, effort redirected, users protected, capability learned); and the earlier signal you would instrument next time.
 
 ## What an L4 answer sounds like
 
-> “The model did not reach accuracy, so the team cancelled the project.”
+> "The model did not reach accuracy, so the team cancelled the project."
 
-This describes an outcome but not the candidate’s judgment or ownership.
+An outcome with no judgment or ownership in it.
 
 ## What an L5 answer adds
 
-An L5 candidate owns the evidence and recommendation within a project area:
-
-- Defines the minimum viable quality or value before further spend
-- Runs the discriminating experiment
-- Distinguishes fixable execution problems from a broken thesis
-- Documents what can be reused
-- Transitions users, data, or infrastructure responsibly
+An L5 answer owns the evidence and the recommendation inside a project area: a minimum viable quality or value defined before further spend, the experiment that discriminated a broken thesis from fixable execution, a clear account of what could be reused, and a responsible transition of users, data, and infrastructure.
 
 ## What an L6 answer adds
 
-An L6 candidate manages portfolio and organizational consequences:
+An L6 answer manages the portfolio and organizational consequences: pushing past sunk-cost and prestige incentives, aligning several teams on a new direction, keeping the trust of sponsors who backed the original bet, and changing review criteria so similar weak bets fail faster. Keep the technical detail. "I reallocated the roadmap" with no evidence behind it sounds managerial and vague.
 
-- Challenges sunk-cost and prestige incentives
-- Aligns several teams on a new direction
-- Preserves trust with sponsors who backed the original bet
-- Redirects people and infrastructure to a higher-leverage strategy
-- Changes review criteria so similar weak bets fail faster
-
-The story still needs technical detail. “I reallocated the roadmap” without the evidence behind the decision sounds managerial and vague.
-
-## Strong-hire signals
+## Tells that get you a strong-hire vote
 
 - The original decision was reasonable, not an obvious straw man.
 - You name the assumption that failed.
-- Stopping criteria were evidence-based.
-- You handled people and transition costs with care.
-- You identify both avoided waste and lost opportunity.
+- The stopping criteria were evidence-based.
+- You handled the people and transition costs with care.
+- You account for both avoided waste and lost opportunity.
 
-## Down-leveling tells
+## Tells that get you down-leveled
 
-- The project died because another team cancelled it.
-- The candidate takes credit for hindsight.
+- The project died because another team cancelled it, not because of you.
+- You take credit for hindsight.
 - No one who disagreed is represented fairly.
-- “We pivoted” hides the specific decision.
-- No learning changed future investment behavior.
+- "We pivoted" hides the specific decision.
+- Nothing you learned changed how you invest next time.
 
-## Likely follow-ups
+## Common follow-ups
 
 - Why not iterate for another quarter?
 - Who disagreed, and what evidence did they have?
 - How much had already been invested?
 - What parts of the work were reusable?
-- Tell me about a time you stopped too early or held on too long.
+- Tell me about a time you stopped too early, or held on too long.
 
 *Related: [decide what to work on](/questions/decide-what-to-work-on/), [scope an ambiguous problem](/questions/scope-ambiguous-problem/), and [L5 vs L6 calibration](/guides/l5-vs-l6-faang-ml/).*
