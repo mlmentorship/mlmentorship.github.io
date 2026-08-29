@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An **eigenvector** of $A$ is a non-zero vector $v$ such that $A v = \lambda v$ for some scalar $\lambda$ (the **eigenvalue**). $A$ acts on $v$ purely by scaling. The **spectral theorem** states that every real symmetric matrix is orthogonally diagonalizable: $A = Q \Lambda Q^\top$ with $Q$ orthogonal and $\Lambda$ diagonal real.
-
-## Why it matters
 
 Eigendecompositions explain stability of dynamical systems, convergence of optimization, structure of covariance matrices, and properties of attention / graph operators. The spectral theorem is the mathematical reason PCA works on covariance matrices, why Laplacian eigenmaps make sense for graphs, and why second-order optimizers reason about Hessian eigenvalues.
 

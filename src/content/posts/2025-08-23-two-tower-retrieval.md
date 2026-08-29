@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
-A two-tower model encodes the query (or user) and the item with two independent neural networks ("towers") into a shared embedding space, scores them with a dot product or cosine, and is trained with a contrastive or sampled-softmax loss so that positive pairs score higher than negatives.
-
-## Why it matters
+A two-tower model encodes the query and item with separate neural networks into a shared embedding space. A dot product or cosine scores each pair. Contrastive or sampled-softmax training pushes positive pairs above negatives.
 
 Two-tower (a.k.a. dual-encoder) is the dominant architecture for the **retrieval** stage of large-scale ranking systems: web search, e-commerce search, YouTube recommendations, ad targeting, dense passage retrieval for RAG, semantic search.
 

@@ -79,4 +79,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Speculative decoding](/concepts/speculative-decoding/), [KV cache](/concepts/kv-cache/), [How would you reduce LLM inference cost by 10x?](/questions/reduce-llm-inference-cost-10x/).*
+*Related: [speculative decoding](/concepts/speculative-decoding/), [KV cache](/concepts/kv-cache/), and [reduce LLM inference cost](/questions/reduce-llm-inference-cost-10x/).*

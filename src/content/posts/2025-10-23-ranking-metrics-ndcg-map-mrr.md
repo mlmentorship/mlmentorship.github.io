@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Ranking metrics evaluate **ordered** lists of items. **NDCG** (Normalized Discounted Cumulative Gain) handles graded relevance with position discount. **MAP** (Mean Average Precision) handles binary relevance averaged over recall levels. **MRR** (Mean Reciprocal Rank) handles a single correct answer per query.
-
-## Why it matters
 
 Search, recommendation, retrieval, and question-answering systems produce ranked lists, not classifications. Treating these problems as classification (precision / recall / F1) ignores order. A wrong top-1 hurts more than a wrong top-10. Ranking metrics quantify "right things at the top."
 
@@ -98,3 +96,5 @@ $$
 
 - [Precision, recall, F1](/concepts/precision-recall-f1/). Binary classification metrics.
 - [Two-tower retrieval](/concepts/two-tower-retrieval/). What gets evaluated with these metrics in production.
+- [Learning-to-rank losses](/concepts/learning-to-rank-losses/). Surrogate objectives for ordered results.
+- [Position bias and counterfactual ranking](/concepts/position-bias-counterfactual-learning-to-rank/). Evaluation from biased interaction logs.

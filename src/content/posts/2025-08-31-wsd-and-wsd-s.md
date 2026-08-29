@@ -1,21 +1,19 @@
 ---
 title: "WSD and WSD-S learning rate schedules"
-description: "Warmup-Stable-Decay holds the LR flat for most of training and decays at the end. WSD-S adds cyclic decay-and-rewarm probes. Both are designed for pretraining where you don't know the total token budget upfront."
+description: "Warmup-Stable-Decay keeps the learning rate flat before a final decay. WSD-S adds decay-and-rewarm probes when the final token budget is uncertain."
 date: "2025-08-31"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **WSD** (Warmup-Stable-Decay) is a three-phase schedule: warm up to a peak LR, hold at that peak for most of training, then decay sharply at the end.
 
 **WSD-S** (Warmup-Stable-Decay-Stable) extends WSD with **periodic short decay-and-rewarm cycles** during the stable phase, used to probe model performance without committing to a final cooldown.
 
 Both schedules differ from cosine decay in one critical way: the schedule is not parameterized by total training horizon. You can decide to keep going at any point.
-
-## Why it matters
 
 Cosine decay (the dominant default for pretraining circa 2022) requires knowing the total training horizon $T$ upfront, because the curve $\eta(t) = \tfrac{1}{2}(1 + \cos(\pi t/T)) \cdot \eta_{\max}$ depends on $T$ explicitly. If you decide to extend training past $T$, you have to re-parameterize the schedule and either restart the cosine or splice in something new.
 

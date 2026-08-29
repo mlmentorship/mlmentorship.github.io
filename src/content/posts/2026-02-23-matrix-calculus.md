@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Matrix calculus extends the ordinary derivative to functions whose inputs and/or outputs are vectors or matrices. The two organizing objects are the **gradient** (for scalar-valued functions) and the **Jacobian** (for vector-valued functions); the **Hessian** is the matrix of second partial derivatives.
-
-## Why it matters
 
 Every learning algorithm computes derivatives of a scalar loss with respect to vector- or tensor-valued parameters. Knowing the right shapes and conventions saves hours of debugging. Backpropagation is matrix calculus applied recursively through a computation graph.
 

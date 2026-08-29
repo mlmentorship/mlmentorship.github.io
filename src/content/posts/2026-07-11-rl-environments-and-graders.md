@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An agent RL environment defines observations, actions, transitions, tools, and terminal conditions; a grader converts the resulting trajectory into structured evidence and a training signal.
-
-## Why it matters
 
 For language-model agents, the environment is part simulator, part benchmark, and part specification. If it omits a permission boundary, rewards only the final answer, or leaks the expected solution, training can improve the score while degrading the intended behavior.
 

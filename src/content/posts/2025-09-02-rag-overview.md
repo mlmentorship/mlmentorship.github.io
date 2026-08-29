@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 RAG augments an LLM's input with relevant documents retrieved from an external corpus, so the model can answer questions about content it wasn't trained on (or content that changes after training).
-
-## Why it matters
 
 The default LLM has two problems for any production application: (1) it doesn't know your private data, and (2) what it does know becomes stale. RAG solves both by separating "knowledge" (retrieval over a corpus you control) from "reasoning" (the LLM acts as a fluent answerer over retrieved facts).
 

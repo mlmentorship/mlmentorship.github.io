@@ -44,7 +44,7 @@ An L5 answer controls compute and tuning, repeats seeds, designs a simple matche
 
 ## What an L6 answer adds
 
-An L6 answer narrows the claim before expanding experiments: which ablation changes the scientific conclusion rather than the paper table; whether benchmark and implementation choices were picked after seeing results; whether the component merely makes optimization easier at one scale; whether a cheaper intervention produces the same mediator; and whether the claimed mechanism is identifiable from these observations at all. It spends the budget on high-information experiments, not a combinatorial grid.
+An L6 answer narrows the claim before expanding the experiment set. It asks which ablation could change the scientific conclusion, whether choices were made after seeing results, and whether the component only helps optimization at one scale. It also tests cheaper interventions and whether the observations can identify the claimed mechanism.
 
 ## Tells that get you a strong-hire vote
 

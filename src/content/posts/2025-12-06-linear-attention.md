@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Linear attention replaces the $n \times n$ softmax matrix with an explicit factorization through a low-dimensional space, so the per-layer cost drops from $O(n^2 d)$ to $O(n k d)$ for some $k \ll n$.
-
-## Why it matters
 
 Sparse attention (see [sparse attention](/concepts/sparse-attention/)) keeps the softmax exact but on fewer pairs. Linear attention approximates the softmax itself, exploiting the empirical observation that the $n \times n$ attention matrix is approximately low-rank.
 

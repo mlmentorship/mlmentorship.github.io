@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 Mixed precision training computes most operations in lower-precision formats (FP16, BF16, FP8) for speed and memory savings, while keeping a master copy of weights and certain operations in FP32 for numerical stability.
-
-## Why it matters
 
 Tensor cores on modern GPUs (A100, H100, B200) execute lower-precision matmuls several times faster than FP32 with proportionally less memory. Mixed precision is the default for large models in 2026.
 
@@ -120,4 +118,4 @@ If asked about mixed precision:
 
 ---
 
-*Related: [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/), [Transformer architecture](/concepts/transformer-architecture/).*
+*Related: [Adam, AdamW, and modern optimizer choices](/concepts/adam-and-adamw/), [Transformer architecture](/concepts/transformer-architecture/).*

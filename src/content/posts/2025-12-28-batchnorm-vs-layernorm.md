@@ -1,6 +1,6 @@
 ---
 title: "BatchNorm vs LayerNorm (and the transformer wrinkle)"
-description: "These look similar and aren't. Mixing them up in interviews is one of the cheapest ways to lose level points. Here's the right mental model."
+description: "BatchNorm and LayerNorm normalize different axes and behave differently during training. The axis and train/eval behavior determine which one fits."
 date: "2025-12-28"
 draft: false
 tags: ["concepts"]
@@ -8,7 +8,7 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 A normalization layer is parameterized by **(a) which dimensions you normalize across** and **(b) which dimensions get learnable scale/shift parameters**. BatchNorm and LayerNorm differ on both axes, and the way LayerNorm is used in transformers is *not* the same as how it was originally specified for sequence models.
 
@@ -32,9 +32,7 @@ For a 4-D activation tensor of shape `(N, C, H, W)` (batch, channel, height, wid
 | **InstanceNorm** | H, W (per sample, per channel) | C |
 | **GroupNorm** | G groups of C/G channels, H, W | C |
 
-The key insight from the original LayerNorm paper that almost everyone misremembers: **LayerNorm normalizes across all features of a sample**. In CNNs that means C&times;H&times;W. In transformers that means just D (the embedding dim). Different norms entirely, despite the same name.
-
-## Why the difference matters
+**LayerNorm normalizes across all features of a sample.** In CNNs that means C&times;H&times;W. In transformers that means only D, the embedding dimension. These are different normalization axes despite the shared name.
 
 **BatchNorm:**
 - Couples samples in a batch together (statistics are computed across N).

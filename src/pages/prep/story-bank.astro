@@ -12,12 +12,16 @@ const stories = [
   { id: 'leadership', label: 'Leadership and mentoring', prompt: 'You raised the effectiveness or judgment of people beyond your own work.', coverage: ['mentoring', 'leadership', 'influence'] },
   { id: 'wrong-bet', label: 'Wrong bet or killed project', prompt: 'You recognized that a strategy was wrong, stopped work, or redirected investment.', coverage: ['L6 strategy', 'recovery', 'decision not to build'] },
   { id: 'quality-risk', label: 'Quality or safety versus speed', prompt: 'You argued for evidence, reliability, or user protection under delivery pressure.', coverage: ['responsibility', 'pushback', 'risk'] },
+  { id: 'technical-strategy', label: 'Technical strategy and portfolio', prompt: 'You chose among product delivery, platform, research, migration, and retirement investments under a real constraint.', coverage: ['principal strategy', 'opportunity cost', 'decision checkpoints'] },
+  { id: 'durable-leverage', label: 'Durable leverage and succession', prompt: 'A technical direction continued to work and improve after ownership changed or your direct involvement ended.', coverage: ['succession', 'operating model', 'durable influence'] },
+  { id: 'delegated-authority', label: 'Delegated technical authority', prompt: 'Several principal-level owners made independent decisions within a coherent architecture or scientific direction you established.', coverage: ['senior-principal scope', 'decision rights', 'principal leadership'] },
+  { id: 'external-change', label: 'Direction under external change', prompt: 'A vendor, regulation, market, or technical shift invalidated part of a multi-year direction and you changed the portfolio without losing its durable value.', coverage: ['adaptability', 'reversal', 'external constraints'] },
 ];
 ---
 
 <PrepLayout
-  title="Senior ML interview story-bank and rehearsal worksheet"
-  description="A private, level-calibrated worksheet for building, rehearsing, saving, and exporting senior ML interview stories."
+  title="Senior through senior-principal ML story bank"
+  description="A private worksheet for building, rehearsing, saving, and exporting senior, staff, principal, and senior-principal ML interview evidence."
   heading="Build stories that survive three layers of follow-up."
   lede="A senior story needs a direct answer, bounded ownership, a consequential decision, evidence, and reflection. Prepare a 90-second opening and a deeper version, never a memorized script."
 >
@@ -31,6 +35,8 @@ const stories = [
     <article><h3>L4</h3><p>Reliable execution in bounded scope. Show correctness, debugging, and learning.</p></article>
     <article><h3>L5</h3><p>Autonomous decisions across a project area. Show alternatives, end-to-end ownership, and operational outcome.</p></article>
     <article><h3>L6</h3><p>Problem and strategy selection across teams. Show influence, wrong bets, killed work, and hands-on technical depth.</p></article>
+    <article><h3>L7</h3><p>Durable direction across organizations. Show portfolio choices, reversibility, technical depth, and other leaders carrying the work.</p></article>
+    <article><h3>Senior principal</h3><p>Coherent direction across principal-owned portfolios. Show doctrine, delegated authority, external adaptability, succession, and reversal.</p></article>
   </div>
 
   <form class="story-form" autocomplete="off">
@@ -39,7 +45,7 @@ const stories = [
         <header><span>{String(index + 1).padStart(2, '0')}</span><div><h2>{story.label}</h2><p>{story.prompt}</p><ul>{story.coverage.map((item) => <li>{item}</li>)}</ul></div></header>
         <div class="story-fields">
           <label><span>Private shorthand</span><input data-field="shorthand" type="text" placeholder="A memorable label, not a company or person name" /></label>
-          <label><span>Target level this story proves</span><select data-field="level"><option value="l4">L4 · bounded execution</option><option value="l5" selected>L5 · autonomous project ownership</option><option value="l6">L6 · strategy and cross-team influence</option></select></label>
+          <label><span>Target level this story proves</span><select data-field="level"><option value="l4">L4 · bounded execution</option><option value="l5" selected>L5 · autonomous project ownership</option><option value="l6">L6 · strategy and cross-team influence</option><option value="l7">L7 · multi-organization direction and portfolio judgment</option><option value="l8">Senior principal · delegated portfolios and durable doctrine</option></select></label>
           <label class="wide"><span>90–120 second opening</span><textarea data-field="opening" rows="4" placeholder="Answer the exact question: stakes → your decision/actions → evidence → reflection"></textarea></label>
           <label><span>Situation and stakes</span><textarea data-field="situation" rows="3" placeholder="Who was affected? What was at risk? Why was this hard at the target level?"></textarea></label>
           <label><span>The consequential decision</span><textarea data-field="decision" rows="3" placeholder="Alternatives, evidence available at the time, your choice, and why"></textarea></label>
@@ -69,7 +75,7 @@ const stories = [
 
   <h2>Coverage matrix</h2>
   <p>Before the loop, make sure the bank, not every single story, covers these signals.</p>
-  <div class="coverage-grid">{['Ambiguous scoping', 'Technical depth', 'Production failure', 'Prioritization', 'Conflict', 'Cross-team influence', 'Mentoring', 'Wrong bet / killed work', 'Quality or safety pushback', 'Measurable impact'].map((item) => <label><input type="checkbox" /> {item}</label>)}</div>
+  <div class="coverage-grid">{['Ambiguous scoping', 'Technical depth', 'Production failure', 'Prioritization', 'Conflict', 'Cross-team influence', 'Mentoring', 'Wrong bet / killed work', 'Quality or safety pushback', 'Measurable impact', 'Portfolio and opportunity cost', 'Delegated principal authority', 'External change and reversal', 'Succession and durable operation'].map((item) => <label><input type="checkbox" /> {item}</label>)}</div>
 
   <section class="callout"><h2>Rehearsal sequence</h2><ol><li>Record the 90-second opening.</li><li>Check whether it answered the exact prompt.</li><li>Ask a peer to choose three follow-ups and challenge one assumption.</li><li>Score ownership, evidence, and response to pushback, not eloquence.</li><li>Rewrite only the outline, then retell without memorizing prose.</li></ol><p><a href="/questions/most-ambitious-project/">Practice the ambitious-project deep-dive →</a> · <a href="/prep/presentation/">Turn one project into a 45-minute technical presentation →</a></p></section>
 </PrepLayout>
@@ -131,7 +137,7 @@ const stories = [
   .save-status { min-height: 1.25rem; margin-top: .25rem !important; color: var(--c-accent) !important; }
   .story-actions { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: flex-end; }
   .danger { color: #b91c1c !important; }
-  .level-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; }
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .65rem; }
   .level-grid article { padding: .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
   .level-grid h3, .level-grid p { margin: 0; }
   .level-grid p { margin-top: .3rem; color: var(--c-text-soft); font-size: .82rem; }

@@ -42,14 +42,6 @@ const fullTitle = title === SITE.title ? title : `${title} · ${SITE.title}`;
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
 <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 
-<!-- Web typography: Inter (body/UI), Inter Tight (display), JetBrains Mono (code) -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-/>
-
 <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -81,22 +73,16 @@ const fullTitle = title === SITE.title ? title : `${title} · ${SITE.title}`;
 <!-- Early theme init: avoid flash of wrong theme -->
 <script is:inline>
   (function () {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark' || saved === 'light') {
-      document.documentElement.dataset.theme = saved;
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark' || saved === 'light') {
+        document.documentElement.dataset.theme = saved;
+      }
+    } catch (_) {
+      // The CSS prefers-color-scheme fallback still works when storage is blocked.
     }
   })();
 </script>
-
-{SITE.newsletter.provider === 'mailerlite' && SITE.newsletter.accountId.length > 0 && (
-  <script is:inline define:vars={{ accountId: SITE.newsletter.accountId }}>
-    (function(w,d,e,u,f,l,n){w[f]=w[f]||function(){(w[f].q=w[f].q||[])
-    .push(arguments);},l=d.createElement(e),l.async=1,l.src=u,
-    n=d.getElementsByTagName(e)[0],n.parentNode.insertBefore(l,n);})
-    (window,document,'script','https://assets.mailerlite.com/js/universal.js','ml');
-    ml('account', accountId);
-  </script>
-)}
 
 {SITE.analytics.provider === 'goatcounter' && SITE.analytics.code.length > 0 && (
   <>
@@ -110,7 +96,7 @@ const fullTitle = title === SITE.title ? title : `${title} · ${SITE.title}`;
       is:inline
       data-goatcounter={`https://${SITE.analytics.code}.goatcounter.com/count`}
       async
-      src="//gc.zgo.at/count.js"
+      src="https://gc.zgo.at/count.js"
     />
   </>
 )}

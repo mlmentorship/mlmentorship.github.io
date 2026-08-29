@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Matrix factorization** for collaborative filtering [(Koren et al., 2009)](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) factorizes a sparse user-item rating matrix $R \in \mathbb{R}^{m \times n}$ into two low-rank matrices: $R \approx U V^\top$ where $U \in \mathbb{R}^{m \times k}$ contains user embeddings and $V \in \mathbb{R}^{n \times k}$ contains item embeddings. Predicted rating: $\hat r_{ui} = u_u^\top v_i$.
-
-## Why it matters
 
 MF was the dominant collaborative-filtering method from the Netflix Prize era (2006–2009) through about 2018. It still underlies modern two-tower retrieval, embedding-based recsys, and has clean equivalences to many later techniques (matrix completion, neural MF, etc.). Knowing MF makes the move to two-tower neural models obvious.
 

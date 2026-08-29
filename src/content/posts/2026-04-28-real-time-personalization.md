@@ -85,4 +85,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [System design case study: personalized search ranking](/guides/personalized-search-ranking/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/).*
+*Related: [delayed and selective labels](/concepts/delayed-labels-selective-labels-feedback-loops/), [point-in-time correctness](/concepts/data-leakage-point-in-time-correctness/), [YouTube recommendation design](/questions/design-youtube-recommender/), and [personalized search ranking](/guides/personalized-search-ranking/).*

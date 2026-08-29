@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Every real matrix $A \in \mathbb{R}^{m \times n}$ admits the factorization $A = U \Sigma V^\top$ where $U \in \mathbb{R}^{m \times m}$ and $V \in \mathbb{R}^{n \times n}$ are orthogonal and $\Sigma$ is diagonal with non-negative entries (singular values). **PCA** is SVD applied to a mean-centered data matrix.
-
-## Why it matters
 
 SVD is the universal matrix factorization. It exists for every matrix, even rectangular and rank-deficient ones. Reading off properties from the SVD answers "what does this matrix do?": singular values give scaling factors, $V$ gives input directions, $U$ gives output directions.
 

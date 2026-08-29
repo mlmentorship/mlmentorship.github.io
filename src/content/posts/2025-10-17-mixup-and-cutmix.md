@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Mixup** [(Zhang et al., 2018)](https://arxiv.org/abs/1710.09412) trains the model on convex combinations of pairs of training examples: $\tilde x = \lambda x_i + (1 - \lambda) x_j$ and $\tilde y = \lambda y_i + (1 - \lambda) y_j$ with $\lambda \sim \text{Beta}(\alpha, \alpha)$. **CutMix** [(Yun et al., 2019)](https://arxiv.org/abs/1905.04899) instead pastes a rectangular patch from $x_j$ onto $x_i$ and mixes labels by the area ratio.
-
-## Why it matters
 
 Both techniques regularize by training on examples between the original training points. Empirically:
 

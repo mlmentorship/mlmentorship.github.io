@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 **Cross-entropy loss** is the negative log-likelihood of the true class under a probability distribution predicted by the model. **Softmax** is the standard parameterization that turns logits into a categorical distribution. The two are nearly always paired because the math composes cleanly.
-
-## Why it matters
 
 Almost every classification model uses softmax + cross-entropy. The reasons are not arbitrary:
 

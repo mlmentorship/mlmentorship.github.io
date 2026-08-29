@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **random forest** [(Breiman, 2001)](https://link.springer.com/article/10.1023/A:1010933404324) trains an ensemble of decision trees on bootstrap samples of the data ("bagging") with each split restricted to a random subset of features, then averages predictions (regression) or takes a majority vote (classification).
-
-## Why it matters
 
 Single decision trees are high-variance: small data shifts cause large changes in splits. Random forests average over many trees, dropping variance roughly as $1/\text{ensemble size}$. They are:
 

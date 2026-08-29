@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An embedding space is a learned vector space in which points represent objects (words, sentences, images, items, users) and geometric relationships. Distance, angle. Encode semantic relationships such as similarity or relevance.
-
-## Why it matters
 
 Embeddings are the substrate for retrieval, recommendation, search, clustering, classification, and most LLM-adjacent products. A senior interview will check whether you can pick the right similarity metric, the right normalization, and the right index.
 

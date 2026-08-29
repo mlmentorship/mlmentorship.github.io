@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A model organism of misalignment is a deliberately constructed model with a controlled, reproducible unwanted behavior used to study how that behavior arises, generalizes, is detected, and responds to mitigation.
-
-## Why it matters
 
 Real alignment failures are rare, poorly labeled, and entangled with model capability. If a researcher waits for a frontier system to exhibit a dangerous failure naturally, the mechanism and ground truth may remain unknown.
 

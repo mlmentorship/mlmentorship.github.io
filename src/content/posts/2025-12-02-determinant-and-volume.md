@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 The determinant $\det(A)$ of a square matrix $A$ is the signed factor by which $A$ scales $n$-dimensional volumes. Geometrically, $|\det(A)|$ is the volume of the parallelepiped spanned by $A$'s column vectors; the sign flips if $A$ contains a reflection.
-
-## Why it matters
 
 Determinants tell you whether a linear map is invertible (non-zero det) or singular (zero det). They appear in change-of-variables formulas (probability density transformations, normalizing flows), in computing volumes of parallelotopes (Gaussian likelihoods), and as Jacobian determinants in differential geometry.
 

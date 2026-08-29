@@ -13,7 +13,14 @@ The L4 story is "the model missed its accuracy bar so the team cancelled it." Th
 
 ## What a strong answer covers
 
-Walk the decision, not just the outcome: why the project was rational when it started; the disconfirming evidence or the assumption that failed; why iteration was no longer the best use of resources; what you did (the discriminating experiment, the proposal, the stakeholder and transition work); the payoff (cost avoided, effort redirected, users protected, capability learned); and the earlier signal you would instrument next time.
+Explain the decision, not only the outcome. Cover:
+
+1. Why the project was rational at the start.
+2. Which evidence or failed assumption changed the case.
+3. Why another iteration was a poor use of resources.
+4. What experiment, proposal, and transition work you owned.
+5. The cost avoided, effort redirected, users protected, or capability learned.
+6. The earlier signal you would instrument next time.
 
 ## What an L4 answer sounds like
 
@@ -23,7 +30,7 @@ An outcome with no judgment or ownership in it.
 
 ## What an L5 answer adds
 
-An L5 answer owns the evidence and the recommendation inside a project area: a minimum viable quality or value defined before further spend, the experiment that discriminated a broken thesis from fixable execution, a clear account of what could be reused, and a responsible transition of users, data, and infrastructure.
+An L5 answer owns the evidence and recommendation inside a project area. It defines minimum viable quality before more spend, runs an experiment that separates a broken thesis from fixable execution, identifies reusable work, and transitions users, data, and infrastructure responsibly.
 
 ## What an L6 answer adds
 
@@ -53,4 +60,4 @@ An L6 answer manages the portfolio and organizational consequences: pushing past
 - What parts of the work were reusable?
 - Tell me about a time you stopped too early, or held on too long.
 
-*Related: [decide what to work on](/questions/decide-what-to-work-on/), [scope an ambiguous problem](/questions/scope-ambiguous-problem/), and [L5 vs L6 calibration](/guides/l5-vs-l6-faang-ml/).*
+*Related: [decide what to work on](/questions/decide-what-to-work-on/), [scope an ambiguous problem](/questions/scope-ambiguous-problem/), and [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/).*

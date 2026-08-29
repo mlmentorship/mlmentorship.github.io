@@ -1,0 +1,162 @@
+---
+import type { LibraryChapter, LibraryVolume } from '../data/library';
+import type { LibraryEntry } from '../utils/library';
+
+interface ChapterContents {
+  chapter: LibraryChapter;
+  entries: LibraryEntry[];
+}
+
+interface Props {
+  volume: LibraryVolume;
+  currentChapter: LibraryChapter;
+  currentSlug: string;
+  chapters: ChapterContents[];
+}
+
+const { volume, currentChapter, currentSlug, chapters } = Astro.props as Props;
+const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id === currentChapter.id);
+---
+
+<aside class="book-sidebar" aria-label={`${volume.title} contents`} data-pagefind-ignore="all">
+  <div class="book-sidebar-inner">
+    <a class="sidebar-book" href={`/library/${volume.id}/`}>
+      <span>Book {volume.number}</span>
+      <strong>{volume.shortTitle}</strong>
+    </a>
+
+    <nav aria-label={`${volume.shortTitle} chapters`}>
+      <ol class="sidebar-chapters">
+        {chapters.map(({ chapter, entries }, chapterIndex) => {
+          const isCurrentChapter = chapter.id === currentChapter.id;
+          return (
+            <li class:list={[isCurrentChapter && 'is-current-chapter']}>
+              <a class="sidebar-chapter" href={`/library/${volume.id}/${chapter.id}/`} aria-current={isCurrentChapter ? 'location' : undefined}>
+                <span>{volume.number}.{chapterIndex + 1}</span>
+                <strong>{chapter.title}</strong>
+              </a>
+              {isCurrentChapter && (
+                <ol class="sidebar-entries" aria-label={`${chapter.title} entries`}>
+                  {entries.map((entry, entryIndex) => (
+                    <li>
+                      <a href={entry.href} aria-current={entry.slug === currentSlug ? 'page' : undefined}>
+                        <span>{String(entryIndex + 1).padStart(2, '0')}</span>
+                        <strong>{entry.title}</strong>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+
+    <footer>
+      <span>Chapter {currentChapterIndex + 1} of {volume.chapters.length}</span>
+      <a href="/">All books</a>
+    </footer>
+  </div>
+</aside>
+
+<style>
+  .book-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 1rem);
+    align-self: start;
+    min-width: 0;
+    max-height: calc(100vh - var(--header-height) - 2rem);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-rule) transparent;
+  }
+  .book-sidebar-inner { padding-right: .35rem; }
+  .sidebar-book {
+    display: block;
+    padding-bottom: .7rem;
+    border-bottom: 1px solid var(--c-rule);
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .sidebar-book span,
+  .sidebar-book strong { display: block; }
+  .sidebar-book span {
+    color: var(--c-muted);
+    font-size: .65rem;
+  }
+  .sidebar-book strong {
+    margin-top: .08rem;
+    font-size: .82rem;
+    font-weight: 600;
+  }
+  .sidebar-book:hover strong { text-decoration: underline; }
+  .sidebar-chapters,
+  .sidebar-entries { margin: 0; padding: 0; list-style: none; }
+  .sidebar-chapters > li { margin: 0; }
+  .sidebar-chapter {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: .45rem;
+    padding: .48rem 0;
+    color: var(--c-muted);
+    text-decoration: none;
+  }
+  .sidebar-chapter span,
+  .sidebar-entries span {
+    color: var(--c-muted);
+    font-size: .62rem;
+    line-height: 1.45;
+  }
+  .sidebar-chapter strong {
+    font-size: .73rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .sidebar-chapter:hover { color: var(--c-text); }
+  .is-current-chapter > .sidebar-chapter { color: var(--c-text); }
+  .is-current-chapter > .sidebar-chapter strong { font-weight: 600; }
+  .sidebar-entries {
+    margin: 0 0 .4rem .65rem;
+    padding-left: .7rem;
+    border-left: 1px solid var(--c-rule);
+  }
+  .sidebar-entries li { margin: 0; }
+  .sidebar-entries a {
+    display: grid;
+    grid-template-columns: 1.45rem minmax(0, 1fr);
+    gap: .35rem;
+    margin-left: -1px;
+    padding: .28rem .35rem .28rem .55rem;
+    border-left: 1px solid transparent;
+    color: var(--c-muted);
+    text-decoration: none;
+  }
+  .sidebar-entries strong {
+    font-size: .7rem;
+    font-weight: 450;
+    line-height: 1.38;
+  }
+  .sidebar-entries a:hover { color: var(--c-text); }
+  .sidebar-entries a[aria-current='page'] {
+    border-left-color: var(--c-text);
+    color: var(--c-text);
+  }
+  .sidebar-entries a[aria-current='page'] span { color: var(--c-text-soft); }
+  .sidebar-entries a[aria-current='page'] strong { font-weight: 600; }
+  .book-sidebar footer {
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-top: .75rem;
+    padding-top: .65rem;
+    border-top: 1px solid var(--c-rule);
+    color: var(--c-muted);
+    font-size: .62rem;
+  }
+  .book-sidebar footer a { color: var(--c-text-soft); }
+
+  @media (max-width: 860px) {
+    .book-sidebar { display: none; }
+  }
+</style>

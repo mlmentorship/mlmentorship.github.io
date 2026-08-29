@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Autoregressive (AR)** models factorize $p(x) = \prod_t p(x_t \mid x_{<t})$ and generate one element at a time. **Diffusion** models learn to invert a Markov noising process and generate by iteratively denoising from Gaussian noise. AR dominates language; diffusion dominates images.
-
-## Why it matters
 
 The two paradigms produce very different production tradeoffs:
 

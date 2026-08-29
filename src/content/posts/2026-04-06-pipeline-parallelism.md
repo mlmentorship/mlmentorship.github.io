@@ -7,13 +7,11 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Pipeline parallelism** (PP) splits a model along its depth: GPU 0 holds layers 1–8, GPU 1 holds layers 9–16, etc. A mini-batch is divided into smaller **micro-batches** that flow through the stages so that GPU 0 starts processing micro-batch 2 while GPU 1 processes micro-batch 1, achieving parallel utilization despite the sequential layer dependency.
 
-## Why it matters
-
-For large models that don't fit on a single GPU, TP is the natural choice **within a node** (where NVLink is fast). But TP doesn't extend across nodes. Communication kills throughput. PP scales across nodes via much smaller cross-stage messages (just the activations between consecutive stages, not weights), enabling **multi-node scaling** of frontier models.
+For large models that do not fit on one accelerator, tensor parallelism is often placed on the fastest links because it communicates every layer. Pipeline parallelism sends activations only between adjacent stages, so it can often use slower links more efficiently. Tensor parallelism can cross nodes when the network and workload support it. The choice follows measured communication cost, not a fixed node boundary.
 
 ## The basic idea
 
@@ -44,14 +42,14 @@ Bubble fraction $\approx (\text{stages} - 1) / (\text{stages} + \text{micro-batc
 - **Interleaved 1F1B** (Megatron): each GPU holds non-contiguous chunks of layers (e.g., layers 1-2 and 9-10) so the bubble shrinks further.
 - **Zero Bubble Pipeline** (recent): split backward into weight-grad and input-grad parts to fill almost all bubbles.
 
-Modern frontier training uses interleaved 1F1B or Zero Bubble.
+Large training systems may use interleaved 1F1B or zero-bubble schedules when simple schedules leave too much idle time.
 
 ## Cost model
 
 For a model with $L$ layers split across $P$ stages and $M$ micro-batches:
 
 - **Bubble**: $(P - 1) / (P + M - 1)$ of total time. Minimize by increasing $M$.
-- **Communication per micro-batch**: send activations of one micro-batch between adjacent stages. Cost $\sim$ activation size $\sim$ batch × seq × hidden, much smaller than full weight all-reduce.
+- **Communication per micro-batch**: send activations between adjacent stages. Cost scales with micro-batch × sequence × hidden size. Whether this is cheaper than another layout depends on message frequency, dtype, topology, and overlap.
 - **Activation memory per stage**: in 1F1B, $\sim P$ micro-batches' worth of activations.
 
 ## When PP wins
@@ -63,29 +61,32 @@ For a model with $L$ layers split across $P$ stages and $M$ micro-batches:
 ## When PP loses
 
 - **Small models** that fit on one node. TP within node + DP across nodes is simpler.
-- **Few micro-batches** in a step. Bubble dominates.
+- **Few micro-batches** in a step. The bubble dominates.
 - **Workloads with very different per-layer compute**. Load imbalance creates idle GPUs.
 
 ## 3D parallelism
 
-The standard frontier training stack:
+One common large-model layout combines:
 
-- **Tensor parallel** within a node (4–8 GPUs, NVLink).
-- **Pipeline parallel** across small groups of nodes.
-- **Data parallel / FSDP** across remaining nodes (sharded for memory).
+- **Tensor parallelism** on the fastest useful links.
+- **Pipeline parallelism** across balanced groups of layers.
+- **Data parallelism or FSDP** across the remaining replica dimension.
 
-For a 405B-parameter model on 1024 GPUs: TP=8, PP=16, DP=8 is a typical configuration.
+The degrees must multiply to the available device count, but that arithmetic does not select the layout. Memory, global batch, topology, and measured scaling select it.
 
 ## Common pitfalls
 
-- **Few micro-batches → big bubble.** Use $M \ge 4P$ as a rule of thumb.
-- **Imbalanced stage compute.** Layer 1 (embedding) and the last layer (LM head) may be much heavier or lighter than middle layers. Manual partitioning helps.
-- **Forgetting activation memory grows with $M$ in 1F1B.** Combine with activation checkpointing.
-- **Treating PP as the same as TP.** Different sharding axes, different communication patterns. PP is bandwidth-light; TP is bandwidth-heavy.
-- **Skipping interleaving on >4 stages.** Sequential 1F1B has noticeable bubble at large $P$; interleaving cuts it.
+- **Few micro-batches create a large bubble.** More micro-batches improve utilization, but they interact with activation memory and the global batch.
+- **Imbalanced stages.** Embeddings, output layers, and uneven blocks can make one stage slower than the others.
+- **Forgetting activation memory.** The schedule controls how many micro-batches' activations remain live. Combine PP with activation checkpointing when needed.
+- **Treating PP as the same as TP.** They split different axes and communicate at different points. Compare their actual activation messages and schedule overhead.
+- **Using a fixed topology rule.** A node boundary is not a law. Measure the links and collectives on the target cluster.
+- **Skipping schedule comparison at many stages.** Interleaving can reduce bubbles, but it changes communication and model placement. Measure both schedules.
 
 ## Related
 
-- [Tensor parallelism](/concepts/tensor-parallelism/). Orthogonal sharding within nodes.
+- [Tensor parallelism](/concepts/tensor-parallelism/). Orthogonal sharding within a layer.
 - [FSDP and ZeRO](/concepts/fsdp-and-zero/). Orthogonal sharding for memory.
 - [Activation checkpointing](/concepts/activation-checkpointing/). Reduce per-stage activation memory.
+- [Strong scaling and parallelism selection](/concepts/strong-scaling-and-parallelism-selection/). Decide whether another pipeline stage helps.
+- [Accelerator network topology](/concepts/accelerator-network-topology/). Place stage boundaries on the target cluster.

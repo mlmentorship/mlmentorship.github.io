@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **Support Vector Machine** finds the hyperplane $w^\top x + b = 0$ that maximally separates the two classes (largest margin). The **kernel trick** replaces $x$ with an implicit nonlinear feature map $\phi(x)$ that is never computed. Only the inner products $K(x, x') = \phi(x)^\top \phi(x')$ matter.
-
-## Why it matters
 
 SVMs were the dominant classification method from ~1998 to ~2012, before deep learning took over for unstructured data and GBDT for tabular. They remain useful in low-data, high-dimensional regimes (small biology and physics datasets) and as a teaching example of margin maximization, convex optimization, and kernel methods.
 

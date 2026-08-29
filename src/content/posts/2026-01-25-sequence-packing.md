@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Sequence packing concatenates multiple training examples back-to-back into a single fixed-length sequence and uses a block-diagonal attention mask so each example only attends within itself, eliminating the FLOPs and memory wasted on padding tokens.
-
-## Why it matters
 
 Most NLP corpora have heavily skewed length distributions: many short examples, few long ones. With naive padding to the longest example in the batch, the wasted-token ratio is
 

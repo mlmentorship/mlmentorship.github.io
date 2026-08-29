@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Discrete gradient estimators approximate $\nabla_\theta \mathbb{E}_{z \sim p_\theta}[f(z)]$ when $z$ is **discrete**, the case where you cannot reparameterize the sample as a smooth function of $\theta$ and noise. The three you must know: **REINFORCE** (score function), **Gumbel-Softmax** (continuous relaxation), and the **straight-through estimator**.
-
-## Why it matters
 
 The [reparameterization trick](/questions/reparameterization-trick/) handles continuous latents (Gaussian VAEs). But many models sample **discrete** objects: categorical latents, hard attention, tokens, architecture choices, RL actions. You can't push a gradient through `argmax` or a categorical sample, so you need an estimator. This is the deep-DL follow-up to "explain the reparameterization trick," and it underpins RLHF (which uses the score-function estimator) and discrete latent-variable models.
 

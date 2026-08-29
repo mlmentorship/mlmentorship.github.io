@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **factorization machine** ([Rendle, 2010](https://cseweb.ucsd.edu/classes/fa17/cse291-b/reading/Rendle2010FM.pdf)) models pairwise feature interactions as $\langle v_i, v_j \rangle$ where each feature $i$ has an embedding $v_i \in \mathbb{R}^k$. The full prediction is
 
 $$
 \hat{y}(x) = w_0 + \sum_i w_i x_i + \sum_{i < j} \langle v_i, v_j \rangle x_i x_j.
 $$
-
-## Why it matters
 
 Linear models (logistic regression) are fast but miss interactions. A degree-2 polynomial model has $\binom{d}{2}$ interaction parameters, which is infeasible at $d = 10^6$ (typical for sparse categorical features) and learns nothing for unseen pairs. FMs sidestep both problems by factorizing the interaction matrix into rank-$k$ embeddings, sharing parameters across pairs.
 

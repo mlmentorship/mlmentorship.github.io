@@ -84,4 +84,4 @@ The L6 answer:
 
 ---
 
-*Related: [How would you build evals for a coding assistant?](/questions/evals-for-coding-assistant/), [How would you reduce LLM inference cost by 10x?](/questions/reduce-llm-inference-cost-10x/), [KV cache](/concepts/kv-cache/).*
+*Related: [design an AI coding product](/questions/design-ai-coding-product/), [enterprise agent-platform design](/questions/design-enterprise-agent-platform/), [build evals for a coding assistant](/questions/evals-for-coding-assistant/), and [reduce LLM inference cost](/questions/reduce-llm-inference-cost-10x/).*

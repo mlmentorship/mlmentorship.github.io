@@ -1,17 +1,15 @@
 ---
 title: "Factor analysis and probabilistic PCA"
-description: "The latent linear-Gaussian model behind PCA. Factor analysis explains observed variables as a few latent factors plus per-feature noise; probabilistic PCA is the special case that recovers classical PCA as a maximum-likelihood limit."
+description: "Factor analysis uses latent factors with per-feature noise. Probabilistic PCA uses isotropic noise and recovers classical PCA in its zero-noise limit."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Factor analysis (FA) is a **latent linear-Gaussian model**: each observation is a linear map of a few low-dimensional latent factors plus Gaussian noise. **Probabilistic PCA (PPCA)** is the special case with **isotropic** noise, and classical PCA falls out as its zero-noise / maximum-likelihood limit.
-
-## Why it matters
 
 This is the model that turns PCA from "an eigen-decomposition trick" into "a probabilistic generative model," which is the framing senior interviewers want. It connects dimensionality reduction to the EM algorithm, to VAEs (a nonlinear PPCA), and to the generative-vs-discriminative discussion. It's also a clean example of how a **prior + likelihood** recovers a classical algorithm as a limiting case.
 
@@ -39,7 +37,7 @@ The whole model is the claim: *the correlations between observed variables are e
 | **Probabilistic PCA** | **isotropic** $\sigma^2 I$ | one shared noise level; MLE has closed form via eigendecomposition |
 | **Classical PCA** | $\sigma^2 \to 0$ limit | deterministic projection onto top-$k$ eigenvectors |
 
-The single most important distinction for interviews: **FA has a diagonal noise covariance (different noise per feature); PPCA forces it isotropic (same noise everywhere).** That's why FA is invariant to rescaling individual features while PCA/PPCA is sensitive to feature scaling (hence "standardize before PCA").
+For interviews, distinguish the noise models: **FA has diagonal noise covariance, while PPCA uses the same isotropic noise for every feature.** FA is invariant to rescaling individual features. PCA and PPCA are sensitive to feature scaling, which is why inputs are usually standardized first.
 
 ## Fitting it
 
@@ -59,7 +57,7 @@ Recasting PCA as a model buys you things plain PCA can't do:
 ## What an interviewer expects you to say
 
 1. Write the **latent linear-Gaussian generative model** and the marginal covariance $WW^\top + \Psi$.
-2. State the key difference: **FA = diagonal noise, PPCA = isotropic noise, PCA = zero-noise limit of PPCA**.
+2. State the difference: **FA = diagonal noise, PPCA = isotropic noise, PCA = zero-noise limit of PPCA**.
 3. Explain the practical consequence: **FA is scale-invariant; PCA/PPCA require feature standardization**.
 4. Know that **PPCA has a closed-form (eigendecomposition) MLE** while **FA needs EM**.
 5. Bonus: connect to **VAEs** (nonlinear PPCA) and note the probabilistic framing enables missing data, model selection, and sampling.

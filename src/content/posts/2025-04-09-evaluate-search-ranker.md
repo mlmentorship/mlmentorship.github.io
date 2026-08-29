@@ -71,4 +71,4 @@ The L6 answer:
 
 ---
 
-*Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/), [System design case study: personalized search ranking](/guides/personalized-search-ranking/).*
+*Related: [learning-to-rank losses](/concepts/learning-to-rank-losses/), [counterfactual ranking](/concepts/position-bias-counterfactual-learning-to-rank/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/), and [personalized search ranking](/guides/personalized-search-ranking/).*

@@ -1,0 +1,127 @@
+---
+import PrepLayout from '../../../layouts/PrepLayout.astro';
+import { STAFF_PRINCIPAL_PATH } from '../../../data/rolePaths';
+import { SITE } from '../../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+
+const path = STAFF_PRINCIPAL_PATH;
+const transferCases = [
+  { title: 'Reasoning systems', caseHref: '/questions/design-reasoning-model-fixed-budget/', mockHref: '/guides/annotated-reasoning-strategy-mock/', focus: 'Compute allocation, verification, serving, recovery, and portfolio choice.' },
+  { title: 'Recommendation ecosystems', caseHref: '/questions/design-short-form-video-ecosystem/', mockHref: '/guides/annotated-ecosystem-strategy-mock/', focus: 'Coupled objectives, creator health, causal uncertainty, rollback, and governance.' },
+  { title: 'Real-time multimodal systems', caseHref: '/questions/design-real-time-multimodal-assistant/', focus: 'Temporal alignment, live latency, modality failure, privacy, and shared contracts.' },
+  { title: 'Foundation-model data', caseHref: '/questions/design-foundation-model-data-platform/', focus: 'Provenance, mixtures, contamination, deletion, infrastructure, and investment boundaries.' },
+  { title: 'AI coding products', caseHref: '/questions/design-ai-coding-product/', focus: 'Repository context, safe execution, developer control, evaluation, and rollout.' },
+  { title: 'Agent safety controls', caseHref: '/questions/design-agent-safety-control-plane/', focus: 'Independent monitors, authority reduction, severe tails, evidence, and incident recovery.' },
+];
+---
+
+<PrepLayout
+  title="Staff through senior-principal ML interview path"
+  description="A level overlay for staff, principal, and senior-principal ML architecture, strategy, influence, delegated authority, and technical-depth interviews."
+  heading="Staff through senior-principal ML level path"
+  lede={path.rule}
+>
+  <section class="composition-note">
+    <p>Level overlay</p>
+    <h2>Keep your role path.</h2>
+    <span>This sequence adds level evidence to Applied Scientist, MLE, Research Scientist, or Research Engineer preparation. It does not replace the role's coding, math, research, or systems bar.</span>
+    <a href="/prep/role-paths/">Choose the underlying role path <span aria-hidden="true">→</span></a>
+  </section>
+
+  <section class="start-card">
+    <p>Start with a closed-book baseline</p>
+    <h2>Design before reading the reference answer.</h2>
+    <span>Use 60 minutes. Ask an observer to challenge the platform boundary, one technical invariant, the migration plan, and an upper-IC portfolio choice.</span>
+    <a href={path.firstPracticeHref}>Start the platform case <span aria-hidden="true">→</span></a>
+  </section>
+
+  <ol class="level-sequence">
+    {path.sequence.map((step, index) => (
+      <li>
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        <div><h2><a href={step.href}>{step.title}</a></h2><p>{step.detail}</p></div>
+        <button type="button" data-level-step-id={`level:${path.id}:${index + 1}`} aria-pressed="false">Mark done</button>
+      </li>
+    ))}
+  </ol>
+
+  <section class="transfer-section">
+    <h2>Choose one domain transfer</h2>
+    <p>Do not complete every case. Select the domain closest to the target role, then use a second domain only to test whether the upper-IC reasoning transfers.</p>
+    <div>{transferCases.map((item) => <article><h3>{item.title}</h3><p>{item.focus}</p><p><a href={item.caseHref}>Open case</a>{item.mockHref && <> · <a href={item.mockHref}>Open annotated mock</a></>}</p></article>)}</div>
+  </section>
+
+  <section class="level-gates">
+    <h2>Evidence gates</h2>
+    <div>
+      <article><h3>Staff</h3><p>Show repeated cross-team impact, a technical boundary you owned, a wrong bet and recovery, measurable adoption, and hands-on depth under follow-up.</p></article>
+      <article><h3>Principal</h3><p>Add portfolio choices, multi-year checkpoints, shared-versus-local boundaries, reversibility, and evidence that other technical leaders can carry the direction.</p></article>
+      <article><h3>Senior principal</h3><p>Connect several principal-owned directions through durable doctrine, delegated authority, external adaptability, succession, and evidence that can reverse major choices.</p></article>
+    </div>
+  </section>
+
+  <section class="after-path">
+    <h2>Use the level overlay selectively</h2>
+    <p>Do not force every answer to organization scope. Use direct technical answers for coding, math, and domain questions. Show level through the rounds that test architecture, project ownership, strategy, and influence.</p>
+    <p><a href="/prep/simulations/#senior-principal">Run the upper-IC simulation</a> · <a href="/prep/story-bank/">Build the evidence stories</a> · <a href="/prep/#queue">Open the Workbook</a></p>
+  </section>
+</PrepLayout>
+
+<script>
+  import { isActivityComplete, setActivityComplete } from '../../../utils/activityProgress';
+  document.querySelectorAll<HTMLButtonElement>('[data-level-step-id]').forEach((button) => {
+    const id = button.dataset.levelStepId;
+    if (!id) return;
+    const render = () => {
+      const complete = isActivityComplete(id);
+      button.textContent = complete ? 'Done' : 'Mark done';
+      button.setAttribute('aria-pressed', String(complete));
+    };
+    button.addEventListener('click', () => {
+      try { setActivityComplete(id, !isActivityComplete(id)); render(); }
+      catch { button.textContent = 'Storage unavailable'; }
+    });
+    render();
+  });
+</script>
+
+<style>
+  .composition-note, .start-card { padding: 1rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .composition-note { margin-bottom: 1rem; }
+  .start-card { border-top: 2px solid var(--c-text); }
+  .composition-note > p, .start-card > p { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
+  .composition-note h2, .start-card h2 { margin: .2rem 0 .3rem !important; font-size: 1.15rem !important; }
+  .composition-note > span, .start-card > span { display: block; max-width: 42rem; color: var(--c-text-soft); font-size: .88rem; }
+  .composition-note > a, .start-card > a { display: inline-block; margin-top: .65rem; font-size: .85rem; font-weight: 700; text-decoration: none; }
+  .composition-note > a:hover, .start-card > a:hover { text-decoration: underline; }
+  .level-sequence { margin: 2rem 0; padding: 0; list-style: none; }
+  .level-sequence li { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: .7rem; margin: 0; padding: .9rem 0; border-bottom: 1px solid var(--c-rule); }
+  .level-sequence > li > span { padding-top: .18rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .72rem; }
+  .level-sequence h2, .level-sequence p { margin: 0; }
+  .level-sequence h2 { font-size: 1rem !important; }
+  .level-sequence h2 a { color: var(--c-text); text-decoration: none; }
+  .level-sequence h2 a:hover { color: var(--c-accent); text-decoration: underline; }
+  .level-sequence p { margin-top: .2rem; color: var(--c-text-soft); font-size: .87rem; }
+  .level-sequence button { align-self: start; padding: .32rem .5rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-muted); font: inherit; font-size: .68rem; cursor: pointer; }
+  .level-sequence button:hover, .level-sequence button[aria-pressed='true'] { border-color: var(--c-accent); color: var(--c-accent); }
+  .level-gates { margin-top: 2rem; }
+  .level-gates > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .7rem; }
+  .level-gates article { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .level-gates h3 { margin-top: 0 !important; }
+  .level-gates p { margin-bottom: 0; color: var(--c-text-soft); font-size: .87rem; }
+  .transfer-section { margin-top: 2rem; }
+  .transfer-section > p { color: var(--c-text-soft); font-size: .88rem; }
+  .transfer-section > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+  .transfer-section article { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
+  .transfer-section h3 { margin-top: 0 !important; }
+  .transfer-section article p { color: var(--c-text-soft); font-size: .84rem; }
+  .transfer-section article p:last-child { margin-bottom: 0; }
+  .after-path { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--c-text); }
+  .after-path h2 { margin-top: 0 !important; }
+  .after-path p { color: var(--c-text-soft); font-size: .88rem; }
+  @media (max-width: 600px) {
+    .level-sequence li { grid-template-columns: 1.8rem minmax(0, 1fr); }
+    .level-sequence button { grid-column: 2; justify-self: start; }
+    .level-gates > div, .transfer-section > div { grid-template-columns: 1fr; }
+  }
+</style>

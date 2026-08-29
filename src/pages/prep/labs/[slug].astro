@@ -2,6 +2,7 @@
 import PrepLayout from '../../../layouts/PrepLayout.astro';
 import { FRONTIER_LABS, type FrontierLab } from '../../../data/frontierLabs';
 import { SITE } from '../../../consts';
+import CompletionToggle from '../../../components/CompletionToggle.astro';
 
 export function getStaticPaths() {
   return FRONTIER_LABS.map((lab) => ({ params: { slug: lab.slug }, props: { lab } }));
@@ -40,6 +41,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   {lab.externalSource && <section class="source-card"><h2>External practice artifact</h2><p><a href={lab.externalSource.href} rel="noopener">{lab.externalSource.label} ↗</a></p><p>{lab.externalSource.note}</p></section>}
 
   <section class="next-step"><h2>Answer key is a rubric, not a solution dump</h2><p>The linked question explains what strong performance looks like, common failure modes, and senior follow-ups. Attempt the lab before reading it.</p><a href={lab.questionHref}>{lab.questionLabel} →</a></section>
+
+  <CompletionToggle itemId={`lab:${lab.slug}`} label="Mark lab complete" />
 
   <p><a href="/prep/labs/">← All executable labs</a></p>
 </PrepLayout>

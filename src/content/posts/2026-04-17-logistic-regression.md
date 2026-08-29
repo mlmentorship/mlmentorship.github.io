@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Logistic regression models $p(y = 1 \mid x) = \sigma(w^\top x + b)$ where $\sigma(z) = 1 / (1 + e^{-z})$ is the sigmoid. Trained by maximum likelihood = minimizing binary cross-entropy.
-
-## Why it matters
 
 Logistic regression is the **first model you should try** on any tabular classification problem. It is interpretable, calibrated by default (when trained on representative data), fast to fit, and competitive with much fancier methods on high-quality features. Most "production tabular models" at large companies have a strong logistic baseline they need to beat.
 

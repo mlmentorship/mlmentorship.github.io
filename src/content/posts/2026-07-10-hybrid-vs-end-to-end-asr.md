@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 "Hybrid or end-to-end?" is a question about constraints, not fashion. The defensible answer is that the choice follows from your data, control needs, latency, and operations, and that modern production systems are often a blend rather than a pure camp. Declaring either one universally obsolete is the fastest way to fail the question.
 
@@ -48,7 +48,7 @@ Costs:
 
 ## Choosing between them
 
-The decision follows the constraints: how much labeled audio you have and how diverse it is; whether you have text-only domain data; streaming latency and endpointing needs; how often the vocabulary changes and how much pronunciation control you need; multilingual requirements; existing infrastructure and expertise; and the cost of errors, interpretability, and fallback. In practice many production systems are end-to-end at the acoustic core while keeping external language rescoring, contextual biasing, or modular safety and confidence layers.
+Choose from the available labeled audio, text-only domain data, latency target, and endpointing needs. Also consider vocabulary change, pronunciation control, language coverage, existing infrastructure, and error cost. Many production systems use an end-to-end acoustic core with external language rescoring, contextual biasing, or separate safety and confidence layers.
 
 ## In an interview
 

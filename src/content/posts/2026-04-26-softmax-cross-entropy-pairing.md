@@ -49,7 +49,7 @@ Combining: `dL / dz_k = p_k - y_k` where `y_k = 1` for `k = y`, `0` otherwise.
 
 The full gradient is `p - y` (predicted probabilities minus the one-hot true label). Three lines of algebra; the cleanest gradient in deep learning.
 
-## Why this matters
+## Benefits of the fused operation
 
 > "Three reasons the joint operation is preferred:
 >
@@ -69,7 +69,7 @@ The full gradient is `p - y` (predicted probabilities minus the one-hot true lab
 
 > "Softmax + cross-entropy is the multiclass generalization of sigmoid + binary cross-entropy, both of which are GLMs under their canonical link functions. The gradient simplification `(predicted - true) * input` is a property of *all* canonical-link GLMs, not just classification. Linear regression with MSE has the same gradient form (because MSE on a Gaussian noise model is the GLM with identity link).
 >
-> This explains why modern deep nets almost universally use sigmoid + BCE for binary, softmax + CE for multiclass: not just convention, but the gradient and stability properties make these the natural choices."
+> Modern deep nets use sigmoid + BCE for binary classification and softmax + CE for multiclass classification because the pairings give simple gradients and stable computation."
 
 ## Tells that get you a strong-hire vote
 
@@ -95,4 +95,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Derive logistic regression from MLE](/questions/derive-logistic-regression/), [How to choose a loss function](/questions/how-to-choose-loss-function/).*
+*Related: [entropy and mutual information](/concepts/entropy-mutual-information/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), [derive logistic regression from MLE](/questions/derive-logistic-regression/), and [choose a loss function](/questions/how-to-choose-loss-function/).*

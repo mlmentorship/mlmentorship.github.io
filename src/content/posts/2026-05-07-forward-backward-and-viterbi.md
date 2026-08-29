@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 For a hidden Markov model with $T$ timesteps and $K$ states, **forward-backward** computes $P(z_t \mid x_{1:T})$ for every $t$ in $O(T K^2)$ time. **Viterbi** computes $\arg\max_{z_{1:T}} P(z_{1:T} \mid x_{1:T})$ in the same time. Brute force would be $O(K^T)$.
-
-## Why it matters
 
 These are the canonical examples of dynamic programming on sequences. Speech recognition (HMM-based decoding), part-of-speech tagging, gene-finding, conditional random fields for sequence labeling, and any structured-prediction task with a chain factor graph relies on one or both. The duality between sum (forward-backward) and max (Viterbi) is the textbook example of how the same DP works in two different semirings.
 

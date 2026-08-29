@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 RNN-T extends CTC with a **prediction network** (an internal language model over emitted tokens) and a **joint network** that combines acoustic and label context, producing a streamable model that marginalizes over alignments while conditioning each output on the tokens already produced.
-
-## Why it matters
 
 RNN-T is the model behind most **on-device, streaming** speech recognition (Google's Gboard/Assistant dictation, many production ASR systems). It is the natural "what fixes CTC?" follow-up in any speech interview.
 

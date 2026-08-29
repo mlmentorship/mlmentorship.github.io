@@ -13,7 +13,14 @@ The L4 story ends with "I blocked a reckless launch and I was right." The L6 sto
 
 ## What a strong answer covers
 
-In 90 to 120 seconds, land six things: the delivery pressure and why it was legitimate; the specific risk (a concrete user harm, not "AI safety" in the abstract); what you personally measured or proposed; the proportional mitigation or staged path; the decision and its measurable outcome; and what you learned about escalating under uncertainty.
+In 90 to 120 seconds, cover six points:
+
+1. The delivery pressure and why it was legitimate.
+2. The specific risk, stated as concrete user harm.
+3. What you measured or proposed.
+4. The proportional mitigation or staged path.
+5. The decision and measurable outcome.
+6. What you learned about escalating under uncertainty.
 
 ## What an L4 answer sounds like
 
@@ -23,7 +30,7 @@ Responsible, but it never shows how you judged severity, moved the decision, or 
 
 ## What an L5 answer adds
 
-An L5 answer names a concrete failure mode, quantifies the exposure, and proposes the smallest action that resolves the uncertainty: a launch-blocking slice with a rollback threshold, a targeted red-team or shadow evaluation, a first launch limited to a lower-risk segment, human review on high-consequence outputs, or a scope cut that preserves the date. It shows how product, legal, or leadership reached the decision, not just that you were right.
+An L5 answer names a concrete failure mode and quantifies the exposure. It proposes the smallest action that resolves the uncertainty: a launch-blocking slice, targeted red-team or shadow evaluation, lower-risk first segment, human review, or scope cut. It also explains how product, legal, and leadership reached the decision.
 
 ## What an L6 answer adds
 

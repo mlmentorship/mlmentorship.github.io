@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 A small "draft" model proposes K candidate tokens cheaply; a single parallel forward pass of the large target model verifies them using a rejection-sampling rule that **provably preserves the target model's output distribution**.
-
-## Why it matters
 
 LLM decoding is autoregressive: each token depends on the previous, so the GPU sits idle most of the time waiting for the next sequential step. Each forward pass on a single token is **memory-bound**: you read all of the model's weights from HBM but only do one matrix-vector multiplication. Tensor cores are barely used.
 
@@ -69,7 +67,7 @@ In 2026, EAGLE-2 / EAGLE-3 are SOTA; Medusa is the simplest to implement; tree s
 If asked about speculative decoding:
 
 1. Frame the problem: decoding is memory-bound, GPUs are idle, the n in the matmul is 1.
-2. Explain draft + verify + accept/reject, with the key insight that **M's verify pass is essentially free** because the cost was dominated by weight-loading, not by the K-fold extra matmul.
+2. Explain draft + verify + accept/reject. **M's verify pass adds little cost** when weight loading dominates the extra matrix multiplication.
 3. State that it's **lossless** (preserves M's distribution) and explain why this is non-obvious and important.
 4. Quote a realistic speedup number (2-3&times;).
 5. Bonus: mention Medusa, EAGLE, or tree speculation as variants.
@@ -101,4 +99,4 @@ If you can also discuss how speculative decoding interacts with KV-cache, batchi
 
 ---
 
-*Related: [FlashAttention](/concepts/flashattention/) (the other big inference optimization). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/questions/) (coming soon).*
+*Related: [FlashAttention](/concepts/flashattention/) and [production LLM inference design](/questions/design-production-llm-inference-service/).*

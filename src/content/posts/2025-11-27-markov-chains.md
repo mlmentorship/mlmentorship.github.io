@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **Markov chain** is a sequence of random variables $X_0, X_1, X_2, \dots$ such that
 
@@ -16,8 +16,6 @@ p(X_{t+1} \mid X_t, X_{t-1}, \dots, X_0) = p(X_{t+1} \mid X_t).
 $$
 
 The conditional distribution of the future given the present is independent of the past. For finite state spaces, the dynamics are summarized by a **transition matrix** $P$ where $P_{ij} = p(X_{t+1} = j \mid X_t = i)$.
-
-## Why it matters
 
 Markov chains underlie:
 

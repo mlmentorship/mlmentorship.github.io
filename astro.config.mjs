@@ -16,6 +16,7 @@ export default defineConfig({
     '/story-bank': prepToolsEnabled ? '/prep/story-bank' : '/questions',
     '/plans': prepToolsEnabled ? '/prep/plans' : '/questions',
     '/final-week': prepToolsEnabled ? '/prep/final-week' : '/questions',
+    '/library/specialist-domains': '/library/vision-language-speech',
   },
   integrations: [
     mermaid({ theme: 'neutral', autoTheme: true, enableLog: false }),
@@ -37,7 +38,9 @@ export default defineConfig({
     format: 'directory',
   },
   prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
+    // Large indexes can expose hundreds of links. Prefetch only links that
+    // explicitly opt in so mobile readers do not download unused chapters.
+    prefetchAll: false,
+    defaultStrategy: 'hover',
   },
 });

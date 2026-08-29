@@ -1,5 +1,6 @@
-export type RoleId = 'applied-scientist' | 'ml-engineer' | 'research-engineer';
-export type LevelId = 'l4' | 'l5' | 'l6';
+export type RoleId = 'applied-scientist' | 'ml-engineer' | 'research-scientist' | 'research-engineer';
+export const ROLE_ORDER: RoleId[] = ['applied-scientist', 'ml-engineer', 'research-scientist', 'research-engineer'];
+export type LevelId = 'l4' | 'l5' | 'l6' | 'l7' | 'l8';
 export type AreaId =
   | 'fundamentals'
   | 'production'
@@ -16,6 +17,7 @@ export type RoundId =
   | 'agentic-codebase'
   | 'ml-system-design'
   | 'project-deep-dive'
+  | 'technical-strategy'
   | 'technical-presentation'
   | 'behavioral'
   | 'values-mission'
@@ -121,6 +123,13 @@ export const INTERVIEW_ROUNDS: Array<{
     minutes: 45,
     areaWeights: { 'system-design': .65, production: .2, experimentation: .15 },
     starterLinks: [
+      { label: 'Design a multi-team ML platform', href: '/questions/design-multi-team-ml-platform/' },
+      { label: 'Train and serve a reasoning model', href: '/questions/design-reasoning-model-fixed-budget/' },
+      { label: 'Design a real-time multimodal assistant', href: '/questions/design-real-time-multimodal-assistant/' },
+      { label: 'Design short-form video recommendation', href: '/questions/design-short-form-video-ecosystem/' },
+      { label: 'Design a foundation-model data platform', href: '/questions/design-foundation-model-data-platform/' },
+      { label: 'Design an AI coding product', href: '/questions/design-ai-coding-product/' },
+      { label: 'Design an agent safety control plane', href: '/questions/design-agent-safety-control-plane/' },
       { label: 'Design fraud detection', href: '/questions/design-fraud-detection/' },
       { label: 'Design ML monitoring', href: '/questions/design-ml-monitoring/' },
     ],
@@ -134,6 +143,22 @@ export const INTERVIEW_ROUNDS: Array<{
     starterLinks: [
       { label: 'Most ambitious project', href: '/questions/most-ambitious-project/' },
       { label: 'Scope an ambiguous problem', href: '/questions/scope-ambiguous-problem/' },
+    ],
+  },
+  {
+    id: 'technical-strategy',
+    label: 'Technical strategy',
+    description: 'Shared boundaries, investment order, delegated authority, decision checkpoints, reversibility, and retained technical depth.',
+    minutes: 60,
+    areaWeights: { 'system-design': .4, behavioral: .3, production: .2, experimentation: .1 },
+    starterLinks: [
+      { label: 'Design an enterprise agent platform', href: '/questions/design-enterprise-agent-platform/' },
+      { label: 'Study an annotated upper-IC mock', href: '/guides/annotated-upper-ic-agent-platform-mock/' },
+      { label: 'Reasoning-model strategy case', href: '/questions/design-reasoning-model-fixed-budget/' },
+      { label: 'Annotated reasoning-strategy mock', href: '/guides/annotated-reasoning-strategy-mock/' },
+      { label: 'Ecosystem-ranking strategy case', href: '/questions/design-short-form-video-ecosystem/' },
+      { label: 'Annotated ecosystem-strategy mock', href: '/guides/annotated-ecosystem-strategy-mock/' },
+      { label: 'Calibrate senior through senior-principal scope', href: '/guides/l5-vs-l6-faang-ml/' },
     ],
   },
   {
@@ -220,6 +245,7 @@ export const INTERVIEW_ROUNDS: Array<{
     minutes: 45,
     areaWeights: { production: .55, coding: .25, 'system-design': .2 },
     starterLinks: [
+      { label: 'Design a multi-team ML platform', href: '/questions/design-multi-team-ml-platform/' },
       { label: 'Train a 100B-parameter model', href: '/questions/train-100b-model/' },
       { label: 'Reduce LLM inference cost 10×', href: '/questions/reduce-llm-inference-cost-10x/' },
     ],
@@ -288,6 +314,24 @@ export const ROLE_OVERLAYS: Record<RoleId, {
     ],
     warning: 'Expect title variation. Confirm whether the loop behaves like research, ML systems, or general software engineering.',
   },
+  'research-scientist': {
+    label: 'Research Scientist',
+    summary: 'Prioritize original hypotheses, mathematical depth, research judgment, and defense of a small number of important contributions.',
+    defaultRounds: ['coding', 'math-oral', 'research-depth', 'research-work-sample', 'technical-presentation', 'behavioral'],
+    allocation: [
+      { label: 'Research depth & paper defense', percent: 30 },
+      { label: 'Math & ML breadth', percent: 25 },
+      { label: 'Research coding & experiments', percent: 20 },
+      { label: 'Job talk & project defense', percent: 15 },
+      { label: 'Behavioral & collaboration', percent: 10 },
+    ],
+    priorityLinks: [
+      { label: 'Critique a paper', href: '/questions/critique-ml-paper/' },
+      { label: 'Design an ablation study', href: '/questions/design-ablation-study/' },
+      { label: 'Investigate model behavior', href: '/questions/investigate-black-box-model-behavior/' },
+    ],
+    warning: 'Publications open the door, but the loop tests whether you can derive, implement, challenge evidence, generate alternatives, and defend your own decisions.',
+  },
 };
 
 export const LEVEL_OVERLAYS: Record<LevelId, {
@@ -313,6 +357,18 @@ export const LEVEL_OVERLAYS: Record<LevelId, {
     bar: 'Choose problems and strategy, influence multiple teams, and remain technically credible.',
     evidence: ['Cross-team adoption or influence', 'A wrong strategic bet and recovery', 'A project you killed or redirected', 'Hands-on depth beneath the strategy'],
     commonFailure: 'Speaking only at the strategic level without concrete technical decisions and failure evidence.',
+  },
+  l7: {
+    label: 'L7 / principal',
+    bar: 'Set durable direction across organizations, balance a multi-year technical portfolio, and preserve the ability to change course.',
+    evidence: ['Multi-organization technical direction', 'Portfolio choices with explicit opportunity cost', 'Reversible standards and decision checkpoints', 'Other technical leaders carrying the work'],
+    commonFailure: 'Presenting a broad architecture without migration cost, stop conditions, retained technical depth, or evidence that the direction outlived personal involvement.',
+  },
+  l8: {
+    label: 'Senior principal / distinguished',
+    bar: 'Create coherent technical direction across several principal-owned portfolios while preserving delegated authority, external adaptability, succession, and reversal.',
+    evidence: ['A durable doctrine above changing implementations', 'Principal-level leaders carrying distinct technical domains', 'Portfolio changes driven by external or multi-year evidence', 'Standards that survive leadership, vendor, and regulatory change'],
+    commonFailure: 'Using company-wide scope as a substitute for decision rights, technical mechanisms, independent principal leadership, or evidence that can reverse the direction.',
   },
 };
 
@@ -498,6 +554,14 @@ const QUESTION_MODE_OVERRIDES: Record<string, PracticeModeId> = {
   'present-technical-ml-project': 'presentation',
   'debug-frontier-llm-training-run': 'coding',
   'design-production-llm-inference-service': 'system-design',
+  'design-multi-team-ml-platform': 'system-design',
+  'design-enterprise-agent-platform': 'system-design',
+  'design-reasoning-model-fixed-budget': 'system-design',
+  'design-real-time-multimodal-assistant': 'system-design',
+  'design-short-form-video-ecosystem': 'system-design',
+  'design-foundation-model-data-platform': 'system-design',
+  'design-ai-coding-product': 'system-design',
+  'design-agent-safety-control-plane': 'system-design',
   'investigate-black-box-model-behavior': 'research',
   'defend-values-under-ethical-pressure': 'values',
   'optimize-accelerator-workload': 'infrastructure',

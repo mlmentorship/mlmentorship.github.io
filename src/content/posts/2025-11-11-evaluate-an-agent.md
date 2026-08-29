@@ -75,4 +75,4 @@ The L6 answer:
 
 ---
 
-*Related: [LLM Evals essay](/guides/llm-evals-the-hardest-part/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/).*
+*Related: [enterprise agent-platform design](/questions/design-enterprise-agent-platform/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), and [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/).*

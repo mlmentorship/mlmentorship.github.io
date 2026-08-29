@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Expectation-Maximization** ([Dempster, Laird & Rubin, 1977](https://www.jstor.org/stable/2984875)) is an iterative algorithm for finding MLE / MAP parameter estimates in latent-variable models. Each iteration alternates:
 
@@ -15,8 +15,6 @@ category: "concepts"
 2. **M-step**: update $\theta_{t+1} = \arg\max_\theta \mathbb{E}_{q(z)}[\log p(x, z; \theta)]$.
 
 EM monotonically increases the log-likelihood until convergence to a local optimum.
-
-## Why it matters
 
 When you have a latent variable model and the latents are unobserved, direct MLE involves a marginalization $\log p(x; \theta) = \log \sum_z p(x, z; \theta)$ that is usually intractable. EM avoids this by alternately filling in expected values of $z$ and optimizing $\theta$ on the completed data.
 

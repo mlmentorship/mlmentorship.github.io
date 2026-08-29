@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Interpretability is the set of methods for explaining **what a model learned** (global) or **why it made a specific prediction** (local), either by using an intrinsically transparent model or by attaching a **post-hoc** explainer to a black box.
-
-## Why it matters
 
 Interpretability shows up in interviews and in production for three reasons: **debugging** (is the model right for the right reasons, or exploiting a spurious feature?), **trust / regulation** (lending, healthcare, and hiring often legally require explanations), and **stakeholder buy-in**. It's also a common "you shipped a model, the PM asks *why did it reject this user*, what do you do?" scenario.
 

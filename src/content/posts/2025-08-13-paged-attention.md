@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 PagedAttention stores the KV cache in fixed-size physical blocks indexed by a per-sequence block table, so the cache is no longer a contiguous tensor and can be allocated, freed, and shared at block granularity. Like virtual memory pages in an OS.
-
-## Why it matters
 
 Naive KV-cache management pre-allocates `max_seq_len` of contiguous memory for every request in the batch. Most requests are short, so most of that memory is wasted (internal fragmentation). Shared prefixes (system prompts, few-shot examples) are duplicated across requests (no sharing). The result: serving throughput is bottlenecked by KV-cache memory, not by compute.
 

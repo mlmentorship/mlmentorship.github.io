@@ -7,13 +7,11 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Microannealing** is a short, low-cost cooldown applied to a mostly-trained checkpoint, with a small fraction (typically 15-30%) of a candidate dataset mixed into the otherwise-normal pretraining mix. The downstream task performance and per-domain loss of the resulting model are compared against a control microannealing run on 100% of the normal mix.
 
 **Midtraining** is the broader umbrella: any technique that intervenes between the bulk of pretraining and the final cooldown, including microannealing, data mixture changes, and curriculum adjustments.
-
-## Why it matters
 
 Data-mix decisions during pretraining are almost impossible to evaluate cheaply. You can't fully retrain to test each candidate, and small-scale ablations don't transfer because data effects compound over training and only become visible at low LR. Microannealing gives you a real signal at less than 1% of full-run cost, by exploiting the fact that cooldown is the regime where data choices actually matter most.
 

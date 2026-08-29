@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
-The **universal approximation theorem** ([Cybenko, 1989](https://link.springer.com/article/10.1007/BF02551274); [Hornik, 1991](https://www.sciencedirect.com/science/article/abs/pii/089360809190009T)) states that a feed-forward neural network with a single hidden layer of sigmoidal (or other non-polynomial) units can approximate any continuous function on a compact subset of $\mathbb{R}^n$ to arbitrary accuracy, provided the layer has enough units.
-
-## Why it matters
+The **universal approximation theorem** ([Cybenko, 1989](https://link.springer.com/article/10.1007/BF02551274); [Hornik, 1991](https://www.sciencedirect.com/science/article/abs/pii/089360809190009T)) applies to continuous functions on a compact subset of $\mathbb{R}^n$. A feed-forward network with one sufficiently wide hidden layer and a suitable non-polynomial activation can approximate any such function to arbitrary accuracy.
 
 UAT is often quoted as "neural networks can learn anything." That is a misleading summary; the theorem is an existence result, not a guarantee that:
 

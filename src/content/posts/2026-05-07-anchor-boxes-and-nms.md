@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Anchor boxes** are predefined reference boxes at every spatial position; the detector predicts offsets relative to each anchor instead of absolute box coordinates. **Non-maximum suppression** (NMS) post-processes the resulting predictions, keeping only the highest-scoring box from each cluster of overlapping boxes.
-
-## Why it matters
 
 Without anchors, a detector would have to predict box coordinates from scratch at every position, with no prior on shape or scale. With anchors, the network only has to predict small offsets, which is a much easier regression problem. Faster R-CNN, SSD, YOLOv2 to v5, and RetinaNet all use anchor boxes.
 

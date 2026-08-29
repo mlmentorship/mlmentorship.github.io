@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 ASR maps an audio waveform to a text transcript. Modern systems are **end-to-end neural models** (CTC, RNN-T, or attention encoder-decoders) trained directly on (audio, text) pairs, replacing the old multi-stage HMM-GMM + pronunciation-lexicon + n-gram pipeline.
-
-## Why it matters
 
 ASR is the canonical "sequence in, sequence out, unknown alignment" problem, and it pulls together several interview-favorite ideas: feature extraction, alignment-free losses, language-model fusion, and streaming-vs-accuracy tradeoffs. It's also a frequent applied-scientist domain (voice assistants, captioning, call-center analytics, medical scribing).
 
@@ -29,7 +27,7 @@ Raw audio is ~16 kHz samples. Models rarely consume raw samples directly; they u
 - Compute a **log-mel spectrogram**: short-time Fourier transform → mel filterbank → log. This mimics human pitch perception and is the de-facto standard input.
 - **MFCCs** (mel-frequency cepstral coefficients) add a DCT on top; common in classical/HMM systems, less needed for deep nets which prefer raw log-mel.
 
-**Augmentation** is critical: **SpecAugment** (time/frequency masking + time warping on the spectrogram) is the single highest-leverage ASR augmentation, plus speed perturbation and noise mixing.
+**Augmentation:** **SpecAugment** applies time and frequency masking, with optional time warping, to the spectrogram. Speed perturbation and noise mixing are also common ASR augmentations.
 
 ### 2. Acoustic / sequence model
 

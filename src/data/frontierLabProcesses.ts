@@ -20,7 +20,7 @@ export interface FrontierLabProcess {
   sources: FrontierSource[];
 }
 
-const checkedOn = 'July 11, 2026';
+const checkedOn = 'August 28, 2026';
 
 export const FRONTIER_LAB_PROCESSES: FrontierLabProcess[] = [
   {
@@ -38,7 +38,7 @@ export const FRONTIER_LAB_PROCESSES: FrontierLabProcess[] = [
       'A June 2026 report describes a beta agentic-coding round in an existing codebase. Treat this as a pilot, not a universal round.',
       'Some research-engineering reports include ML debugging, statistics, probability, or information-theory work. Team scope matters more than the company label.',
     ],
-    aiPolicy: 'The official guide does not publish one universal live-interview AI rule. A current method-based report says AI is restricted except in an explicitly agentic pilot. Follow the recruiter instructions for the exact round.',
+    aiPolicy: 'Official guidance says tool rules vary by interview. Some formats intentionally allow AI, while others assess independent problem solving without it. The preparation material for each assessment states what is allowed. Ask the recruiter when anything is unclear.',
     prep: [
       { label: 'Agentic ML codebase lab', href: '/prep/labs/agentic-codebase/' },
       { label: 'Technical presentation', href: '/prep/presentation/' },
@@ -47,7 +47,7 @@ export const FRONTIER_LAB_PROCESSES: FrontierLabProcess[] = [
     ],
     caution: 'OpenAI explicitly says experiences vary by team. Ask for the assessment format, editor, AI policy, presentation requirement, and domain before choosing a drill.',
     sources: [
-      { label: 'OpenAI interview guide', href: 'https://openai.com/interview-guide/', tier: 'Official', checkedOn, supports: 'Stages, assessment examples, final-loop length, and engineering criteria.' },
+      { label: 'OpenAI interview guide', href: 'https://openai.com/interview-guide/', tier: 'Official', checkedOn, supports: 'Stages, assessment examples, assessment-specific AI rules, final-loop length, and engineering criteria.' },
       { label: 'interviewing.io OpenAI process', href: 'https://interviewing.io/openai-interview-questions', tier: 'Method-based report', checkedOn, supports: 'Practical coding, presentation, system design, and agentic-coding pilot.' },
       { label: 'Frontier Evals and Environments role', href: 'https://openai.com/careers/research-engineer-frontier-evals-and-environments-san-francisco/', tier: 'Official', checkedOn, supports: 'Current work in RL environments, graders, synthetic data, and evaluation systems.' },
     ],
@@ -98,7 +98,7 @@ export const FRONTIER_LAB_PROCESSES: FrontierLabProcess[] = [
       'Reported ML prompts reward derivation and intuition, not definition recall. Constraints often change after the first answer.',
       'General algorithms remain a real requirement for some roles, but this site deliberately leaves that curriculum to dedicated resources.',
     ],
-    aiPolicy: 'The public careers overview does not state one universal AI policy. Use the role-specific instructions sent by recruiting.',
+    aiPolicy: 'The official interview guide permits AI for preparation, but says not to use AI during live interviews or interview tasks unless the instructions explicitly allow it. Role-specific recruiting instructions control.',
     prep: [
       { label: 'Math oral', href: '/prep/labs/math-oral/' },
       { label: 'ML implementation set', href: '/prep/labs/implementation/' },
@@ -108,6 +108,7 @@ export const FRONTIER_LAB_PROCESSES: FrontierLabProcess[] = [
     caution: 'Do not substitute generic Google interview guidance for DeepMind role instructions. Research Engineer, Research Scientist, and product-facing ML roles use different mixes.',
     sources: [
       { label: 'Google DeepMind careers', href: 'https://deepmind.google/careers/', tier: 'Official', checkedOn, supports: 'Initial, skills, final, and decision stages.' },
+      { label: 'Google DeepMind interview guide', href: 'https://storage.googleapis.com/deepmind-media/DeepMind.com/Assets/Docs/interviewing-at-google-deepmind.pdf', tier: 'Official', checkedOn, supports: 'Interview stages, preparation, and AI-use policy.' },
       { label: '2026 Research Engineer synthesis', href: 'https://igotanoffer.com/en/advice/google-deepmind-research-engineer-interview', tier: 'Method-based report', checkedOn, supports: 'Reported coding, ML fundamentals, ML design, and team interviews.' },
     ],
   },
@@ -116,9 +117,9 @@ export const FRONTIER_LAB_PROCESSES: FrontierLabProcess[] = [
     lab: 'Meta AI',
     bottomLine: 'AI-assisted coding and design are now first-class formats for selected roles. The signal is control, review, debugging, and judgment, not prompt volume.',
     confirmed: [
-      'Many interviews now include an AI assistant built into the interview environment, and candidates are expected to use it.',
+      'Select roles now include an authorized AI assistant inside CoderPad during technical interviews.',
       'The assistant is built into CoderPad and offers Claude, ChatGPT, Gemini, and Meta models.',
-      'AI-native design interviews use Mermaid Markdown in CoderPad with the same assistant available.',
+      'For selected AI-native design interviews, candidates use Mermaid Markdown in CoderPad with the authorized assistant available.',
       'Meta recommends practicing in the provided environment and getting comfortable reading, debugging, and extending existing code.',
     ],
     reported: [

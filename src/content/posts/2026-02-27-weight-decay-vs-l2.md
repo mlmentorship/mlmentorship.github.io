@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 L2 regularization adds a penalty $\frac{\lambda}{2} \|\theta\|^2$ to the loss; weight decay multiplies parameters by $(1 - \eta \lambda)$ at each step. Under vanilla SGD they are mathematically equivalent. Under adaptive optimizers like Adam they are **not**. And the difference is large enough that AdamW [(Loshchilov & Hutter, 2019)](https://arxiv.org/abs/1711.05101) is now the default for transformer training.
 

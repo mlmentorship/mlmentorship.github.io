@@ -1,40 +1,42 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts';
 ---
-<BaseLayout title="Not found" description="That page doesn't exist.">
-  <section class="container notfound">
+<BaseLayout title="Page not found" description="The requested mlmentorship page could not be found.">
+  <section class="notfound">
     <p class="code">404</p>
-    <h1>Page not found</h1>
-    <p class="muted">The page you're looking for may have moved, or never existed.</p>
-    <p>
-      <a href="/">← Go home</a> · <a href="/questions/">Browse interview questions</a>
-    </p>
+    <h1>This page is not in the book.</h1>
+    <p>The link may be old, or the address may contain a typo. Use search in the header or continue from one of the main sections.</p>
+    <nav aria-label="Continue browsing">
+      <a href="/">Contents</a>
+      <a href="/questions/">Questions</a>
+      <a href="/concepts/">Concepts</a>
+      <a href="/guides/">Guides</a>
+      {SITE.features.prepTools && <a href="/prep/">Workbook</a>}
+    </nav>
   </section>
 </BaseLayout>
 
 <style>
   .notfound {
-    padding: clamp(5rem, 14vw, 9rem) var(--gutter);
-    text-align: center;
-    max-width: 40rem;
+    width: min(100%, 42rem);
+    margin: 0 auto;
+    padding: clamp(4rem, 12vw, 8rem) var(--gutter);
   }
   .code {
-    font-family: var(--font-display);
-    font-weight: 300;
-    font-variation-settings: 'opsz' 144, 'SOFT' 80;
-    font-size: clamp(6rem, 22vw, 12rem);
+    margin: 0 0 .6rem;
     color: var(--c-accent);
-    margin: 0 0 .5rem;
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    font-style: italic;
+    font-family: var(--font-mono);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .14em;
   }
   .notfound h1 {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-variation-settings: 'opsz' 72, 'SOFT' 30;
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    margin: 0 0 .8rem;
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 6vw, 3.4rem);
   }
-  .notfound .muted { font-size: 1.05rem; margin-bottom: 1.5rem; }
+  .notfound > p:not(.code) { max-width: 36rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.08rem; line-height: 1.65; }
+  .notfound nav { display: flex; flex-wrap: wrap; gap: .65rem 1.2rem; margin-top: 1.8rem; }
+  .notfound nav a { color: var(--c-text); font-size: .9rem; font-weight: 650; text-decoration: none; }
+  .notfound nav a:hover { color: var(--c-accent); text-decoration: underline; }
 </style>

@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Semantic segmentation is the dense version of classification: a class label for every pixel, which is what scene parsing, medical imaging, and autonomous perception actually need. Two things make it hard. A network downsamples to build semantic context, so the central challenge is recovering spatial precision at the boundaries it blurred. And the obvious metric lies: pixel accuracy can look excellent while the model quietly predicts background everywhere. It differs from object detection, which predicts boxes, and instance segmentation, which separates individual objects of the same class.
 

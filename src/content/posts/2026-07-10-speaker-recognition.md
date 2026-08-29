@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Voice is an attractive identity signal (hands-free, no extra hardware) and a dangerous one: it is observable, hard to revoke, and easy to replay or synthesize. Speaker recognition predicts identity from voice, and the real engineering difficulty is less the embedding than calibrating a decision threshold to the risk and defending it against spoofing. Two tasks sit underneath: **verification** asks whether an utterance matches a claimed speaker, and **identification** chooses among enrolled speakers. Both differ from speech recognition, which predicts words.
 

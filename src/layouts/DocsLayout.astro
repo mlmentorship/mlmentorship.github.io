@@ -2,17 +2,18 @@
 import type { MarkdownHeading } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
-import SectionNav from '../components/SectionNav.astro';
-import TableOfContents from '../components/TableOfContents.astro';
 import MockCTA from '../components/MockCTA.astro';
-import AuthorCard from '../components/AuthorCard.astro';
-import Subscribe from '../components/Subscribe.astro';
 import PracticeMode from '../components/PracticeMode.astro';
+import CompletionToggle from '../components/CompletionToggle.astro';
+import BookReaderNav from '../components/BookReaderNav.astro';
+import BookSidebar from '../components/BookSidebar.astro';
 import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
 import { SITE } from '../consts';
 import { getSubcategoryMap, type Category } from '../utils/subcategories';
 import { getPracticeMode } from '../data/prepCurriculum';
+import { findLibraryLocation, getLibraryShelf } from '../data/library';
+import { entriesForChapter, getLibraryEntries } from '../utils/library';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -20,7 +21,7 @@ interface Props {
   rawContent: string;
 }
 const { post, headings, rawContent } = Astro.props;
-const { title, description, date, updated } = post.data;
+const { title, description, date, updated, reviewed, aliases, difficulty, priority } = post.data;
 const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 const category = post.data.category as Category;
@@ -34,6 +35,13 @@ const categoryMeta = CATEGORY_META[category];
 const subcategoryConfig = getSubcategoryMap(category);
 const currentSubcategory = subcategoryConfig?.map[slug];
 const practiceMode = getPracticeMode(slug, currentSubcategory);
+const libraryLocation = findLibraryLocation(slug);
+const libraryShelf = libraryLocation ? getLibraryShelf(libraryLocation.volume.id) : undefined;
+const chapterIndex = libraryLocation ? libraryLocation.volume.chapters.findIndex((chapter) => chapter.id === libraryLocation.chapter.id) : -1;
+const displayDate = reviewed ?? updated ?? date;
+const displayDateLabel = reviewed ? 'Reviewed' : updated ? 'Updated' : 'Published';
+const scopePriority = priority ?? libraryLocation?.chapter.priority;
+const scopeDifficulty = difficulty ?? libraryLocation?.chapter.difficulty;
 
 const categoryPosts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category))
   .map((entry) => ({
@@ -54,11 +62,27 @@ const categoryPosts = (await getCollection('posts', ({ data }) => !data.draft &&
     return a.title.localeCompare(b.title);
   });
 
-const currentIndex = categoryPosts.findIndex((entry) => entry.slug === slug);
-const previousPost = currentIndex > 0 ? categoryPosts[currentIndex - 1] : undefined;
-const nextPost = currentIndex >= 0 && currentIndex < categoryPosts.length - 1
-  ? categoryPosts[currentIndex + 1]
+const libraryEntries = await getLibraryEntries();
+const orderedChapterEntries = libraryLocation ? entriesForChapter(libraryEntries, libraryLocation.chapter) : [];
+const bookChapters = libraryLocation ? libraryLocation.volume.chapters.map((chapter) => ({
+  chapter,
+  entries: entriesForChapter(libraryEntries, chapter),
+})) : [];
+const sectionPosts = orderedChapterEntries.length > 0
+  ? orderedChapterEntries.map((entry) => ({ slug: entry.slug, title: entry.title, href: entry.href }))
+  : currentSubcategory
+    ? categoryPosts.filter((entry) => entry.subcategory === currentSubcategory).map((entry) => ({ ...entry, href: `/${category}/${entry.slug}/` }))
+    : categoryPosts.map((entry) => ({ ...entry, href: `/${category}/${entry.slug}/` }));
+const sectionIndex = sectionPosts.findIndex((entry) => entry.slug === slug);
+const bookEntries = bookChapters.flatMap(({ entries }) => entries.map((entry) => ({ slug: entry.slug, title: entry.title, href: entry.href })));
+const navigationPosts = bookEntries.length > 0 ? bookEntries : sectionPosts;
+const navigationIndex = navigationPosts.findIndex((entry) => entry.slug === slug);
+const previousPost = navigationIndex > 0 ? navigationPosts[navigationIndex - 1] : undefined;
+const nextPost = navigationIndex >= 0 && navigationIndex < navigationPosts.length - 1
+  ? navigationPosts[navigationIndex + 1]
   : undefined;
+const pageHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? categoryMeta.plural;
 ---
 <BaseLayout
   title={title}
@@ -66,40 +90,69 @@ const nextPost = currentIndex >= 0 && currentIndex < categoryPosts.length - 1
   image={`/og/${post.slug}.png`}
   article
   publishedTime={date}
-  modifiedTime={updated}
+  modifiedTime={updated ?? reviewed}
 >
-  <div class="docs-layout">
-    <nav class="docs-sidebar" aria-label="Section navigation" data-pagefind-ignore="all">
-      <SectionNav category={post.data.category} currentSlug={slug} />
-    </nav>
-
-    <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
+  {libraryLocation && <BookReaderNav
+    volume={libraryLocation.volume}
+    currentChapter={libraryLocation.chapter}
+    currentSlug={slug}
+    chapters={bookChapters}
+    previousEntry={previousPost ? { href: previousPost.href, title: previousPost.title } : undefined}
+    nextEntry={nextPost ? { href: nextPost.href, title: nextPost.title } : undefined}
+    mobileOnly
+  />}
+  <div class="docs-shell">
+    {libraryLocation && <BookSidebar
+      volume={libraryLocation.volume}
+      currentChapter={libraryLocation.chapter}
+      currentSlug={slug}
+      chapters={bookChapters}
+    />}
+    <div class="docs-layout">
+      <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
       <header class="docs-head">
-        <nav class="breadcrumbs" aria-label="Breadcrumb" data-pagefind-ignore="all">
-          <a href="/start-here/">Start here</a>
-          <span aria-hidden="true">/</span>
-          <a href={`/${category}/`}>{categoryMeta.plural}</a>
-          {currentSubcategory && (
+        <nav class="breadcrumbs" aria-label="Chapter context" data-pagefind-ignore="all">
+          {libraryLocation ? (
             <>
-              <span aria-hidden="true">/</span>
-              <span aria-current="page">{currentSubcategory}</span>
+              <a href={`/library/${libraryLocation.volume.id}/${libraryLocation.chapter.id}/`}>{chapterTitle}</a>
+              <span aria-hidden="true">·</span>
+              <span>Chapter {chapterIndex + 1}</span>
+              {sectionIndex >= 0 && <><span aria-hidden="true">·</span><span>{sectionIndex + 1} of {sectionPosts.length}</span></>}
             </>
+          ) : (
+            <a href={`/${category}/`}>{categoryMeta.plural}</a>
           )}
         </nav>
-        <h1 itemprop="headline">{title}</h1>
+        <h1 itemprop="headline" data-pagefind-weight="10">{title}</h1>
         {description && <p class="lede" itemprop="description">{description}</p>}
+        <div class="search-meta sr-only" aria-hidden="true">
+          <span data-pagefind-filter="Type">{categoryMeta.singular}</span>
+          {libraryShelf && <span data-pagefind-filter="Shelf">{libraryShelf.title}</span>}
+          {libraryLocation && <span data-pagefind-filter="Book">{libraryLocation.volume.shortTitle}</span>}
+          {aliases.length > 0 && <span data-pagefind-weight="8">{aliases.join(' ')}</span>}
+        </div>
         <div class="docs-meta">
-          <span>Reviewed <time itemprop="dateModified" datetime={(updated ?? date).toISOString()}>{formatDate(updated ?? date)}</time></span>
+          <span>{displayDateLabel} <time datetime={displayDate.toISOString()}>{formatDate(displayDate)}</time></span>
           <span class="dot">·</span>
           <span>{Math.max(1, Math.round(stats.minutes))} min read</span>
-          {currentIndex >= 0 && (
-            <>
-              <span class="dot">·</span>
-              <span>{currentIndex + 1} of {categoryPosts.length}</span>
-            </>
-          )}
+          {scopePriority && <><span class="dot">·</span><span>{scopePriority}</span></>}
+          {scopeDifficulty && <><span class="dot">·</span><span>{scopeDifficulty}</span></>}
         </div>
       </header>
+
+      {pageHeadings.length > 2 && <nav class="reader-tools" aria-label="On this page" data-pagefind-ignore="all">
+        <details class="reader-tool">
+          <summary>
+            <span>On this page</span>
+            <small>{pageHeadings.length} sections</small>
+          </summary>
+          <div class="reader-menu">
+            <ol>{pageHeadings.map((heading) => (
+              <li class:list={[`depth-${heading.depth}`]}><a href={`#${heading.slug}`}>{heading.text}</a></li>
+            ))}</ol>
+          </div>
+        </details>
+      </nav>}
 
       {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
 
@@ -107,21 +160,23 @@ const nextPost = currentIndex >= 0 && currentIndex < categoryPosts.length - 1
         <slot />
       </div>
 
-      <nav class="journey-nav" aria-label={`Continue through ${categoryMeta.plural}`} data-pagefind-ignore="all">
+      {category !== 'questions' && <CompletionToggle itemId={`entry:${slug}`} />}
+
+      <nav class="journey-nav" aria-label={`Continue through ${libraryLocation ? libraryLocation.volume.title : categoryMeta.plural}`} data-pagefind-ignore="all">
         <div class="journey-context">
-          <span>{currentSubcategory ?? categoryMeta.plural}</span>
-          <a href={`/${category}/`}>View all {categoryPosts.length} {categoryMeta.plural.toLowerCase()}</a>
+          <span>{chapterTitle}</span>
+          <a href={libraryLocation ? `/library/${libraryLocation.volume.id}/` : `/${category}/`}>{libraryLocation ? 'Book contents' : `All ${categoryMeta.plural.toLowerCase()}`}</a>
         </div>
         <div class="journey-links">
           {previousPost ? (
-            <a class="journey-link journey-link--previous" href={`/${category}/${previousPost.slug}/`}>
-              <span>← Previous {categoryMeta.singular.toLowerCase()}</span>
+            <a class="journey-link journey-link--previous" href={previousPost.href} data-astro-prefetch>
+              <span>← Previous entry</span>
               <strong>{previousPost.title}</strong>
             </a>
           ) : <span></span>}
           {nextPost ? (
-            <a class="journey-link journey-link--next" href={`/${category}/${nextPost.slug}/`}>
-              <span>Next {categoryMeta.singular.toLowerCase()} →</span>
+            <a class="journey-link journey-link--next" href={nextPost.href} data-astro-prefetch>
+              <span>Next entry →</span>
               <strong>{nextPost.title}</strong>
             </a>
           ) : <span></span>}
@@ -129,157 +184,179 @@ const nextPost = currentIndex >= 0 && currentIndex < categoryPosts.length - 1
       </nav>
 
       {SITE.features.bookingCTA && category === 'questions' && <MockCTA />}
-      <Subscribe variant="inline" heading="Get new posts" />
-      <AuthorCard />
-    </article>
-
-    <aside class="docs-toc" aria-label="On this page" data-pagefind-ignore="all">
-      <TableOfContents headings={headings} />
-    </aside>
+      </article>
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  .docs-layout {
+  .docs-shell {
     display: grid;
-    grid-template-columns: 16rem minmax(0, 1fr) 14rem;
-    gap: 2.5rem;
-    max-width: 80rem;
+    grid-template-columns: 12rem minmax(0, var(--measure));
+    gap: 2rem;
+    justify-content: center;
+    width: min(100%, var(--container));
     margin: 0 auto;
-    padding: 2rem var(--gutter) 4rem;
+    padding: clamp(1.25rem, 3vw, 2.2rem) var(--gutter) 3.5rem;
   }
-
-  .docs-sidebar {
-    position: sticky;
-    top: 5rem;
-    align-self: start;
-    /* No overflow / max-height: rely on the single page scroll. */
-  }
+  .docs-layout { min-width: 0; }
 
   .docs-article { min-width: 0; }
-  .docs-head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
+  .docs-head { max-width: var(--measure); margin: 0 auto 1rem; }
   .breadcrumbs {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.4rem;
+    gap: .35rem;
     font-family: var(--font-ui);
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: .72rem;
+    font-weight: 500;
     color: var(--c-muted);
-    margin: 0 0 1rem;
+    margin: 0 0 .75rem;
   }
-  .breadcrumbs a { color: var(--c-accent); text-decoration: none; }
-  .breadcrumbs a:hover { color: var(--c-link-hover); text-decoration: underline; }
+  .breadcrumbs a { color: var(--c-text-soft); text-decoration: none; }
+  .breadcrumbs a:hover { color: var(--c-text); text-decoration: underline; }
   .docs-head h1 {
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
-    font-weight: 700;
-    line-height: 1.18;
-    letter-spacing: -0.02em;
-    margin: 0 0 0.6rem;
+    font-size: clamp(1.65rem, 3vw, 1.95rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -.018em;
+    margin: 0 0 .45rem;
   }
   .lede {
-    font-size: 1.05rem;
+    font-size: .98rem;
     color: var(--c-text-soft);
-    line-height: 1.55;
-    margin: 0 0 1rem;
+    line-height: 1.5;
+    margin: 0 0 .7rem;
   }
   .docs-meta {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-family: var(--font-ui);
+    font-size: .72rem;
     color: var(--c-muted);
   }
-  .dot { margin: 0 0.4rem; opacity: 0.5; }
+  .dot { margin: 0 .28rem; opacity: .55; }
 
-  .docs-body { font-size: 1rem; line-height: 1.65; }
-  #answer { scroll-margin-top: 5.5rem; }
-  .docs-body :global(h2) { margin-top: 2.2rem; }
-  .docs-body :global(h3) { margin-top: 1.6rem; }
+  .docs-body {
+    font-family: var(--font-reading);
+    font-size: 1rem;
+    line-height: 1.68;
+  }
+  #answer { scroll-margin-top: var(--sticky-offset); }
+  .docs-body :global(h2) { margin-top: 1.9rem; }
+  .docs-body :global(h3) { margin-top: 1.4rem; }
+  .docs-body :global(h2), .docs-body :global(h3) { scroll-margin-top: var(--sticky-offset); }
+
+  .reader-tools { max-width: var(--measure); margin: .9rem auto 1.5rem; }
+  .reader-tool {
+    padding: 0;
+    border-bottom: 1px solid var(--c-rule);
+    font-family: var(--font-ui);
+  }
+  .reader-tool summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .5rem 0;
+    cursor: pointer;
+    list-style: none;
+    color: var(--c-text);
+    font-size: .76rem;
+    font-weight: 550;
+  }
+  .reader-tool summary::-webkit-details-marker { display: none; }
+  .reader-tool summary::after { content: '+'; color: var(--c-muted); font-family: var(--font-mono); }
+  .reader-tool[open] summary::after { content: '−'; }
+  .reader-tool summary small {
+    margin-left: auto;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .68rem;
+    font-weight: 400;
+  }
+  .reader-menu { padding: .2rem 0 1rem; }
+  .reader-tool ol {
+    max-height: 45vh;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0.1rem 0 0.2rem 1.2rem;
+  }
+  .reader-tool li { margin: 0.25rem 0; color: var(--c-muted); }
+  .reader-tool li.depth-3 { margin-left: 0.8rem; font-size: 0.92em; }
+  .reader-tool a { color: var(--c-text-soft); text-decoration: none; }
+  .reader-tool a:hover { color: var(--c-accent); text-decoration: underline; }
+  .reader-tool a[aria-current='page'] { color: var(--c-accent); font-weight: 650; }
 
   .journey-nav {
-    margin: 3rem 0 0;
-    padding: 1rem 0 0;
+    max-width: var(--measure);
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 2.5rem;
+    padding: .8rem 0 0;
     border-top: 1px solid var(--c-rule);
   }
   .journey-context {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 0.8rem;
+    margin-bottom: .55rem;
     font-family: var(--font-ui);
-    font-size: 0.78rem;
+    font-size: .72rem;
     color: var(--c-muted);
   }
   .journey-context > span {
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-weight: 550;
   }
   .journey-context a { color: var(--c-text-soft); }
   .journey-context a:hover { color: var(--c-accent); }
   .journey-links {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem;
+    gap: 1.5rem;
   }
   .journey-link {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: .25rem;
     min-width: 0;
-    padding: 0.9rem 1rem;
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius-lg);
+    padding: .6rem 0;
     color: var(--c-text);
     text-decoration: none;
-    transition: border-color var(--transition), background var(--transition);
+    transition: color var(--transition);
   }
-  .journey-link:hover { border-color: var(--c-accent); background: var(--c-bg-tint); }
+  .journey-link:hover { color: var(--c-accent); }
   .journey-link > span {
     font-family: var(--font-ui);
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-size: .68rem;
+    font-weight: 500;
     color: var(--c-muted);
   }
   .journey-link strong {
     font-family: var(--font-display);
-    font-size: 0.9rem;
+    font-size: .84rem;
     line-height: 1.35;
     overflow-wrap: anywhere;
   }
   .journey-link--next { text-align: right; }
 
-  .docs-toc {
-    position: sticky;
-    top: 5rem;
-    align-self: start;
-    font-size: 0.85rem;
-  }
-  .docs-toc :global(.toc) {
-    border-left: 2px solid var(--c-rule);
-    padding-left: 0.8rem;
-    margin: 0;
-  }
-
-  @media (max-width: 1100px) {
-    .docs-layout {
-      grid-template-columns: 14rem minmax(0, 1fr);
-      gap: 2rem;
-    }
-    .docs-toc { display: none; }
-  }
   @media (max-width: 800px) {
-    .docs-layout {
-      grid-template-columns: 1fr;
+    .docs-shell {
       padding: 1rem var(--gutter) 3rem;
     }
-    .docs-sidebar { display: none; }
     .journey-links { grid-template-columns: 1fr; }
     .journey-link--next { text-align: left; }
+  }
+  @media (max-width: 860px) {
+    .docs-shell {
+      display: block;
+      max-width: 48rem;
+    }
+  }
+  @media (min-width: 861px) {
+    .breadcrumbs { display: none; }
+    #answer,
+    .docs-body :global(h2),
+    .docs-body :global(h3) { scroll-margin-top: calc(var(--header-height) + .75rem); }
   }
 </style>

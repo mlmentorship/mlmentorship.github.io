@@ -7,13 +7,11 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **graph neural network** (GNN) updates each node's features by aggregating its neighbors' features and applying a learned transformation. The simplest variant is one matmul: $H^{(l+1)} = \sigma(\hat{A} H^{(l)} W^{(l)})$, where $\hat{A}$ is a normalized adjacency matrix and $H^{(l)}$ stacks node features.
 
-## Why it matters
-
-A CNN exploits regular grid structure with shared local filters. A GNN does the same on graphs: shared parameters, local aggregation, but the neighborhood is defined by graph edges instead of pixel proximity. This unlocks ML on social networks, molecules, knowledge graphs, code ASTs, and recommender bipartite graphs.
+A CNN exploits regular grid structure with shared local filters. A GNN applies shared parameters and local aggregation to neighborhoods defined by graph edges. This supports models for social networks, molecules, knowledge graphs, code ASTs, and recommender bipartite graphs.
 
 GNNs power drug-discovery pipelines (AlphaFold's Evoformer, DeepMind's GNoME), large-scale recommenders (Pinterest's PinSAGE, Uber's GraphSAGE), and protein structure prediction. Modern transformers are arguably a special case (complete graph with attention as edge weighting).
 

@@ -6,7 +6,7 @@
 
 | Value | Behavior |
 |---|---|
-| unset or `true` | Shows Prep navigation and homepage/Start Here links, builds `/prep/*`, and enables question Practice Mode. |
+| unset or `true` | Shows the Workbook entry point, builds `/prep/*`, and enables question Practice Mode. |
 | `false` (or any value other than exact `true`) | Hides all Prep entry points and Practice Mode; `/prep/*` and legacy prep URLs redirect to `/questions/`. |
 
 ### Local build

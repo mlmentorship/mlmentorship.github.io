@@ -1,17 +1,15 @@
 ---
 title: "Content-based filtering"
-description: "The recommender that scores items by their features against a user's profile, not by who-else-liked-what. Why it's the answer to item cold-start, how it differs from collaborative filtering, and why production systems run both."
+description: "Content-based filtering scores item features against a user profile. It handles item cold-start and often complements collaborative filtering."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Content-based filtering recommends items whose **features** (genre, text, tags, embeddings) match a **profile built from the items a user already engaged with**: it scores item–profile similarity, using **no other users' behavior**.
-
-## Why it matters
 
 Content-based filtering is the standard answer to the **item cold-start** problem: a brand-new item with zero interactions has no collaborative signal, but it *does* have features, so a content model can recommend it on day one. It also drives **explainability** ("because you watched X") and works for niche users with unique tastes. Every recsys interview expects you to contrast it with collaborative filtering and explain why production systems combine them.
 

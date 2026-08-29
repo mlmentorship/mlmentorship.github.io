@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Activation checkpointing (also called gradient checkpointing) saves only a subset of activations during the forward pass and recomputes the rest from those saved checkpoints during the backward pass. Memory drops at the cost of one extra forward pass per checkpoint segment.
 
-## Why it matters
-
 Backprop needs every layer's input activation to compute that layer's parameter gradient. For a deep model the activations dominate training memory. Often more than parameters and optimizer state combined. A 7B-parameter transformer with 32 layers, batch 1, sequence 4096 stores tens of GB of activations.
 
-Checkpointing recovers this memory at a typical cost of ~33% extra training time (one extra forward pass over the checkpointed segments). It is the standard way to fit large transformers on memory-constrained GPUs.
+Checkpointing recovers this memory by repeating part of the forward work. Recomputing the full forward graph adds about one forward pass of FLOPs. Wall-time cost depends on kernels, memory traffic, and how much of the graph is recomputed.
 
 ## The mechanism
 
@@ -35,8 +33,9 @@ For a transformer, the natural segment is one transformer block. PyTorch provide
 
 ## Cost model
 
-- **Memory**: dominant activation memory drops from $O(L)$ to $O(L/K + \sqrt{L})$ activations for $K$ checkpointed segments. For "checkpoint every block" with $L$ blocks, memory drops by ~$L$×.
-- **Compute**: each backward step does one extra forward pass per segment. Wall-clock overhead ~33% for typical transformer training (sometimes less because the recomputed forward fuses well with backward kernels).
+- **Memory across a simple chain**: if each segment has $K$ layers, peak saved boundary state scales like $O(L/K)$ and peak temporary recomputation state like $O(K)$. The total $O(L/K + K)$ is minimized near $K=\sqrt{L}$.
+- **Memory inside a transformer block**: checkpointing every block still stores block boundaries, but discards the larger internal matrix and attention intermediates. The reduction is a workload-dependent constant factor, not $L$×.
+- **Compute**: full rematerialization adds roughly one forward pass to a training step. Since a forward and backward step is often estimated at three forward-pass units, this is about 33% more FLOPs. Wall-time overhead can differ.
 
 ## When to use
 
@@ -54,7 +53,7 @@ For a transformer, the natural segment is one transformer block. PyTorch provide
 ## Common pitfalls
 
 - **Recomputing through randomness.** Forward passes with dropout or other stochastic ops must use the same RNG state at recomputation; PyTorch's checkpoint utility handles this with `preserve_rng_state=True` (default).
-- **Checkpointing too aggressively.** Checkpointing every layer maximizes memory savings but causes ~50% slowdown; per-block is the sweet spot for transformers.
+- **Checkpointing too aggressively.** Larger rematerialized regions save more boundary state and repeat more work. Profile selective, per-block, and larger-segment choices under the real memory limit.
 - **Forgetting that the recomputation runs inside the backward graph.** Custom forward hooks may fire twice; gradients stay correct.
 - **Trying to checkpoint inference.** Checkpointing only helps when there is a backward pass to run.
 

@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **normalizing flow** transforms a simple base distribution (typically standard Gaussian) into a target distribution through a sequence of **invertible**, **differentiable** mappings $f_K \circ \dots \circ f_1$. The change-of-variables formula gives exact log-likelihood:
 
 $$
 \log p_X(x) = \log p_Z(f^{-1}(x)) + \log \left| \det \frac{\partial f^{-1}}{\partial x} \right|.
 $$
-
-## Why it matters
 
 Flows are the only family of deep generative models that simultaneously offer:
 

@@ -5,6 +5,7 @@ date: "2026-07-11"
 draft: false
 tags: ["questions"]
 category: "questions"
+aliases: ["LoRA", "low-rank adaptation", "parameter efficient fine tuning", "PEFT"]
 ---
 
 > Wrap a frozen linear layer with a trainable rank-$r$ update. At initialization, output must exactly match the base layer.

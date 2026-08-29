@@ -4,7 +4,7 @@ export const LOOPLET_URL = 'https://github.com/hsaghir/looplet';
 
 export const SITE = {
   title: 'mlmentorship',
-  description: 'Senior ML & AI interview prep. Essays, interview questions with leveled answers (L4/L5/L6), reference notes, system design case studies. Free.',
+  description: 'Senior ML & AI interview prep with upper-IC paths through senior principal, reference notes, practice, and deep system-design cases. Free.',
   author: 'Hamidreza Saghir',
   authorBio: 'Notes on senior ML interviews, system design, and applied ML practice.',
   email: 'ml.mentorship@gmail.com',
@@ -52,16 +52,13 @@ export const SITE = {
     // the core Questions library.
     prepTools: import.meta.env.PUBLIC_PREP_TOOLS === undefined || import.meta.env.PUBLIC_PREP_TOOLS === 'true',
   },
-  // Navigation (top of every page). Start here stays globally available because
-  // deep-linked and mobile visitors do not see the desktop docs sidebar.
+  // Keep the header short. The wordmark links to the table of contents.
   // Mock-interview link is appended dynamically when bookingCTA is enabled.
   // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
-    { label: 'Start here', href: '/start-here/' },
+    { label: 'Contents', href: '/' },
     { label: 'Questions', href: '/questions/' },
-    { label: 'Guides', href: '/guides/' },
-    { label: 'Concepts', href: '/concepts/' },
-    { label: 'Prep', href: '/prep/' },
+    { label: 'Workbook', href: '/prep/' },
     { label: 'About', href: '/about/' },
   ],
   postsPerPage: 30,

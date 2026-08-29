@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Tensor parallelism** (TP) splits the *computation* of a single layer (typically a matmul) across multiple GPUs by sharding the weight matrix along one of its dimensions. Each GPU computes its slice, and an all-reduce or all-gather aggregates the result before the next layer.
-
-## Why it matters
 
 For very large models (70B+, 405B, MoE-1T), a single transformer layer's weights and activations don't fit on a single GPU even with FSDP. TP shards individual layers. Required for frontier-scale training and inference. Combined with pipeline parallelism and FSDP, it forms **3D parallelism** used by modern training stacks.
 
@@ -38,15 +36,21 @@ Two matmuls (heads, output projection) with one all-reduce per attention block.
 
 ## Communication cost
 
-Per forward pass, TP requires 2 all-reduces per transformer block (one per FFN, one per attention). All-reduce cost scales as $O(N \cdot \text{params}/N)$. Same as without sharding, but split into many small messages. Bandwidth-bound.
+In the common Megatron layout, a forward pass uses one activation reduction after the attention output projection and one after the second feed-forward projection. The backward pass has matching communication for the input gradients of the column-parallel projections.
 
-For backward pass: same number of all-reduces. So TP doubles the communication compared to a single-GPU forward.
+The message size follows the activation shape, not the parameter count. If an activation tensor contains $A$ bytes and the tensor-parallel degree is $N$, a ring all-reduce moves about:
 
-**Critical**: TP communication must use high-bandwidth interconnect (NVLink within a server, NVSwitch). Across PCIe or InfiniBand, TP throughput collapses. **TP is typically restricted to within a single node** (4–8 GPUs).
+$$
+2A\frac{N-1}{N}
+$$
+
+bytes per rank. Sequence-parallel implementations often replace an all-reduce with a reduce-scatter and a later all-gather so the intermediate activation stays split. The exact collective count depends on the layout and framework.
+
+TP communicates every layer, so it needs high effective bandwidth and low latency. It is commonly kept inside a fast accelerator domain. It can cross nodes when the network, message sizes, and local batch provide enough communication efficiency. The decision should come from a cost estimate and a scaling trace, not a fixed node boundary.
 
 ## Sequence parallelism
 
-A complement to TP that shards the **sequence dimension** for operations not parallelized by TP (LayerNorm, dropout, residual). Saves activation memory by ~$N$× without extra all-reduce overhead. Used in NVIDIA's Megatron and most modern stacks.
+A complement to TP that shards the **sequence dimension** for operations not parallelized by TP, such as LayerNorm, dropout, and residual work. It can reduce those activation tensors by about the tensor-parallel degree. It is not free: it usually changes all-reduce operations into paired reduce-scatter and all-gather operations. This can keep similar communication volume while reducing peak memory.
 
 ## TP vs. data parallelism vs. pipeline parallelism
 
@@ -55,26 +59,26 @@ A complement to TP that shards the **sequence dimension** for operations not par
 | **DDP / FSDP** (data) | Each GPU sees a different mini-batch | Gradient all-reduce / all-gather |
 | **TP** (tensor) | Each GPU shards layer weights and activations | Per-layer all-reduce |
 | **PP** (pipeline) | Each GPU holds different layers | Activation send between adjacent stages |
-| **Sequence** (within TP) | Reduces activation memory in TP | Free; done with TP |
+| **Sequence** (within TP) | Reduces activation memory in TP | Reduce-scatter and all-gather layout changes |
 
 **3D parallelism**: combine DP + TP + PP for very large models. Typical config: TP within a node, PP across small groups of nodes, DP across remaining nodes.
 
 ## When to use TP
 
 - **Layer too large to fit on single GPU**: even with FSDP all-gather, the unsharded layer must fit. TP keeps the layer sharded throughout.
-- **Inference**: TP is the standard way to serve large models; vLLM, TGI, TensorRT-LLM all support TP.
+- **Inference**: TP is a common way to serve models that need several accelerators; major serving runtimes support it.
 - **Throughput optimization within a node**: TP with NVLink can be faster than data parallelism for small batch sizes.
 
 ## When NOT to use TP
 
-- **Across PCIe / Ethernet**: communication overhead dominates.
+- **When the required links are too slow**: estimate exposed collective time for the real message sizes before extending the group.
 - **Small models that fit on one GPU**: pure DP / FSDP is simpler.
 - **Pipeline-friendly architectures**: PP can be cheaper communication-wise across slow interconnects.
 
 ## Common pitfalls
 
-- **Using TP across slow interconnect.** Bandwidth-limited; use only with NVLink / NVSwitch (within a single node typically).
-- **Forgetting to combine with FSDP.** TP shards layers, FSDP shards optimizer/grads/params; both can run together.
+- **Using TP across a slow interconnect.** Frequent activation collectives can dominate. Keep the group on the fastest useful links unless measurements support a wider group.
+- **Assuming TP solves every memory limit.** TP shards layers along selected axes. Add optimizer or full-state sharding only when the remaining state requires it.
 - **Sharding embedding tables incorrectly.** The vocab embedding is large ($V \times d$); shard it carefully (Megatron has its own embedding sharding).
 - **Communication count math.** Each TP block adds all-reduces; for narrow models / small batches, communication can dominate compute.
 - **Tooling ambiguity.** "Tensor parallel size = 8" with mismatched DP / PP can give surprising aggregate batch sizes.
@@ -84,3 +88,5 @@ A complement to TP that shards the **sequence dimension** for operations not par
 - [FSDP and ZeRO](/concepts/fsdp-and-zero/). Orthogonal sharding.
 - [Pipeline parallelism](/concepts/pipeline-parallelism/). Alternative cross-device split.
 - [All-reduce and collectives](/concepts/all-reduce-and-collectives/). The underlying primitives.
+- [Sharded matrix multiplication](/concepts/sharded-matrix-multiplication/). Derive collectives from tensor layouts.
+- [Accelerator network topology](/concepts/accelerator-network-topology/). Place the tensor-parallel group.

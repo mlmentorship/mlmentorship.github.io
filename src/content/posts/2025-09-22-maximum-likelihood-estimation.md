@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 For a parametric family $p(x \mid \theta)$ and observed data $\{x_1, \dots, x_n\}$, the **maximum likelihood estimate (MLE)** is
 
 $$
 \hat\theta_\text{MLE} = \arg\max_\theta \prod_{i=1}^{n} p(x_i \mid \theta) = \arg\max_\theta \sum_{i=1}^{n} \log p(x_i \mid \theta).
 $$
-
-## Why it matters
 
 MLE underlies almost every modern ML loss function:
 

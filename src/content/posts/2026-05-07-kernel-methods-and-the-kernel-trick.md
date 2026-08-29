@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **kernel** $k(x, x') = \langle \phi(x), \phi(x') \rangle$ computes the inner product of two points in a feature space defined by $\phi$, without explicitly evaluating $\phi$. Algorithms expressible in terms of inner products (SVM, Gaussian processes, kernel PCA, kernel ridge regression) can swap dot products for $k$ and operate implicitly in feature space.
-
-## Why it matters
 
 Linear models are limited to linear decision boundaries. The classical fix was to engineer nonlinear features and run a linear model on them. Kernel methods give you that move for free: any positive-definite kernel implicitly defines a (potentially infinite-dimensional) feature space, and the algorithm only ever touches inner products.
 

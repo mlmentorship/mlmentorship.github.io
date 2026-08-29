@@ -7,13 +7,11 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Preference data records comparative judgments among model outputs, and a reward model learns a scoring function that predicts those judgments for training or evaluation.
 
-## Why it matters
-
-RLHF diagrams often compress the hardest part into "collect preferences." The resulting signal depends on which prompts and responses were sampled, who judged them, what rubric they used, how disagreement was handled, and whether the reward model remains valid as the policy changes.
+RLHF diagrams often compress the hardest part into "collect preferences." The signal depends on the sampled prompts and responses, the judges, the rubric, and the treatment of disagreement. It also changes as the policy moves away from the reward model's training distribution.
 
 A powerful optimizer amplifies measurement defects. Better preference-data design can matter more than another RL algorithm.
 

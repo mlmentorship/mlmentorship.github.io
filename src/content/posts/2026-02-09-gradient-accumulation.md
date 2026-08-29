@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Gradient accumulation runs $K$ forward-backward passes on $K$ micro-batches, summing (or averaging) the gradients across those passes, and then performs a single optimizer step. The effective batch size is $K \times$ the per-pass batch size, with no extra activation memory.
-
-## Why it matters
 
 Many training recipes prescribe a specific effective batch size (e.g., 1024 sequences) for stable convergence. If your GPU can only hold 32 sequences at a time, you have two choices: spread the batch across 32 GPUs, or accumulate gradients over 32 steps on one GPU.
 
@@ -50,7 +48,7 @@ Key points:
 
 - **Activation memory**: same as one micro-batch (each is forward-backward'd independently).
 - **Optimizer memory**: unchanged (no extra optimizer state).
-- **Wall clock**: roughly $K \times$ slower per optimizer step, but each step uses $K \times$ as much data. Same throughput per sample.
+- **Wall clock**: an optimizer step runs $K$ forward-backward micro-batches. Per-sample throughput may stay similar, improve through less frequent communication, or fall because smaller matrix shapes use the accelerator poorly. Measure it.
 - **Convergence**: nearly equivalent to a true large-batch step, modulo BatchNorm (see pitfalls).
 
 ## Combined with other techniques

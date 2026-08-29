@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Long-context LLMs combine **position-encoding extension** (so the model generalizes past its training length), **I/O-aware attention kernels** (so attention fits in memory), and **KV-cache management** (so serving stays affordable at long inputs).
-
-## Why it matters
 
 Frontier models in 2026 advertise 128K–2M-token context windows. The headline number hides three independent engineering problems, each with its own state of the art. Knowing which technique addresses which problem is the senior-level test.
 
@@ -58,3 +56,9 @@ KV cache size scales linearly with context (see [KV cache](/concepts/kv-cache/))
 - **Quoting context length without measuring quality.** A model can run at 128K but degrade rapidly past 32K. Use needle-in-a-haystack and long-doc QA evals.
 - **Confusing training length with usable context.** Models often degrade on inputs longer than the longest examples seen during training (or RoPE extension).
 - **Ignoring serving cost.** A 1M context window is feasible to compute but may cost $10+ per request at frontier prices.
+
+## Related
+
+- [Context parallelism and ring attention](/concepts/context-parallelism-and-ring-attention/). Split exact long-context attention across devices.
+- [FlashAttention](/concepts/flashattention/). Compute exact attention without writing the full score matrix to HBM.
+- [KV cache](/concepts/kv-cache/). Account for long-context serving memory.

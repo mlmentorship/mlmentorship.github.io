@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Naive Bayes models $p(y \mid x) \propto p(y) \prod_j p(x_j \mid y)$, assuming features $x_j$ are **conditionally independent given the class $y$**. Trained by counting (closed-form MLE for each conditional).
-
-## Why it matters
 
 Naive Bayes is the cheapest possible probabilistic classifier. Closed-form MLE, $O(nd)$ training, $O(d)$ prediction, no hyperparameter tuning. Despite the obviously wrong independence assumption, it works remarkably well as a baseline on:
 

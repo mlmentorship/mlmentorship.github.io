@@ -140,4 +140,4 @@ The code is the entry ticket. The conversation around it is the interview.
 
 ---
 
-*Related reference: [FlashAttention](/concepts/flashattention/), [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/).*
+*Related: [FlashAttention](/concepts/flashattention/) and [BatchNorm versus LayerNorm](/concepts/batchnorm-vs-layernorm/).*

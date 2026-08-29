@@ -42,11 +42,11 @@ Drift is one candidate, but retraining before you validate experiment and servin
 
 ## What an L5 answer adds
 
-An L5 answer builds a decision tree: was treatment assigned and exposed correctly; do production predictions match an offline replay; which slices account for the aggregate regression; is the offline metric aligned with the product mechanism; did latency, fallbacks, or candidate coverage change; can a small rollback or shadow comparison isolate the cause safely.
+An L5 answer builds a decision tree. First verify assignment and exposure, then compare production predictions with an offline replay. Find the slices that explain the regression. Check metric alignment, latency, fallbacks, and candidate coverage. Use a small rollback or shadow comparison to isolate the cause safely.
 
 ## What an L6 answer adds
 
-An L6 answer questions the offline evaluation system itself: does the benchmark encode the old policy's selection bias; are labels missing for items the old system never showed; did optimizing the proxy create a predictable second-order effect; should the team add counterfactual evaluation, randomized exploration, or long-term holdbacks; and what process let an 8% offline gain bypass this risk.
+An L6 answer questions the offline evaluation system. The benchmark may contain the old policy's selection bias or omit labels for unseen items. Proxy optimization may also create a predictable second-order effect. The answer considers counterfactual evaluation, randomized exploration, long-term holdbacks, and the process gap that missed the risk.
 
 ## Tells that get you a strong-hire vote
 
@@ -72,4 +72,4 @@ An L6 answer questions the offline evaluation system itself: does the benchmark 
 - How would selection bias enter a recommender's offline dataset?
 - When would you keep the model running despite the initial regression?
 
-*Related: [cross-validation strategies](/concepts/cross-validation-strategies/), [A/B testing for ML](/concepts/ab-testing-for-ml/), and [evaluate a search ranker](/questions/evaluate-search-ranker/).*
+*Related: [delayed and selective labels](/concepts/delayed-labels-selective-labels-feedback-loops/), [point-in-time correctness](/concepts/data-leakage-point-in-time-correctness/), [causal inference](/concepts/causal-inference-for-ml-decisions/), and [A/B testing for ML](/concepts/ab-testing-for-ml/).*

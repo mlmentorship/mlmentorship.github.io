@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
-Gradient boosting builds an ensemble $F(x) = \sum_t \eta \cdot h_t(x)$ by repeatedly fitting a weak learner $h_t$ (typically a small decision tree) to the **negative gradient** of the loss with respect to the current ensemble's prediction, and adding it with a small step size $\eta$ (the learning rate).
-
-## Why it matters
+Gradient boosting builds an ensemble $F(x) = \sum_t \eta \cdot h_t(x)$ one weak learner at a time. Each learner $h_t$, usually a small decision tree, fits the **negative gradient** of the current loss. The learning rate $\eta$ controls how much of that learner is added.
 
 Gradient-boosted decision trees (GBDT) are the **dominant model class for tabular data in 2026**. xgboost, lightgbm, and catboost win the majority of Kaggle tabular competitions and are heavily used in production at scale (search ranking, ad CTR, fraud, credit risk). Knowing the algorithm at a level that distinguishes you from "I called `xgboost.fit`" is a core senior-ML expectation.
 

@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **GAN** [(Goodfellow et al., 2014)](https://arxiv.org/abs/1406.2661) trains two networks adversarially: a **generator** $G$ that maps noise $z \sim p_z$ to samples $G(z)$, and a **discriminator** $D$ that tries to distinguish $G(z)$ from real samples $x \sim p_\text{data}$. The minimax objective:
 
 $$
 \min_G \max_D \mathbb{E}_{x \sim p_\text{data}}[\log D(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D(G(z)))].
 $$
-
-## Why it matters
 
 GANs produced the sharpest, most realistic image samples of the deep learning era from 2015 to 2021, peaking with StyleGAN3 and BigGAN. They have largely been displaced by diffusion for image generation in 2026, but remain relevant in:
 

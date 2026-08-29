@@ -1,0 +1,268 @@
+---
+import type { LibraryChapter, LibraryVolume } from '../data/library';
+import type { LibraryEntry } from '../utils/library';
+
+interface ReaderLink {
+  href: string;
+  title: string;
+}
+
+interface ChapterContents {
+  chapter: LibraryChapter;
+  entries: LibraryEntry[];
+}
+
+interface Props {
+  volume: LibraryVolume;
+  currentChapter: LibraryChapter;
+  currentSlug: string;
+  chapters: ChapterContents[];
+  previousEntry?: ReaderLink;
+  nextEntry?: ReaderLink;
+  stepNoun?: 'entry' | 'chapter';
+  mobileOnly?: boolean;
+}
+
+const { volume, currentChapter, currentSlug, chapters, previousEntry, nextEntry, stepNoun = 'entry', mobileOnly = false } = Astro.props as Props;
+const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id === currentChapter.id);
+---
+
+<nav class:list={['book-reader-nav', mobileOnly && 'book-reader-nav--mobile-only']} aria-label="Book navigation" data-pagefind-ignore="all">
+  <div class="book-reader-inner">
+    <a class="book-mark" href={`/library/${volume.id}/`}>
+      <span>Book {volume.number}</span>
+      <strong>{volume.shortTitle}</strong>
+    </a>
+
+    <div class="reader-actions">
+      {previousEntry ? (
+        <a class="reader-step" href={previousEntry.href} rel="prev" aria-label={`Previous ${stepNoun}: ${previousEntry.title}`}>
+          <span aria-hidden="true">←</span><span class="reader-word">Previous</span>
+        </a>
+      ) : <span class="reader-step reader-step--disabled" aria-hidden="true">←<span class="reader-word"> Previous</span></span>}
+      {nextEntry ? (
+        <a class="reader-step" href={nextEntry.href} rel="next" aria-label={`Next ${stepNoun}: ${nextEntry.title}`}>
+          <span class="reader-word">Next</span><span aria-hidden="true">→</span>
+        </a>
+      ) : <span class="reader-step reader-step--disabled" aria-hidden="true"><span class="reader-word">Next </span>→</span>}
+
+      <details class="book-contents" data-book-contents>
+        <summary><span>Sections</span></summary>
+        <div class="contents-panel">
+          <header>
+            <div><span>Book {volume.number}</span><strong>{volume.title}</strong></div>
+            <a href="/">All books</a>
+          </header>
+          <ol class="chapter-list">
+            {chapters.map(({ chapter, entries }, chapterIndex) => {
+              const isCurrentChapter = chapter.id === currentChapter.id;
+              return (
+                <li class:list={[isCurrentChapter && 'is-current-chapter']}>
+                  <a class="chapter-link" href={`/library/${volume.id}/${chapter.id}/`}>
+                    <span>{volume.number}.{chapterIndex + 1}</span>
+                    <strong>{chapter.title}</strong>
+                  </a>
+                  {isCurrentChapter && (
+                    <ol class="entry-list" aria-label={`${chapter.title} entries`}>
+                      {entries.map((entry, entryIndex) => (
+                        <li>
+                          <a href={entry.href} aria-current={entry.slug === currentSlug ? 'page' : undefined} data-current-entry={entry.slug === currentSlug ? '' : undefined}>
+                            <span>{String(entryIndex + 1).padStart(2, '0')}</span>
+                            <strong>{entry.title}</strong>
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+          <footer>
+            <span>Chapter {currentChapterIndex + 1} of {volume.chapters.length}</span>
+            <a href={`/library/${volume.id}/${currentChapter.id}/`}>Open chapter page</a>
+          </footer>
+        </div>
+      </details>
+    </div>
+  </div>
+</nav>
+
+<script>
+  document.querySelectorAll<HTMLDetailsElement>('[data-book-contents]').forEach((details) => {
+    details.addEventListener('toggle', () => {
+      if (details.open) details.querySelector<HTMLElement>('[data-current-entry]')?.scrollIntoView({ block: 'nearest' });
+    });
+    document.addEventListener('click', (event) => {
+      if (details.open && event.target instanceof Node && !details.contains(event.target)) details.open = false;
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && details.open) {
+        details.open = false;
+        details.querySelector<HTMLElement>('summary')?.focus();
+      }
+    });
+  });
+</script>
+
+<style>
+  .book-reader-nav {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 45;
+    border-bottom: 1px solid var(--c-rule);
+    background: var(--c-bg);
+  }
+  .book-reader-inner {
+    display: flex;
+    align-items: stretch;
+    width: min(100%, var(--container));
+    min-height: var(--reader-height);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+  .book-mark {
+    display: flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: .45rem;
+    padding: .52rem 0;
+    color: var(--c-text);
+    text-decoration: none;
+  }
+  .book-mark span {
+    flex: 0 0 auto;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .68rem;
+    font-weight: 500;
+  }
+  .book-mark strong {
+    overflow: hidden;
+    font-family: var(--font-display);
+    font-size: .78rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .book-mark:hover strong { color: var(--c-accent); text-decoration: underline; }
+  .reader-actions { display: flex; align-items: stretch; gap: .1rem; margin-left: auto; }
+  .reader-step,
+  .book-contents > summary {
+    display: flex;
+    min-width: 4.7rem;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    padding: .5rem .6rem;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .72rem;
+    font-weight: 550;
+    text-decoration: none;
+  }
+  .reader-step:hover { color: var(--c-text); }
+  .reader-step--disabled { color: var(--c-rule); }
+  .book-contents { position: relative; }
+  .book-contents > summary { height: 100%; cursor: pointer; list-style: none; }
+  .book-contents > summary::-webkit-details-marker { display: none; }
+  .book-contents > summary::after { content: '+'; color: var(--c-muted); font-family: var(--font-mono); }
+  .book-contents[open] > summary { color: var(--c-text); }
+  .book-contents[open] > summary::after { content: '−'; }
+  .contents-panel {
+    position: absolute;
+    top: calc(100% + 1px);
+    right: 0;
+    width: min(30rem, calc(100vw - 2rem));
+    max-height: min(72vh, 42rem);
+    overflow-y: auto;
+    padding: .8rem;
+    border: 1px solid var(--c-rule);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--c-surface);
+    box-shadow: var(--shadow-md);
+  }
+  .contents-panel > header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: .65rem;
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .contents-panel > header div { min-width: 0; }
+  .contents-panel > header span,
+  .contents-panel > header strong { display: block; }
+  .contents-panel > header span {
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .65rem;
+  }
+  .contents-panel > header strong { margin-top: .08rem; font-size: .86rem; font-weight: 600; }
+  .contents-panel > header > a { flex: 0 0 auto; color: var(--c-text-soft); font-size: .7rem; }
+  .chapter-list,
+  .entry-list { margin: 0; padding: 0; list-style: none; }
+  .chapter-list > li { margin: 0; border-bottom: 1px solid var(--c-rule); }
+  .chapter-link {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: .55rem;
+    padding: .5rem 0;
+    color: var(--c-text-soft);
+    text-decoration: none;
+  }
+  .chapter-link > span,
+  .entry-list a > span { color: var(--c-muted); font-family: var(--font-ui); font-size: .64rem; }
+  .chapter-link strong { font-size: .77rem; font-weight: 550; }
+  .chapter-link:hover strong { color: var(--c-accent); text-decoration: underline; }
+  .is-current-chapter > .chapter-link { color: var(--c-text); }
+  .is-current-chapter > .chapter-link > span { color: var(--c-text-soft); }
+  .entry-list { margin: 0 0 .45rem 2rem; border-left: 1px solid var(--c-rule); }
+  .entry-list li { margin: 0; }
+  .entry-list a {
+    display: grid;
+    grid-template-columns: 1.6rem minmax(0, 1fr);
+    gap: .45rem;
+    padding: .3rem .5rem;
+    color: var(--c-muted);
+    text-decoration: none;
+  }
+  .entry-list a strong { font-size: .73rem; font-weight: 450; line-height: 1.35; }
+  .entry-list a:hover { color: var(--c-text); }
+  .entry-list a[aria-current='page'] { background: var(--c-bg-tint); color: var(--c-text); }
+  .entry-list a[aria-current='page'] > span { color: var(--c-text-soft); }
+  .entry-list a[aria-current='page'] strong { font-weight: 600; }
+  .contents-panel > footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: .75rem;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .68rem;
+  }
+
+  @media (max-width: 680px) {
+    .book-reader-inner { min-height: var(--reader-height); }
+    .book-mark { max-width: calc(100vw - 9rem); padding: .5rem 0; }
+    .book-mark span { display: none; }
+    .book-mark strong { font-size: .77rem; }
+    .reader-step { min-width: 2.3rem; padding: .45rem; }
+    .reader-word { display: none; }
+    .book-contents > summary { min-width: 4.7rem; padding: .45rem .55rem; }
+    .contents-panel {
+      top: calc(100% + 1px);
+      right: 0;
+      left: auto;
+      width: calc(100vw - 2rem);
+      max-height: calc(100dvh - var(--header-height) - var(--reader-height) - 1rem);
+      padding: .8rem;
+    }
+    .entry-list { margin-left: 1rem; }
+    .entry-list a { grid-template-columns: 1.55rem minmax(0, 1fr); padding-right: .3rem; padding-left: .45rem; }
+  }
+  @media (min-width: 861px) {
+    .book-reader-nav--mobile-only { display: none; }
+  }
+</style>

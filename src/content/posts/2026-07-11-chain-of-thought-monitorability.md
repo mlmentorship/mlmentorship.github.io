@@ -5,13 +5,12 @@ date: "2026-07-11"
 draft: false
 tags: ["concepts"]
 category: "concepts"
+aliases: ["CoT monitoring", "chain of thought monitoring", "reasoning monitorability"]
 ---
 
-## One-line definition
+## Summary
 
 Chain-of-thought monitorability asks whether a model's visible reasoning trace contains reliable, usable signals about properties such as mistakes, policy violations, reward hacking, or deceptive intent.
-
-## Why it matters
 
 A monitor that flags concerning reasoning before an action can provide an additional safety layer for reasoning models and agents. The opportunity is practical: traces can expose plans and uncertainty that final answers hide.
 

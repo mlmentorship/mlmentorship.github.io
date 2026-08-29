@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A distribution is in the **exponential family** if its density / mass function can be written as:
 
@@ -16,8 +16,6 @@ p(x \mid \theta) = h(x) \exp\big( \eta(\theta)^\top T(x) - A(\theta) \big)
 $$
 
 with **natural parameter** $\eta(\theta)$, **sufficient statistic** $T(x)$, **base measure** $h(x)$, and **log-partition** $A(\theta)$ (which normalizes).
-
-## Why it matters
 
 Most distributions you use day-to-day are exponential family: Gaussian, Bernoulli, categorical, Poisson, Beta, Gamma, Dirichlet, geometric, exponential. Recognizing them as such gives you free results:
 

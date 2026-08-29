@@ -1,6 +1,6 @@
 ---
 title: "How do you scope an ambiguous problem?"
-description: "Scoping is the single most important senior skill. The interview tests whether you have a process, not just a definition."
+description: "Scoping is a core senior skill. The interview tests how you reduce ambiguity before choosing a model or system design."
 date: "2026-04-23"
 draft: false
 tags: ["questions"]
@@ -89,4 +89,4 @@ The L6 answer:
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/), [How do you decide what to work on?](/questions/decide-what-to-work-on/).*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/), [How do you decide what to work on?](/questions/decide-what-to-work-on/).*

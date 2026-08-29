@@ -89,4 +89,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Regularization](/concepts/regularization/), [Bayesian vs frequentist](/questions/bayesian-vs-frequentist/).*
+*Related: [cross-entropy and softmax](/concepts/cross-entropy-softmax/), [regularization](/concepts/regularization/), and [Bayesian versus frequentist](/questions/bayesian-vs-frequentist/).*

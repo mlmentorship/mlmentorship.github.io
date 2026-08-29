@@ -1,0 +1,53 @@
+---
+interface Props {
+  itemId: string;
+  label?: string;
+}
+const { itemId, label = 'Mark studied' } = Astro.props;
+---
+
+<div class="completion-toggle" data-completion-toggle data-item-id={itemId} data-label={label} data-pagefind-ignore="all">
+  <button type="button"><span data-completion-label>{label}</span><small data-completion-date></small></button>
+  <p aria-live="polite" data-completion-status></p>
+</div>
+
+<script>
+  import { isActivityComplete, loadActivityProgress, setActivityComplete } from '../utils/activityProgress';
+
+  document.querySelectorAll<HTMLElement>('[data-completion-toggle]').forEach((root) => {
+    const id = root.dataset.itemId;
+    const baseLabel = root.dataset.label ?? 'Mark studied';
+    const button = root.querySelector<HTMLButtonElement>('button');
+    const label = root.querySelector<HTMLElement>('[data-completion-label]');
+    const date = root.querySelector<HTMLElement>('[data-completion-date]');
+    const status = root.querySelector<HTMLElement>('[data-completion-status]');
+    if (!id || !button || !label || !date) return;
+    const render = () => {
+      const state = loadActivityProgress();
+      const completedOn = state.completed[id];
+      const complete = Boolean(completedOn);
+      label.textContent = complete ? 'Studied on this device' : baseLabel;
+      date.textContent = completedOn ? new Date(completedOn).toLocaleDateString() : '';
+      button.setAttribute('aria-pressed', String(complete));
+    };
+    button.addEventListener('click', () => {
+      try {
+        const complete = setActivityComplete(id, !isActivityComplete(id));
+        if (status) status.textContent = complete ? 'Saved on this device.' : 'Removed from study history.';
+        render();
+      } catch {
+        if (status) status.textContent = 'Browser storage is unavailable.';
+      }
+    });
+    render();
+  });
+</script>
+
+<style>
+  .completion-toggle { max-width: var(--measure); margin: 1.5rem auto 0; padding-top: .8rem; border-top: 1px solid var(--c-rule-soft); }
+  .completion-toggle button { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; width: 100%; padding: .5rem 0; border: 0; background: none; color: var(--c-text-soft); font: inherit; font-size: .8rem; font-weight: 650; text-align: left; cursor: pointer; }
+  .completion-toggle button:hover { color: var(--c-accent); }
+  .completion-toggle button[aria-pressed='true'] { color: var(--c-accent); }
+  .completion-toggle small { color: var(--c-muted); font-family: var(--font-mono); font-size: .68rem; font-weight: 400; }
+  .completion-toggle p { min-height: 1rem; margin: 0; color: var(--c-muted); font-size: .7rem; }
+</style>

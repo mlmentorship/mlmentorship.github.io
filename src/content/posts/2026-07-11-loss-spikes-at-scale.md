@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A loss spike is a sudden, material increase in training loss or related instability that may recover, persist, or cascade into divergence. At scale, diagnosis requires the last good state, first bad transition, and rank-local evidence.
-
-## Why it matters
 
 Large training runs expose rare samples, long numerical chains, distributed synchronization, changing data mixtures, and hardware faults. A scalar loss curve compresses all of those systems into one symptom.
 

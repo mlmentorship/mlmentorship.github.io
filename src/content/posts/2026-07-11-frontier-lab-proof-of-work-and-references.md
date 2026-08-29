@@ -38,7 +38,7 @@ Use five moves:
 2. **Ownership:** one sentence on what you personally decided or built.
 3. **Technical difficulty:** one sentence on the mechanism or bottleneck.
 4. **Evidence:** one sentence on measured outcome or research result.
-5. **Why it matters:** one sentence on adoption, learning, or transfer.
+5. **Impact:** one sentence on adoption, learning, or transfer.
 
 Example:
 

@@ -13,11 +13,32 @@ Start with the workload. "Use vLLM" is an implementation choice, not a design. T
 
 ## Split the two phases
 
-**Prefill** processes prompt tokens in parallel. It is usually compute-bound and drives time to first token.
+**Prefill** processes prompt tokens in parallel. Large prefills with efficient matrix shapes are often compute-bound and drive time to first token. Short prompts or small batches can be limited by memory traffic or launch overhead.
 
-**Decode** produces one token per active sequence per iteration. It is usually memory-bandwidth-bound because every step reads model weights and KV state for little new arithmetic. It drives inter-token latency.
+**Decode** produces one token per active sequence per iteration. Small decode batches are usually memory-bandwidth-bound because every step reads model weights and KV state for little new arithmetic. Large batches can reach a compute limit. Decode drives inter-token latency.
 
 A scheduler that treats both as interchangeable work will let long prefills stall decode or will starve new prompts to protect active streams.
+
+## Decide whether to separate prefill and decode
+
+A shared worker pool is the simpler starting point. Chunked prefill lets one scheduler mix prompt work with active decode.
+
+At larger scale, **disaggregated serving** places prefill and decode on separate worker pools. Prefill workers produce KV state and transfer it to decode workers. This can:
+
+- isolate long-prompt work from inter-token latency;
+- scale the two hardware pools independently;
+- use different parallel layouts or accelerator types for each phase;
+- keep decode batches full.
+
+It also adds a queue boundary, KV transfer, failure states, and network load. Approximate transfer time as:
+
+$$
+T_{\text{transfer}} \approx \frac{\text{KV bytes for the prompt}}{\text{effective network bandwidth}}.
+$$
+
+Do not disaggregate when that transfer and queueing cost is larger than the scheduling interference it removes.
+
+Measure accelerator-seconds of prefill and decode work on the real request distribution. At the same target utilization, the ratio of prefill workers to decode workers should start near the ratio of those two offered workloads. Then load-test tail latency and rebalance.
 
 ## Quantify before drawing
 
@@ -47,7 +68,7 @@ where $L$ is layer count, $H_{kv}$ is the number of KV heads, $d_h$ is head dime
 4. **Scheduler:** continuous batching with chunked prefill, decode priority, and fairness across tenants or classes.
 5. **Model executor:** paged KV cache, fused kernels, tensor or pipeline parallelism as required.
 6. **Streaming response:** backpressure, cancellation, usage accounting, and partial-failure semantics.
-7. **Telemetry:** per-request phase timing, queue age, batch composition, KV occupancy, token throughput, errors, and quality version.
+7. **Telemetry:** per-request phase timing, queue age, batch composition, KV occupancy, token throughput, requests or tokens that meet their SLO, errors, and quality version.
 
 ## Scheduling policy
 
@@ -88,6 +109,8 @@ They connect metrics to diagnoses:
 
 An L6 candidate designs the control plane around uncertainty. Output length is not known at admission, model versions have different KV footprints, prefix caching changes routing value, and speculative decoding changes the relationship between compute and delivered tokens.
 
+They treat co-located versus disaggregated serving as a measured choice. Separate pools help only when phase isolation and independent scaling repay KV-transfer and queueing costs.
+
 They define explicit overload stages:
 
 1. stop admitting low-priority batch traffic;
@@ -103,6 +126,7 @@ They also separate product quality from serving health. Quantization, speculativ
 - You model prefill and decode separately.
 - Admission follows KV capacity and output policy.
 - Long prefills are chunked so decode remains responsive.
+- Co-located and disaggregated serving are compared with KV-transfer cost included.
 - Time to first token and inter-token latency have separate SLOs.
 - Tenant fairness and priority are explicit, not implied.
 - Overload behavior starts before universal timeout.
@@ -127,4 +151,4 @@ Do not admit it merely because one replica has enough total memory. Route it to 
 
 Try the [inference scheduler lab](/prep/labs/inference-scheduler/) before reading implementation details again.
 
-*Related: [KV cache](/concepts/kv-cache/), [continuous batching](/concepts/continuous-batching/), and [reduce inference cost by 10x](/questions/reduce-llm-inference-cost-10x/).*
+*Related: [Transformer compute and memory accounting](/concepts/transformer-compute-memory-accounting/), [KV cache](/concepts/kv-cache/), and [continuous batching](/concepts/continuous-batching/).*

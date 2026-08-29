@@ -1,7 +1,7 @@
 ---
 import PrepLayout from '../../layouts/PrepLayout.astro';
 import { SITE } from '../../consts';
-import { ROLE_OVERLAYS } from '../../data/prepCurriculum';
+import { ROLE_ORDER, ROLE_OVERLAYS } from '../../data/prepCurriculum';
 if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 
 const packets = [
@@ -13,6 +13,16 @@ const packets = [
       { time: '40 min', title: 'Project deep-dive', prompt: 'Probe ownership, the hardest decision, one failure, evidence, and what the candidate would change.' },
       { time: '35 min', title: 'Product & experimentation', prompt: 'Define a ship decision, primary metric, guardrails, experiment unit, and validity threats.' },
       { time: '30 min', title: 'Behavioral / leadership', prompt: 'Ask one conflict and one prioritization question; push back on at least two claims.' },
+    ],
+  },
+  {
+    id: 'research-scientist', role: 'Research Scientist', duration: '4h 10m including breaks', observer: 'Prefer an active researcher or Research Engineer who can test derivations, experimental validity, and ownership of claims.',
+    rounds: [
+      { time: '45 min', title: 'Math and ML depth', prompt: 'Use one derivation and two mechanism questions. Change an assumption after the first answer.' },
+      { time: '45 min', title: 'Paper and research defense', prompt: 'Defend one central claim, its evidence, the strongest alternative explanation, and one limitation.' },
+      { time: '60 min', title: 'Research work sample', prompt: 'Turn an unfamiliar observation into competing hypotheses, discriminating probes, and a short evidence readout.' },
+      { time: '40 min', title: 'Research implementation', prompt: 'Implement or debug a small ML mechanism with tests, numerical checks, and complexity analysis.' },
+      { time: '40 min', title: 'Job-talk follow-up', prompt: 'Present one contribution briefly, then probe ownership, failed paths, impact, and the next research question.' },
     ],
   },
   {
@@ -33,6 +43,46 @@ const packets = [
       { time: '45 min', title: 'Research depth', prompt: 'Critique a claim, identify alternative explanations, and design discriminating ablations.' },
       { time: '35 min', title: 'ML breadth', prompt: 'Test mechanisms that connect algorithms to training or systems behavior.' },
       { time: '40 min', title: 'Project deep-dive', prompt: 'Probe research-to-production translation, a failed experiment, and the candidate’s personal decisions.' },
+    ],
+  },
+  {
+    id: 'staff-principal', role: 'Staff / Principal ML level overlay', duration: '4h 15m including breaks', observer: 'Use an experienced staff or principal IC who can challenge both technical mechanisms and organization-level claims.',
+    rounds: [
+      { time: '60 min', title: 'Multi-team architecture', prompt: 'Use the multi-team ML platform case. Change one constraint after the architecture, then probe state, failure, migration, ownership, and adoption.' },
+      { time: '45 min', title: 'Technical strategy and portfolio', prompt: 'Give three credible investments under one constraint. Require an order, opportunity cost, quarterly checkpoints, and evidence that would stop or reverse the strategy.' },
+      { time: '45 min', title: 'High-scope project deep-dive', prompt: 'Probe problem selection, personal authority, cross-team consequences, one wrong bet, operating results, and who carried the work afterward.' },
+      { time: '35 min', title: 'Influence and recovery', prompt: 'Use one disagreement and one stopped or redirected project. Test incentives, evidence, cost of delay, and whether the candidate changed their own view.' },
+      { time: '40 min', title: 'Retained domain depth', prompt: 'Choose one mechanism from the candidate’s primary role. Move from strategy to architecture to an algorithm, invariant, experiment, or failure trace.' },
+    ],
+  },
+  {
+    id: 'senior-principal', role: 'Senior Principal / Distinguished ML level overlay', duration: '4h 40m including breaks', observer: 'Use a principal, distinguished engineer, research leader, or equivalent upper IC who can challenge delegated authority and technical depth.',
+    rounds: [
+      { time: '60 min', title: 'Enterprise agent architecture', prompt: 'Use the enterprise agent-platform case. Probe authority, unknown side effects, memory, regional policy, evaluation, migration, and one deep technical invariant.' },
+      { time: '55 min', title: 'Multi-portfolio technical strategy', prompt: 'Balance product, platform, model, security, migration, and retirement investments. Require opportunity cost, checkpoints, and reversal evidence.' },
+      { time: '45 min', title: 'Delegated technical leadership', prompt: 'Define principal-owned domains, decision rights, interface review, incident authority, and escalation without centralizing every choice.' },
+      { time: '45 min', title: 'Durability under external change', prompt: 'Change a vendor, regulation, region, or organization assumption. Test doctrine, portability, succession, and which decisions reopen.' },
+      { time: '45 min', title: 'Retained domain depth', prompt: 'Move from company-level direction to one algorithm, experiment, distributed invariant, security boundary, or performance model.' },
+    ],
+  },
+  {
+    id: 'upper-ic-reasoning', role: 'Upper-IC reasoning-systems transfer', duration: '4h 25m including breaks', observer: 'Use a research or systems leader who can challenge compute arithmetic, evaluation support, serving constraints, and portfolio claims.',
+    rounds: [
+      { time: '60 min', title: 'Reasoning under fixed compute', prompt: 'Allocate fixed capacity across training, post-training, evaluation, and serving. Require arithmetic, routing, stopping rules, and graceful degradation.' },
+      { time: '50 min', title: 'Verifier and evaluation strategy', prompt: 'Probe verifier support, false acceptance, correlated errors, severe tails, held-out families, and evidence that changes the allocation.' },
+      { time: '45 min', title: 'Serving and recovery', prompt: 'Change request mix, KV pressure, or provider availability. Require admission control, fallback, state preservation, and recovery.' },
+      { time: '45 min', title: 'Portfolio and delegated ownership', prompt: 'Partition model, verifier, serving, evaluation, and product decisions across technical leaders with explicit review checkpoints.' },
+      { time: '35 min', title: 'Project evidence', prompt: 'Test one real capacity, quality, or research decision for ownership, failure, update, and measured outcome.' },
+    ],
+  },
+  {
+    id: 'upper-ic-ecosystem', role: 'Upper-IC ecosystem-ranking transfer', duration: '4h 15m including breaks', observer: 'Use a ranking, marketplace, experimentation, or product leader who can challenge causal claims and participant trade-offs.',
+    rounds: [
+      { time: '60 min', title: 'Short-form video ecosystem design', prompt: 'Balance viewer value, creator opportunity, quality, revenue, and concentration without hiding policy in one weighted score.' },
+      { time: '50 min', title: 'Causal evidence and feedback loops', prompt: 'Probe exposure bias, interference, exploration, cohort maturity, long horizons, and what cannot be learned from one experiment.' },
+      { time: '45 min', title: 'Incident and rollback', prompt: 'A watch-time win damages creator retention. Require containment, rollback, diagnosis, compensation, and a safe next experiment.' },
+      { time: '45 min', title: 'Governance and portfolio', prompt: 'Assign metric authority and decision rights across ranking, product, integrity, creator, and revenue leaders. Define reversal evidence.' },
+      { time: '35 min', title: 'Retained ranking depth', prompt: 'Probe one objective, calibration, counterfactual estimator, exploration policy, or serving constraint below the strategy.' },
     ],
   },
 ];
@@ -80,12 +130,16 @@ const unfamiliarPrompts = [
   'A new policy forbids storing raw labels after 24 hours. Redesign training, evaluation, and auditability.',
   'Two teams report opposite experiment results for the same model. Design the investigation.',
   'The strongest paper baseline is missing and the reported gain is within seed variance. Decide what evidence you need.',
+  'Eight ML teams use incompatible training and release systems. Choose the first shared contract, migration sequence, ownership model, and stop condition.',
+  'Forty teams use agents with incompatible tools and authority. Design the common contracts, delegated ownership, migration, and evidence that can reverse centralization.',
+  'A reasoning-model program has a fixed cluster budget. Allocate training, verification, evaluation, and serving capacity, then define evidence that changes the allocation.',
+  'A short-form video ranker raises watch time while creator retention falls. Contain the harm, investigate causality, and redesign objectives and decision rights.',
 ];
 ---
 
 <PrepLayout
-  title="Senior ML interview simulation packets"
-  description="Role-specific Applied Scientist, MLE, and Research Engineer mock-loop packets with timing, rubrics, and readiness gates."
+  title="Senior through senior-principal ML interview simulations"
+  description="Role-specific ML mock loops plus staff, principal, and senior-principal level packets with timing, rubrics, and readiness gates."
   heading="Simulate the loop, not a favorite question."
   lede="A useful mock removes predictable cues, preserves real round timing, and produces bounded repair tasks. Run one early enough to improve and one only if the first exposed broad uncertainty."
 >
@@ -95,13 +149,24 @@ const unfamiliarPrompts = [
 
   <section class="simulation-builder">
     <div><p class="builder-kicker">Quick builder</p><h2>Generate a concrete prompt set</h2><p>Select a role to draw one core-library prompt for each typical round. Regenerate to change prompts; replace any question the candidate rehearsed recently.</p></div>
-    <div class="builder-controls"><label>Role<select data-builder-role>{Object.entries(ROLE_OVERLAYS).map(([id, role]) => <option value={id}>{role.label}</option>)}</select></label><button class="print-button" type="button" data-build-simulation>Build prompt set</button></div>
+    <div class="builder-controls"><label>Role<select data-builder-role>{ROLE_ORDER.map((id) => <option value={id}>{ROLE_OVERLAYS[id].label}</option>)}</select></label><button class="print-button" type="button" data-build-simulation>Build prompt set</button><button class="print-button" type="button" data-start-simulation>Start timed loop</button></div>
     <ol class="builder-output" data-builder-output hidden></ol>
   </section>
 
+  <dialog class="simulation-dialog" data-simulation-dialog aria-labelledby="simulation-round-title">
+    <div class="simulation-dialog-inner">
+      <header><div><p data-simulation-position></p><h2 id="simulation-round-title" data-simulation-title></h2></div><button type="button" data-close-simulation aria-label="Close simulation">×</button></header>
+      <p class="simulation-prompt" data-simulation-prompt></p>
+      <div class="simulation-timer"><strong data-simulation-timer>00:00</strong><button type="button" data-pause-simulation>Pause</button></div>
+      <label>Private notes<textarea rows="7" data-simulation-notes placeholder="Outline evidence and follow-ups. Notes are cleared when this runner closes."></textarea></label>
+      <p class="simulation-note">Do not open the linked answer during the round. Score after the timer or when you choose to stop.</p>
+      <div class="simulation-actions"><button type="button" data-next-simulation>Next round</button></div>
+    </div>
+  </dialog>
+
   {packets.map((packet) => (
     <section id={packet.id} class="packet">
-      <header><p>Role-specific packet</p><h2>{packet.role}</h2><span>{packet.duration}</span><p>{packet.observer}</p></header>
+      <header><p>Simulation packet</p><h2>{packet.role}</h2><span>{packet.duration}</span><p>{packet.observer}</p></header>
       <ol class="round-list">{packet.rounds.map((round, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><div><h3>{round.title} <small>{round.time}</small></h3><p>{round.prompt}</p></div></li>)}</ol>
     </section>
   ))}
@@ -139,20 +204,25 @@ const unfamiliarPrompts = [
     </div>
   </section>
 
-  <section class="callout"><h2>After the simulation</h2><ol><li>Write the failure as an observable behavior, not “study systems more.”</li><li>Choose one corrective drill and a due date.</li><li>Retry closed-book after spacing.</li><li>Graduate only after the repair survives a mixed session.</li></ol><p><a href="/prep/progress/">Open the local progress and retry queue →</a></p></section>
+  <section class="callout"><h2>After the simulation</h2><ol><li>Write the failure as an observable behavior, not “study systems more.”</li><li>Choose one corrective drill and a due date.</li><li>Retry closed-book after spacing.</li><li>Graduate only after the repair survives a mixed session.</li></ol><p><a href="/prep/#queue">Open the Workbook →</a></p></section>
 </PrepLayout>
 
 <script>
   import { INTERVIEW_ROUNDS, ROLE_OVERLAYS, type RoleId } from '../../data/prepCurriculum';
+  import { setActivityComplete } from '../../utils/activityProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
   trackPublicEvent('simulation_opened');
   document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
-  document.querySelector('[data-build-simulation]')?.addEventListener('click', () => {
-    const select = document.querySelector<HTMLSelectElement>('[data-builder-role]');
-    const output = document.querySelector<HTMLOListElement>('[data-builder-output]');
-    if (!select || !output) return;
+  const select = document.querySelector<HTMLSelectElement>('[data-builder-role]');
+  const output = document.querySelector<HTMLOListElement>('[data-builder-output]');
+  const buildRounds = () => {
+    if (!select) return [];
     const role = ROLE_OVERLAYS[select.value as RoleId];
-    const rounds = role.defaultRounds.map((roundId) => INTERVIEW_ROUNDS.find((round) => round.id === roundId)).filter((round): round is (typeof INTERVIEW_ROUNDS)[number] => Boolean(round));
+    return role.defaultRounds.map((roundId) => INTERVIEW_ROUNDS.find((round) => round.id === roundId)).filter((round): round is (typeof INTERVIEW_ROUNDS)[number] => Boolean(round));
+  };
+  document.querySelector('[data-build-simulation]')?.addEventListener('click', () => {
+    if (!select || !output) return;
+    const rounds = buildRounds();
     output.replaceChildren(...rounds.map((round) => {
       const item = document.createElement('li');
       const heading = document.createElement('strong');
@@ -168,6 +238,63 @@ const unfamiliarPrompts = [
     }));
     output.hidden = false;
   });
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-simulation-dialog]');
+  const position = document.querySelector<HTMLElement>('[data-simulation-position]');
+  const title = document.querySelector<HTMLElement>('[data-simulation-title]');
+  const prompt = document.querySelector<HTMLElement>('[data-simulation-prompt]');
+  const timer = document.querySelector<HTMLElement>('[data-simulation-timer]');
+  const pause = document.querySelector<HTMLButtonElement>('[data-pause-simulation]');
+  const next = document.querySelector<HTMLButtonElement>('[data-next-simulation]');
+  const notes = document.querySelector<HTMLTextAreaElement>('[data-simulation-notes]');
+  let activeRounds: ReturnType<typeof buildRounds> = [];
+  let activePrompts: string[] = [];
+  let activeIndex = 0;
+  let remaining = 0;
+  let paused = false;
+  let interval: number | undefined;
+
+  const stopTimer = () => { if (interval !== undefined) window.clearInterval(interval); interval = undefined; };
+  const showTime = () => { if (timer) timer.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`; };
+  const startTimer = () => {
+    stopTimer();
+    interval = window.setInterval(() => {
+      if (!paused && remaining > 0) { remaining -= 1; showTime(); }
+      if (remaining === 0) stopTimer();
+    }, 1000);
+  };
+  const showRound = () => {
+    const round = activeRounds[activeIndex];
+    if (!round) return;
+    remaining = round.minutes * 60;
+    paused = false;
+    if (position) position.textContent = `Round ${activeIndex + 1} of ${activeRounds.length}`;
+    if (title) title.textContent = round.label;
+    if (prompt) prompt.textContent = `${activePrompts[activeIndex]}. ${round.description}`;
+    if (pause) pause.textContent = 'Pause';
+    if (next) next.textContent = activeIndex === activeRounds.length - 1 ? 'Finish simulation' : 'Next round';
+    if (notes) notes.value = '';
+    showTime(); startTimer();
+  };
+  const closeRunner = () => { stopTimer(); if (notes) notes.value = ''; dialog?.close(); };
+  document.querySelector('[data-start-simulation]')?.addEventListener('click', () => {
+    activeRounds = buildRounds(); activeIndex = 0;
+    activePrompts = activeRounds.map((round) => round.starterLinks[Math.floor(Math.random() * round.starterLinks.length)]?.label ?? round.label);
+    if (!dialog || activeRounds.length === 0) return;
+    dialog.showModal(); showRound();
+  });
+  pause?.addEventListener('click', () => { paused = !paused; pause.textContent = paused ? 'Resume' : 'Pause'; });
+  next?.addEventListener('click', () => {
+    stopTimer();
+    if (activeIndex >= activeRounds.length - 1) {
+      if (select) { try { setActivityComplete(`simulation:${select.value}`); } catch { /* simulation still completed */ } }
+      closeRunner();
+      return;
+    }
+    activeIndex += 1; showRound();
+  });
+  document.querySelector('[data-close-simulation]')?.addEventListener('click', closeRunner);
+  dialog?.addEventListener('cancel', closeRunner);
 </script>
 
 <style>
@@ -183,6 +310,21 @@ const unfamiliarPrompts = [
   .builder-output li { display: grid; grid-template-columns: 12rem 1fr; gap: .2rem .7rem; padding: .65rem 0; border-top: 1px solid var(--c-rule); }
   .builder-output strong, .builder-output a, .builder-output span { display: block; }
   .builder-output span { grid-column: 2; color: var(--c-muted); font-size: .78rem; }
+  .simulation-dialog { width: min(42rem, 94vw); max-height: 92vh; padding: 0; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); color: var(--c-text); box-shadow: var(--shadow-lg); }
+  .simulation-dialog::backdrop { background: rgba(15, 23, 42, .62); }
+  .simulation-dialog-inner { max-height: 92vh; overflow-y: auto; padding: clamp(1rem, 4vw, 1.7rem); }
+  .simulation-dialog header { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: .8rem; border-bottom: 1px solid var(--c-rule); }
+  .simulation-dialog header p { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
+  .simulation-dialog header h2 { margin: .15rem 0 0 !important; }
+  .simulation-dialog header button { width: 2rem; height: 2rem; border: 1px solid var(--c-rule); border-radius: 50%; background: var(--c-bg); color: var(--c-text); font-size: 1.15rem; cursor: pointer; }
+  .simulation-prompt { margin: 1rem 0; color: var(--c-text-soft); }
+  .simulation-timer { display: flex; justify-content: space-between; align-items: center; margin-bottom: .8rem; }
+  .simulation-timer strong { font-family: var(--font-mono); font-size: 1.6rem; }
+  .simulation-timer button { padding: .45rem .7rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); cursor: pointer; }
+  .simulation-dialog label { font-weight: 700; }
+  .simulation-note { margin: .4rem 0 1rem; color: var(--c-muted); font-size: .75rem; }
+  .simulation-actions { display: flex; justify-content: flex-end; }
+  .simulation-actions button { padding: .62rem .8rem; border: 0; border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font-weight: 700; cursor: pointer; }
   .packet { margin: 2.5rem 0; scroll-margin-top: 5.5rem; }
   .packet > header { padding-bottom: .8rem; border-bottom: 2px solid var(--c-text); }
   .packet > header > p:first-child { margin: 0; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
@@ -216,6 +358,6 @@ const unfamiliarPrompts = [
   .frontier-packet li { display: grid; grid-template-columns: 1fr auto; gap: .2rem .8rem; padding: .7rem 0; border-top: 1px solid var(--c-rule); }
   .frontier-packet small { color: var(--c-accent); font-family: var(--font-mono); }
   .frontier-packet li p { grid-column: 1 / -1; margin: 0; color: var(--c-text-soft); font-size: .82rem; }
-  @media (max-width: 700px) { .score-grid, .gate-grid { grid-template-columns: 1fr; } .builder-controls { align-items: stretch; flex-direction: column; } .builder-controls button { width: 100%; } .builder-output li { grid-template-columns: 1fr; } .builder-output span { grid-column: auto; } }
+  @media (max-width: 700px) { .score-grid, .gate-grid { grid-template-columns: 1fr; } .builder-controls { align-items: stretch; flex-direction: column; } .builder-controls button { width: 100%; } .builder-output li { grid-template-columns: 1fr; } .builder-output span { grid-column: auto; } .simulation-dialog { width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border: 0; border-radius: 0; } .simulation-dialog-inner { max-height: 100dvh; } }
   @media print { .packet { break-before: page; } .scorecard { break-before: page; } }
 </style>

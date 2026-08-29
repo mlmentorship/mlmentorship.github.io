@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Label smoothing [(Szegedy et al., 2016)](https://arxiv.org/abs/1512.00567) replaces the hard one-hot target $y$ with $\tilde{y} = (1 - \varepsilon) \cdot y + \varepsilon / K$, where $K$ is the number of classes and $\varepsilon$ is a small smoothing constant (typically 0.1). The cross-entropy loss is computed against $\tilde{y}$.
-
-## Why it matters
 
 With one-hot targets, the cross-entropy loss is unbounded as the model becomes confident. It can always reduce loss further by making the correct logit larger. This pushes the model toward arbitrarily large logits and overconfident predictions, which are poorly calibrated.
 

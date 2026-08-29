@@ -1,57 +1,34 @@
 ---
-// DocsIndexLayout: section-archive page styled like a docs page,
-// with the persistent left sidebar and global category strip.
-// Mirrors DocsLayout but takes raw content as a slot rather than a post.
+// DocsIndexLayout: a quiet single-column archive page.
 import BaseLayout from './BaseLayout.astro';
-import SectionNav from '../components/SectionNav.astro';
 
 interface Props {
   category?: 'guides' | 'questions' | 'concepts';
   title: string;
   description?: string;
 }
-const { category, title, description } = Astro.props;
+const { title, description } = Astro.props;
 ---
 <BaseLayout title={title} description={description}>
   <div class="docs-layout">
-    <nav class="docs-sidebar" aria-label="Section navigation" data-pagefind-ignore="all">
-      <SectionNav category={category} />
-    </nav>
-
-    <main class="docs-article">
+    <div class="docs-article">
       <slot />
-    </main>
-
-    {/* Empty placeholder so the 3-column grid matches DocsLayout and the
-        sidebar position stays stable when navigating between index and post. */}
-    <aside class="docs-toc-placeholder" aria-hidden="true"></aside>
+    </div>
   </div>
 </BaseLayout>
 
 <style>
   .docs-layout {
-    display: grid;
-    grid-template-columns: 16rem minmax(0, 1fr) 14rem;
-    gap: 2.5rem;
-    max-width: 80rem;
+    max-width: 46rem;
     margin: 0 auto;
-    padding: 2rem var(--gutter) 4rem;
-  }
-
-  .docs-sidebar {
-    position: sticky;
-    top: 5rem;
-    align-self: start;
-    /* No overflow / max-height: rely on the single page scroll. */
+    padding: clamp(1.3rem, 3vw, 2.2rem) var(--gutter) 3.5rem;
   }
 
   .docs-article { min-width: 0; }
 
   @media (max-width: 800px) {
     .docs-layout {
-      grid-template-columns: 1fr;
       padding: 1rem var(--gutter) 3rem;
     }
-    .docs-sidebar { display: none; }
   }
 </style>

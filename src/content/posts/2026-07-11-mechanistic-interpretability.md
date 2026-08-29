@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Mechanistic interpretability tries to identify the internal computations that cause a model behavior, using representations, components, and causal interventions rather than only input-output attribution.
-
-## Why it matters
 
 SHAP or saliency can tell you which input features correlate with one prediction. Frontier-model questions are often different: where is a behavior represented, which components transform it, and does changing that internal state change the output as predicted?
 

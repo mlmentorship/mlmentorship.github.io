@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An **activation function** is a (usually) elementwise nonlinearity applied between linear layers in a neural network. Without it, stacking linear layers collapses to a single linear layer (no expressive power gain). The choice of activation shapes optimization, gradient flow, and final accuracy.
 

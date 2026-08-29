@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Q-learning** [(Watkins, 1989)](https://www.cs.rhul.ac.uk/~chrisw/new_thesis.pdf) is an off-policy temporal-difference algorithm that learns the optimal action-value function $Q^*(s, a)$. The expected return from taking action $a$ in state $s$ and then acting optimally. By iterating the Bellman optimality update:
 
 $$
 Q(s, a) \leftarrow Q(s, a) + \alpha \big[ r + \gamma \max_{a'} Q(s', a') - Q(s, a) \big].
 $$
-
-## Why it matters
 
 Q-learning is the canonical value-based RL algorithm. Combined with deep neural networks (DQN; [Mnih et al., 2015](https://www.nature.com/articles/nature14236)), it produced the original deep RL breakthroughs on Atari and remains the foundation of value-based methods. Knowing Q-learning is the prerequisite for understanding: target networks, experience replay, double DQN, dueling networks, and the relationship to actor-critic methods.
 

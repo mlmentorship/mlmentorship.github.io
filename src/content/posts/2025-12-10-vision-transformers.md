@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **Vision Transformer** [(Dosovitskiy et al., 2020)](https://arxiv.org/abs/2010.11929) splits an image into fixed-size patches (e.g., $16 \times 16$ pixels), linearly embeds each patch into a vector, adds positional embeddings, and processes the resulting sequence with a standard transformer encoder. A learned `[CLS]` token (or global average pool over patch tokens) feeds the classifier.
-
-## Why it matters
 
 ViT showed that **transformers can match or beat CNNs** on image classification given enough training data. It triggered the convergence of vision and language architectures: same building block, same training approach, same scaling laws. Modern vision foundation models (DINOv2, SAM, CLIP image encoder, MaskedAutoencoder, EVA, BEiT) all use ViT backbones.
 

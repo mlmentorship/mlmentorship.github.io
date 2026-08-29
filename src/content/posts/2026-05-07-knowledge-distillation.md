@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Knowledge distillation** trains a student model with a loss against a teacher's soft predictions, not the hard label. The student learns the teacher's full output distribution, which carries information about how classes relate ([Hinton et al., 2015](https://arxiv.org/abs/1503.02531)).
-
-## Why it matters
 
 Hard labels say "this is a 7." Teacher logits say "94 percent 7, 4 percent 1, 1 percent 9, everything else 0.01." That extra structure tells the student that 7 looks more like 1 than like 9. A small model trained against this signal usually beats the same model trained from scratch on hard labels at matched compute.
 

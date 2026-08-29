@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Multi-head attention** projects $Q$, $K$, $V$ into $h$ lower-dimensional subspaces, runs scaled dot-product attention independently in each, and concatenates the results before a final output projection. Same FLOPs as one large head; very different inductive bias.
-
-## Why it matters
 
 Single-head attention computes one weighted average per position. That single distribution has to encode every relation the model needs: syntactic, positional, semantic, coreferential. In practice it cannot, and ablations show that single-head transformers underperform multi-head transformers at matched parameter count ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)).
 

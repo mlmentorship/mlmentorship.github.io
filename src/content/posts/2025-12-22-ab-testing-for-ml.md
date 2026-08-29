@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 A/B testing for ML systems randomly assigns users to control and treatment models, then measures whether business outcome differences are statistically significant.
-
-## Why it matters
 
 Offline metrics are unreliable for ML systems. They suffer from distribution shift, label bias, observational confounds, and Goodhart's law. The only reliable way to know if a model change actually helps in production is to test it against the current model on real users.
 
@@ -123,8 +121,8 @@ A/B testing questions test:
 3. Whether you know the practical pitfalls (multiple comparisons, novelty effects, network effects).
 4. Whether you can advocate for or against shipping a change based on data.
 
-A common follow-up: "What would make you not ship a model with a positive primary metric?" The senior answer: regressions in guardrails, regressions in important slices, low statistical power despite the positive estimate, novelty effects not having decayed yet, or strategic concerns the data doesn't capture.
+A common follow-up asks what could block launch despite a positive primary metric. A senior answer checks guardrail and slice regressions, statistical power, unresolved novelty effects, and strategic concerns that the experiment does not measure.
 
 ---
 
-*Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Design YouTube's recommender](/questions/design-youtube-recommender/), [Calibration](/concepts/calibration/).*
+*Related: [causal inference for ML decisions](/concepts/causal-inference-for-ml-decisions/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Design YouTube's recommender](/questions/design-youtube-recommender/), and [Calibration](/concepts/calibration/).*

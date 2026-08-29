@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 The post-training pipeline turning a base LLM (fluent, raw next-token predictor) into a useful assistant. Standard 2026 stack: **supervised fine-tuning (SFT) -> preference optimization (DPO or RLHF)** plus optional safety / RL.
-
-## Why it matters
 
 A base LLM trained on internet text is fluent but not useful. It will continue your prompt as if it were the next bit of internet text, not as a helpful answerer. Post-training is what turns the base model into Claude, ChatGPT, or any other production assistant.
 

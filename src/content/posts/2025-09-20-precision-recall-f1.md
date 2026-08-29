@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 For a binary classifier:
 
 - **Precision** = $\frac{TP}{TP + FP}$. Of the positives I predicted, what fraction are correct?
 - **Recall** = $\frac{TP}{TP + FN}$. Of the actual positives, what fraction did I catch?
 - **F1** = $\frac{2 \cdot P \cdot R}{P + R}$. Harmonic mean of the two.
-
-## Why it matters
 
 These are the three most-cited classification metrics. Picking the wrong one for your problem is a senior-level mistake; recommending "use precision and recall" without specifying the operating point is a common interview tell.
 

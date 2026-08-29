@@ -39,11 +39,11 @@ It knows the shape of an experiment but leaves the decision, guardrails, exposur
 
 ## What an L5 answer adds
 
-An L5 answer defines user-level randomization for a persistent personalized experience; a primary metric tied to the product objective, not whichever metric happens to move; guardrails for latency, complaints, retention, diversity, safety, and cost; power based on a minimum worthwhile effect; an exposure analysis so assignment dilution does not hide impact; and a launch rule that weighs practical significance against uncertainty.
+An L5 answer defines the randomization unit and ties the primary metric to the product objective. It adds guardrails for latency, complaints, retention, diversity, safety, and cost. Power uses a minimum worthwhile effect. Exposure analysis catches assignment dilution, and the launch rule weighs practical significance against uncertainty.
 
 ## What an L6 answer adds
 
-An L6 answer questions whether a standard user-level A/B test even identifies the right effect: marketplace or social interference may force cluster randomization; ranking changes can alter future training data and create long-term feedback; novelty may reverse after the first week; heavy users can dominate aggregate metrics; the treatment may lift engagement while degrading ecosystem health. It says what evidence would make it not launch despite a positive primary metric.
+An L6 answer asks whether a user-level A/B test identifies the right effect. Marketplace or social interference may require cluster randomization. Ranking changes can alter future training data, novelty can fade, and heavy users can dominate aggregates. A positive engagement result may still harm ecosystem health.
 
 ## Tells that get you a strong-hire vote
 

@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 Regularization constrains effective model capacity to reduce overfitting. It includes explicit forms (L1/L2, dropout, early stopping, data augmentation) and implicit forms (SGD noise, optimizer choice, architecture).
-
-## Why it matters
 
 Overfitting is the most common failure mode of moderately-sized models on moderately-sized datasets. Regularization is the response. Modern large-scale models often don't need explicit regularization (they're underfitting at trillion-token scale), but for almost everything outside frontier LLM pretraining, regularization choices matter.
 
@@ -104,4 +102,4 @@ Regularization questions test:
 
 ---
 
-*Related: [Why does dropout work?](/questions/why-does-dropout-work/), [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/).*
+*Related: [Why does dropout work?](/questions/why-does-dropout-work/), [Adam, AdamW, and modern optimizer choices](/concepts/adam-and-adamw/).*

@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Gradient clipping rescales the gradient vector before the optimizer step so that its global norm does not exceed a fixed threshold $c$. If $\|g\| > c$, replace $g$ with $g \cdot c / \|g\|$; otherwise leave it unchanged.
-
-## Why it matters
 
 Training instabilities. Loss spikes, NaN gradients, exploding updates. Are usually caused by a single batch with anomalous gradients. Without clipping, that one bad step can drive parameters into a region from which training never recovers. Clipping bounds the worst-case update and turns a divergence into a recoverable hiccup.
 

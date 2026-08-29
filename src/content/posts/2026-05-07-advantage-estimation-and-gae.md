@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 The **advantage** $A^\pi(s, a) = Q^\pi(s, a) - V^\pi(s)$ measures how much better action $a$ is than the policy's average. **Generalized Advantage Estimation** (GAE, [Schulman et al., 2016](https://arxiv.org/abs/1506.02438)) estimates it as an exponentially weighted average of $n$-step TD residuals, controlled by a single parameter $\lambda$.
-
-## Why it matters
 
 Policy gradient methods optimize $\nabla_\theta J(\theta) = \mathbb{E}[\nabla \log \pi_\theta(a \mid s) \cdot \Psi]$. The choice of $\Psi$ controls the bias-variance tradeoff:
 

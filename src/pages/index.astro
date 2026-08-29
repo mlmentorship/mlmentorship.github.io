@@ -1,562 +1,104 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { LIBRARY_SHELVES, LIBRARY_VOLUMES } from '../data/library';
+import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { SITE } from '../consts';
-import Subscribe from '../components/Subscribe.astro';
 
-const all = await getCollection('posts', ({ data }) => !data.draft);
-const counts = {
-  essays: all.filter((p) => p.data.category === 'guides').length,
-  interviews: all.filter((p) => p.data.category === 'questions').length,
-  reference: all.filter((p) => p.data.category === 'concepts').length,
-};
+const entries = await getLibraryEntries();
+const volumeStats = LIBRARY_VOLUMES.map((volume) => ({
+  volume,
+  entries: volume.chapters.flatMap((chapter) => entriesForChapter(entries, chapter)),
+}));
+const assignedHrefs = volumeStats.flatMap((item) => item.entries.map((entry) => entry.href));
+if (assignedHrefs.length !== entries.length || new Set(assignedHrefs).size !== entries.length) {
+  throw new Error(`Library taxonomy must assign each published entry exactly once. Assigned ${assignedHrefs.length} references across ${new Set(assignedHrefs).size} unique entries; expected ${entries.length}.`);
+}
+const volumeStatsById = new Map(volumeStats.map((item) => [item.volume.id, item]));
+const shelfVolumeIds = LIBRARY_SHELVES.flatMap((shelf) => shelf.volumeIds);
+if (shelfVolumeIds.length !== LIBRARY_VOLUMES.length || new Set(shelfVolumeIds).size !== LIBRARY_VOLUMES.length) {
+  throw new Error('Library shelves must assign every volume exactly once.');
+}
 ---
-<BaseLayout title={SITE.title} description={SITE.description}>
-  <main class="home">
-    <!-- HERO -->
-    <section class="block hero">
-      <h1 class="display">
-        Senior ML &amp; AI<br/>interviews, distilled.
-      </h1>
-      <p class="lede">
-        Most ML interview prep is calibrated for new grads. This isn't.
-      </p>
-      <p class="sub-lede">
-        {counts.interviews + counts.essays + counts.reference} questions,
-        guides, and concept notes for engineers preparing for L5+ Applied
-        Scientist, MLE, and Research Engineer loops. Free, by a senior
-        practitioner.
-      </p>
-      <p class="hero-ctas">
-        <a class="btn-primary" href="/start-here/">Browse the library <span aria-hidden="true">→</span></a>
-        {SITE.features.prepTools && <a class="btn-secondary" href="/prep/readiness/">Check readiness</a>}
-      </p>
-    </section>
 
-    <hr class="rule" />
-
-    <!-- THREE SECTIONS -->
-    <section class="block">
-      <p class="block-eyebrow">Where to look</p>
-      <ul class="sections-grid">
-        <li>
-          <a href="/questions/">
-            <h2>Questions <span class="sections-count">{counts.interviews}</span></h2>
-            <p>The senior ML interview canon. Each one with what L4 / L5 / L6 answers actually sound like.</p>
-            <p class="sections-when"><strong>Best when:</strong> you have a specific question and want a level-calibrated answer.</p>
-          </a>
-        </li>
-        <li>
-          <a href="/guides/">
-            <h2>Guides <span class="sections-count">{counts.essays}</span></h2>
-            <p>Long-form opinion pieces on senior ML interviews, system design, and applied practice. Take a position and defend it.</p>
-            <p class="sections-when"><strong>Best when:</strong> you want a senior-IC point of view on something contested.</p>
-          </a>
-        </li>
-        <li>
-          <a href="/concepts/">
-            <h2>Concepts <span class="sections-count">{counts.reference}</span></h2>
-            <p>Concise notes on attention, normalization, LLM internals, optimization, and the math underneath.</p>
-            <p class="sections-when"><strong>Best when:</strong> you need to look up or refresh a specific concept fast.</p>
-          </a>
-        </li>
-      </ul>
-      <p class="block-foot">
-        Or follow a <a href="/start-here/">curated reading path</a> by what you're trying to do.
+<BaseLayout title="Senior ML & AI interview prep" description={SITE.description}>
+  <div class="library-page">
+    <header class="library-head">
+      <p class="edition">Free field guide for experienced candidates</p>
+      <h1>Senior ML &amp; AI interview prep</h1>
+      <p class="subtitle">
+        Prepare for Applied Scientist, Research Scientist, Machine Learning Engineer, and Research Engineer interviews with concise concepts, realistic questions, and role-specific practice.
       </p>
-    </section>
-
-    {SITE.features.prepTools && <hr class="rule" />}
-
-    {SITE.features.prepTools && <section class="block">
-      <p class="block-eyebrow">Free prep tools</p>
-      <h2 class="block-headline">Use the library with an executable practice plan.</h2>
-      <div class="tools-grid">
-        <a href="/prep/readiness/"><strong>Find your focus</strong><span>Evidence-based workload and gap check</span></a>
-        <a href="/prep/practice/"><strong>Practice by round</strong><span>Round timers, diagnostic rubrics, and retries</span></a>
-        <a href="/prep/plans/"><strong>Choose a workload</strong><span>Executable 2-, 4-, and 8-week plans</span></a>
+      <div class="quick-links">
+        <a href="/library/foundations/">Start with Book I</a>
+        {SITE.features.prepTools && <a href="/prep/">Open your workbook</a>}
       </div>
-      <p class="block-foot"><a href="/prep/">See all preparation tools →</a></p>
-    </section>}
+    </header>
 
-    <section class="home-subscribe" aria-label="Newsletter">
-      <Subscribe heading="Get the next senior ML note" />
+    <section class="volumes" aria-labelledby="curriculum-heading">
+      <div class="section-label"><span>Curriculum</span><strong>{LIBRARY_VOLUMES.length} books · {entries.length} entries</strong></div>
+      <h2 id="curriculum-heading" class="sr-only">Browse the curriculum by subject</h2>
+      <p class="starting-note"><strong>Not sure where to begin?</strong> Start with the Core chapters in Books I and II. Add Role-specific or Specialist chapters only when your role path or interview loop requires them.</p>
+      {LIBRARY_SHELVES.map((shelf) => (
+        <section class="shelf" id={shelf.id}>
+          <header><h2>{shelf.title}</h2><p>{shelf.description}</p></header>
+          <ol>
+            {shelf.volumeIds.map((volumeId) => volumeStatsById.get(volumeId)).filter((item) => item !== undefined).map(({ volume, entries: volumeEntries }) => (
+              <li>
+                <a href={`/library/${volume.id}/`}>
+                  <span class="volume-number">{volume.number}</span>
+                  <div><h3>{volume.title}</h3><p>{volume.description}</p></div>
+                  <span class="volume-count">{volumeEntries.length}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
     </section>
-  </main>
+
+    <aside class="find-note">
+      <strong>Looking for one term?</strong>
+      Use Search in the header. Prefer a type-only view? Open <a href="/concepts/">all concepts</a> or <a href="/guides/">all guides</a>. {SITE.features.prepTools
+        ? <>Looking for an interview plan? Open the <a href="/prep/">Workbook</a>.</>
+        : <>Looking for an ordered route? Use the <a href="/start-here/">reading paths</a>.</>}
+    </aside>
+  </div>
 </BaseLayout>
 
 <style>
-  .home {
-    max-width: 52rem;
-    margin: 0 auto;
-    padding: clamp(2rem, 5vw, 4rem) var(--gutter) clamp(3rem, 8vw, 6rem);
-  }
+  .library-page { width: min(100%, 48rem); margin: 0 auto; padding: clamp(1.7rem, 4vw, 2.8rem) var(--gutter) 4rem; }
+  .library-head { max-width: 40rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--c-rule); }
+  .edition { margin: 0 0 .45rem; color: var(--c-muted); font-size: .72rem; font-weight: 500; }
+  .library-head h1 { max-width: 42rem; margin: 0 0 .55rem; font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -.035em; line-height: 1.08; }
+  .subtitle { max-width: 39rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1rem; line-height: 1.55; }
+  .quick-links { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .85rem; }
+  .quick-links a { color: var(--c-text-soft); font-size: .78rem; font-weight: 550; text-decoration: none; }
+  .quick-links a:hover { color: var(--c-text); text-decoration: underline; }
 
-  .block {
-    padding: clamp(1.8rem, 4vw, 2.6rem) 0;
-  }
-  .hero {
-    padding-top: clamp(2.5rem, 7vw, 5rem);
-    padding-bottom: clamp(2rem, 5vw, 3rem);
-  }
+  .volumes { padding-top: 1.5rem; }
+  .section-label { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: .35rem; font-size: .7rem; }
+  .section-label span { color: var(--c-text-soft); font-weight: 600; }
+  .section-label strong { color: var(--c-muted); font-weight: 500; }
+  .starting-note { max-width: 40rem; margin: .65rem 0 0; color: var(--c-muted); font-size: .78rem; line-height: 1.45; }
+  .shelf { margin-top: 1.6rem; }
+  .shelf > header { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: .8rem; align-items: baseline; margin-bottom: .35rem; }
+  .shelf > header h2 { margin: 0; font-size: .9rem; }
+  .shelf > header p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .78rem; line-height: 1.4; }
+  .volumes ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--c-rule); }
+  .volumes li { margin: 0; border-bottom: 1px solid var(--c-rule); }
+  .volumes a { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .7rem; padding: .8rem 0; color: inherit; text-decoration: none; }
+  .volume-number, .volume-count { padding-top: .12rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .66rem; }
+  .volumes h3 { margin: 0 0 .12rem; font-size: .92rem; }
+  .volumes p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; }
+  .volumes a:hover h3 { color: var(--c-accent); text-decoration: underline; }
+  .volume-count { padding-left: .5rem; }
 
-  .rule {
-    border: 0;
-    border-top: 1px solid var(--c-rule);
-    margin: 0;
-  }
-
-  .display {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(2.6rem, 8vw, 5.2rem);
-    line-height: 0.96;
-    letter-spacing: -0.04em;
-    color: var(--c-text);
-    margin: 0 0 1.4rem;
-  }
-
-  .lede {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(1.15rem, 2.4vw, 1.45rem);
-    line-height: 1.4;
-    color: var(--c-text-soft);
-    margin: 0 0 1.8rem;
-    max-width: 36rem;
-    letter-spacing: -0.005em;
-  }
-
-  /* Small accent stripe above the hero title: quiet design signature */
-  .hero {
-    position: relative;
-  }
-  .hero::before {
-    content: '';
-    display: block;
-    width: 2.4rem;
-    height: 3px;
-    background: var(--c-accent);
-    margin-bottom: 1.6rem;
-    border-radius: 1.5px;
-  }
-
-  .sub-lede {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--c-muted);
-    margin: 0 0 1.8rem;
-    max-width: 38rem;
-  }
-
-  .hero-ctas {
-    display: flex;
-    gap: 0.7rem;
-    flex-wrap: wrap;
-    margin: 2rem 0 0;
-  }
-  .btn-primary, .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.7rem 1.2rem;
-    border-radius: var(--radius);
-    font-family: var(--font-ui);
-    font-size: 0.95rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: background var(--transition), border-color var(--transition), transform var(--transition);
-  }
-  .btn-primary {
-    background: var(--c-accent-fill);
-    color: var(--c-on-accent);
-  }
-  .btn-primary:hover {
-    background: var(--c-link-hover);
-    transform: translateY(-1px);
-  }
-  .btn-secondary {
-    background: var(--c-bg-tint);
-    color: var(--c-text);
-    border: 1px solid var(--c-rule);
-    font-weight: 600;
-  }
-  .btn-secondary:hover {
-    border-color: var(--c-accent);
-    color: var(--c-accent);
-    background: var(--c-surface);
-    transform: translateY(-1px);
-  }
-
-  .hero-foot {
-    margin: 1.2rem 0 0;
-    font-family: var(--font-ui);
-    font-size: 0.88rem;
-    color: var(--c-muted);
-  }
-  .hero-foot a {
-    color: var(--c-text-soft);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
-    text-decoration-color: var(--c-rule);
-    transition: color var(--transition), text-decoration-color var(--transition);
-  }
-  .hero-foot a:hover {
-    color: var(--c-accent);
-    text-decoration-color: var(--c-accent);
-  }
-
-  /* WHY block: 3-column card grid */
-  .why-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  @media (max-width: 720px) {
-    .why-grid { grid-template-columns: 1fr; }
-  }
-  .why-card {
-    padding: 1.4rem 1.4rem 1.5rem;
-    background: var(--c-surface);
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius-lg);
-    transition: border-color var(--transition), transform var(--transition);
-  }
-  .why-card:hover {
-    border-color: var(--c-accent);
-    transform: translateY(-2px);
-  }
-  .why-num {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    color: var(--c-accent);
-    margin: 0 0 0.7rem;
-    letter-spacing: 0.06em;
-  }
-  .why-title {
-    font-family: var(--font-display);
-    font-size: 1.02rem;
-    font-weight: 600;
-    color: var(--c-text);
-    margin: 0 0 0.55rem;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
-  }
-  .why-body {
-    font-size: 0.92rem;
-    line-height: 1.55;
-    color: var(--c-text-soft);
-    margin: 0;
-  }
-
-  /* WHERE TO LOOK: three section cards */
-  .sections-grid {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-  @media (max-width: 720px) {
-    .sections-grid { grid-template-columns: 1fr; }
-  }
-  .sections-grid > li { margin: 0; padding: 0; }
-  .sections-grid a {
-    display: block;
-    padding: 1.3rem 1.4rem 1.4rem;
-    background: var(--c-surface);
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-    color: inherit;
-    transition: border-color var(--transition), transform var(--transition);
-  }
-  .sections-grid a:hover {
-    border-color: var(--c-accent);
-    transform: translateY(-2px);
-  }
-  .sections-grid h2 {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--c-text);
-    margin: 0 0 0.6rem;
-    letter-spacing: -0.01em;
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-  }
-  .sections-count {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--c-accent);
-    font-weight: 500;
-  }
-  .sections-grid > li > a > p {
-    font-size: 0.92rem;
-    line-height: 1.55;
-    color: var(--c-text-soft);
-    margin: 0 0 0.6rem;
-  }
-  .sections-when {
-    font-size: 0.85rem !important;
-    color: var(--c-muted) !important;
-    margin: 0.8rem 0 0 !important;
-  }
-  .sections-when strong {
-    color: var(--c-text-soft);
-    font-weight: 600;
-  }
-
-  .block-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--c-muted);
-    margin: 0 0 1.4rem;
-  }
-  .block-headline {
-    font-family: var(--font-display);
-    font-size: clamp(1.4rem, 3vw, 1.8rem);
-    font-weight: 600;
-    color: var(--c-text);
-    margin: 0 0 1.6rem;
-    letter-spacing: -0.018em;
-    line-height: 1.2;
-  }
-  .block-foot {
-    margin: 1.6rem 0 0;
-    font-family: var(--font-ui);
-    font-size: 0.95rem;
-  }
-  .block-foot a {
-    color: var(--c-accent);
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .block-foot a:hover { text-decoration: underline; }
-
-  .tools-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.7rem;
-  }
-  .tools-grid a {
-    padding: 1rem;
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius);
-    background: var(--c-surface);
-    color: inherit;
-    text-decoration: none;
-    transition: border-color var(--transition), transform var(--transition);
-  }
-  .tools-grid a:hover { border-color: var(--c-accent); transform: translateY(-2px); }
-  .tools-grid strong, .tools-grid span { display: block; }
-  .tools-grid strong { margin-bottom: 0.25rem; font-size: 0.92rem; }
-  .tools-grid span { color: var(--c-text-soft); font-size: 0.78rem; line-height: 1.45; }
-  @media (max-width: 720px) { .tools-grid { grid-template-columns: 1fr; } }
-
-  .home-subscribe { padding: 0 0 clamp(1.8rem, 4vw, 2.6rem); }
-  .home-subscribe :global(.subscribe) { margin-top: 0; }
-
-  /* Quiet footnote at the very bottom of the home page */
-  .footnote {
-    margin-top: 3rem;
-    padding-top: 1.6rem;
-    border-top: 1px solid var(--c-rule);
-    font-family: var(--font-ui);
-    font-size: 0.88rem;
-    color: var(--c-muted);
-    text-align: center;
-  }
-  .footnote a {
-    color: var(--c-text-soft);
-    text-decoration: none;
-    transition: color var(--transition);
-  }
-  .footnote a:hover { color: var(--c-accent); }
-  .footnote-sep {
-    margin: 0 0.6rem;
-    color: var(--c-rule);
-  }
-  .footnote kbd {
-    font-family: var(--font-mono);
-    background: var(--c-kbd-bg);
-    border: 1px solid var(--c-rule);
-    padding: 0.05rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.85em;
-    margin: 0 0.15rem;
-  }
-
-  /* Latest essays as a vertical list */
-  .post-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-  .post-row {
-    display: grid;
-    grid-template-columns: 2.4rem 1fr;
-    gap: 0.6rem;
-    padding: 1rem 0.6rem 1rem 0.4rem;
-    margin: 0 -0.6rem 0 -0.4rem;
-    border-radius: var(--radius);
-    text-decoration: none;
-    transition: background var(--transition);
-  }
-  .post-row:hover { background: var(--c-bg-tint); }
-  .post-row-num {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 500;
-    color: var(--c-muted);
-    line-height: 1.55;
-    padding-top: 0.25rem;
-    letter-spacing: 0.04em;
-    transition: color var(--transition);
-  }
-  .post-row:hover .post-row-num {
-    color: var(--c-accent);
-  }
-  .post-row-title {
-    font-family: var(--font-display);
-    font-size: 1.18rem;
-    font-weight: 600;
-    color: var(--c-text);
-    margin: 0 0 0.35rem;
-    line-height: 1.3;
-    letter-spacing: -0.012em;
-  }
-  .post-row-desc {
-    font-size: 0.95rem;
-    color: var(--c-text-soft);
-    margin: 0 0 0.55rem;
-    line-height: 1.55;
-  }
-  .post-row-meta {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    color: var(--c-muted);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  /* Reading paths as bullet list */
-  .path-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-  .path-list a {
-    display: grid;
-    grid-template-columns: 0.8rem 1fr auto;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.75rem 0.6rem 0.75rem 0.4rem;
-    margin: 0 -0.6rem 0 -0.4rem;
-    border-radius: var(--radius);
-    text-decoration: none;
-    color: var(--c-text);
-    font-size: 1.02rem;
-    transition: background var(--transition);
-  }
-  .path-list a:hover { background: var(--c-bg-tint); }
-  .path-bullet {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--c-accent);
-    display: inline-block;
-  }
-  .path-arrow {
-    color: var(--c-muted);
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    transition: color var(--transition), transform var(--transition);
-  }
-  .path-list a:hover .path-arrow {
-    color: var(--c-accent);
-    transform: translateX(3px);
-  }
-
-  /* Counts as a single quiet line */
-  .counts-line {
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    color: var(--c-text-soft);
-    margin: 0 0 0.7rem;
-    line-height: 1.7;
-  }
-  .counts-line a {
-    color: var(--c-text-soft);
-    text-decoration: none;
-    transition: color var(--transition);
-  }
-  .counts-line a:hover { color: var(--c-accent); }
-  .counts-line strong {
-    color: var(--c-text);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-  .counts-sep {
-    margin: 0 0.6rem;
-    color: var(--c-rule);
-  }
-  .counts-foot {
-    font-size: 0.92rem;
-    color: var(--c-muted);
-    margin: 0;
-  }
-  .counts-foot kbd {
-    font-family: var(--font-mono);
-    background: var(--c-kbd-bg);
-    border: 1px solid var(--c-rule);
-    padding: 0.05rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.85em;
-  }
-
-  /* Quiet consulting close */
-  .consulting-headline {
-    font-family: var(--font-display);
-    font-size: clamp(1.25rem, 2.6vw, 1.5rem);
-    font-weight: 600;
-    color: var(--c-text);
-    margin: 0 0 0.8rem;
-    letter-spacing: -0.012em;
-    line-height: 1.3;
-  }
-  .consulting-body {
-    font-size: 1rem;
-    color: var(--c-text-soft);
-    line-height: 1.6;
-    margin: 0 0 1.2rem;
-    max-width: 40rem;
-  }
-  .consulting-cta {
-    margin: 0;
-    font-family: var(--font-ui);
-  }
-  .consulting-cta a {
-    color: var(--c-accent);
-    font-weight: 600;
-    text-decoration: none;
-    font-size: 1rem;
-  }
-  .consulting-cta a:hover { text-decoration: underline; }
+  .find-note { margin-top: 2rem; padding: .7rem 0; border-top: 1px solid var(--c-rule); color: var(--c-muted); font-size: .76rem; }
+  .find-note strong { color: var(--c-text-soft); }
 
   @media (max-width: 600px) {
-    .post-row { grid-template-columns: 2rem 1fr; }
+    .shelf > header { grid-template-columns: 1fr; gap: .15rem; }
+    .volumes a { grid-template-columns: 1.8rem minmax(0, 1fr); gap: .65rem; }
+    .volume-count { display: none; }
   }
 </style>

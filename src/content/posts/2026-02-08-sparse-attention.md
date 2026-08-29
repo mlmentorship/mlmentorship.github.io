@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Sparse attention is exact attention restricted to a structured sparse mask, so cost scales as $O(n \cdot k)$ for some constant $k \ll n$ instead of $O(n^2)$, while the mask is designed so information can still propagate to all positions in a small number of layers.
-
-## Why it matters
 
 Dense self-attention costs $O(n^2 \cdot d)$ in compute and $O(n^2)$ in memory. For long inputs (long documents, long-form audio, code repos) this becomes the binding constraint. Empirically most attention weights are near zero. So the dense matrix is wasteful.
 

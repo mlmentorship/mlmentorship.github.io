@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Value-based** RL learns a value function (typically $Q(s, a)$) and acts greedily with respect to it: $\pi(s) = \arg\max_a Q(s, a)$. **Policy-based** RL directly parametrizes a stochastic policy $\pi_\theta(a \mid s)$ and optimizes $\theta$ via the policy gradient. **Actor-critic** combines both.
-
-## Why it matters
 
 Choosing the right paradigm is a central decision in RL system design. Mismatch leads to poor sample efficiency, instability, or simply not working. For instance, value-based methods are awkward in continuous action spaces, and pure policy-based methods are sample-inefficient in tabular settings.
 

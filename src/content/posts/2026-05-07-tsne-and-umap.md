@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **t-SNE** ([van der Maaten & Hinton, 2008](https://www.jmlr.org/papers/v9/vandermaaten08a.html)) and **UMAP** ([McInnes et al., 2018](https://arxiv.org/abs/1802.03426)) embed high-dimensional points into 2 or 3 dimensions while preserving local neighborhood structure. The default tools for "what does this embedding space look like" plots.
-
-## Why it matters
 
 Linear projections (PCA) preserve global variance but smear local structure. For high-dimensional embeddings (transformer activations, sentence embeddings, single-cell genomics), the interesting structure is local: which points cluster together, which categories are separable. t-SNE and UMAP optimize for that locally and produce maps that show the cluster structure clearly.
 

@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Monte Carlo** estimates $\mathbb{E}_p[f(X)] = \int f(x) p(x)\, dx$ by drawing $X_1, \dots, X_n \sim p$ and computing the sample average $\hat\mu = \tfrac{1}{n} \sum_i f(X_i)$. **Importance sampling** corrects for sampling from a different distribution $q$ by reweighting: $\hat\mu = \tfrac{1}{n} \sum_i f(X_i) \tfrac{p(X_i)}{q(X_i)}$.
-
-## Why it matters
 
 Almost every probabilistic ML algorithm computes intractable expectations: posterior expectations in Bayesian inference, gradients of expectations in REINFORCE, off-policy returns in RL. Monte Carlo and importance sampling are the universal hammers when you can sample from the relevant distribution but can't integrate analytically.
 

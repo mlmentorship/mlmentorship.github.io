@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 For random variables $\theta$ (parameters / hypothesis) and $D$ (data / evidence):
 
@@ -16,8 +16,6 @@ p(\theta \mid D) = \frac{p(D \mid \theta)\, p(\theta)}{p(D)} \propto p(D \mid \t
 $$
 
 The **posterior** $p(\theta \mid D)$ is proportional to the **likelihood** $p(D \mid \theta)$ times the **prior** $p(\theta)$.
-
-## Why it matters
 
 Bayes' rule is the only mathematically consistent way to update probabilistic beliefs given new evidence. It underlies probabilistic ML (Gaussian processes, Bayesian deep learning), classification (naive Bayes), generative models (latent variable inference), and many engineering systems (Kalman filtering, sensor fusion).
 
@@ -42,7 +40,7 @@ $$
 p(\text{disease} \mid \text{pos}) = \frac{0.99 \times 0.001}{0.99 \times 0.001 + 0.01 \times 0.999} \approx 0.09.
 $$
 
-Despite the 99% test accuracy, ~91% of positive results are false. The posterior depends crucially on the prior.
+Despite 99% test accuracy, about 91% of positive results are false. The prior strongly affects the posterior.
 
 ## Conjugate priors
 

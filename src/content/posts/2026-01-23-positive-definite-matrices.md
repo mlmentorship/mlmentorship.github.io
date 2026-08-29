@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A symmetric matrix $A \in \mathbb{R}^{n \times n}$ is **positive semi-definite (PSD)** if $x^\top A x \ge 0$ for all $x \in \mathbb{R}^n$, and **positive definite (PD)** if $x^\top A x > 0$ for all $x \ne 0$. Equivalently: all eigenvalues are non-negative (PSD) or strictly positive (PD).
-
-## Why it matters
 
 PSD matrices are the matrices that can serve as **covariance matrices**, **kernel matrices** (Gram matrices), **inner-product weight matrices**, and **Hessians at local minima**. The PSD cone is the natural domain for many optimization problems (semidefinite programming, Gaussian processes, kernel methods).
 

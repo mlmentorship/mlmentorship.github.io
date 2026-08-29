@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A repeatable, ordered procedure for training neural networks: **become one with the data → build a dumb baseline end-to-end → overfit a tiny set → regularize → tune → squeeze**. The discipline is in the *order* and in changing **one thing at a time**.
-
-## Why it matters
 
 Most failed training runs aren't caused by a bad architecture; they're caused by silent bugs, mis-scaled data, or skipping verification steps. This recipe (popularized by Karpathy's "A Recipe for Training Neural Networks") is what an interviewer is probing when they ask *"your model isn't learning, what do you do?"* It complements the interview-framed answer in [How would you debug a model that's not learning?](/questions/debug-model-not-learning/); this page is the procedural checklist.
 

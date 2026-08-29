@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **residual connection** (skip connection) makes a block compute $y = x + f(x)$ instead of $y = f(x)$, so that the block's output adds to its input rather than replacing it. Introduced by ResNet [(He et al., 2015)](https://arxiv.org/abs/1512.03385) and ubiquitous in every modern deep architecture.
-
-## Why it matters
 
 Pre-ResNet (2014), networks past ~20 layers showed *worse* training accuracy than shallower networks. Not from overfitting but from optimization pathology. Residual connections solved this and made 152-layer ResNets routine, then 1000-layer networks (with normalization) feasible. Every modern architecture. ResNets, transformers, U-Nets, diffusion models, MLP-Mixers. Uses residuals.
 

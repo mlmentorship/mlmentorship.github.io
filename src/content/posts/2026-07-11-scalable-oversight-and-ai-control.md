@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Scalable oversight** develops ways for humans and trusted systems to evaluate increasingly capable model work. **AI control** designs protocols that limit harm even if a powerful model may knowingly pursue an unwanted objective.
-
-## Why the distinction matters
 
 Both address a capability gap between the model and its overseer, but they make different assumptions.
 

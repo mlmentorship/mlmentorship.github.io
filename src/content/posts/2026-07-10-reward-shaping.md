@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Sparse or delayed rewards (robotics, games, long-horizon agents, recommender objectives) make credit assignment hard: the agent rarely sees a signal, so it rarely learns. Reward shaping adds auxiliary feedback to densify that signal. The danger is that changing the reward can change the optimal policy, and a badly shaped reward produces confident, well-optimized behavior that does the wrong thing: circling near a waypoint, farming easy interactions, or maximizing proxy engagement while destroying long-term value.
 

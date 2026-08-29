@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **convolutional neural network** stacks **convolutional layers** (sliding-window linear operators with shared weights), **non-linearities**, and **pooling / downsampling** to map images to feature maps that grow in semantic abstraction and shrink in spatial resolution with depth.
-
-## Why it matters
 
 CNNs powered the deep-learning revolution in computer vision (AlexNet 2012, VGG 2014, ResNet 2015). Their structural priors. Translation equivariance via weight sharing, local receptive fields, hierarchical composition. Match the structure of natural images and gave them a huge sample-efficiency advantage over fully-connected networks. Even in the transformer era, modern CNNs (ConvNeXt) remain competitive on standard benchmarks.
 

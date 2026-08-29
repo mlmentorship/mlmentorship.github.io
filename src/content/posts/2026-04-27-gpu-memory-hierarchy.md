@@ -1,19 +1,17 @@
 ---
-title: "GPU memory hierarchy: HBM, SRAM, and why I/O matters more than FLOPs"
-description: "Modern GPUs are memory-bound for almost everything except big matmuls. Understanding HBM vs. SRAM bandwidth is the prerequisite for FlashAttention, KV-cache reasoning, and inference cost models."
+title: "GPU memory hierarchy: HBM, SRAM, and roofline reasoning"
+description: "Decide whether an accelerator operation is limited by compute or by data movement across HBM, caches, and on-chip memory."
 date: "2026-04-27"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
-A GPU has a small, fast on-chip SRAM and a large, slow off-chip HBM. Most LLM operations are bandwidth-bound between HBM and SRAM, not compute-bound. So the binding constraint is bytes moved, not FLOPs computed.
+A GPU has small, fast on-chip memory and larger, slower HBM. Large matrix multiplications are often compute-bound. Decode, small matrix multiplications, and many elementwise operations are often memory-bound. The operation's arithmetic intensity determines which limit applies.
 
-## Why it matters
-
-Naive cost models count multiply-adds. They give the wrong answer for almost every modern LLM kernel. The correct first-order model is:
+Counting only multiply-adds can give the wrong answer. A better first-order model is:
 
 $$
 \text{time} \approx \max\!\left(\frac{\text{FLOPs}}{\text{tensor TFLOPs/s}}, \frac{\text{bytes moved}}{\text{HBM TB/s}}\right)
@@ -30,13 +28,13 @@ For most LLM ops at typical batch sizes, the second term dominates. This single 
 
 | Tier | Capacity | Bandwidth | Latency | What lives here |
 |------|----------|-----------|---------|----------------|
-| **Registers** | KB per thread |. | <1 ns | per-thread scalars |
-| **SRAM (shared memory / L1)** | ~100–200 KB per SM | ~10 TB/s aggregate | ~10 ns | tiles for matmul |
-| **L2 cache** | ~50 MB (H100) | ~5 TB/s | ~100 ns | shared across SMs |
-| **HBM** | 40–80 GB | 1.5–3 TB/s | ~500 ns | weights, activations, KV cache |
-| **PCIe / NVLink to host or peer** |. | 50–900 GB/s | µs | inter-GPU |
+| **Register file** | hundreds of KB per SM | highest on-chip | very low | per-thread values |
+| **SRAM (shared memory / L1)** | tens to hundreds of KB per SM | very high | low | tiles for matrix operations |
+| **L2 cache** | tens to hundreds of MB per device | below local SRAM | medium | shared across SMs |
+| **HBM** | tens to hundreds of GB | below on-chip memory | higher | weights, activations, KV cache |
+| **PCIe or accelerator link** | external | below local HBM in many systems | µs scale | host or peer transfer |
 
-H100 has 80 GB HBM3 at ~3 TB/s and ~989 BF16 TFLOPs. A100 is 40 or 80 GB HBM2e at ~2 TB/s and ~312 BF16 TFLOPs.
+These values are illustrative. Capacity, bandwidth, precision, sparsity mode, and power settings vary by accelerator and SKU. Use measured values from the target machine for a deployment plan.
 
 ## Arithmetic intensity
 
@@ -48,20 +46,26 @@ $$
 
 A kernel is **compute-bound** when its intensity exceeds the GPU's peak FLOPs/byte ratio (the "ridge" in a roofline plot). Otherwise it's **memory-bound**.
 
-H100 ridge: ~989 / 3 ≈ ~330 FLOPs/byte (BF16). For comparison:
+An accelerator with 989 BF16 TFLOPs/s and 3 TB/s of HBM bandwidth has a ridge near 330 FLOPs/byte. For comparison:
 
-- Large square matmul (n×n × n×n): ~n/2 FLOPs/byte → compute-bound for n ≥ ~660.
+- Large square matmul ($n\times n$ by $n\times n$): up to about $n/2$ FLOPs/byte when counting two BF16 inputs and ignoring output traffic. Counting output reads and writes lowers the intensity.
 - Attention kernel (without FlashAttention): ~O(d) FLOPs/byte → memory-bound at common d=64–128.
-- Single-token decode forward pass: ~2 FLOPs per weight byte (one multiply-add per weight) → severely memory-bound.
+- Single-token decode with BF16 weights: about 1 FLOP per weight byte at batch 1, before other traffic. One multiply-add uses a two-byte weight. This is severely memory-bound.
 
 ## Implications for LLMs
 
-- **Training**: dominated by big matmuls and FlashAttention; mostly compute-bound at typical sequence lengths.
-- **Decode**: weight bandwidth-bound. Batch size 1 wastes the GPU; batch size 32 amortizes weight reads across 32 outputs.
+- **Training**: large matrix multiplications can be compute-bound, while small batches, elementwise work, and communication can expose other limits.
+- **Decode**: often weight-bandwidth-bound at small batch sizes. Batching amortizes weight reads until matrix compute or KV-cache traffic becomes the next limit.
 - **KV cache**: bandwidth-dominated read at every decode step. Cache size growth is a serving-throughput issue.
 
 ## Common pitfalls
 
 - **Quoting FLOPs as a single-number cost.** Throughput on memory-bound kernels is dictated by bytes, not FLOPs.
-- **Assuming faster GPUs scale equally.** H100 vs A100: ~3× FLOPs but ~1.5× HBM bandwidth. Memory-bound workloads see only the latter.
-- **Ignoring SRAM size when designing kernels.** FlashAttention's tile sizes are determined by SRAM capacity per SM (~100 KB), not HBM size.
+- **Assuming peak compute predicts every speedup.** A new accelerator can increase matrix throughput faster than memory bandwidth. Memory-bound work then sees a smaller gain.
+- **Ignoring on-chip memory when designing kernels.** FlashAttention tile sizes are constrained by shared memory, registers, and the compiled kernel, not only HBM size.
+
+## Related
+
+- [Accelerator network topology](/concepts/accelerator-network-topology/). Extend the hierarchy across devices and nodes.
+- [Transformer compute and memory accounting](/concepts/transformer-compute-memory-accounting/). Convert a model configuration into bytes and FLOPs.
+- [Profiling distributed ML workloads](/concepts/profiling-distributed-ml-workloads/). Compare a trace with roofline limits.

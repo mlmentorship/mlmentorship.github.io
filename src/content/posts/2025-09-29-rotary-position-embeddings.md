@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 RoPE encodes token position by rotating each pair of dimensions of the query and key vectors by an angle proportional to position, so that the inner product $Q_m^\top K_n$ depends only on the relative offset $m - n$.
-
-## Why it matters
 
 Standard absolute position embeddings (sinusoidal in original transformer; learned in BERT/GPT-2) are added to token embeddings at the input. They couple position with content additively and don't extend cleanly past the training context.
 

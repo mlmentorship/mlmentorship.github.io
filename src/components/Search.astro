@@ -5,7 +5,7 @@
 // doesn't fail.
 ---
 
-<button id="search-trigger" class="search-trigger" aria-label="Search" aria-keyshortcuts="Meta+K Control+K" type="button" data-pagefind-ignore="all">
+<button id="search-trigger" class="search-trigger" aria-label="Search ⌘K" aria-keyshortcuts="Meta+K Control+K" type="button" data-pagefind-ignore="all">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <circle cx="11" cy="11" r="7"/>
     <path d="m21 21-4.3-4.3"/>
@@ -16,6 +16,11 @@
 
 <dialog id="search-dialog" class="search-dialog" aria-label="Search the site" data-pagefind-ignore="all">
   <div class="search-inner">
+    <aside id="search-topic-hint" class="search-topic-hint" hidden>
+      <strong data-topic-hint-title></strong>
+      <p data-topic-hint-copy></p>
+      <a data-topic-hint-link></a>
+    </aside>
     <div id="pagefind-host"></div>
     <p class="search-hint" id="search-hint" hidden>Search index not available in dev. Run <code>npm run build &amp;&amp; npm run preview</code> to use search locally.</p>
   </div>
@@ -25,27 +30,21 @@
   .search-trigger {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--c-bg-tint);
-    border: 1px solid var(--c-rule);
+    gap: .35rem;
+    background: transparent;
+    border: 0;
     color: var(--c-text-soft);
-    padding: 0.4rem 0.7rem;
+    padding: .35rem .45rem;
     border-radius: var(--radius);
     font-family: var(--font-ui);
-    font-size: 0.82rem;
+    font-size: .76rem;
     cursor: pointer;
     transition: border-color var(--transition), color var(--transition);
   }
-  .search-trigger:hover { border-color: var(--c-accent); color: var(--c-text); }
+  .search-trigger:hover { background: var(--c-bg-tint); color: var(--c-text); }
   .search-trigger-label { line-height: 1; }
   .search-trigger-kbd {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    padding: 0.05rem 0.35rem;
-    background: var(--c-kbd-bg);
-    border: 1px solid var(--c-rule);
-    border-radius: 4px;
-    color: var(--c-muted);
+    display: none;
   }
 
   .search-dialog {
@@ -78,11 +77,17 @@
     padding: 0.05rem 0.3rem;
     border-radius: 3px;
   }
+  .search-topic-hint { margin: 0 0 .8rem; padding: .75rem .85rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); }
+  .search-topic-hint strong, .search-topic-hint p, .search-topic-hint a { display: block; }
+  .search-topic-hint strong { font-size: .85rem; }
+  .search-topic-hint p { margin: .15rem 0 .35rem; color: var(--c-text-soft); font-size: .8rem; line-height: 1.4; }
+  .search-topic-hint a { width: fit-content; font-size: .78rem; font-weight: 650; text-decoration: none; }
+  .search-topic-hint a:hover { text-decoration: underline; }
 
   @media (max-width: 480px) {
     .search-trigger-label,
     .search-trigger-kbd { display: none; }
-    .search-trigger { width: 38px; height: 38px; justify-content: center; padding: 0; }
+    .search-trigger { width: 32px; height: 32px; justify-content: center; padding: 0; }
   }
 
   .pagefind-ui {
@@ -114,6 +119,40 @@
     const trigger = document.getElementById('search-trigger');
     const dialog = document.getElementById('search-dialog');
     const hint = document.getElementById('search-hint');
+    const topicHint = document.getElementById('search-topic-hint');
+    const topicHints = [
+      {
+        terms: ['cuped', 'variance reduction', 'minimum detectable effect'],
+        title: 'This advanced experiment topic is covered inside broader entries.',
+        copy: 'Start with hypothesis testing and A/B testing. Use the causal-inference entry when assignment or identification is the main issue.',
+        label: 'Open hypothesis testing',
+        href: '/concepts/hypothesis-testing-confidence-intervals/',
+      },
+      {
+        terms: ['sql', 'leetcode', 'data structures', 'general algorithms', 'object oriented design', 'oop interview'],
+        title: 'This interview dependency is intentionally external.',
+        copy: 'mlmentorship tracks these rounds in readiness, but does not duplicate dedicated coding or SQL curricula.',
+        label: 'Open the readiness check',
+        href: '/prep/readiness/',
+      },
+      {
+        terms: ['cuda', 'triton kernel', 'pallas'],
+        title: 'Low-level kernel programming is specialist material.',
+        copy: 'Start with hardware, profiling, and roofline reasoning here, then use a current framework-specific kernel course.',
+        label: 'Open hardware and performance',
+        href: '/library/systems/hardware-performance/',
+      },
+    ];
+    const aliases = new Map([
+      ['cross val', 'cross validation'],
+      ['zero 3', 'FSDP ZeRO'],
+      ['zero stage 3', 'FSDP ZeRO'],
+      ['mfu', 'model FLOPs utilization MFU'],
+      ['cot monitoring', 'chain of thought monitorability'],
+      ['lora', 'LoRA adapter'],
+      ['rlvr', 'verifiable rewards'],
+      ['gqa', 'grouped query attention'],
+    ]);
     let pagefindLoaded = false;
     let pagefindFailed = false;
 
@@ -140,11 +179,28 @@
         // eslint-disable-next-line no-new
         new window.PagefindUI({
           element: '#pagefind-host',
-          showSubResults: true,
+          pageSize: 8,
+          showSubResults: false,
+          showEmptyFilters: false,
           resetStyles: false,
           showImages: false,
-          excerptLength: 30,
+          excerptLength: 24,
+          processTerm: (term) => aliases.get(term.trim().toLowerCase()) || term,
         });
+        const input = document.querySelector('.pagefind-ui__search-input');
+        if (input && topicHint) {
+          input.addEventListener('input', () => {
+            const term = input.value.trim().toLowerCase();
+            const match = topicHints.find((item) => item.terms.some((candidate) => term.includes(candidate)));
+            topicHint.hidden = !match;
+            if (!match) return;
+            topicHint.querySelector('[data-topic-hint-title]').textContent = match.title;
+            topicHint.querySelector('[data-topic-hint-copy]').textContent = match.copy;
+            const link = topicHint.querySelector('[data-topic-hint-link]');
+            link.textContent = match.label;
+            link.href = match.href;
+          });
+        }
         pagefindLoaded = true;
       } catch (err) {
         pagefindFailed = true;

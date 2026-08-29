@@ -1,6 +1,6 @@
 ---
 title: "FlashAttention"
-description: "I/O-aware exact attention. Replaces the O(n²) HBM traffic with a tiled streaming softmax in SRAM. The single most important kernel-level optimization in modern transformers."
+description: "I/O-aware exact attention replaces O(n²) HBM traffic with a tiled streaming softmax in SRAM. It is a core transformer kernel optimization."
 date: "2026-04-10"
 draft: false
 tags: ["concepts"]
@@ -8,7 +8,7 @@ category: "concepts"
 ---
 
 
-## Why it matters
+## Summary
 
 Attention is **memory-bound**: not compute-bound, on modern GPUs. The bottleneck for long sequences is moving the n×n attention matrix between HBM and SRAM, not the matmuls. The n×n matrix never goes to HBM; only n-sized output and statistics are stored.
 
@@ -72,7 +72,7 @@ This is the same idea as gradient checkpointing applied at kernel level.
 
 If asked to explain FlashAttention:
 
-1. Frame the problem as memory-bound, not compute-bound. (This is the key insight; everything else follows.)
+1. Frame the problem as memory-bound, not compute-bound. The cost model then determines the design.
 2. Mention HBM vs SRAM and that the n&times;n attention matrix is the bottleneck.
 3. Describe tiling + streaming softmax + recomputation in backward.
 4. State the result: exact, 2-4&times; faster, O(n) memory.
@@ -84,7 +84,7 @@ Explaining why streaming log-sum-exp works (numerical stability via running max)
 
 - **"FlashAttention is approximate."** No. It is **bit-exact** with standard attention (modulo floating-point reordering). The win is purely from I/O reduction.
 - **"It's a sub-quadratic attention algorithm."** No. The compute is still O(n²d). It's the *memory* that drops from O(n²) to O(n), and the *wall clock* improves because the operation was memory-bound. Sub-quadratic attention (BigBird, Linformer, LongNet) is a separate axis.
-- **"It only helps long sequences."** It helps any non-trivial sequence (n &geq; 256 or so) but the gain grows with n. At n = 64 it's roughly the same as standard attention; at n = 8K-128K it's transformative.
+- **"It only helps long sequences."** It helps any non-trivial sequence (n &geq; 256 or so), and the gain grows with n. At n = 64 it is similar to standard attention; at n = 8K-128K it can change what fits in memory.
 - **"It saves FLOPs."** No, it does *more* FLOPs in backward (the recomputation). The wins are I/O and memory.
 
 ## Why interviewers care
@@ -105,4 +105,4 @@ Foundational for large-model training/inference work. Explains KV-cache, paged a
 
 ---
 
-*Related reference: [Speculative decoding](/concepts/speculative-decoding/), [LayerNorm vs BatchNorm](/concepts/batchnorm-vs-layernorm/). Related interview question: ["Walk me through how you'd serve an LLM with low latency"](/questions/) (coming soon).*
+*Related: [speculative decoding](/concepts/speculative-decoding/), [LayerNorm versus BatchNorm](/concepts/batchnorm-vs-layernorm/), and [production LLM inference design](/questions/design-production-llm-inference-service/).*

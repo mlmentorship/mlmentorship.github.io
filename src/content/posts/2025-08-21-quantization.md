@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 Quantization reduces model weights (and sometimes activations) to lower precision than the trained representation, trading accuracy for memory and speed at inference.
-
-## Why it matters
 
 LLM serving is dominated by weight-loading bandwidth. Reducing weight precision from 16 bits to 4 bits cuts that bandwidth by 4&times;, often the single largest serving cost reduction available. For GPU memory, it lets you fit much larger models on a given device.
 
@@ -100,7 +98,7 @@ For GPU memory:
 ## Why interviewers ask
 
 Quantization questions test:
-1. Whether you know the technique landscape (not just one).
+1. Whether you know several quantization methods and their tradeoffs.
 2. Whether you understand *why* it works (memory-bandwidth bottleneck).
 3. Whether you've measured quality loss in production (vs trusting published numbers).
 4. Whether you can prioritize: which quantization technique for which problem.

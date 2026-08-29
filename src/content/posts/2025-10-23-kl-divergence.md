@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 For probability distributions $p$ and $q$ over the same space:
 
@@ -16,8 +16,6 @@ $$
 $$
 
 It's the expected log-ratio of $p$ to $q$ under $p$. Measuring how much information is lost using $q$ to encode samples from $p$.
-
-## Why it matters
 
 KL divergence is the fundamental object of statistical learning. It connects:
 
@@ -71,3 +69,5 @@ Cross-entropy = entropy + KL. Since entropy of the data doesn't depend on $\thet
 - **Confusing JS divergence (symmetric) with KL.** GANs originally used JS; modern variants (Wasserstein) avoid both.
 - **Forgetting the asymmetry direction.** Forward and reverse KL produce qualitatively different optimizers.
 - **Using KL on samples without density estimates.** KL is between distributions, not between sample sets; sample-based estimators are noisy and biased.
+
+*Related: [entropy, mutual information, and information gain](/concepts/entropy-mutual-information/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), and [variational autoencoders](/concepts/variational-autoencoders/).*

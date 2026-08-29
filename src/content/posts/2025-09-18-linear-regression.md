@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Linear regression models $y = w^\top x + b + \varepsilon$ with $\varepsilon \sim \mathcal{N}(0, \sigma^2)$. The MLE / least-squares estimator is
 
 $$
 \hat w = (X^\top X)^{-1} X^\top y.
 $$
-
-## Why it matters
 
 Linear regression is the most-analyzed model in statistics and the building block for almost everything: GLMs, kernel ridge regression, MLP last layers, factor models. Knowing its assumptions and failure modes is essential. If you don't know when OLS is wrong, you don't know when fancier models help.
 

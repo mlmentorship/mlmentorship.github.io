@@ -10,7 +10,7 @@ category: "guides"
 
 **Your model is only as good as your eval. Your eval is a product. Treat it like one.**
 
-The eval pipeline is the single highest-leverage piece of engineering in any serious LLM application, and the piece most teams underinvest in (because it doesn't ship and isn't visible). The patterns below separate teams that ship reliably from teams that thrash.
+A reliable eval pipeline determines whether an LLM application can improve without hidden regressions. Teams often underinvest in it because users do not see it directly.
 
 ## Why this is harder than classical ML eval
 
@@ -55,7 +55,7 @@ Hand-curated. Stratified across:
 - **Known failure modes** (so regressions are caught)
 - **Edge cases** (so launches don't break)
 
-Crucially, **the team builds this together**. The act of labeling 200 examples *is itself the most important eval activity*: it forces shared understanding of what good looks like. Outsourcing this step is the single most expensive shortcut you can take.
+**The team should build this set together.** Labeling 200 examples forces a shared definition of good output. Outsourcing the first labeling pass removes that calibration step.
 
 Version in git with maintainers and changelog. When adding examples, document *why*. Treat as production code.
 

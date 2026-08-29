@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A multimodal foundation model learns representations or generation across two or more modalities, such as text, image, audio, or video, using modality-specific encoders plus a shared alignment, fusion, or autoregressive model.
-
-## Why it matters
 
 Modern assistants observe screens, images, speech, documents, and video rather than isolated text. The design problem is not simply adding more tokens. Modalities have different sampling rates, spatial or temporal structure, noise, and evaluation.
 
@@ -98,4 +96,4 @@ Text-only benchmarks cannot establish multimodal grounding.
 
 Start with task and interaction, then modality encoders, token budget, fusion, objectives, data alignment, grounding evaluation, failure slices, and serving cost.
 
-*Related: [vision transformers](/concepts/vision-transformers/), [automatic speech recognition](/concepts/automatic-speech-recognition/), and [embedding spaces](/concepts/embedding-spaces-and-similarity/).*
+*Related: [design a real-time multimodal assistant](/questions/design-real-time-multimodal-assistant/), [vision transformers](/concepts/vision-transformers/), [automatic speech recognition](/concepts/automatic-speech-recognition/), and [embedding spaces](/concepts/embedding-spaces-and-similarity/).*

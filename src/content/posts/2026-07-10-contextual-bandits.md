@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Bandits show up everywhere a system chooses an action and only learns about the action it took: recommendation, notifications, ranking, treatment selection, adaptive experiments. They formalize the cost that logged production data hides: you know what happened under the policy you ran, not what would have happened under the alternatives you never tried.
 

@@ -5,13 +5,12 @@ date: "2025-12-01"
 draft: false
 tags: ["concepts"]
 category: "concepts"
+aliases: ["cross val", "k-fold", "k fold validation", "grouped cross validation", "time series split"]
 ---
 
-## One-line definition
+## Summary
 
 Cross-validation estimates a model's generalization error by repeatedly partitioning the training data into a fitting set and a validation set, training on the first, scoring on the second, and averaging the scores. The right partitioning scheme depends on the data's structure (i.i.d. vs. grouped vs. temporal).
-
-## Why it matters
 
 Pick the wrong CV scheme and your validation score is optimistically biased. The model looks great in CV and falls apart in production. The classic failures are (a) k-fold on grouped data leaking the same group into both folds, and (b) random splits on time-series leaking the future into the past.
 
@@ -68,5 +67,6 @@ Use when: hyperparameter tuning matters and you need an unbiased estimate of gen
 
 ## Related
 
+- [Data leakage and point-in-time correctness](/concepts/data-leakage-point-in-time-correctness/). Prevent future, target, group, and preprocessing leakage.
 - [A/B testing for ML](/concepts/ab-testing-for-ml/). Online evaluation, complementary to offline CV.
 - [Calibration](/concepts/calibration/). Also evaluated on held-out data.

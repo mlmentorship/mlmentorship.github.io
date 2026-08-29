@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related: [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/), [Regularization](/concepts/regularization/).*
+*Related: [Adam, AdamW, and modern optimizer choices](/concepts/adam-and-adamw/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/), [Regularization](/concepts/regularization/).*

@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An **encoder-decoder** model has two networks: an **encoder** that reads the input sequence and produces hidden representations, and a **decoder** that generates the output sequence one token at a time, attending to both the encoder's representations and the partial output so far.
-
-## Why it matters
 
 Encoder-decoder is the canonical architecture for **sequence-to-sequence** tasks where the input and output may differ in length, structure, or modality:
 

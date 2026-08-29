@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **LSTM** and **GRU** are recurrent units with learned gates that decide, per timestep, what to keep and what to forget. Each gate is a sigmoid output, applied via Hadamard (elementwise) product to the hidden state. The state is no longer multiplied by a weight matrix at every step, so gradients can flow.
-
-## Why it matters
 
 A vanilla RNN updates its hidden state as $h_t = \tanh(W h_{t-1} + U x_t)$. Backpropagating through $T$ timesteps multiplies the gradient by $W$ a total of $T$ times. Eigenvalues of $W$ less than 1 vanish; eigenvalues greater than 1 explode. Both kill learning ([Pascanu et al., 2013](https://arxiv.org/abs/1211.5063)).
 

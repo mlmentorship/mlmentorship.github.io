@@ -1,17 +1,15 @@
 ---
 title: "Epistemic vs aleatoric uncertainty"
-description: "Epistemic uncertainty shrinks with more data; aleatoric does not. Conflating them produces miscalibrated systems and wasted data collection. The distinction every senior ML engineer should be able to articulate."
+description: "Epistemic uncertainty shrinks with more data; aleatoric uncertainty does not. Confusing them causes miscalibration and wasted data collection."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Aleatoric uncertainty** is irreducible noise in the data-generating process. **Epistemic uncertainty** is uncertainty about the model itself, due to limited data. More training data shrinks epistemic uncertainty but leaves aleatoric uncertainty unchanged.
-
-## Why it matters
 
 Decision-making under uncertainty depends on which kind you have:
 

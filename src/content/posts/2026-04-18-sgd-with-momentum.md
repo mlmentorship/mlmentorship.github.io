@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 SGD with momentum maintains a velocity $v_t = \beta v_{t-1} + g_t$ (an exponential moving average of past gradients) and updates parameters with $\theta_{t+1} = \theta_t - \eta v_t$ instead of with the raw gradient. Typical $\beta = 0.9$.
-
-## Why it matters
 
 Vanilla SGD bounces around in narrow loss valleys: gradients perpendicular to the valley axis cancel slowly, gradients along the axis are small. Momentum accumulates the consistent along-axis component while perpendicular components average to zero.
 

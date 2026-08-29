@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A floating-point number is encoded as $(-1)^s \cdot 1.m \cdot 2^{e - \text{bias}}$. One sign bit, several exponent bits, several mantissa bits. The choice of how many bits go where determines representable range, precision, and storage / bandwidth cost.
-
-## Why it matters
 
 Modern training and inference use a mix of formats: FP32 master weights, BF16 activations, FP8 matmuls, INT8 KV cache. Each format trades range vs. precision vs. throughput. Knowing the bit layouts saves hours of debugging numerical issues.
 

@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Alternating Least Squares** (ALS) factorizes a sparse rating matrix $R \approx U V^\top$ where $U \in \mathbb{R}^{m \times k}$ holds user factors and $V \in \mathbb{R}^{n \times k}$ holds item factors. Optimization alternates: fix $V$, solve for $U$ in closed form (a linear regression per user); fix $U$, solve for $V$. Repeat.
-
-## Why it matters
 
 The classic Netflix Prize era was largely won by matrix factorization, and ALS is the simplest training algorithm for it. SGD-based factorization is competitive on dense data, but ALS dominates when the data is implicit-feedback or stored row- and column-blocked across a cluster (Spark MLlib's recommender is ALS).
 

@@ -1,6 +1,6 @@
 ---
-title: "Adam, AdamW, and the modern optimizer landscape"
-description: "Why Adam works, why AdamW is the version you actually want, and what's changed in the optimizer landscape since 2018."
+title: "Adam, AdamW, and modern optimizer choices"
+description: "How Adam works, why AdamW is usually preferred, and which newer optimizers address memory, batch size, or curvature."
 date: "2025-09-15"
 draft: false
 tags: ["concepts"]
@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 **Adam** is an adaptive optimizer that combines momentum (running mean of gradients) with per-parameter learning rate scaling (running mean of squared gradients), giving robust default behavior across many problems. **AdamW** is a small but important fix that decouples weight decay from the gradient update, and is what most modern training pipelines actually use.
-
-## Why it matters
 
 Adam is the default optimizer since 2015 across transformers, LLMs, and modern deep learning. Understanding why it works and where it breaks is interview-canonical.
 
@@ -73,7 +71,7 @@ Adam is robust but not bulletproof:
 - **Memory overhead is 3x.** Stores m and v alongside parameters. For 70B in BF16, optimizer state is 280 GB. ZeRO/FSDP shard across ranks.
 - **Adam's adaptive scaling can dramatically inflate updates on noisy gradients**. For RL or other settings with high gradient variance, Adam can be unstable.
 
-## The modern optimizer landscape
+## Modern optimizer choices
 
 Since Adam (2014), several alternatives have emerged. Most have not displaced AdamW for general use, but each occupies a niche:
 
@@ -100,7 +98,7 @@ The Adam question tests whether you:
 1. Understand adaptive vs non-adaptive optimization.
 2. Know the warmup-and-bias-correction subtleties.
 3. Have used the version (AdamW) that actually works for transformers.
-4. Have kept up with the optimizer landscape post-2020.
+4. Know the main optimizer choices introduced since 2020.
 
 Easy to ace; easy to fumble.
 

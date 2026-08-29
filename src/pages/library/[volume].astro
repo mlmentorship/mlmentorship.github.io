@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LIBRARY_VOLUMES, type LibraryVolume } from '../../data/library';
+import { entriesForChapter, getLibraryEntries } from '../../utils/library';
+
+export function getStaticPaths() {
+  return LIBRARY_VOLUMES.map((volume) => ({ params: { volume: volume.id }, props: { volume } }));
+}
+
+interface Props { volume: LibraryVolume; }
+const { volume } = Astro.props as Props;
+const entries = await getLibraryEntries();
+const chapters = volume.chapters.map((chapter) => ({ chapter, entries: entriesForChapter(entries, chapter) }));
+const volumeIndex = LIBRARY_VOLUMES.findIndex((item) => item.id === volume.id);
+const previousVolume = volumeIndex > 0 ? LIBRARY_VOLUMES[volumeIndex - 1] : undefined;
+const nextVolume = volumeIndex < LIBRARY_VOLUMES.length - 1 ? LIBRARY_VOLUMES[volumeIndex + 1] : undefined;
+const entryCount = chapters.reduce((total, item) => total + item.entries.length, 0);
+---
+
+<BaseLayout title={volume.title} description={volume.description}>
+  <div class="volume-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Contents</a><span>/</span><span aria-current="page">Book {volume.number}</span></nav>
+
+    <header class="volume-head">
+      <p>Book {volume.number}</p>
+      <h1>{volume.title}</h1>
+      <div class="volume-intro"><p>{volume.description}</p><span>{volume.chapters.length} chapters · {entryCount} entries</span></div>
+    </header>
+
+    <div class="chapters-head"><h2>Chapters</h2><span>{volume.chapters.length}</span></div>
+    <div class="chapters">
+      {chapters.map(({ chapter, entries: chapterEntries }, index) => (
+        <section id={chapter.id} class="chapter">
+          <header>
+            <span>{volume.number}.{index + 1}</span>
+            <div><h2><a href={`/library/${volume.id}/${chapter.id}/`}>{chapter.title}</a></h2><p>{chapter.description}</p></div>
+          </header>
+          <dl class="chapter-meta">
+            <div><dt>Scope</dt><dd>{chapter.priority}</dd></div>
+            <div><dt>Difficulty</dt><dd>{chapter.difficulty}</dd></div>
+            <div><dt>Useful for</dt><dd>{chapter.roles.join(', ')}</dd></div>
+          </dl>
+          <p class="chapter-link"><a href={`/library/${volume.id}/${chapter.id}/`}>Open {chapterEntries.length}-entry chapter <span aria-hidden="true">→</span></a><small data-chapter-progress data-entry-ids={chapterEntries.map((entry) => `entry:${entry.slug}`).join(',')}></small></p>
+        </section>
+      ))}
+    </div>
+
+    <nav class="volume-nav" aria-label="Other books">
+      {previousVolume ? <a href={`/library/${previousVolume.id}/`}><span>← Previous book</span><strong>{previousVolume.title}</strong></a> : <span></span>}
+      {nextVolume ? <a class="next" href={`/library/${nextVolume.id}/`}><span>Next book →</span><strong>{nextVolume.title}</strong></a> : <span></span>}
+    </nav>
+  </div>
+</BaseLayout>
+
+<script>
+  import { loadActivityProgress } from '../../utils/activityProgress';
+  const completed = loadActivityProgress().completed;
+  document.querySelectorAll<HTMLElement>('[data-chapter-progress]').forEach((element) => {
+    const ids = (element.dataset.entryIds ?? '').split(',').filter(Boolean);
+    const count = ids.filter((id) => completed[id]).length;
+    if (count > 0) element.textContent = `${count}/${ids.length} studied`;
+  });
+</script>
+
+<style>
+  .volume-page { width: min(100%, 46rem); margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.6rem) var(--gutter) 4rem; }
+  .breadcrumb { display: flex; gap: .35rem; margin-bottom: 1.3rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .7rem; }
+  .breadcrumb a { color: var(--c-text-soft); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .volume-head { padding-bottom: 1.2rem; border-bottom: 1px solid var(--c-rule); }
+  .volume-head > p { margin: 0 0 .35rem; color: var(--c-muted); font-size: .7rem; font-weight: 500; }
+  .volume-head h1 { margin: 0 0 .5rem; font-size: clamp(1.75rem, 4vw, 2.35rem); letter-spacing: -.025em; }
+  .volume-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: end; }
+  .volume-intro p { max-width: 36rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .92rem; line-height: 1.5; }
+  .volume-intro span { color: var(--c-muted); font-size: .68rem; white-space: nowrap; }
+
+  .chapters-head { display: flex; align-items: baseline; justify-content: space-between; margin-top: 1.6rem; padding-bottom: .35rem; border-bottom: 1px solid var(--c-rule); }
+  .chapters-head h2 { margin: 0; font-size: .85rem; }
+  .chapters-head span { color: var(--c-muted); font-size: .68rem; }
+  .chapter { margin: 0; padding: 1rem 0; border-bottom: 1px solid var(--c-rule); scroll-margin-top: var(--sticky-offset); }
+  .chapter > header { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .65rem; }
+  .chapter > header > span { padding-top: .18rem; color: var(--c-muted); font-size: .68rem; }
+  .chapter h2 { margin: 0 0 .15rem; font-size: 1rem; }
+  .chapter h2 a { color: var(--c-text); text-decoration: none; }
+  .chapter h2 a:hover { color: var(--c-accent); text-decoration: underline; }
+  .chapter header p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; }
+  .chapter-meta { display: flex; flex-wrap: wrap; gap: .35rem .8rem; margin: .55rem 0 0 2.85rem; }
+  .chapter-meta div { display: flex; gap: .35rem; }
+  .chapter-meta dt { color: var(--c-muted); font-size: .62rem; }
+  .chapter-meta dd { margin: 0; color: var(--c-text-soft); font-size: .66rem; }
+  .chapter-link { margin: .45rem 0 0 2.85rem; font-size: .72rem; font-weight: 550; }
+  .chapter-link a { text-decoration: none; }
+  .chapter-link a:hover { text-decoration: underline; }
+  .chapter-link small { margin-left: .7rem; color: var(--c-muted); font-family: var(--font-mono); font-size: .65rem; font-weight: 400; }
+
+  .volume-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1.5rem; padding-top: .75rem; border-top: 1px solid var(--c-rule); }
+  .volume-nav a { display: flex; flex-direction: column; color: var(--c-text); text-decoration: none; }
+  .volume-nav a.next { text-align: right; }
+  .volume-nav span { color: var(--c-muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+  .volume-nav strong { margin-top: .2rem; font-size: .88rem; }
+  .volume-nav a:hover strong { color: var(--c-accent); text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .volume-intro { grid-template-columns: 1fr; }
+    .chapter > header { grid-template-columns: 1.8rem minmax(0, 1fr); }
+    .chapter-meta, .chapter-link { margin-left: 2.45rem; }
+    .volume-nav { grid-template-columns: 1fr; }
+    .volume-nav a.next { text-align: left; }
+  }
+</style>

@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A learning-rate schedule is a function $\eta(t)$ that varies the optimizer's step size over training. The dominant 2026 default for LLMs is **linear warmup** for a few hundred to a few thousand steps, followed by **cosine decay** down to ~10% of the peak LR.
 

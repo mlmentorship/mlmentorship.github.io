@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Training on one distribution and deploying on a related but shifted one is the normal case, not the exception: a fraud model meets new fraud, a medical model meets a new hospital's scanner, a speech model meets a new accent. Domain adaptation transfers a predictor from a source distribution $P_s(X,Y)$ to a target $P_t(X,Y)$ where the label space is usually the same but the inputs, prevalences, or input-label relationship have moved. The first job is to name which of those moved, because that decides whether the problem is even solvable from the data you have.
 

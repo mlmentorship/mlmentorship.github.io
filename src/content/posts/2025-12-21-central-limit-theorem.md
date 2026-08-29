@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 If $X_1, \dots, X_n$ are i.i.d. with mean $\mu$ and finite variance $\sigma^2$, then as $n \to \infty$:
 
@@ -16,8 +16,6 @@ $$
 $$
 
 The standardized sample mean converges in distribution to a Gaussian, regardless of the original distribution's shape (as long as variance is finite).
-
-## Why it matters
 
 The CLT is why we can:
 

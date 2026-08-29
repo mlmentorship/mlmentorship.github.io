@@ -76,4 +76,4 @@ The signal is whether you can productively push back, not whether you've ever sa
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/).*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/).*

@@ -54,7 +54,7 @@ An L5 answer estimates traffic and unit economics, proposes a baseline, allocate
 
 ## What an L6 answer adds
 
-An L6 answer treats cost as a portfolio decision: which user segments justify expensive ranking, whether spend can be dynamic by request value or uncertainty, whether better candidate generation beats a larger ranker, what keeps cost from drifting upward, where the marginal-value curve flattens past the chosen operating point, and whether to build infrastructure or buy capacity.
+An L6 answer treats cost as a portfolio decision. It identifies segments that justify expensive ranking and varies spend by request value or uncertainty. It compares candidate generation with a larger ranker, controls cost drift, locates the flat part of the value curve, and weighs building infrastructure against buying capacity.
 
 ## Tells that get you a strong-hire vote
 

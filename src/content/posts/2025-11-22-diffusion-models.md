@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **diffusion model** ([Ho et al., 2020](https://arxiv.org/abs/2006.11239); [Sohl-Dickstein et al., 2015](https://arxiv.org/abs/1503.03585)) defines a forward Markov chain that gradually adds Gaussian noise to data $x_0 \to x_1 \to \dots \to x_T \approx \mathcal{N}(0, I)$, and learns a neural network $\epsilon_\theta(x_t, t)$ to reverse it by predicting the noise added at each step. Sampling iterates the learned reverse process from pure noise.
-
-## Why it matters
 
 Diffusion is the **dominant 2026 paradigm** for high-fidelity generation in continuous modalities:
 

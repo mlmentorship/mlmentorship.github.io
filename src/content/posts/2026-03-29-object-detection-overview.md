@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Object detection** outputs, for each input image, a set of (bounding box, class label, confidence) tuples for the objects present. The three architectural families: **two-stage** (Faster R-CNN family. First propose regions, then classify), **one-stage** (YOLO, RetinaNet. Predict box and class in one pass at every grid cell), and **set-prediction** (DETR. Transformer encoder-decoder predicts a fixed-size set of boxes).
-
-## Why it matters
 
 Detection is the **core production CV task**: autonomous driving, retail analytics, surveillance, medical imaging, robotics. The architectural choice determines latency-accuracy tradeoffs and what's possible in your inference budget.
 

@@ -1,6 +1,6 @@
 ---
 title: "How do you choose a loss function?"
-description: "The loss is the objective. Picking the wrong one means optimizing for the wrong thing, no matter how well you train. The senior answer derives the loss from the problem, not from a list."
+description: "Choose a loss from the target, noise model, error cost, and output constraints. A well-trained model still fails when its objective is wrong."
 date: "2026-03-09"
 draft: false
 tags: ["questions"]
@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related: [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Regularization](/concepts/regularization/), [Calibration](/concepts/calibration/).*
+*Related: [multi-task learning and objective interference](/concepts/multi-task-learning-objective-interference/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), [regularization](/concepts/regularization/), and [calibration](/concepts/calibration/).*

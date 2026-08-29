@@ -17,7 +17,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.ca
     <p class="lede">{posts.length} {posts.length === 1 ? 'guide' : 'guides'}, newest first. Opinionated notes on senior ML interviews, system design, and applied practice.</p>
   </header>
 
-  <ul class="post-list">
+  <ul class="post-list" data-pagefind-ignore="all">
     {posts.map((post) => {
       const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
       return (
@@ -36,17 +36,13 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.ca
 <style>
   .head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
   .kicker {
-    font-family: var(--font-ui);
+    font-family: var(--font-mono);
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.14em;
     color: var(--c-accent);
-    background: var(--c-accent-soft);
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    margin: 0 0 1rem;
+    margin: 0 0 .8rem;
   }
   .head h1 {
     font-family: var(--font-display);
@@ -56,7 +52,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.ca
     letter-spacing: -0.02em;
     margin: 0 0 0.6rem;
   }
-  .lede { color: var(--c-text-soft); margin: 0; max-width: 42rem; }
+  .lede { color: var(--c-text-soft); margin: 0; max-width: 42rem; font-family: var(--font-reading); font-size: 1.02rem; }
 
   .post-list { list-style: none; padding: 0; margin: 0; }
   .post-list li {
@@ -83,7 +79,8 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft && data.ca
   }
   .post-list .entry a:hover { color: var(--c-accent); text-decoration: underline; }
   .post-list .desc {
-    font-size: 0.9rem;
+    font-family: var(--font-reading);
+    font-size: 0.94rem;
     color: var(--c-text-soft);
     margin: 0.3rem 0 0;
     line-height: 1.5;

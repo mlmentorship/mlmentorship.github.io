@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Gradients flowing back through a deep network multiply many Jacobians together. If the average per-layer Jacobian norm is $> 1$, gradient magnitudes grow exponentially with depth (**exploding**); if $< 1$, they shrink to zero (**vanishing**). Either failure mode prevents the early layers from learning.
-
-## Why it matters
 
 This was the central obstacle to training deep networks before ~2014. The standard fixes. Careful initialization, normalization layers, residual connections, ReLU activations, gradient clipping. Exist primarily to control gradient magnitudes through depth. Knowing the failure mode and the fixes is core senior-level material.
 

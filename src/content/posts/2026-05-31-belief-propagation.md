@@ -1,17 +1,15 @@
 ---
 title: "Belief propagation (message passing)"
-description: "How to compute marginals in a graphical model without summing over an exponential number of configurations. The sum-product algorithm passes local messages along the graph; exact on trees, approximate (loopy BP) on general graphs."
+description: "Belief propagation computes graphical-model marginals through local messages. Sum-product is exact on trees and approximate on graphs with cycles."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Belief propagation is a **message-passing** algorithm for computing marginal distributions in a graphical model. Nodes exchange local "messages" summarizing the evidence from their part of the graph; the **sum-product** variant computes marginals, the **max-product** variant computes the most probable configuration. It is **exact on trees** and an approximation (**loopy BP**) on graphs with cycles.
-
-## Why it matters
 
 Inference (computing $p(x_i \mid \text{evidence})$) is the central operation in probabilistic models, and the naive sum over all configurations is exponential. Belief propagation is *the* algorithm that exploits the graph's factorization to make it tractable. It's the engine behind:
 

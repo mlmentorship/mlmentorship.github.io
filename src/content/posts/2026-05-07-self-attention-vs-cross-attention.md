@@ -1,21 +1,19 @@
 ---
 title: "Self-attention vs cross-attention"
-description: "Same operation, different inputs. Self-attention reads from one sequence; cross-attention reads from another. The distinction every encoder-decoder architecture rests on."
+description: "Self-attention reads from one sequence; cross-attention reads from another. This input choice determines encoder-only, decoder-only, and encoder-decoder structures."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Self-attention** computes $\text{softmax}(QK^\top / \sqrt{d}) V$ where $Q, K, V$ are all derived from the same sequence. **Cross-attention** uses $Q$ from one sequence and $K, V$ from another. Same kernel, different routing.
 
-## Why it matters
+This input choice separates encoder-only models (BERT), decoder-only models (GPT), and encoder-decoder models (T5, the original Transformer, and Whisper). Multimodal architectures also use cross-attention to connect image, text, or audio representations.
 
-The distinction defines the difference between encoder-only models (BERT: self-attention only), decoder-only models (GPT: causal self-attention only), and encoder-decoder models (T5, original Transformer, Whisper: both). Every multi-modal architecture (image-conditioned text, text-conditioned audio) routes the modalities through cross-attention.
-
-If you can write the matmuls correctly and explain why a given layer uses one or the other, you understand most of the transformer architecture landscape.
+If you can write the matrix multiplications and explain why a layer uses one form, you understand the attention structure of common transformer architectures.
 
 ## Self-attention
 

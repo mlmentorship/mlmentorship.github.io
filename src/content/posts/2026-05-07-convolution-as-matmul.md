@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **im2col** rearranges a convolution input so each spatial location's receptive field becomes a column of a matrix. The convolution then reduces to a single matmul: $\text{Conv}(X, W) = W_{\text{flat}} \cdot \text{im2col}(X)$.
-
-## Why it matters
 
 Modern hardware (GPUs, TPUs) is optimized for dense matmul. A naive 2D convolution loop is the wrong shape for that hardware: nested loops over spatial positions, channels, and kernel offsets, with poor memory locality. im2col turns the same arithmetic into a single GEMM call that lands on the highly tuned BLAS path.
 
@@ -35,7 +33,7 @@ Memory cost: $X_{\text{col}}$ duplicates each input pixel up to $k^2$ times. For
 - **FFT convolution**: $\mathcal{F}^{-1}(\mathcal{F}(X) \odot \mathcal{F}(W))$. Wins for large kernels (rare in modern CNNs).
 - **Depthwise convolution**: each input channel has its own filter, so $W$ is block-diagonal. The matmul splits into $C_{in}$ tiny independent matmuls, much cheaper.
 
-## Why this matters for the senior interview
+## Interview focus
 
 If asked "how does convolution actually run on a GPU," the expected answer is: it is a matmul. Then walk through the im2col reshape, the GEMM call, and the memory blowup. Bonus points for noting that the flattened kernel ${W_{\text{flat}}}$ has shape $C_{out} \times C_{in} k^2$, so the FLOP count is $C_{out} \cdot C_{in} \cdot k^2 \cdot H_{out} \cdot W_{out}$. The same formula you see in every model card.
 

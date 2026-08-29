@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Foundation-model data curation turns raw corpora into a versioned training distribution through provenance, policy, parsing, quality filtering, deduplication, contamination control, mixture design, and audit.
-
-## Why it matters
 
 At large scale, data determines capability, memorization, bias, legal exposure, evaluation validity, and training stability. "More tokens" is not a neutral scaling variable. The source and repeated structure of those tokens change what the model learns.
 
@@ -90,4 +88,4 @@ A filter that improves average benchmark score while deleting low-resource langu
 
 Start with target capabilities and constraints, then source, provenance, filtering, deduplication, contamination, mixture, synthetic data, versioning, and the downstream evidence that determines whether curation helped.
 
-*Related: [lessons from Marin 8B](/guides/lessons-from-marin-8b/), [preference data and reward models](/concepts/preference-data-and-reward-models/), and [data versioning in feature stores](/questions/design-feature-store/).*
+*Related: [design a foundation-model data platform](/questions/design-foundation-model-data-platform/), [ML data lineage and versioning](/concepts/ml-data-lineage-versioning/), [lessons from Marin 8B](/guides/lessons-from-marin-8b/), and [preference data and reward models](/concepts/preference-data-and-reward-models/).*

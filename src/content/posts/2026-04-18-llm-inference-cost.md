@@ -126,7 +126,7 @@ The L4 answer is "use a smaller model." The L6 answer is "let's identify where t
 
 ## The thing nobody mentions
 
-LLM inference cost is *contagious* across layers. Reducing context length helps not just per-token cost but also latency (less prefill), which improves agentic step time, which lets you cap iterations earlier, which reduces total cost further. Optimizations compound.
+Inference optimizations can compound. A shorter context lowers per-token cost and prefill latency. Faster agent steps can then support tighter iteration limits, which reduces total request cost.
 
 Cost improvements are *contagious* across layers. Reducing context helps per-token cost and latency, improving agentic step time, enabling earlier iteration caps, reducing total cost. Optimizations compound.
 

@@ -1,6 +1,5 @@
-// Shared subcategory taxonomy used by both the category index pages and the
-// left sidebar (SectionNav). Keeping this in one place ensures the grouping
-// stays consistent across surfaces.
+// Shared subcategory taxonomy used by category indexes, library volumes, and
+// article chapter navigation.
 //
 // Slugs not listed in a category's map fall into 'Other' and render at the
 // bottom of the list.
@@ -21,6 +20,7 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'class-imbalance': 'Deep Learning Production',
   'bptt-backprop-through-time': 'Deep Learning Production',
   'adam-vs-sgd-generalization': 'Deep Learning Production',
+  'design-reasoning-model-fixed-budget': 'Deep Learning Production',
 
   'how-would-you-evaluate-an-llm-application': 'LLM Systems',
   'fine-tune-vs-prompt-vs-rag': 'LLM Systems',
@@ -33,8 +33,12 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'evals-for-coding-assistant': 'LLM Systems',
   'llm-deployment-healthcare': 'LLM Systems',
   'build-llm-coding-assistant': 'LLM Systems',
+  'design-ai-coding-product': 'LLM Systems',
+  'design-enterprise-agent-platform': 'LLM Systems',
+  'design-agent-safety-control-plane': 'LLM Systems',
 
   'design-youtube-recommender': 'Recsys & Search',
+  'design-short-form-video-ecosystem': 'Recsys & Search',
   'two-tower-vs-cross-encoder': 'Recsys & Search',
   'design-spotify-homepage': 'Recsys & Search',
   'cold-start-new-user': 'Recsys & Search',
@@ -48,6 +52,9 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'real-time-personalization': 'ML System Design',
   'design-feature-store': 'ML System Design',
   'design-ml-monitoring': 'ML System Design',
+  'design-multi-team-ml-platform': 'ML System Design',
+  'design-real-time-multimodal-assistant': 'ML System Design',
+  'design-foundation-model-data-platform': 'ML System Design',
   'design-ml-system-fixed-budget': 'ML System Design',
 
   'ab-test-chatbot': 'Product & Experimentation',
@@ -90,6 +97,8 @@ export const INTERVIEW_SUBCATEGORY: Record<string, string> = {
   'design-production-llm-inference-service': 'ML System Design',
   'design-fault-tolerant-distributed-training': 'ML System Design',
 
+  'plan-70b-training-run': 'Deep Learning Production',
+
   'design-post-training-data-and-rl-environment': 'LLM Systems',
   'design-llm-red-team-program': 'LLM Systems',
 };
@@ -116,6 +125,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'matrix-calculus': 'Linear Algebra & Math',
 
   // Probability & Statistics
+  'expectation-variance-covariance-correlation': 'Probability & Statistics',
+  'probability-distributions-in-ml': 'Probability & Statistics',
+  'entropy-mutual-information': 'Probability & Statistics',
   'maximum-likelihood-estimation': 'Probability & Statistics',
   'bias-variance-of-estimators': 'Probability & Statistics',
   'bayes-rule-and-posterior': 'Probability & Statistics',
@@ -125,6 +137,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'markov-chains': 'Probability & Statistics',
   'monte-carlo-and-importance-sampling': 'Probability & Statistics',
   'epistemic-vs-aleatoric-uncertainty': 'Probability & Statistics',
+  'hypothesis-testing-confidence-intervals': 'Probability & Statistics',
+  'bootstrap-and-resampling': 'Probability & Statistics',
+  'causal-inference-for-ml-decisions': 'Probability & Statistics',
 
   // Classical ML
   'logistic-regression': 'Classical ML',
@@ -149,6 +164,7 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'encoder-decoder-architectures': 'Deep Learning Foundations',
   'autoregressive-vs-diffusion': 'Deep Learning Foundations',
   'graph-neural-networks': 'Deep Learning Foundations',
+  'contrastive-self-supervised-learning': 'Deep Learning Foundations',
 
   // Generative Models
   'variational-autoencoders': 'Generative Models',
@@ -180,6 +196,8 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'multi-agent-reinforcement-learning': 'Reinforcement Learning',
   'rl-environments-and-graders': 'Reinforcement Learning',
   'robotics-policy-learning': 'Reinforcement Learning',
+  'mdps-and-bellman-equations': 'Reinforcement Learning',
+  'rl-verifiable-rewards-grpo': 'Reinforcement Learning',
 
   // Computer Vision
   'cnn-architecture': 'Computer Vision',
@@ -215,6 +233,9 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'matrix-factorization-recsys': 'Retrieval & Recommenders',
   'tf-idf-and-bm25': 'Retrieval & Recommenders',
   'two-tower-retrieval': 'Retrieval & Recommenders',
+  'learning-to-rank-losses': 'Retrieval & Recommenders',
+  'position-bias-counterfactual-learning-to-rank': 'Retrieval & Recommenders',
+  'multi-task-learning-objective-interference': 'Retrieval & Recommenders',
 
   // LLM Internals
   'flashattention': 'LLM Internals',
@@ -244,6 +265,7 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'model-organisms-of-misalignment': 'LLM Internals',
   'llm-security-threat-models': 'LLM Internals',
   'preference-data-and-reward-models': 'LLM Internals',
+  'test-time-compute-search-verifiers': 'LLM Internals',
 
   // Training Fundamentals
   'cross-entropy-softmax': 'Training Fundamentals',
@@ -268,6 +290,8 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'z-loss': 'Training Fundamentals',
   'foundation-model-data-curation': 'Training Fundamentals',
   'loss-spikes-at-scale': 'Training Fundamentals',
+  'neural-scaling-laws': 'Training Fundamentals',
+  'synthetic-data-generation-verification': 'Training Fundamentals',
 
   // Systems & Infrastructure
   'gpu-memory-hierarchy': 'Systems & Infrastructure',
@@ -280,10 +304,18 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'knowledge-distillation': 'Systems & Infrastructure',
   'pruning': 'Systems & Infrastructure',
   'fault-tolerant-collectives': 'Systems & Infrastructure',
+  'transformer-compute-memory-accounting': 'Systems & Infrastructure',
+  'sharded-matrix-multiplication': 'Systems & Infrastructure',
+  'accelerator-network-topology': 'Systems & Infrastructure',
+  'strong-scaling-and-parallelism-selection': 'Systems & Infrastructure',
+  'context-parallelism-and-ring-attention': 'Systems & Infrastructure',
+  'profiling-distributed-ml-workloads': 'Systems & Infrastructure',
+  'ml-data-lineage-versioning': 'Systems & Infrastructure',
 
   // ML Systems & Evaluation
   'ab-testing-for-ml': 'ML Systems & Evaluation',
   'cross-validation-strategies': 'ML Systems & Evaluation',
+  'data-leakage-point-in-time-correctness': 'ML Systems & Evaluation',
   'roc-pr-auc': 'ML Systems & Evaluation',
   'perplexity-and-bits-per-token': 'ML Systems & Evaluation',
   'precision-recall-f1': 'ML Systems & Evaluation',
@@ -291,6 +323,11 @@ export const REFERENCE_SUBCATEGORY: Record<string, string> = {
   'confusion-matrix-and-classification-metrics': 'ML Systems & Evaluation',
   'expected-calibration-error': 'ML Systems & Evaluation',
   'model-interpretability': 'ML Systems & Evaluation',
+  'evaluation-validity-benchmark-contamination': 'ML Systems & Evaluation',
+  'llm-as-judge': 'ML Systems & Evaluation',
+  'reproducibility-fair-model-comparison': 'ML Systems & Evaluation',
+  'decision-thresholds-asymmetric-costs-abstention': 'ML Systems & Evaluation',
+  'delayed-labels-selective-labels-feedback-loops': 'ML Systems & Evaluation',
 };
 
 export const REFERENCE_ORDER = [

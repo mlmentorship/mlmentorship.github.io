@@ -84,7 +84,7 @@ export const GET: APIRoute = async () => {
                       maxWidth: '1000px',
                     },
                     children:
-                      'Questions, guides, and concept notes for L5+ Applied Scientist, MLE, and Research Engineer loops.',
+                      'Questions, guides, and concept notes for senior Applied Scientist, Research Scientist, MLE, and Research Engineer loops.',
                   },
                 },
               ],

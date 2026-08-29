@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **probabilistic graphical model** (PGM) is a representation of a joint probability distribution as a graph whose nodes are random variables and whose edges encode dependencies. The graph structure determines a factorization of the joint and a set of conditional independence relations.
-
-## Why it matters
 
 PGMs were the dominant framework for probabilistic ML from the 1990s through the early 2010s. Many modern probabilistic methods. VAEs, latent-variable diffusion, message passing in transformers (loosely). Descend from PGM ideas. Knowing PGMs gives you the right conceptual vocabulary for any latent-variable model: independence, factorization, marginalization, conditioning.
 

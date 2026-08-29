@@ -1,6 +1,6 @@
 ---
 title: "Applied Scientist vs MLE vs Research Engineer: what these roles actually do"
-description: "The role taxonomy is confusing because companies use the same titles to mean different things. Here's the actual decomposition, and which one you should target."
+description: "Companies use the same ML titles for different work. Compare the modeling, research, engineering, and product mix before choosing a target role."
 date: "2026-02-28"
 draft: false
 tags: ["guides"]
@@ -81,7 +81,7 @@ Where it exists: Everywhere. Every company doing serious ML has MLEs.
 
 Who it suits: Software engineers who want to specialize in ML systems. People who care more about reliability and scale than about novelty.
 
-How competitive: Bar is mostly "are you a strong software engineer with enough ML literacy to be useful?" The ML literacy bar varies hugely by team, some teams want senior researchers; others want people who could swap to a non-ML SWE role tomorrow.
+**Hiring bar:** Most teams ask whether you are a strong software engineer with enough ML knowledge for the role. The ML depth varies by team. Some want senior researchers; others want engineers who could also work in a non-ML role.
 
 ### Software Engineer (ML adjacent)
 
@@ -120,8 +120,9 @@ Across all roles, the senior trajectory looks similar:
 - **Mid** (L5): own a project area; make autonomous technical decisions.
 - **Senior** (L6 / Staff): own a problem space; influence multiple teams; set technical direction; mentor.
 - **Principal** (L7): cross-org technical leadership; long-time-horizon strategic decisions.
+- **Senior principal / distinguished** (company-dependent): create coherence across principal-owned technical portfolios; preserve delegated authority, external adaptability, succession, and reversal.
 
-The difference between roles diminishes at higher levels. A Principal RS, AS, and RE all spend a lot of their time on the same things: cross-team influence, long-term technical direction, mentorship, strategic prioritization. They differ in *where* they apply that influence (research agendas vs. product roadmaps vs. infrastructure decisions) but not in the nature of the work.
+The difference between roles diminishes at higher levels, but the technical core remains. Upper ICs share responsibility for direction, portfolio choices, and influence. They differ in where they apply it: research agendas, product decisions, platform contracts, safety systems, or infrastructure.
 
 ## How to interview for each
 
@@ -149,4 +150,4 @@ Two people with the same title at the same company often do very different jobs 
 
 ---
 
-*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/).*
+*Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/).*

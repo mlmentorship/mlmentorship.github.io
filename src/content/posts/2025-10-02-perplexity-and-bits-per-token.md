@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Perplexity is the exponentiated average per-token cross-entropy of a language model on a held-out corpus: $\text{PPL} = \exp(\bar{L})$ where $\bar L = -\frac{1}{N} \sum_{i=1}^{N} \log p(x_i \mid x_{<i})$. **Bits per token (BPT)** is the same quantity in $\log_2$ units: $\text{BPT} = \bar L / \ln 2$.
-
-## Why it matters
 
 Perplexity is the dominant intrinsic metric used during pretraining: cheap to compute, smooth, monotonically related to next-token log-likelihood. Loss curves are usually reported as cross-entropy or perplexity. Scaling laws ([Kaplan et al., 2020](https://arxiv.org/abs/2001.08361); [Chinchilla, 2022](https://arxiv.org/abs/2203.15556)) are derived in perplexity / loss space.
 

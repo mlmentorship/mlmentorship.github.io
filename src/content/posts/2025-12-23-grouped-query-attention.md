@@ -5,13 +5,12 @@ date: "2025-12-23"
 draft: false
 tags: ["concepts"]
 category: "concepts"
+aliases: ["GQA", "MQA", "multi-query attention", "grouped query attention"]
 ---
 
-## One-line definition
+## Summary
 
 GQA and MQA reduce the number of distinct K/V projection heads while keeping the full set of Q heads, so multiple query heads share the same key and value tensors. MQA is the extreme case: one K/V head total. GQA picks an intermediate number of K/V groups.
-
-## Why it matters
 
 The KV cache dominates LLM serving memory at long contexts (see [KV cache](/concepts/kv-cache/)). Cutting the number of K/V heads cuts cache size proportionally:
 

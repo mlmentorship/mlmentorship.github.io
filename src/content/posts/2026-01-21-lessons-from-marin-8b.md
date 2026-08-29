@@ -50,13 +50,13 @@ If you've ever gotten worse benchmarks after switching to a "cleaner" dataset, t
 
 ## 4. Perplexity is mostly a measurement of preprocessing, not capability
 
-Marin saw eval loss on Paloma's `c4en` jump up during their first cooldown and jump down during their second. Same model architecture, same cooldown structure, opposite directions on the same eval. The cause was structural preprocessing mismatches: in Phase 1 they discovered some Paloma domains had texts ending in trailing space characters, and the deeper the cooldown, the more the model "disliked" those trailing spaces, which showed up as a domain-specific loss spike that had nothing to do with capability.
+Marin saw Paloma `c4en` eval loss rise during the first cooldown and fall during the second. The architecture and cooldown structure were unchanged. Some Paloma domains contained trailing spaces, and longer cooldowns amplified the mismatch. The resulting loss spike did not measure capability.
 
 Don't trust a single perplexity number. If your eval loss moved a lot after a data change, the first question is whether the formatting of training and eval data still matches, not whether the model got better or worse.
 
 ## 5. Microannealing is the right way to evaluate a candidate dataset
 
-The Marin (and Olmo 2, and Llama 3) recipe for "is this dataset worth including?" is to take a checkpoint that's already mostly trained, run a short cooldown with a small fraction of the candidate data, and compare against a control on 100% of the normal mix. Cost: less than 1% of a full run. Signal: real downstream task impact, not just per-domain loss.
+Marin, OLMo 2, and Llama 3 test candidate data with a mostly trained checkpoint. Run a short cooldown with a small candidate-data fraction, then compare it with a control that uses the normal mix. This costs less than 1% of a full run and measures downstream task impact as well as per-domain loss.
 
 The full procedure, including how to set the mixing fraction and the common failure modes, is on the [microannealing reference page](/concepts/microannealing/). The interview-ready summary is that "run an ablation" is the L5 answer and "run a microannealing study at the late-training low-LR regime where data choices actually matter" is the L6 answer.
 

@@ -69,4 +69,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [Regularization](/concepts/regularization/), [Adam, AdamW, and the modern optimizer landscape](/concepts/adam-and-adamw/).*
+*Related: [regularization](/concepts/regularization/) and [Adam and AdamW](/concepts/adam-and-adamw/).*

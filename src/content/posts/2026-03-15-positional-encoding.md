@@ -1,6 +1,6 @@
 ---
-title: "RoPE, ALiBi, and the modern positional encoding landscape"
-description: "Sinusoidal positional encoding is in the original transformer paper and not in any modern LLM. Here's what replaced it and why."
+title: "RoPE, ALiBi, and modern positional encodings"
+description: "Modern LLMs usually replace sinusoidal positional encoding with RoPE, ALiBi, or related methods. Compare how they represent relative position and extrapolate."
 date: "2026-03-15"
 draft: false
 tags: ["concepts"]
@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 Positional encoding gives a transformer information about token *order*, since attention itself is permutation-invariant. Modern LLMs use **rotary position embeddings (RoPE)** or **ALiBi** instead of the original sinusoidal scheme, primarily for better long-context behavior.
-
-## Why it matters
 
 The choice of positional encoding determines long-context performance, extrapolation beyond training length, and relative position representation. It's a small choice with outsized impact on production inference.
 

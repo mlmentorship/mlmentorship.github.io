@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Streaming ASR is the difference between a voice assistant that feels responsive and one that feels broken: it has to emit transcript while the user is still speaking, with bounded latency. The catch is that the model cannot attend to unlimited future context, so it trades recognition quality against emission latency, compute, and transcript stability. Offline ASR has none of those constraints, which is why a system that scores well offline can still feel terrible live.
 

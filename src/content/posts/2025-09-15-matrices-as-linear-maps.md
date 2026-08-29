@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A matrix $A \in \mathbb{R}^{m \times n}$ represents a linear map $f: \mathbb{R}^n \to \mathbb{R}^m$ defined by $f(x) = Ax$. Composition of linear maps corresponds to matrix multiplication; the columns of $A$ are the images of the standard basis vectors.
-
-## Why it matters
 
 Every layer in a neural network is a linear map (followed by a non-linearity). Every embedding lookup, every attention score, every gradient backward pass is a matrix multiplication. Understanding what a matrix *does* geometrically. Rather than just how to compute with it. Is the foundation for reasoning about model capacity, conditioning, and gradient flow.
 

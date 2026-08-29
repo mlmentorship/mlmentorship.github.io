@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Initialize each layer's weights from a distribution whose variance is set so the variance of activations (forward pass) and gradients (backward pass) stays approximately constant from layer to layer. Two standard schemes: **Xavier/Glorot** for tanh/sigmoid layers, **Kaiming/He** for ReLU-family layers.
-
-## Why it matters
 
 If weights are too small, activations shrink toward zero through depth and gradients vanish. If too large, activations explode and gradients blow up. With either failure, training stalls or diverges in the first few hundred steps.
 

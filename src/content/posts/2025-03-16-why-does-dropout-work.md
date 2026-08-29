@@ -69,4 +69,4 @@ If you can have this exchange fluently, you're solidly at the senior bar.
 
 ---
 
-*Related reference: [Regularization, L1, L2, dropout, early stopping](/concepts/regularization/) (coming soon), [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/).*
+*Related: [regularization](/concepts/regularization/) and [BatchNorm versus LayerNorm](/concepts/batchnorm-vs-layernorm/).*

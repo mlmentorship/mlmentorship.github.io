@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An **actor-critic** algorithm trains two networks jointly: an **actor** $\pi_\theta(a \mid s)$ that chooses actions and a **critic** $V_\phi(s)$ (or $Q_\phi(s, a)$) that estimates expected return. The actor is updated with a policy gradient using the critic's estimate as a baseline; the critic is updated to fit observed returns.
-
-## Why it matters
 
 Pure policy gradient (REINFORCE) is unbiased but high-variance. Pure value-based methods (Q-learning, DQN) are sample-efficient but only support discrete actions and struggle with stochastic optimal policies. Actor-critic combines both: low-variance gradient estimates from the critic, direct policy parameterization from the actor.
 

@@ -1,0 +1,90 @@
+---
+import PrepLayout from '../../../layouts/PrepLayout.astro';
+import { ROLE_PATHS, type RolePath } from '../../../data/rolePaths';
+import { SITE } from '../../../consts';
+if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
+
+export function getStaticPaths() {
+  return ROLE_PATHS.map((role) => ({ params: { role: role.id }, props: { role } }));
+}
+
+interface Props { role: RolePath; }
+const { role } = Astro.props as Props;
+---
+
+<PrepLayout
+  title={`${role.title} interview path`}
+  description={`A focused nine-step ${role.title} interview preparation path.`}
+  heading={`${role.title} preparation path`}
+  lede={role.rule}
+>
+  <nav class="role-switcher" aria-label="Other role paths">
+    {ROLE_PATHS.map((item) => <a href={`/prep/role-paths/${item.id}/`} aria-current={item.id === role.id ? 'page' : undefined}>{item.shortTitle}</a>)}
+  </nav>
+
+  <section class="start-card">
+    <p>Start with a closed-book baseline</p>
+    <h2>Do not read the full path first.</h2>
+    <span>Attempt the first scored question now. Use the result to decide which later steps need repair.</span>
+    <a href={role.firstPracticeHref}>Start first practice <span aria-hidden="true">→</span></a>
+  </section>
+
+  <ol class="role-sequence">
+    {role.sequence.map((step, index) => (
+      <li>
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        <div><h2><a href={step.href}>{step.title}</a></h2><p>{step.detail}</p></div>
+        <button type="button" data-role-step-id={`role:${role.id}:${index + 1}`} aria-pressed="false">Mark done</button>
+      </li>
+    ))}
+  </ol>
+
+  <section class="after-path">
+    <h2>After the core path</h2>
+    <p>Add only the format and subject that recruiting confirmed. Do not add every frontier lab or specialist topic.</p>
+    <p><a href="/prep/role-paths/#domain-supplements">Choose one domain supplement</a> · <a href="/prep/level-paths/staff-principal/">Add the upper-IC level overlay</a> · <a href="/prep/frontier-labs/">Check current lab formats</a> · <a href={`/prep/simulations/#${role.id}`}>Run the role simulation</a></p>
+  </section>
+</PrepLayout>
+
+<script>
+  import { isActivityComplete, setActivityComplete } from '../../../utils/activityProgress';
+  document.querySelectorAll<HTMLButtonElement>('[data-role-step-id]').forEach((button) => {
+    const id = button.dataset.roleStepId;
+    if (!id) return;
+    const render = () => {
+      const complete = isActivityComplete(id);
+      button.textContent = complete ? 'Done' : 'Mark done';
+      button.setAttribute('aria-pressed', String(complete));
+    };
+    button.addEventListener('click', () => { try { setActivityComplete(id, !isActivityComplete(id)); render(); } catch { button.textContent = 'Storage unavailable'; } });
+    render();
+  });
+</script>
+
+<style>
+  .role-switcher { display: flex; gap: .45rem; margin: 0 0 1.5rem; }
+  .role-switcher a { min-width: 3.2rem; padding: .42rem .6rem; border: 1px solid var(--c-rule); border-radius: var(--radius); color: var(--c-text-soft); font-family: var(--font-mono); font-size: .72rem; font-weight: 650; text-align: center; text-decoration: none; }
+  .role-switcher a:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .role-switcher a[aria-current='page'] { border-color: var(--c-accent); color: var(--c-text); box-shadow: inset 0 -2px var(--c-accent); }
+  .start-card { padding: 1rem 0; border-top: 2px solid var(--c-text); border-bottom: 1px solid var(--c-rule); }
+  .start-card > p { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; }
+  .start-card h2 { margin: .2rem 0 .3rem !important; font-size: 1.15rem !important; }
+  .start-card > span { display: block; max-width: 40rem; color: var(--c-text-soft); font-size: .88rem; }
+  .start-card > a { display: inline-block; margin-top: .65rem; font-size: .85rem; font-weight: 700; text-decoration: none; }
+  .start-card > a:hover { text-decoration: underline; }
+  .role-sequence { margin: 2rem 0; padding: 0; list-style: none; }
+  .role-sequence li { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: .7rem; margin: 0; padding: .9rem 0; border-bottom: 1px solid var(--c-rule); }
+  .role-sequence > li > span { padding-top: .18rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .72rem; }
+  .role-sequence h2, .role-sequence p { margin: 0; }
+  .role-sequence h2 { font-size: 1rem !important; }
+  .role-sequence h2 a { color: var(--c-text); text-decoration: none; }
+  .role-sequence h2 a:hover { color: var(--c-accent); text-decoration: underline; }
+  .role-sequence p { margin-top: .2rem; color: var(--c-text-soft); font-size: .87rem; }
+  .role-sequence button { align-self: start; padding: .32rem .5rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-muted); font: inherit; font-size: .68rem; cursor: pointer; }
+  .role-sequence button:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .role-sequence button[aria-pressed='true'] { border-color: var(--c-accent); color: var(--c-accent); }
+  .after-path { margin-top: 2rem; padding-top: 1rem; border-top: 2px solid var(--c-text); }
+  .after-path h2 { margin-top: 0 !important; }
+  .after-path p { color: var(--c-text-soft); font-size: .88rem; }
+  @media (max-width: 560px) { .role-sequence li { grid-template-columns: 1.8rem minmax(0, 1fr); } .role-sequence button { grid-column: 2; justify-self: start; } }
+</style>

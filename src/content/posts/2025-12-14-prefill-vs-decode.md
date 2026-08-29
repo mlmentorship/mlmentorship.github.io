@@ -7,13 +7,11 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
-LLM inference splits into **prefill** (one parallel pass over the entire prompt) and **decode** (one new token per autoregressive step). Prefill is compute-bound; decode is memory-bound. Almost every serving optimization makes sense only when you know which phase it targets.
+LLM inference splits into **prefill** (one parallel pass over the prompt) and **decode** (one new token per autoregressive step). Large, well-batched prefills are often compute-bound. Small decode batches are often memory-bound. Almost every serving optimization makes sense only when you know which phase and shape it targets.
 
-## Why it matters
-
-Prefill processes thousands of tokens at once with high arithmetic intensity. A single decode step processes one token but must read the entire model weights from HBM. Per-token costs and per-token latencies differ by orders of magnitude.
+Prefill can process many tokens at once with high arithmetic intensity. A single-request decode step processes one token but may read the model weights from HBM for very little arithmetic. Their per-token costs and latency limits can differ greatly.
 
 Picking the wrong cost model leads to wrong decisions: batching helps decode but barely affects prefill latency; quantization helps decode bandwidth but not prefill compute; speculative decoding only accelerates the decode phase.
 
@@ -24,9 +22,9 @@ For a prompt of length $P$:
 - Single forward pass: compute K, V, and output for all $P$ tokens in parallel.
 - FLOPs: $\approx 2 \cdot P \cdot N_\text{params}$ for the FFN and Q/K/V/O matmuls, plus $O(P^2 \cdot d \cdot \text{layers})$ for attention.
 - Arithmetic intensity is high because Q has $P$ rows; matmuls are square-shaped and saturate tensor cores.
-- Time per token (TTFT, time to first token) scales sublinearly with $P$ until attention's $O(P^2)$ term dominates (typically past 8–32K tokens).
+- Time to first token grows with prompt length. Matrix efficiency, attention's $O(P^2)$ work, batching, and scheduler load determine the exact curve.
 
-Bottleneck: compute-bound at any reasonable prompt length.
+Likely bottleneck: compute for large efficient matrix shapes. Short prompts, small batches, or poor kernels can be memory-bound or launch-bound.
 
 ## Decode
 
@@ -36,15 +34,15 @@ For each subsequent generated token:
 - Q is a single vector; K and V come from the [KV cache](/concepts/kv-cache/).
 - FLOPs: $\approx 2 \cdot N_\text{params}$. One multiply-add per parameter for the matmul.
 - Bytes moved from HBM: at least $N_\text{params} \cdot \text{dtype\_bytes}$ (must read all weights).
-- Arithmetic intensity: $\sim 2$ FLOPs/byte at batch 1.
+- Arithmetic intensity from BF16 weight reads: about 1 FLOP/byte at batch 1 because one multiply-add uses a two-byte weight. Other reads and writes lower the effective value.
 
-Bottleneck: HBM bandwidth-bound. Tensor cores are idle most of the time.
+Likely bottleneck: HBM bandwidth at small batch sizes. Batching increases arithmetic intensity until compute or KV-cache traffic becomes limiting.
 
 ## What follows from the asymmetry
 
 | Optimization | Helps prefill? | Helps decode? | Why |
 |--------------|---------------|---------------|-----|
-| Larger batch | small | huge | amortizes weight reads across requests |
+| Larger batch | workload-dependent | large until another limit | amortizes weight reads across requests |
 | FlashAttention | yes (long prompts) | yes (long context) | reduces HBM traffic in attention |
 | Weight quantization (int8/4) | small | huge | cuts decode bandwidth proportionally |
 | KV-cache quantization | no | yes (long context) | cuts decode-time KV reads |

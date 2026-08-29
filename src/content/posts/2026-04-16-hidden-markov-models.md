@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **Hidden Markov Model** is a latent-variable sequence model with: (a) a discrete latent state $z_t$ evolving as a first-order Markov chain with transition matrix $A$, and (b) per-state emission distributions producing observations $x_t \mid z_t$.
-
-## Why it matters
 
 HMMs were the dominant sequence model from the 1970s through the early 2010s for speech recognition, part-of-speech tagging, gene finding, and many time-series problems. They have largely been displaced by neural sequence models (RNNs, transformers) for tasks with abundant data, but remain useful for:
 

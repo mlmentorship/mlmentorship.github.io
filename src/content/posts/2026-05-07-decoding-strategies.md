@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Decoding** turns a language model's per-token distributions into actual text. Strategies differ in how they pick the next token from the distribution. Each makes a tradeoff between fidelity (high probability) and diversity (broader sampling).
-
-## Why it matters
 
 A trained LLM produces a probability distribution $p(x_t \mid x_{<t})$ at every step. The text the user sees depends entirely on how you sample from those distributions. Bad decoding makes a strong model look weak: greedy can repeat, beam can be bland, pure sampling can be incoherent. Modern systems typically combine top-p with a moderate temperature, but the right choice depends on the task.
 

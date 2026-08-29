@@ -1,17 +1,15 @@
 ---
 title: "Conditional random fields (CRFs)"
-description: "The discriminative model for structured prediction. A CRF directly models p(labels | input) over a whole sequence, scoring label transitions jointly instead of classifying each token independently, which is why a linear-chain CRF sits on top of so many taggers."
+description: "A CRF models labels for a whole sequence and scores transitions jointly. Linear-chain CRFs improve taggers when neighboring labels constrain each other."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A CRF is a **discriminative**, undirected graphical model that defines $p(\mathbf{y} \mid \mathbf{x})$ over a structured output $\mathbf{y}$ (e.g. a label sequence), scoring entire labelings jointly through feature functions over cliques, most commonly a **linear-chain CRF** that couples adjacent labels.
-
-## Why it matters
 
 CRFs are the classic answer to **structured prediction**: when your outputs are interdependent (the label of token $t$ depends on token $t-1$), independent per-token softmax classification is wrong because it can produce **illegal or incoherent label sequences** (e.g. an `I-PER` tag right after an `O` tag in BIO tagging). A CRF layer fixes this by modeling transitions.
 
@@ -35,7 +33,7 @@ $$
 Z(\mathbf{x}) = \sum_{\mathbf{y}'} \exp(\cdots)
 $$
 
-is the **partition function**: a sum over all $|V|^T$ possible labelings. Crucially $Z$ couples the whole sequence: this is **global normalization**, the key difference from per-token softmax (which normalizes locally and independently).
+is the **partition function**: a sum over all $|V|^T$ possible labelings. $Z$ couples the whole sequence through **global normalization**. Per-token softmax instead normalizes each position locally and independently.
 
 ## Training and inference
 

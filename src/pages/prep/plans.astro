@@ -1,6 +1,6 @@
 ---
 import PrepLayout from '../../layouts/PrepLayout.astro';
-import { LEVEL_OVERLAYS, ROLE_OVERLAYS } from '../../data/prepCurriculum';
+import { LEVEL_OVERLAYS, ROLE_ORDER, ROLE_OVERLAYS } from '../../data/prepCurriculum';
 import { SITE } from '../../consts';
 if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 
@@ -46,7 +46,7 @@ const plans = [
         ],
         links: [
           { label: 'Open simulation packets', href: '/prep/simulations/' },
-          { label: 'Review retry queue', href: '/prep/progress/' },
+          { label: 'Review retry queue', href: '/prep/#queue' },
           { label: 'Use the final-week checklist', href: '/prep/final-week/' },
         ],
         output: 'One scored simulation, two repaired failures, and a final list of known (not hidden) risks.',
@@ -68,14 +68,14 @@ const plans = [
       {
         title: 'Week 2 · Build depth without dropping other lanes', focus: 'Make the primary domain follow-up ready while continuing ML implementation, design, and story repetitions.',
         blocks: ['2 domain-specific short attempts with one unfamiliar follow-up each', '1 long round selected by role: ML implementation, system design, research, or experimentation', '3 retries from Week 1 before adding optional topics', '1 project or behavioral rehearsal with ownership partition', 'One mechanism-level repair block, weekly review, and flex'],
-        links: [{ label: 'Practice method', href: '/prep/practice/' }, { label: 'Question categories', href: '/questions/' }, { label: 'Concept reference', href: '/concepts/' }],
+        links: [{ label: 'Practice method', href: '/prep/#how-practice-works' }, { label: 'Question categories', href: '/questions/' }, { label: 'Concept reference', href: '/concepts/' }],
         output: 'One deep answer per primary technical domain and a shrinking (not merely changing) retry queue.',
         gate: 'A strong headline answer that fails the first “why?” follow-up is not ready.',
       },
       {
         title: 'Week 3 · Interleave systems, decisions, and evidence', focus: 'Remove predictable cues and pressure-test senior judgment.',
         blocks: ['1 short breadth attempt selected at random', '1 product/experiment or transfer drill in an unfamiliar domain', '1 full ML implementation, system design, research, or project deep-dive round', '3 delayed retries, including at least one previously improved answer', '2 behavioral stories under skeptical pushback', 'Weekly review and flex'],
-        links: [{ label: 'Experiment questions', href: '/questions/#product-and-experimentation' }, { label: 'Story bank', href: '/prep/story-bank/' }, { label: 'Progress queue', href: '/prep/progress/' }],
+        links: [{ label: 'Experiment questions', href: '/questions/#product-and-experimentation' }, { label: 'Story bank', href: '/prep/story-bank/' }, { label: 'Workbook', href: '/prep/#queue' }],
         output: 'Mixed-round performance, four rehearsed stories, and evidence that prior repairs survived spacing.',
         gate: 'At least 70% of critical rubric dimensions are solid across a mixed session; no single round is consistently Weak.',
       },
@@ -97,8 +97,8 @@ const plans = [
       { title: 'Week 3 · Primary domain depth', focus: 'Connect mechanisms, metrics, failure modes, and operational decisions.', blocks: ['2 primary-domain attempts', '1 long ML implementation, design, or research round', '3 spaced retries', '1 story rehearsal with technical follow-ups', 'Reference repair, review, and flex'], links: [{ label: 'All question domains', href: '/questions/' }, { label: 'Reference library', href: '/concepts/' }], output: 'Two follow-up-ready domain answers and one defensible project decision.', gate: 'One unfamiliar follow-up does not collapse the answer into memorized phrases.' },
       { title: 'Week 4 · Design and experimentation', focus: 'Build end-to-end judgment from objective through launch and monitoring.', blocks: ['1 ML design attempt', '1 experimentation or transfer drill', '1 role-specific long round', '3 retries', '1 behavioral rehearsal', 'Review and flex'], links: [{ label: 'ML system design', href: '/questions/#ml-system-design' }, { label: 'Product & experimentation', href: '/questions/#product-and-experimentation' }], output: 'A coherent architecture and an explicit ship/iterate/stop rule.', gate: 'The answer links offline evidence, online outcomes, guardrails, cost, and rollback.' },
       { title: 'Week 5 · Production and implementation', focus: 'Turn models into reliable systems while preserving all other lanes.', blocks: ['1 debugging or production attempt', '1 short breadth attempt', '1 full ML implementation or infrastructure round', '3 retries', '1 project story about failure/recovery', 'Review and flex'], links: [{ label: 'Production questions', href: '/questions/#deep-learning-production' }, { label: 'ML implementation questions', href: '/questions/#ml-implementation' }], output: 'A systematic debugging procedure and a tested implementation under time.', gate: 'You can identify the bottleneck or next diagnostic before proposing random fixes.' },
-      { title: 'Week 6 · Project and leadership depth', focus: 'Pressure-test level, ownership, influence, wrong bets, and killed work.', blocks: ['1 short technical maintenance attempt', '1 long project deep-dive', '3 retries', '3 behavioral stories in 90–120 seconds', 'One instructed pushback drill', 'Review and flex'], links: [{ label: 'Story bank', href: '/prep/story-bank/' }, { label: 'L5 vs L6', href: '/guides/l5-vs-l6-faang-ml/' }], output: 'Six complete stories and one 20-minute project deep-dive.', gate: 'Ownership is bounded, target-level scope is visible, and skeptical follow-ups reveal more (not less) specificity.' },
-      { title: 'Week 7 · Mixed simulation and repair', focus: 'Remove domain blocks and test the integrated loop.', blocks: ['1 full role-specific simulation', '2 high-impact repairs', '2 delayed retries', '1 recorded story review', 'One short random transfer drill', 'Risk review and flex'], links: [{ label: 'Simulation packets', href: '/prep/simulations/' }, { label: 'Progress queue', href: '/prep/progress/' }], output: 'A scored simulation and no more than three bounded repair tasks.', gate: 'If more than one critical round remains Weak, extend the plan when possible.' },
+      { title: 'Week 6 · Project and leadership depth', focus: 'Pressure-test level, ownership, influence, wrong bets, and killed work.', blocks: ['1 short technical maintenance attempt', '1 long project deep-dive', '3 retries', '3 behavioral stories in 90–120 seconds', 'One instructed pushback drill', 'Review and flex'], links: [{ label: 'Story bank', href: '/prep/story-bank/' }, { label: 'Senior to principal scope', href: '/guides/l5-vs-l6-faang-ml/' }], output: 'Six complete stories and one 20-minute project deep-dive.', gate: 'Ownership is bounded, target-level scope is visible, and skeptical follow-ups reveal more (not less) specificity.' },
+      { title: 'Week 7 · Mixed simulation and repair', focus: 'Remove domain blocks and test the integrated loop.', blocks: ['1 full role-specific simulation', '2 high-impact repairs', '2 delayed retries', '1 recorded story review', 'One short random transfer drill', 'Risk review and flex'], links: [{ label: 'Simulation packets', href: '/prep/simulations/' }, { label: 'Workbook', href: '/prep/#queue' }], output: 'A scored simulation and no more than three bounded repair tasks.', gate: 'If more than one critical round remains Weak, extend the plan when possible.' },
       { title: 'Week 8 · Consolidate and taper', focus: 'Finish evidence, avoid new-topic overload, and protect interview execution.', blocks: ['2 final due retries', '1 short mixed confidence session', '2 concise story rehearsals', 'Role narrative and interviewer questions', 'Final-week checklist, logistics, rest, and flex'], links: [{ label: 'Final-week checklist', href: '/prep/final-week/' }, { label: 'Readiness gates', href: '#readiness-gates' }], output: 'Known risks, stable retrieval, tested logistics, and preserved energy.', gate: 'No critical round is unattempted; every graduated gap has two spaced successes.' },
     ],
   },
@@ -107,13 +107,14 @@ const plans = [
 
 <PrepLayout
   title="Executable 2, 4, and 8-week ML interview plans"
-  description="Time-budgeted, role-aware 2-, 4-, and 8-week plans for senior ML interview preparation."
+  description="Time-budgeted, role-aware 2-, 4-, and 8-week plans for senior through senior-principal ML interview preparation."
   heading="Choose hours, not just weeks."
   lede="A plan is executable only when it states the weekly workload, recurring practice lanes, outputs, and conditions for extending or stopping. The schedules below assume eight hours per week and show how to scale."
 >
   <section class="plan-chooser" aria-label="Choose plan horizon">{plans.map((plan) => <a href={`#${plan.id}`}><strong>{plan.title}</strong><span>{plan.eyebrow}</span></a>)}</section>
 
   <section class="callout"><h2>Start from evidence</h2><p>Use the <a href="/prep/readiness/">readiness and workload check</a>. Two weeks is for consolidation, four for bounded repair, and eight for transitions or several critical gaps. If your runway is shorter than the evidence suggests, triage to actual rounds or consider moving the loop.</p></section>
+  <p class="saved-plan-status" data-saved-plan-status hidden></p>
 
   <h2>Weekly workload contract</h2>
   <div class="workload-table" role="region" aria-label="Weekly workload options" tabindex="0">
@@ -134,8 +135,8 @@ const plans = [
   </div>
 
   <h2>Role overlays</h2>
-  <p>Apply the allocation before choosing questions. The same four-week calendar should not look identical for AS, MLE, and RE candidates.</p>
-  <div class="overlay-grid">{Object.values(ROLE_OVERLAYS).map((role) => <article><h3>{role.label}</h3><p>{role.summary}</p><ul>{role.allocation.map((item) => <li><strong>{item.percent}%</strong> {item.label}</li>)}</ul><p class="warning">{role.warning}</p><p>{role.priorityLinks.map((link, index) => <><a href={link.href}>{link.label}</a>{index < role.priorityLinks.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
+  <p>Apply the allocation before choosing questions. The same four-week calendar should not look identical for AS, RS, MLE, and RE candidates.</p>
+  <div class="overlay-grid">{ROLE_ORDER.map((id) => ROLE_OVERLAYS[id]).map((role) => <article><h3>{role.label}</h3><p>{role.summary}</p><ul>{role.allocation.map((item) => <li><strong>{item.percent}%</strong> {item.label}</li>)}</ul><p class="warning">{role.warning}</p><p>{role.priorityLinks.map((link, index) => <><a href={link.href}>{link.label}</a>{index < role.priorityLinks.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
 
   <h2>Frontier format substitution</h2>
   <p>Do not add a frontier work sample on top of the weekly contract. Replace the closest long round only when recruiting confirms the format.</p>
@@ -154,7 +155,7 @@ const plans = [
   {plans.map((plan) => (
     <section id={plan.id} class="plan-section">
       <header><p>{plan.eyebrow}</p><h2>{plan.title}</h2><span><strong>Best for:</strong> {plan.bestFor}</span><p class="plan-warning">{plan.warning}</p></header>
-      <div class="weeks">{plan.weeks.map((week) => <article class="week"><h3>{week.title}</h3><p class="week-focus">{week.focus}</p><p class="week-total">Standard workload: about 8 hours, including review and flex.</p><h4>Standard 8-hour blocks</h4><ul>{week.blocks.map((block) => <li>{block}</li>)}</ul><p class="week-links">{week.links.map((link, index) => <><a href={link.href}>{link.label}</a>{index < week.links.length - 1 ? ' · ' : ''}</>)}</p><p><strong>Required output:</strong> {week.output}</p><p class="gate"><strong>Exit gate:</strong> {week.gate}</p></article>)}</div>
+      <div class="weeks">{plan.weeks.map((week, index) => <article class="week" data-week-number={index + 1}><h3>{week.title}</h3><p class="week-focus">{week.focus}</p><p class="week-total">Standard workload: about 8 hours, including review and flex.</p><h4>Standard 8-hour blocks</h4><ul>{week.blocks.map((block) => <li>{block}</li>)}</ul><p class="week-links">{week.links.map((link, index) => <><a href={link.href}>{link.label}</a>{index < week.links.length - 1 ? ' · ' : ''}</>)}</p><p><strong>Required output:</strong> {week.output}</p><p class="gate"><strong>Exit gate:</strong> {week.gate}</p></article>)}</div>
     </section>
   ))}
 
@@ -171,11 +172,29 @@ const plans = [
 </PrepLayout>
 
 <script>
+  import { currentPlanWeek, loadPrepPlan } from '../../utils/prepPlan';
+  const plan = loadPrepPlan();
+  if (plan) {
+    const week = currentPlanWeek(plan);
+    const section = document.querySelector<HTMLElement>(`#plan-${plan.horizon}-week`);
+    const current = section?.querySelector<HTMLElement>(`[data-week-number="${week}"]`);
+    current?.classList.add('current-week');
+    const status = document.querySelector<HTMLElement>('[data-saved-plan-status]');
+    if (status) {
+      status.hidden = false;
+      status.textContent = `${plan.roleLabel} saved plan · week ${week} of ${plan.horizon} · ${plan.weeklyHours} hours/week`;
+    }
+  }
+</script>
+
+<script>
   import { trackPublicEvent } from '../../utils/publicEvents';
   trackPublicEvent('generic_plan_opened');
 </script>
 
 <style>
+  .saved-plan-status { margin: 1rem 0; padding: .7rem .8rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); color: var(--c-text-soft); font-size: .82rem; }
+  .week.current-week { outline: 2px solid var(--c-accent); outline-offset: 2px; }
   .plan-chooser { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-bottom: 1.5rem; }
   .plan-chooser a { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); color: inherit; text-decoration: none; }
   .plan-chooser a:hover { border-color: var(--c-accent); }

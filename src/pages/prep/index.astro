@@ -5,83 +5,376 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 ---
 
 <PrepLayout
-  title="Free ML interview prep tools"
-  description="Private, browser-only tools and practical worksheets for senior ML interview preparation."
-  heading="A practice system built around the core library."
-  lede="Start with the Questions, Guides, and Concepts library. Use the tools here only to choose what matters, schedule retrieval, inspect failures, and decide whether you are ready."
+  title="Private ML interview workbook"
+  description="One private, browser-local place for an ML interview plan, next practice task, due retries, and simulations."
+  heading="Workbook"
+  lede="The books explain the material. This companion keeps one plan, one next action, and the practice evidence stored on this device."
+  eyebrow="Companion to the field guide"
 >
-  <section class="library-primary" aria-labelledby="library-primary-heading">
-    <p class="section-kicker">Start here</p>
-    <h2 id="library-primary-heading">The library remains the source of truth</h2>
-    <div class="resource-grid">
-      <a class="resource-card" href="/questions/"><h3>Questions</h3><p>Level-calibrated interview prompts with strong-hire and down-leveling signals.</p></a>
-      <a class="resource-card" href="/guides/"><h3>Guides</h3><p>Senior-IC positions on role calibration, system design, evaluation, and applied practice.</p></a>
-      <a class="resource-card" href="/concepts/"><h3>Concepts</h3><p>Fast reference notes for mechanisms, math, training, systems, and LLM internals.</p></a>
+  <p class="storage-warning" data-storage-warning aria-live="polite" hidden>Browser storage is unavailable. The books and question practice still work, but this device cannot save a plan or retry dates.</p>
+
+  <section class="start-sheet" data-no-plan>
+    <p class="section-kicker" data-start-kicker>Start here</p>
+    <h2 data-start-title>Build one plan from your actual interview loop.</h2>
+    <p data-start-copy>Select the role, rounds, and recent closed-book evidence that matter. The result becomes your private next-action list.</p>
+    <div class="start-actions">
+      <a class="primary-link" data-start-primary href="/prep/readiness/">Build my plan</a>
+      <a data-start-secondary href="/questions/">Practice without a plan</a>
     </div>
   </section>
 
-  <h2>Preparation workflow</h2>
-  <div class="resource-grid">
-    <a class="resource-card" href="/prep/readiness/">
-      <h2>Readiness check</h2>
-      <p>Separate real round formats from domains, estimate workload, and identify three evidence-based gaps.</p>
-    </a>
-    <a class="resource-card" href="/prep/plans/">
-      <h2>Executable plans</h2>
-      <p>Choose 2, 4, or 8 weeks with explicit 5/8/12-hour workloads, outputs, links, and exit gates.</p>
-    </a>
-    <a class="resource-card" href="/prep/role-paths/">
-      <h2>Role and domain paths</h2>
-      <p>Follow an ordered AS, MLE, or RE core sequence, then add only the domain supplement in your actual loop.</p>
-    </a>
-    <a class="resource-card" href="/prep/frontier-labs/">
-      <h2>Frontier-lab field guide</h2>
-      <p>Separate verified company process from candidate reports, then map each confirmed format to a focused drill.</p>
-    </a>
-    <a class="resource-card" href="/prep/labs/">
-      <h2>Executable labs</h2>
-      <p>Practice agentic codebase work, LLM training debugging, model investigation, performance analysis, implementation, and math.</p>
-    </a>
-    <a class="resource-card" href="/prep/practice/">
-      <h2>Practice method</h2>
-      <p>Use round-specific timers and rubrics, diagnose weak dimensions, and schedule retries.</p>
-    </a>
-    <a class="resource-card" href="/prep/progress/">
-      <h2>Progress & retry queue</h2>
-      <p>See what is due on this device, repeated weak dimensions, and whether gaps truly graduated.</p>
-    </a>
-    <a class="resource-card" href="/prep/story-bank/">
-      <h2>Story-bank worksheet</h2>
-      <p>Build, save locally, export, rehearse, and level-calibrate evidence-rich stories.</p>
-    </a>
-    <a class="resource-card" href="/prep/simulations/">
-      <h2>Simulation packets</h2>
-      <p>Run realistic AS, MLE, or RE loops with prompt pools, observers, scoring, and go/no-go gates.</p>
-    </a>
-    <a class="resource-card" href="/prep/final-week/">
-      <h2>Final-week checklist</h2>
-      <p>Consolidate, simulate, and protect retrieval quality without cramming new topics.</p>
-    </a>
-  </div>
-
-  <section class="callout">
-    <h2>Privacy by design</h2>
-    <p>The readiness calculation runs in your browser. Scratchpad text is never saved or sent. Optional local progress contains only question IDs, rubric dimensions, scores, and due dates. Story text is stored only if you explicitly choose “Save on this device.” Anonymous analytics record coarse actions, not selections or written content.</p>
+  <section class="plan-sheet" data-plan-context hidden>
+    <header>
+      <div><p class="section-kicker">Current plan</p><h2 data-plan-title></h2><p data-plan-summary></p></div>
+      <a href="/prep/readiness/">Edit plan</a>
+    </header>
+    <section class="next-action" data-next-action hidden>
+      <p>Do this next</p>
+      <a data-next-link><strong data-next-title></strong><span data-next-detail></span></a>
+    </section>
+    <details class="later-tasks" data-later-tasks hidden>
+      <summary>Next after this</summary>
+      <ol data-later-list></ol>
+    </details>
+    <div class="external-blockers" data-plan-blockers hidden><strong>Prepare separately</strong><ul></ul></div>
   </section>
 
-  <h2>A simple sequence</h2>
-  <ol class="step-list">
-    <li><strong>Choose a focus.</strong> Take the readiness check once; do not keep retaking it to chase a better result.</li>
-    <li><strong>Choose a horizon and workload.</strong> Use the shortest plan that fits your actual weekly hours and still leaves room for retries and simulation.</li>
-    <li><strong>Practice before reading.</strong> Attempt questions aloud, reveal the rubric, then compare against the reference.</li>
-    <li><strong>Prove improvement.</strong> Graduate a critical gap only after two spaced successful attempts and one unfamiliar follow-up.</li>
-  </ol>
+  <section id="queue" class="record-sheet">
+    <header>
+      <div><p class="section-kicker">Practice record</p><h2>Due and recent work</h2></div>
+      <p data-record-summary>No question attempts yet.</p>
+    </header>
+    <section class="empty-record" data-record-empty>
+      <p>Question pages include a timer and round-specific scorecard. Start with one question, then return here only when a retry is due.</p>
+      <a href="/questions/">Choose a question <span aria-hidden="true">→</span></a>
+    </section>
+    <div data-record-content hidden>
+      <section class="due-section">
+        <h3>Due now</h3>
+        <div class="record-list" data-due-list></div>
+      </section>
+      <details class="other-records" data-other-records>
+        <summary data-other-summary>Scheduled and completed</summary>
+        <div class="record-list" data-other-list></div>
+      </details>
+    </div>
+    <details class="backup" data-backup-controls hidden>
+      <summary>Backup or reset this workbook</summary>
+      <p>Export saves the plan, question record, and study completion marks as one JSON file.</p>
+      <div><button type="button" data-export>Export</button><button type="button" data-import>Import</button><button class="danger" type="button" data-clear>Clear workbook</button><input type="file" accept="application/json" data-import-file hidden /></div>
+    </details>
+  </section>
+
+  <details id="how-practice-works" class="method-sheet">
+    <summary><strong>How practice works</strong><span>Three steps</span></summary>
+    <ol>
+      <li><strong>Attempt closed-book.</strong> Use Practice Mode on a question page. Speak, derive, design, or code until the timer ends.</li>
+      <li><strong>Compare and score.</strong> Mark the observable gap before reading the reference answer.</li>
+      <li><strong>Retry later.</strong> Weak returns in two days. Review returns in one week. A Confident result still needs spaced evidence.</li>
+    </ol>
+    <p><strong>Graduation rule:</strong> two successful attempts on different days, no critical weak dimension, one unfamiliar follow-up, and a later mixed-session pass.</p>
+    <a href="/questions/">Choose a question <span aria-hidden="true">→</span></a>
+  </details>
+
+  <section class="next-stage">
+    <h2>When the basics are working</h2>
+    <ul>
+      <li><a href="/prep/simulations/">Run a role-specific simulation</a> after every expected round has a baseline.</li>
+      <li><a href="/prep/role-paths/">Open a role guide</a> when the next subject is unclear.</li>
+    </ul>
+    <details>
+      <summary>Specialist and final-stage appendices</summary>
+      <ul>
+        <li><a href="/prep/labs/">Executable labs</a></li>
+        <li><a href="/prep/frontier-labs/">Current interview formats</a></li>
+        <li><a href="/prep/story-bank/">Story bank</a></li>
+        <li><a href="/prep/final-week/">Final-week checklist</a></li>
+        <li><a href="/prep/plans/">Printable planning templates</a></li>
+      </ul>
+    </details>
+  </section>
 </PrepLayout>
 
+<script>
+  import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, replacePrepProgress, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
+  import { clearPrepPlan, currentPlanWeek, loadPrepPlan, nextPrepTasks, parsePrepBackup, savePrepPlan } from '../../utils/prepPlan';
+  import { clearActivityProgress, loadActivityProgress, replaceActivityProgress } from '../../utils/activityProgress';
+  import { trackPublicEvent } from '../../utils/publicEvents';
+
+  const today = toLocalDate(new Date());
+  const storageWarning = document.querySelector<HTMLElement>('[data-storage-warning]');
+  const backupControls = document.querySelector<HTMLElement>('[data-backup-controls]');
+  if (storageWarning) storageWarning.hidden = isPrepStorageAvailable();
+  if (backupControls) backupControls.hidden = false;
+
+  function dimensionLabel(value: string): string {
+    return value.replaceAll('-', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+  }
+
+  function taskItem(title: string, detail: string, href: string): HTMLLIElement {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = href;
+    const strong = document.createElement('strong');
+    strong.textContent = title;
+    const span = document.createElement('span');
+    span.textContent = detail;
+    link.append(strong, span);
+    item.append(link);
+    return item;
+  }
+
+  function renderPlan(records: PracticeProgressRecord[]): void {
+    const plan = loadPrepPlan();
+    const context = document.querySelector<HTMLElement>('[data-plan-context]');
+    const noPlan = document.querySelector<HTMLElement>('[data-no-plan]');
+    if (context) context.hidden = !plan;
+    if (noPlan) noPlan.hidden = Boolean(plan);
+
+    if (!plan || !context) {
+      const due = records.filter((record) => record.dueOn !== null && record.dueOn <= today);
+      const kicker = document.querySelector<HTMLElement>('[data-start-kicker]');
+      const title = document.querySelector<HTMLElement>('[data-start-title]');
+      const copy = document.querySelector<HTMLElement>('[data-start-copy]');
+      const primary = document.querySelector<HTMLAnchorElement>('[data-start-primary]');
+      const secondary = document.querySelector<HTMLAnchorElement>('[data-start-secondary]');
+      if (due.length > 0) {
+        if (kicker) kicker.textContent = 'Due now';
+        if (title) title.textContent = `${due.length} ${due.length === 1 ? 'question needs' : 'questions need'} another attempt.`;
+        if (copy) copy.textContent = 'Complete due work before opening another topic. Keep the answer closed until the attempt ends.';
+        if (primary) { primary.href = `/questions/${due[0].slug}/?practice=1`; primary.textContent = 'Practice the next due question'; }
+        if (secondary) { secondary.href = '/prep/readiness/'; secondary.textContent = 'Build a plan'; }
+      } else if (records.length > 0) {
+        if (kicker) kicker.textContent = 'Continue';
+        if (title) title.textContent = 'No retry is due today.';
+        if (copy) copy.textContent = 'Choose one new question. Preserve spacing instead of repeating a familiar answer immediately.';
+        if (primary) { primary.href = '/questions/'; primary.textContent = 'Choose a new question'; }
+        if (secondary) { secondary.href = '/prep/readiness/'; secondary.textContent = 'Build a plan'; }
+      }
+      return;
+    }
+
+    const week = currentPlanWeek(plan);
+    const title = context.querySelector<HTMLElement>('[data-plan-title]');
+    const summary = context.querySelector<HTMLElement>('[data-plan-summary]');
+    if (title) title.textContent = `${plan.roleLabel} · week ${week} of ${plan.horizon}`;
+    if (summary) summary.textContent = `${plan.level.toUpperCase()} · ${plan.weeklyHours} hours/week · estimated ${plan.estimatedHours.low}–${plan.estimatedHours.high} hours · updated ${plan.updatedOn}`;
+
+    const tasks = nextPrepTasks(plan, records, today);
+    const nextAction = context.querySelector<HTMLElement>('[data-next-action]');
+    const nextLink = context.querySelector<HTMLAnchorElement>('[data-next-link]');
+    const nextTitle = context.querySelector<HTMLElement>('[data-next-title]');
+    const nextDetail = context.querySelector<HTMLElement>('[data-next-detail]');
+    const first = tasks[0];
+    if (nextAction) nextAction.hidden = !first;
+    if (first && nextLink && nextTitle && nextDetail) {
+      nextLink.href = first.href;
+      nextTitle.textContent = first.title;
+      nextDetail.textContent = first.detail;
+    }
+
+    const later = context.querySelector<HTMLDetailsElement>('[data-later-tasks]');
+    const laterList = context.querySelector<HTMLOListElement>('[data-later-list]');
+    if (later) later.hidden = tasks.length < 2;
+    if (laterList) laterList.replaceChildren(...tasks.slice(1).map((task) => taskItem(task.title, task.detail, task.href)));
+
+    const blockerBox = context.querySelector<HTMLElement>('[data-plan-blockers]');
+    const blockerList = blockerBox?.querySelector('ul');
+    const blockers = plan.externalRounds.filter((item) => item.status === 'missing');
+    if (blockerBox) blockerBox.hidden = blockers.length === 0;
+    if (blockerList) blockerList.replaceChildren(...blockers.map((blocker) => Object.assign(document.createElement('li'), { textContent: blocker.label })));
+  }
+
+  function recordCard(record: PracticeProgressRecord): HTMLElement {
+    const card = document.createElement('article');
+    card.className = 'record-row';
+    const header = document.createElement('header');
+    const title = document.createElement('h4');
+    const link = document.createElement('a');
+    link.href = `/questions/${record.slug}/?practice=1`;
+    link.textContent = record.title;
+    title.append(link);
+    const badge = document.createElement('span');
+    badge.className = `score score--${record.score.toLowerCase()}`;
+    badge.textContent = record.score;
+    header.append(title, badge);
+
+    const due = record.dueOn ? (record.dueOn <= today ? 'Due now' : `Due ${record.dueOn}`) : 'No retry scheduled';
+    const meta = document.createElement('p');
+    meta.textContent = `${record.attempts} attempt${record.attempts === 1 ? '' : 's'} · ${due}`;
+    card.append(header, meta);
+
+    if (record.weakDimensions.length > 0) {
+      const gaps = document.createElement('p');
+      gaps.className = 'gaps';
+      gaps.textContent = `Repair: ${record.weakDimensions.map(dimensionLabel).join(', ')}`;
+      card.append(gaps);
+    }
+
+    const eligibleForMixed = record.successfulAttempts >= 2 && record.weakDimensions.length === 0;
+    if (eligibleForMixed && !record.mixedVerifiedOn) {
+      const verify = document.createElement('button');
+      verify.type = 'button';
+      verify.className = 'verify-button';
+      verify.textContent = 'Mark mixed-session pass';
+      verify.addEventListener('click', () => {
+        if (!window.confirm('Confirm this answer passed later with a changed prompt or unfamiliar follow-up?')) return;
+        try { markMixedSessionVerified(record.slug); render(); }
+        catch { if (storageWarning) storageWarning.hidden = false; }
+      });
+      card.append(verify);
+    } else if (record.mixedVerifiedOn) {
+      const graduated = document.createElement('p');
+      graduated.className = 'graduated';
+      graduated.textContent = `Graduated ${record.mixedVerifiedOn}`;
+      card.append(graduated);
+    }
+    return card;
+  }
+
+  function render(): void {
+    const records = loadPrepProgress().sort((left, right) => (left.dueOn ?? '9999').localeCompare(right.dueOn ?? '9999'));
+    renderPlan(records);
+    const due = records.filter((record) => record.dueOn !== null && record.dueOn <= today);
+    const other = records.filter((record) => !due.includes(record));
+    const attempts = records.reduce((sum, record) => sum + record.attempts, 0);
+    const study = Object.keys(loadActivityProgress().completed).length;
+    const summary = document.querySelector<HTMLElement>('[data-record-summary]');
+    if (summary) summary.textContent = records.length === 0
+      ? `${study} study ${study === 1 ? 'item' : 'items'} completed`
+      : `${records.length} ${records.length === 1 ? 'question' : 'questions'} · ${attempts} ${attempts === 1 ? 'attempt' : 'attempts'} · ${due.length} due · ${study} study items`;
+
+    const empty = document.querySelector<HTMLElement>('[data-record-empty]');
+    const content = document.querySelector<HTMLElement>('[data-record-content]');
+    if (empty) empty.hidden = records.length > 0;
+    if (content) content.hidden = records.length === 0;
+
+    const dueList = document.querySelector<HTMLElement>('[data-due-list]');
+    if (dueList) dueList.replaceChildren(...(due.length > 0
+      ? due.map(recordCard)
+      : [Object.assign(document.createElement('p'), { className: 'nothing-due', textContent: 'Nothing is due. Preserve spacing rather than retrying immediately.' })]));
+    const otherList = document.querySelector<HTMLElement>('[data-other-list]');
+    if (otherList) otherList.replaceChildren(...other.map(recordCard));
+    const otherRecords = document.querySelector<HTMLDetailsElement>('[data-other-records]');
+    const otherSummary = document.querySelector<HTMLElement>('[data-other-summary]');
+    if (otherRecords) otherRecords.hidden = other.length === 0;
+    if (otherSummary) otherSummary.textContent = `Scheduled and completed (${other.length})`;
+  }
+
+  document.querySelector('[data-clear]')?.addEventListener('click', () => {
+    if (!window.confirm('Clear the local plan, question record, and study completion marks?')) return;
+    try { clearPrepProgress(); clearPrepPlan(); clearActivityProgress(); render(); }
+    catch { if (storageWarning) storageWarning.hidden = false; }
+  });
+
+  document.querySelector('[data-export]')?.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ version: 1, exportedOn: new Date().toISOString(), plan: loadPrepPlan(), records: loadPrepProgress(), activity: loadActivityProgress() }, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'mlmentorship-workbook-backup.json';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  });
+
+  const importFile = document.querySelector<HTMLInputElement>('[data-import-file]');
+  document.querySelector('[data-import]')?.addEventListener('click', () => importFile?.click());
+  importFile?.addEventListener('change', async () => {
+    const file = importFile.files?.[0];
+    if (!file) return;
+    try {
+      const backup = parsePrepBackup(JSON.parse(await file.text()));
+      if (!backup) throw new Error('Invalid backup');
+      if (backup.plan) savePrepPlan(backup.plan); else clearPrepPlan();
+      replacePrepProgress(backup.records);
+      replaceActivityProgress(backup.activity);
+      render();
+    } catch {
+      if (storageWarning) { storageWarning.textContent = 'This file is not a valid mlmentorship workbook backup.'; storageWarning.hidden = false; }
+    } finally {
+      importFile.value = '';
+    }
+  });
+
+  try {
+    Object.keys(localStorage).filter((key) => key.startsWith('mlm:practice:')).forEach((key) => localStorage.removeItem(key));
+  } catch {
+    if (storageWarning) storageWarning.hidden = false;
+  }
+  const anchoredDetails = window.location.hash ? document.querySelector<HTMLDetailsElement>(window.location.hash) : null;
+  if (anchoredDetails?.tagName === 'DETAILS') anchoredDetails.open = true;
+  render();
+  trackPublicEvent('workbook_opened');
+</script>
+
 <style>
-  .library-primary { margin: 0 0 2.5rem; padding: 1.2rem; border: 2px solid var(--c-text); border-radius: var(--radius-lg); }
-  .library-primary h2 { margin: .15rem 0 1rem !important; }
-  .library-primary :global(.resource-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 0; }
-  .section-kicker { margin: 0; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
-  @media (max-width: 720px) { .library-primary :global(.resource-grid) { grid-template-columns: 1fr; } }
+  .storage-warning { margin: 0 0 1rem; padding: .75rem .85rem; border-left: 3px solid #b45309; background: var(--c-bg-tint); color: var(--c-text-soft); font-size: .82rem; }
+  .section-kicker { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
+  .start-sheet, .plan-sheet, .record-sheet { margin: 0 0 1.7rem; padding: .8rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .start-sheet h2, .plan-sheet h2, .record-sheet h2 { margin: .15rem 0 .35rem !important; font-size: 1.05rem !important; }
+  .start-sheet > p:not(.section-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); }
+  .start-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-top: .9rem; }
+  .primary-link { display: inline-block; padding: .58rem .78rem; border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font-weight: 700; text-decoration: none; }
+  .plan-sheet[hidden], .start-sheet[hidden], [data-record-content][hidden], .empty-record[hidden], [data-next-action][hidden], [data-later-tasks][hidden], [data-plan-blockers][hidden] { display: none; }
+  .plan-sheet > header, .record-sheet > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .plan-sheet > header > a { font-size: .78rem; }
+  .plan-sheet [data-plan-summary], .record-sheet > header > p { margin: 0; color: var(--c-muted); font-size: .78rem; }
+  .next-action { margin-top: 1rem; padding: .8rem 0 .8rem .9rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); }
+  .next-action[hidden] { display: none; }
+  .next-action > p { margin: 0 0 .25rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; }
+  .next-action a, .later-tasks a { color: inherit; text-decoration: none; }
+  .next-action strong, .next-action span, .later-tasks strong, .later-tasks span { display: block; }
+  .next-action span, .later-tasks span { margin-top: .12rem; color: var(--c-muted); font-size: .76rem; }
+  .next-action a:hover strong, .later-tasks a:hover strong { color: var(--c-accent); text-decoration: underline; }
+  .later-tasks { margin-top: .8rem; }
+  .later-tasks summary, .backup summary, .method-sheet summary, .next-stage details summary, .other-records summary { cursor: pointer; font-weight: 700; }
+  .later-tasks ol { margin: .5rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
+  .later-tasks li { margin: 0; padding: .55rem 0; border-bottom: 1px solid var(--c-rule); }
+  .external-blockers { margin-top: .8rem; padding: .65rem .75rem; border-left: 3px solid #b45309; background: var(--c-bg-tint); font-size: .78rem; }
+  .external-blockers ul { margin: .3rem 0 0; }
+  .empty-record { color: var(--c-text-soft); }
+  .empty-record p { max-width: 42rem; margin-bottom: .5rem; }
+  .due-section h3 { margin: .8rem 0 .2rem !important; font-size: .86rem !important; text-transform: uppercase; letter-spacing: .06em; }
+  .record-list { border-top: 1px solid var(--c-rule); }
+  .record-row { padding: .7rem 0; border-bottom: 1px solid var(--c-rule); }
+  .record-row header { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+  .record-row h4, .record-row p { margin: 0; }
+  .record-row h4 { font-size: .92rem; }
+  .record-row p { margin-top: .18rem; color: var(--c-muted); font-size: .76rem; }
+  .record-row .gaps { color: var(--c-text-soft); }
+  .record-row .graduated { color: #166534; font-weight: 700; }
+  .score { flex: 0 0 auto; color: var(--c-muted); font-size: .7rem; font-weight: 700; }
+  .score--weak { color: #b91c1c; }
+  .score--confident { color: #166534; }
+  .verify-button { margin-top: .45rem; padding: .38rem .55rem; border: 1px solid var(--c-accent); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+  .nothing-due { margin: 0; padding: .7rem 0; color: var(--c-muted); font-size: .8rem; }
+  .other-records { margin-top: .8rem; }
+  .other-records[hidden] { display: none; }
+  .backup { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--c-rule); }
+  .backup[hidden] { display: none; }
+  .backup p { color: var(--c-muted); font-size: .78rem; }
+  .backup > div { display: flex; flex-wrap: wrap; gap: .45rem; }
+  .backup button { padding: .45rem .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .75rem; cursor: pointer; }
+  .backup button:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .backup .danger { color: #b91c1c; }
+  .method-sheet { margin: 2.2rem 0; padding: .85rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); scroll-margin-top: var(--sticky-offset); }
+  .method-sheet > summary { display: flex; justify-content: space-between; gap: 1rem; list-style: none; }
+  .method-sheet > summary::-webkit-details-marker { display: none; }
+  .method-sheet > summary::after { content: '+'; color: var(--c-accent); font-family: var(--font-mono); }
+  .method-sheet[open] > summary::after { content: '−'; }
+  .method-sheet > summary span { margin-left: auto; color: var(--c-muted); font-size: .75rem; font-weight: 400; }
+  .method-sheet ol { margin: 1rem 0; padding-left: 1.3rem; }
+  .method-sheet li { margin: .55rem 0; }
+  .method-sheet p, .method-sheet li { color: var(--c-text-soft); font-size: .88rem; }
+  .next-stage { margin-top: 2.2rem; }
+  .next-stage h2 { margin-bottom: .5rem !important; font-size: 1.15rem !important; }
+  .next-stage > ul { margin: 0; padding-left: 1.2rem; }
+  .next-stage > ul li { margin: .4rem 0; }
+  .next-stage details { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--c-rule); }
+  .next-stage details ul { columns: 2; }
+  @media (max-width: 620px) {
+    .plan-sheet > header, .record-sheet > header { flex-direction: column; }
+    .start-actions { align-items: stretch; flex-direction: column; }
+    .start-actions a { text-align: center; }
+    .next-stage details ul { columns: 1; }
+  }
 </style>

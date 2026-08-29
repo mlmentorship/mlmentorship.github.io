@@ -65,7 +65,7 @@ The L6 answer contains everything in the L5 answer, then adds the things only pe
 **Why this is L6:**
 - Treats eval as a system with lifecycle, owners, and failure modes, not as a measurement.
 - Names specific pathologies and specific mitigations. Earned knowledge.
-- Mentions the offline-online correlation, almost no one mentions this and it's the single most important number for any LLM team.
+- Mentions offline-online correlation. Few candidates explain whether offline evals predict product behavior.
 - Pareto framing, won't be tricked by a metric-only improvement.
 - Cuts by slice, knows aggregates lie.
 

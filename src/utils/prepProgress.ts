@@ -1,4 +1,5 @@
 export const PREP_PROGRESS_KEY = 'mlm:prep-progress:v1';
+const PREP_STORAGE_PROBE_KEY = 'mlm:storage-probe';
 
 export type PracticeScore = 'Weak' | 'Review' | 'Confident';
 
@@ -15,6 +16,16 @@ export interface PracticeProgressRecord {
   mixedVerifiedOn: string | null;
   lastAttemptOn: string;
   dueOn: string | null;
+}
+
+export function isPrepStorageAvailable(): boolean {
+  try {
+    localStorage.setItem(PREP_STORAGE_PROBE_KEY, '1');
+    localStorage.removeItem(PREP_STORAGE_PROBE_KEY);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function isRecord(value: unknown): value is PracticeProgressRecord {
@@ -96,6 +107,12 @@ export function markMixedSessionVerified(slug: string): PracticeProgressRecord |
 
 export function clearPrepProgress(): void {
   localStorage.removeItem(PREP_PROGRESS_KEY);
+}
+
+export function replacePrepProgress(values: unknown[]): number {
+  const records = values.filter(isRecord);
+  localStorage.setItem(PREP_PROGRESS_KEY, JSON.stringify(records));
+  return records.length;
 }
 
 export function toLocalDate(date: Date): string {

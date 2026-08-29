@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A fault-tolerant collective detects missing, delayed, divergent, or corrupted participants and either completes with a stated guarantee or aborts into a consistent recovery path. Ordinary all-reduce assumes the group is healthy; fault tolerance begins when that assumption fails.
-
-## Why it matters
 
 Synchronous training advances at the pace of the slowest required rank. One fail-stop worker can abort the communication group, one straggler can stall every peer, and one rank with divergent state can produce a numerically valid but scientifically invalid update.
 

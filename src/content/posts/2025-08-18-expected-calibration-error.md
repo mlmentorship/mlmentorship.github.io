@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Expected Calibration Error** measures how well a model's predicted probabilities match empirical accuracies. Bin predictions by predicted confidence, and compute the weighted average of $|\text{accuracy in bin} - \text{average confidence in bin}|$:
 
 $$
 \text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \cdot \big| \text{acc}(B_m) - \text{conf}(B_m) \big|.
 $$
-
-## Why it matters
 
 A classifier that scores well on accuracy can still produce wildly miscalibrated probabilities. Predicting "90% confident" when only 60% of such predictions are correct. Calibration matters whenever:
 

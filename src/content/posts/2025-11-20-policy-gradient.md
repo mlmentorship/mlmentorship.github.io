@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Policy gradient** methods directly parametrize a policy $\pi_\theta(a \mid s)$ and optimize $\theta$ by ascending the gradient of expected return:
 
@@ -16,8 +16,6 @@ $$
 $$
 
 This is the **policy gradient theorem** [(Sutton et al., 1999)](https://papers.nips.cc/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html).
-
-## Why it matters
 
 Policy gradient methods are the foundation of modern continuous-control RL (SAC, PPO), of large-scale RL (AlphaGo's policy net, OpenAI Five), and of LLM alignment (RLHF uses PPO). They are essential whenever:
 

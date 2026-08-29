@@ -3,19 +3,165 @@
 Tracker for what's been written for the relaunch and what's still on the inventory list from the blueprint.
 This file is for internal planning; it isn't published as a site page.
 
-**Updated 2026-07-11 after the frontier-lab work-sample batch.**
+**Updated 2026-08-29 after the AI-lab, scaling-systems, UX, editorial consistency, and upper-IC depth passes.**
+
+For the next curriculum and product phase, see [docs/ML_CAREER_CURRICULUM_AND_UX_ROADMAP.md](docs/ML_CAREER_CURRICULUM_AND_UX_ROADMAP.md). It prioritizes ML-specific concept gaps and a role-to-round-to-practice workflow while preserving the decision not to duplicate generic LeetCode, SQL, or backend interview resources.
+
+For the chapter-level scaling review, see [docs/JAX_SCALING_BOOK_CONTENT_AUDIT.md](docs/JAX_SCALING_BOOK_CONTENT_AUDIT.md). It keeps framework-neutral systems reasoning in the core library and treats JAX APIs as an optional specialist dependency.
+
+For hosting and interface decisions, see [docs/STATIC_FIRST_UX.md](docs/STATIC_FIRST_UX.md). GitHub Pages is a hard constraint: core reading and navigation must work as generated HTML, CSS, and static assets.
+
+For tested user journeys and their resolution status, see [docs/USER_JOURNEY_UX_REVIEW_2026-08-28.md](docs/USER_JOURNEY_UX_REVIEW_2026-08-28.md).
+
+For writing rules and the full-library review, see [docs/EDITORIAL_STYLE.md](docs/EDITORIAL_STYLE.md) and [docs/CONTENT_STYLE_AUDIT_2026-08-28.md](docs/CONTENT_STYLE_AUDIT_2026-08-28.md).
 
 ## Targets
 
 | Section | Current | Previous 12-month target | Status |
 | --- | ---: | ---: | --- |
-| Guides | 10 | 15 | Depth over volume |
-| Interview Q&A | 76 | 50 | Exceeded |
-| Concepts | 157 | 100 | Exceeded |
-| Deep system-design case studies | 1 | 8 | Still underweight |
-| **Total posts** | **243** | **174** | Breadth target exceeded |
+| Guides | 13 | 15 | Depth over volume |
+| Interview Q&A | 85 | 50 | Exceeded |
+| Concepts | 185 | 100 | Exceeded |
+| Deep system-design case studies | 9 | 8 | Exceeded |
+| **Total posts** | **283** | **174** | Breadth target exceeded |
 
 **The library no longer needs broad reference expansion as its default.** Future work should prioritize realistic work samples, deep system-design cases, source maintenance, and revision of existing pages.
+
+## Done: static-first reading UX, 2026-08-28
+
+- [x] Replace the marketing-style root page with four shelves and nine subject-first books
+- [x] Add book pages with ordered chapters that combine concepts, questions, and guides
+- [x] Verify at build time that all 283 entries appear exactly once in the library taxonomy
+- [x] Keep `/start-here/` as a focused reading-path page for existing links
+- [x] Reduce the header to Contents, Questions, Workbook, and About
+- [x] Use one system sans-serif stack without a third-party font request
+- [x] Replace the three-column article shell with one reading column, one location rail, and a mobile Sections disclosure
+- [x] Stop broad viewport prefetching across large indexes
+- [x] Load the newsletter provider only on pages that render the form
+- [x] Remove repeated newsletter and author cards from every article
+- [x] Remove competing archive and right-side rails; keep one contextual book rail
+- [x] Exclude archive listing text from Pagefind so exact article results rank first
+- [x] Warn when local practice storage is unavailable
+- [x] Keep a static custom 404 page with recovery links
+- [x] Reduce prep navigation to Start, Path, Practice, Review, and Simulate
+- [x] Replace the prep tool directory with one ordered workflow and a returning-user Continue card
+- [x] Default readiness evidence to not attempted instead of a presumed workable answer
+- [x] Surface external coding, SQL, practical software, and general systems dependencies without duplicating those curricula
+- [x] Add a Research Scientist path, readiness overlay, and simulation
+- [x] Make Practice Mode full-screen and shorter on mobile
+- [x] Order every chapter pedagogically and use that order for article position and previous/next links
+- [x] Split oversized chapters and add dedicated static chapter routes
+- [x] Move misplaced technical guides and compression concepts to their subject books
+- [x] Show chapter priority, difficulty, role relevance, rounds, and prerequisites
+- [x] Split role preparation into four dedicated static paths with direct Practice Mode starts
+- [x] Save readiness as a local plan with next tasks, current week, recalibration delta, and import/export
+- [x] Track local study history across concepts, guides, role steps, labs, confident attempts, and simulations
+- [x] Add a timed multi-round simulation runner with private scratch notes
+- [x] Add search title weighting, filters, aliases, and missing-topic guidance
+- [x] Display Published, Updated, and Reviewed dates honestly
+- [x] Give undecided candidates a default Core-chapter starting sequence
+- [x] Load analytics over explicit HTTPS and pass final Lighthouse Best Practices audits
+- [x] Resolve the product identity as an ML interview field guide with one private Workbook
+- [x] Consolidate the prep hub, practice method, and progress queue into one Workbook
+- [x] Reduce global navigation to Contents, Questions, Workbook, and About
+- [x] Demote generic schedules, role guides, and specialist tools to contextual appendices
+- [x] Preserve old Practice and Progress URLs with permanent redirects
+- [x] Add a persistent Book / Previous / Next / Sections reader bar
+- [x] Make Previous and Next cross chapter boundaries within a book
+- [x] Separate book Sections from article-level On this page navigation
+- [x] Unify reading and interface typography around one minimal system font
+- [x] Reduce persistent header and reader-bar height and remove button chrome
+- [x] Remove repeated chapter indexes and entry descriptions from table-of-contents pages
+- [x] Reduce article metadata, role badges, title scale, spacing, borders, and shadows
+- [x] Add a minimal sticky desktop rail with book, chapter, and active-entry context
+- [x] Keep the compact Sections bar as the tablet and mobile fallback
+
+## Done: editorial consistency pass, 2026-08-28
+
+- [x] Audit all 283 concepts, questions, and guides
+- [x] Give all 185 concepts an answer-first Summary section
+- [x] Merge 143 separate stakes sections into their opening summaries
+- [x] Remove every Why-it-matters heading
+- [x] Replace high-confidence generated-prose templates with direct technical claims
+- [x] Split dense sentences and shorten every description to 32 words or fewer
+- [x] Preserve valid technical terms such as loss landscape and robust estimator
+- [x] Enforce pyramid openings, sentence length, description length, banned phrases, and em-dash exclusion in the build
+
+## Done: evidence-backed foundations batch, 2026-08-28
+
+- [x] Expectation, variance, covariance, and correlation
+- [x] Practical probability-distribution choice for ML
+- [x] Bootstrap, paired resampling, and dependent-data variants
+- [x] Data leakage and point-in-time correctness
+- [x] Decision thresholds, asymmetric costs, and abstention
+- [x] Causal inference for ML decisions
+- [x] Integrate all six into ordered books, reference indexes, role guidance, search, and related reading
+
+## Done: ranking, feedback, and lineage batch, 2026-08-28
+
+- [x] Learning-to-rank pointwise, pairwise, listwise, and lambda objectives
+- [x] Position bias, logging support, IPS, SNIPS, clipping, and doubly robust ranking
+- [x] Delayed labels, selective labels, censoring, and policy feedback loops
+- [x] Multi-task loss balancing, negative transfer, MMoE, and PLE
+- [x] ML data lineage, versioning, replay, deletion, and rollback
+- [x] Integrate all five into ordered books, role supplements, reference indexes, and existing practice pages
+
+## Done: depth and upper-IC foundation batch, 2026-08-28
+
+- [x] Publish a 6,000-word multi-team ML platform case with technical invariants, migration, ownership, adoption, cost, and portfolio decisions
+- [x] Expand senior-level calibration through staff and principal scope without treating level as a separate job family
+- [x] Add a reusable upper-IC level path that composes with AS, MLE, RS, and RE paths
+- [x] Add principal readiness, evidence bars, Workbook routing, and a five-round level simulation
+- [x] Extend the private story bank with technical-strategy, portfolio, durable-leverage, and succession evidence
+- [x] Integrate the case into the Systems book, question taxonomy, domain supplements, search, and related reading
+
+## Done: principal and senior-principal depth batch, 2026-08-29
+
+- [x] Publish an 8,000-word enterprise agent-platform case covering authority, tool effects, durable state, memory, security, evaluation, migration, and multi-organization strategy
+- [x] Publish a 4,000-word synthetic annotated mock with ten challenged turns, score movement, weak alternatives, and spaced retry drills
+- [x] Extend level calibration through company-dependent senior-principal and distinguished scope
+- [x] Add technical strategy as a selectable interview round
+- [x] Add senior-principal readiness, a dedicated simulation, Workbook routing, and story evidence
+- [x] Expand the upper-IC path to include both architecture cases and the annotated mock
+
+## Done: high-value depth completion, 2026-08-29
+
+- [x] Close the P0 concept set with entropy, conditional entropy, mutual information, information gain, and estimation limits
+- [x] Publish a fixed-budget reasoning-model case and annotated upper-IC strategy mock
+- [x] Publish a real-time multimodal assistant case spanning audio, video, screen, timing, privacy, and failure
+- [x] Publish a short-form video ecosystem case and annotated senior-principal strategy mock
+- [x] Publish a foundation-model data-platform case spanning provenance, mixtures, contamination, deletion, and infrastructure
+- [x] Publish an AI coding-product case spanning repository context, safe execution, evaluation, developer control, and rollout
+- [x] Publish an independent safety control-plane case for high-impact agents
+- [x] Integrate all nine entries into books, indexes, domain paths, technical-strategy practice, simulations, search, and related reading
+
+## Done: scaling-systems batch, 2026-08-28
+
+- [x] Audit all twelve chapters of the JAX Scaling Book against the current library
+- [x] Transformer parameter, FLOP, training-state, activation, and KV-cache accounting
+- [x] Sharded matrix multiplication from tensor axes to collectives
+- [x] GPU and TPU network topology without generation-specific tables
+- [x] Strong scaling, MFU, and parallelism selection
+- [x] Context parallelism and exact ring attention
+- [x] Framework-neutral distributed workload profiling
+- [x] Worked 70B model configuration to memory, time, cost, and layout question
+- [x] Add disaggregated prefill and decode to the inference-service design
+- [x] Correct collective, TP, FSDP, pipeline, checkpointing, and inference cost assumptions
+- [x] Keep broad JAX API teaching outside the core path
+
+## Done: AI-lab concept batch, 2026-08-28
+
+- [x] Hypothesis testing and confidence intervals
+- [x] Reproducibility and fair model comparison
+- [x] Contrastive and self-supervised learning
+- [x] Neural scaling laws and compute-optimal training
+- [x] Markov decision processes and Bellman equations
+- [x] LLM-as-judge evaluation
+- [x] Evaluation validity and benchmark contamination
+- [x] Synthetic data generation and verification
+- [x] RL with verifiable rewards and GRPO
+- [x] Test-time compute, search, and verifiers
+- [x] Link the new concepts from research, post-training, alignment, multimodal, agent, and infrastructure domain paths
 
 ## Done: frontier-lab work-sample batch, 2026-07-11
 
@@ -45,7 +191,7 @@ This file is for internal planning; it isn't published as a site page.
 ### Essays (6 / 15)
 
 - [x] LLM Evals: The hardest part of shipping LLMs
-- [x] What L5 vs L6 actually means at FAANG ML
+- [x] Senior through senior-principal ML scope
 - [x] The 5 things every applied scientist interview is testing for
 - [x] Designing a RAG system that actually works
 - [x] How to think about LLM inference cost
@@ -179,17 +325,9 @@ Written to close gaps found by diffing the CS/ML interview deck against publishe
 
 ---
 
-## Current backlog
+## Demand-gated backlog
 
-### Deep case studies
-
-- [ ] Training and serving a frontier reasoning model under a fixed cluster budget
-- [ ] End-to-end agent platform: environments, graders, training, deployment, and incident response
-- [ ] Real-time multimodal assistant: audio, vision, tool use, latency, and privacy
-- [ ] Short-form video recommendation with long-term ecosystem objectives
-- [ ] Foundation-model data platform: provenance, filtering, mixture, deletion, and audit
-- [ ] AI coding product: repository context, agent loop, sandbox, evals, and rollout
-- [ ] Safety control plane for high-impact tool-using agents
+The declared P0 concept set and deep-case target are complete. New public content now requires observed demand, a missing interview transfer, or current specialist review.
 
 ### Maintenance
 
@@ -200,9 +338,9 @@ Written to close gaps found by diffing the CS/ML interview deck against publishe
 - [ ] Add source or confidence labels where a page currently presents a moving frontier as settled
 - [ ] Track which labs candidates actually use before adding more formats
 
-### Quality gaps
+### Quality work requiring external evidence
 
-- [ ] Add one observed mock packet for every deep case study
+- [ ] Publish observed mock packets only with informed consent and useful annotation; three synthetic upper-IC transfer mocks are complete
 - [ ] Add hidden-test guidance for people facilitating the public implementation labs
 - [ ] Commission domain review for robotics, multimodal, alignment, and accelerator pages
 - [ ] Add visual architecture diagrams only where they improve a decision, not as decoration

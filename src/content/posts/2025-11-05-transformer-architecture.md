@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 A transformer stacks blocks of (1) self-attention layers mixing information across positions, and (2) feed-forward layers mixing information across features, bound by residual connections and normalization.
-
-## Why it matters
 
 The transformer is the dominant ML architecture of 2017-2026. It powers nearly every modern NLP system, most computer vision systems, all current LLMs, and increasingly recommendation, biology, and reinforcement learning systems. Understanding *why* it works (not just what it does) is foundational.
 

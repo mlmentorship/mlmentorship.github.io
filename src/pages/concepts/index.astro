@@ -48,7 +48,7 @@ if (ungrouped.length > 0) jumpItems.push({ label: 'Other', id: 'other', count: u
     return (
       <section class="group" id={toAnchor(sub)}>
         <h2 class="group-title">{sub} <span class="group-count">{list.length}</span></h2>
-        <ul class="post-list">
+        <ul class="post-list" data-pagefind-ignore="all">
           {list.map((p) => (
             <li>
               <a href={`/concepts/${p.slug}/`} class="entry-title">{p.title}</a>
@@ -63,7 +63,7 @@ if (ungrouped.length > 0) jumpItems.push({ label: 'Other', id: 'other', count: u
   {ungrouped.length > 0 && (
     <section class="group" id="other">
       <h2 class="group-title">Other</h2>
-      <ul class="post-list">
+      <ul class="post-list" data-pagefind-ignore="all">
         {ungrouped.map((p) => (
           <li>
             <a href={`/concepts/${p.slug}/`} class="entry-title">{p.title}</a>
@@ -78,16 +78,15 @@ if (ungrouped.length > 0) jumpItems.push({ label: 'Other', id: 'other', count: u
 <style>
   .head { margin-bottom: 1.8rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
   .kicker {
-    font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.14em;
-    color: var(--c-accent); background: var(--c-accent-soft);
-    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; margin: 0 0 1rem;
+    color: var(--c-accent); margin: 0 0 .8rem;
   }
   .head h1 {
     font-family: var(--font-display); font-size: clamp(1.6rem, 3.2vw, 2.2rem);
     font-weight: 700; line-height: 1.18; letter-spacing: -0.02em; margin: 0 0 0.6rem;
   }
-  .lede { color: var(--c-text-soft); margin: 0; max-width: 42rem; }
+  .lede { color: var(--c-text-soft); margin: 0; max-width: 42rem; font-family: var(--font-reading); font-size: 1.02rem; }
   .lede kbd {
     font-family: var(--font-mono); background: var(--c-kbd-bg);
     border: 1px solid var(--c-rule); padding: 0.05rem 0.35rem;
@@ -111,5 +110,5 @@ if (ungrouped.length > 0) jumpItems.push({ label: 'Other', id: 'other', count: u
     color: var(--c-text); text-decoration: none;
   }
   .entry-title:hover { color: var(--c-accent); text-decoration: underline; }
-  .desc { font-size: 0.9rem; color: var(--c-text-soft); margin: 0.25rem 0 0; line-height: 1.5; }
+  .desc { font-family: var(--font-reading); font-size: 0.94rem; color: var(--c-text-soft); margin: 0.25rem 0 0; line-height: 1.5; }
 </style>

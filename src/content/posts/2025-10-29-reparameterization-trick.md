@@ -30,7 +30,7 @@ The randomness now comes from `epsilon`, which doesn't depend on `phi`. The samp
 
 In short: instead of "sample `z` from `q_phi`," do "sample `epsilon` from a fixed distribution, then transform deterministically."
 
-## Why this matters
+## Lower-variance gradients
 
 This is the foundational trick for variational autoencoders (VAE). Without it, you'd have to use REINFORCE / score-function gradients, which have much higher variance and need many samples to be useful.
 
@@ -83,4 +83,4 @@ The L6 answer:
 
 ---
 
-*Related reference: [RLHF and DPO](/concepts/rlhf-and-dpo/), [Cross-entropy and softmax](/concepts/cross-entropy-softmax/), [Bayesian vs frequentist](/questions/bayesian-vs-frequentist/).*
+*Related: [RLHF and DPO](/concepts/rlhf-and-dpo/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), and [Bayesian versus frequentist](/questions/bayesian-vs-frequentist/).*

@@ -7,17 +7,15 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Continuous batching (a.k.a. iteration-level scheduling) processes a batch one decode step at a time and lets new requests enter the batch as soon as another request finishes, instead of waiting for the entire static batch to complete.
 
-## Why it matters
-
-LLM decoding is memory-bound: the cost is dominated by reading model weights from HBM, not by per-token compute. So increasing batch size is nearly free in latency for each request. But only if the batch stays full.
+Small-batch LLM decoding is usually memory-bound because each step reads model weights for little arithmetic. Adding requests can amortize those weight reads and improve throughput. Iteration time eventually grows as matrix compute, KV-cache traffic, or scheduler overhead becomes limiting.
 
 With **static batching**, you wait for the longest request in the batch before reusing GPU. If one request generates 1000 tokens and another generates 50, the second request's GPU slot sits idle for 950 steps.
 
-Continuous batching keeps the GPU saturated. Combined with PagedAttention (see [paged attention](/concepts/paged-attention/)), it is the foundation of vLLM, TGI, and other modern LLM servers. Throughput improvements over static batching are 2–10× depending on the request mix.
+Continuous batching keeps more useful work on the GPU. Combined with paged KV allocation, it is a common design in modern LLM servers. The gain over static batching depends on arrival rate, length distribution, memory capacity, scheduler policy, and latency target.
 
 ## The mechanism
 

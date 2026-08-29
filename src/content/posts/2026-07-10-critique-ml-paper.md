@@ -39,11 +39,11 @@ These may be true, but they are generic and never identify the highest-impact th
 
 ## What an L5 answer adds
 
-An L5 answer ties each criticism to the claim: if the claim is efficiency, compare matched wall time and hardware utilization; if robustness, define the shift and the uncertainty; if a mechanism, demand a discriminating ablation; if the gain is small, compare it against seed variance and tuning budget. It proposes one feasible next experiment, not a wish list.
+An L5 answer ties each criticism to the claim. For efficiency, compare matched wall time and hardware use. For robustness, define the shift and uncertainty. For a mechanism, require a discriminating ablation. Compare small gains with seed variance and tuning budget, then propose one feasible experiment.
 
 ## What an L6 answer adds
 
-An L6 answer judges strategic value: is the benchmark saturated or misaligned with real use, does the method move the cost or reliability frontier, which result is likely to survive scale, what capability would be needed to reproduce it, and is the contribution a new primitive, a recipe, or a local optimization. It updates visibly when the evidence contradicts a first impression.
+An L6 answer also judges strategic value. It checks whether the benchmark matches real use, whether the method improves cost or reliability, and which result may survive scale. It identifies the capability needed to reproduce the work and classifies the contribution as a primitive, recipe, or local optimization.
 
 ## Tells that get you a strong-hire vote
 

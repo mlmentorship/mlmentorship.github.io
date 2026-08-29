@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 A model is well-calibrated if among predictions made with confidence p, the fraction that are correct is also p. A model can be accurate but poorly calibrated, or calibrated but inaccurate; both matter for production.
-
-## Why it matters
 
 Many production systems consume model probabilities, not just classifications. Examples:
 - Threshold tuning for downstream actions (flag for review if probability &gt; 0.9).
@@ -117,4 +115,4 @@ A common follow-up: "When does calibration *not* matter?" The senior answer: whe
 
 ---
 
-*Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/).*
+*Related: [decision thresholds, asymmetric costs, and abstention](/concepts/decision-thresholds-asymmetric-costs-abstention/), [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), and [How do you handle hallucinations in production?](/questions/handle-hallucinations-in-production/).*

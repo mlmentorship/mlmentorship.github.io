@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 A model can hit 99% test accuracy and still fail on inputs a human cannot tell apart from clean ones, because average-case accuracy says nothing about the worst case an attacker can search for. That gap matters wherever an adversary is present: fraud, content moderation, malware, authentication, autonomous perception. An adversarial example is an input deliberately perturbed to cause failure while staying inside a defined threat model, and robustness only means something relative to that threat model: the attacker's knowledge, capabilities, norm or semantic budget, and the system being defended.
 

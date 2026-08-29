@@ -11,41 +11,32 @@ interface Props {
 
 const { title, description, heading, lede, eyebrow = 'Free prep resources' } = Astro.props;
 const pathname = Astro.url.pathname;
-const resources = [
-  { href: '/prep/', label: 'Overview' },
-  { href: '/prep/readiness/', label: 'Readiness' },
-  { href: '/prep/plans/', label: 'Plans' },
-  { href: '/prep/role-paths/', label: 'Role paths' },
-  { href: '/prep/frontier-labs/', label: 'Frontier labs' },
-  { href: '/prep/labs/', label: 'Labs' },
-  { href: '/prep/practice/', label: 'Practice' },
-  { href: '/prep/progress/', label: 'Progress' },
-  { href: '/prep/story-bank/', label: 'Story bank' },
-  { href: '/prep/simulations/', label: 'Simulations' },
-  { href: '/prep/final-week/', label: 'Final week' },
-];
+const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
+  : pathname.startsWith('/prep/role-paths/') ? 'Role guide'
+  : pathname.startsWith('/prep/simulations/') ? 'Simulation'
+  : pathname.startsWith('/prep/labs/') ? 'Lab'
+  : pathname.startsWith('/prep/frontier-labs/') ? 'Interview formats'
+  : pathname.startsWith('/prep/story-bank/') ? 'Story bank'
+  : pathname.startsWith('/prep/presentation/') ? 'Presentation'
+  : pathname.startsWith('/prep/values/') ? 'Values'
+  : pathname.startsWith('/prep/final-week/') ? 'Final week'
+  : pathname.startsWith('/prep/plans/') ? 'Planning appendix'
+  : null;
 ---
 
 <BaseLayout title={title} description={description}>
   <div class="prep-page">
+    <nav class="workbook-trail" aria-label="Breadcrumb">
+      <a href="/">Contents</a><span aria-hidden="true">/</span>
+      {pathname === '/prep/' ? <span aria-current="page">Workbook</span> : <a href="/prep/">Workbook</a>}
+      {sectionLabel && <><span aria-hidden="true">/</span><span aria-current="page">{sectionLabel}</span></>}
+    </nav>
+
     <header class="prep-hero">
       <p class="prep-eyebrow">{eyebrow}</p>
       <h1>{heading}</h1>
       <p>{lede}</p>
     </header>
-
-    <nav class="library-strip" aria-label="Core interview library">
-      <span>Core library</span>
-      <a href="/questions/">Questions</a>
-      <a href="/guides/">Guides</a>
-      <a href="/concepts/">Concepts</a>
-    </nav>
-
-    <nav class="prep-nav" aria-label="Preparation resources">
-      {resources.map((resource) => (
-        <a href={resource.href} aria-current={pathname === resource.href ? 'page' : undefined}>{resource.label}</a>
-      ))}
-    </nav>
 
     <article class="prep-content">
       <slot />
@@ -54,32 +45,27 @@ const resources = [
 </BaseLayout>
 
 <style>
-  .prep-page { max-width: 55rem; margin: 0 auto; padding: clamp(2rem, 6vw, 4.5rem) var(--gutter) 5rem; }
-  .prep-hero { max-width: 46rem; margin-bottom: 1.8rem; }
-  .prep-eyebrow { margin: 0 0 .75rem !important; font-family: var(--font-mono); font-size: .7rem !important; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--c-accent) !important; }
-  .prep-hero h1 { margin: 0 0 1rem; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.05; letter-spacing: -.035em; }
-  .prep-hero > p:last-child { max-width: 43rem; margin: 0; font-size: 1.08rem; line-height: 1.6; color: var(--c-text-soft); }
-  .library-strip { display: flex; align-items: center; flex-wrap: wrap; gap: .55rem .9rem; margin-bottom: 1rem; padding: .7rem .85rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); font-family: var(--font-ui); font-size: .82rem; }
-  .library-strip span { color: var(--c-muted); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
-  .library-strip a { color: var(--c-text); font-weight: 700; text-decoration: none; }
-  .library-strip a:hover { color: var(--c-accent); text-decoration: underline; }
-  .prep-nav { display: flex; gap: .45rem; margin: 0 calc(-1 * var(--gutter)) 2.5rem; padding: 0 var(--gutter) .8rem; overflow-x: auto; border-bottom: 1px solid var(--c-rule); scrollbar-width: thin; }
-  .prep-nav a { flex: 0 0 auto; padding: .45rem .65rem; border: 1px solid var(--c-rule); border-radius: 999px; color: var(--c-text-soft); font-family: var(--font-ui); font-size: .78rem; font-weight: 600; text-decoration: none; }
-  .prep-nav a:hover { border-color: var(--c-accent); color: var(--c-accent); }
-  .prep-nav a[aria-current='page'] { border-color: var(--c-accent); background: var(--c-accent-soft); color: var(--c-text); }
-  .prep-content :global(h2) { margin: 2.6rem 0 .75rem; font-size: 1.45rem; scroll-margin-top: 5.5rem; }
-  .prep-content :global(h3) { margin: 1.7rem 0 .5rem; font-size: 1.08rem; }
-  .prep-content :global(p), .prep-content :global(li) { line-height: 1.65; }
+  .prep-page { max-width: 46rem; margin: 0 auto; padding: clamp(1.3rem, 3vw, 2.2rem) var(--gutter) 4rem; }
+  .workbook-trail { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: 1.1rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .68rem; }
+  .workbook-trail a { color: var(--c-text-soft); text-decoration: none; }
+  .workbook-trail a:hover { color: var(--c-accent); text-decoration: underline; }
+  .prep-hero { max-width: 42rem; margin-bottom: 1.4rem; padding-bottom: .9rem; border-bottom: 1px solid var(--c-rule); }
+  .prep-eyebrow { margin: 0 0 .4rem !important; color: var(--c-muted) !important; font-size: .68rem !important; font-weight: 500; }
+  .prep-hero h1 { margin: 0 0 .45rem; font-size: clamp(1.65rem, 4vw, 2.15rem); line-height: 1.14; letter-spacing: -.02em; }
+  .prep-hero > p:last-child { max-width: 40rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .94rem; line-height: 1.5; }
+  .prep-content :global(h2) { margin: 2rem 0 .6rem; font-size: 1.2rem; scroll-margin-top: var(--sticky-offset); }
+  .prep-content :global(h3) { margin: 1.35rem 0 .4rem; font-size: 1rem; }
+  .prep-content :global(p), .prep-content :global(li) { overflow-wrap: anywhere; line-height: 1.55; }
   .prep-content :global(.intro) { max-width: 44rem; padding: 1rem 1.1rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); color: var(--c-text-soft); }
   .prep-content :global(.resource-grid) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.4rem 0 2rem; }
-  .prep-content :global(.resource-card) { display: block; padding: 1.15rem 1.2rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); color: inherit; text-decoration: none; }
-  .prep-content :global(.resource-card:hover) { border-color: var(--c-accent); transform: translateY(-2px); }
+  .prep-content :global(.resource-card) { display: block; padding: .85rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); color: inherit; text-decoration: none; }
+  .prep-content :global(.resource-card:hover) { border-color: var(--c-muted); }
   .prep-content :global(.resource-card h2), .prep-content :global(.resource-card h3) { margin: 0 0 .45rem; font-size: 1.08rem; }
   .prep-content :global(.resource-card p) { margin: 0; color: var(--c-text-soft); font-size: .9rem; }
   .prep-content :global(.step-list) { list-style: none; margin: 1.2rem 0; padding: 0; counter-reset: prep-step; }
   .prep-content :global(.step-list > li) { position: relative; margin: 0; padding: 1rem 0 1rem 3rem; border-top: 1px solid var(--c-rule); counter-increment: prep-step; }
   .prep-content :global(.step-list > li::before) { content: counter(prep-step, decimal-leading-zero); position: absolute; left: 0; top: 1.2rem; font-family: var(--font-mono); font-size: .76rem; color: var(--c-accent); }
-  .prep-content :global(.callout) { margin: 1.5rem 0; padding: 1rem 1.1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); }
+  .prep-content :global(.callout) { margin: 1.3rem 0; padding: .8rem .9rem; border-left: 2px solid var(--c-rule); background: var(--c-bg-tint); }
   .prep-content :global(.callout > :first-child) { margin-top: 0; }
   .prep-content :global(.callout > :last-child) { margin-bottom: 0; }
   .prep-content :global(.print-button) { padding: .65rem .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-weight: 600; cursor: pointer; }
@@ -88,7 +74,7 @@ const resources = [
     .prep-content :global(.resource-grid) { grid-template-columns: 1fr; }
   }
   @media print {
-    :global(.masthead), :global(footer), .library-strip, .prep-nav, .prep-content :global(.print-button) { display: none !important; }
+    :global(.masthead), :global(footer), .workbook-trail, .prep-content :global(.print-button) { display: none !important; }
     .prep-page { max-width: none; padding: 0; }
     .prep-hero { margin-bottom: 1rem; }
   }

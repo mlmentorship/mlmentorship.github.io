@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## Why it matters
+## Summary
 
 Single-agent RL assumes a stationary environment. The moment other learning agents share it, that assumption breaks: markets, game-playing, traffic, negotiation, ad auctions, and self-play training are all multi-agent. Multi-agent RL studies environments where several agents act at once, and each agent's reward and transitions depend on the other agents' policies, which are themselves changing.
 

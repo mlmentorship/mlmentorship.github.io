@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A Mixture-of-Experts layer replaces a single dense feed-forward network with $N$ parallel "expert" FFNs and a router that sends each token to the top-$k$ experts (typically $k=1$ or $k=2$). Total parameters scale with $N$; per-token compute scales with $k$.
-
-## Why it matters
 
 The defining tradeoff: a $k$-of-$N$ MoE has roughly the same per-token FLOPs as a dense model with $k/N$ of the parameters, but the *capacity* of all $N$ experts. Mixtral 8×7B [(Jiang et al., 2023)](https://arxiv.org/abs/2401.04088) has 47B total parameters and uses ~13B per token. Quality close to a 70B dense model at ~5× lower inference compute.
 

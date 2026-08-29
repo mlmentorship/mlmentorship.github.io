@@ -8,11 +8,9 @@ category: "concepts"
 ---
 
 
-## One-line definition
+## Summary
 
 Tokenization splits text into discrete units (tokens). Modern LLMs use subword schemes (BPE, WordPiece, SentencePiece) that decompose rare words into subword pieces while preserving common words as single tokens.
-
-## Why it matters
 
 - Tokenization defines the model's input and output space, it's irreversibly baked into a trained model.
 - Token count drives both cost and latency at inference. Different tokenizers give different counts for the same text (sometimes by 30%+).
@@ -93,7 +91,7 @@ Tokenization questions test:
 3. Whether you know modern LLM tokenization choices (byte-level BPE, digit splitting, code-aware vocab).
 4. Whether you're aware of multilingual fairness/cost issues.
 
-A common follow-up: "How would you handle a domain where the standard tokenizer is inefficient (e.g., medical, legal, or code with rare keywords)?" The senior answer: extending the tokenizer with new tokens (continued pretraining) or training a new tokenizer from scratch on domain text and retraining the model.
+A common follow-up asks how to handle an inefficient tokenizer for medical, legal, or code text. Extend the tokenizer and continue pretraining, or train a new tokenizer on domain text and retrain the model.
 
 ---
 

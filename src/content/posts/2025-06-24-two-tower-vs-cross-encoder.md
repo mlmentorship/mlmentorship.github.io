@@ -48,7 +48,7 @@ This is L5. You've named the architectures, the trade-offs, the standard composi
 >
 > **For RAG specifically**: the standard stack is bi-encoder retrieval (top 50-100) → cross-encoder rerank (top 5-10) → LLM generation. Each stage is its own engineering and quality optimization."
 
-This is L6. You've gone past the textbook two-architecture comparison into the modern landscape (ColBERT, SPLADE, distillation) and the practical training discipline (hard negative mining).
+This is L6. You have connected the textbook comparison to newer methods such as ColBERT, SPLADE, and distillation, plus the practical training discipline of hard negative mining.
 
 ## The tells that get you a strong-hire vote
 

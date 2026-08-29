@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **confusion matrix** is a $K \times K$ table where rows are true classes and columns are predicted classes (or vice versa, depending on convention). Each cell counts how many examples had that (true, predicted) pair. Every standard classification metric. Accuracy, precision, recall, specificity, F1, balanced accuracy. Is a function of the confusion-matrix counts.
-
-## Why it matters
 
 Reporting a single classification metric is almost always insufficient. The confusion matrix:
 

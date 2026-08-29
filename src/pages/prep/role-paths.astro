@@ -1,52 +1,8 @@
 ---
 import PrepLayout from '../../layouts/PrepLayout.astro';
 import { SITE } from '../../consts';
+import { ROLE_PATHS, STAFF_PRINCIPAL_PATH } from '../../data/rolePaths';
 if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
-
-const rolePaths = [
-  {
-    id: 'applied-scientist', title: 'Applied Scientist', rule: 'Do not prep like a pure researcher. Preserve science, but prove scoping, experimentation, shipping, and influence.',
-    sequence: [
-      ['01 · Calibrate role and level', '/guides/as-vs-mle-vs-re/', 'Read the role taxonomy and L5/L6 calibration; choose the target rubric.'],
-      ['02 · Scope before solving', '/questions/scope-ambiguous-problem/', 'Practice objective, user, data, constraints, and smallest discriminating experiment.'],
-      ['03 · Prove ML breadth', '/questions/how-to-choose-loss-function/', 'Explain mechanisms and alternatives, not recipes.'],
-      ['04 · Design end to end', '/questions/design-fraud-detection/', 'Connect data, baseline, model, eval, serving, monitoring, and iteration.'],
-      ['05 · Make a product decision', '/questions/design-ml-ab-test/', 'Choose metrics, experiment design, validity checks, and a ship rule.'],
-      ['06 · Debug evidence disagreement', '/questions/debug-offline-online-metric-gap/', 'Separate objective mismatch, leakage, serving skew, and feedback effects.'],
-      ['07 · Defend project ownership', '/questions/most-ambitious-project/', 'Prepare a short opening and 20-minute technical deep-dive.'],
-      ['08 · Show judgment under pressure', '/questions/advocated-quality-over-speed/', 'Balance legitimate delivery pressure with measurable user risk.'],
-      ['09 · Simulate the loop', '/prep/simulations/#applied-scientist', 'Run the AS packet and reduce results to three bounded repairs.'],
-    ],
-  },
-  {
-    id: 'ml-engineer', title: 'Machine Learning Engineer', rule: 'Do not substitute ML reading for software execution. Code, debug, and design reliable systems repeatedly.',
-    sequence: [
-      ['01 · Confirm the loop', '/guides/as-vs-mle-vs-re/', 'Ask whether implementation means general algorithms, ML primitives, debugging, or all three. Use other resources for general algorithms.'],
-      ['02 · Establish an ML implementation baseline', '/questions/implement-streaming-classification-metrics/', 'Build mergeable model-evaluation logic with tests, edge cases, and explicit metric semantics.'],
-      ['03 · Add bounded-memory implementation', '/questions/implement-batched-top-k/', 'Reason about vectorization, memory, and exact-versus-ANN trade-offs.'],
-      ['04 · Debug systematically', '/questions/debug-training-loop/', 'State the diagnostic order before editing code.'],
-      ['05 · Design reliable serving', '/questions/design-ml-monitoring/', 'Cover data, model, outcome, alerts, ownership, and rollback.'],
-      ['06 · Make cost explicit', '/questions/design-ml-system-fixed-budget/', 'Quantify workload and quality/cost/latency frontiers.'],
-      ['07 · Debug offline and online disagreement', '/questions/debug-offline-online-metric-gap/', 'Separate experiment integrity, serving skew, proxy mismatch, and feedback effects.'],
-      ['08 · Prepare production failure and recovery stories', '/prep/story-bank/', 'Use failure, incident recovery, trade-off, and cross-team stories.'],
-      ['09 · Simulate the loop', '/prep/simulations/#ml-engineer', 'Run ML implementation, design, production, breadth, and project rounds.'],
-    ],
-  },
-  {
-    id: 'research-engineer', title: 'Research Engineer', rule: 'Balance implementation and systems depth with scientific skepticism. Confirm whether the title is research-heavy or software-heavy.',
-    sequence: [
-      ['01 · Confirm role mix', '/guides/as-vs-mle-vs-re/', 'Map research, modeling, engineering, and product expectations.'],
-      ['02 · Implement a core primitive', '/questions/implement-attention-from-scratch/', 'Build the mechanism correctly and explain dimensions and complexity.'],
-      ['03 · Add systems implementation', '/questions/implement-batched-top-k/', 'Handle memory and performance without hiding behind a library.'],
-      ['04 · Model the workload', '/questions/train-100b-model/', 'Reason about memory, parallelism, communication, failures, and checkpoints.'],
-      ['05 · Reason about inference', '/questions/reduce-llm-inference-cost-10x/', 'Use measurement and cost models rather than a list of optimizations.'],
-      ['06 · Design discriminating evidence', '/questions/design-ablation-study/', 'Control compute, tuning, variance, and alternative explanations.'],
-      ['07 · Critique research fairly', '/questions/critique-ml-paper/', 'Prioritize the threat that most changes the central claim.'],
-      ['08 · Prepare translation stories', '/prep/story-bank/', 'Show failed experiments, implementation decisions, and research-to-production impact.'],
-      ['09 · Simulate the loop', '/prep/simulations/#research-engineer', 'Run ML implementation, systems, research depth, breadth, and project rounds.'],
-    ],
-  },
-];
 
 const frontierFormats = [
   { title: 'Agentic codebase', when: 'The recruiter names an existing repository or authorized coding agent.', action: 'Replace one implementation repetition with the agentic evaluation-service lab. Practice mapping, bounded delegation, diff review, and proof.', href: '/prep/labs/agentic-codebase/' },
@@ -57,36 +13,45 @@ const frontierFormats = [
 ];
 
 const domains = [
-  { title: 'LLM and agents', do: ['LLM evals and failure taxonomy', 'RAG versus fine-tuning decisions', 'Inference workload and cost', 'Agent reliability and tool-use evaluation'], links: [['Evaluate an LLM application', '/questions/how-would-you-evaluate-an-llm-application/'], ['Inference service', '/questions/design-production-llm-inference-service/'], ['Evaluate an agent', '/questions/evaluate-an-agent/']] },
-  { title: 'Post-training and environments', do: ['Preference data and reward models', 'RL environments and evidence-bearing graders', 'Synthetic data and held-out behavioral families', 'Reward hacking and online product validation'], links: [['Post-training design', '/questions/design-post-training-data-and-rl-environment/'], ['Preference data', '/concepts/preference-data-and-reward-models/'], ['Environment lab', '/prep/labs/post-training-environment/']] },
-  { title: 'Alignment and model behavior', do: ['Scalable oversight and control', 'Mechanistic interpretability', 'Monitorability and model behavior', 'Adaptive red-team and LLM security'], links: [['Scalable oversight', '/concepts/scalable-oversight-and-ai-control/'], ['Mechanistic interpretability', '/concepts/mechanistic-interpretability/'], ['Red-team design', '/questions/design-llm-red-team-program/']] },
-  { title: 'Multimodal and robotics', do: ['Cross-modal alignment and fusion', 'Image, audio, and video token budgets', 'Grounding and modality-conflict evaluation', 'Observation, action, safety, and sim-to-real'], links: [['Multimodal models', '/concepts/multimodal-foundation-models/'], ['Robotics policies', '/concepts/robotics-policy-learning/'], ['Vision transformers', '/concepts/vision-transformers/']] },
-  { title: 'Recommendations and search', do: ['Candidate generation and ranking', 'Offline ranking metrics and position bias', 'Exploration and feedback loops', 'Cold start and ecosystem health'], links: [['YouTube recommender', '/questions/design-youtube-recommender/'], ['Evaluate a ranker', '/questions/evaluate-search-ranker/'], ['Cold start', '/questions/cold-start-new-user/']] },
-  { title: 'ML platform and infrastructure', do: ['Training and serving workload models', 'Distributed communication and memory', 'Feature/data reliability', 'Monitoring, fallback, and cost ownership'], links: [['Train a 100B model', '/questions/train-100b-model/'], ['Feature store', '/questions/design-feature-store/'], ['Fixed-budget system', '/questions/design-ml-system-fixed-budget/']] },
-  { title: 'General product ML', do: ['Problem framing and baseline', 'Experiment and metric hierarchy', 'Delayed labels and feedback', 'Cross-functional decision evidence'], links: [['Choose product metrics', '/questions/choose-ml-product-metrics/'], ['Design an A/B test', '/questions/design-ml-ab-test/'], ['Fraud detection', '/questions/design-fraud-detection/']] },
-  { title: 'Research and modeling', do: ['Hypothesis and discriminating evidence', 'Matched baselines and compute', 'Ablations and alternative explanations', 'Derivations and boundary conditions'], links: [['Design an ablation', '/questions/design-ablation-study/'], ['Critique a paper', '/questions/critique-ml-paper/'], ['Derive logistic regression', '/questions/derive-logistic-regression/']] },
+  { title: 'LLM and agents', do: ['Reasoning quality under fixed compute', 'Coding-product context and evaluation', 'Agent authority and runtime safety', 'RAG, inference, and tool-use evaluation'], links: [['Reasoning under budget', '/questions/design-reasoning-model-fixed-budget/'], ['AI coding product', '/questions/design-ai-coding-product/'], ['Enterprise agent platform', '/questions/design-enterprise-agent-platform/'], ['Agent safety control plane', '/questions/design-agent-safety-control-plane/'], ['Evaluate an agent', '/questions/evaluate-an-agent/']] },
+  { title: 'Post-training and environments', do: ['Preference data and reward models', 'RL environments and evidence-bearing graders', 'Synthetic data and held-out task families', 'Verifiable rewards and reward hacking'], links: [['Post-training design', '/questions/design-post-training-data-and-rl-environment/'], ['Preference data', '/concepts/preference-data-and-reward-models/'], ['RLVR and GRPO', '/concepts/rl-verifiable-rewards-grpo/'], ['Synthetic data', '/concepts/synthetic-data-generation-verification/']] },
+  { title: 'Alignment and model behavior', do: ['Scalable oversight and control', 'Mechanistic interpretability', 'Evaluation validity and contamination', 'Adaptive red-team and LLM security'], links: [['Scalable oversight', '/concepts/scalable-oversight-and-ai-control/'], ['Evaluation validity', '/concepts/evaluation-validity-benchmark-contamination/'], ['LLM-as-judge', '/concepts/llm-as-judge/'], ['Red-team design', '/questions/design-llm-red-team-program/']] },
+  { title: 'Multimodal and robotics', do: ['Contrastive alignment and fusion', 'Live audio, video, screen, and tool timing', 'Grounding and modality-conflict evaluation', 'Observation, action, safety, and sim-to-real'], links: [['Real-time multimodal assistant', '/questions/design-real-time-multimodal-assistant/'], ['Contrastive learning', '/concepts/contrastive-self-supervised-learning/'], ['Multi-task learning', '/concepts/multi-task-learning-objective-interference/'], ['Multimodal models', '/concepts/multimodal-foundation-models/'], ['Robotics policies', '/concepts/robotics-policy-learning/']] },
+  { title: 'Recommendations and search', do: ['Candidate generation and ranking objectives', 'Position bias and counterfactual evaluation', 'Multi-task learning and feedback loops', 'Creator cold start and ecosystem health'], links: [['Short-form video ecosystem', '/questions/design-short-form-video-ecosystem/'], ['Ecosystem strategy mock', '/guides/annotated-ecosystem-strategy-mock/'], ['Ranking losses', '/concepts/learning-to-rank-losses/'], ['Counterfactual ranking', '/concepts/position-bias-counterfactual-learning-to-rank/'], ['Evaluate a ranker', '/questions/evaluate-search-ranker/']] },
+  { title: 'ML platform and infrastructure', do: ['Foundation-model data provenance and mixtures', 'Training and serving workload models', 'Distributed communication and memory', 'Migration, reliability, adoption, and cost ownership'], links: [['Foundation-model data platform', '/questions/design-foundation-model-data-platform/'], ['Multi-team platform case', '/questions/design-multi-team-ml-platform/'], ['ML lineage', '/concepts/ml-data-lineage-versioning/'], ['Parallelism selection', '/concepts/strong-scaling-and-parallelism-selection/'], ['Distributed profiling', '/concepts/profiling-distributed-ml-workloads/']] },
+  { title: 'General product ML', do: ['Problem framing and baseline', 'Causal identification and experiment design', 'Cost-aware thresholds and abstention', 'Delayed and selective labels'], links: [['Causal inference', '/concepts/causal-inference-for-ml-decisions/'], ['Delayed labels', '/concepts/delayed-labels-selective-labels-feedback-loops/'], ['Decision thresholds', '/concepts/decision-thresholds-asymmetric-costs-abstention/'], ['Choose product metrics', '/questions/choose-ml-product-metrics/'], ['Design an A/B test', '/questions/design-ml-ab-test/']] },
+  { title: 'Research and modeling', do: ['Moments and distribution choice', 'Paired resampling and uncertainty', 'Matched baselines and compute', 'Reproducible ablations'], links: [['Statistical moments', '/concepts/expectation-variance-covariance-correlation/'], ['Bootstrap', '/concepts/bootstrap-and-resampling/'], ['Hypothesis testing', '/concepts/hypothesis-testing-confidence-intervals/'], ['Design an ablation', '/questions/design-ablation-study/']] },
 ];
 ---
 
 <PrepLayout
-  title="Applied Scientist, MLE, and Research Engineer prep paths"
-  description="Ordered role-specific and domain-specific interview preparation paths using the mlmentorship core library."
+  title="ML role and level preparation paths"
+  description="Ordered role paths for Applied Scientist, Research Scientist, MLE, and Research Engineer, plus a staff through senior-principal level overlay."
   heading="Prepare for the role and loop, not the title alone."
   lede="Follow one ordered role path, then add only the domain supplement that appears in the actual job and recruiter-provided round breakdown. Everything else is optional breadth."
 >
   <section class="callout"><h2>Before choosing a path</h2><p>Company titles are inconsistent. Ask for round formats, implementation style, project expectations, and the day-to-day research/modeling/engineering/product mix. If the recruiter cannot provide detail, use the typical rounds in the <a href="/prep/readiness/">readiness check</a> and mark uncertainty as risk.</p></section>
 
-  <nav class="path-jumps" aria-label="Jump to role path">{rolePaths.map((role) => <a href={`#${role.id}`}>{role.title}</a>)}</nav>
+  <section class="role-chooser" aria-labelledby="choose-role-heading">
+    <h2 id="choose-role-heading">Choose one role</h2>
+    <div>{ROLE_PATHS.map((role) => <article id={role.id}><span>{role.shortTitle}</span><h3><a href={`/prep/role-paths/${role.id}/`}>{role.title}</a></h3><p>{role.rule}</p><a class="open-path" href={`/prep/role-paths/${role.id}/`}>Open 9-step path →</a></article>)}</div>
+  </section>
 
-  {rolePaths.map((role) => <section id={role.id} class="role-path"><header><p>Ordered core path</p><h2>{role.title}</h2><span>{role.rule}</span></header><ol>{role.sequence.map(([label, href, detail]) => <li><h3><a href={href}>{label}</a></h3><p>{detail}</p></li>)}</ol></section>)}
+  <section class="level-overlay" aria-labelledby="level-overlay-heading">
+    <div><span>Optional level overlay</span><h2 id="level-overlay-heading">{STAFF_PRINCIPAL_PATH.title}</h2><p>{STAFF_PRINCIPAL_PATH.rule}</p></div>
+    <a href="/prep/level-paths/staff-principal/">Open {STAFF_PRINCIPAL_PATH.sequence.length}-step level path →</a>
+  </section>
 
-  <h2>Frontier format overlays</h2>
-  <p>Do not add these because the company is fashionable. Add one only when recruiting confirms the format.</p>
-  <div class="format-grid">{frontierFormats.map((format) => <article><h3>{format.title}</h3><p><strong>Use when:</strong> {format.when}</p><p>{format.action}</p><a href={format.href}>Open practice →</a></article>)}</div>
+  <details class="optional-section">
+    <summary><strong>Frontier format overlays</strong><span>Add one only when recruiting confirms the format.</span></summary>
+    <div class="format-grid">{frontierFormats.map((format) => <article><h3>{format.title}</h3><p><strong>Use when:</strong> {format.when}</p><p>{format.action}</p><a href={format.href}>Open practice →</a></article>)}</div>
+  </details>
 
-  <h2 id="domain-supplements">Domain supplements</h2>
-  <p>A domain supplement changes examples and technical depth. It does not replace ML implementation, project evidence, behavioral judgment, or the actual round formats.</p>
-  <div class="domain-grid">{domains.map((domain) => <article><h3>{domain.title}</h3><ul>{domain.do.map((item) => <li>{item}</li>)}</ul><p>{domain.links.map(([label, href], index) => <><a href={href}>{label}</a>{index < domain.links.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
+  <details id="domain-supplements" class="optional-section">
+    <summary><strong>Domain supplements</strong><span>Add only the technical subject used in the actual role.</span></summary>
+    <p>A domain supplement changes examples and depth. It does not replace implementation, project evidence, behavioral judgment, or confirmed rounds.</p>
+    <div class="domain-grid">{domains.map((domain) => <article><h3>{domain.title}</h3><ul>{domain.do.map((item) => <li>{item}</li>)}</ul><p>{domain.links.map(([label, href], index) => <><a href={href}>{label}</a>{index < domain.links.length - 1 ? ' · ' : ''}</>)}</p></article>)}</div>
+  </details>
 
   <h2>Specialist-domain boundary</h2>
   <section class="boundary"><p>The core library is deepest in LLMs, recommendations, general ML, training, and systems. For specialized CV, speech, or RL loops, use the concept collections below for foundations, but obtain a domain-specific paper/project mock from someone current in that field.</p><ul><li><a href="/concepts/#computer-vision">Computer Vision concepts</a></li><li><a href="/concepts/#nlp-and-speech">NLP & Speech concepts</a></li><li><a href="/concepts/#reinforcement-learning">Reinforcement Learning concepts</a></li></ul></section>
@@ -94,23 +59,38 @@ const domains = [
   <h2>What the core library does not yet cover deeply</h2>
   <section class="boundary"><p>This site does not attempt to replace general algorithms or SQL interview preparation. The implementation questions stay here only when the task is fundamentally about ML: attention, training-loop diagnosis, memory-bounded retrieval, or mergeable evaluation metrics. Use external, current material for general data structures, framework internals, streaming-data infrastructure, privacy/compliance implementation, advanced causal inference, or a specialist research frontier.</p></section>
 
-  <section class="callout"><h2>How to use the sequence</h2><p>Do not merely read from 01 to 09. Attempt each linked question first, diagnose with its round-specific rubric, schedule retries, and move forward while due items continue in parallel. Run the simulation only after every expected round has a baseline.</p></section>
+  <section class="callout"><h2>How to use a path</h2><p>Attempt each linked question before reading, diagnose with its rubric, and schedule retries. Run the simulation only after every expected round has a baseline.</p></section>
 </PrepLayout>
 
+<script>
+  const target = window.location.hash ? document.querySelector<HTMLDetailsElement>(window.location.hash) : null;
+  if (target?.tagName === 'DETAILS') target.open = true;
+</script>
+
 <style>
-  .path-jumps { display: flex; flex-wrap: wrap; gap: .5rem; }
-  .path-jumps a { padding: .5rem .7rem; border: 1px solid var(--c-rule); border-radius: 999px; text-decoration: none; }
-  .role-path { scroll-margin-top: 5.5rem; }
-  .role-path > header { margin: 2.5rem 0 .8rem; padding-bottom: .8rem; border-bottom: 2px solid var(--c-text); }
-  .role-path > header p { margin: 0; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
-  .role-path > header h2 { margin: .2rem 0 !important; }
-  .role-path > header span { color: var(--c-text-soft); font-size: .86rem; }
-  .role-path ol { list-style: none; padding: 0; counter-reset: path; }
-  .role-path li { position: relative; padding: .8rem 0 .8rem 3.3rem; border-bottom: 1px solid var(--c-rule); counter-increment: path; }
-  .role-path li::before { content: counter(path, decimal-leading-zero); position: absolute; left: 0; font-family: var(--font-mono); color: var(--c-accent); }
-  .role-path h3, .role-path p { margin: 0; }
-  .role-path h3 { font-size: .95rem !important; }
-  .role-path p { color: var(--c-text-soft); font-size: .82rem; }
+  .role-chooser > h2 { margin-top: 0 !important; }
+  .role-chooser > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+  .role-chooser article { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); scroll-margin-top: var(--sticky-offset); }
+  .role-chooser article > span { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; }
+  .role-chooser h3 { margin: .15rem 0 .35rem !important; }
+  .role-chooser h3 a { color: var(--c-text); text-decoration: none; }
+  .role-chooser h3 a:hover { color: var(--c-accent); text-decoration: underline; }
+  .role-chooser p { min-height: 4.2rem; margin: 0 0 .55rem; color: var(--c-text-soft); font-size: .84rem; }
+  .open-path { font-size: .8rem; font-weight: 650; text-decoration: none; }
+  .open-path:hover { text-decoration: underline; }
+  .level-overlay { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; margin: 1rem 0 1.5rem; padding: 1rem; border: 2px solid var(--c-text); border-radius: var(--radius); }
+  .level-overlay span { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; text-transform: uppercase; }
+  .level-overlay h2 { margin: .15rem 0 .25rem !important; font-size: 1.1rem !important; }
+  .level-overlay p { max-width: 40rem; margin: 0; color: var(--c-text-soft); font-size: .84rem; }
+  .level-overlay > a { flex: 0 0 auto; font-size: .8rem; font-weight: 700; text-decoration: none; }
+  .level-overlay > a:hover { text-decoration: underline; }
+  .optional-section { margin: 1.5rem 0; padding: .85rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); scroll-margin-top: var(--sticky-offset); }
+  .optional-section > summary { display: flex; justify-content: space-between; gap: 1rem; cursor: pointer; list-style: none; }
+  .optional-section > summary::-webkit-details-marker { display: none; }
+  .optional-section > summary::after { content: '+'; color: var(--c-accent); font-family: var(--font-mono); }
+  .optional-section[open] > summary::after { content: '−'; }
+  .optional-section > summary span { margin-left: auto; color: var(--c-muted); font-size: .78rem; font-weight: 400; }
+  .optional-section > p { margin-top: .9rem; color: var(--c-text-soft); font-size: .85rem; }
   .domain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
   .format-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
   .format-grid article { padding: .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
@@ -120,5 +100,5 @@ const domains = [
   .domain-grid h3 { margin-top: 0 !important; }
   .domain-grid li, .domain-grid p { font-size: .82rem; }
   .boundary { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); }
-  @media (max-width: 700px) { .domain-grid, .format-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .role-chooser > div, .domain-grid, .format-grid { grid-template-columns: 1fr; } .role-chooser p { min-height: 0; } .level-overlay { align-items: flex-start; flex-direction: column; } .optional-section > summary span { display: none; } }
 </style>

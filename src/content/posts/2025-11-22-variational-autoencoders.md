@@ -7,15 +7,13 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **variational autoencoder** [(Kingma & Welling, 2013)](https://arxiv.org/abs/1312.6114) is a generative model with a latent variable $z$, learned encoder $q_\phi(z \mid x)$, and decoder $p_\theta(x \mid z)$, trained to maximize the **evidence lower bound** (ELBO):
 
 $$
 \log p_\theta(x) \ge \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x \mid z)] - \mathrm{KL}(q_\phi(z \mid x) \,\|\, p(z)).
 $$
-
-## Why it matters
 
 VAEs introduced **amortized variational inference** to deep learning: a neural network learns to predict the posterior of a latent given the input, enabling end-to-end training of latent variable models with backprop. This idea now powers:
 

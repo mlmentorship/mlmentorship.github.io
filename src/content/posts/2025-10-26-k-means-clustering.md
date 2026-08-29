@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **k-means** partitions $n$ data points into $k$ clusters by minimizing the sum of squared distances from each point to its cluster's centroid:
 
@@ -16,8 +16,6 @@ $$
 $$
 
 **Lloyd's algorithm** (1957) alternates: (a) assign each point to its nearest centroid; (b) recompute each centroid as the mean of its assigned points. Iterate to convergence.
-
-## Why it matters
 
 k-means is the canonical clustering algorithm: $O(n k d)$ per iteration, easy to implement, and a good first attempt at any unsupervised structure problem. It is used directly (customer segmentation, vector-quantization codebooks) and as a building block (initialization for GMMs, anchor selection for object detection, sub-sampling for retrieval index training).
 

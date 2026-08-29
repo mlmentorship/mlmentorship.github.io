@@ -1,306 +1,103 @@
 ---
 import DocsIndexLayout from '../layouts/DocsIndexLayout.astro';
-import { getCollection } from 'astro:content';
 import { SITE } from '../consts';
-
-const posts = await getCollection('posts', ({ data }) => !data.draft);
-const counts = {
-  questions: posts.filter((p) => p.data.category === 'questions').length,
-  guides: posts.filter((p) => p.data.category === 'guides').length,
-  concepts: posts.filter((p) => p.data.category === 'concepts').length,
-};
 ---
+
 <DocsIndexLayout
-  title="Start here"
-  description="Where to start on mlmentorship by what you're trying to do. Curated reading paths for senior ML interviews, applied LLM work, and agent systems."
+  title="How to use the ML interview field guide"
+  description="Short, optional reading routes through the mlmentorship books for technical foundations, large-model systems, and research interviews."
 >
   <header class="head">
-    <p class="kicker">Start here</p>
-    <h1>Where to start, by what you're trying to do.</h1>
+    <p class="kicker">Front matter</p>
+    <h1>Read by book or follow one focused route.</h1>
     <p class="lede">
-      {posts.length} questions, guides, and concept notes
-      can be a lot. Pick the path that matches why you're here. Each item
-      links directly; come back to this page when you finish a path.
+      The table of contents is the main path. Use one route below only when you need to cross several books for a specific goal.
     </p>
   </header>
 
-  <section class="sections-overview">
-    <p class="sections-eyebrow">The three sections</p>
-    <ul class="sections-grid">
-      <li>
-        <a href="/questions/">
-          <h2>Questions <span class="sections-count">{counts.questions}</span></h2>
-          <p>The senior ML interview canon. Each one with what L4 / L5 / L6 answers actually sound like, the tells that get a strong-hire vote, and what gets you down-leveled.</p>
-          <p class="sections-when"><strong>Go here when:</strong> you have a specific question and want a level-calibrated answer.</p>
-        </a>
-      </li>
-      <li>
-        <a href="/guides/">
-          <h2>Guides <span class="sections-count">{counts.guides}</span></h2>
-          <p>Long-form opinion pieces on senior ML interviews, system design, and applied practice. Take a position and defend it.</p>
-          <p class="sections-when"><strong>Go here when:</strong> you want a senior-IC point of view on something contested (fine-tune vs RAG, evals, inference cost).</p>
-        </a>
-      </li>
-      <li>
-        <a href="/concepts/">
-          <h2>Concepts <span class="sections-count">{counts.concepts}</span></h2>
-          <p>Concise notes on attention, normalization, LLM internals, optimization, and the math underneath. Each follows the same template: definition, why it matters, mechanism, common confusions.</p>
-          <p class="sections-when"><strong>Go here when:</strong> you need to look up or refresh a specific concept fast.</p>
-        </a>
-      </li>
-    </ul>
+  {SITE.features.prepTools && <aside class="workbook-note"><strong>Preparing for an active interview loop?</strong> The <a href="/prep/">Workbook</a> combines role, rounds, current evidence, and due practice in one place.</aside>}
+
+  <nav class="path-index" aria-label="Reading paths">
+    <ol>
+      <li><a href="#building-deep-technical-foundations"><span>01</span>Build technical foundations</a></li>
+      <li><a href="#large-model-systems"><span>02</span>Study large-model systems</a></li>
+      <li><a href="#research-to-industry"><span>03</span>Move from research to industry</a></li>
+      <li><a href="#engineering-leader-hiring-manager"><span>04</span>Calibrate a senior ML hire</a></li>
+    </ol>
+  </nav>
+
+  <section class="path" id="building-deep-technical-foundations">
+    <header><span>01</span><div><h2>Build deep technical foundations</h2><p>Use this for a compact pass through math, learning, and transformer basics.</p></div></header>
+    <ol>
+      <li>Linear algebra: <a href="/concepts/matrices-as-linear-maps/">linear maps</a>, <a href="/concepts/svd-and-pca/">SVD and PCA</a>, <a href="/concepts/eigenvalues-and-spectral-theorem/">eigenvalues</a>.</li>
+      <li>Probability: <a href="/concepts/maximum-likelihood-estimation/">maximum likelihood</a>, <a href="/concepts/bayes-rule-and-posterior/">Bayes rule</a>, <a href="/concepts/kl-divergence/">KL divergence</a>.</li>
+      <li>Deep learning: <a href="/concepts/backpropagation/">backpropagation</a>, <a href="/concepts/attention-mechanism/">attention</a>, <a href="/concepts/transformer-architecture/">transformers</a>.</li>
+      <li>Evaluation: <a href="/concepts/hypothesis-testing-confidence-intervals/">hypothesis testing</a>, <a href="/concepts/reproducibility-fair-model-comparison/">fair comparison</a>, <a href="/concepts/evaluation-validity-benchmark-contamination/">evaluation validity</a>.</li>
+      <li>Use the <a href="/concepts/">concept index</a> only when an attempt exposes another gap.</li>
+    </ol>
   </section>
 
-  {SITE.features.prepTools && <section class="tools-overview" aria-labelledby="prep-tools-heading">
-    <div>
-      <p class="sections-eyebrow">Use what you read</p>
-      <h2 id="prep-tools-heading">Turn the core library into an executable plan</h2>
-      <p>Choose a workload, attempt before reading, diagnose weak dimensions, and prove improvement with spaced retrieval and simulation.</p>
-    </div>
-    <ul>
-      <li><a href="/prep/readiness/"><strong>Readiness check</strong><span>Estimate gaps and workload</span></a></li>
-      <li><a href="/prep/plans/"><strong>Prep plans</strong><span>Choose weeks and hours</span></a></li>
-      <li><a href="/prep/role-paths/"><strong>Role paths</strong><span>AS, MLE, and RE sequences</span></a></li>
-      <li><a href="/prep/frontier-labs/"><strong>Frontier labs</strong><span>Verify current round formats</span></a></li>
-      <li><a href="/prep/labs/"><strong>Executable labs</strong><span>Practice realistic work samples</span></a></li>
-      <li><a href="/prep/practice/"><strong>Practice method</strong><span>Attempt, diagnose, retry</span></a></li>
-      <li><a href="/prep/simulations/"><strong>Simulations</strong><span>Test the integrated loop</span></a></li>
-    </ul>
-  </section>}
+  <section class="path" id="large-model-systems">
+    <header><span>02</span><div><h2>Study large-model systems</h2><p>Use this for training, inference, accelerator, or Research Engineer loops.</p></div></header>
+    <ol>
+      <li><a href="/concepts/transformer-compute-memory-accounting/">Count parameters, FLOPs, and memory</a>.</li>
+      <li><a href="/concepts/sharded-matrix-multiplication/">Derive communication from sharded tensor axes</a>.</li>
+      <li><a href="/concepts/accelerator-network-topology/">Map the layout to the accelerator network</a>.</li>
+      <li><a href="/concepts/strong-scaling-and-parallelism-selection/">Choose a parallel plan and measure MFU</a>.</li>
+      <li>Attempt the worked <a href="/questions/plan-70b-training-run/">70B training plan</a>, then read <a href="/concepts/profiling-distributed-ml-workloads/">distributed profiling</a>.</li>
+    </ol>
+  </section>
 
-    <section class="path" id="preparing-for-a-senior-ml-interview-loop">
-      <header>
-        <h2>1. Preparing for a senior ML interview loop</h2>
-        <p>You have a loop in 2-8 weeks. You want to know what's actually tested at L5/L6 vs. what showed up on your old prep material.</p>
-      </header>
-      <ol>
-        {SITE.features.prepTools && <li>Start with the <a href="/prep/readiness/">private readiness check</a>, then choose an <a href="/prep/plans/">hours-based 2-, 4-, or 8-week plan</a></li>}
-        {SITE.features.prepTools && <li>Use the <a href="/prep/practice/">round-specific practice method</a> on every question</li>}
-        {SITE.features.prepTools && <li>If you are interviewing at a frontier lab, verify the <a href="/prep/frontier-labs/">current format evidence</a> and substitute only the matching <a href="/prep/labs/">work sample</a></li>}
-        <li><a href="/guides/five-things-as-interview-tests/">The 5 things AS interviews test for</a></li>
-        <li><a href="/guides/l5-vs-l6-faang-ml/">L5 vs L6 calibration: what's the difference</a></li>
-        <li><a href="/questions/most-ambitious-project/">Tell me about your most ambitious project</a></li>
-        <li><a href="/questions/how-would-you-evaluate-an-llm-application/">How would you evaluate an LLM application</a></li>
-        <li><a href="/questions/reduce-llm-inference-cost-10x/">Reduce LLM inference cost 10x</a></li>
-        <li>Browse <a href="/questions/">all {counts.questions} questions</a></li>
-      </ol>
-    </section>
+  <section class="path" id="research-to-industry">
+    <header><span>03</span><div><h2>Move from research to industry</h2><p>Use this when strong research experience must become clear interview evidence.</p></div></header>
+    <ol>
+      <li><a href="/guides/as-vs-mle-vs-re/">Compare applied, engineering, and research role expectations</a>.</li>
+      <li><a href="/questions/critique-ml-paper/">Practice fair paper critique</a>.</li>
+      <li><a href="/questions/design-ablation-study/">Design a discriminating ablation</a>.</li>
+      <li><a href="/questions/most-ambitious-project/">Prepare the ambitious-project discussion</a>.</li>
+      <li><a href="/questions/present-technical-ml-project/">Present one project under interruption and pushback</a>.</li>
+    </ol>
+  </section>
 
-    <section class="path" id="shipping-an-llm-product-right-now">
-      <header>
-        <h2>2. Shipping LLM products or building agents</h2>
-        <p>You're building a real LLM application or agent system. mlmentorship is interview-focused; my opinion writing on applied LLMs and agents lives on my personal site.</p>
-      </header>
-      <ol>
-        <li>Browse essays at <a href="https://hsaghir.com/blog/" rel="noopener">hsaghir.com/blog</a> (verification asymmetry, similarity-is-all-you-need, the-loop-is-the-product, under-specified coding agents).</li>
-        <li>Skim <a href="https://github.com/hsaghir/looplet" rel="noopener">Looplet</a>, my iterator-first agent framework.</li>
-        <li>For consulting on agents/evals/post-training: <a href="https://hsaghir.com/work-together/" rel="noopener">hsaghir.com/work-together</a>.</li>
-      </ol>
-    </section>
+  <section class="path" id="engineering-leader-hiring-manager">
+    <header><span>04</span><div><h2>Calibrate a senior ML hire</h2><p>Use this to define the role and evaluate evidence at the intended level.</p></div></header>
+    <ol>
+      <li><a href="/guides/as-vs-mle-vs-re/">Define the role before writing the loop</a>.</li>
+      <li><a href="/guides/five-things-as-interview-tests/">Choose the capabilities the loop should test</a>.</li>
+      <li><a href="/guides/l5-vs-l6-faang-ml/">Calibrate senior through senior-principal evidence</a>.</li>
+      <li>Choose representative prompts from the <a href="/questions/">question index</a>.</li>
+    </ol>
+  </section>
 
-    <section class="path" id="phd-or-postdoc-transitioning-to-industry">
-      <header>
-        <h2>3. PhD or postdoc transitioning to industry</h2>
-        <p>You have research credentials. You want to know what industry interviews look like and how research projects translate to "ambitious project" stories.</p>
-      </header>
-      <ol>
-        <li><a href="/guides/as-vs-mle-vs-re/">Applied Scientist vs MLE vs Research Engineer</a></li>
-        <li><a href="/guides/five-things-as-interview-tests/">The 5 things AS interviews test for</a></li>
-        <li><a href="/questions/most-ambitious-project/">Tell me about your most ambitious project</a></li>
-        <li><a href="/questions/disagreed-with-senior/">When you disagreed with a senior person</a></li>
-        <li><a href="/questions/scope-ambiguous-problem/">Scoping an ambiguous problem</a></li>
-      </ol>
-    </section>
-
-    <section class="path" id="building-deep-technical-foundations">
-      <header>
-        <h2>4. Building deep technical foundations</h2>
-        <p>You want the canonical ML/DL reference, organized so you can study for breadth and depth in parallel.</p>
-      </header>
-      <ol>
-        <li>Foundations: <a href="/concepts/matrices-as-linear-maps/">matrices as linear maps</a> → <a href="/concepts/svd-and-pca/">SVD and PCA</a> → <a href="/concepts/eigenvalues-and-spectral-theorem/">eigenvalues</a></li>
-        <li>Probability: <a href="/concepts/maximum-likelihood-estimation/">MLE</a> → <a href="/concepts/kl-divergence/">KL divergence</a> → <a href="/concepts/bayes-rule-and-posterior/">Bayes rule</a></li>
-        <li>Deep learning: <a href="/concepts/backpropagation/">backprop</a> → <a href="/concepts/attention-mechanism/">attention</a> → <a href="/concepts/transformer-architecture/">transformers</a></li>
-        <li>LLM internals: <a href="/concepts/flashattention/">FlashAttention</a> → <a href="/concepts/kv-cache/">KV cache</a> → <a href="/concepts/speculative-decoding/">speculative decoding</a></li>
-        <li>Browse <a href="/concepts/">all {counts.concepts} concepts</a> by sub-category</li>
-      </ol>
-    </section>
-
-    <section class="path" id="engineering-leader-hiring-manager">
-      <header>
-        <h2>5. Engineering leader / hiring manager</h2>
-        <p>You're not preparing for an interview. You want to calibrate what good looks like, what to test for, or who to hire.</p>
-      </header>
-      <ol>
-        <li><a href="/guides/five-things-as-interview-tests/">What senior ML interviews actually test</a></li>
-        <li><a href="/guides/l5-vs-l6-faang-ml/">L5 vs L6 calibration</a></li>
-        <li><a href="/guides/as-vs-mle-vs-re/">AS vs MLE vs Research Engineer (which role to hire)</a></li>
-        <li><a href="/guides/llm-evals-the-hardest-part/">Why your team's eval pipeline is probably broken</a></li>
-        <li><a href="https://hsaghir.com/work-together/" rel="noopener">If you'd like a senior sounding board on a specific decision</a></li>
-      </ol>
-    </section>
-
-    <p class="closer">
-      Lost? Press <kbd>/</kbd> to search. Or browse the three sections from the top
-      nav: <a href="/questions/">Questions</a>, <a href="/guides/">Guides</a>,
-      <a href="/concepts/">Concepts</a>.
-    </p>
-  </DocsIndexLayout>
+  <p class="back"><a href="/">← Back to the full contents</a></p>
+</DocsIndexLayout>
 
 <style>
-  .head {
-    margin-bottom: 2rem;
-    max-width: 42rem;
-  }
-  .head h1 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(1.6rem, 4vw, 2.2rem);
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-    margin: 0 0 1rem;
-  }
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--c-accent);
-    margin: 0 0 1rem;
-  }
-  .lede {
-    font-size: 1.1rem;
-    color: var(--c-text-soft);
-    margin-bottom: 2.5rem;
-  }
+  .head { max-width: 42rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--c-rule); }
+  .kicker { margin: 0 0 0.8rem; color: var(--c-accent); font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+  .head h1 { margin: 0 0 0.7rem; font-size: clamp(1.8rem, 4vw, 2.45rem); }
+  .lede { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.08rem; line-height: 1.6; }
 
-  .tools-overview {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 1fr);
-    gap: 1.5rem;
-    margin: 0 0 2.5rem;
-    padding: 1.3rem;
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius-lg);
-    background: var(--c-bg-tint);
-  }
-  .tools-overview h2 { margin: 0 0 .5rem; font-size: 1.25rem; }
-  .tools-overview > div > p:last-child { margin: 0; color: var(--c-text-soft); font-size: .9rem; }
-  .tools-overview ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; list-style: none; padding: 0; margin: 0; }
-  .tools-overview a { display: block; height: 100%; padding: .65rem .7rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); color: inherit; text-decoration: none; }
-  .tools-overview a:hover { border-color: var(--c-accent); }
-  .tools-overview strong, .tools-overview span { display: block; }
-  .tools-overview strong { font-size: .82rem; }
-  .tools-overview span { color: var(--c-muted); font-size: .72rem; }
-  @media (max-width: 700px) {
-    .tools-overview { grid-template-columns: 1fr; }
-    .tools-overview ul { grid-template-columns: 1fr; }
-  }
+  .workbook-note { margin: 0 0 2rem; padding: .8rem 0 .8rem .9rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); color: var(--c-text-soft); font-family: var(--font-reading); font-size: .9rem; }
 
-  /* The three sections overview */
-  .sections-overview {
-    margin: 0 0 3rem;
-    padding: 0 0 2rem;
-    border-bottom: 1px solid var(--c-rule);
-  }
-  .sections-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    color: var(--c-muted);
-    margin: 0 0 1rem;
-  }
-  .sections-grid {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-    gap: 1rem;
-  }
-  .sections-grid > li { margin: 0; padding: 0; }
-  .sections-grid a {
-    display: block;
-    padding: 1.2rem 1.3rem 1.4rem;
-    background: var(--c-surface);
-    border: 1px solid var(--c-rule);
-    border-radius: var(--radius-lg);
-    text-decoration: none;
-    color: inherit;
-    transition: border-color var(--transition), transform var(--transition);
-  }
-  .sections-grid a:hover {
-    border-color: var(--c-accent);
-    transform: translateY(-2px);
-  }
-  .sections-grid h2 {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--c-text);
-    margin: 0 0 0.6rem;
-    letter-spacing: -0.01em;
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-  }
-  .sections-count {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--c-accent);
-    font-weight: 500;
-  }
-  .sections-grid p {
-    font-size: 0.92rem;
-    line-height: 1.55;
-    color: var(--c-text-soft);
-    margin: 0 0 0.6rem;
-  }
-  .sections-when {
-    font-size: 0.85rem;
-    color: var(--c-muted);
-    margin: 0.8rem 0 0;
-  }
-  .sections-when strong {
-    color: var(--c-text-soft);
-    font-weight: 600;
-  }
+  .path-index { margin-bottom: 3rem; }
+  .path-index ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--c-rule); }
+  .path-index li { margin: 0; border-bottom: 1px solid var(--c-rule); }
+  .path-index a { display: grid; grid-template-columns: 2rem 1fr; gap: 0.7rem; padding: 0.72rem 0; color: var(--c-text); text-decoration: none; }
+  .path-index a:hover { color: var(--c-accent); }
+  .path-index span { color: var(--c-muted); font-family: var(--font-mono); font-size: 0.72rem; }
 
-  .path {
-    margin-bottom: 2.5rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--c-rule-soft);
-  }
-  .path:last-of-type { border-bottom: 0; }
-  .path header h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0 0 0.4rem;
-    color: var(--c-text);
-  }
-  .path header p {
-    color: var(--c-text-soft);
-    font-size: 0.95rem;
-    margin: 0 0 1rem;
-  }
-  .path ol {
-    padding-left: 1.4rem;
-    color: var(--c-text-soft);
-  }
-  .path ol li { margin: 0.4rem 0; }
-  .path ol a { color: var(--c-link); }
-  .closer {
-    margin-top: 3rem;
-    color: var(--c-muted);
-    font-size: 0.95rem;
-  }
-  .closer kbd {
-    font-family: var(--font-mono);
-    background: var(--c-kbd-bg);
-    border: 1px solid var(--c-rule);
-    padding: 0.05rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.85em;
+  .path { margin-bottom: 3rem; scroll-margin-top: var(--sticky-offset); }
+  .path > header { display: grid; grid-template-columns: 2rem 1fr; gap: 0.7rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--c-rule); }
+  .path > header > span { padding-top: 0.2rem; color: var(--c-accent); font-family: var(--font-mono); font-size: 0.72rem; }
+  .path h2 { margin: 0 0 0.25rem; font-size: 1.2rem; }
+  .path header p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: 0.95rem; }
+  .path ol { margin: 1rem 0 0 2rem; padding-left: 1.2rem; font-family: var(--font-reading); }
+  .path li { margin: 0.55rem 0; color: var(--c-text-soft); line-height: 1.55; }
+  .back { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--c-rule); font-size: 0.9rem; }
+
+  @media (max-width: 560px) {
+    .path > header { grid-template-columns: 1.5rem 1fr; }
+    .path ol { margin-left: 0.5rem; }
   }
 </style>

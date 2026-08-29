@@ -1,17 +1,15 @@
 ---
 title: "Knowledge-graph embeddings"
-description: "How to learn vector representations of entities and relations so that link prediction becomes a geometric operation. Covers TransE, DistMult, ComplEx, and RotatE, plus why the scoring function determines which relation patterns a model can express."
+description: "Knowledge-graph embeddings turn link prediction into vector scoring. Compare TransE, DistMult, ComplEx, and RotatE by the relation patterns they can represent."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Knowledge-graph embeddings map **entities** and **relations** of a graph of (head, relation, tail) triples into a continuous vector space, with a **scoring function** $f(h, r, t)$ that ranks true triples above false ones, turning **link prediction** into a geometric / algebraic operation.
-
-## Why it matters
 
 Knowledge graphs (entities like titles, people, genres, products linked by typed relations) power recommendation, search, and question answering. Embedding them lets you **predict missing links** ("which genre is this new title?"), compute entity similarity, and inject structured side-information into recsys and RAG. The interview angle is sharp: **the choice of scoring function determines which relation patterns (symmetry, antisymmetry, inversion, composition) the model can represent**, a clean test of representational reasoning.
 

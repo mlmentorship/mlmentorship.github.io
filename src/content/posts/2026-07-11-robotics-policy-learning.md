@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 Robotics policy learning maps observations and goals to actions or action distributions using demonstrations, reinforcement learning, planning, or combinations of learned world models and control.
-
-## Why it matters
 
 Robotics turns prediction error into physical consequence. Data is expensive, observations are partial, actions are continuous and temporally coupled, and small perception or control errors compound over a trajectory.
 

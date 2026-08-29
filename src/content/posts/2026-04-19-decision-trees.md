@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 A **decision tree** partitions the feature space by a sequence of axis-aligned threshold tests on individual features, assigning a constant prediction (class probability for classification, mean target for regression) to each leaf. Trained greedily by choosing splits that maximize information gain or equivalently minimize a purity / impurity criterion.
-
-## Why it matters
 
 Single trees are rarely the production model. Variance is too high. But they are the building block of the dominant tabular learners: **gradient boosting** (xgboost, lightgbm, catboost) and **random forests**. Understanding tree training is the prerequisite for using or tuning either.
 

@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Backpropagation** computes gradients of a scalar loss with respect to every parameter in a neural network in one backward pass through the computation graph, by applying the chain rule from the output back to the inputs and reusing intermediate computations.
-
-## Why it matters
 
 Without backprop, training a deep network would require either:
 

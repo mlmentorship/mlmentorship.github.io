@@ -1,6 +1,6 @@
 ---
 title: "How do you deal with class imbalance in 2026?"
-description: "Class weighting and SMOTE are the textbook answers and often the wrong ones. The senior answer matches the technique to the imbalance ratio, the cost asymmetry, and the metric you actually care about."
+description: "Match the treatment to the imbalance ratio, error costs, label process, and decision metric. Class weighting and SMOTE are only two options."
 date: "2025-10-13"
 draft: false
 tags: ["questions"]

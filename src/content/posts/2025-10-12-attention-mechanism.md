@@ -7,7 +7,7 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 For queries $Q \in \mathbb{R}^{n_q \times d}$, keys $K \in \mathbb{R}^{n_k \times d}$, and values $V \in \mathbb{R}^{n_k \times d_v}$:
 
@@ -17,9 +17,7 @@ $$
 
 Each query is replaced by a weighted average of values, with weights given by query-key similarities normalized by softmax.
 
-## Why it matters
-
-Attention is the single most important architectural primitive of the past decade:
+Attention is a central architectural primitive in modern ML:
 
 - **Transformers** are stacks of attention + FFN. Every modern LLM is mostly attention by parameter and FLOP count.
 - **Retrieval** (two-tower, cross-encoder) is dot-product attention between queries and items.

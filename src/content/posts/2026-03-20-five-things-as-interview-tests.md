@@ -39,7 +39,7 @@ The fix in prep: dig hard into your real project history. Find the specific fail
 
 ## 3. Do you understand the science, or just the recipe?
 
-This is what the "ML breadth" round is actually for. The interviewer doesn't care whether you can recite the cross-entropy formula. They care whether you understand *why* cross-entropy is the right loss for classification (it's the negative log-likelihood under a categorical distribution, which is how you turn classification into MLE), why softmax pairs with it (the gradient of softmax+CE simplifies to (p &minus; y), which is numerically stable), and what would happen if you used MSE instead (gradients vanish for confident-but-wrong predictions, training stalls).
+This is what the ML breadth round tests. Cross-entropy is the negative log-likelihood of a categorical distribution, so classification becomes maximum-likelihood estimation. Softmax pairs with it because the gradient simplifies to $p - y$. With MSE, gradients can vanish for confident but wrong predictions and stall training.
 
 Interviewers always probe the *why* behind common choices. A few examples:
 
@@ -62,7 +62,7 @@ The interviewer will, at some point, push back on something you said. Maybe they
 
 The senior response is rare because it requires two things at once: confidence in your reasoning and openness to being wrong. Both can be practiced; neither is innate.
 
-The behavioral round tests the same thing: "tell me about a time you disagreed with someone senior." The strong answer is not "and they realized I was right." The strong answer is "we both had partial information, we worked through it, and the actual decision was a synthesis neither of us had at the start."
+The behavioral round tests the same judgment with prompts such as "tell me about a time you disagreed with someone senior." A strong answer does not end with "they realized I was right." It shows how partial information changed and how the final decision improved.
 
 ## 5. Are you the kind of person we want in the room?
 
@@ -94,4 +94,4 @@ If you're transitioning from a pure-MLE role to AS, your prep should disproporti
 
 ---
 
-*Related: [What L5 vs L6 actually means at FAANG ML](/guides/l5-vs-l6-faang-ml/) for the level calibration. [Applied Scientist vs MLE vs Research Engineer](/guides/as-vs-mle-vs-re/) for the role taxonomy.*
+*Related: [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/) for level calibration. [Applied Scientist vs MLE vs Research Engineer](/guides/as-vs-mle-vs-re/) for the role taxonomy.*

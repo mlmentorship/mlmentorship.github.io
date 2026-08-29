@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 CTC is a loss function that trains a frame-level classifier to output a shorter label sequence **without requiring a frame-to-label alignment**, by introducing a special **blank** symbol and summing the probability of *all* alignments that collapse to the target.
-
-## Why it matters
 
 The canonical interview topic for speech, handwriting, and any **monotonic, unaligned** sequence-to-sequence task. It answers the question every ASR interviewer eventually asks: *"You have 1000 audio frames and a 5-word transcript. How do you train without per-frame labels?"*
 

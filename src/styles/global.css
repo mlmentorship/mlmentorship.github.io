@@ -8,6 +8,7 @@ html {
   background: var(--c-bg);
   color: var(--c-text);
   scroll-behavior: smooth;
+  scroll-padding-top: var(--sticky-offset);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -39,23 +40,23 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--c-text);
 }
 h1 {
-  font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+  font-size: clamp(1.65rem, 3vw, 2.15rem);
   font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
+  letter-spacing: -0.02em;
+  line-height: 1.16;
 }
 h2 {
-  font-size: clamp(1.35rem, 2vw, 1.6rem);
+  font-size: clamp(1.2rem, 1.8vw, 1.42rem);
   font-weight: 600;
-  letter-spacing: -0.018em;
+  letter-spacing: -0.012em;
 }
 h3 {
-  font-size: 1.18rem;
+  font-size: 1.08rem;
   font-weight: 600;
 }
-h4 { font-size: 1.04rem; font-weight: 600; }
+h4 { font-size: 1rem; font-weight: 600; }
 
-p, ul, ol, blockquote, pre, table { margin: 0 0 1.15rem; }
+p, ul, ol, blockquote, pre, table { margin: 0 0 .95rem; }
 
 a {
   color: var(--c-link);
@@ -172,6 +173,15 @@ th {
   border-bottom-width: 2px;
 }
 
+@media (max-width: 640px) {
+  .prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 kbd {
   font-family: var(--font-mono);
   background: var(--c-kbd-bg);
@@ -200,7 +210,7 @@ mark {
 .prose {
   max-width: var(--measure);
   margin: 0 auto;
-  font-size: 1.05rem;
+  font-size: 1rem;
 }
 .prose > * { max-width: var(--measure); }
 .prose > figure,

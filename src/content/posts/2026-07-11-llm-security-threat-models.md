@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 An LLM security threat model states what must be protected, who can attack it, what capabilities they have, which boundaries the system trusts, and what concrete outcomes count as compromise.
-
-## Why it matters
 
 A language model is rarely the whole product. It receives untrusted text, retrieves documents, calls tools, stores memory, generates code, and acts under an identity. Security failures often arise from composition: each component behaves as designed locally while the combined system grants an attacker a path to an asset.
 
@@ -113,4 +111,4 @@ Use multiple independent layers:
 
 Start with assets, actors, capabilities, boundaries, and compromise. Then prioritize attack paths, system controls, adaptive evaluation, residual risk, and incident response.
 
-*Related: [design an LLM red-team program](/questions/design-llm-red-team-program/), [adversarial robustness](/concepts/adversarial-robustness/), and [safe LLM deployment in healthcare](/questions/llm-deployment-healthcare/).*
+*Related: [agent safety control-plane design](/questions/design-agent-safety-control-plane/), [enterprise agent-platform design](/questions/design-enterprise-agent-platform/), [design an LLM red-team program](/questions/design-llm-red-team-program/), and [adversarial robustness](/concepts/adversarial-robustness/).*

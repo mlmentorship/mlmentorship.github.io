@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **BERT** (Bidirectional Encoder Representations from Transformers, [Devlin et al., 2019](https://arxiv.org/abs/1810.04805)) is a transformer encoder pretrained with masked language modeling: replace 15 percent of input tokens with a special `[MASK]` token, train the model to predict them. The pretrained encoder is then fine-tuned for downstream tasks.
-
-## Why it matters
 
 Pre-BERT, NLP pipelines were task-specific: parse trees for parsing, sequence-to-sequence for translation, hand-crafted features for classification. BERT showed that one bidirectional pretrained encoder, fine-tuned per task, beat the entire task-specific stack on 11 benchmarks at once.
 

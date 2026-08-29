@@ -67,4 +67,4 @@ The right move when asked this question: give the textbook decomposition in 30 s
 
 ---
 
-*Related reference: [Regularization, L1, L2, dropout, early stopping](/concepts/regularization/).*
+*Related: [regularization](/concepts/regularization/).*

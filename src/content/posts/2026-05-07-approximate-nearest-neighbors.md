@@ -7,11 +7,9 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
-## One-line definition
+## Summary
 
 **Approximate Nearest Neighbors** finds vectors close to a query without comparing against every stored vector. The three dominant methods are graph-based (HNSW), inverted-file (IVF), and quantization-based (PQ, OPQ). Production systems combine them.
-
-## Why it matters
 
 Modern embedding models produce 768- to 4096-dimensional vectors. Brute-force k-NN over $N$ vectors is $O(N \cdot d)$ per query. At $N = 10^9$ and $d = 1024$, that is roughly a teraflop per query, infeasible at retrieval QPS.
 
