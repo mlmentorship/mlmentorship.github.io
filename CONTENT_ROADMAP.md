@@ -73,7 +73,8 @@ For writing rules and the full-library review, see [docs/EDITORIAL_STYLE.md](doc
 - [x] Reduce persistent header and reader-bar height and remove button chrome
 - [x] Remove repeated chapter indexes and entry descriptions from table-of-contents pages
 - [x] Reduce article metadata, role badges, title scale, spacing, borders, and shadows
-- [x] Add a minimal sticky desktop rail with book, chapter, and active-entry context
+- [x] Add one sticky desktop library rail to every page; expand the current book and collapse the other eight by default
+- [x] Pin the current book, chapter, and active entry inside long scrolling rails
 - [x] Keep the compact Sections bar as the tablet and mobile fallback
 
 ## Done: editorial consistency pass, 2026-08-28

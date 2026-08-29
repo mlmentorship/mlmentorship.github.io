@@ -31,6 +31,7 @@ const typeLabel = { concepts: 'Concept', questions: 'Question', guides: 'Guide' 
     previousEntry={previousChapter ? { href: `/library/${volume.id}/${previousChapter.id}/`, title: previousChapter.title } : undefined}
     nextEntry={nextChapter ? { href: `/library/${volume.id}/${nextChapter.id}/`, title: nextChapter.title } : undefined}
     stepNoun="chapter"
+    mobileOnly
   />
   <div class="chapter-page">
     <header class="chapter-head">

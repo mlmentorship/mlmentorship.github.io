@@ -95,13 +95,13 @@ Keep the existing `/start-here/` URL for inbound links. Treat it as optional boo
 
 ### Books and category indexes
 
-Book pages are the primary discovery surface. They show ordered chapter summaries, scope, difficulty, and local progress. Dedicated static chapter routes show the full ordered entry list, role relevance, interview rounds, and prerequisites. Questions, Concepts, and Guides indexes remain complete alternate views. No archive uses a persistent side rail.
+Book pages are the primary discovery surface. They show ordered chapter summaries, scope, difficulty, and local progress. Dedicated static chapter routes show the full ordered entry list, role relevance, interview rounds, and prerequisites. Questions, Concepts, and Guides indexes remain complete alternate views. Every desktop page uses the same library rail rather than a page-specific archive rail.
 
 ### Article pages
 
 Use this order:
 
-1. a persistent desktop book rail, with a compact Book, Previous, Next, and Sections bar on smaller screens;
+1. the global desktop library rail, with a compact Book, Previous, Next, and Sections bar on smaller screens;
 2. breadcrumb;
 3. title and short description;
 4. reading metadata;
@@ -109,9 +109,9 @@ Use this order:
 6. article;
 7. previous and next links.
 
-The desktop rail lists every chapter in the current book, expands the current chapter's ordered entries, and marks the current article with a quiet rule. On smaller screens the Sections menu provides the same hierarchy. Previous and Next traverse the whole book across chapter boundaries. The global Contents link continues to mean all books.
+The desktop rail lists all nine books as native disclosures. It expands the current book, shows the current chapter's ordered entries, and marks the active article with a quiet rule. Other books start collapsed. Pages outside a book start with every book collapsed. On smaller screens the Sections menu provides article hierarchy. Previous and Next traverse the whole book across chapter boundaries.
 
-Use one centered reading column. Persistent left and right rails should not compete with the article. Repeated newsletter and author cards should not interrupt every chapter. The global footer can provide identity, RSS, and About links.
+Use one centered reading column and one global left rail. Do not add a competing right rail. Repeated newsletter and author cards should not interrupt every chapter. The global footer can provide identity, RSS, and About links.
 
 ## Reading design
 
@@ -135,7 +135,7 @@ Article pages should expose two static controls:
 - On this page, for the current article headings;
 - Sections, for the current book, chapter, and sibling entries.
 
-On this page and mobile Sections should use native `details` elements. They work without JavaScript and are keyboard accessible. On small screens the book bar keeps only the short book title, arrow controls, and Sections label. The desktop rail is plain static HTML and remains visible while the article scrolls.
+On this page, mobile Sections, and desktop book disclosures use native `details` elements. They work without JavaScript and are keyboard accessible. On small screens the book bar keeps only the short book title, arrow controls, and Sections label. The desktop rail remains visible while the page scrolls.
 
 ## Performance rules
 

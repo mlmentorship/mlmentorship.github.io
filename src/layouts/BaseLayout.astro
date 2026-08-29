@@ -2,6 +2,8 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import LibrarySidebar from '../components/LibrarySidebar.astro';
+import { findLibraryLocation } from '../data/library';
 import '../styles/global.css';
 
 interface Props {
@@ -15,6 +17,13 @@ interface Props {
 }
 
 const props = Astro.props;
+const pathParts = Astro.url.pathname.split('/').filter(Boolean);
+const isArticleRoute = pathParts.length === 2 && ['concepts', 'questions', 'guides'].includes(pathParts[0]);
+const articleSlug = isArticleRoute ? pathParts[1] : undefined;
+const articleLocation = articleSlug ? findLibraryLocation(articleSlug) : undefined;
+const isLibraryRoute = pathParts[0] === 'library';
+const currentBookId = articleLocation?.volume.id ?? (isLibraryRoute ? pathParts[1] : undefined);
+const currentChapterId = articleLocation?.chapter.id ?? (isLibraryRoute ? pathParts[2] : undefined);
 ---
 <!doctype html>
 <html lang="en">
@@ -24,9 +33,35 @@ const props = Astro.props;
   <body>
     <a class="sr-only" href="#main">Skip to content</a>
     <Header />
-    <main id="main">
-      <slot />
+    <main id="main" class="site-shell">
+      <LibrarySidebar currentBookId={currentBookId} currentChapterId={currentChapterId} currentSlug={articleSlug} />
+      <div class="site-page">
+        <slot />
+      </div>
     </main>
     <Footer />
   </body>
 </html>
+
+<style>
+  .site-shell {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    column-gap: 1.5rem;
+    width: min(100%, var(--container));
+    margin: 0 auto;
+    padding-left: var(--gutter);
+  }
+  .site-page { min-width: 0; }
+
+  @media (max-width: 860px) {
+    .site-shell {
+      display: block;
+      width: 100%;
+      padding-left: 0;
+    }
+  }
+  @media print {
+    .site-shell { display: block; width: 100%; padding: 0; }
+  }
+</style>

@@ -6,7 +6,6 @@ import MockCTA from '../components/MockCTA.astro';
 import PracticeMode from '../components/PracticeMode.astro';
 import CompletionToggle from '../components/CompletionToggle.astro';
 import BookReaderNav from '../components/BookReaderNav.astro';
-import BookSidebar from '../components/BookSidebar.astro';
 import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
 import { SITE } from '../consts';
@@ -102,12 +101,6 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
     mobileOnly
   />}
   <div class="docs-shell">
-    {libraryLocation && <BookSidebar
-      volume={libraryLocation.volume}
-      currentChapter={libraryLocation.chapter}
-      currentSlug={slug}
-      chapters={bookChapters}
-    />}
     <div class="docs-layout">
       <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
       <header class="docs-head">
@@ -191,11 +184,7 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
 
 <style>
   .docs-shell {
-    display: grid;
-    grid-template-columns: 12rem minmax(0, var(--measure));
-    gap: 2rem;
-    justify-content: center;
-    width: min(100%, var(--container));
+    width: min(100%, var(--measure));
     margin: 0 auto;
     padding: clamp(1.25rem, 3vw, 2.2rem) var(--gutter) 3.5rem;
   }
@@ -346,12 +335,6 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
     }
     .journey-links { grid-template-columns: 1fr; }
     .journey-link--next { text-align: left; }
-  }
-  @media (max-width: 860px) {
-    .docs-shell {
-      display: block;
-      max-width: 48rem;
-    }
   }
   @media (min-width: 861px) {
     .breadcrumbs { display: none; }

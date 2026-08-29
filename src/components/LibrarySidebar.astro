@@ -1,0 +1,260 @@
+---
+import { LIBRARY_VOLUMES } from '../data/library';
+import { entriesForChapter, getLibraryEntries } from '../utils/library';
+
+interface Props {
+  currentBookId?: string;
+  currentChapterId?: string;
+  currentSlug?: string;
+}
+
+const { currentBookId, currentChapterId, currentSlug } = Astro.props as Props;
+const allEntries = await getLibraryEntries();
+const books = LIBRARY_VOLUMES.map((volume) => ({
+  volume,
+  chapters: volume.chapters.map((chapter) => ({
+    chapter,
+    entries: entriesForChapter(allEntries, chapter),
+  })),
+}));
+---
+
+<aside class="library-sidebar" aria-label="Library navigation" data-library-sidebar data-pagefind-ignore="all">
+  <header class="sidebar-header">
+    <a href="/">Contents</a>
+    <span>{LIBRARY_VOLUMES.length} books</span>
+  </header>
+
+  <nav aria-label="Books">
+    {books.map(({ volume, chapters }) => {
+      const isCurrentBook = volume.id === currentBookId;
+      return (
+        <details class:list={['book-disclosure', isCurrentBook && 'is-current-book']} open={isCurrentBook}>
+          <summary data-current-nav={isCurrentBook && !currentChapterId ? '' : undefined}>
+            <span>Book {volume.number}</span>
+            <strong>{volume.shortTitle}</strong>
+          </summary>
+
+          <div class="book-panel">
+            <a class="book-overview" href={`/library/${volume.id}/`} aria-current={isCurrentBook && !currentChapterId ? 'page' : undefined}>
+              Book overview
+            </a>
+            <ol class="chapter-list" aria-label={`${volume.shortTitle} chapters`}>
+              {chapters.map(({ chapter, entries }, chapterIndex) => {
+                const isCurrentChapter = isCurrentBook && chapter.id === currentChapterId;
+                return (
+                  <li class:list={[isCurrentChapter && 'is-current-chapter']}>
+                    <a
+                      class="chapter-link"
+                      href={`/library/${volume.id}/${chapter.id}/`}
+                      aria-current={isCurrentChapter ? (currentSlug ? 'location' : 'page') : undefined}
+                      data-current-nav={isCurrentChapter && !currentSlug ? '' : undefined}
+                    >
+                      <span>{volume.number}.{chapterIndex + 1}</span>
+                      <strong>{chapter.title}</strong>
+                    </a>
+                    {isCurrentChapter && (
+                      <ol class="entry-list" aria-label={`${chapter.title} entries`}>
+                        {entries.map((entry, entryIndex) => (
+                          <li>
+                            <a
+                              href={entry.href}
+                              aria-current={entry.slug === currentSlug ? 'page' : undefined}
+                              data-current-nav={entry.slug === currentSlug ? '' : undefined}
+                            >
+                              <span>{String(entryIndex + 1).padStart(2, '0')}</span>
+                              <strong>{entry.title}</strong>
+                            </a>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </details>
+      );
+    })}
+  </nav>
+
+  <footer>
+    <a href="/questions/">Questions</a>
+    <a href="/prep/">Workbook</a>
+  </footer>
+</aside>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-library-sidebar]').forEach((sidebar) => {
+    const current = sidebar.querySelector<HTMLElement>('[data-current-nav]');
+    if (!current) return;
+    const revealCurrent = () => requestAnimationFrame(() => {
+      const target = current.offsetTop - sidebar.clientHeight * 0.25;
+      sidebar.scrollTop = Math.max(0, Math.min(target, sidebar.scrollHeight - sidebar.clientHeight));
+    });
+    revealCurrent();
+    if (document.readyState !== 'complete') window.addEventListener('load', revealCurrent, { once: true });
+    document.fonts?.ready.then(revealCurrent);
+  });
+</script>
+
+<style>
+  .library-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 1rem);
+    align-self: start;
+    min-width: 0;
+    max-height: calc(100vh - var(--header-height) - 2rem);
+    margin-top: clamp(1.25rem, 3vw, 2.2rem);
+    padding: 0 .35rem 1rem 0;
+    overflow-y: auto;
+    scrollbar-color: var(--c-rule) transparent;
+    scrollbar-width: thin;
+    font-family: var(--font-ui);
+  }
+  .sidebar-header,
+  .library-sidebar > footer {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: 0 0 .55rem;
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .sidebar-header {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    min-height: 1.8rem;
+    background: var(--c-bg);
+  }
+  .sidebar-header a {
+    color: var(--c-text);
+    font-size: .78rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+  .sidebar-header a:hover { color: var(--c-accent); text-decoration: underline; }
+  .sidebar-header span { color: var(--c-muted); font-size: .62rem; }
+  .book-disclosure { margin: 0; border-bottom: 1px solid var(--c-rule); }
+  .book-disclosure > summary {
+    display: grid;
+    grid-template-columns: 2.3rem minmax(0, 1fr) auto;
+    gap: .4rem;
+    align-items: baseline;
+    padding: .58rem .1rem;
+    color: var(--c-muted);
+    cursor: pointer;
+    list-style: none;
+  }
+  .book-disclosure > summary::-webkit-details-marker { display: none; }
+  .book-disclosure > summary::after {
+    content: '+';
+    color: var(--c-muted);
+    font-family: var(--font-mono);
+    font-size: .68rem;
+  }
+  .book-disclosure[open] > summary::after { content: '−'; }
+  .book-disclosure > summary > span { font-size: .6rem; white-space: nowrap; }
+  .book-disclosure > summary > strong {
+    overflow: hidden;
+    color: var(--c-text-soft);
+    font-size: .72rem;
+    font-weight: 550;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+  }
+  .book-disclosure > summary:hover > strong { color: var(--c-text); }
+  .book-disclosure.is-current-book > summary > span { color: var(--c-text-soft); }
+  .book-disclosure.is-current-book > summary > strong { color: var(--c-text); font-weight: 650; }
+  .book-disclosure.is-current-book > summary {
+    position: sticky;
+    top: 1.8rem;
+    z-index: 3;
+    background: var(--c-bg);
+  }
+  .book-panel { padding: 0 0 .45rem; }
+  .book-overview {
+    display: block;
+    margin: 0 0 .2rem 2.7rem;
+    color: var(--c-muted);
+    font-size: .63rem;
+    text-decoration: none;
+  }
+  .book-overview:hover,
+  .book-overview[aria-current='page'] { color: var(--c-accent); text-decoration: underline; }
+  .chapter-list,
+  .entry-list { margin: 0; padding: 0; list-style: none; }
+  .chapter-list > li,
+  .entry-list > li { margin: 0; }
+  .chapter-link {
+    display: grid;
+    grid-template-columns: 2.3rem minmax(0, 1fr);
+    gap: .4rem;
+    padding: .32rem .1rem;
+    color: var(--c-muted);
+    text-decoration: none;
+  }
+  .chapter-link > span,
+  .entry-list a > span {
+    color: var(--c-muted);
+    font-size: .6rem;
+    line-height: 1.45;
+  }
+  .chapter-link > strong {
+    font-size: .68rem;
+    font-weight: 450;
+    line-height: 1.38;
+  }
+  .chapter-link:hover { color: var(--c-text); }
+  .chapter-link[aria-current] { color: var(--c-text); }
+  .chapter-link[aria-current] > strong { font-weight: 650; }
+  .is-current-chapter > .chapter-link {
+    position: sticky;
+    top: 4.25rem;
+    z-index: 2;
+    background: var(--c-bg);
+  }
+  .entry-list {
+    margin: .05rem 0 .35rem .7rem;
+    padding-left: .65rem;
+    border-left: 1px solid var(--c-rule);
+  }
+  .entry-list a {
+    display: grid;
+    grid-template-columns: 1.35rem minmax(0, 1fr);
+    gap: .3rem;
+    margin-left: -1px;
+    padding: .26rem .25rem .26rem .45rem;
+    border-left: 1px solid transparent;
+    color: var(--c-muted);
+    text-decoration: none;
+  }
+  .entry-list a > strong {
+    font-size: .66rem;
+    font-weight: 450;
+    line-height: 1.35;
+  }
+  .entry-list a:hover { color: var(--c-text); }
+  .entry-list a[aria-current='page'] {
+    border-left-color: var(--c-text);
+    color: var(--c-text);
+  }
+  .entry-list a[aria-current='page'] > strong { font-weight: 650; }
+  .library-sidebar > footer {
+    margin-top: .7rem;
+    padding: .6rem 0 0;
+    border-top: 1px solid var(--c-rule);
+    border-bottom: 0;
+  }
+  .library-sidebar > footer a { color: var(--c-muted); font-size: .62rem; }
+  .library-sidebar > footer a:hover { color: var(--c-accent); }
+
+  @media (max-width: 860px) {
+    .library-sidebar { display: none; }
+  }
+  @media print {
+    .library-sidebar { display: none !important; }
+  }
+</style>

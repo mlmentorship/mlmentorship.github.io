@@ -29,7 +29,7 @@ The friction documented below was used as the implementation checklist. The Augu
 - separate Sections and On this page controls so book navigation no longer competes with article headings.
 - one sans-serif visual system, 15px reading text, smaller titles, tighter spacing, softer color, and substantially less button and card chrome;
 - compact Book and Chapter pages that show each navigation list once rather than repeating summaries and expanded descriptions.
-- a sticky desktop book rail showing all chapters, current-chapter entries, and the active article; tablet and mobile keep the compact Sections bar.
+- one sticky desktop library rail on every page; the current book is expanded, other books are collapsed, and tablet and mobile keep the compact article Sections bar.
 
 Two suggestions were intentionally not implemented:
 
