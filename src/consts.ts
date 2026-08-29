@@ -4,7 +4,7 @@ export const LOOPLET_URL = 'https://github.com/hsaghir/looplet';
 
 export const SITE = {
   title: 'mlmentorship',
-  description: 'Senior ML & AI interview prep with upper-IC paths through senior principal, reference notes, practice, and deep system-design cases. Free.',
+  description: 'Build a private senior ML interview plan from your role, level, rounds, available time, and recent closed-book evidence. Free and browser-local.',
   author: 'Hamidreza Saghir',
   authorBio: 'Notes on senior ML interviews, system design, and applied ML practice.',
   email: 'ml.mentorship@gmail.com',

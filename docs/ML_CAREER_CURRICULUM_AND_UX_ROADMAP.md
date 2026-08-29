@@ -43,7 +43,7 @@ The highest-return content work is not publishing another 100 isolated definitio
 
 ### Static-first UX decision
 
-The August 28, 2026 interface pass made the root page a subject-first curriculum with four shelves and nine books. Later passes gave all 283 entries an explicit pedagogical order across 49 chapters, added chapter routes, split the four role paths, and connected readiness to local next tasks and evidence history. Type-specific indexes remain available, but users no longer choose a publishing format before a subject.
+The August 2026 interface passes gave all 283 entries an explicit order across four shelves, nine books, and 49 chapters. The root page now leads with readiness, timed practice, method, proof, privacy, and author context before presenting the complete curriculum. Returning users continue directly to their locally saved Workbook.
 
 GitHub Pages remains a hard constraint. Do not add accounts, cloud state, server APIs, required client-side routing, or database-backed recommendations. Pagefind, browser-local practice progress, theme choice, and newsletter forms are progressive enhancements. The complete rules are in [STATIC_FIRST_UX.md](STATIC_FIRST_UX.md).
 
@@ -461,9 +461,9 @@ The current site answers "What content exists?" very well. The redesign should a
 
 ## 11. User friction resolved in the online-book pass
 
-### 11.1 The homepage gives a default start
+### 11.1 The homepage gives a concrete start
 
-The root is a short book-like contents page with goal-based starts. Candidates who do not yet know what to choose are told to begin with the Core chapters in Books I and II, then add Role-specific or Specialist work only when their role or loop requires it.
+The root leads with Build my private plan and Try an 8-minute question. It explains the four-step evidence method, shows real scope and deep cases, answers common objections, and keeps the complete subject-first curriculum below. Candidates who prefer browsing can still start with Core chapters in Books I and II.
 
 ### 11.2 The curriculum is ordered and scoped
 
@@ -886,6 +886,10 @@ Do not set numerical targets before collecting a baseline. Add privacy-preservin
 
 ### Events
 
+- `homepage_plan_clicked`
+- `homepage_workbook_clicked`
+- `homepage_practice_clicked`
+- `homepage_curriculum_clicked`
 - `plan_started`
 - `plan_created`
 - `plan_saved`
@@ -993,7 +997,7 @@ The final entropy and mutual-information page closed the set on August 29, 2026.
 
 The first five product actions are complete or were superseded by the subject-first online-book design. The remaining five are content publication decisions and should proceed only with demand and technical review.
 
-1. Completed: reframe the homepage around the subject library and ML-specific candidate workflow.
+1. Completed: reframe the homepage around the ML-specific candidate workflow while retaining the full subject library below it.
 2. Completed: simplify Prep navigation.
 3. Completed: add local plan persistence, next tasks, and an evidence queue.
 4. Completed: add Research Scientist to role selection, paths, and simulations.

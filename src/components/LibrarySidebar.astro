@@ -1,5 +1,6 @@
 ---
 import { LIBRARY_VOLUMES } from '../data/library';
+import { SITE } from '../consts';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 
 interface Props {
@@ -81,7 +82,7 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
 
   <footer>
     <a href="/questions/">Questions</a>
-    <a href="/prep/">Workbook</a>
+    {SITE.features.prepTools && <a href="/prep/">Workbook</a>}
   </footer>
 </aside>
 

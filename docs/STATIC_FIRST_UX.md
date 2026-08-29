@@ -8,15 +8,16 @@
 
 ## Decision
 
-mlmentorship is an ML interview field guide with a private local Workbook. It is not a web application with a marketing site in front of it.
+mlmentorship is an ML interview field guide with a private local Workbook. The root page gives a concise product pitch, then exposes the full curriculum on the same static page.
 
-The root page is the table of contents. It should help a visitor choose one of three tasks:
+The root page should help a visitor choose one of four tasks:
 
-1. read a book or chapter;
-2. find an interview question;
-3. continue a private Workbook task.
+1. build a private plan from the actual loop;
+2. try one timed question;
+3. continue a saved Workbook task;
+4. browse a book or chapter.
 
-The site should not make a visitor pass through a large sales-style landing page before reaching the material.
+The pitch must use product facts rather than testimonials, promises, or inflated outcomes. Books, search, questions, and the Workbook remain directly reachable from the header and global rail.
 
 ## GitHub Pages is a hard constraint
 
@@ -73,7 +74,7 @@ The wordmark and Contents link to the table of contents. Search acts as the inde
 
 ### Root page
 
-Lead with the product promise: senior ML and AI interview preparation. Follow it with four shelves and nine subject books. Each book contains ordered chapters and combines concepts, questions, and guides. Keep type-specific indexes for direct and legacy links, but do not make users choose a publishing format before choosing a subject.
+Lead with one outcome: prepare for the ML interview the visitor actually has. Route new users to readiness, returning users to their saved Workbook, and visitors who want proof to a timed sample question. Then show method, scope, privacy, author credibility, and all four shelves and nine books. Keep type-specific indexes for direct and legacy links.
 
 ### Workbook
 
@@ -148,7 +149,8 @@ On this page, mobile Sections, and desktop book disclosures use native `details`
 
 ## Acceptance checks
 
-- A new visitor can reach Book I, Questions, or the Workbook in one click from the root page.
+- A new visitor can reach readiness, a timed question, Book I, Questions, or the Workbook from the root page.
+- A returning visitor with a saved plan sees a direct Continue my workbook action.
 - A returning visitor can use search from every page.
 - A phone user can move to a sibling article without returning to an index.
 - All primary navigation works with JavaScript disabled.

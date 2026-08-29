@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { LIBRARY_SHELVES, LIBRARY_VOLUMES } from '../data/library';
+import { INTERVIEW_ROUNDS } from '../data/prepCurriculum';
+import { ROLE_PATHS } from '../data/rolePaths';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { SITE } from '../consts';
 
@@ -18,35 +20,169 @@ const shelfVolumeIds = LIBRARY_SHELVES.flatMap((shelf) => shelf.volumeIds);
 if (shelfVolumeIds.length !== LIBRARY_VOLUMES.length || new Set(shelfVolumeIds).size !== LIBRARY_VOLUMES.length) {
   throw new Error('Library shelves must assign every volume exactly once.');
 }
+
+const questionCount = entries.filter((entry) => entry.category === 'questions').length;
+const deepCaseSlugs = [
+  'personalized-search-ranking',
+  'design-multi-team-ml-platform',
+  'design-enterprise-agent-platform',
+  'design-reasoning-model-fixed-budget',
+  'design-real-time-multimodal-assistant',
+  'design-ai-coding-product',
+  'design-short-form-video-ecosystem',
+  'design-foundation-model-data-platform',
+  'design-agent-safety-control-plane',
+];
+const knownSlugs = new Set(entries.map((entry) => entry.slug));
+if (deepCaseSlugs.some((slug) => !knownSlugs.has(slug))) throw new Error('Homepage deep-case proof list is stale.');
+
+const methodSteps = [
+  { number: '01', title: 'Map the real loop', copy: 'Choose the role, target level, confirmed rounds, available hours, and specialist domain that affect your interview.' },
+  { number: '02', title: 'Attempt before reading', copy: 'Use a timer and a round-specific rubric. A topic you recognize is not evidence that you can answer it under pressure.' },
+  { number: '03', title: 'Repair and retry', copy: 'Weak attempts return in two days. Review attempts return in one week. The Workbook keeps the queue on this device.' },
+  { number: '04', title: 'Simulate the full loop', copy: 'Combine unfamiliar prompts at realistic timing. Turn the result into no more than three bounded repairs.' },
+];
+
+const depthSamples = [
+  { label: 'Reasoning systems', title: 'Train and serve a reasoning model under fixed compute', href: '/questions/design-reasoning-model-fixed-budget/', detail: 'Allocate training, verification, evaluation, KV memory, serving, and recovery inside one capacity envelope.' },
+  { label: 'Live multimodal', title: 'Design a real-time multimodal assistant', href: '/questions/design-real-time-multimodal-assistant/', detail: 'Coordinate audio, video, screen state, barge-in, privacy, latency, tools, and partial failure.' },
+  { label: 'Upper-IC agents', title: 'Design an enterprise agent platform', href: '/questions/design-enterprise-agent-platform/', detail: 'Defend delegated authority, side effects, durable state, memory, evaluation, migration, and technical doctrine.' },
+];
 ---
 
-<BaseLayout title="Senior ML & AI interview prep" description={SITE.description}>
-  <div class="library-page">
-    <header class="library-head">
-      <p class="edition">Free field guide for experienced candidates</p>
-      <h1>Senior ML &amp; AI interview prep</h1>
-      <p class="subtitle">
-        Prepare for Applied Scientist, Research Scientist, Machine Learning Engineer, and Research Engineer interviews with concise concepts, realistic questions, and role-specific practice.
-      </p>
-      <div class="quick-links">
-        <a href="/library/foundations/">Start with Book I</a>
-        {SITE.features.prepTools && <a href="/prep/">Open your workbook</a>}
+<BaseLayout
+  title="Senior ML interview prep built around your actual loop"
+  description="Build a private senior ML interview plan from your role, level, rounds, available time, and recent closed-book evidence. Free and browser-local."
+>
+  <div class="landing-page">
+    <header class="hero">
+      <p class="eyebrow">Free field guide + private Workbook</p>
+      <h1>Prepare for the ML interview you actually have.</h1>
+      <p class="hero-copy">Choose your role, level, confirmed rounds, and recent evidence. mlmentorship turns them into one focused plan: what to practice first, when to retry, and when to simulate the full loop.</p>
+      <div class="hero-actions">
+        {SITE.features.prepTools ? (
+          <>
+            <a class="primary-action" href="/prep/readiness/" data-home-primary data-home-event="homepage_plan_clicked">
+              <span data-home-primary-label>Build my private plan</span><span aria-hidden="true">→</span>
+            </a>
+            <a class="secondary-action" href="/questions/how-to-choose-loss-function/?practice=1" data-home-event="homepage_practice_clicked">Try an 8-minute question</a>
+          </>
+        ) : (
+          <a class="primary-action" href="/questions/"><span>Browse interview questions</span><span aria-hidden="true">→</span></a>
+        )}
+        <a class="text-action" href="#curriculum" data-home-event="homepage_curriculum_clicked">Browse the nine books</a>
       </div>
+      <p class="trust-line"><strong>Free.</strong> No account. No answer upload. Your plan and practice record stay in this browser.</p>
+      <p class="returning-note" data-returning-note hidden></p>
     </header>
 
-    <section class="volumes" aria-labelledby="curriculum-heading">
-      <div class="section-label"><span>Curriculum</span><strong>{LIBRARY_VOLUMES.length} books · {entries.length} entries</strong></div>
-      <h2 id="curriculum-heading" class="sr-only">Browse the curriculum by subject</h2>
-      <p class="starting-note"><strong>Not sure where to begin?</strong> Start with the Core chapters in Books I and II. Add Role-specific or Specialist chapters only when your role path or interview loop requires them.</p>
+    <section class="proof-strip" aria-label="Field guide coverage">
+      <div><strong>{ROLE_PATHS.length}</strong><span>role paths</span></div>
+      <div><strong>{INTERVIEW_ROUNDS.length}</strong><span>round types</span></div>
+      <div><strong>{questionCount}</strong><span>interview questions</span></div>
+      <div><strong>{deepCaseSlugs.length}</strong><span>deep design cases</span></div>
+      <div><strong>{entries.length}</strong><span>ordered entries</span></div>
+    </section>
+
+    <section class="problem-section" aria-labelledby="problem-heading">
+      <div class="section-kicker">The problem</div>
+      <h2 id="problem-heading">Reading more is not the same as answering well under pressure.</h2>
+      <p>Senior ML loops mix coding, math, ML breadth, system design, experiments, project defense, technical strategy, and behavior. A generic checklist gives every topic equal weight. Your interview does not.</p>
+      <p>Start from the rounds recruiting confirmed. Replace confidence with recent timed evidence. Spend the limited preparation window on the gaps that can still change the result.</p>
+    </section>
+
+    <section class="method-section" aria-labelledby="method-heading">
+      <header class="section-head">
+        <div><span class="section-kicker">The method</span><h2 id="method-heading">From interview scope to repeated evidence</h2></div>
+        {SITE.features.prepTools && <a href="/prep/#how-practice-works">Read the practice contract</a>}
+      </header>
+      <ol class="method-grid">
+        {methodSteps.map((step) => (
+          <li><span>{step.number}</span><div><h3>{step.title}</h3><p>{step.copy}</p></div></li>
+        ))}
+      </ol>
+    </section>
+
+    {SITE.features.prepTools && (
+      <section class="workbook-proof" aria-labelledby="workbook-heading">
+        <div>
+          <span class="section-kicker">What you get</span>
+          <h2 id="workbook-heading">One next action, backed by an honest gap assessment.</h2>
+          <p>The readiness check compares your evidence with the role, level, domain, and rounds you selected. It saves the result locally and gives the Workbook a concrete queue.</p>
+          <a href="/prep/readiness/" data-home-event="homepage_plan_clicked">Build my starting point →</a>
+        </div>
+        <ol aria-label="Workbook output">
+          <li><span>01</span><div><strong>Estimated work</strong><p>Compare the likely workload with your weekly capacity and interview runway.</p></div></li>
+          <li><span>02</span><div><strong>First three gaps</strong><p>See the highest-weight areas with direct practice links and current evidence scores.</p></div></li>
+          <li><span>03</span><div><strong>Private next-action queue</strong><p>Continue one role path, practice one question, or complete a due retry.</p></div></li>
+          <li><span>04</span><div><strong>Readiness blockers</strong><p>Keep confirmed coding, SQL, practical software, or general systems rounds visible even when they remain outside this library.</p></div></li>
+        </ol>
+      </section>
+    )}
+
+    <section class="fit-section" aria-labelledby="fit-heading">
+      <header class="section-head">
+        <div><span class="section-kicker">Role and level fit</span><h2 id="fit-heading">Technical depth without losing the interview context.</h2></div>
+        {SITE.features.prepTools && <a href="/prep/role-paths/">Compare role paths</a>}
+      </header>
+      <div class="role-grid">
+        {ROLE_PATHS.map((role) => (
+          <a href={SITE.features.prepTools ? `/prep/role-paths/${role.id}/` : '/guides/as-vs-mle-vs-re/'}>
+            <span>{role.shortTitle}</span><strong>{role.title}</strong><p>{role.rule}</p>
+          </a>
+        ))}
+      </div>
+      <p class="level-note"><strong>Targeting staff or principal scope?</strong> Add the upper-IC overlay for architecture, technical strategy, portfolio judgment, delegated authority, recovery, and succession. Company level names vary, so the evidence rubric uses observable scope.</p>
+    </section>
+
+    <section class="depth-section" aria-labelledby="depth-heading">
+      <header class="section-head">
+        <div><span class="section-kicker">Inspect the depth</span><h2 id="depth-heading">The hard cases connect models to real operating decisions.</h2></div>
+        <a href="/questions/#ml-system-design">All system-design questions</a>
+      </header>
+      <ol>
+        {depthSamples.map((item, index) => (
+          <li><a href={item.href}><span class="depth-number">{String(index + 1).padStart(2, '0')}</span><div><small>{item.label}</small><h3>{item.title}</h3><p>{item.detail}</p></div><span aria-hidden="true">→</span></a></li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="trust-section" aria-labelledby="trust-heading">
+      <div>
+        <span class="section-kicker">Who built it</span>
+        <h2 id="trust-heading">Written from senior ML research, product, and platform experience.</h2>
+        <p>Hamidreza Saghir is a Principal Applied Scientist at Microsoft. Earlier roles include Senior MLE Lead at X, Applied Scientist at Amazon, and ML Researcher at Borealis AI. He holds a PhD from the University of Toronto.</p>
+        <a href="/about/">Read the scope and author background →</a>
+      </div>
+      <ul>
+        <li><strong>No leaked prompts.</strong><span>Public process evidence and representative skill practice only.</span></li>
+        <li><strong>No generic coding clone.</strong><span>Confirmed DSA, SQL, practical software, and general systems rounds remain explicit external dependencies.</span></li>
+        <li><strong>No readiness by confidence.</strong><span>Every evidence area begins at “not attempted recently.”</span></li>
+      </ul>
+    </section>
+
+    <section class="faq-section" aria-labelledby="faq-heading">
+      <span class="section-kicker">Before you start</span>
+      <h2 id="faq-heading">Common questions</h2>
+      <details><summary>Do I need to read all {entries.length} entries?</summary><p>No. Build a plan from the actual loop or start with the Core chapters in Books I and II. Add one specialist subject only when the role needs it.</p></details>
+      <details><summary>Does this replace a live mock interviewer?</summary><p>No. This is structured self-directed preparation. It helps you find and repair gaps before spending live-mock time on realistic pressure and external feedback.</p></details>
+      <details><summary>Is this only for staff and principal candidates?</summary><p>No. The readiness check covers mid-level through company-dependent senior-principal scope. Role paths cover Applied Scientist, Research Scientist, MLE, and Research Engineer interviews.</p></details>
+      <details><summary>What leaves my browser?</summary><p>The Workbook does not submit answer, story, or plan text. It stores practice state locally. The site counts page views and coarse event names such as readiness started or practice scored.</p></details>
+    </section>
+
+    <section id="curriculum" class="volumes" aria-labelledby="curriculum-heading">
+      <div class="section-label"><span>The field guide</span><strong>{LIBRARY_VOLUMES.length} books · {entries.length} entries</strong></div>
+      <h2 id="curriculum-heading">Prefer to browse first? Explore the complete curriculum.</h2>
+      <p class="starting-note">Start with Core chapters. Use role-specific and specialist books only when the target loop requires them.</p>
       {LIBRARY_SHELVES.map((shelf) => (
         <section class="shelf" id={shelf.id}>
-          <header><h2>{shelf.title}</h2><p>{shelf.description}</p></header>
+          <header><h3>{shelf.title}</h3><p>{shelf.description}</p></header>
           <ol>
             {shelf.volumeIds.map((volumeId) => volumeStatsById.get(volumeId)).filter((item) => item !== undefined).map(({ volume, entries: volumeEntries }) => (
               <li>
                 <a href={`/library/${volume.id}/`}>
                   <span class="volume-number">{volume.number}</span>
-                  <div><h3>{volume.title}</h3><p>{volume.description}</p></div>
+                  <div><h4>{volume.title}</h4><p>{volume.description}</p></div>
                   <span class="volume-count">{volumeEntries.length}</span>
                 </a>
               </li>
@@ -56,49 +192,167 @@ if (shelfVolumeIds.length !== LIBRARY_VOLUMES.length || new Set(shelfVolumeIds).
       ))}
     </section>
 
-    <aside class="find-note">
-      <strong>Looking for one term?</strong>
-      Use Search in the header. Prefer a type-only view? Open <a href="/concepts/">all concepts</a> or <a href="/guides/">all guides</a>. {SITE.features.prepTools
-        ? <>Looking for an interview plan? Open the <a href="/prep/">Workbook</a>.</>
-        : <>Looking for an ordered route? Use the <a href="/start-here/">reading paths</a>.</>}
-    </aside>
+    <section class="closing-section">
+      <h2>Start with evidence, not a reading list.</h2>
+      <p>Use the readiness check if you know the role or rounds. Try one timed question if you want to inspect the method first.</p>
+      <div class="hero-actions">
+        {SITE.features.prepTools ? (
+          <>
+            <a class="primary-action" href="/prep/readiness/" data-home-event="homepage_plan_clicked"><span>Build my private plan</span><span aria-hidden="true">→</span></a>
+            <a class="secondary-action" href="/questions/how-to-choose-loss-function/?practice=1" data-home-event="homepage_practice_clicked">Try an 8-minute question</a>
+          </>
+        ) : <a class="primary-action" href="/questions/"><span>Browse interview questions</span><span aria-hidden="true">→</span></a>}
+      </div>
+    </section>
   </div>
 </BaseLayout>
 
-<style>
-  .library-page { width: min(100%, 48rem); margin: 0 auto; padding: clamp(1.7rem, 4vw, 2.8rem) var(--gutter) 4rem; }
-  .library-head { max-width: 40rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--c-rule); }
-  .edition { margin: 0 0 .45rem; color: var(--c-muted); font-size: .72rem; font-weight: 500; }
-  .library-head h1 { max-width: 42rem; margin: 0 0 .55rem; font-size: clamp(2rem, 5vw, 2.8rem); letter-spacing: -.035em; line-height: 1.08; }
-  .subtitle { max-width: 39rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1rem; line-height: 1.55; }
-  .quick-links { display: flex; flex-wrap: wrap; gap: .4rem 1rem; margin-top: .85rem; }
-  .quick-links a { color: var(--c-text-soft); font-size: .78rem; font-weight: 550; text-decoration: none; }
-  .quick-links a:hover { color: var(--c-text); text-decoration: underline; }
+{SITE.features.prepTools && (
+  <script>
+    import { currentPlanWeek, loadPrepPlan } from '../utils/prepPlan';
+    import { trackPublicEvent, type PublicEventName } from '../utils/publicEvents';
 
-  .volumes { padding-top: 1.5rem; }
+    const primary = document.querySelector<HTMLAnchorElement>('[data-home-primary]');
+    const primaryLabel = document.querySelector<HTMLElement>('[data-home-primary-label]');
+    const returningNote = document.querySelector<HTMLElement>('[data-returning-note]');
+    const plan = loadPrepPlan();
+    if (plan && primary && primaryLabel) {
+      primary.href = '/prep/';
+      primary.dataset.homeEvent = 'homepage_workbook_clicked';
+      primaryLabel.textContent = 'Continue my workbook';
+      if (returningNote) {
+        returningNote.hidden = false;
+        returningNote.textContent = `${plan.roleLabel} plan saved on this device · week ${currentPlanWeek(plan)} of ${plan.horizon}`;
+      }
+    }
+
+    document.querySelectorAll<HTMLElement>('[data-home-event]').forEach((element) => {
+      element.addEventListener('click', () => {
+        const name = element.dataset.homeEvent as PublicEventName | undefined;
+        if (name) trackPublicEvent(name);
+      });
+    });
+  </script>
+)}
+
+<style>
+  .landing-page { width: min(100%, 50rem); margin: 0 auto; padding: clamp(2rem, 5vw, 4rem) var(--gutter) 4.5rem; }
+  .hero { max-width: 46rem; padding-bottom: 1.8rem; border-bottom: 2px solid var(--c-text); }
+  .eyebrow, .section-kicker { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+  .eyebrow { margin: 0 0 .65rem; }
+  .hero h1 { max-width: 44rem; margin: 0 0 .75rem; font-size: clamp(2.35rem, 6vw, 3.65rem); line-height: 1.02; letter-spacing: -.045em; }
+  .hero-copy { max-width: 43rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: clamp(1rem, 2vw, 1.12rem); line-height: 1.55; }
+  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem 1rem; margin-top: 1.1rem; }
+  .primary-action, .secondary-action { display: inline-flex; align-items: center; justify-content: center; gap: .65rem; min-height: 2.65rem; padding: .66rem .85rem; border-radius: var(--radius); font-size: .82rem; font-weight: 700; text-decoration: none; }
+  .primary-action { border: 1px solid var(--c-accent-fill); background: var(--c-accent-fill); color: var(--c-on-accent); }
+  .primary-action:hover { border-color: var(--c-link-hover); background: var(--c-link-hover); color: var(--c-on-accent); }
+  .secondary-action { border: 1px solid var(--c-rule); background: var(--c-bg); color: var(--c-text); }
+  .secondary-action:hover { border-color: var(--c-text-soft); color: var(--c-accent); }
+  .text-action { color: var(--c-text-soft); font-size: .78rem; font-weight: 550; text-decoration: none; }
+  .text-action:hover { color: var(--c-text); text-decoration: underline; }
+  .trust-line { margin: .75rem 0 0; color: var(--c-muted); font-size: .72rem; }
+  .returning-note { margin: .35rem 0 0; color: var(--c-accent); font-size: .72rem; font-weight: 550; }
+  .proof-strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-bottom: 1px solid var(--c-rule); }
+  .proof-strip div { padding: .85rem .65rem .85rem 0; }
+  .proof-strip strong, .proof-strip span { display: block; }
+  .proof-strip strong { font-size: 1.15rem; font-weight: 650; }
+  .proof-strip span { margin-top: .05rem; color: var(--c-muted); font-size: .63rem; }
+  .problem-section, .method-section, .fit-section, .depth-section, .faq-section, .volumes { padding-top: 2.6rem; }
+  .problem-section { max-width: 43rem; }
+  .problem-section h2, .section-head h2, .workbook-proof h2, .trust-section h2, .faq-section h2, .volumes > h2, .closing-section h2 { margin: .25rem 0 .65rem; font-size: clamp(1.4rem, 3vw, 1.8rem); line-height: 1.18; }
+  .problem-section p { max-width: 42rem; color: var(--c-text-soft); font-family: var(--font-reading); line-height: 1.6; }
+  .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.2rem; margin-bottom: .8rem; padding-bottom: .65rem; border-bottom: 1px solid var(--c-rule); }
+  .section-head h2 { margin-bottom: 0; }
+  .section-head > a { flex: 0 0 auto; color: var(--c-muted); font-size: .72rem; }
+  .method-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
+  .method-grid > li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: .55rem; margin: 0; padding: .9rem .9rem .9rem 0; border-bottom: 1px solid var(--c-rule); }
+  .method-grid > li:nth-child(odd) { padding-right: 1.1rem; border-right: 1px solid var(--c-rule); }
+  .method-grid > li:nth-child(even) { padding-left: 1.1rem; }
+  .method-grid > li > span, .workbook-proof li > span, .depth-number { color: var(--c-accent); font-family: var(--font-mono); font-size: .65rem; }
+  .method-grid h3, .method-grid p { margin: 0; }
+  .method-grid h3 { font-size: .88rem; }
+  .method-grid p { margin-top: .2rem; color: var(--c-muted); font-size: .76rem; line-height: 1.45; }
+  .workbook-proof { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, .9fr); gap: 2rem; margin-top: 2.8rem; padding: 1.35rem; border: 1px solid var(--c-rule); border-top: 3px solid var(--c-accent); background: var(--c-bg-tint); }
+  .workbook-proof > div > p { color: var(--c-text-soft); font-family: var(--font-reading); font-size: .86rem; line-height: 1.55; }
+  .workbook-proof > div > a { font-size: .8rem; font-weight: 650; text-decoration: none; }
+  .workbook-proof > div > a:hover { text-decoration: underline; }
+  .workbook-proof ol { margin: 0; padding: 0; list-style: none; }
+  .workbook-proof li { display: grid; grid-template-columns: 1.8rem minmax(0, 1fr); gap: .45rem; margin: 0; padding: .45rem 0; border-bottom: 1px solid var(--c-rule); }
+  .workbook-proof li:first-child { padding-top: 0; }
+  .workbook-proof li:last-child { padding-bottom: 0; border-bottom: 0; }
+  .workbook-proof strong, .workbook-proof p { display: block; margin: 0; }
+  .workbook-proof strong { font-size: .76rem; }
+  .workbook-proof li p { margin-top: .08rem; color: var(--c-muted); font-size: .69rem; line-height: 1.4; }
+  .role-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+  .role-grid > a { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr); gap: .1rem .55rem; padding: .8rem; border: 1px solid var(--c-rule); color: inherit; text-decoration: none; }
+  .role-grid > a:hover { border-color: var(--c-text-soft); }
+  .role-grid > a > span { grid-row: 1 / span 2; color: var(--c-accent); font-family: var(--font-mono); font-size: .65rem; }
+  .role-grid strong { font-size: .82rem; }
+  .role-grid p { grid-column: 2; margin: .15rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.4; }
+  .level-note { margin: .8rem 0 0; padding: .75rem 0; border-bottom: 1px solid var(--c-rule); color: var(--c-text-soft); font-size: .78rem; }
+  .depth-section > ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
+  .depth-section li { margin: 0; border-bottom: 1px solid var(--c-rule); }
+  .depth-section li > a { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .7rem; padding: .9rem 0; color: inherit; text-decoration: none; }
+  .depth-section small { display: block; margin-bottom: .1rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .61rem; text-transform: uppercase; }
+  .depth-section h3, .depth-section p { margin: 0; }
+  .depth-section h3 { font-size: .92rem; }
+  .depth-section p { margin-top: .18rem; color: var(--c-muted); font-size: .75rem; line-height: 1.4; }
+  .depth-section li > a:hover h3 { color: var(--c-accent); text-decoration: underline; }
+  .depth-section li > a > span:last-child { align-self: center; color: var(--c-muted); }
+  .trust-section { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(16rem, .85fr); gap: 2rem; margin-top: 2.8rem; padding: 1.2rem 0; border-top: 2px solid var(--c-text); border-bottom: 1px solid var(--c-rule); }
+  .trust-section > div > p { color: var(--c-text-soft); font-family: var(--font-reading); font-size: .82rem; line-height: 1.55; }
+  .trust-section > div > a { font-size: .75rem; }
+  .trust-section ul { margin: 0; padding: 0; list-style: none; }
+  .trust-section li { padding: .55rem 0; border-bottom: 1px solid var(--c-rule); }
+  .trust-section li:last-child { border-bottom: 0; }
+  .trust-section li strong, .trust-section li span { display: block; }
+  .trust-section li strong { font-size: .76rem; }
+  .trust-section li span { margin-top: .1rem; color: var(--c-muted); font-size: .69rem; line-height: 1.4; }
+  .faq-section > details { border-top: 1px solid var(--c-rule); }
+  .faq-section > details:last-child { border-bottom: 1px solid var(--c-rule); }
+  .faq-section summary { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 0; cursor: pointer; font-size: .8rem; font-weight: 600; list-style: none; }
+  .faq-section summary::-webkit-details-marker { display: none; }
+  .faq-section summary::after { content: '+'; color: var(--c-muted); font-family: var(--font-mono); }
+  .faq-section details[open] summary::after { content: '−'; }
+  .faq-section details p { max-width: 42rem; margin: 0 0 .8rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .8rem; line-height: 1.55; }
   .section-label { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: .35rem; font-size: .7rem; }
-  .section-label span { color: var(--c-text-soft); font-weight: 600; }
+  .section-label span { color: var(--c-accent); font-weight: 600; }
   .section-label strong { color: var(--c-muted); font-weight: 500; }
-  .starting-note { max-width: 40rem; margin: .65rem 0 0; color: var(--c-muted); font-size: .78rem; line-height: 1.45; }
+  .starting-note { max-width: 40rem; margin: 0; color: var(--c-muted); font-size: .78rem; line-height: 1.45; }
   .shelf { margin-top: 1.6rem; }
   .shelf > header { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: .8rem; align-items: baseline; margin-bottom: .35rem; }
-  .shelf > header h2 { margin: 0; font-size: .9rem; }
+  .shelf > header h3 { margin: 0; font-size: .9rem; }
   .shelf > header p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .78rem; line-height: 1.4; }
   .volumes ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--c-rule); }
   .volumes li { margin: 0; border-bottom: 1px solid var(--c-rule); }
-  .volumes a { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .7rem; padding: .8rem 0; color: inherit; text-decoration: none; }
+  .volumes li > a { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: .7rem; padding: .8rem 0; color: inherit; text-decoration: none; }
   .volume-number, .volume-count { padding-top: .12rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .66rem; }
-  .volumes h3 { margin: 0 0 .12rem; font-size: .92rem; }
-  .volumes p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; }
-  .volumes a:hover h3 { color: var(--c-accent); text-decoration: underline; }
+  .volumes h4 { margin: 0 0 .12rem; font-size: .92rem; }
+  .volumes li p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; }
+  .volumes li > a:hover h4 { color: var(--c-accent); text-decoration: underline; }
   .volume-count { padding-left: .5rem; }
+  .closing-section { margin-top: 3rem; padding: 1.4rem 0; border-top: 3px solid var(--c-accent); }
+  .closing-section p { max-width: 38rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); }
 
-  .find-note { margin-top: 2rem; padding: .7rem 0; border-top: 1px solid var(--c-rule); color: var(--c-muted); font-size: .76rem; }
-  .find-note strong { color: var(--c-text-soft); }
-
+  @media (max-width: 720px) {
+    .proof-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .proof-strip div:nth-child(n + 4) { border-top: 1px solid var(--c-rule); }
+    .workbook-proof, .trust-section { grid-template-columns: 1fr; gap: 1.2rem; }
+  }
   @media (max-width: 600px) {
+    .landing-page { padding-top: 1.5rem; }
+    .hero h1 { font-size: clamp(2.15rem, 12vw, 2.8rem); }
+    .hero-actions { align-items: stretch; flex-direction: column; }
+    .primary-action, .secondary-action { width: 100%; }
+    .text-action { text-align: center; }
+    .proof-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .proof-strip div:nth-child(n + 3) { border-top: 1px solid var(--c-rule); }
+    .method-grid, .role-grid { grid-template-columns: 1fr; }
+    .method-grid > li:nth-child(odd), .method-grid > li:nth-child(even) { padding-right: 0; padding-left: 0; border-right: 0; }
+    .section-head { align-items: flex-start; flex-direction: column; gap: .35rem; }
+    .workbook-proof { margin-right: calc(var(--gutter) * -.25); margin-left: calc(var(--gutter) * -.25); padding: 1rem; }
     .shelf > header { grid-template-columns: 1fr; gap: .15rem; }
-    .volumes a { grid-template-columns: 1.8rem minmax(0, 1fr); gap: .65rem; }
+    .volumes li > a { grid-template-columns: 1.8rem minmax(0, 1fr); gap: .65rem; }
     .volume-count { display: none; }
   }
 </style>

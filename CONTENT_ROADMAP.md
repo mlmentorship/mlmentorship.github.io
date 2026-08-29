@@ -29,7 +29,8 @@ For writing rules and the full-library review, see [docs/EDITORIAL_STYLE.md](doc
 
 ## Done: static-first reading UX, 2026-08-28
 
-- [x] Replace the marketing-style root page with four shelves and nine subject-first books
+- [x] Lead the root page with a concise evidence-based pitch and keep all four shelves and nine books below it
+- [x] Route new visitors to readiness, returning visitors to their saved Workbook, and skeptical visitors to a timed sample question
 - [x] Add book pages with ordered chapters that combine concepts, questions, and guides
 - [x] Verify at build time that all 283 entries appear exactly once in the library taxonomy
 - [x] Keep `/start-here/` as a focused reading-path page for existing links
