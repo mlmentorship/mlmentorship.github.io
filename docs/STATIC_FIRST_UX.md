@@ -8,16 +8,15 @@
 
 ## Decision
 
-mlmentorship is an ML interview field guide with a private local Workbook. The root page gives a concise product pitch, then exposes the full curriculum on the same static page.
+mlmentorship is an ML interview field guide with an optional private local Workbook. The root page explains the field guide in one screen and puts the full curriculum immediately below the pitch.
 
-The root page should help a visitor choose one of four tasks:
+The root page should help a visitor choose one of three tasks:
 
-1. build a private plan from the actual loop;
-2. try one timed question;
-3. continue a saved Workbook task;
-4. browse a book or chapter.
+1. explore the nine-book curriculum;
+2. start reading one book directly;
+3. try one interview question.
 
-The pitch must use product facts rather than testimonials, promises, or inflated outcomes. Books, search, questions, and the Workbook remain directly reachable from the header and global rail.
+The Workbook appears as one optional local-planning link. A saved plan can change that link to Continue my Workbook, but it does not replace the curriculum action. The pitch uses product facts rather than testimonials, promises, or inflated outcomes.
 
 ## GitHub Pages is a hard constraint
 
@@ -74,7 +73,7 @@ The wordmark and Contents link to the table of contents. Search acts as the inde
 
 ### Root page
 
-Lead with one outcome: prepare for the ML interview the visitor actually has. Route new users to readiness, returning users to their saved Workbook, and visitors who want proof to a timed sample question. Then show method, scope, privacy, author credibility, and all four shelves and nine books. Keep type-specific indexes for direct and legacy links.
+Lead with one outcome: prepare for the ML interview the visitor actually has. Explain the audience, depth, and practice model in one screen. Put all four shelves and nine books immediately below, with direct Start reading links. Keep timed practice visible and the private Workbook optional. Keep type-specific indexes for direct and legacy links.
 
 ### Workbook
 
@@ -149,8 +148,10 @@ On this page, mobile Sections, and desktop book disclosures use native `details`
 
 ## Acceptance checks
 
-- A new visitor can reach readiness, a timed question, Book I, Questions, or the Workbook from the root page.
-- A returning visitor with a saved plan sees a direct Continue my workbook action.
+- A new visitor understands the audience, content, and practice model in the first screen.
+- Every book has a one-click path from the root page to its first entry.
+- A new visitor can reach the complete curriculum or a sample question from the first screen.
+- A returning visitor with a saved plan sees a compact Continue my Workbook link.
 - A returning visitor can use search from every page.
 - A phone user can move to a sibling article without returning to an index.
 - All primary navigation works with JavaScript disabled.

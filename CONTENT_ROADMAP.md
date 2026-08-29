@@ -29,8 +29,9 @@ For writing rules and the full-library review, see [docs/EDITORIAL_STYLE.md](doc
 
 ## Done: static-first reading UX, 2026-08-28
 
-- [x] Lead the root page with a concise evidence-based pitch and keep all four shelves and nine books below it
-- [x] Route new visitors to readiness, returning visitors to their saved Workbook, and skeptical visitors to a timed sample question
+- [x] Lead the root page with one concise value proposition and place the complete curriculum immediately after it
+- [x] Give every book a one-click Start reading action while keeping chapter overviews available
+- [x] Keep the Workbook optional; offer a timed sample question and a compact returning-user link without making planning the pitch
 - [x] Add book pages with ordered chapters that combine concepts, questions, and guides
 - [x] Verify at build time that all 283 entries appear exactly once in the library taxonomy
 - [x] Keep `/start-here/` as a focused reading-path page for existing links

@@ -3,6 +3,7 @@ export const PUBLIC_EVENT_NAMES = [
   'homepage_workbook_clicked',
   'homepage_practice_clicked',
   'homepage_curriculum_clicked',
+  'homepage_start_clicked',
   'readiness_started',
   'readiness_completed',
   'practice_started',

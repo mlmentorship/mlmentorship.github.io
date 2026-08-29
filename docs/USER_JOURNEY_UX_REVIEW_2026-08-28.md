@@ -273,8 +273,9 @@ Article metadata uses “Reviewed” even when only the original `date` exists.
 
 ## Things that should not change
 
-- Keep the clear first-screen promise, readiness action, and timed trial.
-- Keep subject-first shelves and books below the pitch and in the global rail.
+- Keep the clear first-screen promise, curriculum action, and timed trial.
+- Keep subject-first shelves and one-click book starts immediately below the pitch and in the global rail.
+- Keep the Workbook optional on the landing page.
 - Keep exact search available globally.
 - Keep Questions as a direct interview-practice view.
 - Keep one centered article column.

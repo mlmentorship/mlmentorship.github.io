@@ -43,7 +43,7 @@ The highest-return content work is not publishing another 100 isolated definitio
 
 ### Static-first UX decision
 
-The August 2026 interface passes gave all 283 entries an explicit order across four shelves, nine books, and 49 chapters. The root page now leads with readiness, timed practice, method, proof, privacy, and author context before presenting the complete curriculum. Returning users continue directly to their locally saved Workbook.
+The August 2026 interface passes gave all 283 entries an explicit order across four shelves, nine books, and 49 chapters. The root page explains the field guide in one screen, then presents the complete curriculum with one-click book starts. Timed practice and the private Workbook remain optional actions.
 
 GitHub Pages remains a hard constraint. Do not add accounts, cloud state, server APIs, required client-side routing, or database-backed recommendations. Pagefind, browser-local practice progress, theme choice, and newsletter forms are progressive enhancements. The complete rules are in [STATIC_FIRST_UX.md](STATIC_FIRST_UX.md).
 
@@ -463,7 +463,7 @@ The current site answers "What content exists?" very well. The redesign should a
 
 ### 11.1 The homepage gives a concrete start
 
-The root leads with Build my private plan and Try an 8-minute question. It explains the four-step evidence method, shows real scope and deep cases, answers common objections, and keeps the complete subject-first curriculum below. Candidates who prefer browsing can still start with Core chapters in Books I and II.
+The root explains the field guide in one screen, then presents the complete subject-first curriculum. Each book has a direct Start reading link and a chapter overview. A timed question remains visible, while the private Workbook is an optional planning link rather than the main pitch.
 
 ### 11.2 The curriculum is ordered and scoped
 
@@ -543,35 +543,23 @@ Company pages should alter format expectations only when supported. They should 
 
 ---
 
-## 13. Homepage redesign
+## 13. Homepage redesign, completed
 
 ### Above the fold
 
 - **Headline:** Keep the senior-ML positioning.
-- **Subhead:** Add the boundary explicitly: "The ML-specific layer on top of general coding prep. No leaked questions, no LeetCode clone."
-- **Primary action:** **Build my interview plan**
-- **Secondary action:** **I already know my rounds**
-- **Tertiary text link:** Browse the concept library
+- **Subhead:** Explain the audience, ordered curriculum, timed practice, and senior-through-principal depth.
+- **Primary action:** **Explore the curriculum**
+- **Secondary action:** **Try one interview question**
+- **Optional text link:** Build or continue a private Workbook plan
 
-### Three intent cards
+### Curriculum access
 
-1. **I have an interview scheduled**
-   - enter weeks and rounds;
-   - get the shortest viable plan.
-2. **I am choosing an ML career path**
-   - compare work profiles, not titles;
-   - choose a role and domain bundle.
-3. **I need to refresh one topic**
-   - open faceted concept search.
+Show all nine books immediately after the first-screen pitch. Each book row has one linked title for its chapter overview and one Start reading link to its first entry.
 
 ### Returning-user state
 
-When local progress exists, replace generic CTAs with:
-
-- 2 retries due;
-- next planned task;
-- weakest round;
-- Continue button.
+When a local plan exists, change the optional Workbook link to Continue my Workbook and show its role and current week. Do not replace the curriculum action.
 
 No account is required.
 
