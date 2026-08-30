@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "bias-variance-tradeoff",
+  "article": "src/content/posts/2025-07-27-bias-variance-tradeoff.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Recognize that the classical U-shaped test-error curve describes only the pre-interpolation regime and that test error can descend again after a model first fits the training set.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align training error, test error, model capacity, and the interpolation threshold on one coordinate system. The shared plot primitives provide responsive geometry, theme-aware contrast, and a print-safe static explanation.",
+  "mediumComparison": {
+    "mermaid": "Rejected: this is a continuous shape-and-position comparison, not a flow or relationship graph.",
+    "svg": "Selected: deterministic curves and a threshold line make the classical regime and second descent directly comparable on shared axes without runtime code.",
+    "semanticHtml": "Rejected: a table could name the regimes but would not show why stopping at the first minimum can miss the post-interpolation descent.",
+    "interaction": "Rejected: no parameter sweep is needed to learn the one-dimensional capacity-to-error relationship, and controls would obscure that the curve is schematic rather than a prediction for every model.",
+    "paperReuse": "Rejected: neither the textbook nor paper artwork has a verified permissive reuse license. The implementation uses original geometry, wording, and layout and cites the sources for the underlying concepts.",
+    "noVisual": "Rejected: prose makes readers hold the classical U and modern second descent in memory separately; one aligned plot exposes their boundary and the changed model-selection implication."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The neighboring data-inspection slide asks readers to identify meaningful versus spurious variation and label noise before diagnosing model behavior."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends deliberately overfitting a tiny batch by increasing capacity and checking whether a simple model is underfitting."
+      },
+      {
+        "page": 60,
+        "insight": "The sanity-check slide diagnoses a train-versus-validation accuracy gap as overfitting and closely tracking curves as insufficient capacity."
+      },
+      {
+        "page": 61,
+        "insight": "The first model-selection slide says to minimize bias by making the model large enough to drive training loss very low."
+      },
+      {
+        "page": 62,
+        "insight": "The continuation lists data, augmentation, model size, dropout, weight decay, early stopping, and even a larger early-stopped model as variance-control options."
+      },
+      {
+        "page": 63,
+        "insight": "The neighboring tuning slide separates model-capacity diagnosis from later hyperparameter search and debugging."
+      }
+    ],
+    "notes": "All 214 pages were text-indexed for bias, variance, underfitting, overfitting, model complexity, generalization error, training error, test error, and double descent. The exact relevant neighborhood is pages 58-63, with the core bias-variance workflow on pages 59-62. Pages 15-16 discuss estimator bias and sampling variance rather than model-capacity tradeoffs, so they were not used. No deck slide presents double descent or the interpolation threshold, and no deck artwork or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The Elements of Statistical Learning, 2nd ed., Section 2.9: Model Selection and the Bias-Variance Tradeoff",
+        "url": "https://hastie.su.domains/ElemStatLearn/",
+        "usage": "Used as the authoritative textbook source for expected prediction error, model complexity, and the classical bias-variance framing.",
+        "license": "The authors provide the book for personal academic use, but Springer retains copyright and no permissive figure-reuse license was identified. No text, data, figure, or layout is copied."
+      },
+      {
+        "title": "Reconciling modern machine-learning practice and the classical bias-variance trade-off",
+        "url": "https://doi.org/10.1073/pnas.1903070116",
+        "usage": "Used as the primary source for the interpolation threshold and the capacity-wise double-descent risk curve that joins a classical regime to a post-interpolation regime.",
+        "license": "No permissive license for reusing the published PNAS figure was established. The visual is an original schematic redraw with different geometry, labels, and layout, and the paper is cited for the concept only."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is where the familiar U-shaped story stops applying: the interpolation threshold is a boundary within a larger capacity axis, not the final point of model selection. Candidate source figures were treated as copyrighted because explicit reuse permission was not established. The shipped plot is illustrative, contains no empirical data, and does not claim that every architecture or training procedure exhibits the same curve."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed the 214-page source deck and inspected pages 58-63, then checked an authoritative textbook and the primary double-descent paper before selecting an original static plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "capacity-regimes-double-descent"
+    ],
+    "accessibility": "The SVG description states both curves, their line styles, the interpolation threshold, and the intended caveat. Curves are directly labelled and distinguished by solid versus dashed strokes, so color is redundant. A compact 360-pixel viewBox has no minimum width and scales to a 390 CSS-pixel viewport; shared theme variables preserve dark-mode contrast, and established print tokens provide a light high-contrast palette and keep the figure together."
+  }
+}

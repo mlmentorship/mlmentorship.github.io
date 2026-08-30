@@ -236,7 +236,8 @@ try {
             const caption = visual.matches('figure')
               ? visual.querySelector('figcaption')
               : visual.nextElementSibling?.matches('.diagram-caption') ? visual.nextElementSibling : null;
-            const scroll = visual.querySelector('.visual-scroll');
+            const scroll = visual.matches('.mermaid') ? visual : visual.querySelector('.visual-scroll');
+            if (scroll) scroll.dataset.visualReviewScroll = ${JSON.stringify(visualId)};
             const rect = visual.getBoundingClientRect();
             const captionRect = caption?.getBoundingClientRect();
             const captureRect = captionRect ? {
@@ -339,7 +340,10 @@ try {
 
         if (details.scroll && details.scroll.scrollWidth > details.scroll.clientWidth + 1 && mode.media !== 'print') {
           await cdp.call('Runtime.evaluate', {
-            expression: `document.querySelector('.visual-scroll').scrollLeft = document.querySelector('.visual-scroll').scrollWidth`,
+            expression: `(() => {
+              const scroll = document.querySelector(${JSON.stringify(`[data-visual-review-scroll="${visualId}"]`)});
+              scroll.scrollLeft = scroll.scrollWidth;
+            })()`,
           });
           const endScreenshot = await cdp.call('Page.captureScreenshot', {
             format: 'png',

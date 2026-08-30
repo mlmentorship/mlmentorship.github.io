@@ -44,6 +44,37 @@ The L6 answer is the L5 answer plus *the things the textbook is wrong about*:
 
 This shows: you know the textbook, you know its limits, and you know what changes in practice.
 
+**Learning objective:** recognize the classical U-shaped curve as one region of a larger capacity axis, with a possible second descent after the model first fits the training set.
+
+<!-- visual:capacity-regimes-double-descent -->
+<figure class="learning-figure plot-panel" aria-labelledby="capacity-regimes-title">
+	<p class="visual-kicker">Capacity regimes</p>
+	<p class="visual-title" id="capacity-regimes-title">The classical sweet spot is not necessarily the end of the curve.</p>
+	<svg viewBox="0 0 360 284" role="img" aria-labelledby="capacity-regimes-svg-title capacity-regimes-svg-desc">
+		<title id="capacity-regimes-svg-title">Schematic capacity-wise double-descent curve</title>
+		<desc id="capacity-regimes-svg-desc">A schematic plot of expected error against effective model capacity. Solid test error falls to a classical minimum, rises toward the interpolation threshold where training error first reaches zero, then falls again in the overparameterized regime. Dashed training error decreases monotonically and stays near zero after the threshold. Exact curve shapes are model- and training-dependent.</desc>
+		<rect class="viz-plot-bg" x="46" y="32" width="294" height="192" rx="3"></rect>
+		<path class="viz-gridline" d="M46 80H340M46 128H340M46 176H340"></path>
+		<path class="viz-axis" d="M46 28V224H344M42 80H46M42 128H46M42 176H46"></path>
+		<text class="viz-axis-label" x="82" y="20" text-anchor="middle">CLASSICAL REGIME</text>
+		<text class="viz-axis-label" x="277" y="20" text-anchor="middle">OVERPARAMETERIZED REGIME</text>
+		<text class="viz-label" x="52" y="218">expected error</text>
+		<text class="viz-label" x="195" y="271" text-anchor="middle">effective model capacity</text>
+		<path class="viz-operating-guide" d="M216 32V224"></path>
+		<text class="viz-callout" x="222" y="49">interpolation</text>
+		<text class="viz-callout" x="222" y="63">threshold</text>
+		<path class="viz-roc-curve" d="M55 72C86 108 111 153 139 157C167 160 190 119 216 61C237 108 270 151 331 170"></path>
+		<path class="viz-baseline" d="M55 82C99 111 154 183 216 207H331"></path>
+		<circle class="viz-operating-point" cx="139" cy="157" r="4"></circle>
+		<text class="viz-callout" x="139" y="179" text-anchor="middle">classical minimum</text>
+		<text class="viz-callout" x="330" y="147" text-anchor="end">solid: test error</text>
+		<text class="viz-label" x="330" y="203" text-anchor="end">dashed: training error ≈ 0</text>
+		<path class="viz-axis" d="M210 231L216 237L222 231"></path>
+		<text class="viz-label" x="216" y="250" text-anchor="middle">training set first fit</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> follow the solid test-error curve from left to right. Before the dashed line, the familiar bias-variance story gives a classical minimum. At the interpolation threshold, training error reaches zero and test error can peak; beyond it, added capacity can produce a second descent. This is a schematic possibility, not a universal curve or a reason to ignore validation. Concepts checked against <a href="https://hastie.su.domains/ElemStatLearn/">The Elements of Statistical Learning</a> and <a href="https://doi.org/10.1073/pnas.1903070116">Belkin et al. (2019)</a>; the graphic is original.</figcaption>
+</figure>
+
 ## The tells that get you a strong-hire vote
 
 - You name **double descent** (or the modern overparameterization regime) without being prompted.

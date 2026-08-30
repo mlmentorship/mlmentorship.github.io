@@ -29,6 +29,49 @@ Critical properties:
 - **Translation equivariance**: shifting the input shifts the output by the same amount. Hard-coded inductive bias.
 - **Locality**: each output depends only on a small spatial neighborhood of the input.
 
+<!-- visual:cnn-spatial-channel-pyramid -->
+<figure class="learning-figure" aria-labelledby="cnn-pyramid-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="cnn-pyramid-title">Track what changes through a CNN: spatial grids shrink, channels grow, and context widens.</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 242" role="img" aria-labelledby="cnn-pyramid-svg-title cnn-pyramid-svg-desc">
+			<title id="cnn-pyramid-svg-title">CNN spatial and channel feature pyramid</title>
+			<desc id="cnn-pyramid-svg-desc">Four numbered stages run left to right. A 32 by 32 RGB input becomes a 32 by 32 stack of 32 local feature maps, then a downsampled 16 by 16 stack of 64 feature maps, and finally 64 values after global average pooling. The drawn squares become spatially smaller while their offset stacks become deeper. Labels below state that spatial resolution decreases, channel count increases, and receptive field grows.</desc>
+			<text class="viz-axis-label" x="49" y="20" text-anchor="middle">1  Input</text>
+			<text class="viz-axis-label" x="137" y="20" text-anchor="middle">2  Local features</text>
+			<text class="viz-axis-label" x="231" y="20" text-anchor="middle">3  Downsample</text>
+			<text class="viz-axis-label" x="319" y="20" text-anchor="middle">4  Pool</text>
+			<rect x="23" y="51" width="58" height="58" rx="2" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></rect>
+			<path d="M42 70H62M42 80H62M42 90H62M42 70V90M52 70V90M62 70V90" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:1"></path>
+			<path d="M88 80H105M99 74L105 80L99 86" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+			<rect x="117" y="49" width="58" height="58" rx="2" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.4"></rect>
+			<rect x="113" y="53" width="58" height="58" rx="2" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.4"></rect>
+			<rect x="109" y="57" width="58" height="58" rx="2" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></rect>
+			<rect x="120" y="66" width="16" height="16" style="fill:none;stroke:var(--c-text);stroke-width:2;stroke-dasharray:3 2"></rect>
+			<path d="M181 80H198M192 74L198 80L192 86" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+			<rect x="222" y="53" width="42" height="42" rx="2" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.2"></rect>
+			<rect x="218" y="57" width="42" height="42" rx="2" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.2"></rect>
+			<rect x="214" y="61" width="42" height="42" rx="2" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.2"></rect>
+			<rect x="210" y="65" width="42" height="42" rx="2" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></rect>
+			<rect x="218" y="73" width="25" height="25" style="fill:none;stroke:var(--c-text);stroke-width:2;stroke-dasharray:3 2"></rect>
+			<path d="M271 80H288M282 74L288 80L282 86" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+			<rect x="320" y="57" width="10" height="48" rx="2" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.2"></rect>
+			<rect x="316" y="61" width="10" height="48" rx="2" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.2"></rect>
+			<rect x="312" y="65" width="10" height="48" rx="2" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:2"></rect>
+			<text class="viz-axis-label" x="52" y="130" text-anchor="middle">32 &#215; 32 &#215; 3</text>
+			<text class="viz-axis-label" x="138" y="130" text-anchor="middle">32 &#215; 32 &#215; 32</text>
+			<text class="viz-axis-label" x="232" y="130" text-anchor="middle">16 &#215; 16 &#215; 64</text>
+			<text class="viz-axis-label" x="321" y="130" text-anchor="middle">1 &#215; 1 &#215; 64</text>
+			<text class="viz-label" x="138" y="146" text-anchor="middle">same filter at every location</text>
+			<path d="M54 170H315M309 164L315 170L309 176" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2"></path>
+			<text class="viz-axis-label" x="184" y="188" text-anchor="middle">spatial resolution decreases: 32 &#8594; 16 &#8594; 1</text>
+			<path d="M54 204H315M309 198L315 204L309 210" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 4"></path>
+			<text class="viz-axis-label" x="184" y="222" text-anchor="middle">channels and receptive field increase</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> Move left to right. Convolution preserves the image grid while detecting the same local pattern everywhere. Later stages usually downsample height and width, add feature channels, and combine earlier neighborhoods, so each unit summarizes more of the original image. Global average pooling collapses the remaining locations before classification. Dimensions are illustrative.</figcaption>
+</figure>
+
 ## Standard CNN ingredients
 
 - **Conv $3 \times 3$**: workhorse; captures local features.

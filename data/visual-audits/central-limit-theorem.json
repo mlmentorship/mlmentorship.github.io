@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "central-limit-theorem",
+  "article": "src/content/posts/2025-12-21-central-limit-theorem.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the distribution of individual observations from the sampling distribution of the mean, and see why the latter becomes more Gaussian and narrows at rate 1/sqrt(n).",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align one skewed population distribution with several repeated-sample-mean distributions on a common center. Shape and width are the learning task, so a static plot communicates both Gaussian convergence and shrinking standard error without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the concept is convergence in distribution and changing density shape, not a flow between discrete entities.",
+    "svg": "Selected: deterministic small multiples can keep the mean aligned while showing skew diminishing and spread shrinking as sample size grows.",
+    "semanticHtml": "Rejected: a table can state sigma/sqrt(n) but cannot efficiently correct the mistaken visual model that the original observations themselves become Gaussian.",
+    "interaction": "Rejected: scrubbing sample size would add controls and JavaScript without improving the core comparison among observations, small-sample means, and larger-sample means.",
+    "paperReuse": "Rejected: no source artwork is necessary, and no permissive license was established for candidate reference figures beyond the openly licensed textbook. The shipped paths, labels, and layout are original.",
+    "noVisual": "Rejected: the article explicitly identifies confusion between the data distribution and the mean's sampling distribution; aligned distribution shapes resolve that confusion more directly than another prose warning."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 7,
+        "insight": "The probability overview defines expectation as a long-run average and introduces Monte Carlo estimation from independent samples."
+      },
+      {
+        "page": 8,
+        "insight": "The neighboring distribution slide distinguishes a Bernoulli observation from a binomial count across repeated trials, the closest deck example of an aggregate having a different distribution."
+      },
+      {
+        "page": 15,
+        "insight": "The model-intuition slide separates an unknown data-generating distribution from individual training and test realizations."
+      },
+      {
+        "page": 16,
+        "insight": "The point-estimation slide states that estimates from one realization differ from the population quantity and defines variation across realizations as estimator variance and its square root as standard error."
+      },
+      {
+        "page": 17,
+        "insight": "The neighboring parameter-learning slide rewrites independent-sample likelihood as an empirical expectation, reinforcing the distinction between samples and a population distribution."
+      }
+    ],
+    "notes": "All 214 pages were text-indexed for central limit theorem, Berry-Esseen, law of large numbers, sample mean, sampling distribution, normal distribution, Gaussian, Cauchy, and finite variance. No slide states the CLT, its finite-variance condition, Gaussian convergence of sample means, or the 1/sqrt(n) standard-error scaling. The probability neighborhood on pages 7-9 and estimator neighborhood on pages 15-17 were inspected with adjacent pages 6, 10, 14, and 18. Pages 7-8 and 15-17 provide only supporting concepts, so no deck artwork or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "OpenStax Introductory Statistics 2e, 7.1: The Central Limit Theorem for Sample Means (Averages)",
+        "url": "https://openstax.org/books/introductory-statistics-2e/pages/7-1-the-central-limit-theorem-for-sample-means-averages",
+        "usage": "Used to verify that the theorem concerns the distribution across repeated sample means, that its center remains the population mean, and that its standard error is the population standard deviation divided by sqrt(n).",
+        "license": "OpenStax publishes Introductory Statistics 2e under CC BY 4.0. No prose, example data, or figure is copied; the theorem informs an original schematic with attribution."
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Normal Distribution",
+        "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda3661.htm",
+        "usage": "Used to verify the standard normal density that serves as the limiting reference shape in the visual.",
+        "license": "NIST-authored material is generally not subject to copyright in the United States, but no NIST text, image, data, or layout is reused. The bell-shaped reference paths are independently drawn."
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Cauchy Distribution",
+        "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda3663.htm",
+        "usage": "Used to check the article's named heavy-tailed counterexample and its standard density definition.",
+        "license": "NIST-authored material is generally not subject to copyright in the United States. No NIST Cauchy plot, formula rendering, text, data, or layout is reused."
+      }
+    ],
+    "notes": "The visual uses a generic right-skewed finite-variance population only to expose the theorem's object: repeated sample means, not transformed observations. Its curves are schematic and do not encode empirical measurements or a claimed universal finite-n shape. Although OpenStax is openly licensed and NIST material is generally public domain in the United States, original geometry avoids importing any source-specific figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the closest probability and estimator neighborhoods, then checked an openly licensed statistics textbook and NIST distribution references before selecting an original aligned sampling-distribution plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "clt-data-vs-sample-means"
+    ],
+    "accessibility": "The SVG title and description explain which distribution changes, the shared mean, and the 1/sqrt(n) narrowing. Every row is directly labelled with its random quantity and sample size; solid paths, width, shape, a shared center line, and text carry the lesson without color. The 360-pixel viewBox has no minimum width and scales to 390 CSS pixels, shared theme variables preserve dark-mode contrast, and established print tokens provide a high-contrast light palette and prevent page breaks."
+  }
+}
