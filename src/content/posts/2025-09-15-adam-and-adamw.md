@@ -58,6 +58,38 @@ AdamW fixes this by applying weight decay *directly to the parameters*, not to t
 theta_t = theta_{t-1} - lr * m_hat / (sqrt(v_hat) + eps) - lr * weight_decay * theta_{t-1}
 ```
 
+<!-- visual:adamw-decoupled-shrinkage -->
+<figure class="learning-figure" aria-labelledby="adamw-shrinkage-title">
+	<p class="visual-kicker">Worked comparison</p>
+	<p class="visual-title" id="adamw-shrinkage-title">Do equal parameters shrink equally when their gradient histories differ?</p>
+	<p>Hold the adaptive preconditioner fixed to isolate regularization. Both parameters start at θ = 1, with learning rate α = 0.01 and regularization rate λ = 0.1.</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of regularization contributions for two equal parameters with adaptive history scales of one and ten">
+		<section class="visual-panel" aria-labelledby="adamw-parameter-a-title">
+			<h4 id="adamw-parameter-a-title">Parameter A · history scale s = 1</h4>
+			<p>The adaptive denominator does not reduce the coupled penalty.</p>
+			<table class="cm-grid" aria-label="Parameter A regularization contributions">
+				<thead><tr><th scope="col">Method</th><th scope="col">Shrinkage this step</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Adam + L2</th><td><strong>0.001</strong> αλθ / s</td></tr>
+					<tr><th scope="row">AdamW</th><td><strong>0.001</strong> αλθ</td></tr>
+				</tbody>
+			</table>
+		</section>
+		<section class="visual-panel" aria-labelledby="adamw-parameter-b-title">
+			<h4 id="adamw-parameter-b-title">Parameter B · history scale s = 10</h4>
+			<p>The larger adaptive denominator makes the coupled penalty ten times smaller.</p>
+			<table class="cm-grid" aria-label="Parameter B regularization contributions">
+				<thead><tr><th scope="col">Method</th><th scope="col">Shrinkage this step</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Adam + L2</th><td><strong>0.0001</strong> αλθ / s</td></tr>
+					<tr><th scope="row">AdamW</th><td><strong>0.001</strong> αλθ</td></tr>
+				</tbody>
+			</table>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> Adam scales a coupled L2 penalty by each parameter's gradient-history denominator, so equal weights can shrink by different amounts. AdamW applies αλθ outside that adaptive scaling, so both equal weights shrink by 0.001.</figcaption>
+</figure>
+
 Decoupled weight decay is independent of adaptive scaling. Though minor-sounding, it's a meaningful improvement for transformers [(Loshchilov & Hutter 2019)](https://arxiv.org/abs/1711.05101). Standard in modern transformer training.
 
 If your code uses `optim.Adam` with `weight_decay > 0`, you probably mean to use `optim.AdamW`.

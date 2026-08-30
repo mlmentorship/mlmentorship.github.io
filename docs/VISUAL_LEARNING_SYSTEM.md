@@ -43,6 +43,8 @@ Parallel agents should own distinct article and sidecar files. Shared styles, co
 
 Generate a deterministic batch with `npm run visuals:batch -- --count=6 --output=scratch/visual-batch.json`. The generator selects planned work first and then unreviewed entries from the canonical queue. It creates one dependency-free article task per entry and one dependent cross-review task. Start the batch through the autonomous pipeline, merge only after its integration gate passes, then generate the next batch. Repeat until the strict completeness gate passes.
 
+During cross-review, verify the exact campaign delta with `node scripts/check-visual-coverage.mjs --expect-resolved=slug-one,slug-two --baseline-ref=<pre-batch-revision>`. This rejects unresolved batch entries, duplicate visual IDs, and any resolved article outside the declared batch.
+
 ## Choose the medium from the learning task
 
 | Learning task | Default medium | Examples |
