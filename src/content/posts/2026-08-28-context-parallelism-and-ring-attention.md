@@ -52,6 +52,92 @@ At each step:
 4. receive another block;
 5. repeat until every local query has seen every allowed key/value block.
 
+<!-- visual:ring-attention-fixed-query-kv-cycle -->
+<figure class="learning-figure plot-panel visual-wide" aria-labelledby="ring-attention-cycle-title">
+	<p class="visual-kicker">One device · four ring steps</p>
+	<p class="visual-title" id="ring-attention-cycle-title">Queries stay put while every key/value block visits.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 820 350" role="img" aria-labelledby="ring-attention-cycle-svg-title ring-attention-cycle-svg-desc">
+			<title id="ring-attention-cycle-svg-title">Device zero processes every key/value block in a four-device ring</title>
+			<desc id="ring-attention-cycle-svg-desc">Across four ordered steps, query block Q zero remains on device zero. Device zero first processes its local key/value block zero, then receives blocks three, two, and one around the ring. After each visit, the block scores merge into the same running maximum m, denominator z, and weighted value sum u. Only after all four blocks have been seen does device zero produce output O zero equal to u divided by z. Every other device performs the same rotated process concurrently.</desc>
+			<text class="viz-axis-label" x="20" y="24">TIME → · DEVICE 0 VIEW</text>
+			<path class="viz-baseline" d="M190 105 H230 M390 105 H430 M590 105 H630"></path>
+			<path class="viz-arrow-forward" d="M230 105 l-9 -5 v10 Z"></path>
+			<path class="viz-arrow-forward" d="M430 105 l-9 -5 v10 Z"></path>
+			<path class="viz-arrow-forward" d="M630 105 l-9 -5 v10 Z"></path>
+			<text class="viz-edge-label" x="210" y="92">next KV arrives</text>
+			<text class="viz-edge-label" x="410" y="92">next KV arrives</text>
+			<text class="viz-edge-label" x="610" y="92">next KV arrives</text>
+			<g aria-label="Step one, local key/value block zero">
+				<rect class="viz-node" x="20" y="45" width="170" height="270" rx="5"></rect>
+				<text class="viz-axis-label" x="35" y="68">STEP 1 · LOCAL</text>
+				<rect class="viz-node viz-node--input" x="40" y="88" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="105" y="106">STAYS ON DEVICE 0</text>
+				<text class="viz-node-label" x="105" y="124">Q₀</text>
+				<text class="viz-node-label" x="105" y="153">+</text>
+				<rect class="viz-node viz-node--focus" x="40" y="164" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="105" y="182">BLOCK ORIGIN 0</text>
+				<text class="viz-node-label" x="105" y="200">K/V₀</text>
+				<path class="viz-axis" d="M105 208 V229"></path><path class="viz-arrow-forward" d="M105 235 l-5 -9 h10 Z"></path>
+				<rect class="viz-node viz-node--output" x="40" y="235" width="130" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="105" y="254">ONE ACCUMULATOR</text>
+				<text class="viz-node-label" x="105" y="274">(m, z, u)</text>
+				<text class="viz-edge-label" x="105" y="307">seen: 0</text>
+			</g>
+			<g aria-label="Step two, key/value block three">
+				<rect class="viz-node" x="220" y="45" width="170" height="270" rx="5"></rect>
+				<text class="viz-axis-label" x="235" y="68">STEP 2 · RECEIVE</text>
+				<rect class="viz-node viz-node--input" x="240" y="88" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="305" y="106">STAYS ON DEVICE 0</text>
+				<text class="viz-node-label" x="305" y="124">Q₀</text>
+				<text class="viz-node-label" x="305" y="153">+</text>
+				<rect class="viz-node viz-node--focus" x="240" y="164" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="305" y="182">FROM DEVICE 3</text>
+				<text class="viz-node-label" x="305" y="200">K/V₃</text>
+				<path class="viz-axis" d="M305 208 V229"></path><path class="viz-arrow-forward" d="M305 235 l-5 -9 h10 Z"></path>
+				<rect class="viz-node viz-node--output" x="240" y="235" width="130" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="305" y="254">RESCALE + MERGE</text>
+				<text class="viz-node-label" x="305" y="274">(m, z, u)</text>
+				<text class="viz-edge-label" x="305" y="307">seen: 0, 3</text>
+			</g>
+			<g aria-label="Step three, key/value block two">
+				<rect class="viz-node" x="420" y="45" width="170" height="270" rx="5"></rect>
+				<text class="viz-axis-label" x="435" y="68">STEP 3 · RECEIVE</text>
+				<rect class="viz-node viz-node--input" x="440" y="88" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="505" y="106">STAYS ON DEVICE 0</text>
+				<text class="viz-node-label" x="505" y="124">Q₀</text>
+				<text class="viz-node-label" x="505" y="153">+</text>
+				<rect class="viz-node viz-node--focus" x="440" y="164" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="505" y="182">FROM DEVICE 2</text>
+				<text class="viz-node-label" x="505" y="200">K/V₂</text>
+				<path class="viz-axis" d="M505 208 V229"></path><path class="viz-arrow-forward" d="M505 235 l-5 -9 h10 Z"></path>
+				<rect class="viz-node viz-node--output" x="440" y="235" width="130" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="505" y="254">RESCALE + MERGE</text>
+				<text class="viz-node-label" x="505" y="274">(m, z, u)</text>
+				<text class="viz-edge-label" x="505" y="307">seen: 0, 3, 2</text>
+			</g>
+			<g aria-label="Step four, key/value block one and final output">
+				<rect class="viz-node" x="620" y="45" width="180" height="270" rx="5"></rect>
+				<text class="viz-axis-label" x="635" y="68">STEP 4 · RECEIVE</text>
+				<rect class="viz-node viz-node--input" x="645" y="88" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="710" y="106">STAYS ON DEVICE 0</text>
+				<text class="viz-node-label" x="710" y="124">Q₀</text>
+				<text class="viz-node-label" x="710" y="153">+</text>
+				<rect class="viz-node viz-node--focus" x="645" y="164" width="130" height="44" rx="4"></rect>
+				<text class="viz-node-value" x="710" y="182">FROM DEVICE 1</text>
+				<text class="viz-node-label" x="710" y="200">K/V₁</text>
+				<path class="viz-axis" d="M710 208 V229"></path><path class="viz-arrow-forward" d="M710 235 l-5 -9 h10 Z"></path>
+				<rect class="viz-node viz-node--output" x="645" y="235" width="130" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="710" y="254">ALL BLOCKS SEEN</text>
+				<text class="viz-node-label" x="710" y="274">O₀ = u / z</text>
+				<text class="viz-edge-label" x="710" y="307">seen: 0, 3, 2, 1</text>
+			</g>
+			<text class="viz-label" x="20" y="338">Every device runs the same rotated trace concurrently; only K/V blocks move around the ring.</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> scan left to right. Q₀ never leaves device 0; K/V₀, K/V₃, K/V₂, and K/V₁ visit in turn. Each visit rescales and merges into the same (m, z, u), so the final O₀ = u/z is one softmax over all visible blocks, not four local softmaxes. Every device performs the same rotated process concurrently. Original schematic based on the <a href="https://arxiv.org/abs/2310.01889">Ring Attention paper</a> and <a href="https://docs.nvidia.com/megatron-core/developer-guide/0.16.1/user-guide/features/context_parallel.html">Megatron Core context-parallel documentation</a>.</figcaption>
+</figure>
+
 The output is exact apart from normal floating-point effects.
 
 ## Online softmax
