@@ -21,6 +21,30 @@ Freeze the evidence before restarting. A fast rollback that destroys the first b
 6. **Test one causal family at a time.** Data, numerics, optimizer state, distributed state, hardware, or code/config drift.
 7. **Recover from a known-good state.** Apply the smallest justified mitigation and retain the original failure for root-cause work.
 
+<!-- visual:frontier-training-divergence-zoom -->
+```mermaid
+flowchart TB
+	accTitle: Localize the first bad transition before testing causes or recovering
+	accDescr: An aggregate loss spike is the end of the evidence chain. First freeze the last good and first bad states. Narrow the transition in order by step, rank, layer, and tensor or sample until the first abnormal value is found. Then test one causal family at a time with the smallest faithful replay. Recovery from a known-good checkpoint is a separate track and does not prove root cause.
+	A["Aggregate alarm<br/>loss spike · gradient jump · rank NaNs"] --> E["Freeze the evidence boundary<br/>last good ↔ first bad"]
+	E ==>|"localize the first change"| T["1 · Step<br/>which update changed?"]
+	T ==> R["2 · Rank<br/>global or rank-local?"]
+	R ==> L["3 · Layer<br/>where do norms separate?"]
+	L ==> X["4 · Tensor / sample<br/>first non-finite or outlier"]
+	X --> H["Test one causal family at a time<br/>data · numerics · optimizer · distributed · system"]
+	H --> P["Smallest faithful replay<br/>change one condition"]
+	P --> C["Root-cause evidence<br/>prediction matched or falsified"]
+	E -.->|"separate recovery track"| K["Resume from known-good state<br/>with the smallest justified mitigation"]
+	K -.->|"recovery ≠ diagnosis"| C
+	class A viz-warning
+	class E,T,R,L,X viz-focus
+	class H,P viz-state
+	class C,K viz-output
+	class T viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> start at the aggregate alarm, then follow the thick diagnostic spine to move backward from effect to the first bad transition: step, rank, layer, then tensor or sample. Only after localization should you replay one causal family. The dashed recovery path can restore progress, but its rejoining arrow explicitly does not count as proof of root cause.</p>
+
 ## The failure families
 
 ### Data
