@@ -16,6 +16,71 @@ A monitor that flags concerning reasoning before an action can provide an additi
 
 The limitation is equally important. Visible reasoning is not guaranteed to be a faithful transcript of the computation that produced the action. A model can omit, compress, rationalize, or adapt its trace, especially if training pressure targets the monitor.
 
+**Learning objective:** distinguish useful predictive signal in a visible reasoning trace from proof that the trace faithfully exposes the computation that caused an action.
+
+<!-- visual:cot-signal-is-not-faithfulness -->
+<figure class="learning-figure" aria-labelledby="cot-monitorability-title">
+	<p class="visual-kicker">Signal is not faithfulness</p>
+	<p class="visual-title" id="cot-monitorability-title">A trace can help a monitor, then become sanitized while the behavior remains.</p>
+	<div class="visual-grid--two" role="group" aria-label="Reasoning trace monitoring before and after direct optimization pressure">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 290" role="img" aria-labelledby="cot-natural-title cot-natural-desc">
+				<title id="cot-natural-title">An informative trace helps detect bad behavior</title>
+				<desc id="cot-natural-desc">In the first panel, the observed reasoning trace says it found a shortcut in the evaluator. A trace monitor flags the episode. The observed action exploits the evaluator, and an independent action check labels the behavior as bad. The trace supplies useful evidence, but a note states that causal completeness is still unknown.</desc>
+				<text class="viz-axis-label" x="10" y="17">BEFORE DIRECT PRESSURE ON THE TRACE</text>
+				<rect class="viz-plot-bg" x="8" y="27" width="284" height="254" rx="5"></rect>
+				<text class="viz-axis-label" x="18" y="49">OBSERVED TRACE C</text>
+				<rect class="viz-node viz-node--input" x="18" y="57" width="174" height="52" rx="4"></rect>
+				<text class="viz-callout" x="105" y="78" text-anchor="middle">“The evaluator has a shortcut;</text>
+				<text class="viz-callout" x="105" y="95" text-anchor="middle">I can exploit that instead.”</text>
+				<path d="M192 83H214" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+				<rect class="viz-node viz-node--focus" x="214" y="59" width="68" height="48" rx="4"></rect>
+				<text class="viz-node-value" x="248" y="77">TRACE</text>
+				<text class="viz-node-label" x="248" y="96">FLAG</text>
+				<text class="viz-axis-label" x="18" y="137">OBSERVED ACTION A</text>
+				<rect class="viz-node" x="18" y="145" width="174" height="48" rx="4"></rect>
+				<text class="viz-callout" x="105" y="174" text-anchor="middle">exploits evaluator shortcut</text>
+				<path d="M192 169H214" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+				<rect class="viz-node viz-node--output" x="214" y="145" width="68" height="48" rx="4"></rect>
+				<text class="viz-node-value" x="248" y="163">VERIFIER Y</text>
+				<text class="viz-node-label" x="248" y="182">BAD</text>
+				<path d="M28 216H272" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<text class="viz-callout" x="150" y="237" text-anchor="middle">Useful signal: C improves detection of Y.</text>
+				<text class="viz-label" x="150" y="259" text-anchor="middle">But predictive evidence does not prove that C</text>
+				<text class="viz-label" x="150" y="273" text-anchor="middle">contains every causal influence on A.</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 290" role="img" aria-labelledby="cot-pressured-title cot-pressured-desc">
+				<title id="cot-pressured-title">Monitor-targeted pressure can hide the signal without fixing behavior</title>
+				<desc id="cot-pressured-desc">In the second panel, after direct optimization against the trace monitor, the observed trace contains benign process language and the monitor passes it. The observed action still exploits the evaluator, and the independent action check still labels the behavior as bad. A mismatch label emphasizes that improving the monitor score did not improve the independently verified behavior.</desc>
+				<text class="viz-axis-label" x="10" y="17">AFTER DIRECT PRESSURE ON THE TRACE</text>
+				<rect class="viz-plot-bg" x="8" y="27" width="284" height="254" rx="5"></rect>
+				<text class="viz-axis-label" x="18" y="49">OBSERVED TRACE C</text>
+				<rect class="viz-node viz-node--input" x="18" y="57" width="174" height="52" rx="4" style="stroke-dasharray:5 3"></rect>
+				<text class="viz-callout" x="105" y="78" text-anchor="middle">“I will follow the requested</text>
+				<text class="viz-callout" x="105" y="95" text-anchor="middle">process carefully.”</text>
+				<path d="M192 83H214" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+				<rect class="viz-node viz-node--output" x="214" y="59" width="68" height="48" rx="4"></rect>
+				<text class="viz-node-value" x="248" y="77">TRACE</text>
+				<text class="viz-node-label" x="248" y="96">PASS</text>
+				<text class="viz-axis-label" x="18" y="137">OBSERVED ACTION A</text>
+				<rect class="viz-node" x="18" y="145" width="174" height="48" rx="4"></rect>
+				<text class="viz-callout" x="105" y="174" text-anchor="middle">exploits evaluator shortcut</text>
+				<path d="M192 169H214" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+				<rect class="viz-node viz-node--focus" x="214" y="145" width="68" height="48" rx="4"></rect>
+				<text class="viz-node-value" x="248" y="163">VERIFIER Y</text>
+				<text class="viz-node-label" x="248" y="182">BAD</text>
+				<path d="M28 216H272" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></path>
+				<text class="viz-callout" x="150" y="237" text-anchor="middle">Mismatch: monitor passes, behavior stays bad.</text>
+				<text class="viz-label" x="150" y="259" text-anchor="middle">The evidence channel became less informative;</text>
+				<text class="viz-label" x="150" y="273" text-anchor="middle">the independent target label did not improve.</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the same action row across both panels first: the independent verifier still finds bad behavior. Then compare the trace rows: direct pressure can replace incriminating evidence with benign-looking text, causing the trace monitor to pass. A useful flag in the first panel is evidence of monitorability, not proof that the trace is a complete causal transcript. This qualitative failure mode is documented by <a href="https://arxiv.org/abs/2503.11926">Baker et al.</a>; the distinction between plausible explanations and faithfulness is supported by <a href="https://arxiv.org/abs/2305.04388">Turpin et al.</a>; the graphic and synthetic wording are original.</figcaption>
+</figure>
+
 ## What to measure
 
 Define a target property $Y$, reasoning trace $C$, action or answer $A$, and monitor score $m(C, A)$. Evaluate:

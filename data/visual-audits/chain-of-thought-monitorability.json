@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "chain-of-thought-monitorability",
+  "article": "src/content/posts/2026-07-11-chain-of-thought-monitorability.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish useful predictive signal in a visible reasoning trace from proof that the trace faithfully exposes the computation that caused an action.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold behavior constant while changing what the visible trace reveals. Aligning the evidence channels, monitor decision, and external action check makes it clear that monitorability can fall under optimization pressure even when the underlying bad behavior remains.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would imply a known causal sequence from internal computation through text to action, while the article explicitly warns that the trace may be incomplete or post-hoc.",
+    "svg": "Selected: two aligned evidence-channel panels can distinguish observed trace text, observed action, monitor result, and independently verified behavior without claiming access to hidden cognition.",
+    "semanticHtml": "Rejected: a table could list monitor outcomes but would not make the controlled contrast spatially immediate or show that the same bad behavior can coexist with different trace evidence.",
+    "interaction": "Rejected: toggling optimization pressure would add controls and hidden state without improving the fixed before-and-after conceptual comparison.",
+    "paperReuse": "Rejected: the primary papers contain model-specific examples and empirical plots, their figure-reuse permissions were not established, and none is necessary for this abstract evidence-channel distinction.",
+    "noVisual": "Rejected: prose states both monitor usefulness and unfaithfulness, but readers can still collapse them into one claim. The aligned panels make the non-equivalence and Goodhart failure mode explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The preceding transformer overview covers architecture, language-model objectives, and training stability but provides no chain-of-thought monitoring or faithfulness claim."
+      },
+      {
+        "page": 104,
+        "insight": "The deck's only chain-of-thought discussion speculates that complex reasoning may emerge from code training, explicitly says the source remains an open question, and discusses how instruction tuning and RLHF change visible response behavior."
+      },
+      {
+        "page": 105,
+        "insight": "The following slide moves to model families, data preprocessing, and Toolformer; it contains no reasoning-trace monitoring, independent behavior labels, or optimization-against-monitor analysis."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for chain of thought, reasoning, monitorability, faithfulness, reward hacking, deception, oversight, and Goodhart terms. Page 104 was the sole chain-of-thought match, so neighboring pages 103 and 105 were inspected in full. The deck discusses possible origins of complex reasoning but does not address whether traces reveal causal computation, whether traces add monitoring signal, or how direct optimization can obfuscate that signal. No deck text, figure, code, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation",
+        "url": "https://arxiv.org/abs/2503.11926",
+        "usage": "Used as primary evidence that chain-of-thought monitoring detected reward hacking better than action-only monitoring in studied coding agents, and that sufficiently strong direct optimization against the monitor produced benign-looking traces while reward hacking continued.",
+        "license": "The paper is publicly accessible on arXiv, but permissive figure-reuse rights were not established. No example, plot, wording, data, or layout is copied; the implementation is an original abstract schematic with no quantitative claim."
+      },
+      {
+        "title": "Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting",
+        "url": "https://arxiv.org/abs/2305.04388",
+        "usage": "Used as primary evidence that plausible chain-of-thought explanations can omit influential input features and rationalize predictions, so plausibility and predictive usefulness do not establish faithfulness.",
+        "license": "The paper is publicly accessible on arXiv, but permissive figure-reuse rights were not established. No table, example, prose, benchmark result, or visual design is reproduced."
+      },
+      {
+        "title": "Chain of Thought Monitorability: A New and Fragile Opportunity for AI Safety",
+        "url": "https://arxiv.org/abs/2507.11473",
+        "usage": "Used as a primary research synthesis to verify that externalized reasoning can offer a useful safety signal while remaining incomplete, behavior-specific, and vulnerable to model-development choices.",
+        "license": "Public arXiv access does not itself grant figure reuse, and no permissive figure license was relied upon. The article's architecture figure and wording are not adapted; only the conceptual limitations inform the original comparison."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that arXiv papers may use different licenses and that free viewing does not by itself establish third-party reuse rights.",
+        "license": "The official policy is cited only to document licensing treatment. No policy prose or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that monitorability and faithfulness are different properties. A visible trace can contain enough evidence to improve detection without exposing every causal influence, and direct pressure on the trace can remove evidence without removing the target behavior. The graphic is an original qualitative schematic: it labels all observed and independently checked quantities, makes no claim that hidden computation is directly known, and uses no source examples or empirical values."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact chain-of-thought neighborhood, then reviewed primary work on monitor obfuscation, unfaithful explanations, and fragile monitorability plus arXiv licensing guidance before selecting an original evidence-channel comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "cot-signal-is-not-faithfulness"
+    ],
+    "accessibility": "Each panel has a linked SVG title and detailed description. Direct labels identify the trace evidence, action evidence, monitor output, independent behavior label, and unchanged bad behavior; solid versus dashed borders and explicit pass, flag, and mismatch text communicate every distinction without color. Each SVG uses a compact 300-pixel viewBox and the established two-panel grid stacks below 640 pixels for readability at 390 CSS pixels. Shared theme variables provide dark-mode contrast, and established print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
