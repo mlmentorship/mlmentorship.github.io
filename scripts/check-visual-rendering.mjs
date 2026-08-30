@@ -264,8 +264,11 @@ try {
               const viewBoxWidth = svg.viewBox.baseVal.width;
               const renderedWidth = svg.getBoundingClientRect().width;
               if (!viewBoxWidth || !renderedWidth) return [];
-              return [...svg.querySelectorAll('text')].map((text) =>
-                Number.parseFloat(getComputedStyle(text).fontSize) * renderedWidth / viewBoxWidth
+              const labels = svg.querySelectorAll(
+                'text, foreignObject .nodeLabel, foreignObject .edgeLabel, foreignObject .label, foreignObject .cluster-label'
+              );
+              return [...labels].filter((label) => label.textContent.trim()).map((label) =>
+                Number.parseFloat(getComputedStyle(label).fontSize) * renderedWidth / viewBoxWidth
               ).filter(Number.isFinite);
             });
             const rangeWidth = (element) => {
@@ -317,14 +320,14 @@ try {
         if (!details.caption.startsWith('Read it this way:') || details.captionGlyphWidth < 1) {
           throw new Error(`${label} lost its rendered direct caption`);
         }
+        if (mode.media !== 'print' && details.minRenderedText !== null && details.minRenderedText < 8) {
+          throw new Error(`${label} renders text at ${details.minRenderedText.toFixed(2)}px`);
+        }
         if (entry.medium === 'svg') {
           if (details.svgCount === 0 || details.svgCount !== details.titleCount || details.svgCount !== details.descCount) {
             throw new Error(`${label} lost SVG accessibility markup`);
           }
           if (details.clippedText.length) throw new Error(`${label} has text outside its viewBox: ${details.clippedText.join(', ')}`);
-          if (mode.media !== 'print' && details.minRenderedText !== null && details.minRenderedText < 8) {
-            throw new Error(`${label} renders text at ${details.minRenderedText.toFixed(2)}px`);
-          }
           if (mode.media === 'print' && details.printMinWidths.some((width) => width !== '0px')) {
             throw new Error(`${label} retains an SVG minimum width in print`);
           }
