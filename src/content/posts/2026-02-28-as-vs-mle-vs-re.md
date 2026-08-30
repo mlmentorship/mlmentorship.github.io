@@ -31,6 +31,54 @@ Different roles weight these differently:
 
 These percentages are rough averages.
 
+<!-- visual:ml-role-activity-profiles -->
+<figure class="learning-figure" aria-labelledby="ml-role-profiles-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="ml-role-profiles-title">See AS, RE, and MLE as different activity profiles, not as a ranking.</p>
+	<div class="visual-grid--two" role="group" aria-label="Three identically scaled role profiles comparing research, modeling, engineering, and product work">
+		<section class="visual-panel plot-panel">
+			<h4>Applied Scientist</h4>
+			<p>Modeling-led, with meaningful work on every axis.</p>
+			<svg viewBox="0 0 300 138" role="img" aria-labelledby="as-profile-title as-profile-desc">
+				<title id="as-profile-title">Applied Scientist activity profile</title>
+				<desc id="as-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 20 percent, modeling 40 percent, engineering 20 percent, and product 20 percent.</desc>
+				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="36" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">20%</text>
+				<text class="viz-label" x="0" y="50">Modeling</text><rect class="viz-plot-bg" x="82" y="39" width="180" height="14" rx="2"></rect><rect x="82" y="39" width="72" height="14" rx="2" style="fill:var(--viz-focus-stroke)"></rect><text class="viz-axis-label" x="292" y="50" text-anchor="end">40%</text>
+				<text class="viz-label" x="0" y="80">Engineering</text><rect class="viz-plot-bg" x="82" y="69" width="180" height="14" rx="2"></rect><rect x="82" y="69" width="36" height="14" rx="2" style="fill:var(--viz-input-stroke)"></rect><text class="viz-axis-label" x="292" y="80" text-anchor="end">20%</text>
+				<text class="viz-label" x="0" y="110">Product</text><rect class="viz-plot-bg" x="82" y="99" width="180" height="14" rx="2"></rect><rect x="82" y="99" width="36" height="14" rx="2" style="fill:var(--viz-output-stroke)"></rect><text class="viz-axis-label" x="292" y="110" text-anchor="end">20%</text>
+				<path class="viz-axis" d="M82 121H262"></path><text class="viz-label" x="82" y="130">0</text><text class="viz-label" x="262" y="130" text-anchor="end">100%</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<h4>Research Engineer</h4>
+			<p>Engineering-led, but still close to experiments and research.</p>
+			<svg viewBox="0 0 300 138" role="img" aria-labelledby="re-profile-title re-profile-desc">
+				<title id="re-profile-title">Research Engineer activity profile</title>
+				<desc id="re-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 25 percent, modeling 30 percent, engineering 40 percent, and product 5 percent.</desc>
+				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="45" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">25%</text>
+				<text class="viz-label" x="0" y="50">Modeling</text><rect class="viz-plot-bg" x="82" y="39" width="180" height="14" rx="2"></rect><rect x="82" y="39" width="54" height="14" rx="2" style="fill:var(--viz-focus-stroke)"></rect><text class="viz-axis-label" x="292" y="50" text-anchor="end">30%</text>
+				<text class="viz-label" x="0" y="80">Engineering</text><rect class="viz-plot-bg" x="82" y="69" width="180" height="14" rx="2"></rect><rect x="82" y="69" width="72" height="14" rx="2" style="fill:var(--viz-input-stroke)"></rect><text class="viz-axis-label" x="292" y="80" text-anchor="end">40%</text>
+				<text class="viz-label" x="0" y="110">Product</text><rect class="viz-plot-bg" x="82" y="99" width="180" height="14" rx="2"></rect><rect x="82" y="99" width="9" height="14" rx="2" style="fill:var(--viz-output-stroke)"></rect><text class="viz-axis-label" x="292" y="110" text-anchor="end">5%</text>
+				<path class="viz-axis" d="M82 121H262"></path><text class="viz-label" x="82" y="130">0</text><text class="viz-label" x="262" y="130" text-anchor="end">100%</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<h4>ML Engineer</h4>
+			<p>Engineering-dominant, with modeling and product context.</p>
+			<svg viewBox="0 0 300 138" role="img" aria-labelledby="mle-profile-title mle-profile-desc">
+				<title id="mle-profile-title">ML Engineer activity profile</title>
+				<desc id="mle-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 5 percent, modeling 30 percent, engineering 50 percent, and product 15 percent.</desc>
+				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="9" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">5%</text>
+				<text class="viz-label" x="0" y="50">Modeling</text><rect class="viz-plot-bg" x="82" y="39" width="180" height="14" rx="2"></rect><rect x="82" y="39" width="54" height="14" rx="2" style="fill:var(--viz-focus-stroke)"></rect><text class="viz-axis-label" x="292" y="50" text-anchor="end">30%</text>
+				<text class="viz-label" x="0" y="80">Engineering</text><rect class="viz-plot-bg" x="82" y="69" width="180" height="14" rx="2"></rect><rect x="82" y="69" width="90" height="14" rx="2" style="fill:var(--viz-input-stroke)"></rect><text class="viz-axis-label" x="292" y="80" text-anchor="end">50%</text>
+				<text class="viz-label" x="0" y="110">Product</text><rect class="viz-plot-bg" x="82" y="99" width="180" height="14" rx="2"></rect><rect x="82" y="99" width="27" height="14" rx="2" style="fill:var(--viz-output-stroke)"></rect><text class="viz-axis-label" x="292" y="110" text-anchor="end">15%</text>
+				<path class="viz-axis" d="M82 121H262"></path><text class="viz-label" x="82" y="130">0</text><text class="viz-label" x="262" y="130" text-anchor="end">100%</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> Start with the longest bar, then inspect what remains. AS is broad and modeling-led; RE keeps more research while shifting toward engineering; MLE puts half its profile in engineering. These are illustrative averages, not standardized job definitions.</figcaption>
+</figure>
+
 ## Role-by-role, in plain language
 
 ### Research Scientist

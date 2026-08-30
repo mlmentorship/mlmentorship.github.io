@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "attention-mechanism",
+  "article": "src/content/posts/2025-10-12-attention-mechanism.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how one query uses keys to produce normalized weights, then applies those same weights to values to produce the attention output.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align each key-derived weight with its paired value contribution and keep the numeric weighted sum visible. Fixed geometry makes the separation between addressing and payload checkable without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show score, softmax, and sum, but it cannot align three weight magnitudes with three value contributions as precisely at phone width.",
+    "svg": "Selected: deterministic bars, direct labels, and a worked scalar example expose both the normalized distribution and the weighted sum in one static trace.",
+    "semanticHtml": "Rejected: a table could verify the arithmetic, but it would weaken the spatial handoff from query-key scoring to value aggregation.",
+    "interaction": "Rejected: changing scores or values would add controls and state without improving the single distinction the learner needs to retain.",
+    "paperReuse": "Rejected: the source figures are architecture-level diagrams, their figure-reuse permission was not established, and none isolates the keys-versus-values mental model as narrowly as this article needs.",
+    "noVisual": "Rejected: the prose lists the operations correctly but requires the reader to mentally preserve row correspondence while switching from keys in the scoring stage to values in the aggregation stage."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 100,
+        "insight": "The preceding slide covers recurrent architectures and provides the boundary before the transformer discussion; it contains no query-key-value mechanism."
+      },
+      {
+        "page": 101,
+        "insight": "The transformer overview reproduces the scaled dot-product pipeline and formula, and distinguishes self-attention from decoder cross-attention by the origins of Q, K, and V."
+      },
+      {
+        "page": 102,
+        "insight": "The adjacent BERT slide discusses contextual sequence applications but adds no explanation of how key-derived weights are applied to values."
+      },
+      {
+        "page": 103,
+        "insight": "The following transformer survey repeats the attention formula, causal mask, and multi-head framing, and notes the square-root scaling; it still does not spatially separate keys as addresses from values as payloads."
+      },
+      {
+        "page": 104,
+        "insight": "The next slide moves to GPT-X, instruction tuning, and in-context learning, marking the end of the local attention-mechanism neighborhood."
+      },
+      {
+        "page": 108,
+        "insight": "A later optimization slide restates standard scaled dot-product attention and its quadratic compute and memory costs before the deck moves to packing, FlashAttention, sparse attention, and low-rank variants."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for attention, self-attention, query/key/value, transformer, softmax, and multi-head references. Pages 101-103 and the later optimization cluster at pages 107-112 were rendered and visually inspected; boundary pages 100 and 104 were also read. Pages 101 and 103 contain dense architecture composites derived from external sources, while page 108 is formula-and-cost prose. None provides a narrow, reusable explanation of why keys determine weights but values determine content. No deck image, coordinates, wording, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used to verify scaled dot-product attention as softmax of scaled query-key products followed by multiplication by V, and that each output is a weighted sum of values.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was identified. No figure, prose, example values, or layout is copied; the shipped diagram is an original schematic with synthetic scalar data."
+      },
+      {
+        "title": "PyTorch scaled_dot_product_attention documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "usage": "Used as official implementation documentation to cross-check that softmax is applied to scaled query-key scores and the resulting attention weights are then multiplied by value tensors.",
+        "license": "Documentation is used only to verify operator semantics. No PyTorch code, prose, or artwork is reproduced."
+      },
+      {
+        "title": "Dive into Deep Learning: Queries, Keys, and Values",
+        "url": "https://d2l.ai/chapter_attention-mechanisms-and-transformers/queries-keys-values.html",
+        "usage": "Used as an authoritative open textbook to cross-check the database analogy in which queries are matched against keys and values are combined into outputs.",
+        "license": "The textbook is published under CC BY-SA 4.0, but no text or figure is adapted. The visual is independently authored, so its layout and synthetic numbers do not invoke the textbook's share-alike terms."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the role split inside a key-value pair: the key affects the normalized coefficient, but the paired value contributes to the output. The two panels use an original one-dimensional teaching example. The normalized synthetic weights 0.60, 0.30, and 0.10 sum to one; applying them to values 1, 4, and 7 gives contributions 0.60, 1.20, and 0.70 and output 2.50. The example makes no empirical or learned-attention claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages, visually inspected the relevant slide clusters and their boundaries, and checked the primary Transformer paper, official PyTorch operator documentation, and an open authoritative textbook before selecting an original two-stage numeric schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "attention-keys-choose-values-contribute"
+    ],
+    "accessibility": "Both SVG panels have linked titles and complete descriptions. Direct key, weight, value, contribution, and sum labels carry all meaning without color; bar length redundantly encodes weight magnitude. The established two-panel primitive stacks below 640 pixels, each SVG scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
