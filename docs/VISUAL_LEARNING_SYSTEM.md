@@ -47,6 +47,8 @@ During cross-review, verify the exact campaign delta with `node scripts/check-vi
 
 Source and DOM checks are necessary but not sufficient. Cross-review must render every new figure in a real browser and inspect the pixels, not only element bounds or accessibility text. Use an actual 390 CSS pixel viewport and assert `window.innerWidth === 390` before drawing conclusions. Windows headless Chrome enforces a 500 CSS pixel minimum for `--window-size=390` and merely crops the screenshot, so command-line screenshots without device-metric emulation are not valid mobile evidence. Check desktop light, desktop dark, 390-pixel light and dark, and print media. Inspect label glyphs, collisions, clipping, intended internal scrolling, and the drawn geometry behind any stated arithmetic.
 
+Use `scripts/check-visual-rendering.mjs` for this matrix. Build the site, serve `dist` on a local port, then pass the batch slugs, base URL, and an ignored screenshot directory. The script launches Chrome or Edge, applies CDP device metrics, requires an exact 390-pixel mobile layout, checks custom SVG text against each viewBox, captures all five modes, and captures both ends of internally scrollable figures. On WSL with a Windows browser, invoke the script with Windows Node and convert the script and output paths with `wslpath -w`; a Linux process cannot reach that browser's loopback CDP endpoint. The automated pass does not replace opening the saved PNGs and inspecting their pixels.
+
 ## Choose the medium from the learning task
 
 | Learning task | Default medium | Examples |
