@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "decision-thresholds-asymmetric-costs-abstention",
+  "article": "src/content/posts/2026-08-28-decision-thresholds-asymmetric-costs-abstention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Read two thresholds as three action regions and see why asymmetric error costs make automatic decisions expensive near the review region.",
+  "mediumRationale": "A deterministic SVG policy strip makes score position, region width, two exact boundaries, and opposing false-action costs spatially comparable in one static view. Mermaid was rejected because the lesson is quantitative geometry rather than flow; semantic HTML would separate values but weaken the continuous score model; interaction would add controls without improving the fixed policy lesson; paper-figure reuse was unnecessary and licensing was not established; mixed media would add complexity; and no visual would leave the three-region mental model implicit.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 32,
+        "insight": "The logistic-regression material distinguishes class probabilities from the loss used to fit them, which is necessary before applying a probability policy."
+      },
+      {
+        "page": 37,
+        "insight": "The ROC material presents threshold selection as an operating-point tradeoff between true-positive benefit and false-positive cost."
+      },
+      {
+        "page": 38,
+        "insight": "The imbalanced classification example shows why an operating policy must account for the different consequences of false positives and false negatives."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration and out-of-distribution material connects meaningful confidence values to low-confidence rejection."
+      }
+    ],
+    "notes": "The deck was reviewed independently across slides 32 through 39. It motivates calibrated scores, cost-sensitive operating points, and rejection, but does not combine them into a two-threshold action policy. The new figure supplies that missing synthesis with an original illustrative policy."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On Optimum Recognition Error and Reject Tradeoff",
+        "url": "https://ieeexplore.ieee.org/document/1054844",
+        "usage": "Used as the primary decision-theoretic source for treating rejection as an action with a cost relative to classification errors.",
+        "license": "No text, data, or figure copied; bibliographic and conceptual reference only because reuse permission was not verified."
+      },
+      {
+        "title": "On the Foundations of Noise-free Selective Classification",
+        "url": "https://jmlr.org/papers/v11/el-yaniv10a.html",
+        "usage": "Used to verify selective-classification terminology and the coverage versus selective-risk tradeoff.",
+        "license": "No source figure copied; conceptual reference only."
+      },
+      {
+        "title": "On Calibration of Modern Neural Networks",
+        "url": "https://proceedings.mlr.press/v70/guo17a.html",
+        "usage": "Used to verify that confidence calibration concerns whether predicted probabilities represent observed correctness likelihoods.",
+        "license": "No source figure, results, or data copied; conceptual reference only."
+      },
+      {
+        "title": "Optimal Strategies for Reject Option Classifiers",
+        "url": "https://jmlr.org/papers/v24/21-0048.html",
+        "usage": "Used to cross-check cost-based, bounded-risk, and bounded-abstention formulations of the reject option.",
+        "license": "No source figure copied; conceptual reference only."
+      }
+    ],
+    "notes": "Primary sources were reviewed independently of the deck. The visual is an original construction from the article's illustrative 0.60 and 0.98 policy; it reproduces no paper-specific layout, data, or empirical result."
+  },
+  "agentReview": {
+    "reviewer": "Decision-thresholds article subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended one static SVG policy strip with patterned regions, explicit threshold lines, and opposing cost callouts. This preserves the score continuum while making abstention a first-class action rather than a confidence failure."
+  },
+  "implementation": {
+    "visualIds": ["decision-threshold-action-regions"],
+    "accessibility": "The SVG provides a title and long description. Region names, numeric endpoints, distinct hatch patterns, solid threshold lines, and direct cost labels preserve the lesson without color; a compact viewBox scales to the reading column and the caption restates the policy in text."
+  }
+}
