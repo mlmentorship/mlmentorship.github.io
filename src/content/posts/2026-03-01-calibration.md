@@ -33,6 +33,45 @@ Typical interpretation:
 - **Underconfident**: accuracy &gt; confidence (model is more right than it claims).
 - **Overconfident**: accuracy &lt; confidence (model is too sure of itself). Most modern deep nets are overconfident.
 
+<!-- visual:calibration-reliability-gap -->
+<figure class="learning-figure plot-panel" aria-labelledby="calibration-visual-title">
+	<p class="visual-kicker">Spatial intuition</p>
+	<p class="visual-title" id="calibration-visual-title">Calibration is the vertical gap between observed frequency and predicted confidence.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 310" role="img" aria-labelledby="calibration-svg-title calibration-svg-desc">
+			<title id="calibration-svg-title">Reliability diagram with perfect calibration and an illustrative overconfident model</title>
+			<desc id="calibration-svg-desc">The horizontal axis is mean predicted confidence and the vertical axis is observed fraction correct. A dashed diagonal from zero-zero to one-one represents perfect calibration. An original illustrative curve connects bin pairs 20 percent confidence and 12 percent correct, 40 and 28, 60 and 43, 80 and 60, and 90 and 72. Every point is below the diagonal, so confidence exceeds observed correctness and the model is overconfident. At 80 percent confidence, a vertical guide marks the 20 percentage-point gap down to 60 percent observed correctness. The region above the diagonal is labeled underconfident and the region below is labeled overconfident.</desc>
+			<rect class="viz-plot-bg" x="54" y="28" width="272" height="222" rx="3"></rect>
+			<path class="viz-gridline" d="M54 194.5H326 M54 139H326 M54 83.5H326 M122 28V250 M190 28V250 M258 28V250"></path>
+			<path class="viz-axis" d="M54 28V250H326"></path>
+			<path class="viz-baseline" d="M54 250L326 28"></path>
+			<text class="viz-axis-label" x="232" y="62" transform="rotate(-39 232 62)">perfect: observed = predicted</text>
+			<text class="viz-label" x="77" y="64">UNDERCONFIDENT</text>
+			<text class="viz-label" x="246" y="220">OVERCONFIDENT</text>
+			<path class="viz-pr-curve" d="M108.4 223.4 L162.8 187.8 L217.2 154.5 L271.6 116.8 L298.8 90.2"></path>
+			<circle class="viz-operating-point" cx="108.4" cy="223.4" r="4"></circle>
+			<circle class="viz-operating-point" cx="162.8" cy="187.8" r="4"></circle>
+			<circle class="viz-operating-point" cx="217.2" cy="154.5" r="4"></circle>
+			<circle class="viz-operating-point" cx="271.6" cy="116.8" r="5"></circle>
+			<circle class="viz-operating-point" cx="298.8" cy="90.2" r="4"></circle>
+			<path class="viz-operating-guide" d="M271.6 72.4V116.8"></path>
+			<path class="viz-operating-guide" d="M266.6 72.4H276.6 M266.6 116.8H276.6"></path>
+			<text class="viz-callout" x="263" y="92" text-anchor="end">20-point gap</text>
+			<text class="viz-callout" x="263" y="107" text-anchor="end">80% vs 60%</text>
+			<text class="viz-callout" x="152" y="211">illustrative bins</text>
+			<text class="viz-label" x="50" y="268">0</text>
+			<text class="viz-label" x="186" y="268">0.5</text>
+			<text class="viz-label" x="320" y="268">1</text>
+			<text class="viz-label" x="36" y="254">0</text>
+			<text class="viz-label" x="30" y="143">0.5</text>
+			<text class="viz-label" x="36" y="33">1</text>
+			<text class="viz-axis-label" x="190" y="294" text-anchor="middle">mean predicted confidence</text>
+			<text class="viz-axis-label" transform="translate(14 194) rotate(-90)">observed fraction correct</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the dashed diagonal is perfect calibration. The illustrative bin pairs are (20%, 12%), (40%, 28%), (60%, 43%), (80%, 60%), and (90%, 72%). Because observed correctness is below confidence in every bin, this model is overconfident; points above the diagonal would be underconfident.</figcaption>
+</figure>
+
 ## Why neural networks are overconfident
 
 Modern neural networks (especially with high capacity and limited training data) tend to be highly overconfident. Common reasons:
