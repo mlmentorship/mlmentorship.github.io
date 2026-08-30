@@ -10,6 +10,8 @@ const prepToolsEnabled = process.env.PUBLIC_PREP_TOOLS === undefined || process.
 // https://astro.build/config
 export default defineConfig({
   site: 'https://mlmentorship.com',
+  // Parallel visual audits share dependencies but must not share mutable build state.
+  cacheDir: './.astro/',
   redirects: {
     '/readiness': prepToolsEnabled ? '/prep/readiness' : '/questions',
     '/practice': prepToolsEnabled ? '/prep/practice' : '/questions',
