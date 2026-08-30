@@ -61,6 +61,66 @@ The dominant implementation in 2026 (Baidu Ring, Horovod, NCCL):
 
 Total: $2(N-1)$ steps, each transferring $B/N$ bytes per rank. **Traffic per rank is $2B(N-1)/N$, which approaches $2B$.** A ring uses link bandwidth well for large messages. Its many sequential steps can make small messages latency-bound.
 
+<!-- visual:ring-all-reduce-chunk-trace -->
+<figure class="learning-figure plot-panel visual-wide" aria-labelledby="ring-trace-title">
+	<p class="visual-kicker">One chunk, four ranks</p>
+	<p class="visual-title" id="ring-trace-title">Reduction moves the partial sum; gathering moves the finished chunk.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 760 370" role="img" aria-labelledby="ring-trace-svg-title ring-trace-svg-desc">
+			<title id="ring-trace-svg-title">One chunk traced through a four-rank ring all-reduce</title>
+			<desc id="ring-trace-svg-desc">In reduce-scatter, rank zero sends its contribution a zero to rank one, which adds a one. Rank one sends that partial sum to rank two, which adds a two. Rank two sends the next partial sum to rank three, which adds a three and finishes chunk A. In all-gather, rank three sends the finished chunk to rank zero, then rank zero forwards it to rank one, and rank one forwards it to rank two without further addition. Every rank concurrently sends one chunk of size B divided by four in each of the six steps, for three B divided by two bytes per rank.</desc>
+			<text class="viz-axis-label" x="20" y="24">REDUCE-SCATTER · 3 hops · receive, then add the local contribution</text>
+			<g aria-label="Reduce-scatter trace">
+				<rect class="viz-node viz-node--input" x="20" y="48" width="142" height="62" rx="4"></rect>
+				<text class="viz-node-value" x="91" y="70">START AT RANK 0</text>
+				<text class="viz-node-label" x="91" y="94">a₀</text>
+				<path class="viz-axis" d="M162 79 H210"></path><path class="viz-arrow-forward" d="M210 79 l-9 -5 v10 Z"></path>
+				<text class="viz-edge-label" x="186" y="67">step 1</text>
+				<rect class="viz-node viz-node--focus" x="210" y="48" width="142" height="62" rx="4"></rect>
+				<text class="viz-node-value" x="281" y="70">AT RANK 1</text>
+				<text class="viz-node-label" x="281" y="94">a₀ + a₁</text>
+				<path class="viz-axis" d="M352 79 H400"></path><path class="viz-arrow-forward" d="M400 79 l-9 -5 v10 Z"></path>
+				<text class="viz-edge-label" x="376" y="67">step 2</text>
+				<rect class="viz-node viz-node--focus" x="400" y="48" width="142" height="62" rx="4"></rect>
+				<text class="viz-node-value" x="471" y="70">AT RANK 2</text>
+				<text class="viz-node-label" x="471" y="94">a₀ + a₁ + a₂</text>
+				<path class="viz-axis" d="M542 79 H590"></path><path class="viz-arrow-forward" d="M590 79 l-9 -5 v10 Z"></path>
+				<text class="viz-edge-label" x="566" y="67">step 3</text>
+				<rect class="viz-node viz-node--output" x="590" y="48" width="150" height="62" rx="4"></rect>
+				<text class="viz-node-value" x="665" y="70">FINAL A* AT RANK 3</text>
+				<text class="viz-node-label" x="665" y="94">a₀ + a₁ + a₂ + a₃</text>
+			</g>
+			<text class="viz-label" x="20" y="135">All four chunks follow the same schedule concurrently; A is isolated here so its accumulation stays visible.</text>
+			<path class="viz-baseline" d="M20 153 H740"></path>
+			<text class="viz-axis-label" x="20" y="181">ALL-GATHER · 3 hops · forward the finished A* without adding</text>
+			<g aria-label="All-gather trace">
+				<rect class="viz-node viz-node--output" x="20" y="205" width="142" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="91" y="227">RANK 3 SENDS</text>
+				<text class="viz-node-label" x="91" y="249">A*</text>
+				<path class="viz-baseline" d="M162 234 H210"></path><path class="viz-arrow-forward" d="M210 234 l-9 -5 v10 Z"></path>
+				<text class="viz-edge-label" x="186" y="222">step 1</text>
+				<rect class="viz-node" x="210" y="205" width="142" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="281" y="227">RANK 0 RECEIVES</text>
+				<text class="viz-node-label" x="281" y="249">A*</text>
+				<path class="viz-baseline" d="M352 234 H400"></path><path class="viz-arrow-forward" d="M400 234 l-9 -5 v10 Z"></path>
+				<text class="viz-edge-label" x="376" y="222">step 2</text>
+				<rect class="viz-node" x="400" y="205" width="142" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="471" y="227">RANK 1 RECEIVES</text>
+				<text class="viz-node-label" x="471" y="249">A*</text>
+				<path class="viz-baseline" d="M542 234 H590"></path><path class="viz-arrow-forward" d="M590 234 l-9 -5 v10 Z"></path>
+				<text class="viz-edge-label" x="566" y="222">step 3</text>
+				<rect class="viz-node" x="590" y="205" width="150" height="58" rx="4"></rect>
+				<text class="viz-node-value" x="665" y="227">RANK 2 RECEIVES</text>
+				<text class="viz-node-label" x="665" y="249">A*</text>
+			</g>
+			<text class="viz-axis-label" x="20" y="301">PER-RANK TRAFFIC FOR N = 4</text>
+			<rect class="viz-node viz-node--focus" x="20" y="315" width="720" height="38" rx="4"></rect>
+			<text class="viz-callout" x="380" y="339" text-anchor="middle">[3 reduce-scatter sends + 3 all-gather sends] × B/4 = 6B/4 = 3B/2</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow chunk A from left to right. Three reduce-scatter hops build A* from four rank-local contributions; three all-gather hops copy A* to the other ranks without more arithmetic. Every rank does this concurrently for one B/4 chunk per step, so it sends 6 × B/4 = 3B/2 bytes, exactly 2B(N − 1)/N for N = 4. Original schematic based on the <a href="https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/">Baidu ring all-reduce explanation</a> and <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html">NCCL collective semantics</a>.</figcaption>
+</figure>
+
 ## Where each appears
 
 | Distributed pattern | Collectives |

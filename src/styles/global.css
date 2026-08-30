@@ -422,7 +422,7 @@ mark {
 .visual-title {
   margin: 0 0 .8rem;
   color: var(--c-text);
-  font-family: var(--font-display);
+  font-family: Lato, var(--font-display);
   font-size: .95rem;
   font-weight: 650;
   line-height: 1.3;
@@ -432,7 +432,7 @@ mark {
   padding-top: .65rem;
   border-top: 1px solid var(--c-rule);
   color: var(--c-muted);
-  font-family: var(--font-ui);
+  font-family: Lato, var(--font-ui);
   font-size: .72rem;
   font-style: normal;
   line-height: 1.5;
@@ -485,7 +485,7 @@ mark {
   width: 100%;
   height: auto;
   overflow: visible;
-  font-family: var(--font-ui);
+  font-family: Lato, var(--font-ui);
 }
 .viz-plot-bg { fill: color-mix(in srgb, var(--viz-neutral-bg) 90%, transparent); }
 .viz-gridline { fill: none; stroke: var(--c-rule); stroke-width: 1; }
@@ -500,7 +500,7 @@ mark {
 .viz-callout { fill: var(--c-text); font-size: 11px; font-weight: 650; }
 
 .visual-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
-.visual-wide svg { min-width: 38rem; }
+.visual-wide svg { min-width: 42rem; }
 .backprop-visual svg { min-width: 42rem; overflow: hidden; }
 .viz-node { fill: var(--viz-neutral-bg); stroke: var(--viz-neutral-stroke); stroke-width: 1.5; }
 .viz-node--input { fill: var(--viz-input-bg); stroke: var(--viz-input-stroke); }

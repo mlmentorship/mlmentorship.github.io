@@ -2,47 +2,69 @@
   "schemaVersion": 1,
   "slug": "anchor-boxes-and-nms",
   "article": "src/content/posts/2026-05-07-anchor-boxes-and-nms.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "Trace greedy non-maximum suppression from overlapping scored boxes to one retained detection while understanding why selection order matters.",
-  "mediumRationale": "A deterministic before, select, suppress, and result SVG can reuse the same box coordinates across stages. Mermaid cannot express IoU overlap geometry, and interaction is unnecessary for the first version.",
+  "learningObjective": "Trace greedy non-maximum suppression from scored, overlapping boxes to the retained detections by following score order and the IoU threshold.",
+  "mediumRationale": "Two deterministic SVG panels can hold the same synthetic box coordinates before and after suppression, making the greedy decision spatially checkable. Mermaid cannot express overlap geometry; semantic HTML would separate the boxes from their intersections; interaction is unnecessary for one threshold; paper reuse adds licensing and density costs; and no visual leaves the score-ordered spatial decision implicit.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can list NMS steps but cannot show the IoU-producing overlap between candidate boxes.",
+    "svg": "Selected: exact coordinates, direct labels, distinct line patterns, and a fixed before-and-after comparison make the suppression decision visible and reproducible.",
+    "semanticHtml": "Rejected: a table can report IoU values but cannot connect them to the overlapping regions that produce those values.",
+    "interaction": "Rejected: a threshold control would add state and scripting without improving the core lesson at one representative threshold.",
+    "paperReuse": "Rejected: source figures are denser than the learning objective, and public access is not treated as permission to reuse their artwork.",
+    "noVisual": "Rejected: prose specifies the loop but does not make it easy to see why the lower-scoring overlapping box disappears while a separated box survives."
+  },
   "deckReview": {
     "pages": [
       {
         "page": 147,
-        "insight": "The computer-vision overview situates object detection and segmentation as localization tasks beyond image classification."
+        "insight": "The image-classification slide introduces object detection as a spatial computer-vision task but contains no anchor or suppression mechanism."
+      },
+      {
+        "page": 148,
+        "insight": "The neighboring CNN slide explains feature extraction and spatial hierarchies; it supplies backbone context but no proposal-box decision rule."
       },
       {
         "page": 149,
-        "insight": "The Faster R-CNN slide provides the proposal and detection context in which anchors and NMS operate."
+        "insight": "The Faster R-CNN slide places multiple anchor aspect ratios on a feature-map grid, defines IoU, and states that boxes are sorted by foreground probability before boxes above an IoU threshold are suppressed."
+      },
+      {
+        "page": 150,
+        "insight": "The following GAN slide starts a different topic and provides no additional detection or NMS context."
       }
     ],
-    "notes": "The deck has detection context but no accessible stepwise NMS teaching figure. The agent's two-figure proposal was narrowed to greedy suppression, the less intuitive algorithm."
+    "notes": "The complete 214-page deck was text-indexed for anchor, NMS, non-maximum, object detection, and Faster R-CNN, then pages 147-150 were visually inspected as the full local neighborhood. Page 149 is the only page that discusses anchors or NMS. It combines several unattributed dense images and states the algorithm in prose, but does not show a readable score-ordered suppression sequence; no deck artwork is reused."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks",
         "url": "https://arxiv.org/abs/1506.01497",
-        "usage": "Use to verify anchor proposal framing and bounding-box regression context.",
-        "license": "No paper figure copied; method semantics referenced only."
+        "usage": "Used to verify anchors as multi-scale, multi-aspect-ratio reference boxes and the use of NMS to reduce ranked region proposals.",
+        "license": "No paper prose, data, or figure is copied. ArXiv distribution is not treated as figure-reuse permission; the coordinates, scores, labels, and two-panel composition are original."
       },
       {
         "title": "torchvision.ops.nms documentation",
-        "url": "https://pytorch.org/vision/stable/generated/torchvision.ops.nms.html",
-        "usage": "Use to verify score ordering, IoU thresholding, and retained-index semantics.",
-        "license": "No documentation figure or code copied; behavior referenced only."
+        "url": "https://docs.pytorch.org/vision/stable/generated/torchvision.ops.nms.html",
+        "usage": "Used to verify that lower-scoring boxes with IoU strictly greater than the threshold are removed and retained indices are returned in decreasing score order.",
+        "license": "Torchvision is BSD-3-Clause licensed, but no documentation text, code, or artwork is reused; only the public API semantics are referenced."
+      },
+      {
+        "title": "Soft-NMS -- Improving Object Detection With One Line of Code",
+        "url": "https://openaccess.thecvf.com/content_ICCV_2017/html/Bodla_Soft-NMS_--_Improving_ICCV_2017_paper.html",
+        "usage": "Used as a primary object-detection source that contrasts standard greedy NMS, which removes overlapping lower-scored detections, with score decay in Soft-NMS.",
+        "license": "No figure, result, table, code, or prose is copied. The visual teaches standard NMS with an independently constructed geometric example."
       }
     ],
-    "notes": "The planned scored boxes and IoU relationships are original, synthetic, and internally checkable. Public access is not treated as figure reuse permission."
+    "notes": "The visual is an original redraw of general algorithm semantics, not a reproduction of any source figure or empirical result. Its rectangles have explicit synthetic coordinates: A and B each have area 12,000, their intersection is 8,500, and IoU is 8,500 / 15,500 = 0.548, so B is suppressed at tau = 0.50. C does not overlap A and remains eligible."
   },
   "agentReview": {
-    "reviewer": "Explore anchors-NMS subagent, manually reconciled",
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent proposed anchor and NMS visuals. Integration selected one staged NMS SVG because overlapping-box geometry and greedy order are the article's hardest spatial concept."
+    "summary": "Independently reviewed the complete article, all 214 deck pages by text index, the relevant slide neighborhood visually, primary papers, and official framework documentation. The hardest prose-only model is the greedy coupling of score order and spatial overlap, so the final design narrows the planned sequence to one before-and-after decision with checkable IoU."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["nms-greedy-suppression"],
+    "accessibility": "Each responsive SVG has its own title and description, while direct A, B, and C labels, score text, solid-versus-dashed outlines, a suppression cross, and explicit keep/suppress words preserve meaning without color. The shared two-panel figure stacks below 640 pixels, uses theme variables for dark mode, removes horizontal minimum widths, and inherits print-safe tokens."
   }
 }

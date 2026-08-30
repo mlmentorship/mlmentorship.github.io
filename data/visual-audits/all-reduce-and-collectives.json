@@ -2,51 +2,75 @@
   "schemaVersion": 1,
   "slug": "all-reduce-and-collectives",
   "article": "src/content/posts/2025-09-22-all-reduce-and-collectives.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "Trace one chunk through the N minus 1 reduce-scatter steps of a four-rank ring and connect the movement to the communication formula.",
-  "mediumRationale": "An original step-aligned SVG can preserve ring geometry, chunk identity, send direction, and accumulated state. Mermaid would show topology but not synchronized buffer evolution clearly.",
+  "learningObjective": "Trace one tensor chunk through the three reduce-scatter hops of a four-rank ring, then connect both three-step phases to the per-rank traffic formula.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align rank-local contributions, hop-by-hop accumulation, the distinct copy-only all-gather phase, and the traffic arithmetic. The diagram traces one chunk while explicitly stating that all four chunks move concurrently.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout can show the ring topology but cannot reliably align three accumulation states with the per-step byte calculation.",
+    "svg": "Selected for deterministic rank and step geometry, explicit text alternatives, responsive horizontal scrolling, theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table can enumerate states but makes the direction and handoff of the accumulating chunk harder to scan.",
+    "interaction": "Rejected because animating steps adds controls and motion without improving the fixed four-rank derivation or its static fallback.",
+    "paperReuse": "Rejected because the canonical Baidu article's figures have no explicit permissive reuse license and contain more full-ring detail than this single-chunk learning objective needs.",
+    "noVisual": "Rejected because the prose gives the two phases and formula but does not spatially connect one chunk's N minus 1 hops to the bytes every rank sends."
+  },
   "deckReview": {
     "pages": [
       {
+        "page": 103,
+        "insight": "The parameter-reduction slide states that distributed-training communication overhead is proportional to model parameter count, motivating why collective traffic matters."
+      },
+      {
         "page": 107,
-        "insight": "The FSDP slide ties distributed model state to mixed-precision collective communication and overlap."
+        "insight": "The LLM-training slide places mixed-precision communication inside FSDP, but does not identify the collective or its algorithm."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision pitfalls slide says ZeRO and FSDP shard optimizer state across data-parallel ranks."
       },
       {
         "page": 115,
-        "insight": "The combined training stack places FSDP communication in the context of memory-saving model training."
+        "insight": "The combined training stack again places FSDP and ZeRO sharding in the memory-efficient training context."
       },
       {
         "page": 167,
-        "insight": "The system-design slide distinguishes data parallelism from model parallelism and motivates worker communication."
+        "insight": "The system-design slide distinguishes data parallelism, where each worker owns a model copy, from model parallelism."
       }
     ],
-    "notes": "The independent agent referenced a nonexistent PPTX path and guessed deck ranges. Manual inspection established the exact relevant PDF pages; none supplies a reusable ring algorithm visual."
+    "notes": "All 214 pages of the local PDF were searched and reviewed for all-reduce, reduce-scatter, all-gather, collective, FSDP, and distributed/data/model-parallel training references. Neighboring pages 102-104, 106-108, 113-116, and 166-168 were inspected in full: they cover transformer models, pruning, LLM training, mixed precision, training stacks, data pipelines, and serving. None shows a ring collective, chunk accumulation, or a reusable communication-cost diagram."
   },
   "sourceReview": {
     "sources": [
       {
-        "title": "NCCL Collective Operations",
-        "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html",
-        "usage": "Use to verify collective semantics while keeping the visual implementation vendor-neutral.",
-        "license": "No NVIDIA diagram or prose copied; official documentation consulted only."
+        "title": "Bringing HPC Techniques to Deep Learning",
+        "url": "https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/",
+        "usage": "Verified that each rank sends one B divided by N chunk in each of N minus 1 reduce-scatter iterations and N minus 1 all-gather iterations, giving 2B(N minus 1)/N bytes per rank.",
+        "license": "The article grants permission for its republication but does not state a permissive license for its figures. No figure, wording, layout, or numeric example is copied; the implementation is an original four-rank, single-chunk schematic."
       },
       {
-        "title": "How to Scale Your Model",
-        "url": "https://jax-ml.github.io/scaling-book/",
-        "usage": "Use for authoritative bandwidth, sharding, and collective communication context.",
-        "license": "No source figure copied; conceptual reference only."
+        "title": "NCCL Collective Operations",
+        "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html",
+        "usage": "Verified all-reduce, all-gather, and reduce-scatter semantics and the identity that reduce-scatter followed by all-gather is equivalent to all-reduce.",
+        "license": "No NVIDIA diagram, prose, or code is copied; official documentation is consulted only for operation semantics."
+      },
+      {
+        "title": "baidu-allreduce reference implementation",
+        "url": "https://github.com/baidu-research/baidu-allreduce",
+        "usage": "Confirmed that the released library is a demonstration of ring all-reduce and ring all-gather intended for framework implementations.",
+        "license": "The repository code is Apache-2.0 licensed, but no source code or repository artwork is reused. The SVG markup and teaching example were authored independently."
       }
     ],
-    "notes": "The planned ring snapshots and chunk values will be original and manually checked against the article's cost model."
+    "notes": "The hardest prose-only mental model is how a chunk becomes a complete reduction while moving only B/N bytes per step, and why a second copy-only pass is still required. The shipped SVG is original: rank positions, contribution symbols, partial-sum sequence, arrows, phase bracket, and arithmetic were created for this article and checked against the cited algorithm."
   },
   "agentReview": {
-    "reviewer": "Explore all-reduce subagent, manually reconciled",
+    "reviewer": "GitHub Copilot CLI agent-4",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent correctly chose SVG for buffer evolution. Integration corrected guessed deck evidence and narrowed the plan to one four-rank reduce-scatter trace."
+    "summary": "Independent review read the complete article, searched the full local deck and inspected relevant neighboring slides, and checked the canonical Baidu algorithm explanation, official NCCL semantics, and reference implementation before selecting an original redraw."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": [
+      "ring-all-reduce-chunk-trace"
+    ],
+    "accessibility": "The SVG has a linked title and description that narrate every state in the four-rank example. Rank labels, contribution terms, plus signs, step numbers, solid reduce arrows, and a dashed copy-only phase distinguish meaning without color. A horizontally scrollable 38rem canvas preserves labels at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette."
   }
 }
