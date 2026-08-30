@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "cross-validation-strategies",
+  "article": "src/content/posts/2025-12-01-cross-validation-strategies.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Choose stratified, grouped, or time-series cross-validation by identifying which class balance, entity boundary, or temporal direction the split must preserve.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that aligns three split constraints on the same visual grammar: labelled train and validation regions, intact entity blocks, and directional time. It makes the forbidden boundary crossings spatially inspectable without runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could ask decision questions, but automatic node layout would not show examples distributed across folds, entities held as indivisible blocks, or expanding temporal prefixes precisely.",
+    "svg": "Selected: fixed rows and labelled regions directly compare class balance, group integrity, and temporal ordering in a compact, deterministic figure.",
+    "semanticHtml": "Rejected: a table could list which splitter to use but would turn the lesson back into prose and would not make boundary placement or temporal direction as immediate.",
+    "interaction": "Rejected: changing folds interactively would introduce controls and hidden states when one static representative split per dependency is enough to choose the strategy.",
+    "paperReuse": "Rejected: the deck provides no relevant split figure, and scikit-learn's cross-validation illustrations are unnecessary for the narrower three-constraint comparison. No external artwork, coordinates, example data, or layout is copied.",
+    "noVisual": "Rejected: the prose names each method but asks readers to mentally simulate three different meanings of a valid fold. A side-by-side spatial explanation makes the preserved dependency, rather than the API name, the basis for choosing."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 62,
+        "insight": "The preceding model-selection slide discusses reducing variance, early stopping on validation loss, and regularization, but gives no resampling or fold structure."
+      },
+      {
+        "page": 63,
+        "insight": "The only explicit cross-validation statement recommends using cross-validation to select hyperparameters before training multiple ensemble members; it does not distinguish i.i.d., grouped, stratified, or temporal splits."
+      },
+      {
+        "page": 64,
+        "insight": "The following slide begins basic probabilistic ML algorithms, confirming that the cross-validation mention has no continuation or explanatory figure."
+      },
+      {
+        "page": 96,
+        "insight": "A text-classification code example uses one random train_test_split with a 30 percent test set. It does not discuss repeated entities, class balance, temporal order, or cross-validation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for cross-validation, k-fold, fold, stratified, grouped, time-series split, train/test, validation set, and data leakage. Pages 62-64 and 95-97 were read as the only relevant neighborhoods. Page 39 mentions a validation set only for calibration, pages 57-60 discuss train/validation/test hygiene and diagnostic curves, and page 161 mentions evaluation in an interview outline; none supplies cross-validation partition geometry. No deck artwork or wording is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "scikit-learn User Guide: Cross-validation—evaluating estimator performance",
+        "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+        "usage": "Used as official implementation guidance to verify ordinary and stratified k-fold behavior, non-overlapping group constraints, chronological time-series splits, and the requirement to keep preprocessing inside each training fold.",
+        "license": "scikit-learn documentation is distributed with the BSD-3-Clause project, but no documentation prose, code, example data, image, or layout is reproduced. The article figure is an independently authored schematic."
+      },
+      {
+        "title": "A survey of cross-validation procedures for model selection",
+        "url": "https://arxiv.org/abs/0907.4728",
+        "usage": "Used as an authoritative survey to cross-check cross-validation's model-selection purpose, dependence on the data-generating setting, and bias-variance considerations.",
+        "license": "The arXiv record does not provide a permissive figure-reuse license for this work. No figure, table, prose, or numerical result is copied or adapted."
+      },
+      {
+        "title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation",
+        "url": "https://jmlr.org/papers/v11/cawley10a.html",
+        "usage": "Used as a primary methodological paper to verify that optimizing a noisy cross-validation criterion can itself overfit and that model selection must be separated from unbiased performance evaluation, motivating nested cross-validation.",
+        "license": "The JMLR paper is cited for its findings only. No permission to reuse its figures was needed or assumed, and no paper artwork, prose, data, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a fold is not merely a random subset: its boundary must match the dependency structure that production predictions cannot share with training. The original schematic therefore encodes three invariants rather than API mechanics. In the i.i.d. classification panel, each illustrative validation fold retains both P and N labels; in the grouped panel, A, B, and C never straddle train and validation; in the temporal panel, each validation point follows an expanding training prefix. The examples are schematic and make no statistical performance claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then checked official scikit-learn guidance and two methodological papers before selecting an original constraint-preserving split comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "cross-validation-preserve-structure"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Every region is explicitly labelled TRAIN or VALIDATE; P and N labels, group letters, containment, chronology, and arrows carry the meaning without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
