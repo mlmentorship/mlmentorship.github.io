@@ -2,51 +2,57 @@
   "schemaVersion": 1,
   "slug": "accelerator-network-topology",
   "article": "src/content/posts/2026-08-28-accelerator-network-topology.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "mermaid",
-  "learningObjective": "See how a hierarchical collective keeps most traffic on fast local links and sends only reduced traffic across slower inter-node links.",
-  "mediumRationale": "The core lesson is topology and staged flow. A single Mermaid hierarchy can show local groups, leaders, link classes, and the return path while remaining editable and accessible.",
+  "learningObjective": "Trace why a hierarchical all-reduce combines values on fast local links before exchanging one partial result per group across the slower scale-out network.",
+  "mediumRationale": "The hardest prose-only mental model is the three-stage path of a hierarchical collective and the boundary between fast local and slower scale-out links. Mermaid is the smallest useful medium because this is a labelled flow and relationship problem, and the existing compact flowchart primitive supplies responsive theme and print behavior. Deterministic SVG would add hand-positioned geometry without teaching more; semantic HTML would make the cross-group flow harder to scan; interaction is unnecessary because there is no parameter to vary; reusing a paper or vendor figure would add licensing and vendor-specific detail; and no visual would leave the key spatial hierarchy implicit.",
   "deckReview": {
     "pages": [
       {
         "page": 107,
-        "insight": "The deck's distributed LLM training material connects FSDP to collective communication and communication overlap."
+        "insight": "The slide motivates hardware scalability and mentions FSDP mixed-precision settings, but it does not show collective traffic, links, or topology."
+      },
+      {
+        "page": 108,
+        "insight": "The neighboring compute-optimization slide distinguishes fast on-chip SRAM from slower HBM, reinforcing hierarchical bandwidth as a concept but stopping at one accelerator."
       },
       {
         "page": 115,
-        "insight": "The combined training and serving stack places distributed execution in its surrounding memory and throughput context."
+        "insight": "The training-stack slide lists FSDP and ZeRO sharding alongside other systems techniques, but provides no network layout or reusable collective diagram."
       },
       {
         "page": 167,
-        "insight": "The system-design modeling slide distinguishes data and model parallelism as scaling choices."
+        "insight": "The system-design modeling slide defines data and model parallelism at a high level, without mapping either axis to physical links."
       }
     ],
-    "notes": "The independent agent incorrectly said the PDF could not be inspected. Manual extraction found distributed-compute context but no clear licensed topology figure. The visual will be an original hierarchy, not a vendor diagram."
+    "notes": "The complete 214-page deck was text-searched and the candidate regions were inspected directly. Pages 106-108, 114-116, and 166-168 were reviewed as neighboring sequences. Pages 106 and 116 concern LLM data and re-scoring; page 114 concerns numeric precision; pages 166 and 168 concern data pipelines and serving. No slide provides an accelerator-network topology or hierarchical-collective figure, so no deck artwork is reused."
   },
   "sourceReview": {
     "sources": [
       {
-        "title": "NCCL Collective Operations",
+        "title": "NVIDIA Collective Communications Library: Overview and Collective Operations",
         "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html",
-        "usage": "Use to verify collective operation semantics while keeping the topology illustration vendor-neutral.",
-        "license": "No NVIDIA diagram or prose copied; official documentation consulted for behavior only."
+        "usage": "Official documentation verifies that all-reduce reduces inputs across ranks and returns the result to every rank; the overview verifies support for topology-aware communication within and across nodes.",
+        "license": "Documentation was consulted for semantics only. No NVIDIA text, image, measurements, or figure layout is copied, and public availability is not treated as reuse permission."
       },
       {
         "title": "How to Scale Your Model",
         "url": "https://jax-ml.github.io/scaling-book/",
-        "usage": "Use for authoritative distributed-ML communication and topology context.",
-        "license": "No source figure copied; conceptual reference with source attribution."
+        "usage": "The Google DeepMind scaling text verifies the communication-bound scaling model and the need to choose parallelism for the hardware topology.",
+        "license": "The repository requests citation and a contributor agreement but does not provide clear figure-reuse permission. No text, data, or figure structure is reused; the shipped diagram is an original abstraction with attribution to the conceptual source."
       }
     ],
-    "notes": "The article does not need five topology diagrams at once. The first visual will isolate hierarchical fast-local versus slow-global placement."
+    "notes": "The visual is an original, vendor-neutral redraw synthesized from the article and cited semantics. It does not reproduce a source figure, benchmark, topology, or branded hardware design. Labels and arrow structure, rather than color, encode all three stages."
   },
   "agentReview": {
-    "reviewer": "Explore accelerator-topology subagent, manually reconciled",
+    "reviewer": "GitHub Copilot CLI (task 1.3 independent article review)",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent proposed five diagrams. Integration chose the hierarchical collective because it directly teaches the article's placement rule and avoids a gallery of disconnected topology icons."
+    "summary": "Selected one compact hierarchical all-reduce flow after independently reviewing the full article, deck, official NCCL documentation, and the Google DeepMind scaling text. The visual targets the article's hardest spatial inference: local aggregation reduces the number of participants that cross the slower network boundary."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": [
+      "hierarchical-all-reduce-path"
+    ],
+    "accessibility": "Mermaid accTitle and accDescr narrate the three stages and link classes. Node text, numbered stages, group boundaries, and solid versus thick arrows preserve meaning without color. The viz-compact marker removes the mobile minimum width at 390 CSS pixels; shared Mermaid variables provide dark/light contrast and explicit print colors."
   }
 }
