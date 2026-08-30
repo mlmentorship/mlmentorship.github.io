@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "automatic-speech-recognition",
+  "article": "src/content/posts/2026-05-31-automatic-speech-recognition.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish how CTC, RNN-T, and attention turn many acoustic frames into fewer output tokens by tracing what advances at each decoding step and which prior outputs are available.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place a one-dimensional CTC path, a two-dimensional RNN-T lattice, and attention links over the same frame and token axes. Fixed geometry makes each paradigm's alignment and output-dependency constraint directly comparable at phone width without adding runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can connect encoder and decoder components but cannot precisely align frame consumption, label emission, and many-to-one attention links on shared axes.",
+    "svg": "Selected: deterministic paths, direct step labels, distinct line patterns, and a compact shared coordinate system make the three alignment rules spatially comparable.",
+    "semanticHtml": "Rejected: the existing comparison table states features well, but rows and columns cannot show why CTC is frame-synchronous, RNN-T can emit without advancing time, and attention chooses context for each output step.",
+    "interaction": "Rejected: stepping through paths would add controls and state without changing the single inference learners need to make.",
+    "paperReuse": "Rejected: the primary papers use denser, paper-specific architecture and lattice figures, and no permissive figure-reuse grant was established. Public availability is not treated as reuse permission.",
+    "noVisual": "Rejected: prose and the table name the differences, but require the reader to invent three incompatible alignment geometries and relate them to streaming and language modeling."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 119,
+        "insight": "The ASR section title establishes the beginning of the complete speech-recognition neighborhood but contains no mechanism."
+      },
+      {
+        "page": 120,
+        "insight": "The speech-recognition title slide contains no alignment or decoder comparison."
+      },
+      {
+        "page": 121,
+        "insight": "The slide contrasts an end-to-end acoustic-features-to-characters path with the traditional HMM-GMM, lexicon, language-model, and decoder pipeline."
+      },
+      {
+        "page": 122,
+        "insight": "The slide defines the waveform-to-text goal, enumerates traditional modules, and introduces CTC and Listen, Attend and Spell, but does not compare their alignment geometry."
+      },
+      {
+        "page": 123,
+        "insight": "The slide covers MFCC and log-mel features plus waveform, time-mask, and frequency-mask augmentation."
+      },
+      {
+        "page": 124,
+        "insight": "The acoustic-model slide explains GMM-HMM and neural acoustic modeling and notes that phoneme systems must learn an alignment and decode a best path."
+      },
+      {
+        "page": 125,
+        "insight": "The CTC slide explains blank tokens, collapse, summing alignments, dynamic programming, and prefix beam search."
+      },
+      {
+        "page": 126,
+        "insight": "The RNN-T slide describes transcription, prediction, and joint networks and a T-by-U lattice where blank steps consume frames and label steps advance output."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for speech, ASR, acoustic, CTC, transducer, and Whisper. Pages 119-126 were reviewed as the full contiguous ASR section; neighboring page 117 covers language-model rescoring for ranking, page 118 covers knowledge-graph embeddings, and page 127 begins model compression, so they add no ASR mechanism. The deck separately explains CTC and RNN-T but provides no compact three-way alignment comparison. No slide artwork is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks",
+        "url": "https://www.cs.toronto.edu/~graves/icml_2006.pdf",
+        "usage": "Used to verify that CTC defines frame-length paths over labels plus blank, collapses repeats and blanks, and sums probabilities over paths that map to one transcript.",
+        "license": "The author-hosted paper is publicly readable, but no permissive figure-reuse license was identified. No figure, wording, numerical result, or layout is copied."
+      },
+      {
+        "title": "Sequence Transduction with Recurrent Neural Networks",
+        "url": "https://arxiv.org/abs/1211.3711",
+        "usage": "Used to verify that RNN-T jointly models input-output and output-output dependencies and permits blank transitions that advance input time and label transitions that advance output position.",
+        "license": "No permissive license for reusing the paper's figures was established. The visual uses independently authored coordinates, labels, and path geometry rather than tracing the paper's lattice figure."
+      },
+      {
+        "title": "Listen, Attend and Spell",
+        "url": "https://arxiv.org/abs/1508.01211",
+        "usage": "Used to verify that the attention decoder predicts characters one at a time from attended encoder features and prior output context, without CTC's conditional-independence assumption.",
+        "license": "No paper figure is reused. The source is used only for mechanism verification, and the new attention-link arrangement is an original schematic."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how the three end-to-end paradigms resolve unknown alignment differently. CTC assigns one label-or-blank decision per frame and collapses the path; RNN-T traverses a time-by-output lattice while conditioning on emitted-label history; an attention decoder conditions each autoregressive output on prior outputs and a weighted view of encoder frames. The proposed visual is an original conceptual comparison and makes no empirical or paper-specific quantitative claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Reviewed the complete article, text-indexed all 214 deck pages, inspected the exact ASR slide neighborhood, and cross-checked primary CTC, RNN-T, and LAS papers before selecting an original three-way alignment comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "asr-alignment-decoder-choices"
+    ],
+    "accessibility": "The SVG has a linked title and full description. Each panel names its paradigm and rule directly; CTC uses ordered labels, RNN-T distinguishes horizontal blank steps from vertical token steps by direction and text, and attention uses dashed many-to-one links plus explicit prior-token arrows, so the lesson does not depend on color. The established plot primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
