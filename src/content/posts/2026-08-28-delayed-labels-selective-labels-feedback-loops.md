@@ -19,6 +19,32 @@ Production labels are often delayed, missing, or created by the current policy. 
 
 Training on these records without the observation process creates bias. Define when a label becomes observable, why some labels remain missing, which action produced the data, and how deployment changes the next training set.
 
+**Learning objective:** Distinguish a mature negative from a pending, censored, or policy-unobserved outcome, then trace how only the observed subset shapes the next deployed policy.
+
+<!-- visual:policy-label-observation-loop -->
+```mermaid
+flowchart TB
+	accTitle: Policy selection and label maturity gate the next training set
+	accDescr: A model policy chooses an action for an example. If the action that would reveal the outcome is not taken, the counterfactual label is missing and must not be recorded as negative. If the action is taken, the outcome may still be pending while its window remains open, right-censored if observation ends early, or a mature positive or negative only after the window closes and the outcome is observed. Only mature observed labels enter ordinary training and evaluation. Retraining on that selected subset produces the next policy, which changes which actions and labels will be observed in the next cycle.
+	E["Decision-time example<br/>features frozen at time t"] --> P{"Policy chooses<br/>revealing action?"}
+	P -.->|"no"| M["Policy-unobserved outcome<br/>missing ≠ negative"]
+	P ==>|"yes"| W{"Outcome status at<br/>evaluation cutoff"}
+	W -.->|"window still open"| D["Pending outcome<br/>unknown ≠ negative"]
+	W -.->|"observation ended early"| C["Right-censored outcome<br/>unknown ≠ negative"]
+	W ==>|"window closed + observed"| O["Mature observed label<br/>positive or negative"]
+	O --> T["Eligible training / evaluation row<br/>retain policy + event-time record"]
+	T --> N["Retrained model<br/>next policy"]
+	N -.->|"changes future selection"| P
+	class E viz-input
+	class P,W viz-focus
+	class M,D,C viz-warning
+	class O,T viz-state
+	class N viz-output
+	class E,P,M,W,D,C,O,T,N viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> pass both gates before calling an outcome negative. The policy must first take an action that can reveal the outcome, and the observation window must then close without censoring. Only the mature observed branch enters ordinary training; follow the dashed return edge to see why that selected evidence changes what the next policy will reveal.</p>
+
 ## Delayed labels
 
 A delayed label arrives after the prediction and action.

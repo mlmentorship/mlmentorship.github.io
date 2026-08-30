@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "delayed-labels-selective-labels-feedback-loops",
+  "article": "src/content/posts/2026-08-28-delayed-labels-selective-labels-feedback-loops.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish a mature negative from a pending, censored, or policy-unobserved outcome, then trace how only the observed subset shapes the next deployed policy.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that can show both observation gates, preserve three distinct unknown states, and close the policy-to-data-to-policy feedback loop without implying a quantitative relationship.",
+  "mediumComparison": {
+    "mermaid": "Selected because labelled branches express the policy-selection gate, maturity gate, non-label outcomes, and retraining return path directly; the established compact class supplies responsive, themed, and print-compatible rendering.",
+    "svg": "Rejected because the lesson is relational rather than geometric or quantitative, so fixed hand-positioned paths would duplicate Mermaid's graph semantics and be harder to maintain.",
+    "semanticHtml": "Rejected because a status table could distinguish missing, pending, censored, and mature rows but would obscure how policy selection determines the observed training set and then changes the next cycle.",
+    "interaction": "Rejected because changing a row's status over time would add controls and state without improving the core two-gate inference.",
+    "paperReuse": "Rejected because the reviewed papers separately establish delayed feedback, selective labels, and performative feedback; none supplies this article-specific combined loop, and no source artwork is needed.",
+    "noVisual": "Rejected because the article defines each failure mode clearly in isolation, but the hardest mental model is their composition: which branches produce no label, which rows become eligible, and how that selected subset feeds the next policy."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider establishes the start of the only deck neighborhood that directly discusses policy-shaped observations."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide states that missing user-item interactions are not missing at random and that presentation bias creates a recommender feedback loop requiring exploration."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid-recommender slide discusses alternative recommenders but adds no observation-status or label-maturity semantics."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide asks how user reactions provide feedback and how frequently the model should update, and its project-flow schematic loops serving back to data and training."
+      },
+      {
+        "page": 169,
+        "insight": "The adjacent Rules of Machine Learning slide calls for knowing freshness requirements, using serving-time features for training, importance-weighting samples, guarding against ranking skew, and avoiding positional feedback loops."
+      },
+      {
+        "page": 170,
+        "insight": "The following algorithms-and-data-structures divider marks the end of the production ML material and contains no label-observation guidance."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) searched each of the 214 physical PDF pages independently for delayed labels, selective labels, censoring, maturity, missingness, feedback loops, presentation bias, propensities, outcome windows, and delayed rewards. Per-page extraction was necessary because whole-document form-feed counting did not reliably preserve physical page numbers. Pages 129-131 and 168-170 were then rendered and inspected as the complete matching neighborhoods. The deck identifies policy-induced missingness and feedback but contains no delayed-label or censoring treatment and no combined observation-gate diagram. No deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Modeling Delayed Feedback in Display Advertising",
+        "url": "https://doi.org/10.1145/2623330.2623634",
+        "usage": "Used as the primary delayed-feedback source to verify that an outcome absent soon after an impression may be an immature observation rather than a negative and that elapsed time must enter label treatment.",
+        "license": "The ACM publication is copyrighted and public metadata does not grant figure-reuse permission. No figure, prose, model, data, or visual arrangement is reproduced."
+      },
+      {
+        "title": "Human Decisions and Machine Predictions",
+        "url": "https://www.nber.org/papers/w23180",
+        "usage": "Used as the primary selective-labels source to verify that prior decisions determine which outcomes are observed, such as observing subsequent behavior for released but not detained defendants, complicating counterfactual policy evaluation.",
+        "license": "The NBER working paper is publicly readable but not treated as permissively licensed artwork. No figure, table, result, prose, or layout is copied."
+      },
+      {
+        "title": "Performative Prediction",
+        "url": "https://proceedings.mlr.press/v119/perdomo20a.html",
+        "usage": "Used as the primary feedback-loop source to verify that predictions used for decisions can change future outcomes and data distributions, so repeated retraining is not evaluation on a fixed population.",
+        "license": "PMLR publishes the paper under CC BY 4.0, but the implementation does not reuse or adapt any paper figure, theorem, example, wording, or layout; citation-only use keeps the diagram an original synthesis."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as official production guidance to cross-check serving-time feature logging, clean held-out samples, inherent ranking skew, feedback loops, and explicit measurement of training-serving skew.",
+        "license": "Google Developers documentation is generally CC BY 4.0 unless otherwise noted. No documentation text, code, brand material, or visual is reproduced; the source is cited only for production concepts."
+      }
+    ],
+    "notes": "The visual is an original synthesis, scoped to settings where a policy action controls whether an outcome can be observed. Its two necessary gates are technically distinct: policy selection determines observability, while elapsed time and continued follow-up determine maturity or censoring. A mature observed outcome may be positive or negative; policy-unobserved, pending, and right-censored states are explicitly not relabelled as negatives. The feedback edge states only that retraining on selected observations changes later selection, not that any particular equilibrium or causal effect is guaranteed."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 physical deck pages and inspected both exact matching neighborhoods, then checked primary delayed-feedback, selective-labels, and performative-prediction papers plus official production guidance before selecting an original two-gate observation loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "policy-label-observation-loop"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description. Every gate, status, branch condition, and feedback edge is directly labelled; solid versus dashed paths reinforce rather than carry meaning, and each unknown state explicitly says it is not negative. The top-to-bottom graph and established viz-compact class remove the mobile minimum width at 390 CSS pixels, while shared Mermaid theme tokens provide dark-mode and print-compatible contrast."
+  }
+}
