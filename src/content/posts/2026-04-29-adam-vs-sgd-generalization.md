@@ -65,7 +65,7 @@ This is L5. You've named the two mechanisms and given the regime breakdown.
 			<path class="viz-axis" d="M180 144V174"></path>
 			<path class="viz-axis" d="M174 168L180 174L186 168"></path>
 			<text class="viz-callout" x="190" y="153">reparameterize</text>
-			<text class="viz-label" x="190" y="169">same f(x), predictions, and generalization</text>
+			<text class="viz-label" x="190" y="169">same function and predictions</text>
 			<rect class="viz-plot-bg" x="12" y="184" width="336" height="124" rx="3"></rect>
 			<text class="viz-axis-label" x="28" y="204">PARAMETERIZATION B · NARROW PROFILE</text>
 			<path class="viz-axis" d="M42 216V288H332"></path>

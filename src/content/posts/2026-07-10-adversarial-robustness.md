@@ -36,20 +36,20 @@ Projected gradient descent iterates gradient steps and projects back into the al
 			<path class="viz-gridline" d="M38 102H324 M38 176H324 M109.5 28V250 M181 28V250 M252.5 28V250"></path>
 			<path class="viz-axis" d="M38 28V250H324"></path>
 			<path class="viz-baseline" d="M105 28L245 250"></path>
-			<text class="viz-axis-label" x="185" y="68" transform="rotate(58 185 68)">decision boundary</text>
+			<text class="viz-axis-label" x="218" y="158" transform="rotate(58 218 158)">decision boundary</text>
 			<text class="viz-callout" x="62" y="226">CLASS A</text>
 			<text class="viz-callout" x="264" y="55">CLASS B</text>
 			<rect class="viz-operating-guide" x="70" y="125" width="110" height="110" rx="2"></rect>
 			<text class="viz-callout" x="76" y="144">allowed L∞ set</text>
 			<text class="viz-label" x="76" y="159">each |δᵢ| ≤ ε</text>
 			<path class="viz-pr-curve" marker-end="url(#adversarial-arrowhead)" d="M125 180L180 125"></path>
-			<text class="viz-callout" x="137" y="170">sign(∇ₓL)</text>
+			<text class="viz-callout" x="100" y="113" text-anchor="middle">sign(∇ₓL)</text>
 			<circle class="viz-operating-point" cx="125" cy="180" r="6"></circle>
 			<text class="viz-callout" x="108" y="200">clean x</text>
 			<polygon class="viz-node--output" points="180,117 188,125 180,133 172,125"></polygon>
-			<text class="viz-callout" x="192" y="121">adversarial x′</text>
-			<text class="viz-label" x="192" y="136">still within budget</text>
-			<text class="viz-axis-label" x="244" y="276">illustrative input feature 1</text>
+			<text class="viz-callout" x="198" y="106">adversarial x′</text>
+			<text class="viz-label" x="198" y="121">still within budget</text>
+			<text class="viz-axis-label" x="324" y="276" text-anchor="end">illustrative input feature 1</text>
 			<text class="viz-axis-label" x="16" y="205" transform="rotate(-90 16 205)">input feature 2</text>
 		</svg>
 	</div>
