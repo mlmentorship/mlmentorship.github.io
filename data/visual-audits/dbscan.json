@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "dbscan",
+  "article": "src/content/posts/2026-03-25-dbscan.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how overlapping neighborhoods of core points expand one cluster, while a nearby non-core point becomes border and an isolated point remains noise.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can show the same epsilon radius around multiple points, overlap between core neighborhoods, and the spatial tests separating core, border, and noise. Fixed geometry makes the local count and expansion direction inspectable without runtime state.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could restate the algorithm but cannot faithfully encode metric distance, equal-radius neighborhoods, overlap, or point density.",
+    "svg": "Selected: exact circles and point positions reveal that cluster membership propagates through core points even though a border point joins without extending the cluster.",
+    "semanticHtml": "Rejected: a table could compare the three labels, but would leave the reader to imagine which points fall inside each epsilon-neighborhood and how overlap creates density reachability.",
+    "interaction": "Rejected: controls for epsilon or minPts could teach parameter sensitivity, but add hidden states and testing burden to a foundational lesson that one carefully chosen static configuration already exposes.",
+    "paperReuse": "Rejected: the original paper contains related spatial diagrams and scikit-learn publishes cluster examples, but no permissive figure-reuse grant was established for either candidate and their layouts teach broader comparisons. No source artwork, coordinates, labels, or composition is copied.",
+    "noVisual": "Rejected: the prose defines core, border, noise, and recursive expansion separately, requiring readers to mentally combine local neighbor counts with the global cluster that emerges from overlapping core neighborhoods."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 22,
+        "insight": "The preceding PCA slide mentions clustering after dimensionality reduction, but provides no density-neighborhood or cluster-expansion mechanism."
+      },
+      {
+        "page": 23,
+        "insight": "The deck's dedicated clustering slide contrasts mixture-model fitting with similarity-graph partitioning and explains k-means and spectral clustering. It does not mention DBSCAN, epsilon-neighborhoods, core or border points, density reachability, or noise."
+      },
+      {
+        "page": 24,
+        "insight": "The following K-nearest-neighbor classifier slide discusses neighborhood search and the curse of dimensionality, but treats supervised prediction rather than density-based cluster expansion."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for DBSCAN, density-based clustering, epsilon neighborhoods, minPts, clustering, k-means, spectral clustering, nearest neighbors, and outliers. No DBSCAN-specific slide or figure exists. Pages 22-24 are the only general clustering neighborhood: page 23 is the sole dedicated clustering slide, with pages 22 and 24 providing its immediate context. Other hits concern unrelated density estimation, KNN classification, EM, model compression, or time-series projects. No deck artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise",
+        "url": "https://cdn.aaai.org/KDD/1996/KDD96-037.pdf",
+        "usage": "Used as the primary source for epsilon-neighborhoods, the MinPts core condition, direct density reachability from a core point, density-connected clusters, recursive expansion, and noise.",
+        "license": "The paper is publicly hosted by the AAAI Digital Library, but no explicit permissive license for reusing or adapting its figures was identified. No paper figure, coordinates, data, wording, or layout is reproduced; the visual is an independently authored schematic."
+      },
+      {
+        "title": "scikit-learn DBSCAN API documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html",
+        "usage": "Used as official implementation documentation to verify that min_samples includes the point itself, eps is a neighborhood distance rather than a cluster-diameter bound, core samples expand clusters, and noisy samples receive label -1.",
+        "license": "scikit-learn source and documentation are distributed under the BSD 3-Clause license, but no documentation figure or example is reused. The citation supports semantics only."
+      },
+      {
+        "title": "DBSCAN Revisited, Revisited: Why and How You Should (Still) Use DBSCAN",
+        "url": "https://doi.org/10.1145/3068335",
+        "usage": "Used as an authoritative retrospective to cross-check the distinction between core and border points, the role of density reachability, parameter interpretation, and the fact that border points can be assigned ambiguously when reachable from multiple clusters.",
+        "license": "The ACM article is used only as a technical reference. No open figure-reuse permission was established, and no figure, benchmark, wording, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how independent local tests create a global, arbitrarily shaped cluster: a core point activates expansion, another core point inside its neighborhood continues the chain, a border point is included but cannot continue it, and a point outside every core neighborhood remains noise. The original schematic uses minPts = 4 with the center counted, two equal-radius overlapping core neighborhoods, direct shape labels, and synthetic coordinates. It intentionally does not imply that epsilon bounds a cluster's diameter. Border assignment between multiple eligible clusters can depend on traversal order, but that separate edge case is outside this single-cluster teaching example."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact clustering neighborhood, then checked the original DBSCAN paper, official scikit-learn semantics, and the authoritative DBSCAN retrospective before selecting an original neighborhood-expansion SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "dbscan-neighborhood-expansion"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Core points are squares, the highlighted border point is a diamond, noise is an x, epsilon-neighborhoods are dashed circles, and all roles are directly labeled, so color is redundant. The 360-unit viewBox scales with the established plot-panel primitive and has no minimum width, preserving readability at 390 CSS pixels; existing theme tokens provide dark-mode contrast and shared print rules force a light high-contrast palette."
+  }
+}
