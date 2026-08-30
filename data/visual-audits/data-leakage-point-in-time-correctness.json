@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "data-leakage-point-in-time-correctness",
+  "article": "src/content/posts/2026-08-28-data-leakage-point-in-time-correctness.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish an event that was available by prediction time from a late-arriving event whose event timestamp alone makes it look eligible.",
+  "mediumRationale": "A compact Mermaid flowchart makes one valid path and one forbidden path visibly cross a named prediction-time boundary. Deterministic SVG would add manual geometry without improving the topological lesson; semantic HTML is weaker at showing paths; interaction is unnecessary for a fixed cutoff; source-figure reuse adds licensing risk; and no visual leaves the distinction between event time and availability time abstract.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The data-inspection checklist emphasizes label noise, bias, and inspecting examples, but does not define temporal eligibility."
+      },
+      {
+        "page": 59,
+        "insight": "The experimentation checklist stresses trustworthy training and evaluation skeletons and full test-set evaluation."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline ground-truth metrics from online production metrics, motivating parity between historical data and serving conditions."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly asks about out-of-time test data, feature freshness, and target leakage."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide asks how often new data arrives and how raw data becomes model features."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide covers online updates, monitoring, and inference constraints but does not visualize historical availability."
+      }
+    ],
+    "notes": "The 214-page Basic_ML_CS_concepts deck was searched by extracted text for data inspection, experimentation, features, pipelines, production, and deployment. Pages 58, 59, 141, 162, 166, and 168 were then inspected directly. None supplies a point-in-time timeline, so the article visual is an original construction."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Feast: Point-in-time joins",
+        "url": "https://docs.feast.dev/getting-started/concepts/point-in-time-joins",
+        "usage": "Used to verify that historical retrieval reproduces feature state at each entity timestamp and that filtering by created timestamp prevents later backfills from leaking.",
+        "license": "No documentation text, code, data, or figure copied; product semantics referenced only. Figure reuse rights were not relied upon."
+      },
+      {
+        "title": "Apache Flink: Timely Stream Processing",
+        "url": "https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/",
+        "usage": "Used to cross-check the distinction between when an event occurred and when an out-of-order or late event reached processing.",
+        "license": "No documentation text or figure copied; timing concepts referenced only."
+      },
+      {
+        "title": "scikit-learn: Common pitfalls and recommended practices",
+        "url": "https://scikit-learn.org/stable/common_pitfalls.html#data-leakage",
+        "usage": "Used to verify the general definition of leakage as using information unavailable at prediction time.",
+        "license": "No documentation text, code, or figure copied; definition checked conceptually."
+      }
+    ],
+    "notes": "The Monday payment example, times, flowchart structure, and wording are original to this article visual. No external figure or empirical data is reproduced."
+  },
+  "agentReview": {
+    "reviewer": "GPT-5.6 Sol point-in-time leakage visual agent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Reviewed the complete article, relevant deck workflow pages, and authoritative feature-store and stream-time documentation. Recommended a compact flowchart with the prediction cutoff as the central boundary and a dashed path that reaches into not-yet-known data."
+  },
+  "implementation": {
+    "visualIds": ["point-in-time-availability-boundary"],
+    "accessibility": "The Mermaid source provides a complete accessible title and description. The cutoff, timestamps, valid path, and leakage path are directly labeled; solid and dashed paths plus node shapes preserve meaning without color; and the caption restates the inference."
+  }
+}

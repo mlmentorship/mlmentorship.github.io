@@ -68,6 +68,31 @@ Two timestamps may matter:
 
 A transaction may occur on Monday but arrive on Wednesday. A Tuesday prediction cannot use it. Joining only on event time still leaks information.
 
+<!-- visual:point-in-time-availability-boundary -->
+```mermaid
+flowchart LR
+	accTitle: Availability time determines which events may cross the prediction-time boundary
+	accDescr: Payment A occurred at 9 AM and was available at 9:05 AM, so it follows a solid valid path into the Monday noon prediction. Payment B occurred at 10 AM but was not available until Wednesday. A dashed leakage path reaches from the prediction into Payment B because an event-time-only join would incorrectly use it. The default label is observed after the prediction and belongs only to the outcome window.
+	subgraph KNOWN["KNOWN BY MONDAY NOON"]
+		A["Payment A<br/>event: Mon 09:00<br/>available: Mon 09:05"]
+	end
+	C{{"PREDICTION-TIME BOUNDARY<br/>Monday 12:00"}}
+	subgraph FUTURE["NOT YET KNOWN AT NOON"]
+		B["Payment B<br/>event: Mon 10:00<br/>available: Wednesday"]
+		Y["Default label<br/>observed later"]
+	end
+	A ==>|"VALID: available before cutoff"| C
+	C ==>|"starts the outcome window"| Y
+	C -. "LEAK: event-time-only join<br/>reaches beyond the cutoff" .-> B
+	class A viz-input
+	class C viz-focus
+	class B viz-warning
+	class Y viz-output
+	class A,B,C,Y viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> Payment B happened before Monday noon, but nobody could know it then because it arrived Wednesday. A join that checks only event time pulls that future knowledge backward across the prediction-time boundary.</p>
+
 A simplified rule is:
 
 ```text
