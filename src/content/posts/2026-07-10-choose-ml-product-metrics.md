@@ -31,6 +31,27 @@ Clarify:
 
 **Offline model metrics.** They support iteration and regression testing but do not replace the product outcome. State the mechanism you expect to link an offline change to online value.
 
+<!-- visual:product-metric-decision-authority -->
+<figure class="learning-figure" aria-labelledby="metric-authority-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="metric-authority-title">Which metrics decide whether to ship, and which only help you understand the result?</p>
+	<div class="visual-grid--two" role="group" aria-label="Product metrics grouped by their authority in a launch decision">
+		<section class="visual-panel">
+			<h4>DECISION GATE · CAN AUTHORIZE OR VETO</h4>
+			<p><strong>1 · Primary outcome: authorize</strong><br />Did successful task completion improve by the pre-set amount within the decision horizon?</p>
+			<p><strong>2 · Guardrails: veto</strong><br />Did unsafe-output rate, p95 latency, and cost per successful task all remain within their limits?</p>
+			<p><strong>Ship rule</strong><br />Eligible only when the primary outcome clears its bar <em>and</em> every guardrail holds.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>SUPPORTING EVIDENCE · CANNOT DECLARE VICTORY</h4>
+			<p><strong>Diagnostics: explain</strong><br />Retry, edit, abandonment, and escalation rates show where the experience changed and which slices need investigation.</p>
+			<p><strong>Offline model metrics: qualify</strong><br />Task-eval and slice scores catch regressions and justify an online test; they do not prove user value.</p>
+			<p><strong>Use rule</strong><br />Use these signals to debug, iterate, or reject a candidate; do not use them to outvote a missed primary outcome.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> read the left panel as an AND gate: the primary outcome must improve and no guardrail may fail. Read the right panel as evidence about why, not as extra votes that can turn a failed launch decision into a win.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "Accuracy, latency, user engagement, and cost."
