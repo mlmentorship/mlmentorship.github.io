@@ -45,6 +45,8 @@ Generate a deterministic batch with `npm run visuals:batch -- --count=6 --output
 
 During cross-review, verify the exact campaign delta with `node scripts/check-visual-coverage.mjs --expect-resolved=slug-one,slug-two --baseline-ref=<pre-batch-revision>`. This rejects unresolved batch entries, duplicate visual IDs, and any resolved article outside the declared batch.
 
+Source and DOM checks are necessary but not sufficient. Cross-review must render every new figure in a real browser and inspect the pixels, not only element bounds or accessibility text. Use an actual 390 CSS pixel viewport and assert `window.innerWidth === 390` before drawing conclusions. Windows headless Chrome enforces a 500 CSS pixel minimum for `--window-size=390` and merely crops the screenshot, so command-line screenshots without device-metric emulation are not valid mobile evidence. Check desktop light, desktop dark, 390-pixel light and dark, and print media. Inspect label glyphs, collisions, clipping, intended internal scrolling, and the drawn geometry behind any stated arithmetic.
+
 ## Choose the medium from the learning task
 
 | Learning task | Default medium | Examples |
@@ -92,6 +94,9 @@ Before publishing a visual, verify:
 - every label is technically correct and agrees with the article;
 - the main inference is clear within five seconds;
 - text remains readable at 390 CSS pixels;
+- the browser actually reports a 390 CSS pixel viewport rather than a cropped wider layout;
+- screenshots contain the title, caption, and SVG or Mermaid label glyphs;
+- labels do not collide and stated calculations match the geometry that is drawn;
 - light and dark themes preserve contrast;
 - the figure works in grayscale and print;
 - screen readers receive a useful description;

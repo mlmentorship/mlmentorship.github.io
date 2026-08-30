@@ -174,6 +174,10 @@ function validateAudit(audit, file, entry) {
       if (figureEnd < 0 || !figure.includes('<figure') || !figure.includes('aria-labelledby=') || !figure.includes('aria-label=') || !figure.includes('<figcaption>')) {
         fail(`${label} semantic visual ${id} needs a labelled figure, accessible child, and caption`);
       }
+      const labelledGenericElements = figure.match(/<(?:div|section|span)\b[^>]*aria-label="[^"]+"[^>]*>/g) ?? [];
+      if (labelledGenericElements.some((tag) => !/\brole="[^"]+"/.test(tag))) {
+        fail(`${label} semantic visual ${id} gives a generic element an aria-label without a semantic role`);
+      }
       if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
         fail(`${label} semantic visual ${id} needs a direct "Read it this way" caption`);
       }
