@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "adam-and-adamw",
+  "article": "src/content/posts/2025-09-15-adam-and-adamw.md",
+  "status": "planned",
+  "medium": "semantic-html",
+  "learningObjective": "See that Adam scales an L2 penalty through each parameter's adaptive denominator while AdamW applies the same direct shrinkage independently of gradient history.",
+  "mediumRationale": "A two-row semantic parameter example with explicit update terms teaches decoupled weight decay more honestly than a generic optimizer trajectory. The loss-surface proposal does not isolate the AdamW mechanism.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 46,
+        "insight": "The deck places SGD, momentum, RMSProp, and Adam update equations side by side and makes Adam's per-parameter second-moment denominator explicit."
+      },
+      {
+        "page": 47,
+        "insight": "The RAdam slide emphasizes early adaptive-variance behavior and warmup, showing that optimizer state changes effective step size."
+      }
+    ],
+    "notes": "Manual review replaced the independent agent's vague deck recommendation. The deck directly supports adaptive scaling, but it does not cover decoupled weight decay."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Adam: A Method for Stochastic Optimization",
+        "url": "https://arxiv.org/abs/1412.6980",
+        "usage": "Use to verify first- and second-moment adaptive updates and bias correction.",
+        "license": "No source figure copied; equations and algorithm cited as conceptual sources."
+      },
+      {
+        "title": "Decoupled Weight Decay Regularization",
+        "url": "https://arxiv.org/abs/1711.05101",
+        "usage": "Use to verify why L2 regularization and weight decay cease to be equivalent under adaptive gradient scaling.",
+        "license": "No paper figure copied. Public distribution is not assumed to grant unrestricted figure reuse."
+      }
+    ],
+    "notes": "The planned numerical parameter table is an original derivation from the two update rules."
+  },
+  "agentReview": {
+    "reviewer": "Explore AdamW subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent correctly identified adaptive scaling versus direct shrinkage but proposed a generic loss-surface trajectory that does not teach AdamW. Integration changed the medium to a focused semantic update comparison."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "advantage-estimation-and-gae",
+  "article": "src/content/posts/2026-05-07-advantage-estimation-and-gae.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "See future TD residuals contribute to one advantage estimate with weights that decay by successive powers of gamma lambda.",
+  "mediumRationale": "A deterministic trajectory SVG can align time steps, residuals, exponential weights, and the right-to-left recursion. Mermaid lacks quantitative weight encoding and an interaction is unnecessary for the first version.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 155,
+        "insight": "The deck explains that RL samples are dependent trajectories rather than iid examples."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-gradient example computes discounted rewards by iterating backward through an episode, matching GAE's reverse-scan intuition."
+      }
+    ],
+    "notes": "The deck does not name GAE, but its trajectory and reverse discounted-return code provide the right temporal precursor."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "High-Dimensional Continuous Control Using Generalized Advantage Estimation",
+        "url": "https://arxiv.org/abs/1506.02438",
+        "usage": "Use to verify the exponentially weighted TD-residual form and bias-variance role of lambda.",
+        "license": "No source figure copied. Public arXiv access is not treated as blanket figure permission."
+      },
+      {
+        "title": "Stable-Baselines3 PPO implementation",
+        "url": "https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/buffers.py",
+        "usage": "Use to cross-check the practical right-to-left GAE recursion.",
+        "license": "MIT-licensed implementation consulted; no code copied into the figure."
+      }
+    ],
+    "notes": "The planned visual is an original temporal composition with symbolic weights, not a redraw of a paper figure."
+  },
+  "agentReview": {
+    "reviewer": "Explore GAE subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent identified temporal accumulation and the lambda spectrum as the central gap. Integration narrows the implementation to one trajectory with weighted future residuals and a reverse-scan cue."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

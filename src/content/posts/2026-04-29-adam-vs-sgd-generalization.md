@@ -37,7 +37,7 @@ This is L5. You've named the two mechanisms and given the regime breakdown.
 
 > "...subtler points:
 >
-> **The 'sharp minima generalize worse' argument is contested.** Multiple papers [(Dinh et al. 2017)](https://arxiv.org/abs/1605.08803) showed that sharpness can be reparameterized away, undermining the simplest version of the argument. The empirical generalization gap exists; the precise reason is still debated. Don't bet a strong answer on the sharp/flat framing alone.
+> **The 'sharp minima generalize worse' argument is contested.** Multiple papers [(Dinh et al. 2017)](https://arxiv.org/abs/1703.04933) showed that sharpness can be reparameterized away, undermining the simplest version of the argument. The empirical generalization gap exists; the precise reason is still debated. Don't bet a strong answer on the sharp/flat framing alone.
 >
 > **AdamW closes most of the gap with SGD on vision.** The [Loshchilov & Hutter 2017](https://arxiv.org/abs/1711.05101) paper showed AdamW + cosine schedule + careful warmup matches or beats SGD on most benchmarks. The 'SGD generalizes better' folk wisdom predates AdamW and is largely outdated.
 >

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "actor-critic-methods",
+  "article": "src/content/posts/2026-05-07-actor-critic-methods.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "Trace shared state features into actor and critic losses while seeing where the advantage estimate is detached from the actor gradient.",
+  "mediumRationale": "A deterministic SVG can distinguish forward data, two losses, separate parameter updates, and a stop-gradient boundary precisely. Mermaid cannot reliably place the gradient paths and detachment marker.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 155,
+        "insight": "The deck contrasts supervised iid samples with dependent RL trajectories and frames policy as a state-to-action mapping."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-gradient slide shows policy sampling, discounted rewards, and the update loop that the critic later augments."
+      }
+    ],
+    "notes": "The independent agent incorrectly said the PDF was inaccessible. Manual inspection found policy-gradient context but no actor-critic architecture figure, so the planned diagram will be original."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Asynchronous Methods for Deep Reinforcement Learning",
+        "url": "https://arxiv.org/abs/1602.01783",
+        "usage": "Use to verify the shared representation and separate policy and value objectives in a modern actor-critic architecture.",
+        "license": "No figure copied. Public arXiv access is not treated as CC0 or blanket figure permission."
+      },
+      {
+        "title": "PyTorch autograd documentation",
+        "url": "https://pytorch.org/docs/stable/autograd.html",
+        "usage": "Use to check stop-gradient and detached-value semantics in the implementation explanation.",
+        "license": "No documentation figure or code copied; behavior referenced only."
+      }
+    ],
+    "notes": "The visual will use the article's notation and an original graph rather than adapting a paper image."
+  },
+  "agentReview": {
+    "reviewer": "Explore actor-critic subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent correctly identified dual objectives and detachment as the spatial gap. Integration removed unsupported licensing claims and narrowed the plan to one architecture and gradient-flow SVG."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

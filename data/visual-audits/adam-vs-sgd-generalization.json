@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "slug": "adam-vs-sgd-generalization",
+  "article": "src/content/posts/2026-04-29-adam-vs-sgd-generalization.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "Separate the empirical optimizer generalization gap from the contested claim that geometric sharpness alone causes it.",
+  "mediumRationale": "A paired illustrative SVG can show two parameterizations with identical predictions but different apparent sharpness, directly visualizing why sharpness is not invariant. A simple SGD-versus-Adam trajectory would overstate a contested explanation.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 46,
+        "insight": "The deck contrasts SGD, momentum, and Adam update mechanics."
+      },
+      {
+        "page": 48,
+        "insight": "The sharpness-aware minimization slide motivates neighborhoods of uniformly low loss while remaining distinct from the claim that sharpness alone determines generalization."
+      }
+    ],
+    "notes": "The deck provides optimizer and sharpness context. It does not resolve the article's central nuance that ordinary sharpness measures can change under reparameterization."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima",
+        "url": "https://arxiv.org/abs/1609.04836",
+        "usage": "Use as evidence for the empirical association between batch regime, sharpness measures, and generalization gap.",
+        "license": "No paper figure copied; empirical claim referenced only."
+      },
+      {
+        "title": "Sharp Minima Can Generalize For Deep Nets",
+        "url": "https://arxiv.org/abs/1703.04933",
+        "usage": "Use to verify the reparameterization critique and prevent a causal sharp-minima claim.",
+        "license": "No paper figure copied; conceptual reference only."
+      },
+      {
+        "title": "Decoupled Weight Decay Regularization",
+        "url": "https://arxiv.org/abs/1711.05101",
+        "usage": "Use to support the article's separate weight-decay explanation for adaptive optimizers.",
+        "license": "No source figure copied; conceptual reference only."
+      }
+    ],
+    "notes": "Independent review found and corrected the article's unrelated Dinh URL before visual implementation. The visual must label its geometry as illustrative, not empirical proof."
+  },
+  "agentReview": {
+    "reviewer": "Explore Adam-versus-SGD subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent found a real citation defect and proposed optimizer trajectories. Integration selected a reparameterization visual because it preserves the article's most important epistemic caution."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}
