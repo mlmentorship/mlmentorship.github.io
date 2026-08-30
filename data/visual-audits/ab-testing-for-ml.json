@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "ab-testing-for-ml",
+  "article": "src/content/posts/2025-12-22-ab-testing-for-ml.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "See how sample size and metric variance jointly determine the minimum effect an experiment can reliably detect.",
+  "mediumRationale": "A deterministic SVG of minimum detectable effect curves makes the inverse-square-root relationship spatial. Mermaid cannot express the quantitative curve, and interaction is unnecessary for the first version.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 164,
+        "insight": "The source deck makes online experimentation the final evidence step in ML system design and asks for a stated effect hypothesis."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of ML section warns that identical short-term behavior does not imply identical long-term behavior and stresses measuring model deltas."
+      }
+    ],
+    "notes": "The independent agent could not extract the provided deck. Manual inspection verified relevant experimentation context but no quantitative power plot, so the planned curve will be an original derivation."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Online Controlled Experiments at Large Scale",
+        "url": "https://dl.acm.org/doi/10.1145/1557019.1557134",
+        "usage": "Use for practical experiment design, guardrails, and trustworthy decision framing.",
+        "license": "No source figure copied; conceptual reference and citation only."
+      },
+      {
+        "title": "Improving the Sensitivity of Online Controlled Experiments by Utilizing Pre-Experiment Data",
+        "url": "https://dl.acm.org/doi/10.1145/2433396.2433413",
+        "usage": "Use to verify the role of variance reduction in detectable-effect sensitivity.",
+        "license": "No source figure copied; conceptual reference and citation only."
+      }
+    ],
+    "notes": "The plot must derive its own illustrative curves from a stated formula and assumptions rather than reproduce a published chart."
+  },
+  "agentReview": {
+    "reviewer": "Explore A/B-testing subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent proposed five visuals. Integration selected one power and minimum-detectable-effect plot because it addresses the article's hardest quantitative intuition with the least complexity."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

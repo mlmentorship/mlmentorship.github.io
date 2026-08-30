@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "activation-checkpointing",
+  "article": "src/content/posts/2026-05-01-activation-checkpointing.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "See why checkpoint memory contains both saved segment boundaries and temporary activations during recomputation, creating an optimum near the square root of depth.",
+  "mediumRationale": "A deterministic SVG can align layer chains, saved versus discarded activations, recomputation segments, and the two memory terms. Mermaid cannot show the quantitative store-recompute geometry precisely.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 44,
+        "insight": "The backpropagation slide shows why intermediate graph values are needed during reverse traversal."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide explicitly describes gradient checkpointing as a memory-versus-computation tradeoff for samples that do not fit in memory."
+      }
+    ],
+    "notes": "The deck directly motivates both prerequisites: reverse traversal needs activations, and checkpointing deliberately recomputes them. It does not provide a reusable square-root tradeoff figure."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Training Deep Nets with Sublinear Memory Cost",
+        "url": "https://arxiv.org/abs/1604.06174",
+        "usage": "Use to verify the sublinear-memory checkpointing construction and compute-memory tradeoff.",
+        "license": "No figure copied. arXiv distribution does not by itself establish CC0 or unrestricted figure reuse."
+      },
+      {
+        "title": "PyTorch torch.utils.checkpoint documentation",
+        "url": "https://pytorch.org/docs/stable/checkpoint.html",
+        "usage": "Use to verify modern recomputation behavior and implementation caveats.",
+        "license": "No documentation figure or code copied; API semantics referenced only."
+      }
+    ],
+    "notes": "The planned figure is an original three-strategy layer-chain comparison with explicitly illustrative dimensions and terms."
+  },
+  "agentReview": {
+    "reviewer": "Explore checkpointing subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent identified the square-root memory tradeoff as the hardest concept. Integration corrected its unsupported arXiv licensing claim and retained the original-redraw recommendation."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

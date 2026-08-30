@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "ab-test-chatbot",
+  "article": "src/content/posts/2026-05-01-ab-test-chatbot.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "See why per-request randomization can switch models inside one conversation while per-conversation assignment preserves state.",
+  "mediumRationale": "An original two-lane SVG can align the same sequence of chat turns under two assignment units. Exact temporal placement matters more than graph topology, so Mermaid is not the best first medium.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 164,
+        "insight": "The deck's ML system-design sequence ends with offline and online experimentation tied to a concrete product hypothesis."
+      },
+      {
+        "page": 165,
+        "insight": "The project setup slide explicitly calls generative and dialogue-system evaluation difficult and emphasizes user reactions as imperfect inference-time signals."
+      }
+    ],
+    "notes": "The independent agent incorrectly reported that the supplied PDF was unavailable. Manual deck inspection found relevant experimentation and dialogue-evaluation context, but no reusable chatbot-randomization figure."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Online Controlled Experiments at Large Scale",
+        "url": "https://dl.acm.org/doi/10.1145/1557019.1557134",
+        "usage": "Use the controlled-experiment principles to verify unit assignment, guardrails, and novelty concerns.",
+        "license": "No figure or text copied; citation and conceptual reference only. Reuse permission is not assumed from public availability."
+      },
+      {
+        "title": "Holistic Evaluation of Language Models",
+        "url": "https://arxiv.org/abs/2211.09110",
+        "usage": "Use the multidimensional evaluation framing to check that product quality is not reduced to one implicit interaction metric.",
+        "license": "No source figure copied; conceptual reference only."
+      }
+    ],
+    "notes": "No paper figure is necessary. The planned conversation assignment lanes will be an original article-specific construction."
+  },
+  "agentReview": {
+    "reviewer": "Explore chatbot-experiment subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent proposed several visuals. Integration narrowed the plan to the highest-information spatial lesson: one conversation under per-request versus per-conversation assignment."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

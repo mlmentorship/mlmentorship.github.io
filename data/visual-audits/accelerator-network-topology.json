@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "slug": "accelerator-network-topology",
+  "article": "src/content/posts/2026-08-28-accelerator-network-topology.md",
+  "status": "planned",
+  "medium": "mermaid",
+  "learningObjective": "See how a hierarchical collective keeps most traffic on fast local links and sends only reduced traffic across slower inter-node links.",
+  "mediumRationale": "The core lesson is topology and staged flow. A single Mermaid hierarchy can show local groups, leaders, link classes, and the return path while remaining editable and accessible.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The deck's distributed LLM training material connects FSDP to collective communication and communication overlap."
+      },
+      {
+        "page": 115,
+        "insight": "The combined training and serving stack places distributed execution in its surrounding memory and throughput context."
+      },
+      {
+        "page": 167,
+        "insight": "The system-design modeling slide distinguishes data and model parallelism as scaling choices."
+      }
+    ],
+    "notes": "The independent agent incorrectly said the PDF could not be inspected. Manual extraction found distributed-compute context but no clear licensed topology figure. The visual will be an original hierarchy, not a vendor diagram."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NCCL Collective Operations",
+        "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html",
+        "usage": "Use to verify collective operation semantics while keeping the topology illustration vendor-neutral.",
+        "license": "No NVIDIA diagram or prose copied; official documentation consulted for behavior only."
+      },
+      {
+        "title": "How to Scale Your Model",
+        "url": "https://jax-ml.github.io/scaling-book/",
+        "usage": "Use for authoritative distributed-ML communication and topology context.",
+        "license": "No source figure copied; conceptual reference with source attribution."
+      }
+    ],
+    "notes": "The article does not need five topology diagrams at once. The first visual will isolate hierarchical fast-local versus slow-global placement."
+  },
+  "agentReview": {
+    "reviewer": "Explore accelerator-topology subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent proposed five diagrams. Integration chose the hierarchical collective because it directly teaches the article's placement rule and avoids a gallery of disconnected topology icons."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}
