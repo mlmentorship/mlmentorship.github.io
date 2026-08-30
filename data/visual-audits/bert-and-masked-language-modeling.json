@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "slug": "bert-and-masked-language-modeling",
+  "article": "src/content/posts/2026-05-07-bert-and-masked-language-modeling.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the 15 percent target-selection step from the conditional 80/10/10 input-corruption step, and identify exactly which positions receive direct masked-language-modeling loss.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can keep the two nested random choices spatially separate, reconverge all three corruption paths on one original-token target, and contrast direct loss with context-only positions without runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could express the branches, but its runtime layout would spend more space on connectors and provide less control over compact conditional labels at phone width.",
+    "svg": "Selected: deterministic geometry separates selection from corruption, aligns all three corruption cases, and makes their shared prediction target explicit in two responsive panels.",
+    "semanticHtml": "Rejected: a table can enumerate 80/10/10, but it does not naturally show that these probabilities apply only after selection or that all paths retain one training target.",
+    "interaction": "Rejected: sampling masks would add controls and stochastic state without improving the fixed distinction between selection probability, corruption probability, and loss placement.",
+    "paperReuse": "Rejected: the BERT paper verifies the mechanism, but no permissive license for its figures was established. Its architecture figure is broader than this learning objective, so no paper or deck geometry, text, or artwork is reused.",
+    "noVisual": "Rejected: prose places 15 percent and 80/10/10 next to each other, making it easy to misread four percentages as peer branches and to miss that random-token and unchanged selected positions still receive prediction loss."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The preceding tokenization and perplexity slide establishes subword inputs and language-model evaluation but does not discuss masked-target selection or corruption."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation overview contrasts feature-based and fine-tuning strategies and states that BERT predicts randomly masked tokens from context, but it does not give the 15 percent or 80/10/10 mechanics."
+      },
+      {
+        "page": 100,
+        "insight": "The intervening recurrent-network slide covers LSTM and GRU gates and marks the architecture transition; it contains no BERT masking mechanism."
+      },
+      {
+        "page": 101,
+        "insight": "The Transformer architecture slide explains encoder and decoder attention at system level but does not locate MLM targets or losses."
+      },
+      {
+        "page": 102,
+        "insight": "The dedicated BERT and Transformer slide states masked language modeling, prediction from context, bidirectional encoding, NSP, and RoBERTa changes. It does not show the conditional 80/10/10 corruption paths or distinguish selected loss positions from context-only positions."
+      },
+      {
+        "page": 103,
+        "insight": "The neighboring Transformer survey lists BERT, RoBERTa, ALBERT, GPT, and training techniques but adds no token-level MLM flow."
+      },
+      {
+        "page": 104,
+        "insight": "The following slide moves to GPT-X, in-context learning, and instruction tuning, marking the end of the local BERT neighborhood."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for BERT, masked language modeling, bidirectional context, Transformer, and RoBERTa. Pages 98-104 were read as the full local neighborhood around the dedicated BERT material on page 102. The deck explains the objective and architecture family but does not spatially separate target selection, input corruption, and direct loss. No deck screenshot, wording, coordinates, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+        "url": "https://arxiv.org/abs/1810.04805",
+        "usage": "Used as the primary source to verify that 15 percent of token positions are selected, selected tokens use the 80 percent MASK, 10 percent random, and 10 percent unchanged procedure, and the original token is predicted with cross-entropy.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was identified on its arXiv record. No figure, prose, example sentence, or layout is copied; the shipped flow and synthetic dinner/violin example are original."
+      },
+      {
+        "title": "Hugging Face Transformers: Masked language modeling",
+        "url": "https://huggingface.co/docs/transformers/main/en/tasks/masked_language_modeling",
+        "usage": "Used as official implementation documentation to cross-check that masked language models predict masked tokens with access to both left and right context.",
+        "license": "Documentation was consulted only for behavior. No code, prose, screenshots, or artwork is reproduced in the visual."
+      },
+      {
+        "title": "Google Research BERT repository license",
+        "url": "https://github.com/google-research/bert/blob/master/LICENSE",
+        "usage": "Used to verify that the accompanying reference implementation is Apache License 2.0 while avoiding the unsupported inference that the repository license grants reuse rights for figures in the separately published paper.",
+        "license": "The repository code is Apache-2.0 licensed. The implementation does not copy repository code or assets, and that code license is not treated as permission to reuse paper artwork."
+      },
+      {
+        "title": "RoBERTa: A Robustly Optimized BERT Pretraining Approach",
+        "url": "https://arxiv.org/abs/1907.11692",
+        "usage": "Used as a primary follow-up source to verify dynamic masking and removal of next-sentence prediction discussed in the neighboring article text and deck slide.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was established. No RoBERTa figure, data, prose, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the nesting of two random decisions: 15 percent of positions are first selected as prediction targets, then each selected position is corrupted according to 80/10/10. The original target remains fixed in every corruption case. The visual also uses the precise phrase 'no direct MLM loss' because unselected tokens can still affect selected predictions as bidirectional context, so saying they receive no gradient at all would be misleading."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 98-104 around the dedicated BERT slide, then checked the primary BERT and RoBERTa papers, official Hugging Face task documentation, and the Google BERT repository license before creating an original nested-probability flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "bert-mlm-selection-and-corruption"
+    ],
+    "accessibility": "Each panel has a linked title and complete description. Percentages, branch labels, box boundaries, connector paths, and repeated target text carry every distinction without color. The established two-panel primitive stacks below 640 pixels; both SVGs use a compact 300-pixel viewBox with no minimum width, keeping labels readable at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and the shared print palette forces a light high-contrast rendering and avoids page breaks inside the figure."
+  }
+}
