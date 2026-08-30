@@ -2,47 +2,63 @@
   "schemaVersion": 1,
   "slug": "adversarial-robustness",
   "article": "src/content/posts/2026-07-10-adversarial-robustness.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "See how a bounded perturbation can cross a nearby decision boundary even when the original sample is classified correctly.",
-  "mediumRationale": "A deterministic SVG can show a two-dimensional decision boundary, an l-infinity square, a clean point, and a gradient-directed adversarial point precisely. Mermaid cannot express continuous geometry.",
+  "learningObjective": "See how an input can cross a decision boundary while remaining inside the perturbation set allowed by a stated threat model.",
+  "mediumRationale": "A deterministic SVG is the smallest useful medium for placing a clean point, a signed-gradient step, a decision boundary, and an L-infinity square in one checkable coordinate system. Mermaid expresses relationships but not continuous geometry; semantic HTML would turn spatial containment into a list; interaction would add controls without changing this fixed inference; reusing a paper figure would add licensing and empirical-context risk; mixed media is unnecessary; and no visual would leave the key distinction between ordinary accuracy and worst-case accuracy abstract.",
   "deckReview": {
     "pages": [
       {
+        "page": 44,
+        "insight": "The neighboring backpropagation slide explains how input gradients are assembled through the chain rule, but it does not discuss attacks or bounded input changes."
+      },
+      {
         "page": 45,
-        "insight": "The loss-optimization slide explains gradients as directions in parameter space and introduces two-dimensional loss slices."
+        "insight": "The loss-optimization slide presents a two-dimensional loss slice and gradient descent as following a local direction; this supports gradient intuition but operates in weight space."
+      },
+      {
+        "page": 46,
+        "insight": "The optimizer slide compares SGD, momentum, and adaptive updates in parameter space and adds no adversarial-input threat set."
+      },
+      {
+        "page": 47,
+        "insight": "The RAdam slide discusses optimizer variance and poor optima, not adversarial examples or worst-case input perturbations."
       },
       {
         "page": 48,
-        "insight": "The sharpness-aware minimization slide evaluates gradients after a bounded adversarial parameter perturbation, providing adjacent worst-case optimization intuition."
+        "insight": "The SAM slide evaluates loss after a bounded adversarial perturbation to model weights. It is adjacent worst-case-neighborhood intuition, but its parameter-space geometry must not be presented as an input-space attack."
+      },
+      {
+        "page": 49,
+        "insight": "The following optimization divider contains no additional mechanism or adversarial-input figure."
       }
     ],
-    "notes": "The independent agent could not inspect the deck and proposed several figures. Manual review found adjacent gradient and worst-case-neighborhood ideas but no adversarial-input figure."
+    "notes": "All 214 pages of Basic_ML_CS_concepts were searched directly for adversarial, robust, threat-model, FGSM, projected-gradient, and worst-case language, then pages 44 through 49 were inspected in sequence. Page 48 is the only nearby adversarial-optimization usage and concerns SAM weight perturbations, not input attacks. Other keyword matches concern GANs, random-forest robustness, or generic algorithmic worst cases. No slide supplies the article's needed input-space threat-set geometry."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "Explaining and Harnessing Adversarial Examples",
         "url": "https://arxiv.org/abs/1412.6572",
-        "usage": "Use to verify the fast-gradient-sign construction and local linearity explanation.",
-        "license": "No source figure copied; method and equation referenced only."
+        "usage": "Used to verify the fast-gradient-sign construction, its signed input-gradient direction, and the local-linearity motivation.",
+        "license": "No figure, text, data, or coordinates were copied. The arXiv record was treated as access to the paper, not permission to reuse a figure; the site geometry is an original illustrative construction from the stated equation."
       },
       {
         "title": "Towards Deep Learning Models Resistant to Adversarial Attacks",
         "url": "https://arxiv.org/abs/1706.06083",
-        "usage": "Use to verify projected worst-case optimization inside a stated threat set.",
-        "license": "No paper figure or benchmark values copied; conceptual reference only."
+        "usage": "Used to verify robustness as worst-case loss over a perturbation set and projected-gradient attacks constrained to that set.",
+        "license": "No paper figure, text, benchmark, data, or coordinates were copied. Figure-reuse permission was not established, so the implementation uses independently chosen points and boundary geometry."
       }
     ],
-    "notes": "The visual will be explicitly illustrative and avoid dataset-specific robust-accuracy claims. Public arXiv access is not treated as figure-reuse permission."
+    "notes": "The figure is an original schematic, not a reproduction of either paper or an empirical result. Its coordinates are disclosed in the SVG description and carry only the general mathematical claim that a bounded set may intersect another decision region. Public arXiv access was explicitly not treated as figure-reuse permission."
   },
   "agentReview": {
-    "reviewer": "Explore adversarial-robustness subagent, manually reconciled",
+    "reviewer": "GPT-5.6 Sol adversarial-robustness visual agent",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent proposed three visuals and optional interaction. Integration retained one decision-boundary and threat-set SVG because it teaches the core average-case versus worst-case gap without unsupported empirical generalization."
+    "summary": "Reviewed the complete article, the full 214-page deck keyword sweep with neighboring pages 44-49, and the two primary attack papers. Selected one compact input-space schematic because the hardest prose-only model is that correctness at x says nothing about every allowed neighbor around x."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["adversarial-threat-set-boundary"],
+    "accessibility": "The SVG has a title and a complete geometric description with coordinates. A circle versus diamond, solid arrow, dashed square and boundary, direct class labels, inequality text, and the caption preserve the full inference without color. Its 360-unit viewBox fits a 390 CSS-pixel viewport without a forced minimum width; shared figure variables provide dark-mode contrast and explicit print colors."
   }
 }
