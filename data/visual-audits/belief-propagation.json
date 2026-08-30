@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "belief-propagation",
+  "article": "src/content/posts/2026-05-31-belief-propagation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how a factor collapses an entire branch into an unnormalized function of one boundary variable, then combine matching entries from independent branches to obtain that variable's marginal.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can preserve the factor-graph shapes, direction of both messages, and entry-by-entry arithmetic at phone width. The first panel makes marginalization spatial; the second makes the final product and normalization checkable.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show message direction, but it cannot compactly align each binary state with the multiply-sum arithmetic and the later entrywise product.",
+    "svg": "Selected: deterministic geometry distinguishes variables from factors while direct numeric labels expose exactly what is eliminated, retained, multiplied, and normalized.",
+    "semanticHtml": "Rejected: a table would make the arithmetic accessible but would lose the branch-to-boundary spatial model that explains why the same partial sum can be reused.",
+    "interaction": "Rejected: changing factor values would add controls and state without improving the single invariant the learner needs to retain.",
+    "paperReuse": "Rejected: the IEEE paper and deck contain useful factor-graph figures, but no permissive figure-reuse license was established. The shipped figure uses independently chosen geometry, wording, and synthetic values.",
+    "noVisual": "Rejected: the equations state the updates precisely but require the reader to imagine that a whole branch becomes a function indexed only by the boundary variable, then align matching entries across multiple messages."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 65,
+        "insight": "The preceding Expectation Maximization slide establishes the topic boundary and discusses alternating latent-variable inference and parameter estimation; it does not define sum-product messages."
+      },
+      {
+        "page": 66,
+        "insight": "The Graphical Models slide motivates factorization, variable elimination, dynamic-programming reuse, and local propagation, but its HMM diagram does not show a factor-to-variable update."
+      },
+      {
+        "page": 67,
+        "insight": "The Message Passing slide shows two variable circles feeding a square factor and a message leaving for a third variable. It conveys node shapes and direction, but not the sum over neighboring states or that the outgoing message remains a function of the destination variable."
+      },
+      {
+        "page": 68,
+        "insight": "The following GMM/HMM slide moves to mixture and chain-model applications and distinguishes evaluation, decoding, and training; it does not add the generic sum-product calculation."
+      },
+      {
+        "page": 69,
+        "insight": "The adjacent Forward-Backward slide specializes dynamic programming to an HMM chain and explains cached left and right terms around one state, supporting the two-branch combination idea without providing a general factor-graph update."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page-by-page for belief propagation, sum-product, factor graph, graphical model, and message passing. Pages 65-68 were rendered and visually inspected, and page 69 was read as the adjacent specialization. Pages 66-67 are the only generic graphical-model/message-passing neighborhood. The page 67 factor-graph image is treated as externally sourced artwork with unverified reuse rights; no deck pixels, layout, wording, or numeric example is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Factor Graphs and the Sum-Product Algorithm",
+        "url": "https://doi.org/10.1109/18.910572",
+        "usage": "Used as the primary factor-graph reference to verify variable-to-factor and factor-to-variable update structure, marginalization over non-destination variables, and exact finite message passing on cycle-free factor graphs.",
+        "license": "IEEE publication copyright applies and no permissive figure-reuse license was identified. No figure, prose, notation layout, or example values are reproduced; the implementation is an original teaching schematic."
+      },
+      {
+        "title": "Probabilistic Machine Learning: An Introduction",
+        "url": "https://probml.github.io/pml-book/book1.html",
+        "usage": "Used as an authoritative textbook reference to cross-check sum-product message passing, unnormalized beliefs, tree-structured exact inference, and the relationship to variable elimination.",
+        "license": "The official page provides access and figure-generation code but does not grant a blanket license to reuse the MIT Press book's figures. No book text, figure, code, or data is adapted."
+      },
+      {
+        "title": "pgmpy BeliefPropagation API reference",
+        "url": "https://pgmpy.org/api/generated/inference/pgmpy.inference.BeliefPropagation.html",
+        "usage": "Used as official library documentation to confirm calibration and exact query behavior on junction trees as a production implementation of belief propagation.",
+        "license": "Documentation is consulted only for API semantics. No pgmpy code, prose, output, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a message is a reusable partial sum over an entire branch, yet remains a vector or function indexed by the boundary variable. The original binary example uses incoming message [0.20, 0.80] and factor rows [0.9, 0.1] and [0.2, 0.8], producing [0.26, 0.68]. Multiplying by an independent message [0.50, 0.25] gives [0.13, 0.17], whose normalized form is [0.43, 0.57] after rounding. These are synthetic potentials for checking the algebra, not empirical probabilities or copied source data."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the exact pages 65-69 neighborhood, and checked the primary IEEE factor-graph paper, an authoritative MIT Press textbook, and official pgmpy documentation before selecting an original two-stage numeric schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "belief-propagation-branch-summary"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description. Circle versus square shapes distinguish variables from factors, arrow direction shows message flow, and every vector and arithmetic step is directly labelled, so color is redundant. The established two-panel primitive stacks below 640 pixels; each panel uses a compact 300-pixel viewBox with no minimum width for readability at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print tokens force a light high-contrast palette and avoid breaks within the figure."
+  }
+}
