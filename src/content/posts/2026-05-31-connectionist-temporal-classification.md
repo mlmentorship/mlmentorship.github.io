@@ -39,6 +39,66 @@ The **collapse function** $\mathcal{B}$ does two things, in order:
 1. Merge consecutive repeated labels.
 2. Remove all blanks.
 
+<!-- visual:ctc-blank-preserves-repeat -->
+<figure class="learning-figure" aria-labelledby="ctc-blank-repeat-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="ctc-blank-repeat-title">Why does a blank let CTC emit the same label twice?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two CTC paths traced through merge repeats and remove blanks">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 215" role="img" aria-labelledby="ctc-adjacent-title ctc-adjacent-desc">
+				<title id="ctc-adjacent-title">Adjacent repeated labels collapse to one label</title>
+				<desc id="ctc-adjacent-desc">The frame path L, L first merges consecutive repeats into one L. Removing blanks changes nothing, so the output contains one L.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="182" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">NO SEPARATOR · ONE L</text>
+				<text class="viz-axis-label" x="20" y="57">PATH</text>
+				<rect class="viz-node viz-node--input" x="116" y="38" width="30" height="28" rx="4"></rect>
+				<rect class="viz-node viz-node--input" x="154" y="38" width="30" height="28" rx="4"></rect>
+				<text class="viz-node-label" x="131" y="57" text-anchor="middle">L</text>
+				<text class="viz-node-label" x="169" y="57" text-anchor="middle">L</text>
+				<path d="M150 72V86M146 82L150 86L154 82" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<text class="viz-axis-label" x="20" y="107">1 · MERGE REPEATS</text>
+				<rect class="viz-node" x="135" y="89" width="30" height="28" rx="4"></rect>
+				<text class="viz-node-label" x="150" y="108" text-anchor="middle">L</text>
+				<text class="viz-label" x="176" y="107">adjacent pair merged</text>
+				<path d="M150 123V137M146 133L150 137L154 133" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<text class="viz-axis-label" x="20" y="158">2 · REMOVE BLANKS</text>
+				<rect class="viz-node viz-node--output" x="135" y="140" width="30" height="28" rx="4"></rect>
+				<text class="viz-node-label" x="150" y="159" text-anchor="middle">L</text>
+				<text class="viz-callout" x="150" y="192" text-anchor="middle">output: one L</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 215" role="img" aria-labelledby="ctc-separated-title ctc-separated-desc">
+				<title id="ctc-separated-title">A blank between repeated labels preserves both labels</title>
+				<desc id="ctc-separated-desc">The frame path L, blank, L has no consecutive repeated labels, so the merge step leaves all three tokens. The blank is then removed without running merge again, so the output contains two L labels.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="182" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">BLANK SEPARATOR · TWO Ls</text>
+				<text class="viz-axis-label" x="20" y="57">PATH</text>
+				<rect class="viz-node viz-node--input" x="104" y="38" width="30" height="28" rx="4"></rect>
+				<path d="M150 38L165 52L150 66L135 52Z" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:3 2"></path>
+				<rect class="viz-node viz-node--input" x="166" y="38" width="30" height="28" rx="4"></rect>
+				<text class="viz-node-label" x="119" y="57" text-anchor="middle">L</text>
+				<text class="viz-node-label" x="150" y="56" text-anchor="middle">∅</text>
+				<text class="viz-node-label" x="181" y="57" text-anchor="middle">L</text>
+				<path d="M150 72V86M146 82L150 86L154 82" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<text class="viz-axis-label" x="20" y="107">1 · MERGE REPEATS</text>
+				<text class="viz-label" x="150" y="107">L</text>
+				<text class="viz-label" x="168" y="107">∅</text>
+				<text class="viz-label" x="186" y="107">L</text>
+				<text class="viz-label" x="209" y="107">unchanged</text>
+				<path d="M150 123V137M146 133L150 137L154 133" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<text class="viz-axis-label" x="20" y="158">2 · REMOVE BLANKS</text>
+				<rect class="viz-node viz-node--output" x="116" y="140" width="30" height="28" rx="4"></rect>
+				<rect class="viz-node viz-node--output" x="154" y="140" width="30" height="28" rx="4"></rect>
+				<text class="viz-node-label" x="131" y="159" text-anchor="middle">L</text>
+				<text class="viz-node-label" x="169" y="159" text-anchor="middle">L</text>
+				<text class="viz-callout" x="150" y="192" text-anchor="middle">output: two Ls</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> CTC merges repeats before it removes blanks. <code>L L</code> merges immediately, but <code>L ∅ L</code> has no adjacent repeat at step 1; removing <code>∅</code> at step 2 leaves both Ls.</figcaption>
+</figure>
+
 The blank is what lets the model emit the same letter twice (`L L` in `HELLO`): insert a blank between them, `L ∅ L`, and the merge step won't collapse them.
 
 ## The loss
