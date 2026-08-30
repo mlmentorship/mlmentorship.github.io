@@ -40,6 +40,35 @@ A useful prompt has four parts:
 - **Boundary:** files and APIs that must not change.
 - **Proof:** the test or measurement that demonstrates success.
 
+<!-- visual:agent-review-control-loop -->
+<figure class="learning-figure" aria-labelledby="agent-control-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="agent-control-title">Separate delegated execution from acceptance authority.</p>
+	<div class="visual-grid--two" role="group" aria-label="Two-lane workflow comparing work delegated to a coding agent with decisions retained by the engineer">
+		<section class="visual-panel">
+			<h4>Agent lane · bounded execution</h4>
+			<p>The agent proposes evidence inside the stated boundary.</p>
+			<ol>
+				<li><strong>Inspect:</strong> trace the named files and failing path.</li>
+				<li><strong>Patch:</strong> change only the allowed surface.</li>
+				<li><strong>Exercise:</strong> run the requested focused test.</li>
+				<li><strong>Report:</strong> expose the diff, output, and assumptions.</li>
+			</ol>
+		</section>
+		<section class="visual-panel">
+			<h4>Reviewer lane · acceptance authority</h4>
+			<p>The engineer owns the contract before and after delegation.</p>
+			<ol>
+				<li><strong>Frame:</strong> map the path and state the invariant.</li>
+				<li><strong>Inspect:</strong> reject scope drift and weakened tests.</li>
+				<li><strong>Prove:</strong> add an independent contract or edge test.</li>
+				<li><strong>Decide:</strong> accept only with residual risk stated.</li>
+			</ol>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the agent can inspect, patch, and run a focused test, but those outputs are evidence rather than acceptance. The engineer sets the invariant, reviews the actual diff, supplies independent proof, and retains the final merge decision.</figcaption>
+</figure>
+
 For example:
 
 > Inspect `metrics.py` and the merge test. Repair only `StreamingConfusion.merge` so merging two shards equals a single pass over their combined examples. Preserve the public API. Explain the defect before proposing a patch, then run the focused merge test.
