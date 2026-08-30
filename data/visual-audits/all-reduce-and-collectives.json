@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "slug": "all-reduce-and-collectives",
+  "article": "src/content/posts/2025-09-22-all-reduce-and-collectives.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "Trace one chunk through the N minus 1 reduce-scatter steps of a four-rank ring and connect the movement to the communication formula.",
+  "mediumRationale": "An original step-aligned SVG can preserve ring geometry, chunk identity, send direction, and accumulated state. Mermaid would show topology but not synchronized buffer evolution clearly.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The FSDP slide ties distributed model state to mixed-precision collective communication and overlap."
+      },
+      {
+        "page": 115,
+        "insight": "The combined training stack places FSDP communication in the context of memory-saving model training."
+      },
+      {
+        "page": 167,
+        "insight": "The system-design slide distinguishes data parallelism from model parallelism and motivates worker communication."
+      }
+    ],
+    "notes": "The independent agent referenced a nonexistent PPTX path and guessed deck ranges. Manual inspection established the exact relevant PDF pages; none supplies a reusable ring algorithm visual."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NCCL Collective Operations",
+        "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html",
+        "usage": "Use to verify collective semantics while keeping the visual implementation vendor-neutral.",
+        "license": "No NVIDIA diagram or prose copied; official documentation consulted only."
+      },
+      {
+        "title": "How to Scale Your Model",
+        "url": "https://jax-ml.github.io/scaling-book/",
+        "usage": "Use for authoritative bandwidth, sharding, and collective communication context.",
+        "license": "No source figure copied; conceptual reference only."
+      }
+    ],
+    "notes": "The planned ring snapshots and chunk values will be original and manually checked against the article's cost model."
+  },
+  "agentReview": {
+    "reviewer": "Explore all-reduce subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent correctly chose SVG for buffer evolution. Integration corrected guessed deck evidence and narrowed the plan to one four-rank reduce-scatter trace."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

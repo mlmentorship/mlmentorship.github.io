@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "adversarial-robustness",
+  "article": "src/content/posts/2026-07-10-adversarial-robustness.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "See how a bounded perturbation can cross a nearby decision boundary even when the original sample is classified correctly.",
+  "mediumRationale": "A deterministic SVG can show a two-dimensional decision boundary, an l-infinity square, a clean point, and a gradient-directed adversarial point precisely. Mermaid cannot express continuous geometry.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 45,
+        "insight": "The loss-optimization slide explains gradients as directions in parameter space and introduces two-dimensional loss slices."
+      },
+      {
+        "page": 48,
+        "insight": "The sharpness-aware minimization slide evaluates gradients after a bounded adversarial parameter perturbation, providing adjacent worst-case optimization intuition."
+      }
+    ],
+    "notes": "The independent agent could not inspect the deck and proposed several figures. Manual review found adjacent gradient and worst-case-neighborhood ideas but no adversarial-input figure."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Explaining and Harnessing Adversarial Examples",
+        "url": "https://arxiv.org/abs/1412.6572",
+        "usage": "Use to verify the fast-gradient-sign construction and local linearity explanation.",
+        "license": "No source figure copied; method and equation referenced only."
+      },
+      {
+        "title": "Towards Deep Learning Models Resistant to Adversarial Attacks",
+        "url": "https://arxiv.org/abs/1706.06083",
+        "usage": "Use to verify projected worst-case optimization inside a stated threat set.",
+        "license": "No paper figure or benchmark values copied; conceptual reference only."
+      }
+    ],
+    "notes": "The visual will be explicitly illustrative and avoid dataset-specific robust-accuracy claims. Public arXiv access is not treated as figure-reuse permission."
+  },
+  "agentReview": {
+    "reviewer": "Explore adversarial-robustness subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent proposed three visuals and optional interaction. Integration retained one decision-boundary and threat-set SVG because it teaches the core average-case versus worst-case gap without unsupported empirical generalization."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

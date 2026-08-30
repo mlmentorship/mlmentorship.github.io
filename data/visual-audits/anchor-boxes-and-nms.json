@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "anchor-boxes-and-nms",
+  "article": "src/content/posts/2026-05-07-anchor-boxes-and-nms.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "Trace greedy non-maximum suppression from overlapping scored boxes to one retained detection while understanding why selection order matters.",
+  "mediumRationale": "A deterministic before, select, suppress, and result SVG can reuse the same box coordinates across stages. Mermaid cannot express IoU overlap geometry, and interaction is unnecessary for the first version.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 147,
+        "insight": "The computer-vision overview situates object detection and segmentation as localization tasks beyond image classification."
+      },
+      {
+        "page": 149,
+        "insight": "The Faster R-CNN slide provides the proposal and detection context in which anchors and NMS operate."
+      }
+    ],
+    "notes": "The deck has detection context but no accessible stepwise NMS teaching figure. The agent's two-figure proposal was narrowed to greedy suppression, the less intuitive algorithm."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks",
+        "url": "https://arxiv.org/abs/1506.01497",
+        "usage": "Use to verify anchor proposal framing and bounding-box regression context.",
+        "license": "No paper figure copied; method semantics referenced only."
+      },
+      {
+        "title": "torchvision.ops.nms documentation",
+        "url": "https://pytorch.org/vision/stable/generated/torchvision.ops.nms.html",
+        "usage": "Use to verify score ordering, IoU thresholding, and retained-index semantics.",
+        "license": "No documentation figure or code copied; behavior referenced only."
+      }
+    ],
+    "notes": "The planned scored boxes and IoU relationships are original, synthetic, and internally checkable. Public access is not treated as figure reuse permission."
+  },
+  "agentReview": {
+    "reviewer": "Explore anchors-NMS subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent proposed anchor and NMS visuals. Integration selected one staged NMS SVG because overlapping-box geometry and greedy order are the article's hardest spatial concept."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}

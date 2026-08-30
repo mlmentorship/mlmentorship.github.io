@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "slug": "alternating-least-squares",
+  "article": "src/content/posts/2026-05-07-alternating-least-squares.md",
+  "status": "planned",
+  "medium": "svg",
+  "learningObjective": "See a sparse user-item matrix split into dense user and item factors, then see why fixing one factor turns each row update into an independent least-squares solve.",
+  "mediumRationale": "One deterministic matrix SVG can combine factor shapes, sparse observations, and alternating row or column solves. Multiple Mermaid and HTML visuals would fragment one mental model.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 30,
+        "insight": "The matrix-factorization slide presents the latent user and item factor decomposition and reconstruction."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-system introduction frames sparse user-item interaction data."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide connects users and items through shared latent structure."
+      }
+    ],
+    "notes": "The independent agent proposed three visuals. Manual deck mapping confirms matrix geometry as the strongest shared representation and does not require copying a source figure."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Collaborative Filtering for Implicit Feedback Datasets",
+        "url": "https://yifanhu.net/PUB/cf.pdf",
+        "usage": "Use to verify confidence-weighted implicit ALS and independent user and item solves.",
+        "license": "No source figure copied; equations and algorithm semantics referenced only."
+      },
+      {
+        "title": "Matrix Factorization Techniques for Recommender Systems",
+        "url": "https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf",
+        "usage": "Use for the latent-factor interpretation and matrix dimensions.",
+        "license": "IEEE material is not assumed reusable; no source figure copied."
+      }
+    ],
+    "notes": "The planned figure is an original compact matrix construction with small illustrative dimensions."
+  },
+  "agentReview": {
+    "reviewer": "Explore ALS subagent, manually reconciled",
+    "reviewedAt": "2026-08-30",
+    "summary": "The agent proposed SVG, Mermaid, and HTML. Integration selected one matrix-factorization SVG that also marks the alternating independent solves, preserving one objective."
+  },
+  "implementation": {
+    "visualIds": [],
+    "accessibility": ""
+  }
+}
