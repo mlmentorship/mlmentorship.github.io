@@ -500,6 +500,7 @@ mark {
 .viz-callout { fill: var(--c-text); font-size: 11px; font-weight: 650; }
 
 .visual-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.visual-wide svg { min-width: 38rem; }
 .backprop-visual svg { min-width: 42rem; overflow: hidden; }
 .viz-node { fill: var(--viz-neutral-bg); stroke: var(--viz-neutral-stroke); stroke-width: 1.5; }
 .viz-node--input { fill: var(--viz-input-bg); stroke: var(--viz-input-stroke); }
@@ -571,9 +572,11 @@ mark {
 }
 
 @media print {
-  .mermaid {
+  .mermaid,
+  .learning-figure {
     --c-text: #18181b;
     --c-text-soft: #3f3f46;
+    --c-muted: #71717a;
     --c-rule: #d4d4d8;
     --viz-canvas: #ffffff;
     --viz-neutral-bg: #ffffff;
@@ -593,10 +596,9 @@ mark {
     background: #ffffff !important;
   }
   .mermaid svg { max-width: 100%; max-height: none; }
-  .learning-figure { page-break-inside: avoid; background: #ffffff !important; }
   .visual-scroll { overflow: visible; }
+  .visual-wide svg,
   .backprop-visual svg { min-width: 0; }
 }
 
 @view-transition { navigation: auto; }
-

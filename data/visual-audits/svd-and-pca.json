@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "svd-and-pca",
+  "article": "src/content/posts/2025-09-09-svd-and-pca.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See rank-1 PCA as orthogonal projection onto the direction of greatest variance, with the discarded perpendicular residual becoming reconstruction error.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place centered samples, orthogonal principal directions, projections, and residuals in one checkable coordinate system. Mermaid is suited to relationships rather than geometry; semantic HTML would obscure angles; interaction adds no necessary inference; reusing a paper figure creates avoidable provenance and licensing risk; and prose alone leaves the projection difficult to picture.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 4,
+        "insight": "The nearby norm diagrams establish the deck's geometric treatment of distance, which is relevant to squared reconstruction error."
+      },
+      {
+        "page": 5,
+        "insight": "The SVD slide frames singular vectors as orthogonal directions and singular values as axis-wise stretching, while contrasting SVD with eigendecomposition."
+      },
+      {
+        "page": 6,
+        "insight": "The following slide starts probability theory and adds no further linear-algebra geometry."
+      },
+      {
+        "page": 21,
+        "insight": "The preceding linear-classifier and kernel slide uses spatial directions and projections as model intuition but does not address PCA reconstruction."
+      },
+      {
+        "page": 22,
+        "insight": "The PCA slide states that principal axes maximize projected variance and that projection minimizes squared reconstruction error."
+      },
+      {
+        "page": 23,
+        "insight": "The following clustering slide uses distance and similarity but adds no PCA-specific visual mechanism."
+      }
+    ],
+    "notes": "Slides 5 and 22, plus both adjacent pages, were reviewed directly in the 214-page Basic_ML_CS_concepts deck. The site visual is an original centered point construction rather than a screenshot or redraw of deck artwork."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Principal Component Analysis, Second Edition",
+        "url": "https://doi.org/10.1007/b98835",
+        "usage": "Used as an authoritative reference for principal components as orthogonal maximum-variance directions and for dimensionality reduction by projection.",
+        "license": "No text, data, or figure copied; bibliographic and mathematical concepts referenced only. Reuse rights for source figures were not established."
+      },
+      {
+        "title": "The Singular Value Decomposition and Principal Component Analysis",
+        "url": "https://www.cs.cmu.edu/~venkatg/teaching/CStheory-infoage/book-chapter-4.pdf",
+        "usage": "Used to cross-check the geometric link between singular directions, low-rank approximation, and PCA.",
+        "license": "No text, data, or figure copied; the source informed only the general mathematical construction. Figure reuse rights were not relied upon."
+      },
+      {
+        "title": "The Approximation of One Matrix by Another of Lower Rank",
+        "url": "https://doi.org/10.1007/BF02288367",
+        "usage": "Used as the primary source for the optimal low-rank approximation result underlying rank-1 reconstruction.",
+        "license": "No text, data, or figure copied; theorem provenance cited only. Reuse rights for the publication were not assumed."
+      }
+    ],
+    "notes": "The six plotted samples are original illustrative coordinates chosen in a principal-component basis so their cross-covariance is exactly zero and their variance along PC1 exceeds their variance along PC2. No empirical dataset or source figure is reproduced."
+  },
+  "agentReview": {
+    "reviewer": "GPT-5.6 Sol SVD/PCA article visual agent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Reviewed the complete article, deck pages 4-6 and 21-23, and authoritative sources. Recommended one static projection diagram because the missing mental model is the geometric meaning of retaining one component, not the mechanics of computing an SVD."
+  },
+  "implementation": {
+    "visualIds": ["pca-rank-one-projection"],
+    "accessibility": "The figure uses a title and detailed description, direct labels, orthogonal line geometry, distinct circle and diamond markers, and dashed perpendicular residuals. Meaning does not depend on color, the SVG scales through its viewBox, and the existing learning-figure primitives provide dark-mode and print treatment."
+  }
+}
