@@ -2,51 +2,51 @@
   "schemaVersion": 1,
   "slug": "alternating-least-squares",
   "article": "src/content/posts/2026-05-07-alternating-least-squares.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "See a sparse user-item matrix split into dense user and item factors, then see why fixing one factor turns each row update into an independent least-squares solve.",
-  "mediumRationale": "One deterministic matrix SVG can combine factor shapes, sparse observations, and alternating row or column solves. Multiple Mermaid and HTML visuals would fragment one mental model.",
+  "learningObjective": "See why fixing the item factors makes every user-vector update independent, and fixing the user factors makes every item-vector update independent.",
+  "mediumRationale": "Deterministic SVG is the smallest medium that can align the sparse matrix, both dense factor shapes, parallel row solves, and the alternating cycle in one spatial explanation. Mermaid expresses flow but not matrix dimensions or aligned parallel solves reliably. Semantic HTML could show the matrices but would make the cycle harder to trace. Interaction adds state without adding insight because the two phases are fixed. Reusing a paper figure adds licensing risk and unnecessary detail. No visual would leave the article's hardest mental model—the independence created by freezing one factor—in prose.",
   "deckReview": {
     "pages": [
       {
         "page": 30,
-        "insight": "The matrix-factorization slide presents the latent user and item factor decomposition and reconstruction."
+        "insight": "The matrix-factorization slide shows an m by n matrix decomposed through a k-dimensional subspace, but specifically frames non-negative matrix factorization rather than ALS."
       },
       {
         "page": 129,
-        "insight": "The recommender-system introduction frames sparse user-item interaction data."
+        "insight": "This is the recommender-systems section divider; it provides topic context but no instructional figure or ALS mechanism."
       },
       {
         "page": 130,
-        "insight": "The collaborative-filtering slide connects users and items through shared latent structure."
+        "insight": "The collaborative-filtering slide describes factorizing a user-rating matrix into user and item embeddings and explicitly describes fold-in as solving a user embedding while item embeddings remain fixed."
       }
     ],
-    "notes": "The independent agent proposed three visuals. Manual deck mapping confirms matrix geometry as the strongest shared representation and does not require copying a source figure."
+    "notes": "Copilot CLI agent 5 searched all 214 PDF pages for alternating least squares, least squares, collaborative filtering, matrix factorization, and implicit feedback, then inspected neighboring pages 29-31 and 129-131 directly. Page 29 covers factorization machines, page 31 is an algorithms divider, and page 131 covers content-based and hybrid recommenders; none shows ALS. Pages 30 and 130 provide relevant matrix and fixed-factor context, but no slide depicts the alternating independent solves and no deck artwork was reused."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "Collaborative Filtering for Implicit Feedback Datasets",
-        "url": "https://yifanhu.net/PUB/cf.pdf",
-        "usage": "Use to verify confidence-weighted implicit ALS and independent user and item solves.",
-        "license": "No source figure copied; equations and algorithm semantics referenced only."
+        "url": "https://doi.org/10.1109/ICDM.2008.22",
+        "usage": "Used to verify the confidence-weighted objective, the fixed-item user update, and the symmetric fixed-user item update for implicit-feedback ALS.",
+        "license": "No paper text, equation layout, table, or figure was copied or adapted. DOI access is not treated as permission to reuse IEEE artwork."
       },
       {
-        "title": "Matrix Factorization Techniques for Recommender Systems",
-        "url": "https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf",
-        "usage": "Use for the latent-factor interpretation and matrix dimensions.",
-        "license": "IEEE material is not assumed reusable; no source figure copied."
+        "title": "Apache Spark ML collaborative filtering guide",
+        "url": "https://spark.apache.org/docs/latest/ml-collaborative-filtering.html",
+        "usage": "Used to cross-check the latent user-item factorization, ALS terminology, user and item blocking for parallel computation, and the explicit-versus-implicit variants.",
+        "license": "No documentation prose, example code, or visual was copied. Only official API and algorithm semantics were consulted."
       }
     ],
-    "notes": "The planned figure is an original compact matrix construction with small illustrative dimensions."
+    "notes": "The shipped diagram is an original, general mathematical construction using the article's notation and established site primitives. It contains no third-party visual asset, paper-specific geometry, or empirical data; source figures were unnecessary and their reuse permissions were therefore not assumed."
   },
   "agentReview": {
-    "reviewer": "Explore ALS subagent, manually reconciled",
+    "reviewer": "Copilot CLI agent 5",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent proposed SVG, Mermaid, and HTML. Integration selected one matrix-factorization SVG that also marks the alternating independent solves, preserving one objective."
+    "summary": "Independent review identified the conditional independence of row updates—not factorization alone—as the hardest prose-only model. The final SVG couples factor dimensions to two explicitly labeled parallel phases without implying that ALS makes the joint objective convex."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["als-alternating-independent-solves"],
+    "accessibility": "The SVG has a programmatic title and complete description. Matrix names, dimensions, numbered phases, independent systems, and cycle arrows carry all meaning without color. Existing visual-wide and visual-scroll primitives preserve readable labels at 390 CSS pixels, theme variables support light and dark modes, and the established print override removes the minimum width and forces high-contrast paper colors."
   }
 }
