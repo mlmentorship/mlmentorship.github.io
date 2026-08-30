@@ -2,47 +2,73 @@
   "schemaVersion": 1,
   "slug": "adam-and-adamw",
   "article": "src/content/posts/2025-09-15-adam-and-adamw.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "See that Adam scales an L2 penalty through each parameter's adaptive denominator while AdamW applies the same direct shrinkage independently of gradient history.",
-  "mediumRationale": "A two-row semantic parameter example with explicit update terms teaches decoupled weight decay more honestly than a generic optimizer trajectory. The loss-surface proposal does not isolate the AdamW mechanism.",
+  "learningObjective": "Compare how two equal parameters with different gradient-history scales receive unequal coupled L2 shrinkage in Adam but equal direct shrinkage in AdamW.",
+  "mediumRationale": "A two-column semantic table is the smallest medium that keeps the equal parameter values, unequal preconditioners, and resulting shrinkage terms aligned. Mermaid emphasizes flow rather than arithmetic; deterministic SVG would make selectable table data less accessible; interaction adds no useful state; paper reuse carries licensing and density costs; and no visual leaves the parameter-wise inequality difficult to see.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is a numerical comparison, not a graph topology.",
+    "svg": "Rejected: fixed geometry adds complexity and makes the tabular values less accessible.",
+    "semanticHtml": "Selected: real headers and cells preserve both the arithmetic and reading order while stacking responsively.",
+    "interaction": "Rejected: changing the denominator is unnecessary once two contrasting cases are adjacent.",
+    "paperReuse": "Rejected: no source figure is needed, and public paper access does not establish figure-reuse permission.",
+    "noVisual": "Rejected: prose states the inequivalence but does not spatially align the same parameter with two different history scales."
+  },
   "deckReview": {
     "pages": [
       {
+        "page": 45,
+        "insight": "The preceding optimization slide introduces movement through parameter space and gradient descent, establishing the local-update context for the optimizer equations that follow."
+      },
+      {
         "page": 46,
-        "insight": "The deck places SGD, momentum, RMSProp, and Adam update equations side by side and makes Adam's per-parameter second-moment denominator explicit."
+        "insight": "The deck places SGD, momentum, RMSProp, and Adam update equations side by side and explicitly divides each Adam update by the square root of its per-parameter second-moment estimate."
       },
       {
         "page": 47,
-        "insight": "The RAdam slide emphasizes early adaptive-variance behavior and warmup, showing that optimizer state changes effective step size."
+        "insight": "The neighboring RAdam slide emphasizes that early second-moment variance changes Adam's effective step size and motivates warmup; it does not discuss weight decay."
+      },
+      {
+        "page": 36,
+        "insight": "The loss-functions slide describes L2 regularization as discouraging large weights, but does not connect the penalty to adaptive optimizer scaling."
+      },
+      {
+        "page": 62,
+        "insight": "The model-training checklist recommends increasing weight decay as an overfitting control, without distinguishing coupled L2 regularization from decoupled decay."
       }
     ],
-    "notes": "Manual review replaced the independent agent's vague deck recommendation. The deck directly supports adaptive scaling, but it does not cover decoupled weight decay."
+    "notes": "The complete 214-page deck was text-indexed for optimizer, Adam, regularization, L2, and weight-decay material. Every match was reviewed, with visual inspection of the optimizer sequence on pages 45-48. Page 46 directly supports per-parameter adaptive scaling; pages 45 and 47 supply neighboring context, while page 48 moves to SAM. Pages 36 and 62 mention L2 regularization and weight decay only generically. No slide explains AdamW or decoupled weight decay, so the visual does not reuse deck artwork."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "Adam: A Method for Stochastic Optimization",
         "url": "https://arxiv.org/abs/1412.6980",
-        "usage": "Use to verify first- and second-moment adaptive updates and bias correction.",
-        "license": "No source figure copied; equations and algorithm cited as conceptual sources."
+        "usage": "Used to verify first- and second-moment adaptive updates, per-coordinate scaling, and bias correction.",
+        "license": "No text, code, or figure is copied. Mathematical facts are cited as conceptual sources; arXiv availability is not treated as figure-reuse permission."
       },
       {
         "title": "Decoupled Weight Decay Regularization",
         "url": "https://arxiv.org/abs/1711.05101",
-        "usage": "Use to verify why L2 regularization and weight decay cease to be equivalent under adaptive gradient scaling.",
-        "license": "No paper figure copied. Public distribution is not assumed to grant unrestricted figure reuse."
+        "usage": "Used to verify Proposition 2 and the fixed-preconditioner intuition: coupled L2 regularization is scaled coordinate-wise, while decoupled weight decay applies one rate.",
+        "license": "No paper figure, table, or prose is copied. Public distribution is not assumed to grant unrestricted figure reuse; the numerical example and layout are original."
+      },
+      {
+        "title": "PyTorch AdamW documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.AdamW.html",
+        "usage": "Used to cross-check the production algorithm ordering and the statement that weight decay does not accumulate in the momentum or variance.",
+        "license": "No documentation figure or code is copied. API semantics are referenced only; the original visual does not depend on PyTorch's BSD-licensed presentation."
       }
     ],
-    "notes": "The planned numerical parameter table is an original derivation from the two update rules."
+    "notes": "The table is an original worked example derived from the cited update rules. It explicitly holds the preconditioner fixed to isolate the regularization contribution and does not claim to reproduce a paper experiment."
   },
   "agentReview": {
-    "reviewer": "Explore AdamW subagent, manually reconciled",
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent correctly identified adaptive scaling versus direct shrinkage but proposed a generic loss-surface trajectory that does not teach AdamW. Integration changed the medium to a focused semantic update comparison."
+    "summary": "Independently reviewed the complete article, deck, primary papers, and official framework documentation. The hardest prose-only model is why equal parameters can receive different regularization under adaptive scaling, so the final design rejects a generic loss surface in favor of one fixed-preconditioner comparison."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["adamw-decoupled-shrinkage"],
+    "accessibility": "The comparison uses a real table with scoped headers, explicit equations, visible Adam and AdamW labels, and a caption that states the conclusion without relying on color. Shared semantic-figure styles stack the panels below 640 pixels, use theme tokens in dark mode, and provide print-safe borders and text."
   }
 }

@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { basename, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 
@@ -119,7 +120,9 @@ function validateAudit(audit, file, entry) {
   if (audit.status !== 'implemented' && visualIds?.length > 0) fail(`${label} non-implemented status cannot claim visual IDs`);
   for (const id of visualIds ?? []) {
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) fail(`${label} has invalid visual ID ${JSON.stringify(id)}`);
-    if (!entry.source.includes(`<!-- visual:${id} -->`)) fail(`${label} cannot find visual marker ${id} in the article`);
+    const marker = `<!-- visual:${id} -->`;
+    const markerCount = entry.source.split(marker).length - 1;
+    if (markerCount !== 1) fail(`${label} needs exactly one article marker for ${id}, found ${markerCount}`);
   }
 
   if (audit.status === 'implemented' && !nonEmpty(audit.implementation?.accessibility)) {
@@ -165,6 +168,9 @@ function validateAudit(audit, file, entry) {
       if (figureEnd < 0 || !figure.includes('<figure') || !figure.includes('aria-labelledby=') || !figure.includes('aria-label=') || !figure.includes('<figcaption>')) {
         fail(`${label} semantic visual ${id} needs a labelled figure, accessible child, and caption`);
       }
+      if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
+        fail(`${label} semantic visual ${id} needs a direct "Read it this way" caption`);
+      }
     }
   }
 }
@@ -172,6 +178,7 @@ function validateAudit(audit, file, entry) {
 const entries = publishedEntries();
 const bySlug = new Map(entries.map((entry) => [entry.slug, entry]));
 const audits = new Map();
+const claimedVisualIds = new Map();
 
 for (const file of auditFiles()) {
   const slug = basename(file, '.json');
@@ -189,6 +196,11 @@ for (const file of auditFiles()) {
   }
   audits.set(slug, audit);
   validateAudit(audit, file, entry);
+  for (const id of audit.implementation?.visualIds ?? []) {
+    const owner = claimedVisualIds.get(id);
+    if (owner) fail(`${file} duplicates visual ID ${id} already claimed by ${owner}`);
+    claimedVisualIds.set(id, file);
+  }
 }
 
 const counts = { implemented: 0, planned: 0, 'no-visual': 0, unreviewed: 0 };
@@ -223,13 +235,60 @@ if (nextArg) {
   }
 }
 
+const expectedResolvedArg = process.argv.find((arg) => arg.startsWith('--expect-resolved='));
+if (expectedResolvedArg) {
+  const expectedSlugs = expectedResolvedArg
+    .slice('--expect-resolved='.length)
+    .split(',')
+    .map((slug) => slug.trim())
+    .filter(Boolean);
+  if (expectedSlugs.length === 0 || new Set(expectedSlugs).size !== expectedSlugs.length) {
+    fail('--expect-resolved needs a non-empty, duplicate-free comma-separated slug list');
+  }
+  for (const slug of expectedSlugs) {
+    const status = audits.get(slug)?.status ?? 'unreviewed';
+    if (!['implemented', 'no-visual'].includes(status)) {
+      fail(`expected batch article ${slug} to be resolved, found ${status}`);
+    }
+  }
+  const baselineArg = process.argv.find((arg) => arg.startsWith('--baseline-ref='));
+  if (baselineArg) {
+    const baselineRef = baselineArg.slice('--baseline-ref='.length).trim();
+    if (!baselineRef) fail('--baseline-ref needs a git revision');
+    const baselineStatuses = new Map();
+    for (const file of auditFiles()) {
+      try {
+        const source = execFileSync('git', ['show', `${baselineRef}:data/visual-audits/${file}`], {
+          cwd: root,
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'pipe'],
+        });
+        baselineStatuses.set(basename(file, '.json'), JSON.parse(source).status);
+      } catch {
+        baselineStatuses.set(basename(file, '.json'), 'unreviewed');
+      }
+    }
+    const newlyResolved = [...audits]
+      .filter(([slug, audit]) => {
+        const before = baselineStatuses.get(slug) ?? 'unreviewed';
+        return !['implemented', 'no-visual'].includes(before) && ['implemented', 'no-visual'].includes(audit.status);
+      })
+      .map(([slug]) => slug)
+      .sort();
+    const expected = [...expectedSlugs].sort();
+    if (JSON.stringify(newlyResolved) !== JSON.stringify(expected)) {
+      fail(`resolved articles since ${baselineRef} are ${newlyResolved.join(', ') || 'none'}; expected ${expected.join(', ')}`);
+    }
+  }
+}
+
 if (process.argv.includes('--require-complete') && incomplete.length > 0) {
   fail(`${incomplete.length} published entries still need review or implementation`);
 }
 
 if (process.argv.includes('--dist')) {
   for (const [slug, audit] of audits) {
-    if (audit.status !== 'implemented' || !['svg', 'semantic-html'].includes(audit.medium)) continue;
+    if (audit.status !== 'implemented') continue;
     const entry = bySlug.get(slug);
     const output = join(root, 'dist', entry.category, slug, 'index.html');
     if (!existsSync(output)) {
@@ -239,6 +298,19 @@ if (process.argv.includes('--dist')) {
     const html = readFileSync(output, 'utf8');
     for (const id of audit.implementation.visualIds) {
       const marker = html.indexOf(`<!-- visual:${id} -->`);
+      if (audit.medium === 'mermaid') {
+        const blockStart = html.indexOf('<pre class="mermaid">', marker);
+        const blockEnd = html.indexOf('</pre>', blockStart);
+        const block = html.slice(blockStart, blockEnd + 6);
+        const after = html.slice(blockEnd, blockEnd + 700);
+        if (marker < 0 || blockStart < 0 || blockEnd < 0 || !block.includes('accTitle:') || !block.includes('accDescr:')) {
+          fail(`generated Mermaid visual ${id} on ${slug} lost its accessible source`);
+        }
+        if (!after.includes('<p class="diagram-caption"><strong>Read it this way:</strong>')) {
+          fail(`generated Mermaid visual ${id} on ${slug} lost its direct caption`);
+        }
+        continue;
+      }
       const figureEnd = html.indexOf('</figure>', marker);
       const figure = html.slice(marker, figureEnd + 9);
       if (marker < 0 || figureEnd < 0 || !figure.includes('<figcaption>') || figure.includes('&lt;figcaption')) {
@@ -246,6 +318,9 @@ if (process.argv.includes('--dist')) {
       }
       if (audit.medium === 'svg' && (!figure.includes('<svg') || !figure.includes('<title') || !figure.includes('<desc'))) {
         fail(`generated SVG visual ${id} on ${slug} lost accessible markup`);
+      }
+      if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
+        fail(`generated visual ${id} on ${slug} lost its direct caption`);
       }
     }
   }
