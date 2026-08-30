@@ -197,11 +197,16 @@ for (const entry of entries) {
   counts[status] += 1;
 }
 
-const unreviewed = entries.filter((entry) => !audits.has(entry.slug));
-const incomplete = entries.filter((entry) => {
-  const status = audits.get(entry.slug)?.status;
-  return status === undefined || status === 'planned';
-});
+const incomplete = entries
+  .filter((entry) => {
+    const status = audits.get(entry.slug)?.status;
+    return status === undefined || status === 'planned';
+  })
+  .sort((a, b) => {
+    const aPlanned = audits.get(a.slug)?.status === 'planned' ? 0 : 1;
+    const bPlanned = audits.get(b.slug)?.status === 'planned' ? 0 : 1;
+    return aPlanned - bPlanned;
+  });
 console.log(`Visual coverage: ${entries.length} published entries`);
 console.log(`  implemented: ${counts.implemented}`);
 console.log(`  planned:     ${counts.planned}`);
