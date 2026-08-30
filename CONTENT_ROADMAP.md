@@ -15,6 +15,8 @@ For tested user journeys and their resolution status, see [docs/USER_JOURNEY_UX_
 
 For writing rules and the full-library review, see [docs/EDITORIAL_STYLE.md](docs/EDITORIAL_STYLE.md) and [docs/CONTENT_STYLE_AUDIT_2026-08-28.md](docs/CONTENT_STYLE_AUDIT_2026-08-28.md).
 
+For the visual medium rules, quality gate, and first twelve instructional figures, see [docs/VISUAL_LEARNING_SYSTEM.md](docs/VISUAL_LEARNING_SYSTEM.md).
+
 ## Targets
 
 | Section | Current | Previous 12-month target | Status |

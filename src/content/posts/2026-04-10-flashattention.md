@@ -22,6 +22,8 @@ Standard attention reads and writes the n×n attention matrix to HBM at every st
 
 ```mermaid
 flowchart LR
+  accTitle: Standard attention repeatedly moves its full score matrix through high-bandwidth memory
+  accDescr: Query and key vectors produce an n by n score matrix. Scores are written to HBM, read for softmax, written again as probabilities, and read before multiplication with values.
     Q[Q] --> S["QKᵀ / √d<br/>(n × n)"]
     K[K] --> S
     S -->|write| HBM1[(HBM)]
@@ -30,7 +32,13 @@ flowchart LR
     HBM2 -->|read| Mul["P · V"]
     V[V] --> Mul
     Mul --> O[O]
+    class Q,K,V viz-input
+    class S,Soft,Mul viz-focus
+    class HBM1,HBM2 viz-state
+    class O viz-output
 ```
+
+  <p class="diagram-caption"><strong>Read it this way:</strong> standard attention materializes the full n×n matrix in HBM twice. FlashAttention keeps small tiles and running softmax statistics in SRAM instead.</p>
 
 Standard attention does this:
 

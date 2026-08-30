@@ -20,7 +20,21 @@ export default defineConfig({
     '/library/specialist-domains': '/library/vision-language-speech',
   },
   integrations: [
-    mermaid({ theme: 'neutral', autoTheme: true, enableLog: false }),
+    mermaid({
+      theme: 'neutral',
+      autoTheme: true,
+      enableLog: false,
+      mermaidConfig: {
+        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+        flowchart: {
+          curve: 'basis',
+          nodeSpacing: 30,
+          rankSpacing: 42,
+          padding: 12,
+          useMaxWidth: true,
+        },
+      },
+    }),
     mdx(),
     sitemap(),
   ],

@@ -282,5 +282,153 @@ mark {
   padding: 0.5rem 0;
 }
 
+/* ---------- Instructional diagrams ---------- */
+.prose > .mermaid {
+  max-width: min(56rem, 95vw);
+  margin: 1.6rem auto .65rem !important;
+}
+.mermaid {
+  padding: clamp(.9rem, 2.5vw, 1.25rem) !important;
+  overflow-x: auto !important;
+  border: 1px solid var(--c-rule) !important;
+  border-radius: var(--radius-lg) !important;
+  background:
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--c-accent-soft) 75%, transparent), transparent 38%),
+    var(--viz-canvas) !important;
+}
+.mermaid svg {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-height: 34rem;
+  margin: 0 auto;
+  font-family: var(--font-ui) !important;
+}
+.mermaid svg text,
+.mermaid svg span,
+.mermaid svg .label,
+.mermaid svg .nodeLabel,
+.mermaid svg .nodeLabel p,
+.mermaid svg .cluster-label,
+.mermaid svg .cluster-label span {
+  color: var(--c-text) !important;
+  fill: var(--c-text) !important;
+  font-family: var(--font-ui) !important;
+}
+.mermaid svg .node rect,
+.mermaid svg .node circle,
+.mermaid svg .node ellipse,
+.mermaid svg .node polygon,
+.mermaid svg .node path,
+.mermaid svg .statediagram-state rect {
+  fill: var(--viz-neutral-bg) !important;
+  stroke: var(--viz-neutral-stroke) !important;
+  stroke-width: 1.25px !important;
+}
+.mermaid svg .flowchart-link,
+.mermaid svg .edgePath .path,
+.mermaid svg .transition {
+  stroke: var(--viz-edge) !important;
+  stroke-width: 1.35px !important;
+}
+.mermaid svg .edge-thickness-thick {
+  stroke: var(--viz-focus-stroke) !important;
+  stroke-width: 2.3px !important;
+}
+.mermaid svg marker path,
+.mermaid svg .marker,
+.mermaid svg .arrowMarkerPath,
+.mermaid svg .arrowheadPath {
+  fill: var(--viz-edge) !important;
+  stroke: var(--viz-edge) !important;
+}
+.mermaid svg .edgeLabel,
+.mermaid svg .edgeLabel p,
+.mermaid svg .labelBkg {
+  color: var(--c-text-soft) !important;
+  background-color: var(--viz-canvas) !important;
+}
+.mermaid svg .edgeLabel rect {
+  fill: var(--viz-canvas) !important;
+  opacity: .96 !important;
+}
+.mermaid svg .cluster rect {
+  fill: color-mix(in srgb, var(--viz-canvas) 86%, var(--c-accent-soft)) !important;
+  stroke: var(--c-rule) !important;
+  stroke-dasharray: 3 3;
+}
+.mermaid svg .node.viz-input rect,
+.mermaid svg .node.viz-input circle,
+.mermaid svg .node.viz-input polygon {
+  fill: var(--viz-input-bg) !important;
+  stroke: var(--viz-input-stroke) !important;
+}
+.mermaid svg .node.viz-focus rect,
+.mermaid svg .node.viz-focus circle,
+.mermaid svg .node.viz-focus polygon {
+  fill: var(--viz-focus-bg) !important;
+  stroke: var(--viz-focus-stroke) !important;
+  stroke-width: 1.8px !important;
+}
+.mermaid svg .node.viz-state rect,
+.mermaid svg .node.viz-state circle,
+.mermaid svg .node.viz-state polygon {
+  fill: var(--viz-state-bg) !important;
+  stroke: var(--viz-state-stroke) !important;
+}
+.mermaid svg .node.viz-output rect,
+.mermaid svg .node.viz-output circle,
+.mermaid svg .node.viz-output polygon {
+  fill: var(--viz-output-bg) !important;
+  stroke: var(--viz-output-stroke) !important;
+}
+.mermaid svg .node.viz-warning rect,
+.mermaid svg .node.viz-warning circle,
+.mermaid svg .node.viz-warning polygon {
+  fill: var(--viz-warning-bg) !important;
+  stroke: var(--viz-warning-stroke) !important;
+}
+.diagram-caption {
+  max-width: var(--measure);
+  margin: 0 auto 1.6rem;
+  padding-left: .75rem;
+  border-left: 2px solid var(--c-accent);
+  color: var(--c-muted);
+  font-family: var(--font-ui);
+  font-size: .74rem;
+  line-height: 1.5;
+}
+.diagram-caption strong { color: var(--c-text-soft); }
+
+@media (max-width: 640px) {
+  .mermaid svg.flowchart { min-width: 36rem; }
+  .mermaid svg.flowchart:has(.viz-compact) { min-width: 0; }
+}
+
+@media print {
+  .mermaid {
+    --c-text: #18181b;
+    --c-text-soft: #3f3f46;
+    --c-rule: #d4d4d8;
+    --viz-canvas: #ffffff;
+    --viz-neutral-bg: #ffffff;
+    --viz-neutral-stroke: #71717a;
+    --viz-input-bg: #eef6ff;
+    --viz-input-stroke: #4777a5;
+    --viz-focus-bg: #f6eee9;
+    --viz-focus-stroke: #9a4d24;
+    --viz-state-bg: #f4f0fa;
+    --viz-state-stroke: #76578e;
+    --viz-output-bg: #edf7f0;
+    --viz-output-stroke: #3f7d57;
+    --viz-warning-bg: #fff1f1;
+    --viz-warning-stroke: #a33f49;
+    --viz-edge: #52525b;
+    page-break-inside: avoid;
+    background: #ffffff !important;
+  }
+  .mermaid svg { max-width: 100%; max-height: none; }
+}
+
 @view-transition { navigation: auto; }
 

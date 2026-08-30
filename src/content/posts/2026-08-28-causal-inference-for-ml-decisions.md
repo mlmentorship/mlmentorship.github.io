@@ -53,11 +53,20 @@ The treatment and outcome share a cause. This is confounding.
 
 A directed acyclic graph can express the claim:
 
-```text
-user difficulty -> support message
-user difficulty -> churn
-support message  -> churn
+```mermaid
+flowchart TB
+	accTitle: User difficulty confounds the relationship between support messages and churn
+	accDescr: User difficulty changes both whether a person receives a support message and whether they churn. The causal effect of the message on churn is therefore mixed with a backdoor path through difficulty.
+	D["User difficulty<br/>pre-treatment cause"] -. "changes assignment" .-> T["Support message<br/>treatment"]
+	D -. "also changes outcome" .-> Y["Churn<br/>outcome"]
+	T ==>|"effect we want"| Y
+	class D viz-warning
+	class T viz-focus
+	class Y viz-output
+	class D,T,Y viz-compact
 ```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> difficulty opens a backdoor path from support messages to churn. The observed association mixes that path with the message's causal effect.</p>
 
 Conditioning on sufficient pre-treatment causes of both treatment and outcome may identify the effect. Conditioning on variables caused by treatment can instead introduce bias.
 

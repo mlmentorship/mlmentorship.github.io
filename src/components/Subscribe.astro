@@ -215,7 +215,7 @@ const hasEmail =
     const markViewed = () => {
       if (viewed) return;
       viewed = true;
-      storageSet('sessionStorage', SESSION_KEY, '1');
+      if (placement === 'entry') storageSet('sessionStorage', SESSION_KEY, '1');
       trackPublicEvent(events.viewed);
     };
 

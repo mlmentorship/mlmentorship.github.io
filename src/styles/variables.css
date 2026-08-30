@@ -39,6 +39,22 @@
   --c-kbd-bg:     #f4f4f5;
   --c-highlight:  #fef9c3;
 
+  /* ---------- Instructional visual palette ---------- */
+  --viz-canvas:         #fafaf9;
+  --viz-neutral-bg:     #ffffff;
+  --viz-neutral-stroke: #a1a1aa;
+  --viz-input-bg:       #eef6ff;
+  --viz-input-stroke:   #4777a5;
+  --viz-focus-bg:       #f6eee9;
+  --viz-focus-stroke:   #9a4d24;
+  --viz-state-bg:       #f4f0fa;
+  --viz-state-stroke:   #76578e;
+  --viz-output-bg:      #edf7f0;
+  --viz-output-stroke:  #3f7d57;
+  --viz-warning-bg:     #fff1f1;
+  --viz-warning-stroke: #a33f49;
+  --viz-edge:           #71717a;
+
   /* ---------- Radii / shadow / motion ---------- */
   --radius:     3px;
   --radius-lg:  5px;
@@ -76,6 +92,20 @@
   --c-code-bg:    #18181b;
   --c-kbd-bg:     #202024;
   --c-highlight:  #3f3a14;
+  --viz-canvas:         #121214;
+  --viz-neutral-bg:     #18181b;
+  --viz-neutral-stroke: #52525b;
+  --viz-input-bg:       #142333;
+  --viz-input-stroke:   #78a7d4;
+  --viz-focus-bg:       #2c1d16;
+  --viz-focus-stroke:   #d6a16f;
+  --viz-state-bg:       #241c2d;
+  --viz-state-stroke:   #b89bd0;
+  --viz-output-bg:      #14251a;
+  --viz-output-stroke:  #74b58a;
+  --viz-warning-bg:     #301a1d;
+  --viz-warning-stroke: #de858e;
+  --viz-edge:           #a1a1aa;
   --shadow-sm:    none;
   --shadow-md:    0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.45);
@@ -100,6 +130,20 @@
     --c-code-bg:    #18181b;
     --c-kbd-bg:     #202024;
     --c-highlight:  #3f3a14;
+    --viz-canvas:         #121214;
+    --viz-neutral-bg:     #18181b;
+    --viz-neutral-stroke: #52525b;
+    --viz-input-bg:       #142333;
+    --viz-input-stroke:   #78a7d4;
+    --viz-focus-bg:       #2c1d16;
+    --viz-focus-stroke:   #d6a16f;
+    --viz-state-bg:       #241c2d;
+    --viz-state-stroke:   #b89bd0;
+    --viz-output-bg:      #14251a;
+    --viz-output-stroke:  #74b58a;
+    --viz-warning-bg:     #301a1d;
+    --viz-warning-stroke: #de858e;
+    --viz-edge:           #a1a1aa;
     --shadow-sm:    none;
     --shadow-md:    0 8px 24px rgba(0, 0, 0, 0.35);
     --shadow-lg:    0 12px 32px rgba(0, 0, 0, 0.45);
