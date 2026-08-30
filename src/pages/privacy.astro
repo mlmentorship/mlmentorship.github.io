@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts';
+---
+
+<BaseLayout title="Privacy" description="How mlmentorship handles analytics, browser-local Workbook data, newsletter subscriptions, and feedback.">
+  <article class="policy-page">
+    <p class="kicker">Privacy</p>
+    <h1>You can use most of mlmentorship without an account.</h1>
+    <p class="lede">The site records aggregate page usage and coarse feature events. Workbook answers, scores, stories, and notes stay in your browser unless you explicitly export them.</p>
+
+    <p class="updated">Last updated: August 30, 2026</p>
+
+    <h2>Aggregate analytics</h2>
+    <p>mlmentorship uses <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a> to understand aggregate traffic, referrers, page use, and coarse events such as opening practice or the Workbook.</p>
+    <p>GoatCounter states that its default aggregate mode does not store IP addresses, full user-agent strings, browser tracker identifiers, cookies, or browser local storage. It may hold a temporary mapping of site, IP address, and user agent in memory for up to eight hours to count repeat visits. Read the <a href="https://www.goatcounter.com/privacy" rel="noopener">GoatCounter privacy policy</a>.</p>
+    <p>Custom mlmentorship events contain only fixed event names. The site does not send practice answers, scores, story text, plan contents, or private notes to analytics.</p>
+
+    <h2>Browser-local data</h2>
+    <p>The optional Workbook stores plan settings, practice attempts, retry dates, completion marks, simulation state, and story-bank text in browser storage on the device you use.</p>
+    <ul>
+      <li>mlmentorship does not transmit this Workbook data to its own server.</li>
+      <li>Clearing browser data removes the saved state.</li>
+      <li>Export happens only when you choose the export action.</li>
+      <li>Use anonymized shorthand for sensitive career stories, especially on a shared device.</li>
+    </ul>
+
+    <h2>Email subscriptions</h2>
+    <p>No subscription is required to read or practice. If a MailerLite form appears and you choose to subscribe, MailerLite processes the email address and any other fields you submit. Emails can include open and link measurement, and every marketing email must include an unsubscribe link.</p>
+    <p>Read the <a href="https://www.mailerlite.com/legal/privacy-policy" rel="noopener">MailerLite privacy policy</a>. To update or remove a mlmentorship subscription, use the unsubscribe link or contact <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+
+    <h2>Hosting and public feedback</h2>
+    <p>GitHub Pages hosts the static site and may process ordinary connection data under the <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub privacy statement</a>.</p>
+    <p>If you file a public correction through GitHub, the issue, account name, and text are public. Use email for a private correction. Do not submit confidential interview material, personal data, or employer-protected information.</p>
+
+    <h2>External links</h2>
+    <p>External websites have their own privacy practices. Opening a link to GitHub, MailerLite, GoatCounter, the author’s personal site, or another source leaves mlmentorship.</p>
+
+    <h2>Questions or requests</h2>
+    <p>For a privacy question, access request, correction, or deletion request related to information controlled by mlmentorship, email <a href={`mailto:${SITE.email}?subject=mlmentorship%20privacy`}>{SITE.email}</a>. A provider may require a separate request for data it controls.</p>
+
+    <h2>Changes</h2>
+    <p>Material changes will be dated on this page. The site will not begin transmitting Workbook answers or notes without an explicit product and privacy change.</p>
+  </article>
+</BaseLayout>
+
+<style>
+  .policy-page { width: min(100%, var(--measure)); margin: 0 auto; padding: clamp(1.7rem, 4vw, 3rem) var(--gutter) 4rem; }
+  .kicker { margin: 0 0 .4rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+  .policy-page h1 { max-width: 36rem; margin: 0 0 .55rem; }
+  .lede { max-width: 39rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1rem; line-height: 1.55; }
+  .updated { margin: 1rem 0 0; color: var(--c-muted); font-size: .72rem; }
+  .policy-page h2 { margin-top: 2rem; }
+  .policy-page p, .policy-page li { line-height: 1.62; }
+</style>

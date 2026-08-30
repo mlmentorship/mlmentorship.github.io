@@ -43,17 +43,12 @@ export const SITE = {
   },
   // Feature flags
   features: {
-    // Show mock-interview booking CTAs (header nav, footer button, in-content CTA, home band).
-    // Default off until the site has traction; the /interview/ page itself stays live and
-    // is reachable from /about/ for anyone who lands directly.
-    bookingCTA: false,
     // Build and expose the browser-only preparation subsystem. When false,
     // navigation and Practice Mode disappear and /prep/* routes redirect to
     // the core Questions library.
     prepTools: import.meta.env.PUBLIC_PREP_TOOLS === undefined || import.meta.env.PUBLIC_PREP_TOOLS === 'true',
   },
   // Keep the header short. The wordmark links to the table of contents.
-  // Mock-interview link is appended dynamically when bookingCTA is enabled.
   // URLs unchanged to preserve search-engine indexing and any inbound links.
   nav: [
     { label: 'Contents', href: '/' },

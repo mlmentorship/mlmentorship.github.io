@@ -14,9 +14,7 @@ function isActive(href: string) {
 }
 
 const visibleNav = SITE.nav.filter((item) => item.href !== '/prep/' || SITE.features.prepTools);
-const navItems: Array<{ label: string; href: string; external?: boolean }> = SITE.features.bookingCTA
-  ? [...visibleNav.slice(0, -1), { label: 'Mock', href: '/interview/' }, visibleNav[visibleNav.length - 1]]
-  : [...visibleNav];
+const navItems: Array<{ label: string; href: string; external?: boolean }> = [...visibleNav];
 ---
 
 <header class="masthead" data-pagefind-ignore="all">

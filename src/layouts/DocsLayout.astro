@@ -2,7 +2,6 @@
 import type { MarkdownHeading } from 'astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
-import MockCTA from '../components/MockCTA.astro';
 import PracticeMode from '../components/PracticeMode.astro';
 import CompletionToggle from '../components/CompletionToggle.astro';
 import BookReaderNav from '../components/BookReaderNav.astro';
@@ -41,6 +40,8 @@ const displayDate = reviewed ?? updated ?? date;
 const displayDateLabel = reviewed ? 'Reviewed' : updated ? 'Updated' : 'Published';
 const scopePriority = priority ?? libraryLocation?.chapter.priority;
 const scopeDifficulty = difficulty ?? libraryLocation?.chapter.difficulty;
+const correctionIssueUrl = `https://github.com/mlmentorship/mlmentorship.github.io/issues/new?title=${encodeURIComponent(`[Correction] ${title}`)}&body=${encodeURIComponent(`Page: ${SITE.url}/${category}/${slug}/\nTitle: ${title}\n\nWhat is incorrect or unclear?\n\n\nProposed correction\n\n\nSupporting evidence\n\n\nPlease do not include confidential, proprietary, personal, or secret information.`)}`;
+const correctionEmailUrl = `mailto:${SITE.email}?subject=${encodeURIComponent(`Correction: ${title}`)}&body=${encodeURIComponent(`Page: ${SITE.url}/${category}/${slug}/\n\nWhat is incorrect or unclear?\n\n`)}`;
 
 const categoryPosts = (await getCollection('posts', ({ data }) => !data.draft && data.category === category))
   .map((entry) => ({
@@ -176,7 +177,7 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
         </div>
       </nav>
 
-      {SITE.features.bookingCTA && category === 'questions' && <MockCTA />}
+      <p class="correction-link" data-pagefind-ignore="all">Found an error or stale claim? <a href={correctionIssueUrl} rel="noopener">Report a correction <span aria-hidden="true">↗</span></a> or <a href={correctionEmailUrl}>send a private note</a>.</p>
       </article>
     </div>
   </div>
@@ -328,6 +329,14 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
     overflow-wrap: anywhere;
   }
   .journey-link--next { text-align: right; }
+  .correction-link {
+    max-width: var(--measure);
+    margin: 1rem auto 0;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .68rem;
+  }
+  .correction-link a { color: var(--c-text-soft); }
 
   @media (max-width: 800px) {
     .docs-shell {

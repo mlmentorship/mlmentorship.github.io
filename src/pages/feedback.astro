@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../consts';
+
+const issueUrl = 'https://github.com/mlmentorship/mlmentorship.github.io/issues/new?template=content-correction.yml';
+const emailUrl = `mailto:${SITE.email}?subject=mlmentorship%20correction`;
+---
+
+<BaseLayout title="Corrections and feedback" description="Report a technical error, stale claim, broken link, or useful missing edge case in mlmentorship.">
+  <article class="feedback-page">
+    <p class="kicker">Corrections</p>
+    <h1>Help keep the field guide accurate.</h1>
+    <p class="lede">Report technical errors, stale claims, broken links, unclear explanations, or missing edge cases. Specific corrections with evidence are especially useful.</p>
+
+    <div class="feedback-actions">
+      <a class="primary" href={issueUrl} rel="noopener">Open a public correction issue <span aria-hidden="true">↗</span></a>
+      <a href={emailUrl}>Email a private correction</a>
+    </div>
+
+    <h2>Include</h2>
+    <ul>
+      <li>the page URL;</li>
+      <li>the exact statement or behavior that needs correction;</li>
+      <li>the proposed replacement or missing qualification;</li>
+      <li>a primary source, reproducible example, or short derivation when available.</li>
+    </ul>
+
+    <h2>Do not include</h2>
+    <ul>
+      <li>confidential or proprietary interview questions;</li>
+      <li>employer-protected documents or internal hiring material;</li>
+      <li>personal candidate information;</li>
+      <li>API keys, credentials, private repository content, or customer data.</li>
+    </ul>
+
+    <h2>Other suggestions</h2>
+    <p>Topic requests and usability feedback are welcome. Explain the role, interview round, or task the suggestion would support.</p>
+
+    <p class="privacy-note">A GitHub issue is public. Email is more appropriate for a private note. See the <a href="/privacy/">privacy page</a> for details.</p>
+  </article>
+</BaseLayout>
+
+<style>
+  .feedback-page { width: min(100%, var(--measure)); margin: 0 auto; padding: clamp(1.7rem, 4vw, 3rem) var(--gutter) 4rem; }
+  .kicker { margin: 0 0 .4rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+  .feedback-page h1 { margin: 0 0 .55rem; }
+  .lede { max-width: 39rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1rem; line-height: 1.55; }
+  .feedback-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem 1rem; margin: 1.2rem 0 2rem; }
+  .feedback-actions a { font-size: .8rem; font-weight: 650; }
+  .feedback-actions .primary { display: inline-flex; gap: .45rem; padding: .62rem .8rem; border: 1px solid var(--c-accent-fill); border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); text-decoration: none; }
+  .feedback-actions .primary:hover { background: var(--c-link-hover); }
+  .feedback-page h2 { margin-top: 1.8rem; }
+  .feedback-page p, .feedback-page li { line-height: 1.62; }
+  .privacy-note { margin-top: 2rem; padding-top: .8rem; border-top: 1px solid var(--c-rule); color: var(--c-muted); font-size: .78rem; }
+  @media (max-width: 520px) { .feedback-actions { align-items: stretch; flex-direction: column; } .feedback-actions a { width: 100%; text-align: center; } .feedback-actions .primary { justify-content: center; } }
+</style>

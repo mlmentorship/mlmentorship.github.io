@@ -16,6 +16,7 @@ export default defineConfig({
     '/story-bank': prepToolsEnabled ? '/prep/story-bank' : '/questions',
     '/plans': prepToolsEnabled ? '/prep/plans' : '/questions',
     '/final-week': prepToolsEnabled ? '/prep/final-week' : '/questions',
+    '/interview': { status: 302, destination: '/about' },
     '/library/specialist-domains': '/library/vision-language-speech',
   },
   integrations: [
