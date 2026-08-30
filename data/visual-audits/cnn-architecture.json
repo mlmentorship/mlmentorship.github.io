@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "slug": "cnn-architecture",
+  "article": "src/content/posts/2025-09-15-cnn-architecture.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Follow the central CNN shape transformation: deeper stages trade spatial resolution for more channels while each unit sees a larger receptive field.",
+  "mediumRationale": "A single deterministic feature-pyramid SVG is the smallest medium that aligns three changes that prose lists separately: height and width shrink, channel count grows, and receptive field expands. Direct stage labels and dimension annotations make the architecture readable without animation or a legend.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show layer order but cannot clearly encode changing feature-map width, depth, and receptive-field size.",
+    "svg": "Selected: deterministic geometry can make spatial size, stack depth, and receptive-field growth comparable while retaining direct labels, responsive scaling, theme tokens, and print output.",
+    "semanticHtml": "Rejected: cards or a table could list tensor shapes but would not make the opposing spatial and channel trends visible at a glance.",
+    "interaction": "Rejected: stepping through layers would hide simultaneous comparison and add state to a fixed architectural invariant.",
+    "paperReuse": "Rejected: the local deck and reviewed papers contain architecture figures, but their layouts are denser than the reading column and figure reuse permission is either unclear or unnecessary. No external artwork, data, or layout is copied.",
+    "noVisual": "Rejected: prose names shrinking resolution, increasing abstraction, and receptive-field growth in separate sections, leaving readers to mentally combine them into one feature hierarchy."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 147,
+        "insight": "The preceding image-classification slide establishes an image as a width-by-height-by-channel array and surveys visual variation, providing the tensor context for a CNN input."
+      },
+      {
+        "page": 148,
+        "insight": "The dedicated CNN slide describes local filters, pooling, shared weights, spatial hierarchies, and residual connections; its small embedded LeNet-style diagram shows feature maps narrowing through convolution and subsampling but is too dense and unattributed for reuse."
+      },
+      {
+        "page": 149,
+        "insight": "The following Faster R-CNN slide gives a concrete backbone transformation from a 640 by 800 by 3 image to a 40 by 50 by 1024 feature map, demonstrating the resolution-down, channels-up pattern in a downstream detector."
+      }
+    ],
+    "notes": "The complete 214-page deck was text-indexed page by page for CNN, convolution, receptive field, weight sharing, and translation equivariance. All hits were reviewed. Page 20 only mentions convolution and downsampling for wavelets; pages 50, 60, 111-112, 118, 122, and 128 use CNNs in normalization, debugging, sparse-attention, speech, or efficiency contexts rather than explaining the image hierarchy. Pages 147-150 were rendered and inspected as the exact neighborhood around the dedicated CNN slide. Pages 147-149 are the relevant sequence; no deck artwork or layout is reused.",
+    "license": "The local deck provides no explicit license or source attribution for the page-148 architecture image. It is treated as review-only material, and the implementation is an original construction."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A guide to convolution arithmetic for deep learning",
+        "url": "https://arxiv.org/abs/1603.07285",
+        "usage": "Used as an authoritative technical reference for sparse local connectivity, parameter reuse, input and output feature maps, and the effects of kernel size, stride, and padding on spatial dimensions.",
+        "license": "The arXiv record makes the paper publicly readable but does not by itself establish broad figure-reuse rights. No paper figure, examples, values, or layout is copied."
+      },
+      {
+        "title": "PyTorch Conv2d documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv2d.html",
+        "usage": "Used as official framework documentation to verify input and output channel semantics and the output-shape dependence on stride, padding, dilation, and kernel size.",
+        "license": "PyTorch documentation is distributed with the PyTorch project under its BSD-style license, but no documentation text, code, or artwork is reproduced."
+      },
+      {
+        "title": "A ConvNet for the 2020s",
+        "url": "https://arxiv.org/abs/2201.03545",
+        "usage": "Used as the primary ConvNeXt paper to verify the article's modern-CNN context and the importance of sliding-window computation and translation-equivariant inductive bias.",
+        "license": "No permissive figure-reuse license was established from the reviewed record. No ConvNeXt result, figure, data, or layout is reproduced."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access to an arXiv paper is not automatically permission to adapt or reuse its figures; reuse depends on the submitter-selected license.",
+        "license": "This is licensing guidance only. The implementation avoids paper reuse and uses original geometry."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the coordinated shape change through a CNN: spatial grids get smaller, feature depth grows, and later units integrate a larger part of the original image. The visual uses illustrative tensor dimensions rather than paper-specific architecture data and does not claim one mandatory CNN recipe."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected the exact pages 147-150 neighborhood plus the page-20 mechanics context, and checked an authoritative convolution guide, official PyTorch semantics, ConvNeXt, and arXiv licensing guidance before selecting an original feature-pyramid SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "cnn-spatial-channel-pyramid"
+    ],
+    "accessibility": "The SVG includes a title and detailed description, direct tensor-shape labels, numbered stages, distinct rectangle-stack depth, solid and dashed trend arrows, and explicit receptive-field text so no inference depends on color. Its 360-pixel viewBox scales without horizontal scrolling at a 390 CSS-pixel viewport; shared theme variables preserve dark-mode contrast and the established learning-figure print palette provides light high-contrast output."
+  }
+}

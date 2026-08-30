@@ -39,7 +39,7 @@ This is L5. You've named the unrolling, the memory and gradient problems, and th
 <figure class="learning-figure" aria-labelledby="bptt-boundary-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="bptt-boundary-title">What does truncated BPTT detach: the recurrent state or the gradient path?</p>
-	<div class="visual-grid--two" role="group" aria-label="Full and truncated backpropagation through time compared">
+	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="group" aria-label="Full and truncated backpropagation through time compared">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 340 200" role="img" aria-labelledby="bptt-full-title bptt-full-desc">
 				<title id="bptt-full-title">Full backpropagation reaches every unrolled recurrent state</title>

@@ -58,7 +58,7 @@ This shows: you know the textbook, you know its limits, and you know what change
 		<path class="viz-axis" d="M46 28V224H344M42 80H46M42 128H46M42 176H46"></path>
 		<text class="viz-axis-label" x="82" y="20" text-anchor="middle">CLASSICAL REGIME</text>
 		<text class="viz-axis-label" x="277" y="20" text-anchor="middle">OVERPARAMETERIZED REGIME</text>
-		<text class="viz-label" x="18" y="132" text-anchor="middle" transform="rotate(-90 18 132)">expected error</text>
+		<text class="viz-label" x="52" y="218">expected error</text>
 		<text class="viz-label" x="195" y="271" text-anchor="middle">effective model capacity</text>
 		<path class="viz-operating-guide" d="M216 32V224"></path>
 		<text class="viz-callout" x="222" y="49">interpolation</text>
@@ -67,8 +67,8 @@ This shows: you know the textbook, you know its limits, and you know what change
 		<path class="viz-baseline" d="M55 82C99 111 154 183 216 207H331"></path>
 		<circle class="viz-operating-point" cx="139" cy="157" r="4"></circle>
 		<text class="viz-callout" x="139" y="179" text-anchor="middle">classical minimum</text>
-		<text class="viz-callout" x="291" y="147">solid: test error</text>
-		<text class="viz-label" x="262" y="203">dashed: training error ≈ 0</text>
+		<text class="viz-callout" x="330" y="147" text-anchor="end">solid: test error</text>
+		<text class="viz-label" x="330" y="203" text-anchor="end">dashed: training error ≈ 0</text>
 		<path class="viz-axis" d="M210 231L216 237L222 231"></path>
 		<text class="viz-label" x="216" y="250" text-anchor="middle">training set first fit</text>
 	</svg>
