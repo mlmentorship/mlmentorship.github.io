@@ -52,6 +52,59 @@ Restrict the sampling pool to the smallest set of tokens whose cumulative probab
 - $p = 0.9$ is the modern default.
 - Adapts to the entropy of each step: confident steps sample from a small set, uncertain steps from a larger one. The standard choice for open-ended generation.
 
+<!-- visual:decoding-fixed-count-adaptive-mass -->
+<figure class="learning-figure" aria-labelledby="decoding-support-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="decoding-support-title">Why does top-p adapt while top-k does not?</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of top-k and top-p candidate supports for confident and uncertain next-token distributions">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 266" role="img" aria-labelledby="decoding-confident-title decoding-confident-desc">
+				<title id="decoding-confident-title">Candidate supports for a confident distribution</title>
+				<desc id="decoding-confident-desc">Seven sorted token probabilities are 72, 12, 6, 4, 3, 2, and 1 percent. Top-k with k equals 3 always keeps tokens A through C and captures 90 percent mass. Top-p with p equals 0.80 keeps only A and B, the smallest prefix reaching at least 80 percent, and captures 84 percent mass.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="232" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">CONFIDENT NEXT TOKEN</text>
+				<path class="viz-gridline" d="M18 160H282"></path>
+				<g class="viz-label" text-anchor="middle">
+					<rect class="viz-node viz-node--focus" x="20" y="52" width="26" height="108"></rect><text x="33" y="47">72%</text><text x="33" y="176">A</text>
+					<rect class="viz-node" x="58" y="142" width="26" height="18"></rect><text x="71" y="137">12%</text><text x="71" y="176">B</text>
+					<rect class="viz-node" x="96" y="151" width="26" height="9"></rect><text x="109" y="146">6%</text><text x="109" y="176">C</text>
+					<rect class="viz-node" x="134" y="154" width="26" height="6"></rect><text x="147" y="149">4%</text><text x="147" y="176">D</text>
+					<rect class="viz-node" x="172" y="155" width="26" height="5"></rect><text x="185" y="150">3%</text><text x="185" y="176">E</text>
+					<rect class="viz-node" x="210" y="156" width="26" height="4"></rect><text x="223" y="151">2%</text><text x="223" y="176">F</text>
+					<rect class="viz-node" x="248" y="156" width="26" height="4"></rect><text x="261" y="151">1%</text><text x="261" y="176">G</text>
+				</g>
+				<path d="M20 190V196H122V190" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<text class="viz-callout" x="71" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 90% mass</text>
+				<path d="M20 220V226H84V220" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 3"></path>
+				<text class="viz-callout" x="20" y="243">top-p = .80 · 2 tokens · 84% mass</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 266" role="img" aria-labelledby="decoding-uncertain-title decoding-uncertain-desc">
+				<title id="decoding-uncertain-title">Candidate supports for an uncertain distribution</title>
+				<desc id="decoding-uncertain-desc">Seven sorted token probabilities are 24, 20, 17, 14, 11, 8, and 6 percent. Top-k with k equals 3 still keeps tokens A through C but now captures only 61 percent mass. Top-p with p equals 0.80 expands through token E, the smallest prefix reaching at least 80 percent, and captures 86 percent mass.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="232" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">UNCERTAIN NEXT TOKEN</text>
+				<path class="viz-gridline" d="M18 160H282"></path>
+				<g class="viz-label" text-anchor="middle">
+					<rect class="viz-node viz-node--focus" x="20" y="88" width="26" height="72"></rect><text x="33" y="83">24%</text><text x="33" y="176">A</text>
+					<rect class="viz-node" x="58" y="100" width="26" height="60"></rect><text x="71" y="95">20%</text><text x="71" y="176">B</text>
+					<rect class="viz-node" x="96" y="109" width="26" height="51"></rect><text x="109" y="104">17%</text><text x="109" y="176">C</text>
+					<rect class="viz-node" x="134" y="118" width="26" height="42"></rect><text x="147" y="113">14%</text><text x="147" y="176">D</text>
+					<rect class="viz-node" x="172" y="127" width="26" height="33"></rect><text x="185" y="122">11%</text><text x="185" y="176">E</text>
+					<rect class="viz-node" x="210" y="136" width="26" height="24"></rect><text x="223" y="131">8%</text><text x="223" y="176">F</text>
+					<rect class="viz-node" x="248" y="142" width="26" height="18"></rect><text x="261" y="137">6%</text><text x="261" y="176">G</text>
+				</g>
+				<path d="M20 190V196H122V190" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<text class="viz-callout" x="71" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 61% mass</text>
+				<path d="M20 220V226H198V220" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 3"></path>
+				<text class="viz-callout" x="20" y="243">top-p = .80 · 5 tokens · 86% mass</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the solid top-k brackets first: both keep exactly three tokens, although their captured probability mass falls from 90% to 61%. Then compare the dashed top-p brackets: the candidate pool expands from two tokens to five so that each pool reaches the 80% mass threshold. Probabilities are renormalized over the retained pool before sampling.</figcaption>
+</figure>
+
 ### Min-p sampling
 
 Restrict to tokens with probability at least $p_{\min} \cdot \max_x p(x)$. Closer to "filter out implausible options" than nucleus's "keep the top mass."

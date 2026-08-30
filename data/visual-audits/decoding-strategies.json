@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "decoding-strategies",
+  "article": "src/content/posts/2026-05-07-decoding-strategies.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why a fixed top-k candidate count can capture very different probability mass at confident and uncertain decoding steps, while top-p changes the candidate count to reach a fixed cumulative-mass threshold.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold two sorted next-token distributions side by side and measure both candidate count and captured probability mass for top-k and top-p.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can state the filtering rules but cannot encode token probabilities, cumulative mass, or the changing support width.",
+    "svg": "Selected because fixed bars, directly labelled probabilities, and solid versus dashed support brackets make count and mass simultaneously inspectable in two controlled distributions.",
+    "semanticHtml": "Rejected because a table can verify the arithmetic but weakens the spatial lesson that one support stays the same width while the other expands with uncertainty.",
+    "interaction": "Rejected because sliders for k, p, or logits add controls and mutable state without improving the article's single transferable contrast; two deterministic examples expose it directly.",
+    "paperReuse": "Rejected because the nucleus-sampling paper contains empirical figures but none is needed for this analytic count-versus-mass comparison. No reuse permission is assumed, and no source figure, data, layout, or wording is copied.",
+    "noVisual": "Rejected because the prose defines top-k and top-p separately but does not make their central difference visible: fixed count yields variable captured mass, while fixed mass yields variable count."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The tokenization-and-perplexity slide establishes next-token probability and language-model evaluation context but does not show how a decoder truncates a distribution."
+      },
+      {
+        "page": 99,
+        "insight": "The neighboring text-representation slide describes autoregressive language modeling and forward factorization, supplying the per-step conditional-distribution context."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide describes a draft model proposing candidate tokens and a target model verifying them, but its goal is lossless acceleration rather than changing the sampling support."
+      },
+      {
+        "page": 115,
+        "insight": "The adjacent training-and-serving stack names speculative decoding in the serving stack but provides no comparison of greedy, beam, temperature, top-k, or top-p behavior."
+      },
+      {
+        "page": 125,
+        "insight": "The CTC slide maps frame-level probabilities to output-sequence probabilities and discusses decoding alignments, a distinct structured decoding problem rather than autoregressive truncation sampling."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for decoding, greedy, beam search, sampling, temperature, top-k, top-p, nucleus, candidate token, and autoregressive generation. The full neighboring ranges 98-100, 112-115, and 124-126 were extracted and inspected. Pages 100, 112, 114, 124, and 126 provide BERT, attention, mixed-precision, acoustic-model, and sequence-model context but no next-token sampling comparison. No slide defines top-k or nucleus sampling, and no deck image, probabilities, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The Curious Case of Neural Text Degeneration",
+        "url": "https://arxiv.org/abs/1904.09751",
+        "usage": "Used as the primary nucleus-sampling paper to verify that top-p dynamically expands and contracts the smallest high-probability prefix, unlike fixed top-k, and that truncation removes the unreliable probability tail before renormalized sampling.",
+        "license": "The arXiv record grants arXiv a perpetual non-exclusive distribution license, not general permission to reuse figures. No paper figure, prose, experimental data, generated text, or layout is reproduced; the two distributions and all geometry are original."
+      },
+      {
+        "title": "Hierarchical Neural Story Generation",
+        "url": "https://arxiv.org/abs/1805.04833",
+        "usage": "Used as the primary source cited by the article for top-k sampling in long-form generation and cross-checked against the later nucleus-sampling paper's fixed-k comparison.",
+        "license": "The arXiv record is publicly readable, but public access is not treated as figure-reuse permission. No paper figure, story, model diagram, prose, or empirical result is copied."
+      },
+      {
+        "title": "Transformers GenerationConfig documentation",
+        "url": "https://huggingface.co/docs/transformers/main/en/main_classes/text_generation",
+        "usage": "Used as official implementation documentation to verify that top-k retains a specified number of highest-probability vocabulary tokens and top-p retains the smallest most-probable set whose probabilities sum to the threshold or higher.",
+        "license": "Transformers source and documentation are distributed with the Apache-2.0-licensed project. No documentation wording, source code, example output, or interface design is reproduced."
+      }
+    ],
+    "notes": "The visual uses two original synthetic distributions, each sorted from token A to G and summing to one. In the confident case, probabilities 0.72, 0.12, 0.06, 0.04, 0.03, 0.02, and 0.01 make top-k=3 capture 0.90 while top-p=0.80 stops after two tokens at 0.84. In the uncertain case, probabilities 0.24, 0.20, 0.17, 0.14, 0.11, 0.08, and 0.06 make the same top-k capture 0.61 while top-p expands to five tokens and 0.86. The examples demonstrate support selection only; retained probabilities must be renormalized before sampling."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected three relevant slide neighborhoods, then checked the primary top-k and nucleus-sampling papers plus official Transformers generation definitions before selecting an original count-versus-mass comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "decoding-fixed-count-adaptive-mass"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description with every probability, retained token range, count, and mass. Solid brackets always denote top-k and dashed brackets always denote top-p; direct labels and bar geometry carry the comparison without color. The established two-panel primitive stacks below 640 CSS pixels, and each 300-unit viewBox has no minimum width, keeping it readable at 390 CSS pixels. Existing theme variables support dark mode, while shared print tokens provide a light high-contrast palette and keep the figure together."
+  }
+}
