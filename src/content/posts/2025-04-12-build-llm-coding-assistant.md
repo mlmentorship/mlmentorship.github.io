@@ -72,7 +72,6 @@ flowchart TB
   class Trigger,Buffer viz-input
   class Index viz-state
   class Ghost,Deep viz-output
-  class Scope,Trigger,Buffer,Index,Prompt,Fast,Ghost,InlineEval,Deep,TaskEval viz-compact
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> choose the product and latency contract before choosing the model. Follow the inline branch: a cancelable IDE event combines prefix and suffix with a small set of retrieved repository chunks, then a fast model returns ghost text and logs acceptance-quality evidence. Function, chat, and agentic work belongs on the separate seconds-budget branch and needs task-level verification. Original schematic informed by the <a href="https://arxiv.org/abs/2207.14255">FIM paper</a>, <a href="https://arxiv.org/abs/2303.12570">RepoCoder</a>, and <a href="https://docs.github.com/en/copilot/concepts/context/repository-indexing">GitHub's repository-indexing documentation</a>.</p>
 

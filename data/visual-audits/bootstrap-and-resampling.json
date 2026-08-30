@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "bootstrap-and-resampling",
+  "article": "src/content/posts/2026-08-28-bootstrap-and-resampling.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Identify the independent sampling unit and keep every dependent observation attached to it when constructing a bootstrap replicate.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can show nested events moving together when users are sampled and contrast that valid replicate with row-wise resampling that breaks dependence. Fixed geometry and direct labels make group boundaries, repetition, omission, and pairing visible without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can state the resampling steps but cannot clearly preserve nested event membership or contrast two concrete replicate compositions at phone width.",
+    "svg": "Selected: deterministic brackets, repeated group outlines, row labels, and an explicit invalid cross-group sample expose the resampling-unit decision spatially in one static figure.",
+    "semanticHtml": "Rejected: the article already provides a semantic table of data structures and units; another table would not show what is kept together when a unit is repeated or omitted.",
+    "interaction": "Rejected: generating random replicates would add controls and variable examples when one fixed counterexample is enough to teach the invariant.",
+    "paperReuse": "Rejected: the foundational paper, textbook, and official documentation explain bootstrap procedures but no reviewed figure isolates clustered resampling for this article, and permissive figure-reuse rights were not established.",
+    "noVisual": "Rejected: prose can name the correct unit, but readers must still mentally transform nested rows into a replicate while preserving dependence; the wrong row-wise replicate is especially difficult to diagnose without a spatial comparison."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 16,
+        "insight": "The parameter-learning slide defines estimator variance across different realizations of the population and calls its square root the standard error, providing the uncertainty target that bootstrap replicates approximate."
+      },
+      {
+        "page": 24,
+        "insight": "The preceding K-nearest-neighbor slide stores individual samples but contains no resampling procedure or discussion of dependent observations."
+      },
+      {
+        "page": 25,
+        "insight": "The random-forest slide says trees are trained on bootstrapped dataset versions and shows row-index sampling with replacement, but it uses bootstrap for ensembling and does not discuss uncertainty, pairing, clusters, or selection of the independent unit."
+      },
+      {
+        "page": 26,
+        "insight": "The following slide returns to decision-tree split criteria and adds no bootstrap interpretation or guidance about resampling units."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for bootstrap, resampling, sampling distribution, standard error, confidence interval, paired, and block-bootstrap terms. Page 16 was inspected for the estimator-variance context. The only bootstrap-specific result was page 25, so its neighboring pages 24 and 26 were also inspected. The deck's row-wise random-forest code is not generalized to clustered evaluation data, and no deck artwork, code, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Bootstrap Methods: Another Look at the Jackknife",
+        "url": "https://doi.org/10.1214/aos/1176344552",
+        "usage": "Used as the foundational primary paper to verify the empirical-distribution bootstrap: resample observations with replacement and recompute the statistic to estimate sampling behavior.",
+        "license": "The paper is publisher-copyrighted and no permissive figure-reuse license was identified. No figure, prose, notation sequence, or example is copied; only the established statistical method informs the original schematic."
+      },
+      {
+        "title": "SciPy API reference: scipy.stats.bootstrap",
+        "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html",
+        "usage": "Used as official implementation documentation to verify resampling with replacement, bootstrap standard errors and intervals, and common-index resampling for paired-sample statistics.",
+        "license": "SciPy documentation is distributed under the SciPy project's BSD license, but no code, prose, data, or documentation figure is reused. The source is cited only to cross-check procedure semantics."
+      },
+      {
+        "title": "Bootstrap Methods and Their Application",
+        "url": "https://doi.org/10.1017/CBO9780511802843",
+        "usage": "Used as an authoritative textbook reference for bootstrap sampling, dependent data, and resampling methods that preserve the structure represented by the sampling unit.",
+        "license": "The Cambridge University Press book is copyrighted and no permissive figure-reuse license was identified. No book text or artwork is adapted; the visual uses original synthetic labels and geometry."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the resampled object must match the independently sampled population unit, even when the dataset stores several dependent rows per unit. The original teaching example has three users with two events each. A valid replicate draws users U3, U1, U3 and carries both events and paired model outcomes each time; an invalid row bootstrap draws detached events from several users. The labels are synthetic, no empirical quantities are claimed, and all meaning is directly encoded rather than borrowed from a source figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact bootstrap and estimator-variance neighborhoods, then checked the foundational paper, an authoritative bootstrap textbook, and official SciPy documentation before selecting an original clustered-resampling comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "bootstrap-resampling-unit"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. User IDs, event labels, enclosing group boxes, repeated-copy labels, a crossed invalid replicate, and explicit valid versus invalid headings carry all meaning without color. Its 360-pixel viewBox has no minimum width and scales below 390 CSS pixels; established theme variables provide dark-mode contrast, and shared print rules provide a light high-contrast palette and prevent a page break inside the figure."
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "slug": "choose-ml-product-metrics",
+  "article": "src/content/posts/2026-07-10-choose-ml-product-metrics.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Separate metrics that authorize or veto a product launch from metrics that only explain behavior or qualify a model for online testing.",
+  "mediumRationale": "A two-panel semantic decision card is the smallest medium that groups metrics by decision authority rather than presenting another undifferentiated dashboard.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would overstate a temporal process when the lesson is a stable hierarchy of decision rights.",
+    "svg": "Rejected: fixed drawing geometry adds no quantitative shape or relationship that semantic headings and grouped text cannot express more accessibly.",
+    "semanticHtml": "Selected: two directly labelled groups make the launch gate and supporting evidence distinct, reflow naturally at phone width, and remain fully readable without graphics.",
+    "interaction": "Rejected: changing thresholds would imply product-specific values and add state without clarifying which metric classes have launch authority.",
+    "paperReuse": "Rejected: the sources provide frameworks and guidance, but no single figure expresses this article's primary-plus-guardrail ship rule; reuse permissions are also not assumed.",
+    "noVisual": "Rejected: prose defines each class separately but leaves readers to infer which classes decide, veto, explain, or qualify."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 140,
+        "insight": "The preceding recommender slide describes the ranking model and training labels but does not connect model scores to a product launch decision."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation-and-launch slide explicitly separates offline recall and mean reciprocal rank from online search engagement and seven-day return, establishing that model evaluation and product outcomes answer different questions."
+      },
+      {
+        "page": 142,
+        "insight": "The following slide moves to a recommendation prompt example, marking the end of the local experimentation sequence without adding a metric hierarchy."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview names four distinct classes: goal metrics, leading indicators, debug metrics, and guardrails that are not directly optimized."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks teams to report offline metrics, business impact estimation, and an online experiment design, but does not state which signal has authority to ship or veto."
+      },
+      {
+        "page": 163,
+        "insight": "The content-feed example begins with the product goal, current metrics, optimization target, and relevant live-data signals before model selection."
+      },
+      {
+        "page": 164,
+        "insight": "The adjacent experimentation step asks for a hypothesis, offline evaluation, online evaluation, satisfaction tracking, and a response when metrics disagree."
+      },
+      {
+        "page": 165,
+        "insight": "Project setup separates goals, user experience, performance constraints, training evaluation, and inference-time user reactions."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide asks which constraints gate the model and which user feedback and reactions should be monitored after launch."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of ML summary recommends one simple, observable, attributable first objective while warning that launch decisions depend on more than one metric."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for product, business, online, offline, evaluation, goal, guardrail, debug, monitoring, experimentation, and launch metrics. Pages 140-142 and 160-169 were read as the two relevant neighborhoods; pages 141, 161-165, 168, and 169 were also rendered and visually inspected. The deck provides the ingredients for a hierarchy but never makes decision authority explicit: which signal authorizes, which vetoes, and which only explains. No deck image, wording, metric value, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Measuring the User Experience on a Large Scale: User-Centered Metrics for Web Applications",
+        "url": "https://research.google.com/pubs/archive/36299.pdf",
+        "usage": "Used as the primary HEART and Goals-Signals-Metrics reference to verify that teams should begin with product goals, identify behavioral or attitudinal signals, and only then operationalize metrics rather than starting from available dashboard numbers.",
+        "license": "The author-hosted CHI paper carries ACM copyright and no permissive figure-reuse license was identified. No paper prose, examples, data, or figure structure is copied."
+      },
+      {
+        "title": "Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing",
+        "url": "https://www.cambridge.org/core/books/trustworthy-online-controlled-experiments/D97B26382EB0EB2DC2019A7A7B518F59",
+        "usage": "Used as an authoritative experimentation textbook to check the role of an overall evaluation criterion, pre-specified decision criteria, guardrails, and trustworthy online evidence.",
+        "license": "The Cambridge University Press book is copyrighted and no open figure license was identified. No text, data, figure, or layout is reproduced."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as official engineering guidance to verify the recommendations to design metrics early, start with a simple observable and attributable objective, and use multiple metrics when making launch decisions.",
+        "license": "Google Developers page content is generally CC BY 4.0 except where noted, but no wording or artwork is adapted. The visual is independently authored from the article's metric classes."
+      },
+      {
+        "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as authoritative public-sector guidance to verify that AI evaluation should incorporate trustworthiness and risks to people, organizations, and society rather than optimize product benefit in isolation.",
+        "license": "NIST states that unmarked NIST information is public information that may be copied with appropriate credit, subject to exceptions and possible foreign copyright. No NIST text or figure is reused."
+      }
+    ],
+    "notes": "The hardest mental model is decision authority, not metric enumeration. A primary product outcome supplies affirmative evidence for the chosen goal; pre-set guardrails can block launch despite that gain; diagnostics and offline evaluation guide investigation and candidate selection but cannot independently establish user value. The metric names in the card are original examples drawn from the article, not empirical thresholds or a universal scorecard."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and visually inspected the two relevant slide neighborhoods, then checked the primary HEART paper, an authoritative controlled-experiment textbook, official Google ML engineering guidance, and NIST AI risk guidance before selecting an original semantic decision-authority card."
+  },
+  "implementation": {
+    "visualIds": [
+      "product-metric-decision-authority"
+    ],
+    "accessibility": "The figure has a linked learning question and a labelled group containing two semantic sections. Every role is directly named in text—authorize, veto, explain, or qualify—and the AND condition is written explicitly, so no meaning depends on color, icons, or position alone. The established two-column primitive stacks into one column below 640 pixels, with ordinary wrapping text and no minimum width, making it readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print tokens provide a light high-contrast palette and avoid splitting the figure across pages."
+  }
+}

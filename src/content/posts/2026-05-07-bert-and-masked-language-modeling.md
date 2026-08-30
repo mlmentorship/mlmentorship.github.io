@@ -33,7 +33,7 @@ The 10/10 random/keep split exists because at fine-tuning time there are no `[MA
 <figure class="learning-figure" aria-labelledby="bert-mlm-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="bert-mlm-title">Which tokens become MLM targets, and what input does BERT see at those positions?</p>
-	<div class="visual-grid--two" role="group" aria-label="Masked language modeling selection and corruption flow">
+	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="group" aria-label="Masked language modeling selection and corruption flow">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 230" role="img" aria-labelledby="bert-selection-title bert-selection-desc">
 				<title id="bert-selection-title">Fifteen percent of positions become prediction targets</title>
