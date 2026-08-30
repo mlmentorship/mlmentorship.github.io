@@ -31,6 +31,60 @@ This is right at the slogan level. Each piece has problems. You've heard A/B tes
 >
 > **3. Statistical setup**: pre-commit to primary metric and sample size. Account for novelty effects (run for at least 2-4 weeks). Cut by user segment and by query type to catch slice regressions."
 
+<!-- visual:chatbot-randomization-unit -->
+<figure class="learning-figure" aria-labelledby="chatbot-randomization-title">
+	<p class="visual-kicker">Unit of randomization</p>
+	<p class="visual-title" id="chatbot-randomization-title">Assign once per conversation, not again at every turn.</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 520" role="img" aria-labelledby="chatbot-randomization-svg-title chatbot-randomization-svg-desc">
+			<title id="chatbot-randomization-svg-title">Per-request versus per-conversation chatbot assignment</title>
+			<desc id="chatbot-randomization-svg-desc">Two panels show the same three-turn conversation. In the first, each request is randomized separately, producing Model A, then Model B, then Model A; a dashed warning states that the conversation outcome mixes both treatments. In the second, the conversation is assigned once to Model B, so all three turns use Model B and the outcome is attributable to one treatment.</desc>
+			<defs>
+				<marker id="arrow-forward" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="viz-arrow-forward" d="M0,0 L8,4 L0,8 Z"></path></marker>
+			</defs>
+			<rect class="viz-plot-bg" x="4" y="4" width="352" height="242" rx="4"></rect>
+			<text class="viz-callout" x="16" y="27">PER REQUEST: assign again at each turn</text>
+			<text class="viz-axis-label" x="16" y="55">USER TURN</text>
+			<text class="viz-axis-label" x="238" y="55">MODEL</text>
+			<text class="viz-label" x="16" y="88">1 · “Plan a trip”</text>
+			<text class="viz-label" x="16" y="128">2 · “Make it cheaper”</text>
+			<text class="viz-label" x="16" y="168">3 · “Book option two”</text>
+			<path class="viz-forward" d="M152 83 H226"></path>
+			<path class="viz-forward" d="M152 123 H226"></path>
+			<path class="viz-forward" d="M152 163 H226"></path>
+			<rect class="viz-node viz-node--input" x="236" y="66" width="104" height="28" rx="4"></rect>
+			<rect class="viz-node viz-node--focus" x="236" y="106" width="104" height="28" rx="4"></rect>
+			<rect class="viz-node viz-node--input" x="236" y="146" width="104" height="28" rx="4"></rect>
+			<text class="viz-node-value" x="288" y="84">Model A</text>
+			<text class="viz-node-value" x="288" y="124">Model B</text>
+			<text class="viz-node-value" x="288" y="164">Model A</text>
+			<path class="viz-operating-guide" d="M10 188 H350 V234 H10 Z"></path>
+			<text class="viz-callout" x="20" y="208">MIXED EXPOSURE</text>
+			<text class="viz-label" x="20" y="226">One conversation outcome cannot isolate A or B.</text>
+			<rect class="viz-plot-bg" x="4" y="260" width="352" height="256" rx="4"></rect>
+			<text class="viz-callout" x="16" y="283">PER CONVERSATION: assign once</text>
+			<rect class="viz-node viz-node--focus" x="16" y="298" width="324" height="32" rx="4"></rect>
+			<text class="viz-node-value" x="178" y="318">Conversation 42 → Model B</text>
+			<text class="viz-axis-label" x="16" y="359">USER TURN</text>
+			<text class="viz-axis-label" x="238" y="359">MODEL</text>
+			<text class="viz-label" x="16" y="390">1 · “Plan a trip”</text>
+			<text class="viz-label" x="16" y="426">2 · “Make it cheaper”</text>
+			<text class="viz-label" x="16" y="462">3 · “Book option two”</text>
+			<path class="viz-forward" d="M152 385 H226"></path>
+			<path class="viz-forward" d="M152 421 H226"></path>
+			<path class="viz-forward" d="M152 457 H226"></path>
+			<rect class="viz-node viz-node--focus" x="236" y="368" width="104" height="28" rx="4"></rect>
+			<rect class="viz-node viz-node--focus" x="236" y="404" width="104" height="28" rx="4"></rect>
+			<rect class="viz-node viz-node--focus" x="236" y="440" width="104" height="28" rx="4"></rect>
+			<text class="viz-node-value" x="288" y="386">Model B</text>
+			<text class="viz-node-value" x="288" y="422">Model B</text>
+			<text class="viz-node-value" x="288" y="458">Model B</text>
+			<text class="viz-callout" x="16" y="494">COHERENT EXPOSURE · outcome belongs to B</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow each row from the user turn to its assigned model. Re-randomizing requests produces an A–B–A conversation, so a conversation-level outcome mixes treatments. Assigning conversation 42 once keeps every turn on B and makes its outcome attributable to B.</figcaption>
+</figure>
+
 This is L5. You've named the three concrete problems and the typical fixes.
 
 ## What an L6 answer adds
