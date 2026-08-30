@@ -47,6 +47,26 @@ Eight weeks later, mature creator cohorts show damage. Thirty-day retention amon
 
 The candidate must address both periods. The later result does not erase the viewer gain. The earlier viewer gain does not erase delayed creator damage.
 
+**Learning objective:** Trace how one ranking policy creates an immediate viewer-feedback loop and a delayed creator-supply loop, so evidence from the first loop does not settle the second.
+
+<!-- visual:ecosystem-delayed-feedback-loop -->
+```mermaid
+flowchart TB
+  accTitle: One ranking policy creates immediate viewer feedback and delayed creator supply feedback
+  accDescr: The ranking and exposure policy sends recommendations to viewer sessions within seconds. Viewer watch, skip, and return labels feed back within minutes to days through a solid path. The same policy allocates qualified creator exposure within hours to days. Along a dashed path, that opportunity changes creator retention and production over weeks, which changes the future catalog, candidate pool, and training data in later ranking cycles. A short viewer test closes only the fast loop.
+  Policy["Ranking and exposure policy<br/>current cycle"]
+  Viewer["Viewer sessions<br/>watch · skip · return"]
+  Creator["Creator opportunity<br/>audience tests · qualified reach"]
+  Supply["Future creator supply<br/>retention · production · catalog"]
+  Policy -->|"seconds · recommendations"| Viewer
+  Viewer -->|"minutes to days · logged labels"| Policy
+  Policy -.->|"hours to days · allocated exposure"| Creator
+  Creator -.->|"weeks · retention and production"| Supply
+  Supply -.->|"later cycles · candidates and training data"| Policy
+  class Policy,Viewer,Creator,Supply viz-compact
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid two-edge viewer loop first: a short A/B test can measure session responses quickly. Then follow the dashed creator path back to policy: exposure changes retention and production over weeks, which changes later candidates and training data. The 5.2 percent watch-time gain closes the fast loop; it cannot close the delayed loop. Original schematic informed by <a href="https://arxiv.org/abs/1710.11214">Chaney et al. on recommender feedback</a> and the <a href="https://doi.org/10.1007/s11257-019-09256-1">multistakeholder recommendation survey</a>.</p>
+
 ## Scorecard
 
 Score each dimension from 0 to 2 after every turn.

@@ -157,6 +157,35 @@ Recompute the plan with 64 accelerators, 20% maintenance loss, and 60B tokens. S
 >
 > I would move more than 14% into training only after smaller runs predict enough hard-task gain to repay the lost serving or post-training work. I would also require a protected recovery floor. A promising run is not permission to spend incident capacity.
 
+<!-- visual:fixed-capacity-portfolio-guardrails -->
+<figure class="learning-figure" aria-labelledby="fixed-capacity-portfolio-title">
+	<p class="visual-kicker">One cluster · 100% allocated</p>
+	<h3 class="visual-title" id="fixed-capacity-portfolio-title">Which claim on capacity can move, and what must stay protected?</h3>
+	<div class="visual-grid--two" role="group" aria-label="Five capacity envelopes totaling 100 percent: online serving 55 percent, continued training 14 percent, post-training 12 percent, evaluation and verifiers 9 percent, and recovery reserve 10 percent.">
+		<section class="visual-panel">
+			<h4>55% · Online serving</h4>
+			<p><strong>Protect first.</strong> Funds launch traffic, interactive decode, and admitted KV state. Reduce optional branches or route supported work to the 3B model before breaking the serving floor.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>14% · Continued training</h4>
+			<p><strong>Evidence-gated.</strong> Small mixture studies and short continuations earn one promoted run. Expand only when marginal hard-task gain repays displaced product evidence.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>12% · Post-training</h4>
+			<p><strong>Count the full loop.</strong> Rollout generation, reference-policy calls, verifier execution, and updates all spend accelerator-hours, not only gradient steps.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>9% · Evaluation and verifiers</h4>
+			<p><strong>Protect the evidence.</strong> Held-out cases, checkpoint evaluation, and verifier audits run throughout the program rather than waiting for the final checkpoint.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>10% · Recovery reserve</h4>
+			<p><strong>Do not borrow informally.</strong> Keeps room for failed hosts, checkpoint restoration, canaries, and incident response even when a training result looks promising.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the five envelopes sum to the entire usable cluster. Training can grow only by naming the work it displaces and presenting evidence for greater marginal value; serving, ongoing evaluation, and the recovery floor are explicit constraints, not leftover capacity.</figcaption>
+</figure>
+
 ### Annotation
 
 The candidate answers the political challenge with an allocation rule rather than saying research is wrong. They ask for marginal gain and name the opportunity cost.
