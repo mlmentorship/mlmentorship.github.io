@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "debug-training-loop",
+  "article": "src/content/posts/2025-12-01-debug-training-loop.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how uncleared parameter gradients and an unrestored evaluation mode persist into the next training batch as two independent state leaks.",
+  "mediumRationale": "A compact two-lane Mermaid flowchart is the smallest useful representation of state surviving across batch boundaries; the spatial continuity makes the consequences of the two omitted reset operations explicit.",
+  "mediumComparison": {
+    "mermaid": "Selected: the learning task is to follow two state transitions across time, and a compact labelled flowchart expresses that ordering without custom geometry.",
+    "svg": "Rejected: deterministic SVG would duplicate Mermaid's node-and-arrow strengths while requiring hand-positioned text and more maintenance.",
+    "semanticHtml": "Rejected: ordered lists or a comparison table can name the states but do not show the omitted transitions carrying stale state into the next batch as directly.",
+    "interaction": "Rejected: stepping through batches adds controls but no mechanism beyond the two fixed state traces.",
+    "paperReuse": "Rejected: no reviewed source contains this exact paired gradient-buffer and module-mode trace with verified figure reuse permission.",
+    "noVisual": "Rejected: prose lists the bugs independently, but the hardest mental model is that both failures are persistent state crossing an iteration boundary."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 48,
+        "insight": "The SAM slide includes optimizer.zero_grad between its first and second gradient computations, showing a specialized two-pass use rather than the ordinary per-batch lifecycle."
+      },
+      {
+        "page": 96,
+        "insight": "The preceding NLP slide defines preprocessing and word2vec components but does not show a complete training-state lifecycle."
+      },
+      {
+        "page": 97,
+        "insight": "The simple character-level language-model slide gives the directly relevant healthy order: model.train once, then device transfer, optimizer.zero_grad, forward, loss, backward, and optimizer.step for every batch."
+      },
+      {
+        "page": 98,
+        "insight": "The following tokenization-and-perplexity slide uses torch.no_grad for evaluation, but does not discuss model.eval or restoration of training mode."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 pages for training-loop, optimizer, zero_grad, model.train, model.eval, no_grad, backpropagation, and gradient-accumulation references. The optimizer neighborhood on pages 46-51 and the complete directly relevant NLP neighborhood on pages 96-98 were read; pages 47 and 96-98 were also rendered and visually inspected. Page 97 is the closest source, while its neighbors establish that the deck treats no_grad separately and provides no paired persistent-state explanation. Later gradient-accumulation matches describe intentional effective-batch scaling, not this accidental stale-gradient bug. No deck wording, layout, code, or figure is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "PyTorch Tensor.backward documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.Tensor.backward.html",
+        "usage": "Used as official framework documentation to verify that backward accumulates gradients in leaf tensors and that existing .grad values must be zeroed or set to None when accumulation is not intended.",
+        "license": "PyTorch is distributed under the BSD-3-Clause license. No documentation prose, source code, or figure is copied; only the documented behavior is paraphrased."
+      },
+      {
+        "title": "PyTorch Module documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+        "usage": "Used as official framework documentation to verify the persistent Module.training boolean and the train/eval mode APIs that affect modules such as Dropout and BatchNorm.",
+        "license": "PyTorch is distributed under the BSD-3-Clause license. No documentation prose, example, source code, or figure is copied."
+      },
+      {
+        "title": "PyTorch no_grad documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.no_grad.html",
+        "usage": "Used as official framework documentation to distinguish the local disabling of gradient calculation from the module's train/eval mode.",
+        "license": "PyTorch is distributed under the BSD-3-Clause license. No documentation prose, example, source code, or figure is copied."
+      },
+      {
+        "title": "PyTorch BSD-3-Clause license",
+        "url": "https://github.com/pytorch/pytorch/blob/main/LICENSE",
+        "usage": "Used to verify the licensing treatment of the reviewed official documentation and project sources.",
+        "license": "The license grants redistribution rights subject to its conditions; this article nevertheless reuses no PyTorch text, code, or figure."
+      }
+    ],
+    "notes": "The shipped Mermaid composition is an original diagram derived from documented API semantics, not a redraw of a source figure. Its gradient lane distinguishes backward accumulation from optimizer.step: after batch one leaves g1 in .grad, batch two backward adds g2 unless zero_grad clears or removes the buffer. Its module lane separately shows eval mode persisting until train is called. The caption explicitly prevents a common conflation: no_grad controls autograd recording locally but does not restore module training mode."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the relevant slide neighborhoods, checked official PyTorch API behavior and licensing, and selected an original compact state-flow diagram for the article's hardest cross-iteration mental model."
+  },
+  "implementation": {
+    "visualIds": [
+      "training-loop-persistent-state"
+    ],
+    "accessibility": "The Mermaid block supplies an accessible title and a detailed description of both lanes. Every state and omitted reset is written directly in the nodes or on dashed missing-transition edges, so the lesson does not depend on color. The viz-compact marker opts out of the wide mobile minimum, allowing the top-to-bottom diagram to fit a 390 CSS-pixel viewport; established Mermaid theme variables provide dark-mode contrast, and shared print rules force a light high-contrast canvas with page-break avoidance."
+  }
+}
