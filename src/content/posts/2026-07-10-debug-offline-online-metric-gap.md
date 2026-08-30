@@ -22,6 +22,37 @@ Before explaining the gap:
 
 If the treatment was not delivered as intended, this is not yet a model-quality mystery.
 
+**Learning objective:** Order the investigation so each check eliminates an entire layer of causes before you form a narrower model-quality hypothesis.
+
+<!-- visual:offline-online-gap-diagnostic-order -->
+```mermaid
+flowchart TB
+	accTitle: Diagnose an offline improvement and online regression in evidence order
+	accDescr: Start with an observed offline improvement and online regression. First test whether assignment, exposure, sample ratio, instrumentation, and statistical interpretation make the experiment trustworthy. If not, repair and rerun the experiment. If it is trustworthy, replay the production path and compare model version, features, candidates, latency, errors, and fallbacks. If delivery differs, fix or roll back the serving path. Only when both gates pass should you localize the regression by slice, test objective mismatch, evaluation bias, system effects, or feedback, and use a shadow comparison, replay, or controlled rollback to discriminate among them.
+	O["Observed gap<br/>offline +8% · online −2%"] --> V{"1 · Trust the experiment?<br/>assignment · exposure · SRM<br/>instrumentation · uncertainty"}
+	V -->|"no"| R["Repair measurement<br/>then rerun"]
+	V ==>|"yes"| S{"2 · Same treatment path?<br/>model · features · candidates<br/>latency · errors · fallbacks"}
+	S -->|"no"| F["Fix or roll back<br/>the serving path"]
+	S ==>|"yes"| L["3 · Localize the loss<br/>by user, item, time, and surface"]
+	L --> H["4 · Test one cause family"]
+	H -.-> P["Proxy / objective<br/>mismatch"]
+	H -.-> B["Leakage / biased<br/>offline evaluation"]
+	H -.-> Y["System or candidate<br/>effects"]
+	H -.-> E["Feedback / equilibrium<br/>effects"]
+	P --> D["5 · Discriminate safely<br/>replay · shadow · small rollback"]
+	B --> D
+	Y --> D
+	E --> D
+	class O viz-input
+	class V,S,L,H viz-focus
+	class R,F viz-warning
+	class P,B,Y,E viz-state
+	class D viz-output
+	class O,V,S,L,H,R,F,P,B,Y,E,D viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the heavy “yes” spine downward. A failed validity or delivery gate is already an explanation, so repair it before blaming model quality. Only after both gates pass should you branch into cause families, then choose a replay, shadow comparison, or small rollback whose result separates those hypotheses.</p>
+
 ## The main cause families
 
 **Objective mismatch.** The offline label or metric is a proxy. Better NDCG, AUC, or accuracy need not improve the user outcome: the model may lift clicks while cutting satisfaction, or raise average relevance while hurting high-value slices.
