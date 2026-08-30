@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "bptt-backprop-through-time",
+  "article": "src/content/posts/2026-02-16-bptt-backprop-through-time.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the hidden state that continues across a truncated-BPTT boundary from the gradient path that stops at detach.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold the forward state path fixed while changing only the backward path at the truncation boundary.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic flowchart routing makes overlaid forward and backward paths harder to compare precisely.",
+    "svg": "Selected: fixed geometry can show the same recurrent states in both panels and place the detach boundary exactly between time steps.",
+    "semanticHtml": "Rejected: a table can state which paths continue, but cannot make the asymmetry between forward state flow and backward gradient flow immediately spatial.",
+    "interaction": "Rejected: changing the truncation length adds controls without improving the single boundary concept.",
+    "paperReuse": "Rejected: no source figure has verified reuse permission or isolates this exact state-versus-gradient distinction.",
+    "noVisual": "Rejected: prose alone makes it easy to misread detach as resetting the recurrent state rather than cutting only the computation graph."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 93,
+        "insight": "The Neural NLP overview says recurrent architectures enabled sequence representations before Transformers, but does not show recurrent training or gradient flow."
+      },
+      {
+        "page": 96,
+        "insight": "The local sequence begins with text preprocessing and word2vec code, establishing the boundary before the recurrent language-model example."
+      },
+      {
+        "page": 97,
+        "insight": "The character-level language-model slide defines and trains a PyTorch LSTM over sequences of length 50, but shows neither an unrolled graph nor a detach operation, so its training loop does not explain the truncation boundary."
+      },
+      {
+        "page": 98,
+        "insight": "The neighboring slide moves to tokenization and perplexity and adds no recurrent credit-assignment detail."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation overview contrasts LSTM-based and Transformer-based approaches but does not discuss BPTT."
+      },
+      {
+        "page": 100,
+        "insight": "The recurrent-nets slide presents LSTM and GRU cell equations and diagrams; it explains state updates but not how gradients traverse or stop between time steps."
+      },
+      {
+        "page": 101,
+        "insight": "The Transformer architecture slide marks the end of the recurrent-model neighborhood and contains no BPTT comparison."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page-by-page for backpropagation through time, BPTT, recurrent neural network, RNN, LSTM, GRU, vanishing gradient, and exploding gradient. No slide names BPTT or TBPTT. Pages 96-101 were rendered and visually inspected as the contiguous neighborhood around the page 97 recurrent language-model implementation and page 100 recurrent-cell overview; page 93 was also read as the earlier Neural NLP context. The deck supplies architecture and training context but no explanation of whether detach cuts state or gradients. No deck image, code, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Backpropagation through time: what it does and how to do it",
+        "url": "https://ieeexplore.ieee.org/document/58337",
+        "usage": "Used as the primary BPTT reference to verify that recurrent training can be represented by unfolding the system through time and applying ordinary backpropagation to the resulting network.",
+        "license": "The IEEE paper is copyrighted and no permissive figure-reuse license was identified. No paper figure, prose, notation, or layout is copied; the shipped diagram is an original schematic."
+      },
+      {
+        "title": "Deep Learning, Chapter 10: Sequence Modeling: Recurrent and Recursive Nets",
+        "url": "https://www.deeplearningbook.org/contents/rnn.html",
+        "usage": "Used as an authoritative textbook source to check the unrolled computational-graph interpretation of BPTT, parameter sharing across time, and the computational motivation for truncation.",
+        "license": "The online book is free to read, but its site states that the MIT Press contract restricts easily copied electronic distribution. No permissive reuse license is assumed, and no textbook text or figure is adapted."
+      },
+      {
+        "title": "PyTorch torch.Tensor.detach documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.Tensor.detach.html",
+        "usage": "Used as official framework documentation to verify that detach returns a tensor disconnected from the current autograd graph while sharing storage with the original tensor, supporting the distinction between carrying a state value and carrying its gradient history.",
+        "license": "The PyTorch repository is BSD-3-Clause licensed. No documentation prose, source code, or artwork is reproduced; only the operator semantics are cited."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the asymmetric TBPTT boundary: the recurrent state value remains available to the next window, but its earlier computation history is absent from that window's backward graph. The original two-panel schematic therefore keeps all four state nodes and every solid forward edge unchanged, while removing only the dashed backward edges before the boundary. K = 2 is a didactic window over h3 and h4, not a claim about a universal framework convention. The shared-W labels preserve the other key BPTT fact: unrolling creates repeated uses of one parameter set, not independent weights."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and visually inspected the exact recurrent-model neighborhood, then checked the primary IEEE BPTT paper, an authoritative deep-learning textbook, and official PyTorch detach semantics before selecting an original full-versus-truncated gradient-path comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "bptt-detach-cuts-gradient-not-state"
+    ],
+    "accessibility": "Each SVG has a linked title and complete description, and the enclosing group identifies the comparison. Solid lines are explicitly labelled as forward state flow; dashed lines, arrow direction, a labelled detach boundary, and a thick stop bar identify backward gradient behavior without relying on color. Every state directly says that W is shared. The established two-panel primitive stacks below 640 pixels, and each panel uses a compact 340-pixel viewBox with no minimum width, keeping labels readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, while shared print tokens force a light high-contrast palette and keep the figure together."
+  }
+}
