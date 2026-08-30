@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "autoregressive-vs-diffusion",
+  "article": "src/content/posts/2026-04-02-autoregressive-vs-diffusion.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish autoregressive sampling, which appends one element per serial step, from diffusion sampling, which revises every element of the current state in parallel at each serial denoising step.",
+  "mediumRationale": "A deterministic two-lane SVG is the smallest medium that can align sampling time horizontally while showing which positions change at each step. Fixed geometry makes the serial dependency and within-step parallelism visible together without scripting.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show two chains, but it cannot compactly align element-level state changes across the two sampling timelines.",
+    "svg": "Selected: deterministic rows of directly labeled cells show both the serial step boundary and whether one position or the whole state changes.",
+    "semanticHtml": "Rejected: a table could enumerate states, but repeated columns would be harder to trace as two sampling processes and would not reuse the established arrow and node grammar.",
+    "interaction": "Rejected: scrubbing through steps adds controls and state without improving the single contrast the learner needs to retain.",
+    "paperReuse": "Rejected: the primary papers contain denser, modality-specific figures, and public arXiv access is not treated as permission to reuse their artwork.",
+    "noVisual": "Rejected: the prose says both samplers are slow and sequential, but does not spatially resolve the crucial difference between appending one element and updating all elements within a step."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 86,
+        "insight": "The preceding slide classifies models by available supervision and supplies no sampling mechanism."
+      },
+      {
+        "page": 87,
+        "insight": "The generative-model overview names an LSTM as an autoregressive model beside VAE and GAN families, but does not show factorization, sampling state, or diffusion generation."
+      },
+      {
+        "page": 88,
+        "insight": "The following references slide covers latent-variable models and adds no autoregressive or diffusion sampling detail."
+      },
+      {
+        "page": 98,
+        "insight": "The preceding language-model slide defines tokenization and perplexity but does not depict generation."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide describes autoregressive pretraining as a unidirectional forward factorization and contrasts it with masked language modeling."
+      },
+      {
+        "page": 100,
+        "insight": "The following recurrent-net slide discusses recurrent architectures rather than the element-by-element sampling process."
+      },
+      {
+        "page": 112,
+        "insight": "The preceding slide covers low-rank and kernel attention approximations, not sampling."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide explicitly states that generation is sequential because token t(k+1) depends on token t(k), confirming the autoregressive serial bottleneck."
+      },
+      {
+        "page": 114,
+        "insight": "The following slide begins mixed-precision training and adds no sampling comparison."
+      },
+      {
+        "page": 150,
+        "insight": "The preceding slide covers GANs and does not introduce diffusion probabilistic models."
+      },
+      {
+        "page": 151,
+        "insight": "The deck's only slide titled Stable Diffusion actually presents finite-difference heat-equation smoothing; it is not a denoising diffusion probabilistic model and is technically unsuitable as a source for this article."
+      },
+      {
+        "page": 152,
+        "insight": "The following slide begins model interpretability and confirms there is no neighboring generative-diffusion treatment."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for autoregressive, diffusion, denoising, noise, and generative-model terms. The four matching neighborhoods above were then inspected page by page. Pages 87, 99, and 113 provide taxonomy, forward-factorization, and serial-dependency context respectively; the sole Stable Diffusion title on page 151 refers to unrelated PDE numerics. The deck therefore contains no applicable figure or technically correct diffusion-model visual to reuse, and no deck artwork is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Pixel Recurrent Neural Networks",
+        "url": "https://arxiv.org/abs/1601.06759",
+        "usage": "Used to verify that autoregressive image modeling factorizes a joint distribution into conditional distributions and generates the next element conditioned on previously generated elements.",
+        "license": "The paper is publicly readable on arXiv, but permissive figure-reuse permission was not established. No figure, layout, prose, data, or artwork is copied; the article uses an independently authored abstract sequence."
+      },
+      {
+        "title": "Denoising Diffusion Probabilistic Models",
+        "url": "https://arxiv.org/abs/2006.11239",
+        "usage": "Used to verify that sampling starts from a full Gaussian-noise state and repeatedly applies a learned reverse transition to produce the next full state.",
+        "license": "The paper is publicly readable on arXiv, but permissive figure-reuse permission was not established. No paper figure, sample, layout, or wording is reproduced; the visual uses original symbolic cells rather than paper imagery."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free viewing and downloading do not by themselves establish third-party reuse rights and that the copyright holder generally retains ownership.",
+        "license": "This official policy is cited only to guide licensing treatment. No policy text or visual asset is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why both methods have serial outer loops while exposing different work inside each step: autoregression freezes the prefix and appends one element, whereas a diffusion reverse transition predicts an update for the entire current tensor. The shipped composition is an original schematic with synthetic symbols and no empirical claim. Primary papers are used only to verify mechanism; unclear figure permissions are handled by reusing no source artwork."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected every relevant neighboring slide, and checked primary autoregressive and diffusion papers plus arXiv licensing guidance before selecting an original aligned sampling comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "autoregressive-diffusion-sampling-steps"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description, and every timeline, state, step boundary, and changed region is directly labeled. Autoregressive prefixes use position and a heavy next-cell outline; diffusion updates use full-state brackets and labels, so the distinction does not rely on color. The established visual-scroll and visual-wide primitives preserve readable fixed-size labels through intentional horizontal scrolling at 390 CSS pixels, theme variables provide dark-mode contrast, and existing print overrides remove the minimum width and force a light high-contrast palette."
+  }
+}

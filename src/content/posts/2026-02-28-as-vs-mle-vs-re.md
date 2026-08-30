@@ -39,7 +39,7 @@ These percentages are rough averages.
 		<section class="visual-panel plot-panel">
 			<h4>Applied Scientist</h4>
 			<p>Modeling-led, with meaningful work on every axis.</p>
-			<svg viewBox="0 0 300 130" role="img" aria-labelledby="as-profile-title as-profile-desc">
+			<svg viewBox="0 0 300 138" role="img" aria-labelledby="as-profile-title as-profile-desc">
 				<title id="as-profile-title">Applied Scientist activity profile</title>
 				<desc id="as-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 20 percent, modeling 40 percent, engineering 20 percent, and product 20 percent.</desc>
 				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="36" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">20%</text>
@@ -52,7 +52,7 @@ These percentages are rough averages.
 		<section class="visual-panel plot-panel">
 			<h4>Research Engineer</h4>
 			<p>Engineering-led, but still close to experiments and research.</p>
-			<svg viewBox="0 0 300 130" role="img" aria-labelledby="re-profile-title re-profile-desc">
+			<svg viewBox="0 0 300 138" role="img" aria-labelledby="re-profile-title re-profile-desc">
 				<title id="re-profile-title">Research Engineer activity profile</title>
 				<desc id="re-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 25 percent, modeling 30 percent, engineering 40 percent, and product 5 percent.</desc>
 				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="45" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">25%</text>
@@ -65,7 +65,7 @@ These percentages are rough averages.
 		<section class="visual-panel plot-panel">
 			<h4>ML Engineer</h4>
 			<p>Engineering-dominant, with modeling and product context.</p>
-			<svg viewBox="0 0 300 130" role="img" aria-labelledby="mle-profile-title mle-profile-desc">
+			<svg viewBox="0 0 300 138" role="img" aria-labelledby="mle-profile-title mle-profile-desc">
 				<title id="mle-profile-title">ML Engineer activity profile</title>
 				<desc id="mle-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 5 percent, modeling 30 percent, engineering 50 percent, and product 15 percent.</desc>
 				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="9" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">5%</text>

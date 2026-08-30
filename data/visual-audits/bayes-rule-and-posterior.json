@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "bayes-rule-and-posterior",
+  "article": "src/content/posts/2025-11-15-bayes-rule-and-posterior.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Use natural-frequency branches to see why a rare prior can make false positives outnumber true positives even when sensitivity and specificity are both 99 percent.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can preserve the two population branches, their different base sizes, and their reunion in the positive-test denominator. Fixed integer counts make every quantity checkable without scripting.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show branches but does not provide the precise, compact quantitative hierarchy needed to compare 99 true positives with 999 false positives.",
+    "svg": "Selected: deterministic positions, direct count labels, distinct branch outlines, and an explicit fraction make the denominator visible and remain legible in one narrow-column panel.",
+    "semanticHtml": "Rejected: a table would expose the counts but not emphasize that two very unequal prior populations feed the same positive-result pool.",
+    "interaction": "Rejected: changing prevalence could be useful in a calculator, but controls and state are unnecessary for the single base-rate lesson in this article.",
+    "paperReuse": "Rejected: no reuse permission was established for the primary paper, textbook figures, clinical-review tables, or local deck artwork. The implementation uses original geometry and the article's independently calculated example.",
+    "noVisual": "Rejected: the prose gives the correct equation and result, but readers must mentally construct why the false-positive term dominates the denominator."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 79,
+        "insight": "The preceding parametric-models slide distinguishes observed, transformed, and latent-variable models but contains no Bayes update or base-rate example."
+      },
+      {
+        "page": 80,
+        "insight": "The directly relevant slide labels prior, likelihood, posterior, and evidence around Bayes' rule; its general inference overview does not show how unequal prior populations contribute to a posterior."
+      },
+      {
+        "page": 81,
+        "insight": "The neighboring learning slide contrasts MLE, Bayesian estimation, and MAP and reinforces that Bayesian parameters retain distributions rather than only point estimates."
+      },
+      {
+        "page": 82,
+        "insight": "The following VAE slide applies Bayes' rule to an intractable latent posterior but adds no diagnostic-testing or natural-frequency treatment."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for Bayes, posterior, likelihood, prior, medical, diagnosis, disease, and prevalence. Pages 79-82 were then rendered and visually inspected as the full relevant neighborhood. Page 80 is the only general Bayes-rule overview; none of these slides teaches the article's rare-disease denominator. No deck image, icon, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Probabilistic Machine Learning: An Introduction",
+        "url": "https://probml.github.io/pml-book/book1.html",
+        "usage": "Used as an authoritative textbook reference for Bayes' rule, prior, likelihood, evidence, posterior, and Bayesian parameter inference.",
+        "license": "The companion repository is MIT licensed, but that does not establish permission to reuse the published book's figures. No figure, prose, code, data, or layout is copied."
+      },
+      {
+        "title": "How to Improve Bayesian Reasoning Without Instruction: Frequency Formats",
+        "url": "https://doi.org/10.1037/0033-295X.102.4.684",
+        "usage": "Used as the primary research source for presenting Bayesian diagnostic reasoning as natural frequencies.",
+        "license": "Published by the American Psychological Association; no permissive figure-reuse license or explicit permission was identified. No figure, experimental result, wording, or layout is copied."
+      },
+      {
+        "title": "Bayes' formula: a powerful but counterintuitive tool for medical decision-making",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7808025/",
+        "usage": "Used to verify that prevalence is the prior, sensitivity and specificity determine positive-test branches, and positive predictive value is the post-test probability.",
+        "license": "The article states © 2020 British Journal of Anaesthesia, published by Elsevier Ltd., all rights reserved. No table, figure, prose, or worked values are copied."
+      }
+    ],
+    "notes": "The hardest mental model is the positive-result denominator under a rare prior. The visual converts the article's own probabilities into an original cohort of 100,000 expected cases: 100 have disease and yield 99 true positives; 99,900 are healthy and yield 999 false positives; therefore 99 of 1,098 positive results, about 9 percent, are true positives. These are exact arithmetic consequences of the article's synthetic assumptions, not empirical clinical claims."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Independently reviewed the complete article, text-indexed all 214 deck pages, visually inspected pages 79-82, and checked an authoritative textbook, a primary frequency-format paper, and an authoritative clinical review before selecting an original natural-frequency funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "bayes-positive-test-denominator"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description containing every branch count and the final fraction. Direct labels identify diseased, healthy, true-positive, and false-positive groups; different box outlines, positions, arrows, and written arithmetic preserve the lesson without color. A 360-unit viewBox scales to the article column without a minimum width, established theme tokens preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette."
+  }
+}

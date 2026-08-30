@@ -47,7 +47,7 @@ This is L5. You've explained both, given examples, and noted when each is the ri
 			</pattern>
 		</defs>
 		<text class="viz-axis-label" x="20" y="22">FREQUENTIST · REPEAT THE DATA</text>
-		<text class="viz-label" x="20" y="40">θ is fixed; the procedure produces a different interval from each sample.</text>
+		<text class="viz-label" x="20" y="40">θ stays fixed; each repeated sample produces a new interval.</text>
 		<rect class="viz-plot-bg" x="20" y="54" width="320" height="184" rx="3"></rect>
 		<path class="viz-operating-guide" d="M218 65V213"></path>
 		<text class="viz-callout" x="218" y="226" text-anchor="middle">fixed θ</text>

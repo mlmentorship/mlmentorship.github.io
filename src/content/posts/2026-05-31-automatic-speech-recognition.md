@@ -120,8 +120,8 @@ The three end-to-end paradigms:
 		<text class="viz-callout" x="180" y="469" text-anchor="middle">A</text>
 		<text class="viz-callout" x="252" y="469" text-anchor="middle">T</text>
 		<path class="viz-forward" d="M128 464H157M200 464H229"></path>
-		<text class="viz-label" x="280" y="459">prior tokens</text>
-		<text class="viz-label" x="280" y="475">+ attended audio</text>
+		<text class="viz-label" x="340" y="459" text-anchor="end">prior tokens</text>
+		<text class="viz-label" x="340" y="475" text-anchor="end">+ attended audio</text>
 	</svg>
 	<figcaption><strong>Read it this way:</strong> CTC must make one label-or-blank choice at every frame, then collapse those choices; it does not condition on emitted labels. RNN-T can move right with a blank or emit upward at the same audio time, and its prediction network sees the prefix. Standard offline attention generates left to right from prior tokens while choosing a weighted context over the encoded utterance, which is why native streaming is hardest.</figcaption>
 </figure>
