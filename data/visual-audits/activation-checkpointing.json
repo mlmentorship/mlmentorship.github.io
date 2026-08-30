@@ -2,47 +2,55 @@
   "schemaVersion": 1,
   "slug": "activation-checkpointing",
   "article": "src/content/posts/2026-05-01-activation-checkpointing.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "See why checkpoint memory contains both saved segment boundaries and temporary activations during recomputation, creating an optimum near the square root of depth.",
-  "mediumRationale": "A deterministic SVG can align layer chains, saved versus discarded activations, recomputation segments, and the two memory terms. Mermaid cannot show the quantitative store-recompute geometry precisely.",
+  "learningObjective": "Explain why checkpointed chain memory contains both L/K saved segment boundaries and K temporary activations during recomputation, and why balancing those terms puts K near the square root of L.",
+  "mediumRationale": "Deterministic SVG is the smallest medium that can align a 16-layer chain, four persistent boundaries, one active four-layer recomputation window, and the L/K + K arithmetic. Mermaid does not control quantitative spacing; semantic HTML would require more markup for the same geometry; interaction would add behavior without improving the fixed optimum; the paper's figures are denser and have no verified reuse license; and no visual would leave the two simultaneous memory terms difficult to picture.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout cannot reliably align layer count, checkpoint boundaries, and the active recomputation window.",
+    "svg": "Selected for deterministic layer geometry, text alternatives, responsive scrolling, theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table or grid can enumerate layers but does not express the overlapping persistent and temporary memory spans as directly.",
+    "interaction": "Rejected because changing L or K is not needed to understand the single balancing argument and would weaken the static fallback.",
+    "paperReuse": "Rejected because the source paper's figures are denser than the learning objective and reuse permission was not established.",
+    "noVisual": "Rejected because prose states L/K + K but does not spatially show why both terms are live at the same backward-pass instant."
+  },
   "deckReview": {
     "pages": [
       {
         "page": 44,
-        "insight": "The backpropagation slide shows why intermediate graph values are needed during reverse traversal."
+        "insight": "The backpropagation slide says forward variables are cached to avoid recomputation during backward, establishing the memory behavior that checkpointing deliberately reverses."
       },
       {
         "page": 167,
-        "insight": "The modeling slide explicitly describes gradient checkpointing as a memory-versus-computation tradeoff for samples that do not fit in memory."
+        "insight": "The modeling slide names gradient checkpointing as a memory-versus-computation tradeoff when a sample cannot fit in memory."
       }
     ],
-    "notes": "The deck directly motivates both prerequisites: reverse traversal needs activations, and checkpointing deliberately recomputes them. It does not provide a reusable square-root tradeoff figure."
+    "notes": "All 214 pages were reviewed via the local PDF. Pages 43-45 and 166-168 were inspected as neighboring context: page 43 is a section divider, page 45 covers loss optimization, page 166 covers data pipelines, and page 168 covers production serving. Only pages 44 and 167 are relevant. Neither shows checkpoint placement, the simultaneous boundary and recomputation terms, or a reusable square-root tradeoff figure."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "Training Deep Nets with Sublinear Memory Cost",
         "url": "https://arxiv.org/abs/1604.06174",
-        "usage": "Use to verify the sublinear-memory checkpointing construction and compute-memory tradeoff.",
-        "license": "No figure copied. arXiv distribution does not by itself establish CC0 or unrestricted figure reuse."
+        "usage": "Verified the chain construction that stores segment boundaries, recomputes one segment at a time, and achieves O(sqrt(n)) memory with an extra forward pass.",
+        "license": "No paper figure, wording, or data is copied. The arXiv record does not establish a permissive figure-reuse license, so the implementation is an original schematic derived from the cited algorithm."
       },
       {
         "title": "PyTorch torch.utils.checkpoint documentation",
-        "url": "https://pytorch.org/docs/stable/checkpoint.html",
-        "usage": "Use to verify modern recomputation behavior and implementation caveats.",
-        "license": "No documentation figure or code copied; API semantics referenced only."
+        "url": "https://docs.pytorch.org/docs/stable/checkpoint.html",
+        "usage": "Verified that checkpointed function outputs are not retained, input tensors are retained, and missing tensors are recomputed during backward; also verified RNG-state handling.",
+        "license": "No documentation prose, code, or imagery is copied; only API semantics are cited."
       }
     ],
-    "notes": "The planned figure is an original three-strategy layer-chain comparison with explicitly illustrative dimensions and terms."
+    "notes": "The visual is an original, deterministic 16-layer teaching example. Its rectangles, braces, labels, and arithmetic were authored for this article; no source figure is reproduced. L = 16 and K = 4 are explicitly illustrative, while the general L/K + K relationship is sourced to Chen et al."
   },
   "agentReview": {
-    "reviewer": "Explore checkpointing subagent, manually reconciled",
+    "reviewer": "GitHub Copilot CLI agent-4",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent identified the square-root memory tradeoff as the hardest concept. Integration corrected its unsupported arXiv licensing claim and retained the original-redraw recommendation."
+    "summary": "Independent review identified the hardest prose-only model as the coexistence of persistent checkpoint boundaries and one temporary recomputation window. The review checked the complete article, local deck and adjacent pages, the primary paper, and current PyTorch documentation before selecting an original redraw."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["checkpoint-boundary-recompute-balance"],
+    "accessibility": "The SVG has a linked title and description that state the complete L = 16, K = 4 example. Checkpoints use diamond shapes and labels, recomputed layers use a dashed enclosure and labels, so no meaning depends on color. A horizontally scrollable 38rem canvas keeps labels legible at 390 CSS pixels; existing theme variables support dark mode, and existing print rules remove the minimum width and force high-contrast light colors."
   }
 }
