@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "slug": "bias-variance-of-estimators",
+  "article": "src/content/posts/2026-01-13-bias-variance-of-estimators.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the two reference points in estimator error: variance measures sample-to-sample spread around the estimator's expectation, while bias measures displacement of that expectation from the true parameter.",
+  "mediumRationale": "One number line with repeated estimates, their expectation, and the true parameter is the smallest spatial explanation that separates the two reference points hidden inside the algebra. Direct labels and distinct line patterns make the decomposition legible without animation or a legend.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would imply a process or causal sequence, while the learning task is one-dimensional statistical geometry.",
+    "svg": "Selected: deterministic SVG precisely aligns repeated estimates, their expectation, and the target on one axis; it remains static, responsive, theme-aware, and printable.",
+    "semanticHtml": "Rejected: a table can repeat definitions but cannot show that estimator variance and bias are distances from different reference points.",
+    "interaction": "Rejected: changing the sampling distribution could illustrate a family of cases, but controls add state and distract from the invariant two-reference-point model.",
+    "paperReuse": "Rejected: the deck embeds an unattributed point-estimate graphic and the reviewed sources do not grant permission for figure reuse. No external artwork, data, or layout is copied.",
+    "noVisual": "Rejected: the equations state the decomposition but leave readers to mentally align the true parameter, the estimator expectation, and estimates from individual samples."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 15,
+        "insight": "The preceding slide distinguishes model bias from variation across training and test realizations using repeated data-generating surfaces; it provides context but addresses model loss rather than scalar estimator error."
+      },
+      {
+        "page": 16,
+        "insight": "The point-estimates slide defines point-estimator bias as an expectation difference and variance across data realizations, but its embedded population-mean graphic does not spatially separate both reference points or show the MSE decomposition."
+      },
+      {
+        "page": 17,
+        "insight": "The neighboring parameter-learning slide contrasts MLE and MAP point choices with Bayesian parameter distributions, confirming that the local sequence moves on from estimator error to estimation paradigms."
+      }
+    ],
+    "notes": "The complete 214-page deck was text-indexed page by page for bias, variance, estimator, James-Stein, mean squared error, and MSE. Exact hits were reviewed, including model bias on pages 15 and 61-62, gradient-estimator variance on pages 52-55, and system-design uses on pages 161-166. Pages 14-18 were also rendered and inspected as the full neighborhood around the only direct point-estimator treatment on page 16. Page 16 is relevant, but its small embedded graphic is unattributed and teaches point versus interval estimates rather than the article's two-reference-point decomposition, so neither its artwork nor layout is reused.",
+    "license": "The local deck provides no explicit license or source attribution for the embedded page-16 graphic. It is treated as review-only material; the implementation is an original redraw."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Lecture 2: Estimation, bias, and mean squared error, University of Cambridge Statistical Laboratory",
+        "url": "https://www.statslab.cam.ac.uk/Dept/People/djsteaching/S1B-17-02-estimation-bias.pdf",
+        "usage": "Used as authoritative university statistics notes to verify the definitions of estimator bias, variance, and mean squared error and the identity MSE equals variance plus squared bias.",
+        "license": "No permissive reuse license was identified. No text, examples, data, figures, or layout is copied; only standard definitions inform the original construction."
+      },
+      {
+        "title": "Estimation with Quadratic Loss",
+        "url": "https://doi.org/10.1214/aoms/1177705059",
+        "usage": "Used as the primary James and Stein (1961) paper supporting the article's statement that under multivariate normal quadratic-loss estimation, shrinkage can dominate the usual unbiased estimator in dimension three or greater.",
+        "license": "Project Euclid identifies the journal publication, but no permissive figure-reuse license was established. No paper figure, prose, or numerical result is reproduced in the visual."
+      },
+      {
+        "title": "NIST Copyright, Fair Use, and Licensing Statements",
+        "url": "https://www.nist.gov/open/copyright-fair-use-and-licensing-statements-srd-data-and-software",
+        "usage": "Consulted to verify how NIST-authored works are treated before considering handbook material as a visual source.",
+        "license": "NIST employee works are generally not copyright-protected in the United States and NIST grants broad reuse rights where it may hold foreign copyright, subject to acknowledgment. No NIST artwork or text is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the algebraic expansion itself but what each squared distance is measured from. The visual therefore uses an abstract sampling distribution rather than paper-specific data: individual estimates vary around E[theta-hat], that expectation is displaced from theta, and total squared error to theta accounts for both. External figures were unnecessary, and unclear reuse permission for candidate graphics led to an original redraw."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected pages 14-18, and checked authoritative estimator notes, the primary James-Stein paper record, and explicit licensing guidance before selecting an original one-axis SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "estimator-error-reference-points"
+    ],
+    "accessibility": "The SVG provides a title and detailed description, direct labels for every reference point, distinct solid and dashed guides, a diamond for the true parameter, a circle for the estimator expectation, and labelled distance rules so position, wording, shape, and line pattern carry the lesson without color. Its 360-pixel viewBox scales to a 390 CSS-pixel viewport without horizontal scrolling, shared theme variables preserve dark-mode contrast, and the established learning-figure print palette provides a light high-contrast output."
+  }
+}
