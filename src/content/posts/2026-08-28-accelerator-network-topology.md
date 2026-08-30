@@ -121,6 +121,33 @@ A large GPU cluster can reduce data in stages:
 2. combine node results across the scale-out network;
 3. distribute the final result inside each node.
 
+**Learning objective:** Trace why only one partial result per fast local group needs to participate in the slower scale-out step.
+
+<!-- visual:hierarchical-all-reduce-path -->
+```mermaid
+flowchart TB
+	accTitle: A hierarchical all-reduce crosses the slower network with one partial per local group
+	accDescr: In stage one, accelerators in fast local groups A and B each reduce their values to one group partial. In stage two, the two group partials enter a logical scale-out all-reduce over the slower inter-group network and produce the final reduced value. In stage three, that value is distributed over fast local links so every accelerator rank receives it.
+	subgraph A["FAST LOCAL GROUP A"]
+		A1["accelerator values"] ==>|"1. fast local reduce"| AP["one A partial"]
+		AO["result on every A rank"]
+	end
+	subgraph B["FAST LOCAL GROUP B"]
+		B1["accelerator values"] ==>|"1. fast local reduce"| BP["one B partial"]
+		BO["result on every B rank"]
+	end
+	AP ==>|"2. slower scale-out link"| G{{"all-reduce<br/>group partials"}}
+	BP ==>|"2. slower scale-out link"| G
+	G -->|"3. fast local distribute"| AO
+	G -->|"3. fast local distribute"| BO
+	class A1,B1 viz-input
+	class AP,BP,G viz-focus
+	class AO,BO viz-output
+	class G viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> Reduce many accelerator values to one partial inside each fast local group first. Only those group partials cross the slower boundary; the completed result then fans out locally to every rank.</p>
+
 This avoids sending every local copy through the slower network.
 
 The same idea applies to any network with fast local groups and slower links among groups.
