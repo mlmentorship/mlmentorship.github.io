@@ -2,47 +2,55 @@
   "schemaVersion": 1,
   "slug": "advantage-estimation-and-gae",
   "article": "src/content/posts/2026-05-07-advantage-estimation-and-gae.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "See future TD residuals contribute to one advantage estimate with weights that decay by successive powers of gamma lambda.",
-  "mediumRationale": "A deterministic trajectory SVG can align time steps, residuals, exponential weights, and the right-to-left recursion. Mermaid lacks quantitative weight encoding and an interaction is unnecessary for the first version.",
+  "learningObjective": "Trace future TD residuals into one advantage estimate, seeing that each additional time step contributes one more factor of gamma lambda and that the same sum can be computed by scanning backward.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align residuals by time, their symbolic weights, the expanded sum, and the equivalent right-to-left recursion. The fixed geometry makes the correspondence visible without requiring animation or a numerical control.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout cannot reliably align each residual with its exact power of gamma lambda or the expanded equation.",
+    "svg": "Selected for deterministic temporal alignment, mathematical labels, a complete text alternative, responsive horizontal scrolling, theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table could list terms but would make the reverse direction of the recurrence and its correspondence to the unrolled trace less immediate.",
+    "interaction": "Rejected because changing gamma or lambda numerically is not needed to learn where the powers come from, and a control would add complexity without improving the core spatial model.",
+    "paperReuse": "Rejected because the primary paper's plots address empirical bias and variance rather than this narrow recursion-to-expansion mapping, and no permissive figure-reuse license was established.",
+    "noVisual": "Rejected because the prose presents the expanded sum and recursion separately; the hardest mental step is seeing that they are the same computation over time."
+  },
   "deckReview": {
     "pages": [
       {
         "page": 155,
-        "insight": "The deck explains that RL samples are dependent trajectories rather than iid examples."
+        "insight": "The deck explains that RL samples form dependent trajectories rather than iid examples, establishing why temporal ordering matters."
       },
       {
         "page": 156,
-        "insight": "The policy-gradient example computes discounted rewards by iterating backward through an episode, matching GAE's reverse-scan intuition."
+        "insight": "The policy-gradient example computes discounted rewards by reversing the episode rewards and carrying a discounted cumulative value, which is the closest deck analogue to GAE's reverse scan."
       }
     ],
-    "notes": "The deck does not name GAE, but its trajectory and reverse discounted-return code provide the right temporal precursor."
+    "notes": "GitHub Copilot CLI agent-2 searched extracted text across all 214 PDF pages for GAE, advantage estimation, temporal-difference residuals, policy gradients, and discounted rewards, then inspected pages 153-158 directly. Page 154 is the Reinforcement Learning divider; pages 155-156 contain the only relevant trajectory and policy-gradient material; page 157 starts Past projects. The deck never names GAE, TD residuals, lambda, or the residual expansion, so no slide figure applies for reuse."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "High-Dimensional Continuous Control Using Generalized Advantage Estimation",
-        "url": "https://arxiv.org/abs/1506.02438",
-        "usage": "Use to verify the exponentially weighted TD-residual form and bias-variance role of lambda.",
-        "license": "No source figure copied. Public arXiv access is not treated as blanket figure permission."
+        "url": "https://arxiv.org/html/1506.02438",
+        "usage": "Verified the GAE residual expansion in Equation 16, its equivalent exponentially weighted blend of k-step estimators, and the bias-variance endpoints for lambda.",
+        "license": "No paper figure, wording, layout, or empirical data is copied. The arXiv record did not establish a permissive figure-reuse license, so public access was not treated as reuse permission."
       },
       {
-        "title": "Stable-Baselines3 PPO implementation",
-        "url": "https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/buffers.py",
-        "usage": "Use to cross-check the practical right-to-left GAE recursion.",
-        "license": "MIT-licensed implementation consulted; no code copied into the figure."
+        "title": "Stable-Baselines3 RolloutBuffer implementation",
+        "url": "https://github.com/DLR-RM/stable-baselines3/blob/3246f5060eacd8bff4de575eaafbbc6e0baac376/stable_baselines3/common/buffers.py",
+        "usage": "Cross-checked the production reverse loop and recurrence that adds the local delta to gamma times gae_lambda times the next accumulated estimate, including the non-terminal mask.",
+        "license": "The repository is MIT licensed. No implementation code, comments, or visual layout was copied; only the recurrence direction and semantics were independently checked."
       }
     ],
-    "notes": "The planned visual is an original temporal composition with symbolic weights, not a redraw of a paper figure."
+    "notes": "The shipped SVG is an original symbolic four-step teaching composition authored for this article. It uses the article's notation and established site primitives, reproduces no source-specific figure geometry, and includes no third-party visual asset."
   },
   "agentReview": {
-    "reviewer": "Explore GAE subagent, manually reconciled",
+    "reviewer": "GitHub Copilot CLI agent-2",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent identified temporal accumulation and the lambda spectrum as the central gap. Integration narrows the implementation to one trajectory with weighted future residuals and a reverse-scan cue."
+    "summary": "Independent review of the complete article identified the equivalence between the residual expansion and backward recursion as the hardest prose-only mental model. The final design pairs those views and avoids implying that lambda alone supplies the full temporal weight."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["gae-residual-weight-trace"],
+    "accessibility": "The SVG has a linked title and a full description of all four weights and the reverse scan. Residuals, weights, equations, arrow direction, direct labels, and solid-versus-dashed lines carry the complete lesson without color. The established visual-scroll wrapper preserves the 38rem drawing and readable labels at 390 CSS pixels; existing theme variables provide dark-mode contrast, and existing print rules remove the minimum width and force a high-contrast light palette."
   }
 }
