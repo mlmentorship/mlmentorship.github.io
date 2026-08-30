@@ -14,7 +14,8 @@
     "check:links": "node scripts/check-links.mjs",
     "check:style": "node scripts/check-editorial-style.mjs",
     "check:visuals": "node scripts/check-visual-coverage.mjs",
-    "visuals:status": "node scripts/check-visual-coverage.mjs --next=20"
+    "visuals:status": "node scripts/check-visual-coverage.mjs --next=20",
+    "visuals:batch": "node scripts/create-visual-batch.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",

@@ -189,6 +189,10 @@ for (const entry of entries) {
 }
 
 const unreviewed = entries.filter((entry) => !audits.has(entry.slug));
+const incomplete = entries.filter((entry) => {
+  const status = audits.get(entry.slug)?.status;
+  return status === undefined || status === 'planned';
+});
 console.log(`Visual coverage: ${entries.length} published entries`);
 console.log(`  implemented: ${counts.implemented}`);
 console.log(`  planned:     ${counts.planned}`);
@@ -198,14 +202,15 @@ console.log(`  unreviewed:  ${counts.unreviewed}`);
 const nextArg = process.argv.find((arg) => arg.startsWith('--next='));
 if (nextArg) {
   const limit = Math.max(1, Number(nextArg.split('=')[1]) || 1);
-  console.log('\nNext unreviewed entries:');
-  for (const entry of unreviewed.slice(0, limit)) {
-    console.log(`  ${entry.slug}\t${entry.category}\t${entry.file}\t${entry.title}`);
+  console.log('\nNext incomplete entries:');
+  for (const entry of incomplete.slice(0, limit)) {
+    const status = audits.get(entry.slug)?.status ?? 'unreviewed';
+    console.log(`  ${entry.slug}\t${status}\t${entry.category}\t${entry.file}\t${entry.title}`);
   }
 }
 
-if (process.argv.includes('--require-complete') && unreviewed.length > 0) {
-  fail(`${unreviewed.length} published entries still need independent visual review`);
+if (process.argv.includes('--require-complete') && incomplete.length > 0) {
+  fail(`${incomplete.length} published entries still need review or implementation`);
 }
 
 if (process.argv.includes('--dist')) {
