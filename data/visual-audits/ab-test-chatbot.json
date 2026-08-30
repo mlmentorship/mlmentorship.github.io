@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "slug": "ab-test-chatbot",
   "article": "src/content/posts/2026-05-01-ab-test-chatbot.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
   "learningObjective": "See why per-request randomization can switch models inside one conversation while per-conversation assignment preserves state.",
-  "mediumRationale": "An original two-lane SVG can align the same sequence of chat turns under two assignment units. Exact temporal placement matters more than graph topology, so Mermaid is not the best first medium.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that aligns the same ordered turns under two assignment units and makes the mid-conversation model switch spatially obvious. Mermaid adds graph-layout machinery without useful topology; semantic HTML would need article-specific layout rules; interaction adds no lesson beyond the static comparison; reusing a paper figure would add licensing risk and no chatbot-specific sequence; and no visual would leave the article's hardest state-continuity model in prose.",
   "deckReview": {
     "pages": [
       {
@@ -17,32 +17,32 @@
         "insight": "The project setup slide explicitly calls generative and dialogue-system evaluation difficult and emphasizes user reactions as imperfect inference-time signals."
       }
     ],
-    "notes": "The independent agent incorrectly reported that the supplied PDF was unavailable. Manual deck inspection found relevant experimentation and dialogue-evaluation context, but no reusable chatbot-randomization figure."
+    "notes": "Reviewed all 214 pages and inspected the exact neighboring sequence on PDF pages 163-166. Page 163 covers requirements and data signals, page 164 covers online experimentation, page 165 covers dialogue-system evaluation, and page 166 begins the data-pipeline section. Pages 164-165 provide relevant context, but none of these pages shows request-, conversation-, or user-level assignment, so no deck figure applies or is reused."
   },
   "sourceReview": {
     "sources": [
       {
-        "title": "Online Controlled Experiments at Large Scale",
-        "url": "https://dl.acm.org/doi/10.1145/1557019.1557134",
-        "usage": "Use the controlled-experiment principles to verify unit assignment, guardrails, and novelty concerns.",
-        "license": "No figure or text copied; citation and conceptual reference only. Reuse permission is not assumed from public availability."
+        "title": "Trustworthy Online Controlled Experiments, Chapter 14: Choosing a Randomization Unit",
+        "url": "https://www.cambridge.org/core/books/trustworthy-online-controlled-experiments/choosing-a-randomization-unit/ED3A3638879A7463193DF65FB18FC9CF",
+        "usage": "Used the authoritative textbook treatment to verify that the experimental unit must match the independent assignment and analysis unit.",
+        "license": "The chapter is copyrighted by Cambridge University Press. No figure, wording, or data is copied; it is cited for conceptual verification only."
       },
       {
-        "title": "Holistic Evaluation of Language Models",
-        "url": "https://arxiv.org/abs/2211.09110",
-        "usage": "Use the multidimensional evaluation framing to check that product quality is not reduced to one implicit interaction metric.",
-        "license": "No source figure copied; conceptual reference only."
+        "title": "LaunchDarkly documentation: Randomization units",
+        "url": "https://launchdarkly.com/docs/home/experimentation/randomization",
+        "usage": "Used the official experimentation documentation to verify stable bucketing by a selected context attribute and the distinction between randomization units.",
+        "license": "No documentation figure, wording, or code is copied. The implementation is an original article-specific construction informed only by the documented semantics."
       }
     ],
-    "notes": "No paper figure is necessary. The planned conversation assignment lanes will be an original article-specific construction."
+    "notes": "Neither source offers a chatbot-turn figure that is necessary for this lesson. Reuse permission was not assumed from public access; the visual is an original sequence using invented turns and model labels."
   },
   "agentReview": {
-    "reviewer": "Explore chatbot-experiment subagent, manually reconciled",
+    "reviewer": "GPT-5.6 Sol autonomous article reviewer",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent proposed several visuals. Integration narrowed the plan to the highest-information spatial lesson: one conversation under per-request versus per-conversation assignment."
+    "summary": "The hardest mental model is that a request is not an independent exposure when later turns depend on earlier responses. The selected visual contrasts identical turn order under per-request and per-conversation assignment, using labels, borders, line patterns, and position rather than color alone."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["chatbot-randomization-unit"],
+    "accessibility": "The responsive SVG has a title and full prose description. Every turn and model is text-labelled; the problematic switch uses a dashed boundary and warning label, so meaning does not depend on color. Existing learning-figure and plot-panel primitives provide theme tokens, mobile scaling at 390 CSS pixels, and print overrides."
   }
 }
