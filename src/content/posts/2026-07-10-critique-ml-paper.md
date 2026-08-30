@@ -29,10 +29,10 @@ flowchart TB
 	accDescr: Begin by stating the paper's strongest claim fairly, then map the headline evidence that supports it. Generate plausible alternative explanations including leakage or selection, unfair compute or tuning, variance or a weak baseline, and limited scope. Rank those threats by which could most overturn the central claim, choose one, and propose an experiment where the claim and that alternative predict different outcomes. The result should strengthen, narrow, or reject the claim.
 	C["1 · State the strongest claim<br/>in the authors' terms"] --> E["2 · Map the headline evidence<br/>to that exact claim"]
 	E --> H["3 · Generate plausible<br/>alternative explanations"]
-	H -.-> L["Leakage<br/>or selection"]
+	H -.-> L["Leakage /<br/>selection"]
 	H -.-> F["Unfair compute<br/>or tuning"]
 	H -.-> V["Variance<br/>or weak baseline"]
-	H -.-> S["Limited scope<br/>or wrong benchmark"]
+	H -.-> S["Scope /<br/>benchmark"]
 	L --> P["4 · Choose the one threat<br/>most able to overturn the claim"]
 	F --> P
 	V --> P
@@ -44,7 +44,6 @@ flowchart TB
 	class L,F,V,S viz-warning
 	class P,X viz-focus
 	class U viz-output
-	class C,E,H,L,F,V,S,P,X,U viz-compact
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the solid spine from claim to evidence, then inspect the dashed candidate threats. Do not turn all four into generic requests for more work. Reconverge on the threat most capable of overturning the claim, and choose one experiment where that threat and the authors' explanation predict different outcomes.</p>

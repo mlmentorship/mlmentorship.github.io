@@ -77,7 +77,7 @@ flowchart TB
 	Policy -->|"sets each action rule"| Decision
 	Content --> Models
 	Models -->|"one score per policy"| Decision
-	Decision -->|"below low threshold"| Allow
+	Decision -->|"below low<br/>threshold"| Allow
 	Decision -->|"between thresholds"| Review
 	Decision -->|"above high threshold"| Auto
 	Review -->|"human decision"| Record
@@ -88,7 +88,6 @@ flowchart TB
 	class Policy,Record viz-state
 	class Decision viz-focus
 	class Allow,Review,Auto,Appeal viz-output
-	class Policy,Content,Models,Decision,Allow,Review,Auto,Appeal,Record viz-compact
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> follow one policy at a time. Its versioned definition shapes labels and action thresholds; its model emits a score; the decision layer routes that score to allow, human review, or explained auto-action. Review and appeal outcomes return as evidence for evaluation and retraining, but the feedback loop never gives the model authority to rewrite policy. Original schematic informed by <a href="https://doi.org/10.1177/2053951719897945">Gorwa, Binns, and Katzenbach</a>, the <a href="https://www.santaclaraprinciples.org/">Santa Clara Principles</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
 

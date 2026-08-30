@@ -359,32 +359,37 @@ mark {
 }
 .mermaid svg .node.viz-input rect,
 .mermaid svg .node.viz-input circle,
-.mermaid svg .node.viz-input polygon {
+.mermaid svg .node.viz-input polygon,
+.mermaid svg .node.viz-input path {
   fill: var(--viz-input-bg) !important;
   stroke: var(--viz-input-stroke) !important;
 }
 .mermaid svg .node.viz-focus rect,
 .mermaid svg .node.viz-focus circle,
-.mermaid svg .node.viz-focus polygon {
+.mermaid svg .node.viz-focus polygon,
+.mermaid svg .node.viz-focus path {
   fill: var(--viz-focus-bg) !important;
   stroke: var(--viz-focus-stroke) !important;
   stroke-width: 1.8px !important;
 }
 .mermaid svg .node.viz-state rect,
 .mermaid svg .node.viz-state circle,
-.mermaid svg .node.viz-state polygon {
+.mermaid svg .node.viz-state polygon,
+.mermaid svg .node.viz-state path {
   fill: var(--viz-state-bg) !important;
   stroke: var(--viz-state-stroke) !important;
 }
 .mermaid svg .node.viz-output rect,
 .mermaid svg .node.viz-output circle,
-.mermaid svg .node.viz-output polygon {
+.mermaid svg .node.viz-output polygon,
+.mermaid svg .node.viz-output path {
   fill: var(--viz-output-bg) !important;
   stroke: var(--viz-output-stroke) !important;
 }
 .mermaid svg .node.viz-warning rect,
 .mermaid svg .node.viz-warning circle,
-.mermaid svg .node.viz-warning polygon {
+.mermaid svg .node.viz-warning polygon,
+.mermaid svg .node.viz-warning path {
   fill: var(--viz-warning-bg) !important;
   stroke: var(--viz-warning-stroke) !important;
 }
@@ -565,7 +570,7 @@ mark {
 .norm-behavior { margin: .55rem 0 0 !important; color: var(--c-muted) !important; font-size: .64rem !important; line-height: 1.4; }
 
 @media (max-width: 640px) {
-  .mermaid svg.flowchart { min-width: 36rem; }
+  .mermaid svg.flowchart { min-width: 42rem; }
   .mermaid svg.flowchart:has(.viz-compact) { min-width: 0; }
   .visual-grid--two { grid-template-columns: 1fr; }
   .learning-figure { max-width: 100% !important; }

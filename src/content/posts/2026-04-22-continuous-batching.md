@@ -93,7 +93,7 @@ Continuous batching keeps more useful work on the GPU. Combined with paged KV al
 				<text class="viz-node-label" x="204" y="119" text-anchor="middle">C</text>
 				<text class="viz-node-label" x="242" y="119" text-anchor="middle">C</text>
 				<path d="M147 137L155 145L163 137" style="fill:none;stroke:var(--viz-edge-strong);stroke-width:2"></path>
-				<text class="viz-callout" x="169" y="153">C admitted for step 3</text>
+				<text class="viz-callout" x="160" y="153">C admitted for step 3</text>
 				<text class="viz-axis-label" x="14" y="185">USEFUL SLOTS: 10 / 10</text>
 			</svg>
 		</section>

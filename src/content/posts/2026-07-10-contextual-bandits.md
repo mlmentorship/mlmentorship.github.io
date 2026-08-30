@@ -41,7 +41,8 @@ Formally, a contextual bandit sees context $x_t$, chooses action $a_t$, and rece
 				<text class="viz-callout" x="232" y="143" text-anchor="middle">1 observed</text>
 				<text class="viz-callout" x="232" y="187" text-anchor="middle">? unknown</text>
 				<path d="M78 138H91" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
-				<text class="viz-axis-label" x="20" y="214">UNCHOSEN REWARDS ARE MISSING, NOT ZERO</text>
+				<text class="viz-axis-label" x="20" y="208">UNCHOSEN REWARDS ARE MISSING,</text>
+				<text class="viz-axis-label" x="20" y="220">NOT ZERO</text>
 			</svg>
 		</section>
 		<section class="visual-panel plot-panel">
@@ -66,7 +67,8 @@ Formally, a contextual bandit sees context $x_t$, chooses action $a_t$, and rece
 				<text class="viz-callout" x="224" y="99" text-anchor="middle">yes · μ(A|x) = 0.70</text>
 				<text class="viz-callout" x="224" y="143" text-anchor="middle">yes · μ(B|x) = 0.30</text>
 				<text class="viz-callout" x="224" y="187" text-anchor="middle">NO · μ(C|x) = 0</text>
-				<text class="viz-axis-label" x="20" y="214">π(C|x) &gt; 0 BUT μ(C|x) = 0 → NOT IDENTIFIABLE</text>
+				<text class="viz-axis-label" x="20" y="208">π(C|x) &gt; 0 BUT μ(C|x) = 0</text>
+				<text class="viz-axis-label" x="20" y="220">→ NOT IDENTIFIABLE</text>
 			</svg>
 		</section>
 	</div>
