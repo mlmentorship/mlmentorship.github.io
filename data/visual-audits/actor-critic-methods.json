@@ -2,47 +2,47 @@
   "schemaVersion": 1,
   "slug": "actor-critic-methods",
   "article": "src/content/posts/2026-05-07-actor-critic-methods.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "Trace shared state features into actor and critic losses while seeing where the advantage estimate is detached from the actor gradient.",
-  "mediumRationale": "A deterministic SVG can distinguish forward data, two losses, separate parameter updates, and a stop-gradient boundary precisely. Mermaid cannot reliably place the gradient paths and detachment marker.",
+  "learningObjective": "Trace one shared state representation into the actor and critic objectives, and identify where the advantage must be treated as a fixed signal during the actor update.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align the shared trunk, two forward branches, two losses, parameter-update paths, and an explicit stop-gradient boundary. Mermaid can show topology but cannot place the detachment boundary and mathematical labels reliably; semantic HTML would make the converging and diverging paths harder to trace; interaction adds no necessary state; paper reuse adds licensing risk without improving this general mechanism; and no visual leaves the article's hardest spatial model unresolved.",
   "deckReview": {
     "pages": [
       {
         "page": 155,
-        "insight": "The deck contrasts supervised iid samples with dependent RL trajectories and frames policy as a state-to-action mapping."
+        "insight": "The deck contrasts iid supervised samples with dependent RL trajectories and frames both domains as learning mappings from inputs or states to outputs or actions."
       },
       {
         "page": 156,
-        "insight": "The policy-gradient slide shows policy sampling, discounted rewards, and the update loop that the critic later augments."
+        "insight": "The policy-optimization slide shows a state-to-action policy network, sampled actions, discounted rewards, and a REINFORCE-style policy update; it contains no critic or shared actor-critic trunk."
       }
     ],
-    "notes": "The independent agent incorrectly said the PDF was inaccessible. Manual inspection found policy-gradient context but no actor-critic architecture figure, so the planned diagram will be original."
+    "notes": "Copilot CLI agent 5 inspected PDF pages 154-157 directly: page 154 is the Reinforcement Learning section divider, pages 155-156 provide the relevant ML/RL and policy-gradient context, and page 157 begins Past projects. No slide in this neighboring range presents actor-critic architecture, separate objectives, or a stop-gradient boundary, so no deck figure applies for reuse."
   },
   "sourceReview": {
     "sources": [
       {
         "title": "Asynchronous Methods for Deep Reinforcement Learning",
         "url": "https://arxiv.org/abs/1602.01783",
-        "usage": "Use to verify the shared representation and separate policy and value objectives in a modern actor-critic architecture.",
-        "license": "No figure copied. Public arXiv access is not treated as CC0 or blanket figure permission."
+        "usage": "Used to verify that A3C maintains policy and value outputs, updates both from n-step returns, and in practice shares all non-output network layers.",
+        "license": "No text, code, layout, or figure was copied or adapted. Public arXiv access is not treated as permission to reuse a paper figure."
       },
       {
-        "title": "PyTorch autograd documentation",
-        "url": "https://pytorch.org/docs/stable/autograd.html",
-        "usage": "Use to check stop-gradient and detached-value semantics in the implementation explanation.",
-        "license": "No documentation figure or code copied; behavior referenced only."
+        "title": "PyTorch Tensor.detach documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.Tensor.detach.html",
+        "usage": "Used to verify that a detached advantage is treated as a value outside the current autograd graph and therefore cannot send the policy-loss gradient into the critic branch.",
+        "license": "No documentation text, code, or figure was copied; only the documented detach semantics were consulted."
       }
     ],
-    "notes": "The visual will use the article's notation and an original graph rather than adapting a paper image."
+    "notes": "The shipped SVG is an original composition using the article's notation and the site's established visual primitives. It does not reproduce paper-specific geometry or empirical data, and no third-party visual asset is included."
   },
   "agentReview": {
-    "reviewer": "Explore actor-critic subagent, manually reconciled",
+    "reviewer": "Copilot CLI agent 5",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent correctly identified dual objectives and detachment as the spatial gap. Integration removed unsupported licensing claims and narrowed the plan to one architecture and gradient-flow SVG."
+    "summary": "Independent review identified the split from shared state features into actor and critic objectives as the hardest prose-only model. The final design makes the fixed advantage signal and separate parameter updates explicit without implying that shared trunk parameters receive only one loss."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": ["actor-critic-two-objective-flow"],
+    "accessibility": "The SVG has a programmatic title and full description. Every node and path is directly labeled; solid forward arrows, dashed update arrows, distinct node shapes, and a labeled stop bar preserve the lesson without color. The established visual-scroll wrapper keeps labels at a readable size at 390 CSS pixels, while theme variables and print overrides support dark mode and paper."
   }
 }
