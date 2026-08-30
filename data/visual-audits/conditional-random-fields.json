@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "slug": "conditional-random-fields",
+  "article": "src/content/posts/2026-05-31-conditional-random-fields.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compare independent emission choices with a CRF's whole-path score, and see how a transition score can replace an incoherent BIO sequence with a coherent one.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can keep the token emissions fixed while adding an adjacent-label transition term and comparing the resulting paths.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic routing cannot reliably align numeric emission and transition scores into a compact path comparison.",
+    "svg": "Selected: fixed geometry makes the two score calculations and the changed first label directly comparable at phone width.",
+    "semanticHtml": "Rejected: a table can list scores but does not make the distinction between isolated nodes and a connected path spatially immediate.",
+    "interaction": "Rejected: changing toy scores would add controls without improving the single global-scoring lesson.",
+    "paperReuse": "Rejected: the canonical paper and tutorial do not grant clear permission to republish their figures, and their broader model diagrams do not teach this concrete BIO failure as directly.",
+    "noVisual": "Rejected: prose and equations leave readers to mentally compose emissions and transitions, which is the article's hardest conceptual step."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 69,
+        "insight": "The preceding slide explains forward-backward dynamic programming for HMM inference, providing the neighboring algorithmic context for the CRF partition function."
+      },
+      {
+        "page": 70,
+        "insight": "The only CRF slide says that a linear-chain CRF augments classifier logits with parameterized neighboring transition scores and uses dynamic programming for dependency-aware normalization."
+      },
+      {
+        "page": 71,
+        "insight": "The following slide starts linear factor models and contributes no additional CRF, sequence-scoring, or decoding detail."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 pages for conditional random field, linear-chain CRF, label bias, and structured prediction, then rendered and inspected pages 69-71 as the complete CRF neighborhood. Only page 70 discusses CRFs. Its model-family graphic is credited as adapted from Sutton and McCallum and is not reused; the shipped visual instead develops an original numeric BIO example."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Conditional Random Fields: Probabilistic Models for Segmenting and Labeling Sequence Data",
+        "url": "https://dl.acm.org/doi/10.5555/645530.655813",
+        "usage": "Used as the primary CRF source to verify conditional whole-sequence modeling, transition-dependent sequence scores, global normalization, and dynamic-programming inference.",
+        "license": "The ICML proceedings paper is publisher-copyrighted and no permissive figure license was identified. No figure, prose, notation, or layout is copied or adapted."
+      },
+      {
+        "title": "An Introduction to Conditional Random Fields",
+        "url": "https://arxiv.org/abs/1011.4088",
+        "usage": "Used as the authoritative tutorial source to check the linear-chain factorization, emission and transition contributions, partition function, forward computation, and Viterbi decoding.",
+        "license": "The accessible manuscript is distributed through arXiv, not under a verified permissive figure-reuse license. No source figure or text is reproduced; the toy values and composition are original."
+      }
+    ],
+    "notes": "The hardest prose-only model is that a CRF does not merely repair labels after independent classification: it scores complete candidate paths by combining fixed per-token emissions with adjacent-label transitions, then normalizes across paths. The original example uses two tokens and three BIO labels. Independent maxima choose O then I-PER (3 + 3 = 6), while adding an O-to-I-PER score of -5 lowers that path to 1; B-PER then I-PER scores 2 + 3 + 1 = 6. The numbers are deliberately synthetic and illustrate soft learned preferences, not a claim that every CRF imposes hard BIO constraints."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, inspected the full deck and exact CRF neighborhood, and checked the primary paper plus authoritative tutorial before selecting an original local-versus-path score comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "crf-global-path-scoring"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Every token, label, emission, transition, arithmetic result, and BIO validity judgment is written explicitly; node borders, an arrow, position, and the words INVALID and VALID preserve meaning without color. A compact 360-unit viewBox avoids horizontal scrolling and keeps text readable at 390 CSS pixels. Established theme variables provide dark-mode contrast, and shared print rules provide a light high-contrast palette with no minimum SVG width."
+  }
+}
