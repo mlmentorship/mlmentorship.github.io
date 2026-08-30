@@ -51,6 +51,62 @@ $$
 p(x_i) \propto \prod_{a \in N(x_i)} \mu_{a \to x_i}(x_i).
 $$
 
+<!-- visual:belief-propagation-branch-summary -->
+<figure class="learning-figure" aria-labelledby="belief-propagation-branch-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="belief-propagation-branch-title">How does a whole branch become one local message?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two-step binary belief-propagation example">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 230" role="img" aria-labelledby="bp-collapse-title bp-collapse-desc">
+				<title id="bp-collapse-title">A factor sums out its branch variable to produce a message about x</title>
+				<desc id="bp-collapse-desc">Variable y sends factor a the two-entry function 0.2, 0.8. Factor a combines each possible x with both possible y values and sums y out. The outgoing message is another two-entry function of x: 0.26, 0.68.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="195" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">1 · COLLAPSE ONE BRANCH</text>
+				<circle class="viz-node viz-node--input" cx="43" cy="70" r="22"></circle>
+				<text class="viz-node-label" x="43" y="74" text-anchor="middle">y</text>
+				<rect class="viz-node" x="126" y="48" width="44" height="44" rx="3"></rect>
+				<text class="viz-node-label" x="148" y="74" text-anchor="middle">ψₐ</text>
+				<circle class="viz-node viz-node--output" cx="255" cy="70" r="22"></circle>
+				<text class="viz-node-label" x="255" y="74" text-anchor="middle">x</text>
+				<path d="M65 70H126M170 70H233" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<path d="M119 66L126 70L119 74ZM226 66L233 70L226 74Z" style="fill:var(--viz-edge)"></path>
+				<text class="viz-label" x="95" y="55" text-anchor="middle">μᵧ→ₐ(y)</text>
+				<text class="viz-callout" x="95" y="91" text-anchor="middle">[0.20, 0.80]</text>
+				<text class="viz-label" x="201" y="55" text-anchor="middle">μₐ→ₓ(x)</text>
+				<text class="viz-callout" x="201" y="91" text-anchor="middle">[0.26, 0.68]</text>
+				<text class="viz-axis-label" x="18" y="122">SUM OUT y; KEEP x AS THE INDEX</text>
+				<text class="viz-callout" x="18" y="148">x = 0: 0.9 × 0.2 + 0.1 × 0.8 = 0.26</text>
+				<text class="viz-callout" x="18" y="174">x = 1: 0.2 × 0.2 + 0.8 × 0.8 = 0.68</text>
+				<text class="viz-label" x="18" y="203">The branch is now a function of x only.</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 230" role="img" aria-labelledby="bp-combine-title bp-combine-desc">
+				<title id="bp-combine-title">The target variable multiplies incoming branch messages and normalizes</title>
+				<desc id="bp-combine-desc">At variable x, the left message 0.26, 0.68 and right message 0.50, 0.25 are multiplied entry by entry. The unnormalized products 0.13, 0.17 sum to 0.30 and normalize to the belief 0.43, 0.57.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="195" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">2 · COMBINE AT THE TARGET</text>
+				<rect class="viz-node" x="20" y="48" width="42" height="42" rx="3"></rect>
+				<text class="viz-node-label" x="41" y="73" text-anchor="middle">ψₐ</text>
+				<circle class="viz-node viz-node--output" cx="150" cy="69" r="24"></circle>
+				<text class="viz-node-label" x="150" y="66" text-anchor="middle">x</text>
+				<text class="viz-node-value" x="150" y="80" text-anchor="middle">belief</text>
+				<rect class="viz-node" x="238" y="48" width="42" height="42" rx="3"></rect>
+				<text class="viz-node-label" x="259" y="73" text-anchor="middle">ψᵦ</text>
+				<path d="M62 69H126M238 69H174" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<path d="M119 65L126 69L119 73ZM181 65L174 69L181 73Z" style="fill:var(--viz-edge)"></path>
+				<text class="viz-callout" x="94" y="101" text-anchor="middle">[0.26, 0.68]</text>
+				<text class="viz-callout" x="206" y="101" text-anchor="middle">[0.50, 0.25]</text>
+				<text class="viz-axis-label" x="18" y="127">MULTIPLY MATCHING ENTRIES</text>
+				<text class="viz-callout" x="18" y="151">x = 0: 0.26 × 0.50 = 0.13</text>
+				<text class="viz-callout" x="18" y="176">x = 1: 0.68 × 0.25 = 0.17</text>
+				<text class="viz-label" x="18" y="203">Normalize [0.13, 0.17] → p(x) = [0.43, 0.57]</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow one branch toward <var>x</var>: the factor multiplies its local compatibility by the incoming evidence and sums out <var>y</var>, leaving a two-entry function of <var>x</var>. At <var>x</var>, multiply matching entries from every branch, then normalize once to read the marginal. A message summarizes a branch; it is not itself a normalized probability.</figcaption>
+</figure>
+
 Replace the inner $\sum$ with a $\max$ and you get **max-product** (a.k.a. max-sum in log space), which finds the MAP configuration, the general version of **Viterbi**.
 
 ## Exact vs approximate
