@@ -33,32 +33,45 @@ if (slugs.length === 0 || new Set(slugs).size !== slugs.length) {
   throw new Error('--slugs needs a non-empty, duplicate-free comma-separated list');
 }
 
-const executable = browserExecutable();
-if (!executable) throw new Error('Chrome or Edge was not found; set CHROME_PATH or --browser');
-if (process.platform !== 'win32' && /^[A-Za-z]:|^\/mnt\/[a-z]\//.test(executable)) {
-  throw new Error('Run this script with Windows Node when using a Windows browser so its CDP port is reachable');
-}
-
 const baseUrl = option('base-url', 'http://127.0.0.1:8123').replace(/\/$/, '');
 const outputDir = resolve(root, option('output', 'scratch/visual-render-review'));
 const auditsDir = join(root, 'data', 'visual-audits');
-const entries = slugs.map((slug) => {
+const auditedEntries = slugs.map((slug) => {
   const auditPath = join(auditsDir, `${slug}.json`);
   if (!existsSync(auditPath)) throw new Error(`Missing audit sidecar for ${slug}`);
   const audit = JSON.parse(readFileSync(auditPath, 'utf8'));
-  if (audit.status !== 'implemented') throw new Error(`${slug} is ${audit.status}, not implemented`);
+  if (!['implemented', 'no-visual'].includes(audit.status)) {
+    throw new Error(`${slug} is ${audit.status}, not resolved`);
+  }
+  if (audit.status === 'no-visual') return { slug, status: audit.status };
   const articlePath = join(root, audit.article);
   const article = readFileSync(articlePath, 'utf8');
   const category = article.match(/^---\n[\s\S]*?^category:\s*["']?([^"'\n]+)["']?\s*$[\s\S]*?^---$/m)?.[1]?.trim();
   if (!category) throw new Error(`Could not read category from ${audit.article}`);
   return {
     slug,
+    status: audit.status,
     category,
     medium: audit.medium,
     visualIds: audit.implementation.visualIds,
     article: basename(audit.article),
   };
 });
+const entries = auditedEntries.filter((entry) => entry.status === 'implemented');
+const noVisualSlugs = auditedEntries.filter((entry) => entry.status === 'no-visual').map((entry) => entry.slug);
+if (entries.length === 0) {
+  rmSync(outputDir, { recursive: true, force: true });
+  mkdirSync(outputDir, { recursive: true });
+  writeFileSync(join(outputDir, 'report.json'), `${JSON.stringify({ renders: [], noVisualSlugs }, null, 2)}\n`);
+  console.log(`No implemented visuals to render; verified ${noVisualSlugs.length} no-visual outcome(s)`);
+  process.exit(0);
+}
+
+const executable = browserExecutable();
+if (!executable) throw new Error('Chrome or Edge was not found; set CHROME_PATH or --browser');
+if (process.platform !== 'win32' && /^[A-Za-z]:|^\/mnt\/[a-z]\//.test(executable)) {
+  throw new Error('Run this script with Windows Node when using a Windows browser so its CDP port is reachable');
+}
 
 const modes = [
   { name: 'desktop-light', width: 1280, height: 900, theme: 'light', media: 'screen' },
@@ -340,8 +353,8 @@ try {
     }
   }
 
-  writeFileSync(join(outputDir, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
-  console.log(`Visual rendering passed: ${report.length} renders; screenshots saved to ${outputDir}`);
+  writeFileSync(join(outputDir, 'report.json'), `${JSON.stringify({ renders: report, noVisualSlugs }, null, 2)}\n`);
+  console.log(`Visual rendering passed: ${report.length} renders, ${noVisualSlugs.length} no-visual outcome(s); screenshots saved to ${outputDir}`);
 } finally {
   cdp?.close();
   await stopBrowser();
