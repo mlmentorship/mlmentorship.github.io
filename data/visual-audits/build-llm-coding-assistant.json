@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "slug": "build-llm-coding-assistant",
+  "article": "src/content/posts/2025-04-12-build-llm-coding-assistant.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace why latency-sensitive inline completion needs a cancelable FIM-and-retrieval fast path, while function, chat, and agentic work belongs on a separate seconds-budget path with task-level evaluation.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that preserves the request sequence, the convergence of current-buffer and repository context, and the split between two latency and evaluation contracts. The relationship is architectural rather than quantitative, so a graph communicates more directly than fixed geometry.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled directed edges expose the request trigger, two context sources, bounded FIM prompt, model tier, output, and evaluation contract while the established renderer handles responsive layout and themes.",
+    "svg": "Rejected: the lesson is a dependency and routing path rather than a precise geometric or quantitative shape, so hand-positioned SVG would add maintenance without more explanatory control.",
+    "semanticHtml": "Rejected: two semantic lanes could compare inline and agentic products, but would obscure that buffer context and retrieved repository chunks converge into one inline prompt.",
+    "interaction": "Rejected: simulating typing, cancellation, or model routing would add state and timing behavior without changing the fixed architecture distinction.",
+    "paperReuse": "Rejected: RepoCoder contains a related repository-completion figure and the FIM paper contains transformation illustrations, but neither covers this article's two-tier product contract. Paper figure reuse permission was not established, and no source composition is copied.",
+    "noVisual": "Rejected: the prose distributes trigger handling, FIM, retrieval, model tiering, and evaluation across L5 and L6 answers, leaving readers to assemble which components belong on the inline critical path and which define a different product."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The preceding Transformer survey names GPT and training techniques but contains no code-completion request path, repository context, or product latency split."
+      },
+      {
+        "page": 104,
+        "insight": "The GPT-X and large-language-model slide covers pretrained generative models, in-context learning, and instruction tuning, providing model-family context but no IDE architecture."
+      },
+      {
+        "page": 105,
+        "insight": "The adjacent applications slide discusses tool use and prompting, but not inline completion, FIM, repository retrieval, cancellation, or separate latency tiers."
+      },
+      {
+        "page": 108,
+        "insight": "The LLM compute-optimization setup identifies inference bottlenecks and mentions speculative decoding, reinforcing that serving latency needs explicit treatment without defining a coding-assistant request lifecycle."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide uses a small draft model to accelerate token decoding. This is distinct from the article's speculative execution, which starts and cancels whole completion requests as the user types; the visual deliberately does not conflate them."
+      },
+      {
+        "page": 114,
+        "insight": "The following mixed-precision slide returns to training numerics and marks the end of the relevant LLM optimization neighborhood."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search section divider begins the deck's closest interactive keystroke-by-keystroke system-design example, but it concerns media ranking rather than code completion."
+      },
+      {
+        "page": 134,
+        "insight": "The instant-search prompt explicitly issues a request after each keystroke, requires responses within 100 milliseconds, and asks whether every request merits personalization. It supports the need for a latency contract and selective work, not a coding-specific architecture."
+      },
+      {
+        "page": 135,
+        "insight": "The neighboring search slide separates candidate generation from ranking and query context. It offers general retrieval-system context but has no repository chunks, FIM prompt, or code model."
+      },
+      {
+        "page": 136,
+        "insight": "The following system-overview slide is a section boundary and supplies no coding-assistant mechanism."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for coding assistant, code assistant, code completion, Copilot, fill-in-the-middle, IDE, repository-level context, and speculative execution; none appears as a coding-assistant treatment. Pages 103-114 were inspected as the nearest LLM and inference-optimization neighborhood, and pages 132-136 as the nearest keystroke-triggered low-latency system-design neighborhood. Page 134 is useful only as a general sub-100-millisecond interaction analogy. No deck artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Training of Language Models to Fill in the Middle",
+        "url": "https://arxiv.org/abs/2207.14255",
+        "usage": "Used as the primary source to verify that FIM transforms a document by moving a middle span after its surrounding prefix and suffix, training a model to condition completion on both sides while retaining left-to-right capability.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was identified. No figure, transformation example, prose, result, or layout is copied; the shipped system flow is independently authored."
+      },
+      {
+        "title": "RepoCoder: Repository-Level Code Completion Through Iterative Retrieval and Generation",
+        "url": "https://arxiv.org/abs/2303.12570",
+        "usage": "Used as the primary source to verify that unfinished in-file code can be augmented with retrieved repository snippets for repository-level code completion and that line, API, and function-body completion are distinct evaluation granularities.",
+        "license": "The paper's public preprint is not treated as permission to reuse its figures. The companion RepoCoder code is MIT licensed, but that software license is not assumed to cover paper artwork. No source figure, code, data, wording, or layout is copied."
+      },
+      {
+        "title": "GitHub Docs: GitHub Copilot code suggestions in your IDE",
+        "url": "https://docs.github.com/en/copilot/concepts/completions/code-suggestions",
+        "usage": "Used as official product documentation to verify that inline ghost-text suggestions are offered while a developer types and may span different completion scopes.",
+        "license": "GitHub Docs source is published under CC BY 4.0. The documentation is cited for behavior only; no prose, screenshot, icon, or layout is adapted."
+      },
+      {
+        "title": "GitHub Docs: Indexing repositories for GitHub Copilot",
+        "url": "https://docs.github.com/en/copilot/concepts/context/repository-indexing",
+        "usage": "Used as official documentation to verify that semantic repository indexing supplies relevant code context and that policy and content exclusion affect which repository data is available.",
+        "license": "GitHub Docs source is published under CC BY 4.0. No documentation text, product artwork, or repository-index diagram is reproduced."
+      },
+      {
+        "title": "GitHub Docs repository license",
+        "url": "https://github.com/github/docs/blob/main/LICENSE",
+        "usage": "Used to explicitly verify the Creative Commons Attribution 4.0 license for GitHub Docs content.",
+        "license": "CC BY 4.0 permits adaptation with attribution. This visual remains original and uses links only as factual citations, so it does not adapt documentation artwork."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the online critical path and its product boundary: inline completion starts from ephemeral cursor state, merges suffix-aware file context with a small retrieved repository set, must cancel stale work, and is judged by acceptance, edit, and latency signals. Function, chat, and agentic work has a different time budget and must be judged by task completion and verification. The visual is an original synthesis and intentionally distinguishes speculative request execution from the deck's speculative token decoding."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the LLM optimization and keystroke-search neighborhoods, then checked the primary FIM and RepoCoder papers plus official GitHub completion, indexing, and documentation-license sources before selecting an original two-latency-path Mermaid flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "coding-assistant-two-latency-paths"
+    ],
+    "accessibility": "The Mermaid block includes a specific accessible title and a complete description of both paths. Node text and labelled edges name every product, latency, context, model, output, and evaluation distinction, so meaning does not depend on color. A top-to-bottom layout and the established viz-compact class remove the wide mobile minimum for readability at 390 CSS pixels; the shared Mermaid theme supplies dark-mode and print-compatible colors."
+  }
+}
