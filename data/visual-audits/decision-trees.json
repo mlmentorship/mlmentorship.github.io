@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "decision-trees",
+  "article": "src/content/posts/2026-04-19-decision-trees.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Map each root-to-leaf rule path to one axis-aligned region of feature space and its constant leaf prediction.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align exact threshold lines in two-dimensional feature space with the corresponding rule nodes and leaves. Showing both representations at once makes recursive partitioning and piecewise-constant prediction directly traceable without interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: Mermaid could render the rule tree, but cannot precisely align full-region and child-region threshold lines with the feature-space rectangles they create.",
+    "svg": "Selected: fixed geometry pairs one partition with its exact tree, distinguishes a full-height root cut from a child-only cut, and supports a visible prediction path.",
+    "semanticHtml": "Rejected: nested lists or a table could express the rules and leaf probabilities, but would not reveal their equivalence to axis-aligned spatial regions.",
+    "interaction": "Rejected: letting readers move a point or threshold could teach sensitivity, but introduces controls and hidden states when one labelled point and simultaneous plot/tree views already expose the core mapping.",
+    "paperReuse": "Rejected: CART and textbook treatments contain tree and partition figures, while scikit-learn publishes rendered examples, but no external composition is needed and no permissive figure-adaptation grant was established for the book artwork. No source figure, coordinates, data, or layout is copied.",
+    "noVisual": "Rejected: prose explains recursive threshold tests and constant leaves separately, leaving readers to mentally construct how a path intersects half-spaces into one region and why a child split affects only its parent's region."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 24,
+        "insight": "The preceding K-nearest-neighbor slide contrasts instance-based classification with learned rules, but contains no recursive partition or decision-tree mechanism."
+      },
+      {
+        "page": 25,
+        "insight": "The Random Forests slide defines a decision tree as if-then statements that split feature space one attribute at a time, describes entropy reduction, includes Gini code, and then shifts to bootstrap aggregation. It does not spatially connect a rule path to nested feature-space regions."
+      },
+      {
+        "page": 26,
+        "insight": "The dedicated split-criterion slide lists variance, information gain, and Gini impurity by target type, but provides no worked candidate split, recursive geometry, or leaf prediction."
+      },
+      {
+        "page": 27,
+        "insight": "The following gradient-boosting slide describes trees as weak models dividing inputs into regions by rules or thresholds, then moves to sequential residual correction rather than explaining a single tree's partition."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for decision tree, random forest, gradient boosting, XGBoost, CART, Gini, entropy, information gain, and feature-space splitting. Pages 24-27 are the only contiguous decision-tree teaching neighborhood: pages 25-26 directly discuss tree training, while pages 24 and 27 establish the neighboring methods. Page 131 mentions gradient boosting only as a hybrid-recommender combiner and adds no tree mechanism. No deck artwork, code, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Classification and Regression Trees",
+        "url": "https://www.routledge.com/Classification-and-Regression-Trees/Breiman-Friedman-Stone-Olshen/p/book/9780412048418",
+        "usage": "Used as the authoritative CART source for recursive binary partitioning, axis-aligned feature-threshold tests, constant terminal-node predictions, greedy split construction, and pruning context.",
+        "license": "The book is commercially published and no permissive license for reproducing or adapting its figures was identified. No figure, example data, wording, coordinates, or layout is reused."
+      },
+      {
+        "title": "scikit-learn User Guide: Decision Trees",
+        "url": "https://scikit-learn.org/stable/modules/tree.html#mathematical-formulation",
+        "usage": "Used as official implementation documentation to verify left and right partitions for a feature-threshold pair, weighted child impurity, greedy exhaustive best-split search, recursive application, and class probability as the class fraction at a terminal node.",
+        "license": "scikit-learn documentation is distributed with the BSD 3-Clause licensed project. It is cited for semantics only; no documentation figure, Iris data, code, prose, or visual layout is reproduced."
+      },
+      {
+        "title": "The Elements of Statistical Learning, 2nd Edition",
+        "url": "https://hastie.su.domains/ElemStatLearn/",
+        "usage": "Used as an authoritative textbook cross-check for recursive binary partitioning into rectangular regions, constant models within terminal regions, greedy top-down construction, and the high variance of individual trees.",
+        "license": "A free author-hosted PDF is available for reading, but free access is not treated as permission to adapt textbook artwork. No textbook figure, dataset, wording, coordinates, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the equivalence of the tree and the partition: the root threshold cuts the entire active region, each descendant threshold cuts only the samples and subregion reaching that node, and the conjunction of path tests defines one axis-aligned terminal rectangle. The original synthetic example has eight training points, with four circles and four triangles. The left leaf contains three circles and one triangle, so P(triangle) = 1/4. The right child separates three lower triangles from one upper circle, producing probabilities 1 and 0. The highlighted point follows x1 > 4 and x2 <= 3 to the pure-triangle leaf. Shapes, labels, and line extent—not color—encode every logical distinction."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact decision-tree neighborhood, then checked CART, official scikit-learn mathematics, and an authoritative statistical-learning textbook before selecting an original paired partition-and-rule-tree SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "decision-tree-partitions-feature-space"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Class 0 uses circles, class 1 uses triangles, the root cut is solid and full-height, the child cut is dashed and confined to its parent region, and rule outcomes and probabilities are directly labelled. The 360-unit viewBox scales with the established plot-panel primitive and has no minimum width for readability at 390 CSS pixels; existing theme variables preserve dark-mode contrast and shared print rules force a light high-contrast palette."
+  }
+}
