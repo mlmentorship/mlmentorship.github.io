@@ -145,6 +145,9 @@ function validateAudit(audit, file, entry) {
       const marker = entry.source.indexOf(`<!-- visual:${id} -->`);
       const figureEnd = entry.source.indexOf('</figure>', marker);
       const figure = entry.source.slice(marker, figureEnd + 9);
+      if (/\n\s*\n/.test(figure)) {
+        fail(`${label} SVG visual ${id} must be one uninterrupted Markdown HTML block`);
+      }
       if (figureEnd < 0 || !figure.includes('<svg') || !figure.includes('role="img"') || !figure.includes('<title') || !figure.includes('<desc') || !figure.includes('<figcaption>')) {
         fail(`${label} SVG visual ${id} needs a figure, role, title, description, and caption`);
       }
@@ -162,6 +165,9 @@ function validateAudit(audit, file, entry) {
       const marker = entry.source.indexOf(`<!-- visual:${id} -->`);
       const figureEnd = entry.source.indexOf('</figure>', marker);
       const figure = entry.source.slice(marker, figureEnd + 9);
+      if (/\n\s*\n/.test(figure)) {
+        fail(`${label} semantic visual ${id} must be one uninterrupted Markdown HTML block`);
+      }
       if (figureEnd < 0 || !figure.includes('<figure') || !figure.includes('aria-labelledby=') || !figure.includes('aria-label=') || !figure.includes('<figcaption>')) {
         fail(`${label} semantic visual ${id} needs a labelled figure, accessible child, and caption`);
       }
