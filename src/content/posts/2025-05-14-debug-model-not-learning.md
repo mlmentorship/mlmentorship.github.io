@@ -34,6 +34,31 @@ This is a list of things, in no particular order, each generic. You've heard the
 
 This is L5. You've described a *procedure* (top-down, fast checks first), with specific tests at each stage and a clear branch on what each result implies.
 
+<!-- visual:model-not-learning-diagnostic-path -->
+```mermaid
+flowchart TB
+	accTitle: A fastest-checks-first path for debugging a model that is not learning
+	accDescr: First try to overfit one tiny fixed batch without regularization. Failure means the training foundation is broken, so inspect exact inputs and labels, verify the loss by hand, and check gradient flow, train mode, and the parameter update. Success earns escalation to full training, where stuck, chaotic, improving training, and diverging validation behavior lead to different diagnoses.
+	A["Overfit one tiny fixed batch<br/>no regularization"] --> B{"Loss reaches its<br/>minimum?"}
+	B -->|"no"| C["Foundation is broken"]
+	C --> D["Inspect exact inputs + labels<br/>verify loss by hand"]
+	D --> E["Check gradient flow, train mode,<br/>and the parameter update"]
+	E -. "fix, then repeat" .-> A
+	B ==>|"yes: escalate"| F["Run full training<br/>watch a fixed batch"]
+	F --> G{"What do predictions<br/>and loss do?"}
+	G -->|"stuck"| H["Recheck foundation;<br/>then LR, optimizer, batch"]
+	G -->|"chaotic"| I["Lower LR; check exploding<br/>gradients and numerics"]
+	G -->|"training improves"| J{"Validation follows<br/>training?"}
+	J -->|"no: gap grows"| K["Overfitting<br/>regularize or add data"]
+	J -->|"yes, both plateau"| L["Underfitting or task mismatch<br/>capacity, data, representation"]
+	class A,F viz-input
+	class B,G,J viz-focus
+	class C,D,E,H,I viz-warning
+	class K,L viz-output
+	class A,B,C,D,E,F,G,H,I,J,K,L viz-compact
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> earn the right to tune by first proving that the complete training path can memorize a tiny batch. If it cannot, stay with inputs, labels, loss, gradients, mode, and updates. Only after it can should full-training behavior route you toward optimization, numerical stability, overfitting, or underfitting. Original synthesis checked against <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's training recipe</a> and the <a href="https://cs231n.github.io/neural-networks-3/">CS231n learning notes</a>.</p>
+
 ## What an L6 answer sounds like
 
 The L6 answer adds the things that come from having debugged a hundred models:
