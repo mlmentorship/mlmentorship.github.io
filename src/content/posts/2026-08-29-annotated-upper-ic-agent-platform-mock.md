@@ -108,6 +108,50 @@ The candidate defines both technical and ownership boundaries. The platform does
 
 The architecture directly supports incremental migration. Runtime adapters preserve team choice while the gateway centralizes shared risk.
 
+**Learning objective:** Trace one consequential action from model proposal to authoritative outcome, and identify which owner controls each boundary.
+
+<!-- visual:agent-governed-action-path -->
+```mermaid
+flowchart TB
+	accTitle: A governed agent action crosses control, execution, and evidence boundaries
+	accDescr: A product-owned runtime lets the model propose a typed tool action. The platform-owned gateway sends identity, purpose, scope, and arguments to policy. A denial produces no credential. A permit issues a narrow credential only to the executor, which dispatches one logical call to the tool. The gateway, policy decision, execution attempt, and authoritative final state all emit records to the durable evidence plane.
+	subgraph Runtime["RUNTIME ADAPTER · product team owns workflow outcome"]
+		Proposal["1 · Model proposes<br/>tool + structured arguments"]
+	end
+	subgraph Control["CONTROL PLANE · platform owns enforcement"]
+		Gateway["2 · Gateway receives<br/>identity + purpose + scope"]
+		Policy{"3 · Policy<br/>permits?"}
+		Credential["4 · Narrow credential<br/>for this call only"]
+		Denied["DENY · no credential"]
+		Gateway ==> Policy
+		Policy ==>|"permit"| Credential
+		Policy -. "deny" .-> Denied
+	end
+	subgraph Execution["EXECUTION · tool team owns action semantics"]
+		Executor["5 · Executor dispatches<br/>one logical call ID"]
+		Tool["6 · Tool reports<br/>authoritative final state"]
+		Executor ==> Tool
+	end
+	subgraph Evidence["EVIDENCE PLANE · platform preserves portable records"]
+		Record[("Authorized request<br/>policy · attempt · outcome")]
+	end
+	Proposal ==> Gateway
+	Credential ==> Executor
+	Gateway -. "request" .-> Record
+	Policy -. "decision" .-> Record
+	Executor -. "attempt" .-> Record
+	Tool -. "status / final state" .-> Record
+	class Proposal viz-input
+	class Gateway,Policy viz-focus
+	class Credential,Executor viz-neutral
+	class Tool viz-output
+	class Denied viz-warning
+	class Record viz-state
+	class Proposal,Gateway,Policy,Credential,Denied,Executor,Tool,Record viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> the model can propose an action, but it never receives action authority. The gateway permits or denies the structured request, the executor alone receives a narrow credential, and durable evidence links that decision to the tool's final state.</p>
+
 **Level signal:** principal. The answer chooses what becomes shared across organizations and what remains local.
 
 **Score movement:** Architecture 0 to 2. Migration 0 to 1. Delegated leadership 0 to 1.
