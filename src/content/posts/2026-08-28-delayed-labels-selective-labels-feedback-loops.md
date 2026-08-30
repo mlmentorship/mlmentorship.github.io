@@ -40,7 +40,7 @@ flowchart TB
 	class M,D,C viz-warning
 	class O,T viz-state
 	class N viz-output
-	class E,P,M,W,D,C,O,T,N viz-compact
+	class E viz-wide
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> pass both gates before calling an outcome negative. The policy must first take an action that can reveal the outcome, and the observation window must then close without censoring. Only the mature observed branch enters ordinary training; follow the dashed return edge to see why that selected evidence changes what the next policy will reveal.</p>

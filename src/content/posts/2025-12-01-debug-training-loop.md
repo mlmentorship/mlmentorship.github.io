@@ -61,12 +61,14 @@ flowchart TB
 	accTitle: Missing resets let gradient and module-mode state leak into later training batches
 	accDescr: The diagram follows two independent pieces of persistent state. In the gradient lane, batch one backward sets parameter gradients to g one and the optimizer step uses them. Without zero grad, batch two backward adds g two to the old g one, so the next step uses both. In the module-mode lane, model eval switches the module to evaluation mode. Without a later model train call, the next training forward still uses evaluation behavior. No grad is a separate local setting and does not restore training mode.
 	subgraph G["PARAMETER .grad STATE"]
+		direction TB
 		G0["Start batch 1<br/>grad = None"] --> G1["backward()<br/>grad = g₁"]
 		G1 --> G2["step()<br/>update uses g₁"]
 		G2 -. "zero_grad() missing" .-> G3["Batch 2 backward()<br/>grad = g₁ + g₂"]
 		G3 --> G4["step()<br/>stale g₁ is reused"]
 	end
 	subgraph M["MODULE MODE STATE"]
+		direction TB
 		M0["Training forward<br/>mode = train"] --> M1["model.eval()<br/>mode = eval"]
 		M1 -. "model.train() missing" .-> M2["Next training forward<br/>still eval mode"]
 	end

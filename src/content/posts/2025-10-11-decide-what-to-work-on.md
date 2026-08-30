@@ -70,7 +70,7 @@ flowchart TB
 	class C viz-warning
 	class I,J,K viz-output
 	class E,F,G viz-state
-	class A,B,C,D,E,F,G,H,I,J,K viz-compact
+	class A viz-wide
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> do not ask only whether a project is valuable. First remove work that misses user outcomes or strategy, then compare each survivor with the next-best use of the same person's time. Select a portfolio rather than a single winner, so near-term delivery and longer-term leverage both receive deliberate capacity. The two-thirds/one-third split is the answer's example, not a universal rule. Original synthesis checked against <a href="https://ntrs.nasa.gov/citations/20170001761">NASA's decision-analysis guidance</a>, <a href="https://openstax.org/books/principles-economics-3e/pages/2-1-how-individuals-make-choices-based-on-their-budget-constraint">OpenStax on opportunity cost</a>, and <a href="https://doi.org/10.1111/1467-9310.00225">Cooper, Edgett, and Kleinschmidt on project portfolios</a>.</p>
 

@@ -5,9 +5,9 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Use one tiny-batch memorization test to separate a broken training foundation from full-training optimization, overfitting, and underfitting problems, then choose the next check from the observed behavior.",
-  "mediumRationale": "A compact Mermaid decision path is the smallest medium that preserves the diagnostic ordering, the tiny-batch gate, and the later behavior-dependent branches without inventing quantitative thresholds.",
+  "mediumRationale": "A Mermaid decision path is the smallest medium that preserves the diagnostic ordering, the tiny-batch gate, and the later behavior-dependent branches without inventing quantitative thresholds. Its wide-canvas marker preserves readable labels for the full branch structure.",
   "mediumComparison": {
-    "mermaid": "Selected: the lesson is an ordered qualitative procedure with a gate, feedback loop, and named branches, which the established compact flowchart primitive expresses directly.",
+    "mermaid": "Selected: the lesson is an ordered qualitative procedure with a gate, feedback loop, and named branches, which the established wide, scrollable flowchart primitive expresses directly.",
     "svg": "Rejected: the article does not need quantitative geometry, and hand-positioning a fixed flowchart would duplicate Mermaid's relationship semantics.",
     "semanticHtml": "Rejected: a checklist or cards could preserve order but would make the decisive tiny-batch gate and the return-to-foundation loop less apparent.",
     "interaction": "Rejected: revealing diagnoses after a click would hide branches that readers benefit from comparing simultaneously and would add controls without adding evidence.",
@@ -93,6 +93,6 @@
     "visualIds": [
       "model-not-learning-diagnostic-path"
     ],
-    "accessibility": "Mermaid receives a complete accessible title and description. Every decision edge names its observed result, the failed foundation loop is dashed, the successful escalation edge is thick, and every terminal diagnosis is directly labelled, so meaning survives grayscale. The established viz-compact class removes the mobile minimum width for readability at 390 CSS pixels; shared Mermaid theme variables support dark mode and print."
+    "accessibility": "Mermaid receives a complete accessible title and description. Every decision edge names its observed result, the failed foundation loop is dashed, the successful escalation edge is thick, and every terminal diagnosis is directly labelled, so meaning survives grayscale. The wide flowchart uses horizontal scrolling at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width; shared Mermaid theme variables support dark mode and print."
   }
 }

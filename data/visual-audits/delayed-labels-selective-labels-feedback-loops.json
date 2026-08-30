@@ -5,9 +5,9 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Distinguish a mature negative from a pending, censored, or policy-unobserved outcome, then trace how only the observed subset shapes the next deployed policy.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that can show both observation gates, preserve three distinct unknown states, and close the policy-to-data-to-policy feedback loop without implying a quantitative relationship.",
+  "mediumRationale": "A wide Mermaid flowchart is the smallest medium that can show both observation gates, preserve three distinct unknown states, and close the policy-to-data-to-policy feedback loop without shrinking branch labels or implying a quantitative relationship.",
   "mediumComparison": {
-    "mermaid": "Selected because labelled branches express the policy-selection gate, maturity gate, non-label outcomes, and retraining return path directly; the established compact class supplies responsive, themed, and print-compatible rendering.",
+    "mermaid": "Selected because labelled branches express the policy-selection gate, maturity gate, non-label outcomes, and retraining return path directly; the established wide, scrollable class supplies readable, themed, and print-compatible rendering.",
     "svg": "Rejected because the lesson is relational rather than geometric or quantitative, so fixed hand-positioned paths would duplicate Mermaid's graph semantics and be harder to maintain.",
     "semanticHtml": "Rejected because a status table could distinguish missing, pending, censored, and mature rows but would obscure how policy selection determines the observed training set and then changes the next cycle.",
     "interaction": "Rejected because changing a row's status over time would add controls and state without improving the core two-gate inference.",
@@ -81,6 +81,6 @@
     "visualIds": [
       "policy-label-observation-loop"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description. Every gate, status, branch condition, and feedback edge is directly labelled; solid versus dashed paths reinforce rather than carry meaning, and each unknown state explicitly says it is not negative. The top-to-bottom graph and established viz-compact class remove the mobile minimum width at 390 CSS pixels, while shared Mermaid theme tokens provide dark-mode and print-compatible contrast."
+    "accessibility": "The Mermaid source includes a complete accessible title and description. Every gate, status, branch condition, and feedback edge is directly labelled; solid versus dashed paths reinforce rather than carry meaning, and each unknown state explicitly says it is not negative. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width and shared Mermaid theme tokens provide dark-mode and print-compatible contrast."
   }
 }

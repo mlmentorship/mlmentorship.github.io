@@ -5,9 +5,9 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Choose work by gating candidates on user value and strategy, comparing each survivor with the next-best use of the same time, and allocating the winners across near-term delivery and longer-term leverage.",
-  "mediumRationale": "A compact Mermaid funnel is the smallest medium that turns the article's dimensions into a repeatable procedure: gate, compare counterfactually, select with stakeholders, and balance a portfolio.",
+  "mediumRationale": "A wide Mermaid funnel is the smallest medium that turns the article's dimensions into a repeatable procedure: gate, compare counterfactually, select with stakeholders, and balance a portfolio without shrinking its branch labels.",
   "mediumComparison": {
-    "mermaid": "Selected: the learning task is a qualitative decision flow with parallel criteria, convergence, and a reconsideration loop, all supported by the established compact flowchart primitive.",
+    "mermaid": "Selected: the learning task is a qualitative decision flow with parallel criteria, convergence, and a reconsideration loop, all supported by the established wide, scrollable flowchart primitive.",
     "svg": "Rejected: the article provides no quantitative scale or geometry, and a hand-positioned flowchart would duplicate Mermaid's relationship semantics.",
     "semanticHtml": "Rejected: a scorecard or table would compare dimensions but obscure the difference between hard gates, counterfactual comparison, and portfolio allocation.",
     "interaction": "Rejected: adjustable weights would imply false precision and a universal ranking formula when priorities and evidence depend on the team context.",
@@ -89,6 +89,6 @@
     "visualIds": [
       "work-prioritization-counterfactual-portfolio"
     ],
-    "accessibility": "The Mermaid source provides a complete title and description. Every gate, comparison dimension, decision outcome, portfolio horizon, and reconsideration path is directly labelled; solid, thick, and dashed edges reinforce semantics without relying on color. The established viz-compact class removes the mobile minimum width for readability at 390 CSS pixels, while shared Mermaid tokens provide dark-mode and print contrast."
+    "accessibility": "The Mermaid source provides a complete title and description. Every gate, comparison dimension, decision outcome, portfolio horizon, and reconsideration path is directly labelled; solid, thick, and dashed edges reinforce semantics without relying on color. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width and shared Mermaid tokens provide dark-mode and print contrast."
   }
 }

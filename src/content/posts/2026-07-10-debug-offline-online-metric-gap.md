@@ -48,7 +48,7 @@ flowchart TB
 	class R,F viz-warning
 	class P,B,Y,E viz-state
 	class D viz-output
-	class O,V,S,L,H,R,F,P,B,Y,E,D viz-compact
+	class O viz-wide
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the heavy “yes” spine downward. A failed validity or delivery gate is already an explanation, so repair it before blaming model quality. Only after both gates pass should you branch into cause families, then choose a replay, shadow comparison, or small rollback whose result separates those hypotheses.</p>

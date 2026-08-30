@@ -55,7 +55,7 @@ flowchart TB
 	class B,G,J viz-focus
 	class C,D,E,H,I viz-warning
 	class K,L viz-output
-	class A,B,C,D,E,F,G,H,I,J,K,L viz-compact
+	class A viz-wide
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> earn the right to tune by first proving that the complete training path can memorize a tiny batch. If it cannot, stay with inputs, labels, loss, gradients, mode, and updates. Only after it can should full-training behavior route you toward optimization, numerical stability, overfitting, or underfitting. Original synthesis checked against <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's training recipe</a> and the <a href="https://cs231n.github.io/neural-networks-3/">CS231n learning notes</a>.</p>
 

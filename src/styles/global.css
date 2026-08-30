@@ -290,6 +290,7 @@ mark {
 .mermaid {
   padding: clamp(.9rem, 2.5vw, 1.25rem) !important;
   overflow-x: auto !important;
+  justify-content: flex-start !important;
   border: 1px solid var(--c-rule) !important;
   border-radius: var(--radius-lg) !important;
   background:
@@ -304,6 +305,7 @@ mark {
   margin: 0 auto;
   font-family: var(--font-ui) !important;
 }
+.mermaid svg.flowchart:has(.viz-wide) { min-width: 42rem; }
 .mermaid svg text,
 .mermaid svg span,
 .mermaid svg .label,
@@ -601,6 +603,7 @@ mark {
     background: #ffffff !important;
   }
   .mermaid svg { max-width: 100%; max-height: none; }
+  .mermaid svg.flowchart:has(.viz-wide) { min-width: 0; }
   .visual-scroll { overflow: visible; }
   .visual-wide svg,
   .backprop-visual svg { min-width: 0; }

@@ -74,7 +74,7 @@ Restrict the sampling pool to the smallest set of tokens whose cumulative probab
 					<rect class="viz-node" x="248" y="156" width="26" height="4"></rect><text x="261" y="151">1%</text><text x="261" y="176">G</text>
 				</g>
 				<path d="M20 190V196H122V190" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
-				<text class="viz-callout" x="71" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 90% mass</text>
+				<text class="viz-callout" x="150" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 90% mass</text>
 				<path d="M20 220V226H84V220" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 3"></path>
 				<text class="viz-callout" x="20" y="243">top-p = .80 · 2 tokens · 84% mass</text>
 			</svg>
@@ -96,7 +96,7 @@ Restrict the sampling pool to the smallest set of tokens whose cumulative probab
 					<rect class="viz-node" x="248" y="142" width="26" height="18"></rect><text x="261" y="137">6%</text><text x="261" y="176">G</text>
 				</g>
 				<path d="M20 190V196H122V190" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
-				<text class="viz-callout" x="71" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 61% mass</text>
+				<text class="viz-callout" x="150" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 61% mass</text>
 				<path d="M20 220V226H198V220" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 3"></path>
 				<text class="viz-callout" x="20" y="243">top-p = .80 · 5 tokens · 86% mass</text>
 			</svg>
