@@ -43,6 +43,39 @@ This is a plausible v0. It will be slow, expensive, and miss what good coding as
 
 This is L5. Scoped use case, multi-tier model, context retrieval, eval framework, security.
 
+<!-- visual:coding-assistant-two-latency-paths -->
+```mermaid
+flowchart TB
+  accTitle: Inline completion and agentic coding require different request paths
+  accDescr: A task and latency decision creates two paths. For inline completion, a cursor event is debounced and stale requests are cancelled. The current file prefix and suffix form a fill-in-the-middle request, while a repository index retrieves a few relevant symbol, import, and test chunks. A bounded prompt goes to a small fast code model and returns ghost text; acceptance, edits, dismissals, language, task type, and latency become evaluation signals. Function generation, chat, and agentic work instead use a seconds-level path with a larger model and tools, and are evaluated by task completion and tests rather than inline acceptance.
+  Scope{"Completion type<br/>+ latency budget"}
+  Trigger["IDE cursor event<br/>debounce · cancel stale request"]
+  Buffer["Current buffer<br/>prefix + suffix"]
+  Index[("Repository index<br/>symbols · imports · tests")]
+  Prompt["Bounded FIM prompt<br/>buffer + retrieved chunks"]
+  Fast["Small fast code model<br/>inline latency path"]
+  Ghost["Inline ghost text<br/>accept · edit · dismiss"]
+  InlineEval["Inline evaluation<br/>acceptance · edit distance · latency"]
+  Deep["Larger model + tools<br/>function · chat · agent task"]
+  TaskEval["Task evaluation<br/>tests · completion rate · safety"]
+  Scope -->|"~50–100 ms target"| Trigger
+  Trigger --> Buffer
+  Trigger -->|"retrieve a few chunks"| Index
+  Buffer --> Prompt
+  Index --> Prompt
+  Prompt --> Fast
+  Fast --> Ghost
+  Ghost -->|"logged by slice"| InlineEval
+  Scope -->|"seconds-level budget"| Deep
+  Deep --> TaskEval
+  class Scope,Prompt viz-focus
+  class Trigger,Buffer viz-input
+  class Index viz-state
+  class Ghost,Deep viz-output
+  class Scope,Trigger,Buffer,Index,Prompt,Fast,Ghost,InlineEval,Deep,TaskEval viz-compact
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> choose the product and latency contract before choosing the model. Follow the inline branch: a cancelable IDE event combines prefix and suffix with a small set of retrieved repository chunks, then a fast model returns ghost text and logs acceptance-quality evidence. Function, chat, and agentic work belongs on the separate seconds-budget branch and needs task-level verification. Original schematic informed by the <a href="https://arxiv.org/abs/2207.14255">FIM paper</a>, <a href="https://arxiv.org/abs/2303.12570">RepoCoder</a>, and <a href="https://docs.github.com/en/copilot/concepts/context/repository-indexing">GitHub's repository-indexing documentation</a>.</p>
+
 ## What an L6 answer adds
 
 > "...practical things:
