@@ -88,7 +88,6 @@ flowchart LR
 	class C viz-focus
 	class B viz-warning
 	class Y viz-output
-	class A,B,C,Y viz-compact
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> Payment B happened before Monday noon, but nobody could know it then because it arrived Wednesday. A join that checks only event time pulls that future knowledge backward across the prediction-time boundary.</p>

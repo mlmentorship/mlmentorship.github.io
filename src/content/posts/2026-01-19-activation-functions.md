@@ -51,7 +51,8 @@ But ReLU has the **dying ReLU problem**: a neuron stuck at $z < 0$ has gradient 
 				<path class="viz-gridline" d="M42 123H292 M42 57H292"></path>
 				<path class="viz-axis" d="M167 24V190 M42 190H292"></path>
 				<path class="viz-roc-curve" d="M42 187.6 L49.8 186.9 L57.6 186.1 L65.4 185 L73.3 183.7 L81.1 182 L88.9 179.9 L96.7 177.3 L104.5 174.1 L112.3 170.3 L120.1 165.7 L127.9 160.3 L135.8 154.1 L143.6 147.2 L151.4 139.7 L159.2 131.6 L167 123.3 L174.8 115 L182.6 107 L190.4 99.4 L198.3 92.5 L206.1 86.4 L213.9 81 L221.7 76.4 L229.5 72.6 L237.3 69.4 L245.1 66.8 L252.9 64.7 L260.8 63 L268.6 61.6 L276.4 60.6 L284.2 59.7 L292 59.1"></path>
-				<text class="viz-callout" x="48" y="169">saturated: σ′(x) → 0</text>
+				<text class="viz-callout" x="48" y="130">left tail:</text>
+				<text class="viz-callout" x="48" y="144">σ′(x) → 0</text>
 				<text class="viz-callout" x="185" y="46">saturated: σ′(x) → 0</text>
 				<circle class="viz-operating-point" cx="167" cy="123" r="4"></circle>
 				<text class="viz-label" x="173" y="119">σ(0) = 0.5</text>
@@ -74,8 +75,8 @@ But ReLU has the **dying ReLU problem**: a neuron stuck at $z < 0$ has gradient 
 				<path class="viz-pr-curve" stroke-dasharray="6 4" d="M42 168.6 L47.2 168.6 L52.4 168.7 L57.6 168.9 L62.8 169 L68 169.3 L73.3 169.6 L78.5 169.9 L83.7 170.3 L88.9 170.8 L94.1 171.4 L99.3 172 L104.5 172.7 L109.7 173.4 L114.9 174.1 L120.1 174.7 L125.3 175.2 L130.5 175.6 L135.8 175.7 L141 175.6 L146.2 175 L151.4 174.1 L156.6 172.7 L161.8 170.8 L167 168.4 L172.2 165.4 L177.4 161.9 L182.6 157.9 L187.8 153.4 L193 148.5 L198.3 143.3 L203.5 137.8 L208.7 132 L213.9 126.1 L219.1 120 L224.3 113.9 L229.5 107.8 L234.7 101.8 L239.9 95.7 L245.1 89.8 L250.3 83.9 L255.5 78 L260.8 72.3 L266 66.6 L271.2 60.9 L276.4 55.4 L281.6 49.8 L286.8 44.3 L292 38.8"></path>
 				<text class="viz-callout" x="49" y="155">ReLU: dead region, f′(x) = 0</text>
 				<text class="viz-callout" x="203" y="112">ReLU: solid</text>
-				<text class="viz-callout" x="189" y="143">GELU: dashed</text>
-				<text class="viz-label" x="82" y="188">smooth negative shoulder</text>
+				<text class="viz-callout" x="180" y="137">GELU: dashed</text>
+				<text class="viz-label" x="75" y="143">smooth negative shoulder</text>
 				<circle class="viz-operating-point" cx="167" cy="168.4" r="4"></circle>
 				<text class="viz-label" x="172" y="181">both pass through (0, 0)</text>
 				<text class="viz-label" x="38" y="207">−3</text><text class="viz-label" x="163" y="207">0</text><text class="viz-label" x="288" y="207">3</text>

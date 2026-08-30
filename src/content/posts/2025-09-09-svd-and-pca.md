@@ -19,13 +19,13 @@ PCA is the canonical use of SVD: project data onto the directions of largest var
 
 $A = U \Sigma V^\top$:
 
-- $V$'s columns are an orthonormal basis of the row space of $A$ (input directions).
-- $U$'s columns are an orthonormal basis of the column space (output directions).
+- $V$'s columns are orthonormal input directions; the first $r$ span the row space and the rest span the nullspace.
+- $U$'s columns are orthonormal output directions; the first $r$ span the column space and the rest span the left nullspace.
 - $\Sigma$'s diagonal entries $\sigma_1 \ge \sigma_2 \ge \dots \ge 0$ are the singular values (how much each input direction is stretched into its output direction).
 
 Geometrically: any linear map is "rotate the input, stretch axis-by-axis, rotate the output." That's it.
 
-The rank of $A$ is the number of non-zero singular values. The condition number is $\sigma_1 / \sigma_r$ where $r$ is the rank.
+The rank of $A$ is the number of non-zero singular values. For a full-rank map, the 2-norm condition number is $\sigma_1 / \sigma_{\min}$. A rank-deficient map has infinite condition number; $\sigma_1 / \sigma_r$ instead describes conditioning after restricting to its rank-$r$ subspace.
 
 ## Truncated SVD and low-rank approximation
 
@@ -53,7 +53,7 @@ Equivalent formulation: PCA = eigendecomposition of the sample covariance $\tild
 <figure class="learning-figure" aria-labelledby="pca-projection-title">
 	<p class="visual-kicker">Spatial intuition</p>
 	<p class="visual-title" id="pca-projection-title">Rank-1 PCA keeps position along PC1 and discards the perpendicular residual.</p>
-	<div class="visual-panel plot-panel">
+	<div class="visual-panel plot-panel visual-scroll visual-wide">
 		<svg viewBox="0 0 640 360" role="img" aria-labelledby="pca-svg-title pca-svg-desc">
 			<title id="pca-svg-title">Six centered samples projected onto their first principal component</title>
 			<desc id="pca-svg-desc">Six circular sample points form a long, narrow cloud around the mean. PC1 follows the cloud's longest direction and PC2 is perpendicular. Dashed perpendicular segments connect every sample to a diamond on PC1. Each diamond is that sample's rank-1 reconstruction; each dashed segment is the discarded residual.</desc>
@@ -64,7 +64,7 @@ Equivalent formulation: PCA = eigendecomposition of the sample covariance $\tild
 			<text class="viz-label" x="220" y="36">rank-1 reconstruction x̂</text>
 			<path class="viz-baseline" d="M243 46 L398 314"></path>
 			<path class="viz-roc-curve" d="M78 320 L563 40"></path>
-			<text class="viz-callout" x="500" y="58">PC1: greatest variance</text>
+			<text class="viz-callout" x="470" y="31">PC1: greatest variance</text>
 			<text class="viz-label" x="403" y="316">PC2: discarded</text>
 			<path class="viz-operating-guide" d="M438 124 L433 115 M202 236 L207 245 M384 120 L394 138 M256 240 L246 223 M360 169 L355 160 M280 191 L285 200"></path>
 			<circle class="viz-node" cx="438" cy="124" r="6"></circle>
@@ -81,7 +81,7 @@ Equivalent formulation: PCA = eigendecomposition of the sample covariance $\tild
 			<path class="viz-operating-point" d="M285 194 L291 200 L285 206 L279 200 Z"></path>
 			<circle class="viz-operating-point" cx="320" cy="180" r="4"></circle>
 			<text class="viz-label" x="326" y="193">mean = 0</text>
-			<text class="viz-label" x="399" y="125">perpendicular residual</text>
+			<text class="viz-label" x="350" y="85">perpendicular residual</text>
 		</svg>
 	</div>
 	<figcaption><strong>Read it this way:</strong> each circle drops perpendicularly to a diamond on PC1. The diamond keeps the coordinate with the largest spread; the dashed segment is the discarded PC2 coordinate and therefore the rank-1 reconstruction error.</figcaption>

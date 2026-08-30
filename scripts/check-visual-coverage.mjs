@@ -135,7 +135,9 @@ function validateAudit(audit, file, entry) {
         fail(`${label} Mermaid visual ${id} needs accTitle and accDescr`);
       }
       const after = entry.source.slice(blockEnd, blockEnd + 700);
-      if (!after.includes('diagram-caption')) fail(`${label} Mermaid visual ${id} needs a nearby diagram caption`);
+      if (!after.includes('<p class="diagram-caption"><strong>Read it this way:</strong>')) {
+        fail(`${label} Mermaid visual ${id} needs a direct "Read it this way" caption`);
+      }
     }
   }
   if (audit.status === 'implemented' && audit.medium === 'svg') {
@@ -145,6 +147,13 @@ function validateAudit(audit, file, entry) {
       const figure = entry.source.slice(marker, figureEnd + 9);
       if (figureEnd < 0 || !figure.includes('<svg') || !figure.includes('role="img"') || !figure.includes('<title') || !figure.includes('<desc') || !figure.includes('<figcaption>')) {
         fail(`${label} SVG visual ${id} needs a figure, role, title, description, and caption`);
+      }
+      const svgTags = figure.match(/<svg\b[^>]*>/g) ?? [];
+      if (svgTags.length === 0 || svgTags.some((tag) => !tag.includes('viewBox='))) {
+        fail(`${label} SVG visual ${id} needs a viewBox on every SVG for responsive rendering`);
+      }
+      if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
+        fail(`${label} SVG visual ${id} needs a direct "Read it this way" caption`);
       }
     }
   }

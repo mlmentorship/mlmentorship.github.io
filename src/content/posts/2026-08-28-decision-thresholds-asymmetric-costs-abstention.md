@@ -128,7 +128,7 @@ The queue can prioritize expected harm, model uncertainty, user impact, or infor
 			<text class="viz-label" x="180" y="282" text-anchor="middle">dollar values do not derive t₁ or t₂</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> below 0.60 the system allows, from 0.60 to 0.98 it abstains to human review, and at 0.98 it blocks. The much larger missed-fraud cost favors earlier intervention, while review capacity and policy determine where the two operational thresholds finally sit.</figcaption>
+	<figcaption><strong>Read it this way:</strong> below 0.60, allow; from 0.60 to 0.98, abstain to review; at or above 0.98, block. The larger missed-fraud cost favors earlier intervention, while capacity and policy place the operational thresholds.</figcaption>
 </figure>
 
 ## Abstention and selective prediction

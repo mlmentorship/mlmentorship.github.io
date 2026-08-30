@@ -69,7 +69,7 @@ Typical interpretation:
 			<text class="viz-axis-label" transform="translate(14 194) rotate(-90)">observed fraction correct</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the dashed diagonal is perfect calibration. The illustrative bin pairs are (20%, 12%), (40%, 28%), (60%, 43%), (80%, 60%), and (90%, 72%). Because observed correctness is below confidence in every bin, this model is overconfident; points above the diagonal would be underconfident.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the dashed diagonal is perfect calibration. Every illustrative point lies below it, so observed correctness is lower than confidence and the model is overconfident. At 80% confidence versus 60% correctness, the gap is 20 points.</figcaption>
 </figure>
 
 ## Why neural networks are overconfident
@@ -78,7 +78,7 @@ Modern neural networks (especially with high capacity and limited training data)
 
 - Cross-entropy loss minimization rewards confidence; the model is trained to push probabilities to 0 or 1.
 - Capacity to memorize training data → overfit confidence to training distribution.
-- BatchNorm / LayerNorm and many other architectural features push toward overconfident outputs.
+- High capacity and weak regularization can keep sharpening confidence after classification error has stopped improving.
 
 This is well-documented for image classification ([Guo et al. 2017](https://arxiv.org/abs/1706.04599), "On Calibration of Modern Neural Networks") and is similar for transformers and LLMs.
 

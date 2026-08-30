@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "slug": "multi-head-attention",
+  "article": "src/content/posts/2026-05-07-multi-head-attention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one full token sequence through per-head Q, K, and V projections, parallel attention, concatenation, and the output projection while tracking feature dimensions.",
+  "mediumRationale": "A deterministic tensor SVG keeps the continuous sequence axis and split feature dimensions aligned through projection and recombination. Mermaid could show topology but not tensor widths and repeated per-head Q/K/V groupings precisely; semantic HTML would make dimensions accessible but weaken the split-and-concatenate geometry; interaction adds no necessary state; direct paper-figure reuse is unnecessary and reuse permission was not verified; mixed media adds complexity; and no visual leaves the crucial distinction between splitting features and splitting tokens implicit.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 101,
+        "insight": "The decoder discussion distinguishes self-attention from cross-attention by identifying where queries, keys, and values originate."
+      },
+      {
+        "page": 102,
+        "insight": "The BERT material reinforces that transformer attention processes contextualized token sequences rather than assigning disjoint token subsets to heads."
+      },
+      {
+        "page": 103,
+        "insight": "The deck explicitly motivates multiple heads as different transformations or aspects of the same hidden features and notes scaled dot-product attention."
+      }
+    ],
+    "notes": "Slides 101 through 103 were reviewed independently. They motivate Q/K/V provenance and parallel views but do not trace the feature-dimension split through concatenation and output projection. The new visual isolates that missing tensor-shape lesson."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used to verify the per-head projected Q/K/V definition, parallel-head formulation, concatenation, output projection, and the original d_model divided across heads design.",
+        "license": "No architecture figure, text, data, or visual layout copied; the license was not relied on because this is an original conceptual redraw."
+      },
+      {
+        "title": "PyTorch MultiheadAttention documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html",
+        "usage": "Used to cross-check that embed_dim is split across num_heads and that MultiHead equals concatenated head outputs followed by W_O.",
+        "license": "No documentation figure or code copied; API semantics referenced only."
+      },
+      {
+        "title": "JAX dot_product_attention documentation",
+        "url": "https://docs.jax.dev/en/latest/_autosummary/jax.nn.dot_product_attention.html",
+        "usage": "Used to cross-check per-head scaled dot-product attention and query, key, and value sequence dimensions.",
+        "license": "No documentation figure or code copied; API semantics referenced only."
+      }
+    ],
+    "notes": "Primary-paper and implementation documentation were reviewed independently of the deck. The diagram is an original tensor-flow construction and does not reproduce the Transformer architecture figure."
+  },
+  "agentReview": {
+    "reviewer": "Multi-head-attention article subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended a phone-width vertical SVG with one shared sequence, two explicit representative heads plus an ellipsis for h heads, repeated Q/K/V labels in every shown head, and dimension labels at every split and merge."
+  },
+  "implementation": {
+    "visualIds": ["multi-head-attention-split-recombine"],
+    "accessibility": "The SVG includes a title and complete description. Numbered stages, direct Q/K/V labels, repeated 'all n tokens' labels, tensor dimensions, solid arrows, distinct head outlines, and a text caption preserve the trace without color."
+  }
+}
