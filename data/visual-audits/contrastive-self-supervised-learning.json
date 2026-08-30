@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "contrastive-self-supervised-learning",
+  "article": "src/content/posts/2026-08-28-contrastive-self-supervised-learning.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See that InfoNCE asks an anchor to identify one declared positive among all candidates, so positive and negative sampling choices determine both the learned invariance and false-negative pressure.",
+  "mediumRationale": "A deterministic SVG candidate map is the smallest medium that can align an anchor, its two-view positive, ordinary negatives, and a nearby false negative with the numerator and denominator of InfoNCE. Fixed geometry makes the data-contract error spatially apparent without simulating training.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show augmentation and encoding stages but cannot make one positive competing against a spatial candidate set or the nearby false-negative conflict legible.",
+    "svg": "Selected: fixed coordinates, direct labels, line styles, and shape differences expose which candidate enters the numerator, which candidates enter the denominator, and why a semantically related in-batch item can receive the wrong gradient.",
+    "semanticHtml": "Rejected: a table could list positive and negative roles, but would not show that all candidates compete relative to the same anchor or that semantic nearness can disagree with the sampling label.",
+    "interaction": "Rejected: a temperature or augmentation control would add state without improving the foundational lesson that candidate construction precedes optimization.",
+    "paperReuse": "Rejected: SimCLR includes a related framework figure and CPC includes contrastive schematics, but reuse permission for paper artwork was not established and neither isolates the false-negative data contract taught here. No source composition is copied.",
+    "noVisual": "Rejected: the prose gives the loss, positive-pair table, and negative-sampling risks in separate sections, leaving the reader to mentally connect the single numerator choice to every denominator competitor."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 35,
+        "insight": "The preceding classification-loss slide covers softmax and negative log likelihood, providing denominator context but no representation-pair construction."
+      },
+      {
+        "page": 36,
+        "insight": "The loss slide defines anchor, positive, and negative embeddings for triplet loss; it is the deck's closest explicit pairwise-learning treatment, but it is margin-based rather than InfoNCE and does not discuss augmentations or false negatives."
+      },
+      {
+        "page": 37,
+        "insight": "The following slide moves to classification evaluation metrics, ending the local pairwise-loss neighborhood."
+      },
+      {
+        "page": 137,
+        "insight": "The recommender data slide defines user-item interactions and successful search sessions, supplying the interaction context from which positives might be constructed."
+      },
+      {
+        "page": 138,
+        "insight": "The personalized-recommender slide says to train from the user-item matrix with contrastive learning, but gives no objective, positive definition, negative sampling rule, or visual mechanism."
+      },
+      {
+        "page": 139,
+        "insight": "The neighboring content-based recommender slide switches to knowledge-graph triplets and title similarity, confirming that the contrastive treatment is limited to the one-line recommendation on page 138."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for contrastive, self-supervised, InfoNCE, SimCLR, CLIP, positive pair, negative sampling, and representation learning. Pages 35-37 and 137-139 were then inspected as the full relevant neighborhoods. Page 36 supplies anchor-positive-negative vocabulary for triplet loss, and page 138 only recommends contrastive learning for personalization. The deck contains no InfoNCE candidate-set explanation or self-supervised augmentation visual. No deck artwork, examples, coordinates, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Simple Framework for Contrastive Learning of Visual Representations",
+        "url": "https://proceedings.mlr.press/v119/chen20j.html",
+        "usage": "Used as the primary source to verify that two independently augmented views of each example form a positive pair, the other augmented examples in the minibatch act as negatives, and augmentation composition defines the predictive task.",
+        "license": "The paper is publicly accessible through PMLR, but no explicit permissive license for its figures was identified. The related SimCLR software is Apache-2.0 licensed, which is not treated as permission to reuse paper artwork. No figure, data, result, wording, or layout is copied."
+      },
+      {
+        "title": "Representation Learning with Contrastive Predictive Coding",
+        "url": "https://arxiv.org/abs/1807.03748",
+        "usage": "Used as the primary source for InfoNCE as a categorical objective that selects a positive sample from a set containing one positive and multiple negatives.",
+        "license": "The arXiv record and paper are publicly accessible, but public access is not assumed to grant figure-reuse rights. No source figure, experiment, wording, or layout is reproduced."
+      },
+      {
+        "title": "Debiased Contrastive Learning",
+        "url": "https://arxiv.org/abs/2007.00224",
+        "usage": "Used as the primary source to verify that randomly sampled negatives may actually share the anchor's latent class and therefore create false-negative bias.",
+        "license": "No source figure, dataset, empirical result, wording, or layout is reused. The paper is cited only for the false-negative mechanism because figure permission was not established."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the data contract hidden inside the loss: for one anchor, exactly one declared positive occupies the numerator while every candidate in the denominator competes with it. A second view of the same source is intentionally invariant, but an independently sampled item can be semantically valid and still be pushed away as a false negative. The visual is an original schematic using synthetic labels and coordinates, not a reconstruction of any paper figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both exact slide neighborhoods, then reviewed the primary SimCLR, CPC, and debiased contrastive-learning papers before selecting an original InfoNCE candidate-set SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "infonce-positive-candidate-set"
+    ],
+    "accessibility": "The SVG has a linked title and long description. Direct role labels, distinct circle and diamond shapes, a solid positive connector, dashed negative connectors, and an explicit warning callout carry the full lesson without color. Its 360-pixel viewBox scales to the reading column without a minimum width for readability at 390 CSS pixels; existing theme variables provide dark-mode and print-compatible contrast."
+  }
+}
