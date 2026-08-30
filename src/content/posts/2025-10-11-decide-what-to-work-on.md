@@ -46,6 +46,34 @@ This is L5. You have a framework, you involve your manager, you're aware of your
 >
 > **Honest assessment of my own engagement.** If I'm dragging through a project I should be excited about, that's a signal. Either the project isn't actually well-scoped, or I'm not the right person, or my interests have shifted. Worth surfacing before I burn months on it."
 
+<!-- visual:work-prioritization-counterfactual-portfolio -->
+```mermaid
+flowchart TB
+	accTitle: A counterfactual process for choosing a portfolio of work
+	accDescr: Candidate projects first pass user-value and strategic-alignment gates. Surviving proposals are compared with the next-best use of the same time using evidence, effort, technical and team leverage, ownership fit, and engagement. Selected work enters a deliberate mix of near-term delivery and longer-term investment; declined work keeps a written rationale and can return when evidence or strategy changes.
+	A["Candidate projects<br/>one-paragraph proposals"] --> B{"Advances a user outcome<br/>and team strategy?"}
+	B -->|"no"| C["Decline now<br/>record the reason"]
+	B ==>|"yes"| D["Name the next-best use<br/>of the same time"]
+	D --> E["Compare evidence + value<br/>against effort + risk"]
+	D --> F["Compare technical leverage<br/>and team multiplier"]
+	D --> G["Check ownership fit<br/>and sustained engagement"]
+	E --> H{"Best counterfactual<br/>use of this person's time?"}
+	F --> H
+	G --> H
+	H -->|"no"| C
+	H ==>|"yes"| I["Select with manager<br/>and affected partners"]
+	I --> J["Near-term work that ships<br/>roughly two-thirds"]
+	I --> K["Longer-term investment<br/>roughly one-third"]
+	C -. "new evidence or strategy" .-> A
+	class A,D viz-input
+	class B,H viz-focus
+	class C viz-warning
+	class I,J,K viz-output
+	class E,F,G viz-state
+	class A,B,C,D,E,F,G,H,I,J,K viz-compact
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> do not ask only whether a project is valuable. First remove work that misses user outcomes or strategy, then compare each survivor with the next-best use of the same person's time. Select a portfolio rather than a single winner, so near-term delivery and longer-term leverage both receive deliberate capacity. The two-thirds/one-third split is the answer's example, not a universal rule. Original synthesis checked against <a href="https://ntrs.nasa.gov/citations/20170001761">NASA's decision-analysis guidance</a>, <a href="https://openstax.org/books/principles-economics-3e/pages/2-1-how-individuals-make-choices-based-on-their-budget-constraint">OpenStax on opportunity cost</a>, and <a href="https://doi.org/10.1111/1467-9310.00225">Cooper, Edgett, and Kleinschmidt on project portfolios</a>.</p>
+
 ## Tells that get you a strong-hire vote
 
 - You have an **explicit framework**, not just a list of considerations.

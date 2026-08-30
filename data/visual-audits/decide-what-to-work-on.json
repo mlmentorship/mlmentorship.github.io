@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "decide-what-to-work-on",
+  "article": "src/content/posts/2025-10-11-decide-what-to-work-on.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Choose work by gating candidates on user value and strategy, comparing each survivor with the next-best use of the same time, and allocating the winners across near-term delivery and longer-term leverage.",
+  "mediumRationale": "A compact Mermaid funnel is the smallest medium that turns the article's dimensions into a repeatable procedure: gate, compare counterfactually, select with stakeholders, and balance a portfolio.",
+  "mediumComparison": {
+    "mermaid": "Selected: the learning task is a qualitative decision flow with parallel criteria, convergence, and a reconsideration loop, all supported by the established compact flowchart primitive.",
+    "svg": "Rejected: the article provides no quantitative scale or geometry, and a hand-positioned flowchart would duplicate Mermaid's relationship semantics.",
+    "semanticHtml": "Rejected: a scorecard or table would compare dimensions but obscure the difference between hard gates, counterfactual comparison, and portfolio allocation.",
+    "interaction": "Rejected: adjustable weights would imply false precision and a universal ranking formula when priorities and evidence depend on the team context.",
+    "paperReuse": "Rejected: the reviewed sources contain decision-process and portfolio concepts, but no source figure exactly represents this article's individual-contributor choice. No external artwork, wording, coordinates, or layout is reused.",
+    "noVisual": "Rejected: the article says an explicit framework matters, but prose leaves its dimensions looking like another checklist. A spatial funnel shows which questions eliminate work, which compare alternatives, and why selection ends in a portfolio."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 159,
+        "insight": "The preceding personal-project slide lists two completed robotics projects but provides no selection criteria, alternatives, or trade-off rationale."
+      },
+      {
+        "page": 160,
+        "insight": "The algorithms-and-data-structures divider shifts from project examples to interview preparation and is unrelated to work prioritization."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview says to clarify requirements and discuss trade-offs, and explicitly asks about product need, business value, objectives, performance, downstream impact, and project resources."
+      },
+      {
+        "page": 162,
+        "insight": "The adjacent production checklist starts with the customer problem and business action, asks about reuse of existing platforms and models, experimentation cost, business impact, and the future roadmap."
+      },
+      {
+        "page": 163,
+        "insight": "The worked content-feed prompt demonstrates clarifying goals and metrics before design, but it assumes the project is already chosen."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide covers lifecycle trade-offs and feedback after a project exists, not choosing among competing projects."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide advises starting without ML when appropriate, prioritizing metrics, preferring simple systems, measuring deltas, and avoiding wasted features."
+      },
+      {
+        "page": 170,
+        "insight": "The following ML design interview summary again emphasizes product need, business value, objectives, constraints, resources, trade-offs, and narration, but provides no counterfactual portfolio method."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 pages for priority, prioritization, roadmap, strategy, strategic, impact, effort, trade-off, opportunity cost, portfolio, business value, and team. It then rendered and inspected pages 159-163 and 168-170, the two relevant ML-project neighborhoods. Other matches on pages 37-38, 93, 104, 106, 112, 128, 130, 166, 167, 172, and 191 concern metric, model, storage, or algorithm trade-offs rather than choosing work. No slide expresses next-best-alternative cost or balances an individual's project portfolio, and no deck image or wording is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NASA Systems Engineering Handbook, Revision 2, Section 6.8: Decision Analysis",
+        "url": "https://ntrs.nasa.gov/citations/20170001761",
+        "usage": "Used as official engineering guidance to verify the sequence of defining the decision and priorities, establishing differentiating criteria, identifying alternatives including doing nothing, evaluating uncertainty, documenting rationale, and involving the decision authority.",
+        "license": "The NASA Technical Reports Server marks the document public with public use permitted and no identified third-party material. NASA media guidance also permits factual educational use subject to exceptions. No handbook figure, text, insignia, or layout is copied."
+      },
+      {
+        "title": "OpenStax Principles of Economics 3e, Section 2.1",
+        "url": "https://openstax.org/books/principles-economics-3e/pages/2-1-how-individuals-make-choices-based-on-their-budget-constraint",
+        "usage": "Used as an authoritative economics textbook to verify that opportunity cost is the value of the next-best alternative forgone under a resource constraint.",
+        "license": "The current book index states CC BY-NC-SA 4.0 terms and separate restrictions for OpenStax marks. The diagram does not adapt its examples, figures, wording, or visual structure; citation-only use avoids imposing that license on the article."
+      },
+      {
+        "title": "Portfolio Management for New Product Development: Results of an Industry Practices Study",
+        "url": "https://doi.org/10.1111/1467-9310.00225",
+        "usage": "Used as a primary empirical project-portfolio study to cross-check value maximization, strategic alignment, and portfolio balance as distinct goals rather than one undifferentiated score.",
+        "license": "The Wiley publication page does not provide a permissive figure-reuse grant. No paper figure, data, wording, scoring method, or layout is reproduced."
+      },
+      {
+        "title": "The Green Book 2026",
+        "url": "https://www.gov.uk/government/publications/the-green-book-appraisal-and-evaluation-in-central-government/the-green-book-2026",
+        "usage": "Used as current official appraisal guidance to verify objective-first option generation, proportionate analysis of costs, benefits, risks, and uncertainty, and selection of a preferred option under constrained resources.",
+        "license": "GOV.UK Crown copyright material is available under the Open Government Licence 3.0 unless otherwise stated. No government figure or wording is reused; the shipped flow is independently authored."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is converting many worthy dimensions into an actual choice. The original visual makes strategic and user alignment hard gates, forces a named next-best alternative before judging value, separates evidence and effort from leverage and ownership fit, and ends with a portfolio rather than pretending one scalar score resolves every trade-off. The article's two-thirds/one-third allocation appears only as an explicitly non-universal example."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected both relevant ML-project neighborhoods, then checked official NASA and UK decision guidance, an authoritative economics textbook, and a primary portfolio-management study before selecting an original counterfactual portfolio funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "work-prioritization-counterfactual-portfolio"
+    ],
+    "accessibility": "The Mermaid source provides a complete title and description. Every gate, comparison dimension, decision outcome, portfolio horizon, and reconsideration path is directly labelled; solid, thick, and dashed edges reinforce semantics without relying on color. The established viz-compact class removes the mobile minimum width for readability at 390 CSS pixels, while shared Mermaid tokens provide dark-mode and print contrast."
+  }
+}
