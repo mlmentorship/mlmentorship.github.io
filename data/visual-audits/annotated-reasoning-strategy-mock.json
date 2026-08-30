@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "slug": "annotated-reasoning-strategy-mock",
+  "article": "src/content/posts/2026-08-29-annotated-reasoning-strategy-mock.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "See how one fixed accelerator budget becomes a complete five-envelope portfolio whose protected serving, evaluation, and recovery capacity cannot be silently consumed by a promoted training run.",
+  "mediumRationale": "A compact semantic HTML allocation map is the smallest medium that keeps all five percentages, their sum, and each envelope's evidence or protection rule readable together. It uses existing responsive panels instead of implying a measured continuous curve or adding article-specific styling.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout emphasizes process flow, while the learning task is to reconcile five simultaneous claims on one finite total and read their distinct allocation rules.",
+    "svg": "Rejected because fixed coordinates would add drawing complexity without improving on labelled semantic panels for these discrete percentages and rules.",
+    "semanticHtml": "Selected because existing figure and panel primitives provide a responsive, screen-reader-readable grouping of all five envelopes, exact text labels, theme support, and print behavior.",
+    "interaction": "Rejected because changing percentages would suggest an optimization model that the article does not supply; the teaching point is the allocation discipline and evidence gates, not slider exploration.",
+    "paperReuse": "Rejected because the cited sources establish compute-budget, test-time-allocation, and serving-memory mechanisms but do not contain this article's five-envelope operating policy. Public access is not treated as artwork reuse permission.",
+    "noVisual": "Rejected because the prose states percentages across separated turns, making it easy to miss that they exhaust one shared 100% budget and that serving, evaluation, and recovery have different protection rules from speculative work."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The transformer overview notes rapid growth in training compute and distributed-training overhead, establishing compute as a real systems constraint but not a lifecycle allocation."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM-training slide discusses throughput, scalable methods, and FSDP mixed precision; it covers one consumer of capacity rather than competition with production."
+      },
+      {
+        "page": 108,
+        "insight": "The neighboring compute-optimization slide distinguishes compute and memory bottlenecks, including H100 memory bandwidth, but does not allocate a fixed cluster."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide explains BF16 on H100-class hardware and optimizer-state sharding, providing nearby implementation context for training capacity."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving-stacks slide places modern training and serving techniques side by side, the closest deck analogue to shared lifecycle concerns, but treats them as separate stacks and gives no allocation or reserve policy."
+      },
+      {
+        "page": 164,
+        "insight": "The ML system-design sequence requires offline and online evaluation plus a response to production bugs, supporting protected evidence and recovery concerns."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide explicitly asks about deployment time, available compute, performance constraints, and training-versus-inference evaluation."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide covers distributed training and compute-memory tradeoffs but does not reconcile those costs with serving demand."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide lists model gating, monitoring, update procedures, and inference latency, memory, and compute constraints."
+      },
+      {
+        "page": 169,
+        "insight": "The following engineering-rules slide emphasizes measured deltas, independent infrastructure tests, and training-serving consistency; it supplies evaluation context but no fixed-capacity portfolio."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for compute, budget, capacity, training, serving, inference, verifier, routing, and portfolio concepts. The full neighboring runs on pages 103-115 and 164-169 were inspected. Page 115 is the closest match because it juxtaposes training and serving stacks; pages 164-169 add evaluation, deployment, and recovery context. No slide reconciles training, post-training, evaluation, serving, and recovery as simultaneous claims on one fixed cluster, so no deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Training Compute-Optimal Large Language Models",
+        "url": "https://arxiv.org/abs/2203.15556",
+        "usage": "Used to verify that accelerator count and training duration define an advance compute budget, that model size and token count must be allocated within it, and that the dense-transformer planning approximation uses roughly 6ND FLOPs.",
+        "license": "The arXiv paper is consulted for technical claims only. No figure, table, experimental result, wording, or layout is copied; arXiv availability is not treated as permission to reuse artwork."
+      },
+      {
+        "title": "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters",
+        "url": "https://arxiv.org/abs/2408.03314",
+        "usage": "Used to verify that the best test-time strategy varies with problem difficulty and compute budget, and that adaptive allocation can outperform a uniform high-generation policy with less compute.",
+        "license": "No paper figure, benchmark value, prose, or visual structure is reused. The article figure contains only its own synthetic allocation and independently authored labels."
+      },
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used to verify that parallel samples share prompt KV state but require diverging generation state, so candidate count consumes serving memory and belongs inside the same capacity decision.",
+        "license": "No paper diagram, code, data, or wording is copied. The source is cited for serving semantics only, and unclear figure-reuse permission defaults to an original article-specific construction."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not any single FLOP or KV equation; it is that training, post-training rollouts, evaluation, online inference, and recovery all spend the same finite accelerator-hours while obeying different release rules. The implemented percentages come from the article's synthetic candidate plan, not from empirical source data. The composition, grouping, headings, and explanatory text are original."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete ten-turn mock, inspected all 214 deck pages through a text index and the relevant neighboring slide sequences in full, and checked primary work on training budgets, adaptive test-time compute, and KV-aware serving. Selected one original semantic allocation map to make the shared-capacity invariant explicit."
+  },
+  "implementation": {
+    "visualIds": [
+      "fixed-capacity-portfolio-guardrails"
+    ],
+    "accessibility": "The figure uses native headings and text with an explicit aria-label; every envelope includes its percentage, purpose, and rule, so no meaning depends on color. Existing learning-figure and visual-grid primitives stack the panels into one column below 640 pixels for 390-CSS-pixel screens, use site theme variables in dark mode, and switch to the shared light high-contrast print palette."
+  }
+}

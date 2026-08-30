@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "slug": "agentic-ml-codebase-interview",
+  "article": "src/content/posts/2026-07-11-agentic-ml-codebase-interview.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Separate the bounded implementation work delegated to a coding agent from the contract setting, independent verification, and acceptance authority retained by the engineer.",
+  "mediumRationale": "Two labelled semantic-HTML lanes make the ownership boundary explicit while preserving a readable ordered sequence in each lane. This is smaller and more accessible than a process diagram, and it reflows into one column without hiding the comparison.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would imply one linear handoff and obscure that agent execution and reviewer control overlap throughout the change.",
+    "svg": "Rejected: custom vector geometry adds fixed-width labels and accessibility work without conveying more than two ordered semantic lanes.",
+    "semanticHtml": "Selected: headings and ordered lists expose both ownership and sequence to visual and screen-reader users, while the existing two-panel primitive stacks at narrow widths.",
+    "interaction": "Rejected: revealing stages or simulating approve/reject decisions would add state without changing the central ownership distinction.",
+    "paperReuse": "Rejected: neither source provides a suitably scoped workflow figure, and public availability is not treated as artwork-reuse permission.",
+    "noVisual": "Rejected: the prose enumerates prompting and verification separately, but a side-by-side responsibility boundary makes clear why successful agent execution is evidence rather than acceptance."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks the candidate to define goals, evaluation, performance constraints, and project constraints before selecting an implementation."
+      },
+      {
+        "page": 168,
+        "insight": "The production-serving slide calls for a model-gating procedure and explicit experiments or tests before a model is accepted."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning Engineering slide says to test infrastructure independently from ML, detect silent failures, assign owners, and quantify undesirable behavior."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for agent, agentic, coding, codebase, review, test, merge, distributed, metric, and confusion-matrix terms. It has no coding-agent or unfamiliar-codebase slide. Pages 165, 168, and 169 are the closest evidence for requirements, gating, independent tests, and human analysis; their full neighborhood, pages 164-170, was inspected. Pages 166-167 cover data pipelines and modeling, while page 170 begins algorithms and data structures, so none adds an agent-review mechanism. No deck layout or artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "GitHub Docs: Review AI-generated code",
+        "url": "https://docs.github.com/en/copilot/tutorials/review-ai-generated-code",
+        "usage": "Used to verify the sequence of automated checks, review against context and intent, scrutiny for changed or skipped tests, and human judgment over generated code.",
+        "license": "No documentation prose, example prompt, code, or artwork is copied. The workflow labels and two-lane composition are original; the documentation is cited only for factual review practices."
+      },
+      {
+        "title": "GitHub Docs: About GitHub Copilot cloud agent",
+        "url": "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent",
+        "usage": "Used to verify that an agent can research a repository, plan, change code on a branch, execute tests and linters, expose work in commits and logs, and return artifacts for developer iteration and review.",
+        "license": "No product screenshot, diagram, prose, or code is reused. The visual independently summarizes the division between agent execution and developer acceptance."
+      },
+      {
+        "title": "MapReduce: Simplified Data Processing on Large Clusters",
+        "url": "https://research.google/pubs/mapreduce-simplified-data-processing-on-large-clusters/",
+        "usage": "Used to cross-check the article's mergeability context: a map operation produces intermediate values and a reduce operation merges values associated with a key across partitioned execution.",
+        "license": "The publication page does not grant permission to reuse the paper's figures. No figure, wording, data, or layout is copied; the article equation and visual use independently written abstractions."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the control boundary: an agent may perform most visible execution steps, but passing its requested test does not transfer acceptance authority. The visual is an original semantic-HTML arrangement of general workflow concepts, contains no copied source expression, and uses no external media."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 164-170, then checked official GitHub guidance and the original MapReduce publication. The review selected a static two-lane responsibility model rather than a generic agent flowchart."
+  },
+  "implementation": {
+    "visualIds": ["agent-review-control-loop"],
+    "accessibility": "The figure uses a labelled heading, a descriptive group label, semantic section headings, and ordered lists. Agent and reviewer ownership is written in every lane and stage rather than encoded by color. The existing two-panel primitive stacks into one column below 640 pixels for a 390 CSS-pixel viewport, uses theme tokens in dark mode, and switches to a high-contrast light palette with page-break protection in print."
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "annotated-upper-ic-agent-platform-mock",
+  "article": "src/content/posts/2026-08-29-annotated-upper-ic-agent-platform-mock.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace one consequential tool action from model proposal through policy enforcement and narrow execution to authoritative outcome evidence, while identifying which owner controls each boundary.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that connects the article's three planes to the governed action path and its ownership boundaries. The lesson is topological rather than quantitative: the model proposes, the control plane authorizes, the executor alone receives narrow authority, and the evidence plane records both the decision and final state.",
+  "mediumComparison": {
+    "mermaid": "Selected because the learning task is to follow entities and authority across plane and ownership boundaries. A top-to-bottom compact flow remains readable in a narrow column and uses the established theme and print treatment.",
+    "svg": "Rejected because deterministic coordinates add maintenance cost without teaching geometry, magnitude, or a quantitative relation.",
+    "semanticHtml": "Rejected because a table can list owners and responsibilities but cannot show the enforced action path and parallel evidence emissions as directly.",
+    "interaction": "Rejected because stepping through a single fixed action adds controls and state without changing the inference; the static path already exposes every boundary.",
+    "paperReuse": "Rejected because the relevant sources either do not grant clear figure-reuse permission or show broader architectures than this article needs. No source figure, layout, wording, or artwork is copied.",
+    "noVisual": "Rejected because the prose defines planes, control points, and owners across several turns; readers must mentally assemble them to see that a model proposal is not authority and that evidence is not merely an after-the-fact trace."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 104,
+        "insight": "The instruction-tuning slide discusses model alignment and rejection behavior, which provides neighboring model-behavior context but no external authorization boundary."
+      },
+      {
+        "page": 105,
+        "insight": "The Toolformer slide says a language model decides which API to call, when to call it, and which arguments to pass; it covers tool proposal but not permission, narrow credentials, side-effect recovery, or durable evidence."
+      },
+      {
+        "page": 106,
+        "insight": "The following slide moves to LLM training data and provides no additional agent execution or governance mechanism."
+      },
+      {
+        "page": 164,
+        "insight": "The system-design sequence frames experimentation and online evaluation, but does not distinguish authority from model quality."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks about objectives, constraints, evaluation, and existing systems; it supports interview framing but contains no agent-platform boundary."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers storage, privacy, and user-data care, offering adjacent governance concerns without an action enforcement path."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide covers baselines, scale, and distributed training rather than runtime authority or tool side effects."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide covers model gating, monitoring, update procedures, cloud-versus-edge placement, and privacy, but not policy enforcement around tool calls."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for agents, Toolformer and tool use, authorization, permissions, gateways, access control, prompt injection, idempotency, retries, security, system design, and control planes. Exact neighboring pages 104-106 and the complete project/data/model/serving sequence on pages 164-168 were then inspected. Page 105 is the only directly relevant agent-tool slide; it stops at model-selected API calls. No slide supplies the article's governed action path, ownership split, or a reusable figure, and no deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NIST Special Publication 800-207: Zero Trust Architecture",
+        "url": "https://doi.org/10.6028/NIST.SP.800-207",
+        "usage": "Used to verify the separation between a policy enforcement point and policy decision components, per-request access decisions, and least-privilege access rather than implicit trust.",
+        "license": "NIST states that employee-created works are generally not subject to U.S. copyright, while third-party material can differ. No NIST prose, figure, or layout is reused; the diagram is an original application of the control-boundary concepts."
+      },
+      {
+        "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+        "url": "https://arxiv.org/abs/2302.04761",
+        "usage": "Used to distinguish a model's learned choice of API, timing, and arguments from the external authorization and credential boundary required for consequential enterprise actions.",
+        "license": "The paper's arXiv availability is not treated as permission to reuse its figures. No paper prose, experiment, data, or artwork is copied."
+      },
+      {
+        "title": "Amazon EC2 Developer Guide: Ensuring idempotency in Amazon EC2 API requests",
+        "url": "https://docs.aws.amazon.com/ec2/latest/devguide/ec2-api-idempotency.html",
+        "usage": "Used to verify that a mutating request can time out after completion and that retries need the same logical client token and parameters to avoid repeating the action.",
+        "license": "AWS documentation is consulted only for official API semantics. No AWS prose, code, diagram, visual structure, or branded element is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the three planes are not a component inventory: together they form one enforceable action contract. The original diagram narrows that contract to one action, labels the owner at each boundary, keeps the credential away from the model process, and makes decision and final-state evidence explicit."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Reviewed the complete article, text-indexed all 214 deck pages and inspected the relevant slide neighborhoods, then checked a primary agent-tool paper and official NIST and AWS documentation before selecting an original compact Mermaid action-path diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "agent-governed-action-path"
+    ],
+    "accessibility": "The Mermaid block provides an accessible title and a full path description. Step numbers, owner labels, node shapes, explicit permit and deny labels, solid action arrows, and dotted evidence arrows preserve meaning without color. A top-to-bottom layout and the established compact-node class avoid horizontal minimum width at 390 CSS pixels; shared Mermaid tokens supply dark-mode contrast and print forces a light, page-safe rendering."
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "annotated-ecosystem-strategy-mock",
+  "article": "src/content/posts/2026-08-29-annotated-ecosystem-strategy-mock.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how one ranking policy creates both an immediate viewer-feedback loop and a delayed creator-supply loop, so a short-term viewer win cannot settle the ecosystem decision.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest useful representation of two loops that leave and return to the same ranking policy on different time scales. Deterministic SVG would add manual geometry without quantitative shapes to preserve; semantic HTML would enumerate stages but obscure the return paths; interaction is unnecessary for a fixed causal sequence; source-figure reuse adds licensing and scope costs; and no visual leaves the central timing mismatch distributed across the ten-turn transcript.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled directed edges make the immediate viewer loop and delayed creator-supply loop traceable around one shared policy, while the repository renderer supplies responsive, themed, and print-compatible output.",
+    "svg": "Rejected: the lesson is relational rather than geometric or quantitative, so hand-positioned SVG would duplicate Mermaid's graph semantics and increase maintenance.",
+    "semanticHtml": "Rejected: a table or ordered list can compare horizons but cannot show that both paths feed back into later ranking decisions.",
+    "interaction": "Rejected: revealing the loops step by step would add controls, scripting, and state without changing the single intended inference.",
+    "paperReuse": "Rejected: the reviewed sources establish feedback-loop and multi-stakeholder concerns, but none provides this article's synthetic viewer-to-creator timing model, and public access is not treated as figure-reuse permission.",
+    "noVisual": "Rejected: the article repeatedly explains immediate viewer evidence and delayed creator damage, but prose alone makes it hard to hold both return paths and their different maturity horizons in one mental model."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The section title introduces recommender systems but contains no mechanism or stakeholder model."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide explicitly warns that presentation bias can create a recommender feedback loop and calls for an explore-exploit tradeoff, but it does not show creator supply or delayed outcomes."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid-recommender slide explains item features and blended outputs, providing cold-start context without an ecosystem feedback path."
+      },
+      {
+        "page": 135,
+        "insight": "The search-ranking slide separates candidate generation from ranking and names user context, but models only viewer discovery."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide connects offline evaluation, online experiments, and launch around viewer play and engagement outcomes; it has no delayed creator metric."
+      },
+      {
+        "page": 163,
+        "insight": "The personalized-feed design slide asks whether to optimize engagement per post or number of posts and how quickly learning updates, but does not connect exposure to future supply."
+      },
+      {
+        "page": 164,
+        "insight": "The adjacent feed slide shows candidate sources, ranking, filtering, and short-horizon online engagement testing; creator effects remain absent."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide includes monitoring, user feedback, model updates, and a generic project-flow loop, but no participant-specific maturity horizon."
+      }
+    ],
+    "notes": "All 214 pages of the local source deck were text-indexed for recommendation, ranking, feedback, creator, ecosystem, experiment, A/B test, and content-feed references. Pages 129-145 and 163-168 were reviewed as the complete relevant neighborhoods, with pages 129-131, 135, 141, 163-164, and 168 visually inspected in detail. Page 130 is the only explicit recommender-feedback-loop statement; pages 141 and 164 focus on viewer online metrics, and none models exposure changing creator retention, future supply, and later training data. No deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "How Algorithmic Confounding in Recommendation Systems Increases Homogeneity and Decreases Utility",
+        "url": "https://arxiv.org/abs/1710.11214",
+        "usage": "Used to verify the general mechanism by which recommendations affect observed interactions, those interactions enter future training data, and repeated retraining can amplify system-level effects.",
+        "license": "The accessible preprint uses arXiv distribution terms, not a permissive artwork license, and the ACM publication is copyrighted. No figure, prose, experiment, data, or layout is reused."
+      },
+      {
+        "title": "Multistakeholder recommendation: Survey and research directions",
+        "url": "https://doi.org/10.1007/s11257-019-09256-1",
+        "usage": "Used as the authoritative framework for treating consumers, providers or creators, and the platform as distinct stakeholders whose outcomes may conflict.",
+        "license": "Springer publication access is not treated as permission to reproduce figures. The diagram is an original abstraction of the article's synthetic scenario and copies no source artwork or wording."
+      },
+      {
+        "title": "Deep Neural Networks for YouTube Recommendations",
+        "url": "https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/",
+        "usage": "Used to verify the deployed-recommender distinction between candidate generation and ranking, and the role of online A/B experiments alongside offline evaluation.",
+        "license": "The publication page does not grant a permissive figure-reuse license. No paper figure, architecture, metric result, prose, or visual composition is reused."
+      }
+    ],
+    "notes": "The visual is an original systems diagram, not a reproduction of a source figure or an empirical causal claim. The node names, two return paths, horizon labels, and composition come from the article's invented ClipStream scenario. Sources support only the general feedback-loop, multi-stakeholder, and staged-recommender concepts; they do not validate the synthetic percentages or prove that creator exposure causes retention."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete 784-line article, text-indexed all 214 deck pages, visually reviewed both relevant slide neighborhoods, and checked primary and authoritative recommender-system sources. The hardest model is not the serving architecture already shown later, but the two feedback loops whose evidence matures on different clocks."
+  },
+  "implementation": {
+    "visualIds": [
+      "ecosystem-delayed-feedback-loop"
+    ],
+    "accessibility": "The Mermaid source will include a specific accessible title and a full description of both return paths. Every edge carries a time-horizon and mechanism label, so direction and timing do not depend on color. A top-to-bottom layout avoids a wide minimum canvas at 390 CSS pixels, and the shared Mermaid renderer supplies dark-mode and print-compatible theming."
+  }
+}

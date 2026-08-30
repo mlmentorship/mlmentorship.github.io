@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "approximate-nearest-neighbors",
+  "article": "src/content/posts/2026-05-07-approximate-nearest-neighbors.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how an IVF-PQ query first narrows the partitions to scan and then replaces full-vector distance work with one lookup per product-quantized subvector.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can keep the spatial IVF partition choice adjacent to the segmented PQ code and its lookup sum. The fixed synthetic geometry makes the two independent cost reductions checkable without scripting.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can name the stages but cannot show proximity to IVF centroids or align PQ subvector codes with their distance-table entries.",
+    "svg": "Selected: deterministic geometry, direct labels, line patterns, and aligned code cells expose both where IVF prunes and how PQ computes an approximate distance.",
+    "semanticHtml": "Rejected: a table can show PQ lookup arithmetic but cannot also make the query-to-partition proximity legible.",
+    "interaction": "Rejected: changing nprobe or codewords would add state and controls without improving the single composition the learner needs to trace.",
+    "paperReuse": "Rejected: the primary papers and local slide are denser than this learning objective, and public availability is not treated as permission to reuse their figures.",
+    "noVisual": "Rejected: the prose defines IVF and PQ separately but leaves readers to mentally compose candidate pruning with compressed-domain distance scoring."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The preceding title slide opens the recommender-systems section and contains no search mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide describes ANN as dividing the vector set into Voronoi buckets, probing nprobe buckets, and using PQ lookup tables for faster approximate distances; it provides the direct conceptual seed for the two-stage visual."
+      },
+      {
+        "page": 131,
+        "insight": "The following slide covers content-based and hybrid recommenders but adds no indexing, quantization, or ANN detail."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for nearest neighbor, approximate nearest neighbor, HNSW, product quantization, nprobe, Voronoi, inverted file, and vector search. Pages 129-131 were then rendered and visually inspected as the full relevant neighborhood. Page 130 is the only ANN-specific slide; it explains IVF-style buckets and PQ in prose and includes an unrelated collaborative-filtering diagram, but no reusable IVF-PQ mechanism artwork. No deck artwork is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Product Quantization for Nearest Neighbor Search",
+        "url": "https://inria.hal.science/inria-00514462/document",
+        "usage": "Used to verify Cartesian-product codebooks, compact subvector identifiers, and asymmetric distance computation as a sum of query-to-codeword lookup-table distances.",
+        "license": "The paper is publicly accessible but no permissive figure-reuse license was identified. No figure, table, result, wording, or layout is copied; all coordinates, codes, and distances are original synthetic teaching data."
+      },
+      {
+        "title": "Faiss documentation: Research foundations",
+        "url": "https://faiss.ai/",
+        "usage": "Used as official implementation documentation to verify that inverted files enable non-exhaustive search and PQ supports compressed-domain distance computation.",
+        "license": "Faiss software is MIT licensed, but the documentation is used only to verify semantics. No Faiss code, prose, or artwork is reproduced."
+      },
+      {
+        "title": "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs",
+        "url": "https://arxiv.org/abs/1603.09320",
+        "usage": "Used to verify that HNSW is the graph-based family contrasted with the IVF-PQ composition and that its hierarchy performs coarse-to-fine proximity search.",
+        "license": "No HNSW figure, empirical result, prose, or graph layout is reused. The implementation deliberately illustrates IVF-PQ instead and is independently authored."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not any family in isolation, but how production IVF-PQ removes two different costs: IVF avoids visiting most vectors, while PQ reduces storage reads and arithmetic for each visited vector. The SVG is an original schematic, not a redraw of a source figure. Its four PQ lookup values are explicit synthetic distances whose sum is 0.65; they illustrate asymmetric distance computation without claiming an empirical recall or latency result."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Independently reviewed the complete article, text-indexed all 214 deck pages, visually inspected the exact slide neighborhood, and checked the primary PQ paper, official Faiss documentation, and primary HNSW paper before selecting an original IVF-PQ composition."
+  },
+  "implementation": {
+    "visualIds": [
+      "ivf-pq-query-funnel"
+    ],
+    "accessibility": "Each panel has a linked SVG title and description. Partition states are distinguished by scan/skip text, solid versus dashed outlines, and direct centroid labels; PQ cells align code IDs with numeric lookup values and a written sum, so no meaning depends on color. The established two-panel primitive stacks below 640 pixels, each SVG scales from its viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}

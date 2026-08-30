@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "advocated-quality-over-speed",
+  "article": "src/content/posts/2026-07-10-advocated-quality-over-speed.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how evidence about severity, exposure, uncertainty, and reversibility leads to the smallest mitigation that bounds harm without treating delay as free.",
+  "mediumRationale": "A deterministic SVG decision path keeps the risk evidence, decision question, and two proportionate outcomes visible together in a narrow reading column. Mermaid could express the branches but adds runtime layout and less predictable mobile sizing; semantic HTML would preserve the words but weaken the branching relationship; interaction is unnecessary because the lesson does not require parameter exploration; paper or deck reuse adds no value and has unclear artwork permissions; and no visual leaves the article's hardest judgment call as a list of disconnected considerations.",
+  "mediumComparison": {
+    "mermaid": "Rejected: it can render the decision tree, but runtime layout is unnecessary for four fixed nodes and less predictable at 390 CSS pixels.",
+    "svg": "Selected: exact placement keeps the evidence packet, decision point, and two labelled outcomes readable as one compact, deterministic path.",
+    "semanticHtml": "Rejected: cards would make each idea accessible but would not show that the same evidence branches according to whether harm is bounded and reversible.",
+    "interaction": "Rejected: invented sliders or scores would imply false precision and add state without improving the qualitative judgment lesson.",
+    "paperReuse": "Rejected: the authoritative sources provide risk-management concepts rather than an article-specific figure, and public availability is not treated as artwork reuse permission.",
+    "noVisual": "Rejected: prose names many mitigations but does not spatially connect evidence to the least restrictive path that still bounds harm."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 141,
+        "insight": "The experimentation-and-launch slide pairs offline metrics with production A/B-test outcomes, providing evidence context but no safety escalation or staged mitigation path."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide asks for model-gating experiments, monitoring, user feedback, update procedures, low-confidence handling, and interpretability; these are concrete controls that can bound deployment risk."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring Rules of Machine Learning slide emphasizes observable metrics, independent infrastructure tests, detecting failures before export, watching silent failures, and planning to launch and iterate."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends facts-first dialogue, replacing either-or framing with 'and' thinking, and speaking with confidence and humility, which matches the article's non-heroic escalation model."
+      }
+    ],
+    "notes": "The complete 214-page deck was text-indexed for safety, quality, risk, launch, gating, monitoring, harm, and leadership terms. The full local neighborhoods on pages 140-142, 161-163, 168-170, and 209-211 were then reviewed. Pages 141, 168, 169, and 210 are relevant; their immediate neighbors either supply ranking and system-design context or change topics. No slide combines concrete harm, uncertainty reduction, reversibility, and delivery-preserving mitigation, and no deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used to verify that AI risk prioritization considers impact, likelihood, uncertainty, affected scope, and whether harmful effects are reversible, and that responses should be prioritized according to assessed risk.",
+        "license": "NIST AI 100-1 is a United States government publication and is not subject to copyright protection under 17 U.S.C. 105. No wording, table, or figure is reproduced; the visual is an original application to the article."
+      },
+      {
+        "title": "NIST AI RMF Playbook",
+        "url": "https://airc.nist.gov/airmf-resources/playbook/",
+        "usage": "Used to verify that risk actions should be tailored rather than applied as a universal checklist, and aligned across Govern, Map, Measure, and Manage outcomes.",
+        "license": "No Playbook text, image, or layout is copied. NIST notes that some site material can carry third-party rights, so public access is not treated as blanket figure-reuse permission."
+      },
+      {
+        "title": "AI Safety Institute approach to evaluations",
+        "url": "https://www.gov.uk/government/publications/ai-safety-institute-approach-to-evaluations/ai-safety-institute-approach-to-evaluations",
+        "usage": "Used to verify that automated assessments, red-teaming, and human evaluations provide different depths of evidence, and that evaluation informs but does not itself make a release decision.",
+        "license": "GOV.UK page content is available under the Open Government Licence v3.0 except where otherwise stated. No prose, data, or artwork is reused; the source is cited only for conceptual verification."
+      }
+    ],
+    "notes": "The figure is an original synthesis, not a reproduction of a source framework, scoring matrix, or empirical result. It intentionally avoids numeric risk scores: the article teaches evidence-backed judgment under uncertainty, not a universal formula. Labels and branch logic were checked against the article and the cited risk-management guidance."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Reviewed the complete article, all 214 deck pages by text index, four relevant slide neighborhoods, and official NIST and UK government guidance. The hardest prose-only model is choosing a proportionate response: evidence should determine whether a monitored staged path bounds harm or whether exposure must first be reduced."
+  },
+  "implementation": {
+    "visualIds": [
+      "quality-speed-proportionate-path"
+    ],
+    "accessibility": "The responsive SVG has a title and detailed description. Every branch is directly labelled, arrow paths differ by solid versus dashed treatment, outcomes use distinct shapes and explicit action text, and the caption restates the inference, so color is supplementary. The 360-pixel viewBox scales without a minimum width; shared theme variables provide dark-mode contrast and print overrides."
+  }
+}
