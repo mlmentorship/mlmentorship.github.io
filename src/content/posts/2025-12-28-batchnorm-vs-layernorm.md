@@ -32,6 +32,41 @@ For a 4-D activation tensor of shape `(N, C, H, W)` (batch, channel, height, wid
 | **InstanceNorm** | H, W (per sample, per channel) | C |
 | **GroupNorm** | G groups of C/G channels, H, W | C |
 
+<!-- visual:normalization-shared-statistics -->
+<figure class="learning-figure" aria-labelledby="normalization-axes-title">
+	<p class="visual-kicker">Spatial intuition</p>
+	<p class="visual-title" id="normalization-axes-title">Color groups values that share one mean and variance.</p>
+	<div class="visual-grid--two">
+		<section class="visual-panel" aria-labelledby="batchnorm-panel-title">
+			<h4 id="batchnorm-panel-title">BatchNorm on (N, C, H, W)</h4>
+			<p>Each column is one channel across samples. Every square also represents all H×W positions.</p>
+			<div class="norm-axis-key"><strong>columns:</strong> C0 · C1 · C2 <strong>rows:</strong> sample N</div>
+			<div class="norm-matrix norm-matrix--batch" role="img" aria-label="Four samples by three channels. Values in each channel column share one mean and variance across batch and spatial positions.">
+				<span class="norm-cell norm-c0">N0 C0</span><span class="norm-cell norm-c1">N0 C1</span><span class="norm-cell norm-c2">N0 C2</span>
+				<span class="norm-cell norm-c0">N1 C0</span><span class="norm-cell norm-c1">N1 C1</span><span class="norm-cell norm-c2">N1 C2</span>
+				<span class="norm-cell norm-c0">N2 C0</span><span class="norm-cell norm-c1">N2 C1</span><span class="norm-cell norm-c2">N2 C2</span>
+				<span class="norm-cell norm-c0">N3 C0</span><span class="norm-cell norm-c1">N3 C1</span><span class="norm-cell norm-c2">N3 C2</span>
+			</div>
+			<p class="norm-brace">One (μ<sub>c</sub>, σ<sub>c</sub>) per colored channel, shared across N, H, and W.</p>
+			<p class="norm-behavior">Train: batch statistics. Eval: stored running statistics.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="layernorm-panel-title">
+			<h4 id="layernorm-panel-title">LayerNorm on transformer (B, T, D)</h4>
+			<p>Each row is one token. Its embedding dimensions share statistics only with each other.</p>
+			<div class="norm-axis-key"><strong>columns:</strong> D0…D5 <strong>rows:</strong> token (b, t)</div>
+			<div class="norm-matrix norm-matrix--layer" role="img" aria-label="Four token rows by six embedding dimensions. Each token row computes its own mean and variance across embedding dimensions, independently of other tokens and samples.">
+				<span class="norm-cell norm-row-a">D0</span><span class="norm-cell norm-row-a">D1</span><span class="norm-cell norm-row-a">D2</span><span class="norm-cell norm-row-a">D3</span><span class="norm-cell norm-row-a">D4</span><span class="norm-cell norm-row-a">D5</span>
+				<span class="norm-cell norm-row-b">D0</span><span class="norm-cell norm-row-b">D1</span><span class="norm-cell norm-row-b">D2</span><span class="norm-cell norm-row-b">D3</span><span class="norm-cell norm-row-b">D4</span><span class="norm-cell norm-row-b">D5</span>
+				<span class="norm-cell norm-row-c">D0</span><span class="norm-cell norm-row-c">D1</span><span class="norm-cell norm-row-c">D2</span><span class="norm-cell norm-row-c">D3</span><span class="norm-cell norm-row-c">D4</span><span class="norm-cell norm-row-c">D5</span>
+				<span class="norm-cell norm-row-d">D0</span><span class="norm-cell norm-row-d">D1</span><span class="norm-cell norm-row-d">D2</span><span class="norm-cell norm-row-d">D3</span><span class="norm-cell norm-row-d">D4</span><span class="norm-cell norm-row-d">D5</span>
+			</div>
+			<p class="norm-brace">One (μ<sub>b,t</sub>, σ<sub>b,t</sub>) per colored token row, computed across D.</p>
+			<p class="norm-behavior">Train and eval: the same per-token computation.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> BatchNorm shares statistics down a channel column and therefore couples examples. Transformer LayerNorm shares statistics across one token row and never mixes tokens or samples.</figcaption>
+</figure>
+
 **LayerNorm normalizes across all features of a sample.** In CNNs that means C&times;H&times;W. In transformers that means only D, the embedding dimension. These are different normalization axes despite the shared name.
 
 **BatchNorm:**

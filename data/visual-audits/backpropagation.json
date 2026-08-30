@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "backpropagation",
+  "article": "src/content/posts/2025-11-06-backpropagation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace cached values forward and upstream gradients backward through local derivatives without constructing a full Jacobian.",
+  "mediumRationale": "A deterministic SVG can place two directions, exact scalar values, local derivative multipliers, and gradient results on one computation graph. Mermaid lacks the label control needed for this trace.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 43,
+        "insight": "The gradient slide establishes local slope and update direction before the algorithm is introduced."
+      },
+      {
+        "page": 44,
+        "insight": "The deck uses a computational graph to break a complex expression into local operations and pass gradients backward."
+      }
+    ],
+    "notes": "The deck's computation-graph framing is the correct spatial model. The site redraw uses an original scalar example so every value and derivative can be checked directly."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Automatic differentiation in machine learning: a survey",
+        "url": "https://jmlr.org/papers/v18/17-468.html",
+        "usage": "Used to verify reverse accumulation, computational-graph terminology, and vector-Jacobian product framing.",
+        "license": "No source figure copied; conceptual reference under the JMLR article."
+      },
+      {
+        "title": "PyTorch autograd documentation",
+        "url": "https://pytorch.org/docs/stable/autograd.html",
+        "usage": "Used to cross-check gradient accumulation and reverse-mode behavior described by the article.",
+        "license": "No documentation figure or code copied; API semantics referenced only."
+      }
+    ],
+    "notes": "Rumelhart, Hinton, and Williams is historically relevant, but its figure is unnecessary for this original, checkable scalar trace."
+  },
+  "agentReview": {
+    "reviewer": "Explore backpropagation subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended a deterministic SVG with forward values above the graph and reverse adjoints below it. The implementation uses a five-node scalar example and explicit local multipliers."
+  },
+  "implementation": {
+    "visualIds": ["backprop-forward-reverse-trace"],
+    "accessibility": "The SVG includes a title and complete description. Solid and dashed paths distinguish direction, every result is labeled, and the caption states the VJP inference."
+  }
+}

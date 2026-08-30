@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "slug": "flashattention",
+  "article": "src/content/posts/2026-04-10-flashattention.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Follow where the full attention score matrix is written and read in standard attention before contrasting that path with SRAM tiling.",
+  "mediumRationale": "The first lesson is a data-movement path through transformations and memory. Mermaid is appropriate for that topology; a later tiled-matrix SVG should explain the spatial FlashAttention algorithm itself.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 110,
+        "insight": "The source slide contrasts standard attention with tiled SRAM execution and highlights repeated HBM traffic as the bottleneck."
+      }
+    ],
+    "notes": "The deck's standard-versus-FlashAttention contrast establishes the right two-view teaching sequence. This first implementation improves the existing standard-attention path; a deterministic tiled-matrix companion remains in the visual roadmap."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "usage": "Used to verify the HBM/SRAM data-movement claim and exact tiled-attention framing. The site diagram is an original simplified redraw.",
+        "license": "No paper figure copied; conceptual reference and citation only."
+      }
+    ],
+    "notes": "The primary paper supports the mechanism. The article should not reuse its dense algorithm figure directly because the web lesson isolates one path at a time."
+  },
+  "agentReview": {
+    "reviewer": "Explore visual-learning subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended retaining Mermaid for the standard dataflow, assigning stable roles to input, transformation, HBM state, and output, then adding a separate deterministic tile visual in a later pass."
+  },
+  "implementation": {
+    "visualIds": ["flashattention-standard-hbm-path"],
+    "accessibility": "The Mermaid source includes an accessible title and detailed path description. Node roles use labels, shapes, and semantic colors, followed by a direct reading caption."
+  }
+}

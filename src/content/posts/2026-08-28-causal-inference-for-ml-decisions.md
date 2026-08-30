@@ -53,6 +53,7 @@ The treatment and outcome share a cause. This is confounding.
 
 A directed acyclic graph can express the claim:
 
+<!-- visual:causal-confounding-dag -->
 ```mermaid
 flowchart TB
 	accTitle: User difficulty confounds the relationship between support messages and churn

@@ -20,6 +20,27 @@ Do not publish screenshots from the deck. Some embedded figures may have separat
 
 The first prototype adds a causal-confounding DAG, semantic colors, accessible Mermaid descriptions, responsive compact and wide layouts, and a caption pattern. FlashAttention uses the same visual roles on its existing dataflow.
 
+## Per-article research protocol
+
+Every published entry is part of the visual queue, including questions and guides. A review may conclude that no visual is useful, but it may not skip the review.
+
+Each article-specific agent must:
+
+1. read the complete article and state the mental model that is hardest to form from prose;
+2. inspect the source deck at `/mnt/c/Users/saghi/Downloads/Basic_ML_CS_concepts (1).pdf`, including related slides rather than title matches alone;
+3. find primary papers, official documentation, or authoritative textbooks for the mechanism;
+4. determine whether any candidate source figure can legally be reused;
+5. default to an original redraw with citation when licensing is unclear;
+6. compare Mermaid, deterministic SVG, semantic HTML, interaction, and no visual;
+7. choose one learning objective and the smallest medium that teaches it;
+8. implement, test, and update one sidecar in `data/visual-audits/`.
+
+The sidecar records deck review, source review, medium rationale, independent reviewer, implementation IDs, and accessibility. Article markers use `<!-- visual:visual-id -->` so validation can connect research claims to shipped visuals.
+
+Run `npm run visuals:status` to see total coverage and the next unreviewed entries. Normal checks validate every existing sidecar. The final campaign gate is `node scripts/check-visual-coverage.mjs --require-complete`; it fails until every published entry has an independent review outcome.
+
+Parallel agents should own distinct article and sidecar files. Shared styles, components, scripts, and this protocol require a separate integration task to prevent merge conflicts and visual-language drift.
+
 ## Choose the medium from the learning task
 
 | Learning task | Default medium | Examples |

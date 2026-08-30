@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "slug": "roc-pr-auc",
+  "article": "src/content/posts/2026-03-25-roc-pr-auc.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Map one imbalanced classifier operating point into ROC and precision-recall coordinates and see why the two views create different intuitions.",
+  "mediumRationale": "Paired deterministic SVG plots provide precise axes, baselines, and synchronized operating points without a plotting dependency. Mermaid cannot express quantitative coordinates.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 37,
+        "insight": "The deck introduces ROC as a threshold sweep over true-positive and false-positive rates and emphasizes operating-point movement."
+      },
+      {
+        "page": 38,
+        "insight": "The adjacent evaluation slide compares classification metrics and motivates choosing a view based on the failure cost."
+      }
+    ],
+    "notes": "The deck supplies the threshold-sweep intuition but does not make the imbalance contrast sufficiently concrete. The new paired figure uses one count-consistent operating point in both coordinate systems."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "An introduction to ROC analysis",
+        "url": "https://doi.org/10.1016/j.patrec.2005.10.010",
+        "usage": "Used to verify ROC axes, threshold interpretation, random baseline, and AUC framing.",
+        "license": "No source figure copied; conceptual reference and citation only."
+      },
+      {
+        "title": "The Relationship Between Precision-Recall and ROC Curves",
+        "url": "https://www.biostat.wisc.edu/~page/rocpr.pdf",
+        "usage": "Used to verify the mathematical relationship between ROC and precision-recall spaces.",
+        "license": "No source figure copied; conceptual reference and existing article citation only."
+      }
+    ],
+    "notes": "The curves are original illustrative paths. The highlighted point is derived from 10 positives, 1,000 negatives, 8 true positives, and 50 false positives."
+  },
+  "agentReview": {
+    "reviewer": "Explore ROC-PR subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended paired SVG plots and a synchronized threshold point. Interaction was deferred until a reproducible underlying score dataset can support the full threshold sweep."
+  },
+  "implementation": {
+    "visualIds": ["roc-pr-same-operating-point"],
+    "accessibility": "Each SVG has its own title and long description. Axis labels, dashed guides, point markers, explicit values, and a count-based caption preserve meaning without color."
+  }
+}

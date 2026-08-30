@@ -26,6 +26,39 @@ A senior ML practitioner should always look at the confusion matrix before repor
 | **Actual 0** | TN (True Neg) | FP (False Pos, Type I) |
 | **Actual 1** | FN (False Neg, Type II) | TP (True Pos) |
 
+<!-- visual:confusion-matrix-denominators -->
+<figure class="learning-figure" aria-labelledby="cm-denominators-title">
+	<p class="visual-kicker">Spatial intuition</p>
+	<p class="visual-title" id="cm-denominators-title">Precision reads a prediction column. Recall reads an actual-class row.</p>
+	<div class="visual-grid--two">
+		<section class="visual-panel" aria-labelledby="precision-panel-title">
+			<h4 id="precision-panel-title">Precision: trust a positive prediction</h4>
+			<p>Highlight the predicted-positive column.</p>
+			<table class="cm-grid" aria-label="Confusion matrix with the predicted-positive column highlighted for precision">
+				<thead><tr><th>Actual</th><th>Pred 0</th><th>Pred 1</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">0</th><td><strong>900</strong> TN</td><td class="cm-selected"><strong>90</strong> FP</td></tr>
+					<tr><th scope="row">1</th><td><strong>2</strong> FN</td><td class="cm-selected"><strong>8</strong> TP</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">precision = 8 / (8 + 90) = 8%</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="recall-panel-title">
+			<h4 id="recall-panel-title">Recall: find the actual positives</h4>
+			<p>Highlight the actual-positive row.</p>
+			<table class="cm-grid" aria-label="Confusion matrix with the actual-positive row highlighted for recall">
+				<thead><tr><th>Actual</th><th>Pred 0</th><th>Pred 1</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">0</th><td><strong>900</strong> TN</td><td><strong>90</strong> FP</td></tr>
+					<tr><th class="cm-selected" scope="row">1</th><td class="cm-selected"><strong>2</strong> FN</td><td class="cm-selected"><strong>8</strong> TP</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">recall = 8 / (8 + 2) = 80%</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the same classifier has 80% recall but only 8% precision. The matrix reveals that abundant negatives create many more false alarms than true alerts.</figcaption>
+</figure>
+
 All binary classification metrics are derived from these four numbers:
 
 | Metric | Formula | Meaning |

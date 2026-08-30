@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "slug": "batchnorm-vs-layernorm",
+  "article": "src/content/posts/2025-12-28-batchnorm-vs-layernorm.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Identify which tensor values share one mean and variance in CNN BatchNorm versus transformer LayerNorm.",
+  "mediumRationale": "Responsive semantic grids make shared statistic groups spatially explicit and can stack on phones. Mermaid cannot represent normalization axes precisely, and interaction does not improve the core grouping lesson.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 50,
+        "insight": "The source slide highlights different tensor slices for BatchNorm, LayerNorm, InstanceNorm, and GroupNorm, making axis choice the central visual idea."
+      }
+    ],
+    "notes": "The implementation preserves the slide's strongest insight, colored statistic groups, but redraws only CNN BatchNorm and transformer LayerNorm to avoid a dense all-method comparison."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+        "url": "https://arxiv.org/abs/1502.03167",
+        "usage": "Used to verify per-channel mini-batch statistics and separate running statistics at inference.",
+        "license": "No paper figure copied; equations and method semantics referenced only."
+      },
+      {
+        "title": "Layer Normalization",
+        "url": "https://arxiv.org/abs/1607.06450",
+        "usage": "Used to verify per-example feature normalization and train-eval behavior.",
+        "license": "No paper figure copied; equations and method semantics referenced only."
+      },
+      {
+        "title": "PyTorch LayerNorm documentation",
+        "url": "https://pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html",
+        "usage": "Used to cross-check normalized_shape and last-dimension behavior for transformer tensors.",
+        "license": "No documentation figure or code copied; API semantics referenced only."
+      }
+    ],
+    "notes": "arXiv hosting does not itself grant permission to copy a figure. The tensor grids are original and cite only the underlying methods."
+  },
+  "agentReview": {
+    "reviewer": "Explore normalization subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended a tensor-axis comparison. Manual integration corrected the review's unsupported reuse claim and used original semantic grids instead of paper figures."
+  },
+  "implementation": {
+    "visualIds": ["normalization-shared-statistics"],
+    "accessibility": "Both tensor grids have descriptive image roles, visible axis keys, textual group labels, and a caption that explains the shared-statistics direction without relying on color."
+  }
+}

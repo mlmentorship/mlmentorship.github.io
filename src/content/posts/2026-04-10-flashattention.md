@@ -20,6 +20,7 @@ Essential in modern transformer training/inference. Every serious framework uses
 
 Standard attention reads and writes the n×n attention matrix to HBM at every step:
 
+<!-- visual:flashattention-standard-hbm-path -->
 ```mermaid
 flowchart LR
   accTitle: Standard attention repeatedly moves its full score matrix through high-bandwidth memory

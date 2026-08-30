@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "slug": "causal-inference-for-ml-decisions",
+  "article": "src/content/posts/2026-08-28-causal-inference-for-ml-decisions.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "See the backdoor path that makes an observed support-message association differ from the intervention effect.",
+  "mediumRationale": "The lesson is topological rather than quantitative. A compact causal DAG makes the competing paths visible and remains editable with the article.",
+  "deckReview": {
+    "pages": [],
+    "notes": "The 214-slide source deck was searched by extracted headings and text. It does not contain a dedicated causal-inference or confounding slide, so the visual is derived from this article's worked example rather than imitating a deck figure."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Causal Inference: What If",
+        "url": "https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/",
+        "usage": "Used to check the treatment, outcome, confounding, and adjustment terminology. The diagram is an original redraw for the article's support-message example.",
+        "license": "No source figure copied; conceptual reference only."
+      }
+    ],
+    "notes": "The article-specific three-node DAG is sufficient. A paper figure would add complexity without improving the core mental model."
+  },
+  "agentReview": {
+    "reviewer": "Explore visual-learning subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended Mermaid for a compact treatment-confounder-outcome DAG, with the causal edge emphasized and the two confounding edges distinguished by line style."
+  },
+  "implementation": {
+    "visualIds": ["causal-confounding-dag"],
+    "accessibility": "The Mermaid source includes an accessible title and full description. Labels and line styles preserve the lesson without relying on color, and a prose caption repeats the inference."
+  }
+}

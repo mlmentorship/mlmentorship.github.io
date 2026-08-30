@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "slug": "confusion-matrix-and-classification-metrics",
+  "article": "src/content/posts/2025-11-04-confusion-matrix-and-classification-metrics.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Read precision from the predicted-positive column and recall from the actual-positive row of the same confusion matrix.",
+  "mediumRationale": "Two semantic tables preserve the matrix structure, remain accessible as data, reflow cleanly on phones, and make the two denominators visible without a chart runtime.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 37,
+        "insight": "The deck connects threshold movement to ROC coordinates and the underlying true-positive and false-positive counts."
+      },
+      {
+        "page": 38,
+        "insight": "The evaluation summary reinforces that accuracy, precision, recall, and F1 are alternate readings of one error table."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration and out-of-distribution examples show why an aggregate score cannot expose the structure of errors."
+      }
+    ],
+    "notes": "The deck's classification sequence motivates a concrete matrix with an imbalanced example. The site visual narrows that material to one spatial rule: precision is a column and recall is a row."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "scikit-learn confusion_matrix documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html",
+        "usage": "Used to verify the row-as-true-class and column-as-predicted-class convention and normalization terminology.",
+        "license": "No documentation figure or code copied; API semantics referenced under scikit-learn's BSD documentation."
+      },
+      {
+        "title": "scikit-learn model evaluation guide",
+        "url": "https://scikit-learn.org/stable/modules/model_evaluation.html",
+        "usage": "Used to cross-check precision, recall, and confusion-matrix definitions.",
+        "license": "No source figure copied; definitions and mathematical facts only."
+      }
+    ],
+    "notes": "The equations are mathematical definitions. An original numerical matrix is clearer and safer than reusing a library screenshot."
+  },
+  "agentReview": {
+    "reviewer": "Explore confusion-matrix subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended semantic matrix views to expose which cells feed each metric. The implementation deliberately narrows the broader three-visual proposal to one denominator comparison."
+  },
+  "implementation": {
+    "visualIds": ["confusion-matrix-denominators"],
+    "accessibility": "Both matrices are real tables with column and row headers, explicit counts, and descriptive labels. The caption states the conclusion without relying on color."
+  }
+}
