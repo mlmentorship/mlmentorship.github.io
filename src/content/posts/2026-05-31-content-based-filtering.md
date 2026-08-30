@@ -21,6 +21,46 @@ Content-based filtering is the standard answer to the **item cold-start** proble
 
 This is structurally a **two-tower** idea (a user/profile tower and an item/content tower) when both sides are learned, which is why content features feed naturally into modern retrieval models.
 
+<!-- visual:content-profile-scores-new-item -->
+<figure class="learning-figure plot-panel" aria-labelledby="content-profile-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="content-profile-title">Why can a content model rank a brand-new item?</p>
+	<svg viewBox="0 0 360 390" role="img" aria-labelledby="content-profile-svg-title content-profile-svg-desc">
+		<title id="content-profile-svg-title">Building a user profile and scoring a new item in the same feature space</title>
+		<desc id="content-profile-svg-desc">Two liked items have binary vectors over science, drama, and short features. Averaging them gives the user profile one, one half, one half. A brand-new telescope guide has zero interactions but a cosine similarity of 0.87 to that profile, so it ranks above a popular drama with 12,000 interactions and a similarity of 0.41. The content score never uses other users' interaction counts.</desc>
+		<defs><marker id="content-profile-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+		<text class="viz-axis-label" x="18" y="25">1 · REPRESENT LIKED ITEMS</text>
+		<text class="viz-label" x="180" y="44" text-anchor="middle">features = [science, drama, short]</text>
+		<rect class="viz-node viz-node--input" x="18" y="58" width="148" height="52" rx="4"></rect>
+		<text class="viz-callout" x="30" y="78">Liked · Space 101</text>
+		<text class="viz-label" x="30" y="98">x₁ = [1, 0, 1]</text>
+		<rect class="viz-node viz-node--input" x="194" y="58" width="148" height="52" rx="4"></rect>
+		<text class="viz-callout" x="206" y="78">Liked · Lab Story</text>
+		<text class="viz-label" x="206" y="98">x₂ = [1, 1, 0]</text>
+		<path d="M92 116V138H180V154" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#content-profile-arrow)"></path>
+		<path d="M268 116V138H180" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+		<text class="viz-axis-label" x="18" y="152">2 · AVERAGE INTO ONE PROFILE</text>
+		<rect class="viz-node viz-node--focus" x="98" y="164" width="164" height="56" rx="4"></rect>
+		<text class="viz-callout" x="180" y="185" text-anchor="middle">user profile</text>
+		<text class="viz-callout" x="180" y="205" text-anchor="middle">p = [1, 0.5, 0.5]</text>
+		<path d="M180 226V251" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#content-profile-arrow)"></path>
+		<text class="viz-axis-label" x="18" y="248">3 · SCORE CANDIDATE FEATURES</text>
+		<rect class="viz-node viz-node--output" x="18" y="263" width="158" height="78" rx="4"></rect>
+		<text class="viz-callout" x="30" y="284">#1 · Telescope guide</text>
+		<text class="viz-label" x="30" y="302">new · 0 interactions</text>
+		<text class="viz-label" x="30" y="319">x = [1, 0, 1]</text>
+		<text class="viz-callout" x="30" y="335">cos(p, x) = 0.87</text>
+		<rect class="viz-node" x="194" y="263" width="148" height="78" rx="4"></rect>
+		<text class="viz-callout" x="206" y="284">#2 · Popular drama</text>
+		<text class="viz-label" x="206" y="302">12k interactions</text>
+		<text class="viz-label" x="206" y="319">x = [0, 1, 0]</text>
+		<text class="viz-callout" x="206" y="335">cos(p, x) = 0.41</text>
+		<path d="M28 359H332" style="fill:none;stroke:var(--c-rule);stroke-width:1"></path>
+		<text class="viz-axis-label" x="180" y="378" text-anchor="middle">OTHER USERS' COUNTS ARE NOT INPUTS TO THIS SCORE</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> average the two liked-item vectors to build the profile, then compare that profile only with each candidate's features. The telescope guide can rank first on day one because its feature vector already exists; the 0 and 12k interaction counts are shown only to emphasize that this content score does not use them. The vectors and layout are original; mechanism checked against <a href="https://developers.google.com/machine-learning/recommendation/content-based/basics">Google's recommendation-systems documentation</a>.</figcaption>
+</figure>
+
 ## Content-based vs collaborative filtering
 
 | | **Content-based** | **Collaborative filtering** |
