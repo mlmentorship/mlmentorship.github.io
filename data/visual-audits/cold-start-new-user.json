@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "cold-start-new-user",
+  "article": "src/content/posts/2025-11-30-cold-start-new-user.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how a recommender uses fallback signals before behavior exists, then gradually gives observed user behavior more influence without ending exploration.",
+  "mediumRationale": "A two-stage semantic card is the smallest medium that can place the initial signal stack beside the feedback-driven handoff. It preserves the sequence as directly readable text and reflows without shrinking at phone width.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show the feedback loop, but its node layout would make the changing relative roles of fallback and behavioral signals less direct and would add a runtime dependency.",
+    "svg": "Rejected: a stacked-area chart would imply measured weights and a universal transition curve that the article does not claim.",
+    "semanticHtml": "Selected: directly labelled stages can distinguish what is available before interactions from what changes after each response, while remaining compact, static, and naturally responsive.",
+    "interaction": "Rejected: an adjustable session count would require invented weight values and state without adding a more defensible lesson than the staged trace.",
+    "paperReuse": "Rejected: the reviewed sources establish cold-start and feedback mechanisms but no source figure narrowly expresses this article's staged signal handoff; figure-reuse permission was not assumed.",
+    "noVisual": "Rejected: the prose names the signals and a 5-10 interaction transition, but readers must still mentally combine the initial fallback stack, exploration feedback, and gradual replacement of fallback evidence."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 128,
+        "insight": "The preceding slide is about model compression, establishing the boundary before the recommender-system section and adding no cold-start mechanism."
+      },
+      {
+        "page": 129,
+        "insight": "This is the recommender-systems section divider; it introduces the relevant neighborhood but contains no explanatory figure or cold-start guidance."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide says interaction-only matrix factorization needs user fold-in, notes presentation-bias feedback and explore/exploit, suggests average ratings as a new user's initial ratings, and recommends user, item, and context features when available."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid-recommender slide explains item-attribute similarity and linear blending of content-based and collaborative outputs, but does not show how their influence should change as a new user generates behavior."
+      },
+      {
+        "page": 132,
+        "insight": "The next slide begins a personalized-search case study, marking the end of the local recommender-method sequence."
+      },
+      {
+        "page": 135,
+        "insight": "The search case study later separates general context and trending items from past behavior and personalized context at ranking time, reinforcing the distinct signal families without describing a new-user transition."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks how fresh data and cold starts affect sampling and model design, but offers no mechanism for blending signals."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly asks for strategies for new customers and explore/exploit adaptation, confirming these as deployment concerns rather than supplying a spatial explanation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for cold start, new user, recommender, collaborative filtering, content-based filtering, hybrid, explore/exploit, and personalization. All matching pages were read; pages 128-132 were inspected as the core neighborhood, with later supporting matches on pages 135, 161, and 162. Page 29 mentions recommender sparsity only as an example for factorization machines and does not apply to the user-lifetime handoff. No deck image, wording, values, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Methods and Metrics for Cold-Start Recommendations",
+        "url": "https://doi.org/10.1145/564376.564421",
+        "usage": "Used as a primary cold-start reference for the distinction between recommending with little or no user-rating history and conventional collaborative-filtering conditions.",
+        "license": "The ACM paper is copyrighted and no permissive figure-reuse license was identified. No paper text, data, figure, or layout is reproduced."
+      },
+      {
+        "title": "A Contextual-Bandit Approach to Personalized News Article Recommendation",
+        "url": "https://arxiv.org/abs/1003.0146",
+        "usage": "Used to verify the sequential loop in which context informs a recommendation, user feedback updates the policy, and exploration is balanced against exploitation.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was established. No algorithm, result, figure, prose, or layout is copied."
+      },
+      {
+        "title": "Google Machine Learning: Content-based filtering basics",
+        "url": "https://developers.google.com/machine-learning/recommendation/content-based/basics",
+        "usage": "Used as official documentation to verify that explicit profile features and prior actions can represent a user in the same feature space as item features.",
+        "license": "Google Developers content is generally CC BY 4.0 except where noted, but no wording, code, matrix, or artwork is adapted; the shipped card is independently authored."
+      },
+      {
+        "title": "Google Machine Learning: Collaborative filtering basics",
+        "url": "https://developers.google.com/machine-learning/recommendation/collaborative/basics",
+        "usage": "Used as official documentation to verify that collaborative filtering draws on user-item feedback and similarities among users and items.",
+        "license": "Google Developers content is generally CC BY 4.0 except where noted, but no wording, examples, data, or artwork is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that cold-start is a controlled handoff, not a hard switch after a fixed count. Before behavioral evidence exists, onboarding, context, item content, and safe population priors can rank candidates. Exploration deliberately creates informative impressions and responses; those observations increase the influence of personalized behavior while fallback influence recedes. Exploration remains present because preferences and catalogs continue to change. The visual states direction only and invents no universal weights, thresholds, or empirical curve."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the recommender neighborhood and later cold-start references, then checked a primary cold-start paper, a primary contextual-bandit paper, and official content-based and collaborative-filtering documentation before selecting an original semantic handoff card."
+  },
+  "implementation": {
+    "visualIds": [
+      "cold-start-signal-handoff"
+    ],
+    "accessibility": "The figure has a linked learning question and a labelled group with two semantic sections. Numbered steps and direct labels state which signals are available, what exploration collects, and which influence rises or recedes, so no meaning depends on color or position alone. The established two-column primitive stacks below 640 pixels and uses wrapping text with no fixed or minimum width, making it readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print tokens force a light high-contrast palette and avoid splitting the figure across pages."
+  }
+}

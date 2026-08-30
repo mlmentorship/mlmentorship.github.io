@@ -35,6 +35,45 @@ $$
 
 is the **partition function**: a sum over all $|V|^T$ possible labelings. $Z$ couples the whole sequence through **global normalization**. Per-token softmax instead normalizes each position locally and independently.
 
+<!-- visual:crf-global-path-scoring -->
+<figure class="learning-figure plot-panel" aria-labelledby="crf-path-visual-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="crf-path-visual-title">How can the same emission scores produce a different label sequence?</p>
+	<svg viewBox="0 0 360 350" role="img" aria-labelledby="crf-path-svg-title crf-path-svg-desc">
+		<title id="crf-path-svg-title">Independent emissions compared with CRF whole-path scoring</title>
+		<desc id="crf-path-svg-desc">For the two tokens Ada Lovelace, independent selection picks O with emission 3 and I-PER with emission 3, totaling 6 but forming an incoherent BIO sequence. In the CRF example, the O to I-PER transition has score minus 5, so that complete path scores 1. The B-PER to I-PER path combines emissions 2 and 3 with transition score plus 1, scores 6, and is selected as coherent. These are illustrative learned scores rather than universal hard constraints.</desc>
+		<defs>
+			<marker id="crf-path-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="viz-arrow-forward" d="M0 0L10 5L0 10Z"></path></marker>
+		</defs>
+		<rect class="viz-plot-bg" x="5" y="5" width="350" height="152" rx="6"></rect>
+		<text class="viz-axis-label" x="15" y="25">INDEPENDENT SOFTMAX · MAXIMIZE EACH EMISSION</text>
+		<text class="viz-node-value" x="105" y="50">Ada</text>
+		<text class="viz-node-value" x="255" y="50">Lovelace</text>
+		<rect class="viz-node viz-node--input" x="55" y="62" width="100" height="55" rx="8"></rect>
+		<rect class="viz-node viz-node--input" x="205" y="62" width="100" height="55" rx="8"></rect>
+		<text class="viz-node-label" x="105" y="85">O</text>
+		<text class="viz-node-value" x="105" y="103">emission = 3</text>
+		<text class="viz-node-label" x="255" y="85">I-PER</text>
+		<text class="viz-node-value" x="255" y="103">emission = 3</text>
+		<text class="viz-callout" x="180" y="137" text-anchor="middle">3 + 3 = 6 · INVALID BIO: O → I-PER</text>
+		<rect class="viz-plot-bg" x="5" y="170" width="350" height="175" rx="6"></rect>
+		<text class="viz-axis-label" x="15" y="190">LINEAR-CHAIN CRF · SCORE COMPLETE PATHS</text>
+		<text class="viz-node-value" x="105" y="215">Ada</text>
+		<text class="viz-node-value" x="255" y="215">Lovelace</text>
+		<path class="viz-forward" style="marker-end:url(#crf-path-arrow)" d="M155 255H202"></path>
+		<text class="viz-edge-label" x="180" y="244">+1</text>
+		<rect class="viz-node viz-node--focus" x="55" y="227" width="100" height="55" rx="8"></rect>
+		<rect class="viz-node viz-node--focus" x="205" y="227" width="100" height="55" rx="8"></rect>
+		<text class="viz-node-label" x="105" y="250">B-PER</text>
+		<text class="viz-node-value" x="105" y="268">emission = 2</text>
+		<text class="viz-node-label" x="255" y="250">I-PER</text>
+		<text class="viz-node-value" x="255" y="268">emission = 3</text>
+		<text class="viz-callout" x="180" y="303" text-anchor="middle">chosen: 2 + 3 + 1 = 6 · VALID BIO</text>
+		<text class="viz-gradient-label" x="180" y="327">rejected O → I-PER: 3 + 3 − 5 = 1</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> the token emissions stay fixed. Softmax takes each column's maximum and cannot penalize the invalid <code>O → I-PER</code> pair. The CRF adds a learned score for each adjacent-label transition, compares complete paths, and selects <code>B-PER → I-PER</code> in this example. The forward algorithm sums the exponentiated scores of all paths to compute <var>Z</var>; Viterbi finds the highest-scoring path.</figcaption>
+</figure>
+
 ## Training and inference
 
 The partition function looks intractable ($|V|^T$ terms) but factorizes over the chain:

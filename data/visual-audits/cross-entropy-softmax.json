@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "cross-entropy-softmax",
+  "article": "src/content/posts/2025-09-05-cross-entropy-softmax.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why cross-entropy still supplies a large logit gradient when the true class has near-zero predicted probability, while squared error through a saturating probability output can supply almost none.",
+  "mediumRationale": "A deterministic SVG curve comparison is the smallest medium that can show how two logit-gradient magnitudes diverge continuously as true-class probability approaches zero.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show the softmax and loss stages but cannot show how gradient magnitude changes with confidence.",
+    "svg": "Selected: fixed numeric axes, calculated curves, and one directly annotated confident-wrong point make the saturation contrast inspectable.",
+    "semanticHtml": "Rejected: a table can list a few values but obscures the limiting behavior and the MSE gradient's interior peak.",
+    "interaction": "Rejected: a probability slider adds controls without teaching more than the static curves and annotated endpoint.",
+    "paperReuse": "Rejected: no reviewed source figure has both verified reuse permission and this exact true-class-probability comparison.",
+    "noVisual": "Rejected: the chain-rule saturation factor is the article's hardest mental model and is difficult to infer from the two formulas alone."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 32,
+        "insight": "The section divider establishes the start of the deck's dedicated classification-loss sequence."
+      },
+      {
+        "page": 33,
+        "insight": "The logistic-regression slide connects maximum likelihood, negative log-likelihood, categorical cross-entropy, softmax, and the simplified target-minus-output derivative."
+      },
+      {
+        "page": 34,
+        "insight": "The neighboring overview discusses convex classification losses but gives no probability-to-logit gradient comparison."
+      },
+      {
+        "page": 35,
+        "insight": "The softmax-classifier slide presents NLL, max-shift stabilization, and a sigmoid training loop; its code labels out-minus-target as a loss-output derivative and then multiplies by the sigmoid derivative, so it does not correctly represent the fused BCE logit gradient."
+      },
+      {
+        "page": 36,
+        "insight": "The following surrogate-loss slide places cross-entropy beside hinge, logistic, exponential, and focal losses but adds no confident-wrong gradient geometry."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 deck pages for softmax, cross-entropy, categorical loss, and log-sum-exp, then rendered and inspected the complete dedicated classification-loss neighborhood on pages 32-36. Later matches are incidental applications, except page 110's streaming log-sum-exp for FlashAttention. No slide layout, embedded figure, code, or wording is reused. In particular, the page 35 backward-pass code is not used because it conflates the BCE derivative with respect to logits and probability."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Learning, Chapter 6: Deep Feedforward Networks",
+        "url": "https://www.deeplearningbook.org/contents/mlp.html",
+        "usage": "Used as an authoritative textbook source for softmax output units, log-likelihood objectives, saturation, and the advantage of losses whose logit derivatives do not vanish when the model is confidently wrong.",
+        "license": "The online book is available to read, but its site does not grant general permission to copy the work. No text, figure, coordinates, or layout is reproduced."
+      },
+      {
+        "title": "PyTorch CrossEntropyLoss documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+        "usage": "Used as official framework documentation to verify that the operation consumes unnormalized logits and is equivalent to LogSoftmax followed by NLLLoss for class-index targets.",
+        "license": "PyTorch documentation is maintained with the BSD-3-Clause-licensed project. No documentation prose, example, source code, or figure is copied."
+      }
+    ],
+    "notes": "The shipped plot is an original deterministic construction from the formulas in the article. It takes a binary sigmoid slice with true label one and true-class probability q. For cross-entropy, the magnitude of the gradient with respect to the true-class logit is 1 - q. For half squared error on the probability, the chain rule gives q(1 - q)^2. At q = 0.01 these are 0.99 and approximately 0.0098. The binary slice isolates the saturation factor; the article's multiclass softmax-cross-entropy result remains dL/dz_i = p_i - y_i."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, inspected the full deck and exact loss neighborhood, rejected an incorrect deck gradient snippet, and checked an authoritative textbook plus official PyTorch behavior before selecting an original confident-wrong gradient plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "cross-entropy-confident-wrong-gradient"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Both curves are directly named and distinguished by solid versus dashed strokes; axes, formulas, the q = 0.01 guide, and numeric gradient values carry the lesson without color. A compact 360-unit viewBox requires no horizontal scrolling at 390 CSS pixels. Established theme variables support dark mode, and shared print rules provide a light high-contrast palette with no minimum SVG width."
+  }
+}

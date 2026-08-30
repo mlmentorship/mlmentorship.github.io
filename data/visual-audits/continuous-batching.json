@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "continuous-batching",
+  "article": "src/content/posts/2026-04-22-continuous-batching.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how iteration-level scheduling replaces a completed request with a queued request at the next decode step while unfinished requests remain active.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align the same five decode iterations and two logical batch slots under static and continuous scheduling. Fixed rows make the idle-slot versus replacement contrast directly comparable at phone width.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show queue, scheduler, and GPU components, but automatic layout does not expose slot occupancy across aligned decode iterations.",
+    "svg": "Selected: deterministic timeline cells preserve iteration and slot correspondence, distinguish idle work with dashed shapes and text, and show the exact admission boundary without runtime code.",
+    "semanticHtml": "Rejected: a table could encode the schedule, but the paired timeline and admission arrow would be less immediate, and a narrow table would require horizontal scrolling or abbreviated headers.",
+    "interaction": "Rejected: changing request lengths or arrivals would add controls and simulation state without improving the single replacement invariant this article needs to teach.",
+    "paperReuse": "Rejected: Orca contains scheduling figures and the vLLM and Sarathi papers contain system diagrams, but no permissive figure-reuse license was established for those papers. The shipped schedule, request lengths, geometry, and wording are independently authored.",
+    "noVisual": "Rejected: prose explains that requests may enter after another finishes, but the reader must mentally synchronize completion, queue admission, and the continuing long request. The aligned schedules make the unused static slot and next-iteration replacement visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide explains a different serving optimization: verifying several drafted tokens in one large-model pass. It establishes nearby decode context but does not discuss changing batch membership."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide covers datatype throughput, memory, and numerical stability. It is the immediate predecessor but adds no scheduling model."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving-stack summary states that continuous batching inserts and evicts requests at token granularity to keep useful GPU work high despite variable generation lengths. It provides no timeline or explanation of the next-iteration replacement mechanism."
+      },
+      {
+        "page": 116,
+        "insight": "The following re-scoring title slide begins a new topic and contains no batching or serving detail."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for continuous batching, iteration-level scheduling, dynamic batching, inference scheduling, vLLM, PagedAttention, and serving. Exact physical page numbers were then verified page-by-page because a naive form-feed counter was offset. Page 115 is the only slide that names continuous batching; pages 113-116 were read and rendered as its neighborhood. Page 115 is text-only and offers no reusable visual. No deck pixels, layout, wording, or examples are copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Orca: A Distributed Serving System for Transformer-Based Generative Models",
+        "url": "https://www.usenix.org/conference/osdi22/presentation/yu",
+        "usage": "Used as the primary systems reference to verify iteration-level scheduling: the scheduler selects requests, runs one model iteration, receives results, detects completions, and can select newly arrived requests for the next iteration.",
+        "license": "USENIX provides open access to the paper and presentation, but no permissive figure-reuse license was identified. No Orca figure, prose, request trace, or visual layout is reproduced."
+      },
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used to verify that vLLM combines iteration-level scheduling with paged KV-cache management so requests with changing and heterogeneous sequence state can be batched efficiently.",
+        "license": "The arXiv record makes the paper publicly accessible but does not establish a permissive license for reusing its figures. No paper artwork, measurements, prose, or examples are adapted."
+      },
+      {
+        "title": "SARATHI: Efficient LLM Inference by Piggybacking Decodes with Chunked Prefills",
+        "url": "https://arxiv.org/abs/2308.16369",
+        "usage": "Used to cross-check the article's prefill/decode distinction and the refinement that chunked prefills can be mixed with decode work to improve utilization without letting long prefills monopolize scheduling.",
+        "license": "The arXiv paper is consulted for mechanism and terminology; no permissive figure-reuse permission was established and no figure, empirical result, wording, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the scheduling boundary between decode iterations. In the original synthetic trace, request A needs five decode steps, B needs two, and queued C needs three and is available before step 3. A conventional static batch leaves B's logical slot idle for steps 3-5 and does not admit C until A finishes. An iteration-level scheduler observes B's completion after step 2 and admits C for step 3 while A continues. The 7-versus-10 useful slot count is arithmetic for this illustrative trace, not an empirical throughput claim; real iteration duration and admission depend on batch shape, KV capacity, policy, and hardware."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, verified and rendered the exact page 113-116 neighborhood, and checked the Orca, vLLM, and Sarathi primary systems papers before selecting an original paired slot-occupancy trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "continuous-batching-reuses-finished-slot"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description. Every occupied cell contains its request letter, idle cells are dashed and explicitly say 'idle,' step numbers and slot labels establish both axes, and the admission boundary is directly labelled, so color is redundant. The established two-panel primitive stacks below 640 pixels, each panel scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens provide a light high-contrast palette."
+  }
+}

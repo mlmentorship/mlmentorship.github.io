@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "content-moderation",
+  "article": "src/content/posts/2025-05-29-content-moderation.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how a versioned policy becomes per-policy decisions while human review and appeals correct decisions and supply evidence for evaluation and retraining.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that keeps policy ownership separate from model scoring while showing the allow, review, and auto-action routes and their shared correction loop.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled directed edges make responsibility, routing, and feedback explicit, while the established renderer supplies responsive layout and theme support.",
+    "svg": "Rejected: the lesson is an architecture and lifecycle rather than quantitative geometry, so fixed coordinates would add maintenance without improving the causal sequence.",
+    "semanticHtml": "Rejected: cards or a table could compare actions but would weaken the converging policy-and-score inputs and the review and appeal feedback paths.",
+    "interaction": "Rejected: changing thresholds interactively would teach calibration tradeoffs, but the article's harder mental model is policy governance plus operational feedback, which is fixed and should remain available without JavaScript.",
+    "paperReuse": "Rejected: the reviewed sources contain related moderation taxonomies and process guidance, but no single figure expresses this article's architecture. Figure reuse permission was not established, and no source composition is copied.",
+    "noVisual": "Rejected: the prose names layers and senior-level additions in separate sections, leaving readers to assemble where policy ends, model scoring begins, and corrected decisions return to the system."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 31,
+        "insight": "The preceding algorithms pros-and-cons divider closes the prior topic and contains no content-moderation, policy, review, or appeals architecture."
+      },
+      {
+        "page": 32,
+        "insight": "The classification loss and evaluation divider begins the nearest relevant neighborhood but provides no moderation workflow."
+      },
+      {
+        "page": 37,
+        "insight": "The classification-metrics slide defines precision, recall, and the ROC operating-point tradeoff, supporting per-policy evaluation rather than a single accuracy number."
+      },
+      {
+        "page": 38,
+        "insight": "The neighboring evaluation slide shows how moving a classifier threshold trades recall against false positives, but it does not connect thresholds to policy-specific actions or human review."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration and out-of-distribution slide links meaningful confidence to threshold-based rejection, the closest deck analogue to routing borderline cases for review."
+      },
+      {
+        "page": 40,
+        "insight": "The general-neural-networks divider ends the relevant classification neighborhood and confirms that no adjacent moderation-system treatment follows."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for moderation, content policy, human review, appeals, enforcement, and closely related classifier, threshold, precision, recall, and calibration terms. It contains no content-moderation system or appeals workflow. Pages 31-40 were inspected as the nearest classification operating-policy neighborhood; pages 37-39 provide useful metric, threshold, and calibration context only. No deck artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Algorithmic content moderation: Technical and political challenges in the automation of platform governance",
+        "url": "https://doi.org/10.1177/2053951719897945",
+        "usage": "Used as the primary research source for the sequence from matching or prediction through a decision to a governance outcome, and for the limits of automated context-dependent decisions.",
+        "license": "The article is publicly readable, but figure-reuse permission was not relied on or assumed. No figure, example, data, wording, or layout is copied; the shipped flow is independently authored."
+      },
+      {
+        "title": "The Santa Clara Principles on Transparency and Accountability in Content Moderation",
+        "url": "https://www.santaclaraprinciples.org/",
+        "usage": "Used as authoritative civil-society guidance to verify that clear rules, notice, human support, appeals, cultural competence, and reporting on successful and unsuccessful appeals are parts of accountable moderation.",
+        "license": "No explicit license granting reuse of site text or artwork was identified. The principles are cited for process requirements only; no prose, graphic, icon, or layout is adapted."
+      },
+      {
+        "title": "NIST AI Risk Management Framework 1.0",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as official risk-management guidance to cross-check the separation of governance, measurement, and management responsibilities across an AI system lifecycle.",
+        "license": "NIST publications are generally not subject to U.S. copyright, but no NIST figure is needed or reused. The visual is an original application-specific synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the classifier itself but the governed decision loop: one item receives separate policy scores; a versioned policy determines per-policy thresholds and actions; uncertain cases go to trained reviewers; auto-actions need notice and appeal; and corrected decisions become evaluation and training evidence rather than silently redefining policy. Source figures were unnecessary, and unclear artwork permissions triggered the default original-redraw treatment."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the neighboring classification slides, then reviewed a primary algorithmic-moderation paper, the Santa Clara Principles, and the official NIST AI RMF before selecting an original compact Mermaid decision-and-correction flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "content-moderation-governed-decision-loop"
+    ],
+    "accessibility": "The Mermaid block provides a specific accessible title and a complete description. Every responsibility, action, and feedback path is directly labelled, and node text plus solid and dashed edge semantics preserve the lesson without color. The top-to-bottom compact layout is designed for the reading column at 390 CSS pixels; the shared Mermaid theme handles dark mode and print."
+  }
+}

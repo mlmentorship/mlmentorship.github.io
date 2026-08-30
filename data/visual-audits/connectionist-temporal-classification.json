@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "connectionist-temporal-classification",
+  "article": "src/content/posts/2026-05-31-connectionist-temporal-classification.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace the CTC collapse operation in its required order and explain why a blank between identical labels preserves both labels.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold two frame-level paths side by side and align each path with the two ordered collapse steps. The repeated shapes make the contrast between adjacent and blank-separated labels visible at phone width without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could name the two collapse operations, but its automatic layout would obscure token-by-token correspondence between the two paths.",
+    "svg": "Selected: fixed token positions and arrows make it possible to compare adjacent repeated labels with blank-separated repeated labels through both ordered transformations.",
+    "semanticHtml": "Rejected: a table could state the intermediate sequences accessibly, but it would weaken the spatial continuity showing which frame labels merge and which survive.",
+    "interaction": "Rejected: changing arbitrary paths would add controls and validation logic without improving the single repeated-label invariant the reader needs to retain.",
+    "paperReuse": "Rejected: the primary paper and deck contain related alignment figures, but no figure-specific reuse permission was established for the paper and the deck mixes externally sourced graphics. Distill's explainer is CC BY 4.0, but adapting its more elaborate graphics is unnecessary. The shipped geometry, wording, and example are original.",
+    "noVisual": "Rejected: prose states 'merge repeats, then remove blanks,' but readers must mentally simulate why LL collapses to L while L-blank-L remains LL; a paired trace makes the ordering and the blank's structural role directly checkable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 121,
+        "insight": "The speech-recognition pipeline slide contrasts end-to-end character prediction with a traditional acoustic, pronunciation, language-model, and decoder stack; it motivates why an alignment-free objective is useful but does not explain CTC collapse."
+      },
+      {
+        "page": 122,
+        "insight": "The ASR overview names CTC as an end-to-end model trained to produce spikes, while the rest of the slide describes traditional frame, phone, and language-model processing."
+      },
+      {
+        "page": 124,
+        "insight": "The preceding acoustic-model slide discusses GMM-HMM and neural acoustic models and notes that phoneme systems need an input-output alignment; it does not define the CTC blank or collapse map."
+      },
+      {
+        "page": 125,
+        "insight": "The dedicated CTC loss slide describes merge-then-remove collapse, the repeated-letter failure without a blank, summing alignment probabilities, dynamic-programming merging, and prefix beam search. Its embedded alignment graphics are dense deck assets and are not reused."
+      },
+      {
+        "page": 126,
+        "insight": "The following RNN-T slide contrasts CTC with a T-by-U lattice whose horizontal transitions consume frames and vertical transitions emit labels; it is useful comparison context but does not sharpen the CTC repeated-label rule."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for CTC, Connectionist Temporal Classification, blank token, alignment, speech recognition, and forward-backward references. Pages 121-126 were read and pages 121, 122, 125, and 126 were rendered for visual inspection. Page 125 is the only dedicated CTC slide. Its alignment examples overlap the Distill explainer's presentation and the slide does not establish asset-level provenance, so no deck image, layout, wording, or example path is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks",
+        "url": "https://dl.acm.org/doi/10.1145/1143844.1143891",
+        "usage": "Used as the primary paper to verify the many-to-one map from paths to labelings, the blank symbol, the rule that repeated labels in a target require intervening blanks, and summation over all valid paths.",
+        "license": "The ACM record provides publication access but no permissive figure-reuse license was identified. No paper figure, prose, notation layout, or example sequence is reproduced; the implementation is an original teaching schematic."
+      },
+      {
+        "title": "Sequence Modeling With CTC",
+        "url": "https://distill.pub/2017/ctc/",
+        "usage": "Used as an authoritative technical explainer to cross-check that collapse merges repeats before removing blanks and that a blank must separate identical consecutive output labels.",
+        "license": "The article repository declares Creative Commons Attribution 4.0. Its graphics could be adapted with attribution, but none is reused or adapted because a smaller independently authored trace serves this article."
+      },
+      {
+        "title": "PyTorch CTCLoss documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.CTCLoss.html",
+        "usage": "Used as official implementation documentation to confirm that CTCLoss sums possible many-to-one alignments, includes a configurable blank class, and requires targets no longer than inputs.",
+        "license": "Documentation is consulted only for operator semantics. No PyTorch code, prose, examples, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the order-sensitive collapse map: adjacent identical frame labels represent one output label, while a blank acts as a separator that lets the same label appear twice in the target. The original schematic uses the minimal synthetic paths [L, L] and [L, blank, L]. It makes no probability or empirical claim and deliberately labels blank as a structural separator rather than silence."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the exact ASR and CTC slide neighborhood, and checked the primary CTC paper, official PyTorch documentation, and the licensed Distill explainer before selecting an original paired collapse trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "ctc-blank-preserves-repeat"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description. Every token and transformation is directly labelled; repeated labels use outlined token shapes, the blank uses a dashed diamond, and the outcomes say 'one L' or 'two Ls,' so color is redundant. The established two-panel primitive stacks below 640 pixels, each panel scales from a compact 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}

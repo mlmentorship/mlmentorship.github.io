@@ -44,6 +44,47 @@ $$
 
 The loss teaches the model to identify the positive among the candidates.
 
+<!-- visual:infonce-positive-candidate-set -->
+<figure class="learning-figure plot-panel" aria-labelledby="infonce-candidates-visual-title">
+	<p class="visual-kicker">Candidate-set intuition</p>
+	<p class="visual-title" id="infonce-candidates-visual-title">InfoNCE rewards one declared positive while every other candidate competes with it.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 370" role="img" aria-labelledby="infonce-candidates-svg-title infonce-candidates-svg-desc">
+			<title id="infonce-candidates-svg-title">One anchor, one declared positive, and three candidate negatives in InfoNCE</title>
+			<desc id="infonce-candidates-svg-desc">An anchor embedding from crop A of one image sits at the left. A solid line connects it to crop B of the same image, the sole declared positive and numerator term. Dashed lines connect the anchor to three other candidates, all included with the positive in the denominator. Two diamond candidates are true negatives. A third diamond is close to the anchor and depicts the same semantic class, but because it came from another source item the sampler labels it negative. A warning states that InfoNCE pushes this false negative away. A summary panel says the positive-pair rule chooses invariance and the candidate sampler chooses repulsion.</desc>
+			<text class="viz-axis-label" x="18" y="20">ONE ANCHOR'S INFONCE CLASSIFICATION TASK</text>
+			<circle class="viz-node viz-node--focus" cx="78" cy="169" r="31"></circle>
+			<text class="viz-callout" x="78" y="165" text-anchor="middle">ANCHOR i</text>
+			<text class="viz-label" x="78" y="181" text-anchor="middle">source A · crop 1</text>
+			<path class="viz-axis" d="M109 156L232 105"></path>
+			<text class="viz-callout" x="165" y="116" text-anchor="middle">PULL TOGETHER</text>
+			<circle class="viz-node viz-node--output" cx="266" cy="91" r="31"></circle>
+			<text class="viz-callout" x="266" y="87" text-anchor="middle">POSITIVE j</text>
+			<text class="viz-label" x="266" y="103" text-anchor="middle">source A · crop 2</text>
+			<text class="viz-label" x="266" y="132" text-anchor="middle">the numerator</text>
+			<path class="viz-operating-guide" d="M116 183L213 199"></path>
+			<polygon class="viz-node" points="246,176 272,202 246,228 220,202" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2"></polygon>
+			<text class="viz-callout" x="246" y="198" text-anchor="middle">FALSE</text>
+			<text class="viz-callout" x="246" y="212" text-anchor="middle">NEGATIVE</text>
+			<text class="viz-label" x="246" y="244" text-anchor="middle">source B · same class</text>
+			<path class="viz-operating-guide" d="M98 194L143 272"></path>
+			<polygon class="viz-node" points="160,270 181,291 160,312 139,291"></polygon>
+			<text class="viz-callout" x="160" y="295" text-anchor="middle">NEG k₁</text>
+			<path class="viz-operating-guide" d="M92 196L275 277"></path>
+			<polygon class="viz-node" points="292,274 313,295 292,316 271,295"></polygon>
+			<text class="viz-callout" x="292" y="299" text-anchor="middle">NEG k₂</text>
+			<rect class="viz-node viz-node--focus" x="18" y="259" width="105" height="72" rx="3"></rect>
+			<text class="viz-callout" x="70" y="279" text-anchor="middle">SAMPLER SAYS</text>
+			<text class="viz-label" x="70" y="296" text-anchor="middle">“different item”</text>
+			<text class="viz-callout" x="70" y="314" text-anchor="middle">LOSS SAYS</text>
+			<text class="viz-label" x="70" y="326" text-anchor="middle">push away</text>
+			<text class="viz-label" x="226" y="343" text-anchor="middle">all three sampled items enter the denominator</text>
+			<text class="viz-callout" x="180" y="362" text-anchor="middle">positive rule chooses invariance · sampler chooses repulsion</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> for anchor <em>i</em>, only the second view of source A is positive <em>j</em> and enters the numerator; that view plus every sampled candidate enters the denominator. If source B is semantically a valid match, the batch still calls it negative and pushes it away; this is the false-negative risk hidden inside the sampling rule. Original schematic informed by <a href="https://proceedings.mlr.press/v119/chen20j.html">SimCLR</a>, <a href="https://arxiv.org/abs/1807.03748">CPC</a>, and <a href="https://arxiv.org/abs/2007.00224">Debiased Contrastive Learning</a>.</figcaption>
+</figure>
+
 ## The positive pair defines the representation
 
 A positive pair tells the model which changes should not alter meaning.

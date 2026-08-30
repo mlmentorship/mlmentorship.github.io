@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "content-based-filtering",
+  "article": "src/content/posts/2026-05-31-content-based-filtering.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how liked-item feature vectors become a user profile, then explain why that profile can score a brand-new item without any interaction history.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that keeps profile construction, a shared feature coordinate system, candidate metadata, and two checkable cosine scores in one spatial trace. Fixed geometry separates interaction counts from the actual score inputs while remaining static and responsive.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show the three stages, but it would not align the profile and candidate coordinates or make the worked similarity comparison directly checkable.",
+    "svg": "Selected: deterministic vector labels, arrows, redundant rank labels, and explicit scores expose both the mechanism and the item cold-start consequence without runtime code.",
+    "semanticHtml": "Rejected: a table would present the vectors compactly but would weaken the visual distinction between history being aggregated and candidates being independently scored.",
+    "interaction": "Rejected: changing features would add controls and state without improving the single inference that zero-interaction items remain scoreable when features exist.",
+    "paperReuse": "Rejected: the deck has no mechanism figure, Google's documentation includes a related feature matrix, and the reviewed textbook chapter is not permissively licensed for figure reuse. No source artwork, wording, coordinates, or example data is copied.",
+    "noVisual": "Rejected: the prose names representation, aggregation, and scoring, but asks the reader to invent the shared vector space and infer why item interaction count is absent from the calculation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 128,
+        "insight": "The preceding slide is the end of model compression and establishes the boundary before the recommender section; it contains no recommendation mechanism."
+      },
+      {
+        "page": 129,
+        "insight": "The section-title slide introduces recommender systems but contains no technical content."
+      },
+      {
+        "page": 130,
+        "insight": "The neighboring collaborative-filtering slide describes matrix factorization, learned user and item embeddings, dot-product matching, new-user fold-in, and interaction-only signals; it also embeds an externally sourced collaborative-plus-content figure."
+      },
+      {
+        "page": 131,
+        "insight": "The exact content-based slide lists item attributes, similarity measures, personalization, reduced diversity, and hybrid blending, but gives no spatial account of how history becomes a profile or why a zero-interaction item can be scored."
+      },
+      {
+        "page": 132,
+        "insight": "The following slide starts a personalized-search-ranking presentation, marking the end of the contiguous recommender overview."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for content-based filtering, collaborative filtering, recommender systems, cold start, cosine similarity, and hybrid recommendation. Pages 128-132 were also rendered and visually inspected as the complete local neighborhood. Page 131 is relevant but prose-only; page 130 contains a dense third-party figure for a different collaborative-filtering mechanism. No deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Google for Developers: Content-based filtering basics",
+        "url": "https://developers.google.com/machine-learning/recommendation/content-based/basics",
+        "usage": "Used as official technical documentation to verify that users and items occupy the same feature space, candidate relevance can be computed by dot product or another similarity metric, and the score does not use other users' data.",
+        "license": "Google Developers site content is generally offered under CC BY 4.0 unless otherwise noted, but the page's feature-matrix image, prose, labels, and numbers are not adapted. The shipped visual is independently authored with synthetic vectors."
+      },
+      {
+        "title": "Google for Developers: Collaborative filtering basics",
+        "url": "https://developers.google.com/machine-learning/recommendation/collaborative/basics",
+        "usage": "Used as official technical documentation to verify the contrast: collaborative filtering learns from user-item feedback and can provide serendipitous recommendations that content features alone may miss.",
+        "license": "Used only to cross-check mechanism and limitations. No documentation text, example, or image is reproduced."
+      },
+      {
+        "title": "Content-based Recommender Systems: State of the Art and Trends",
+        "url": "https://doi.org/10.1007/978-0-387-85820-3_3",
+        "usage": "Used as an authoritative Recommender Systems Handbook chapter for the profile-based framing, item-description representation, similarity matching, and overspecialization limitation.",
+        "license": "The Springer chapter is copyrighted and no permissive figure-reuse grant was identified. No chapter figure, prose, or worked example is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the shared feature space that makes item cold-start possible: representations of liked items are aggregated into a profile, and every candidate with features can be compared with that profile whether or not the candidate has interactions. The original teaching example uses features [science, drama, short]. Averaging [1, 0, 1] and [1, 1, 0] gives p = [1, 0.5, 0.5]. Cosine similarity with [1, 0, 1] is 1.5 / sqrt(3), approximately 0.87; similarity with [0, 1, 0] is 0.5 / sqrt(1.5), approximately 0.41. Interaction counts are annotations, not model inputs."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected the exact recommender slide neighborhood, and checked official Google documentation plus an authoritative handbook chapter before selecting an original worked profile-to-candidate schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "content-profile-scores-new-item"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Every stage, vector, interaction count, similarity, and rank is directly labeled; arrows establish sequence and borders distinguish the selected output, so no inference depends on color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "context-parallelism-and-ring-attention",
+  "article": "src/content/posts/2026-08-28-context-parallelism-and-ring-attention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one device's fixed query block as every key/value block visits it, and connect each visit to one exact running-softmax output rather than separate per-block softmaxes.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that keeps device-local queries, the ordered arrival of remote key/value blocks, and the growing exact accumulator aligned. The fixed four-step trace makes the spatial invariant visible without animation.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout can show a ring but cannot reliably align four time steps with the fixed-query and growing-accumulator invariants.",
+    "svg": "Selected for deterministic step geometry, explicit block-origin labels, a fixed query lane, responsive horizontal scrolling, shared theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table can enumerate block arrivals but makes movement around the ring and the repeated merge into one output harder to scan.",
+    "interaction": "Rejected because animation would add controls and motion while hiding comparisons between steps; the complete four-device cycle fits in one static trace.",
+    "paperReuse": "Rejected because the Ring Attention paper does not grant a clear permissive license for its figures. No paper figure, caption, layout, or artwork is copied.",
+    "noVisual": "Rejected because prose does not make the key invariant immediately visible: queries stay local while all key/value blocks move, and every block updates one globally normalized result."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 108,
+        "insight": "The long-context bottleneck slide states the dense exact-attention equation, quadratic work and memory pressure, and distinguishes same-math I/O optimization from changing the attention rule."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide gives the directly relevant blockwise mechanism: fixed query tiles consume successive key/value tiles while running maximum, denominator, and weighted output statistics preserve exact softmax."
+      },
+      {
+        "page": 115,
+        "insight": "The long-context training-stack slide combines FSDP, FlashAttention, packing, checkpointing, and approximate attention, but does not include context parallelism or KV ring exchange."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for ring attention, context parallelism, sequence parallelism, distributed attention, model/tensor parallelism, FlashAttention, and online softmax. Pages 107-113 and 114-116 were then read in full. Page 109 covers packing, pages 111-112 cover sparse and low-rank alternatives, page 113 covers speculative decoding, and pages 114-116 cover mixed precision and training stacks. None depicts sequence sharding across devices or a KV ring, so the deck supplies the exact blockwise-softmax foundation but no reusable ring visual."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Ring Attention with Blockwise Transformers for Near-Infinite Context",
+        "url": "https://arxiv.org/abs/2310.01889",
+        "usage": "Verified that each host keeps its query block while key/value blocks rotate between hosts and blockwise attention updates running numerator, denominator, and maximum statistics.",
+        "license": "The arXiv record does not provide clear permissive figure-reuse permission. No figure, prose, code, numeric example, or layout is copied; the four-step teaching trace is an original redraw."
+      },
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "usage": "Cross-checked the blockwise online-softmax principle and the claim that processing successive key/value tiles can preserve exact attention without materializing the full score matrix.",
+        "license": "No paper figure or algorithm text is reproduced. The source is cited only for the exact blockwise-softmax mechanism."
+      },
+      {
+        "title": "Context Parallelism — Megatron Core",
+        "url": "https://docs.nvidia.com/megatron-core/developer-guide/0.16.1/user-guide/features/context_parallel.html",
+        "usage": "Cross-checked production terminology: sequence activations are partitioned across GPUs and p2p communication performs asynchronous KV ring exchange.",
+        "license": "No NVIDIA diagram, prose, or code is copied; official documentation is consulted only for implementation semantics."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that context sharding does not make attention local: a query block remains on its owner while every KV block visits, and numerically stable partial results merge into one globally normalized output. The SVG was authored independently from the cited sources and uses a linear time trace rather than either paper's figure composition."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the relevant neighboring slides, then checked the primary Ring Attention and FlashAttention papers plus official Megatron Core documentation before selecting an original static trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "ring-attention-fixed-query-kv-cycle"
+    ],
+    "accessibility": "The SVG has a linked title and description that narrate all four visits. Step numbers, block-origin labels, repeated 'Q0 stays' labels, arrows, and the explicitly growing seen-set carry the lesson without color. A horizontally scrollable shared canvas preserves text size at 390 CSS pixels; shared theme variables support dark mode, and shared print rules remove the minimum width and force a light high-contrast palette."
+  }
+}

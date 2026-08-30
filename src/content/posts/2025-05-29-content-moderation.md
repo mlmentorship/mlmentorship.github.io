@@ -59,6 +59,38 @@ This is L5. Layered architecture with human-in-the-loop and feedback.
 >
 > **Explainability is a regulatory and trust issue.** When auto-actioning content, surface a reason ('flagged for hate speech against [protected category]'); helps user understanding and reduces disputes."
 
+<!-- visual:content-moderation-governed-decision-loop -->
+```mermaid
+flowchart TB
+	accTitle: Policy governs a multi-policy moderation decision and correction loop
+	accDescr: Policy owners publish versioned definitions and actions. Those definitions determine training labels for per-policy models and set policy-specific routing thresholds. User content enters the models, which produce separate scores for policies such as hate speech, violence, and spam. The decision layer combines each score with its policy threshold and routes the item to allow, trained human review, or an automatic action with a reason. Human decisions and appealed automatic actions create corrected decision records. Those records feed evaluation and retraining, but do not let the model redefine policy.
+	Policy["Policy owners<br/>versioned definitions + actions"]
+	Content["User content<br/>text · image · video"]
+	Models["Per-policy models<br/>hate · violence · spam · …"]
+	Decision{"Decision layer<br/>score × policy threshold"}
+	Allow["ALLOW<br/>log for random audit"]
+	Review["HUMAN REVIEW<br/>borderline score"]
+	Auto["AUTO-ACTION + REASON<br/>high-confidence score"]
+	Appeal["USER APPEAL<br/>senior review"]
+	Record[("Corrected decision record<br/>policy version + reviewer outcome")]
+	Policy -->|"defines labels"| Models
+	Policy -->|"sets each action rule"| Decision
+	Content --> Models
+	Models -->|"one score per policy"| Decision
+	Decision -->|"below low<br/>threshold"| Allow
+	Decision -->|"between thresholds"| Review
+	Decision -->|"above high threshold"| Auto
+	Review -->|"human decision"| Record
+	Auto --> Appeal
+	Appeal -->|"uphold or reverse"| Record
+	Record -. "evaluate by policy and slice<br/>then retrain" .-> Models
+	class Content viz-input
+	class Policy,Record viz-state
+	class Decision viz-focus
+	class Allow,Review,Auto,Appeal viz-output
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow one policy at a time. Its versioned definition shapes labels and action thresholds; its model emits a score; the decision layer routes that score to allow, human review, or explained auto-action. Review and appeal outcomes return as evidence for evaluation and retraining, but the feedback loop never gives the model authority to rewrite policy. Original schematic informed by <a href="https://doi.org/10.1177/2053951719897945">Gorwa, Binns, and Katzenbach</a>, the <a href="https://www.santaclaraprinciples.org/">Santa Clara Principles</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
+
 ## Tells that get you a strong-hire vote
 
 - You **separate policy from model**.

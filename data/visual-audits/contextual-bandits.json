@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "contextual-bandits",
+  "article": "src/content/posts/2026-07-10-contextual-bandits.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See why a contextual-bandit log contains a reward only for the chosen action and why a target policy cannot be evaluated where the logging policy had zero support.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can keep the same three actions aligned across logging and evaluation, mark the two counterfactual rewards as unobserved, and expose the exact zero-support row. Fixed geometry makes the missing-label pattern visible without implying that missing rewards are zeros.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a feedback-loop flowchart would show context, action, and reward, but it would not align observed and unobserved outcomes across the same action set precisely enough.",
+    "svg": "Selected: an original aligned action-row schematic can directly distinguish the one observed reward from two unknown counterfactuals and then show which target-policy action violates support.",
+    "semanticHtml": "Rejected: a table could contain the same symbols, but ordinary table reading would weaken the spatial continuity between the logged action rows and the target-policy support check.",
+    "interaction": "Rejected: changing propensities would add controls and state while the core identification failure is already complete in one static example.",
+    "paperReuse": "Rejected: the primary sources establish partial feedback, replay, propensity weighting, and doubly robust evaluation, but their figures are not needed for this narrow lesson and permissive figure-reuse rights were not established.",
+    "noVisual": "Rejected: the prose states that unchosen labels are missing and support is required, but readers must mentally align the logging policy, the single observed outcome, and a new policy's proposed actions."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The recommender-systems section divider establishes the boundary before the nearest explore/exploit discussion and contains no bandit mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide notes presentation-bias feedback loops and the need to trade off exploration and exploitation, but it does not define contextual actions, partial rewards, propensities, or off-policy support."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid-recommender slide moves to similarity and model blending, ending the local explore/exploit mention without adding evaluation semantics."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks about sampling biases, fresh data, online metrics, and experimentation but does not explain policy-induced missing labels."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks whether a model uses explore/exploit, corrects selection and position bias, and has offline and online evaluation, yet does not show logged propensities or the overlap condition."
+      },
+      {
+        "page": 163,
+        "insight": "The following project-setup slide begins a generic content-feed design sequence, marking the boundary after the production checklist."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for contextual bandit, multi-armed bandit, bandit, explore/exploit, propensity, off-policy, counterfactual, and selection bias. Only pages 130 and 162 matched the mechanism vocabulary. Their neighboring pages 129-131 and 161-163 were read to establish context and boundaries. The deck identifies exploration and bias as concerns but supplies no contextual-bandit action/reward trace, propensity-weighted evaluation, or reusable figure. No deck image, wording, coordinates, values, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Contextual-Bandit Approach to Personalized News Article Recommendation",
+        "url": "https://arxiv.org/abs/1003.0146",
+        "usage": "Used as a primary source to verify the sequential context-action-reward setting, adaptive learning from click feedback, and the exploration-exploitation objective.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was established. No algorithm, result, figure, prose, example values, or layout is copied."
+      },
+      {
+        "title": "Unbiased Offline Evaluation of Contextual-bandit-based News Article Recommendation Algorithms",
+        "url": "https://arxiv.org/abs/1003.5956",
+        "usage": "Used as the primary offline-evaluation source to verify that logged bandit events contain context, chosen action, and observed reward, and that evaluation can use events where the evaluated policy agrees with the logged action.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was identified. The shipped action rows and synthetic propensities are independently authored."
+      },
+      {
+        "title": "Doubly Robust Policy Evaluation and Learning",
+        "url": "https://arxiv.org/abs/1103.4601",
+        "usage": "Used as a primary source to verify that rewards are partially observed, historic action proportions may differ from a new policy, and doubly robust evaluation combines reward and logging-policy models.",
+        "license": "The paper is publicly accessible, but no permissive figure-reuse license was identified. No theorem, equation, data, prose, figure, or layout is reproduced."
+      },
+      {
+        "title": "Bandit Algorithms",
+        "url": "https://tor-lattimore.com/downloads/book/book.pdf",
+        "usage": "Used as an authoritative textbook to cross-check contextual-bandit notation, importance weighting, and the requirement that the sampling policy assign positive probability where an evaluated policy acts.",
+        "license": "The author-hosted Cambridge University Press book is copyrighted and no open figure license was identified. No text, proof, example, or artwork is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is selective feedback and its identification consequence. In the original synthetic event, logging policy mu assigns probabilities 0.70, 0.30, and 0 to actions A, B, and C, chooses B, and observes reward 1 only for B; the counterfactual rewards for A and C remain unknown, not zero. A target policy pi assigning probabilities 0.20, 0.30, and 0.50 has overlap for A and B but not C because pi(C|x) is positive while mu(C|x) is zero. Therefore this target policy is not identifiable from such logs without additional assumptions or new exploration. The numbers illustrate support only and make no empirical claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected both matching neighborhoods, then checked primary contextual-bandit, replay-evaluation, and doubly robust papers plus an authoritative bandit textbook before selecting an original aligned partial-feedback and support schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "contextual-bandit-partial-feedback-support"
+    ],
+    "accessibility": "Both SVG panels have linked titles and complete descriptions. Every action, logging and target probability, observed reward, unknown counterfactual, and support verdict is directly labelled; question marks and the explicit zero-probability equation carry the lesson without color. The established two-panel primitive stacks below 640 pixels, and each 300-pixel viewBox scales without a minimum width for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, while shared print tokens force a light high-contrast palette and prevent page breaks inside the figure."
+  }
+}

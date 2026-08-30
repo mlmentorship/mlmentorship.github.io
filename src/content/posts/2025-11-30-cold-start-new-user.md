@@ -32,6 +32,27 @@ The right idea, no nuance. Misses how to make the transition smooth, what interm
 
 This is L5. Three signals, sequenced over user-lifetime.
 
+<!-- visual:cold-start-signal-handoff -->
+<figure class="learning-figure" aria-labelledby="cold-start-handoff-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="cold-start-handoff-title">How does a recommender hand control from fallback signals to learned user behavior?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two stages of the cold-start signal handoff from fallback evidence to observed user behavior">
+		<section class="visual-panel">
+			<h4>1 · BEFORE BEHAVIOR EXISTS</h4>
+			<p><strong>Start with available evidence</strong><br />Onboarding choices + request context + item content + safe population priors.</p>
+			<p><strong>Compose the first slate</strong><br />Anchor it with likely-relevant items, then reserve some positions for diverse exploration.</p>
+			<p><strong>What is missing</strong><br />There are no clicks, skips, saves, or watch-time observations for this user yet.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 · EACH RESPONSE UPDATES THE MIX</h4>
+			<p><strong>Observe</strong><br />Exploratory impressions produce clicks, skips, saves, and dwell-time evidence.</p>
+			<p><strong>Shift influence gradually</strong><br />Observed behavior gains influence; onboarding, context, and population fallbacks recede as confidence grows.</p>
+			<p><strong>Keep learning</strong><br />Do not turn exploration off: preferences, intent, and the item catalog can still change.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> begin on the left with signals that exist at sign-up. The slate intentionally gathers feedback; carry that feedback to the right, where personalized behavior gains influence rather than switching on at one fixed interaction count. Exploration stays in the mix so the system can keep learning. Original schematic informed by <a href="https://doi.org/10.1145/564376.564421">Schein et al. on cold-start recommendation</a> and <a href="https://arxiv.org/abs/1003.0146">Li et al. on contextual-bandit feedback</a>.</figcaption>
+</figure>
+
 ## What an L6 answer adds
 
 > "...practical things:

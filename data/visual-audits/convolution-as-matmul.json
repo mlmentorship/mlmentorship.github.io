@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "convolution-as-matmul",
+  "article": "src/content/posts/2026-05-07-convolution-as-matmul.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Map each overlapping receptive field to one im2col matrix column, then trace how one flattened filter computes every output position with a single matrix multiplication.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that preserves spatial overlap in the input, column order in the unfolded matrix, repeated values, and the final numeric GEMM in one trace. Fixed cells make both the reshape and arithmetic inspectable without runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can name unfold, GEMM, and reshape, but cannot align individual receptive-field values with matrix rows and columns precisely.",
+    "svg": "Selected: deterministic cells, direct patch labels, repeated numbers, and a worked filter product reveal that im2col changes layout rather than arithmetic.",
+    "semanticHtml": "Rejected: HTML tables could encode the matrices, but would not overlay a receptive field on the spatial input or connect its position to a specific column as clearly.",
+    "interaction": "Rejected: moving the patch could teach traversal, but adds controls and hidden states when four simultaneously visible patch vectors make overlap and duplication easier to compare.",
+    "paperReuse": "Rejected: the local deck has no im2col figure, and the reviewed paper and documentation figures are unnecessary to the narrow worked example. No external artwork, coordinates, values, or layout is copied.",
+    "noVisual": "Rejected: the prose gives correct tensor shapes but requires readers to mentally convert overlapping two-dimensional neighborhoods into ordered matrix columns and infer where duplicated storage comes from."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 147,
+        "insight": "The preceding image-classification slide establishes images as width-by-height-by-channel arrays but contains no convolution execution or matrix lowering."
+      },
+      {
+        "page": 148,
+        "insight": "The dedicated CNN slide explains filters over local regions, pooling, and shared weights, but does not show receptive fields flattened into columns or convolution as GEMM."
+      },
+      {
+        "page": 149,
+        "insight": "The neighboring Faster R-CNN slide gives a concrete image-to-feature-map shape and sliding anchors, but adds no im2col or kernel-execution mechanism."
+      },
+      {
+        "page": 150,
+        "insight": "The following GAN slide marks the end of the CNN neighborhood and is unrelated to convolution lowering."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for im2col, unfold, convolution, convolutional, CNN, receptive field, cross-correlation, Winograd, and convolution as matrix multiplication. No im2col, unfold, or convolution-to-GEMM treatment exists. All convolution-related hits were reviewed; page 20 mentions wavelet convolution as a linear operation, pages 50 and 60 mention CNN normalization and debugging, pages 111-112 use CNN receptive fields as an attention analogy, and pages 118, 122, 124, and 128 mention convolution in unrelated knowledge-graph, speech, or compression contexts. Pages 147-150 form the only dedicated CNN neighborhood. No deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "PyTorch Unfold documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Unfold.html",
+        "usage": "Used as official framework documentation to verify that each sliding local block is flattened into one output column, that two-dimensional unfolding is called im2col, that overlap copies values, and that convolution is equivalent to Unfold plus matrix multiplication and reshape or Fold.",
+        "license": "PyTorch documentation is part of the BSD-licensed PyTorch project, but no code, prose, example numbers, or artwork is reproduced. The shipped example and geometry are independently authored."
+      },
+      {
+        "title": "NVIDIA Deep Learning Performance Guide: Convolutional Layers",
+        "url": "https://docs.nvidia.com/deeplearning/performance/dl-performance-convolutional/index.html",
+        "usage": "Used as official hardware documentation to verify that implicit GEMM forms the equivalent convolution matrices on the fly, does not materialize them, and has the same mathematical operations as direct convolution.",
+        "license": "The documentation is used only to verify execution semantics. No permissive figure-reuse grant was established, and no NVIDIA figure, prose, benchmark, or layout is copied."
+      },
+      {
+        "title": "A guide to convolution arithmetic for deep learning",
+        "url": "https://arxiv.org/abs/1603.07285",
+        "usage": "Used as an authoritative technical reference to cross-check receptive-field traversal, stride-one output dimensions, and the distinction between mathematical convolution and the cross-correlation used in neural networks.",
+        "license": "Public arXiv access does not itself grant figure adaptation rights, and no permissive figure license was relied upon. No paper figure, animation, example, or wording is reused."
+      },
+      {
+        "title": "CS231n: Convolutional Neural Networks",
+        "url": "https://cs231n.github.io/convolutional-networks/",
+        "usage": "Used as an authoritative Stanford course text to verify that a filter computes a dot product with each local input region and produces one activation per spatial position.",
+        "license": "No clear permissive license for reusing course figures was identified. No figure, text, or numerical example is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the exact identity between spatial sliding and matrix columns. For a 3 x 3 input, 2 x 2 kernel, stride 1, and no padding, the four patches flatten in top-left, top-right, bottom-left, bottom-right order to columns [1,2,4,5], [2,3,5,6], [4,5,7,8], and [5,6,8,9]. Multiplying each by the original filter flattened as [1,0,0,-1] gives -4 at all four positions. This is cross-correlation, matching deep-learning framework convention. Repeated values such as the center 5 expose why explicit im2col consumes extra memory; implicit GEMM preserves the equivalent virtual matrix without storing it."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, enumerated every convolution-related occurrence across all 214 deck pages, inspected the exact CNN neighborhood, and checked official PyTorch and NVIDIA semantics plus authoritative convolution references before selecting an original numeric unfold-to-GEMM SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "im2col-patches-become-columns"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Patch order, every matrix value, dimensions, filter, product, and output are directly labeled; borders, position, repetition, and arrows carry the lesson without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
