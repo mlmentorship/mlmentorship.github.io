@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "critique-ml-paper",
+  "article": "src/content/posts/2026-07-10-critique-ml-paper.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Turn a paper's central claim and headline evidence into one prioritized alternative explanation and one experiment whose outcome would materially change belief in the claim.",
+  "mediumRationale": "A compact Mermaid funnel is the smallest medium that shows the key review motion: establish the claim-evidence link, branch into plausible threats, rank them by their ability to overturn the claim, then reconverge on one discriminating experiment.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a qualitative reasoning path with branches and convergence, and the established compact flowchart primitive provides accessible text, responsive layout, theme support, and print output.",
+    "svg": "Rejected because the process contains no quantitative geometry and fixed hand-drawn paths would duplicate Mermaid's relationship semantics.",
+    "semanticHtml": "Rejected because cards or a checklist can enumerate review questions but do not make the deliberate many-threats-to-one-experiment convergence as clear.",
+    "interaction": "Rejected because ranking invented threats interactively would add controls and imply a universal scoring rule; prioritization depends on the paper under review.",
+    "paperReuse": "Rejected because the authoritative sources provide review criteria and reproducibility guidance rather than an article-specific funnel. No source figure is needed, and artwork permissions are not assumed.",
+    "noVisual": "Rejected because the prose's eight-part reading order can be misread as an exhaustive checklist; a spatial funnel clarifies that a strong ten-minute critique narrows to one decision-relevant threat and test."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends simple models, explicit hypotheses, ablation experiments, fixed seeds, and direct inspection before trusting a result."
+      },
+      {
+        "page": 60,
+        "insight": "The adjacent sanity-check slide uses predicted outcomes such as chance loss and tiny-set overfitting to distinguish a working implementation from alternative failure explanations."
+      },
+      {
+        "page": 61,
+        "insight": "The next slide recommends a simple related baseline and changing one factor at a time, supporting fair and interpretable comparisons."
+      },
+      {
+        "page": 76,
+        "insight": "The scientific-method slide ends the model-data-prediction sequence with criticizing and revising the model, the broad loop that a falsifiable paper critique should close."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide asks for random, human, and heuristic baselines and says added model complexity should earn a significant improvement."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for paper, research claim, hypothesis, ablation, baseline, reproducibility, statistical significance, experiment design, scientific method, critique, and peer review. Pages 58-61, 74-78, and 166-168 were read in full as the relevant neighborhoods. Pages 58, 74-75, 77-78, 166, and 168 supply data-inspection, generative-model, statistical-pipeline, data, and serving context but no paper-review workflow. No slide maps a paper's claim to competing explanations and one belief-changing experiment, and no deck image or wording is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NeurIPS 2025 Reviewer Guidelines",
+        "url": "https://neurips.cc/Conferences/2025/ReviewerGuidelines",
+        "usage": "Verified that a review should first summarize the paper fairly, substantiate criticism with evidence, assess whether claims are supported, and focus on technical quality, significance, and originality rather than superficial faults.",
+        "license": "No conference text, form, rating scale, or visual layout is copied. Public access is not treated as permission to reuse artwork; only review semantics are cited."
+      },
+      {
+        "title": "NeurIPS Paper Checklist Guidelines",
+        "url": "https://neurips.cc/public/guides/PaperChecklist",
+        "usage": "Cross-checked that claims should match contributions, experimental results, scope, assumptions, and limitations, and that experimental details, uncertainty, compute resources, and reproducibility support evaluation.",
+        "license": "No checklist wording, table, or artwork is reproduced. The original funnel uses article-specific labels and structure."
+      },
+      {
+        "title": "Improving Reproducibility in Machine Learning Research",
+        "url": "https://jmlr.org/papers/v22/20-303.html",
+        "usage": "Used as a primary report from the NeurIPS reproducibility program to verify that reliable findings require reproducible experimental workflows and enough code, data, and reporting detail to test results.",
+        "license": "The JMLR article is openly accessible and its authors retain copyright, but no figure, prose, data, or checklist structure is reused. Citation-only use avoids relying on reuse permission."
+      }
+    ],
+    "notes": "The hardest mental model is prioritization under incomplete information, not remembering a longer checklist. The visual is an original synthesis: it represents the article's own claim-evidence-threat-experiment sequence and does not reproduce a conference review form, source figure, empirical result, or scoring rubric."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected three relevant slide neighborhoods, then checked official NeurIPS reviewer and checklist guidance plus the primary NeurIPS reproducibility-program report before selecting an original compact reasoning funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "paper-critique-prioritization-funnel"
+    ],
+    "accessibility": "The Mermaid source provides a complete title and description. Every stage and candidate threat is directly labelled, dashed branches distinguish alternatives from the solid main argument, and the caption states the convergence explicitly, so meaning does not rely on color. The established compact Mermaid class removes the mobile minimum width for a phone-width layout; shared Mermaid theme tokens support dark mode and print."
+  }
+}
