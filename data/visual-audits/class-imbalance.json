@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "class-imbalance",
+  "article": "src/content/posts/2025-10-13-class-imbalance.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why random class-only oversampling changes the training prior rather than the deployment prevalence, then map a sampled posterior back to deployment odds.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can place the natural and sampled class proportions on the same scale, then carry one raw posterior through an explicit prior-odds correction. Fixed geometry and arithmetic make the calibration consequence visible without controls.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could sequence oversampling and recalibration, but it would not encode the 1:99-to-1:1 proportion change or keep the odds arithmetic aligned.",
+    "svg": "Selected: proportional bars, distinct patterns, direct counts, and a worked correction expose both the sampling operation and its probability consequence in one static trace.",
+    "semanticHtml": "Rejected: a table could compare counts and priors, but it would weaken the central spatial contrast between an almost invisible rare class and an artificially balanced sample.",
+    "interaction": "Rejected: changing prevalence would add controls and state without improving the article's single warning that sampled probabilities inherit the sampled prior.",
+    "paperReuse": "Rejected: source papers and official documentation contain relevant plots, but no source figure is needed and permissive reuse was not established for the IEEE paper. The shipped geometry, patterns, wording, and values are original.",
+    "noVisual": "Rejected: the prose states that calibration breaks under sampling fixes but leaves the reader to imagine how an unchanged deployment population can coexist with a balanced training set and why the same numeric score then means something different."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 35,
+        "insight": "The classification-loss slide introduces sigmoid and softmax outputs as class probabilities or confidences and warns that absolute scores depend on regularization and temperature, providing the probability-output context."
+      },
+      {
+        "page": 36,
+        "insight": "The neighboring surrogate-loss slide recommends focal loss for imbalanced data and shows its down-weighting of well-classified examples, but it does not compare focal loss with sampling or discuss calibration."
+      },
+      {
+        "page": 37,
+        "insight": "The evaluation slide defines precision, recall, F-score, and ROC, and explicitly reasons that ROC AUC is unchanged after subsampling negatives because both false positives and true negatives scale together."
+      },
+      {
+        "page": 58,
+        "insight": "The data-inspection slide tells practitioners to inspect imbalance, bias, label noise, predictions, and distributions before selecting an intervention."
+      },
+      {
+        "page": 59,
+        "insight": "The adjacent training-skeleton slide uses a 1:10 positive-to-negative dataset to motivate initializing the final logit bias to a 0.1 prediction, directly connecting prevalence to initial probabilities."
+      },
+      {
+        "page": 60,
+        "insight": "The following sanity-check slide returns to chance loss, tiny-subset overfitting, and training diagnostics and adds no sampling-prior treatment."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design interview overview asks whether data is balanced, whether sampling is needed, which metrics matter, and whether false positives or false negatives cost more."
+      },
+      {
+        "page": 162,
+        "insight": "The neighboring production checklist separately asks for the training sampling strategy, out-of-time test data, calibrated probabilities, cost-benefit action rules, and offline evaluation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page-by-page for class imbalance, imbalanced, minority class, focal loss, oversampling, undersampling, SMOTE, precision, recall, and calibration. The three relevant neighborhoods at pages 35-37, 58-60, and 160-162 were rendered and visually inspected. The deck covers losses, metrics, data inspection, prevalence-aware initialization, sampling strategy, and calibrated outputs, but no slide spatially connects a balanced training prior to a different deployment posterior. No deck pixels, artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Calibrating Probability with Undersampling for Unbalanced Classification",
+        "url": "https://doi.org/10.1109/SSCI.2015.33",
+        "usage": "Used as the primary reference for the result that class sampling alters posterior probability estimates and that Bayes prior correction can restore deployment probabilities under class-only sampling assumptions.",
+        "license": "IEEE publication copyright applies and no permissive figure-reuse license was identified. No paper figure, prose, experimental result, or layout is reproduced; the visual is an original synthetic derivation."
+      },
+      {
+        "title": "scikit-learn Probability calibration",
+        "url": "https://scikit-learn.org/stable/modules/calibration.html",
+        "usage": "Used as official documentation to verify that a calibrated 0.8 prediction means approximately 80 percent positives among comparable predictions and that calibration must be measured on held-out data.",
+        "license": "Documentation is used only to verify semantics. No scikit-learn prose, code, example data, or calibration plot is reproduced."
+      },
+      {
+        "title": "imbalanced-learn Common pitfalls and recommended practices",
+        "url": "https://imbalanced-learn.org/stable/common_pitfalls.html",
+        "usage": "Used as official library guidance to verify that evaluation data should retain the natural class distribution and that resampling before splitting creates both distribution mismatch and leakage.",
+        "license": "Documentation is used only for procedural verification. No imbalanced-learn prose, code, dataset output, or artwork is reproduced."
+      },
+      {
+        "title": "Focal Loss for Dense Object Detection",
+        "url": "https://arxiv.org/abs/1708.02002",
+        "usage": "Used as the primary source to cross-check the article's alternative of down-weighting easy examples rather than statically balancing all classes.",
+        "license": "The arXiv record is publicly accessible, but no permissive figure-reuse license was relied upon. No paper equation, figure, result, or wording appears in the implementation."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that balancing the training data changes the model's observed class prior, not the deployment base rate. The original example starts from one positive and 99 negatives, then uses random duplication to create 99 positive and 99 negative training rows. Under class-only sampling with unchanged class-conditional feature distributions, a sampled posterior q=0.50 has odds 1; multiplying by the deployment-to-sample prior-odds ratio (0.01/0.99)/(0.50/0.50) gives odds 1/99 and p=0.01. The caption requires untouched deployment-like validation and recalibration. This analytic correction is deliberately not claimed for SMOTE or other methods that can alter class-conditional feature distributions."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, visually inspected the three relevant slide neighborhoods, and checked a primary calibration paper, official scikit-learn and imbalanced-learn guidance, and the focal-loss paper before selecting an original sampling-prior schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "class-imbalance-sampling-prior"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description. Hatching versus dots, proportional width, plus and minus signs, direct counts, percentages, arrows, and equations carry all meaning without color. The established two-panel primitive stacks below 640 pixels; each panel uses a 300-pixel viewBox with no minimum width for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, while shared print tokens produce a light high-contrast palette and avoid breaks within the figure."
+  }
+}
