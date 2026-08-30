@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "slug": "calibration",
+  "article": "src/content/posts/2026-03-01-calibration.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Read a reliability diagram by comparing observed frequency with predicted confidence and use the diagonal to identify overconfidence or underconfidence.",
+  "mediumRationale": "A deterministic SVG provides exact shared axes, a perfect-calibration diagonal, checkable illustrative bin coordinates, and a visible calibration gap without a plotting dependency. Semantic HTML could list the bins but would obscure their position relative to the diagonal; interaction would add controls without improving this fixed reading lesson; Mermaid is unsuitable for quantitative coordinates; paper-figure reuse is unnecessary and permission was not verified; mixed media adds no benefit; and no visual would leave the sign of the calibration gap difficult to form from prose.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 37,
+        "insight": "The ROC discussion establishes that evaluation plots map model behavior to explicit coordinates, but its axes measure ranking performance rather than probability meaning."
+      },
+      {
+        "page": 38,
+        "insight": "The classification-evaluation example distinguishes aggregate accuracy from more diagnostic views of model behavior."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration slide defines ECE through confidence bins, notes neural-network overconfidence, and lists temperature scaling, Platt scaling, ensembles, and isotonic regression."
+      }
+    ],
+    "notes": "Slides 37 through 39 were reviewed independently. Slide 39 contains the relevant calibration concepts but no reliability diagram that directly teaches how to read above and below the perfect diagonal. The original site visual fills that spatial gap."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On Calibration of Modern Neural Networks",
+        "url": "https://proceedings.mlr.press/v70/guo17a.html",
+        "usage": "Used to verify confidence calibration, reliability diagrams, ECE, modern neural-network overconfidence, and temperature scaling.",
+        "license": "No paper figure, experimental curve, or result values copied; conceptual reference only."
+      },
+      {
+        "title": "Transforming Classifier Scores into Accurate Multiclass Probability Estimates",
+        "url": "https://dl.acm.org/doi/10.1145/775047.775151",
+        "usage": "Used as a primary source for classifier-score calibration with pairwise coupling and isotonic regression.",
+        "license": "No source figure or algorithm text copied; bibliographic and conceptual reference only."
+      },
+      {
+        "title": "Predicting Good Probabilities With Supervised Learning",
+        "url": "https://www.cs.cornell.edu/~alexn/papers/calibration.icml05.crc.rev3.pdf",
+        "usage": "Used as a primary comparative study of reliability diagrams, Platt scaling, and isotonic regression.",
+        "license": "No source figure, data, or empirical curve copied; conceptual reference only."
+      }
+    ],
+    "notes": "The plotted bins are an original, explicitly illustrative construction rather than empirical results. Their coordinates are listed in the accessible description and caption so every plotted claim is checkable."
+  },
+  "agentReview": {
+    "reviewer": "Calibration article subagent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Recommended one compact reliability diagram with a dashed identity line, an illustrative overconfident bin series, one measured gap, and direct labels for the overconfident and underconfident regions."
+  },
+  "implementation": {
+    "visualIds": ["calibration-reliability-gap"],
+    "accessibility": "The SVG includes a title and full description with all five illustrative coordinates. Distinct dashed and solid lines, point markers, direct region labels, a measured gap at 80 percent confidence, explicit axes, and the text caption preserve the interpretation without color."
+  }
+}

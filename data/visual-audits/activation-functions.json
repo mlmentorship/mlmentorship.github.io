@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "activation-functions",
+  "article": "src/content/posts/2026-01-19-activation-functions.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compare where sigmoid, ReLU, and exact GELU flatten so the connection between output shape and gradient flow is visible.",
+  "mediumRationale": "Two deterministic SVG plots are the smallest medium that can show numeric axes, asymptotes, the ReLU dead half-line, and GELU's smooth negative shoulder together. Mermaid cannot express function shape; semantic HTML is unsuitable for continuous curves; interaction adds no necessary inference; source-figure reuse creates avoidable provenance risk; and prose alone makes the flat regions difficult to compare.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 40,
+        "insight": "The preceding section divider introduces general neural-network concepts but contains no activation details."
+      },
+      {
+        "page": 41,
+        "insight": "The activation slide identifies sigmoid saturation, ReLU's dying-unit region, leaky ReLU, and GELU approximations."
+      },
+      {
+        "page": 42,
+        "insight": "The following learning divider adds no activation-function behavior."
+      },
+      {
+        "page": 43,
+        "insight": "The next gradient-descent section connects activation slopes to optimization but adds no comparative curves."
+      }
+    ],
+    "notes": "Pages 40 through 43 of the 214-page Basic_ML_CS_concepts deck were inspected directly. Page 41's claim that GELU is self-normalizing and its labeling of x sigmoid(1.702x) as GELU were not adopted. The site plot uses the exact definition x times the standard normal CDF and original coordinates."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Sparse Rectifier Neural Networks",
+        "url": "https://proceedings.mlr.press/v15/glorot11a.html",
+        "usage": "Used to verify the rectifier definition, hard nonlinearity at zero, and exact zero outputs in the inactive region.",
+        "license": "No source text, data, or figure copied; definition and training implications referenced only."
+      },
+      {
+        "title": "Gaussian Error Linear Units (GELUs)",
+        "url": "https://arxiv.org/abs/1606.08415",
+        "usage": "Used to verify exact GELU as x times the standard normal CDF, its smooth non-monotonic shape, and the published approximations.",
+        "license": "No source text, data, code, or figure copied; the curve was calculated independently from the formula. Figure reuse rights were not relied upon."
+      },
+      {
+        "title": "Deep Learning, Chapter 6: Deep Feedforward Networks",
+        "url": "https://www.deeplearningbook.org/contents/mlp.html",
+        "usage": "Used as an authoritative reference for sigmoid and tanh saturation, rectified linear units, and activation choice in feedforward networks.",
+        "license": "No source text or figure copied; conceptual and mathematical reference only."
+      },
+      {
+        "title": "Searching for Activation Functions",
+        "url": "https://arxiv.org/abs/1710.05941",
+        "usage": "Used to cross-check the swish family x times sigmoid(beta x) discussed in the article, although swish is omitted from the focused visual.",
+        "license": "No source text, data, code, or figure copied; formula provenance referenced only."
+      }
+    ],
+    "notes": "All plotted values are original deterministic samples of sigmoid, ReLU, and exact GELU over labeled domains. Sigmoid and tanh were reviewed as saturating functions; ReLU, leaky ReLU, ELU, GELU, and SiLU derivative behavior was checked to ensure the article and focused comparison do not claim gradients are nonzero everywhere."
+  },
+  "agentReview": {
+    "reviewer": "GPT-5.6 Sol activation-function visual agent",
+    "reviewedAt": "2026-08-30",
+    "summary": "Reviewed the complete article, deck pages 40-43, and authoritative activation definitions. Recommended two small plots focused on gradient-flow consequences instead of a gallery of every activation."
+  },
+  "implementation": {
+    "visualIds": ["activation-gradient-regions"],
+    "accessibility": "The SVGs include separate titles and complete descriptions. Numeric axes, direct curve labels, explicit saturation and dead-region annotations, solid versus dashed strokes, and the caption preserve the comparison without relying on color."
+  }
+}

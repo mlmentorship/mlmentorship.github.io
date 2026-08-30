@@ -135,7 +135,9 @@ function validateAudit(audit, file, entry) {
         fail(`${label} Mermaid visual ${id} needs accTitle and accDescr`);
       }
       const after = entry.source.slice(blockEnd, blockEnd + 700);
-      if (!after.includes('diagram-caption')) fail(`${label} Mermaid visual ${id} needs a nearby diagram caption`);
+      if (!after.includes('<p class="diagram-caption"><strong>Read it this way:</strong>')) {
+        fail(`${label} Mermaid visual ${id} needs a direct "Read it this way" caption`);
+      }
     }
   }
   if (audit.status === 'implemented' && audit.medium === 'svg') {
@@ -145,6 +147,13 @@ function validateAudit(audit, file, entry) {
       const figure = entry.source.slice(marker, figureEnd + 9);
       if (figureEnd < 0 || !figure.includes('<svg') || !figure.includes('role="img"') || !figure.includes('<title') || !figure.includes('<desc') || !figure.includes('<figcaption>')) {
         fail(`${label} SVG visual ${id} needs a figure, role, title, description, and caption`);
+      }
+      const svgTags = figure.match(/<svg\b[^>]*>/g) ?? [];
+      if (svgTags.length === 0 || svgTags.some((tag) => !tag.includes('viewBox='))) {
+        fail(`${label} SVG visual ${id} needs a viewBox on every SVG for responsive rendering`);
+      }
+      if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
+        fail(`${label} SVG visual ${id} needs a direct "Read it this way" caption`);
       }
     }
   }
@@ -189,6 +198,10 @@ for (const entry of entries) {
 }
 
 const unreviewed = entries.filter((entry) => !audits.has(entry.slug));
+const incomplete = entries.filter((entry) => {
+  const status = audits.get(entry.slug)?.status;
+  return status === undefined || status === 'planned';
+});
 console.log(`Visual coverage: ${entries.length} published entries`);
 console.log(`  implemented: ${counts.implemented}`);
 console.log(`  planned:     ${counts.planned}`);
@@ -198,14 +211,15 @@ console.log(`  unreviewed:  ${counts.unreviewed}`);
 const nextArg = process.argv.find((arg) => arg.startsWith('--next='));
 if (nextArg) {
   const limit = Math.max(1, Number(nextArg.split('=')[1]) || 1);
-  console.log('\nNext unreviewed entries:');
-  for (const entry of unreviewed.slice(0, limit)) {
-    console.log(`  ${entry.slug}\t${entry.category}\t${entry.file}\t${entry.title}`);
+  console.log('\nNext incomplete entries:');
+  for (const entry of incomplete.slice(0, limit)) {
+    const status = audits.get(entry.slug)?.status ?? 'unreviewed';
+    console.log(`  ${entry.slug}\t${status}\t${entry.category}\t${entry.file}\t${entry.title}`);
   }
 }
 
-if (process.argv.includes('--require-complete') && unreviewed.length > 0) {
-  fail(`${unreviewed.length} published entries still need independent visual review`);
+if (process.argv.includes('--require-complete') && incomplete.length > 0) {
+  fail(`${incomplete.length} published entries still need review or implementation`);
 }
 
 if (process.argv.includes('--dist')) {
