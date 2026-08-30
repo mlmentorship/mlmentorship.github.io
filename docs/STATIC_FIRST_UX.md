@@ -107,11 +107,12 @@ Use this order:
 4. reading metadata;
 5. one collapsed On this page row for article headings;
 6. article;
-7. previous and next links.
+7. one quiet, session-capped email prompt after the reader reaches the end;
+8. previous and next links.
 
 The desktop rail lists all nine books as native disclosures. It expands the current book, shows the current chapter's ordered entries, and marks the active article with a quiet rule. Other books start collapsed. Pages outside a book start with every book collapsed. On smaller screens the Sections menu provides article hierarchy. Previous and Next traverse the whole book across chapter boundaries.
 
-Use one centered reading column and one global left rail. Do not add a competing right rail. Repeated newsletter and author cards should not interrupt every chapter. The global footer can provide identity, RSS, and About links.
+Use one centered reading column and one global left rail. Do not add a competing right rail. The end-of-entry email prompt appears at most once per browser session and supports explicit suppression. It must not become a popup, gate, sticky banner, or mid-article interruption. The global footer can provide identity, RSS, and About links.
 
 ## Reading design
 
@@ -142,6 +143,7 @@ On this page, mobile Sections, and desktop book disclosures use native `details`
 - Do not prefetch every visible link on index pages.
 - Load Pagefind only after the user opens search.
 - Load the newsletter provider only on a page that displays its form.
+- Lazy-load the newsletter provider only when an eligible form approaches the viewport, and disable provider-managed popups.
 - Prefer system fonts to render-blocking third-party font stylesheets.
 - Keep analytics asynchronous and non-blocking.
 - Test the generated site, not only the development server.
@@ -153,6 +155,7 @@ On this page, mobile Sections, and desktop book disclosures use native `details`
 - A new visitor can reach the complete curriculum or a sample question from the first screen.
 - A returning visitor with a saved plan sees a compact Continue my Workbook link.
 - A returning visitor can use search from every page.
+- A reader can find email signup after the homepage promise or an earned article read without seeing repeated end-of-entry prompts in one session.
 - A phone user can move to a sibling article without returning to an index.
 - All primary navigation works with JavaScript disabled.
 - Browser-storage failure does not block reading or practice.

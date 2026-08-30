@@ -4,6 +4,7 @@ import { LIBRARY_SHELVES, LIBRARY_VOLUMES } from '../data/library';
 import { ROLE_PATHS } from '../data/rolePaths';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { SITE } from '../consts';
+import Subscribe from '../components/Subscribe.astro';
 
 const entries = await getLibraryEntries();
 const volumeStats = LIBRARY_VOLUMES.map((volume) => {
@@ -73,6 +74,8 @@ const depthSamples = [
         <p class="workbook-line"><span>Optional:</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
       )}
     </header>
+
+    <Subscribe placement="home" />
 
     <section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading">
       <header class="section-head">

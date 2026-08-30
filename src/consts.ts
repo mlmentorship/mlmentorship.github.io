@@ -24,7 +24,7 @@ export const SITE = {
     provider: 'mailerlite' as 'mailerlite' | 'none',
     accountId: '2284644',
     formId: 'rgOeEV',
-    blurb: 'Occasional notes on senior ML interviews. No spam, unsubscribe any time.',
+    blurb: 'Occasional senior-level answer patterns, interview-process changes, and new deep cases. No fixed schedule.',
   },
   analytics: {
     // Shared with hsaghir.com; BaseHead prefixes paths with the hostname so the

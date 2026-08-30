@@ -14,7 +14,7 @@ import { SITE } from '../consts';
     <h2>Aggregate analytics</h2>
     <p>mlmentorship uses <a href="https://www.goatcounter.com/" rel="noopener">GoatCounter</a> to understand aggregate traffic, referrers, page use, and coarse events such as opening practice or the Workbook.</p>
     <p>GoatCounter states that its default aggregate mode does not store IP addresses, full user-agent strings, browser tracker identifiers, cookies, or browser local storage. It may hold a temporary mapping of site, IP address, and user agent in memory for up to eight hours to count repeat visits. Read the <a href="https://www.goatcounter.com/privacy" rel="noopener">GoatCounter privacy policy</a>.</p>
-    <p>Custom mlmentorship events contain only fixed event names. The site does not send practice answers, scores, story text, plan contents, or private notes to analytics.</p>
+    <p>Custom mlmentorship events contain only fixed event names. They include coarse signup steps such as viewed, attempted, confirmation sent, or dismissed. The site does not send email addresses, practice answers, scores, story text, plan contents, or private notes to analytics.</p>
 
     <h2>Browser-local data</h2>
     <p>The optional Workbook stores plan settings, practice attempts, retry dates, completion marks, simulation state, and story-bank text in browser storage on the device you use.</p>
@@ -23,10 +23,12 @@ import { SITE } from '../consts';
       <li>Clearing browser data removes the saved state.</li>
       <li>Export happens only when you choose the export action.</li>
       <li>Use anonymized shorthand for sensitive career stories, especially on a shared device.</li>
+      <li>The site stores a session flag after showing an end-of-entry signup prompt and may store a suppression date for up to 180 days after MailerLite accepts a request or you select “Already subscribed.” These values contain no email address.</li>
     </ul>
 
     <h2>Email subscriptions</h2>
-    <p>No subscription is required to read or practice. If a MailerLite form appears and you choose to subscribe, MailerLite processes the email address and any other fields you submit. Emails can include open and link measurement, and every marketing email must include an unsubscribe link.</p>
+    <p>No subscription is required to read or practice. When an eligible signup form approaches the viewport, the site loads MailerLite’s form code. MailerLite may receive ordinary request data and use cookies or similar technologies as described in its policy. If you choose to subscribe, MailerLite processes the email address and any other fields you submit.</p>
+    <p>The form uses double opt-in. Emails can include open and link measurement, and every marketing email includes an unsubscribe link.</p>
     <p>Read the <a href="https://www.mailerlite.com/legal/privacy-policy" rel="noopener">MailerLite privacy policy</a>. To update or remove a mlmentorship subscription, use the unsubscribe link or contact <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
 
     <h2>Hosting and public feedback</h2>
