@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "slug": "as-vs-mle-vs-re",
+  "article": "src/content/posts/2026-02-28-as-vs-mle-vs-re.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compare Applied Scientist, Research Engineer, and ML Engineer as different mixtures of research, modeling, engineering, and product work rather than as interchangeable or ranked titles.",
+  "mediumRationale": "Three compact, identically scaled bar profiles are the smallest spatial explanation that makes both each role's dominant activity and the differences between adjacent roles visible. Direct row labels and percentages keep the comparison readable without a legend or interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would imply transitions or hierarchy between roles, while the learning task is a quantitative profile comparison.",
+    "svg": "Selected: deterministic, identically scaled bars make activity magnitude comparable across roles and support direct labels, accessible descriptions, theme tokens, and print without runtime JavaScript.",
+    "semanticHtml": "Rejected: the existing prose table is already the semantic tabular representation; another table or list would repeat it without making each role's shape easier to see.",
+    "interaction": "Rejected: changing weights would imply unsupported precision and add controls to a fixed editorial comparison.",
+    "paperReuse": "Rejected: the authoritative sources describe occupational tasks but provide no figure matching this three-role editorial framing. Public availability is not treated as permission to reuse artwork.",
+    "noVisual": "Rejected: the table exposes exact values but still requires readers to scan twelve cells to see that Applied Scientist is modeling-led and balanced, Research Engineer shifts toward engineering while retaining research, and ML Engineer is engineering-dominant."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 163,
+        "insight": "The ML system-design example separates clarifying product requirements and a data deep-dive, showing that product framing and data work are distinct activities."
+      },
+      {
+        "page": 164,
+        "insight": "The neighboring continuation separates algorithm selection from experimentation, reinforcing that modeling and evaluation are distinct from initial product framing."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup overview asks for goals, evaluation, performance constraints, and project constraints before implementation."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers collection, annotation, storage, processing, privacy, and bias, supplying the engineering context around modeling."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide isolates task definition, baselines, architecture choice, loss, and offline evaluation."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide covers model gating, serving, monitoring, and feedback, distinguishing production engineering from model development."
+      },
+      {
+        "page": 169,
+        "insight": "The following rules slide emphasizes independent infrastructure tests, silent-failure detection, ownership, and human analysis."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page-by-page for applied scientist, research scientist, research engineer, machine learning engineer, ML engineer, career, role, and job-title terms. No slide defines or compares these titles. Pages 163-169 were then inspected as the closest complete neighborhood because they decompose an ML project into product requirements, data, modeling, experimentation, serving, monitoring, and human analysis. That neighborhood supports the article's activity-axis framing but does not establish its illustrative percentages, and no deck artwork or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "O*NET OnLine: Data Scientists (15-2051.00)",
+        "url": "https://www.onetonline.org/link/summary/15-2051.00",
+        "usage": "Used to verify that data-science work can combine model development and validation, programming, reading scientific literature, stakeholder problem definition, and communicating recommendations.",
+        "license": "O*NET Database content is available under CC BY 4.0, but no O*NET prose, ratings, or artwork is reproduced. The source is cited only to validate the activity categories."
+      },
+      {
+        "title": "O*NET OnLine: Software Developers (15-1252.00)",
+        "url": "https://www.onetonline.org/link/summary/15-1252.00",
+        "usage": "Used to verify the engineering-side activities: requirements analysis, software design and development, testing, performance standards, deployment coordination, and consultation with users or other departments.",
+        "license": "O*NET Database content is available under CC BY 4.0, but no O*NET prose, ratings, or artwork is reproduced. The source is cited only to validate the activity categories."
+      },
+      {
+        "title": "O*NET Database licensing",
+        "url": "https://www.onetcenter.org/database.html#license",
+        "usage": "Used to verify the explicit Creative Commons Attribution 4.0 license covering O*NET Database content.",
+        "license": "The license permits reuse with attribution. This implementation still uses only original labels and geometry and does not adapt an O*NET figure."
+      },
+      {
+        "title": "Amazon Applied Science careers",
+        "url": "https://www.amazon.jobs/content/en/job-categories/applied-science",
+        "usage": "Used as primary employer documentation to confirm that Applied Science spans practical AI problems across products and domains rather than denoting one standardized task allocation.",
+        "license": "No permissive artwork-reuse license was identified. No Amazon text, imagery, data, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that neighboring ML titles are overlapping mixtures of work, not steps on one ladder. Authoritative occupational and employer sources support the four kinds of activity but do not establish universal role percentages or a standardized AS/RE/MLE boundary. The visual therefore redraws only the article's explicitly rough values, labels them illustrative, and makes no empirical labor-market claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact pages 163-169 neighborhood, then checked official O*NET occupational descriptions and licensing plus Amazon's Applied Science career description before selecting an original three-profile comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "ml-role-activity-profiles"
+    ],
+    "accessibility": "Each role profile has its own SVG title and description, and every bar is directly labelled with the activity and percentage. Bar length, row order, text, and numeric values carry all meaning without color. Existing visual panels stack below 640 pixels; each SVG has a compact responsive viewBox with no minimum width for readability at 390 CSS pixels. Theme variables preserve dark-mode contrast, while established print tokens provide a light high-contrast palette and prevent page breaks inside the figure."
+  }
+}
