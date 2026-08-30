@@ -2,53 +2,69 @@
   "schemaVersion": 1,
   "slug": "adam-vs-sgd-generalization",
   "article": "src/content/posts/2026-04-29-adam-vs-sgd-generalization.md",
-  "status": "planned",
+  "status": "implemented",
   "medium": "svg",
-  "learningObjective": "Separate the empirical optimizer generalization gap from the contested claim that geometric sharpness alone causes it.",
-  "mediumRationale": "A paired illustrative SVG can show two parameterizations with identical predictions but different apparent sharpness, directly visualizing why sharpness is not invariant. A simple SGD-versus-Adam trajectory would overstate a contested explanation.",
+  "learningObjective": "Separate an observed optimizer generalization gap from the contested claim that a geometrically sharp minimum alone causes poor generalization.",
+  "mediumRationale": "Deterministic SVG is the smallest medium that places a broad and a narrow loss profile side by side while joining them to one unchanged predictor. Mermaid was rejected because this is coordinate geometry, not flow; semantic HTML would weaken the profile-shape comparison; interaction would imply a quantitative transformation and add no necessary lesson; paper-figure reuse has unclear permission and is unnecessary; and no visual would leave the reparameterization critique abstract. The figure is an original conceptual construction rather than a redraw of a source layout.",
   "deckReview": {
     "pages": [
       {
+        "page": 45,
+        "insight": "Introduces loss-surface slices and optimization directions, providing the immediate geometric context for interpreting a one-dimensional loss profile."
+      },
+      {
         "page": 46,
-        "insight": "The deck contrasts SGD, momentum, and Adam update mechanics."
+        "insight": "Contrasts vanilla and momentum SGD with per-parameter adaptive methods, including Adam's first- and second-moment update."
+      },
+      {
+        "page": 47,
+        "insight": "Covers RAdam and warmup as responses to early adaptive-rate variance; it does not establish a generalization mechanism."
       },
       {
         "page": 48,
-        "insight": "The sharpness-aware minimization slide motivates neighborhoods of uniformly low loss while remaining distinct from the claim that sharpness alone determines generalization."
+        "insight": "Presents sharpness-aware minimization as seeking neighborhoods of uniformly low loss, but does not address whether ordinary parameter-space sharpness is invariant."
       }
     ],
-    "notes": "The deck provides optimizer and sharpness context. It does not resolve the article's central nuance that ordinary sharpness measures can change under reparameterization."
+    "notes": "All 214 pages of Basic_ML_CS_concepts were searched from extracted text for Adam, stochastic gradient, generalization, minima, and sharpness. The complete relevant run, pages 44-50, was then inspected: page 44 closes backpropagation, pages 45-48 contain the relevant loss-surface, optimizer, warmup, and SAM material, page 49 is an Optimization divider, and page 50 begins normalization. The deck supplies useful context but no optimizer-generalization comparison or reparameterization caveat, so no deck figure is reused."
   },
   "sourceReview": {
     "sources": [
       {
-        "title": "On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima",
-        "url": "https://arxiv.org/abs/1609.04836",
-        "usage": "Use as evidence for the empirical association between batch regime, sharpness measures, and generalization gap.",
-        "license": "No paper figure copied; empirical claim referenced only."
+        "title": "The Marginal Value of Adaptive Gradient Methods in Machine Learning",
+        "url": "https://arxiv.org/abs/1705.08292",
+        "usage": "Used as primary empirical evidence that adaptive methods can reach low training loss yet generalize worse than momentum SGD in some models and benchmark settings.",
+        "license": "No text, data, plot, or figure copied. The paper is cited for its empirical conclusion only; figure-reuse permission was not assumed from arXiv availability."
       },
       {
         "title": "Sharp Minima Can Generalize For Deep Nets",
         "url": "https://arxiv.org/abs/1703.04933",
-        "usage": "Use to verify the reparameterization critique and prevent a causal sharp-minima claim.",
-        "license": "No paper figure copied; conceptual reference only."
+        "usage": "Used to verify that rectifier-network symmetries can produce functionally equivalent models with arbitrarily different parameter-space sharpness and unchanged generalization.",
+        "license": "No text, equation, data, or figure copied. The side-by-side profiles and labels are an original conceptual construction; the paper's figure license was not relied upon."
       },
       {
         "title": "Decoupled Weight Decay Regularization",
         "url": "https://arxiv.org/abs/1711.05101",
-        "usage": "Use to support the article's separate weight-decay explanation for adaptive optimizers.",
-        "license": "No source figure copied; conceptual reference only."
+        "usage": "Used to distinguish classic Adam from AdamW and verify that decoupled weight decay substantially improves Adam's generalization, allowing it to compete with momentum SGD on the paper's image-classification experiments.",
+        "license": "No source text, results table, code, or figure copied; the optimizer claim is paraphrased with citation and no reuse permission is required."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to check that free access does not itself grant figure-reuse rights and that each submission can carry a different license.",
+        "license": "The policy was consulted only. Because the individual papers' reusable figure rights were not established, the implementation defaults to original artwork."
       }
     ],
-    "notes": "Independent review found and corrected the article's unrelated Dinh URL before visual implementation. The visual must label its geometry as illustrative, not empirical proof."
+    "notes": "The primary sources support three separate claims: a setting-dependent empirical optimizer gap, a non-invariance objection to naive sharpness explanations, and the AdamW decoupling improvement. The implemented curves are explicitly illustrative, encode no measurements, and reproduce no source-specific composition or result."
   },
   "agentReview": {
-    "reviewer": "Explore Adam-versus-SGD subagent, manually reconciled",
+    "reviewer": "GPT-5.6 Sol task 1.1 article visual reviewer",
     "reviewedAt": "2026-08-30",
-    "summary": "The agent found a real citation defect and proposed optimizer trajectories. Integration selected a reparameterization visual because it preserves the article's most important epistemic caution."
+    "summary": "Read the full article, searched the full deck and inspected the complete neighboring slide run, then checked primary optimizer and reparameterization papers plus arXiv's licensing guidance. Selected one compact original SVG that teaches why apparent sharpness cannot by itself explain generalization."
   },
   "implementation": {
-    "visualIds": [],
-    "accessibility": ""
+    "visualIds": [
+      "optimizer-sharpness-reparameterization"
+    ],
+    "accessibility": "The SVG has a programmatic title and detailed description. Both profiles use direct labels, identical minimum markers, and a labeled equality connector, so shape, position, and text carry the argument without color. A 360-unit viewBox, short labels, existing responsive visual primitives, and no fixed CSS width preserve readability at 390 CSS pixels, dark mode, grayscale, and print."
   }
 }
