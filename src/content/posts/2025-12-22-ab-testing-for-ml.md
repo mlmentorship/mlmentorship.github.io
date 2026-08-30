@@ -32,13 +32,47 @@ Analysis:
 
 ## Statistical power
 
-The most common A/B testing mistake: not running long enough. The minimum detectable effect (MDE) at given power and sample size is:
+The most common A/B testing mistake: not running long enough. For two equal-sized arms and a continuous metric, the normal approximation for the minimum detectable effect (MDE) is:
 
 ```
-MDE ~ z * sigma / sqrt(N)
+MDE ≈ (z_(1-alpha/2) + z_(1-beta)) * sigma * sqrt(2/N)
 ```
 
-where `sigma` is the metric's standard deviation, `N` is the sample size per arm, and `z` depends on power (typically `z = 2.8` for 80% power at p=0.05).
+where `sigma` is the metric's standard deviation and `N` is the sample size **per arm**. For a two-sided `alpha = 0.05` test at 80% power, the two z-scores are approximately 1.96 and 0.84. The exact calculation depends on the metric distribution and test.
+
+<!-- visual:ab-test-mde-sample-size -->
+<figure class="learning-figure plot-panel" aria-labelledby="ab-test-mde-visual-title">
+	<p class="visual-kicker">Power intuition</p>
+	<p class="visual-title" id="ab-test-mde-visual-title">Four times the users halves MDE; twice the noise doubles it.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 290" role="img" aria-labelledby="ab-test-mde-svg-title ab-test-mde-svg-desc">
+			<title id="ab-test-mde-svg-title">Minimum detectable effect by per-arm sample size for two levels of metric noise</title>
+			<desc id="ab-test-mde-svg-desc">An original line plot using a two-sided alpha of 0.05, 80 percent power, equal experiment arms, and the normal approximation. The horizontal axis gives 1,000, 4,000, and 16,000 observations per arm. For a metric standard deviation of one unit, shown as a solid line, minimum detectable effects are 0.125, 0.063, and 0.031 units. For a standard deviation of two units, shown as a dashed line, the values are 0.250, 0.125, and 0.063 units. Quadrupling sample size halves minimum detectable effect, while doubling standard deviation doubles it.</desc>
+			<rect class="viz-plot-bg" x="58" y="28" width="272" height="210" rx="3"></rect>
+			<path class="viz-gridline" d="M58 50H330 M58 144H330 M58 238H330 M70 28V238 M190 28V238 M310 28V238"></path>
+			<path class="viz-axis" d="M58 28V238H330"></path>
+			<path class="viz-pr-curve" style="stroke-dasharray: 7 5" d="M70 50 C110 88 150 128 190 144 C230 170 270 188 310 191"></path>
+			<path class="viz-roc-curve" d="M70 144 C110 174 150 188 190 191 C230 207 270 214 310 215"></path>
+			<circle class="viz-operating-point" cx="70" cy="50" r="4"></circle>
+			<circle class="viz-operating-point" cx="190" cy="144" r="4"></circle>
+			<circle class="viz-operating-point" cx="310" cy="191" r="4"></circle>
+			<circle class="viz-operating-point" cx="70" cy="144" r="4"></circle>
+			<circle class="viz-operating-point" cx="190" cy="191" r="4"></circle>
+			<circle class="viz-operating-point" cx="310" cy="215" r="4"></circle>
+			<text class="viz-callout" x="84" y="45">σ = 2 (dashed)</text>
+			<text class="viz-callout" x="84" y="139">σ = 1 (solid)</text>
+			<text class="viz-label" x="50" y="54" text-anchor="end">0.250</text>
+			<text class="viz-label" x="50" y="148" text-anchor="end">0.125</text>
+			<text class="viz-label" x="50" y="242" text-anchor="end">0</text>
+			<text class="viz-label" x="70" y="256" text-anchor="middle">1k</text>
+			<text class="viz-label" x="190" y="256" text-anchor="middle">4k</text>
+			<text class="viz-label" x="310" y="256" text-anchor="middle">16k</text>
+			<text class="viz-axis-label" x="194" y="281" text-anchor="middle">observations per arm (N)</text>
+			<text class="viz-axis-label" transform="translate(14 190) rotate(-90)">MDE (metric units)</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow either line from 1k to 4k to 16k users per arm: each 4× increase halves the effect the test can detect. At any sample size, the dashed σ = 2 line is twice as high, so a metric with twice the noise needs 4× the users to detect the same effect.</figcaption>
+</figure>
 
 For a small movement on a noisy metric, you need many users. If "no significant effect" appears, first check whether the test had power to detect your target effect.
 
