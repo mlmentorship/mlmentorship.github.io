@@ -93,10 +93,10 @@ A first quarterly allocation is:
 | Envelope | Share | Accelerator-hours | Purpose |
 | --- | ---: | ---: | --- |
 | Online serving | 55% | 136,858 | Baseline inference, routed reasoning, online verifiers, canaries |
-| Continued training | 14% | 34,837 | Scale studies, domain continuation, checkpoint selection |
+| Continued training | 14% | 34,836 | Scale studies, domain continuation, checkpoint selection |
 | Post-training | 12% | 29,860 | Supervised tuning, preference work, RL rollouts, distillation |
 | Evaluation and verifiers | 9% | 22,395 | Offline suites, human review, adversarial tests, verifier training |
-| Recovery reserve | 10% | 24,883 | Node loss, traffic spikes, rollback overlap, urgent reruns |
+| Recovery reserve | 10% | 24,883 | Node loss, traffic spikes, rollback overlap |
 
 <p class="visual-kicker">Learning objective</p>
 <p class="visual-title">Distinguish quarterly budget fences from physical partitions, then trace how offline work returns capacity without spending protected claims twice.</p>
@@ -105,40 +105,34 @@ A first quarterly allocation is:
 ```mermaid
 flowchart TB
   accTitle: Fixed budget fences protect serving and recovery while offline nodes remain reclaimable
-  accDescr: The raw quarterly capacity loses a ten-percent operating margin, leaving 248,832 usable accelerator-hours. That planning envelope has three claims that sum to one hundred percent: a fifty-five-percent online serving floor, a ten-percent recovery reserve, and a thirty-five-percent reclaimable offline portfolio comprising continued training, post-training, evaluation, and verifier work. Queue, latency, route-cost, and node-health telemetry feed a capacity broker. Under normal conditions the broker admits checkpointable offline jobs into available windows. When the serving floor is at risk, those jobs finish a proven checkpoint boundary and pause; their nodes return to serving. The recovery reserve joins only for its declared triggers such as node loss, traffic spike, or rollback overlap. Percentages are accounting fences rather than fixed hardware partitions.
+  accDescr: The raw quarterly capacity loses a ten-percent operating margin, leaving 248,832 usable accelerator-hours. That planning envelope has protected claims of fifty-five percent for online serving and ten percent for recovery, plus a thirty-five-percent reclaimable offline portfolio comprising continued training, post-training, evaluation, and verifier work. The claims sum to one hundred percent. Protected claims and queue, latency, route-cost, and node-health telemetry are separate inputs to a capacity broker. Under normal conditions the broker admits checkpointable offline jobs into available windows. When the serving floor is at risk, those jobs finish a proven checkpoint boundary and pause, returning physical nodes to serving. The recovery reserve is used only for a declared recovery trigger. Percentages are accounting fences rather than fixed hardware partitions.
   Raw["RAW QUARTER<br/>128 × 24 × 90<br/>276,480 accelerator-hours"]
   Plan["USABLE PLANNING ENVELOPE<br/>248,832 accelerator-hours<br/>after 10% operating margin"]
-  Online["PROTECTED ONLINE FLOOR · 55%<br/>136,858 h<br/>baseline + routed reasoning + canaries"]
-  Reserve["PROTECTED RECOVERY · 10%<br/>24,883 h<br/>node loss + spikes + rollback"]
+  Protected["PROTECTED CLAIMS · 65%<br/>online floor 55% · recovery 10%<br/>recovery only for declared triggers"]
   Offline["RECLAIMABLE OFFLINE · 35%<br/>continued training 14% · post-training 12%<br/>evaluation + verifiers 9%"]
   Signals["OBSERVED PRESSURE<br/>queue · latency · route cost · node health"]
   Broker{"CAPACITY BROKER<br/>Is the online floor at risk?"}
-  Jobs["CHECKPOINTABLE OFFLINE JOBS<br/>run only in admitted windows"]
-  Boundary["PROVEN SAFE BOUNDARY<br/>checkpoint · verify · pause"]
-  Return["RETURN PHYSICAL NODES<br/>reduce optional routes first<br/>expand useful serving capacity"]
+  Jobs["NO · RUN OFFLINE<br/>only in admitted windows"]
+  Reclaim["YES · CHECKPOINT AND PAUSE<br/>return physical nodes to serving"]
   Raw ==> Plan
-  Plan ==> Online
-  Plan ==> Reserve
+  Plan ==> Protected
   Plan ==> Offline
-  Online --> Signals
+  Protected --> Broker
   Signals ==> Broker
   Broker -->|"no · slack remains"| Jobs
   Offline --> Jobs
-  Broker ==>|"yes · reclaim"| Boundary
-  Jobs -->|"finish current boundary"| Boundary
-  Boundary ==> Return
-  Reserve -.->|"declared incident trigger only"| Return
-  Return ==> Online
+  Broker ==>|"yes · floor at risk"| Reclaim
+  Jobs -.->|"pressure rises"| Reclaim
+  Reclaim ==> Protected
   class Raw,Signals viz-input
   class Plan,Broker viz-focus
-  class Online,Reserve viz-state
+  class Protected viz-state
   class Offline,Jobs viz-neutral
-  class Boundary viz-warning
-  class Return viz-output
-  class Raw viz-tall
+  class Reclaim viz-output
+  class Raw viz-wide
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> first account for all usable quarterly capacity exactly once: 55% online, 10% recovery, and 35% offline. Then follow the runtime loop. Normal slack admits checkpointable offline jobs; pressure makes them stop at a tested boundary and return physical nodes to serving. The recovery fence joins only for its declared triggers; it is not ordinary training capacity.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> first account for all usable quarterly capacity exactly once: 55% online, 10% recovery, and 35% offline. Then follow the runtime loop. Normal slack admits checkpointable offline jobs; pressure makes them stop at a tested boundary and return physical nodes to serving. Recovery remains a protected incident claim, not ordinary training capacity.</p>
 <p class="diagram-source">Original synthesis informed by the <a href="https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/">Borg cluster-management paper</a> on admission, sharing, and isolation, <a href="https://slurm.schedmd.com/preempt.html">Slurm's preemption documentation</a> on bounded job transitions, the <a href="https://sre.google/sre-book/handling-overload/">Google SRE overload guidance</a> on resource-based capacity and deliberate degradation, and the <a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html">NVIDIA GPU performance guide</a> on measured rather than peak throughput.</p>
 
 These are budget fences, not permanent hardware partitions. Production may use 56 accelerators overnight and 80 during peak windows. A six-node training job can use 48 accelerators when the service and reserve leave room.

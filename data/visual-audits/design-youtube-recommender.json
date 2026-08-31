@@ -116,7 +116,7 @@
         "license": "The arXiv paper is publicly accessible, but its record was not treated as a permissive license to adapt figures. No experiment, result, prose, diagram, synthetic value, or arrangement is reproduced."
       }
     ],
-    "notes": "The hardest prose-only mental model is that the production funnel is also an observation policy. Candidate generation and ranking determine the small slate a user can react to; ordinary logs reveal outcomes for exposed items, while unshown outcomes remain unknown rather than negative. Training on those logs changes later retrieval and ordering, so exploitation can reinforce its own earlier choices. The original diagram adds explicit content/freshness and randomized-exploration inputs to show how coverage can be broadened without teaching the detailed IPS or doubly robust estimators covered by the linked counterfactual-ranking article."
+    "notes": "The hardest prose-only mental model is that the production funnel is also an observation policy. Candidate generation and ranking determine the small slate a user can react to; ordinary logs reveal outcomes for exposed items, while unshown outcomes remain unknown rather than negative. Training on those logs changes later retrieval and ordering, so exploitation can reinforce its own earlier choices. The original diagram adds explicit content, freshness, and randomized-exploration inputs only to show how observed coverage can be broadened; it does not prescribe a counterfactual estimator."
   },
   "agentReview": {
     "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
@@ -127,6 +127,6 @@
     "visualIds": [
       "youtube-recommender-selective-feedback-loop"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description that names both serving stages, all candidate sources, composition, displayed and unshown outcomes, exposure logging, retraining, and both feedback edges. Every distinction is encoded with direct labels, arrow direction, numbered stages, shapes, and solid versus dashed paths rather than color. The established tall-flow marker prevents screen-height compression and permits constrained-width overflow for readable labels at 390 CSS pixels; shared theme tokens support dark mode and print, and the adjacent prose and direct caption preserve the lesson without client-side rendering."
+    "accessibility": "The Mermaid source includes a complete accessible title and description that names both serving stages, the candidate sources, composition, displayed and unshown outcomes, exposure logging, retraining, and both feedback edges. Every distinction is encoded with direct labels, arrow direction, numbered stages, shapes, and solid versus dashed paths rather than color. The compact top-to-bottom flow and established tall-flow marker preserve readable labels at 390 CSS pixels; shared theme tokens support dark mode and print, and the adjacent prose and direct caption preserve the lesson without client-side rendering."
   }
 }

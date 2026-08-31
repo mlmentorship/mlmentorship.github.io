@@ -108,7 +108,7 @@ where $J_{f^{-1}}$ is the Jacobian of the inverse transform. This is the basis o
 | Eigendecomposition: $\prod \lambda_i$ | $O(n^3)$ | If you need eigenvalues anyway |
 | **Log-determinant** for PD matrices | via Cholesky | When you only need $\log \det$ (e.g., Gaussian log-likelihood) |
 
-Numerical tip: for large matrices, compute $\log \det$ directly (sum of $\log$ of LU diagonal); $\det$ itself overflows or underflows quickly.
+Numerical tip: for a general matrix, use a signed log-determinant: track the row-pivot sign and the signs of the LU diagonal entries, then sum $\log |U_{ii}|$. For a positive-definite matrix with $A = LL^\top$, compute $\log \det(A) = 2\sum_i \log L_{ii}$. The determinant itself overflows or underflows quickly.
 
 ## Common pitfalls
 

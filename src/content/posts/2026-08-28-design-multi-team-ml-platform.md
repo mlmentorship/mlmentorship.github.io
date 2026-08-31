@@ -154,9 +154,9 @@ The shared platform should own a small control plane. Existing systems can conti
 
 <!-- visual:multi-team-platform-contract-boundary -->
 ```mermaid
-flowchart LR
+flowchart TB
   accTitle: Shared lifecycle authority with replaceable team execution systems
-  accDescr: Product teams submit code, configuration, and declared contracts to one shared lifecycle control plane. The control plane assigns immutable identity and lineage, records evaluation evidence, and authorizes promotion and desired deployment state. That desired state crosses an adapter boundary into existing team training, feature, and serving systems rather than replacing them. Those execution systems return artifacts, telemetry, and actual state as evidence to the shared lifecycle record. The organization standardizes authority and evidence while heterogeneous execution remains replaceable.
+  accDescr: Product teams submit code, configuration, and declared contracts to one shared lifecycle control plane. The control plane assigns immutable identity and lineage, records evaluation evidence, and authorizes promotion and desired deployment state. That desired state crosses an adapter boundary into existing team training, feature, and serving systems rather than replacing them. The data planes return artifacts, telemetry, and actual state as evidence to the shared lifecycle record. The organization standardizes authority and evidence while heterogeneous execution remains replaceable.
   Teams["PRODUCT TEAMS<br/>code · config · declared contracts"]
 
   subgraph SHARED["SHARED AUTHORITY · one organization-wide lifecycle"]
@@ -167,30 +167,21 @@ flowchart LR
   end
 
   Adapter["ADAPTER BOUNDARY<br/>translate contract, expose capabilities"]
-
-  subgraph EXECUTION["EXECUTION DATA PLANES · existing systems may remain"]
-    Training["TEAM TRAINING<br/>batch · accelerator · specialized runtime"]
-    Features["DATA + FEATURES<br/>warehouse · stream · online store"]
-    Serving["TEAM SERVING<br/>online · batch · product fallback"]
-    Results["ARTIFACTS + TELEMETRY + ACTUAL STATE"]
-    Training --> Results
-    Features --> Results
-    Serving --> Results
-  end
+  Execution["TEAM DATA PLANES MAY REMAIN<br/>training · features · serving"]
+  Results["ARTIFACTS + TELEMETRY<br/>actual execution state"]
 
   Teams ==> Identity
   State ==>|"authorized intent"| Adapter
-  Adapter --> Training
-  Adapter --> Features
-  Adapter --> Serving
+  Adapter --> Execution
+  Execution --> Results
   Results -.->|"evidence returns to shared record"| Evidence
 
   class Teams viz-input
   class Identity,Evidence,State viz-focus
   class Adapter viz-state
-  class Training,Features,Serving viz-neutral
+  class Execution viz-neutral
   class Results viz-output
-  class Teams viz-wide
+  class Teams viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path first: every team enters one lifecycle for identity, evidence, and promotion, then adapters translate authorized intent into each team's existing runtime. Follow the dashed path back: artifacts, telemetry, and actual state become shared evidence. Standardize the authority loop; do not require one universal executor. Original synthesis checked against <a href="https://research.google/pubs/hidden-technical-debt-in-machine-learning-systems/">Sculley et al. on ML system debt</a>, the <a href="https://mlflow.org/docs/latest/ml/model-registry/">MLflow lifecycle documentation</a>, and Google's <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Rules of Machine Learning</a>.</p>

@@ -89,6 +89,6 @@
     "visualIds": [
       "ecosystem-experiment-interference"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description that trace current shared inventory through both randomized cells, creator opportunity and production, and next-period spillover into both future cells. Every cell, timescale, and interpretation is text-labelled; arrows and the dashed cross-cell return path carry meaning without color. A top-to-bottom layout with the established viz-tall marker removes the wide mobile minimum so labels remain readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, print uses the established light page-safe palette, and the direct caption preserves the inference if visual rendering is unavailable."
+    "accessibility": "The Mermaid source provides a complete accessible title and description that trace current shared inventory through the two randomized cells, shared creator opportunity and production, and next-period spillover into both future cells. Every cell, timescale, and interpretation is text-labelled; arrows and the dashed shared-supply path carry meaning without color. A compact top-to-bottom layout with the established viz-tall marker keeps labels readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, print uses the established light page-safe palette, and the direct caption preserves the inference if visual rendering is unavailable."
   }
 }
