@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "matrix-calculus",
+  "article": "src/content/posts/2026-02-23-matrix-calculus.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Use Jacobian dimensions to trace how a transposed Jacobian maps an output-shaped upstream gradient to a parameter-shaped gradient, with each parameter collecting sensitivity through every output.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align a concrete 2 by 3 Jacobian, its transpose, the upstream 2-vector, the resulting parameter 3-vector, and all three checkable dot products in one static trace.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show forward and backward direction, but automatic node layout cannot align matrix rows, dimensions, and dot products precisely enough to explain why the transpose is required.",
+    "svg": "Selected: fixed matrix entries, shape labels, multiplication order, and independently checkable arithmetic make the pullback spatial rather than merely symbolic.",
+    "semanticHtml": "Rejected: semantic tables could represent each matrix accessibly, but three separate tables would weaken the left-to-right multiplication and row-to-result alignment. The SVG provides a complete text alternative instead.",
+    "interaction": "Rejected: changing dimensions or entries would add controls and hidden states when one fully visible counterexample to shape guessing teaches the invariant directly.",
+    "paperReuse": "Rejected: the reviewed deck, survey, framework documentation, and tutorial contain broader diagrams or derivations, but no external artwork is needed. Public availability is not treated as reuse permission; no figure, coordinates, values, wording, or layout is copied.",
+    "noVisual": "Rejected: prose states J transpose times the upstream gradient but asks the reader to mentally rotate the Jacobian, reconcile three spaces, and infer that each parameter gradient sums paths through both outputs."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 42,
+        "insight": "The preceding Learning section divider establishes the start of the optimization cluster but contains no calculus content."
+      },
+      {
+        "page": 43,
+        "insight": "The gradient descent and backprop divider includes handwritten notes on gradients, Hessians, computational graphs, forward differentiation, and backward differentiation, but it does not give a clean vector chain-rule shape trace."
+      },
+      {
+        "page": 44,
+        "insight": "The dedicated backprop slide is the closest source: it combines local gradients by the chain rule and attempts to make layer-gradient matrix shapes explicit. Its stated Y = WX convention conflicts with the displayed W1 and W2 dimensions and product order, so its numeric layout was not reused."
+      },
+      {
+        "page": 45,
+        "insight": "The neighboring loss-optimization slide moves to random search, finite differences, and gradient descent; it does not explain Jacobians or reverse-mode shape flow."
+      },
+      {
+        "page": 46,
+        "insight": "The following optimization slide introduces Hessian-based second-order updates and adaptive optimizers, confirming the end of the relevant chain-rule neighborhood without adding a Jacobian-transpose explanation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for matrix calculus, Jacobian, Hessian, chain rule, gradients on vectors and matrices, vector-Jacobian product, and Jacobian-vector product. Relevant hits were page 22 (kernel PCA, unrelated), pages 43-46 (the optimization and backprop neighborhood), and page 52 (gradient estimators, downstream of the core chain rule). Pages 42-46 were read as neighboring slides and pages 43-45 were visually inspected. Page 44 motivates a shape-first visual, but its text says Y = WX while listing X as 3 by 1, W1 as 3 by 4, H as 4 by 1, and dW1 as X dot dH transpose; that set only works with an implicit transposed forward convention. The implementation therefore uses a new, internally consistent Jacobian example. No deck artwork, values, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "JAX jax.vjp API documentation",
+        "url": "https://docs.jax.dev/en/latest/_autosummary/jax.vjp.html",
+        "usage": "Used as official framework documentation to verify that reverse mode maps an output-shaped cotangent to cotangents with the same structures and shapes as the primal inputs.",
+        "license": "JAX is Apache-2.0 licensed, but no documentation prose, code example, figure, values, or layout is copied. The article links to the API contract and uses an independently authored calculation."
+      },
+      {
+        "title": "Automatic Differentiation in Machine Learning: a Survey",
+        "url": "https://jmlr.org/papers/v18/17-468.html",
+        "usage": "Used as a peer-reviewed authoritative source to verify reverse accumulation, transposed Jacobian products, and the reason a full Jacobian need not be materialized for scalar-loss gradients.",
+        "license": "JMLR public access and author-held copyright are not treated as blanket figure-reuse permission. No survey figure, prose, notation layout, or example is reproduced."
+      },
+      {
+        "title": "The Matrix Calculus You Need For Deep Learning",
+        "url": "https://arxiv.org/abs/1802.01528",
+        "usage": "Used as an authoritative tutorial to cross-check Jacobian orientation, vector chain rules, and the convention that gradients have the shape of the differentiated parameters.",
+        "license": "The arXiv record is used for reading and citation; public availability alone is not treated as adaptation permission. No figure, derivation layout, wording, or numeric example is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why reverse mode uses J_f transpose and how the dimensions encode its meaning. For f from R^3 to R^2, rows of J correspond to outputs and columns to parameters. With J = [[2,-1,0],[1,3,4]] and upstream g_y = [5,-2], the pullback J transpose g_y has parameter shape R^3 and equals [2(5)+1(-2), -1(5)+3(-2), 0(5)+4(-2)] = [8,-11,-8]. Each result is the dot product of one original Jacobian column with the output cotangent. The arithmetic, dimensions, and layout are original and were checked directly."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact backprop neighborhood, identified and avoided the deck's inconsistent matrix convention, checked official JAX semantics plus peer-reviewed and authoritative references, and selected an original shape-and-arithmetic pullback SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "jacobian-transpose-pullback"
+    ],
+    "accessibility": "The SVG has a linked title and a complete description that states the mapping, dimensions, matrix entries, upstream gradient, results, and interpretation. Stage headings, box boundaries, multiplication symbols, dimensions, row alignment, and explicit equations carry the lesson without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
