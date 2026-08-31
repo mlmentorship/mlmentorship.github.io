@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "slug": "floating-point-formats",
+  "article": "src/content/posts/2026-02-01-floating-point-formats.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Explain how moving three bits from the fraction to the exponent gives BF16 FP32-like range but makes adjacent values near one eight times farther apart than FP16.",
+  "mediumRationale": "Two aligned semantic tables are the smallest medium that exposes a fixed 16-bit budget, the competing exponent and fraction allocations, and one checkable consequence of each. Exact normal-range endpoints and next-after-one values connect abstract field widths to the underflow-versus-rounding failure modes.",
+  "mediumComparison": {
+    "mermaid": "Rejected because this is a quantitative allocation and spacing comparison, not a process or relationship topology; flowchart nodes would obscure the shared bit budget and exact values.",
+    "svg": "Rejected because fixed bit rectangles would either become too small at 390 CSS pixels or require horizontal scrolling. Real headings and tables provide the same alignment with better text reflow, selection, and assistive semantics.",
+    "semanticHtml": "Selected because two labelled panels align field widths with numerical consequences, stack into ordinary reading order below 640 CSS pixels, and preserve exact values without runtime rendering.",
+    "interaction": "Rejected because switching among all formats would hide states and add controls before the reader has formed the central FP16-versus-BF16 tradeoff. One deterministic comparison is sufficient.",
+    "paperReuse": "Rejected because the deck, official documentation, and papers contain related bit-layout figures, but no external artwork or paper-specific geometry is needed. The implementation uses original wording, values derived from the format definitions, and established site primitives.",
+    "noVisual": "Rejected because the prose lists field widths and ranges but leaves readers to infer that a fixed total bit budget couples range and local spacing, and that reallocating three bits changes spacing by a factor of eight."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The earlier LLM-training slide says selected operations stay in full precision while most run in BF16, providing mixed-precision context but no bit allocation or spacing model."
+      },
+      {
+        "page": 108,
+        "insight": "The following compute-optimization slide names BF16 and FP16 as a throughput and memory lever but does not compare their encodings."
+      },
+      {
+        "page": 113,
+        "insight": "The slide immediately before the main match covers speculative decoding and contains no floating-point content, establishing the start of the inspected local neighborhood."
+      },
+      {
+        "page": 114,
+        "insight": "The direct mixed-precision slide lists FP16 as 1/5/10, BF16 as 1/8/7, and FP32 as 1/8/23, then connects exponent width to underflow and loss scaling. It does not show how fraction width changes representable spacing."
+      },
+      {
+        "page": 115,
+        "insight": "The immediate following slide places BF16 mixed precision and FP32 master weights in a modern training stack, but adds no numerical-format geometry."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling checklist briefly recommends reduced precision to scale training, with no format definitions or tradeoff analysis."
+      },
+      {
+        "page": 205,
+        "insight": "The slide immediately before the FP32 encoding slide is an algorithms index and contains no numerical representation content."
+      },
+      {
+        "page": 206,
+        "insight": "The direct IEEE FP32 slide explains sign, biased exponent, stored fraction, and the implicit leading one, and includes an unattributed bit-field image. It does not compare reduced-precision formats."
+      },
+      {
+        "page": 207,
+        "insight": "The immediate following slide is a behavioral-interview divider and contains no numerical representation content."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for float, floating point, FP16, BF16, mixed precision, mantissa, significand, and exponent-bit terminology. Matches on pages 107, 108, 114, 115, 128, 167, and 206 were reviewed. The complete contiguous neighborhoods on pages 113-115 and 205-207 were rendered and visually inspected. Page 114 is the strongest format comparison; page 206 supplies encoding background but its exponent-bias prose is imprecise and its bitmap attribution is unclear. No deck wording, screenshot, bitmap, coordinates, or layout is reused.",
+    "license": "The local deck states no license and page 206 embeds a bit-layout image without a visible source or reuse grant. The deck is treated as review-only. The shipped semantic figure is independently authored from published format definitions."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NVIDIA CUDA Floating Point",
+        "url": "https://docs.nvidia.com/cuda/floating-point/index.html",
+        "usage": "Used as official technical documentation for IEEE binary field semantics, the implicit leading significand bit, biased exponents, finite precision, and rounding.",
+        "license": "NVIDIA documentation is copyrighted and no permissive figure-reuse grant was identified on the page. No image, example, prose, or page layout is copied."
+      },
+      {
+        "title": "Improve your model's performance with bfloat16",
+        "url": "https://cloud.google.com/tpu/docs/bfloat16",
+        "usage": "Used as official TPU documentation to verify that BF16 and FP32 have equivalent dynamic range, BF16 halves storage, FP32-to-BF16 conversion rounds to nearest even on TPU, and TPU BF16 flushes subnormals to zero.",
+        "license": "Google Cloud documentation is generally licensed under CC BY 4.0 unless otherwise noted, but no text, code, image, or layout is adapted; the article links to the source and uses an original numerical comparison."
+      },
+      {
+        "title": "A Study of BFLOAT16 for Deep Learning Training",
+        "url": "https://arxiv.org/abs/1905.12322",
+        "usage": "Used as a primary paper to verify the 1/8/7 BF16 encoding, FP32-equivalent exponent range, reduced significand precision, and the training rationale for retaining wide range.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, not a permissive third-party figure license. No paper figure, result table, prose, or example is reproduced."
+      },
+      {
+        "title": "OCP 8-bit Floating Point Specification (OFP8) Revision 1.1",
+        "url": "https://www.opencompute.org/documents/ocp-8-bit-floating-point-specification-ofp8-revision-1-1-final-pdf",
+        "usage": "Used as the official specification to cross-check the article's E4M3 and E5M2 field widths, exceptional-value conventions, and maximum finite values.",
+        "license": "Use of the specification is governed by the Open Web Foundation Modified Final Specification Agreement 1.0.2 rather than a Creative Commons artwork license. No specification table, diagram, prose, or formatting is copied."
+      },
+      {
+        "title": "NVIDIA Ampere GPU Architecture Tuning Guide",
+        "url": "https://docs.nvidia.com/cuda/ampere-tuning-guide/index.html",
+        "usage": "Used as official architecture documentation to verify TF32 as a 19-bit Tensor Core format with one sign bit, eight exponent bits, and ten mantissa bits.",
+        "license": "NVIDIA documentation is copyrighted and no permissive figure-reuse grant was identified. No guide figure, wording, benchmark, or layout is copied."
+      },
+      {
+        "title": "FP8 Formats for Deep Learning",
+        "url": "https://arxiv.org/abs/2209.05433",
+        "usage": "Used as a primary paper to cross-check the motivation and field tradeoff of E4M3 and E5M2 and the use of the wider-range E5M2 format for gradients in hybrid FP8 training.",
+        "license": "The arXiv record identifies CC BY 4.0, but no paper figure or prose is reused. The implementation remains an original FP16-versus-BF16 comparison."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that exponent width and fraction width buy different things from one fixed bit budget. For normal values in [1, 2), adjacent representable values differ by 2^(-fraction bits): FP16 spacing is 2^-10 and BF16 spacing is 2^-7, so BF16's gap is exactly eight times wider. Conversely, BF16's eight-bit exponent field gives normal magnitudes approximately 1.17549435e-38 through 3.38953139e38, while FP16's five-bit exponent field gives approximately 6.103515625e-5 through 65504. The visual states normal ranges explicitly because subnormal support and flush-to-zero behavior vary by format and hardware."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed the full 214-page deck, rendered and inspected both relevant slide neighborhoods, and checked official NVIDIA, Google, and OCP documentation plus primary BF16 and FP8 papers before selecting an original semantic bit-budget comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "fp16-bf16-bit-budget"
+    ],
+    "accessibility": "The figure uses two semantic sections and real tables with scoped row and column headers. Format names, field counts, range endpoints, next-after-one values, and failure modes are all written explicitly; selected borders are redundant emphasis, so the lesson does not rely on color. The established two-panel primitive stacks below 640 CSS pixels with no minimum width and ordinary text wrapping, making it readable at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}
