@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "matrices-as-linear-maps",
+  "article": "src/content/posts/2025-09-15-matrices-as-linear-maps.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how a matrix maps basis vectors to its columns and therefore maps any input by taking the same linear combination of those columns.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place the domain basis, the matrix columns in the codomain, and a rank-deficient cancellation in one spatial trace. One exact two-dimensional example makes the column rule, output range, and null-space collapse directly checkable.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can name input, matrix, and output but cannot preserve vector direction, collinearity, or cancellation, which are the lesson.",
+    "svg": "Selected because fixed coordinates can show two independent input directions landing on collinear output columns and show the exact weighted sum that collapses to zero. A 360-unit-wide stacked viewBox avoids horizontal scrolling at 390 CSS pixels.",
+    "semanticHtml": "Rejected because a native matrix or coefficient table could expose the arithmetic but would not show that the domain is two-dimensional while every output lies on one line.",
+    "interaction": "Rejected because dragging vectors would add controls and hidden states without improving the single invariant: once the two basis images are known, linearity determines every other image.",
+    "paperReuse": "Rejected because the lesson is standard textbook geometry and needs no paper-specific result. Although reviewed educational sources permit some reuse, no source figure, example, wording, coordinates, or layout is copied or adapted.",
+    "noVisual": "Rejected because the hardest mental model is spatial: columns live in the output space, their span is the range, and a nonzero input can cancel those column contributions. Equations state these facts but do not make their relationship immediate."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 2,
+        "insight": "The preceding page is only the Linear Algebra section divider and supplies no matrix geometry."
+      },
+      {
+        "page": 3,
+        "insight": "The directly relevant slide describes a matrix as basis vectors defining a space, depicts their span, and says solving Ax = b asks whether b lies in the span of A's columns. It does not show why the columns equal the basis-vector images or how input coordinates weight them."
+      },
+      {
+        "page": 4,
+        "insight": "The following slide distinguishes Hadamard, inner, and matrix products and reviews trace and norms, but it does not connect matrix multiplication to transformed basis vectors."
+      },
+      {
+        "page": 5,
+        "insight": "The next linear-algebra slide treats factorization and lower- or higher-dimensional maps. It motivates geometric action but does not derive the map from matrix columns."
+      },
+      {
+        "page": 21,
+        "insight": "The only later exact search hit for linear mapping states f(x) = Wx while introducing kernels; it assumes rather than explains the matrix-as-map mental model."
+      },
+      {
+        "page": 22,
+        "insight": "The neighboring PCA slide mentions nonlinear feature mappings and linear projection, but adds no explanation of basis images or column-weighted outputs."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for linear map, linear transformation, column space, row space, null space, span of vectors, and basis vectors. Exact hits occur on pages 3, 21, and 22. Pages 2-5 were read as the complete local matrix neighborhood; pages 21-22 were reviewed as later ML uses. Page 3 is the only slide that directly joins matrix geometry, span, and column space. The implementation does not reproduce deck artwork, prose, coordinates, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "MIT 18.022, Section 16.1: Matrices and Linear Transformations",
+        "url": "https://math.mit.edu/~djk/18_022/chapter16/section01.html",
+        "usage": "Used as authoritative university course material to verify that a linear transformation is determined by its action on a basis, that the kth matrix column is the image of the kth basis vector, and that an m-by-n matrix maps n-dimensional inputs to m-dimensional outputs.",
+        "license": "No explicit permissive reuse license was identified on this mathematics department page. No prose, example, proof, figure, or layout is copied or adapted; it is cited only to check standard mathematical claims."
+      },
+      {
+        "title": "Matrix Theory and Linear Algebra",
+        "url": "https://www.mathstat.dal.ca/~selinger/linear-algebra/",
+        "usage": "Used as an authoritative university open textbook to cross-check linear transformations, spans, bases, matrix transformations, and rank-deficient maps.",
+        "license": "The official textbook site licenses the work under CC BY 4.0 and permits sharing and adaptation with attribution. Reuse was still unnecessary: the shipped matrix, vector values, geometry, labels, and arrangement are independently authored."
+      },
+      {
+        "title": "Introduction to Applied Linear Algebra: Vectors, Matrices, and Least Squares",
+        "url": "https://web.stanford.edu/~boyd/vmls/",
+        "usage": "Used as an authoritative Stanford and UCLA textbook source to cross-check the interpretation of matrix-vector multiplication as a linear combination of columns.",
+        "license": "The official site says Cambridge University Press holds the book copyright and permits the book to remain available on the web; that access is not treated as figure-reuse permission. No book figure, prose, example, or layout is copied or adapted."
+      }
+    ],
+    "notes": "The complete article's hardest prose-only mental model is that A does not act as an opaque grid of numbers: its columns are Ae1 and Ae2, so A(x1, x2) is x1Ae1 + x2Ae2. The original example uses A = [[1, 2], [1, 2]]. Thus Ae1 = (1, 1), Ae2 = (2, 2), the range is the line y = x, and x = (2, -1) is nonzero while Ax = 2(1, 1) - (2, 2) = (0, 0). The matrix-vector product, collinearity, rank one, and null-space claim were recalculated directly."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the dedicated matrix neighborhood plus later mapping mentions, then checked two university textbooks and MIT course material before selecting one original rank-one coordinate construction."
+  },
+  "implementation": {
+    "visualIds": [
+      "matrix-columns-define-map"
+    ],
+    "accessibility": "The SVG has a programmatic title and detailed description containing the matrix, basis images, weighted-column equation, range, and null-space result. Numbered panels, direct labels, solid vectors, dashed guides, and explicit coefficients carry the lesson without color. Its 360-unit-wide stacked viewBox scales to the article column without a minimum width or horizontal scrolling, preserving readable labels at 390 CSS pixels. Established visual tokens provide dark-mode contrast and explicit light-page print colors."
+  }
+}
