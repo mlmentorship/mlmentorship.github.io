@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "mixture-of-experts",
+  "article": "src/content/posts/2026-03-27-mixture-of-experts.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one token through top-2 routing and distinguish the two experts that perform compute from all four expert parameter sets that remain resident in memory.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can preserve token-to-expert paths, visibly distinguish selected from skipped experts, and juxtapose active compute with resident parameters. It keeps the routing rule and the memory-versus-FLOPs tradeoff in one static trace without requiring a runtime.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show fan-out and combine, but it cannot compactly align router weights, selected-versus-skipped paths, and the resident-versus-active expert count at phone width.",
+    "svg": "Selected: deterministic paths, direct weights, border styles, and a second accounting panel make both sparse execution and dense parameter residency spatially checkable.",
+    "semanticHtml": "Rejected: cards could compare counts, but connecting one token to its weighted expert paths and recombination would be less direct.",
+    "interaction": "Rejected: changing token routes would add controls and state without improving the invariant lesson that only top-k experts compute while all N parameter sets remain stored.",
+    "paperReuse": "Rejected: Mixtral and Switch Transformer contain architecture figures, but figure-reuse permission was not established and their layouts include more implementation detail than this learning objective needs.",
+    "noVisual": "Rejected: prose states k-of-N correctly, but readers must simultaneously imagine token-dependent routing and reconcile low active compute with high memory use."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 100,
+        "insight": "The preceding recurrent-networks slide establishes the boundary before the transformer cluster and contains no conditional expert routing."
+      },
+      {
+        "page": 101,
+        "insight": "The transformer slide shows the standard dense encoder and decoder architecture, including one feed-forward sublayer through which every token passes."
+      },
+      {
+        "page": 102,
+        "insight": "The adjacent BERT slide discusses dense transformer representation learning and task heads but adds no sparse feed-forward mechanism."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer-neural-nets slide explicitly identifies residual connections around the attention and feed-forward sublayers, providing the closest deck context for the FFN sublayer that MoE replaces."
+      },
+      {
+        "page": 104,
+        "insight": "The following GPT-X slide moves from architecture to instruction tuning and in-context learning, marking the end of the relevant local architecture discussion."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was searched page by page for mixture of experts, MoE, expert routing, top-k routing, conditional computation, sparse models, Switch Transformer, GShard, expert parallelism, all-to-all, and load balancing. No MoE-specific slide exists. Pages 100-104 were rendered and inspected directly because pages 101 and 103 are the nearest authoritative deck context: they show the dense transformer FFN sublayer that an MoE layer replaces. No deck screenshot, wording, coordinates, or embedded artwork was reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+        "url": "https://arxiv.org/abs/1701.06538",
+        "usage": "Used as the foundational primary source for a sparsely gated layer that selects a small subset of experts per example and requires load-balancing mechanisms.",
+        "license": "No paper prose, equations, data, or figures were copied or adapted. Public arXiv access was not treated as permission to reuse source artwork."
+      },
+      {
+        "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+        "url": "https://arxiv.org/abs/2101.03961",
+        "usage": "Used to cross-check token-wise routing, sparse expert activation, expert parallelism, capacity constraints, and the distinction between parameter count and per-token computation.",
+        "license": "No paper text, data, equation layout, or figure was copied or adapted. Figure-reuse rights were not assumed."
+      },
+      {
+        "title": "Mixtral of Experts",
+        "url": "https://arxiv.org/abs/2401.04088",
+        "usage": "Used to verify top-2 routing, softmax weights over selected experts, additive recombination, experts as transformer feed-forward blocks, and the total-versus-active parameter distinction.",
+        "license": "The model weights and accompanying source code are Apache 2.0, but that does not establish permission to reuse the paper's figures. No figure, prose, benchmark data, or layout was copied."
+      }
+    ],
+    "notes": "The shipped schematic is independently authored and uses a generic four-expert teaching model rather than a paper architecture or empirical result. One token receives synthetic normalized top-2 weights 0.65 and 0.35 for E1 and E3; E2 and E4 have zero gate weight after top-k selection. All four expert parameter sets are shown as resident, while only E1 and E3 execute. The weighted symbolic output 0.65 E1(x) + 0.35 E3(x) is mathematically consistent and makes no claim about expert specialization."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages, inspected the nearest dense-transformer slide neighborhood, and checked three primary MoE papers. The hardest prose-only mental model is that sparse compute does not mean sparse storage, so the selected visual traces one top-2 route and then accounts for active versus resident experts."
+  },
+  "implementation": {
+    "visualIds": [
+      "moe-top-two-routing-accounting"
+    ],
+    "accessibility": "Each SVG panel has a linked title and full description. Expert numbers, selected and skipped labels, solid versus dashed paths, gate weights, and explicit 2-of-4 versus 4-of-4 counts carry all meaning without color. The established two-panel primitive stacks below 640 pixels; each 300-unit viewBox scales without a minimum width for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
