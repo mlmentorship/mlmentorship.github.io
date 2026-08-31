@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "slug": "lessons-from-marin-8b",
+  "article": "src/content/posts/2026-01-21-lessons-from-marin-8b.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish evidence-gated reactive pretraining from ad hoc recipe changes by tracing how a recoverable mainline checkpoint, controlled side probes, multiple diagnostics, and an explicit decision feed the next training phase.",
+  "mediumRationale": "A deterministic vertical SVG is the smallest medium that can separate the expensive checkpointed mainline from low-cost experimental branches, then show evidence returning to a decision gate before the next phase. It makes observability and rollback structural prerequisites rather than items in a prose list.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the mechanism is a compact process graph, but this article benefits from precisely separating the persistent mainline, disposable side probes, evidence bundle, and rollback path within a narrow reading column without adding Mermaid runtime cost.",
+    "svg": "Selected because a fixed vertical layout can encode mainline continuity, branch-and-compare experiments, evidence aggregation, and the gated continue/change/rollback outcomes with established visual roles.",
+    "semanticHtml": "Rejected because a checklist or table would name the safeguards but would not show that probes branch from the same checkpoint and must rejoin only through evidence.",
+    "interaction": "Rejected because choosing simulated probe outcomes adds controls and hidden states without improving the core operational distinction between reactive and arbitrary changes.",
+    "paperReuse": "Rejected because the Marin retrospective's timeline and experiment plots are not necessary for this learning objective. Although the Marin repository is Apache-2.0 licensed, the documentation images' complete third-party provenance was not independently established; no source image, data trace, wording, coordinates, or layout is copied.",
+    "noVisual": "Rejected because the prose describes phases, observability, microannealing, and rollback separately, leaving readers to assemble the control loop that makes an unplanned training program scientifically defensible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The preceding data-inspection checklist emphasizes inspecting samples, variation, labels, and model errors before choosing interventions, but does not connect those observations to a long-running checkpointed program."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide is the closest methodological match: it requires a trusted train/eval loop, explicit-hypothesis ablations, fixed controls, visualized losses and predictions, and interpretable metrics."
+      },
+      {
+        "page": 60,
+        "insight": "The adjacent sanity-check slide says to plot training and validation behavior, parameter-update ratios, activations, and gradients, closely matching the multi-signal observability prerequisite."
+      },
+      {
+        "page": 61,
+        "insight": "The next model-selection slide recommends changing one factor at a time, preserving seeds, and distrusting inherited schedule defaults, which supports controlled comparisons rather than untracked recipe drift."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer slide introduces warmup and cooldown phases and notes that language-model loss follows scale, but presents a planned schedule rather than reactive decay-and-rewarm probes."
+      },
+      {
+        "page": 104,
+        "insight": "The neighboring instruction-tuning slide describes alignment tax and capability tradeoffs, relevant to Marin's SFT regression lesson but not the experimental control loop."
+      },
+      {
+        "page": 105,
+        "insight": "The next LLM slide emphasizes data preprocessing, distribution consistency, and later batch changes, but provides no checkpoint, side-probe, or rollback structure."
+      },
+      {
+        "page": 106,
+        "insight": "The LLM-data slide covers joint model/data scaling and mixtures of web and curated sources, motivating data-mix decisions without explaining how to test them during one continuing run."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for pretraining, training data, data mix, perplexity, evaluation, checkpoint, learning-rate schedule, cooldown, fine-tuning, instruction, benchmark, ablation, and experiment terminology. Pages 58-61 were inspected as the complete closest training-method neighborhood; pages 102-106 were inspected around the deck's transformer schedule, instruction-tuning, and LLM-data treatments. Pages 162-165 discuss production experimentation and metrics but add governance breadth rather than the checkpointed reactive loop. No deck image, wording, data, coordinates, or composition is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Marin 8B Retrospective",
+        "url": "https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/",
+        "usage": "Used as the primary source for the unplanned five-phase mainline, 20,000-step permanent checkpoint cadence, decay-and-rewarm transitions, microannealing branches, multiple evaluation signals, failed side runs, and reactive decisions.",
+        "license": "The corresponding Marin repository is Apache License 2.0, but documentation pages may embed linked artifacts with separate provenance. No retrospective timeline, chart, values-as-geometry, prose, or layout is copied; the diagram is an original synthesis of the documented process."
+      },
+      {
+        "title": "Marin source repository",
+        "url": "https://github.com/marin-community/marin",
+        "usage": "Used as the official reproducibility record for experiment specifications, issue-linked decisions, documentation source, and the project's open-development method.",
+        "license": "The repository LICENSE is Apache License 2.0 and permits reuse subject to its terms. The visual nevertheless uses no repository code, documentation text, image, or layout, avoiding ambiguity around embedded third-party materials."
+      },
+      {
+        "title": "Understanding Warmup-Stable-Decay Learning Rates: A River Valley Loss Landscape Perspective",
+        "url": "https://arxiv.org/abs/2410.05192",
+        "usage": "Used as the primary source for WSD-S decay cycles as intermediate model-quality probes and for decay/rewarm flexibility during continued training.",
+        "license": "The arXiv record is publicly readable, but public access alone does not establish adaptation rights. No paper figure, empirical trace, equation, prose, or visual structure is reused."
+      },
+      {
+        "title": "2 OLMo 2 Furious",
+        "url": "https://arxiv.org/abs/2501.00656",
+        "usage": "Used as a primary source to cross-check late-training annealing experiments, controlled checkpoint continuations, high-quality data mixtures, and downstream evaluation during mid-training.",
+        "license": "No permissive figure-reuse permission was established from the record. No OLMo figure, table, data point, wording, or layout is copied."
+      },
+      {
+        "title": "OPT-175B Logbook",
+        "url": "https://github.com/facebookresearch/metaseq/blob/main/projects/OPT/chronicles/OPT175B_Logbook.pdf",
+        "usage": "Used as a primary operational record to cross-check the broader value of detailed failure logs, checkpoint recovery, and explicit incident evidence in large language-model pretraining.",
+        "license": "The metaseq repository is archived and its logbook is publicly viewable, but no separate permissive license for adapting the PDF's content was established. No logbook text, incident, image, or layout is reused."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that arXiv submissions can carry different licenses and that public download does not itself grant figure-adaptation rights.",
+        "license": "The policy is cited only to document the conservative licensing decision; no policy wording or artwork is reproduced."
+      }
+    ],
+    "notes": "The complete article's hardest mental model is the operational boundary between adaptive science and expensive improvisation. The original figure therefore does not reproduce Marin's phase timeline. It shows a generic phase checkpoint branching into a same-checkpoint control and candidate probe; per-domain loss, task evaluations, and parameter norms form the evidence bundle; an explicit gate chooses continue, change one factor, or restore the checkpoint; only then does the mainline advance. Named Marin examples annotate each role without asserting that every historical transition followed one identical protocol."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the closest training-method and LLM-data neighborhoods, then checked the official Marin retrospective and repository, the WSD-S and OLMo 2 papers, the OPT logbook, and licensing guidance before selecting an original checkpoint-probe-decision loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "reactive-pretraining-evidence-loop"
+    ],
+    "accessibility": "The SVG uses a linked title and detailed description, a solid vertical mainline, dashed disposable probe branches, direct labels for all diagnostics and outcomes, numbered stages, and a distinct rollback arrow. Meaning is carried by line style, position, text, and node shape rather than color. A single 360-unit viewBox with no minimum width scales in the established plot-panel primitive at 390 CSS pixels; existing theme variables preserve dark-mode contrast and shared print rules provide a light high-contrast rendering."
+  }
+}
