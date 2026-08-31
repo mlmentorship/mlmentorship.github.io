@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "slug": "learning-to-rank-losses",
+  "article": "src/content/posts/2026-08-28-learning-to-rank-losses.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why LambdaRank gives a larger update to the same pairwise ordering error near the top of a ranked list by scaling the pair signal with the NDCG change caused by the swap.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that keeps two ranked lists, their identical wrong pair, two swap positions, and the resulting NDCG weights spatially aligned. Exact geometry makes the position-dependent contrast immediately inspectable without requiring interaction or a plotting library.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout can show a training flow but cannot reliably align rank positions or make two swap magnitudes visually comparable at phone width.",
+    "svg": "Selected: fixed ranked rows, swap arrows, and numeric NDCG deltas show that the pairwise error is unchanged while its metric consequence changes with position.",
+    "semanticHtml": "Rejected: a table could preserve the numbers but would weaken the spatial correspondence between the same pair at ranks 1-2 and ranks 3-4; the established responsive SVG primitive preserves that relationship.",
+    "interaction": "Rejected: no parameter exploration is required. A fixed, fully worked counterexample teaches the mechanism without controls, state, or JavaScript.",
+    "paperReuse": "Rejected: the primary papers contain algorithm diagrams and experiments but no figure matching this article-specific two-swap construction. Their artwork permissions are not assumed from public availability.",
+    "noVisual": "Rejected: prose states that metric-changing swaps get larger updates, but readers must still mentally hold score gaps, rank positions, gain, discount, and the pair-to-list bridge at once."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 116,
+        "insight": "The Re-scoring divider introduces an adjacent ranking topic but contains no loss or metric content."
+      },
+      {
+        "page": 117,
+        "insight": "The re-scoring slide assigns one language-model score to each alternative and sorts candidates; it demonstrates pointwise scoring but not query-group losses or metric-weighted pairs."
+      },
+      {
+        "page": 118,
+        "insight": "The neighboring knowledge-graph slide ends the re-scoring section and is unrelated to learning-to-rank objectives."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider introduces the closest recommendation neighborhood but contains no substantive objective."
+      },
+      {
+        "page": 130,
+        "insight": "The recommender slide sorts user-item similarity scores and works through NDCG, including position discount and ideal normalization, but does not connect NDCG changes to training gradients."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid recommender slide discusses score blending and gradient boosting, not pointwise, pairwise, listwise, or lambda-weighted ranking losses."
+      },
+      {
+        "page": 139,
+        "insight": "The content-based recommender slide describes feature representations and similarity scoring before the second-stage ranker."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage ranker slide concatenates query, user, and item representations and trains a network to output one score per candidate, but leaves the training loss unspecified."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline recall and mean reciprocal rank from online engagement and viewing outcomes; it does not show how a surrogate training signal relates to those discrete metrics."
+      },
+      {
+        "page": 142,
+        "insight": "The following LLM recommendation prompt asks for ranked, scored suggestions but supplies no supervised ranking objective."
+      },
+      {
+        "page": 160,
+        "insight": "The ML Design divider introduces the system-design neighborhood without objective details."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview names NDCG as a ranking metric and asks candidates to connect goals, objective functions, algorithms, and metrics, but does not explain their surrogate relationship."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for baselines, training experiments, offline evaluation, business impact, and online success criteria; it does not compare ranking losses."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for learning to rank, RankNet, LambdaRank, LambdaMART, ListNet, pointwise, pairwise, listwise, ranking model, ranker, relevance, NDCG, and MRR. Pages 116-118, 129-131, 139-142, and 160-162 were then read in full as every relevant neighborhood. Page 130 supplies NDCG mechanics, pages 117 and 140 supply per-candidate scoring, and pages 141 and 161 name ranking metrics, but no slide compares training surrogates or shows metric-change weighting. No deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Learning to Rank using Gradient Descent",
+        "url": "https://www.microsoft.com/en-us/research/publication/learning-to-rank-using-gradient-descent/",
+        "usage": "Used as the primary RankNet source to verify pairwise probabilistic training on score differences and the resulting pairwise gradient signal.",
+        "license": "The ICML 2005 paper and Microsoft technical-report record do not provide a permissive figure-reuse license. No paper text, experiment, figure, data, or layout is reproduced."
+      },
+      {
+        "title": "Learning to Rank with Nonsmooth Cost Functions",
+        "url": "https://proceedings.neurips.cc/paper/2006/hash/af44c4c56f385c43f2529f9b1b018f6a-Abstract.html",
+        "usage": "Used as the primary LambdaRank source to verify that rank metrics depend on scores through sorting, making ordinary derivatives zero or undefined, and that lambda gradients provide an implicit-cost approach.",
+        "license": "NeurIPS states that authors retain copyright and grant NeurIPS a non-exclusive distribution license; this is not blanket permission to adapt figures. No source wording, result, figure, or layout is reused."
+      },
+      {
+        "title": "From RankNet to LambdaRank to LambdaMART: An Overview",
+        "url": "https://www.microsoft.com/en-us/research/publication/from-ranknet-to-lambdarank-to-lambdamart-an-overview/",
+        "usage": "Used as the authoritative technical synthesis to verify scaling the RankNet pair lambda by the absolute change in the target ranking metric produced by swapping the two documents, and that LambdaMART applies lambda-weighted training with boosted trees.",
+        "license": "Microsoft Research provides the technical report for reading but does not state a permissive artwork license on the publication page. No report equation, diagram, wording, or visual structure is copied."
+      },
+      {
+        "title": "LightGBM Parameters",
+        "url": "https://lightgbm.readthedocs.io/en/stable/Parameters.html",
+        "usage": "Used as official implementation documentation to verify that the lambdarank objective uses integer graded labels, configurable label gains, query groups, and a ranking cutoff.",
+        "license": "LightGBM and its repository documentation are distributed under the MIT License. The visual does not copy documentation text, code, or layout and uses the source only to check implementation-facing terminology."
+      }
+    ],
+    "notes": "The original worked visual uses four items with relevance grades 3, 2, 1, and 0, exponential gains 7, 3, 1, and 0, and discount 1/log2(rank+1). IDCG is 9.3928. In two hypothetical current rankings, the same wrong pair places grade 2 above grade 3 with the same 0.2 score gap. Correcting that pair at ranks 1 and 2 changes NDCG by |(7-3)(1/log2(2)-1/log2(3))/9.3928| = 0.1572; correcting it at ranks 3 and 4 changes NDCG by |(7-3)(1/log2(4)-1/log2(5))/9.3928| = 0.0295. Thus the top correction receives about 5.3 times the metric weight. These are derived illustrative values, not copied empirical results. The visual says LambdaRank reweights a pairwise signal rather than differentiating NDCG directly."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected every relevant ranking neighborhood, checked the primary RankNet and LambdaRank papers, the Microsoft algorithm overview, and official LightGBM documentation, then independently derived the two-swap NDCG example."
+  },
+  "implementation": {
+    "visualIds": [
+      "lambdarank-swap-impact-weight"
+    ],
+    "accessibility": "The responsive SVG has a title and detailed description containing both rankings, the identical pair error, both NDCG deltas, and the 5.3-times conclusion. Rank numbers, relevance grades, score gaps, swap labels, numeric weights, row position, and distinct solid versus dashed guides carry the lesson without color. The 360-pixel viewBox has no minimum width and uses established theme-aware SVG classes for dark mode and print."
+  }
+}
