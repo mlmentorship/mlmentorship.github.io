@@ -44,11 +44,11 @@ At each step:
 				<text class="viz-node-label" x="58" y="174" text-anchor="middle">LIVE B</text>
 				<text class="viz-label" x="58" y="190" text-anchor="middle">-0.35</text>
 				<rect class="viz-node" x="176" y="39" width="108" height="26" rx="4"></rect>
-				<rect x="176" y="73" width="108" height="26" rx="4" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
+				<rect x="176" y="73" width="108" height="26" rx="4" style="fill:var(--c-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
 				<rect class="viz-node" x="176" y="107" width="108" height="26" rx="4"></rect>
 				<rect class="viz-node" x="176" y="141" width="108" height="26" rx="4"></rect>
 				<rect class="viz-node" x="176" y="175" width="108" height="26" rx="4"></rect>
-				<rect x="176" y="209" width="108" height="26" rx="4" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
+				<rect x="176" y="209" width="108" height="26" rx="4" style="fill:var(--c-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
 				<g class="viz-node-label" text-anchor="middle"><text x="230" y="56">A x · -0.30</text><text x="230" y="90">A &lt;EOS&gt; · -0.45</text><text x="230" y="124">A z · -0.90</text><text x="230" y="158">B y · -0.40</text><text x="230" y="192">B x · -0.75</text><text x="230" y="226">B &lt;EOS&gt; · -1.15</text></g>
 			</svg>
 		</section>
@@ -58,11 +58,11 @@ At each step:
 				<desc id="beam-prune-desc">A dashed finished pool contains A EOS at negative 0.45 and B EOS at negative 1.15; these records have no outgoing arrows and are not part of top-k pruning. The live pool ranks four non-EOS candidates. With beam size two it keeps A x at negative 0.30 and B y at negative 0.40, and prunes B x at negative 0.75 and A z at negative 0.90. Final ranking uses completed hypotheses, falling back to live hypotheses only if none completed.</desc>
 				<rect class="viz-plot-bg" x="8" y="25" width="284" height="217" rx="5"></rect>
 				<text class="viz-axis-label" x="12" y="16">2 · ROUTE EOS, THEN PRUNE LIVE ONLY</text>
-				<rect x="16" y="47" width="128" height="83" rx="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 3"></rect>
+				<rect x="16" y="47" width="128" height="83" rx="5" style="fill:var(--c-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 3"></rect>
 				<text class="viz-axis-label" x="24" y="63">FINISHED · STOP</text>
 				<text class="viz-node-label" x="80" y="88" text-anchor="middle">A &lt;EOS&gt; · -0.45</text>
 				<text class="viz-node-label" x="80" y="111" text-anchor="middle">B &lt;EOS&gt; · -1.15</text>
-				<rect x="154" y="47" width="130" height="149" rx="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5"></rect>
+				<rect x="154" y="47" width="130" height="149" rx="5" style="fill:var(--c-surface);stroke:var(--viz-edge);stroke-width:1.5"></rect>
 				<text class="viz-axis-label" x="162" y="63">LIVE · TOP 2 OF 4</text>
 				<rect class="viz-node viz-node--focus" x="163" y="72" width="112" height="25" rx="4"></rect>
 				<rect class="viz-node viz-node--focus" x="163" y="103" width="112" height="25" rx="4"></rect>

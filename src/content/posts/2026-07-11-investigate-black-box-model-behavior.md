@@ -57,7 +57,7 @@ Now choose probes where predictions diverge. Move the same phrase between contex
 			<table class="cm-grid" aria-label="Four one-factor probes and the hypothesis uniquely supported if behavior switches">
 				<thead><tr><th scope="col">one change</th><th scope="col">switch supports</th><th scope="col">rivals predict</th></tr></thead>
 				<tbody>
-					<tr><th scope="row">tool to context</th><td class="cm-selected"><strong>H1</strong>stop</td><td>follow</td></tr>
+					<tr><th scope="row">tool to context, still last</th><td class="cm-selected"><strong>H1</strong>stop</td><td>follow</td></tr>
 					<tr><th scope="row">paraphrase trigger</th><td class="cm-selected"><strong>H2</strong>stop</td><td>follow</td></tr>
 					<tr><th scope="row">low to high risk</th><td class="cm-selected"><strong>H3</strong>stop</td><td>follow</td></tr>
 					<tr><th scope="row">conflict first, user last</th><td class="cm-selected"><strong>H4</strong>stop</td><td>follow</td></tr>

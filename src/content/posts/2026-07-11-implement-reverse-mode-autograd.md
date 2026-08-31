@@ -33,6 +33,30 @@ out._backward = _backward
 
 Use `+=`, not assignment. A node can influence the output through multiple paths. For $y = x^2 + 2x$, both paths contribute to $\partial y / \partial x$.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Accumulate every branch contribution before a shared node propagates once.</p>
+
+<!-- visual:autograd-shared-node-accumulate-then-propagate -->
+```mermaid
+flowchart TB
+  accTitle: A shared intermediate accumulates both gradient contributions before propagating
+  accDescr: For x equal to 2, u equals 3x or 6, and loss equals u squared plus 2u or 48. Solid arrows show the forward graph from x through shared node u into two branches and then loss. Reading backward, loss seeds both branches with 1. The square branch returns 12 to u and the times-two branch returns 2. Node u accumulates 14 before propagating once through its local derivative 3, giving x a gradient of 42.
+  X["x = 2"] -->|"× 3"| U["u = 3x = 6<br/><strong>shared node</strong>"]
+  U -->|"square"| A["a = u² = 36<br/>backward contributes 12"]
+  U -->|"× 2"| B["b = 2u = 12<br/>backward contributes 2"]
+  A -->|"add"| L["L = a + b = 48<br/>seed gradient = 1"]
+  B -->|"add"| L
+  A -. "12" .-> J["at u: 12 + 2 = 14<br/><strong>accumulate first</strong>"]
+  B -. "2" .-> J
+  J -. "14 × 3 = 42" .-> G["at x: gradient = 42<br/><strong>propagate once</strong>"]
+  class X viz-input
+  class U,J viz-state
+  class A,B viz-focus
+  class L,G viz-output
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid arrows forward to see one value, u, feed two branches. Then follow the dashed contributions backward: 12 and 2 must both arrive and add at u before u’s local backward rule runs once. Propagating 12 upstream immediately would produce 36 at x and miss the later branch; reverse topological order waits, then sends (12 + 2) × 3 = 42. Original example checked against the <a href="https://jmlr.org/papers/v18/17-468.html">automatic differentiation survey</a> and <a href="https://docs.pytorch.org/docs/stable/notes/autograd.html">PyTorch autograd mechanics</a>.</p>
+
 For $z = xy$:
 
 ```python

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "slug": "k-means-clustering",
+  "article": "src/content/posts/2025-10-26-k-means-clustering.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one Lloyd iteration by assigning each point to its nearest fixed centroid, then replacing each centroid with the arithmetic mean of its fixed assigned points.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold one dataset fixed while changing the operation from nearest-center partitioning to mean recomputation, with point shapes and exact coordinates making both steps independently checkable.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout cannot preserve Euclidean distances, nearest-center geometry, or centroid movement in a shared coordinate system.",
+    "svg": "Selected because fixed coordinates can show the same six observations, two initial centers, one representative distance comparison, and exact old-to-mean centroid moves across aligned panels.",
+    "semanticHtml": "Rejected because a table can verify the coordinate arithmetic but cannot show how nearest-center assignment creates spatial regions or where each mean moves.",
+    "interaction": "Rejected because dragging initial centers could teach sensitivity but adds hidden states and controls before the reader understands the two deterministic substeps of one iteration.",
+    "paperReuse": "Rejected because the deck and reviewed sources contain related clustering explanations, but no permissive figure-reuse grant was established for a candidate that teaches this exact two-step objective. The plotted points, coordinates, labels, and composition are original.",
+    "noVisual": "Rejected because the prose states two formulas sequentially while requiring the reader to imagine that each substep holds a different quantity fixed. The aligned panels make that alternation and its geometric consequence visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 21,
+        "insight": "The preceding linear-classifier and kernel slide contains no unsupervised partitioning and marks the boundary before dimensionality reduction and clustering."
+      },
+      {
+        "page": 22,
+        "insight": "The PCA slide discusses low-dimensional embeddings followed by clustering, providing preprocessing context but no k-means iteration."
+      },
+      {
+        "page": 23,
+        "insight": "The dedicated clustering slide gives the exact nearest-centroid assignment and move-to-mean update, plus vectorized code. It is the direct topical source, but it does not spatially hold the points fixed across the two substeps or expose checkable mean coordinates."
+      },
+      {
+        "page": 24,
+        "insight": "The following K-nearest-neighbor classifier slide uses Euclidean distance and mentions k-means for indexing, but moves from unsupervised clustering to supervised neighbor prediction."
+      },
+      {
+        "page": 25,
+        "insight": "The next page is a section break with no additional clustering mechanism, confirming the end of the local neighborhood."
+      },
+      {
+        "page": 65,
+        "insight": "The later expectation-maximization slide uses k-means as a hard-assignment analogy, but focuses on latent-variable likelihood and does not add Lloyd-step geometry."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed page by page for k-means, kmeans, clustering, centroid, assignment, Lloyd, within-cluster variance, and unsupervised terminology. Pages 21-25 were read as the complete contiguous clustering neighborhood; page 23 is the only dedicated k-means treatment. Page 65 was also inspected because it compares EM with hard k-means assignments. No deck screenshot, code, wording, coordinates, artwork, or layout is reused.",
+    "license": "The local deck states no general reuse license and includes externally derived material. It is treated as review-only; the shipped figure is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Least Squares Quantization in PCM",
+        "url": "https://doi.org/10.1109/TIT.1982.1056489",
+        "usage": "Used as the primary source for the alternating nearest-representative partition and centroid conditions underlying Lloyd's algorithm.",
+        "license": "The IEEE publication is copyrighted and no permissive figure-reuse license was identified. No paper figure, prose, data, notation layout, or geometry is copied."
+      },
+      {
+        "title": "k-means++: The Advantages of Careful Seeding",
+        "url": "https://theory.stanford.edu/~sergei/papers/kMeansPP-soda.pdf",
+        "usage": "Used as the primary initialization source to verify D-squared seeding and its expected logarithmic approximation guarantee discussed later in the article.",
+        "license": "The proceedings paper is used for technical verification only. No permissive figure license is assumed, and no figure, example data, prose, or layout is reproduced."
+      },
+      {
+        "title": "scikit-learn User Guide: K-means",
+        "url": "https://scikit-learn.org/stable/modules/clustering.html#k-means",
+        "usage": "Used as official implementation documentation to verify the within-cluster sum-of-squares objective, nearest-centroid assignment, mean update, convergence to a local minimum, Voronoi interpretation, and sensitivity to initialization.",
+        "license": "The scikit-learn project is BSD-3-Clause licensed, but the documentation is used only to cross-check semantics. No documentation figure, code, prose, sample coordinates, or visual layout is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is what alternates and what remains fixed. In the original worked example, circular points (50,80), (70,110), and (90,80) are nearer the initial center (110,130) than (210,120); square points (230,70), (250,100), and (270,70) are nearer the second center. Holding those assignments fixed, their means are exactly (70,90) and (250,80). Each update minimizes squared distance for its assigned set; reassignment then minimizes distance for fixed centers. The example demonstrates one iteration, not global optimality or guaranteed recovery of latent classes."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact clustering plus EM neighborhoods, then checked the primary Lloyd and k-means++ papers and official scikit-learn documentation before selecting an original two-step geometry."
+  },
+  "implementation": {
+    "visualIds": [
+      "kmeans-assign-then-update"
+    ],
+    "accessibility": "Each panel has a linked title and complete description. Cluster membership uses circles versus squares, centroids use large x marks, old-to-new movement uses labelled arrows, and every coordinate and mean calculation is written, so color is redundant. The two 340-unit SVGs stack at every viewport width to keep their smallest text above the rendering threshold on desktop as well as at 390 CSS pixels. Existing theme tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette."
+  }
+}

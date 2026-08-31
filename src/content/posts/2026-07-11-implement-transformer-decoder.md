@@ -39,12 +39,8 @@ $$
 		<title id="pre-norm-decoder-svg-title">Residual stream through a pre-norm Transformer decoder block</title>
 		<desc id="pre-norm-decoder-svg-desc">A vertical solid identity rail carries input h with shape batch by time by model dimension through two additions. At stage one, a dashed branch copies h through LayerNorm and causal self-attention, then rejoins the rail at a plus node to produce h prime. At stage two, another dashed branch copies h prime through LayerNorm and the position-wise MLP, then rejoins at a second plus node to produce output y. LayerNorm appears only on the branches, so the raw residual states bypass both normalization and sublayers.</desc>
 		<defs>
-			<marker id="decoder-solid-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-				<path d="M0 0L10 5L0 10Z" fill="var(--c-text-soft)"></path>
-			</marker>
-			<marker id="decoder-branch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-				<path d="M0 0L10 5L0 10Z" fill="var(--viz-input-stroke)"></path>
-			</marker>
+			<marker id="decoder-solid-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="var(--c-text-soft)"></path></marker>
+			<marker id="decoder-branch-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="var(--viz-input-stroke)"></path></marker>
 		</defs>
 		<text class="viz-axis-label" x="18" y="20">RESIDUAL STREAM · [B, T, C] THROUGHOUT</text>
 		<rect class="viz-plot-bg" x="16" y="32" width="328" height="348" rx="4"></rect>
@@ -58,14 +54,14 @@ $$
 		<text class="viz-node-label" x="55" y="294" text-anchor="middle">+</text>
 		<path d="M55 302V345" style="fill:none;stroke:var(--c-text-soft);stroke-width:3" marker-end="url(#decoder-solid-arrow)"></path>
 		<text class="viz-node-label" x="55" y="367" text-anchor="middle">y</text>
-		<text class="viz-node-value" x="55" y="375" text-anchor="middle">[B,T,C]</text>
+		<text class="viz-node-value" x="55" y="383" text-anchor="middle">[B,T,C]</text>
 		<path d="M55 88H110" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:6 4" marker-end="url(#decoder-branch-arrow)"></path>
 		<rect class="viz-node viz-node--input" x="116" y="68" width="82" height="40" rx="4"></rect>
 		<text class="viz-node-label" x="157" y="85" text-anchor="middle">LayerNorm 1</text>
 		<text class="viz-node-value" x="157" y="100" text-anchor="middle">LN(h)</text>
 		<path d="M198 88H214" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:6 4" marker-end="url(#decoder-branch-arrow)"></path>
 		<rect class="viz-node viz-node--focus" x="220" y="58" width="108" height="60" rx="4"></rect>
-		<text class="viz-node-label" x="274" y="79" text-anchor="middle">Causal self-attention</text>
+		<text class="viz-node-label" x="274" y="79" text-anchor="middle">Causal self-attn</text>
 		<text class="viz-node-value" x="274" y="96" text-anchor="middle">normalized Q, K, V</text>
 		<text class="viz-node-value" x="274" y="111" text-anchor="middle">future keys blocked</text>
 		<path d="M274 118V158H78V174H70" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:6 4" marker-end="url(#decoder-branch-arrow)"></path>
@@ -79,7 +75,7 @@ $$
 		<text class="viz-node-value" x="157" y="230" text-anchor="middle">LN(h′)</text>
 		<path d="M198 218H214" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:6 4" marker-end="url(#decoder-branch-arrow)"></path>
 		<rect class="viz-node viz-node--focus" x="220" y="198" width="108" height="40" rx="4"></rect>
-		<text class="viz-node-label" x="274" y="215" text-anchor="middle">Position-wise MLP</text>
+		<text class="viz-node-label" x="274" y="215" text-anchor="middle">MLP</text>
 		<text class="viz-node-value" x="274" y="230" text-anchor="middle">feature update</text>
 		<path d="M274 238V273H78V289H70" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:6 4" marker-end="url(#decoder-branch-arrow)"></path>
 		<text class="viz-axis-label" x="82" y="268">UPDATE 2</text>

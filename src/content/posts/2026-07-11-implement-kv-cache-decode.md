@@ -27,6 +27,39 @@ For a basic equal-head implementation:
 
 No causal mask is needed when the query is the newest token and the cache contains only its prefix plus itself. There is no future position to block.
 
+<!-- visual:kv-cache-newest-row-equivalence -->
+<figure class="learning-figure" aria-labelledby="kv-equivalence-title" aria-describedby="kv-equivalence-description">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="kv-equivalence-title">Why does cached decoding produce the same newest-token output?</p>
+	<p id="kv-equivalence-description">At prefix length four, compare the projection work in a full causal pass with a cached step. Both compute the fourth output from the same newest query, four keys, and four values.</p>
+	<div class="visual-grid--two" role="group" aria-label="Full-prefix and cached attention at prefix length four">
+		<section class="visual-panel" aria-labelledby="kv-full-title">
+			<h4 id="kv-full-title">Full-prefix pass: recompute history</h4>
+			<table class="cm-grid" aria-label="Projection work and newest-row attention in a full-prefix pass">
+				<tbody>
+					<tr><th scope="row">Project now</th><td>Q<sub>1</sub>–Q<sub>4</sub>, K<sub>1</sub>–K<sub>4</sub>, and V<sub>1</sub>–V<sub>4</sub></td></tr>
+					<tr><th scope="row">Use for newest row</th><td>q<sub>4</sub></td></tr>
+					<tr><th scope="row">Attend to</th><td>K = [k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub>, k<sub>4</sub>]<br>V = [v<sub>1</sub>, v<sub>2</sub>, v<sub>3</sub>, v<sub>4</sub>]</td></tr>
+					<tr><th scope="row">Keep</th><td>Newest row o<sub>4</sub></td></tr>
+				</tbody>
+			</table>
+		</section>
+		<section class="visual-panel" aria-labelledby="kv-cached-title">
+			<h4 id="kv-cached-title">Cached step: reuse history</h4>
+			<table class="cm-grid" aria-label="Projection work and one-token attention in a cached decoding step">
+				<tbody>
+					<tr><th scope="row">Reuse cached</th><td>K<sub>1</sub>–K<sub>3</sub> and V<sub>1</sub>–V<sub>3</sub></td></tr>
+					<tr><th scope="row">Project now</th><td>q<sub>4</sub>, k<sub>4</sub>, and v<sub>4</sub></td></tr>
+					<tr><th scope="row">Attend to</th><td>K = [k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub>, k<sub>4</sub>]<br>V = [v<sub>1</sub>, v<sub>2</sub>, v<sub>3</sub>, v<sub>4</sub>]</td></tr>
+					<tr><th scope="row">Return</th><td>One position o<sub>4</sub></td></tr>
+				</tbody>
+			</table>
+		</section>
+	</div>
+	<p class="cm-equation">Both paths: softmax(q<sub>4</sub>K<sup>T</sup> / √d<sub>h</sub>)V = o<sub>4</sub></p>
+	<figcaption><strong>Read it this way:</strong> compare the “Attend to” rows first: they contain the same ordered keys and values, so the newest query performs the same computation and produces the same o<sub>4</sub> up to floating-point tolerance. Then compare the projection rows: caching saves work by reusing k<sub>1</sub>–k<sub>3</sub> and v<sub>1</sub>–v<sub>3</sub>; it does not approximate or shorten attention. Original comparison checked against the <a href="https://arxiv.org/abs/1706.03762">Transformer attention definition</a> and <a href="https://huggingface.co/docs/transformers/main/en/cache_explanation">Hugging Face cache documentation</a>.</figcaption>
+</figure>
+
 ## Reference sketch
 
 ```python

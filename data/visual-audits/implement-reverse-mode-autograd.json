@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-reverse-mode-autograd",
+  "article": "src/content/posts/2026-07-11-implement-reverse-mode-autograd.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Explain why a shared intermediate must receive and sum every downstream gradient contribution before its local backward function propagates upstream once.",
+  "mediumRationale": "A compact directed graph is the smallest medium that exposes the shared intermediate, its two downstream paths, their separate reverse contributions, and the dependency order that makes accumulation correct.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is graph topology and dependency order. A small diamond-shaped DAG makes the two paths into one shared node explicit, preserves labels during responsive reflow, and uses the established accessible flowchart primitive.",
+    "svg": "Rejected because exact coordinates are unnecessary for a five-node dependency graph, and a custom SVG would duplicate Mermaid's accessible graph rendering without adding quantitative geometry.",
+    "semanticHtml": "Rejected because a table can list derivative terms but cannot show as directly that one intermediate fans out during forward execution and must join two reverse contributions before propagating.",
+    "interaction": "Rejected because stepping through scheduling states would hide part of a graph that is small enough to understand at once and would add runtime controls with no additional learning value.",
+    "paperReuse": "Rejected because no candidate figure has a permissive reuse grant established for this site or isolates this exact unsafe-recursion case. The implementation is an original graph with independently chosen expression, labels, and layout.",
+    "noVisual": "Rejected because prose says to use reverse topological order but leaves the failure mechanism abstract. The graph makes visible why early recursion can propagate an incomplete gradient from a shared intermediate."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 42,
+        "insight": "The preceding section boundary contains only the heading Learning and establishes the start of the optimization neighborhood."
+      },
+      {
+        "page": 43,
+        "insight": "The title slide introduces gradient descent and backpropagation but contains no computation graph or execution-order detail."
+      },
+      {
+        "page": 44,
+        "insight": "The backpropagation slide explicitly says that local gradients compose by the chain rule, forward values are cached, and gradients add where a variable branches. It is the direct conceptual source for the shared-node lesson, though it does not explain reverse-topological scheduling."
+      },
+      {
+        "page": 45,
+        "insight": "The adjacent slide moves to loss optimization, random search, and numerical gradients, marking the end of the direct backpropagation neighborhood."
+      },
+      {
+        "page": 51,
+        "insight": "The later gradient-estimator section distinguishes exact backpropagation from estimators for stochastic or non-differentiable objectives but adds no graph-order implementation detail."
+      },
+      {
+        "page": 52,
+        "insight": "The next estimator slide factorizes a layer gradient into upstream and local factors, reinforcing local backward functions but not accumulation at a shared node."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed page by page for automatic differentiation, autodiff, backpropagation, computational graph, chain rule, gradient, branching, and accumulation terminology. Pages 42-45 were read as the complete contiguous backpropagation neighborhood, and pages 51-53 as the later gradient-estimator neighborhood. Page 44 is the only slide that directly covers branching gradient addition; none covers reverse topological ordering or the failure of immediate recursive propagation.",
+    "license": "The local deck provides no general reuse license and contains externally sourced material. It is treated as review-only; no screenshot, wording, artwork, graph geometry, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Automatic Differentiation in Machine Learning: a Survey",
+        "url": "https://jmlr.org/papers/v18/17-468.html",
+        "usage": "Used as the primary technical source to verify reverse accumulation on an evaluation trace, local partial derivatives, and the distinction between automatic and symbolic or numerical differentiation.",
+        "license": "The JMLR article is used for technical verification and citation only. No figure, prose, notation sequence, or layout is copied."
+      },
+      {
+        "title": "Deep Learning, Chapter 6: Deep Feedforward Networks",
+        "url": "https://www.deeplearningbook.org/contents/mlp.html",
+        "usage": "Used as an authoritative textbook source to verify backpropagation as an efficient chain-rule computation over a graph with reused intermediate quantities.",
+        "license": "The online book is free to read, but no permissive figure-reuse license is assumed. No textbook figure, prose, or layout is adapted."
+      },
+      {
+        "title": "PyTorch: Autograd mechanics",
+        "url": "https://docs.pytorch.org/docs/stable/notes/autograd.html",
+        "usage": "Used as official framework documentation to verify that operations recorded during forward execution form a DAG that is evaluated backward and that operations save intermediates needed by local gradient rules.",
+        "license": "Documentation is cited for public framework semantics only. No PyTorch prose, code, branding, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the chain rule itself but when a shared node may safely propagate. For u = 3x and L = u squared + 2u at x = 2, the two branches contribute 2u = 12 and 2 to dL/du. Reverse topological execution accumulates 14 at u before u propagates once through du/dx = 3, giving dL/dx = 42. A naive recursive traversal that reaches u through the square branch and immediately propagates can send 12 times 3 upstream before the second contribution arrives; adding 2 to u later cannot repair x unless u is incorrectly run again."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected the exact backpropagation and gradient-estimator neighborhoods, and checked a primary autodiff survey, an authoritative textbook, and official PyTorch documentation before selecting an original shared-node DAG."
+  },
+  "implementation": {
+    "visualIds": [
+      "autograd-shared-node-accumulate-then-propagate"
+    ],
+    "accessibility": "The Mermaid source provides an accessible title and a complete description with every forward value and reverse contribution. Node labels, edge direction, arithmetic, and the explicit words 'accumulate' and 'propagate once' carry the full lesson without color. The compact top-to-bottom graph uses no fixed pixel dimensions and the established Mermaid wrapper adapts at 390 CSS pixels. Existing visual roles provide dark-mode contrast, while shared print rules use a light high-contrast palette."
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-kv-cache-decode",
+  "article": "src/content/posts/2026-07-11-implement-kv-cache-decode.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Match the newest row of full-prefix causal attention to one-token cached attention and identify exactly which key and value projections are reused.",
+  "mediumRationale": "Two aligned semantic panels are the smallest medium that can compare the same newest-token computation at one prefix while distinguishing recomputed projections from cached state.",
+  "mediumComparison": {
+    "mermaid": "Rejected because this is an alignment and reuse comparison, not a branching process; graph edges would obscure which token positions are identical across the two computations.",
+    "svg": "Rejected because fixed coordinates add no explanatory geometry and make token labels less adaptable at 390 CSS pixels than native text and grid layout.",
+    "semanticHtml": "Selected because two labeled panels can express the same q4-to-K/V-prefix computation, projection work, and matching output in accessible reading order, then stack naturally on narrow screens.",
+    "interaction": "Rejected because stepping through more prefixes would hide states and add controls without improving the single invariant the equivalence test must establish.",
+    "paperReuse": "Rejected because no source figure has a permissive reuse grant established for this site. The implementation is an original semantic construction and copies no source artwork, wording, coordinates, or layout.",
+    "noVisual": "Rejected because prose requires the reader to simultaneously imagine the full causal matrix, isolate its newest row, and compare that row with a growing cache. A side-by-side spatial alignment makes the equality and saved work directly inspectable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 101,
+        "insight": "The transformer overview explains decoder self-attention and causal access to earlier positions, but does not show incremental decoding or cached projections."
+      },
+      {
+        "page": 103,
+        "insight": "The neighboring transformer-mechanism slide covers scaled dot-product attention and multiple heads, establishing the underlying operation without a KV-cache execution model."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization setup gives the standard full-sequence attention formula and quadratic matrix cost, but does not isolate the newest causal row."
+      },
+      {
+        "page": 113,
+        "insight": "The decoding-neighborhood slide explains autoregressive serial dependence and one large-model forward pass per step, but focuses on speculative decoding rather than projection reuse."
+      },
+      {
+        "page": 114,
+        "insight": "The adjacent mixed-precision slide confirms that softmax commonly runs in FP32, supporting the article's numerical-stability note but not its cache geometry."
+      },
+      {
+        "page": 115,
+        "insight": "The serving-stack summary names a paged KV cache and distinguishes prefill from serving optimizations, but provides no token-level append or equivalence visual."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed page by page for cache, KV cache, key/value cache, decode, decoding, autoregressive, attention, and transformer terminology. Pages 98-105 were inspected as the complete local language-model and transformer neighborhood; pages 107-115 were inspected as the complete attention-optimization and decoding neighborhood. No slide explains basic KV-cache append or proves newest-token equivalence. Pages 101, 103, 108, and 113-115 are the closest relevant pages; their neighboring slides move respectively to recurrent models/BERT, training throughput/sequence packing, and mixed precision/serving summary.",
+    "license": "The local deck states no general reuse license and includes externally sourced material. It is treated as review-only; no screenshot, wording, artwork, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary source for scaled dot-product attention and decoder causal masking, which establish that the newest position attends only to its prefix.",
+        "license": "The arXiv record is used for technical verification only. No paper figure, prose, or layout is copied, and no figure-reuse permission is assumed."
+      },
+      {
+        "title": "Efficiently Scaling Transformer Inference",
+        "url": "https://arxiv.org/abs/2211.05102",
+        "usage": "Used as the primary systems source to verify that autoregressive serving retains per-request key and value tensors and that cache memory grows with sequence length.",
+        "license": "The arXiv record is used for factual reference only. No paper figure, result plot, prose, or layout is reproduced."
+      },
+      {
+        "title": "Hugging Face Transformers: How caching works",
+        "url": "https://huggingface.co/docs/transformers/main/en/cache_explanation",
+        "usage": "Used as official implementation documentation to verify per-layer K/V append along the sequence axis, one-token query attention over past plus current K/V, and reuse of prior projections.",
+        "license": "Documentation is cited for public API and tensor-shape semantics only. No documentation artwork, code, or prose is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why cached attention remains exact rather than approximate. At prefix length four, a full causal pass computes a fourth output from q4 against k1 through k4 and v1 through v4. Cached decoding performs that same newest-row operation; it changes only where k1 through k3 and v1 through v3 come from. They are retained from earlier steps rather than projected again. This does not make total attention linear: the newest query still attends over a prefix whose length grows each step."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected both relevant slide neighborhoods, and checked a primary transformer paper, a primary inference-systems paper, and official cache documentation before choosing an original semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "kv-cache-newest-row-equivalence"
+    ],
+    "accessibility": "The figure uses semantic sections, headings, ordered token lists, and explicit text equations. Recompute versus reuse is communicated by the words 'project now' and 'reuse cached,' not color. The established two-panel primitive stacks below 640 CSS pixels and has no fixed or minimum width, so content wraps at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}

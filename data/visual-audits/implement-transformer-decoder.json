@@ -45,7 +45,8 @@
         "insight": "The modern LLM-training slide lists OLMo changes such as non-parametric LayerNorm, SwiGLU, and RoPE, but does not draw the residual path or normalization order."
       }
     ],
-    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for transformer, decoder, causal or masked attention, multi-head attention, LayerNorm, and residual connections. Pages 100-104 were read as the main architecture neighborhood; page 50 and page 107 were read for transformer LayerNorm and modern decoder context. The source diagrams are dense, externally derived architecture composites and do not isolate the requested two-sublayer pre-norm identity path. No deck image, text, coordinates, or layout is reused."
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for transformer, decoder, causal or masked attention, multi-head attention, LayerNorm, and residual connections. Pages 100-104 were read as the main architecture neighborhood; page 50 and page 107 were read for transformer LayerNorm and modern decoder context. The source diagrams are dense, externally derived architecture composites and do not isolate the requested two-sublayer pre-norm identity path. No deck image, text, coordinates, or layout is reused.",
+    "license": "The local deck provides no general reuse license and contains externally sourced diagrams. It is treated as review-only; the implementation is independently authored."
   },
   "sourceReview": {
     "sources": [
