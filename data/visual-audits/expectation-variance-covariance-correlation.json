@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "slug": "expectation-variance-covariance-correlation",
+  "article": "src/content/posts/2026-08-28-expectation-variance-covariance-correlation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Determine the sign of a covariance contribution from whether each paired observation lies on the same or opposite side of its variable's mean.",
+  "mediumRationale": "A centered scatter plot is the smallest spatial explanation that turns the product (X - E[X])(Y - E[Y]) into visible signed regions. Direct quadrant labels connect each observation's two deviations to a positive or negative contribution without requiring animation or a legend.",
+  "mediumComparison": {
+    "mermaid": "Rejected because covariance sign is coordinate geometry, not a sequence or relationship graph; a flowchart would hide magnitude and quadrant.",
+    "svg": "Selected because deterministic SVG precisely aligns observations with both means and labels the sign of every centered-product region in one responsive coordinate system.",
+    "semanticHtml": "Rejected because a table can enumerate signs but cannot show why the two deviations have the same sign in two diagonal quadrants and opposite signs in the other two.",
+    "interaction": "Rejected because moving points could demonstrate changing covariance, but controls add state and test burden when one static centered plot is sufficient for the sign mental model.",
+    "paperReuse": "Rejected because the local deck has no relevant licensed figure, and reproducing the reviewed textbook's area diagrams is unnecessary. No source artwork, data, wording, or layout is copied.",
+    "noVisual": "Rejected because the formula defines covariance algebraically, but prose alone requires readers to mentally combine two signed deviations for every point."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 6,
+        "insight": "The preceding section-divider slide only introduces probability theory and contains no explanatory figure."
+      },
+      {
+        "page": 7,
+        "insight": "The probability-measures slide describes expectation as integration and long-run average, but does not define variance, covariance, correlation, or centered products."
+      },
+      {
+        "page": 8,
+        "insight": "The following discrete-distributions slide includes handwritten variance notes as an unattributed screenshot, but does not explain paired deviations or covariance."
+      },
+      {
+        "page": 21,
+        "insight": "The preceding linear-classifier and kernel slide uses a correlation map only as template-matching output; it does not explain statistical correlation."
+      },
+      {
+        "page": 22,
+        "insight": "The PCA slide defines covariance-matrix entries as feature covariances and connects projected directions to variance, but provides no centered-product geometry."
+      },
+      {
+        "page": 23,
+        "insight": "The following clustering slide uses covariance matrices in a Gaussian-process application without explaining their entries or signs."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for expectation, variance, covariance, and correlation. Direct matches occurred on pages 7, 22, 23, 53, 71, and 72; the complete neighborhoods on pages 6-8 and 21-23 were rendered and inspected because they contain the foundational definitions closest to this article. Pages 53 and 71-72 use covariance only in specialized gradient-estimation and latent-variable contexts. No slide explains the sign of a centered product, and no deck artwork, equation, wording, screenshot, or layout is reused.",
+    "license": "The local deck states no license and includes embedded third-party-looking screenshots without complete attribution. It is treated as review-only material; the implementation will be an original SVG."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Reading 7b: Covariance and Correlation, MIT OpenCourseWare 18.05",
+        "url": "https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2022/resources/mit18_05_s22_class07-prep-b_pdf/",
+        "usage": "Used as authoritative university course material to verify covariance as the expectation of centered products, the sign interpretation, correlation as standardized covariance, and the distinction between uncorrelated and independent variables.",
+        "license": "MIT OpenCourseWare identifies its materials as CC BY-NC-SA 4.0 unless otherwise noted. No MIT prose, examples, figures, or layout is copied; standard mathematical facts inform an original construction."
+      },
+      {
+        "title": "MUDE 4.3: Covariance and correlation coefficient",
+        "url": "https://mude.citg.tudelft.nl/book/2025/multivariate/Correlation_and_Covariance.html",
+        "usage": "Used as an authoritative TU Delft open textbook to cross-check the geometric interpretation of each centered product as a signed rectangular area, covariance-matrix entries, and unit-free correlation.",
+        "license": "The source repository publishes the book under CC BY 4.0. Although adaptation is permitted with attribution, no figure, dataset, prose, or layout is reused; the implementation uses original coordinates and labels."
+      },
+      {
+        "title": "NIST Copyright, Fair Use, and Licensing Statements",
+        "url": "https://www.nist.gov/open/copyright-fair-use-and-licensing-statements-srd-data-software-and-technical-series-publications",
+        "usage": "Consulted as explicit federal licensing guidance while evaluating whether external statistical figures needed to be reused.",
+        "license": "NIST states that employee-created non-SRD works are generally not copyright-protected in the United States and grants broad foreign reuse rights with acknowledgment. No NIST material is reused because an original visual is smaller and clearer."
+      }
+    ],
+    "notes": "The hardest prose-only model is the sign mechanism inside Cov(X,Y): after centering, observations above both means or below both means multiply two deviations with the same sign and contribute positively; observations on opposite sides multiply deviations with opposite signs and contribute negatively. Covariance is the expectation of those signed products, so contributions can cancel. The visual uses invented coordinates only to place representative points in all four regions; it reports no sample estimate and copies no external data."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected both relevant slide neighborhoods, and checked two authoritative university sources plus explicit licensing guidance before choosing an original centered scatter SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "covariance-centered-product-signs"
+    ],
+    "accessibility": "The SVG has an explicit title and detailed description, directly labels all four sign regions, and distinguishes positive contributions as circles containing plus signs from negative contributions as diamonds containing minus signs. Position, shape, symbols, and prose carry the full lesson without color. The 480-by-330 viewBox scales within the established plot panel at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print rules provide a light high-contrast rendering."
+  }
+}

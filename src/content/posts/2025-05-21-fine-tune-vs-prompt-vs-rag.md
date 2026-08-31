@@ -28,6 +28,28 @@ This is roughly correct. It's also exactly what the interviewer can read on any 
 >
 > In practice I'd build in this order: prompting first (cheapest, fastest iteration), add RAG when I see knowledge gaps, fine-tune only when I see persistent quality or latency issues that the first two can't fix."
 
+<!-- visual:llm-adaptation-layers -->
+<figure class="learning-figure" aria-labelledby="llm-adaptation-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="llm-adaptation-title">Which layer owns the failure, and how can the layers work together?</p>
+	<div class="visual-grid--two" role="group" aria-label="An evaluation-driven diagnosis panel followed by a production composition panel for prompting, retrieval, and fine-tuning">
+		<section class="visual-panel">
+			<h4>1 · DIAGNOSE THE FAILED EVAL</h4>
+			<p><strong>Instructions or examples are unclear?</strong><br />Change the <strong>prompt</strong>: shape this request without updating model weights.</p>
+			<p><strong>A needed fact is missing, private, or stale?</strong><br />Add <strong>RAG</strong>: retrieve evidence into this request without storing it in model weights.</p>
+			<p><strong>The task stays unreliable, or repeated prompt tokens miss cost or latency targets?</strong><br />Consider <strong>fine-tuning</strong>: train representative examples into new model parameters.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 · COMPOSE THE PRODUCTION SYSTEM</h4>
+			<p><strong>At request time</strong><br />Prompt instructions + retrieved evidence</p>
+			<p><strong>Then generate with</strong><br />A base model or a fine-tuned model</p>
+			<p><strong>Finally</strong><br />Response &rarr; the same eval and operational gates</p>
+			<p><strong>These are layers, not rungs.</strong><br />A tuned model can still use RAG, and both still need a prompt.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> start with the failed eval, not a favorite technique. Change request instructions with prompting, supply missing evidence with RAG, and change persistent learned behavior or efficiency with fine-tuning. If failures span layers, combine the interventions and evaluate the whole system.</figcaption>
+</figure>
+
 This is hireable at L5. You've reframed the question to be about *what's broken*, not *which technique*.
 
 ## What an L6 answer sounds like
