@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "slug": "linear-regression",
+  "article": "src/content/posts/2025-09-18-linear-regression.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See ordinary least squares as projecting the observed target vector onto the column space of the design matrix, leaving a residual perpendicular to every feature direction.",
+  "mediumRationale": "A single deterministic SVG is the smallest medium that can place y, Xw-hat, the column space of X, and the residual in one geometric relationship. The right-angle marker makes the normal-equation condition visible without animation or a second panel.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show computation order but cannot faithfully represent projection, a subspace, or orthogonality.",
+    "svg": "Selected because fixed vector geometry can directly align the fitted vector with Col(X), the residual with y minus y-hat, and a right-angle marker with X-transpose r equals zero, without a runtime dependency.",
+    "semanticHtml": "Rejected because a table could restate the equations but would not make the perpendicular decomposition of y spatially apparent.",
+    "interaction": "Rejected because changing y or the feature subspace could demonstrate many projections, but controls add state without improving the one invariant mental model needed here.",
+    "paperReuse": "Rejected because no external figure is necessary. Source availability is not treated as reuse permission; the implementation uses original geometry, labels, coordinates, and composition rather than tracing a textbook, course, or deck figure.",
+    "noVisual": "Rejected because the article gives the closed form and says it follows from setting the gradient to zero, but prose alone does not reveal that the normal equations impose an orthogonality condition."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 15,
+        "insight": "The machine-learning-intuitions slide introduces parameterized scores and losses plus training-versus-test error, but it does not present linear regression or least-squares geometry."
+      },
+      {
+        "page": 16,
+        "insight": "The neighboring point-estimates slide defines estimator bias and variance; it is relevant statistical context but contains no design-matrix, residual, or projection treatment."
+      },
+      {
+        "page": 17,
+        "insight": "The parameter-learning slide explains maximum likelihood and MAP generally, including independent-sample likelihood, but does not connect Gaussian likelihood to squared-error regression."
+      },
+      {
+        "page": 18,
+        "insight": "The following overview maps training data through a parameterized score and loss to a learned model; it adds no normal-equation or column-space geometry."
+      },
+      {
+        "page": 26,
+        "insight": "The slide before the only extracted regression word near the supervised-model section covers decision-tree split criteria for continuous and categorical targets, not linear regression."
+      },
+      {
+        "page": 27,
+        "insight": "The extracted regression hit is a gradient-boosting code branch for continuous targets; the slide discusses pseudo-residual fitting by decision trees, not OLS."
+      },
+      {
+        "page": 28,
+        "insight": "The next slide compares boosting with bagging and contributes no linear least-squares explanation."
+      },
+      {
+        "page": 29,
+        "insight": "The following factorization-machines slide mentions a linear model plus pairwise interactions, but does not derive or visualize OLS."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for linear regression, ordinary least squares, least squares, squared error, mean squared error, normal equations, residual, ridge, lasso, Gauss-Markov, collinearity, QR decomposition, and related regression terms. No slide directly teaches linear regression or OLS projection geometry. The complete parameter-learning neighborhood on pages 15-18 and the supervised-model neighborhood around the only generic regression code hit on pages 26-29 were inspected. Logistic-regression pages 33-35 concern classification likelihood and losses rather than this article's continuous-target geometry. No deck artwork, wording, coordinates, or layout is reused.",
+    "license": "The local deck provides no explicit license suitable for figure reuse. It is treated as review-only material; the shipped visual is an original construction."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Linear Least Squares Regression",
+        "url": "https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm",
+        "usage": "Used as an authoritative government handbook to verify that linear least squares estimates parameters by minimizing the sum of squared deviations in an overdetermined linear system.",
+        "license": "NIST-authored works are generally not subject to United States copyright, but no NIST prose, equations, examples, data, or graphics are copied; the source is used only to verify the method."
+      },
+      {
+        "title": "MIT OpenCourseWare 18.06SC Linear Algebra: Orthogonal Projections and Their Applications",
+        "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/positive-definite-matrices-and-applications/orthogonal-projections-and-their-applications/",
+        "usage": "Used as authoritative linear-algebra course material to verify the projection interpretation, the perpendicular residual, and the normal equation A-transpose A x-hat equals A-transpose b.",
+        "license": "MIT OpenCourseWare material is offered under CC BY-NC-SA 4.0. The implementation does not adapt or copy its figures, wording, examples, or layout; it independently redraws the general mathematical relationship."
+      },
+      {
+        "title": "LAPACK Users' Guide: Linear Least Squares Problems",
+        "url": "https://netlib.org/lapack/lug/node27.html",
+        "usage": "Used as official numerical-library documentation to verify that full-rank overdetermined least squares is solved with QR or LQ factorization and that rank-deficient minimum-norm problems can use SVD-based drivers.",
+        "license": "The documentation is consulted only for algorithm semantics. No Netlib text, table, equation image, code, or visual design is reused."
+      },
+      {
+        "title": "An Introduction to Statistical Learning, Second Edition",
+        "url": "https://www.statlearning.com/",
+        "usage": "Used as an authoritative statistical-learning textbook cross-check for least-squares regression, coefficient uncertainty under collinearity, and ridge and lasso behavior.",
+        "license": "The authors make the book available online, but no permissive figure-adaptation license was established. No textbook figure, data, wording, or layout is copied."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is what the normal equations mean geometrically. For any fitted value Xw-hat in Col(X), least squares chooses the point closest to y; therefore r equals y minus Xw-hat is perpendicular to the whole column space, so X-transpose r equals zero. When X has full column rank, solving that condition gives the displayed inverse formula. The visual deliberately separates this exact geometric fact from numerical implementation: the caption reiterates that QR or SVD should be used instead of explicitly forming the inverse. Direct labels, a right-angle marker, solid versus dashed vectors, and position carry the lesson without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the relevant parameter-learning and supervised-model neighborhoods, then checked authoritative statistical, linear-algebra, and numerical-library sources before selecting an original one-panel projection SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "ols-orthogonal-projection"
+    ],
+    "accessibility": "The SVG has a dedicated title and detailed description, directly labels y, y-hat equals Xw-hat, the residual, and Col(X), and uses a right-angle marker plus solid, dashed, and outlined shapes so orthogonality does not depend on color. Its 360-unit viewBox scales inside the existing responsive learning-figure primitive at 390 CSS pixels; established theme variables preserve dark-mode contrast, and shared print rules produce a light high-contrast rendering."
+  }
+}
