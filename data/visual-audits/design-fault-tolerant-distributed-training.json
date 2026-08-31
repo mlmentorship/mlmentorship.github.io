@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-fault-tolerant-distributed-training",
+  "article": "src/content/posts/2026-07-11-design-fault-tolerant-distributed-training.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Choose the narrowest safe recovery scope by testing whether ranks share one proven training state before retrying, rebuilding a group, or rolling back.",
+  "mediumRationale": "A compact Mermaid decision flow is the smallest medium that separates failure detection from recovery authorization and makes the state-consistency gate control every safe path. Labelled branches preserve the conditional logic without implying quantitative relationships.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is a decision graph with explicit evidence gates, recovery branches, and a single return to training; automatic layout keeps that relational structure maintainable.",
+    "svg": "Rejected: the learning task is conditional rather than geometric or quantitative, so hand-positioned paths would duplicate Mermaid graph semantics without adding explanatory value.",
+    "semanticHtml": "Rejected: a table could compare failure classes and remedies, but it would not show that the same consistency proof must precede every narrow recovery decision.",
+    "interaction": "Rejected: a failure-scenario chooser would add controls and hidden states when all safe branches fit in one static flow.",
+    "paperReuse": "Rejected: the reviewed sources verify runtime and recovery semantics but do not provide this article-specific decision flow. No source figure, layout, wording, data, or code is reused.",
+    "noVisual": "Rejected: the prose lists failure types and remedies well, but readers can still pair a visible symptom directly with a retry. The missing mental model is that recovery scope follows state evidence, not symptom category alone."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 161,
+        "insight": "The preceding ML-design slide covers data validation, metrics, and system requirements but contains no distributed-training failure or recovery model."
+      },
+      {
+        "page": 162,
+        "insight": "The training checklist recommends checkpointing the model object, train/validation/test data, and hyperparameter configuration for reproducibility, but does not address sharded completeness, integrity, atomic publication, or recovery scope."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring worked system-design slide moves to a personalized-feed example and adds no checkpoint or failure semantics."
+      },
+      {
+        "page": 166,
+        "insight": "The slide immediately before the distributed-training material discusses data pipelines, privacy, and bias; it adds no runtime fault-tolerance guidance."
+      },
+      {
+        "page": 167,
+        "insight": "The distributed-training slide distinguishes data and model parallelism and mentions gradient checkpointing for memory, but does not discuss process failure, collectives, consistent recovery state, or persistent checkpoints."
+      },
+      {
+        "page": 168,
+        "insight": "The following production-serving slide covers model gates, updates, inference, and interpretability rather than training failure recovery."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of ML slide says to watch for silent failures, but it concerns production ML pipelines and provides no silent-corruption detector or distributed recovery contract."
+      },
+      {
+        "page": 170,
+        "insight": "The algorithms-and-data-structures divider ends the relevant ML-production neighborhood and contains no fault-tolerance material."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) searched all 214 physical PDF pages independently for fault tolerance, failures, checkpoints, distributed training, collectives, all-reduce, stragglers, corruption, elasticity, recovery, restart, and resilience. Pages 161-163 and 166-170 were read as the complete matching neighborhoods. The deck contains only a reproducibility-checkpoint prompt, a basic distributed-training definition, and a generic silent-failure reminder; it has no recovery decision model. No deck artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "torchrun (Elastic Launch)",
+        "url": "https://docs.pytorch.org/docs/2.13/elastic/run.html",
+        "usage": "Used as official runtime documentation to verify that one worker failure stops and restarts the worker group, and that elastic membership changes form a new worker group with new rank and world-size assignments.",
+        "license": "PyTorch documentation source is distributed with the PyTorch project under a BSD-style license, but no documentation text, code, diagram, or example is copied; the visual is an original synthesis."
+      },
+      {
+        "title": "Distributed Checkpoint - torch.distributed.checkpoint",
+        "url": "https://docs.pytorch.org/docs/2.13/distributed.checkpoint.html",
+        "usage": "Used as official documentation to verify that distributed checkpoints contain multiple rank-written files, support parallel save/load, and can reshard state when loading under a different topology.",
+        "license": "PyTorch documentation source is distributed with the PyTorch project under a BSD-style license. The implementation cites concepts only and reuses no prose, code, screenshot, or figure."
+      },
+      {
+        "title": "NVIDIA Collective Communications Library: Communicator Creation and Management Functions",
+        "url": "https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/api/comms.html",
+        "usage": "Used as official communication-library documentation to verify fixed unique ranks within a communicator, collective communicator shrink semantics, and the requirement to resolve outstanding operations when shrinking after an error.",
+        "license": "The NVIDIA documentation is publicly readable, but no permissive figure-reuse grant was identified. No documentation prose, code, branding, or visual structure is reproduced."
+      },
+      {
+        "title": "TRANSOM: An Efficient Fault-Tolerant System for Training LLMs",
+        "url": "https://arxiv.org/abs/2310.10046",
+        "usage": "Used as a primary systems paper to cross-check the separation of anomaly detection, fault localization, process recovery, and fault-tolerant checkpointing in large-scale language-model training.",
+        "license": "The arXiv record permits public access but was not treated as permission to reuse its figures. No figure, table, measured result, wording, or system layout is copied."
+      }
+    ],
+    "notes": "The hardest mental model is that a timeout, slow rank, checksum mismatch, or process exit is evidence of a problem but not permission to retry locally. A narrow recovery is safe only when participating ranks can prove agreement on the committed step and all trajectory-defining state, and when the operation is idempotent or membership change is explicitly supported. Otherwise the affected consistency domain must roll back to a complete, integrity-checked checkpoint; an incomplete candidate must be rejected. The visual deliberately says 'affected consistency domain' rather than always 'whole job' because data-parallel replicas may sometimes have valid isolation boundaries while tensor, pipeline, or optimizer-sharded groups often do not."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected both relevant neighborhoods, then checked two official PyTorch references, NVIDIA NCCL communicator semantics, and a primary LLM fault-tolerance paper before selecting an original recovery-evidence decision flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "distributed-recovery-consistency-gate"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Decision diamonds, explicit yes/no edge labels, direct state labels, and solid versus dashed paths carry the logic without color. The compact top-to-bottom flow uses established theme-aware primitives, remains readable at 390 CSS pixels, and resets through shared Mermaid print behavior."
+  }
+}
