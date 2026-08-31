@@ -32,6 +32,43 @@ For the claim above:
 
 Now choose probes where predictions diverge. Move the same phrase between context and tool output. Change order without changing content. Vary risk while holding the conflict constant. Paraphrase the trigger. Include a control with no conflict.
 
+<!-- visual:black-box-discriminating-probes -->
+<figure class="learning-figure" aria-labelledby="black-box-probes-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="black-box-probes-title">Choose the next query by asking where the hypotheses disagree.</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of an ambiguous observation and four matched discriminating probes">
+		<section class="visual-panel" aria-labelledby="black-box-ambiguous-title">
+			<h4 id="black-box-ambiguous-title">One observation fits every story</h4>
+			<p>Setup: an exact override phrase appears last in tool output and requests a low-risk action. The model follows it.</p>
+			<table class="cm-grid" aria-label="Four hypotheses that all predict the observed behavior">
+				<thead><tr><th scope="col">hypothesis</th><th scope="col">prediction</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">H1 source priority</th><td>follow conflict</td></tr>
+					<tr><th scope="row">H2 lexical trigger</th><td>follow conflict</td></tr>
+					<tr><th scope="row">H3 risk gate</th><td>follow conflict</td></tr>
+					<tr><th scope="row">H4 recency</th><td>follow conflict</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">result: 4 explanations remain compatible</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="black-box-discriminate-title">
+			<h4 id="black-box-discriminate-title">Change one factor; predict before querying</h4>
+			<p>Hold the other factors fixed. A switch back to the user request singles out one explanation.</p>
+			<table class="cm-grid" aria-label="Four one-factor probes and the hypothesis uniquely supported if behavior switches">
+				<thead><tr><th scope="col">one change</th><th scope="col">switch supports</th><th scope="col">rivals predict</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">tool to context, still last</th><td class="cm-selected"><strong>H1</strong>stop</td><td>follow</td></tr>
+					<tr><th scope="row">paraphrase trigger</th><td class="cm-selected"><strong>H2</strong>stop</td><td>follow</td></tr>
+					<tr><th scope="row">low to high risk</th><td class="cm-selected"><strong>H3</strong>stop</td><td>follow</td></tr>
+					<tr><th scope="row">conflict first, user last</th><td class="cm-selected"><strong>H4</strong>stop</td><td>follow</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">best next probe = largest useful prediction split</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the first query confirms the behavior but cannot choose among H1-H4 because all four predict the same outcome. Spend the next query on a matched contrast: change only source, phrase, risk, or order and write the predictions first. If behavior switches only under one contrast, that result removes more uncertainty than another unstructured prompt variation. These predictions illustrate the stated hypotheses, not hidden model internals. Original synthesis informed by <a href="https://doi.org/10.1126/science.146.3642.347">Platt's strong-inference method</a> and <a href="https://aclanthology.org/2020.acl-main.442/">CheckList behavioral testing</a>.</figcaption>
+</figure>
+
 ## Keep an experiment ledger
 
 For each probe, record:

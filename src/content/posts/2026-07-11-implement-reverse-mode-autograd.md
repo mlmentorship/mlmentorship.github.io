@@ -33,6 +33,9 @@ out._backward = _backward
 
 Use `+=`, not assignment. A node can influence the output through multiple paths. For $y = x^2 + 2x$, both paths contribute to $\partial y / \partial x$.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Accumulate every branch contribution before a shared node propagates once.</p>
+
 <!-- visual:autograd-shared-node-accumulate-then-propagate -->
 ```mermaid
 flowchart TB

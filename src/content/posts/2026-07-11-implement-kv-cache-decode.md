@@ -37,8 +37,8 @@ No causal mask is needed when the query is the newest token and the cache contai
 			<h4 id="kv-full-title">Full-prefix pass: recompute history</h4>
 			<table class="cm-grid" aria-label="Projection work and newest-row attention in a full-prefix pass">
 				<tbody>
-					<tr><th scope="row">Project now</th><td>K<sub>1</sub>–K<sub>4</sub> and V<sub>1</sub>–V<sub>4</sub></td></tr>
-					<tr><th scope="row">Newest query</th><td>q<sub>4</sub></td></tr>
+					<tr><th scope="row">Project now</th><td>Q<sub>1</sub>–Q<sub>4</sub>, K<sub>1</sub>–K<sub>4</sub>, and V<sub>1</sub>–V<sub>4</sub></td></tr>
+					<tr><th scope="row">Use for newest row</th><td>q<sub>4</sub></td></tr>
 					<tr><th scope="row">Attend to</th><td>K = [k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub>, k<sub>4</sub>]<br>V = [v<sub>1</sub>, v<sub>2</sub>, v<sub>3</sub>, v<sub>4</sub>]</td></tr>
 					<tr><th scope="row">Keep</th><td>Newest row o<sub>4</sub></td></tr>
 				</tbody>

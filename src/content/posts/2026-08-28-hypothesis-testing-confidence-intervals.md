@@ -83,8 +83,8 @@ Example: a model gain is $0.8$ points with a 95% interval from $0.1$ to $1.5$ po
 		<desc id="model-gain-decision-svg-desc">An original plot of three synthetic 95 percent confidence intervals in percentage points. The first interval runs from minus 0.3 to 1.9 and crosses zero, so the direction is uncertain. The second runs from 0.1 to 1.5; it excludes zero but crosses the predeclared minimum useful gain of 1.0, so there is evidence of a positive effect but practical value remains unresolved. The third runs from 1.2 to 2.0 and lies entirely above the minimum useful gain, supporting a decision-relevant gain under the assumptions.</desc>
 		<rect class="viz-plot-bg" x="64" y="54" width="276" height="198" rx="3"></rect>
 		<path class="viz-gridline" d="M78 54V252M127 54V252M176 54V252M225 54V252M274 54V252M323 54V252"></path>
-		<path class="viz-operating-guide" style="stroke-dasharray:7 5" d="M127 42V263"></path>
-		<path style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:2 5" d="M225 42V263"></path>
+		<path class="viz-operating-guide" style="stroke-dasharray:7 5" d="M127 42V218"></path>
+		<path style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:2 5" d="M225 42V218"></path>
 		<text class="viz-callout" x="127" y="17" text-anchor="middle">no effect</text>
 		<text class="viz-callout" x="225" y="17" text-anchor="middle">minimum useful gain</text>
 		<text class="viz-label" x="127" y="33" text-anchor="middle">0</text>

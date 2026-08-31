@@ -76,6 +76,6 @@
     "visualIds": [
       "kmeans-assign-then-update"
     ],
-    "accessibility": "Each panel has a linked title and complete description. Cluster membership uses circles versus squares, centroids use large x marks, old-to-new movement uses labelled arrows, and every coordinate and mean calculation is written, so color is redundant. Each SVG uses a 340-unit viewBox with no minimum width inside the established two-panel primitive, which stacks below 640 CSS pixels for readable 390-pixel output. Existing theme tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette."
+    "accessibility": "Each panel has a linked title and complete description. Cluster membership uses circles versus squares, centroids use large x marks, old-to-new movement uses labelled arrows, and every coordinate and mean calculation is written, so color is redundant. The two 340-unit SVGs stack at every viewport width to keep their smallest text above the rendering threshold on desktop as well as at 390 CSS pixels. Existing theme tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette."
   }
 }

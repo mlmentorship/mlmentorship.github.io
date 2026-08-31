@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "slug": "investigate-black-box-model-behavior",
+  "article": "src/content/posts/2026-07-11-investigate-black-box-model-behavior.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Choose a matched black-box probe where competing hypotheses make different predictions, rather than spending queries on variations that all hypotheses explain.",
+  "mediumRationale": "A paired semantic prediction matrix is the smallest medium that can align hypotheses with observable outcomes and contrast an ambiguous query against four one-factor probes. Native tables keep the categorical predictions inspectable, accessible, and readable without custom geometry or runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a branching flowchart could show the investigation sequence, but automatic layout would emphasize procedure and make the matched hypothesis-by-outcome comparison harder to scan.",
+    "svg": "Rejected: no quantitative geometry or continuous scale is needed, and fixed coordinates would add label-scaling risk without improving the categorical prediction matrix.",
+    "semanticHtml": "Selected: native row and column headers preserve the experimental contrasts for assistive technology, while established paired panels stack cleanly at phone width.",
+    "interaction": "Rejected: toggling factors could simulate planning, but hidden state and controls are unnecessary for learning the pre-query prediction discipline and would weaken the static fallback.",
+    "paperReuse": "Rejected: the reviewed sources provide methodological frameworks and empirical examples, not a figure matching this four-hypothesis tool-conflict case. Even where reuse is licensed, an original narrow synthesis is more useful and avoids importing source-specific layouts or data.",
+    "noVisual": "Rejected: the prose lists useful manipulations, but the central information-value test remains implicit. The side-by-side matrices show why repeating a compatible observation is weak and why holding three factors fixed while changing one can isolate a rival explanation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 57,
+        "insight": "The preceding training note covers split hygiene, initialization, and gradient scaling, establishing the boundary before the deck's experiment-oriented training sequence."
+      },
+      {
+        "page": 58,
+        "insight": "The data-inspection slide recommends examining biases, variation, predictions, and input-label relationships, but does not turn observations into competing behavioral hypotheses."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide explicitly recommends a series of ablation experiments with hypotheses, fixed seeds, simplified conditions, prediction inspection, and human-checkable metrics."
+      },
+      {
+        "page": 60,
+        "insight": "The sanity-check slide uses expected chance loss, tiny-subset overfitting, and train-versus-validation behavior as probes with predicted outcomes, but focuses on white-box training diagnostics."
+      },
+      {
+        "page": 61,
+        "insight": "The model-selection slide recommends changing one component at a time and controlling seed and initialization, supporting matched contrasts while remaining specific to model development."
+      },
+      {
+        "page": 62,
+        "insight": "The following slide moves to variance reduction and regularization interventions, marking the end of the direct experiment-design neighborhood."
+      },
+      {
+        "page": 140,
+        "insight": "The preceding ranking-model slide covers model inputs and training, providing context before the deck transitions from model construction to evaluation and launch."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline ranking evidence from online product metrics and launch, reinforcing that an investigation should connect its result to a decision."
+      },
+      {
+        "page": 142,
+        "insight": "The next slide moves to a personalized-content prompt example and does not add controls, rival predictions, or behavioral evaluation guidance."
+      },
+      {
+        "page": 152,
+        "insight": "The model-interpretability divider begins the deck's only dedicated interpretability neighborhood."
+      },
+      {
+        "page": 153,
+        "insight": "The explainability slide describes perturbing or replacing features and observing prediction changes, but uses those changes for feature attribution rather than bounded black-box behavioral claims."
+      },
+      {
+        "page": 154,
+        "insight": "The reinforcement-learning divider immediately ends the one-slide interpretability neighborhood."
+      },
+      {
+        "page": 163,
+        "insight": "The feed-design example frames requirements and data analysis before the interview's algorithm and experiment stages."
+      },
+      {
+        "page": 164,
+        "insight": "The experimentation section asks for a concrete hypothesis, offline evaluation, online measurement, and bug handling, tying empirical evidence to a system objective without comparing alternative explanations."
+      },
+      {
+        "page": 165,
+        "insight": "The following project-setup slide returns to goals, constraints, and data pipelines, marking the boundary after the interview experiment example."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for black-box, hypothesis, experiment, ablation, prompt injection, jailbreak, adversarial, interpretability, falsification, controls, and counterfactuals. Pages 57-62, 140-142, 151-154, and 163-165 were extracted and visually inspected as the full relevant neighborhoods. Page 59 supplies the closest hypothesis-led experiment guidance, page 153 supplies the closest input-perturbation idea, and pages 141 and 164 connect evidence to launch decisions. None shows how to select a query because rival black-box hypotheses predict different outcomes. No deck wording, image, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Strong Inference",
+        "url": "https://doi.org/10.1126/science.146.3642.347",
+        "usage": "Used as the foundational methodological source for devising alternative hypotheses and choosing crucial experiments whose alternative outcomes exclude different hypotheses.",
+        "license": "The 1964 Science article is publisher-copyrighted, and no permissive figure-reuse license was established. No paper text, figure, example, or layout is copied; the visual is an original application to the article's hypotheses."
+      },
+      {
+        "title": "Beyond Accuracy: Behavioral Testing of NLP Models with CheckList",
+        "url": "https://aclanthology.org/2020.acl-main.442/",
+        "usage": "Used as primary NLP research to verify capability-oriented black-box testing through controlled minimum-functionality, invariance, and directional-expectation tests rather than relying only on aggregate accuracy or ad hoc examples.",
+        "license": "ACL materials published after 2016 are available under CC BY 4.0 according to the ACL Anthology copyright policy, so attributed reuse is available in principle. No CheckList figure, table, test case, wording, or data is reused."
+      },
+      {
+        "title": "Red Teaming Language Models with Language Models",
+        "url": "https://arxiv.org/abs/2202.03286",
+        "usage": "Used as primary language-model research to cross-check the value of systematic, scalable behavioral discovery and the need to distinguish generated test volume from evidence about bounded failure behavior.",
+        "license": "The arXiv record provides public access but was not treated as a permissive third-party figure-reuse grant. No paper figure, prompt, result, taxonomy, or composition is adapted."
+      },
+      {
+        "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+        "url": "https://doi.org/10.6028/NIST.AI.600-1",
+        "usage": "Used as authoritative official guidance to connect structured adversarial testing, incident evidence, uncertainty, and risk measurement to deployment and risk-management decisions.",
+        "license": "This U.S. government publication is cited for guidance; no assumption about every embedded third-party element's copyright was made. No NIST table, figure, wording, or visual structure is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is experimental compression: an observation has low discriminating value when every live hypothesis predicts it. The original matrix operationalizes the article's four hypotheses under an explicit reference condition: an exact override phrase is last, appears in tool output, and requests a low-risk action. Each follow-up changes one factor while holding the other three fixed. Under the hypotheses as stated, source swap uniquely challenges H1, paraphrase uniquely challenges H2, risk escalation uniquely challenges H3, and order reversal uniquely challenges H4. Real results can remain noisy or support interactions, so the caption describes belief updates rather than claiming hidden architecture."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and visually inspected four relevant neighborhoods with boundaries, then checked foundational strong-inference methodology, primary behavioral-testing and language-model red-teaming research, and official NIST risk guidance before selecting an original matched-probe matrix."
+  },
+  "implementation": {
+    "visualIds": [
+      "black-box-discriminating-probes"
+    ],
+    "accessibility": "The figure has a linked learning question, a labelled two-panel group, native tables with explicit row and column headers, descriptive table labels, direct 'follow' and 'stop' outcomes, and a complete caption. Text labels and matched row positions carry every distinction without color. The established two-panel primitive stacks below 640 pixels for an exact 390 CSS pixel viewport; ordinary text wraps without a minimum width, theme tokens preserve dark-mode contrast, and shared print rules provide a light high-contrast rendering."
+  }
+}

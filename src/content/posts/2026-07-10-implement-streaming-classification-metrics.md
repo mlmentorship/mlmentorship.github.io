@@ -113,7 +113,7 @@ TP, FP, TN, and FN are additive sufficient statistics for metrics at a fixed thr
 				<desc id="f1-after-merge-desc">The wrong path computes shard A F1 as 1.00 and shard B F1 as 0.10, then averages them to 0.55. The correct path first uses the merged counts and computes F1 as two times 2 divided by two times 2 plus 9 plus 9, which is 4 over 22 or approximately 0.18. F1 is nonlinear, so 0.55 and 0.18 differ.</desc>
 				<rect class="viz-plot-bg" x="8" y="25" width="284" height="212" rx="5"></rect>
 				<text class="viz-axis-label" x="12" y="16">2 · COMPUTE THE RATIO ONCE</text>
-				<rect x="20" y="39" width="260" height="72" rx="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 3"></rect>
+				<rect x="20" y="39" width="260" height="72" rx="5" style="fill:var(--c-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 3"></rect>
 				<text class="viz-axis-label" x="30" y="57">WRONG · AVERAGE WORKER F1</text>
 				<text class="viz-label" x="150" y="79" text-anchor="middle">(1.00 + 0.10) / 2 = 0.55</text>
 				<path d="M55 67L245 97M245 67L55 97" style="fill:none;stroke:var(--viz-edge);stroke-width:1.3"></path>
