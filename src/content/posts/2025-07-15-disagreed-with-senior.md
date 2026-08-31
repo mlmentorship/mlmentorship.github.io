@@ -50,6 +50,27 @@ The L6 version often has these properties:
 - **You changed your view at some point.** Maybe started with strong conviction for B, learned something through the process, updated to a third option C that was better than either A or B.
 - **The story includes someone you respect being on the other side.** L6 candidates have learned to disagree well with smart people, not just to dismiss them.
 
+<!-- visual:disagreement-evidence-commit-loop -->
+```mermaid
+flowchart TB
+	accTitle: From two defensible positions to one owned decision
+	accDescr: Two defensible positions are first steelmanned against a shared goal, constraints, and evidence. The team names the uncertainty that could change the choice. If it is answerable, they run the smallest decisive test or gather missing evidence; if it is not testable yet, they name assumptions and risks and use agreed criteria. They then honestly retain A, retain B, or synthesize C. A decision owner records the rationale and a revisit rule, after which everyone commits publicly and executes. New evidence reopens the uncertainty only when it crosses the agreed revisit rule.
+	A["Position A + position B<br/>both defensible"] --> B["Steelman both sides<br/>shared goal · constraints · evidence"]
+	B --> C{"What uncertainty<br/>could change the choice?"}
+	C -->|"answerable"| D["Run the smallest decisive test<br/>or gather missing evidence"]
+	C -->|"not testable yet"| E["Name assumptions + risks<br/>use agreed criteria"]
+	D --> F["Update honestly<br/>retain A · retain B · synthesize C"]
+	E --> F
+	F ==> G["Decision owner chooses<br/>record rationale + revisit rule"]
+	G ==> H["Commit publicly<br/>execute the chosen direction"]
+	H -. "new evidence crosses the revisit rule" .-> C
+	class A,B viz-input
+	class C,F viz-focus
+	class D,E viz-state
+	class G,H viz-output
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> disagreement is not repeated advocacy until one side yields. First make both positions legible, then identify what could change the choice and update honestly from evidence or explicit criteria. Once an owner decides, commit to execution; reopen the decision only when new evidence crosses the rule agreed in advance. Original synthesis checked against <a href="https://www.amazon.jobs/content/en/our-workplace/leadership-principles">Amazon's disagree-and-commit principle</a>, <a href="https://doi.org/10.2307/2666999">Edmondson on psychological safety and team learning</a>, and <a href="https://ntrs.nasa.gov/citations/20170001761">NASA decision-analysis guidance</a>.</p>
+
 ## Tells that get you a strong-hire vote
 
 - The story is **specific and technical**, not abstract.
