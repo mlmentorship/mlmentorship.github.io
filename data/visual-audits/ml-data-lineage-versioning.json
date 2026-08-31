@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "ml-data-lineage-versioning",
+  "article": "src/content/posts/2026-08-28-ml-data-lineage-versioning.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Traverse the same immutable ML lineage graph backward from a deployment to reconstruct its exact inputs and forward from a faulty transform to identify every affected model and deployment.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can show one branched, versioned graph and distinguish the two incident queries with explicit starting points, paths, and immutable identifiers.",
+  "mediumComparison": {
+    "mermaid": "Rejected: Mermaid expresses a dependency DAG well, but precise two-direction overlays and compact incident annotations are harder to keep readable in a 390-pixel viewport.",
+    "svg": "Selected: fixed geometry keeps the branch structure, immutable IDs, faulty transform, backward reconstruction path, and forward blast radius legible in one narrow panel.",
+    "semanticHtml": "Rejected: nested lists or a table can enumerate dependencies but do not make shared ancestry and downstream fan-out spatially immediate.",
+    "interaction": "Rejected: selectable start nodes would support arbitrary queries, but controls and runtime state are unnecessary for teaching the two canonical traversals.",
+    "paperReuse": "Rejected: the reviewed standards and official documentation establish the entity, execution, and edge model, but no external figure is needed. The shipped incident graph is original.",
+    "noVisual": "Rejected: the article names backward and forward tracing, but its hardest mental model is that both are traversals of the same persisted graph rather than separate logs or pipeline views."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 161,
+        "insight": "The preceding ML design overview asks candidates to draw an ML pipeline and covers data, features, modeling, evaluation, and deployment, but does not version nodes or record lineage edges."
+      },
+      {
+        "page": 162,
+        "insight": "The production-considerations checklist explicitly recommends checkpointing models, train/validation/test datasets, and hyperparameters for reproducibility, but does not address provenance queries or downstream impact."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring content-feed example discusses training and live data sources without stable artifact identities or backward and forward tracing."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide presents a cyclic project flow among setup, data pipeline, modeling, and serving; it is a process overview rather than an immutable artifact graph."
+      },
+      {
+        "page": 166,
+        "insight": "The dedicated data-pipeline slide covers collection, storage, preprocessing, privacy, and bias while reusing the project-flow graphic, but includes no dataset manifests, transform versions, or lineage queries."
+      },
+      {
+        "page": 167,
+        "insight": "The following modeling slide covers baselines, distributed training, scale, and checkpointing, but not the exact dataset-to-model-to-deployment dependencies needed for incident response."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 deck pages for lineage, provenance, versioning, reproducibility, model registry, feature store, and data pipeline. No lineage or provenance slide exists. The two relevant neighborhoods were rendered and visually inspected: pages 161-163 around the sole reproducibility checklist item on page 162, and pages 165-167 around the generic data-pipeline treatment on page 166. No deck graphic, wording, layout, or externally embedded illustration is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "OpenLineage Object Model",
+        "url": "https://openlineage.io/docs/spec/object-model/",
+        "usage": "Used as an official open standard reference for building a lineage graph from uniquely identified jobs, runs, input datasets, output datasets, and emitted events.",
+        "license": "The OpenLineage project repository is Apache-2.0 licensed, but the documentation figure license was not relied upon. No prose, diagram, schema payload, icon, or layout is copied."
+      },
+      {
+        "title": "TensorFlow TFX: ML Metadata",
+        "url": "https://www.tensorflow.org/tfx/guide/mlmd",
+        "usage": "Used as official framework documentation for artifacts, executions, events, recursive upstream tracing, and finding downstream artifacts created from a given input.",
+        "license": "TensorFlow documentation is provided under the Creative Commons Attribution 4.0 license and code samples under Apache 2.0 unless otherwise noted. No prose, code, figure, or data-model artwork is reproduced."
+      },
+      {
+        "title": "W3C PROV Model Primer",
+        "url": "https://www.w3.org/TR/prov-primer/",
+        "usage": "Used as an authoritative provenance standard reference for entities, activities, usage, generation, stable identifiers, and graph-based reconstruction.",
+        "license": "The W3C document is governed by the W3C document license. No examples, prose, diagrams, notation, or visual conventions are copied."
+      }
+    ],
+    "notes": "The shipped graph is an original synthetic incident. It records a source snapshot, transform version, content-addressed training manifest, two run IDs, model versions, evaluation versions, deployments, and serving feature-contract versions. Dependency edges permit a backward traversal from production deployment 31 to its exact ancestors and a forward traversal from faulty transform version 2 to both downstream branches. The example makes no claim about a particular vendor's storage or API."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages, rendered and inspected both relevant slide neighborhoods, and checked OpenLineage, TensorFlow MLMD, and W3C PROV before selecting an original two-way incident trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "ml-lineage-two-way-incident-trace"
+    ],
+    "accessibility": "The SVG has a linked title and complete description that names every versioned node, branch, and query result. Node labels and immutable IDs carry the graph; the faulty transform also has a dashed outline and incident text, while direction labels, arrow geometry, and solid versus dashed paths distinguish the two traversals without color. The 360-unit viewBox scales without horizontal scrolling at 390 CSS pixels. Established theme tokens support dark mode, and shared print rules provide a light high-contrast palette."
+  }
+}

@@ -85,6 +85,43 @@ Large datasets do not require a full physical copy for every version. A manifest
 
 Both directions matter during incidents. A team that can reproduce one model but cannot find all affected models still lacks operational lineage.
 
+<!-- visual:ml-lineage-two-way-incident-trace -->
+<figure class="learning-figure plot-panel" aria-labelledby="lineage-trace-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="lineage-trace-title">Use one immutable graph for backward reconstruction and forward blast-radius tracing</p>
+	<svg viewBox="0 0 360 430" role="img" aria-labelledby="lineage-trace-svg-title lineage-trace-svg-desc">
+		<title id="lineage-trace-svg-title">Two directions through one versioned ML lineage graph</title>
+		<desc id="lineage-trace-svg-desc">An original lineage graph begins with raw source payments at snapshot 42, then currency transform version 2, then training manifest 88. The manifest branches to training runs 501 and 502, which produce model A version 17 and model B version 9. Model A version 17 reaches production deployment 31, while model B version 9 reaches shadow deployment 12. A dashed backward trace starts at production deployment 31 and follows model A, training run 501, manifest 88, transform version 2, and snapshot 42 to reconstruct its inputs. Solid forward traces start at the bad currency transform version 2 and reach both models and both deployments, exposing the complete blast radius.</desc>
+		<rect class="viz-plot-bg" x="4" y="4" width="352" height="422" rx="6"></rect>
+		<text class="viz-callout" x="16" y="24">DEPENDENCIES · each node has an immutable ID</text>
+		<rect class="viz-node viz-node--input" x="70" y="38" width="220" height="42" rx="5"></rect>
+		<text class="viz-node-label" x="180" y="55">raw source · payments</text><text class="viz-node-value" x="180" y="70">snapshot @42</text>
+		<path d="M180 80V94" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path><path d="M174 90L180 98L186 90Z" style="fill:var(--viz-edge)"></path>
+		<rect class="viz-node viz-node--focus" x="70" y="98" width="220" height="48" rx="5" style="stroke-dasharray:6 3"></rect>
+		<text class="viz-node-label" x="180" y="116">currency transform @v2</text><text class="viz-node-value" x="180" y="134">incident: dollars interpreted as cents</text>
+		<path d="M180 146V160" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5"></path><path d="M174 156L180 164L186 156Z" style="fill:var(--viz-focus-stroke)"></path>
+		<rect class="viz-node viz-node--output" x="70" y="164" width="220" height="42" rx="5"></rect>
+		<text class="viz-node-label" x="180" y="181">training manifest @88</text><text class="viz-node-value" x="180" y="196">content-addressed inputs + contracts</text>
+		<path d="M180 206V220H91V234M180 220H269V234" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
+		<path d="M85 230L91 238L97 230ZM263 230L269 238L275 230Z" style="fill:var(--viz-focus-stroke)"></path>
+		<rect class="viz-node" x="12" y="238" width="158" height="54" rx="5"></rect>
+		<text class="viz-node-label" x="91" y="256">training run @501</text><text class="viz-node-value" x="91" y="273">model A @17</text><text class="viz-label" x="91" y="286">evaluation @A17</text>
+		<rect class="viz-node" x="190" y="238" width="158" height="54" rx="5"></rect>
+		<text class="viz-node-label" x="269" y="256">training run @502</text><text class="viz-node-value" x="269" y="273">model B @9</text><text class="viz-label" x="269" y="286">evaluation @B9</text>
+		<path d="M91 292V306M269 292V306" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
+		<path d="M85 302L91 310L97 302ZM263 302L269 310L275 302Z" style="fill:var(--viz-focus-stroke)"></path>
+		<rect class="viz-node viz-node--output" x="12" y="310" width="158" height="48" rx="5"></rect>
+		<text class="viz-node-label" x="91" y="329">production @31</text><text class="viz-node-value" x="91" y="346">model A + feature contract @7</text>
+		<rect class="viz-node viz-node--output" x="190" y="310" width="158" height="48" rx="5"></rect>
+		<text class="viz-node-label" x="269" y="329">shadow @12</text><text class="viz-node-value" x="269" y="346">model B + feature contract @7</text>
+		<path d="M44 310H8V122H64" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:6 4"></path><path d="M58 116L68 122L58 128Z" style="fill:var(--viz-edge)"></path>
+		<text class="viz-callout" x="16" y="380">BACKWARD ← start at production @31: what made it?</text>
+		<path class="viz-operating-guide" d="M16 389H344" style="stroke-dasharray:6 4"></path>
+		<text class="viz-callout" x="16" y="410">FORWARD → start at transform @v2: what is affected?</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> the arrows record creation dependencies, not merely pipeline order. To reproduce <code>production @31</code>, trace backward through its exact model, run, manifest, transform, and source snapshot. When <code>transform @v2</code> is found faulty, traverse forward through every branch: both models and both deployments are in scope. Stable IDs make both answers possible after jobs and mutable table names have changed.</figcaption>
+</figure>
+
 ## Point-in-time lineage
 
 Store event time and availability time for temporal features. Also store the query or feature-view version that enforced the cutoff.
