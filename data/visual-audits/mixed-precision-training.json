@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "slug": "mixed-precision-training",
+  "article": "src/content/posts/2025-09-21-mixed-precision-training.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how scaling the loss preserves a tiny FP16 gradient during backward while unscaling in FP32 restores the original gradient before clipping and the optimizer step.",
+  "mediumRationale": "A two-path semantic ledger is the smallest medium that can keep one exact gradient value visible through underflow, scaling, FP16 storage, FP32 unscaling, and update. Native text and tables make the dtype boundary and arithmetic inspectable without runtime rendering or a wide process diagram.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout can sequence the recipe but cannot align the same numeric gradient across scaled and unscaled paths precisely.",
+    "svg": "Rejected because a fixed-coordinate pipeline would either shrink its stage labels at 390 CSS pixels or become vertically longer than two compact native tables; the lesson depends on exact values rather than geometry.",
+    "semanticHtml": "Selected because two labelled tables can compare the failed and preserved paths row by row, wrap normally at phone width, and expose headers and arithmetic directly to assistive technology.",
+    "interaction": "Rejected because changing the scale factor would add controls and hidden states while obscuring the invariant that scaling and unscaling cancel algebraically when the intermediate value is representable.",
+    "paperReuse": "Rejected because the primary paper's gradient histograms and training curves are empirical, model-specific figures that are unnecessary for this mechanism. No external figure, data, example, wording, or layout is reused.",
+    "noVisual": "Rejected because prose lists the operations but leaves readers to mentally track three separate facts: the chain rule scales every gradient, FP16 stores the enlarged intermediate, and division happens only after conversion to FP32."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The earlier LLM-training slide says PyTorch AMP keeps selected operations such as softmax in full precision while most operations use BF16, establishing automatic dtype selection without explaining gradient scaling."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization slide names BF16 and FP16 mixed precision as a throughput and memory lever but contains no training-step precision trace."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide mentions FP8 support in later kernels, but it does not describe FP8 tensor scaling or the mixed-precision optimizer boundary."
+      },
+      {
+        "page": 113,
+        "insight": "The slide immediately preceding the dedicated treatment is about speculative decoding and adds no mixed-precision mechanism."
+      },
+      {
+        "page": 114,
+        "insight": "The directly relevant slide gives FP16, BF16, and FP32 layouts, the FP16 master-weight and dynamic-loss-scaling recipe, FP32-sensitive operations, and FP32 optimizer state. It states the sequence but does not trace one gradient through representability and recovery."
+      },
+      {
+        "page": 115,
+        "insight": "The immediate following slide places BF16, FP32 master weights, and FSDP or ZeRO in a modern stack and summarizes mixed precision as removing FP32 throughput and memory ceilings; it adds no numerical trace."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for mixed precision, FP16, BF16, FP8, loss scaling, master weights, and autocast. Relevant occurrences were reviewed on pages 107, 108, 110, 114, and 115, and pages 113-115 were read as the complete local neighborhood around the dedicated slide. Page 114 is the only complete training recipe. The implementation does not reproduce deck artwork, prose, values, or layout.",
+    "license": "The local deck states no license, so it is treated as review-only. No screenshot, diagram, typography, or slide composition is copied or adapted."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Mixed Precision Training",
+        "url": "https://openreview.net/forum?id=r1gs9JgRZ",
+        "usage": "Used as the primary ICLR 2018 paper to verify FP32 master weights, FP16 forward and backward storage, FP32 accumulation, loss scaling by the chain rule, unscaling before the update, and dynamic scale adjustment.",
+        "license": "The reviewed OpenReview and arXiv records provide public access but no permissive figure-reuse license was relied upon. No paper histogram, curve, table, prose, experimental value, or layout is reproduced."
+      },
+      {
+        "title": "PyTorch Automatic Mixed Precision examples",
+        "url": "https://docs.pytorch.org/docs/stable/notes/amp_examples.html",
+        "usage": "Used as official framework documentation to verify that GradScaler scales the loss before backward, unscales gradients before stepping, skips the optimizer step for Inf or NaN gradients, and requires unscaling before gradient clipping.",
+        "license": "PyTorch documentation is distributed with the BSD-licensed PyTorch project. No code sample, prose, image, or page structure is copied; only API behavior is checked."
+      },
+      {
+        "title": "Using FP8 and FP4 with Transformer Engine",
+        "url": "https://docs.nvidia.com/deeplearning/transformer-engine/user-guide/examples/fp8_primer.html",
+        "usage": "Used as official NVIDIA documentation to verify hybrid FP8 use of E4M3 in the forward pass and E5M2 in the backward pass, amax history, scaling-factor updates, and selective FP8 autocasting.",
+        "license": "NVIDIA documentation is copyrighted and no permissive figure-reuse grant was identified. No documentation code, output, prose, figure, or layout is reused."
+      }
+    ],
+    "notes": "The complete article's hardest distinct mental model is loss scaling rather than bit layout, which is already taught by the separate floating-point-formats article. The original worked value uses a true gradient g = 2^-30. Direct FP16 storage loses it because its magnitude is below FP16's minimum positive subnormal 2^-24. With S = 2^20, differentiating S times the loss produces Sg = 2^-10, an exactly representable normal FP16 value. Casting that stored value to FP32 and dividing by S recovers 2^-30 exactly for clipping and the optimizer. The example demonstrates preservation, not a guarantee that one fixed scale prevents overflow elsewhere; dynamic scaling still checks for Inf and NaN."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the dedicated precision neighborhood, then checked the primary mixed-precision paper plus official PyTorch and NVIDIA behavior before selecting an original two-path loss-scaling ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "fp16-loss-scaling-ledger"
+    ],
+    "accessibility": "The figure uses labelled semantic sections and native tables with scoped column and row headers. Every dtype, operation, power-of-two value, underflow result, and update decision is written explicitly; path labels, row order, symbols, and words carry the lesson without color. The established two-panel grid stacks below 640 CSS pixels with ordinary wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
