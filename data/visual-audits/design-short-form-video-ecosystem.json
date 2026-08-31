@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-short-form-video-ecosystem",
+  "article": "src/content/posts/2026-08-29-design-short-form-video-ecosystem.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how viewer-randomized treatment and control cells share creators, so exposure in both cells changes next-period creator production and contaminates the future inventory served to both cells.",
+  "mediumRationale": "A focused Mermaid flowchart is the smallest useful spatial explanation because experiment interference is a directed shared-resource problem: two randomized viewer cells draw from one creator supply, their exposure changes production, and the resulting inventory returns to both cells. Labelled branches and a dashed spillover path expose why an immediate viewer effect and a long-term ecosystem effect require different designs.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson depends on following two assignment branches into one shared creator response and then tracing next-period inventory back across both experimental cells. The established top-to-bottom Mermaid primitive keeps that causal structure explicit and themed.",
+    "svg": "Rejected because no numeric axis, scale, or fixed geometry carries the lesson. Manually positioning the same graph would increase maintenance and small-screen risk without adding technical precision.",
+    "semanticHtml": "Rejected because a table could compare viewer, creator-cluster, market, and saturation designs, but it would not make the cross-cell return path that violates no-interference assumptions visible.",
+    "interaction": "Rejected because toggling spillover on and off would add controls and hidden state when a static trace can show the immediate estimand and contaminated long-horizon comparison simultaneously.",
+    "paperReuse": "Rejected because the reviewed papers analyze two-sided marketplace and recommender interference with study-specific models and figures. None depicts this article's shared short-form creator inventory, and public availability was not treated as figure-reuse permission. No external artwork, wording, values, data, coordinates, or layout is reused.",
+    "noVisual": "Rejected because the prose states that creators supply both cells but leaves the reader to mentally propagate treatment through creator production and back into future control inventory. The shared return path is the precise relationship that a spatial explanation clarifies."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The Recommender systems divider begins the complete recommendation neighborhood but contains no experiment or multi-stakeholder mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide explicitly notes presentation-bias feedback loops, non-random missing interactions, and the explore-exploit tradeoff, but it models neither creators nor cross-cell experimental interference."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid-recommender slide explains alternative item signals and blended recommenders, useful context for shared inventory but not treatment spillover."
+      },
+      {
+        "page": 135,
+        "insight": "The search-ranking overview separates candidate generation from ranking and viewer context; it treats the catalog as fixed rather than affected by experiment exposure."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide is the closest experimental match: it connects offline metrics, an online A/B test, engagement, and days with a play, but assumes viewer outcomes can settle launch and contains no shared creator-supply path."
+      },
+      {
+        "page": 163,
+        "insight": "The content-feed design slide asks about engagement objectives, user feedback, training data, live data, and sampling; creators and interference across randomized cells remain absent."
+      },
+      {
+        "page": 164,
+        "insight": "The neighboring feed slide covers algorithm choice and online experimentation around engagement, again with a fixed supply and no producer-side estimand."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide closes the related ML-design sequence with model gating, monitoring, feedback, and updates, but does not warn that an experiment can change the data-generating ecosystem for its own control group."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for recommendation, ranking, recommender, creator, ecosystem, exposure, feedback loop, collaborative filtering, retrieval, exploration, bandit, and experiment terms. Pages 7, 38, 42, 51, 69, 110, and 157 are unrelated matches involving probability, optimization, sampling, attention, or reinforcement learning. Pages 127-146 and 161-170 were read as the complete recommender, personalized-search, content-feed, and production neighborhoods. Page 130 is the only explicit recommender feedback-loop warning; page 141 is the closest A/B testing slide. The deck contains no creator-side supply response, two-sided randomization, or cross-cell interference figure, so no deck image, prose, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A/B Testing for Recommender Systems in a Two-sided Marketplace",
+        "url": "https://arxiv.org/abs/2106.00762",
+        "usage": "Used as a primary recommender-systems paper to cross-check that conventional member-side randomization can create interference for producer outcomes and that producer-side measurement requires an assignment design that separates treatment exposure.",
+        "license": "The arXiv copy is publicly distributed, but no permissive license for republishing its figures was established. No paper figure, UniCoRn diagram, equation, prose, experiment, or layout is reproduced."
+      },
+      {
+        "title": "Experimental Design in Two-Sided Platforms: An Analysis of Bias",
+        "url": "https://arxiv.org/abs/2002.05670",
+        "usage": "Used as a primary methodological paper to verify that randomization on one side of a platform can yield biased treatment-effect estimates because treatment changes congestion or competition experienced by units in the other cell, and that the appropriate design depends on which side is constrained.",
+        "license": "The preprint is available under arXiv distribution terms, which are not treated as blanket figure-reuse permission. No model diagram, notation, theorem, data, prose, or visual arrangement is reused."
+      },
+      {
+        "title": "Limiting Bias from Test-Control Interference in Online Marketplace Experiments",
+        "url": "https://arxiv.org/abs/2004.12162",
+        "usage": "Used as a primary paper to cross-check that test and control participants sharing a marketplace can affect one another, biasing naive comparisons, and that clustering or other interference-aware designs trade bias against variance and implementation constraints.",
+        "license": "Public preprint access was not treated as permission to reproduce source figures. The implementation copies no figure, empirical result, prose, cluster construction, or layout."
+      },
+      {
+        "title": "Modeling Recommender Ecosystems: Research Challenges at the Intersection of Mechanism Design, Reinforcement Learning and Generative Models",
+        "url": "https://research.google/pubs/modeling-recommender-ecosystems-research-challenges-at-the-intersection-of-mechanism-design-reinforcement-learning-and-generative-models/",
+        "usage": "Used as an authoritative research framework to verify that recommender policies couple users, content providers, advertisers, and other actors over long horizons, making provider behavior and policy-induced interactions necessary parts of ecosystem evaluation.",
+        "license": "The Google Research publication page provides access and citation metadata but no general license to reuse paper artwork. No source figure, conceptual framework graphic, wording, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest mental model not already visualized in the related annotated strategy mock is causal contamination across experiment cells. Viewer assignment can isolate immediate feed responses while creator supply remains shared. Exposure allocated under both policies changes creator learning, retention, and production; next-period inventory then reaches both treatment and control viewers. The visual is an original article-specific synthesis and does not claim that one experimental design universally removes interference."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, compared its existing coupled-system and serving diagrams with the related annotated strategy visual, indexed all 214 deck pages and inspected both full recommendation neighborhoods, then checked primary two-sided experimentation papers and an authoritative recommender-ecosystem framework before selecting a focused original interference trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "ecosystem-experiment-interference"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description that trace current shared inventory through both randomized cells, creator opportunity and production, and next-period spillover into both future cells. Every cell, timescale, and interpretation is text-labelled; arrows and the dashed cross-cell return path carry meaning without color. A top-to-bottom layout with the established viz-tall marker removes the wide mobile minimum so labels remain readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, print uses the established light page-safe palette, and the direct caption preserves the inference if visual rendering is unavailable."
+  }
+}

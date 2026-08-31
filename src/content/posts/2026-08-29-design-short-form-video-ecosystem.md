@@ -953,6 +953,46 @@ Check sample-ratio mismatch, instrumentation, pre-period balance, and policy com
 
 Creators supply content to treatment and control viewers. Treatment exposure can change creator production, which later changes inventory for both groups. Viral trends also cross experiment cells.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how viewer-randomized cells stop being independent when both change and reuse the same creator supply.</p>
+
+<!-- visual:ecosystem-experiment-interference -->
+```mermaid
+flowchart TB
+  accTitle: Shared creator supply creates interference between viewer-randomized treatment and control cells
+  accDescr: Current creator inventory supplies both treatment and control feeds. Each feed produces immediate viewer outcomes and allocates different exposure to the same creators. Exposure in both cells changes creator learning, retention, and production over weeks. That response creates next-period shared inventory, which enters both future treatment and future control feeds. The current viewer comparison may estimate an immediate feed effect before supply responds, but the future control cell is exposed to an ecosystem partly changed by treatment and is not an untouched long-horizon counterfactual.
+  Inventory["CURRENT SHARED INVENTORY<br/>same creators supply both cells"]
+  Treatment["TREATMENT FEED<br/>new ranking policy"]
+  Control["CONTROL FEED<br/>current ranking policy"]
+  ViewerT["TREATMENT VIEWERS<br/>watch · skip · satisfaction"]
+  ViewerC["CONTROL VIEWERS<br/>watch · skip · satisfaction"]
+  OpportunityT["CREATOR OPPORTUNITY<br/>allocated by treatment"]
+  OpportunityC["CREATOR OPPORTUNITY<br/>allocated by control"]
+  Response["CREATOR RESPONSE OVER WEEKS<br/>learning · retention · production"]
+  Next["NEXT-PERIOD SHARED INVENTORY<br/>supply has responded to both cells"]
+  FutureT["FUTURE TREATMENT FEED"]
+  FutureC["FUTURE CONTROL FEED<br/>not an untouched ecosystem"]
+  Inventory --> Treatment
+  Inventory --> Control
+  Treatment -->|"immediate exposure"| ViewerT
+  Control -->|"immediate exposure"| ViewerC
+  Treatment ==>|"qualified reach"| OpportunityT
+  Control -->|"qualified reach"| OpportunityC
+  OpportunityT ==> Response
+  OpportunityC --> Response
+  Response ==> Next
+  Next -.->|"shared supply returns"| FutureT
+  Next -.->|"cross-cell spillover"| FutureC
+  class Inventory viz-state
+  class Treatment,OpportunityT,Response viz-focus
+  class Control,OpportunityC viz-neutral
+  class ViewerT,ViewerC,Next,FutureT viz-output
+  class FutureC viz-warning
+  class Inventory viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> compare viewer outcomes across the two top branches before supply responds, then follow both exposure paths into creator production. The resulting inventory returns to both future cells, so the future control feed contains treatment-induced ecosystem changes and cannot serve as an untouched long-horizon counterfactual. Use creator-side, clustered, switchback, or saturation designs according to the spillover and estimand. Original synthesis informed by <a href="https://arxiv.org/abs/2106.00762">Nandy et al. on two-sided recommender experiments</a>, <a href="https://arxiv.org/abs/2002.05670">Johari et al. on two-sided platform experiment bias</a>, and <a href="https://arxiv.org/abs/2004.12162">test-control interference in online marketplaces</a>.</p>
+
 Possible designs include:
 
 - viewer-level randomization for immediate feed effects;
