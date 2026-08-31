@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "hybrid-vs-end-to-end-asr",
+  "article": "src/content/posts/2026-07-10-hybrid-vs-end-to-end-asr.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compare where acoustic evidence, pronunciation knowledge, text-only language knowledge, and operational controls enter hybrid and end-to-end ASR systems, and identify which changes require retraining the learned core.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align two complete audio-to-transcript paths while showing separate adaptation inputs and the boundary around the jointly learned end-to-end core. Stacked lanes remain complete in print and expose the production blend without requiring controls or hidden states.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic flowchart layout would show component order but make the adaptation ports and matched audio-to-text paths harder to compare at narrow width.",
+    "svg": "Selected: fixed lanes, direct labels, solid inference arrows, dashed adaptation paths, and an explicit constraint strip make both decomposition and change boundaries visible together.",
+    "semanticHtml": "Rejected: the article's prose already lists strengths and costs; cards or a table would repeat those claims without showing where independent knowledge enters each computation path.",
+    "interaction": "Rejected: a constraint selector could recommend an architecture, but the recommendation would conceal tradeoffs in state and would not improve the core spatial lesson or print output.",
+    "paperReuse": "Rejected: the deck and reviewed sources contain related system diagrams, but no artwork is necessary and no source figure reuse is relied upon. The lanes, geometry, wording, control ports, and decision strip are independently authored.",
+    "noVisual": "Rejected: prose describes components and selection factors, but readers must mentally reconcile the apparent one-model end-to-end story with real decoding, language integration, contextual biasing, and endpointing around the jointly learned core."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 119,
+        "insight": "The ASR section title establishes the start of the relevant deck neighborhood but contains no architecture."
+      },
+      {
+        "page": 120,
+        "insight": "The speech-recognition title slide is another section divider and adds no mechanism or comparison."
+      },
+      {
+        "page": 121,
+        "insight": "The direct comparison slide contrasts a traditional pipeline of windowing, MFCC features, GMM or DNN acoustic scores, HMM phones, language model, and decoder with an end-to-end path from the same signal toward characters. It motivates the two lanes but does not show adaptation boundaries or modern external controls around end-to-end models."
+      },
+      {
+        "page": 122,
+        "insight": "The overview derives the MAP combination of acoustic likelihood and language prior, details frame and triphone processing, and names CTC and Listen, Attend and Spell as end-to-end alternatives."
+      },
+      {
+        "page": 123,
+        "insight": "The audio-feature slide covers MFCC construction and waveform, speed, noise, time-mask, and frequency-mask augmentation; it supplies shared input context rather than an architecture choice."
+      },
+      {
+        "page": 124,
+        "insight": "The acoustic-model slide explains GMM-HMM and DNN or LSTM acoustic models, alignment, and decoding a best path, sharpening the modular hybrid side of the comparison."
+      },
+      {
+        "page": 125,
+        "insight": "The CTC slide explains blank-augmented alignment, collapse, marginalization, dynamic programming, and prefix beam search, showing that an end-to-end training objective still requires decoding."
+      },
+      {
+        "page": 126,
+        "insight": "The RNN-T slide separates transcription, prediction, and joint networks and explains its time-by-output lattice, demonstrating that end-to-end denotes joint training rather than the absence of internal structure."
+      },
+      {
+        "page": 127,
+        "insight": "The following model-compression title slide marks the end of the contiguous ASR section and adds no system-selection evidence."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for speech recognition, ASR, acoustic model, pronunciation, lexicon, CTC, RNN-T, transducer, WFST, language model, and end-to-end. Pages 119-127 were read as the full contiguous ASR section; page 117's generic rescoring discussion and page 118's knowledge-graph material were also checked as preceding context. Page 121 is the only direct hybrid-versus-end-to-end visual comparison. No deck pixels, layout, labels, or artwork are reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Kaldi Decoding Graph Construction",
+        "url": "https://kaldi-asr.org/doc/graph.html",
+        "usage": "Used as official toolkit documentation to verify the hybrid HCLG composition: HMM definitions, context dependency, pronunciation lexicon, and grammar or language model are composed into a decoding graph with explicit interfaces.",
+        "license": "Kaldi source and documentation are distributed under the Apache License 2.0, but no text, code, equations, or graph artwork is copied. The implementation uses an independently authored conceptual lane."
+      },
+      {
+        "title": "Listen, Attend and Spell",
+        "url": "https://arxiv.org/abs/1508.01211",
+        "usage": "Used as a primary end-to-end ASR source to verify joint listener-speller training from speech to characters, contrast with separately trained acoustic, pronunciation, and language components, and confirm that language-model rescoring can still improve an end-to-end system.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established. No paper figure, prose, data, numerical result, or architecture layout is reproduced."
+      },
+      {
+        "title": "Sequence Transduction with Recurrent Neural Networks",
+        "url": "https://arxiv.org/abs/1211.3711",
+        "usage": "Used as the primary RNN-T source to verify joint input-output and output-output modeling, unknown-alignment marginalization, and the role of output-sequence prior knowledge within an end-to-end transducer.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established. No lattice figure, prose, notation layout, dataset, or values are reused."
+      },
+      {
+        "title": "Joint CTC-Attention Based End-to-End Speech Recognition Using Multi-Task Learning",
+        "url": "https://arxiv.org/abs/1609.06773",
+        "usage": "Used as a primary source to cross-check that end-to-end systems can deliberately combine objectives and structural constraints, so hybridized training choices are compatible with joint optimization rather than evidence of a single universal architecture.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established. No paper figure, equations, results, or visual structure are reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is where the architecture boundary actually sits. In a traditional hybrid recognizer, HMM topology, context dependency, lexicon, and language model remain explicit decoding components, so text-only or pronunciation changes can be introduced without retraining the acoustic model. In end-to-end ASR, an encoder and token model learn more of the audio-to-transcript mapping under a paired-data objective, but beam decoding, language-model rescoring, contextual bias phrases, endpointing, confidence, and safety can remain external production components. The figure therefore does not claim that every hybrid system needs less data, that every end-to-end model is offline, or that external controls are free of tuning and evaluation."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full pages 119-127 ASR neighborhood, then checked official Kaldi graph documentation and primary LAS, RNN-T, and joint CTC-attention sources before selecting an original adaptation-boundary comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "asr-adaptation-boundaries"
+    ],
+    "accessibility": "The SVG has a linked title and full description naming every inference stage, adaptation input, retraining boundary, optional control, and selection endpoint. Solid arrows encode inference, dashed arrows and dashed borders encode independently supplied controls, and every component is directly labelled, so color is redundant. The single 360-unit viewBox has no minimum width or horizontal scrolling and scales within the established plot-panel primitive at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, while shared print tokens force a light high-contrast palette and avoid breaks within the figure."
+  }
+}
