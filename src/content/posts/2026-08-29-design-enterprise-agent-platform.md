@@ -191,27 +191,19 @@ flowchart TB
   end
   subgraph Execution["EXECUTION PLANE · performs bounded work"]
     Entry["1 · Agent entry API"]
-    Runtime["3 · Runtime adapter"]
-    Model["4a · Model gateway"]
-    Memory[("4b · Scoped memory")]
+    Runtime["3–4 · Runtime adapter<br/>model + scoped memory"]
     Gateway["5 · Tool gateway"]
     Executor["7 · Tool executor<br/>with narrow authority"]
     Systems["8 · Enterprise system<br/>authoritative outcome"]
   end
   subgraph Evidence["EVIDENCE PLANE · records what happened"]
     Events[("Durable execution events")]
-    Audit["Trace + audit"]
-    Eval["Evaluation + incidents"]
-    Cost["Budget + cost"]
-    Events --> Audit
-    Events --> Eval
-    Events --> Cost
+    Uses["Trace + audit<br/>evaluation + incidents<br/>budget + cost"]
+    Events --> Uses
   end
   User ==> Entry
   Entry ==> Admission
   Admission ==>|"allow workflow"| Runtime
-  Runtime --> Model
-  Runtime --> Memory
   Runtime ==>|"structured proposal"| Gateway
   Gateway ==> Policy
   Policy ==>|"allow + scoped capability"| Executor
@@ -225,10 +217,10 @@ flowchart TB
   Systems -. "final state" .-> Events
   class User,Entry viz-input
   class Admission,Policy,Gateway viz-focus
-  class Registry,Memory,Events viz-state
-  class Runtime,Model,Executor viz-neutral
-  class Systems,Audit,Eval,Cost viz-output
-  class User,Registry,Admission,Policy,Entry,Runtime,Model,Memory,Gateway,Executor,Systems,Events,Audit,Eval,Cost viz-compact
+  class Registry,Events viz-state
+  class Runtime,Executor viz-neutral
+  class Systems,Uses viz-output
+  class User,Registry,Admission,Policy,Entry,Runtime,Gateway,Executor,Systems,Events,Uses viz-compact
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the numbered solid path. Control checks identity before the runtime starts and checks structured arguments again before a side effect; the model never receives action authority. Then follow the dashed edges: decisions, attempts, and the enterprise system's final state become evidence, but the evidence store does not authorize the call. Original synthesis checked against <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>, <a href="https://www.rfc-editor.org/rfc/rfc8693.html">RFC 8693</a>, <a href="https://docs.temporal.io/workflow-execution">Temporal's durable-execution documentation</a>, and the <a href="https://github.com/open-telemetry/semantic-conventions-genai">OpenTelemetry GenAI semantic conventions</a>.</p>
