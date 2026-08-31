@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "discrete-gradient-estimators",
+  "article": "src/content/posts/2026-05-31-discrete-gradient-estimators.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace where the backward signal travels for REINFORCE, Gumbel-Softmax, and straight-through estimation relative to each method's hard or relaxed forward computation.",
+  "mediumRationale": "A deterministic stacked SVG is the smallest medium that can align each estimator's forward computation with its distinct backward route. Repeated node positions and solid-versus-dashed arrows expose whether the gradient bypasses, follows, or deliberately differs from the sampling path.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show connectivity but offers weak control over aligned forward and backward paths, the central comparison in this lesson.",
+    "svg": "Selected because three vertically aligned, deterministic computation paths can distinguish solid forward arrows from dashed backward arrows while remaining legible without horizontal scrolling.",
+    "semanticHtml": "Rejected because cards or a table would summarize properties but would not make the gradient's route around or through the sampling operation spatially explicit.",
+    "interaction": "Rejected because changing temperature could illustrate relaxation sharpness but would distract from the prior concept readers need: which computational path supplies each estimator's gradient.",
+    "paperReuse": "Rejected because the primary papers' figures are not needed to explain this general mechanism, and public paper access does not establish figure-reuse permission. No source figure, data, layout, code, or wording is copied.",
+    "noVisual": "Rejected because prose and equations describe each estimator independently but require the reader to mentally overlay forward and backward computation to understand why their bias, variance, and differentiability requirements differ."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 51,
+        "insight": "Introduces gradients of expectations with stochastic or non-differentiable functions, then motivates REINFORCE for sampled discrete actions and delayed rewards."
+      },
+      {
+        "page": 52,
+        "insight": "Derives the score-function identity, states that its Monte Carlo estimate is unbiased and noisy, and explains that control variates reduce its high variance."
+      },
+      {
+        "page": 53,
+        "insight": "Explains pathwise gradients for continuous reparameterizable variables and why their variance generally behaves better, providing the immediate contrast for discrete relaxations."
+      },
+      {
+        "page": 54,
+        "insight": "Directly covers Gumbel-Softmax as a continuous relaxation with temperature-controlled bias and variance, and identifies pretending the stochastic variable is the identity on the backward pass as straight-through estimation."
+      },
+      {
+        "page": 55,
+        "insight": "Extends the sequence to control-variate estimators REBAR and RELAX, confirming that REINFORCE and Concrete pathwise gradients can be combined rather than representing unrelated problem settings."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for gradient estimator, REINFORCE, score function, categorical, discrete, Gumbel, Concrete, and straight-through terminology. The full relevant run on pages 51-55 was extracted and inspected along with neighboring pages 50 and 56. Page 50 concludes normalization and page 56 begins neural-network project guidance, so neither adds estimator content. The visual preserves the sequence's forward-versus-backward distinction but does not reproduce any slide image, code, wording, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Simple statistical gradient-following algorithms for connectionist reinforcement learning",
+        "url": "https://doi.org/10.1007/BF00992696",
+        "usage": "Used as the primary REINFORCE source to verify the sampled-reward-weighted log-probability gradient and its unbiased stochastic-gradient interpretation.",
+        "license": "The publisher record is authoritative, but no open figure-reuse license was established. No text, equation rendering, figure, data, or layout is copied; only the mathematical mechanism informs an original diagram."
+      },
+      {
+        "title": "Categorical Reparameterization with Gumbel-Softmax",
+        "url": "https://arxiv.org/abs/1611.01144",
+        "usage": "Used as a primary source to verify the differentiable categorical relaxation, temperature behavior, and pathwise optimization through a soft sample.",
+        "license": "The arXiv record permits public distribution of the paper but is not treated as general permission to reuse figures. No paper figure, result, wording, data, or layout is reproduced."
+      },
+      {
+        "title": "The Concrete Distribution: A Continuous Relaxation of Discrete Random Variables",
+        "url": "https://arxiv.org/abs/1611.00712",
+        "usage": "Used as the independent concurrent primary formulation to verify that replacing discrete variables with Concrete relaxations enables automatic differentiation while optimizing a biased relaxed objective.",
+        "license": "Public arXiv availability is not treated as figure-reuse permission. The implementation is an original computation-path comparison and copies no figure, code, prose, data, or layout."
+      },
+      {
+        "title": "Estimating or Propagating Gradients Through Stochastic Neurons for Conditional Computation",
+        "url": "https://arxiv.org/abs/1308.3432",
+        "usage": "Used as a primary source to verify the straight-through heuristic: copy the gradient with respect to a stochastic neuron's output directly as an estimator for the gradient with respect to its input.",
+        "license": "No general figure-reuse permission was established from the arXiv record. No source figure, prose, experiment, or layout is reused."
+      },
+      {
+        "title": "Gradient Estimation Using Stochastic Computation Graphs",
+        "url": "https://arxiv.org/abs/1506.05254",
+        "usage": "Used to cross-check the computation-graph distinction between score-function terms for stochastic nodes and pathwise backpropagation through differentiable deterministic dependencies.",
+        "license": "No source artifact is copied and no figure license is relied upon; the paper's formal gradient decomposition is cited only to validate the original visual's paths."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is not the estimators' property table but the mismatch between what happens in the forward pass and where a usable derivative comes from. The original visual therefore uses no empirical values or paper-specific geometry. Solid and dashed routes, arrow direction, explicit hard/soft labels, and text annotations encode every distinction independently of color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the full article, searched all 214 source-deck pages and inspected the complete pages 50-56 neighborhood, then checked four primary estimator papers and the stochastic-computation-graph formalism before selecting an original forward-versus-backward path comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "discrete-gradients-forward-backward-paths"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that states every forward and backward route. Solid right-pointing arrows always encode forward computation; dashed left-pointing arrows always encode backward signals, while hard/soft and forward-only/backward-only labels preserve the lesson without color. The single 360-unit viewBox scales fluidly with no minimum width or horizontal scroll at 390 CSS pixels. Established theme variables provide dark-mode contrast, and the shared print palette forces a light high-contrast canvas and keeps the figure together."
+  }
+}
