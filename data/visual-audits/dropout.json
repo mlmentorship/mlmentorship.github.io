@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "dropout",
+  "article": "src/content/posts/2025-09-30-dropout.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Explain why inverted dropout scales surviving activations by 1/(1-p) during training so their expectation matches the unchanged inference-time activation.",
+  "mediumRationale": "A compact semantic table is the smallest medium that aligns an input, two complementary masks, their scaled training outputs, the elementwise average, and the unchanged inference output. This makes expectation preservation inspectable without introducing custom geometry or interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson is elementwise arithmetic and expectation, not a relationship or process graph.",
+    "svg": "Rejected because fixed drawing geometry would duplicate the semantics of a table while making the values less selectable and less naturally responsive.",
+    "semanticHtml": "Selected because real row and column headers expose the calculation to assistive technology, keep exact values aligned, and fit the established responsive two-panel primitive.",
+    "interaction": "Rejected because repeatedly sampling masks could imply that a small run empirically proves the expectation; two complementary masks plus the general expectation identity teach the invariant directly.",
+    "paperReuse": "Rejected because the original paper's network diagrams are denser than this learning objective requires, and public access does not establish figure-reuse permission. No source figure, layout, prose, or experimental data is copied.",
+    "noVisual": "Rejected because prose states the scaling rule but leaves the hardest mental model implicit: a survivor is larger in one stochastic pass precisely so averaging over masks recovers the original activation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 56,
+        "insight": "The section divider introduces practical neural-network project guidance but contains no dropout mechanism."
+      },
+      {
+        "page": 57,
+        "insight": "The notes slide states that dropout masks units during training and that scaling can be moved from test time into training. Its notation uses p for the retained fraction in the scaling sentence, unlike this article and PyTorch, which use p for drop probability."
+      },
+      {
+        "page": 58,
+        "insight": "The following slide starts data inspection and contributes no further explanation of dropout scaling or expectation."
+      },
+      {
+        "page": 61,
+        "insight": "The preceding model-selection slide focuses on reducing optimization bias and supplies context for the later variance-reduction checklist, but does not mention dropout."
+      },
+      {
+        "page": 62,
+        "insight": "The regularization checklist recommends dropout, specifically spatial dropout for ConvNets, and warns about its interaction with batch normalization; it does not explain inverted scaling."
+      },
+      {
+        "page": 63,
+        "insight": "The neighboring tuning slide says to search dropout rate on the original zero-to-one scale and then discusses explicit ensembles, without connecting either point to expectation preservation."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for dropout, masking, regularization, and ensembling. Every dropout match was reviewed, and the complete neighboring ranges 56-58 and 61-63 were extracted. Page 57 is the only slide that describes train-versus-test scaling; pages 62-63 add usage context. The deck's ambiguous p convention is not copied, and no deck artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+        "url": "https://www.jmlr.org/papers/v15/srivastava14a.html",
+        "usage": "Used as the primary source for independent Bernoulli masking, thinned-network training, approximate model averaging, and the original convention of multiplying weights by the retention probability at test time.",
+        "license": "JMLR public access and its author information do not provide clear permission to republish this paper's figures. No figure, prose, data, or layout is copied; the worked activation vectors and table are an original derivation from the method."
+      },
+      {
+        "title": "PyTorch Dropout documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html",
+        "usage": "Used as official implementation documentation to verify that p is the probability of zeroing an element, outputs are scaled by 1/(1-p) during training, masks are sampled independently per forward call, and evaluation is the identity function.",
+        "license": "No documentation text, code, figure, or interface design is copied. Only API semantics are referenced; the example values and presentation are original."
+      }
+    ],
+    "notes": "The original worked example uses x = [1, 2, 3, 4] and p = 0.5. Two explicitly complementary illustrative masks produce scaled outputs [2, 0, 6, 0] and [0, 4, 0, 8], whose elementwise average is x. The general identity E[m_i x_i/(1-p)] = x_i follows because E[m_i] = 1-p. Complementary masks are used only to make that expectation visible; independent production masks need not arrive in pairs."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed the 214-page deck and inspected both relevant slide neighborhoods, then checked the primary JMLR paper and official PyTorch behavior. The hardest prose-only model is why scaling noisy training outputs allows inference to become an identity operation."
+  },
+  "implementation": {
+    "visualIds": [
+      "dropout-inverted-expectation"
+    ],
+    "accessibility": "The figure uses a real table with scoped headers, explicit kept and dropped words in each mask row, a textual expectation identity, and a caption that states the inference without relying on color. Shared semantic-figure styles stack the panels below 640 CSS pixels, remain within a 390-pixel viewport, use dark-mode theme tokens, and switch to the established high-contrast print palette."
+  }
+}

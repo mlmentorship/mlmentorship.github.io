@@ -34,6 +34,59 @@ A common convention: project every embedding onto the unit sphere by dividing by
 - Vector index (FAISS, ScaNN, HNSW) can use Inner Product mode for cosine retrieval.
 - Magnitude (which often correlates with item popularity or training frequency) is removed as a confound.
 
+<!-- visual:embedding-normalization-metric-equivalence -->
+<figure class="learning-figure" aria-labelledby="embedding-normalization-title">
+	<p class="visual-kicker">Metric geometry</p>
+	<p class="visual-title" id="embedding-normalization-title">What changes when every embedding is projected onto the unit circle?</p>
+	<div class="visual-grid--two">
+		<section class="visual-panel plot-panel" aria-labelledby="raw-embedding-panel-title">
+			<h4 id="raw-embedding-panel-title">Before: magnitude can win</h4>
+			<p>Raw dot product rewards length as well as alignment.</p>
+			<svg viewBox="0 0 300 260" role="img" aria-labelledby="raw-embedding-svg-title raw-embedding-svg-desc">
+				<title id="raw-embedding-svg-title">Raw query and candidate embedding vectors</title>
+				<desc id="raw-embedding-svg-desc">From a shared origin, unit query q points right. Candidate A is a longer solid ray ending in a circle at coordinates 1.8, 1.6. Candidate B is a shorter dashed ray ending in a diamond at 0.9, 0.2. Although B has the smaller angle to q, raw dot product ranks A first because A is longer.</desc>
+				<rect class="viz-plot-bg" x="5" y="5" width="290" height="220" rx="3"></rect>
+				<path class="viz-axis" d="M40 195 H278 M40 195 V18"></path>
+				<text class="viz-label" x="28" y="210">0</text>
+				<path class="viz-roc-curve" d="M40 195 L120 195"></path>
+				<text class="viz-callout" x="94" y="214">q = (1, 0)</text>
+				<path class="viz-pr-curve" d="M40 195 L184 67"></path>
+				<circle class="viz-node" cx="184" cy="67" r="6"></circle>
+				<text class="viz-callout" x="192" y="61">A = (1.8, 1.6)</text>
+				<path class="viz-baseline" d="M40 195 L112 179"></path>
+				<path class="viz-operating-point" d="M112 173 L118 179 L112 185 L106 179 Z"></path>
+				<text class="viz-callout" x="121" y="176">B = (0.9, 0.2)</text>
+				<text class="viz-callout" x="10" y="244">raw dot: A 1.80 &gt; B 0.90</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel" aria-labelledby="normalized-embedding-panel-title">
+			<h4 id="normalized-embedding-panel-title">After: direction decides</h4>
+			<p>Normalization preserves each angle and sets every length to 1.</p>
+			<svg viewBox="0 0 300 260" role="img" aria-labelledby="normalized-embedding-svg-title normalized-embedding-svg-desc">
+				<title id="normalized-embedding-svg-title">The query and candidates normalized onto a unit circle</title>
+				<desc id="normalized-embedding-svg-desc">The same three vector directions now end on one circle. Candidate B's diamond endpoint is closer to query q than candidate A's circle endpoint. Dot product equals cosine, so both rank B first; Euclidean chord distance is also smaller for B.</desc>
+				<rect class="viz-plot-bg" x="5" y="5" width="290" height="220" rx="3"></rect>
+				<circle class="viz-gridline" cx="130" cy="125" r="90"></circle>
+				<path class="viz-axis" d="M25 125 H280"></path>
+				<path class="viz-roc-curve" d="M130 125 L220 125"></path>
+				<text class="viz-callout" x="224" y="140">q</text>
+				<path class="viz-pr-curve" d="M130 125 L197 65"></path>
+				<circle class="viz-node" cx="197" cy="65" r="6"></circle>
+				<text class="viz-callout" x="205" y="61">unit A</text>
+				<path class="viz-baseline" d="M130 125 L218 105"></path>
+				<path class="viz-operating-point" d="M218 99 L224 105 L218 111 L212 105 Z"></path>
+				<text class="viz-callout" x="228" y="105">unit B</text>
+				<path class="viz-operating-guide" d="M220 125 L197 65"></path>
+				<path class="viz-operating-guide" d="M220 125 L218 105"></path>
+				<text class="viz-label" x="46" y="27">all endpoints: length = 1</text>
+				<text class="viz-callout" x="10" y="240">dot = cos: B 0.976 &gt; A 0.747</text>
+				<text class="viz-callout" x="10" y="255">L2 chord: B 0.218 &lt; A 0.711</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow each ray from the origin. Before normalization, A's extra length overwhelms its worse angle, so dot product ranks A first. On the unit circle only direction remains: dot equals cosine, and the shorter L2 chord identifies the same winner, B.</figcaption>
+</figure>
+
 If you store unnormalized embeddings and compare with cosine, you're paying the normalization cost at every query.
 
 ## Geometry of learned embeddings

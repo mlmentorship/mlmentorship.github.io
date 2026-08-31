@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "epistemic-vs-aleatoric-uncertainty",
+  "article": "src/content/posts/2026-05-07-epistemic-vs-aleatoric-uncertainty.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish uncertainty within each posterior model draw from disagreement between the draws' predictive means, even when the aggregate predictions occupy the same overall output range.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that aligns predictive ranges and means for several posterior model draws. Holding the overall envelope fixed while changing within-model width and between-model mean separation makes the law-of-total-variance decomposition visible rather than merely restating its labels.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can name the two uncertainty sources but cannot encode predictive width or model-mean separation on a common numeric axis.",
+    "svg": "Selected because aligned intervals and diamond means precisely expose within-model spread versus between-model disagreement in two controlled static cases.",
+    "semanticHtml": "Rejected because a table could list ranges and means but would make readers calculate the spatial decomposition rather than see it.",
+    "interaction": "Rejected because varying sample count or noise could demonstrate convergence, but controls add state and complexity beyond the prerequisite distinction this article needs.",
+    "paperReuse": "Rejected because no empirical or paper-specific figure is required. Public access to the candidate papers is not treated as reuse permission, and no source figure, data, code, layout, or wording is copied.",
+    "noVisual": "Rejected because the equation names two variance terms but prose alone leaves many readers without the nested mental model: predictions vary inside a fixed model, while model means vary across plausible parameters."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 33,
+        "insight": "Defines entropy as uncertainty within a probability distribution, which is relevant to predictive spread but does not distinguish uncertainty about parameters."
+      },
+      {
+        "page": 53,
+        "insight": "Discusses variance of stochastic gradients and global weight uncertainty translated into local activation uncertainty, but addresses estimator variance rather than predictive aleatoric and epistemic components."
+      },
+      {
+        "page": 80,
+        "insight": "Introduces Bayesian inference from prior and likelihood to posterior belief, supplying the posterior-over-parameters context needed for epistemic uncertainty."
+      },
+      {
+        "page": 81,
+        "insight": "Contrasts Bayesian parameter distributions with single MLE and MAP parameter values, the closest deck treatment of disagreement across plausible models."
+      },
+      {
+        "page": 98,
+        "insight": "Connects next-token entropy and perplexity to model prediction uncertainty, but does not separate data noise from parameter uncertainty."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for epistemic, aleatoric, uncertainty, entropy, posterior, variance, and Bayesian terminology. No slide names or decomposes epistemic and aleatoric predictive uncertainty. The relevant neighborhoods on pages 32-34, 52-54, 79-82, 97-99, and 154-156 were extracted and inspected. Pages 155-156 use uncertainty only in a broad ML-versus-RL discussion and add no predictive decomposition. The original visual synthesizes the deck's entropy and parameter-posterior concepts without reproducing any slide image, wording, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "What Uncertainties Do We Need in Bayesian Deep Learning for Computer Vision?",
+        "url": "https://arxiv.org/abs/1703.04977",
+        "usage": "Used as the primary source for the article's distinction between aleatoric uncertainty in observations and epistemic uncertainty in model parameters, including data-dependent aleatoric prediction.",
+        "license": "The arXiv paper is publicly distributed, but no general figure-reuse permission was established. No figure, prose, empirical data, visual arrangement, or code is copied; only the definitions inform an original diagram."
+      },
+      {
+        "title": "Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles",
+        "url": "https://arxiv.org/abs/1612.01474",
+        "usage": "Used as a primary source to verify that independently trained probabilistic networks combine predictive distributions and that their diversity supplies a practical model-uncertainty signal.",
+        "license": "Public arXiv access is not treated as permission to reuse paper figures. The visual contains no paper data, result, figure geometry, wording, or implementation."
+      },
+      {
+        "title": "Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning",
+        "url": "https://arxiv.org/abs/1506.02142",
+        "usage": "Used as a primary source to verify the interpretation of repeated dropout predictions as approximate samples for model uncertainty.",
+        "license": "No open figure-reuse license was established from the record. No paper figure, experiment, data, prose, or layout is reproduced."
+      },
+      {
+        "title": "STAT 25100 Lecture 18: Conditional Expectation, Conditional Variance",
+        "url": "https://www.stat.uchicago.edu/~yibi/teaching/stat251/L18.pdf",
+        "usage": "Used as an authoritative university probability reference for the law of total variance: expected conditional variance plus variance of the conditional mean.",
+        "license": "The lecture notes were consulted for the mathematical identity only. No text, example, equation rendering, or visual is copied, so the implementation does not rely on reuse permission."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is the nested source of predictive spread: variability of y conditional on one parameter draw versus variability of conditional means over parameter draws. The visual uses invented, qualitative ranges rather than measurements. In the aleatoric panel all model means align while each conditional range is broad; in the epistemic panel each range is narrow while the means separate. The panels intentionally share an overall endpoint envelope, but do not claim equal numerical variances."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-searched all 214 deck pages and inspected five relevant neighborhoods, then checked the primary aleatoric/epistemic, deep-ensemble, and MC-dropout papers plus an authoritative total-variance reference before selecting an original within-versus-between model comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "uncertainty-within-between-models"
+    ],
+    "accessibility": "Each panel has a linked title and detailed description that states the range widths, mean alignment or separation, and practical implication. Interval length, diamond position, direct panel headings, and within-model labels communicate the distinction without color. The existing two-panel primitive stacks below 640 CSS pixels; each 300-unit SVG scales without a minimum width or scrolling at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and the shared print palette provides a light high-contrast rendering and keeps the figure together."
+  }
+}

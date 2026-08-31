@@ -17,6 +17,64 @@ The [reparameterization trick](/questions/reparameterization-trick/) handles con
 
 We want $\nabla_\theta \mathbb{E}_{z \sim p_\theta(z)}[f(z)]$. The expectation is a sum over discrete $z$; the sampling operation is non-differentiable. The two families of solutions trade **bias** for **variance**.
 
+<!-- visual:discrete-gradients-forward-backward-paths -->
+<figure class="learning-figure" aria-labelledby="discrete-gradient-paths-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="discrete-gradient-paths-title">Where does each estimator send the backward signal?</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 570" role="img" aria-labelledby="discrete-gradient-svg-title discrete-gradient-svg-desc">
+			<title id="discrete-gradient-svg-title">Forward and backward paths for three discrete gradient estimators</title>
+			<desc id="discrete-gradient-svg-desc">Three stacked computation paths compare REINFORCE, Gumbel-Softmax, and straight-through estimation. Solid arrows point right and show the forward computation. Dashed arrows point left and show the backward signal. REINFORCE evaluates a hard categorical sample and sends the sampled reward directly to the log probability without differentiating through the sample or objective. Gumbel-Softmax replaces the hard sample with a soft temperature-controlled sample and differentiates through the entire relaxed path. Straight-through uses a hard sample in the forward path but routes the backward signal through a separate soft surrogate.</desc>
+			<defs>
+				<marker id="discrete-forward-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0 0L7 3.5L0 7Z"></path></marker>
+				<marker id="discrete-backward-arrow" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><path class="viz-arrow-backward" d="M7 0L0 3.5L7 7Z"></path></marker>
+			</defs>
+			<rect class="viz-plot-bg" x="5" y="5" width="350" height="170" rx="6"></rect>
+			<text class="viz-axis-label" x="18" y="27">1 · REINFORCE: HARD FORWARD, SCORE BACKWARD</text>
+			<rect class="viz-node viz-node--input" x="18" y="54" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="60" y="75">π<tspan baseline-shift="sub" font-size="9">θ</tspan></text><text class="viz-node-value" x="60" y="92">probabilities</text>
+			<rect class="viz-node viz-node--focus" x="137" y="54" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="179" y="75">hard z</text><text class="viz-node-value" x="179" y="92">sample category</text>
+			<rect class="viz-node viz-node--output" x="256" y="54" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="298" y="75">f(z)</text><text class="viz-node-value" x="298" y="92">sampled value</text>
+			<path d="M102 78H133" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#discrete-forward-arrow)"></path>
+			<path d="M221 78H252" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#discrete-forward-arrow)"></path>
+			<path d="M298 108C298 153 60 153 60 108" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#discrete-backward-arrow)"></path>
+			<text class="viz-gradient-label" x="179" y="137">f(z) · ∇θ log pθ(z)</text>
+			<text class="viz-edge-label" x="179" y="160">bypasses derivatives of hard z and f</text>
+			<rect class="viz-plot-bg" x="5" y="191" width="350" height="170" rx="6"></rect>
+			<text class="viz-axis-label" x="18" y="213">2 · GUMBEL-SOFTMAX: SOFT FORWARD + BACKWARD</text>
+			<rect class="viz-node viz-node--input" x="18" y="240" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="60" y="261">log π + g</text><text class="viz-node-value" x="60" y="278">fixed noise g</text>
+			<rect class="viz-node viz-node--focus" x="137" y="240" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="179" y="261">soft y<tspan baseline-shift="sub" font-size="9">τ</tspan></text><text class="viz-node-value" x="179" y="278">relaxed sample</text>
+			<rect class="viz-node viz-node--output" x="256" y="240" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="298" y="261">f(y<tspan baseline-shift="sub" font-size="9">τ</tspan>)</text><text class="viz-node-value" x="298" y="278">must be smooth</text>
+			<path d="M102 264H133" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#discrete-forward-arrow)"></path>
+			<path d="M221 264H252" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#discrete-forward-arrow)"></path>
+			<path d="M298 294V320H60V294" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#discrete-backward-arrow)"></path>
+			<text class="viz-gradient-label" x="179" y="314">pathwise gradient through the relaxation</text>
+			<text class="viz-edge-label" x="179" y="345">low variance · biased for the discrete objective</text>
+			<rect class="viz-plot-bg" x="5" y="377" width="350" height="188" rx="6"></rect>
+			<text class="viz-axis-label" x="18" y="399">3 · STRAIGHT-THROUGH: HARD FORWARD, SOFT BACKWARD</text>
+			<rect class="viz-node viz-node--input" x="18" y="426" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="60" y="447">logits</text><text class="viz-node-value" x="60" y="464">parameters θ</text>
+			<rect class="viz-node viz-node--focus" x="137" y="426" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="179" y="447">hard z</text><text class="viz-node-value" x="179" y="464">forward only</text>
+			<rect class="viz-node viz-node--output" x="256" y="426" width="84" height="48" rx="5"></rect>
+			<text class="viz-node-label" x="298" y="447">f(z)</text><text class="viz-node-value" x="298" y="464">sees hard value</text>
+			<path d="M102 450H133" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#discrete-forward-arrow)"></path>
+			<path d="M221 450H252" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#discrete-forward-arrow)"></path>
+			<rect class="viz-node" x="137" y="506" width="84" height="38" rx="5" style="stroke-dasharray:5 3"></rect>
+			<text class="viz-node-value" x="179" y="522">soft surrogate y<tspan baseline-shift="sub" font-size="8">τ</tspan></text><text class="viz-node-value" x="179" y="536">backward only</text>
+			<path d="M298 480V525H225" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#discrete-backward-arrow)"></path>
+			<path d="M133 525H60V480" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#discrete-backward-arrow)"></path>
+			<text class="viz-edge-label" x="277" y="548">deliberate mismatch → biased</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> solid arrows are what the model computes; dashed arrows are the training signal. REINFORCE jumps around the non-differentiable sample using its log probability, Gumbel-Softmax makes the whole path soft, and straight-through keeps the hard forward value while borrowing a soft backward path. The construction is original; definitions were checked against Williams (1992), Jang et al. (2017), Maddison et al. (2017), and Bengio et al. (2013).</figcaption>
+</figure>
+
 ## 1. Score-function estimator (REINFORCE / likelihood ratio)
 
 Use the log-derivative identity $\nabla_\theta p_\theta(z) = p_\theta(z)\, \nabla_\theta \log p_\theta(z)$:

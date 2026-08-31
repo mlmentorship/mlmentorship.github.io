@@ -34,6 +34,55 @@ $$
 
 A clean separation: aleatoric is the average noise prediction; epistemic is the disagreement between models.
 
+<!-- visual:uncertainty-within-between-models -->
+<figure class="learning-figure" aria-labelledby="uncertainty-decomposition-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="uncertainty-decomposition-title">Does predictive spread live within models or between them?</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of aleatoric and epistemic predictive spread across three posterior model draws">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 250" role="img" aria-labelledby="aleatoric-panel-title aleatoric-panel-desc">
+				<title id="aleatoric-panel-title">Mostly aleatoric uncertainty</title>
+				<desc id="aleatoric-panel-desc">Three posterior model draws theta one, theta two, and theta three have broad predictive ranges with diamond means aligned at the same output value. Each model is individually uncertain, but the models agree with one another. Additional examples of the same kind do not remove this outcome noise.</desc>
+				<rect class="viz-plot-bg" x="8" y="27" width="284" height="214" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="17">MOSTLY ALEATORIC</text>
+				<path class="viz-axis" d="M42 205H270"></path>
+				<g class="viz-label" text-anchor="middle"><text x="55" y="222">low y</text><text x="258" y="222">high y</text></g>
+				<g class="viz-axis-label"><text x="16" y="74">θ1</text><text x="16" y="124">θ2</text><text x="16" y="174">θ3</text></g>
+				<g style="fill:none;stroke:var(--viz-input-stroke);stroke-width:5;stroke-linecap:round">
+					<path d="M55 70H255"></path><path d="M55 120H255"></path><path d="M55 170H255"></path>
+				</g>
+				<g style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2">
+					<path d="M155 63L162 70L155 77L148 70Z"></path><path d="M155 113L162 120L155 127L148 120Z"></path><path d="M155 163L162 170L155 177L148 170Z"></path>
+				</g>
+				<path class="viz-operating-guide" d="M155 48V190"></path>
+				<text class="viz-callout" x="155" y="43" text-anchor="middle">means agree</text>
+				<text class="viz-label" x="155" y="237" text-anchor="middle">wide within-model ranges</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 250" role="img" aria-labelledby="epistemic-panel-title epistemic-panel-desc">
+				<title id="epistemic-panel-title">Mostly epistemic uncertainty</title>
+				<desc id="epistemic-panel-desc">Three posterior model draws have narrow predictive ranges, but their diamond means are separated across low, middle, and high output values. Each model is individually confident, yet the models disagree. More representative data can concentrate the posterior and bring these model predictions together.</desc>
+				<rect class="viz-plot-bg" x="8" y="27" width="284" height="214" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="17">MOSTLY EPISTEMIC</text>
+				<path class="viz-axis" d="M42 205H270"></path>
+				<g class="viz-label" text-anchor="middle"><text x="55" y="222">low y</text><text x="258" y="222">high y</text></g>
+				<g class="viz-axis-label"><text x="16" y="74">θ1</text><text x="16" y="124">θ2</text><text x="16" y="174">θ3</text></g>
+				<g style="fill:none;stroke:var(--viz-input-stroke);stroke-width:5;stroke-linecap:round">
+					<path d="M55 70H105"></path><path d="M130 120H180"></path><path d="M205 170H255"></path>
+				</g>
+				<g style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2">
+					<path d="M80 63L87 70L80 77L73 70Z"></path><path d="M155 113L162 120L155 127L148 120Z"></path><path d="M230 163L237 170L230 177L223 170Z"></path>
+				</g>
+				<path d="M80 43H230" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:4 3"></path>
+				<text class="viz-callout" x="155" y="38" text-anchor="middle">means disagree</text>
+				<text class="viz-label" x="155" y="237" text-anchor="middle">narrow within-model ranges</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> each line is one model draw's predictive range; each diamond is that model's mean. On the left, individual models are uncertain even though their means agree, so the spread is aleatoric. On the right, each model is confident but their means disagree, so the spread is epistemic. Both panels cover the same overall output envelope, showing why one aggregate “confidence” cannot identify the remedy. This is an original construction based on the law of total variance and Kendall and Gal (2017).</figcaption>
+</figure>
+
 ## Estimating each in practice
 
 ### Aleatoric

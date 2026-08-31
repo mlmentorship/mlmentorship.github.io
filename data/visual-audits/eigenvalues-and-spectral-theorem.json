@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "eigenvalues-and-spectral-theorem",
+  "article": "src/content/posts/2025-08-21-eigenvalues-and-spectral-theorem.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Read a real symmetric matrix multiplication as three operations: change to orthonormal eigenvector coordinates, scale each coordinate by its eigenvalue, and change back.",
+  "mediumRationale": "A narrow deterministic SVG is the smallest medium that can keep the original axes, orthogonal eigenvector axes, coordinate values, and unequal scaling spatially connected. One exact 2D example makes every arrow checkable while complementing, rather than repeating, the algebraic statement.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout can show three stages but cannot preserve orthogonality, vector direction, or relative scale, which are the lesson.",
+    "svg": "Selected because fixed coordinates can show the orthogonal eigenbasis and the fact that only the q1 coordinate grows. A 360-unit-wide stacked viewBox avoids horizontal scrolling and keeps labels readable at 390 CSS pixels.",
+    "semanticHtml": "Rejected because cards or a table could list Q transpose, Lambda, and Q, but would not show that these operations are coordinate changes around independent axis-wise scaling.",
+    "interaction": "Rejected because changing matrix entries would require recomputing eigenpairs and would distract from the single decomposition. The exact static example already exposes all intermediate values.",
+    "paperReuse": "Rejected because no paper-specific result or artwork is needed. Reuse permission for candidate textbook and lecture figures was not assumed; the geometry, coordinates, wording, and arrangement are original.",
+    "noVisual": "Rejected because the hardest prose-only mental model is spatial: Q transpose and Q are changes between orthonormal frames, while Lambda is the only scaling step. The equation alone does not make those roles easy to distinguish."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 3,
+        "insight": "The earlier matrix-and-determinant slide states that a determinant is the product of eigenvalues and represents total volume scaling, but it does not separate scaling by individual eigendirections."
+      },
+      {
+        "page": 4,
+        "insight": "The slide immediately preceding the factorization treatment covers products, trace, and norms. Its norm-ball geometry adds no eigenbasis or diagonalization explanation."
+      },
+      {
+        "page": 5,
+        "insight": "The exact matrix-factorization slide describes eigenvalues as magnitudes and eigenvectors as orthogonal bases for real symmetric matrices, then contrasts eigendecomposition with SVD. It states the ingredients but does not show the Q transpose, Lambda, Q sequence geometrically."
+      },
+      {
+        "page": 6,
+        "insight": "The slide immediately following the factorization treatment is a probability-theory section divider and adds no relevant content."
+      },
+      {
+        "page": 22,
+        "insight": "The PCA slide applies eigendecomposition to the normalized covariance matrix and selects the largest eigenvalues and eigenvectors, confirming an ML use of the symmetric-matrix result without explaining the underlying change of basis."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for eigen decomposition, eigendecomposition, eigenvalue, eigenvector, spectral theorem, diagonalization, and orthogonality. Direct eigenvalue material occurs on pages 3, 5, 22, 23, and 71; page 5 is the only dedicated factorization comparison. Pages 4-6 were read as its complete local neighborhood. Page 22 was reviewed as the article's closest ML application; pages 23 and 71 only mention spectral clustering and linear-dynamical-system stability, respectively, and add no change-of-basis geometry. The implementation does not reproduce deck artwork, prose, coordinates, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "MIT OpenCourseWare 18.06, Lecture 25: Symmetric Matrices and Positive Definiteness",
+        "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-25-symmetric-matrices-and-positive-definiteness/",
+        "usage": "Used as authoritative university course material to cross-check that real symmetric matrices have real eigenvalues and orthogonal eigenvectors and admit an orthogonal diagonalization.",
+        "license": "MIT OpenCourseWare identifies its course materials as CC BY-NC-SA 4.0 except where otherwise noted. No video frame, transcript, figure, example, or wording is copied or adapted; the source is cited only."
+      },
+      {
+        "title": "Linear Algebra Done Right, fourth edition",
+        "url": "https://linear.axler.net/",
+        "usage": "Used as an authoritative textbook to cross-check the finite-dimensional spectral theorem and the interpretation of an orthonormal eigenbasis.",
+        "license": "The author's official site states that the fourth edition is open access under CC BY-NC. No textbook figure, prose, example coordinates, or layout is reused; only standard mathematical claims are checked and the book is cited."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is the operational meaning of A = Q Lambda Q transpose: Q transpose and Q change orthonormal coordinates, while Lambda alone performs independent scaling. The example A = [[2, 1], [1, 2]] is an original construction with q1 = (1, 1)/sqrt(2), lambda1 = 3, q2 = (-1, 1)/sqrt(2), and lambda2 = 1. For v = (2, 1), Q transpose v = (3/sqrt(2), -1/sqrt(2)), Lambda Q transpose v = (9/sqrt(2), -1/sqrt(2)), and Q Lambda Q transpose v = (5, 4) = Av. These identities were recalculated directly; no source figure or dataset is reproduced."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the dedicated factorization slide with its neighbors and PCA application, then checked an MIT course and an open-access linear algebra textbook before selecting one original stacked coordinate construction."
+  },
+  "implementation": {
+    "visualIds": [
+      "spectral-theorem-change-basis"
+    ],
+    "accessibility": "The SVG has a programmatic title and detailed description containing the matrix, eigenpairs, all intermediate coordinates, and the final result. Numbered panels, direct labels, orthogonal and standard axes, solid vectors, dashed guides, and explicit multiplication factors convey the meaning without color. The 360-unit-wide stacked viewBox scales to the article column without a minimum width or horizontal scrolling, preserving 11-unit labels at 390 CSS pixels. Existing visual tokens provide dark-mode contrast and explicit light-page print colors."
+  }
+}
