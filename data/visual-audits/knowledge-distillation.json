@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "slug": "knowledge-distillation",
+  "article": "src/content/posts/2026-05-07-knowledge-distillation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain how increasing softmax temperature exposes the teacher's relative preferences among non-target classes while preserving their order, giving the student more information than a one-hot label.",
+  "mediumRationale": "A deterministic SVG with three aligned probability distributions is the smallest medium that makes the one-hot target, the teacher's confident output, and the softened transfer target quantitatively comparable on one scale.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a teacher-to-student flowchart would show where predictions travel but not how temperature redistributes probability mass across classes.",
+    "svg": "Selected: aligned bars encode exact probabilities from one fixed logit vector and make both magnitude and preserved non-target ordering inspectable.",
+    "semanticHtml": "Rejected: a table could report the same values, but readers would still have to reconstruct the change in distribution shape rather than seeing it.",
+    "interaction": "Rejected: a temperature slider would add controls and state when two calculated static temperatures already establish the mechanism.",
+    "paperReuse": "Rejected: the primary paper's examples inform the concept, but no paper or deck figure has verified reuse permission or is needed for this original calculated construction.",
+    "noVisual": "Rejected: prose names dark knowledge, but the useful signal hidden in tiny non-target probabilities is the article's hardest mental model to form without a shared spatial scale."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 127,
+        "insight": "The preceding section divider introduces model compression but contains no mechanism or visual explanation."
+      },
+      {
+        "page": 128,
+        "insight": "The deck's only dedicated distillation treatment defines a student mimicking teacher outputs or internal representations and lists Patient KD, DistilBERT, and TinyBERT; it does not explain temperature, soft targets, or dark knowledge."
+      },
+      {
+        "page": 129,
+        "insight": "The following divider begins recommender systems and confirms that the distillation discussion ends on page 128."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 pages for distillation, teacher/student, dark knowledge, soft labels, and temperature, then rendered and inspected the complete local neighborhood on PDF pages 127-129. Page 128 is relevant context but its dense two-column compression survey does not supply the article's temperature mental model. No slide screenshot, layout, wording, link annotation, or figure is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Distilling the Knowledge in a Neural Network",
+        "url": "https://arxiv.org/abs/1503.02531",
+        "usage": "Used as the primary source for soft targets, relative probabilities among incorrect classes, applying the same raised temperature to teacher and student, mixing true-target and distillation objectives, and the temperature-squared gradient correction.",
+        "license": "The arXiv record permits public access but does not establish a reusable license for its figures or prose. No paper figure, example, wording, data, or layout is copied; the visual is an original calculation from a newly chosen logit vector."
+      },
+      {
+        "title": "DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter",
+        "url": "https://arxiv.org/abs/1910.01108",
+        "usage": "Used as a primary implementation paper to confirm that practical language-model distillation can combine language-modeling, distillation, and cosine-distance losses while transferring from a larger Transformer teacher.",
+        "license": "Public arXiv availability is not treated as permission to reuse the paper's figure. No figure, benchmark data, prose, visual structure, or code is reproduced."
+      }
+    ],
+    "notes": "The original worked example uses teacher logits [5, 2, 1] for classes 7, 1, and 9. Softmax gives [93.6%, 4.7%, 1.7%] at temperature 1 and [61.3%, 22.5%, 16.2%] at temperature 3, rounded to one decimal. Dividing every logit by the same positive temperature preserves the ordering 7 > 1 > 9 while making the two non-target probabilities large enough to influence the student's KL loss. The hard target [100%, 0%, 0%] contains none of that similarity ordering."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the exact compression neighborhood, checked the foundational distillation paper and DistilBERT, verified the plotted softmax arithmetic, and selected an original aligned probability comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "distillation-temperature-dark-knowledge"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description containing every plotted probability and the preserved class ordering. Direct row labels, class labels, printed values, and distinct bar outlines carry the lesson without color. Its 360-unit viewBox has no minimum width or horizontal scroll and scales to 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print rules switch the figure to a light high-contrast palette and keep it together."
+  }
+}
