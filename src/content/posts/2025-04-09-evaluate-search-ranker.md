@@ -32,6 +32,46 @@ Right tool, only one of three. You've heard the metric, not the eval system.
 
 This is L5. Three layers, what each is good for.
 
+**Learning objective:** Route a ranker candidate through human calibration, offline screening, and randomized online validation without asking one evidence layer to answer another layer's question.
+
+<!-- visual:search-ranker-evidence-flywheel -->
+```mermaid
+flowchart TB
+	accTitle: Three evidence layers form a search-ranker evaluation flywheel
+	accDescr: Human reviewers apply a relevance rubric to sampled query-document pairs, creating a labeled test set. Offline metrics use that set to screen ranker candidates quickly and by slice. Promising candidates enter a randomized online A/B test or interleaving comparison with production traffic. Only candidates with an online lift and healthy guardrails ship gradually; other candidates return for revision. Production failures and drift are sampled by slice for the next human review cycle and labeled-set refresh. Raw clicks never bypass randomized exposure to become relevance labels.
+	Ranker["Ranker candidate"]
+	Human["1 · Human judgments<br/>rubric-defined relevance<br/><b>Are these results useful?</b>"]
+	Labels["Labeled query-document set<br/>head · torso · tail · verticals"]
+	Offline["2 · Offline metrics<br/>NDCG · MRR · Recall@K<br/><b>Does it beat baseline on fixed labels?</b>"]
+	Traffic["Production traffic<br/>randomized exposure"]
+	Online["3 · Online comparison<br/>A/B: product impact<br/>interleaving: relative preference"]
+	Ship["Ship gradually<br/>monitor + rollback"]
+	Revise["Revise ranker<br/>or diagnose labels"]
+	Failures["Production failures + drift<br/>sample by slice"]
+	NextReview["Next review cycle<br/>re-judge hard cases + refresh labels"]
+
+	Human -->|applies rubric| Labels
+	Labels -->|fixed evaluation set| Offline
+	Ranker --> Offline
+	Offline -->|promising on key slices| Online
+	Offline -->|weak or regressed| Revise
+	Traffic --> Online
+	Online -->|no causal lift| Revise
+	Online -->|lift + healthy guardrails| Ship
+	Ship --> Failures
+	Failures -.-> NextReview
+
+	class Ranker,Traffic viz-input
+	class Human,Labels,Failures,NextReview viz-state
+	class Offline,Online viz-focus
+	class Ship viz-output
+	class Revise viz-warning
+	class Human viz-tall
+	class Ranker viz-wide
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> start with a candidate, not a favorite metric. Human judgments define rubric-based relevance; offline metrics cheaply screen variants against those labels; randomized online evidence decides whether behavior and guardrails improve. Then send production failures back through human review so drift and weak slices refresh the next offline set. Raw clicks do not skip the exposure-control step.</p>
+
 ## What an L6 answer adds
 
 > "...practical points:
