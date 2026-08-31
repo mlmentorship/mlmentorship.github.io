@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-attention-from-scratch",
+  "article": "src/content/posts/2025-11-27-implement-attention-from-scratch.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace one query row through a boolean causal mask and softmax over key columns, verifying that future keys receive zero weight and the permitted weights sum to one.",
+  "mediumRationale": "Two compact semantic tables are the smallest medium that preserves the row-query and column-key orientation while making one numeric softmax row directly inspectable. Existing responsive figure, panel, and matrix primitives provide readable structure without new styles or runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can order mask, softmax, and value aggregation, but it cannot precisely align each query row with its permitted key columns or expose the wrong-axis bug.",
+    "svg": "Rejected: fixed geometry would reproduce the same discrete matrix and row trace with more markup and greater label-scaling risk at phone width.",
+    "semanticHtml": "Selected: native tables give row and column headers to assistive technology, preserve exact cell correspondence, stack through the established two-panel primitive, and remain legible in print.",
+    "interaction": "Rejected: changing token count or scores would add controls and state without improving the single implementation invariant the learner must retain.",
+    "paperReuse": "Rejected: the reviewed Transformer figures are architecture-level graphics, and no permissive figure-reuse grant was established. The implementation uses no copied figure, layout, wording, or source data.",
+    "noVisual": "Rejected: prose names the correct mask polarity and softmax dimension, but readers must still mentally construct which tensor axis is queries, which is keys, and why one masked row normalizes independently."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 100,
+        "insight": "The preceding recurrent-network slide contains LSTM and GRU equations and establishes the boundary before the transformer material; it has no attention mask."
+      },
+      {
+        "page": 101,
+        "insight": "The transformer overview shows scaled dot-product attention with an optional mask and states that the decoder attends only to preceding words, but it does not label query rows versus key columns."
+      },
+      {
+        "page": 102,
+        "insight": "The neighboring BERT slide covers masked-language-model pretraining and downstream tasks; its use of 'masked' concerns input-token corruption rather than the causal attention matrix."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer survey repeats the attention formula and includes a small triangular mask image, but the dense composite does not trace mask fill, row-wise softmax, or the boolean keep convention."
+      },
+      {
+        "page": 104,
+        "insight": "The next slide moves to GPT-X, instruction tuning, and in-context learning, marking the end of the local transformer-mechanism neighborhood."
+      },
+      {
+        "page": 107,
+        "insight": "The mixed-precision setup slide notes FP32-sensitive operations and distributed training concerns but does not explain attention matrix axes."
+      },
+      {
+        "page": 108,
+        "insight": "The optimization overview states the scaled attention equation and quadratic score-matrix cost, providing the boundary before specialized attention optimizations."
+      },
+      {
+        "page": 109,
+        "insight": "The sequence-packing slide describes block-diagonal attention masks that prevent cross-example attention, reinforcing that mask geometry controls permitted key columns."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide explicitly writes softmax with axis -1 and describes per-row running statistics, confirming that normalization is independent for each query row."
+      },
+      {
+        "page": 111,
+        "insight": "The adjacent sparse-attention slide replaces the dense matrix with sparse patterns; it does not clarify boolean polarity or the basic causal row trace."
+      },
+      {
+        "page": 112,
+        "insight": "The following low-rank and kernel-attention slide changes the attention computation and marks the end of the optimization neighborhood."
+      }
+    ],
+    "notes": "The complete 214-page deck was text-indexed for attention, transformer, query, key, scaled dot product, causal mask, and softmax. Pages 100-104 and 107-112 were extracted and visually inspected as the complete relevant neighborhoods. The closest material is the optional-mask pipeline on page 101, the triangular thumbnail on page 103, and the explicit axis=-1 statement on page 110. None provides a readable worked mapping from query rows to key columns and then to normalized weights. No deck image, text, numbers, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary source to verify scaled dot-product attention, masking illegal decoder connections before softmax, and multiplying the resulting attention weights by values.",
+        "license": "The arXiv paper is publicly accessible, but no permissive figure-reuse license was established. No figure, prose, example values, or composition is copied; the shipped tables are an original worked example."
+      },
+      {
+        "title": "PyTorch scaled_dot_product_attention documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "usage": "Used as official implementation documentation to verify that a boolean True participates in attention, False is filled with negative infinity, causal masking is lower triangular for a square matrix, and softmax uses the last dimension.",
+        "license": "Documentation is used only to verify API and tensor semantics. No PyTorch code, prose, artwork, or documentation layout is reproduced."
+      },
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "usage": "Used as a primary source to cross-check the article's production distinction: exact attention can be tiled without materializing the full attention matrix in high-bandwidth memory.",
+        "license": "Public availability is not treated as figure-reuse permission. No paper figure, benchmark, text, algorithm listing, or visual structure is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is tensor orientation at the mask boundary: scores have query positions on the penultimate axis and key positions on the last axis, so causal masking and softmax act independently across each query row. The synthetic q3 scores are 0.2, 1.1, -0.4, and 2.8. Filling future k4 with negative infinity produces rounded softmax weights 0.25, 0.61, 0.14, and 0.00; the unrounded first three weights sum to one. The example illustrates mechanics only and makes no claim about learned attention patterns."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, visually inspected both relevant slide neighborhoods and their boundaries, and checked the primary Transformer and FlashAttention papers plus official PyTorch operator documentation before selecting an original causal-row trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "attention-causal-mask-row"
+    ],
+    "accessibility": "The figure has a linked learning title, a labelled group, native tables with explicit row and column headers, descriptive table labels, direct stage labels, and a complete caption. Every causal decision is written as 'keep' or '-inf', while the numeric trace states the zero weight and unit sum, so meaning does not depend on color. Established panels stack below 640 pixels for a 390 CSS pixel viewport; theme tokens provide dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
