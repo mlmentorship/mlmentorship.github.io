@@ -99,10 +99,10 @@ These equations are recursive. They turn a long-horizon problem into a one-step 
 		<rect class="viz-node viz-node--focus" x="202" y="38" width="131" height="55" rx="4"></rect>
 		<text class="viz-callout" x="268" y="61" text-anchor="middle">ask for fact</text>
 		<text class="viz-label" x="268" y="79" text-anchor="middle">environment responds</text>
-		<text class="viz-axis-label" x="18" y="127">2 · SCORE EACH POSSIBLE NEXT STATE</text>
-		<path d="M268 94V114L104 151M268 114L256 151" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#bellman-backup-arrow)"></path>
-		<text class="viz-callout" x="123" y="129">P = 0.75</text>
-		<text class="viz-callout" x="260" y="132">P = 0.25</text>
+		<text class="viz-axis-label" x="18" y="112">2 · SCORE EACH POSSIBLE NEXT STATE</text>
+		<path d="M268 94V120L104 151M268 120L256 151" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#bellman-backup-arrow)"></path>
+		<text class="viz-callout" x="123" y="140">P = 0.75</text>
+		<text class="viz-callout" x="260" y="142">P = 0.25</text>
 		<rect class="viz-node viz-node--output" x="27" y="153" width="147" height="91" rx="4"></rect>
 		<text class="viz-callout" x="101" y="176" text-anchor="middle">resolved (terminal)</text>
 		<text class="viz-label" x="101" y="198" text-anchor="middle">reward r = +2</text>

@@ -58,7 +58,7 @@ Results depend on the corruption, metric, patch location, and distribution shift
 		<rect class="viz-node" x="134" y="170" width="92" height="56" rx="4"></rect><text class="viz-node-value" x="180" y="191">ACTIVATION</text><text class="viz-node-label" x="180" y="212">a<tspan baseline-shift="sub" font-size="9">corr</tspan></text>
 		<path class="viz-axis" d="M226 198 H248"></path><path class="viz-arrow-forward" d="M254 198 l-9 -5 v10 Z"></path>
 		<rect class="viz-node" x="254" y="170" width="96" height="56" rx="4"></rect><text class="viz-node-value" x="302" y="191">EXPECTED TARGET</text><text class="viz-node-label" x="302" y="212">low</text>
-		<path class="viz-backward" d="M180 122 V278"></path><path class="viz-arrow-backward" d="M180 286 l-5 -9 h10 Z"></path><rect class="viz-node viz-node--focus" x="108" y="242" width="144" height="30" rx="4"></rect><text class="viz-node-value" x="180" y="261">COPY CLEAN STATE AT s</text>
+		<path d="M180 122 V278" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></path><path class="viz-arrow-backward" d="M180 286 l-5 -9 h10 Z"></path><rect class="viz-node viz-node--focus" x="108" y="242" width="144" height="30" rx="4"></rect><text class="viz-node-value" x="180" y="261">COPY CLEAN STATE AT s</text>
 		<text class="viz-callout" x="10" y="316">3 · PATCHED RUN</text>
 		<rect class="viz-node viz-node--input" x="10" y="328" width="96" height="64" rx="4"></rect><text class="viz-node-value" x="58" y="351">SAME CORRUPTED</text><text class="viz-node-label" x="58" y="374">x<tspan baseline-shift="sub" font-size="9">corr</tspan></text>
 		<path class="viz-axis" d="M106 360 H128"></path><path class="viz-arrow-forward" d="M134 360 l-9 -5 v10 Z"></path>
