@@ -32,6 +32,32 @@ This is leaderboard eval, useful for vendor selection but useless for a product.
 >
 > Public benchmarks are useful for vendor selection. Real-task metrics are what you ship on."
 
+**Learning objective:** choose the evaluation layer that can answer a coding-assistant claim, and state what evidence that layer still cannot provide.
+
+<!-- visual:coding-assistant-evidence-ladder -->
+<figure class="learning-figure" aria-labelledby="coding-eval-visual-title">
+	<p class="visual-kicker">Evidence ladder</p>
+	<p class="visual-title" id="coding-eval-visual-title">A green test suite is the first gate, not the product verdict.</p>
+	<div class="visual-panel" role="list" aria-label="Three evaluation layers, the claims they support, and the evidence each still lacks">
+		<section role="listitem">
+			<h4>1 · EXECUTE · DID THE PATCH MEET THE TESTED CONTRACT?</h4>
+			<p><strong>Evidence:</strong> isolated tasks, repository setup, tests, type checks, and regression slices by language and task shape.</p>
+			<p><strong>Still unknown:</strong> untested behavior, maintainability, unsafe shortcuts, and whether the benchmark resembles real work.</p>
+		</section>
+		<section role="listitem">
+			<h4>2 · INSPECT · IS THE CHANGE FIT TO MAINTAIN?</h4>
+			<p><strong>Evidence:</strong> static analysis plus rubric-based human review of readability, scope, architecture, and adjacent-code risk.</p>
+			<p><strong>Still unknown:</strong> whether developers accept, keep, and benefit from the change in their actual workflow.</p>
+		</section>
+		<section role="listitem">
+			<h4>3 · OBSERVE · DID THE ASSISTANT IMPROVE REAL WORK?</h4>
+			<p><strong>Evidence:</strong> acceptance, subsequent edits, time to final code, task completion, reversions, and severe-failure rates.</p>
+			<p><strong>Still unknown:</strong> causality without a controlled comparison; acceptance alone can include code later rewritten.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> climb only as high as the claim you need to make. Tests can reject a broken patch, but passing them does not prove maintainability or user value. Review covers qualities outside the oracle; production evidence tests usefulness, with controlled experiments needed for causal claims. Original synthesis checked against <a href="https://arxiv.org/abs/2107.03374">HumanEval</a>, <a href="https://www.swebench.com/original.html">SWE-bench</a>, and the <a href="https://docs.github.com/en/copilot/reference/copilot-usage-metrics/copilot-usage-metrics">GitHub Copilot usage-metrics reference</a>.</figcaption>
+</figure>
+
 This is L5. You've named the three layers and distinguished benchmarks from product evals.
 
 ## What an L6 answer adds

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "slug": "evals-for-coding-assistant",
+  "article": "src/content/posts/2025-06-07-evals-for-coding-assistant.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Choose the evaluation layer that can answer a coding-assistant claim, and state what evidence that layer still cannot provide.",
+  "mediumRationale": "A semantic evidence ladder is the smallest useful medium for pairing each evaluation layer with both the claim it supports and its remaining blind spot. Native headings and text preserve the logic without requiring quantitative geometry or client-side rendering.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could connect stages, but automatic graph layout would emphasize process order over the more important claim-and-limitation pairing within each layer.",
+    "svg": "Rejected: the lesson depends on readable evidence boundaries rather than scale or geometry, so fixed-position text would be less responsive and accessible than semantic HTML.",
+    "semanticHtml": "Selected: three ordered, directly labelled sections expose what execution, inspection, and production observation each prove and fail to prove, while reflowing naturally at phone width.",
+    "interaction": "Rejected: toggling metrics or scoring a sample patch would add state and task-specific assumptions without improving the fixed distinction between functional, maintainability, and product evidence.",
+    "paperReuse": "Rejected: HumanEval, SWE-bench, and LiveCodeBench contain benchmark-specific figures and results, but none expresses this product evidence ladder. Paper-figure reuse permission was not established, and no source figure, wording, data, layout, or icon is copied.",
+    "noVisual": "Rejected: the prose lists three layers but leaves their epistemic boundaries implicit. The ladder prevents the common error of treating a stronger result at one layer, especially test passing, as a substitute for evidence from the next layer."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 104,
+        "insight": "The GPT-X slide discusses code training, benchmark performance, instruction tuning, and an alignment tradeoff. It provides code-model context but no coding-assistant evaluation design."
+      },
+      {
+        "page": 105,
+        "insight": "The Toolformer slide explains choosing and executing external API calls, establishing that an agent may need tool-use evaluation rather than single-shot text scoring. It does not cover repository tasks, code quality, or product outcomes."
+      },
+      {
+        "page": 106,
+        "insight": "The following LLM-data slide discusses code corpora and generated Python exercises and solutions, but not held-out evaluation, contamination controls, or online product evidence."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview separates model evaluation, goal metrics, leading indicators, debug metrics, and guardrails. This supports layered measurement but is generic rather than coding-assistant specific."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist distinguishes offline metrics, error analysis, business-impact estimation, and online experiments with success criteria. It supplies the offline-to-product evidence distinction without executable-code or review layers."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring content-feed walkthrough returns to recommendation data and requirements, marking the end of the general production-evaluation checklist."
+      },
+      {
+        "page": 185,
+        "insight": "The preceding dynamic-programming slide ends with one expected-output call, but does not discuss systematic evaluation or generated code."
+      },
+      {
+        "page": 186,
+        "insight": "The dedicated unit-testing slide distinguishes normal, extreme, illegal, and strange inputs and advocates predictable tests. It supports executable oracles but does not claim that tests establish code quality or user value."
+      },
+      {
+        "page": 187,
+        "insight": "The following concurrency slide covers execution models and contains no additional testing, code-review, benchmark, or product-metric guidance."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for coding assistant, code generation, HumanEval, MBPP, SWE-bench, benchmark, contamination, unit test, static analysis, linter, code quality, tool use, acceptance rate, edit distance, online evaluation, product metric, and experimentation. No coding-assistant evaluation framework appears. Pages 104-106 were inspected as the code-trained-LLM and tool-use neighborhood, pages 161-163 as the model-to-product evaluation neighborhood, and pages 185-187 as the unit-testing neighborhood. The deck supplies three disconnected ingredients but no claim-to-evidence ladder. No deck artwork, wording, values, code, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Evaluating Large Language Models Trained on Code",
+        "url": "https://arxiv.org/abs/2107.03374",
+        "usage": "Used as the primary HumanEval source to verify execution-based functional-correctness evaluation over hand-written programming problems and the pass@k framing.",
+        "license": "The arXiv paper was used as a technical reference only; public access was not treated as figure-reuse permission. The companion HumanEval repository is MIT licensed, but that software license was not assumed to cover paper artwork. No figure, problem, test, result, wording, or layout is reused."
+      },
+      {
+        "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+        "url": "https://arxiv.org/abs/2310.06770",
+        "usage": "Used as the primary repository-level benchmark source to verify evaluation from an issue description, a real repository at a base commit, a generated patch, and fail-to-pass tests in a reproducible execution environment.",
+        "license": "The SWE-bench software repository is MIT licensed, but no permissive license for adapting paper figures was established. No source figure, repository task, data, metric value, wording, or layout is copied."
+      },
+      {
+        "title": "LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code",
+        "url": "https://arxiv.org/abs/2403.07974",
+        "usage": "Used as a primary source to verify temporal contamination controls and the need to evaluate multiple code capabilities rather than infer them all from one fixed code-generation benchmark.",
+        "license": "The LiveCodeBench code repository is BSD 3-Clause licensed, but that software license was not treated as permission to reuse paper artwork. No figure, benchmark item, empirical value, wording, or layout is reproduced."
+      },
+      {
+        "title": "Data available in GitHub Copilot usage metrics",
+        "url": "https://docs.github.com/en/copilot/reference/copilot-usage-metrics/copilot-usage-metrics",
+        "usage": "Used as official product documentation to verify that suggested and accepted completions, acceptance rate, active use, language distribution, and repository-level activity are observable product signals rather than functional-correctness oracles.",
+        "license": "GitHub Docs source content is licensed CC BY 4.0. The visual cites metric categories only and does not adapt documentation prose, tables, screenshots, icons, or layout."
+      },
+      {
+        "title": "Interpreting usage and adoption metrics for GitHub Copilot",
+        "url": "https://docs.github.com/en/copilot/reference/copilot-usage-metrics/interpret-copilot-metrics",
+        "usage": "Used as official guidance to verify that acceptance rate is interpreted as an engagement, trust, or usefulness signal and that changes may also reflect workflow friction; it is not treated as proof of code correctness or causal product impact.",
+        "license": "GitHub Docs source content is licensed CC BY 4.0. No source wording, threshold, chart, screenshot, or layout is reused."
+      },
+      {
+        "title": "GitHub Docs repository license",
+        "url": "https://github.com/github/docs/blob/main/LICENSE",
+        "usage": "Used to explicitly verify the Creative Commons Attribution 4.0 license for GitHub Docs source content.",
+        "license": "CC BY 4.0 permits adaptation with attribution. This implementation remains an original semantic composition and uses documentation links only as factual citations."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the boundary of each evaluation claim. Executable checks can strongly reject a patch that violates the tested contract, but a pass is conditional on task realism and oracle coverage. Static analysis and calibrated human review inspect maintainability, scope, and adjacent-code risk that tests may omit. Product telemetry then measures real workflow behavior, but acceptance can be noisy and observational movement does not by itself establish causality. The implementation is an original synthesis with no benchmark scores, source examples, or universal thresholds."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the code-LLM, production-evaluation, and unit-testing neighborhoods, then checked primary HumanEval, SWE-bench, and LiveCodeBench research plus official GitHub product-metric and licensing documentation before selecting an original semantic evidence ladder."
+  },
+  "implementation": {
+    "visualIds": [
+      "coding-assistant-evidence-ladder"
+    ],
+    "accessibility": "The figure has a programmatically associated title and a labelled semantic list with three native sections in source order. Every layer, evidence type, and limitation is stated in text, so meaning does not depend on color or position alone. The single-column panel uses ordinary wrapping text with no fixed or minimum width for readability at 390 CSS pixels; established theme variables supply dark-mode contrast and shared print rules provide a high-contrast light palette with page-break protection."
+  }
+}
