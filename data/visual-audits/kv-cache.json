@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "slug": "kv-cache",
+  "article": "src/content/posts/2026-04-04-kv-cache.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace four decode steps and distinguish the single K/V pair appended at each step from the growing set of cached pairs that the newest query must read.",
+  "mediumRationale": "One semantic table is the smallest medium that keeps decode step, cache state, append work, and attention read aligned. Four rows make both invariants countable without adding animation or a second visual.",
+  "mediumComparison": {
+    "mermaid": "Rejected because this is repeated state growth with exact row alignment, not a branching graph. Routed edges would add clutter and make the one-write-versus-growing-read comparison harder to count.",
+    "svg": "Rejected because fixed coordinates add no explanatory geometry. Native table text wraps more reliably at 390 CSS pixels and provides stronger row and column semantics.",
+    "semanticHtml": "Selected because scoped row and column headers expose the cache transition in accessible reading order, preserve selectable text, and use an established responsive visual primitive without runtime code.",
+    "interaction": "Rejected because stepping through four states would hide earlier rows and prevent direct comparison. The complete invariant fits in one compact static table.",
+    "paperReuse": "Rejected because no candidate source figure has a permissive reuse grant established for this site. The implementation is an original semantic construction and copies no source artwork, wording, coordinates, or layout.",
+    "noVisual": "Rejected because prose asks the reader to hold two different growth rates at once: one new K/V write per step and an attention read spanning every cached position. Aligning those quantities by decode step makes the distinction directly inspectable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The LLM training overview introduces transformer scale and throughput concerns but does not discuss autoregressive cache state, setting the boundary before the attention-optimization material."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization slide shows the full-sequence attention formula and quadratic attention matrix, but it does not separate one-token decode writes from reads of retained K/V state."
+      },
+      {
+        "page": 109,
+        "insight": "The neighboring sequence-packing slide remains focused on training utilization rather than incremental inference or cache growth."
+      },
+      {
+        "page": 112,
+        "insight": "The model-optimization slide preceding decoding frames efficiency techniques but does not provide a token-by-token cache execution model."
+      },
+      {
+        "page": 113,
+        "insight": "The decoding slide explains serial autoregressive generation and one large-model forward pass per step, then focuses on speculative decoding rather than K/V append and read behavior."
+      },
+      {
+        "page": 114,
+        "insight": "The adjacent mixed-precision slide discusses numerical formats and stable softmax computation, not persistent attention state."
+      },
+      {
+        "page": 115,
+        "insight": "The serving-stack summary names a paged KV cache, compute-bound prefill, and weight-loading-dominated single-token decoding, but it does not show why cache writes stay constant while attention reads grow."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed for KV cache, key/value cache, cache, paged attention, decoding, autoregressive generation, and attention. Pages 98-105 were inspected as the complete language-model and transformer neighborhood, and pages 107-115 as the complete attention-optimization and decoding neighborhood. No slide teaches basic token-by-token KV-cache growth. Pages 108, 113, and 115 are the closest relevant slides; pages 107, 109, 112, and 114 were reviewed to establish their surrounding context.",
+    "license": "The local deck states no general reuse license and contains externally sourced material. It is treated as review-only; no screenshot, wording, artwork, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary source for scaled dot-product attention and causal decoder self-attention, establishing that a newest-token query attends to the available prefix.",
+        "license": "Used for technical verification only. No paper figure, prose, equation layout, or artwork is copied, and no figure-reuse permission is assumed."
+      },
+      {
+        "title": "Efficiently Scaling Transformer Inference",
+        "url": "https://arxiv.org/abs/2211.05102",
+        "usage": "Used as the primary systems source to verify that every layer's key and value tensors are retained for the duration of decoding and create memory traffic at each generation step.",
+        "license": "Used for factual reference only. No plot, table, prose, benchmark result, or layout is reproduced."
+      },
+      {
+        "title": "Hugging Face Transformers: How caching works",
+        "url": "https://huggingface.co/docs/transformers/main/en/cache_explanation",
+        "usage": "Used as official implementation documentation to verify per-layer K/V append along the sequence axis, one-token query attention over past plus current K/V, and linear cache growth.",
+        "license": "Documentation is cited only for public cache and tensor-shape semantics. No documentation artwork, code, prose, or layout is copied."
+      },
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used as the primary PagedAttention source to verify that autoregressive generation grows per-request KV-cache state dynamically and that paging changes its memory management rather than the underlying attention semantics.",
+        "license": "Used for technical verification only. No paper figure, block diagram, prose, measurements, or layout is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is what the KV cache removes and what it leaves behind. At decode step t, the model appends only the new pair (k_t, v_t), so it does not project earlier tokens' keys and values again. The newest query q_t still attends to all t cached pairs. Across four illustrative steps, writes are one pair per step while the read spans one, two, three, then four positions. Thus cache memory grows linearly and attention for each new token remains linear in prefix length; the cache eliminates repeated projection work but does not make total standard-attention generation linear."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected the complete transformer and inference neighborhoods, and checked two primary systems papers, the original Transformer paper, and official cache documentation before selecting an original semantic cache-growth ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "kv-cache-one-write-growing-read"
+    ],
+    "accessibility": "The figure uses a labelled semantic table with scoped row and column headers plus an explicit textual invariant. Every cache state, appended pair, and read span is written out, so the lesson does not depend on color. The established table primitive has no minimum width and uses short wrapping labels at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}
