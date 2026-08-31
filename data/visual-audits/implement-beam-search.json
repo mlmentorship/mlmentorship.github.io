@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-beam-search",
+  "article": "src/content/posts/2026-07-11-implement-beam-search.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one beam-search expansion and explain why EOS hypotheses leave the live frontier before top-k pruning while remaining eligible for final ranking.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can preserve hypothesis identity across expansion, EOS routing, and live-only pruning. The first panel shows where candidates come from; the second makes the live and finished pools spatially disjoint so the no-expansion invariant is immediately inspectable.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flow layout would emphasize generic control flow while making cumulative scores and the correspondence between parent hypotheses and candidates harder to compare.",
+    "svg": "Selected because fixed rows, branch lines, cumulative log scores, and distinct solid versus dashed containers can show one exact transition without runtime code.",
+    "semanticHtml": "Rejected because a table can list live and finished records but cannot as directly preserve the branching relationship from each parent to its candidate continuations.",
+    "interaction": "Rejected because changing beam width, token probabilities, or length penalty would add controls and mutable state without improving the core invariant that EOS exits the expandable frontier before pruning.",
+    "paperReuse": "Rejected because the reviewed papers explain beam scoring and length treatment in broader translation systems, not this live-versus-finished state transition. No source figure has both the narrow teaching scope and verified figure-reuse permission, so no source geometry, wording, or data is copied.",
+    "noVisual": "Rejected because the prose lists the state transitions sequentially, but readers must still mentally track which hypotheses are expandable, which are preserved for final ranking, and which pool top-k pruning applies to."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The tokenization-and-perplexity slide defines sequence probability normalized by sequence length, providing nearby score context but no search-state diagram."
+      },
+      {
+        "page": 99,
+        "insight": "The neighboring text-representation slide names autoregressive forward factorization, supplying the conditional next-token setting without covering beam management."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide shows serial autoregressive generation and candidate verification, but its candidate set is a draft-model acceleration mechanism rather than competing sequence hypotheses."
+      },
+      {
+        "page": 124,
+        "insight": "The acoustic-model slide names Viterbi decoding as a way to find a best output path, but does not discuss EOS, bounded live hypotheses, or length-normalized beam ranking."
+      },
+      {
+        "page": 125,
+        "insight": "The CTC slide briefly describes a modified prefix beam search that merges alignments mapping to the same collapsed output prefix. This is related search context but has blank and alignment semantics distinct from autoregressive EOS handling."
+      },
+      {
+        "page": 126,
+        "insight": "The following RNN-T slide visualizes a time-by-output lattice and forward-backward summation; it is useful neighboring sequence context but not a live-versus-finished beam transition."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for beam, search, decoding, sequence, autoregressive, EOS, end token, length, probability, and score. The full neighboring ranges 98-100, 112-115, and 124-126 were extracted, and pages 124-126 were also rendered for visual inspection. Page 125 is the only slide that explicitly names beam search, and it covers CTC prefix merging rather than autoregressive EOS or length normalization. Pages 98-100 move from sequence probability and autoregressive representations into BERT; pages 112-115 cover efficient attention and serving; pages 124-126 move from acoustic decoding through CTC to RNN-T. The deck has no directly applicable live/finished-pool visual, and no deck wording, image, layout, or example is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Google's Neural Machine Translation System: Bridging the Gap between Human and Machine Translation",
+        "url": "https://arxiv.org/abs/1609.08144",
+        "usage": "Used as a primary system paper to verify beam-search sequence scoring, explicit end-of-sentence handling, and the use of a length penalty when comparing completed translation hypotheses.",
+        "license": "The arXiv record permits arXiv distribution but does not establish a permissive license for reusing the paper's figures. No paper figure, wording, architecture, result, or data is reproduced."
+      },
+      {
+        "title": "Correcting Length Bias in Neural Machine Translation",
+        "url": "https://arxiv.org/abs/1808.10006",
+        "usage": "Used as a primary analysis of how beam-search scoring and stopping interact with sequence length, supporting the article's warning that stopping bounds must match the final scoring rule.",
+        "license": "Public availability on arXiv is not treated as permission to reuse artwork. No figure, derivation, experiment, wording, or layout is copied; the worked scores are independently authored."
+      },
+      {
+        "title": "Transformers generation strategies",
+        "url": "https://huggingface.co/docs/transformers/main/en/generation_strategies",
+        "usage": "Used as official implementation documentation to cross-check that beam search retains several generated sequences, prunes by overall sequence probability, and treats one beam as greedy decoding.",
+        "license": "The Transformers repository, including its documentation source, is Apache-2.0 licensed. It is consulted only for behavior; no documentation prose, code, example output, visualizer design, or layout is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the pool transition. Every live prefix branches using additive log probabilities; EOS children become completed records and stop generating immediately; only non-EOS children compete for the next top-k live frontier. Finished hypotheses remain available for the final consistent scoring rule, while live hypotheses are a fallback only when no sequence completes. The original worked example uses beam size two and synthetic cumulative log scores: live A at -0.20 and B at -0.35 expand to non-EOS candidates Ax at -0.30, By at -0.40, Bx at -0.75, and Az at -0.90, plus finished A<EOS> at -0.45 and B<EOS> at -1.15. Because larger log scores are better, live-only pruning keeps Ax and By; neither EOS record is expanded or discarded by that pruning step."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and visually inspected the only beam-adjacent slide neighborhood, then checked two primary beam-search and length-bias papers plus official Transformers generation documentation before selecting an original state-transition schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "beam-search-live-finished-transition"
+    ],
+    "accessibility": "Each panel has a linked title and complete description containing the hypothesis scores and transition result. Direct LIVE, EOS, FINISHED, KEEP, and PRUNE labels, arrow direction, dashed finished boundaries, crossed prune marks, and the absence of outgoing finished edges carry meaning without color. The established two-panel primitive stacks below 640 CSS pixels; each compact 300-unit SVG has no minimum width and keeps labels readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print tokens produce a light, high-contrast figure that stays together."
+  }
+}
