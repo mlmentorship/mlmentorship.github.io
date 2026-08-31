@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "loss-spikes-at-scale",
+  "article": "src/content/posts/2026-07-11-loss-spikes-at-scale.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Classify a loss event as transient, persistent, divergent, or metric-only from its trace while recognizing that trace shape does not identify the underlying causal family.",
+  "mediumRationale": "One compact deterministic SVG with four aligned small multiples is the smallest medium that makes recovery, a new plateau, compounding divergence, and a metric-only disagreement visually distinct. A shared time direction supports rapid comparison, while direct labels state what each shape establishes and what it cannot establish.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the learning task is to compare temporal shape and relative trajectories, not follow entities through a process. Flowchart nodes would not preserve the defining recovery, plateau, or divergence geometry.",
+    "svg": "Selected: deterministic small multiples encode the four trace signatures precisely in one narrow-column figure, require no runtime, and remain complete in print.",
+    "semanticHtml": "Rejected: four text cards would repeat the taxonomy but would not make the differences among returning to baseline, settling higher, accelerating upward, and disagreeing metrics immediately visible.",
+    "interaction": "Rejected: adjustable thresholds or simulated causes would add unsupported quantitative assumptions. The four static signatures fully satisfy the classification objective.",
+    "paperReuse": "Rejected: PaLM and Spike No More contain empirical loss traces, but this article needs a general taxonomy rather than a reproduction of one run. PaLM is CC BY 4.0 and could be reused with attribution; the other reviewed arXiv papers use arXiv's non-exclusive distribution license. No source trace, value, coordinates, data, wording, or layout is copied.",
+    "noVisual": "Rejected: prose defines the four classes, but readers must mentally simulate each trajectory and may confuse a visible signature with a root cause. Aligned traces make the classification boundary immediate and the caption explicitly limits the inference."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The data-inspection slide recommends visualizing distributions and outliers and inspecting prediction errors, supporting data-slice evidence rather than assuming every spike has an optimization cause."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends fixed seeds, explicit hypotheses, loss and metric plots, prediction inspection, and gradient-based debugging; it also notes that prediction wiggle may reveal instability."
+      },
+      {
+        "page": 60,
+        "insight": "The sanity-check slide asks readers to plot loss, train and validation accuracy, update-to-weight ratio, and per-layer activation and gradient histograms, showing why one aggregate loss curve is insufficient."
+      },
+      {
+        "page": 61,
+        "insight": "The adjacent model-selection slide notes that fixed seeds can reproduce perplexity spikes at the same confusing data, but presents this only as a comparison aid and does not establish a universal data cause."
+      },
+      {
+        "page": 63,
+        "insight": "The debugging slide recommends inspecting internal activations and gradients for odd artifacts, reinforcing localization below the final loss metric."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM-training slide combines mixed precision, FSDP, data mixtures, and architectural stability choices, showing that large-scale instability spans numerical, distributed, data, and model boundaries."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide explains FP16 underflow, loss scaling, skipped updates on Inf or NaN, FP32-sensitive operations, and distributed optimizer-state sharding as concrete numerical and state mechanisms."
+      },
+      {
+        "page": 115,
+        "insight": "The neighboring training-stack slide combines BF16, FP32 master weights, FSDP or ZeRO, packing, kernels, checkpointing, and accumulation, but provides no loss-spike taxonomy or diagnostic timeline."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 text-indexed all 214 pages of Basic_ML_CS_concepts for loss spike, spike, divergence, NaN, Inf, overflow, underflow, exploding gradients, gradient clipping, debugging, checkpointing, distributed training, hardware, numerical precision, learning rate, and warmup. It then read the complete neighboring ranges on pages 58-64, 102-108, and 113-116. The deck has no loss-spike taxonomy or large-scale incident trace. Pages 58-63 provide general monitoring and debugging advice; pages 107 and 114-115 supply relevant large-scale numerical and distributed context. Page 61's claim that fixed runs encounter the same confusing data is treated as a debugging heuristic, not evidence that data universally causes spikes. The deck states no reuse license and includes external material, so it was treated as review-only; no screenshot, trace, data, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "PaLM: Scaling Language Modeling with Pathways",
+        "url": "https://arxiv.org/abs/2204.02311",
+        "usage": "Used as a primary large-scale training report documenting irregular loss spikes despite gradient clipping, rollback and batch skipping as an operational mitigation, and failed reproduction when the same surrounding batches were replayed from an earlier parameter state. This supports separating observed timing from root-cause proof.",
+        "license": "The arXiv record identifies CC BY 4.0, so attributed adaptation is permitted. No PaLM figure, empirical trace, numeric value, prose, or layout is reused; the four signatures are original qualitative constructions."
+      },
+      {
+        "title": "Spike No More: Stabilizing the Pre-training of Large Language Models",
+        "url": "https://arxiv.org/abs/2312.16903",
+        "usage": "Used as a primary mechanistic study connecting controlled loss spikes to sudden gradient-norm growth and testing initialization and normalization interventions, while keeping that mechanism narrower than the article's full systems taxonomy.",
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, which limits third-party reuse. No paper figure, trace, experiment value, equation, prose, or visual structure is reproduced."
+      },
+      {
+        "title": "The Llama 3 Herd of Models",
+        "url": "https://arxiv.org/abs/2407.21783",
+        "usage": "Used as a primary system report showing that large-scale training incidents include hardware, network, software, silent-corruption, and collective failures, and that rank-aware traces and automated checkpoint recovery are operational requirements distinct from model-loss stability.",
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, not a permissive artwork license. No interruption table, loss trace, statistic, prose, or layout is reproduced."
+      },
+      {
+        "title": "PyTorch Automatic Mixed Precision examples",
+        "url": "https://docs.pytorch.org/docs/stable/notes/amp_examples.html",
+        "usage": "Used as official framework documentation to verify that GradScaler checks gradients for Inf and NaN, skips unsafe optimizer steps, and requires unscaling before gradient inspection or clipping.",
+        "license": "PyTorch documentation is part of the BSD-3-Clause-licensed PyTorch project. No documentation prose, code, sample, diagram, or page structure is reproduced."
+      }
+    ],
+    "notes": "The visual is an original qualitative taxonomy with no empirical values and no claim that the four traces exhaust all behavior. Transient means the monitored loss returns toward its prior trend; persistent means it settles into a worse regime; divergent means instability compounds toward failure; metric-only means the training-state signal stays healthy while a separate reported metric changes. These shapes classify symptoms only. Data, numerics, optimization, distributed state, software, and hardware remain competing causal families that require preserved state and controlled tests."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every relevant neighboring slide sequence, then checked three primary large-scale training papers and current official PyTorch AMP behavior before selecting an original four-signature taxonomy."
+  },
+  "implementation": {
+    "visualIds": [
+      "loss-spike-trace-taxonomy"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming every signature and its inference. Each panel directly labels its class and consequence; position, trajectory shape, and solid-versus-dashed lines distinguish the metric-only case without color. A 360-unit viewBox scales fluidly with no minimum width or horizontal scrolling at 390 CSS pixels. Established theme variables provide dark-mode contrast, and shared print tokens force a light high-contrast canvas while keeping the figure together."
+  }
+}
