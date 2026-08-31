@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "slug": "fine-tuning-deep",
+  "article": "src/content/posts/2025-06-27-fine-tuning-deep.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Separate the training objective (continued pretraining, supervised fine-tuning, or preference optimization) from the parameter-update scope (full weights or a parameter-efficient adapter such as LoRA).",
+  "mediumRationale": "A two-panel semantic comparison is the smallest useful spatial explanation: the first panel orders objectives by the signal they learn from, while the second makes parameter-update scope a separate choice that applies after selecting an objective.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a single flowchart would falsely make LoRA a terminal stage after SFT or preference optimization; the learning task is to separate two axes, not follow one branching process.",
+    "svg": "Rejected because the distinction is categorical rather than geometric or quantitative, and fixed SVG labels would wrap less naturally at a 390 CSS-pixel viewport.",
+    "semanticHtml": "Selected because two labelled panels expose the orthogonal choices in ordinary reading order, use established responsive primitives, and preserve all meaning as selectable text in dark mode and print.",
+    "interaction": "Rejected because toggling objectives or update scopes would hide valid combinations and add controls without improving the stable two-axis mental model.",
+    "paperReuse": "Rejected because the reviewed papers contain method-specific architecture and training figures, but none teaches this objective-versus-update-scope distinction. Reuse permission is either limited or unnecessary, so no source figure, layout, wording, result, or data is copied.",
+    "noVisual": "Rejected because the prose presents four items as peer modes even though LoRA and QLoRA can implement parameter-efficient updates for a selected training objective; readers need a spatial separation to avoid treating objective and update scope as one axis."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The preceding slide covers tokenization and perplexity, establishing the language-model objective context but no adaptation choice."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide distinguishes feature-based transfer from fine-tuning pretrained parameters on downstream tasks, but predates modern parameter-efficient adapters and preference optimization."
+      },
+      {
+        "page": 100,
+        "insight": "The following slide covers recurrent architectures and memory networks and adds no fine-tuning taxonomy."
+      },
+      {
+        "page": 103,
+        "insight": "The preceding transformer overview explains model architecture and training objectives but does not separate post-training objective from update scope."
+      },
+      {
+        "page": 104,
+        "insight": "The strongest relevant slide contrasts instruction tuning, in-context learning, and RLHF, and explicitly says instruction tuning is supervised while RLHF changes response tendencies; it does not cover LoRA or DPO."
+      },
+      {
+        "page": 105,
+        "insight": "The following LLM slide distinguishes base, instruction-trained, and RLHF models and discusses tool use, but adds no adapter-based training mechanism."
+      },
+      {
+        "page": 165,
+        "insight": "A system-design checklist briefly suggests fine-tuning one base model per user group for personalization; it supplies an operational use case but no objective or parameter-update comparison."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for fine-tuning, instruction tuning, in-context learning, few-shot learning, pretraining, LoRA, QLoRA, DPO, RLHF, and preference optimization. The directly relevant transfer-learning neighborhood on pages 98-100 and LLM adaptation neighborhood on pages 103-105 were rendered and visually inspected in full. Page 165 was also reviewed because it mentions per-group fine-tuning. The deck contains no LoRA, QLoRA, DPO, or two-axis objective-versus-update-scope treatment. No deck artwork, screenshots, wording, examples, or layout is reused.",
+    "license": "The local deck states no reuse license and includes third-party figures with mixed or incomplete attribution. It is treated as review-only material; the implementation is original semantic HTML."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Don't Stop Pretraining: Adapt Language Models to Domains and Tasks",
+        "url": "https://aclanthology.org/2020.acl-main.740/",
+        "usage": "Used as the primary source for domain-adaptive continued pretraining on unlabeled domain text before task-specific fine-tuning.",
+        "license": "The paper is used only as a technical reference. No figure, table, result, wording, or visual structure is reproduced."
+      },
+      {
+        "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+        "url": "https://arxiv.org/abs/2106.09685",
+        "usage": "Used as the primary source establishing LoRA as frozen pretrained weights plus trainable low-rank matrices, which makes it an update-scope mechanism rather than a distinct data objective.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, which limits third-party reuse. No paper figure, equation, benchmark result, wording, or layout is reproduced."
+      },
+      {
+        "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+        "url": "https://arxiv.org/abs/2305.14314",
+        "usage": "Used as the primary source for backpropagating through a frozen quantized base model into LoRA adapters, supporting the separation of storage and update strategy from the chosen fine-tuning objective.",
+        "license": "The source is used for technical verification only. No paper figure, equation, memory result, wording, or layout is reproduced."
+      },
+      {
+        "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+        "url": "https://arxiv.org/abs/2305.18290",
+        "usage": "Used as the primary source for direct optimization on preference pairs relative to a reference policy without fitting a separate reward model or running PPO.",
+        "license": "The source is used for technical verification only. No paper figure, equation, empirical result, wording, or layout is reproduced."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to avoid treating public availability as permission to reuse paper figures and to interpret the arXiv perpetual non-exclusive distribution license.",
+        "license": "The page explains that copyright holders retain ownership and that the arXiv distribution license limits reuse by other entities. No page content is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the article mixes two independent decisions. Continued pretraining, SFT, and preference optimization specify the training signal and intended behavioral change. Full fine-tuning versus PEFT specifies which parameters are trainable and how adaptations are stored or served. An original two-panel visual makes the non-peer relationship explicit without asserting a universal quality or cost ordering."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected both relevant slide neighborhoods, and checked primary sources for continued pretraining, LoRA, QLoRA, and DPO before selecting an original two-axis semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "fine-tuning-two-decisions"
+    ],
+    "accessibility": "The figure uses a linked learning question and an explicitly labelled group of two semantic sections. Objectives, data signals, effects, and update scopes are all stated in text; numbered stages, headings, and written relationships carry the full lesson without color. The established two-column primitive stacks below 640 CSS pixels with normal text wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast and shared print rules produce a high-contrast light rendering."
+  }
+}
