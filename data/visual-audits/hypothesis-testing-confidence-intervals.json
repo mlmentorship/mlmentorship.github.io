@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "hypothesis-testing-confidence-intervals",
+  "article": "src/content/posts/2026-08-28-hypothesis-testing-confidence-intervals.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Classify a model-gain confidence interval by whether it rules out no effect and whether it establishes a gain large enough to change the decision.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that aligns several intervals against the same null value and minimum useful gain, making statistical evidence and practical value separately visible and quantitatively checkable.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could name decision branches, but it cannot preserve interval endpoints and shared thresholds on a quantitative axis.",
+    "svg": "Selected: fixed interval geometry, endpoint labels, threshold lines, and direct verdicts expose both comparisons in one compact static figure.",
+    "semanticHtml": "Rejected: a table could list the same numbers, but readers would still need to mentally compare every lower and upper endpoint with both thresholds.",
+    "interaction": "Rejected: movable endpoints would add controls and transient states when three fixed cases fully demonstrate the decision logic.",
+    "paperReuse": "Rejected: the reviewed sources establish the statistical interpretation but reuse permission for their figures was not established, and no source figure teaches this exact ML launch comparison.",
+    "noVisual": "Rejected: prose explains significance and effect size separately, but the hardest mental model is applying both tests to the same interval without collapsing them into one binary verdict."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 15,
+        "insight": "The preceding slide distinguishes one training and test realization from an unknown data-generating distribution, establishing why measured performance varies."
+      },
+      {
+        "page": 16,
+        "insight": "The parameter-learning slide defines point-estimator variance across data realizations and identifies its square root as standard error."
+      },
+      {
+        "page": 17,
+        "insight": "The following slide contrasts MLE and MAP point estimates with Bayesian parameter distributions but does not introduce hypothesis tests or confidence intervals."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design checklist asks candidates to connect model evaluation to product objectives, costs, downstream impacts, and guardrail metrics."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks about prediction-level confidence intervals, cost-benefit triggers, experiments, statistical significance, and success criteria, but does not distinguish parameter-effect intervals from predictive uncertainty."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring worked example focuses on requirements, data, and system design and adds no statistical decision rule."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for hypothesis, confidence interval, p-value, Type I and II error, statistical significance, and standard error. Pages 15-17 and 161-163 were read in full as the only relevant neighborhoods. The deck supplies uncertainty and product-decision context but contains no effect confidence-interval comparison, p-value interpretation, or null-versus-practical-threshold graphic; no deck artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The ASA's Statement on p-Values: Context, Process, and Purpose",
+        "url": "https://doi.org/10.1080/00031305.2016.1154108",
+        "usage": "Used as the authoritative professional-society statement that a p-value does not measure effect size or the importance of a result and should not alone determine a decision.",
+        "license": "The journal article is publisher-copyrighted and no permissive figure-reuse license was established. No figure, prose, examples, or layout is copied; its principles are cited to support the original visual's separate practical threshold."
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Confidence intervals and hypothesis testing",
+        "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm",
+        "usage": "Used as an authoritative government handbook to verify the two-sided test and confidence-interval correspondence: a null value outside the matching interval is rejected at the stated significance level.",
+        "license": "No NIST graph, data, prose, or visual structure is reused. The interval cases and launch threshold are original synthetic teaching examples."
+      },
+      {
+        "title": "Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability",
+        "url": "https://doi.org/10.1098/rsta.1937.0005",
+        "usage": "Used as the foundational primary source for confidence-interval estimation and repeated-sampling coverage.",
+        "license": "The Royal Society paper is copyrighted and no permissive figure-reuse license was identified. No figure, notation sequence, prose, or numerical example is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that excluding zero answers an evidence question while clearing a predeclared minimum useful gain answers a decision question. The original schematic uses three synthetic 95% intervals in percentage points: [-0.3, 1.9] crosses zero; [0.1, 1.5] excludes zero but crosses a 1.0-point minimum useful gain; and [1.2, 2.0] lies wholly above that threshold. These cases classify uncertainty, positive statistical evidence with unresolved practical value, and evidence of a decision-relevant gain without claiming that confidence intervals alone encode costs or assumptions."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, reviewed the full deck index and both relevant slide neighborhoods, checked a foundational paper, an official handbook, and the ASA statement, and selected an original interval-versus-threshold plot rather than duplicating the site's existing confidence-versus-credible-interval visual."
+  },
+  "implementation": {
+    "visualIds": [
+      "model-gain-evidence-decision"
+    ],
+    "accessibility": "The SVG provides a linked title and detailed description with every endpoint and verdict. Solid interval bars, bracket endpoints, point markers, two differently dashed and directly labeled vertical thresholds, row numbers, and explicit text outcomes carry all meaning without color. A 360-unit viewBox scales below 390 CSS pixels, shared theme variables preserve dark-mode contrast, and established figure print rules provide a light high-contrast palette and avoid page breaks."
+  }
+}

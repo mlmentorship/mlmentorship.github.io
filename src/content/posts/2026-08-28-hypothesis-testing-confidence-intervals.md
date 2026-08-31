@@ -72,6 +72,54 @@ For a 95% interval under a normal approximation, $z^*$ is about 1.96.
 
 Example: a model gain is $0.8$ points with a 95% interval from $0.1$ to $1.5$ points. Zero is outside the interval. The data supports a positive effect under the assumptions. The interval also shows that the true gain may be too small to justify added cost.
 
+**Learning objective:** classify a model-gain confidence interval by whether it rules out no effect and whether it establishes a gain large enough to change the decision.
+
+<!-- visual:model-gain-evidence-decision -->
+<figure class="learning-figure plot-panel" aria-labelledby="model-gain-decision-title">
+	<p class="visual-kicker">Evidence versus decision</p>
+	<p class="visual-title" id="model-gain-decision-title">Compare every interval with zero and the minimum useful gain.</p>
+	<svg viewBox="0 0 360 338" role="img" aria-labelledby="model-gain-decision-svg-title model-gain-decision-svg-desc">
+		<title id="model-gain-decision-svg-title">Three model-gain confidence intervals compared with zero and a minimum useful gain</title>
+		<desc id="model-gain-decision-svg-desc">An original plot of three synthetic 95 percent confidence intervals in percentage points. The first interval runs from minus 0.3 to 1.9 and crosses zero, so the direction is uncertain. The second runs from 0.1 to 1.5; it excludes zero but crosses the predeclared minimum useful gain of 1.0, so there is evidence of a positive effect but practical value remains unresolved. The third runs from 1.2 to 2.0 and lies entirely above the minimum useful gain, supporting a decision-relevant gain under the assumptions.</desc>
+		<rect class="viz-plot-bg" x="64" y="54" width="276" height="198" rx="3"></rect>
+		<path class="viz-gridline" d="M78 54V252M127 54V252M176 54V252M225 54V252M274 54V252M323 54V252"></path>
+		<path class="viz-operating-guide" style="stroke-dasharray:7 5" d="M127 42V263"></path>
+		<path style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:2 5" d="M225 42V263"></path>
+		<text class="viz-callout" x="127" y="17" text-anchor="middle">no effect</text>
+		<text class="viz-callout" x="225" y="17" text-anchor="middle">minimum useful gain</text>
+		<text class="viz-label" x="127" y="33" text-anchor="middle">0</text>
+		<text class="viz-label" x="225" y="33" text-anchor="middle">+1.0 point</text>
+		<text class="viz-axis-label" x="12" y="89">1</text>
+		<path class="viz-baseline" d="M98 84H313M98 77V91M313 77V91"></path>
+		<circle class="viz-operating-point" cx="205" cy="84" r="4"></circle>
+		<text class="viz-label" x="98" y="107" text-anchor="middle">−0.3</text>
+		<text class="viz-label" x="313" y="107" text-anchor="middle">+1.9</text>
+		<text class="viz-axis-label" x="12" y="139">2</text>
+		<path class="viz-axis" d="M137 134H274M137 127V141M274 127V141"></path>
+		<circle class="viz-operating-point" cx="205" cy="134" r="4"></circle>
+		<text class="viz-label" x="137" y="157" text-anchor="middle">+0.1</text>
+		<text class="viz-label" x="274" y="157" text-anchor="middle">+1.5</text>
+		<text class="viz-axis-label" x="12" y="189">3</text>
+		<path class="viz-axis" style="stroke-width:3" d="M245 184H323M245 177V191M323 177V191"></path>
+		<circle class="viz-operating-point" cx="284" cy="184" r="4"></circle>
+		<text class="viz-label" x="245" y="207" text-anchor="middle">+1.2</text>
+		<text class="viz-label" x="323" y="207" text-anchor="middle">+2.0</text>
+		<text class="viz-axis-label" x="12" y="230">VERDICT</text>
+		<text class="viz-label" x="78" y="230">1 · Direction uncertain: interval crosses zero.</text>
+		<text class="viz-label" x="78" y="247">2 · Positive effect; useful size still uncertain.</text>
+		<text class="viz-label" x="78" y="264">3 · Entire interval clears the useful-gain threshold.</text>
+		<path class="viz-axis" d="M78 282H323M78 277V287M127 277V287M176 277V287M225 277V287M274 277V287M323 277V287"></path>
+		<text class="viz-label" x="78" y="301" text-anchor="middle">−0.5</text>
+		<text class="viz-label" x="127" y="301" text-anchor="middle">0</text>
+		<text class="viz-label" x="176" y="301" text-anchor="middle">+0.5</text>
+		<text class="viz-label" x="225" y="301" text-anchor="middle">+1.0</text>
+		<text class="viz-label" x="274" y="301" text-anchor="middle">+1.5</text>
+		<text class="viz-label" x="323" y="301" text-anchor="middle">+2.0</text>
+		<text class="viz-axis-label" x="200" y="326" text-anchor="middle">model B gain over model A (percentage points)</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> compare each interval's left endpoint with both vertical rules. Crossing zero means the direction remains uncertain. Clearing zero but not the predeclared +1.0-point threshold supports a positive effect without establishing enough gain to act. Only row 3 clears both bars; that conclusion still depends on the test assumptions and whether +1.0 point was chosen before seeing the result. Definitions checked against the <a href="https://doi.org/10.1080/00031305.2016.1154108">ASA statement on p-values</a>, the <a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm">NIST handbook</a>, and <a href="https://doi.org/10.1098/rsta.1937.0005">Neyman's confidence-interval formulation</a>; the graphic and values are original.</figcaption>
+</figure>
+
 ## Use paired comparisons
 
 Model A and Model B often score the same examples. Their errors are linked. Use the per-example difference instead of treating the two score sets as independent.
