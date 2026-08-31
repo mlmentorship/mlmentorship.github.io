@@ -34,6 +34,43 @@ def attention(Q, K, V, mask=None):
     return attn @ V
 ```
 
+<!-- visual:attention-causal-mask-row -->
+<figure class="learning-figure" aria-labelledby="attention-causal-mask-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="attention-causal-mask-title">For one query, which axis does softmax normalize after causal masking?</p>
+	<div class="visual-grid--two" role="group" aria-label="Causal attention mask and a worked softmax row">
+		<section class="visual-panel" aria-labelledby="attention-mask-grid-title">
+			<h4 id="attention-mask-grid-title">Rows are queries; columns are keys</h4>
+			<p>A query may keep its own key and earlier keys. Future-key scores become negative infinity.</p>
+			<table class="cm-grid" aria-label="Four-token lower-triangular causal mask where keep cells are on and below the diagonal">
+				<thead><tr><th scope="col">query</th><th scope="col">k1</th><th scope="col">k2</th><th scope="col">k3</th><th scope="col">k4</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">q1</th><td class="cm-selected"><strong>keep</strong></td><td>-inf</td><td>-inf</td><td>-inf</td></tr>
+					<tr><th scope="row">q2</th><td class="cm-selected"><strong>keep</strong></td><td class="cm-selected"><strong>keep</strong></td><td>-inf</td><td>-inf</td></tr>
+					<tr><th scope="row">q3</th><td class="cm-selected"><strong>keep</strong></td><td class="cm-selected"><strong>keep</strong></td><td class="cm-selected"><strong>keep</strong></td><td>-inf</td></tr>
+					<tr><th scope="row">q4</th><td class="cm-selected"><strong>keep</strong></td><td class="cm-selected"><strong>keep</strong></td><td class="cm-selected"><strong>keep</strong></td><td class="cm-selected"><strong>keep</strong></td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">mask shape: (1, 1, T queries, T keys)</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="attention-row-trace-title">
+			<h4 id="attention-row-trace-title">Trace query q3 across key columns</h4>
+			<p>The fourth raw score is largest, but q3 cannot use future key k4.</p>
+			<table class="cm-grid" aria-label="Worked query row before masking, after masking, and after softmax over four key columns">
+				<thead><tr><th scope="col">stage</th><th scope="col">values across k1, k2, k3, k4</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">scores</th><td>0.2, 1.1, -0.4, 2.8</td></tr>
+					<tr><th scope="row">filled</th><td>0.2, 1.1, -0.4, -inf</td></tr>
+					<tr><th scope="row">softmax</th><td class="cm-selected"><strong>0.25, 0.61, 0.14, 0.00</strong></td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">dim = -1: weights across keys sum to 1.00</p>
+			<p class="cm-equation">output for q3 = 0.25V1 + 0.61V2 + 0.14V3</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> choose one query row, replace every disallowed key score with negative infinity, then normalize left to right across key columns. For q3, k4 receives exactly zero weight even though its raw score was largest; the remaining weights sum to one and multiply the matching value rows. This is an original worked example checked against <a href="https://arxiv.org/abs/1706.03762">scaled dot-product attention</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">PyTorch's boolean-mask semantics</a>.</figcaption>
+</figure>
+
 If this is all you write and you stop talking, you're at L4. The interviewer now wants to see you bring up the things they were planning to probe.
 
 ## What the L5 candidate adds, unprompted
