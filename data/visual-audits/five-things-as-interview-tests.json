@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "five-things-as-interview-tests",
+  "article": "src/content/posts/2026-03-20-five-things-as-interview-tests.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Reclassify familiar interview rounds as overlapping evidence for five cross-cutting senior Applied Scientist signals, then prepare directly for the signal each prompt can reveal.",
+  "mediumRationale": "Five compact semantic evidence cards are the smallest useful spatial explanation because the lesson is a reclassification, not a process: each stable signal appears as a heading, the card names multiple rounds where it can surface, and one targeted preparation drill follows.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a many-to-many graph between round types and five signals would create crossing edges and imply a fixed interview-loop topology that varies by employer.",
+    "svg": "Rejected: no quantitative scale, geometry, or fixed coordinates carry the lesson, and text in SVG would wrap less reliably at 390 CSS pixels.",
+    "semanticHtml": "Selected: directly labelled cards preserve the five-part grouping, expose overlap through explicit Seen in lines, remain native text for assistive technology, and reflow from two columns to one using the established responsive primitive.",
+    "interaction": "Rejected: filtering by round would hide the central fact that one prompt can produce evidence for several signals and would add state without new explanatory value.",
+    "paperReuse": "Rejected: the authoritative sources describe competency-based and Applied Scientist interviewing but do not provide a figure for this article's original five-signal synthesis. Public access was not treated as permission to copy any source artwork or arrangement.",
+    "noVisual": "Rejected: the prose explains each signal and later lists preparation drills, but readers must mentally connect those signals across the conventional round labels. The grouped cards make that cross-cutting reclassification explicit at a glance."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The ML Design divider and timing strip introduce a conventional round label, beginning the closest technical-interview neighborhood."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview combines vague product prompts, algorithm choice, trade-offs, and feature selection, showing that one nominal round can elicit both scoping and scientific reasoning."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist covers customer goals, global rollout, tooling, and training data, supplying concrete shipping evidence inside a technical design discussion."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example explicitly reserves time for clarifying ambiguous requirements and then probes training and live data, directly supporting the article's scope-before-solve signal."
+      },
+      {
+        "page": 164,
+        "insight": "The neighboring worked-example page asks for algorithm trade-offs, a hypothesis, and offline and online evaluation, joining scientific understanding to production judgment."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide asks about model gates, monitoring, user feedback, updates, low-confidence behavior, latency, memory, compute, privacy, and interpretability—the article's boring middle of shipped ML."
+      },
+      {
+        "page": 169,
+        "insight": "The adjacent Rules of ML Engineering summary emphasizes observable metrics, launch discipline, error analysis, and training-serving skew before the deck changes to algorithms and data structures."
+      },
+      {
+        "page": 207,
+        "insight": "The Behavioral/Culture Interview divider begins a separate conventional round neighborhood with no claim that behavioral evidence is isolated from technical rounds."
+      },
+      {
+        "page": 208,
+        "insight": "The resource slide lists behavioral and general interview references but supplies no model connecting behavioral prompts to technical-round evidence."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider introduces the neighboring communication material."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends facts-first dialogue, examining one's own role, replacing either-or framing, keeping others safe, and speaking with confidence and humility; this closely matches constructive disagreement and low-ego collaboration."
+      },
+      {
+        "page": 211,
+        "insight": "The following DL Frameworks divider ends the behavioral and leadership neighborhood, confirming that the deck keeps these topics spatially separate from its ML design material."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for interview, design, ambiguity, requirements, production, launch, behavioral, culture, leadership, disagreement, and communication concepts. Pages 159-170 and 207-211 were read as the complete matching neighborhoods, including their boundary slides. The deck supplies relevant examples on pages 161-164, 168-169, and 210, but it does not provide the article's five-signal taxonomy or show that conventional rounds collect overlapping evidence. No deck screenshot, wording, layout, or artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Applied Scientist Interview Prep",
+        "url": "https://www.amazon.jobs/content/en/how-we-hire/applied-scientist-interview-prep",
+        "usage": "Used as official employer guidance to verify that Applied Scientist loops assess technical and non-technical competencies, combine behavioral and technical questions, and cover problem solving and coding, knowledge depth and breadth, and Leadership Principles across assigned interviewers.",
+        "license": "Amazon publishes the page for candidate guidance but provides no clear permissive license for its text, videos, or artwork. No wording, media, page structure, or visual arrangement is copied; it is cited only to check the cross-competency premise."
+      },
+      {
+        "title": "Structured Interviews",
+        "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/",
+        "usage": "Used as authoritative U.S. government guidance to verify that structured interviews measure job-related competencies through past behavior and hypothetical situations and can assess interpersonal skills that other methods struggle to measure.",
+        "license": "As an official U.S. federal government resource, unmarked agency-authored material is generally not protected by U.S. copyright under 17 U.S.C. 105, subject to third-party exceptions. No text, form, or figure is reproduced."
+      },
+      {
+        "title": "A Review of Structure in the Selection Interview",
+        "url": "https://doi.org/10.1111/j.1744-6570.1997.tb00709.x",
+        "usage": "Used as a peer-reviewed primary review to check the role of job analysis, job-related questions, standardized evaluation, interviewer training, and multiple dimensions in making selection interviews more reliable and valid.",
+        "license": "The Personnel Psychology article is copyrighted by its publisher, and no open figure-reuse license was identified. No prose, data, table, figure, or visual structure is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that round names are containers, not the latent criteria. A system-design prompt can reveal scoping, science, shipping, and communication; a project-depth prompt can reveal shipping, science, disagreement handling, and room presence. The five signals and their preparation drills are the article author's synthesis rather than an empirically exhaustive or employer-standard rubric. The sources validate competency-based, multi-dimensional assessment, not the exact count of five."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full ML-design and behavioral-leadership neighborhoods, then checked official Amazon Applied Scientist guidance, U.S. OPM structured-interview guidance, and a peer-reviewed review before choosing an original semantic reclassification visual."
+  },
+  "implementation": {
+    "visualIds": [
+      "as-five-cross-cutting-signals"
+    ],
+    "accessibility": "The figure has a linked learning question and a labelled list of five semantic cards. Each signal, the rounds where it can surface, and its preparation drill are written explicitly; ordinal numbers, headings, and text grouping carry all meaning without color. The established two-column primitive collapses to one column below 640 pixels, with native wrapping text and no minimum width, so it remains readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, while shared print tokens provide a light high-contrast palette and avoid splitting the figure across pages."
+  }
+}
