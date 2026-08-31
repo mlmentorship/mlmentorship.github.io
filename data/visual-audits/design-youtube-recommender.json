@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-youtube-recommender",
+  "article": "src/content/posts/2025-10-20-design-youtube-recommender.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how a two-stage recommender narrows the catalog, then identify why its displayed slate—not the whole catalog—determines tomorrow's ordinary training labels.",
+  "mediumRationale": "A focused Mermaid funnel with a feedback edge is the smallest useful explanation because the lesson depends on both directed serving stages and a returning data path. It keeps candidate generation, ranking, composition, selective observation, and deliberate exploration connected without reproducing detailed model architectures or counterfactual-estimator mathematics covered elsewhere.",
+  "mediumComparison": {
+    "mermaid": "Selected because the learning task is a directed funnel plus a feedback loop. Labelled edges make selection and non-selection explicit, while the existing tall-flow treatment preserves readable labels and themed rendering at narrow widths.",
+    "svg": "Rejected because no quantitative scale or fixed geometry carries the claim. Hand-positioning a flow graph would add maintenance cost and risk implying that box sizes represent catalog or candidate proportions.",
+    "semanticHtml": "Rejected because a table can compare candidate generation with ranking, but it cannot make the displayed slate's dual role as output and training-data gate visible in one trace.",
+    "interaction": "Rejected because simulating exploration rates or ranker weights would require workload and causal assumptions beyond the article. The static ordering and selective-observation invariant is the durable lesson.",
+    "paperReuse": "Rejected because the reviewed YouTube papers contain system-specific figures and the algorithmic-confounding paper contains experimental diagrams. Their publication pages permit reading and citation, but permissive figure-adaptation rights were not established. No source artwork, coordinates, wording, values, or layout is reused.",
+    "noVisual": "Rejected because prose separately explains the two-stage serving path and the feedback-loop risk, leaving readers to compose the causal connection: only items surviving both stages can normally generate the labels used to update those stages."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 128,
+        "insight": "The preceding model-compression slide closes the prior topic and establishes the boundary before the recommender section."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider introduces the exact local section but contains no mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide is directly relevant: it states that observed positives are not missing at random, presentation bias creates a feedback loop, exploration must be traded against exploitation, and ANN avoids scoring every item. It does not connect these facts through a two-stage serving-and-learning loop."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid slide supports a parallel source for new or low-interaction items and notes that content-only similarity can reduce diversity."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search divider begins a related worked ranking sequence."
+      },
+      {
+        "page": 133,
+        "insight": "The overview lists problem formulation, system design, data, models, and experimentation, framing the neighboring end-to-end sequence."
+      },
+      {
+        "page": 134,
+        "insight": "The search prompt defines request-level personalization and a 100-millisecond latency constraint, relevant production context but not a recommendation feedback mechanism."
+      },
+      {
+        "page": 135,
+        "insight": "The problem-formulation slide explicitly separates candidate generation from ranking and assigns intent signals to retrieval and richer context and behavior to ranking."
+      },
+      {
+        "page": 136,
+        "insight": "The system-overview slide is only a section heading in extracted text and contributes no inspectable mechanism."
+      },
+      {
+        "page": 137,
+        "insight": "The data slide defines interaction histories and successful sessions whose returned items receive outcome labels, directly supporting the selective-label concern."
+      },
+      {
+        "page": 138,
+        "insight": "The personalized-recommender slide uses past interactions and contrastive learning for one candidate source."
+      },
+      {
+        "page": 139,
+        "insight": "The content-based slide uses knowledge-graph item features and similarity, supporting a source that does not require item interaction history."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide combines query, user, item, and interaction features to score retrieved candidates."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline recall and reciprocal rank from online engagement and days-with-a-play outcomes."
+      },
+      {
+        "page": 142,
+        "insight": "The first LLM exploration example begins a speculative interface detour and no longer develops the production two-stage feedback mechanism."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview requires scoping, logging, sampling-bias analysis, latency, NDCG, goal metrics, and guardrails but provides no article-specific recommendation loop."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly asks about explore-exploit adaptation and correction for position, selection, and labeling bias, independently reinforcing the need to log the exposure policy."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example asks how training and live data transform and how biased training data is avoided; it adds process context without a selective-feedback visual."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide warns about inherent skew in ranking and feedback loops from positional features, but does not show how displayed recommendations become later labels."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for YouTube, recommender, recommendation, collaborative filtering, content-based filtering, feedback loop, presentation bias, candidate generation, ranking, exploration, position bias, and selection bias. Pages 128-142 were read as the complete recommender and personalized-ranking neighborhood through its first topic change; pages 161-163 and 169 were read as the matching design and production guidance. Pages 130, 135, 137, 140, and 162 contain the closest ingredients, but no slide connects the narrowing funnel to selective outcome collection and later retraining. No deck image, text, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Neural Networks for YouTube Recommendations",
+        "url": "https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/",
+        "usage": "Used as the primary YouTube systems source to verify the classic split between a deep candidate-generation model and a separate deep ranking model at massive catalog scale.",
+        "license": "The Google Research publication page and linked ACM paper are publicly readable, but no permissive license for adapting the paper's figures was established. No figure, prose, model diagram, result, value, or layout is reproduced."
+      },
+      {
+        "title": "Recommending What Video to Watch Next: A Multitask Ranking System",
+        "url": "https://research.google/pubs/recommending-what-video-to-watch-next-a-multitask-ranking-system/",
+        "usage": "Used as a primary industrial ranking source to cross-check multiple competing objectives and the explicit selection biases present in implicit user feedback.",
+        "license": "The publication page is available for citation, while the linked ACM paper remains copyrighted and no figure-reuse grant was identified. No source figure, architecture, wording, data, or layout is copied."
+      },
+      {
+        "title": "How Algorithmic Confounding in Recommendation Systems Increases Homogeneity and Decreases Utility",
+        "url": "https://arxiv.org/abs/1710.11214",
+        "usage": "Used as a primary study of repeated recommendation feedback to verify that algorithm-mediated observations can confound preference estimates, homogenize users, and reduce utility over time.",
+        "license": "The arXiv paper is publicly accessible, but its record was not treated as a permissive license to adapt figures. No experiment, result, prose, diagram, synthetic value, or arrangement is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the production funnel is also an observation policy. Candidate generation and ranking determine the small slate a user can react to; ordinary logs reveal outcomes for exposed items, while unshown outcomes remain unknown rather than negative. Training on those logs changes later retrieval and ordering, so exploitation can reinforce its own earlier choices. The original diagram adds explicit content/freshness and randomized-exploration inputs to show how coverage can be broadened without teaching the detailed IPS or doubly robust estimators covered by the linked counterfactual-ranking article."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the full recommender, personalized-ranking, and production neighborhoods, then checked two primary YouTube systems papers and a primary algorithmic-confounding study before selecting an original selective-feedback funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "youtube-recommender-selective-feedback-loop"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description that names both serving stages, all candidate sources, composition, displayed and unshown outcomes, exposure logging, retraining, and both feedback edges. Every distinction is encoded with direct labels, arrow direction, numbered stages, shapes, and solid versus dashed paths rather than color. The established tall-flow marker prevents screen-height compression and permits constrained-width overflow for readable labels at 390 CSS pixels; shared theme tokens support dark mode and print, and the adjacent prose and direct caption preserve the lesson without client-side rendering."
+  }
+}
