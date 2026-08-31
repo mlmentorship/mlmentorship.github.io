@@ -78,7 +78,7 @@ Initialize $k$ centroids (random points or **k-means++** for stability). Then re
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> in the left panel, compare distances while A₀ and B₀ stay fixed; circles and squares encode the resulting memberships without relying on color. In the right panel, freeze those memberships and move each × to the arithmetic mean of its three points. Alternating these two objective-nonincreasing steps reaches a fixed point, but the result can still be only a local minimum. Original construction checked against <a href="https://doi.org/10.1109/TIT.1982.1056489">Lloyd's least-squares quantization paper</a> and the <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means">scikit-learn k-means guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> in the assignment panel, compare distances while A₀ and B₀ stay fixed; circles and squares encode the resulting memberships without relying on color. In the update panel, freeze those memberships and move each × to the arithmetic mean of its three points. Alternating these two objective-nonincreasing steps reaches a fixed point, but the result can still be only a local minimum. Original construction checked against <a href="https://doi.org/10.1109/TIT.1982.1056489">Lloyd's least-squares quantization paper</a> and the <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means">scikit-learn k-means guide</a>.</figcaption>
 </figure>
 
 Stop when assignments don't change (or change below a threshold). Convergence is guaranteed in finite steps but only to a local minimum. K-means is **not convex**.
