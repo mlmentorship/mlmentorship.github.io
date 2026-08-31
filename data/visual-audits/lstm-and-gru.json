@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "slug": "lstm-and-gru",
+  "article": "src/content/posts/2026-05-07-lstm-and-gru.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compute one LSTM cell update coordinate by coordinate, then read the direct backward multiplier from the same forget gate.",
+  "mediumRationale": "A deterministic worked SVG is the smallest useful medium for aligning old state, forget gate, retained state, candidate, input gate, written state, and the direct gradient multiplier by coordinate. The fixed vertical alignment makes the Hadamard operation visible while a narrow viewBox scales without horizontal scrolling.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show cell components but does not naturally align numeric vector coordinates or verify the elementwise arithmetic.",
+    "svg": "Selected: a deterministic three-coordinate calculation preserves exact alignment, values, products, sums, and the backward multiplier in one compact responsive panel.",
+    "semanticHtml": "Rejected: a table could reproduce the arithmetic, but the separate retained and written paths plus their convergence into the new state would be less visually distinct within ordinary article table styling.",
+    "interaction": "Rejected: adjustable gates could demonstrate interpolation, but controls and state are unnecessary when three representative coordinates already show copy, partial retention, and strong forgetting.",
+    "paperReuse": "Rejected: the local deck and reviewed sources include familiar LSTM and GRU cell diagrams, but artwork provenance or adaptation permission was not established for the paper figures, and their dense full-cell layouts do not teach this coordinate-level objective. No figure, data, wording, coordinates, or layout is copied.",
+    "noVisual": "Rejected: the equations define Hadamard products but require readers to mentally align every vector coordinate, calculate two gated contributions, add them, and connect the forget value to the backward path."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 3,
+        "insight": "The preceding linear-algebra slide covers matrices, determinants, and spans, establishing the neighborhood before product definitions."
+      },
+      {
+        "page": 4,
+        "insight": "The products slide explicitly contrasts element-wise Hadamard, dot, and outer products and gives a matrix-valued Hadamard example, but does not connect coordinate-wise scaling to recurrent gates."
+      },
+      {
+        "page": 5,
+        "insight": "The following slide moves to matrix factorization, eigen decomposition, and SVD, ending the product-definition neighborhood."
+      },
+      {
+        "page": 40,
+        "insight": "The section divider introduces general neural-network concepts immediately before the activation material."
+      },
+      {
+        "page": 41,
+        "insight": "The activation slide explains sigmoid saturation and gradient loss and mentions vanishing and exploding gradients, but does not distinguish sigmoid as a gate value on the direct cell-state path."
+      },
+      {
+        "page": 42,
+        "insight": "The following slide starts the learning section and adds no gated-recurrence mechanism."
+      },
+      {
+        "page": 86,
+        "insight": "The preceding slide frames latent, transformation, and autoregressive model families but does not explain a recurrent update."
+      },
+      {
+        "page": 87,
+        "insight": "The model-family overview labels LSTM as an autoregressive model without equations, gates, or gradient behavior."
+      },
+      {
+        "page": 88,
+        "insight": "The following references slide closes the model-family overview and contains no LSTM mechanism."
+      },
+      {
+        "page": 96,
+        "insight": "The preceding NLP slide covers text preprocessing and word2vec, providing context for the language-model example."
+      },
+      {
+        "page": 97,
+        "insight": "The character-language-model slide instantiates PyTorch nn.LSTM and truncated sequences but treats the recurrent cell as an opaque library component."
+      },
+      {
+        "page": 98,
+        "insight": "The neighboring tokenization and perplexity slide evaluates language models but does not expose recurrent state."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide identifies LSTM-based feature pretraining before contrasting transformer fine-tuning."
+      },
+      {
+        "page": 100,
+        "insight": "The dedicated recurrent-net slide places LSTM and GRU cell schematics and equations side by side, including gates, candidates, and update rules. It is dense, combines unrelated memory-network material, and does not work a coordinate-level Hadamard update or its direct derivative."
+      },
+      {
+        "page": 101,
+        "insight": "The following slide switches to transformer encoder and decoder structure, ending the recurrent-net neighborhood."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for LSTM, GRU, recurrent, RNN, Hadamard, long short-term memory, vanishing gradient, exploding gradient, forget, gate, cell state, and update rule. Exact matches and their complete neighborhoods were extracted, and pages 4, 97, and 100 were also rendered and visually inspected. Page 100 is the only dedicated LSTM/GRU slide, but its imported cell artwork has no clear reuse provenance and its layout is unsuitable for a narrow reading column. No deck screenshot, equation arrangement, artwork, values, or layout is reused.",
+    "license": "The local deck states no reuse license and contains externally sourced figures. It is treated as review-only; the shipped numeric example and SVG layout are independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Long Short-Term Memory",
+        "url": "https://www.bioinf.jku.at/publications/older/2604.pdf",
+        "usage": "Used as the primary LSTM source to verify the multiplicative gate mechanism, protected internal state path, and the motivation of preserving error flow over long time intervals.",
+        "license": "The authors' hosted PDF is publicly accessible, but no permissive figure-reuse license was established. No source figure, notation layout, empirical result, prose, or worked value is reproduced."
+      },
+      {
+        "title": "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation",
+        "url": "https://arxiv.org/abs/1406.1078",
+        "usage": "Used as the primary GRU source to verify update and reset gating, a single hidden state, and interpolation between the previous state and a candidate activation.",
+        "license": "The arXiv record is public, but no permissive third-party figure-reuse grant was established. No paper figure, architecture layout, experiment, phrase data, wording, or values are copied."
+      },
+      {
+        "title": "On the difficulty of training recurrent neural networks",
+        "url": "https://proceedings.mlr.press/v28/pascanu13.html",
+        "usage": "Used as the primary analytical source for vanishing and exploding gradients through repeated recurrent Jacobian products and for distinguishing direct gated state flow from unrestricted dense recurrent multiplication.",
+        "license": "PMLR states that authors retain copyright. No source figure, geometric construction, experimental data, wording, or layout is reused."
+      },
+      {
+        "title": "PyTorch LSTM documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.LSTM.html",
+        "usage": "Used as official implementation documentation to cross-check the modern LSTM equations, state meanings, gate ranges, Hadamard products, and the distinction between hidden and cell state.",
+        "license": "The PyTorch repository is BSD-3-Clause licensed. The documentation is cited to verify equations only; no documentation prose, code, page design, or diagram is adapted."
+      },
+      {
+        "title": "PyTorch GRU documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.GRU.html",
+        "usage": "Used as official implementation documentation to cross-check GRU reset, update, candidate, and hidden-state equations and to note that implementation conventions may swap which update-gate complement weights the old state.",
+        "license": "The PyTorch repository is BSD-3-Clause licensed. No source prose, code, equation formatting, screenshot, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a Hadamard gate is a bank of independent scalar controls, not another state-mixing matrix. The original worked vector demonstrates three simultaneous regimes: near-copy, strong forgetting, and exact copy. Its products are checked directly: [2, -1, 0.5] elementwise times [0.9, 0.2, 1] gives [1.8, -0.2, 0.5]; [-1, 0.5, 0.8] times [0.1, 0.8, 0.5] gives [-0.1, 0.4, 0.4]; their sum is [1.7, 0.2, 0.9]. Holding gate values fixed, the direct partial derivative is diag(f), so a unit incoming gradient becomes [0.9, 0.2, 1]. The article wording was tightened to avoid claiming the full recurrent Jacobian equals diag(f) or that values below one cannot decay across time."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and visually inspected the Hadamard, PyTorch example, and dedicated recurrent-net slides, then checked the original LSTM, GRU, and gradient papers plus official implementation equations before selecting an original worked vector update."
+  },
+  "implementation": {
+    "visualIds": [
+      "lstm-coordinate-gated-state-update"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description containing every input vector, gate, intermediate product, sum, and direct backward multiplier. Column labels, row labels, numeric values, outlined groups, and vertical alignment carry all meaning without color. Its 360-unit viewBox scales fluidly with no minimum width or horizontal scrolling at 390 CSS pixels. Established theme variables provide light and dark contrast; shared print tokens switch to a high-contrast light palette and keep the figure together."
+  }
+}
