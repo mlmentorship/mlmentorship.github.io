@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "slug": "frontier-lab-interview-processes-2026",
+  "article": "src/content/posts/2026-07-11-frontier-lab-interview-processes-2026.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Turn recruiter-confirmed round constraints into targeted practice instead of inferring an interview loop from the company name.",
+  "mediumRationale": "A two-panel semantic-HTML routing card is the smallest medium that contrasts an unreliable logo-first shortcut with an evidence-first preparation path. Written inputs and outputs preserve the reasoning in ordinary reading order and stack cleanly on a narrow screen.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a branching flowchart would overstate the stability of interview paths and imply that one answer determines one terminal drill.",
+    "svg": "Rejected because the lesson is categorical routing rather than quantitative geometry; fixed vector labels would add accessibility and narrow-screen costs without adding meaning.",
+    "semanticHtml": "Selected because two labelled panels expose the contrast between assumption and evidence, retain a logical text order, and reuse an established responsive primitive.",
+    "interaction": "Rejected because a lab or role picker would hide states and risk presenting volatile process details as a durable recommendation engine.",
+    "paperReuse": "Rejected because the authoritative sources provide process facts, not a suitably scoped reusable figure, and public access is not treated as artwork-reuse permission.",
+    "noVisual": "Rejected because the article lists both evidence quality and recruiter questions, but prose alone leaves readers to connect those answers to the smallest useful practice set."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 89,
+        "insight": "The section divider labels the start of actual interview examples, establishing that the following material is example-specific rather than a universal process."
+      },
+      {
+        "page": 90,
+        "insight": "The Twitter example combines formulation, product objective, data, modeling, and productionization in one company-specific ML exercise."
+      },
+      {
+        "page": 91,
+        "insight": "The neighboring Cash App screen switches immediately to executable code, demonstrating that even adjacent interview examples demand different work products."
+      },
+      {
+        "page": 160,
+        "insight": "The ML design section assigns fixed time boxes to stages of one design format."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview asks for requirements, algorithm choice, evaluation, and experimentation, describing one specific oral design work sample."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example begins by clarifying requirements and then performs a data deep-dive, reinforcing that the round format determines the expected artifact and sequence."
+      },
+      {
+        "page": 164,
+        "insight": "The same worked example closes with algorithm selection and an experimentation plan, completing that particular design-round contract."
+      },
+      {
+        "page": 186,
+        "insight": "The unit-testing slide tells candidates to discuss assumptions and write tests for normal, extreme, null, and invalid cases in coding interviews."
+      },
+      {
+        "page": 196,
+        "insight": "The coding-problem checklist routes a different format through examples, brute force, optimization, pseudocode, implementation, and edge-case testing."
+      },
+      {
+        "page": 207,
+        "insight": "A separate behavioral and culture section begins here, showing another interview category without connecting it to a particular employer's complete loop."
+      },
+      {
+        "page": 213,
+        "insight": "A separate design-interview section begins here, again organizing preparation by work-sample format rather than employer."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page, then the full neighborhoods at pages 89-91, 160-165, 185-187, 195-196, and 207-214 were inspected. The deck supports format-specific preparation through isolated ML design, coding, testing, behavioral, and system-design sections, but it does not document current OpenAI, Anthropic, Google DeepMind, Meta, or xAI loops and contains no evidence-to-drill routing figure. The PDF metadata and extracted text identify no reuse license; all deck artwork, wording, examples, and layouts are treated as review-only and are not reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "OpenAI interview guide",
+        "url": "https://openai.com/interview-guide/",
+        "usage": "Used as the official source for team-varying skills assessments and the emphasis on collaboration, communication, code quality, performance, and testing.",
+        "license": "No explicit permission to reuse page artwork was identified. No screenshot, diagram, wording, or visual layout is copied."
+      },
+      {
+        "title": "Anthropic candidate AI guidance",
+        "url": "https://www.anthropic.com/candidate-ai-guidance",
+        "usage": "Used as the official source for stage-specific AI rules: independent first drafts, AI-assisted preparation, and no AI in take-homes or live interviews unless explicitly allowed.",
+        "license": "The page invites organizations to adapt its policy framework, but the visual does not reproduce that framework, its examples, prose, or artwork."
+      },
+      {
+        "title": "AI-resistant technical evaluations",
+        "url": "https://www.anthropic.com/engineering/AI-resistant-technical-evaluations",
+        "usage": "Used as an official first-party account showing why a longer, realistic performance-engineering take-home evaluates different evidence than a short live coding round.",
+        "license": "No figure-reuse permission was identified. No source figure, task detail, wording, result, or layout is reproduced."
+      },
+      {
+        "title": "Meta hiring process",
+        "url": "https://www.metacareers.com/hiring-process/",
+        "usage": "Used as Meta's official source for its AI-native coding format and supported interview environment, confirming that tool policy is part of the work-sample contract.",
+        "license": "No explicit artwork-reuse license was identified. No product screenshot, branding, diagram, prose, or interface is copied."
+      },
+      {
+        "title": "Google DeepMind careers",
+        "url": "https://deepmind.google/careers/",
+        "usage": "Used as Google DeepMind's official process source and to preserve its caveat that candidate support and exact interview steps are handled through the recruiting process.",
+        "license": "No explicit artwork-reuse license was identified. No photography, branding, page structure, or prose is copied."
+      },
+      {
+        "title": "xAI careers",
+        "url": "https://x.ai/careers",
+        "usage": "Used as xAI's official careers source; its limited public process detail supports asking the recruiter rather than inventing a stable round map.",
+        "license": "No explicit artwork-reuse license was identified. No branding, imagery, wording, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that company identity is weak routing information: role, team, work-sample environment, allowed tools, expected artifact, and scoring target jointly determine useful preparation. The visual is an original semantic-HTML synthesis of that decision rule and uses no external media or source-specific visual expression."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the relevant interview-format neighborhoods, and checked official process and AI-policy sources before selecting an original evidence-to-drill routing card."
+  },
+  "implementation": {
+    "visualIds": [
+      "interview-evidence-to-drill"
+    ],
+    "accessibility": "The figure uses a labelled heading, an explicit group label, semantic sections, and written inputs, decisions, and outcomes. The incorrect and preferred paths are named in text rather than distinguished by color. The established two-panel primitive has no minimum width, stacks below 640 CSS pixels for readability at 390 CSS pixels, uses theme tokens for dark mode, and applies a high-contrast light palette with page-break protection in print."
+  }
+}
