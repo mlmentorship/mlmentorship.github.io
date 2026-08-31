@@ -83,6 +83,52 @@ class BinaryMetrics:
 
 TP, FP, TN, and FN are additive sufficient statistics for metrics at a fixed threshold. Each worker can accumulate locally, then reducers sum the counts. Storing probabilities would be necessary for metrics across all thresholds such as exact ROC-AUC.
 
+<!-- visual:streaming-metrics-counts-before-f1 -->
+<figure class="learning-figure" aria-labelledby="streaming-counts-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="streaming-counts-title">What should workers merge: confusion counts or finished F1 scores?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two shards merge confusion counts before computing one global F1 score">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 245" role="img" aria-labelledby="count-merge-title count-merge-desc">
+				<title id="count-merge-title">Confusion-count states add component by component</title>
+				<desc id="count-merge-desc">Shard A stores true positives 1, false positives 0, true negatives 9, and false negatives 0. Shard B stores true positives 1, false positives 9, true negatives 1, and false negatives 9. Componentwise addition produces the global state: true positives 2, false positives 9, true negatives 10, and false negatives 9. Only four counts are retained regardless of stream size.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="212" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">1 · REDUCE THE ADDITIVE STATE</text>
+				<rect class="viz-node viz-node--input" x="20" y="39" width="260" height="45" rx="4"></rect>
+				<text class="viz-node-label" x="56" y="58">SHARD A</text>
+				<text class="viz-label" x="150" y="74" text-anchor="middle">TP 1 · FP 0 · TN 9 · FN 0</text>
+				<text class="viz-callout" x="150" y="104" text-anchor="middle">+</text>
+				<rect class="viz-node viz-node--input" x="20" y="115" width="260" height="45" rx="4"></rect>
+				<text class="viz-node-label" x="56" y="134">SHARD B</text>
+				<text class="viz-label" x="150" y="150" text-anchor="middle">TP 1 · FP 9 · TN 1 · FN 9</text>
+				<text class="viz-callout" x="150" y="180" text-anchor="middle">= · add matching fields</text>
+				<rect class="viz-node viz-node--output" x="20" y="190" width="260" height="39" rx="4"></rect>
+				<text class="viz-node-label" x="65" y="214">GLOBAL</text>
+				<text class="viz-label" x="189" y="214" text-anchor="middle">TP 2 · FP 9 · TN 10 · FN 9</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 245" role="img" aria-labelledby="f1-after-merge-title f1-after-merge-desc">
+				<title id="f1-after-merge-title">Averaging shard F1 differs from F1 computed from global counts</title>
+				<desc id="f1-after-merge-desc">The wrong path computes shard A F1 as 1.00 and shard B F1 as 0.10, then averages them to 0.55. The correct path first uses the merged counts and computes F1 as two times 2 divided by two times 2 plus 9 plus 9, which is 4 over 22 or approximately 0.18. F1 is nonlinear, so 0.55 and 0.18 differ.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="212" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">2 · COMPUTE THE RATIO ONCE</text>
+				<rect x="20" y="39" width="260" height="72" rx="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 3"></rect>
+				<text class="viz-axis-label" x="30" y="57">WRONG · AVERAGE WORKER F1</text>
+				<text class="viz-label" x="150" y="79" text-anchor="middle">(1.00 + 0.10) / 2 = 0.55</text>
+				<path d="M55 67L245 97M245 67L55 97" style="fill:none;stroke:var(--viz-edge);stroke-width:1.3"></path>
+				<rect class="viz-node viz-node--focus" x="20" y="129" width="260" height="91" rx="5"></rect>
+				<text class="viz-axis-label" x="30" y="148">CORRECT · F1 FROM GLOBAL COUNTS</text>
+				<text class="viz-node-label" x="150" y="173">F1 = 2TP / (2TP + FP + FN)</text>
+				<text class="viz-label" x="150" y="194" text-anchor="middle">= 4 / (4 + 9 + 9) = 4 / 22</text>
+				<text class="viz-callout" x="150" y="213" text-anchor="middle">approximately 0.18 · not 0.55</text>
+				<text class="viz-label" x="150" y="233" text-anchor="middle">F1 is nonlinear; its inputs are mergeable.</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> retain the four fixed-threshold counts on every worker, add matching fields, and compute F1 once from the totals. Computing early loses each shard's denominator: here the mean worker F1 is <code>0.55</code>, but the same records have global F1 <code>4/22 ≈ 0.18</code>. The count state is mergeable; the finished ratio is not. Original example checked against the <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html">scikit-learn confusion-matrix</a> and <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html">F1 definitions</a> plus <a href="https://lightning.ai/docs/torchmetrics/stable/pages/implement.html">TorchMetrics state-reduction guidance</a>.</figcaption>
+</figure>
+
 ## L4, L5, and L6 signals
 
 - **L4:** correct counts and formulas with basic tests.
