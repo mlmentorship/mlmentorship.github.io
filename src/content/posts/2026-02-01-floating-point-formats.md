@@ -30,8 +30,41 @@ Modern training and inference use a mix of formats: FP32 master weights, BF16 ac
 
 Same total bits (16) but different distributions:
 
-- **FP16** (5 exponent + 10 mantissa): more precision, less range. Underflows easily on small gradients (e.g., during late-training small updates). Requires loss scaling (multiply loss by ~$2^{15}$ before backward, divide gradients afterward).
-- **BF16** (8 exponent + 7 mantissa): same range as FP32, less precision. **Never underflows** in practice. No loss scaling needed.
+- **FP16** (5 exponent + 10 mantissa): more precision, less range. Underflows easily on small gradients (e.g., during late-training small updates). Commonly requires loss scaling (multiply the loss before backward, then unscale gradients before the optimizer step).
+- **BF16** (8 exponent + 7 mantissa): essentially the same normal range as FP32, with less precision. Small gradients are far less likely to underflow, so loss scaling is usually unnecessary.
+
+<!-- visual:fp16-bf16-bit-budget -->
+<figure class="learning-figure" aria-labelledby="fp16-bf16-budget-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="fp16-bf16-budget-title">How can two 16-bit formats fail in opposite ways?</p>
+	<div class="visual-grid--two" role="group" aria-label="Side-by-side comparison of how FP16 and BF16 divide the same sixteen-bit budget and the numerical consequence of each division">
+		<section class="visual-panel" aria-labelledby="fp16-budget-title">
+			<h4 id="fp16-budget-title">FP16: 1 sign + 5 exponent + 10 fraction</h4>
+			<p>More fraction bits make nearby values finer; fewer exponent bits narrow the normal range.</p>
+			<table class="cm-grid" aria-label="FP16 bit allocation and numerical consequences">
+				<thead><tr><th scope="col">Field</th><th scope="col">Bits</th><th scope="col">What those bits buy</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Exponent</th><td><strong>5</strong></td><td>normal magnitudes ≈ 6.10 × 10<sup>−5</sup> to 6.55 × 10<sup>4</sup></td></tr>
+					<tr><th scope="row">Fraction</th><td class="cm-selected"><strong>10</strong></td><td>next value after 1 is 1 + 2<sup>−10</sup> ≈ 1.00098</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Failure mode: values below the narrow range become subnormal, then zero.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="bf16-budget-title">
+			<h4 id="bf16-budget-title">BF16: 1 sign + 8 exponent + 7 fraction</h4>
+			<p>More exponent bits preserve FP32-like range; fewer fraction bits make nearby values coarser.</p>
+			<table class="cm-grid" aria-label="BF16 bit allocation and numerical consequences">
+				<thead><tr><th scope="col">Field</th><th scope="col">Bits</th><th scope="col">What those bits buy</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Exponent</th><td class="cm-selected"><strong>8</strong></td><td>normal magnitudes ≈ 1.18 × 10<sup>−38</sup> to 3.39 × 10<sup>38</sup></td></tr>
+					<tr><th scope="row">Fraction</th><td><strong>7</strong></td><td>next value after 1 is 1 + 2<sup>−7</sup> ≈ 1.00781</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Failure mode: updates can round away because adjacent values are farther apart.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the exponent rows first: BF16 spends three more bits on scale, extending normal magnitudes from about 10<sup>−38</sup> to 10<sup>38</sup>. Then compare the fraction rows: those three bits come out of local precision, so the gap after 1 is 8× wider in BF16. Equal storage does not mean equal numerical behavior. This is an original comparison checked against <a href="https://docs.nvidia.com/cuda/floating-point/index.html">NVIDIA's IEEE 754 overview</a>, <a href="https://cloud.google.com/tpu/docs/bfloat16">Google Cloud's BF16 documentation</a>, and the <a href="https://arxiv.org/abs/1905.12322">BFLOAT16 study</a>.</figcaption>
+</figure>
 
 In 2026, **BF16 has largely won for training**. Both Nvidia (Ampere+) and Google TPUs support it natively, and the "no loss scaling" simplicity is decisive.
 
