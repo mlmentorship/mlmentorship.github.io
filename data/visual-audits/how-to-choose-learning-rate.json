@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "how-to-choose-learning-rate",
+  "article": "src/content/posts/2026-03-22-how-to-choose-learning-rate.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Select a defensible peak learning rate from the sustained descent of a logarithmic range-test curve with margin before instability, then distinguish that peak from the warmup and decay schedule used during full training.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align the two different horizontal axes the procedure requires: logarithmic learning rate during a short diagnostic sweep, then training time during the real schedule. The spatial handoff from the marked candidate to the marked schedule peak prevents the common error of treating one selected number as a constant for every step.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can list sweep, choose, and schedule, but cannot teach how the slope and later upturn of a loss curve delimit the candidate region.",
+    "svg": "Selected: deterministic plots align a qualitative loss curve, hatched candidate band, instability crosses, warmup, selected peak, and decay while keeping all labels readable at phone width.",
+    "semanticHtml": "Rejected: a checklist or table could preserve procedural order but would not expose the curve geometry used to reject both tiny rates and the minimum or blow-up boundary.",
+    "interaction": "Rejected: dragging a candidate or changing schedule fractions would add controls and state without adding evidence, and hidden states would weaken print completeness.",
+    "paperReuse": "Rejected: Smith's paper and the fastai documentation contain related plots, but the paper's figure-reuse permission was not established and the documentation plot teaches implementation output rather than this article's two-stage distinction. No source curve, values, coordinates, styling, or composition is copied.",
+    "noVisual": "Rejected: prose describes both a range test and a schedule, but readers must mentally switch from learning rate as the sweep's x-axis to learning rate as the schedule's y-axis. A paired spatial explanation makes that handoff explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 45,
+        "insight": "The preceding Optimization of Loss slide introduces random search, analytic gradients, and gradient checks. It establishes the optimization section but gives no learning-rate selection procedure."
+      },
+      {
+        "page": 46,
+        "insight": "The main Optimization slide compares SGD, momentum, adaptive methods, Adam bias correction, and learning-rate annealing. It explains why large rates bounce and suggests halving the rate when validation accuracy stalls, but does not show a range test or separate peak selection from scheduling."
+      },
+      {
+        "page": 47,
+        "insight": "The neighboring RAdam slide attributes early adaptive-optimizer instability to high update variance and describes adaptive warmup. It supports caution near training start but does not select a peak learning rate."
+      },
+      {
+        "page": 48,
+        "insight": "The following optimization slide moves to sharpness-aware minimization, ending the direct optimizer and learning-rate neighborhood."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends watching loss and prediction instability as signs that learning rate may be too high or too low, but supplies no diagnostic sweep."
+      },
+      {
+        "page": 60,
+        "insight": "The sanity-check slide says loss-curve shape reflects learning rate and gives an update-to-parameter ratio heuristic. It helps diagnose a run after selection rather than deriving a rate."
+      },
+      {
+        "page": 61,
+        "insight": "The baseline-model slide suggests Adam at 3e-4 and warns against inherited decay defaults, illustrating why a memorized default is not a complete procedure."
+      },
+      {
+        "page": 63,
+        "insight": "The tuning slide is the closest procedural source: it recommends coarse one-epoch-or-less search from 10^-6 to 10^1, narrowing afterward, and sampling learning rates on a log scale. It does not use one continuously increasing range test or identify a pre-divergence slope."
+      },
+      {
+        "page": 103,
+        "insight": "A later transformer slide states that training commonly uses warmup and cooldown phases and gives qualitative motivations, but does not connect those phases to empirical peak-rate selection."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for learning rate, LR, warmup, warm-up, annealing, decay, schedules, log-scale search, and instability. Direct matches occur on pages 46-47, 59-61, 63, and 103. Pages 45-48 were read as the complete optimizer neighborhood; pages 58-64 were read as the practical training and tuning neighborhood; and pages 102-104 were checked around the transformer schedule mention. Page 63 is the nearest selection procedure, while page 103 is the nearest schedule treatment. No slide joins an increasing range test to a selected schedule peak. No deck artwork, wording, curve, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Cyclical Learning Rates for Training Neural Networks",
+        "url": "https://arxiv.org/abs/1506.01186",
+        "usage": "Used as the primary source for the learning-rate range test: increase the rate over a short run, observe the loss or accuracy response, and use the resulting bounds to identify a useful rate region rather than guessing one value.",
+        "license": "The arXiv record is publicly accessible, but arXiv permits submission-specific licenses and no permissive artwork-reuse grant was established for this paper. No paper figure, empirical values, curve, prose, or composition is reused."
+      },
+      {
+        "title": "fastai training callbacks: lr_find",
+        "url": "https://docs.fast.ai/callback.schedule.html#lrfind",
+        "usage": "Used as official framework documentation to verify the operational range-test pattern, exponential rate increase, early stopping when loss becomes much worse, and suggestions derived from the loss-versus-rate trace.",
+        "license": "The fastai project code is Apache-2.0 licensed, but the documentation was consulted only for API behavior. No documentation prose, code, generated plot, data, or styling is reproduced."
+      },
+      {
+        "title": "Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour",
+        "url": "https://arxiv.org/abs/1706.02677",
+        "usage": "Used as a primary source to verify that scaling learning rate with minibatch size is a regime-dependent rule accompanied by gradual warmup, not a universal optimizer-independent constant.",
+        "license": "The public arXiv record does not by itself establish broad third-party artwork reuse. No paper figure, experimental result, schedule, prose, or layout is reproduced."
+      },
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as a primary transformer source to verify a training recipe in which learning rate rises during warmup and then decreases, supporting the distinction between a peak rate and a full schedule.",
+        "license": "The paper is publicly readable on arXiv, but no permissive figure-reuse license was relied upon. No figure, equation layout, numeric schedule, prose, or data is copied."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that arXiv hosts submissions under several possible licenses and that free access alone does not grant adaptation rights.",
+        "license": "The policy supports the conservative original-artwork decision. No policy text, icon, or page design is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the axis change between diagnosis and training. During a range test, learning rate is deliberately increased and appears on a logarithmic x-axis while loss is observed; during full training, the selected candidate becomes the peak on the y-axis over time. The curve and schedule are qualitative and synthetic, not empirical measurements or a claim that every workload has the same shape. The candidate band is deliberately inside sustained descent and before the upturn; it does not prescribe the loss minimum, the largest stable value, or an optimizer-independent multiplier."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact optimizer, practical-training, and transformer-schedule neighborhoods, then checked the primary range-test, large-batch scaling, and transformer papers plus official fastai behavior and arXiv licensing guidance before selecting an original paired plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "learning-rate-range-to-schedule"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description stating its axes, curve behavior, candidate rule, warning region, and schedule. The candidate uses hatching plus a point and guide; instability uses crosses; warmup and decay are directly labelled; and the selected peak uses a double ring, so no distinction relies on color. The established two-panel primitive stacks below 640 pixels, each 300-unit viewBox has no minimum width, and labels remain readable at 390 CSS pixels. Existing theme variables supply dark-mode contrast, while shared print tokens provide a light high-contrast palette and keep the figure together."
+  }
+}
