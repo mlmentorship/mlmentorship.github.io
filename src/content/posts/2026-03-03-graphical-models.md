@@ -52,6 +52,74 @@ Two nodes are **d-separated** by $C$ if every path between them is blocked. d-se
 
 This formalism explains the famous explaining-away phenomenon: conditioning on a common effect makes its causes correlated.
 
+<!-- visual:d-separation-conditioning-switch -->
+<figure class="learning-figure" aria-labelledby="d-separation-conditioning-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="d-separation-conditioning-title">Predict whether conditioning blocks or opens a path</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 388" role="img" aria-labelledby="d-separation-svg-title d-separation-svg-desc">
+			<title id="d-separation-svg-title">Conditioning closes a chain path but opens a collider path</title>
+			<desc id="d-separation-svg-desc">Four directed three-node graphs compare a chain A to M to B with a collider A to C from B. In the unconditioned chain, the path from A to B is active, so A and B may be dependent. Observing middle node M blocks the chain, so A and B are conditionally independent. In the unconditioned collider, the path is blocked, so A and B are independent. Observing common effect C opens the collider path, so its causes A and B become conditionally dependent through explaining away. Observed nodes have a double outline and the word observed; blocked paths have a central cross and dashed outer edges.</desc>
+			<rect class="viz-plot-bg" x="8" y="8" width="344" height="178" rx="5"></rect>
+			<text class="viz-axis-label" x="18" y="29">CHAIN · A → M → B</text>
+			<text class="viz-label" x="18" y="53">Do not observe M</text>
+			<circle class="viz-node" cx="142" cy="50" r="18"></circle>
+			<circle class="viz-node" cx="220" cy="50" r="18"></circle>
+			<circle class="viz-node" cx="298" cy="50" r="18"></circle>
+			<text class="viz-node-label" x="142" y="55">A</text>
+			<text class="viz-node-label" x="220" y="55">M</text>
+			<text class="viz-node-label" x="298" y="55">B</text>
+			<path d="M160 50H202M238 50H280" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M195 46L202 50L195 54ZM273 46L280 50L273 54Z" style="fill:var(--viz-edge)"></path>
+			<text class="viz-callout" x="181" y="81" text-anchor="middle">ACTIVE PATH</text>
+			<text class="viz-label" x="248" y="81" text-anchor="middle">A and B may depend</text>
+			<path class="viz-gridline" d="M18 96H342"></path>
+			<text class="viz-label" x="18" y="125">Observe M</text>
+			<circle class="viz-node" cx="142" cy="122" r="18"></circle>
+			<circle class="viz-node viz-node--focus" cx="220" cy="122" r="21"></circle>
+			<circle class="viz-node" cx="220" cy="122" r="16"></circle>
+			<circle class="viz-node" cx="298" cy="122" r="18"></circle>
+			<text class="viz-node-label" x="142" y="127">A</text>
+			<text class="viz-node-label" x="220" y="127">M</text>
+			<text class="viz-node-label" x="298" y="127">B</text>
+			<path d="M160 122H199M241 122H280" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 4"></path>
+			<path d="M192 118L199 122L192 126ZM273 118L280 122L273 126Z" style="fill:var(--viz-edge)"></path>
+			<text class="viz-node-value" x="220" y="158">OBSERVED</text>
+			<text class="viz-callout" x="142" y="175" text-anchor="middle">BLOCKED</text>
+			<text class="viz-label" x="271" y="175" text-anchor="middle">A ⟂ B | M</text>
+			<rect class="viz-plot-bg" x="8" y="202" width="344" height="178" rx="5"></rect>
+			<text class="viz-axis-label" x="18" y="223">COLLIDER · A → C ← B</text>
+			<text class="viz-label" x="18" y="247">Do not observe C</text>
+			<circle class="viz-node" cx="142" cy="244" r="18"></circle>
+			<circle class="viz-node" cx="220" cy="244" r="18"></circle>
+			<circle class="viz-node" cx="298" cy="244" r="18"></circle>
+			<text class="viz-node-label" x="142" y="249">A</text>
+			<text class="viz-node-label" x="220" y="249">C</text>
+			<text class="viz-node-label" x="298" y="249">B</text>
+			<path d="M160 244H202M280 244H238" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 4"></path>
+			<path d="M195 240L202 244L195 248ZM245 240L238 244L245 248Z" style="fill:var(--viz-edge)"></path>
+			<path d="M214 234L226 254M226 234L214 254" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2"></path>
+			<text class="viz-callout" x="151" y="275" text-anchor="middle">BLOCKED AT C</text>
+			<text class="viz-label" x="275" y="275" text-anchor="middle">A ⟂ B</text>
+			<path class="viz-gridline" d="M18 290H342"></path>
+			<text class="viz-label" x="18" y="319">Observe C</text>
+			<circle class="viz-node" cx="142" cy="316" r="18"></circle>
+			<circle class="viz-node viz-node--focus" cx="220" cy="316" r="21"></circle>
+			<circle class="viz-node" cx="220" cy="316" r="16"></circle>
+			<circle class="viz-node" cx="298" cy="316" r="18"></circle>
+			<text class="viz-node-label" x="142" y="321">A</text>
+			<text class="viz-node-label" x="220" y="321">C</text>
+			<text class="viz-node-label" x="298" y="321">B</text>
+			<path d="M160 316H199M280 316H241" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M192 312L199 316L192 320ZM248 312L241 316L248 320Z" style="fill:var(--viz-edge)"></path>
+			<text class="viz-node-value" x="220" y="352">OBSERVED</text>
+			<text class="viz-callout" x="140" y="369" text-anchor="middle">PATH OPENS</text>
+			<text class="viz-label" x="275" y="369" text-anchor="middle">A and B depend | C</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the middle node in each pair. Observing a non-collider blocks the chain, but a collider starts blocked and observing its common effect opens the path. If two independent causes can produce the same effect, learning that the effect occurred makes evidence for one cause evidence against the other: explaining away. The graph encodes the independence pattern; it does not by itself assert causation. Original schematic checked against <a href="https://probml.github.io/pml-book/book1.html">Murphy (2022)</a> and <a href="https://dl.acm.org/doi/10.1016/0890-5401%2890%2990060-T">Geiger, Verma, and Pearl (1990)</a>.</figcaption>
+</figure>
+
 ## Inference tasks
 
 For a graphical model, the standard tasks are:

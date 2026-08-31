@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "graphical-models",
+  "article": "src/content/posts/2026-03-03-graphical-models.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Predict whether conditioning on the middle node blocks or opens a three-node path, and use that distinction to explain why observing a common effect makes its otherwise independent causes dependent.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can hold chain and collider structures in the same coordinates while visibly switching path state after conditioning. Four aligned rows make the reversal checkable: conditioning blocks a non-collider but opens a collider.",
+  "mediumComparison": {
+    "mermaid": "Rejected: directed graph syntax can draw the two structures, but it cannot compactly align before-and-after path states, double-outlined observed nodes, and explicit blocked-path marks with predictable mobile geometry.",
+    "svg": "Selected: deterministic coordinates keep A, the middle node, and B aligned across all four cases, while arrow direction, double outlines, dashed edges, a cross, and direct labels make conditioning's opposite effects visible without color.",
+    "semanticHtml": "Rejected: cards or a table could state the four outcomes, but would not preserve the arrowhead-at-the-middle distinction that defines a collider.",
+    "interaction": "Rejected: toggling observed nodes could demonstrate the rule, but hidden states would weaken print completeness and add controls for a lesson that needs only four fixed cases.",
+    "paperReuse": "Rejected: the reviewed paper and textbooks contain graphical-model examples, but no permissive grant for their published artwork was established. The shipped node coordinates, labels, state comparison, and explanatory composition are original.",
+    "noVisual": "Rejected: the prose definition requires readers to mentally inspect arrow direction and then invert the familiar conditioning intuition for a collider. A spatial before-and-after comparison directly exposes that reversal."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 65,
+        "insight": "The preceding Expectation Maximization slide discusses latent-variable inference and parameter estimation, establishing the topic boundary but not graphical separation or collider behavior."
+      },
+      {
+        "page": 66,
+        "insight": "The Graphical Models slide is the only direct overview. It connects graph factorization, conditional independence, elimination, and local message passing, but it does not define d-separation, distinguish chains from colliders, or show explaining away."
+      },
+      {
+        "page": 67,
+        "insight": "The neighboring Message Passing slide develops local marginalization and forward/backward propagation. It concerns inference after factorization and provides no d-separation path cases."
+      },
+      {
+        "page": 68,
+        "insight": "The following GMM/HMM slide specializes graphical models to mixture and chain latent-variable models, then moves to evaluation, decoding, and training rather than collider conditioning."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for graphical models, Bayesian networks, Markov random fields, conditional independence, d-separation, colliders, and explaining away. Exact graphical-model coverage is confined to page 66 and the adjacent message-passing treatment on page 67. Pages 64-68 were read in full: page 64 is a section divider, page 65 covers EM, page 66 covers graphical models, page 67 covers message passing, and page 68 begins GMM/HMM. No slide defines or depicts the selected collider mental model. No deck artwork, wording, graph geometry, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Probabilistic Machine Learning: An Introduction",
+        "url": "https://probml.github.io/pml-book/book1.html",
+        "usage": "Used as an authoritative textbook to verify directed graphical-model factorization, d-separation path rules, the distinction between chains and colliders, and explaining away.",
+        "license": "The official page provides the MIT Press book and links to figure-generation code, but it does not state a blanket permissive license for the book's published artwork. No text, figure, code, data, or example layout is reproduced."
+      },
+      {
+        "title": "Identifying Independence in Bayesian Networks",
+        "url": "https://dl.acm.org/doi/10.1016/0890-5401%2890%2990060-T",
+        "usage": "Used as a primary research source for the graphical criterion connecting directed-network structure to conditional independence, including head-to-head path activation through conditioning.",
+        "license": "The article is an Elsevier publication surfaced through the ACM record; no permissive figure-reuse license was identified. No paper figure, notation layout, proof, prose, or example is adapted."
+      },
+      {
+        "title": "Probabilistic Graphical Models: Principles and Techniques",
+        "url": "https://mitpress.mit.edu/9780262013192/probabilistic-graphical-models/",
+        "usage": "Used as an authoritative textbook reference to cross-check Bayesian-network semantics, active trails, conditional independence, and the explaining-away interpretation of observed common effects.",
+        "license": "The MIT Press catalog identifies the copyrighted book and does not provide a blanket permissive artwork-reuse grant. No book figure, prose, notation, data, or composition is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that conditioning does not uniformly remove dependence: a non-collider transmits association until observed, whereas a collider blocks association until it or one of its descendants is observed. The visual restricts itself to direct observation of the middle node so all four cases remain explicit. The independence labels describe distributions that satisfy the DAG's Markov property; the caption also preserves the article's warning that graph structure alone does not establish causality."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and read pages 64-68 as the exact graphical-model neighborhood, then checked a primary d-separation paper and two authoritative textbooks before selecting an original conditioning-state comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "d-separation-conditioning-switch"
+    ],
+    "accessibility": "The SVG has a linked title and complete description that states every graph, observation, path state, and independence conclusion. Arrow direction identifies the collider; observed nodes use a double outline plus the word OBSERVED; blocked paths use dashed edges or a cross; and every outcome is directly labelled, so no distinction relies on color. The single 360-unit viewBox has no minimum width and scales to the reading column at 390 CSS pixels. Established visual variables provide dark-mode contrast, while shared print rules provide a light high-contrast palette and keep the figure together."
+  }
+}
