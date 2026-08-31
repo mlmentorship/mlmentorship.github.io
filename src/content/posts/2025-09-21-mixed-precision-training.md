@@ -49,6 +49,40 @@ The original mixed-precision recipe [(Micikevicius et al. 2018)](https://arxiv.o
 5. Before the optimizer step: cast gradients to FP32 and divide by S (unscale).
 6. Apply update to FP32 master weights.
 
+<!-- visual:fp16-loss-scaling-ledger -->
+<figure class="learning-figure" aria-labelledby="fp16-loss-scaling-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="fp16-loss-scaling-title">Follow one tiny gradient through scaling, FP16 backward, and FP32 unscaling.</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of the same gradient without loss scaling and with loss scaling">
+		<section class="visual-panel" aria-labelledby="unscaled-gradient-title">
+			<h4 id="unscaled-gradient-title">Without scaling: the update disappears</h4>
+			<table class="cm-grid" aria-label="Unscaled FP16 gradient path">
+				<thead><tr><th scope="col">Stage</th><th scope="col">Value</th><th scope="col">Result</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">True gradient</th><td>g = 2<sup>−30</sup></td><td>Smaller than FP16's minimum nonzero 2<sup>−24</sup></td></tr>
+					<tr><th scope="row">FP16 backward</th><td class="cm-selected">store(g) = 0</td><td>Underflow loses the gradient</td></tr>
+					<tr><th scope="row">FP32 optimizer</th><td>update = 0</td><td>Master weight does not move</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Casting zero to FP32 cannot recover what FP16 already lost.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="scaled-gradient-title">
+			<h4 id="scaled-gradient-title">With scaling: enlarge, store, restore</h4>
+			<table class="cm-grid" aria-label="Loss-scaled FP16 gradient path">
+				<thead><tr><th scope="col">Stage</th><th scope="col">Value</th><th scope="col">Result</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Scale loss</th><td>S = 2<sup>20</sup></td><td>Chain rule scales every gradient by S</td></tr>
+					<tr><th scope="row">FP16 backward</th><td class="cm-selected">Sg = 2<sup>−10</sup></td><td>Normal, exactly representable FP16 value</td></tr>
+					<tr><th scope="row">Cast + unscale</th><td>2<sup>−10</sup> / 2<sup>20</sup> = 2<sup>−30</sup></td><td>Original gradient restored in FP32</td></tr>
+					<tr><th scope="row">Clip, then step</th><td>update uses g</td><td>FP32 master weight receives the update</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Scale before backward; unscale before clipping or stepping.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the FP16 backward rows. Without scaling, 2<sup>−30</sup> becomes zero and stays zero after casting. Multiplying the loss by 2<sup>20</sup> makes the backward gradient 2<sup>−10</sup>, which FP16 can store. Convert that value to FP32 and divide by the same scale before clipping or updating: the optimizer receives the original 2<sup>−30</sup>. This original ledger follows <a href="https://openreview.net/forum?id=r1gs9JgRZ">Micikevicius et al.</a> and the <a href="https://docs.pytorch.org/docs/stable/notes/amp_examples.html">PyTorch AMP sequence</a>.</figcaption>
+</figure>
+
 **Dynamic loss scaling**: start with large S (e.g., 2&#185;&#8309;). If any gradient is inf/NaN this step, skip the step and halve S. If N consecutive steps go fine, double S. Standard in PyTorch's `torch.cuda.amp.GradScaler`.
 
 ## The BF16 recipe
