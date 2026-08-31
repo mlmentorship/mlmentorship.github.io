@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "slug": "llm-evals-the-hardest-part",
+  "article": "src/content/posts/2026-05-05-llm-evals-the-hardest-part.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how production evidence grounds human judgment, human judgment calibrates scalable checks, and production drift can invalidate the offline eval.",
+  "mediumRationale": "A semantic four-stage evidence chain is the smallest useful medium for showing that validity flows from production outcomes through human specifications into automated proxies, then must be tested against production again. Native headings and paragraphs keep every dependency and limitation readable without client-side rendering, fixed geometry, or horizontal scrolling.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the concept has one ordered descent and one stated return condition, so graph layout and arrows would add visual machinery without clarifying the evidence carried between stages.",
+    "svg": "Rejected: there is no quantitative geometry to preserve, and fixed-position explanatory text would be less adaptable and accessible than native HTML.",
+    "semanticHtml": "Selected: four numbered, directly labelled stages pair each source of evidence with its limitation and reflow naturally in the reading column at phone width.",
+    "interaction": "Rejected: a metric picker or simulated score would require invented product context and hidden state, while the transferable lesson is the fixed dependency of proxies on stronger evidence.",
+    "paperReuse": "Rejected: reviewed sources contain related workflows and empirical figures, but none expresses this article-specific ground-encode-scale-revalidate chain. Figure reuse permission was not established, and no source artwork, data, prose, layout, icon, or threshold is copied.",
+    "noVisual": "Rejected: the prose ranks individual signals and later describes implementation steps, but readers must connect those sections themselves. The chain makes explicit that cheaper signals inherit validity from human and production evidence and can lose it as the task or traffic changes."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The preceding slide is only the ML-design interview time allocation, establishing the boundary before the evaluation material."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview starts with product need and objective, separates goal, leading, debug, and guardrail metrics, and includes model debugging and evaluation."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist requires baselines, test-data strategy, confidence intervals, offline metrics, error analysis, business-impact estimates, and an online experiment with explicit success criteria."
+      },
+      {
+        "page": 164,
+        "insight": "The content-feed walkthrough asks for an offline evaluation followed by online evaluation and user-satisfaction tracking, supporting the return from offline evidence to product outcomes."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide distinguishes user-reaction metrics from training objectives and explicitly notes that generative-model responses are difficult to evaluate."
+      },
+      {
+        "page": 166,
+        "insight": "The neighboring data slide asks about annotation quality, annotator disagreement, user feedback, and train-test distribution mismatch, supporting human calibration and drift review."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide calls for model-gating tests, monitored user reactions, update procedures, and latency, memory, compute, and privacy constraints."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide prioritizes metric design, human error analysis, measured model deltas, silent-failure monitoring, training-serving skew, and multi-metric launch decisions."
+      },
+      {
+        "page": 170,
+        "insight": "The following slide begins the algorithms and data-structures section and contains no further evaluation guidance, marking the end of the relevant neighborhood."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for eval, evaluation, generative model, annotation, human analysis, metrics, offline, online, user feedback, distribution, and monitoring terms. The full relevant neighborhood on pages 160-170 was then read. Pages 161-169 supply general ML evaluation ingredients, but the deck contains no golden-set workflow, LLM-as-judge calibration protocol, judge-bias treatment, or complete evidence chain for LLM applications. No deck screenshot, wording, artwork, coordinates, or layout is reused.",
+    "license": "The local deck states no reuse license and includes externally sourced material. It is treated as review-only; the shipped semantic figure is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+        "url": "https://arxiv.org/abs/2306.05685",
+        "usage": "Used as a primary paper to verify that LLM judges can show substantial agreement with human preferences while still exhibiting position, verbosity, self-enhancement, and reasoning limitations that require task-specific validation and mitigation.",
+        "license": "The arXiv record provides public access but was not treated as a permissive third-party figure-reuse grant. No figure, table, prompt, response, empirical value, wording, or layout is copied."
+      },
+      {
+        "title": "OpenAI Evaluation best practices",
+        "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+        "usage": "Used as official implementation guidance to verify that task-specific evaluations should reflect real-world distributions, combine metrics with human judgment, calibrate automated scoring with human feedback, log failures, and continuously expand the eval set.",
+        "license": "The public documentation is used only for evaluation principles and does not establish permission to reproduce its visual presentation. No page text, code, table, screenshot, branding, or layout is reused."
+      },
+      {
+        "title": "NIST Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as authoritative lifecycle guidance to verify that measurement belongs within a governed process that maps context and continuously monitors and manages deployed-system risk rather than ending at one offline score.",
+        "license": "This United States government publication is cited as an authoritative factual reference. No NIST figure, table, prose, iconography, or framework layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how confidence is transferred between evaluation layers. Production outcomes and sampled outputs define what matters but are slow and noisy. Humans encode that evidence into a representative golden set and concrete rubric. Programmatic checks and an LLM judge can then scale only the criteria they actually cover and for which agreement has been measured. After release, slices and production outcomes test whether the proxy still predicts value; divergence or drift invalidates trust and routes fresh cases back into the set, rubric, and scorer. The visual is an original qualitative synthesis and states no universal agreement threshold, dataset size, or correlation value."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full ML-evaluation neighborhood, then checked a primary LLM-judge study plus current OpenAI and NIST lifecycle guidance before selecting an original semantic evidence chain."
+  },
+  "implementation": {
+    "visualIds": [
+      "llm-eval-chain-of-trust"
+    ],
+    "accessibility": "The figure has a programmatically associated visible title and a labelled semantic list with four numbered stages in source order. Every evidence source, limitation, and repair action is written directly, so meaning does not depend on color or position alone. The single-column panel uses ordinary wrapping text with no fixed or minimum width, supporting readability at 390 CSS pixels; established theme variables provide dark-mode contrast, and shared print rules switch the figure to a high-contrast light palette with page-break protection."
+  }
+}
