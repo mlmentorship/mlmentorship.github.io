@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "l1-vs-l2-beyond-formula",
+  "article": "src/content/posts/2025-12-04-l1-vs-l2-beyond-formula.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See why the first loss contour to touch an L1 constraint can land on an axis corner and set one coefficient exactly to zero, while contact with a smooth L2 constraint usually leaves both coefficients nonzero.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold the unregularized optimum and loss contours fixed while changing only the equal-penalty boundary from a diamond to a circle. The contact point then makes sparsity a geometric consequence rather than a memorized rule.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a relationship graph cannot represent tangency, axis corners, or the position of an optimum on a continuous coefficient plane.",
+    "svg": "Selected because fixed coordinate geometry can compare the first contour contact against L1 and L2 boundaries, with direct labels and no runtime dependency.",
+    "semanticHtml": "Rejected because a table can list corner versus smooth boundary but cannot show why a contour reaches one before another.",
+    "interaction": "Rejected because moving the unconstrained optimum or penalty budget could show cases where L1 contact is not sparse, but controls add unnecessary state before the reader understands the typical two-dimensional mechanism.",
+    "paperReuse": "Rejected because the canonical textbook and paper figures are not needed. Their online availability is not treated as permission to adapt artwork; the implementation uses independently chosen synthetic coordinates and no copied source figure, data, wording, or layout.",
+    "noVisual": "Rejected because the article names corners and roundness, but prose alone requires the reader to mentally superimpose loss contours, constraint sets, and their first contact."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 3,
+        "insight": "The preceding linear-algebra slide covers determinant and vector span but does not introduce norms or optimization constraints."
+      },
+      {
+        "page": 4,
+        "insight": "The Norms panel shows two-dimensional equal-Lp level sets and states that L1 promotes sparse solutions while L2 promotes homogeneous ones, but it does not overlay a loss contour or mark an optimizer."
+      },
+      {
+        "page": 5,
+        "insight": "The following SVD slide returns to matrix factorization and adds no regularization geometry."
+      },
+      {
+        "page": 56,
+        "insight": "The preceding section divider introduces practical neural-network project guidance and contains no regularization mechanism."
+      },
+      {
+        "page": 57,
+        "insight": "The practical notes state that L2 diffuses a weight vector across inputs and L1 encourages a sparse subset, but give neither the constrained geometry nor the optimization caveat."
+      },
+      {
+        "page": 58,
+        "insight": "The following data-inspection checklist discusses noisy inputs and spurious variation but not explicit penalties."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for L1, L2, norm, regularization, weight decay, ridge, lasso, sparse, Laplace, Gaussian prior, and elastic net. Page 4 is the only norm-shape treatment and page 57 is the only direct sparse-versus-diffuse penalty comparison; both complete neighboring ranges, pages 3-5 and 56-58, were inspected. Pages 24 and 60-63 mention L1/L2 distances or regularization practice but add no coefficient-space contact geometry. No slide artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Regression Shrinkage and Selection via the Lasso",
+        "url": "https://doi.org/10.1111/j.2517-6161.1996.tb02080.x",
+        "usage": "Used as the primary source for the lasso constrained formulation, coefficient shrinkage, exact zeros, and the geometric contrast with ridge.",
+        "license": "The publisher record does not establish a permissive figure-reuse license. No paper figure, example, data, prose, coordinates, or layout is copied; only the method and general geometric result inform an original construction."
+      },
+      {
+        "title": "Ridge Regression: Biased Estimation for Nonorthogonal Problems",
+        "url": "https://www.jstor.org/stable/1267351",
+        "usage": "Used as the primary source for ridge regression's L2-constrained coefficient estimator and shrinkage behavior.",
+        "license": "JSTOR access is not treated as permission to reuse publication artwork. No figure, table, data, text, or visual composition is reproduced."
+      },
+      {
+        "title": "The Elements of Statistical Learning, Second Edition",
+        "url": "https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12.pdf",
+        "usage": "Used as an authoritative textbook cross-check for the equivalent penalized and constrained forms and for the standard coefficient-space explanation of why lasso solutions can occur at corners.",
+        "license": "The authors provide the book for download, but no permissive license for adapting Figure 3.11 was established. The site figure is not traced or copied: its coordinates, contour shapes, annotations, and panel composition are original."
+      },
+      {
+        "title": "Proximal Algorithms",
+        "url": "https://web.stanford.edu/~boyd/papers/prox_algs.html",
+        "usage": "Used as an authoritative optimization reference for nonsmooth regularization and the L1 proximal operator's soft-thresholding behavior.",
+        "license": "The monograph is consulted for algorithm semantics only. No equation rendering, example, figure, wording, or layout is reused, so the implementation does not depend on figure-reuse permission."
+      },
+      {
+        "title": "Decoupled Weight Decay Regularization",
+        "url": "https://arxiv.org/abs/1711.05101",
+        "usage": "Used as the primary source for the article's separate claim that L2 regularization and weight decay are inequivalent for adaptive gradient methods and that AdamW decouples decay.",
+        "license": "Public arXiv access alone does not establish adaptation rights. No paper figure, experiment, prose, or visual design is reused."
+      },
+      {
+        "title": "PyTorch AdamW documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.AdamW.html",
+        "usage": "Used as official implementation documentation to verify that weight decay is applied separately and does not accumulate in AdamW's momentum or variance.",
+        "license": "The documentation is used only to cross-check optimizer semantics. No code, prose, equation layout, or image is copied into the visual."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is why L1's geometry makes exact zero coefficients plausible. The original panels use the same coefficient axes, same unregularized minimum, and circular schematic loss contours. In the L1 panel, the closest feasible point for the chosen setup is the right-hand diamond corner, so w2 equals zero. In the L2 panel, radial projection onto the circle lies between axes, so both w1 and w2 remain nonzero. This illustrates a common mechanism, not a claim that every lasso solution is sparse or that ridge coefficients can never equal zero. Direct labels, a star for the unconstrained minimum, a diamond versus circle boundary, and marked contact points carry meaning without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both exact regularization neighborhoods, then checked the foundational lasso and ridge papers, an authoritative statistical-learning textbook, proximal optimization guidance, the AdamW paper, and official PyTorch documentation before selecting an original two-panel contact-geometry SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "l1-l2-first-contact-geometry"
+    ],
+    "accessibility": "The SVG uses two separately titled and described panels, direct axis and boundary labels, a star for the shared unregularized minimum, and ringed contact points. Diamond-versus-circle shape and the contact point's position on or away from the horizontal axis communicate the result without color. Each panel uses a 300-unit responsive viewBox and the established two-panel grid, which stacks below 640 CSS pixels for 390-pixel readability; existing theme variables preserve dark contrast and shared print rules provide a light high-contrast palette."
+  }
+}
