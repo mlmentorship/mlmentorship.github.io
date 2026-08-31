@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-production-llm-inference-service",
+  "article": "src/content/posts/2026-07-11-design-production-llm-inference-service.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how KV admission and the per-iteration token budget protect memory capacity and decode latency at the same time.",
+  "mediumRationale": "A focused Mermaid control flow is the smallest useful spatial explanation because the lesson is the dependency between two budgets rather than a quantitative curve: KV pages gate entry before work is queued, then each model iteration protects active decode and uses only the remaining token capacity for bounded prefill chunks.",
+  "mediumComparison": {
+    "mermaid": "Selected because labelled decisions, queues, feedback, and the decode loop carry the lesson. The established Mermaid visual roles and wide-flow marker preserve legible feedback paths through contained narrow-screen scrolling, themed colors, and print rendering without introducing article-specific styling.",
+    "svg": "Rejected because the article supplies no measured scale or geometry for a plot. Fixed coordinates would make a long control loop harder to maintain and would imply quantitative proportions that are not claimed.",
+    "semanticHtml": "Rejected because cards or a comparison table could name the memory and token budgets but would obscure the feedback paths from continuing work into the next iteration and from released KV pages into later admission.",
+    "interaction": "Rejected because changing prompt length, output bounds, or batch composition would require an explicit simulator and workload assumptions. The durable lesson is the ordering invariant, which one static trace exposes without hidden states or controls.",
+    "paperReuse": "Rejected because the reviewed papers contain system-specific architectures and evaluation figures rather than this article's combined admission-and-iteration policy. Public availability was not treated as figure-reuse permission, and no source artwork, coordinates, labels, example values, or visual arrangement is reused.",
+    "noVisual": "Rejected because the prose states the individual rules but requires readers to compose two coupled loops mentally. The visual shows why available GPU memory is an admission concern while decode responsiveness is a recurring scheduling concern."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding slide is about distributed and continual training throughput, establishing the boundary before the inference-optimization sequence."
+      },
+      {
+        "page": 108,
+        "insight": "The setup slide distinguishes GPU compute from memory movement and explicitly names speculative decoding as an inference-side lever, but it does not yet describe request scheduling or KV admission."
+      },
+      {
+        "page": 109,
+        "insight": "The sequence-packing slide concerns eliminating padding waste in training batches; it is useful negative evidence because static training packing is not continuous request batching."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide explains HBM-to-SRAM traffic for exact attention kernels, a kernel-level optimization separate from request-level KV capacity and scheduling."
+      },
+      {
+        "page": 111,
+        "insight": "The sparse-attention slide changes which token pairs attend for sub-quadratic cost and does not address multi-request serving policy."
+      },
+      {
+        "page": 112,
+        "insight": "The low-rank and kernel-method slide changes attention mathematics and is not a source for the serving control loop."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide directly states that single-token autoregressive decode is sequential and memory-bound, supporting the need to protect repeated decode steps without supplying an admission or chunked-prefill policy."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision training slide returns to training memory and numerics, marking a neighboring topic rather than a request scheduler."
+      },
+      {
+        "page": 115,
+        "insight": "The serving-stack summary is the closest match: it names compute-bound prefill, paged KV cache, speculative decoding, and continuous token-granularity insertion and eviction, but it presents a technique inventory rather than showing how KV admission and one iteration's token budget interact."
+      },
+      {
+        "page": 116,
+        "insight": "The following re-scoring slide begins a different topic and closes the relevant inference-optimization neighborhood."
+      },
+      {
+        "page": 168,
+        "insight": "The general production-serving slide lists latency, memory, footprint, compute, and privacy as inference concerns but provides no phase-aware scheduling mechanism."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring Rules of Machine Learning slide discusses production checks and training-serving skew, not LLM inference admission or batching."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for inference, serving, latency, throughput, batching, KV cache, prefill, decode, production, and GPU terms. Pages 107-116 were read as the complete modern inference-optimization neighborhood, and pages 168-169 were read as the separate generic production-serving neighborhood. Page 115 is directly relevant but does not connect memory reservation, decode priority, bounded prefill chunks, and KV release into one policy. No deck image, prose, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Sarathi-Serve: Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve",
+        "url": "https://www.usenix.org/conference/osdi24/presentation/agrawal",
+        "usage": "Used as a primary peer-reviewed systems source to verify the prefill/decode phase distinction, the throughput-latency interference between them, and chunked prefills that add new work without pausing ongoing decodes.",
+        "license": "USENIX makes the paper and presentation media openly accessible, but open access was not treated as permission to adapt a figure. No paper figure, benchmark value, prose, code, or visual structure is reproduced."
+      },
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used as the primary PagedAttention systems paper to verify that per-request KV cache grows and shrinks dynamically, inefficient fragmentation limits batching, and block-based memory management supports higher concurrency.",
+        "license": "The arXiv record is publicly readable, but a permissive license for adapting its figures was not established. The implementation cites the mechanism only and does not copy artwork, text, data, examples, or layout."
+      },
+      {
+        "title": "DistServe: Disaggregating Prefill and Decoding for Goodput-optimized Large Language Model Serving",
+        "url": "https://www.usenix.org/conference/osdi24/presentation/zhong-yinmin",
+        "usage": "Used as a primary peer-reviewed systems source to cross-check that prefill and decode have distinct latency objectives and resource characteristics, and that separating their resources is a measured alternative to co-location.",
+        "license": "USENIX provides open access to the publication and media, but no external figure is needed and no adaptation right is relied upon. No source figure, result, prose, or architecture arrangement is reproduced."
+      },
+      {
+        "title": "vLLM open-source inference and serving engine",
+        "url": "https://github.com/vllm-project/vllm",
+        "usage": "Used as official project documentation to cross-check support for PagedAttention, continuous batching, chunked prefill, streaming, and disaggregated prefill/decode.",
+        "license": "The repository is Apache License 2.0. No code, documentation prose, logo, diagram, or visual arrangement is copied; the project is cited only as implementation evidence."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the coupling of a slow memory-capacity loop with a fast scheduling loop. KV pages must be reserved before admission and released on completion or cancellation, while every model iteration must protect active decode latency and fit prefill into bounded remaining work. The original diagram synthesizes the article's explicit policy and was checked against primary serving systems research and official implementation documentation."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected both relevant neighborhoods, then checked three primary systems papers and official vLLM documentation before selecting an original two-budget scheduler flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "llm-inference-two-budget-scheduler"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description naming both budgets, both admission outcomes, decode-first allocation, bounded prefill, continuing work, cancellation, and KV release. Labels, numbered scheduling stages, decision shapes, and arrow direction carry every distinction without color. The compact top-to-bottom flow and established wide-flow marker preserve readable labels through contained horizontal scrolling at 390 CSS pixels; theme tokens supply dark-mode contrast, print uses the existing light page-safe rendering, and the adjacent prose and direct caption preserve the lesson if client-side rendering is unavailable."
+  }
+}

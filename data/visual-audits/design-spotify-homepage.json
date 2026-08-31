@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-spotify-homepage",
+  "article": "src/content/posts/2025-12-12-design-spotify-homepage.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace why independently completed shelves must become candidates for a second composition decision that optimizes the whole homepage rather than merging every item into one global ranking.",
+  "mediumRationale": "A compact hierarchical Mermaid is the smallest useful spatial explanation because the lesson depends on two distinct decision levels and their separate feedback: each learned or curated pipeline produces a coherent local list, then a composer selects and orders shelves under page-level context, diversity, editorial, and long-term constraints.",
+  "mediumComparison": {
+    "mermaid": "Selected because the mental model is a many-to-one hierarchy followed by an ordered page and two feedback paths. Labelled nodes and edges preserve which decisions happen inside shelves versus across shelves, while the established renderer supplies accessible metadata, responsive overflow, and theme-safe styling.",
+    "svg": "Rejected because no quantitative scale or fixed screen geometry carries the lesson. Drawing a mock Spotify interface would add brand-specific decoration and maintenance cost without clarifying the optimization boundary.",
+    "semanticHtml": "Rejected because responsive cards could compare shelf purposes, but they would not show as directly that completed shelf lists become units in a second ranking decision or that local and page outcomes train different layers.",
+    "interaction": "Rejected because dragging shelves or changing objective weights would require invented scoring behavior and hidden state. The stable architectural invariant is more useful than a speculative simulator.",
+    "paperReuse": "Rejected because the reviewed sources include denser product screenshots, architecture figures, and empirical layouts that answer different questions. No source figure is needed, and public access was not treated as permission to copy artwork, coordinates, examples, wording, or arrangement.",
+    "noVisual": "Rejected because the prose names two layers but leaves readers to mentally separate item ranking within a shelf from selection and ordering across shelves. The diagram makes the unit of each decision and its corresponding evidence explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 128,
+        "insight": "The preceding model-compression slide marks the boundary before the recommender section and contains no recommendation or page-composition mechanism."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider introduces the relevant neighborhood but has no explanatory content."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide covers matching, per-user item scores, ranking, cold start, presentation-bias feedback, explore-exploit, context, and nDCG for one list. It does not distinguish a shelf ranker from a whole-page composer."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid slide combines item-level recommendation streams through linear blending or boosting, but its output is still one recommendation ranking rather than several independently meaningful shelves."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search divider closes the core recommender-method neighborhood and begins a single-result-list case study."
+      },
+      {
+        "page": 144,
+        "insight": "The preceding slide shows a single personalized search example and supplies no multi-shelf structure."
+      },
+      {
+        "page": 145,
+        "insight": "The closest fusion slide re-ranks candidates through search and recommendation streams and combines results by ranked voting. It supports a second-stage decision but operates on items, not coherent shelf lists with distinct purposes."
+      },
+      {
+        "page": 146,
+        "insight": "The following computer-vision divider ends the recommendation and personalized-search sequence."
+      },
+      {
+        "page": 160,
+        "insight": "The ML-design timing divider introduces the later system-design neighborhood without specifying recommendation layers."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks for a feed or recommendation system, end-to-end data flow, objective choice, and deployment metrics, but does not distinguish local shelf quality from page quality."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist covers baselines, features, calibration, experiments, business impact, and online evaluation. It motivates multiple objectives and launch evidence but has no carousel-composition model."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example connects requirements, a high-level design, and training/live data for one relevance pipeline rather than a two-dimensional recommendation surface."
+      },
+      {
+        "page": 164,
+        "insight": "The adjacent worked-example slide covers algorithm trade-offs and offline/online hypothesis testing, ending the closest feed-design sequence without adding shelf interaction."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for recommendation, ranking, ranker, Spotify, music, feed, homepage, diversity, novelty, exploration, and multi-stream concepts. Pages 128-132, 144-146, and 160-164 were read as the complete matching neighborhoods. Page 145 is the nearest second-stage fusion example, but the deck contains no multi-carousel page composer or separation between shelf-level and page-level objectives. No deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Hypothesis-Driven Shelf Generation for Personalised Recommendation",
+        "url": "https://arxiv.org/abs/2607.25823",
+        "usage": "Used as a primary Spotify systems paper to verify that shelves are themed recommendation units, that shelf planning and catalogue fulfilment can be separated, that expensive generation can happen offline, and that completed shelves enter Spotify Home as ranking candidates rather than fixed placements.",
+        "license": "The arXiv paper is publicly readable, but its submission license was not treated as permission to reproduce figures. No screenshot, architecture figure, shelf example, prose, model detail, result, or visual arrangement is copied."
+      },
+      {
+        "title": "Calibrated Recommendations with Contextual Bandits on Spotify Homepage",
+        "url": "https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage",
+        "usage": "Used as official Spotify research to cross-check request context, evolving preferences, content-type calibration, sequential slate construction, exploration, online A/B validation, and the distinction between short-term engagement and future long-term satisfaction objectives.",
+        "license": "Spotify's public research page does not present a clear figure-reuse grant. No page image, chart, table, values, wording, algorithm diagram, or visual structure is reused; the source is cited only."
+      },
+      {
+        "title": "Offline Evaluation of Recommender Systems in a User Interface With Multiple Carousels",
+        "url": "https://doi.org/10.3389/fdata.2022.910030",
+        "usage": "Used as a primary peer-reviewed source to verify that carousel interfaces contain multiple recommendation lists generated by independent pipelines, may include editorial rows, require selection and relative ordering, and must be evaluated for complementarity and two-dimensional position rather than as isolated lists.",
+        "license": "The Frontiers article is distributed under Creative Commons Attribution 4.0. Although reuse with attribution is permitted, no source figure, screenshot, metric formulation, data, prose, or layout is adapted; the shipped visual is independently authored."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is hierarchical composition. A shelf pipeline builds a coherent list against one intent and local metrics; learned shelves may retrieve and rank items, while editorial shelves may be curated. Each completed list is then one candidate among personalized, recency, discovery, new-release, and editorial shelves. A separate composer uses session context and cross-shelf constraints to choose and order those units for page-level and longer-term outcomes. Flattening every item into one ranker destroys shelf semantics; evaluating shelves alone misses cannibalization, repetition, and position effects."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the three closest recommendation neighborhoods, then checked a primary Spotify shelf-generation paper, official Spotify contextual-bandit research, and a peer-reviewed multi-carousel evaluation study before selecting an original two-level ranking flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "spotify-two-level-shelf-composition"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description naming the local shelf decisions, whole-page composition decision, ordered output, and separate feedback signals. Layer headings, node shapes, direct labels, arrows, and solid versus dashed feedback paths carry the hierarchy without color. The established wide-canvas marker preserves readable labels through horizontal scrolling at 390 CSS pixels; existing theme tokens provide light and dark contrast, and print removes the width floor and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the lesson if client-side rendering is unavailable."
+  }
+}

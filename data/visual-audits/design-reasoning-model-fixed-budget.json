@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-reasoning-model-fixed-budget",
+  "article": "src/content/posts/2026-08-29-design-reasoning-model-fixed-budget.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish fixed quarterly budget fences from physical partitions, then trace how the capacity broker reclaims checkpointable offline work without spending the protected serving floor or recovery reserve twice.",
+  "mediumRationale": "A compact Mermaid allocation-and-reclaim flow is the smallest useful spatial explanation: it connects the arithmetic envelope, two protected claims, the reclaimable offline portfolio, observed pressure, and the checkpoint boundary without reproducing the article's serving architecture or implying that percentage fences are fixed hardware partitions.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson combines a hierarchy of budget claims with a directed state transition under pressure. Labelled nodes and edges expose what is protected, what is reclaimable, and when offline nodes return to serving; the established wide-flow marker supports themed rendering and contained narrow-screen scrolling for the reclaim loop.",
+    "svg": "Rejected because exact geometric scale is not the lesson and the shares are already precise in the adjacent table. Hand-positioning the same flow would add maintenance cost without improving technical accuracy.",
+    "semanticHtml": "Rejected because cards or another table could compare the five shares but would not make the pressure-triggered checkpoint, pause, and reclaim sequence visible. The article already provides the exact tabular allocation.",
+    "interaction": "Rejected because a demand slider could animate capacity movement, but hidden states and controls would add complexity while teaching no more than the two explicit normal and pressure paths.",
+    "paperReuse": "Rejected because the reviewed cluster-management and operations sources do not present this article-specific five-envelope reasoning-model portfolio. Their public availability is not treated as permission to reuse artwork, and no source figure, coordinates, wording, values, or arrangement is copied.",
+    "noVisual": "Rejected because the prose and table state the shares but leave readers to reconcile two distinct ideas: budget fences sum to one quarterly envelope, while physical nodes move over time. The diagram makes the protected claims and reclaim boundary inspectable in one pass."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide explains iterative reward-driven training but has no rollout-capacity accounting, inference competition, verifier support, or shared-cluster budget."
+      },
+      {
+        "page": 162,
+        "insight": "The ML production-considerations slide is the closest portfolio match: it asks how experimentation compute is made efficient, whether teams share GPU clusters, how experiments are selected, how models are checkpointed, and how online evaluation is run, but it gives no capacity allocation or reclaim policy."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide covers data and model parallelism, batching at scale, reduced precision, and gradient checkpointing as a compute-memory tradeoff; it informs job shape but not competition between serving and offline work."
+      },
+      {
+        "page": 168,
+        "insight": "The adjacent production-serving slide names model gating, monitoring, model updates, latency, memory, compute, privacy, and compression, but does not connect serving demand to a protected floor or an offline preemption boundary."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring Rules of Machine Learning slide calls for simple first models, independent infrastructure tests, measured deltas, quantified undesirable behavior, and multi-metric launch decisions; it supports evidence-driven allocation but contains no fixed-budget portfolio."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for fixed budget, compute budget, capacity, accelerator, serving, inference, distributed training, reinforcement learning, production, and checkpoint terms. Pages 150 and 153-154 concern GANs and explainability; page 156 covers policy optimization. Pages 162 and 167-169 were read as the complete closest ML-production and serving neighborhood. No slide combines training, rollout generation, evaluation, online serving, and recovery under one fixed accelerator budget, so no deck image, prose, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Large-scale cluster management at Google with Borg",
+        "url": "https://research.google/pubs/large-scale-cluster-management-at-google-with-borg/",
+        "usage": "Used as a primary systems paper to cross-check that one cluster can raise utilization through admission control, task packing, machine sharing, and isolation while retaining runtime support for high-availability services.",
+        "license": "The paper is publicly readable, but no permissive figure-reuse grant was established. No Borg figure, data, prose, visual hierarchy, or layout is reproduced; the source is cited only."
+      },
+      {
+        "title": "Slurm Workload Manager: Preemption",
+        "url": "https://slurm.schedmd.com/preempt.html",
+        "usage": "Used as official scheduler documentation to verify that lower-priority work can be cancelled, requeued, suspended, or resumed for higher-priority work and that a configured grace period can provide a bounded transition.",
+        "license": "SchedMD's public documentation is used as technical reference only; public access is not treated as figure-reuse permission. No documentation text, diagram, configuration example, or page arrangement is copied."
+      },
+      {
+        "title": "Site Reliability Engineering: Handling Overload",
+        "url": "https://sre.google/sre-book/handling-overload/",
+        "usage": "Used as an authoritative operations text to cross-check direct resource-based capacity accounting, admission limits, and deliberate degraded responses before transparent rejection under overload.",
+        "license": "No figure or prose reuse is needed, so no license grant is relied upon. The implementation cites the page but does not reproduce its examples, wording, values, artwork, or structure."
+      },
+      {
+        "title": "NVIDIA Deep Learning Performance Guide: GPU Performance Background",
+        "url": "https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html",
+        "usage": "Used as official hardware-performance guidance to cross-check that theoretical operation count and peak throughput do not by themselves predict elapsed performance because arithmetic intensity, memory bandwidth, and implementation efficiency can bind.",
+        "license": "NVIDIA's notice says reproduction requires advance written approval and grants no implied intellectual-property license. No NVIDIA figure, table, wording, numbers, or visual design is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the difference between quarterly accounting and runtime placement. The five shares are budget fences over one usable envelope, not five static machine partitions. Online serving and recovery are protected claims; continued training, post-training, and evaluation remain reclaimable only when jobs can stop at a proven checkpoint boundary. The original diagram teaches that distinction and leaves the article's detailed model, verifier, routing, and KV-cache flows to their existing sections."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 source-deck pages and inspected the closest reinforcement-learning and production neighborhood, then checked a primary cluster-management paper, official scheduler and GPU documentation, and an authoritative reliability text before selecting an original capacity-fence flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "reasoning-fixed-budget-reclaim"
+    ],
+    "accessibility": "The Mermaid source has a complete accessible title and description that state all three claims, their exact shares, the normal admission path, the pressure-triggered checkpoint path, and the reserve restriction. Node shapes, direct labels, percentages, edge labels, and solid-versus-dashed paths carry the full meaning without color. The compact top-to-bottom flow and established wide-flow marker preserve readable labels through contained horizontal scrolling at 390 CSS pixels; shared Mermaid theme tokens provide dark-mode contrast and print-safe output. The adjacent allocation table and direct caption preserve the lesson if client-side rendering is unavailable."
+  }
+}

@@ -149,33 +149,42 @@ The targets are examples. The candidate should derive them from product risk and
 
 The shared platform should own a small control plane. Existing systems can continue to execute data and model workloads behind adapters.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Separate the lifecycle contracts that need one shared authority from the execution systems teams can retain behind adapters.</p>
+
+<!-- visual:multi-team-platform-contract-boundary -->
 ```mermaid
-flowchart LR
-  Dev[Team code and config] --> CI[Validation and package build]
-  CI --> CP[ML control plane]
-  CP --> Meta[Metadata and lineage]
-  CP --> Orch[Training orchestrator]
-  CP --> Eval[Evaluation service]
-  CP --> Reg[Model registry]
-  CP --> Deploy[Deployment controller]
+flowchart TB
+  accTitle: Shared lifecycle authority with replaceable team execution systems
+  accDescr: Product teams submit code, configuration, and declared contracts to one shared lifecycle control plane. The control plane assigns immutable identity and lineage, records evaluation evidence, and authorizes promotion and desired deployment state. That desired state crosses an adapter boundary into existing team training, feature, and serving systems rather than replacing them. The data planes return artifacts, telemetry, and actual state as evidence to the shared lifecycle record. The organization standardizes authority and evidence while heterogeneous execution remains replaceable.
+  Teams["PRODUCT TEAMS<br/>code · config · declared contracts"]
 
-  Orch --> Batch[Batch compute]
-  Orch --> Accel[Accelerator compute]
-  Orch --> Stream[Streaming jobs]
-  Batch --> Artifacts[Versioned object storage]
-  Accel --> Artifacts
-  Stream --> Offline[Offline feature data]
-  Stream --> Online[Online feature store]
+  subgraph SHARED["SHARED AUTHORITY · one organization-wide lifecycle"]
+    Identity["IMMUTABLE IDENTITY + LINEAGE"]
+    Evidence["EVALUATION + RELEASE EVIDENCE"]
+    State{"PROMOTION + DESIRED STATE"}
+    Identity --> Evidence --> State
+  end
 
-  Eval --> Artifacts
-  Reg --> Artifacts
-  Deploy --> ServingA[Online serving]
-  Deploy --> ServingB[Batch serving]
-  ServingA --> Telemetry[Predictions, outcomes, and system telemetry]
-  ServingB --> Telemetry
-  Telemetry --> Eval
-  Telemetry --> Meta
+  Adapter["ADAPTER BOUNDARY<br/>translate contract, expose capabilities"]
+  Execution["TEAM DATA PLANES MAY REMAIN<br/>training · features · serving"]
+  Results["ARTIFACTS + TELEMETRY<br/>actual execution state"]
+
+  Teams ==> Identity
+  State ==>|"authorized intent"| Adapter
+  Adapter --> Execution
+  Execution --> Results
+  Results -.->|"evidence returns to shared record"| Evidence
+
+  class Teams viz-input
+  class Identity,Evidence,State viz-focus
+  class Adapter viz-state
+  class Execution viz-neutral
+  class Results viz-output
+  class Teams viz-tall
 ```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path first: every team enters one lifecycle for identity, evidence, and promotion, then adapters translate authorized intent into each team's existing runtime. Follow the dashed path back: artifacts, telemetry, and actual state become shared evidence. Standardize the authority loop; do not require one universal executor. Original synthesis checked against <a href="https://research.google/pubs/hidden-technical-debt-in-machine-learning-systems/">Sculley et al. on ML system debt</a>, the <a href="https://mlflow.org/docs/latest/ml/model-registry/">MLflow lifecycle documentation</a>, and Google's <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Rules of Machine Learning</a>.</p>
 
 The control plane stores desired state, identities, policy, and evidence. Data planes perform high-volume work such as scans, training, feature materialization, and inference.
 

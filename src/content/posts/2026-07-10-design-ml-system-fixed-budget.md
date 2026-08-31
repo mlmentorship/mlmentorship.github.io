@@ -11,6 +11,8 @@ category: "questions"
 
 The constraint is the question. A candidate who names the best model without estimating its cost has not designed the requested system, so do the arithmetic before picking hardware.
 
+**Learning objective:** Trace how a narrowing ranking funnel reserves expensive scoring for fewer candidates while every request remains inside one end-to-end latency ceiling and one unit-cost ceiling.
+
 ## Clarify before calculating
 
 - Requests per user per day, and peak-to-average traffic
@@ -31,6 +33,37 @@ Suppose 100 million ranking requests per day:
 - Cost ceiling: roughly $0.08 per thousand requests before non-serving costs
 
 The exact numbers will move. Writing them down is what stops you from proposing an architecture whose cost is off by an order of magnitude.
+
+<!-- visual:fixed-budget-ranking-funnel -->
+```mermaid
+flowchart TB
+	accTitle: A ranking funnel constrained by one serving budget
+	accDescr: One hundred million daily requests imply about 1,160 average QPS and 5,800 QPS at a five-times peak. Each request enters one measured envelope: p95 latency stays below 80 milliseconds and serving cost stays at or below about eight cents per thousand requests before non-serving costs. Cheap candidate generation starts with a large set, a light pre-ranker scores a smaller set, and the expensive final model scores only the smallest set before returning ranked results. Precomputed embeddings and cached popular candidates reduce repeated work. Under overload or budget pressure, the system bypasses expensive scoring for a degraded path using cached or reduced candidates and a simple scorer.
+	Q["100M requests/day<br/>~1,160 average QPS<br/>~5,800 QPS at 5x peak"]
+	S[("Precomputed embeddings<br/>+ popular-item cache")]
+	subgraph E["ONE MEASURED REQUEST ENVELOPE<br/>p95 below 80 ms | serving at or below ~$0.08 / 1K requests"]
+		C["Candidate generation<br/>large set | cheapest work per candidate"]
+		P["Light pre-ranker<br/>smaller set | moderate work per candidate"]
+		F["Final ranker<br/>smallest set | expensive model only here"]
+		O["Ranked results"]
+		C -->|"discard low-value candidates"| P
+		P ==>|"spend where it can change the order"| F
+		F --> O
+	end
+	Q --> C
+	S -->|"reuse stable work"| C
+	C -.->|"overload or budget pressure"| B["Degraded fallback<br/>cached or reduced candidates<br/>+ simple scorer"]
+	B -.-> O
+	class Q viz-input
+	class S viz-state
+	class F viz-focus
+	class O viz-output
+	class B viz-warning
+	class Q viz-tall
+	class Q viz-wide
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> start with the request arithmetic, then follow the candidate set as it shrinks. Later stages may spend more per candidate only because earlier stages invoke them on fewer candidates; the complete path still has to clear the same measured latency and unit-cost ceilings. The dashed branch is the cheaper degraded path when normal ranking would exceed capacity.</p>
 
 ## A defensible architecture progression
 

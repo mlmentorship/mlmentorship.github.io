@@ -39,6 +39,54 @@ Plus the operational layer: an eval pipeline (see [LLM Evals](/guides/llm-evals-
 
 Skipping components 4-6 is the single most common failure.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how hybrid retrieval protects recall before a query-aware reranker selects a small, precise context.</p>
+
+<!-- visual:rag-recall-precision-funnel -->
+<figure class="learning-figure plot-panel" aria-labelledby="rag-funnel-heading">
+	<h3 id="rag-funnel-heading" class="visual-title">Recall first, precision second</h3>
+	<svg viewBox="0 0 360 526" role="img" aria-labelledby="rag-funnel-title rag-funnel-desc">
+		<title id="rag-funnel-title">Hybrid retrieval and reranking candidate funnel</title>
+		<desc id="rag-funnel-desc">For the synthetic query ERR-42 after rotating a token, lexical retrieval ranks evidence A, the exact ERR-42 runbook, first but misses evidence B, the semantically relevant rotated-access recovery guide. Dense retrieval ranks evidence B first but misses evidence A. Reciprocal rank fusion combines rank evidence into a broad candidate pool containing both A and B plus lower-priority candidates. A cross-encoder then jointly scores the query with each candidate and selects B then A as the small context passed to the generator. Retrieval protects recall; reranking improves precision.</desc>
+		<defs><marker id="rag-funnel-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+		<rect class="viz-node viz-node--input" x="40" y="8" width="280" height="48" rx="4"></rect>
+		<text class="viz-axis-label" x="180" y="27" text-anchor="middle">QUERY</text>
+		<text class="viz-callout" x="180" y="45" text-anchor="middle">“ERR-42 after rotating a token”</text>
+		<path d="M180 60V76H92.5V92" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
+		<path d="M180 76H267.5V92" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
+		<rect class="viz-node" x="10" y="96" width="165" height="134" rx="4"></rect>
+		<text class="viz-axis-label" x="92.5" y="117" text-anchor="middle">LEXICAL · EXACT TERMS</text>
+		<rect class="viz-node viz-node--focus" x="20" y="128" width="145" height="26" rx="3"></rect>
+		<text class="viz-callout" x="30" y="146">1 · A · ERR-42 runbook</text>
+		<text class="viz-label" x="30" y="176">2 · Error-code index</text>
+		<text class="viz-label" x="30" y="200">3 · Token catalog</text>
+		<text class="viz-axis-label" x="92.5" y="219" text-anchor="middle">KEEPS EVIDENCE A</text>
+		<rect class="viz-node" x="185" y="96" width="165" height="134" rx="4"></rect>
+		<text class="viz-axis-label" x="267.5" y="117" text-anchor="middle">DENSE · SEMANTIC MATCH</text>
+		<rect class="viz-node viz-node--focus" x="195" y="128" width="145" height="26" rx="3"></rect>
+		<text class="viz-callout" x="205" y="146">1 · B · Restore access</text>
+		<text class="viz-label" x="205" y="176">2 · Token refresh guide</text>
+		<text class="viz-label" x="205" y="200">3 · Login recovery</text>
+		<text class="viz-axis-label" x="267.5" y="219" text-anchor="middle">KEEPS EVIDENCE B</text>
+		<path d="M92.5 234V253H155V268" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
+		<path d="M267.5 234V253H205V268" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
+		<rect class="viz-node viz-node--focus" x="35" y="272" width="290" height="92" rx="4"></rect>
+		<text class="viz-axis-label" x="180" y="294" text-anchor="middle">FUSE RANKS · BROAD CANDIDATE POOL</text>
+		<text class="viz-callout" x="180" y="317" text-anchor="middle">A · exact runbook + B · recovery guide</text>
+		<text class="viz-label" x="180" y="338" text-anchor="middle">plus error index · token guide · login guide</text>
+		<text class="viz-axis-label" x="180" y="355" text-anchor="middle">RECALL: BOTH RELEVANT PASSAGES SURVIVE</text>
+		<path d="M180 368V386" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
+		<rect class="viz-node" x="60" y="390" width="240" height="76" rx="4"></rect>
+		<text class="viz-axis-label" x="180" y="412" text-anchor="middle">CROSS-ENCODER RERANK · QUERY + PASSAGE</text>
+		<text class="viz-callout" x="180" y="435" text-anchor="middle">1 · B · recovery steps</text>
+		<text class="viz-callout" x="180" y="455" text-anchor="middle">2 · A · exact error constraints</text>
+		<path d="M180 470V488" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="75" y="492" width="210" height="30" rx="4"></rect>
+		<text class="viz-axis-label" x="180" y="512" text-anchor="middle">PRECISE CONTEXT → GENERATOR</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> follow the same query down both first-stage lists. Lexical search preserves the exact error-code passage A; dense search preserves the paraphrased recovery passage B. Fuse those ranks to keep both relevant candidates, then let the slower query-passage reranker choose their order and discard distractions before generation. The first stage protects recall; the second buys precision. This is an original synthetic example informed by <a href="https://aclanthology.org/2020.emnlp-main.550/">Karpukhin et al.'s dense passage retrieval</a>, <a href="https://dl.acm.org/doi/10.1145/1571941.1572114">Cormack et al.'s reciprocal rank fusion</a>, and <a href="https://arxiv.org/abs/1901.04085">Nogueira and Cho's BERT reranker</a>.</figcaption>
+</figure>
+
 ## Component-by-component, with the things that actually matter
 
 ### Chunking

@@ -289,6 +289,35 @@ Event time describes when the user spoke or the screen changed. Arrival time des
 
 A video packet may arrive late because the mobile uplink stalled. Replaying that packet as current evidence recreates the prototype incident. The timeline marks it late and places it at its original event time.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace why the last frame to arrive is not necessarily the current frame, then apply a freshness gate to the user's question.</p>
+
+<!-- visual:multimodal-stale-frame-gate -->
+```mermaid
+flowchart TB
+  accTitle: Event time prevents a recovered stale screen frame from becoming current evidence
+  accDescr: An old screen frame is captured before a network stall. During the stall, the user asks what to press now. On recovery, the old frame arrives after the question. Selecting evidence by arrival order treats that frame as current and can produce an unsafe answer. Selecting by capture event time places the frame in history and leaves the screen watermark delayed. Because this question requires a current screen, a freshness gate either accepts a requested fresh keyframe and answers from it or reaches its latency bound and tells the user that the screen is stale.
+  Old["OLD SCREEN FRAME<br/>captured before the stall"] --> Stall["UPLINK STALL<br/>frame waits in transport"]
+  Question["USER ASKS<br/>'What should I press now?'"] --> Recovery["NETWORK RECOVERS<br/>old frame arrives after question"]
+  Stall --> Recovery
+  Recovery --> Clock{"WHICH CLOCK<br/>selects evidence?"}
+  Clock -->|"arrival time"| Arrival["LAST ARRIVAL = CURRENT<br/>old frame advances state"]
+  Arrival ==> Unsafe["UNSAFE ANSWER<br/>describes obsolete UI"]
+  Clock -->|"capture event time + sequence"| Event["PLACE FRAME IN HISTORY<br/>do not advance live state"]
+  Event --> Watermark["SCREEN WATERMARK<br/>still delayed"]
+  Watermark --> Gate{"CURRENT SCREEN<br/>required for this request"}
+  Gate -->|"fresh keyframe arrives"| Answer["ANSWER FROM<br/>new screen state"]
+  Gate -.->|"latency bound expires"| Abstain["VISIBLE DEGRADATION<br/>'Screen view is stale'"]
+  class Old,Question viz-input
+  class Recovery,Clock,Gate viz-focus
+  class Stall,Watermark viz-state
+  class Event,Answer viz-output
+  class Arrival,Unsafe,Abstain viz-warning
+  class Old viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the recovered frame to the clock decision. Arrival order makes the old frame look newest; event time makes it a historical repair and leaves the live screen delayed. Because “now” requires current evidence, answer only after a fresh keyframe or state plainly that the screen is stale. Original synthesis checked against <a href="https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/">Apache Flink's event-time and watermark guidance</a>, <a href="https://www.rfc-editor.org/rfc/rfc3550.html">RTP timestamp and sequence contracts</a>, and <a href="https://www.rfc-editor.org/rfc/rfc8834.html">WebRTC media transport guidance</a>.</p>
+
 ### Define watermarks
 
 A watermark states that the service expects no more events before a session time, within the configured lateness bound. Maintain it per source and modality. A request then applies its own freshness policy to those watermarks.

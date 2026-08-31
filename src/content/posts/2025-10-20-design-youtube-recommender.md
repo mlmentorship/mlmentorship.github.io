@@ -89,6 +89,45 @@ The L6 answer is the L5 answer plus the things only people who've shipped at thi
 
 > "...recsys has a strong **feedback loop**: today's recommendations create tomorrow's training data, so the system can self-reinforce a narrow distribution. I've seen teams ship a 'better' model offline that immediately tanked diversity online because it learned to recommend exactly what users had previously clicked. Mitigations: explicit diversity terms in the ranker, exploration in candidate generation (epsilon-greedy or Thompson sampling on the head distribution), counterfactual augmentation."
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how a two-stage recommender narrows the catalog, then identify why its displayed slate, not the whole catalog, determines tomorrow's ordinary training labels.</p>
+
+<!-- visual:youtube-recommender-selective-feedback-loop -->
+```mermaid
+flowchart TB
+  accTitle: A two-stage recommender also acts as a selective data-collection policy
+  accDescr: A catalog of billions plus content, fresh-item, and randomized-exploration sources enter candidate generation, producing thousands of candidates. A richer multi-task ranker scores those candidates, and a composition policy applies diversity, freshness, and safety constraints. This creates an exposure gate: the small displayed slate can produce observed outcomes, while unshown outcomes remain unknown rather than negative. Logged exposure-policy context and outcomes train later retrieval and ranking models, closing a feedback loop. Randomized exploration broadens which items receive exposure.
+  Sources["CATALOG + COVERAGE SOURCES<br/>billions · content · fresh · exploration"]
+  Retrieve["1 · CANDIDATE GENERATION<br/>retrieve thousands"]
+  Rank["2 · MULTI-TASK RANKER<br/>watch · satisfaction · return"]
+  Compose{"COMPOSITION POLICY<br/>diversity · freshness · safety"}
+  Gate["EXPOSURE GATE<br/>displayed: observable · unshown: unknown"]
+  Outcomes["OBSERVED OUTCOMES<br/>watch · skip · survey · return"]
+  Logs[("EXPOSURE + OUTCOME LOG<br/>policy context included")]
+  Train["TRAIN NEXT MODELS<br/>retrieval + ranking"]
+
+  Sources ==> Retrieve
+  Retrieve ==> Rank
+  Rank ==> Compose
+  Compose ==> Gate
+  Gate ==>|"displayed slate only"| Outcomes
+  Outcomes ==> Logs
+  Logs ==> Train
+  Train -.->|"changes later candidates"| Retrieve
+  Train -.->|"changes later ordering"| Rank
+
+  class Logs viz-state
+  class Retrieve,Rank,Compose viz-focus
+  class Sources viz-input
+  class Train viz-neutral
+  class Outcomes viz-output
+  class Gate viz-warning
+  class Sources viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid funnel from billions of videos to the exposure gate, then follow the feedback loop. A watch or skip is observed only after display; an unshown video's outcome is unknown, not negative. Deliberate exploration widens exposure so future training and evaluation are not limited entirely to yesterday's choices.</p>
+<p class="diagram-source">Original synthesis informed by the <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/">YouTube candidate-generation and ranking paper</a>, its <a href="https://research.google/pubs/recommending-what-video-to-watch-next-a-multitask-ranking-system/">multitask ranking follow-up</a>, and <a href="https://arxiv.org/abs/1710.11214">Chaney, Stewart, and Engelhardt on algorithmic confounding</a>. No source figure or layout is reproduced.</p>
+
 ### Add: the cold-start strategy
 
 > "...for new videos, the embedding-based two-tower has nothing to retrieve. I'd add a content-based candidate source (text/audio/visual features extracted from the video) running in parallel with the collaborative source, and explicitly boost new content in early hours. For new users, I'd start with popularity-based recommendations and switch to the personalized model after a few sessions of signal."

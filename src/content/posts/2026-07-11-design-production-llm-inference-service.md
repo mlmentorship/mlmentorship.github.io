@@ -85,6 +85,53 @@ A defensible baseline is:
 
 Priority without quotas becomes starvation. Fairness without class-aware SLOs can make interactive traffic wait behind batch jobs. State the policy and the sacrifice.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how KV admission and the per-iteration token budget protect memory capacity and decode latency at the same time.</p>
+
+<!-- visual:llm-inference-two-budget-scheduler -->
+```mermaid
+flowchart TB
+  accTitle: Production LLM scheduling coordinates a KV-memory budget with a per-iteration token budget
+  accDescr: A request's prompt and bounded output allowance are compared with free KV pages before model work begins. A request that cannot fit is rejected, deferred, or routed elsewhere. An admitted request reserves pages and joins eligible work containing active decode sequences and bounded prefill chunks. Each iteration spends its fixed token budget on one latency-sensitive token per active decode sequence first, then fills remaining capacity with fair prefill chunks. Continuing work keeps its reservation and rejoins the next iteration; end of sequence, cancellation, or a limit releases KV pages for later admission.
+  Inputs["ADMISSION INPUTS<br/>request bound + free KV pages"]
+  Admit{"KV ADMISSION<br/>prompt + bounded output fits?"}
+  Reject["REJECT · DEFER · ROUTE<br/>before an inevitable SLO miss"]
+  Reserve["RESERVE KV PAGES<br/>admit bounded work"]
+  Work["ELIGIBLE WORK<br/>active decode + prefill chunks"]
+  Schedule{"EACH MODEL ITERATION<br/>fixed token budget + fair quotas"}
+  Protect["1 · PROTECT DECODE<br/>schedule active next tokens"]
+  Fill["2 · FILL REMAINDER<br/>schedule bounded prefill chunks"]
+  Execute["EXECUTE ONE MIXED BATCH"]
+  Continue{"EOS · CANCEL · LIMIT?"}
+  Rejoin["CONTINUE<br/>keep reservation · rejoin next iteration"]
+  Release["STOP<br/>release KV pages for later admission"]
+
+  Inputs ==> Admit
+  Admit -->|"no"| Reject
+  Admit ==>|"yes"| Reserve
+  Reserve --> Work
+  Work ==> Schedule
+  Schedule ==> Protect
+  Protect ==> Fill
+  Fill ==> Execute
+  Execute --> Continue
+  Continue -->|"continue"| Rejoin
+  Continue ==>|"stop"| Release
+  Rejoin --> Work
+  Release -.->|"pages available again"| Inputs
+
+  class Inputs viz-input
+  class Reserve,Work,Rejoin viz-state
+  class Admit,Schedule,Protect,Fill viz-focus
+  class Execute viz-neutral
+  class Release viz-output
+  class Reject viz-warning
+  class Inputs viz-wide
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> read the two gates in order. First, reserve KV pages before work enters the scheduler. Then, in every iteration, give active sequences their latency-sensitive decode step before filling the remaining token budget with bounded prefill chunks. Continuing work keeps its reservation; only stopped work releases pages for later admission.</p>
+<p class="diagram-source">Original synthesis informed by the <a href="https://www.usenix.org/conference/osdi24/presentation/agrawal">Sarathi-Serve scheduler</a>, the <a href="https://arxiv.org/abs/2309.06180">PagedAttention paper</a>, and <a href="https://www.usenix.org/conference/osdi24/presentation/zhong-yinmin">DistServe</a>. No source figure or layout is reproduced.</p>
+
 ## What an L4 answer sounds like
 
 > "Put the model behind an API, add a queue, batch requests, cache prompts, autoscale GPUs, and monitor latency."

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "diffusion-models",
+  "article": "src/content/posts/2025-11-22-diffusion-models.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish one-step diffusion training at an independently sampled noise level from sampling, which must chain learned reverse transitions from noise to a clean sample.",
+  "mediumRationale": "A deterministic two-lane SVG is the smallest useful explanation because aligned horizontal geometry can contrast an independently sampled training timestep with the dependent reverse chain while showing that the same time-conditioned noise predictor serves both.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart would show control flow but would not align arbitrary noise-level selection against the full reverse timeline as precisely.",
+    "svg": "Selected because fixed, labelled lanes make the skipped forward intermediates and unavoidable reverse dependencies visible without implying photographic denoising quality.",
+    "semanticHtml": "Rejected because a table can list training and sampling steps but cannot show the random jump to any t and the serial state dependency with equal immediacy.",
+    "interaction": "Rejected because scrubbing a noise schedule adds controls and hidden states when a static comparison already resolves the conceptual confusion.",
+    "paperReuse": "Rejected because the papers contain algorithm listings and sample trajectories, but their article-specific figures are not needed. Public arXiv access is not treated as figure-reuse permission, and no source image, layout, wording, data, or samples are copied.",
+    "noVisual": "Rejected because the prose separately explains closed-form corruption, training, and reverse sampling but leaves the learner to infer why training does not unroll T steps while generation normally does."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 74,
+        "insight": "The generative-model divider introduces the topic but contains no mechanism."
+      },
+      {
+        "page": 75,
+        "insight": "The neighboring overview defines a generative model as approximating the data distribution but does not discuss diffusion, noising, or sampling."
+      },
+      {
+        "page": 86,
+        "insight": "The supervision-taxonomy slide precedes the deck's generative-model comparison and supplies no diffusion process."
+      },
+      {
+        "page": 87,
+        "insight": "The generative-model overview shows latent-variable, GAN, and autoregressive families but omits diffusion models entirely."
+      },
+      {
+        "page": 88,
+        "insight": "The following references slide covers variational autoencoders and inference, confirming no neighboring diffusion treatment."
+      },
+      {
+        "page": 149,
+        "insight": "The preceding Faster R-CNN slide is unrelated and marks the start of the nearest image-generation neighborhood."
+      },
+      {
+        "page": 150,
+        "insight": "The GAN slide discusses adversarial objectives, instability, and mode dropping but provides no diffusion comparison or denoising mechanism."
+      },
+      {
+        "page": 151,
+        "insight": "The only slide titled Stable Diffusion describes an explicit finite-difference heat-equation smoother, not a learned denoising diffusion probabilistic model; it is technically inapplicable to this article."
+      },
+      {
+        "page": 152,
+        "insight": "The following model-interpretability divider confirms that the deck contains no neighboring correction or generative-diffusion continuation."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for diffusion, denoising, noise schedule, score matching, DDPM, DDIM, stable diffusion, and generative-model terms, then read the complete matching neighborhoods on pages 74-75, 86-88, and 149-152. Page 151 is about numerical PDE diffusion and must not be used as evidence for a learned generative model. The deck has no applicable training-versus-sampling visual, so no deck image, wording, code, values, or arrangement is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Denoising Diffusion Probabilistic Models",
+        "url": "https://arxiv.org/abs/2006.11239",
+        "usage": "Used as the primary source for the closed-form noisy sample, uniformly sampled training timestep, noise-prediction loss, and iterative reverse sampling algorithm.",
+        "license": "The paper is freely readable on arXiv, but free access alone does not establish permission to republish its figures. No algorithm text, figure, sample image, visual layout, or empirical data is copied."
+      },
+      {
+        "title": "Deep Unsupervised Learning using Nonequilibrium Thermodynamics",
+        "url": "https://arxiv.org/abs/1503.03585",
+        "usage": "Used as the foundational primary source for a fixed forward diffusion that gradually destroys structure and a learned reverse process that transforms a simple distribution back toward the data distribution.",
+        "license": "The arXiv record is publicly accessible, but permissive reuse rights for its figures were not established. No Swiss-roll trajectory, image, prose, data, or figure composition is reproduced."
+      },
+      {
+        "title": "Denoising Diffusion Implicit Models",
+        "url": "https://arxiv.org/abs/2010.02502",
+        "usage": "Used as a primary source to verify both the closed-form expression for an arbitrary forward noise level and the fact that DDPM generation normally performs reverse iterations sequentially, while alternative non-Markovian sampling can reduce the number of steps.",
+        "license": "The paper is freely readable on arXiv, but no general figure-reuse permission is assumed. No graphical model, equation formatting, sample, table, or layout is reused."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used as the authoritative licensing reference to distinguish free viewing and downloading from permission to redistribute or adapt paper figures.",
+        "license": "The policy is cited only to determine licensing treatment. No policy wording, icon, or visual asset is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the training-sampling asymmetry. Because q(x_t|x_0) has a closed form, training can choose one t, construct x_t directly from x_0 and epsilon, and make one time-conditioned prediction; it need not simulate x_1 through x_t or run a reverse chain. Sampling has no clean x_0 or known epsilon target. It begins at x_T and must use the current predicted state to obtain the next state, so reverse transitions are dependent even though the network parameters are shared across timesteps. The visual is an original symbolic schematic and makes no claim that three pictured states equal the actual T-step schedule."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected every relevant neighborhood, then checked three primary diffusion papers and arXiv licensing guidance before selecting an original training-versus-sampling schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "diffusion-training-sampling-asymmetry"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description, while lane headings, step labels, node text, arrow direction, and solid-versus-dashed paths carry the full distinction without color. Training shows clean data and independently sampled time and noise converging on the closed-form construction; sampling labels noise prediction separately from the state update. The established visual-wide and visual-scroll primitives preserve readable labels through contained horizontal scrolling at 390 CSS pixels; enlarged mathematical subscripts remain legible when print scales the complete figure to the page, and shared theme variables provide dark-mode contrast."
+  }
+}
