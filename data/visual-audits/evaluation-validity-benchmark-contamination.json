@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "slug": "evaluation-validity-benchmark-contamination",
+  "article": "src/content/posts/2026-08-28-evaluation-validity-benchmark-contamination.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish an evaluation that provides independent confirmation from one that has become part of development through repeated feedback.",
+  "mediumRationale": "A compact Mermaid comparison is the smallest medium that makes the change in information flow visible: an untouched hidden evaluation receives a frozen system once, while an adaptively reused benchmark sends results back into system selection. The lesson is relational rather than quantitative, and the established Mermaid renderer already supplies responsive theme and print behavior.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled arrows and two top-to-bottom paths directly contrast independent confirmation with the feedback loop created by repeated benchmark use.",
+    "svg": "Rejected: the lesson does not require precise geometry, scales, or plotted values, so custom coordinates would add maintenance without instructional value.",
+    "semanticHtml": "Rejected: a table or paired cards could list differences but would not show benchmark results flowing back into model, prompt, or data selection.",
+    "interaction": "Rejected: no parameter sweep or hidden state is needed, and simulated score changes could imply unsupported quantitative effects.",
+    "paperReuse": "Rejected: the reviewed papers contain relevant figures and experiments, but none expresses this article's exact two-path synthesis. The Dwork et al. and Brown et al. arXiv records grant only arXiv's non-exclusive distribution license, not a permissive third-party figure-reuse license; no figure was copied. HELM is CC BY 4.0, but reuse would still be larger and less targeted than an original diagram.",
+    "noVisual": "Rejected: prose explains several contamination types but leaves the role transition abstract. The feedback-loop comparison shows why the same benchmark ceases to be independent evidence after it guides repeated choices."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 57,
+        "insight": "The deck states that preprocessing statistics must be computed only on training data and then applied to train, validation, and test splits, establishing a one-way boundary from training choices to held-out evaluation."
+      },
+      {
+        "page": 58,
+        "insight": "The neighboring data-inspection slide recommends examining predictions and data variation; these are appropriate development activities, but it does not distinguish development examples from a final confirmation set."
+      },
+      {
+        "page": 59,
+        "insight": "The neighboring training-skeleton slide recommends repeated experiments, ablations, prediction inspection, and full-test-set evaluation, illustrating how evaluation results can enter an iterative development loop if the set's role is not controlled."
+      },
+      {
+        "page": 62,
+        "insight": "The model-selection slide explicitly uses measured validation loss for early stopping, so validation is development data rather than final independent confirmation."
+      },
+      {
+        "page": 63,
+        "insight": "The adjacent tuning slide uses cross-validation to choose hyperparameters, reinforcing that any set used for selection cannot also be treated as an untouched final test."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline ground-truth ranking metrics from later production A/B-test outcomes, motivating predictive-validity checks rather than assuming an offline score supports the target decision."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide starts with goals and asks how performance will be evaluated during both training and inference, linking metric choice to the intended claim and use."
+      },
+      {
+        "page": 166,
+        "insight": "The adjacent data-pipeline slide asks whether train and test sets come from the same distribution and what biases they contain, covering population validity and source mismatch."
+      },
+      {
+        "page": 168,
+        "insight": "The adjacent production slide requires model-gating experiments and monitoring metrics, showing that a benchmark score is one stage of evidence rather than the production outcome itself."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide recommends testing a model trained through one date on later data and warns that short-term behavior need not predict long-term behavior, supporting fresh confirmation and predictive-validity checks."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 pages of Basic_ML_CS_concepts for benchmark, contamination, validity, evaluation, test set, train/test, validation, cross-validation, data leakage, offline, online, and production terms. It then read the complete neighboring sequences on pages 57-63, 103-106, 140-142, and 161-170. The deck has no dedicated benchmark-contamination or validity diagram. Pages 57-63 show split boundaries and adaptive model selection; pages 141 and 165-169 connect offline metrics to goals, distributions, gating, and later outcomes. Pages 103-106 discuss LLM training and data but do not address benchmark overlap. No deck artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Standards for Educational and Psychological Testing (2014)",
+        "url": "https://www.testingstandards.net/open-access-files.html",
+        "usage": "Used as the authoritative testing standard for the principle that validity concerns evidence supporting interpretations and uses of scores, rather than being an intrinsic property of a test.",
+        "license": "The publisher provides an open-access copy but does not grant a permissive license to reuse its figures or prose. No text, table, figure, or layout is copied."
+      },
+      {
+        "title": "Generalization in Adaptive Data Analysis and Holdout Reuse",
+        "url": "https://arxiv.org/abs/1506.02629",
+        "usage": "Used as the primary source for the result that repeatedly and adaptively reusing holdout results can overfit the holdout itself, making its later measurements unreliable as ordinary independent estimates.",
+        "license": "The arXiv record uses the arXiv non-exclusive distribution license, which is not a permissive third-party figure-reuse grant. No paper figure, synthetic result, wording, or algorithm is reproduced."
+      },
+      {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "usage": "Used as a primary model-evaluation paper that explicitly studies train-test overlap, measures benchmark contamination, and qualifies or omits affected results.",
+        "license": "The arXiv record uses the arXiv non-exclusive distribution license. No contamination figure, benchmark data, table, text, or visual structure is reused."
+      },
+      {
+        "title": "Holistic Evaluation of Language Models",
+        "url": "https://arxiv.org/abs/2211.09110",
+        "usage": "Used to cross-check that evaluation should cover scenarios and metrics aligned with intended use and should make benchmark limitations and contamination concerns explicit.",
+        "license": "The arXiv record identifies CC BY 4.0, so attributed figure reuse is available in principle. No HELM figure, table, data, prose, or layout is reused because an original two-path diagram is narrower and clearer."
+      }
+    ],
+    "notes": "The diagram is an original conceptual synthesis. It reproduces no empirical values or paper-specific geometry. Its core distinction is deliberately narrow: feedback from a benchmark can influence system selection even when test items never enter gradient-based training, so a fresh hidden evaluation is needed before making a broad claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the relevant neighboring slide sequences, then checked an authoritative testing standard and primary work on adaptive holdout reuse and language-model benchmark contamination. The hardest prose-only model is the benchmark's role transition from independent evidence to development feedback."
+  },
+  "implementation": {
+    "visualIds": [
+      "independent-confirmation-vs-adaptive-reuse"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description. The two paths are named in text; each node states its role; the valid evidence arrow is thick and directly labelled; and the problematic feedback and unsupported-claim arrows are dashed and directly labelled, so meaning does not depend on color. A top-to-bottom layout, short labels, and no forced dimensions support a 390 CSS-pixel viewport. Established Mermaid theme tokens provide dark-mode and print contrast, while the caption preserves the inference in plain text."
+  }
+}

@@ -76,6 +76,33 @@ A model or policy learns details of the grader. It may exploit those details wit
 
 Train and test items come from the same repository, author, template, benchmark family, or generated source. Exact deduplication may miss this link.
 
+**Learning objective:** distinguish an evaluation that provides independent confirmation from one that has become part of development through repeated feedback.
+
+<!-- visual:independent-confirmation-vs-adaptive-reuse -->
+```mermaid
+flowchart TB
+	accTitle: Independent confirmation compared with adaptive benchmark reuse
+	accDescr: In the independent path, development data is used to choose a system, then the chosen system is scored once on a hidden evaluation from fresh sources. That score supports only the matching target claim. In the contaminated path, a public benchmark produces scores and inspected errors that drive changes to prompts, data, or checkpoints. A dashed arrow sends each change back to the same benchmark, so its later score is development feedback rather than independent confirmation and cannot by itself support a broad claim.
+	subgraph INDEPENDENT["INDEPENDENT CONFIRMATION"]
+		D["Development data<br/>train + tune"] --> S["Freeze the chosen system"]
+		H["Hidden evaluation<br/>fresh sources"] --> E["Score once"]
+		S --> E
+		E ==>|"evidence matches target"| C["Supported claim<br/>within tested scope"]
+	end
+	subgraph REUSED["ADAPTIVE BENCHMARK REUSE"]
+		B["Public benchmark"] --> R["Score + inspect errors"]
+		R --> T["Change prompt, data,<br/>or checkpoint"]
+		T -. "try again on the same benchmark" .-> B
+		R -. "development feedback,<br/>not untouched confirmation" .-> U["Broad claim<br/>not supported by this score alone"]
+	end
+	class D,H viz-input
+	class S,E viz-focus
+	class C viz-output
+	class B,R,T,U viz-warning
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> the benchmark changes roles when its results influence the next system choice. Keep iteration on development data, freeze the system, and use fresh hidden sources once for confirmation; otherwise limit the claim and confirm the gain on an independent evaluation. Original synthesis informed by <a href="https://arxiv.org/abs/1506.02629">Dwork et al. (2015)</a> on adaptive holdout reuse and <a href="https://arxiv.org/abs/2005.14165">Brown et al. (2020)</a> on benchmark contamination.</p>
+
 ## Reduce contamination risk
 
 1. Track source and transformation history for training and evaluation data.
