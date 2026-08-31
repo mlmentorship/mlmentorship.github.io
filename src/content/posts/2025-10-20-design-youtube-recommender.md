@@ -89,6 +89,54 @@ The L6 answer is the L5 answer plus the things only people who've shipped at thi
 
 > "...recsys has a strong **feedback loop**: today's recommendations create tomorrow's training data, so the system can self-reinforce a narrow distribution. I've seen teams ship a 'better' model offline that immediately tanked diversity online because it learned to recommend exactly what users had previously clicked. Mitigations: explicit diversity terms in the ranker, exploration in candidate generation (epsilon-greedy or Thompson sampling on the head distribution), counterfactual augmentation."
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how a two-stage recommender narrows the catalog, then identify why its displayed slate, not the whole catalog, determines tomorrow's ordinary training labels.</p>
+
+<!-- visual:youtube-recommender-selective-feedback-loop -->
+```mermaid
+flowchart TB
+  accTitle: A two-stage recommender also acts as a selective data-collection policy
+  accDescr: A catalog of billions first enters candidate generation, where personalized retrieval, content and fresh-item sources, and an explicit exploration source produce thousands of candidates. A richer multi-task ranker scores those candidates, and a composition policy applies diversity and safety constraints to create the small displayed slate. Only displayed videos can normally produce observed watches, skips, likes, surveys, and return outcomes; candidates and catalog items that were not displayed have unknown ordinary outcomes rather than negative labels. Logged exposures and outcomes train later retrieval and ranking models, closing a feedback loop. Randomized exploration broadens which items receive exposure and creates support for evaluating alternatives.
+  Catalog[("VIDEO CATALOG<br/>billions of eligible items")]
+  Retrieve["1 · CANDIDATE GENERATION<br/>personalized retrieval"]
+  Content["CONTENT + FRESH SOURCES<br/>new-item coverage"]
+  Explore["RANDOMIZED EXPLORATION<br/>known exposure probability"]
+  Candidates["CANDIDATE SET<br/>thousands"]
+  Rank["2 · MULTI-TASK RANKER<br/>watch · satisfaction · return"]
+  Compose{"COMPOSITION POLICY<br/>diversity · freshness · safety"}
+  Shown["DISPLAYED SLATE<br/>small set"]
+  Hidden["NOT DISPLAYED<br/>ordinary outcome unknown"]
+  Outcomes["OBSERVED OUTCOMES<br/>watch · skip · survey · return"]
+  Logs[("EXPOSURE + OUTCOME LOG<br/>policy and propensity included")]
+  Train["TRAIN NEXT MODELS<br/>retrieval + ranking"]
+
+  Catalog ==> Retrieve
+  Content --> Candidates
+  Explore --> Candidates
+  Retrieve ==> Candidates
+  Candidates ==> Rank
+  Rank ==> Compose
+  Compose ==>|"selected"| Shown
+  Candidates -.->|"not selected"| Hidden
+  Shown ==> Outcomes
+  Outcomes ==> Logs
+  Shown --> Logs
+  Logs ==> Train
+  Train -.->|"changes later candidates"| Retrieve
+  Train -.->|"changes later ordering"| Rank
+
+  class Catalog,Logs viz-state
+  class Retrieve,Rank,Compose viz-focus
+  class Content,Explore viz-input
+  class Candidates,Train viz-neutral
+  class Shown,Outcomes viz-output
+  class Hidden viz-warning
+  class Catalog viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid funnel from billions of videos to one displayed slate, then follow the feedback loop. A watch or skip is observed only after exposure; an unshown video's outcome is unknown, not negative. Deliberate exploration widens exposure with known probabilities so future training and evaluation are not limited entirely to yesterday's choices.</p>
+<p class="diagram-source">Original synthesis informed by the <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/">YouTube candidate-generation and ranking paper</a>, its <a href="https://research.google/pubs/recommending-what-video-to-watch-next-a-multitask-ranking-system/">multitask ranking follow-up</a>, and <a href="https://arxiv.org/abs/1710.11214">Chaney, Stewart, and Engelhardt on algorithmic confounding</a>. No source figure or layout is reproduced.</p>
+
 ### Add: the cold-start strategy
 
 > "...for new videos, the embedding-based two-tower has nothing to retrieve. I'd add a content-based candidate source (text/audio/visual features extracted from the video) running in parallel with the collaborative source, and explicitly boost new content in early hours. For new users, I'd start with popularity-based recommendations and switch to the personalized model after a few sessions of signal."
