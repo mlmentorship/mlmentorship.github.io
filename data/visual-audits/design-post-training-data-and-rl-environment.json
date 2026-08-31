@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-post-training-data-and-rl-environment",
+  "article": "src/content/posts/2026-07-11-design-post-training-data-and-rl-environment.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Decide whether a successful trajectory is eligible for quality-score aggregation by applying a hard policy gate to its evidence before producing a training signal.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align two trajectories with the same successful outcome while forcing their authorization evidence through visibly different pass and fail paths. The fixed comparison makes non-compensation immediate: outcome quality is considered only after the policy gate passes.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show a policy branch, but automatic layout would not reliably align two equal-outcome trajectories so their one decisive difference can be compared row by row.",
+    "svg": "Selected: fixed columns keep task outcome, authorization evidence, gate decision, and training eligibility aligned for a direct counterexample to additive safety penalties.",
+    "semanticHtml": "Rejected: a table could compare the two logs, but the gate physically interrupting the unsafe path and the safe path continuing into score aggregation are the core spatial relationships.",
+    "interaction": "Rejected: changing permissions or penalty weights could become an exercise, but controls and hidden states add complexity to a lesson that one static counterexample establishes.",
+    "paperReuse": "Rejected: the deck and reviewed sources contain general RLHF pipelines, reward-optimization results, or process-supervision experiments, not this article-specific authorization-gate comparison. Public access was not treated as reuse permission, and no source artwork, values, wording, or layout is copied.",
+    "noVisual": "Rejected: the prose states that safety violations are gates, but readers must mentally test whether a high outcome score can still outweigh a penalty. Two equally successful trajectories make the prohibited compensation and the correct ordering visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 104,
+        "insight": "The RLHF discussion attributes instruction following and safer refusals to alignment tuning and notes an alignment tax, but it provides no episode contract, trajectory evidence, or non-tradeable policy gate."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring Toolformer discussion covers deciding which APIs to call, when to call them, and what arguments to pass, then filtering generated API calls for usefulness. It is relevant to tool-use data construction but does not grade authorization boundaries or full trajectories."
+      },
+      {
+        "page": 154,
+        "insight": "The reinforcement-learning divider begins the deck's only dedicated RL neighborhood and contains no technical model."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide distinguishes iid supervised samples from dependent RL trajectories and contrasts likelihood with expected reward. It supports trajectory-level evaluation but does not separate outcome, process, and policy evidence."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-gradient slide optimizes expected cumulative reward in CartPole and shows a scalar-reward update. It illustrates exactly why the article must define a safe environment and grader before choosing an optimizer, but it has no hard constraint or evidence-bearing grader."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol) text-indexed all 214 physical pages for reinforcement learning, RLHF, reward, human feedback, grader, trajectory, policy, preference, and tool-use terms. Pages 104-105 were read as the closest RLHF and tool-use neighborhood, and pages 153-157 were read around the complete dedicated RL section. Page 153 concerns SHAP explainability and page 157 is a project divider, so neither adds grader guidance. The deck never shows a safety constraint that blocks an otherwise successful trajectory from reward aggregation. No deck image, code, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://proceedings.neurips.cc/paper_files/paper/2022/hash/b1efde53be364a73914f58805a001731-Abstract-Conference.html",
+        "usage": "Used as a primary RLHF source to verify the demonstration, ranked-output, reward-model, and policy-optimization pipeline and the need to evaluate helpfulness and safety rather than treating model scale as alignment.",
+        "license": "The proceedings page provides public access, but no permissive figure-reuse grant was relied on. No paper figure, result value, prose, or pipeline layout is copied."
+      },
+      {
+        "title": "Scaling Laws for Reward Model Overoptimization",
+        "url": "https://proceedings.mlr.press/v202/gao23h.html",
+        "usage": "Used as a primary empirical source showing that optimizing an imperfect proxy reward too strongly can reduce gold-standard performance, supporting evidence-bearing graders and adversarial checks before optimization.",
+        "license": "PMLR provides public access while copyright remains with the authors; public access alone was not treated as permission to reproduce a figure. No plot, coefficient, data, text, or visual arrangement is reused."
+      },
+      {
+        "title": "Let's Verify Step by Step",
+        "url": "https://arxiv.org/abs/2305.20050",
+        "usage": "Used as a primary process-supervision study to cross-check the distinction between evaluating only a final outcome and evaluating intermediate reasoning steps. The article extends that distinction to observable tool actions and policy evidence rather than hidden reasoning.",
+        "license": "The arXiv record provides access, but no figure-reuse permission was assumed. No figure, benchmark result, annotation example, prose, or visual structure is adapted."
+      },
+      {
+        "title": "Gymnasium: Handling Time Limits",
+        "url": "https://gymnasium.farama.org/tutorials/gymnasium_basics/handling_time_limits/",
+        "usage": "Used as official environment documentation to verify that terminal success or failure must be distinguished from externally imposed truncation or timeout because they have different learning semantics.",
+        "license": "The documentation is used only as an authoritative citation. No documentation text, equation, code, diagram, or page layout is copied, so the implementation does not depend on a reuse license."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the ordering of a constrained structured grade. An outcome check can establish that the ticket was resolved, but authorization evidence must independently determine whether the trajectory is eligible for optimization. If an unauthorized account was accessed, the trajectory is disqualified rather than assigned a quality score that could compensate for the violation. Only a policy-passing trajectory proceeds to task-success, process-quality, and communication-quality aggregation, with evidence retained for debugging and calibration."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then checked three primary post-training studies and official environment documentation before selecting an original equal-outcome trajectory comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "post-training-policy-gate"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that names both successful trajectories, their different authorization evidence, the pass and fail decisions, and the resulting eligibility. Direct SAFE PATH and UNSAFE PATH headings, PASS and FAIL labels, distinct rectangular and stop-sign shapes, a barrier, and continuous versus terminated arrows carry the lesson without color. The 360-unit viewBox uses established responsive SVG primitives with no minimum width, preserving readable labels at 390 CSS pixels; shared theme tokens provide dark-mode contrast and print-safe colors."
+  }
+}
