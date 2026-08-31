@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "gradient-clipping",
+  "article": "src/content/posts/2025-08-17-gradient-clipping.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain geometrically why global L2-norm clipping shortens an over-threshold gradient while preserving its direction.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place an original gradient, its clipped result, and the L2 threshold on the same ray and verify the scaling with one exact 3-4-5 example. The fixed geometry makes radial projection immediate without runtime code or horizontal scrolling.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show the conditional steps but cannot faithfully encode vector length, a circular L2 boundary, or unchanged direction.",
+    "svg": "Selected because a deterministic vector construction can align the norm boundary, original endpoint, clipped endpoint, and exact component calculation in one compact panel.",
+    "semanticHtml": "Rejected because a table can compare before and after coordinates but cannot make same-direction radial projection spatially visible.",
+    "interaction": "Rejected because changing the threshold or vector would add exploration rather than improve the single objective, and static geometry is complete in print.",
+    "paperReuse": "Rejected because the Pascanu et al. paper contains broader optimization geometry and no explicit permissive figure-reuse grant was established. No paper or deck figure, coordinates, prose, data, or layout is copied; the 3-4-5 construction and SVG are original.",
+    "noVisual": "Rejected because the scaling equation is concise, but prose alone requires the reader to infer that multiplying all coordinates by one positive scalar moves the endpoint along the same ray to the norm boundary."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 41,
+        "insight": "The activation-functions slide notes that a large gradient can produce a destructive ReLU update and mentions exploding gradients, but gives no clipping rule or gradient-space geometry."
+      },
+      {
+        "page": 44,
+        "insight": "The backpropagation slide explains how vector and matrix gradients are formed and how scale can create unstable optimization; it provides context for gradient magnitude but does not discuss clipping."
+      },
+      {
+        "page": 57,
+        "insight": "The practical-notes slide mentions clamping weight-vector norms to prevent parameter explosion at large learning rates. This is weight constraint geometry, not clipping the concatenated gradient before an optimizer step, so it was not reused as evidence of gradient clipping."
+      },
+      {
+        "page": 148,
+        "insight": "The CNN slide says residual connections ease gradient flow and alleviate vanishing gradients, distinguishing a structural gradient-flow intervention from clipping an exploding update."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for gradient clipping, clip, clamp, exploding gradient, gradient norm, gradient magnitude, and large gradient terminology. There is no slide that states or draws gradient clipping. Exact relevant pages 41, 44, 57, and 148 were read with their neighbors: pages 40 and 42 are section dividers; pages 43 and 45 are the backpropagation title and loss-optimization slides; pages 56 and 58 are a project-practice divider and data inspection; pages 147 and 149 cover image-classification context and Faster R-CNN. Page 57's weight-norm clamp is explicitly a different operation. No slide image, geometry, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On the difficulty of training recurrent neural networks",
+        "url": "https://proceedings.mlr.press/v28/pascanu13.html",
+        "usage": "Used as the primary source proposing gradient norm clipping for exploding gradients and supporting the geometric interpretation of rescaling an over-threshold gradient.",
+        "license": "PMLR provides public paper access while the publication copyright remains with the authors; no explicit permissive figure-reuse grant was established. No source figure, experimental data, wording, coordinates, or layout is reproduced."
+      },
+      {
+        "title": "PyTorch torch.nn.utils.clip_grad_norm_ documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html",
+        "usage": "Used as official implementation documentation to verify that the norm is computed as if all parameter gradients were concatenated into one vector and that the gradients are then modified in place.",
+        "license": "The PyTorch documentation is part of the BSD-3-Clause PyTorch project. It is consulted only for API semantics; no documentation prose, code, example, or artwork is reproduced."
+      },
+      {
+        "title": "PyTorch Automatic Mixed Precision examples: Gradient clipping",
+        "url": "https://docs.pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping",
+        "usage": "Used as official documentation to verify that scaled gradients must be unscaled before clipping so the requested threshold applies to the true gradients.",
+        "license": "The PyTorch documentation is part of the BSD-3-Clause PyTorch project. No documentation prose, code sample, or artwork is copied into the visual."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is why global-norm clipping preserves direction while per-parameter or value clipping can distort it. The original example uses g = (6, 8), whose L2 norm is 10, and c = 5; the shared factor 1/2 yields g-prime = (3, 4) with norm 5. The drawn original vector is exactly twice the clipped vector, and both share one ray. This is a mathematical construction, not empirical or paper-specific data."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every relevant slide with its neighbors, reviewed the primary paper and official PyTorch norm-clipping and AMP documentation, then selected an original radial-projection schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "global-norm-clipping-radial-projection"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming the original vector, threshold, scale factor, clipped vector, norms, and unchanged direction. Dashed versus solid lines, triangle versus square endpoints, position, and direct labels encode all distinctions without color. Its 360-unit viewBox scales fluidly with no minimum width or horizontal scrolling at 390 CSS pixels. Established theme variables provide light and dark contrast, and shared print tokens force a light high-contrast canvas while keeping the figure together."
+  }
+}
