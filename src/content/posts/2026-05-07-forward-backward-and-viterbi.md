@@ -33,6 +33,59 @@ $$
 
 There are $K^T$ possible paths. Both algorithms factor through a $T \times K$ DP table.
 
+<!-- visual:forward-backward-viterbi-chain-objectives -->
+<figure class="visual-container" aria-label="Forward-backward and Viterbi objectives compared on the same state chain">
+	<div class="visual-grid--two" role="group" aria-label="The same four-timestep, three-state chain used for forward-backward state marginals and Viterbi path decoding">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 230" role="img" aria-labelledby="fb-chain-title fb-chain-desc">
+				<title id="fb-chain-title">Forward-backward combines summaries from both sides at one state</title>
+				<desc id="fb-chain-desc">A three-state chain runs across four timesteps. At state B in timestep three, a right-pointing alpha arrow summarizes every prefix ending at B and a left-pointing beta arrow summarizes every suffix beginning at B. Their product, normalized across states at timestep three, gives the posterior marginal for state B at that timestep. It does not select a complete path.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="195" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">FORWARD-BACKWARD · ONE TIME MARGINAL</text>
+				<text class="viz-axis-label" x="38" y="43" text-anchor="middle">t=1</text>
+				<text class="viz-axis-label" x="113" y="43" text-anchor="middle">t=2</text>
+				<text class="viz-axis-label" x="188" y="43" text-anchor="middle">t=3</text>
+				<text class="viz-axis-label" x="263" y="43" text-anchor="middle">t=4</text>
+				<path d="M50 68H101M125 68H176M200 68H251M50 108H101M125 108H176M200 108H251M50 148H101M125 148H176M200 148H251" style="fill:none;stroke:var(--viz-edge);stroke-width:1.2"></path>
+				<path d="M50 68L101 108M50 108L101 68M50 108L101 148M50 148L101 108M125 68L176 108M125 108L176 68M125 108L176 148M125 148L176 108M200 68L251 108M200 108L251 68M200 108L251 148M200 148L251 108" style="fill:none;stroke:var(--viz-edge);stroke-width:0.8;stroke-dasharray:3 3"></path>
+				<g class="viz-node"><circle cx="38" cy="68" r="12"></circle><circle cx="38" cy="108" r="12"></circle><circle cx="38" cy="148" r="12"></circle><circle cx="113" cy="68" r="12"></circle><circle cx="113" cy="108" r="12"></circle><circle cx="113" cy="148" r="12"></circle><circle cx="188" cy="68" r="12"></circle><circle cx="188" cy="148" r="12"></circle><circle cx="263" cy="68" r="12"></circle><circle cx="263" cy="108" r="12"></circle><circle cx="263" cy="148" r="12"></circle></g>
+				<circle class="viz-node viz-node--focus" cx="188" cy="108" r="15"></circle>
+				<circle cx="188" cy="108" r="11" style="fill:none;stroke:var(--viz-edge);stroke-width:1"></circle>
+				<g class="viz-node-label" text-anchor="middle"><text x="38" y="72">A</text><text x="38" y="112">B</text><text x="38" y="152">C</text><text x="113" y="72">A</text><text x="113" y="112">B</text><text x="113" y="152">C</text><text x="188" y="72">A</text><text x="188" y="112">B</text><text x="188" y="152">C</text><text x="263" y="72">A</text><text x="263" y="112">B</text><text x="263" y="152">C</text></g>
+				<path d="M68 181H174M232 181H202" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<path d="M167 177L174 181L167 185M209 177L202 181L209 185" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<text class="viz-callout" x="121" y="174" text-anchor="middle">alpha: all prefixes</text>
+				<text class="viz-callout" x="238" y="174" text-anchor="middle">beta: all suffixes</text>
+				<text class="viz-label" x="150" y="207" text-anchor="middle">normalize alpha_3(B) x beta_3(B) across A, B, C</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 230" role="img" aria-labelledby="viterbi-chain-title viterbi-chain-desc">
+				<title id="viterbi-chain-title">Viterbi preserves one best predecessor per state and backtracks a complete path</title>
+				<desc id="viterbi-chain-desc">The same three-state chain runs across four timesteps. Thin solid and dashed lines show candidate transitions. Thick arrowed segments connect A at timestep one, B at timestep two, B at timestep three, and C at timestep four. Backtracking the stored predecessor pointers from the best final state recovers this one globally consistent path.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="195" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">VITERBI · ONE COMPLETE PATH</text>
+				<text class="viz-axis-label" x="38" y="43" text-anchor="middle">t=1</text>
+				<text class="viz-axis-label" x="113" y="43" text-anchor="middle">t=2</text>
+				<text class="viz-axis-label" x="188" y="43" text-anchor="middle">t=3</text>
+				<text class="viz-axis-label" x="263" y="43" text-anchor="middle">t=4</text>
+				<path d="M50 68H101M125 68H176M200 68H251M50 108H101M125 108H176M200 108H251M50 148H101M125 148H176M200 148H251" style="fill:none;stroke:var(--viz-edge);stroke-width:0.8"></path>
+				<path d="M50 68L101 108M50 108L101 68M50 108L101 148M50 148L101 108M125 68L176 108M125 108L176 68M125 108L176 148M125 148L176 108M200 68L251 108M200 108L251 68M200 108L251 148M200 148L251 108" style="fill:none;stroke:var(--viz-edge);stroke-width:0.8;stroke-dasharray:3 3"></path>
+				<path d="M50 68L101 108H176L251 148" style="fill:none;stroke:var(--viz-focus);stroke-width:4"></path>
+				<path d="M94 102L101 108L92 110M169 103L176 108L169 113M242 141L251 148L240 149" style="fill:none;stroke:var(--viz-focus);stroke-width:2.5"></path>
+				<g class="viz-node"><circle cx="38" cy="108" r="12"></circle><circle cx="38" cy="148" r="12"></circle><circle cx="113" cy="68" r="12"></circle><circle cx="113" cy="148" r="12"></circle><circle cx="188" cy="68" r="12"></circle><circle cx="188" cy="148" r="12"></circle><circle cx="263" cy="68" r="12"></circle><circle cx="263" cy="108" r="12"></circle></g>
+				<g class="viz-node viz-node--focus"><circle cx="38" cy="68" r="14"></circle><circle cx="113" cy="108" r="14"></circle><circle cx="188" cy="108" r="14"></circle><circle cx="263" cy="148" r="14"></circle></g>
+				<g class="viz-node-label" text-anchor="middle"><text x="38" y="72">A</text><text x="38" y="112">B</text><text x="38" y="152">C</text><text x="113" y="72">A</text><text x="113" y="112">B</text><text x="113" y="152">C</text><text x="188" y="72">A</text><text x="188" y="112">B</text><text x="188" y="152">C</text><text x="263" y="72">A</text><text x="263" y="112">B</text><text x="263" y="152">C</text></g>
+				<path d="M263 174H49" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<path d="M56 170L49 174L56 178" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<text class="viz-callout" x="156" y="190" text-anchor="middle">backtrack stored psi pointers</text>
+				<text class="viz-label" x="150" y="207" text-anchor="middle">decoded sequence: A -> B -> B -> C</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> use the same state lattice twice. Forward-backward sums every prefix arriving at a chosen state and every suffix leaving it, then combines those two summaries to answer “which state at this time?” Viterbi replaces each sum with a max, stores the winning predecessor, and backtracks to answer “which single path?” The thick path and arrowheads carry the distinction without relying on color. Original schematic checked against <a href="https://doi.org/10.1109/5.18626">Rabiner (1989)</a> and <a href="https://doi.org/10.1109/TIT.1967.1054010">Viterbi (1967)</a>.</figcaption>
+</figure>
+
 ## Forward algorithm
 
 Define the **forward variable**
