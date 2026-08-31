@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "gradient-accumulation",
+  "article": "src/content/posts/2026-02-09-gradient-accumulation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the state that changes after every micro-batch (the gradient buffer) from the parameters that change only once after K micro-batches.",
+  "mediumRationale": "A deterministic SVG timeline is the smallest medium that can align four micro-batches, the progressively accumulated gradient expression, an unchanged parameter value, and one optimizer-step boundary. The fixed K = 4 example makes both the averaging arithmetic and state transition visible without adding controls or reproducing a source figure.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout would obscure the regular timing and exact one-quarter gradient arithmetic that the lesson depends on.",
+    "svg": "Selected because a fixed timeline can align each backward pass with the gradient-buffer contents and show exactly one parameter update; established vector primitives provide theme and print behavior.",
+    "semanticHtml": "Rejected because a table could enumerate the four states but would make the temporal flow and single update boundary less immediate.",
+    "interaction": "Rejected because varying K adds controls without changing the core invariant; a static K = 4 example is sufficient and remains useful without JavaScript.",
+    "paperReuse": "Rejected because the reviewed official documentation explains the mechanism in prose and code rather than providing a narrowly reusable state timeline; no external figure is needed, and no artwork reuse permission was assumed.",
+    "noVisual": "Rejected because the prose loop does not spatially separate two simultaneous facts: `.grad` changes after each backward call while the model parameters remain fixed until the accumulation boundary."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 97,
+        "insight": "The character-language-model training loop shows the conventional per-batch sequence zero_grad, backward, and optimizer.step, providing the baseline that accumulation changes."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide explicitly places gradient conversion and unscaling before the optimizer step, reinforcing that gradients can be prepared separately from applying the parameter update."
+      },
+      {
+        "page": 115,
+        "insight": "The training-stack slide explicitly names gradient accumulation as the technique used to reach large effective batch sizes, but it gives no mechanism, timing, or averaging visual."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for accumulation, batches, mini-batches, backward passes, gradient buffers, zero_grad, optimizer steps, and training loops. Pages 96-98 were inspected around the conventional loop on page 97: page 96 is word2vec preprocessing and page 98 is tokenization. Pages 113-116 were inspected around the only explicit gradient-accumulation mention: page 113 is speculative decoding, page 114 is mixed precision, page 115 lists the modern training stack, and page 116 begins speech re-scoring. No slide shows multiple backward passes feeding one optimizer step, and no deck artwork or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "PyTorch Tensor.backward documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.Tensor.backward.html",
+        "usage": "Verified that backward accumulates gradients into leaf tensors and that callers must zero or clear .grad when a fresh accumulation window is required.",
+        "license": "No documentation wording, source code, or imagery is copied. The implementation uses only the documented API semantics and is an original schematic, so documentation-figure reuse rights are not relied upon."
+      },
+      {
+        "title": "PyTorch Zeroing out gradients recipe",
+        "url": "https://docs.pytorch.org/tutorials/recipes/recipes/zeroing_out_gradients.html",
+        "usage": "Verified the official explanation that repeated backward calls add to gradient buffers rather than overwrite them and that zeroing defines the next gradient window.",
+        "license": "No recipe prose, code, data, or imagery is copied. The original state timeline cites the behavior rather than adapting any source material."
+      },
+      {
+        "title": "Hugging Face Accelerate gradient accumulation guide",
+        "url": "https://huggingface.co/docs/accelerate/usage_guides/gradient_accumulation",
+        "usage": "Cross-checked the standard K-step loop, loss division by K, single optimizer step, and distributed synchronization caveat against maintained framework documentation.",
+        "license": "The guide is used as an authoritative technical reference only. No code, wording, examples, or figures are reproduced, and no broad reuse grant is assumed from public access."
+      }
+    ],
+    "notes": "The hardest prose-only model is not the effective-batch formula but the two different state clocks inside one accumulation window: each backward call adds a normalized micro-batch gradient to `.grad`, while every forward pass still reads the same parameter value; only the boundary call to optimizer.step consumes the completed average and creates the next parameter value. The visual uses an illustrative K = 4 window with equal-sized micro-batches and mean-reduced losses. Its geometry, labels, arithmetic, and composition are original and do not adapt a deck or documentation figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected both relevant neighborhoods, then checked maintained PyTorch and Hugging Face documentation before selecting an original state timeline."
+  },
+  "implementation": {
+    "visualIds": [
+      "gradient-accumulation-state-boundary"
+    ],
+    "accessibility": "The SVG title and description state the complete K = 4 sequence, including unchanged parameters, the four gradient-buffer expressions, and the sole optimizer update. Step numbers, repeated theta labels, arithmetic, a dashed accumulation path, and a solid update arrow carry the meaning without color. The established horizontally scrollable vector primitive keeps a 42rem canvas legible at 390 CSS pixels, uses theme variables in dark mode, and removes its minimum width under the existing print rules."
+  }
+}
