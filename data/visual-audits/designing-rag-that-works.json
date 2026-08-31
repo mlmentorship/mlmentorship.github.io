@@ -87,6 +87,6 @@
     "visualIds": [
       "rag-recall-precision-funnel"
     ],
-    "accessibility": "The SVG has a linked title and detailed description naming every synthetic candidate retained or omitted at each stage. Direct LEXICAL, DENSE, FUSED CANDIDATES, and RERANKED CONTEXT labels, A/B evidence tags, numbered ranks, borders, and converging arrows carry the inference without color. The 360-unit viewBox uses established responsive SVG primitives with no minimum width for readability at 390 CSS pixels; shared theme tokens provide dark-mode contrast and print-safe colors."
+    "accessibility": "The SVG has a linked title and detailed description naming the evidence retained by each retrieval path, the fused pool, and the final cross-encoder ordering. Direct LEXICAL, DENSE, FUSE RANKS, CROSS-ENCODER RERANK, and PRECISE CONTEXT labels, A/B evidence tags, numbered ranks, borders, and converging arrows carry the inference without color. The 360-unit viewBox uses established responsive SVG primitives with no minimum width for readability at 390 CSS pixels; shared theme tokens provide dark-mode contrast and print-safe colors."
   }
 }

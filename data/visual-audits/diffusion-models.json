@@ -93,6 +93,6 @@
     "visualIds": [
       "diffusion-training-sampling-asymmetry"
     ],
-    "accessibility": "The SVG has a linked title and detailed description, while lane headings, step labels, node text, arrow direction, and solid-versus-dashed paths carry the full distinction without color. The established visual-wide and visual-scroll primitives preserve readable labels through contained horizontal scrolling at 390 CSS pixels; shared theme variables provide dark-mode contrast and print overrides remove the width floor for a complete light-background rendering."
+    "accessibility": "The SVG has a linked title and detailed description, while lane headings, step labels, node text, arrow direction, and solid-versus-dashed paths carry the full distinction without color. Training shows clean data and independently sampled time and noise converging on the closed-form construction; sampling labels noise prediction separately from the state update. The established visual-wide and visual-scroll primitives preserve readable labels through contained horizontal scrolling at 390 CSS pixels; enlarged mathematical subscripts remain legible when print scales the complete figure to the page, and shared theme variables provide dark-mode contrast."
   }
 }

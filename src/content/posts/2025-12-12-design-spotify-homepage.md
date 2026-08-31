@@ -28,9 +28,9 @@ The hardest design decision is how the shelves *interact*: which appear, in what
 ```mermaid
 flowchart TB
   accTitle: Two ranking levels compose a multi-shelf recommendation homepage
-  accDescr: At the first level, separate pipelines retrieve and rank items for familiar favorites, discovery, new releases, and editorial content. Each pipeline produces a coherent shelf candidate with its own intent and local objective. At the second level, a page composer receives those completed shelf candidates plus user and session context. It selects which shelves appear and orders them while enforcing cross-shelf diversity, editorial commitments, and repetition constraints. The output is an ordered homepage of intact shelves. Evaluation keeps local shelf outcomes separate from page and long-term outcomes, so a locally strong shelf does not automatically dominate the page.
+  accDescr: At the first level, separate pipelines build or rank coherent shelves for familiar favorites, discovery, new releases, and editorial content. Each produces a completed shelf candidate with its own intent and local objective. At the second level, a page composer receives those completed shelf candidates plus user and session context. It selects which shelves appear and orders them while enforcing cross-shelf diversity, editorial commitments, and repetition constraints. The output is an ordered homepage of intact shelves. Evaluation keeps local shelf outcomes separate from page and long-term outcomes, so a locally strong shelf does not automatically dominate the page.
 
-  subgraph LOCAL["LEVEL 1 · RANK ITEMS WITHIN EACH SHELF"]
+  subgraph LOCAL["LEVEL 1 · BUILD OR RANK EACH SHELF"]
     Familiar["FAMILIAR FAVORITES<br/>retrieve + rank items<br/>completion · repeat"]
     Discovery["DISCOVERY<br/>retrieve + rank items<br/>appeal · novelty"]
     Fresh["NEW RELEASES<br/>retrieve + rank items<br/>taste · freshness"]
@@ -49,7 +49,7 @@ flowchart TB
   Context ==> Composer
   Composer ==> Homepage
   Homepage --> Evidence
-  Evidence -.->|"improve local rankers"| Familiar
+  Evidence -.->|"example: improve a learned shelf"| Familiar
   Evidence -.->|"improve page policy"| Composer
 
   class Familiar,Discovery,Fresh,Editorial viz-input
@@ -59,7 +59,7 @@ flowchart TB
   class Familiar viz-wide
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> read the top row as four complete recommendation products, not four item pools. Each emits an internally ranked shelf with a distinct promise. Only then does the page composer use session context to select and order those shelves under cross-shelf constraints. A shelf can win its local metric and still lose page position if it repeats another intent or harms longer-term outcomes. Original synthesis checked against Spotify's <a href="https://arxiv.org/abs/2607.25823">shelf-generation research</a> and <a href="https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage">homepage calibration work</a>, plus the <a href="https://doi.org/10.3389/fdata.2022.910030">multi-carousel evaluation study</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> read the top row as four complete recommendation products, not four item pools. Each emits a completed shelf with a distinct promise; editorial shelves may be curated rather than ranked. Only then does the page composer use session context to select and order those shelves under cross-shelf constraints. A shelf can win its local metric and still lose page position if it repeats another intent or harms longer-term outcomes. Original synthesis checked against Spotify's <a href="https://arxiv.org/abs/2607.25823">shelf-generation research</a> and <a href="https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage">homepage calibration work</a>, plus the <a href="https://doi.org/10.3389/fdata.2022.910030">multi-carousel evaluation study</a>.</p>
 
 ## What an L5 answer sounds like
 

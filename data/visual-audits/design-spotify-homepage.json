@@ -4,8 +4,8 @@
   "article": "src/content/posts/2025-12-12-design-spotify-homepage.md",
   "status": "implemented",
   "medium": "mermaid",
-  "learningObjective": "Trace why independently ranked shelves must become candidates for a second composition decision that optimizes the whole homepage rather than merging every item into one global ranking.",
-  "mediumRationale": "A compact hierarchical Mermaid is the smallest useful spatial explanation because the lesson depends on two distinct ranking levels and their separate feedback: each shelf produces a coherent local list, then a composer selects and orders shelves under page-level context, diversity, editorial, and long-term constraints.",
+  "learningObjective": "Trace why independently completed shelves must become candidates for a second composition decision that optimizes the whole homepage rather than merging every item into one global ranking.",
+  "mediumRationale": "A compact hierarchical Mermaid is the smallest useful spatial explanation because the lesson depends on two distinct decision levels and their separate feedback: each learned or curated pipeline produces a coherent local list, then a composer selects and orders shelves under page-level context, diversity, editorial, and long-term constraints.",
   "mediumComparison": {
     "mermaid": "Selected because the mental model is a many-to-one hierarchy followed by an ordered page and two feedback paths. Labelled nodes and edges preserve which decisions happen inside shelves versus across shelves, while the established renderer supplies accessible metadata, responsive overflow, and theme-safe styling.",
     "svg": "Rejected because no quantitative scale or fixed screen geometry carries the lesson. Drawing a mock Spotify interface would add brand-specific decoration and maintenance cost without clarifying the optimization boundary.",
@@ -92,7 +92,7 @@
         "license": "The Frontiers article is distributed under Creative Commons Attribution 4.0. Although reuse with attribution is permitted, no source figure, screenshot, metric formulation, data, prose, or layout is adapted; the shipped visual is independently authored."
       }
     ],
-    "notes": "The hardest prose-only mental model is hierarchical ranking. A shelf ranker retrieves and orders items against one coherent intent and local metrics. Its completed list is then one candidate among personalized, recency, discovery, new-release, and editorial shelves. A separate composer uses session context and cross-shelf constraints to choose and order those units for page-level and longer-term outcomes. Flattening every item into one ranker destroys shelf semantics; evaluating shelves alone misses cannibalization, repetition, and position effects."
+    "notes": "The hardest prose-only mental model is hierarchical composition. A shelf pipeline builds a coherent list against one intent and local metrics; learned shelves may retrieve and rank items, while editorial shelves may be curated. Each completed list is then one candidate among personalized, recency, discovery, new-release, and editorial shelves. A separate composer uses session context and cross-shelf constraints to choose and order those units for page-level and longer-term outcomes. Flattening every item into one ranker destroys shelf semantics; evaluating shelves alone misses cannibalization, repetition, and position effects."
   },
   "agentReview": {
     "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",

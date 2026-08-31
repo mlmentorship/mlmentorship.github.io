@@ -953,6 +953,36 @@ Check sample-ratio mismatch, instrumentation, pre-period balance, and policy com
 
 Creators supply content to treatment and control viewers. Treatment exposure can change creator production, which later changes inventory for both groups. Viral trends also cross experiment cells.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how viewer-randomized cells stop being independent when both change and reuse the same creator supply.</p>
+
+<!-- visual:ecosystem-experiment-interference -->
+```mermaid
+flowchart TB
+  accTitle: Shared creator supply creates interference between viewer-randomized treatment and control cells
+  accDescr: Current creator inventory supplies viewer-randomized treatment and control cells. The cells compare immediate viewer outcomes while their ranking policies allocate different exposure to the same creators. Exposure from both cells changes creator learning, retention, and production over weeks. That response creates next-period shared inventory, which enters both future treatment and future control cells. The immediate comparison may estimate a feed effect before supply responds, but the future control cell is exposed to an ecosystem partly changed by treatment and is not an untouched long-horizon counterfactual.
+  Inventory["CURRENT SHARED INVENTORY<br/>same creators supply both cells"]
+  Cells["VIEWER-RANDOMIZED CELLS<br/>treatment: new policy · control: current policy"]
+  Immediate["IMMEDIATE VIEWER COMPARISON<br/>watch · skip · satisfaction"]
+  Opportunity["SHARED CREATOR OPPORTUNITY<br/>both policies allocate reach"]
+  Response["CREATOR RESPONSE OVER WEEKS<br/>learning · retention · production"]
+  Next["NEXT-PERIOD SHARED INVENTORY<br/>supply has responded to both cells"]
+  Future["FUTURE TREATMENT + CONTROL<br/>control is not an untouched ecosystem"]
+  Inventory ==> Cells
+  Cells -->|"before supply responds"| Immediate
+  Cells ==>|"different policies, same creators"| Opportunity
+  Opportunity ==> Response
+  Response ==> Next
+  Next -.->|"shared supply returns to both cells"| Future
+  class Inventory viz-state
+  class Cells,Opportunity,Response viz-focus
+  class Immediate,Next viz-output
+  class Future viz-warning
+  class Inventory viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> the viewer cells can estimate an immediate feed effect before supply responds, but both policies allocate reach to the same creators. The resulting production changes next-period inventory for both cells, so future control is not an untouched long-horizon counterfactual. Use creator-side, clustered, switchback, or saturation designs according to the spillover and estimand. Original synthesis informed by <a href="https://arxiv.org/abs/2106.00762">Nandy et al. on two-sided recommender experiments</a>, <a href="https://arxiv.org/abs/2002.05670">Johari et al. on two-sided platform experiment bias</a>, and <a href="https://arxiv.org/abs/2004.12162">test-control interference in online marketplaces</a>.</p>
+
 Possible designs include:
 
 - viewer-level randomization for immediate feed effects;

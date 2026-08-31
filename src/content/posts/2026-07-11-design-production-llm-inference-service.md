@@ -92,49 +92,44 @@ Priority without quotas becomes starvation. Fairness without class-aware SLOs ca
 ```mermaid
 flowchart TB
   accTitle: Production LLM scheduling coordinates a KV-memory budget with a per-iteration token budget
-  accDescr: An incoming request first reaches KV admission, which estimates prompt tokens plus a bounded output allowance. A request that cannot fit is rejected, deferred, or routed elsewhere before it consumes model work. An admitted request reserves KV pages and enters the prefill queue. Each model iteration combines two eligible work sources: active sequences each receive one latency-sensitive decode token first, then remaining token capacity is filled with fair chunks from admitted prefills. Executed prefill chunks accumulate until a request becomes an active decode sequence. Executed decode tokens loop into the next iteration until end of sequence, cancellation, or an output limit releases the request's KV pages back to admission.
-  Request["INCOMING REQUEST<br/>prompt · output bound · tenant class"]
-  Capacity[("FREE KV PAGES<br/>memory admission budget")]
+  accDescr: A request's prompt and bounded output allowance are compared with free KV pages before model work begins. A request that cannot fit is rejected, deferred, or routed elsewhere. An admitted request reserves pages and joins eligible work containing active decode sequences and bounded prefill chunks. Each iteration spends its fixed token budget on one latency-sensitive token per active decode sequence first, then fills remaining capacity with fair prefill chunks. Continuing work keeps its reservation and rejoins the next iteration; end of sequence, cancellation, or a limit releases KV pages for later admission.
+  Inputs["ADMISSION INPUTS<br/>request bound + free KV pages"]
   Admit{"KV ADMISSION<br/>prompt + bounded output fits?"}
   Reject["REJECT · DEFER · ROUTE<br/>before an inevitable SLO miss"]
-  Reserve["RESERVE KV PAGES<br/>then enqueue prefill"]
-  Prefill["ADMITTED PREFILL QUEUE<br/>long prompts split into chunks"]
-  Decode["ACTIVE DECODE SET<br/>one next token per sequence"]
+  Reserve["RESERVE KV PAGES<br/>admit bounded work"]
+  Work["ELIGIBLE WORK<br/>active decode + prefill chunks"]
   Schedule{"EACH MODEL ITERATION<br/>fixed token budget + fair quotas"}
   Protect["1 · PROTECT DECODE<br/>schedule active next tokens"]
   Fill["2 · FILL REMAINDER<br/>schedule bounded prefill chunks"]
   Execute["EXECUTE ONE MIXED BATCH"]
-  Ready["PREFILL COMPLETE<br/>sequence becomes active"]
   Continue{"EOS · CANCEL · LIMIT?"}
-  Release["RELEASE KV PAGES"]
+  Rejoin["CONTINUE<br/>keep reservation · rejoin next iteration"]
+  Release["STOP<br/>release KV pages for later admission"]
 
-  Request ==> Admit
-  Capacity ==> Admit
+  Inputs ==> Admit
   Admit -->|"no"| Reject
   Admit ==>|"yes"| Reserve
-  Reserve --> Prefill
-  Decode ==> Schedule
-  Prefill --> Schedule
+  Reserve --> Work
+  Work ==> Schedule
   Schedule ==> Protect
   Protect ==> Fill
   Fill ==> Execute
-  Execute --> Ready
-  Ready --> Decode
   Execute --> Continue
-  Continue -->|"continue"| Decode
+  Continue -->|"continue"| Rejoin
   Continue ==>|"stop"| Release
-  Release -.->|"capacity for later requests"| Capacity
+  Rejoin --> Work
+  Release -.->|"pages available again"| Inputs
 
-  class Request viz-input
-  class Capacity,Reserve,Decode viz-state
+  class Inputs viz-input
+  class Reserve,Work,Rejoin viz-state
   class Admit,Schedule,Protect,Fill viz-focus
-  class Prefill,Execute,Ready viz-neutral
+  class Execute viz-neutral
   class Release viz-output
   class Reject viz-warning
-  class Request viz-tall
+  class Inputs viz-wide
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> read the outer memory loop first: reserve KV pages before work enters the scheduler and return them only when generation stops. Then read one iteration: every active sequence gets its latency-sensitive decode step before the remaining token budget is filled with bounded prefill chunks. Admission prevents memory collapse; chunking prevents one long prompt from monopolizing an iteration.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> read the two gates in order. First, reserve KV pages before work enters the scheduler. Then, in every iteration, give active sequences their latency-sensitive decode step before filling the remaining token budget with bounded prefill chunks. Continuing work keeps its reservation; only stopped work releases pages for later admission.</p>
 <p class="diagram-source">Original synthesis informed by the <a href="https://www.usenix.org/conference/osdi24/presentation/agrawal">Sarathi-Serve scheduler</a>, the <a href="https://arxiv.org/abs/2309.06180">PagedAttention paper</a>, and <a href="https://www.usenix.org/conference/osdi24/presentation/zhong-yinmin">DistServe</a>. No source figure or layout is reproduced.</p>
 
 ## What an L4 answer sounds like

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "determinant-and-volume",
+  "article": "src/content/posts/2025-12-02-determinant-and-volume.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Read a 2D determinant as two linked facts: its absolute value is the area scale of the ordered column parallelogram, while its sign records orientation; see why dependent columns force both area and determinant to zero.",
+  "mediumRationale": "A narrow deterministic SVG is the smallest medium that can hold coordinates, ordered column vectors, equal-area opposite orientations, and a collapsed span in one checkable geometry. It complements the prose with the spatial invariant rather than adding another property list.",
+  "mediumComparison": {
+    "mermaid": "Rejected because flowchart layout cannot preserve vector direction, collinearity, orientation, or parallelogram area; those geometric relationships are the lesson.",
+    "svg": "Selected because fixed coordinates make the two non-singular panels use exactly the same parallelogram while swapping the ordered columns, and make the singular panel visibly collinear. A tall 360-unit viewBox preserves readable labels without requiring horizontal scrolling at 390 CSS pixels.",
+    "semanticHtml": "Rejected because cards or a table can state positive, negative, and zero cases but cannot demonstrate that swapping the ordered columns changes sign without changing geometric area.",
+    "interaction": "Rejected because draggable vectors could recalculate a determinant, but controls, state, and pointer precision are unnecessary for the single invariant the article needs readers to retain.",
+    "paperReuse": "Rejected because source figures either carry unclear reuse rights or include broader textbook exposition. No external artwork, coordinates, wording, examples, or visual arrangement is needed for this original construction.",
+    "noVisual": "Rejected because the hardest claim is intrinsically spatial: the same unsigned parallelogram supports two determinant signs, while dependence destroys a dimension. Prose gives the rule but not the contrast."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 2,
+        "insight": "The preceding divider opens the linear-algebra section but contains no mathematical content."
+      },
+      {
+        "page": 3,
+        "insight": "The exact determinant slide says a matrix defines basis vectors, the determinant gives parallelepiped volume, absolute determinant measures expansion or contraction, zero determinant loses volume along at least one dimension, and singularity prevents inversion. It does not visualize orientation sign."
+      },
+      {
+        "page": 4,
+        "insight": "The neighboring products, trace, and norm slide moves to other matrix operations and geometric norm balls; it adds no determinant or orientation detail."
+      },
+      {
+        "page": 5,
+        "insight": "The following factorization slide describes singular vectors as orthogonal bases, singular values as stretching directions, and possible flips; this supports the stretch-and-orientation interpretation but does not show signed area or collapse."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for determinant, Jacobian, volume, linear algebra, eigenvalue, and matrix terms. Page 3 is the sole direct determinant treatment. Pages 2-5 were read as its complete local neighborhood; later matches cover unrelated matrix uses, PCA, probability, and optimization. The implemented geometry is original and does not reproduce the deck's prose, artwork, coordinates, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "MIT OpenCourseWare 18.06: Lecture 18, Properties of Determinants",
+        "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-18-properties-of-determinants/",
+        "usage": "Used as authoritative university course material to cross-check determinant multiplication, row-swap sign change, singularity, and the geometric area interpretation.",
+        "license": "MIT OpenCourseWare materials are offered under CC BY-NC-SA 4.0 subject to its terms and third-party exceptions. No lecture video frame, transcript, figure, wording, or example is adapted; the source is cited only."
+      },
+      {
+        "title": "Deep Learning, Chapter 2: Linear Algebra",
+        "url": "https://www.deeplearningbook.org/contents/linear_algebra.html",
+        "usage": "Used as an authoritative ML textbook to cross-check the equivalence between singular square matrices, linearly dependent columns, failure of inversion, and a column space that does not span the full output space.",
+        "license": "The authors state that their MIT Press contract restricts easily copied electronic distribution. No book text, notation layout, equation, or figure is reproduced; only standard mathematical claims are checked and cited."
+      },
+      {
+        "title": "Convex Optimization",
+        "url": "https://web.stanford.edu/~boyd/cvxbook/",
+        "usage": "Used as an authoritative textbook reference to cross-check determinant and log-determinant treatment for positive definite matrices and change-of-variables applications.",
+        "license": "Copyright is held by Cambridge University Press, which permits the authors to host the book online. Hosting permission is not treated as artwork reuse permission; no figure, prose, data, or layout is copied."
+      },
+      {
+        "title": "Interactive Linear Algebra: Determinants",
+        "url": "https://math.libretexts.org/Bookshelves/Linear_Algebra/Interactive_Linear_Algebra_(Margalit_and_Rabinoff)/04%3A_Determinants/4.01%3A_Determinants-_Definition",
+        "usage": "Used as an open textbook to cross-check determinant multilinearity, sign reversal under a row swap, and zero determinant when rows repeat.",
+        "license": "LibreTexts identifies the textbook content under CC BY-SA 4.0 unless otherwise noted. No source text, diagram, example coordinates, or visual structure is adapted; citation alone is used."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that determinant sign and volume are not competing definitions. The absolute value measures the area of the column parallelogram, while the sign depends on the order in which the basis vectors orient the plane. The first two original panels therefore use the exact same polygon with columns swapped; the third uses proportional columns so the polygon collapses to a segment."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected pages 2-5, then checked university course material and three authoritative textbooks before selecting an original stacked signed-area construction."
+  },
+  "implementation": {
+    "visualIds": [
+      "determinant-signed-area-collapse"
+    ],
+    "accessibility": "The SVG provides a detailed title and description with every vector coordinate, determinant, orientation, area, and dependence relation. Direct panel numbering, coordinate labels, ordered vector names, arrow direction, identical polygon outlines, and the final collinear geometry carry the meaning without color. Its 360-unit-wide stacked viewBox scales to the article column without a minimum width, retaining readable labels at 390 CSS pixels. Existing semantic visual tokens provide light and dark contrast, while print uses the same labelled geometry and outlines on a light page."
+  }
+}

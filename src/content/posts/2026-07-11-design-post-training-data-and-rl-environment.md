@@ -90,7 +90,7 @@ Some violations are gates, not tradeable penalties. Unauthorized access cannot b
 		<path d="M197 444H338" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:5 4"></path>
 		<text class="viz-axis-label" x="267.5" y="463" text-anchor="middle">PATH TERMINATED</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare the columns from top to bottom. Both agents resolve the ticket, but only the action log proves whether the trajectory respected authorization. The safe path passes the policy gate and reaches quality-score aggregation; the unsafe path stops before scoring, so a strong outcome or polished response cannot cancel the violation. This original schematic is informed by <a href="https://proceedings.mlr.press/v202/gao23h.html">Gao et al.'s reward-overoptimization results</a> and <a href="https://gymnasium.farama.org/tutorials/gymnasium_basics/handling_time_limits/">Gymnasium's environment-semantics guidance</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the columns from top to bottom. Both agents resolve the ticket, but only the action log proves whether the trajectory respected authorization. The safe path passes the policy gate and reaches quality-score aggregation; the unsafe path stops before scoring, so a strong outcome or polished response cannot cancel the violation. The hard gate is an original design recommendation; <a href="https://proceedings.mlr.press/v202/gao23h.html">Gao et al.</a> establish the reward-overoptimization risk, while <a href="https://gymnasium.farama.org/tutorials/gymnasium_basics/handling_time_limits/">Gymnasium's guidance</a> supports explicit termination semantics.</figcaption>
 </figure>
 
 ### 4. Choose the grader stack

@@ -77,7 +77,7 @@ Skipping components 4-6 is the single most common failure.
 		<text class="viz-axis-label" x="180" y="355" text-anchor="middle">RECALL: BOTH RELEVANT PASSAGES SURVIVE</text>
 		<path d="M180 368V386" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>
 		<rect class="viz-node" x="60" y="390" width="240" height="76" rx="4"></rect>
-		<text class="viz-axis-label" x="180" y="412" text-anchor="middle">PAIRWISE RERANK · QUERY + EACH PASSAGE</text>
+		<text class="viz-axis-label" x="180" y="412" text-anchor="middle">CROSS-ENCODER RERANK · QUERY + PASSAGE</text>
 		<text class="viz-callout" x="180" y="435" text-anchor="middle">1 · B · recovery steps</text>
 		<text class="viz-callout" x="180" y="455" text-anchor="middle">2 · A · exact error constraints</text>
 		<path d="M180 470V488" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#rag-funnel-arrow)"></path>

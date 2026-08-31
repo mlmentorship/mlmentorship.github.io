@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-real-time-multimodal-assistant",
+  "article": "src/content/posts/2026-08-29-design-real-time-multimodal-assistant.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace why a recovered screen frame that arrives last must remain historical, and how a request-specific freshness gate waits for a new keyframe or abstains instead of treating arrival order as current state.",
+  "mediumRationale": "A compact Mermaid comparison is the smallest useful spatial explanation because the lesson is a directed change in interpretation: the same delayed frame is unsafe when arrival order advances current state, but harmless when event time places it behind the screen watermark and a freshness gate requires new evidence. The article already establishes Mermaid as its relationship-diagram primitive, including responsive theme and print behavior.",
+  "mediumComparison": {
+    "mermaid": "Selected because labelled edges and two outcome branches make the causal difference between arrival-order selection and event-time freshness gating explicit. A top-to-bottom compact flow remains readable without scaling a detailed time axis.",
+    "svg": "Rejected because exact geometric scale and quantitative spacing are not part of the lesson. Hand-positioning two timelines would add maintenance cost and small-screen text constraints without improving the event-order invariant.",
+    "semanticHtml": "Rejected because a table can compare arrival time and event time, but it cannot show as directly that one delayed packet produces either an unsafe current-state update or a historical repair followed by a fresh-keyframe gate.",
+    "interaction": "Rejected because replaying packets could be engaging but would hide one state behind controls, add JavaScript and keyboard obligations, and teach no more than the static two-path comparison.",
+    "paperReuse": "Rejected because the reviewed specifications and documentation describe timestamps, synchronization, out-of-order events, and watermarks but do not contain this article-specific stale-screen incident and freshness decision. Public access was not treated as permission to reuse artwork; no external figure, wording, coordinates, values, or layout is copied.",
+    "noVisual": "Rejected because the prose defines event time, arrival time, watermarks, and keyframe recovery in separate sections. Readers still have to mentally simulate why a frame that arrives after the question is older than the state the question asks about; the comparison makes that temporal inversion visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 118,
+        "insight": "The preceding knowledge-graph slide closes an unrelated topic and confirms that the ASR section begins a new neighborhood; it contains no live-media timing guidance."
+      },
+      {
+        "page": 119,
+        "insight": "The Automatic Speech Recognition divider starts the deck's only sustained live-media-adjacent section but contains no synchronization mechanism."
+      },
+      {
+        "page": 120,
+        "insight": "The Speech recognition title slide introduces the topic without event timestamps, arrival order, jitter, or multimodal alignment."
+      },
+      {
+        "page": 121,
+        "insight": "The closest architectural slide contrasts end-to-end and traditional ASR and segments audio into 20-40 millisecond windows, but it models one ordered audio stream rather than asynchronous modalities or reconnect."
+      },
+      {
+        "page": 122,
+        "insight": "The neighboring speech-recognition slide maps waveform frames to words and describes 10-30 millisecond frame analysis; it supports bounded streaming units but not cross-source event-time ordering."
+      },
+      {
+        "page": 123,
+        "insight": "The audio-feature and augmentation slide discusses MFCCs, spectrograms, and time masking for model inputs, not transport delay or current-evidence selection."
+      },
+      {
+        "page": 124,
+        "insight": "The acoustic-model slide covers temporal speech modeling and feature extraction but does not distinguish capture time from arrival time."
+      },
+      {
+        "page": 125,
+        "insight": "The CTC slide aligns acoustic frames to a shorter output sequence; this is model-label alignment, not synchronization of delayed screen and audio evidence."
+      },
+      {
+        "page": 126,
+        "insight": "The following RNN-T slide continues acoustic-frame and output-label alignment and provides no watermark, freshness, reconnect, or multimodal state contract."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for multimodal, real-time, streaming, speech recognition, voice activity, synchronization, event time, watermark, jitter, audio, and video terms. Pages 51 and 65 are false matches for sampling and multimodal probability distributions; pages 110, 134, 140, 148, and 159 concern streaming attention, instant search, ranking, CNN video recognition, and robotics rather than live-media evidence ordering. Pages 118-126 were read as the complete closest ASR neighborhood. The deck has no multimodal event-time, watermark, reconnect, or freshness-gate figure, so no deck image, text, values, or visual arrangement is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Apache Flink: Timely Stream Processing",
+        "url": "https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/",
+        "usage": "Used as official stream-processing documentation to verify the distinction between processing or arrival time and producer-recorded event time, the handling of out-of-order events, finite lateness, and watermarks as declarations of event-time progress.",
+        "license": "Flink documentation source is distributed by the Apache Software Foundation under Apache License 2.0. No Flink figure, example, prose, code, or layout is reproduced; the source is cited only."
+      },
+      {
+        "title": "RFC 3550: RTP: A Transport Protocol for Real-Time Applications",
+        "url": "https://www.rfc-editor.org/rfc/rfc3550.html",
+        "usage": "Used as an Internet Standards Track specification to cross-check RTP sequence numbers, sampling timestamps, interarrival jitter, and RTCP timestamp pairs for synchronizing separately timestamped audio and video streams.",
+        "license": "The RFC is governed by the applicable IETF Trust Legal Provisions and states that distribution is unlimited. No RFC text, packet diagram, algorithm, numeric example, or visual structure is reproduced."
+      },
+      {
+        "title": "RFC 8834: Media Transport and Use of RTP in WebRTC",
+        "url": "https://www.rfc-editor.org/rfc/rfc8834.html",
+        "usage": "Used as an Internet Standards Track WebRTC media specification to cross-check that independently encoded media streams require source identification and synchronization, and that a receiver or middlebox can request a fresh intra frame after disruption.",
+        "license": "The RFC is governed by the applicable IETF Trust Legal Provisions. No topology figure, normative prose, media example, or layout is adapted or copied."
+      },
+      {
+        "title": "WebRTC 1.0: Real-Time Communication Between Browsers",
+        "url": "https://www.w3.org/TR/webrtc/",
+        "usage": "Used as the W3C Recommendation defining browser APIs for local media tracks, RTP senders and receivers, connection state, and real-time media transport, supporting the article's separation of device capture and live transport state.",
+        "license": "The Recommendation is published under the W3C document license, and implementation commitments are covered by the W3C Patent Policy. No specification text, WebIDL, diagram, example, or arrangement is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the temporal inversion behind the stale-screen incident: network recovery makes an old frame arrive after the user's current-state question, but later arrival cannot make earlier capture current. The original figure narrows the article's broad architecture to one decision. Event time and sequence place the recovered frame in history; the screen watermark remains delayed; a request-specific freshness requirement then accepts a fresh keyframe or abstains."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the full neighboring ASR section, then checked official Flink, RTP, WebRTC media, and W3C specifications before selecting an original focused comparison of unsafe arrival-order selection and safe event-time freshness gating."
+  },
+  "implementation": {
+    "visualIds": [
+      "multimodal-stale-frame-gate"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description that narrate both outcomes. Every node names the frame's capture relation, arrival relation, freshness state, and response behavior; solid versus dashed edges and explicit safe or unsafe labels preserve meaning without color. The compact top-to-bottom layout uses the established viz-tall marker so labels fit at 390 CSS pixels without a wide minimum canvas. Existing theme tokens supply dark-mode contrast, and the established print rules remove height limits and use a light page-safe palette. The direct caption and adjacent incident prose preserve the lesson if Mermaid does not render."
+  }
+}
