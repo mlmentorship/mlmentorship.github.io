@@ -49,6 +49,34 @@ The modes can share identity, repository metadata, model access, policy, telemet
 | Review | Seconds to minutes | Diff, base revision, surrounding code, policy | Comments only | Valid findings with low review burden |
 | Asynchronous agent | Minutes | Task, repository, tools, durable work state | Bounded sandbox edits and approved actions | Reviewable patch supported by independent evidence |
 
+<!-- visual:coding-product-authority-boundary -->
+<figure class="learning-figure" aria-labelledby="coding-authority-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="coding-authority-title">Separate shared repository intelligence from execution authority.</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of three coding modes that stop at generated output with asynchronous agent mode that receives bounded execution authority">
+		<section class="visual-panel">
+			<h4>Generate or advise · no tool authority</h4>
+			<p>These modes may share authorized context, policy, and model routes, but they stop before execution.</p>
+			<ul>
+				<li><strong>Inline:</strong> proposes text; the developer accepts an editor change.</li>
+				<li><strong>Chat:</strong> explains or previews a patch; the developer chooses whether to apply it.</li>
+				<li><strong>Review:</strong> comments on a pinned diff; it does not mutate the branch.</li>
+			</ul>
+		</section>
+		<section class="visual-panel">
+			<h4>Execute in isolation · bounded tool authority</h4>
+			<p>Only asynchronous agent mode crosses into a durable, policy-controlled workspace.</p>
+			<ol>
+				<li><strong>Delegate:</strong> bind repository, paths, tools, network, time, and cost.</li>
+				<li><strong>Execute:</strong> edit and test inside the isolated worktree.</li>
+				<li><strong>Return:</strong> expose the patch, tool evidence, and residual risk.</li>
+				<li><strong>Accept:</strong> the developer reviews, applies, or rejects the change.</li>
+			</ol>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> sharing a context broker does not share authority. Inline, chat, and review end at generated output. Only the asynchronous agent may cross the execution boundary, and it does so inside a bounded workspace that returns evidence rather than a merge decision. The developer remains the final acceptance boundary. Original synthesis checked against GitHub's documentation for <a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent">cloud agent operation</a>, <a href="https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations">security boundaries</a>, and <a href="https://docs.github.com/en/copilot/tutorials/review-ai-generated-code">reviewing AI-generated code</a>.</figcaption>
+</figure>
+
 ### Inline completion
 
 Inline completion is an interaction loop, not a small chat request. The user types, pauses, accepts, ignores, edits, or continues within milliseconds. Slow retrieval and verbose explanation have negative value.

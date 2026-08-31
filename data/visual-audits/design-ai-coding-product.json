@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-ai-coding-product",
+  "article": "src/content/posts/2026-08-29-design-ai-coding-product.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish shared repository context from execution authority: inline, chat, and review can generate or advise, while only the asynchronous agent may use bounded tools in an isolated workspace, and the developer still controls acceptance.",
+  "mediumRationale": "A two-panel semantic comparison is the smallest useful spatial explanation of the product boundary. It groups three non-executing modes against the one bounded execution mode, keeps authority labels explicit, and stacks into a linear reading order on narrow screens.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the article already contains broad architecture and agent-state diagrams, while another graph would add routing detail around a simpler authority distinction.",
+    "svg": "Rejected: the lesson depends on named permissions and outcomes rather than precise geometry, so fixed vector labels would add accessibility and responsive-layout work without more explanatory value.",
+    "semanticHtml": "Selected: two labelled panels expose the asymmetric authority boundary with native headings and lists, remain useful without color, and reuse the established responsive figure primitives.",
+    "interaction": "Rejected: allowing readers to toggle modes or approve actions would add state but would not change the fixed rule that only agent mode receives bounded execution authority.",
+    "paperReuse": "Rejected: the reviewed official sources describe relevant product and security controls but provide no figure matching this four-mode architecture. Artwork reuse is unnecessary, and no source layout, screenshot, icon, or wording is copied.",
+    "noVisual": "Rejected: the article repeatedly says the modes share infrastructure but keep separate paths; a compact grouping makes the easy-to-miss asymmetry visible at once: three modes stop at generated output, while one enters isolated execution and still stops before developer acceptance."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 104,
+        "insight": "The GPT-X slide covers instruction tuning and general language-model behavior but does not separate coding-product modes, repository context, or execution authority."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring Toolformer slide establishes that a language model may use tools, but it does not define product-mode permissions, isolation, or human patch acceptance."
+      },
+      {
+        "page": 134,
+        "insight": "The instant-search prompt issues a request for every keystroke and supplies a useful low-latency interaction analogy for inline completion, but it has no coding-specific context or write-authority boundary."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks for explicit goals, user experience, evaluation, performance, and constraints before implementation, supporting separate product contracts rather than one blended assistant."
+      },
+      {
+        "page": 168,
+        "insight": "The production-serving slide requires a gating procedure and experiments or tests that show all constraints are met, supporting evidence gates without defining an agent workflow."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning Engineering slide calls for independent infrastructure tests, checks for silent failures, and clear ownership, which supports layered evidence rather than treating one green test suite as authority."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for coding, code assistant, repository, sandbox, permission, agent, retrieval, monorepo, review, and tool terms. No slide presents an AI coding product or its four-mode authority model. The full LLM neighborhood on pages 103-114 was inspected: pages 103-105 cover Transformers, instruction tuning, and tool use; pages 108-113 cover inference bottlenecks and speculative decoding; page 114 moves to mixed-precision training. Pages 132-136 were inspected around the closest keystroke-driven product example: pages 132-133 introduce personalized search, page 134 defines per-keystroke requests, page 135 covers search retrieval, and page 136 is only a system-overview divider. Pages 164-170 were inspected around general ML system design: pages 164-169 cover synthesis, setup, data, modeling, serving gates, testing, and ownership; page 170 begins algorithms and data structures. No deck artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "GitHub Docs: About GitHub Copilot cloud agent",
+        "url": "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent",
+        "usage": "Used as official product documentation to verify that asynchronous coding work can research a repository, change code in an ephemeral development environment, run tests and linters, and expose a diff and logs for developer review.",
+        "license": "GitHub Docs source content is licensed CC BY 4.0. The visual cites the behavior only and does not adapt documentation prose, screenshots, icons, or layout."
+      },
+      {
+        "title": "GitHub Docs: Risks and mitigations for GitHub Copilot cloud agent",
+        "url": "https://docs.github.com/en/copilot/concepts/agents/cloud-agent/risks-and-mitigations",
+        "usage": "Used as official security documentation to verify bounded branch and credential access, restricted network access, auditable session evidence, and required human review before merge.",
+        "license": "GitHub Docs source content is licensed CC BY 4.0. No product artwork or source wording is reproduced; the two-panel authority model is independently authored."
+      },
+      {
+        "title": "GitHub Docs: Indexing repositories for GitHub Copilot",
+        "url": "https://docs.github.com/en/copilot/concepts/context/repository-indexing",
+        "usage": "Used as official documentation to verify that repository indexing provides semantic context to both chat and asynchronous agent work and that policy can filter content before it is passed onward.",
+        "license": "GitHub Docs source content is licensed CC BY 4.0. The article and visual use an original generalized context-broker abstraction rather than copying a source figure or description."
+      },
+      {
+        "title": "GitHub Docs: Review AI-generated code",
+        "url": "https://docs.github.com/en/copilot/tutorials/review-ai-generated-code",
+        "usage": "Used as official guidance to verify that tests and static checks should be combined with review against intent, architecture, dependencies, and AI-specific failure modes such as deleted or skipped tests.",
+        "license": "GitHub Docs source content is licensed CC BY 4.0. No checklist wording, examples, or visual composition is copied."
+      },
+      {
+        "title": "GitHub Docs repository license",
+        "url": "https://github.com/github/docs/blob/main/LICENSE",
+        "usage": "Used to explicitly verify that GitHub Docs source content is published under the Creative Commons Attribution 4.0 International license.",
+        "license": "CC BY 4.0 permits reuse with attribution. This implementation uses factual citations only and remains an original semantic-HTML composition."
+      },
+      {
+        "title": "NIST SP 800-218A: Secure Software Development Practices for Generative AI and Dual-Use Foundation Models",
+        "url": "https://csrc.nist.gov/pubs/sp/800/218/a/final",
+        "usage": "Used as authoritative government guidance to cross-check that secure development responsibilities apply to producers of AI systems that use models as well as model producers and acquirers.",
+        "license": "No NIST figure, table, recommendation text, or layout is reused. The publication is cited only as an authoritative security-development reference, so figure-reuse permission is not relied upon."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the asymmetry between shared intelligence and granted authority. All four modes may use identity, repository context, model routing, policy, telemetry, and billing, but that sharing does not make them one pipeline: inline emits text, chat previews patches, review emits comments, and only the asynchronous agent receives bounded filesystem and tool authority in isolation. Even that agent returns a patch and evidence rather than final acceptance. No reviewed source contained a suitably scoped figure, and unclear or irrelevant artwork permissions triggered the default original-redraw treatment."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 103-114, 132-136, and 164-170, then checked official GitHub product, indexing, security, review, and licensing documentation plus NIST secure-development guidance before selecting an original two-panel authority boundary."
+  },
+  "implementation": {
+    "visualIds": [
+      "coding-product-authority-boundary"
+    ],
+    "accessibility": "The figure has a programmatically associated learning-objective title, a descriptive group label, native section headings, and ordered mode labels. Authority, environment, output, and acceptance are written in text rather than encoded by color. The established two-panel primitive stacks into one column below 640 pixels for a 390 CSS-pixel viewport, uses site theme tokens in dark mode, and switches to a high-contrast light palette with page-break protection in print."
+  }
+}
