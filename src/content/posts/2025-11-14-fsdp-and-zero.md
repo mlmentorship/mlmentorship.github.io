@@ -25,6 +25,49 @@ Training memory has four big consumers:
 
 A 7B-parameter model therefore needs about 84–112 GB of persistent training state before activations and temporary buffers. The lower value omits separate FP32 master weights. The exact value depends on optimizer and framework storage. Ideal full sharding spreads persistent state across $N$ GPUs, but each GPU also needs transient gathered parameters, communication buffers, and activations.
 
+<!-- visual:fsdp-wrapped-unit-lifecycle -->
+<figure class="learning-figure plot-panel" aria-labelledby="fsdp-lifecycle-visual-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="fsdp-lifecycle-visual-title">Separate persistent shards from the temporary full unit needed for compute.</p>
+	<svg viewBox="0 0 360 520" role="img" aria-labelledby="fsdp-lifecycle-svg-title fsdp-lifecycle-svg-desc">
+		<title id="fsdp-lifecycle-svg-title">Lifecycle of one wrapped unit on one rank under FSDP full sharding</title>
+		<desc id="fsdp-lifecycle-svg-desc">At rest, rank i stores only parameter shard P i, a slot for gradient shard G i, and optimizer shard O i. Before forward, an all-gather reconstructs the current wrapped unit's full parameters P zero through P three temporarily. Forward compute runs, then the full parameters are freed while P i remains. Before backward, another all-gather reconstructs the full unit. Backward compute produces gradients, and reduce-scatter leaves gradient shard G i on this rank. The local optimizer shard O i uses G i to update P i. Activations and communication buffers are additional memory and are not shown.</desc>
+		<text class="viz-axis-label" x="20" y="22">ONE DATA-PARALLEL RANK i · ONE WRAPPED UNIT · FULL_SHARD</text>
+		<text class="viz-callout" x="20" y="48">Persistent rank-local state</text>
+		<rect class="viz-node viz-node--input" x="20" y="60" width="96" height="52" rx="4"></rect>
+		<text class="viz-node-value" x="68" y="81">PARAMETER SHARD</text>
+		<text class="viz-node-label" x="68" y="101">Pᵢ</text>
+		<rect class="viz-node" x="132" y="60" width="96" height="52" rx="4"></rect>
+		<text class="viz-node-value" x="180" y="81">GRADIENT SLOT</text>
+		<text class="viz-node-label" x="180" y="101">Gᵢ</text>
+		<rect class="viz-node viz-node--output" x="244" y="60" width="96" height="52" rx="4"></rect>
+		<text class="viz-node-value" x="292" y="81">OPTIMIZER SHARD</text>
+		<text class="viz-node-label" x="292" y="101">Oᵢ</text>
+		<path class="viz-axis" d="M180 112 V142"></path><path class="viz-arrow-forward" d="M180 148 l-5 -9 h10 Z"></path>
+		<text class="viz-edge-label" x="180" y="132">all-gather parameter shards</text>
+		<text class="viz-callout" x="20" y="166">Temporary forward window</text>
+		<rect class="viz-node viz-node--focus" x="20" y="178" width="320" height="58" rx="4"></rect>
+		<text class="viz-node-value" x="180" y="199">FULL CURRENT UNIT ON THIS RANK</text>
+		<text class="viz-node-label" x="180" y="222">P₀ | P₁ | P₂ | P₃ → forward compute</text>
+		<path class="viz-axis" d="M180 236 V266"></path><path class="viz-arrow-forward" d="M180 272 l-5 -9 h10 Z"></path>
+		<text class="viz-edge-label" x="180" y="256">reshard · free full parameters</text>
+		<rect class="viz-node viz-node--input" x="100" y="280" width="160" height="42" rx="4"></rect>
+		<text class="viz-node-value" x="180" y="297">BETWEEN COMPUTE WINDOWS</text>
+		<text class="viz-node-label" x="180" y="315">keep Pᵢ, not full P</text>
+		<path class="viz-axis" d="M180 322 V352"></path><path class="viz-arrow-forward" d="M180 358 l-5 -9 h10 Z"></path>
+		<text class="viz-edge-label" x="180" y="342">all-gather parameter shards again</text>
+		<text class="viz-callout" x="20" y="376">Temporary backward window</text>
+		<rect class="viz-node viz-node--focus" x="20" y="388" width="320" height="52" rx="4"></rect>
+		<text class="viz-node-value" x="180" y="408">FULL CURRENT UNIT ON THIS RANK</text>
+		<text class="viz-node-label" x="180" y="430">backward compute → full gradients</text>
+		<path class="viz-axis" d="M180 440 V466"></path><path class="viz-arrow-forward" d="M180 472 l-5 -9 h10 Z"></path>
+		<text class="viz-edge-label" x="180" y="458">reduce-scatter gradients · free full unit</text>
+		<rect class="viz-node viz-node--output" x="20" y="480" width="320" height="28" rx="4"></rect>
+		<text class="viz-callout" x="180" y="499" text-anchor="middle">local step: Oᵢ + Gᵢ updates Pᵢ</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> read the narrow shard boxes as what rank <var>i</var> owns across the step. The wide boxes are temporary peaks: full parameters for only the active wrapped unit are all-gathered for forward and again for backward, then freed. Reduce-scatter returns only <var>Gᵢ</var>, so the local optimizer shard can update <var>Pᵢ</var>. Activations and communication buffers still add to peak memory. Original schematic checked against the <a href="https://arxiv.org/abs/1910.02054">ZeRO paper</a>, <a href="https://docs.pytorch.org/docs/2.13/fsdp.html">PyTorch FSDP documentation</a>, and <a href="https://deepspeed.readthedocs.io/en/stable/zero3.html">DeepSpeed ZeRO documentation</a>.</figcaption>
+</figure>
+
 ZeRO ([Rajbhandari et al., 2019](https://arxiv.org/abs/1910.02054), DeepSpeed) and PyTorch FSDP implement this idea. They are the standard for any training run that doesn't fit in a single GPU's memory and doesn't need full tensor or pipeline parallelism.
 
 ## The three stages (ZeRO-1/2/3)
