@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "slug": "fine-tune-vs-prompt-vs-rag",
+  "article": "src/content/posts/2025-05-21-fine-tune-vs-prompt-vs-rag.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Diagnose whether a failed evaluation needs changed request instructions, retrieved evidence, or model parameters, while recognizing that the three interventions can be combined.",
+  "mediumRationale": "A two-panel semantic decision card is the smallest medium that first routes an observed failure to the layer that owns it and then shows those layers composing in one production request. Direct headings and prose preserve the decision logic more clearly than decorative geometry.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a branching flowchart would imply mutually exclusive terminal choices, contradicting the article's central point that prompting, retrieval, and tuning can be combined.",
+    "svg": "Rejected because the lesson is categorical ownership and composition rather than quantitative geometry; fixed drawing text would also be less adaptable at phone width.",
+    "semanticHtml": "Selected because two labelled panels can separate diagnosis from composition, preserve ordinary reading order, stack at 390 CSS pixels, and remain accessible and printable without custom styling.",
+    "interaction": "Rejected because changing hypothetical failures adds controls and hidden states without improving the stable three-layer decision model.",
+    "paperReuse": "Rejected because the OpenAI guide contains a related proprietary matrix and the foundational papers contain architecture figures, but no external layout is needed. No source figure, wording, data, or visual organization is copied.",
+    "noVisual": "Rejected because the prose correctly says the methods solve different problems, but readers must still mentally map a failed eval to the intervention boundary and reconcile that routing with the fact that production systems stack all three."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 99,
+        "insight": "The text-representation slide distinguishes pretrained feature extraction from downstream parameter fine-tuning, but predates modern prompt and RAG system composition."
+      },
+      {
+        "page": 103,
+        "insight": "The preceding transformer overview provides model architecture and training context but no adaptation decision."
+      },
+      {
+        "page": 104,
+        "insight": "The LLM slide directly contrasts instruction tuning, which updates parameters under supervision, with in-context learning, which conditions on examples without parameter optimization."
+      },
+      {
+        "page": 105,
+        "insight": "The following slide names base models as suitable for both fine-tuning and few-shot prompting and discusses trained tool use, but does not add retrieval-augmented generation or an eval-driven selection rule."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline evaluation from online launch metrics, supporting the article's claim that evaluation must gate optimization choices."
+      },
+      {
+        "page": 142,
+        "insight": "The first neighboring recommendation example shows instructions, request context, task definition, and output structure combined in one inference-time prompt."
+      },
+      {
+        "page": 143,
+        "insight": "The second prompt example changes user context while retaining the same task and output contract, illustrating request-time adaptation without changing model parameters."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for fine-tuning, prompting, few-shot and in-context learning, retrieval-augmented generation, and RAG. Direct LLM adaptation material was reviewed on pages 99 and 102-105; pages 103-105 were rendered and visually inspected as the full neighborhood around the strongest comparison. The production-evaluation and prompt-example neighborhood on pages 141-143 was also rendered and inspected. The deck contains no direct treatment of retrieval-augmented generation as an external knowledge layer and no three-way decision framework. No deck artwork, screenshots, wording, examples, or layout is reused.",
+    "license": "The local deck states no license and contains embedded figures and screenshots with incomplete attribution. It is treated as review-only material; the implementation will be original semantic HTML."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Optimizing LLM Accuracy",
+        "url": "https://developers.openai.com/api/docs/guides/optimizing-llm-accuracy",
+        "usage": "Used as official implementation guidance to verify that prompting, RAG, and fine-tuning are different levers rather than a linear maturity path; failed evals should distinguish context failures from learned-behavior failures, and the methods can stack.",
+        "license": "No explicit permissive license for the page's diagrams was identified. The visual does not reproduce its matrix, journey, exam analogy, diagrams, wording, examples, or data."
+      },
+      {
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "url": "https://arxiv.org/abs/2005.11401",
+        "usage": "Used as the primary RAG paper to verify the separation between parametric model memory and an inspectable, replaceable non-parametric document index supplied through retrieval.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, which limits third-party reuse. No paper figure, architecture, result, prose, or dataset is reproduced."
+      },
+      {
+        "title": "Language Models are Few-Shot Learners",
+        "url": "https://arxiv.org/abs/2005.14165",
+        "usage": "Used as a primary source for in-context learning: instructions or demonstrations condition a pretrained model at inference time without gradient updates or fine-tuning.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, not a permissive figure-reuse license. No paper figure, benchmark result, prose, or example is reproduced."
+      },
+      {
+        "title": "Model optimization",
+        "url": "https://developers.openai.com/api/docs/guides/model-optimization",
+        "usage": "Used as current official documentation to verify an eval-first optimization loop, prompting as context and instruction, and fine-tuning as training on representative input-output examples for task consistency and efficiency.",
+        "license": "No explicit permissive license for documentation figures was identified. No documentation artwork, prose, workflow diagram, or product-specific recommendation is copied."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to interpret the licenses shown on the two primary paper records rather than assuming that free access permits figure reuse.",
+        "license": "The page explains that the arXiv perpetual non-exclusive license grants limited distribution rights to arXiv and limits reuse by other entities. No page content is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is intervention ownership plus composition. Prompting changes request-time instructions and examples; RAG changes request-time evidence by retrieving from an external corpus; fine-tuning changes model parameters through training. A failed eval should be diagnosed before choosing a lever, and mixed failures can justify a tuned model receiving retrieved evidence under a prompt. The card uses only original labels and generic system structure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected both relevant neighborhoods, and checked two primary papers, current official implementation guidance, and explicit arXiv licensing before selecting an original semantic diagnosis-and-composition card."
+  },
+  "implementation": {
+    "visualIds": [
+      "llm-adaptation-layers"
+    ],
+    "accessibility": "The figure has a linked learning question and an explicitly labelled group of two semantic sections. Every decision is stated in text: the observed failure, the intervention, what that intervention changes, and how all three compose. Numbered panel headings and written transitions preserve order without color or icons. The established two-column primitive stacks below 640 CSS pixels with ordinary text wrapping and no minimum width, making it readable at 390 CSS pixels; existing theme tokens provide dark-mode contrast and shared print rules provide a light high-contrast rendering."
+  }
+}
