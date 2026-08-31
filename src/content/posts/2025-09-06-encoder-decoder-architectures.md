@@ -23,15 +23,26 @@ Modern decoder-only LLMs (GPT, Llama, Mistral) are the dominant chat architectur
 
 ## The structure
 
+<!-- visual:encoder-once-decoder-loop -->
+```mermaid
+flowchart TB
+	accTitle: Encode once, then reuse the input memory at every decoding step
+	accDescr: The complete input passes through a bidirectional encoder once, producing fixed encoder hidden states from which cross-attention keys and values are derived and reused. At each generation step, a start token plus the output prefix passes through causal decoder self-attention, where queries, keys, and values all come from that prefix. The resulting decoder state supplies the query for cross-attention over the fixed encoder keys and values. The decoder predicts one next token; unless it is the end token, that token is appended to the prefix and the decoder repeats without rerunning the encoder.
+	X["Complete input sequence"] --> ENC["Encoder stack<br/>bidirectional self-attention"]
+	ENC --> MEM["Fixed encoder memory<br/>encode once · K,V reused"]
+	PRE["Start token + output prefix<br/>grows one token per step"] --> SELF["Decoder causal self-attention<br/>Q,K,V from the prefix"]
+	SELF --> CROSS["Decoder cross-attention<br/>Q from decoder state"]
+	MEM ==>|"same encoder K,V every step"| CROSS
+	CROSS --> NEXT["Predict one next token"]
+	NEXT --> STOP{"End token?"}
+	STOP -->|"yes"| OUT["Completed output sequence"]
+	STOP -. "no · append token" .-> PRE
+	class X,PRE viz-input
+	class ENC,SELF viz-state
+	class MEM,CROSS viz-focus
+	class NEXT,OUT viz-output
 ```
-Input → [Encoder Stack] → Encoder hidden states
-                              ↓
-                 [Decoder Stack] → Output (autoregressive)
-                              ↑
-                          Self-attention on previous output
-                              ↑
-                          Cross-attention to encoder hidden states
-```
+<p class="diagram-caption"><strong>Read it this way:</strong> at inference, encode the complete input once. The decoder's causal self-attention reads only the output prefix generated so far; its cross-attention then uses the decoder state as Q and the unchanged encoder memory as K,V. Append one predicted token and repeat the decoder path, not the encoder path. Original synthesis checked against the <a href="https://arxiv.org/abs/1706.03762">Transformer paper</a>, the original <a href="https://arxiv.org/abs/1409.3215">sequence-to-sequence formulation</a>, and <a href="https://huggingface.co/docs/transformers/en/model_doc/encoder-decoder">Hugging Face's implementation documentation</a>.</p>
 
 Each decoder block has two attention sub-blocks:
 
