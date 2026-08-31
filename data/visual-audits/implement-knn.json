@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-knn",
+  "article": "src/content/posts/2025-08-17-implement-knn.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Choose an index by separating three decisions: whether approximation is allowed, how to avoid visiting every vector, and whether stored vectors must be compressed.",
+  "mediumRationale": "A deterministic vertical SVG is the smallest medium that can make index choice a constraint-driven funnel rather than a memorized size table. It keeps the exact baseline, three alternative pruning families, optional compression layer, and empirical verification gate visible in one mobile-safe trace.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can express branching, but fixed SVG geometry better distinguishes the three peer pruning families from the orthogonal, optional PQ layer and keeps the labels readable without horizontal scrolling.",
+    "svg": "Selected: deterministic boxes, branch geometry, a dashed optional compression path, and a final measurement gate communicate hierarchy and orthogonality without runtime code or color dependence.",
+    "semanticHtml": "Rejected: a comparison table would encourage choosing from nominal algorithm properties while obscuring the sequence of first proving the exact baseline inadequate, then pruning visits, then considering compression.",
+    "interaction": "Rejected: changing N, dimension, or recall targets would imply universal numeric cutoffs that the sources do not establish and would add state without improving the core selection model.",
+    "paperReuse": "Rejected: the reviewed deck and papers contain denser, mechanism-specific material, and public access was not treated as figure-reuse permission. No source composition, artwork, coordinates, or empirical data is copied.",
+    "noVisual": "Rejected: the article names flat search, trees, HNSW, IVF, and PQ in prose, but does not show that candidate pruning and vector compression solve different bottlenecks or that every approximate choice must return to a flat-ground-truth recall check."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 23,
+        "insight": "The preceding slide covers random forests and contains no nearest-neighbor search or index-selection guidance."
+      },
+      {
+        "page": 24,
+        "insight": "The K-nearest-neighbor classifier slide states that prediction compares a test item with every training item, discusses L1, L2, and dot-product distance, names the curse of dimensionality, and notes preprocessing or indexing as a retrieval trade-off."
+      },
+      {
+        "page": 25,
+        "insight": "The following clustering slide surveys distance measures and k-means assignment but does not address nearest-neighbor retrieval indexes."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems section divider contains no retrieval mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide describes exhaustive embedding comparisons, pruning into Voronoi buckets with nprobe, and PQ compression for approximate distance computation; this supports the distinction between visiting fewer vectors and storing fewer bytes."
+      },
+      {
+        "page": 131,
+        "insight": "The following content-based and hybrid recommendation slide discusses item attributes and similarity measures but adds no ANN index-selection detail."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for K-nearest neighbor, nearest neighbor, approximate nearest neighbor, HNSW, KD-tree, ball tree, inverted file, nprobe, and product quantization. Exact matches occur on pages 24 and 130. Their full neighboring ranges, pages 23-25 and 129-131, were rendered and visually inspected. Page 24 motivates exhaustive comparison and dimensionality limits; page 130 distinguishes cluster pruning from PQ compression. Neither provides the shipped constraint-driven decision funnel, and no deck artwork, wording, code, layout, or data is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "scikit-learn User Guide: Nearest Neighbors",
+        "url": "https://scikit-learn.org/stable/modules/neighbors.html",
+        "usage": "Used as official library documentation to verify the brute-force, KD-tree, and ball-tree families and the degradation of tree pruning as dimensionality increases.",
+        "license": "The documentation is used only to verify algorithm semantics. No prose, example, code, table, or artwork is reproduced; the SVG labels and structure are independently authored."
+      },
+      {
+        "title": "Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs",
+        "url": "https://arxiv.org/abs/1603.09320",
+        "usage": "Used as the primary source to verify hierarchical graph navigation and the HNSW trade-off among search performance, recall, and index construction.",
+        "license": "The paper is publicly readable, but no permissive figure-reuse permission was established. No paper figure, graph layout, empirical result, or wording is copied."
+      },
+      {
+        "title": "Product Quantization for Nearest Neighbor Search",
+        "url": "https://hal.science/inria-00514462",
+        "usage": "Used as the primary source to verify that PQ represents vectors with short subspace-quantization codes and estimates distances from those codes, including in combination with an inverted file.",
+        "license": "The repository record provides public access, but public access is not treated as permission to adapt figures. No figure, table, result, notation, wording, or worked data is reused."
+      },
+      {
+        "title": "Faiss documentation: Research foundations",
+        "url": "https://faiss.ai/",
+        "usage": "Used as official implementation documentation to verify that inverted files enable non-exhaustive search, PQ enables compressed-domain distance computation, HNSW is a supported graph index, and GPU implementations accelerate similarity search and k-selection.",
+        "license": "Faiss software is MIT licensed, but this audit does not rely on that software license as permission for documentation artwork. No Faiss code, prose, figure, branding, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the named techniques are not interchangeable answers to dataset size. Flat search is the exact ground truth and can be highly optimized. KD and ball trees, HNSW, and IVF are alternative ways to avoid evaluating every vector under different data and operational constraints. PQ addresses storage and memory bandwidth by replacing full vectors with lossy codes, and can be composed with an inverted or graph index. The visual intentionally provides no universal N or dimension cutoff: index performance is data- and hardware-dependent, so approximate configurations must be evaluated against exact flat neighbors for recall@k as well as latency, memory, build time, and update cost."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected both exact slide neighborhoods, and checked primary HNSW and PQ papers plus official scikit-learn and Faiss documentation before selecting an original index-decision funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "knn-index-decision-funnel"
+    ],
+    "accessibility": "The SVG has a linked title and full description that states every branch and the final verification rule. Exact search, the approximation gate, three peer pruning choices, optional PQ, and evaluation are directly labeled; branch position, borders, arrow direction, and the dashed optional path preserve all meaning without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width, keeping labels readable at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}

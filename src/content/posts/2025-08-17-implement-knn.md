@@ -48,6 +48,55 @@ def knn_squared(X, queries, k):
 
 This is the form used by FAISS's flat index. Order-of-magnitude faster than the naive form for batched queries because of BLAS-accelerated matmul.
 
+**Learning objective:** choose an index by separating three decisions: whether approximation is allowed, how to avoid visiting every vector, and whether stored vectors must be compressed.
+
+<!-- visual:knn-index-decision-funnel -->
+<figure class="learning-figure plot-panel" aria-labelledby="knn-index-funnel-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="knn-index-funnel-title">Which constraint should change the KNN index?</p>
+	<svg viewBox="0 0 360 478" role="img" aria-labelledby="knn-index-funnel-svg-title knn-index-funnel-svg-desc">
+		<title id="knn-index-funnel-svg-title">A constraint-driven decision funnel for exact and approximate nearest-neighbor indexes</title>
+		<desc id="knn-index-funnel-svg-desc">Start with a flat exact scan over all N vectors and batch it on the available hardware. Only if measured latency misses its target and approximation is allowed, choose a way to visit fewer vectors: KD or ball trees for low-dimensional data where partitions prune well, HNSW graph navigation for high-recall low-latency search when graph memory is acceptable, or IVF cluster probing when scan budget is controlled by nprobe. Product quantization is a separate optional lossy compression layer when vector memory or read bandwidth is the bottleneck. Every approximate path ends by measuring recall at k against flat ground truth together with latency, memory, build time, and update cost.</desc>
+		<defs><marker id="knn-funnel-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+		<text class="viz-axis-label" x="18" y="22">1 · ESTABLISH THE EXACT BASELINE</text>
+		<rect class="viz-node viz-node--input" x="47" y="34" width="266" height="56" rx="4"></rect>
+		<text class="viz-callout" x="180" y="55" text-anchor="middle">FLAT · score all N vectors</text>
+		<text class="viz-label" x="180" y="73" text-anchor="middle">exact · O(Nd) · batch / GEMM / GPU first</text>
+		<path d="M180 90V120" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#knn-funnel-arrow)"></path>
+		<text class="viz-label" x="188" y="108">misses latency SLO?</text>
+		<rect class="viz-node viz-node--focus" x="51" y="122" width="258" height="48" rx="4"></rect>
+		<text class="viz-callout" x="180" y="143" text-anchor="middle">Is approximation allowed?</text>
+		<text class="viz-label" x="180" y="159" text-anchor="middle">if no, scale or shard the flat scan</text>
+		<text class="viz-axis-label" x="18" y="197">2 · IF YES, VISIT FEWER VECTORS</text>
+		<path d="M180 170V207M62 207H298M62 207V221M180 207V221M298 207V221" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+		<rect class="viz-node" x="10" y="222" width="104" height="82" rx="4"></rect>
+		<text class="viz-callout" x="62" y="243" text-anchor="middle">KD / ball tree</text>
+		<text class="viz-label" x="62" y="263" text-anchor="middle">low dimension;</text>
+		<text class="viz-label" x="62" y="279" text-anchor="middle">partitions still</text>
+		<text class="viz-label" x="62" y="295" text-anchor="middle">prune effectively</text>
+		<rect class="viz-node" x="128" y="222" width="104" height="82" rx="4"></rect>
+		<text class="viz-callout" x="180" y="243" text-anchor="middle">HNSW</text>
+		<text class="viz-label" x="180" y="263" text-anchor="middle">navigate a graph;</text>
+		<text class="viz-label" x="180" y="279" text-anchor="middle">fast, high recall;</text>
+		<text class="viz-label" x="180" y="295" text-anchor="middle">graph costs RAM</text>
+		<rect class="viz-node" x="246" y="222" width="104" height="82" rx="4"></rect>
+		<text class="viz-callout" x="298" y="243" text-anchor="middle">IVF</text>
+		<text class="viz-label" x="298" y="263" text-anchor="middle">probe selected</text>
+		<text class="viz-label" x="298" y="279" text-anchor="middle">clusters; nprobe</text>
+		<text class="viz-label" x="298" y="295" text-anchor="middle">sets scan budget</text>
+		<text class="viz-axis-label" x="18" y="333">3 · COMPRESS ONLY IF MEMORY OR READS DOMINATE</text>
+		<path d="M180 304V346" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8;stroke-dasharray:5 4;marker-end:url(#knn-funnel-arrow)"></path>
+		<rect class="viz-node viz-node--focus" x="47" y="348" width="266" height="55" rx="4" style="stroke-dasharray:5 4"></rect>
+		<text class="viz-callout" x="180" y="369" text-anchor="middle">OPTIONAL PQ · store short lossy codes</text>
+		<text class="viz-label" x="180" y="387" text-anchor="middle">fewer bytes · approximate distances</text>
+		<path d="M180 403V426" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#knn-funnel-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="22" y="428" width="316" height="40" rx="4"></rect>
+		<text class="viz-callout" x="180" y="446" text-anchor="middle">VERIFY AGAINST FLAT GROUND TRUTH</text>
+		<text class="viz-label" x="180" y="461" text-anchor="middle">recall@k · latency · RAM · build · updates</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> start with the exact flat scan and optimize that baseline before buying index complexity. If it misses the measured latency target and approximation is acceptable, choose one candidate-pruning path for the data regime. Treat PQ as a separate compression decision; it can be combined with IVF or a graph index, but it introduces another source of distance error. Finally, compare recall@<var>k</var> with flat ground truth while measuring the operational costs. Original synthesis checked against the <a href="https://scikit-learn.org/stable/modules/neighbors.html">scikit-learn neighbors guide</a>, <a href="https://arxiv.org/abs/1603.09320">the HNSW paper</a>, and <a href="https://faiss.ai/">Faiss's research foundations</a>.</figcaption>
+</figure>
+
 ## What an L5 answer should add
 
 > "Brute-force scales as O(N * d) per query. For N up to ~100K and d ~ 100, brute-force on GPU with batched queries is fast enough.
