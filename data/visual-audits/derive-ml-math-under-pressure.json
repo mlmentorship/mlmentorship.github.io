@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "derive-ml-math-under-pressure",
+  "article": "src/content/posts/2026-07-11-derive-ml-math-under-pressure.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace why summing d independent unit-variance query-key products produces variance d, while dividing the resulting logit by square root of d restores unit variance.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can keep the random-variable operation and its variance operation in parallel. The aligned rows expose the easily missed square law: multiplying a logit by 1/square root of d multiplies its variance by 1/d.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can order the derivation, but automatic layout cannot align each random-variable transformation with its variance transformation or emphasize the squared scale factor precisely.",
+    "svg": "Selected: fixed parallel rows, direct equation labels, and arrows make the sum-of-variances step and the square-law scaling step spatially comparable in a narrow column.",
+    "semanticHtml": "Rejected: a table could present the equations, but it would read as another symbolic derivation rather than visually pairing what happens to the logit with what happens to its variance.",
+    "interaction": "Rejected: varying d could animate logit spread, but controls introduce state and suggest an empirical simulation when the article needs one assumption-driven symbolic result.",
+    "paperReuse": "Rejected: the source deck and Transformer paper contain architecture figures and formulas, but neither provides the focused variance trace needed here. Reuse permission for their figures was not established, and no external artwork, layout, wording, or example is copied.",
+    "noVisual": "Rejected: the prose states that division by square root of d gives unit variance but does not show that variance squares a multiplicative scale factor, the decisive step learners often have to reconstruct."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 100,
+        "insight": "The preceding recurrent-net slide describes memory-network attention weights but does not discuss scaled dot products or variance."
+      },
+      {
+        "page": 101,
+        "insight": "The Transformer overview shows encoder and decoder attention context, but its extracted text contains no derivation of the square-root scale."
+      },
+      {
+        "page": 102,
+        "insight": "The neighboring BERT slide covers masked-language-model training and Transformer resources, with no attention-scaling explanation."
+      },
+      {
+        "page": 103,
+        "insight": "The Transformer survey says dot-product attention is scaled by the square root of feature dimension to address sharp or diffuse attention weights, but it does not derive the variance or show why the square root is the correct factor."
+      },
+      {
+        "page": 104,
+        "insight": "The following slide moves to GPT-X, instruction tuning, and in-context learning, marking the end of the local Transformer neighborhood."
+      },
+      {
+        "page": 108,
+        "insight": "A later compute-optimization slide states standard attention as softmax(QK transpose divided by square root of d)V, then focuses on quadratic compute, memory, and I/O rather than the statistical reason for scaling."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for attention, self-attention, query, key, Transformer, softmax, variance, square root, and scaling. Pages 100-104 were read as the full relevant neighborhood, and the later attention optimization cluster beginning at page 108 was checked. Page 103 is the only slide that gives a qualitative scaling rationale; page 108 repeats the formula. Neither derives Var(q transpose k)=d or the squared effect of scaling. No deck screenshot, artwork, coordinates, wording, or equation layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary source to verify scaled dot-product attention and the stated rationale that, for large key dimension, unscaled dot products grow in magnitude and push softmax into regions with extremely small gradients.",
+        "license": "The paper is publicly accessible through arXiv, but no permissive figure-reuse grant was established. No figure, prose, equation arrangement, or worked example is copied; the implementation is an original derivation trace."
+      },
+      {
+        "title": "PyTorch scaled_dot_product_attention documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "usage": "Used as official implementation documentation to cross-check that the default scale factor is one over the square root of the query/key embedding dimension and is applied before softmax.",
+        "license": "The documentation is used only to verify public API semantics. No documentation prose, source code, or artwork is reproduced, so no third-party visual license is required."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not that attention uses 1/square root of d, but why the square root follows from variance. Under the article's assumptions, each X_i=q_i k_i has mean zero and variance E[q_i squared]E[k_i squared]=1. Independence across coordinates removes covariance terms, so Var(sum X_i)=d. For a constant a, Var(aZ)=a squared Var(Z); with a=1/square root of d, the scaled variance is (1/d)d=1. The conclusion is conditional: correlations add covariance terms, and non-unit coordinate variances change the sum."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the relevant Transformer neighborhood plus the later attention formula, then checked the primary Transformer paper and official PyTorch operator documentation before selecting an original variance-flow derivation."
+  },
+  "implementation": {
+    "visualIds": [
+      "attention-scaling-variance-trace"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that states every assumption and derivation step. Parallel row labels, numbered stages, equations, box boundaries, and arrows carry the full lesson without relying on color. The established plot-panel primitive scales a 360-unit viewBox without a minimum width for readability at 390 CSS pixels; shared theme tokens preserve dark-mode contrast and shared print tokens provide a light high-contrast rendering."
+  }
+}
