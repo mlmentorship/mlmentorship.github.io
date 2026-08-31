@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "slug": "frontier-lab-proof-of-work-and-references",
+  "article": "src/content/posts/2026-07-11-frontier-lab-proof-of-work-and-references.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Build one bounded ownership claim that a concise statement, an inspectable artifact, and an independent witness can each support without requiring identical wording.",
+  "mediumRationale": "A two-panel semantic card is the smallest useful medium: one panel defines the claim core and the other applies three independent checks. It makes corroboration and ownership boundaries visible without inventing scores or implying that the three surfaces should be scripted.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson is not a process with causal branches; a flowchart would imply that statement, artifact, and reference happen sequentially rather than independently checking one claim.",
+    "svg": "Rejected because the model is categorical rather than geometric or quantitative, and fixed drawing text would wrap less naturally at a 390 CSS-pixel viewport.",
+    "semanticHtml": "Selected because a labelled claim panel beside a numbered verification panel preserves ordinary reading order, uses established responsive primitives, and keeps every distinction as accessible selectable text.",
+    "interaction": "Rejected because toggling sample claims would hide parts of the consistency test and introduce subjective scoring without improving the stable verification model.",
+    "paperReuse": "Rejected because official hiring and personnel-selection sources provide supporting principles but no figure that expresses this article-specific claim-to-three-surfaces model. No source figure, wording, data, or layout is copied.",
+    "noVisual": "Rejected because the existing prose and evidence table list fields, but readers must still mentally distinguish three repeated versions of a story from three genuinely independent checks on one bounded claim."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 206,
+        "insight": "The slide immediately before the behavioral section explains floating-point bits and contributes no application, artifact, or reference guidance."
+      },
+      {
+        "page": 207,
+        "insight": "The Behavioral/Culture interview divider identifies the closest relevant section but contains no model or substantive guidance."
+      },
+      {
+        "page": 208,
+        "insight": "The behavioral resource slide links generic preparation material but gives no proof-of-work, ownership, artifact, or reference-selection framework."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider marks the neighboring section but adds no evidence model."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends sharing facts, examining one's personal role, speaking with confidence and humility, acknowledging problems, and documenting work. Those ideas support bounded ownership and evidence, but it does not discuss application claims, artifacts, or references."
+      },
+      {
+        "page": 211,
+        "insight": "The following slide begins the deep-learning-frameworks section, confirming that the relevant behavioral and leadership neighborhood ends on page 210."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for reference, resume, artifact, portfolio, ownership, evidence, interview, presentation, project, leadership, impact, metric, and behavioral terms. The only plausibly relevant neighborhood, pages 206-211, was rendered and visually inspected in full. Pages 207-210 cover behavioral resources and leadership, but no slide teaches exceptional-work statements, artifact selection, independent references, or triangulation across those surfaces. No deck artwork, screenshots, wording, examples, or layout is reused.",
+    "license": "The local deck states no reuse license and includes linked or embedded third-party material with incomplete attribution. It is treated as review-only material; the implementation is original semantic HTML."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Anthropic Careers",
+        "url": "https://www.anthropic.com/careers",
+        "usage": "Used as official frontier-lab guidance that demonstrated ability matters more than pedigree and that independent research, thoughtful writing, or open-source contributions should be made prominent as inspectable evidence.",
+        "license": "No permissive license for the careers page or its visual design was identified. No wording, artwork, icons, or layout is reproduced."
+      },
+      {
+        "title": "Software Engineer - Evals",
+        "url": "https://job-boards.greenhouse.io/xai/jobs/5188230007",
+        "usage": "Used as an official current role page to verify the emphasis on hands-on direct contribution, consistently delivered work, and concise, accurate communication rather than prestige alone.",
+        "license": "The job page provides no permissive figure-reuse license. No company artwork, wording, form design, or layout is reproduced."
+      },
+      {
+        "title": "Work Samples and Simulations",
+        "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/other-assessment-methods/work-samples-and-simulations/",
+        "usage": "Used as official personnel-selection guidance that work samples should closely represent job tasks and can provide content-valid evidence of competencies and performance.",
+        "license": "This U.S. Office of Personnel Management page is used as a technical reference only. No text, table, artwork, or page layout is reproduced; any third-party material remains excluded."
+      },
+      {
+        "title": "Reference Checking",
+        "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/other-assessment-methods/reference-checking/",
+        "usage": "Used as official personnel-selection guidance that references verify applicant claims, add information beyond resumes and interviews, and are most useful when based on people who directly observed past performance.",
+        "license": "This U.S. Office of Personnel Management page is used as a technical reference only. No text, table, artwork, rating procedure, or page layout is reproduced; any third-party material remains excluded."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is triangulation with bounded attribution. A statement is the candidate's claim, an artifact makes relevant work inspectable, and a reference supplies independent observation. Agreement means all three support the same decision, ownership boundary, evidence, and caveat; it does not mean using identical language or coaching a witness. The visual is an original synthesis and makes no empirical magnitude or universal hiring-process claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected the full behavioral and leadership neighborhood, and checked current official frontier-lab and U.S. personnel-selection guidance before selecting an original semantic triangulation card."
+  },
+  "implementation": {
+    "visualIds": [
+      "proof-of-work-three-checks"
+    ],
+    "accessibility": "The figure has a linked learning question and an explicitly labelled group of two semantic sections. The claim core and all three checks are numbered and stated in text, including the required ownership boundary and caveat, so color carries no meaning. The established two-column primitive stacks below 640 CSS pixels with normal text wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast and shared print rules produce a high-contrast light rendering."
+  }
+}
