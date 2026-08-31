@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "slug": "kl-divergence",
+  "article": "src/content/posts/2025-10-23-kl-divergence.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Predict why forward KL prefers a distribution that covers both modes while reverse KL can prefer a distribution concentrated on one mode when the approximation family cannot match a bimodal target.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can hold one discrete bimodal target and two constrained candidate approximations fixed while exposing the exact forward and reverse KL values that rank those candidates differently.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can name forward and reverse KL, but automatic graph layout cannot encode probability mass or make the candidate rankings numerically inspectable.",
+    "svg": "Selected: fixed bars can show the same three-outcome target and candidates, while a compact score table verifies that changing which distribution supplies the expectation changes the preferred approximation.",
+    "semanticHtml": "Rejected: a table alone could compare the four KL values but would not make the missing middle mass and covered versus selected modes spatially immediate.",
+    "interaction": "Rejected: adjustable probabilities would add controls and many states even though one exact counterexample is sufficient to establish the directional behavior.",
+    "paperReuse": "Rejected: the reviewed paper and textbook discuss inclusive and exclusive KL behavior, but no candidate figure has a verified permissive reuse grant or matches this exact discrete example. No source figure, data, wording, notation layout, or geometry is copied.",
+    "noVisual": "Rejected: the prose names mass-covering and mode-seeking behavior but asks readers to imagine both the distributions and the expectation that creates each penalty. The fixed example makes both rankings directly checkable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 16,
+        "insight": "The preceding point-estimation slide defines estimator bias and variance but contains no divergence or distribution-approximation geometry."
+      },
+      {
+        "page": 17,
+        "insight": "The parameter-learning slide connects maximum likelihood, cross-entropy, and KL for an empirical data distribution, but its displayed KL arguments are not developed into a forward-versus-reverse comparison."
+      },
+      {
+        "page": 18,
+        "insight": "The following slide depicts model learning through a generic loss function and confirms that the local parameter-learning neighborhood does not explain KL direction."
+      },
+      {
+        "page": 32,
+        "insight": "This section divider starts the classification-loss neighborhood and contains no mechanism."
+      },
+      {
+        "page": 33,
+        "insight": "The logistic-regression slide explains cross-entropy, entropy, surprise, and the infinite penalty when model probability is zero, supporting the forward-KL support-mismatch interpretation."
+      },
+      {
+        "page": 34,
+        "insight": "The next slide discusses convex loss functions and cross-entropy optimization but adds no distribution geometry or KL-direction comparison."
+      },
+      {
+        "page": 35,
+        "insight": "The numerical-stability and logistic-regression slide remains focused on softmax and binary cross-entropy rather than divergence direction."
+      },
+      {
+        "page": 36,
+        "insight": "The surrogate-loss slide explicitly relates cross-entropy to KL between empirical and predicted distributions, but does not identify which distribution weights the expectation."
+      },
+      {
+        "page": 37,
+        "insight": "The following evaluation-metrics slide moves to ROC, precision, and recall, ending the classification-loss neighborhood."
+      },
+      {
+        "page": 81,
+        "insight": "The learning overview introduces MLE, Bayesian estimation, and MAP immediately before the variational-inference sequence."
+      },
+      {
+        "page": 82,
+        "insight": "The VAE latent-variable slide motivates approximating an intractable posterior but does not yet specify the divergence."
+      },
+      {
+        "page": 83,
+        "insight": "The variational-inference slide explicitly labels KL(q||p) and an ELBO derivation. It is the exact reverse-KL use case, but it does not compare the result with KL(p||q) on a multimodal target."
+      },
+      {
+        "page": 84,
+        "insight": "The following VAE slide moves to neural parameterization, reparameterized sampling, amortized inference, and SGD without adding KL geometry."
+      },
+      {
+        "page": 85,
+        "insight": "The code slide includes a Gaussian VAE KL term but supplies neither forward-versus-reverse interpretation nor mode behavior."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for KL divergence, Kullback, forward KL, reverse KL, cross-entropy, variational inference, and ELBO. Pages 16-18, 32-37, and 81-85 were extracted and read as the complete relevant neighborhoods. Page 83 is the only slide that explicitly labels KL(q||p); pages 17, 33, and 36 connect KL to likelihood or cross-entropy. No reviewed slide compares directional optima for a multimodal target.",
+    "license": "The local deck provides no general reuse license and contains externally sourced material. It is treated as review-only: no screenshot, plot, code, wording, equation layout, coordinates, or visual composition is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On Information and Sufficiency",
+        "url": "https://doi.org/10.1214/aoms/1177729694",
+        "usage": "Used as the primary source for the relative-information quantity now called Kullback-Leibler divergence and its expectation under the first distribution.",
+        "license": "The Annals of Mathematical Statistics article is publisher-controlled, and no permissive figure-reuse license was identified. No figure, prose, example, data, or notation layout is copied."
+      },
+      {
+        "title": "Divergence Measures and Message Passing",
+        "url": "https://www.microsoft.com/en-us/research/publication/divergence-measures-and-message-passing/",
+        "usage": "Used as an authoritative technical report to verify the inclusive-versus-exclusive KL distinction and the symmetry-breaking solutions preferred by exclusive KL approximations.",
+        "license": "Microsoft Research provides the report for reading but does not state a permissive license for adapting its figures. No figure, example values, prose, or layout is reused."
+      },
+      {
+        "title": "Pattern Recognition and Machine Learning",
+        "url": "https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/",
+        "usage": "Used as an authoritative textbook to cross-check KL non-negativity, the cross-entropy decomposition, and variational inference based on minimizing KL(q||p).",
+        "license": "Microsoft Research officially hosts the Springer book PDF, but its copyright notice does not grant a permissive figure-reuse license. No textbook figure, sample values, wording, or geometry is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why swapping KL arguments changes an approximation under a restricted family. The original three-outcome construction fixes p=(0.49, 0.02, 0.49), q_cover=(0.34, 0.32, 0.34), and q_left=(0.96, 0.02, 0.02). Direct calculation in natural-log units gives KL(p||q_cover)=0.302699 versus KL(p||q_left)=1.237811, so forward KL favors covering both target modes. The reverse values are KL(q_cover||p)=0.638716 versus KL(q_left||p)=0.581653, so reverse KL slightly favors selecting one mode. This is a constrained illustrative candidate set, not a claim that every family or optimization has those exact optima."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every KL, cross-entropy, and variational-inference neighborhood, then checked the original KL paper, an inclusive-versus-exclusive divergence report, and an authoritative probabilistic-ML textbook before selecting an original discrete comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "kl-direction-candidate-ranking"
+    ],
+    "accessibility": "The SVG will provide a linked title and complete description, direct probability labels, distinct solid and dashed candidate outlines, explicit KL argument order, and numeric rankings with selected labels so no meaning depends on color. A 360-unit viewBox without a minimum width will use existing theme tokens for 390 CSS pixel, dark-mode, and print compatibility."
+  }
+}
