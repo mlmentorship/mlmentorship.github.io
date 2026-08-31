@@ -10,6 +10,40 @@ category: "guides"
 
 Every senior Applied Scientist loop tests five things, regardless of rubric categories. Knowing them changes prep, story selection, and in-room optimization.
 
+<!-- visual:as-five-cross-cutting-signals -->
+<figure class="learning-figure" aria-labelledby="as-signals-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="as-signals-title">See past round labels to the five signals that prompts can reveal across the loop.</p>
+	<div class="visual-grid--two" role="list" aria-label="Five cross-cutting Applied Scientist interview signals, where they surface, and how to prepare">
+		<section class="visual-panel" role="listitem">
+			<h4>1 · SCOPE BEFORE SOLVING</h4>
+			<p><strong>Seen in:</strong> system design, product sense, and project depth.</p>
+			<p><strong>Prep move:</strong> practice naming the user, harm, goal, data, scale, and constraints before choosing a model.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>2 · SHOW SHIPPING EVIDENCE</h4>
+			<p><strong>Seen in:</strong> project depth, ML design, and behavioral follow-ups.</p>
+			<p><strong>Prep move:</strong> retrieve specific failures, diagnostics, trade-offs, launch gates, and rollback decisions.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>3 · EXPLAIN THE SCIENCE</h4>
+			<p><strong>Seen in:</strong> ML breadth, modeling choices, and debugging.</p>
+			<p><strong>Prep move:</strong> explain why a method works, when its assumptions fail, and what evidence would change your choice.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>4 · ENGAGE WITH PUSHBACK</h4>
+			<p><strong>Seen in:</strong> every technical round and explicit disagreement stories.</p>
+			<p><strong>Prep move:</strong> clarify the objection, accept the valid part, then update or defend the remaining claim with evidence.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>5 · IMPROVE THE ROOM</h4>
+			<p><strong>Seen in:</strong> every round, transitions, and informal conversation.</p>
+			<p><strong>Prep move:</strong> think aloud, mark uncertainty, incorporate suggestions, and make collaboration visible.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move down the cards as five recurring evidence questions, not five separate rounds. One system-design prompt may expose scoping, science, shipping, communication, and room presence at once; prepare the signal you need to demonstrate rather than memorizing an answer for the round label.</figcaption>
+</figure>
+
 ## 1. Can you scope an ambiguous problem?
 
 The highest-information signal in any AS loop. Strong candidates spend 5-10 minutes asking clarifying questions and naming unknowns before solving. The job is taking ill-defined business problems ("better personalization," "unreliable agent") into tractable ML problems with clear success criteria. If you can't scope in an interview, interviewers assume you can't in production.
