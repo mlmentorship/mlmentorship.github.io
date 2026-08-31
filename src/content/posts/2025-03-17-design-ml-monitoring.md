@@ -18,6 +18,30 @@ Standard service monitoring (uptime, latency, error rates) tells you if the *ser
 
 ML failures are often silent: the service runs, requests succeed, predictions return, but the model has degraded because data drifted, features broke, labels shifted, or the world changed. You won't notice from logs.
 
+**Learning objective:** Locate the earliest monitoring layer that can detect a failure, and distinguish an early warning from delayed evidence that users were harmed.
+
+<!-- visual:ml-monitoring-observability-layers -->
+```mermaid
+flowchart TB
+	accTitle: Three monitoring taps along a healthy ML serving path
+	accDescr: A request can succeed and service latency and error metrics can remain normal while an ML failure develops. The production path runs from serving features to a model score, then a product action, and finally a delayed outcome. A data monitor taps serving features and can immediately detect schema, null, freshness, and input-distribution problems. A model-behavior monitor taps scores and can quickly detect changed prediction distributions, confidence, and slices, but cannot prove quality. An outcome monitor joins mature labels or business effects back to predictions and can confirm quality or harm, but arrives after the label delay. Direct labels, numbered layers, and dashed monitoring taps communicate the distinctions without color.
+	S["Service telemetry normal<br/>requests succeed; latency + errors in range"] --> X["Serving features"]
+	X --> P["Model score<br/>or ranking"]
+	P --> A["Product action"]
+	A --> Y["Mature label or<br/>business outcome"]
+	X -.-> D["1 · DATA<br/>schema · nulls · freshness · drift<br/><b>early: catches broken inputs</b>"]
+	P -.-> M["2 · MODEL BEHAVIOR<br/>scores · confidence · slices<br/><b>early: warning, not quality proof</b>"]
+	Y -.-> O["3 · OUTCOME<br/>quality · impact · control comparison<br/><b>delayed: confirms user effect</b>"]
+	class S viz-warning
+	class X viz-input
+	class P,A viz-focus
+	class Y viz-state
+	class D,M,O viz-output
+	class S,X,P,A,Y,D,M,O viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid serving path first: every request can complete even when the ML system is wrong. Then read each dashed tap at the point where its evidence exists. Data checks catch broken or stale inputs earliest; output checks expose changed behavior but cannot prove degraded quality; only mature labels or business outcomes confirm user impact, and they arrive last. Keep service telemetry as a separate guardrail rather than treating it as model health.</p>
+
 ## What an L5 answer sounds like
 
 > "Three layers:
