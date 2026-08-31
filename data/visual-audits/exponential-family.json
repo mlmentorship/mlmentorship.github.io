@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "exponential-family",
+  "article": "src/content/posts/2025-12-03-exponential-family.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See how an i.i.d. exponential-family sample collapses to a fixed-size summed sufficient statistic and why an interior MLE matches its empirical moment to the model moment.",
+  "mediumRationale": "A compact deterministic SVG can show six raw Bernoulli observations collapsing to one count, substitute that count into the sample log-likelihood, and align the empirical and model moments at the MLE without requiring interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout would obscure the quantitative six-observation-to-one-count compression and the aligned moment equation.",
+    "svg": "Selected: fixed geometry can make the dataset reduction, likelihood terms, and moment-matching equality spatially checkable in one static figure.",
+    "semanticHtml": "Rejected: a table can list the derivation but does not make the many-to-one compression from a growing sample to a fixed-dimensional statistic as immediate.",
+    "interaction": "Rejected: changing the observations or Bernoulli parameter adds controls without improving the central sufficiency and score-equation argument.",
+    "paperReuse": "Rejected: no authoritative source figure with verified reuse permission isolates this exact Bernoulli compression-to-moment-match lesson; the implementation is an original worked schematic.",
+    "noVisual": "Rejected: prose states both sufficiency and moment matching, but readers must currently perform the product-to-sum factorization mentally to understand why those properties are the same structural result."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 64,
+        "insight": "The Basic Probabilistic ML Algorithms divider begins the only deck neighborhood that explicitly names the exponential family."
+      },
+      {
+        "page": 65,
+        "insight": "The EM slide says exponential-family complete-data likelihoods reduce the E-step to expected sufficient statistics and can make M-step updates closed form, but it does not define canonical form or derive dataset sufficiency."
+      },
+      {
+        "page": 66,
+        "insight": "The neighboring graphical-models slide moves to factorization, conditional independence, and variable elimination, adding no exponential-family derivation."
+      },
+      {
+        "page": 69,
+        "insight": "The forward-backward and Baum-Welch slide provides later context for the EM claim on page 65 but does not discuss sufficient-statistic compression."
+      },
+      {
+        "page": 70,
+        "insight": "The CRF slide uses a log-partition function to normalize sequence scores, offering a concrete later use of the term but not its exponential-family derivative identities."
+      },
+      {
+        "page": 71,
+        "insight": "The next slide begins linear factor models and confirms that the deck has moved beyond the log-partition example."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page-by-page for exponential family, sufficient statistic, natural parameter, log-partition, conjugate prior, Bernoulli, and Poisson. Page 65 is the only slide that explicitly names the exponential family and sufficient statistics; pages 64-66 were read as its contiguous neighborhood. Page 70 is the only other log-partition match, so pages 69-71 were also inspected. The deck supplies an EM use case and a CRF normalization use case, but no canonical-form derivation, dataset-compression visual, or moment-matching explanation. No deck image, wording, equation layout, or artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Exponential Families, Stat 210A course notes",
+        "url": "https://www.stat.berkeley.edu/~wfithian/courses/stat210a/exponential-families.html",
+        "usage": "Used to verify canonical form, Bernoulli natural parameterization, the product likelihood for repeated sampling, fixed-dimensional summed sufficient statistics, and the identities for derivatives of the log-partition function.",
+        "license": "The university course page provides no explicit permissive reuse license. No prose, figure, or page layout is copied; the shipped Bernoulli example is independently drawn from the mathematical identities."
+      },
+      {
+        "title": "Stat 5421 Lecture Notes: Exponential Families",
+        "url": "https://www.stat.umn.edu/geyer/5421/notes/expfam.html",
+        "usage": "Used as an independent authoritative check that the canonical statistic enters linearly, cumulant-function derivatives give its mean and variance, and mean values parameterize regular full exponential families.",
+        "license": "The notes do not state a permissive figure-reuse license. No note text, code, data, or visual structure is reproduced; only the mathematical claims are cited."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the connection between sufficiency and moment matching. For i.i.d. observations, multiplying canonical-form densities makes every parameter-dependent data term pass through S = sum_i T(x_i), while the log-partition term becomes nA(eta). Differentiating gives S - n grad A(eta) = S - n E_eta[T(X)]; therefore an interior stationary MLE equates the empirical sufficient-statistic mean S/n with the model mean. The original figure uses six Bernoulli observations, S = 4, and p-hat = 4/6 as a fully checkable instance. It does not claim that an MLE always exists or is interior."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then checked two university statistics references before choosing an original Bernoulli sufficient-statistic and moment-matching derivation."
+  },
+  "implementation": {
+    "visualIds": [
+      "exponential-family-sufficient-stat-moment-match"
+    ],
+    "accessibility": "The SVG has a linked title and a complete text description containing all six observations, the summed statistic, the sample log-likelihood, score equation, and result. Every stage is explicitly labelled and connected by arrow direction; the statistic uses a pill shape and the estimate uses a double-outlined result box, so the lesson does not depend on color. Its 360-pixel viewBox fits the established single-column visual panel without a minimum width, preserving readable labels at 390 CSS pixels. Existing theme variables provide dark-mode contrast and shared print tokens force a high-contrast light palette while keeping the figure together."
+  }
+}
