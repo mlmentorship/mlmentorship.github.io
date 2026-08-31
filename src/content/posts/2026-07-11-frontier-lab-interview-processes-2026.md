@@ -34,6 +34,29 @@ Use this order:
 
 Do not turn one team's performance take-home into "the Anthropic interview." Do not turn one Fellows experience into a full-time Research Engineer process. Do not publish an alleged exact prompt because an SEO page repeats it.
 
+<!-- visual:interview-evidence-to-drill -->
+<figure class="learning-figure" aria-labelledby="interview-routing-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="interview-routing-title">Turn confirmed round constraints into targeted practice.</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of unreliable company-first preparation with evidence-first preparation">
+		<section class="visual-panel">
+			<h4>Company first · weak routing signal</h4>
+			<p><strong>Input:</strong> “I am interviewing at Lab X.”</p>
+			<p><strong>Assumption:</strong> infer one standard loop from anecdotes or brand identity.</p>
+			<p><strong>Prep result:</strong> spread effort across generic coding, ML design, trivia, and every possible work sample.</p>
+			<p><strong>Risk:</strong> arrive fluent in the wrong format.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>Evidence first · strong routing signals</h4>
+			<p><strong>Confirm:</strong> environment and artifact&mdash;blank file, codebase, notebook, take-home, trace, or presentation.</p>
+			<p><strong>Confirm:</strong> allowed tools, domain, duration, evaluation criteria, and follow-up style.</p>
+			<p><strong>Prep result:</strong> select the few drills that reproduce those constraints and outputs.</p>
+			<p><strong>Fallback:</strong> if evidence is missing, ask the recruiter instead of filling gaps with anecdotes.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the lab name narrows the search, but it does not select the drill. Route preparation only after you can name the round's environment, permitted tools, expected artifact, domain, and scoring target.</figcaption>
+</figure>
+
 ## Current format map
 
 | Lab | Officially visible signal | Additional current report | Best targeted practice |
