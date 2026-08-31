@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "disagreed-with-senior",
+  "article": "src/content/posts/2025-07-15-disagreed-with-senior.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how two defensible positions become a shared decision by exposing assumptions, gathering decision-relevant evidence, updating the options, and committing while preserving an evidence-based path to revisit.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that makes the article's resolution process visible as a sequence with a feedback loop: steelman both positions, isolate the uncertainty that could change the choice, gather evidence, update, decide, and commit while monitoring. The established renderer supplies responsive dark, light, mobile, and print behavior without article-specific styling.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is a relationship-heavy decision flow with three evidence-dependent outcomes and one explicit revisit loop, which Mermaid expresses accessibly without hand-positioned geometry.",
+    "svg": "Rejected: the article contains no quantitative geometry, and a manually positioned SVG would duplicate flowchart semantics while making narrow-screen maintenance harder.",
+    "semanticHtml": "Rejected: a checklist or card sequence would preserve the words but would weaken the convergence from A, B, or synthesis into one owned decision and obscure the evidence-triggered revisit loop.",
+    "interaction": "Rejected: choosing fictional positions or changing invented evidence would add state and imply a general scoring rule without improving the transferable process.",
+    "paperReuse": "Rejected: the authoritative sources support speaking up, interpersonal safety, structured decision analysis, and commitment, but no source figure represents this article-specific interview model. Public access is not treated as permission to reuse artwork.",
+    "noVisual": "Rejected: prose describes strong-answer properties in several sections, but it does not spatially distinguish productive disagreement from repeated advocacy or show where updating and commitment belong in the same loop."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 207,
+        "insight": "The Behavioral/Culture interview divider establishes the relevant deck section but contains no model or guidance."
+      },
+      {
+        "page": 208,
+        "insight": "The neighboring resource slide links behavioral-interview preparation material but contains no disagreement-resolution process."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider introduces the only deck neighborhood directly relevant to senior disagreement."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends adding facts and views to a shared pool, examining one's own role, replacing either-or framing with synthesis, maintaining safety, speaking with confidence and humility, encouraging testing, and agreeing on follow-up."
+      },
+      {
+        "page": 211,
+        "insight": "The immediate next slide begins the deep-learning-frameworks section, confirming that the relevant leadership treatment ends on page 210."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 pages for leadership, tough conversation, shared pool, confidence and humility, disagreement, and commitment, then read pages 207-214 in full. Only page 210 contains a directly relevant process; pages 207-209 and 211 document its section boundaries and immediate context. The shipped visual does not copy the slide's layout, wording, or artwork."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Amazon Leadership Principles: Have Backbone; Disagree and Commit",
+        "url": "https://www.amazon.jobs/content/en/our-workplace/leadership-principles",
+        "usage": "Used as official employer guidance to verify the paired expectations of respectfully challenging a decision with conviction and committing wholly after the decision is determined.",
+        "license": "Amazon does not grant a permissive artwork-reuse license on this page. No wording, visual design, icon, or layout is reproduced; the principle is cited only to verify the challenge-then-commit boundary."
+      },
+      {
+        "title": "Psychological Safety and Learning Behavior in Work Teams",
+        "url": "https://doi.org/10.2307/2666999",
+        "usage": "Used as the primary empirical source for the relationship between team psychological safety, interpersonal risk-taking, and learning behavior in work teams.",
+        "license": "The journal publication does not provide a permissive figure-reuse grant. No paper figure, table, data, scale, or wording is reproduced; citation-only use avoids adapting copyrighted material."
+      },
+      {
+        "title": "NASA Systems Engineering Handbook, Revision 2, Section 6.8: Decision Analysis",
+        "url": "https://ntrs.nasa.gov/citations/20170001761",
+        "usage": "Used as official engineering guidance to verify defining the decision, identifying alternatives and discriminating criteria, evaluating uncertainty, involving the decision authority, and documenting the rationale.",
+        "license": "The NASA Technical Reports Server marks the document public with public use permitted and no identified third-party material. No handbook figure, prose, insignia, or layout is copied; the visual is an original application."
+      }
+    ],
+    "notes": "The flowchart is an original synthesis of the article and cited concepts, not a reproduction or adaptation of a source figure. It makes no empirical magnitude claim and adds no invented scoring system. The evidence branch permits retaining A, retaining B, or forming C, so updating does not falsely require compromise."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full relevant neighborhood, then checked official employer and engineering guidance plus a primary organizational-learning paper. The hardest prose-only model is the transition from respectful opposition to evidence-driven updating, one owned decision, and principled commitment."
+  },
+  "implementation": {
+    "visualIds": [
+      "disagreement-evidence-commit-loop"
+    ],
+    "accessibility": "The Mermaid source provides a complete title and description. Every stage, outcome, and feedback condition is directly labelled; position outcomes use explicit A, B, and C text, ordinary progress uses solid arrows, and reopening uses a dashed arrow, so color is supplementary. The compact top-to-bottom graph has short labels and no forced minimum width, while established Mermaid theme tokens provide dark-mode and print contrast."
+  }
+}
