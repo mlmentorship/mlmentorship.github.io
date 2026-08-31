@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "maximum-likelihood-estimation",
+  "article": "src/content/posts/2025-09-22-maximum-likelihood-estimation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Read a likelihood curve as a score over candidate parameter values for fixed observations, and identify the Bernoulli MLE at the observed success fraction.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can hold the observations fixed while mapping candidate parameter values to a continuous likelihood curve and marking its maximum.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show data flowing into an objective but cannot show likelihood varying continuously as the candidate parameter changes.",
+    "svg": "Selected: fixed geometry supports a checkable Bernoulli example, a responsive parameter axis, and a directly labelled optimum without runtime code.",
+    "semanticHtml": "Rejected: a table of candidate values would be accessible but would hide the continuous rise, unique maximum, and fall of the likelihood.",
+    "interaction": "Rejected: a slider could evaluate individual candidates, but controls and state add complexity without improving the core fixed-data parameter sweep.",
+    "paperReuse": "Rejected: reuse rights were not established for the local deck artwork, the historical paper, or textbook figures. The shipped diagram is an original construction from the Bernoulli likelihood formula.",
+    "noVisual": "Rejected: the article defines the optimizer correctly, but prose and formulas alone leave the hardest mental model implicit—data stay fixed while likelihood becomes a function of the candidate parameter."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 16,
+        "insight": "The preceding point-estimation slide defines estimator bias, variance, and standard error and uses an externally sourced population-mean illustration; it does not depict likelihood over candidate parameters."
+      },
+      {
+        "page": 17,
+        "insight": "The dedicated parameter-learning slide states the product and log-sum forms of MLE, contrasts MLE with MAP and Bayesian estimation, and shows several candidate distributions above fixed observations. Its displayed KL notation reverses the direction used by the article, so neither that notation nor its artwork was reused."
+      },
+      {
+        "page": 18,
+        "insight": "The following slide shows training data under a parameterized score surface and a learned model after loss minimization, but it does not isolate likelihood as a function of one candidate parameter."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 pages of the local deck for likelihood and MLE, then rendered and visually inspected the complete immediate neighborhood on pages 16-18. Page 17 is the exact relevant slide. No deck image, equation layout, wording, color system, or geometry is reused; the article visual instead derives an original Bernoulli parameter sweep."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On the Mathematical Foundations of Theoretical Statistics",
+        "url": "https://doi.org/10.1098/rsta.1922.0009",
+        "usage": "Used as the primary historical source for Fisher's formulation of likelihood-based parameter estimation.",
+        "license": "The 1922 Royal Society paper is historically published material and no permissive figure-reuse license was established. No figure, prose, notation layout, or data is copied."
+      },
+      {
+        "title": "Deep Learning, Chapter 5: Machine Learning Basics",
+        "url": "https://www.deeplearningbook.org/contents/ml.html",
+        "usage": "Used as an authoritative textbook source for maximum likelihood estimation, conditional log-likelihood, and the connection between maximum likelihood and cross-entropy.",
+        "license": "The book is available to read online, but the site does not grant general permission to reuse its figures. No figure, prose, example, or layout is copied."
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Maximum Likelihood",
+        "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda3652.htm",
+        "usage": "Used as an authoritative government reference confirming that MLE is a function-optimization problem over likelihood equations.",
+        "license": "This U.S. government reference was consulted for verification only. No text, software, table, figure, or page layout is reproduced."
+      }
+    ],
+    "notes": "The visual is an original deterministic derivation for ten fixed Bernoulli observations containing seven successes and three failures. Independence gives L(p; D) = p^7(1-p)^3. Differentiating the log-likelihood gives 7/p - 3/(1-p) = 0, hence p = 7/10; the second derivative is negative on 0 < p < 1, so this is the unique maximum. The plotted vertical scale divides L(p; D) by L(0.7; D), making the peak one without changing its location. The values are synthetic arithmetic, not empirical data."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed the full 214-page deck, rendered and inspected pages 16-18, and checked a primary paper, an authoritative textbook, and NIST guidance before selecting an original likelihood parameter sweep."
+  },
+  "implementation": {
+    "visualIds": [
+      "mle-bernoulli-parameter-sweep"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description containing the fixed observations, likelihood formula, curve behavior, and optimum. Successes and failures use written digits plus solid versus dashed outlines; the optimum uses a vertical guide, point, formula, and direct label, so no meaning depends on color. A 360-unit viewBox scales to the article column without a minimum width at 390 CSS pixels. Established theme tokens preserve dark-mode contrast, and shared print rules supply a light high-contrast palette."
+  }
+}
