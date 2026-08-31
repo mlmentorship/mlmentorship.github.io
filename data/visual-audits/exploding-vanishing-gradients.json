@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "exploding-vanishing-gradients",
+  "article": "src/content/posts/2026-03-24-exploding-vanishing-gradients.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Predict whether a gradient grows, stays stable, or vanishes as a small representative Jacobian scale compounds over many backward steps.",
+  "mediumRationale": "A deterministic SVG line plot is the smallest medium that makes exponential separation through depth spatially immediate. A logarithmic vertical scale keeps the exploding, stable, and vanishing paths readable in one compact phone-width panel while direct endpoint labels preserve the exact factors.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show the backward route but cannot faithfully encode the quantitative exponential separation in gradient magnitude.",
+    "svg": "Selected because a deterministic log-scale plot can align three depth trajectories, exact endpoint factors, and the shared starting magnitude without runtime JavaScript or horizontal scrolling.",
+    "semanticHtml": "Rejected because a table can list factors at selected depths but makes the compounding trajectory and widening separation harder to perceive.",
+    "interaction": "Rejected because changing rho could be exploratory, but interaction adds controls and state to a lesson fully taught by three representative static cases.",
+    "paperReuse": "Rejected because the primary papers contain broader experimental and geometric figures, no reviewed figure exactly matches this single-objective comparison, and public paper access was not treated as figure-reuse permission. No paper or deck figure, coordinates, data, wording, or layout is copied.",
+    "noVisual": "Rejected because the equation states rho raised to depth, but prose alone requires readers to mentally convert small per-layer deviations into a four-orders-of-magnitude separation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 41,
+        "insight": "States that sigmoid saturation kills gradients and identifies activation choice as a source of vanishing gradients; it also mentions exploding and vanishing gradients in the GELU discussion."
+      },
+      {
+        "page": 44,
+        "insight": "Explains that local gradients combine by the chain rule, shows layer gradients as matrix products, and notes that multiply operations and data scale change gradient magnitude."
+      },
+      {
+        "page": 57,
+        "insight": "Connects Xavier initialization and BatchNorm to controlling activation and gradient scale, and warns about numerically tiny per-example gradients."
+      },
+      {
+        "page": 148,
+        "insight": "Explains that residual or skip connections let gradients flow more easily and alleviate vanishing gradients in deeper networks."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for vanishing, exploding, gradient magnitude, chain-rule multiplication, initialization, normalization, residual, and skip-connection terminology. Exact relevant pages 41, 44, 57, and 148 were extracted and inspected with their neighbors: pages 40 and 42 are section dividers around activation functions; page 43 is a backpropagation title slide and page 45 moves to loss optimization; page 56 is a project-practice divider and page 58 starts data inspection; pages 147 and 149 cover image classification context and Faster R-CNN. None provides a cumulative gradient-versus-depth plot, so no slide image, geometry, text, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Understanding the difficulty of training deep feedforward neural networks",
+        "url": "https://proceedings.mlr.press/v9/glorot10a.html",
+        "usage": "Used as the primary source for the connection between trainability and layer-Jacobian singular values near one, activation saturation, and variance-preserving initialization.",
+        "license": "PMLR states that authors retain copyright. No figure-reuse grant was established or relied on; the visual independently plots the article's illustrative rho powers and copies no figure, experimental data, prose, or layout."
+      },
+      {
+        "title": "On the difficulty of training recurrent neural networks",
+        "url": "https://proceedings.mlr.press/v28/pascanu13.html",
+        "usage": "Used as the primary analytical source for vanishing and exploding gradients as repeated Jacobian products and for gradient norm clipping as a response to explosion.",
+        "license": "PMLR states that authors retain copyright. No source figure is reused; only the general mathematical mechanism validates the original schematic."
+      },
+      {
+        "title": "Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification",
+        "url": "https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html",
+        "usage": "Used as the primary source to verify variance-preserving initialization designed specifically for rectifier networks.",
+        "license": "CVF open access establishes public paper access but was not treated as permission to republish figures. No figure, result, wording, or visual structure is copied."
+      },
+      {
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html",
+        "usage": "Used as the primary source to verify that identity shortcut connections improve optimization of substantially deeper networks.",
+        "license": "CVF open access was not treated as a general figure-reuse license. The implementation does not reproduce the residual-network architecture, paper data, figures, or layout."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is how a modest representative per-layer Jacobian norm, repeatedly multiplied, becomes a severe gradient-scale failure far from the loss. The SVG therefore uses only calculated values from rho^k for rho 0.9, 1, and 1.1, not empirical or paper-specific data. Direct labels, vertical position, endpoint values, and a dashed stable trajectory encode every distinction independently of color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the full article, searched all 214 deck pages and inspected each relevant page with its neighbors, reviewed four primary sources, corrected the depth example to count Jacobian multiplications explicitly, and selected an original compact log-scale plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "gradient-magnitude-through-depth"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that gives the start, direction, rho values, and exact endpoints for all trajectories. Direct labels and vertical position distinguish every case, while the stable path is additionally dashed, so color is not required. Its 360-unit viewBox scales fluidly with no minimum width or horizontal scroll at 390 CSS pixels. Established theme variables provide light and dark contrast; shared print tokens force a light high-contrast canvas and keep the figure together."
+  }
+}
