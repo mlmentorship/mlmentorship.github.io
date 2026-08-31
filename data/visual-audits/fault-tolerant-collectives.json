@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "fault-tolerant-collectives",
+  "article": "src/content/posts/2026-07-11-fault-tolerant-collectives.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish unsafe collective replay after a partial optimizer commit from safe recovery at a shared checkpoint boundary.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align four rank-local states at the failure point and branch them into unsafe communication-only replay versus safe coordinated rollback. Direct state labels make the consistency invariant visible without adding runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can express the recovery branches, but automatic layout makes it difficult to align simultaneous rank-local states and show precisely which ranks applied the optimizer transition.",
+    "svg": "Selected: deterministic geometry keeps four ranks on one timeline, contrasts the two recovery scopes, and preserves a compact phone-width reading order.",
+    "semanticHtml": "Rejected: a table can list rank states but does not clearly connect the shared checkpoint, partial commit, and two divergent recovery paths.",
+    "interaction": "Rejected: simulating different failed ranks would add controls and state without improving the core invariant that all ranks must restart from one application-level commit boundary.",
+    "paperReuse": "Rejected: runtime documentation and the ULFM literature include useful architecture and API material, but no permissive license was established for candidate figures. The shipped diagram uses original geometry, wording, and a synthetic four-rank state trace.",
+    "noVisual": "Rejected: the prose correctly says that collective replay is insufficient, but readers must mentally track different rank-local optimizer states and distinguish communicator recovery from application-state recovery."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The LLM training slide mentions FSDP and mixed-precision communication, but does not discuss collectives, worker failure, rollback, or state consistency."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision training slide discusses numeric formats and optimizer-state memory, but not distributed failure semantics."
+      },
+      {
+        "page": 115,
+        "insight": "The training-stack slide combines FSDP or ZeRO, activation checkpointing, and other throughput techniques; its checkpointing reference is activation recomputation rather than fault recovery."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline system-design slide covers data availability and collection, not failed ranks or communication recovery."
+      },
+      {
+        "page": 167,
+        "insight": "The neighboring modeling slide covers task definition and baselines, with no distributed-training recovery content."
+      },
+      {
+        "page": 168,
+        "insight": "The production-serving slide covers model gating and monitoring but not training collectives or commit boundaries."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for fault tolerance, all-reduce, collectives, NCCL, process groups, rank failure, stragglers, network partitions, elastic membership, and checkpoints. It contains no dedicated fault-tolerant-collective or all-reduce slide. Pages 107, 114-115, and 166-168 were inspected as the nearest distributed-training, optimizer-state, checkpointing, and systems neighborhoods; none explains communicator failure or application-level rollback. No deck image, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Elastic Agent — PyTorch documentation",
+        "url": "https://docs.pytorch.org/docs/main/elastic/agent.html",
+        "usage": "Used as official runtime documentation to verify that fault recovery tears down all workers and restarts everyone, and that membership changes also restart the worker group.",
+        "license": "PyTorch documentation is BSD-3-Clause licensed through the PyTorch repository, but no documentation figure or prose is reproduced. The visual is independently authored."
+      },
+      {
+        "title": "User-Level Fault Mitigation (ULFM) — Open MPI documentation",
+        "url": "https://docs.open-mpi.org/en/v5.0.x/features/ulfm.html",
+        "usage": "Used as official implementation documentation to verify failure-aware communicator operations: revoke interrupts pending communication, shrink removes failed ranks, and agree propagates failure knowledge.",
+        "license": "Open MPI documentation is covered by the project's BSD license, but no diagram, wording, API example, or source code is copied."
+      },
+      {
+        "title": "Post-failure recovery of MPI communication capability: Design and rationale",
+        "url": "https://doi.org/10.1177/1094342013488238",
+        "usage": "Used as the primary research reference for restoring communication capability after process failure and separating MPI-level recovery mechanisms from application recovery policy.",
+        "license": "The SAGE journal article is publisher-controlled and no permissive figure-reuse license was identified. No paper figure, prose, or experimental result is reused."
+      },
+      {
+        "title": "Distributed Checkpoint — PyTorch documentation",
+        "url": "https://docs.pytorch.org/docs/main/distributed.checkpoint.html",
+        "usage": "Used as official documentation to verify that distributed recovery includes model and sharded optimizer state and supports load-time resharding across cluster topologies.",
+        "license": "PyTorch documentation is BSD-3-Clause licensed, but no documentation figure, prose, code, or checkpoint layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that communicator recovery and optimizer-transition recovery have different scopes. If ranks have mixed states S_t and S_(t-1), a communication-only retry cannot infer or undo which optimizer applications committed. The original four-rank example therefore contrasts replay from mixed state with restoring model, optimizer, scheduler, scaler, RNG, and data position from one committed checkpoint before replaying the complete step."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the nearest distributed-training neighborhoods, then checked official PyTorch, Open MPI, and distributed-checkpoint documentation plus the primary ULFM paper before selecting an original commit-boundary state diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "collective-failure-commit-boundary"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description narrating every rank state and both recovery paths. Rank labels, explicit S_t versus S_(t-1) notation, solid versus dashed outlines, branch headings, arrows, and written outcomes make color redundant. The 360-unit viewBox has no minimum width and uses existing 11-14 unit visual labels for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and keep the figure together."
+  }
+}
