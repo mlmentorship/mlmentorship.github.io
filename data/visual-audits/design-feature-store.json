@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-feature-store",
+  "article": "src/content/posts/2026-01-23-design-feature-store.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Separate the feature store's two time contracts: reconstruct the latest eligible historical value for every training example while retrieving the latest materialized value for a live serving request.",
+  "mediumRationale": "A full-width two-lane Mermaid is the smallest medium that can keep one versioned definition visibly shared while separating the offline historical as-of path from the online latest-value path without shrinking labels. It teaches why the two stores reduce skew together yet cannot be conflated, without repeating the neighboring article's detailed late-arrival timeline.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a branching dataflow with shared computation, distinct state stores, and two retrieval paths. Labelled edges and grouped lanes preserve the temporal and SLA relationships, while the established full-width tall-flow class supplies readable themed rendering.",
+    "svg": "Rejected because no scale, plotted quantity, or fixed geometry carries the lesson; hand-positioning the same boxes and arrows would add maintenance cost without technical precision.",
+    "semanticHtml": "Rejected because a comparison table could list offline and online properties but would obscure that both paths originate from one definition and that training joins examples to history while serving performs a current key lookup.",
+    "interaction": "Rejected because switching between historical timestamps could demonstrate individual lookup results, but controls and state add complexity when the article needs the stable architectural distinction rather than a query simulator.",
+    "paperReuse": "Rejected because Feast and the AzureML paper contain denser product-specific architecture figures. Even where source material is permissively available, no external artwork, coordinates, visual arrangement, wording, or example is needed for this article-specific two-time contract.",
+    "noVisual": "Rejected because the prose names both stores but leaves readers to compose why shared definitions do not imply shared retrieval semantics. The spatial split makes the historical-versus-latest distinction inspectable in one pass."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks about training, inference, features, latency, and scale, but does not define a feature-store boundary or temporal retrieval contract."
+      },
+      {
+        "page": 162,
+        "insight": "The production-considerations slide asks about standard production frameworks, out-of-time test data, feature generation, and production checks; it motivates consistent infrastructure but shows no offline/online feature path."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring worked design process distinguishes training data from live data and asks how both transform through the system, but it does not specify shared feature definitions or storage semantics."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide covers inference performance, personalization, evaluation, and constraints; it supplies design context but no feature-store mechanism."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers source availability, storage, update frequency, preprocessing, missing data, and train-test distribution shift, the closest deck treatment of feature inputs before modeling."
+      },
+      {
+        "page": 167,
+        "insight": "The adjacent modeling slide moves from data into model choice and training scale and adds no historical or online retrieval semantics."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide asks about online updates, monitoring, confidence, latency, compute, and privacy, establishing a distinct production SLA but not an online feature store."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide explicitly names training-serving skew and says to log serving-time features for training, independently supporting parity while providing no dual-store architecture."
+      },
+      {
+        "page": 170,
+        "insight": "The algorithms-and-data-structures divider closes the ML production neighborhood and contains no feature-management guidance."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for feature store, offline store, online store, point-in-time, training-serving skew, feature freshness, data lineage, feature pipeline, and production terms. Page 151 is a false text match about numerical stable diffusion. Pages 161-163 and 165-170 were read as the full relevant ML-design and production neighborhoods. The deck discusses data transformation and skew but contains no feature-store or two-time retrieval diagram. No deck image, text, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Feast: Point-in-time joins",
+        "url": "https://docs.feast.dev/getting-started/concepts/point-in-time-joins",
+        "usage": "Used as official implementation documentation to verify that historical retrieval reproduces feature state separately for each entity timestamp by scanning backward within the configured window, and that availability filtering prevents later corrections from leaking backward.",
+        "license": "Feast's documentation source is distributed in its Apache License 2.0 repository. No documentation figure, table, code, example, prose, or layout is copied; the diagram is an original citation-only synthesis."
+      },
+      {
+        "title": "Feast: Offline store and online store",
+        "url": "https://docs.feast.dev/getting-started/components/offline-store",
+        "usage": "Used with Feast's official online-store documentation to verify that the offline interface serves historical training retrieval and materialization, while the online store supports low-latency retrieval and retains only the latest feature values per entity key.",
+        "license": "The Feast repository is Apache License 2.0, including documentation source. The implementation does not adapt its architecture image, sample tables, code, prose, or arrangement; only the documented store contracts are cited."
+      },
+      {
+        "title": "Managed Geo-Distributed Feature Store: Architecture and System Design",
+        "url": "https://arxiv.org/abs/2305.20077",
+        "usage": "Used as a primary systems paper from the AzureML Feature Store team to cross-check feature reuse and lineage, offline-online skew, point-in-time retrieval, scheduled materialization, high-throughput offline access, and low-latency online access.",
+        "license": "The paper is publicly readable on arXiv, but a permissive figure-reuse grant was not established. No paper figure, prose, example, data, or architecture layout is reproduced."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as authoritative production guidance to cross-check training-serving skew, logging the exact features used at serving time, testing infrastructure independently from ML, and choosing simple shared infrastructure before adding complexity.",
+        "license": "Google Developers labels page content CC BY 4.0 except where otherwise noted and excludes separately licensed media. No text, image, code, or layout is reused; citation alone supports the parity rationale."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why a feature store needs two storage and retrieval contracts even when feature definitions are shared. Historical training retrieval is relative to each example timestamp and must preserve all eligible versions; low-latency serving normally looks up the latest materialized value for an entity. The original diagram deliberately teaches that branch rather than duplicating the separate point-in-time article's event-time-versus-availability-time example."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the full matching ML-production neighborhoods, compared the existing point-in-time visual, and checked official Feast contracts, a primary AzureML systems paper, and Google production guidance before selecting an original compact two-lane flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "feature-store-two-time-contract"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description naming both stores, requests, retrieval rules, and outputs. Group labels, cylinder store shapes, decision shape, direct text, and arrows carry the distinction without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; established theme tokens provide dark-mode contrast and print resets the width floor for a light, page-safe palette. The surrounding prose and caption preserve the lesson if client-side Mermaid rendering is unavailable."
+  }
+}

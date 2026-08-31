@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-llm-red-team-program",
+  "article": "src/content/posts/2026-07-11-design-llm-red-team-program.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how an adaptive red-team finding becomes an owned mitigation, a residual-risk release decision, and a static regression test while production evidence updates the threat model.",
+  "mediumRationale": "A full-width Mermaid loop is the smallest medium that distinguishes adaptive discovery from static recurrence testing and connects both to mitigation, release gates, and production feedback without shrinking stage labels. The lesson is a lifecycle relationship rather than a quantity or geometry, so labelled paths and decision nodes carry more meaning than fixed coordinates.",
+  "mediumComparison": {
+    "mermaid": "Selected because a flowchart makes the operating loop and its two distinct feedback paths explicit: failed retests return to adaptive attack, while sanitized findings enter the static regression suite.",
+    "svg": "Rejected because deterministic coordinates would add maintenance cost without teaching shape, scale, or a quantitative relationship.",
+    "semanticHtml": "Rejected because a checklist or table can name program stages but obscures how findings become tests and how production evidence reopens the threat model.",
+    "interaction": "Rejected because stepping through a fixed lifecycle would add controls and hidden state without improving the core distinction between discovery and recurrence.",
+    "paperReuse": "Rejected because the sources cover complementary parts of the lifecycle rather than one article-specific program loop. No external figure, layout, wording, benchmark value, or artwork is copied.",
+    "noVisual": "Rejected because the prose names all stages but leaves readers to assemble two easy-to-confuse loops: adaptive search for novel failures and deterministic regression tests for known failures."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 48,
+        "insight": "The sharpness-aware minimization slide uses an adversarial weight perturbation for optimization robustness; this is not security red teaming and contributes no program lifecycle."
+      },
+      {
+        "page": 79,
+        "insight": "The generative-model overview uses 'adversarial' in Generative Adversarial Networks, not in the attacker or security-evaluation sense."
+      },
+      {
+        "page": 87,
+        "insight": "The neighboring model-family slide again names GANs but contains no threat model, attack campaign, mitigation, or release gate."
+      },
+      {
+        "page": 104,
+        "insight": "The instruction-tuning slide discusses alignment to human instructions but does not test adversarial instructions or system effects."
+      },
+      {
+        "page": 105,
+        "insight": "The Toolformer slide explains model-selected APIs, timing, arguments, and returned results, establishing an adjacent tool attack surface without authorization or security evaluation."
+      },
+      {
+        "page": 106,
+        "insight": "The following LLM-data slide moves to corpus scaling and filtering and adds no system red-team mechanism."
+      },
+      {
+        "page": 160,
+        "insight": "The ML design section divider introduces a five-part interview structure but no security-specific stage."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design slide mentions bad-actor systems, privacy, stress tests, evaluation, and downstream impact, but does not define an adaptive security program."
+      },
+      {
+        "page": 162,
+        "insight": "The production-considerations checklist covers business actions, global launches, privacy, reproducibility, error analysis, and offline/online evaluation; it is useful adjacent release context but has no threat-model-to-retest loop."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring design walkthrough focuses on requirements and data flow rather than adversarial evaluation."
+      },
+      {
+        "page": 164,
+        "insight": "The experimentation slide connects offline and online measurement to a product hypothesis but does not cover adaptive attackers or severity-weighted gates."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide covers goals, constraints, evaluation, and deployment timing, with no security testing lifecycle."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide discusses privacy and user feedback but not poisoning, exfiltration, or red-team operations."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide discusses baselines and scale and provides no security evaluation guidance."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide covers model gating, monitoring, user feedback, privacy, and model updates, but no adversarial discovery or finding workflow."
+      },
+      {
+        "page": 169,
+        "insight": "The adjacent Rules of Machine Learning slide emphasizes monitoring, policy layers, launch decisions, and error analysis but does not connect incidents to security regressions."
+      }
+    ],
+    "notes": "All 214 physical pages of the local deck were text-indexed independently for red teaming, jailbreaks, prompt injection, adversarial attacks, security, threats, poisoning, backdoors, extraction, membership inference, tools, privacy, stress tests, production gating, and monitoring. Pages 47-49, 78-80, 86-88, 104-106, and 160-169 were read as complete matching neighborhoods. The first three matches use 'adversarial' for optimization or GANs, not security. Toolformer and production material only establish adjacent attack-surface and release concepts. The deck contains no red-team lifecycle and no artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile (NIST AI 600-1)",
+        "url": "https://doi.org/10.6028/NIST.AI.600-1",
+        "usage": "Used as official guidance to verify lifecycle risk management, structured red teaming, incident disclosure, continuous monitoring, and measurement of both risks and mitigation impacts.",
+        "license": "NIST employee-created works are generally not subject to U.S. copyright, with broad reuse rights described by NIST and caveats for third-party content. No NIST prose, table, figure, or layout is reused."
+      },
+      {
+        "title": "Red Teaming Language Models with Language Models",
+        "url": "https://arxiv.org/abs/2202.03286",
+        "usage": "Used as a primary paper to verify automated generation of diverse adversarial tests and the value of attacker methods that search beyond a fixed hand-written prompt list.",
+        "license": "Public arXiv access is not treated as permission to reuse figures. No paper text, prompts, results, data, figure, or visual arrangement is copied."
+      },
+      {
+        "title": "AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents",
+        "url": "https://arxiv.org/abs/2406.13352",
+        "usage": "Used as a primary agent-security evaluation source to verify testing attacks and defenses in dynamic tool-using tasks while measuring both attack success and benign task utility.",
+        "license": "Public arXiv access is not treated as figure-reuse permission. No benchmark tasks, values, prose, figures, or layouts are reproduced."
+      },
+      {
+        "title": "MITRE ATLAS",
+        "url": "https://atlas.mitre.org/",
+        "usage": "Used as an authoritative, maintained knowledge base for mapping observed adversary tactics and techniques into a reusable attack taxonomy rather than organizing tests only by prompt string.",
+        "license": "MITRE's ATLAS data repository is Apache-2.0 licensed. The implementation does not copy or adapt ATLAS data, names, matrices, icons, figures, or layouts; it uses the source only to validate taxonomy practice."
+      },
+      {
+        "title": "Python Risk Identification Tool for generative AI (PyRIT)",
+        "url": "https://github.com/Azure/PyRIT",
+        "usage": "Used as official open-source tooling evidence that red-team orchestration supports multi-turn and adaptive attack strategies, scoring, memory, and reusable datasets as parts of an operating program.",
+        "license": "PyRIT is MIT licensed. No source code, logo, documentation text, examples, screenshots, or visual structure is reused."
+      }
+    ],
+    "notes": "The visual is an original synthesis of the article and reviewed sources. It deliberately separates a living adaptive campaign, which searches for novel reachable failures under an attacker budget, from a static regression suite, which checks that a known sanitized failure does not recur. Findings require reproducibility, severity, reachability, an owner, mitigation, and retest. Release follows residual risk and utility evidence rather than aggregate attack success alone; production near misses and incidents can reopen the threat model."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected every relevant neighborhood, rejected optimization and GAN false-positive matches, and checked primary language-model and agent evaluation papers plus official NIST, MITRE, and Microsoft sources before selecting an original program loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "adaptive-red-team-release-loop"
+    ],
+    "accessibility": "The Mermaid source provides an accessible title and complete description. Numbered stages, decision diamonds, explicit branch labels, node boundaries, and solid versus dashed feedback paths preserve the lesson without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; shared theme tokens support dark mode and print resets the width floor for a light page-safe palette."
+  }
+}

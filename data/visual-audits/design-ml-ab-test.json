@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-ml-ab-test",
+  "article": "src/content/posts/2026-07-10-design-ml-ab-test.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Apply validity, practical-effect, and guardrail gates in order so a statistically significant result is not mistaken for a ship decision.",
+  "mediumRationale": "A full-width Mermaid decision flow is the smallest medium that makes experiment validity a prerequisite for interpretation, separates a precommitted worthwhile effect from mere statistical significance, and gives guardrails an explicit veto before staged rollout without compressing the gate labels.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled decision branches express the ordered launch gates and their stop, diagnose, iterate, and ship outcomes directly using the established responsive diagram primitive.",
+    "svg": "Rejected: this lesson is conditional rather than geometric or quantitative. A confidence-interval plot would teach one statistical gate while obscuring validity and guardrail vetoes.",
+    "semanticHtml": "Rejected: a decision table could enumerate outcomes but would not make the prerequisite ordering as clear as one top-to-bottom path.",
+    "interaction": "Rejected: controls for hypothetical p-values, intervals, and guardrails would add state and test combinations without improving the single launch-rule inference.",
+    "paperReuse": "Rejected: the reviewed sources establish experiment trustworthiness, effect interpretation, and metric roles, but none supplies this article-specific gate sequence. No source figure, layout, wording, or data is reused.",
+    "noVisual": "Rejected: the prose names all required ingredients, but the hardest mental model is their logical composition—especially why p < 0.05 cannot bypass invalid assignment, an economically trivial effect, or a harmful guardrail."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 140,
+        "insight": "The preceding search-system slide describes a second-stage ranker and logged interaction labels, establishing the model context but no online decision rule."
+      },
+      {
+        "page": 141,
+        "insight": "The search experimentation slide explicitly separates offline ranking metrics from online A/B outcomes and says the model would eventually be deployed into an A/B test, but gives no randomization, validity, uncertainty, or guardrail gates."
+      },
+      {
+        "page": 142,
+        "insight": "The neighboring slide moves to advertising-system design and adds no controlled-experiment guidance."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview distinguishes goal, leading, debug, and guardrail metrics, supporting multiple metric roles without defining a ship decision."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for online A/B setup, experiment duration, statistical significance, and success criteria, but does not distinguish statistical from practical significance or make data quality a prerequisite."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed-design example introduces high-level system and data design before experimentation and contains no launch threshold."
+      },
+      {
+        "page": 164,
+        "insight": "The worked example asks candidates to state a falsifiable effect hypothesis, such as a 0.5% engagement lift, and explain offline and online tests; this is the closest deck support for a precommitted worthwhile effect."
+      },
+      {
+        "page": 165,
+        "insight": "The following slide covers project constraints such as deployment time, compute, and staffing rather than experiment interpretation."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide asks which experiments ensure all constraints are met and which metrics are monitored, supporting a pre-launch constraint gate."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of ML slide says to measure model deltas and let launch decisions depend on more than one metric, but does not provide an uncertainty-aware launch flow."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) searched all 214 physical PDF pages independently for A/B testing, experiments, randomization, hypotheses, p-values, statistical significance, confidence intervals, power, minimum detectable effects, online and offline metrics, guardrails, sample-ratio mismatch, interference, spillovers, and novelty. Pages 140-142, 161-165, and 168-169 were read as the complete matching neighborhoods. The deck motivates online testing and multiple metric roles but has no ordered validity-to-launch decision diagram. No deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Controlled experiments on the web: survey and practical guide",
+        "url": "https://doi.org/10.1007/s10618-008-0114-1",
+        "usage": "Used as a primary practical reference for randomized online experiments, power, validity checks, and using an overall evaluation criterion to inform product decisions.",
+        "license": "The Springer publication is copyrighted and its public record does not grant general figure-reuse rights. No figure, table, wording, or empirical result is copied."
+      },
+      {
+        "title": "Diagnosing Sample Ratio Mismatch in Online Controlled Experiments",
+        "url": "https://www.microsoft.com/en-us/research/publication/diagnosing-sample-ratio-mismatch-in-online-controlled-experiments-a-taxonomy-and-rules-of-thumb-for-practitioners/",
+        "usage": "Used as a primary KDD paper to verify that sample-ratio mismatch is evidence of assignment, execution, logging, or analysis defects and must be diagnosed before trusting treatment effects.",
+        "license": "The ACM paper and Microsoft-hosted record do not grant permission to republish figures here. No taxonomy figure, example, measured prevalence, prose, or layout is reused."
+      },
+      {
+        "title": "A Dirty Dozen: Twelve Common Metric Interpretation Pitfalls in Online Controlled Experiments",
+        "url": "https://www.microsoft.com/en-us/research/publication/a-dirty-dozen-twelve-common-metric-interpretation-pitfalls-in-online-controlled-experiments/",
+        "usage": "Used as a primary KDD paper to cross-check that statistically valid metric movements can still be misinterpreted and lead to harmful product decisions.",
+        "license": "The publication is copyrighted and no permissive figure license was identified. The visual copies no figure, case study, wording, metric, or result."
+      },
+      {
+        "title": "Trustworthy Online Controlled Experiments: A Practical Guide to A/B Testing",
+        "url": "https://www.cambridge.org/core/books/trustworthy-online-controlled-experiments/D97B26382EB0EB2DC2019A7A7B518F59",
+        "usage": "Used as the authoritative textbook reference for pre-experiment hypotheses, overall evaluation criteria, guardrail metrics, confidence intervals, practical significance, and ship decisions.",
+        "license": "Cambridge University Press retains copyright and does not grant general figure-reuse permission on the catalog page. No book figure, text, example, or visual organization is reproduced."
+      },
+      {
+        "title": "Patterns of Trustworthy Experimentation: During-Experiment Stage",
+        "url": "https://www.microsoft.com/en-us/research/articles/patterns-of-trustworthy-experimentation-during-experiment-stage/",
+        "usage": "Used as official Microsoft experimentation guidance to verify the separate roles of data-quality, primary, diagnostic, and guardrail metrics and that SRM generally invalidates effect interpretation.",
+        "license": "The article is publicly readable, but no permissive license for its illustrations was identified. No illustration, taxonomy table, wording, or product example is copied."
+      }
+    ],
+    "notes": "The visual presents one conservative precommitted launch policy, not a universal statistical theorem. First validate assignment, exposure, logging, SRM, and the planned analysis; invalid data cannot be rescued by a small p-value. Next compare the treatment-effect estimate and confidence interval with the minimum worthwhile effect under the experiment's prespecified rule. This is stricter and more decision-relevant than merely excluding zero. Finally apply guardrail and critical-slice constraints as vetoes. Passing all gates authorizes staged rollout with monitoring and rollback, not an irreversible full launch. Tests using non-inferiority guardrails, sequential designs, or risk-adjusted utility can instantiate different thresholds while preserving this order."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected every relevant neighborhood, then reviewed three primary experimentation papers, an authoritative textbook, and official Microsoft guidance before selecting an original launch-gate decision flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "ml-ab-test-launch-gates"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Diamond shapes, explicit pass/fail branch labels, numbered gates, and outcome text carry all meaning without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; print resets the width floor and inherits shared theme-aware behavior."
+  }
+}

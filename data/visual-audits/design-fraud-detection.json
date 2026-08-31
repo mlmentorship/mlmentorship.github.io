@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-fraud-detection",
+  "article": "src/content/posts/2025-12-25-design-fraud-detection.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how the deployed fraud policy determines which outcomes become labels, then identify why an independently reviewed sample must cover both allowed and declined transactions.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can separate outcome labels from independent review labels, show the missing counterfactual after a decline, and connect both policy branches to a coverage-repair sample while guaranteeing readable labels in the narrow article column.",
+  "mediumComparison": {
+    "mermaid": "Rejected after render testing: labelled branches expressed the semantics, but the complete graph shrank its smallest text to 6.95 CSS pixels, below a readable instructional size.",
+    "svg": "Selected: fixed narrow-column lanes preserve the action split, outcome states, and cross-policy audit sample with controlled text sizes and no runtime layout dependency.",
+    "semanticHtml": "Rejected: a table could inventory label states, but it would obscure that the deployed policy creates those states and therefore shapes the next training set.",
+    "interaction": "Rejected: changing the policy threshold could alter label coverage, but controls would add state while leaving the fundamental observability split unchanged.",
+    "paperReuse": "Rejected: none of the reviewed sources contains this article-specific payment flow, and reuse permission for their figures was not established. No figure, layout, data, or wording is copied.",
+    "noVisual": "Rejected: the prose names label bias and random investigation, but readers must still mentally connect policy action, delayed chargeback observability, missing decline outcomes, and representative label acquisition."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 36,
+        "insight": "The preceding classification-loss slide mentions focal loss for imbalanced data but contains no payment-fraud label process."
+      },
+      {
+        "page": 37,
+        "insight": "The classification-evaluation slide defines precision, recall, ROC, and the benefit-cost operating-point tradeoff, but assumes ground-truth labels are already observed."
+      },
+      {
+        "page": 38,
+        "insight": "The neighboring imbalanced binary-classification example shows why accuracy fails and why precision-recall tradeoffs matter, but does not question how positives and negatives were labeled."
+      },
+      {
+        "page": 39,
+        "insight": "The following calibration slide connects scores to confidence and rejection, but adds no treatment of delayed, missing, or policy-selected fraud outcomes."
+      },
+      {
+        "page": 57,
+        "insight": "The slide before data inspection contains general training notes and marks the boundary of the data-quality neighborhood."
+      },
+      {
+        "page": 58,
+        "insight": "The data-inspection slide explicitly asks readers to inspect imbalance, biases, the labeling process, and label noise, but provides no observation-flow model."
+      },
+      {
+        "page": 59,
+        "insight": "The adjacent training-skeleton slide discusses class-prior initialization and model sanity checks, not selective labels or counterfactual outcomes."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks whether false positives or false negatives cost more and how inference-time outcomes support evaluation."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide asks about annotation quality and cost, user feedback, class imbalance, distribution shift, and data bias, but does not show how a fraud policy controls outcome observability."
+      },
+      {
+        "page": 167,
+        "insight": "The following modeling slide moves from data questions to baseline model selection, marking the end of the relevant system-design neighborhood."
+      }
+    ],
+    "notes": "The complete 214-page local deck was indexed for fraud, chargeback, payment, anomaly, imbalance, precision-recall, active learning, selective labels, annotation, bias, and adversarial behavior. It contains no fraud- or chargeback-specific slide. Physical PDF pages 36-39, 57-59, and 165-167 were extracted independently and read as the complete nearest neighborhoods. They cover imbalanced evaluation, noisy-label inspection, asymmetric costs, and annotation questions, but never connect a deployed action to whether a later outcome can be observed. No deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The Selective Labels Problem: Evaluating Algorithmic Predictions in the Presence of Unobservables",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5958915/",
+        "usage": "Used as the foundational primary source to verify that decision-maker choices determine which instances receive outcomes, making the labelled subset non-random and ordinary evaluation potentially biased.",
+        "license": "The PMC record makes the article readable, but no permissive figure-reuse grant was relied on. No figure, text, application example, result, or layout is reproduced."
+      },
+      {
+        "title": "From Biased Selective Labels to Pseudo-Labels: An Expectation-Maximization Framework for Learning from Biased Decisions",
+        "url": "https://proceedings.mlr.press/v235/chang24e.html",
+        "usage": "Used as a primary peer-reviewed source to cross-check that imputing policy-unobserved labels as negative can amplify labeling bias.",
+        "license": "PMLR papers are publicly available for scholarly use, but the visual does not adapt any paper figure, algorithm, experiment, prose, or visual structure."
+      },
+      {
+        "title": "Reproducible Machine Learning for Credit Card Fraud Detection - Practical Handbook",
+        "url": "https://fraud-detection-handbook.github.io/fraud-detection-handbook/Chapter_4_PerformanceMetrics/ThresholdBased.html",
+        "usage": "Used as an authoritative fraud-detection textbook to verify score-threshold decisions, heavy class imbalance, unequal false-positive and false-negative costs, and the limits of accuracy for fraud evaluation.",
+        "license": "The handbook repository is Apache-2.0 licensed, but its plots, code, numerical examples, and prose are not reused. The implementation is an independently authored policy-label schematic."
+      },
+      {
+        "title": "Payment fraud detection and approval rates",
+        "url": "https://stripe.com/resources/more/payment-fraud-detection-and-approval-rates",
+        "usage": "Used as payment-industry documentation to verify layered rules and ML, allow/challenge/decline actions, delayed disputes, and the coupled fraud-rate, false-positive, chargeback, and approval-rate tradeoffs.",
+        "license": "Stripe retains copyright in its documentation and no figure-reuse permission was identified. No prose, artwork, metrics, or page structure is copied."
+      }
+    ],
+    "notes": "The visual distinguishes two evidence mechanisms. Outcome labels follow the deployed action: an allowed payment may later produce a chargeback or mature without one, while a declined payment has no realized payment outcome and must not be called legitimate. Independent analyst or adjudication review can sample both policy branches and create a separate label source, subject to review quality. That sample supports coverage checks and base-rate or calibration estimates; it does not magically reveal every declined transaction's counterfactual payment outcome. Chargebacks are also delayed and imperfect, so the diagram labels a mature no-chargeback outcome as a noisy negative rather than guaranteed legitimacy."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete fraud-system article, indexed all 214 deck pages and inspected three exact neighboring slide clusters, then checked foundational selective-label research, a recent peer-reviewed treatment, an authoritative fraud handbook, and payment-industry documentation before selecting an original policy-to-label flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "fraud-policy-label-coverage"
+    ],
+    "accessibility": "The SVG provides a linked title and complete description. Every policy action, outcome state, missing-label warning, sampling path, and training result is directly labelled; box boundaries, lane headings, solid arrows, and labelled dashed audit paths carry the lesson without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for controlled readability at 390 CSS pixels; shared theme tokens maintain dark-mode contrast and print uses a light high-contrast palette."
+  }
+}

@@ -60,6 +60,48 @@ Track:
 
 Use adaptive attackers. A static prompt list becomes a regression suite, not a red team.
 
+**Learning objective:** Trace how an adaptive red-team finding becomes an owned mitigation, a residual-risk release decision, and a static regression test while production evidence updates the threat model.
+
+<!-- visual:adaptive-red-team-release-loop -->
+```mermaid
+flowchart TB
+  accTitle: Adaptive red-team discovery and release loop
+  accDescr: The threat model defines assets, attacker capabilities, boundaries, and success conditions. An adaptive campaign searches the whole reachable system for novel attacks under a budget. A finding is triaged by severity, reachability, reproducibility, and utility impact, assigned to an owner, and mitigated. Retesting either returns unacceptable residual risk to adaptive attack or sends acceptable risk to a release gate. A sanitized reproduction also enters a static regression suite, which detects recurrence but does not replace adaptive discovery. Production near misses and incidents update the threat model.
+  Threat["1 · THREAT MODEL<br/>assets · capabilities · boundaries"]
+  Campaign["2 · ADAPTIVE CAMPAIGN<br/>vary path, context, tools, budget"]
+  Outcome{"3 · Reachable<br/>asset impact?"}
+  Coverage["Record coverage,<br/>budget + utility"]
+  Finding["4 · TRIAGE FINDING<br/>severity · repro · owner"]
+  Mitigate["5 · MITIGATE<br/>model + system controls"]
+  Retest{"6 · RETEST<br/>residual risk acceptable?"}
+  Gate["7 · RELEASE GATE<br/>ship · narrow · block"]
+  Regression[("STATIC REGRESSION<br/>known sanitized failures")]
+  Production["PRODUCTION EVIDENCE<br/>near misses · incidents · denials"]
+  Threat ==> Campaign
+  Campaign ==> Outcome
+  Outcome -->|"no"| Coverage
+  Outcome ==>|"yes"| Finding
+  Finding ==> Mitigate
+  Mitigate ==> Retest
+  Retest ==>|"yes"| Gate
+  Retest ==>|"no · search again"| Campaign
+  Finding -. "add reproduction" .-> Regression
+  Regression -. "recurrence check" .-> Retest
+  Gate --> Production
+  Coverage --> Production
+  Production -. "update assumptions" .-> Threat
+  class Threat,Campaign viz-input
+  class Outcome,Finding,Retest viz-focus
+  class Regression viz-state
+  class Mitigate,Coverage viz-neutral
+  class Gate viz-output
+  class Production viz-warning
+  class Threat viz-wide
+  class Threat viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the numbered solid loop to discover, own, mitigate, and retest a reachable failure before making a release decision. The dotted path turns that finding into a static recurrence check; it does not replace the adaptive campaign that found it. Production evidence can reopen the threat model even after release. Original synthesis checked against <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST AI 600-1</a>, <a href="https://arxiv.org/abs/2202.03286">Perez et al.</a>, <a href="https://arxiv.org/abs/2406.13352">AgentDojo</a>, <a href="https://atlas.mitre.org/">MITRE ATLAS</a>, and <a href="https://github.com/Azure/PyRIT">PyRIT</a>.</p>
+
 ## What an L4 answer sounds like
 
 > "Collect jailbreak prompts, run them before launch, add filters, and block anything unsafe. Monitor abuse in production."

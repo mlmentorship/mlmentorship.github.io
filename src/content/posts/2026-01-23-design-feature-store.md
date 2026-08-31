@@ -38,6 +38,40 @@ If you don't have these problems at scale, you don't need a feature store. Most 
 >
 > Reference implementations: Feast (open source), Tecton (commercial), Hopsworks, Vertex AI Feature Store, Databricks Feature Store."
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Separate the two time contracts: reconstruct the past for training, retrieve the latest value for serving.</p>
+
+<!-- visual:feature-store-two-time-contract -->
+```mermaid
+flowchart TB
+	accTitle: One feature definition supports historical training retrieval and latest-value online serving
+	accDescr: A versioned feature definition feeds batch or stream computation. Computed timestamped values are retained in an offline history and materialized into an online key-value store that keeps the latest value per entity. In the training lane, examples supply entity keys and prediction timestamps to a point-in-time join, which selects the latest eligible historical value at or before each example time and produces a training dataset. In the serving lane, a live entity key triggers a low-latency lookup of the latest materialized online value and sends it to the model for a current prediction. The two paths share a definition but have different retrieval semantics and latency contracts.
+	D["Versioned feature definition<br/>entity · schema · transform · freshness"] --> C["Batch or stream computation<br/>timestamp every value"]
+	C --> H[("Offline history<br/>all timestamped values")]
+	C --> O[("Online key-value store<br/>latest value per entity")]
+
+	subgraph TRAIN["TRAINING · reconstruct each example's past"]
+		E["Examples<br/>entity + prediction time"] --> J{"Point-in-time join<br/>latest eligible value<br/>at or before example time"}
+		H --> J
+		J --> T["Training dataset<br/>historically correct features"]
+	end
+
+	subgraph SERVE["SERVING · answer with current materialized state"]
+		R["Live request<br/>entity key"] --> L["Low-latency lookup"]
+		O --> L
+		L --> P["Current model prediction<br/>latest available features"]
+	end
+
+	class E,R viz-input
+	class D,J viz-focus
+	class H,O viz-state
+	class T,P viz-output
+	class D viz-wide
+	class D viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> start from the shared definition, then choose a clock. Training scans offline history backward from each example's timestamp; serving reads the latest materialized value from the online store. Sharing a definition reduces skew, but the stores cannot be conflated because their retrieval and latency contracts differ. Original synthesis checked against the <a href="https://docs.feast.dev/getting-started/concepts/point-in-time-joins">Feast point-in-time join</a>, <a href="https://docs.feast.dev/getting-started/components/online-store">online-store</a>, and <a href="https://arxiv.org/abs/2305.20077">managed feature-store architecture</a> descriptions.</p>
+
 This is L5. Components named, point-in-time correctness explicit, build-or-buy options listed.
 
 ## What an L6 answer adds

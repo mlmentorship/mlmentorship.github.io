@@ -11,6 +11,32 @@ category: "questions"
 
 Turn the offline gain into a launch decision: choose a randomization unit, one primary metric with guardrails, a minimum worthwhile effect fixed in advance, and a rule for what result ships. A p-value is not a decision, and a test that harms users to chase significance is a failed design.
 
+**Learning objective:** Apply validity, practical-effect, and guardrail gates in order so a statistically significant result is not mistaken for a ship decision.
+
+<!-- visual:ml-ab-test-launch-gates -->
+```mermaid
+flowchart TB
+	accTitle: An ML A/B test must pass three launch gates
+	accDescr: An offline model improvement is only a candidate for an online test. Before running, the team commits to the randomization unit, primary metric, minimum worthwhile effect, guardrails, duration, and analysis rule. Gate one checks assignment, exposure, logging, sample-ratio mismatch, and the planned analysis; a failure requires diagnosis and forbids treatment-effect interpretation. Gate two asks whether the effect estimate and confidence interval meet the precommitted worthwhile-effect rule; a statistically significant but too-small effect can fail here. Gate three checks guardrails and critical prespecified slices. A failure means stop, repair, or limit treatment to a justified safer segment. Passing all three gates permits only a staged rollout with monitoring and rollback.
+	O["Offline gain<br/>candidate, not launch evidence"] --> P["Precommit before exposure<br/>unit + primary metric + worthwhile effect<br/>guardrails + duration + analysis"]
+	P --> V{"GATE 1 - VALID?<br/>assignment + exposure + logging<br/>SRM + planned analysis"}
+	V -.->|"fail or unexplained"| D["Diagnose or rerun<br/>do not interpret the effect"]
+	V ==>|"pass"| E{"GATE 2 - WORTHWHILE?<br/>estimate + confidence interval meet<br/>the precommitted effect rule"}
+	E -.->|"no"| I["Iterate or stop<br/>p < 0.05 alone does not ship"]
+	E ==>|"yes"| G{"GATE 3 - SAFE?<br/>guardrails + critical<br/>prespecified slices pass"}
+	G -.->|"no"| H["Stop, repair, or justify<br/>a safer target segment"]
+	G ==>|"yes"| R["Stage rollout<br/>monitor + retain rollback"]
+	class O viz-input
+	class P viz-state
+	class V,E,G viz-focus
+	class D,I,H viz-warning
+	class R viz-output
+	class O viz-wide
+	class O viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the three numbered gates in order. Invalid assignment or telemetry blocks effect interpretation. Valid evidence must then clear the worthwhile-effect rule, not merely exclude zero, and any guardrail regression can still veto launch. Only the all-pass path reaches a monitored, reversible rollout.</p>
+
 ## Start with the decision
 
 Clarify before choosing metrics:

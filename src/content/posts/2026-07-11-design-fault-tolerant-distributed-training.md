@@ -11,6 +11,34 @@ category: "questions"
 
 Start with failure semantics. "Add retries" is unsafe until you know whether the failed operation is idempotent, whether ranks still agree on step and parameters, and whether a retry can duplicate or omit an update.
 
+**Learning objective:** Choose the narrowest safe recovery scope by testing whether ranks share one proven training state before retrying, rebuilding a group, or rolling back.
+
+<!-- visual:distributed-recovery-consistency-gate -->
+```mermaid
+flowchart TB
+	accTitle: State consistency determines distributed-training recovery scope
+	accDescr: A worker exit, collective timeout, slow rank, or checksum mismatch first causes the affected work to stop while logs, topology, and checkpoint evidence are preserved. The system then asks whether participating ranks can prove agreement on the committed step, model and optimizer, random-number state, and data position. If they agree, a narrow retry or group rebuild is allowed only when the operation is idempotent or the algorithm explicitly supports the membership change. Otherwise the system requires a complete integrity-checked checkpoint. A valid checkpoint rolls the affected consistency domain back with all trajectory state; an incomplete checkpoint is rejected in favor of an older committed checkpoint. Both paths require cross-rank validation and lineage recording before training resumes.
+	S["Failure signal<br/>exit • timeout • lag • mismatch"] --> E["Stop affected work<br/>preserve logs + topology + checkpoint evidence"]
+	E --> G{"Do ranks prove one state?<br/>step • model + optimizer<br/>RNG + data position"}
+	G ==>|"yes"| N{"Is narrow recovery valid?<br/>idempotent operation or<br/>supported membership change"}
+	G -.->|"no or uncertain"| C{"Complete, integrity-checked<br/>checkpoint available?"}
+	N ==>|"yes"| L["Retry or rebuild the<br/>smallest valid group"]
+	N -.->|"no"| C
+	C ==>|"yes"| R["Roll back the affected<br/>consistency domain"]
+	C -.->|"no"| O["Reject partial checkpoint<br/>select older committed state"]
+	O --> R
+	L --> V["Cross-rank validation<br/>record lineage, then resume"]
+	R --> V
+	class S viz-input
+	class G,N,C viz-focus
+	class E,O viz-warning
+	class R viz-state
+	class L,V viz-output
+	class S viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> move downward from the symptom, but do not choose a remedy until the consistency gate. Proven aligned state permits only an explicitly safe narrow action. Any disagreement or uncertainty sends the affected consistency domain back to a complete checkpoint; a half-written candidate is evidence to reject, not a recovery point.</p>
+
 ## Four failure classes
 
 ### Fail-stop
