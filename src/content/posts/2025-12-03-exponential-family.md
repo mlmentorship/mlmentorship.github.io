@@ -12,10 +12,10 @@ category: "concepts"
 A distribution is in the **exponential family** if its density / mass function can be written as:
 
 $$
-p(x \mid \theta) = h(x) \exp\big( \eta(\theta)^\top T(x) - A(\theta) \big)
+p(x \mid \eta) = h(x) \exp\big( \eta^\top T(x) - A(\eta) \big)
 $$
 
-with **natural parameter** $\eta(\theta)$, **sufficient statistic** $T(x)$, **base measure** $h(x)$, and **log-partition** $A(\theta)$ (which normalizes).
+with **natural parameter** $\eta$, **sufficient statistic** $T(x)$, **base measure** $h(x)$, and **log-partition** $A(\eta)$ (which normalizes).
 
 Most distributions you use day-to-day are exponential family: Gaussian, Bernoulli, categorical, Poisson, Beta, Gamma, Dirichlet, geometric, exponential. Recognizing them as such gives you free results:
 
@@ -29,11 +29,11 @@ Most distributions you use day-to-day are exponential family: Gaussian, Bernoull
 Given the form above:
 
 - $T(x)$ are the **sufficient statistics** (Bernoulli: $T(x) = x$; Gaussian: $T(x) = (x, x^2)$).
-- $\eta(\theta)$ are the **natural parameters** (Bernoulli: $\eta = \log\frac{p}{1-p}$, the logit; Gaussian: $\eta = (\mu/\sigma^2, -1/(2\sigma^2))$).
-- $A(\theta)$ is the **log-partition function**; gradient gives the mean, Hessian gives the covariance of $T(x)$:
+- $\eta$ are the **natural parameters** (Bernoulli: $\eta = \log\frac{p}{1-p}$, the logit; Gaussian: $\eta = (\mu/\sigma^2, -1/(2\sigma^2))$).
+- $A(\eta)$ is the **log-partition function**; its derivatives with respect to the natural parameter give the mean and covariance of $T(x)$:
 
 $$
-\nabla A(\theta) = \mathbb{E}[T(X)], \qquad \nabla^2 A(\theta) = \mathrm{Cov}(T(X)).
+\nabla_\eta A(\eta) = \mathbb{E}_\eta[T(X)], \qquad \nabla_\eta^2 A(\eta) = \mathrm{Cov}_\eta(T(X)).
 $$
 
 This is why MLE via moment-matching works: the gradient of the log-likelihood is "data sufficient stat minus model expected sufficient stat."

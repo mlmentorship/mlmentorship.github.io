@@ -3,13 +3,13 @@
   "slug": "evaluation-validity-benchmark-contamination",
   "article": "src/content/posts/2026-08-28-evaluation-validity-benchmark-contamination.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "semantic-html",
   "learningObjective": "Distinguish an evaluation that provides independent confirmation from one that has become part of development through repeated feedback.",
-  "mediumRationale": "A compact Mermaid comparison is the smallest medium that makes the change in information flow visible: an untouched hidden evaluation receives a frozen system once, while an adaptively reused benchmark sends results back into system selection. The lesson is relational rather than quantitative, and the established Mermaid renderer already supplies responsive theme and print behavior.",
+  "mediumRationale": "A two-panel semantic comparison is the smallest medium that keeps both role transitions readable in the article column: an untouched hidden evaluation follows a one-way freeze-and-confirm sequence, while an adaptively reused benchmark loops its results back into system selection. Numbered text preserves the complete inference without runtime rendering.",
   "mediumComparison": {
-    "mermaid": "Selected: labelled arrows and two top-to-bottom paths directly contrast independent confirmation with the feedback loop created by repeated benchmark use.",
+    "mermaid": "Rejected after cross-render review: the two subgraphs compressed their labels to 3.7 CSS pixels in the reading column, far below the campaign's readability threshold.",
     "svg": "Rejected: the lesson does not require precise geometry, scales, or plotted values, so custom coordinates would add maintenance without instructional value.",
-    "semanticHtml": "Rejected: a table or paired cards could list differences but would not show benchmark results flowing back into model, prompt, or data selection.",
+    "semanticHtml": "Selected: paired numbered sequences retain the one-way confirmation path and mark repeated benchmark scoring with a loop symbol, while ordinary text stacks cleanly at 390 CSS pixels.",
     "interaction": "Rejected: no parameter sweep or hidden state is needed, and simulated score changes could imply unsupported quantitative effects.",
     "paperReuse": "Rejected: the reviewed papers contain relevant figures and experiments, but none expresses this article's exact two-path synthesis. The Dwork et al. and Brown et al. arXiv records grant only arXiv's non-exclusive distribution license, not a permissive third-party figure-reuse license; no figure was copied. HELM is CC BY 4.0, but reuse would still be larger and less targeted than an original diagram.",
     "noVisual": "Rejected: prose explains several contamination types but leaves the role transition abstract. The feedback-loop comparison shows why the same benchmark ceases to be independent evidence after it guides repeated choices."
@@ -97,6 +97,6 @@
     "visualIds": [
       "independent-confirmation-vs-adaptive-reuse"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description. The two paths are named in text; each node states its role; the valid evidence arrow is thick and directly labelled; and the problematic feedback and unsupported-claim arrows are dashed and directly labelled, so meaning does not depend on color. A top-to-bottom layout, short labels, and no forced dimensions support a 390 CSS-pixel viewport. Established Mermaid theme tokens provide dark-mode and print contrast, while the caption preserves the inference in plain text."
+    "accessibility": "The figure is linked to a direct learning question and its two semantic sections sit in a labelled group. Numbered headings, the explicit repeat symbol and text, named outcomes, and the caption preserve all meaning without color. The established two-column primitive stacks below 640 CSS pixels with ordinary text wrapping and no minimum width; theme tokens support dark mode and shared print rules provide a high-contrast paper rendering."
   }
 }

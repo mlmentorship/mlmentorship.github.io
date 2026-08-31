@@ -79,29 +79,27 @@ Train and test items come from the same repository, author, template, benchmark 
 **Learning objective:** distinguish an evaluation that provides independent confirmation from one that has become part of development through repeated feedback.
 
 <!-- visual:independent-confirmation-vs-adaptive-reuse -->
-```mermaid
-flowchart TB
-	accTitle: Independent confirmation compared with adaptive benchmark reuse
-	accDescr: In the independent path, development data is used to choose a system, then the chosen system is scored once on a hidden evaluation from fresh sources. That score supports only the matching target claim. In the contaminated path, a public benchmark produces scores and inspected errors that drive changes to prompts, data, or checkpoints. A dashed arrow sends each change back to the same benchmark, so its later score is development feedback rather than independent confirmation and cannot by itself support a broad claim.
-	subgraph INDEPENDENT["INDEPENDENT CONFIRMATION"]
-		D["Development data<br/>train + tune"] --> S["Freeze the chosen system"]
-		H["Hidden evaluation<br/>fresh sources"] --> E["Score once"]
-		S --> E
-		E ==>|"evidence matches target"| C["Supported claim<br/>within tested scope"]
-	end
-	subgraph REUSED["ADAPTIVE BENCHMARK REUSE"]
-		B["Public benchmark"] --> R["Score + inspect errors"]
-		R --> T["Change prompt, data,<br/>or checkpoint"]
-		T -. "try again on the same benchmark" .-> B
-		R -. "development feedback,<br/>not untouched confirmation" .-> U["Broad claim<br/>not supported by this score alone"]
-	end
-	class D,H viz-input
-	class S,E viz-focus
-	class C viz-output
-	class B,R,T,U viz-warning
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> the benchmark changes roles when its results influence the next system choice. Keep iteration on development data, freeze the system, and use fresh hidden sources once for confirmation; otherwise limit the claim and confirm the gain on an independent evaluation. Original synthesis informed by <a href="https://arxiv.org/abs/1506.02629">Dwork et al. (2015)</a> on adaptive holdout reuse and <a href="https://arxiv.org/abs/2005.14165">Brown et al. (2020)</a> on benchmark contamination.</p>
+<figure class="learning-figure" aria-labelledby="evaluation-role-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="evaluation-role-title">When does an evaluation confirm a claim instead of shaping the system?</p>
+	<div class="visual-grid--two" role="group" aria-label="Independent confirmation compared with adaptive benchmark reuse">
+		<section class="visual-panel">
+			<h4>INDEPENDENT CONFIRMATION</h4>
+			<p><strong>1 · Develop</strong><br />Train and tune on development data.</p>
+			<p><strong>2 · Freeze</strong><br />Choose the system before opening the final evaluation.</p>
+			<p><strong>3 · Confirm once</strong><br />Score on hidden examples from fresh sources.</p>
+			<p><strong>Result: supported claim</strong><br />Evidence applies within the tested scope.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>ADAPTIVE BENCHMARK REUSE</h4>
+			<p><strong>1 · Score and inspect</strong><br />A public benchmark exposes results and errors.</p>
+			<p><strong>2 · Change the system</strong><br />Adjust prompts, data, or checkpoints.</p>
+			<p><strong>3 · Score the same set again ↺</strong><br />Its feedback now guides development.</p>
+			<p><strong>Result: broad claim unsupported</strong><br />Confirm the gain on fresh hidden sources.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> the benchmark changes roles when its results influence the next system choice. Keep iteration on development data, freeze the system, and use fresh hidden sources once for confirmation; otherwise limit the claim and confirm the gain on an independent evaluation. Original synthesis informed by <a href="https://arxiv.org/abs/1506.02629">Dwork et al. (2015)</a> on adaptive holdout reuse and <a href="https://arxiv.org/abs/2005.14165">Brown et al. (2020)</a> on benchmark contamination.</figcaption>
+</figure>
 
 ## Reduce contamination risk
 

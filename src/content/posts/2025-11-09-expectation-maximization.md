@@ -89,7 +89,7 @@ So $\log p(x; \theta_{t+1}) \ge \log p(x; \theta_t)$. This monotonicity does not
 		<text class="viz-axis-label" x="226" y="207" text-anchor="middle">θ<tspan baseline-shift="sub" font-size="8">t+1</tspan></text>
 		<path d="M116 119Q164 91 216 99" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
 		<path d="M210 93L220 100L209 104Z" style="fill:var(--viz-edge)"></path>
-		<text class="viz-callout" x="165" y="80" text-anchor="middle">M-step raises bound</text>
+		<text class="viz-callout" x="158" y="157" text-anchor="middle">M-step raises bound →</text>
 		<rect class="viz-node viz-node--input" x="12" y="240" width="336" height="48" rx="5"></rect>
 		<text class="viz-node-label" x="180" y="259">1 · E-step: make the bound tight</text>
 		<text class="viz-node-value" x="180" y="277">q<tspan baseline-shift="sub" font-size="8">t</tspan> = p(z|x; θ<tspan baseline-shift="sub" font-size="8">t</tspan>) ⇒ KL gap = 0</text>
