@@ -24,6 +24,60 @@ At each step:
 5. stop when no live candidates remain, the token budget is exhausted, or a valid early-stop bound proves no live beam can beat the best finished one;
 6. rank finished hypotheses with one consistent final scoring rule.
 
+<!-- visual:beam-search-live-finished-transition -->
+<figure class="learning-figure" aria-labelledby="beam-pools-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="beam-pools-title">When does an EOS hypothesis leave the expandable beam?</p>
+	<div class="visual-grid--two" role="group" aria-label="One beam-search step routes EOS candidates to a finished pool before pruning only the live candidates">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 250" role="img" aria-labelledby="beam-expand-title beam-expand-desc">
+				<title id="beam-expand-title">Every live prefix expands and accumulates log probability</title>
+				<desc id="beam-expand-desc">With beam size two, live prefix A has cumulative log score negative 0.20 and live prefix B has negative 0.35. A expands to A x at negative 0.30, A EOS at negative 0.45, and A z at negative 0.90. B expands to B y at negative 0.40, B x at negative 0.75, and B EOS at negative 1.15. Each child score is its parent score plus the new token log probability.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="217" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">1 · EXPAND EVERY LIVE PREFIX</text>
+				<path d="M98 73L174 52M98 73L174 86M98 73L174 120M98 177L174 154M98 177L174 188M98 177L174 222" style="fill:none;stroke:var(--viz-edge);stroke-width:1.4"></path>
+				<path d="M168 49L174 52L169 56M168 82L174 86L168 89M168 116L174 120L168 123M168 150L174 154L168 157M168 184L174 188L168 191M168 218L174 222L168 225" style="fill:none;stroke:var(--viz-edge);stroke-width:1.4"></path>
+				<rect class="viz-node viz-node--input" x="18" y="52" width="80" height="42" rx="4"></rect>
+				<rect class="viz-node viz-node--input" x="18" y="156" width="80" height="42" rx="4"></rect>
+				<text class="viz-node-label" x="58" y="70" text-anchor="middle">LIVE A</text>
+				<text class="viz-label" x="58" y="86" text-anchor="middle">-0.20</text>
+				<text class="viz-node-label" x="58" y="174" text-anchor="middle">LIVE B</text>
+				<text class="viz-label" x="58" y="190" text-anchor="middle">-0.35</text>
+				<rect class="viz-node" x="176" y="39" width="108" height="26" rx="4"></rect>
+				<rect x="176" y="73" width="108" height="26" rx="4" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
+				<rect class="viz-node" x="176" y="107" width="108" height="26" rx="4"></rect>
+				<rect class="viz-node" x="176" y="141" width="108" height="26" rx="4"></rect>
+				<rect class="viz-node" x="176" y="175" width="108" height="26" rx="4"></rect>
+				<rect x="176" y="209" width="108" height="26" rx="4" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
+				<g class="viz-node-label" text-anchor="middle"><text x="230" y="56">A x · -0.30</text><text x="230" y="90">A &lt;EOS&gt; · -0.45</text><text x="230" y="124">A z · -0.90</text><text x="230" y="158">B y · -0.40</text><text x="230" y="192">B x · -0.75</text><text x="230" y="226">B &lt;EOS&gt; · -1.15</text></g>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 250" role="img" aria-labelledby="beam-prune-title beam-prune-desc">
+				<title id="beam-prune-title">EOS routes to finished before top-k prunes the live candidates</title>
+				<desc id="beam-prune-desc">A dashed finished pool contains A EOS at negative 0.45 and B EOS at negative 1.15; these records have no outgoing arrows and are not part of top-k pruning. The live pool ranks four non-EOS candidates. With beam size two it keeps A x at negative 0.30 and B y at negative 0.40, and prunes B x at negative 0.75 and A z at negative 0.90. Final ranking uses completed hypotheses, falling back to live hypotheses only if none completed.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="217" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">2 · ROUTE EOS, THEN PRUNE LIVE ONLY</text>
+				<rect x="16" y="47" width="128" height="83" rx="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 3"></rect>
+				<text class="viz-axis-label" x="24" y="63">FINISHED · STOP</text>
+				<text class="viz-node-label" x="80" y="88" text-anchor="middle">A &lt;EOS&gt; · -0.45</text>
+				<text class="viz-node-label" x="80" y="111" text-anchor="middle">B &lt;EOS&gt; · -1.15</text>
+				<rect x="154" y="47" width="130" height="149" rx="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5"></rect>
+				<text class="viz-axis-label" x="162" y="63">LIVE · TOP 2 OF 4</text>
+				<rect class="viz-node viz-node--focus" x="163" y="72" width="112" height="25" rx="4"></rect>
+				<rect class="viz-node viz-node--focus" x="163" y="103" width="112" height="25" rx="4"></rect>
+				<rect class="viz-node" x="163" y="134" width="112" height="25" rx="4"></rect>
+				<rect class="viz-node" x="163" y="165" width="112" height="25" rx="4"></rect>
+				<g class="viz-node-label" text-anchor="middle"><text x="219" y="89">KEEP A x · -0.30</text><text x="219" y="120">KEEP B y · -0.40</text><text x="219" y="151">PRUNE B x · -0.75</text><text x="219" y="182">PRUNE A z · -0.90</text></g>
+				<path d="M166 135L272 158M272 135L166 158M166 166L272 189M272 166L166 189" style="fill:none;stroke:var(--viz-edge);stroke-width:1.2"></path>
+				<text class="viz-callout" x="150" y="216" text-anchor="middle">FINAL: rank FINISHED; use LIVE only if none finished</text>
+				<text class="viz-label" x="150" y="233" text-anchor="middle">No outgoing edge means no expansion after EOS.</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> add each token's log probability, then route by state before pruning. Dashed <code>&lt;EOS&gt;</code> records leave the live frontier and are never expanded again; top-<var>k</var> compares only the four non-EOS candidates. Here it keeps <code>A x</code> and <code>B y</code>, while both completed records remain available for the final scoring rule. Original worked example checked against <a href="https://arxiv.org/abs/1609.08144">Wu et al. (2016)</a>, <a href="https://arxiv.org/abs/1808.10006">Murray and Chiang (2018)</a>, and the <a href="https://huggingface.co/docs/transformers/main/en/generation_strategies">Transformers generation documentation</a>.</figcaption>
+</figure>
+
 The raw sequence score is:
 
 $$
