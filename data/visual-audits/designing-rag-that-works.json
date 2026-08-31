@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "designing-rag-that-works",
+  "article": "src/content/posts/2026-05-07-designing-rag-that-works.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how lexical and dense retrieval preserve complementary relevant passages for recall, then distinguish fusion from the query-aware reranking step that selects a small high-precision context.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align two ranked candidate lists, mark which relevant passage each retriever uniquely contributes, merge their rank evidence, and narrow the union before generation. Fixed geometry makes the change from broad first-stage recall to expensive second-stage precision visible in one scan.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can name lexical retrieval, dense retrieval, fusion, and reranking, but automatic layout cannot reliably align ranked candidates or expose which relevant passage would disappear under either single retriever.",
+    "svg": "Selected: fixed parallel lists and a narrowing funnel preserve candidate identity across retrieval, fusion, and reranking while making rank and selection directly inspectable.",
+    "semanticHtml": "Rejected: tables could compare ranks accessibly, but several separate tables would make candidate identity harder to follow through the union and narrowing stages than one labelled SVG.",
+    "interaction": "Rejected: toggling retrievers or K could teach failure modes, but controls and hidden states are unnecessary for the single lesson that first-stage recall and second-stage precision have different jobs.",
+    "paperReuse": "Rejected: the reviewed papers separately describe RAG, dense retrieval, reciprocal-rank fusion, and cross-encoder reranking, but none contains this article-specific synthetic candidate funnel. No source figure, dataset result, wording, or layout is reused.",
+    "noVisual": "Rejected: the prose lists strong components but leaves readers to mentally compose two different ranking objectives. The funnel shows why hybrid retrieval should retain a broad complementary pool before a slower query-passage model selects the compact context."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The tokenization and perplexity slide explains subword text representation and language-model evaluation, but contains no document retrieval, rank fusion, or context-selection mechanism."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide covers bag-of-words, TF-IDF, word embeddings, contextual representations, and question-answering formulations. It supplies representation background but does not compare lexical and dense retrieval or show ranked candidates."
+      },
+      {
+        "page": 100,
+        "insight": "The neighboring recurrent-network slide moves from text representation into sequence models and adds no retrieval-stage guidance."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider opens the deck neighborhood containing its only approximate-nearest-neighbor retrieval discussion."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide describes approximate nearest-neighbor buckets, nprobe, and product quantization for candidate retrieval. It covers efficient dense search but not lexical retrieval, rank fusion, cross-encoder reranking, or RAG generation."
+      },
+      {
+        "page": 131,
+        "insight": "The following content-based and hybrid-recommender slide combines recommendation signals, not lexical and dense document rankings; it provides no RAG context funnel."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol) text-indexed all 214 physical pages for RAG, retrieval-augmented generation, information retrieval, BM25, lexical retrieval, dense retrieval, passage retrieval, reranking, vector search, question answering, and nearest neighbors. No RAG, BM25, dense-passage, or reranking match exists. Pages 98-100 were read as the closest text-representation neighborhood and pages 129-131 as the complete ANN neighborhood. The deck has no reusable hybrid-retrieval figure, so no deck artwork, wording, values, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "url": "https://arxiv.org/abs/2005.11401",
+        "usage": "Used as the primary RAG source to verify the separation between retrieved non-parametric evidence and the parametric generator, and that generation is conditioned on retrieved passages.",
+        "license": "The arXiv record provides public access, but no permissive figure-reuse grant was relied on. No paper figure, result, prose, model layout, or notation is copied."
+      },
+      {
+        "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+        "url": "https://aclanthology.org/2020.emnlp-main.550/",
+        "usage": "Used as a primary source to verify first-stage dense passage retrieval with independently encoded questions and passages before downstream answer generation.",
+        "license": "ACL Anthology states that materials published from 2016 onward are CC BY 4.0. The source is cited, but no figure, benchmark value, passage, wording, or layout is adapted."
+      },
+      {
+        "title": "Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods",
+        "url": "https://dl.acm.org/doi/10.1145/1571941.1572114",
+        "usage": "Used as the primary rank-fusion source to verify that separately ranked result sets can be combined using reciprocal rank evidence rather than incomparable raw lexical and dense scores.",
+        "license": "The ACM record is publicly viewable, but no reuse permission for its figures was assumed. No source figure, formula rendering, experiment, prose, or visual organization is reproduced."
+      },
+      {
+        "title": "Passage Re-ranking with BERT",
+        "url": "https://arxiv.org/abs/1901.04085",
+        "usage": "Used as a primary reranking source to verify a two-stage design in which an initial retrieval system supplies candidates and a query-passage model reorders that bounded set.",
+        "license": "The arXiv record provides public access, but public access was not treated as figure-reuse permission. No architecture figure, result, text, or arrangement is copied."
+      },
+      {
+        "title": "Elasticsearch reference: Reciprocal rank fusion",
+        "url": "https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion",
+        "usage": "Used as official implementation documentation to cross-check that RRF combines result sets with different relevance indicators and that its rank window is broader than the final requested result size.",
+        "license": "The documentation is used only to verify behavior. No Elastic code, formula presentation, example request, prose, branding, or artwork is reproduced, so the implementation does not depend on a documentation reuse license."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that retrieval and reranking solve different bottlenecks. Fast lexical and dense retrievers should maximize candidate recall using complementary signals; fusion combines ranks without pretending their raw scores are calibrated. A slower query-passage reranker then spends compute only on that bounded union to improve precision and choose the small context passed to the generator. The visual uses an invented query, passage titles, ranks, and labels and makes no empirical performance claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both closest neighborhoods, then checked primary RAG, dense-retrieval, rank-fusion, and reranking papers plus official RRF documentation before selecting an original candidate funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "rag-recall-precision-funnel"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming every synthetic candidate retained or omitted at each stage. Direct LEXICAL, DENSE, FUSED CANDIDATES, and RERANKED CONTEXT labels, A/B evidence tags, numbered ranks, borders, and converging arrows carry the inference without color. The 360-unit viewBox uses established responsive SVG primitives with no minimum width for readability at 390 CSS pixels; shared theme tokens provide dark-mode contrast and print-safe colors."
+  }
+}
