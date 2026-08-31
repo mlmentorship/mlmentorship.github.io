@@ -42,6 +42,38 @@ The order computes the low-rank path without constructing a full $d_{out} \times
 
 If both factors are random, attaching the adapter changes model behavior before training. If both are zero, both gradients begin at zero because each factor's gradient contains the other factor. Initializing $A$ randomly and $B$ to zero gives exact base behavior while allowing $B$ to receive a gradient on the first step. After $B$ moves, $A$ receives useful gradients.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Follow the no-op forward pass and the asymmetric first backward pass</p>
+
+<!-- visual:lora-zero-impact-first-gradient -->
+```mermaid
+flowchart TB
+	accTitle: Random A and zero B preserve the base output while allowing B to learn first
+	accDescr: Input x follows two branches. The frozen base matrix W produces Wx. On the adapter branch, random A maps d-in features into rank r, then zero B maps rank r to d-out, so the scaled adapter update is exactly zero. Adding both branches gives y equals Wx at initialization. During the first backward pass, B generally receives a nonzero gradient because it depends on Ax, A receives zero gradient because its gradient contains B transposed, and frozen W is not updated. After B moves, gradients can reach A.
+	X["input x<br/>last dimension d_in"]
+	X --> W["frozen W<br/>d_out × d_in"]
+	W --> Base["base path<br/>Wx"]
+	X --> A["random A · trainable<br/>r × d_in"]
+	A --> H["rank-r bottleneck<br/>Ax"]
+	H --> B["zero B · trainable<br/>d_out × r"]
+	B --> U["scaled update<br/>(α/r)BAx = 0"]
+	Base --> Add(("add"))
+	U --> Add
+	Add --> Y["initial output<br/>y = Wx"]
+	G["first upstream gradient ∇y"] -. "∇B uses Ax: generally nonzero" .-> B
+	G -. "∇A uses Bᵀ: zero" .-> A
+	G -. "frozen: no parameter update" .-> W
+	class X viz-input
+	class W viz-state
+	class A,H viz-input
+	class B,U viz-focus
+	class Base,Add,G viz-neutral
+	class Y viz-output
+	class X viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid arrows first. The random projection <em>A</em> creates a usable rank-<em>r</em> signal, but zero <em>B</em> blocks it, so the residual update is exactly zero and the output matches the frozen base. Then follow the dashed arrows: <em>B</em>'s gradient can use the nonzero <em>Ax</em>, while <em>A</em>'s gradient contains <em>B</em><sup>T</sup> and is zero on the first step. Once <em>B</em> moves, both adapter factors can learn. Original synthesis based on <a href="https://arxiv.org/abs/2106.09685">Hu et al.'s LoRA formulation</a> and the <a href="https://huggingface.co/docs/peft/main/package_reference/lora">PEFT initialization reference</a>.</p>
+
 ## What an L4 answer sounds like
 
 The candidate adds a full trainable matrix, forgets to freeze the base, or initializes both low-rank factors to zero. They know LoRA means "fewer parameters" but cannot derive shapes or explain why the initial output should match.

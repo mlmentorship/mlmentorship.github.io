@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-lora-adapter",
+  "article": "src/content/posts/2026-07-11-implement-lora-adapter.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how random A and zero B make a LoRA adapter an exact no-op at initialization while still giving B, but not A, a gradient on the first backward pass.",
+  "mediumRationale": "A compact top-to-bottom Mermaid dataflow is the smallest medium that can show the frozen base and low-rank residual branches together, then distinguish ordinary forward flow from first-step gradient flow. The graph exposes both the shape-changing bottleneck and the initialization asymmetry without quantitative geometry or interaction.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a directed forward-and-backward relationship among input, frozen base, low-rank factors, residual addition, and gradients.",
+    "svg": "Rejected because fixed coordinates would add maintenance and mobile-label risk without encoding the branch and gradient relationships better than a responsive graph.",
+    "semanticHtml": "Rejected because a matrix-shape table could list dimensions and initialization states but would not make the two parallel output paths or asymmetric gradient dependencies as immediate.",
+    "interaction": "Rejected because stepping from initialization to the first optimizer update would hide one of the two states and add controls to a mechanism fully explained by one static graph.",
+    "paperReuse": "Rejected because the LoRA paper's architecture figure is broader than this implementation invariant and no permissive artwork license was established. No paper or documentation figure, data, wording, or layout is reused.",
+    "noVisual": "Rejected because prose requires readers to simultaneously track two residual branches and infer two product-rule dependencies: zero B kills the update and A's first gradient, but random A leaves B's first gradient alive."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 28,
+        "insight": "The preceding boosting-versus-bagging divider provides no low-rank or parameter-adaptation context."
+      },
+      {
+        "page": 29,
+        "insight": "The factorization-machines slide explains replacing an O(n squared) interaction parameterization with low-dimensional factors and O(kn) computation, a structural analogy for parameter reduction but not a LoRA update or initialization rule."
+      },
+      {
+        "page": 30,
+        "insight": "The neighboring matrix-factorization slide shows an m by n matrix factored through a chosen k-dimensional subspace, supporting the general bottleneck shape but not frozen weights, residual addition, or zero-impact initialization."
+      },
+      {
+        "page": 98,
+        "insight": "The preceding tokenization-and-perplexity slide marks the context before the deck's pretrained-model fine-tuning discussion and contains no adapter mechanism."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide contrasts feature-based transfer with fine-tuning pretrained parameters and mentions minimal task-specific parameters, but predates or omits LoRA and does not freeze the base or factorize its update."
+      },
+      {
+        "page": 100,
+        "insight": "The following recurrent-networks slide ends the fine-tuning neighborhood without adding parameter-efficient adaptation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for LoRA, low rank, adapter, parameter efficient, fine-tuning, and task-specific parameters. It contains no LoRA or adapter slide. Pages 28-30 were inspected around the closest low-rank parameterization analogy, and pages 98-100 around the only explicit pretrained-model fine-tuning discussion. Other low-rank hits on pages 108, 112, and 115 concern approximate long-context attention rather than weight adaptation. No deck wording, equation, code, figure, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+        "url": "https://arxiv.org/abs/2106.09685",
+        "usage": "Used as the primary source for freezing the pretrained weight, representing its update with a low-rank product, scaling by alpha over r, and initializing one factor to zero so the adapter begins as a no-op.",
+        "license": "The arXiv record is publicly accessible, but public access is not treated as permission to adapt its artwork and no permissive figure license was established. No paper figure, wording, experimental result, or layout is copied."
+      },
+      {
+        "title": "Microsoft loralib reference implementation",
+        "url": "https://github.com/microsoft/LoRA",
+        "usage": "Used as the authors' official implementation to cross-check frozen base parameters, adapter-only state, merge behavior, and the random-A/zero-B initialization convention.",
+        "license": "The repository code is MIT-licensed, but no code or artwork is reproduced. The diagram is an independently authored explanation of mathematical and gradient semantics."
+      },
+      {
+        "title": "Hugging Face PEFT LoRA documentation",
+        "url": "https://huggingface.co/docs/peft/main/package_reference/lora",
+        "usage": "Used as official library documentation to verify that the default Kaiming-uniform A and zero B initialization is a no-op and that merged adapter weights can eliminate the extra inference path.",
+        "license": "The documentation is consulted only for API behavior. No prose, code sample, benchmark, image, or page structure is copied into the original diagram."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the asymmetric first backward pass. With y = Wx + sBAx and B = 0, the adapter contribution is exactly zero. By the product rule, the gradient with respect to A includes B transposed and is therefore zero initially, while the gradient with respect to B includes Ax; random A generally makes that quantity nonzero. W is separately frozen. After the first optimizer step moves B, subsequent gradients can reach A."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then reviewed the primary paper, authors' reference implementation, and official PEFT documentation before selecting an original forward-and-gradient flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "lora-zero-impact-first-gradient"
+    ],
+    "accessibility": "The Mermaid source provides a specific accessible title and a complete description of both branches and first-step gradients. Matrix names, shapes, initialization values, node shapes, solid forward arrows, and dashed backward arrows carry meaning without color. The established tall graph primitive removes the mobile minimum width at 390 CSS pixels, theme variables preserve dark-mode contrast, and print rules use a light high-contrast palette."
+  }
+}
