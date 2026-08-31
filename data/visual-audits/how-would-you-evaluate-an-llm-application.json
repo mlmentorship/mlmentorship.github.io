@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "slug": "how-would-you-evaluate-an-llm-application",
+  "article": "src/content/posts/2026-01-10-how-would-you-evaluate-an-llm-application.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how product objectives and human judgments calibrate scalable offline scoring, then use production evidence and drift to decide whether to trust or rebuild the evaluation system.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that turns the article's evaluation ingredients into a closed measurement loop. Labelled branches distinguish human grounding, automated scale, release evidence, and production validity, while the return edge makes eval maintenance part of the system rather than an afterthought.",
+  "mediumComparison": {
+    "mermaid": "Selected because the core lesson is a sequence of evidence transformations and a feedback loop. The established renderer supplies labelled edges, accessible source, responsive layout, theme support, and print behavior.",
+    "svg": "Rejected because there is no quantitative geometry to preserve. A custom SVG would reproduce flowchart semantics with more fixed-position text and weaker narrow-screen adaptation.",
+    "semanticHtml": "Rejected because a table or evidence ladder could compare evaluation layers but would not show that human labels calibrate automation or that production mismatch must refresh the dataset and rubric.",
+    "interaction": "Rejected because choosing metrics for a hypothetical product would require invented context and hidden states. The transferable lesson is the fixed evidence loop, not a configurable dashboard.",
+    "paperReuse": "Rejected because the reviewed paper and official guides contain related evaluation taxonomies and workflows, but no source figure matches this article-specific product-to-calibration-to-production loop. Public availability is not treated as artwork reuse permission.",
+    "noVisual": "Rejected because the prose names all important parts but leaves them distributed across L5 and L6 answers. Readers must otherwise infer which evidence grounds which scorer and why an offline score can stop being trustworthy."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The preceding slide is only an ML-design interview time allocation, establishing the boundary before the evaluation checklist."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview starts from product need and objective, distinguishes goal, leading, debug, and guardrail metrics, and calls for model debugging and evaluation."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for baselines, test-data strategy, confidence intervals, offline metrics, error analysis, business-impact estimates, and online experiment success criteria."
+      },
+      {
+        "page": 164,
+        "insight": "The content-feed example explicitly asks candidates to state a hypothesis, run initial offline evaluation, then evaluate online and track user satisfaction."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide begins with goals and user experience, distinguishes training from inference evaluation, and notes that generative responses are difficult to evaluate."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide asks about annotation quality, annotator disagreement, user feedback, and train-test distribution mismatch, supporting human grounding and drift review."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide requires random, human, or heuristic baselines so model quality is comparative rather than an isolated score."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide requires release gates, monitoring metrics, user feedback, update procedures, and latency, memory, compute, and privacy constraints."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide prioritizes metric design, ownership, freshness, silent-failure monitoring, human error analysis, quantified undesirable behavior, and multi-metric launch decisions."
+      },
+      {
+        "page": 170,
+        "insight": "The following slide starts the algorithms and data-structures section and contains no evaluation guidance, marking the end of the neighborhood."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed page by page for LLM evaluation, generative evaluation, human evaluation, annotation, metrics, offline evaluation, online evaluation, A/B tests, user feedback, and drift. The complete relevant neighborhood on pages 160-170 was then read. Pages 161-169 provide general ML-system evaluation ingredients, and page 165 explicitly notes the difficulty of evaluating generative responses, but the deck has no LLM-as-judge, golden-set, judge-calibration, or judge-bias treatment. No deck screenshot, wording, artwork, coordinates, or layout is reused.",
+    "license": "The local deck states no reuse license and includes externally sourced material. It is treated as review-only; the shipped flowchart is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+        "url": "https://arxiv.org/abs/2306.05685",
+        "usage": "Used as a primary paper to verify that LLM judges can agree with human preferences while exhibiting position, verbosity, self-enhancement, and reasoning limitations that require explicit validation and mitigation.",
+        "license": "The arXiv record is publicly accessible, but no permissive third-party figure-reuse grant was established. No figure, prompt, example, result value, prose, or layout is copied."
+      },
+      {
+        "title": "OpenAI Evaluation best practices",
+        "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+        "usage": "Used as official implementation guidance to verify that task-specific evaluations should reflect production distributions, combine metrics with human judgment, calibrate automated scoring with human feedback, log failures, and continuously grow the eval set.",
+        "license": "The documentation is used only for public evaluation principles. No page text, code, table, screenshot, branding, or layout is reproduced."
+      },
+      {
+        "title": "Holistic Evaluation of Language Models",
+        "url": "https://arxiv.org/abs/2211.09110",
+        "usage": "Used as a primary evaluation-framework paper to verify that meaningful model evaluation spans multiple scenarios and metrics, including accuracy, calibration, robustness, fairness, bias, toxicity, and efficiency, rather than collapsing quality to one aggregate score.",
+        "license": "The paper's public arXiv distribution is not treated as permission to adapt its figures. No scenario taxonomy, result, figure, data, prose, or layout is reproduced."
+      },
+      {
+        "title": "NIST Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as authoritative lifecycle guidance to verify that measurement belongs within a governed, context-mapped, continuously monitored and managed process rather than a one-time model score.",
+        "license": "This United States government publication is used as a factual framework reference. No NIST figure, table, prose, iconography, or framework layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is evidence dependency. Product criteria and representative cases must come before metric choice. Human labels and a rubric anchor both deterministic checks and any LLM judge; the judge does not create ground truth. Offline results can gate a candidate only provisionally, alongside slices, uncertainty, cost, and latency. Production task outcomes then test whether offline trends predict user value. New failures, distribution drift, or offline-online divergence return to dataset and rubric maintenance. The visual intentionally makes trust conditional and states no universal threshold."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the full ML-evaluation neighborhood, then checked primary LLM-judge and holistic-evaluation papers plus current OpenAI and NIST lifecycle guidance before selecting an original calibration loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "llm-eval-calibration-loop"
+    ],
+    "accessibility": "The Mermaid source provides a complete title and description. Numbered stages, explicit evidence labels, a decision question, solid forward edges, and a dashed mismatch-and-drift return path carry all meaning without color. The top-to-bottom graph uses short labels and no wide-layout marker for readability at 390 CSS pixels; established Mermaid theme tokens provide dark-mode and print contrast."
+  }
+}

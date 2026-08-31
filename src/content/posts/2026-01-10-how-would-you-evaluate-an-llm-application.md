@@ -12,6 +12,29 @@ category: "questions"
 
 The same words elicit a junior, senior, or staff answer. Interviewers calibrate **on what you reach for first** and **what you don't say**.
 
+<!-- visual:llm-eval-calibration-loop -->
+```mermaid
+flowchart TB
+	accTitle: LLM application evaluation as a human-grounded calibration loop
+	accDescr: First define the user outcome, unacceptable failures, and operating constraints. Build a versioned golden set from representative production traffic and known failure slices, then have humans apply an explicit rubric. Use those judgments to validate deterministic checks for closed tasks and a bias-tested LLM judge for open tasks. Run offline release evaluation across quality slices, uncertainty, cost, and latency. In production, observe task outcomes, guardrails, and drift. If offline trends predict production outcomes, continue monitoring. If they diverge or new failures appear, update the golden set and rubric, recalibrate the scorers, and rerun the loop.
+	A["1 · Define the product contract<br/>user outcome · costly failures · constraints"] --> B["2 · Version a golden set<br/>real traffic · edge cases · failure slices"]
+	B --> C["3 · Humans apply an explicit rubric<br/>resolve disagreement · preserve labels"]
+	C --> D["4 · Validate scalable scorers<br/>closed tasks: deterministic checks<br/>open tasks: bias-tested LLM judge"]
+	D --> E["5 · Gate offline by evidence<br/>quality slices · uncertainty · cost · latency"]
+	E --> F["6 · Observe production<br/>task outcomes · guardrails · drift"]
+	F --> G{"Do offline trends<br/>predict production?"}
+	G ==>|"yes"| H["Continue monitoring<br/>keep the eval versioned"]
+	G -. "no · drift or new failure" .-> I["Refresh cases + rubric<br/>recalibrate scorers"]
+	I -. "rerun" .-> B
+	class A,B viz-input
+	class C,D viz-focus
+	class E viz-state
+	class F,H viz-output
+	class G,I viz-warning
+	class A viz-tall
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> start with the product contract, not a metric. Human-scored representative cases ground the scalable checks and judge; those scorers provide fast offline evidence but only production can show whether the evidence predicts user outcomes. When production diverges or reveals a new failure, repair the cases and rubric, recalibrate, and rerun. Original synthesis checked against the primary <a href="https://arxiv.org/abs/2306.05685">LLM-as-judge study</a>, <a href="https://developers.openai.com/api/docs/guides/evaluation-best-practices">OpenAI's evaluation guidance</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
+
 ## What an L4 answer sounds like
 
 > "I'd compute accuracy on a held-out test set. For generation tasks I'd use BLEU or ROUGE. I'd also do some manual inspection of outputs and check for hallucinations. We could also use perplexity."
