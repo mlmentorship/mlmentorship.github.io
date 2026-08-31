@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "domain-adaptation",
+  "article": "src/content/posts/2026-07-10-domain-adaptation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish covariate, label, and concept shift by the joint-distribution factor that changes, then decide whether unlabeled target inputs contain enough evidence to adapt.",
+  "mediumRationale": "A deterministic SVG is the smallest useful medium for aligning each shift assumption with its changed factor, fixed factor, and evidence requirement in one left-to-right scan.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show method selection, but it would make the parallel changed-versus-fixed factorization harder to compare and would add a client-side rendering dependency.",
+    "svg": "Selected: fixed rows, direct labels, and arrows make the assumptions spatially comparable while preserving exact wording and deterministic mobile and print rendering.",
+    "semanticHtml": "Rejected: a table is plausible, but the article already defines the shifts as a list; the arrows from assumptions to available evidence are the additional mental model the prose lacks.",
+    "interaction": "Rejected: toggling source and target distributions would add states and controls without resolving the fundamental identifiability question better than one complete static view.",
+    "paperReuse": "Rejected: the reviewed papers contain theory and method-specific figures, but no candidate figure exactly matches this three-assumption learning objective and no permissive figure-reuse grant was established. No source figure, layout, coordinates, wording, or data is copied.",
+    "noVisual": "Rejected: readers otherwise must mentally factor the same joint distribution in two ways and connect each invariance assumption to what unlabeled target inputs can identify."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 38,
+        "insight": "The preceding classification-evaluation slide explains accuracy, precision, recall, PR, and ROC on a fixed dataset, without considering a source-to-target distribution change."
+      },
+      {
+        "page": 39,
+        "insight": "The only directly adjacent distribution-change material defines out-of-distribution samples as unlike training data and lists rejection or detection methods. It does not distinguish covariate, label, and concept shift or state an invariant conditional."
+      },
+      {
+        "page": 40,
+        "insight": "The following slide is only the General Neural Nets Concepts section divider and adds no adaptation mechanism."
+      },
+      {
+        "page": 98,
+        "insight": "The slide before the deck's transfer-learning material covers tokenization and language-model perplexity, not source and target distributions."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide describes feature-based transfer and fine-tuning pretrained parameters on downstream tasks. It establishes transfer as a strategy but does not define dataset-shift assumptions or identifiability from unlabeled target data."
+      },
+      {
+        "page": 100,
+        "insight": "The following recurrent-net slide covers LSTM, GRU, and memory networks and contributes no domain-adaptation model."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for domain adaptation, covariate shift, label shift, concept shift, distribution shift, source and target domains, out-of-distribution data, transfer learning, pretraining, and fine-tuning. No slide names or explains the three dataset-shift assumptions. Pages 38-40 are the only OOD neighborhood, and pages 98-100 are the closest explicit pretrain/fine-tune transfer neighborhood. Both were inspected in sequence; neither contains reusable artwork or the required assumption-to-evidence comparison."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Covariate Shift Adaptation by Importance Weighted Cross Validation",
+        "url": "https://jmlr.org/papers/v8/sugiyama07a.html",
+        "usage": "Used as the primary source for covariate shift, where the input distribution changes while the conditional output distribution remains unchanged, and for importance weighting by the test-to-training input-density ratio.",
+        "license": "The JMLR article was used as a technical reference only. No explicit permissive license for adapting its figures was identified, and no figure, data, coordinates, wording, or layout is reused."
+      },
+      {
+        "title": "Detecting and Correcting for Label Shift with Black Box Predictors",
+        "url": "https://proceedings.mlr.press/v80/lipton18a.html",
+        "usage": "Used as the primary source for label shift, where P(X given Y) is invariant, and for estimating target label proportions from unlabeled target inputs when the source confusion matrix is invertible.",
+        "license": "PMLR provides public access but the article page does not grant a permissive figure-reuse license. No paper figure, empirical result, wording, coordinates, or layout is reused."
+      },
+      {
+        "title": "Impossibility Theorems for Domain Adaptation",
+        "url": "https://proceedings.mlr.press/v9/david10a.html",
+        "usage": "Used as the primary theoretical source for the failure of unsupervised domain adaptation without assumptions linking source and target labeling behavior.",
+        "license": "PMLR public access was not treated as permission to reuse figures. The visual is an independently authored synthesis and copies no theorem text, figure, construction, data, coordinates, or layout."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not that two point clouds differ; it is that adaptation becomes defensible only after specifying which factor of P(X,Y) changed and which remained invariant. The original schematic therefore maps each assumption to the evidence available from target X. It states the overlap condition for density ratios, the invertible-confusion-matrix condition for black-box label-shift estimation, and the need for target labels or additional structure under unrestricted concept shift. It is conceptual, contains no empirical values, and does not imply that unlabeled target data identifies every covariate- or label-shift problem."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant slide neighborhoods, then checked primary papers for covariate shift, label shift, and domain-adaptation impossibility before selecting an original assumption map."
+  },
+  "implementation": {
+    "visualIds": [
+      "domain-adaptation-shift-assumptions"
+    ],
+    "accessibility": "The SVG includes a linked title and complete description. Every distinction is directly labeled with CHANGED or FIXED, and the concept-shift row additionally uses a dashed warning border and dashed arrow, so color is redundant. Its 360-unit viewBox has no minimum width and scales within a 390 CSS-pixel viewport; established theme variables provide dark-mode contrast and the shared print palette renders high-contrast light output."
+  }
+}

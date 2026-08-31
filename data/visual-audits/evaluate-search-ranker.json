@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "slug": "evaluate-search-ranker",
+  "article": "src/content/posts/2025-04-09-evaluate-search-ranker.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Route a ranker candidate through human-judgment calibration, fast offline screening, and randomized online validation without treating any one evidence layer as a substitute for the others.",
+  "mediumRationale": "A compact Mermaid feedback loop is the smallest medium that can show both the order of evaluation decisions and how production failures refresh the human-labeled set. It keeps each evidence layer attached to the question it can answer and makes randomized exposure a gate before clicks inform shipping.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is a flow of evidence and decisions with a feedback loop, not quantitative geometry. Labelled edges can distinguish calibration, screening, and causal launch evidence.",
+    "svg": "Rejected: a custom drawing would reproduce flowchart behavior with more markup and no additional spatial or numerical insight.",
+    "semanticHtml": "Rejected: a comparison table would list strengths and limitations but would not show that human judgments seed offline evaluation or that production slices feed the next audit cycle.",
+    "interaction": "Rejected: choosing hypothetical metrics or clicking through gates adds state without improving the fixed evidence-routing lesson.",
+    "paperReuse": "Rejected: the reviewed sources address individual evaluation methods, not this article-specific synthesis, and no permissive figure-reuse rights were established.",
+    "noVisual": "Rejected: prose enumerates three layers, but the hardest mental model is how they compose into one recurring develop-ship-calibrate process rather than three interchangeable metric menus."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The preceding page is only the recommender-systems section title and contains no evaluation guidance."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide includes a worked NDCG calculation, illustrating one offline ranking metric, but does not connect it to online or human evaluation."
+      },
+      {
+        "page": 131,
+        "insight": "The following content-based and hybrid recommender slide names similarity methods and adds no ranker-evaluation process."
+      },
+      {
+        "page": 139,
+        "insight": "The personalized-search neighborhood introduces a content-based candidate representation but contains no evaluation evidence."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide trains from prior user interactions and labels, motivating scrutiny of how ranking labels are obtained."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation-and-launch slide is the key relevant page: it separates offline recall and MRR from online search engagement and days-with-a-play, and routes offline evaluation into an online experiment before launch."
+      },
+      {
+        "page": 142,
+        "insight": "The following slide changes to an LLM content-exploration example and adds no evaluation method."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed for NDCG, MRR, recall, ranker, search evaluation, online metrics, A/B tests, clicks, relevance, interleaving, and propensity. Pages 129-131 and 139-142 were then rendered and visually inspected as the complete matching neighborhoods. Page 141 supplies an offline-to-online launch path but omits human calibration, position bias, randomization requirements, and the feedback cycle. The implementation is an original synthesis; no deck artwork, wording, values, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Introduction to Information Retrieval: Evaluation of ranked retrieval results and Assessing relevance",
+        "url": "https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-in-information-retrieval-1.html",
+        "usage": "Used as an authoritative textbook source for held-out test collections, ranked retrieval metrics, pooled human relevance assessments, assessor variability, and the distinction between absolute scores and stable relative system comparisons.",
+        "license": "Cambridge University Press retains copyright. No figure, table, wording, example, or data is copied; only general evaluation concepts inform the original flow."
+      },
+      {
+        "title": "Controlled experiments on the web: survey and practical guide",
+        "url": "https://doi.org/10.1007/s10618-008-0114-1",
+        "usage": "Used as a primary practical reference for randomized online experiments as the basis for causal product decisions.",
+        "license": "The Springer publication is copyrighted and no general figure-reuse permission was identified. No figure, taxonomy, wording, metric, or result is reproduced."
+      },
+      {
+        "title": "Predicting Search Satisfaction Metrics with Interleaved Comparisons",
+        "url": "https://www.microsoft.com/en-us/research/publication/predicting-search-satisfaction-metrics-with-interleaved-comparisons/",
+        "usage": "Used as a primary search-evaluation paper to verify that A/B tests estimate online metric differences while interleaving compares rankers within a combined result list with substantially higher sensitivity.",
+        "license": "The ACM publication is copyrighted and its Microsoft record does not grant general figure reuse. No figure, experimental value, metric construction, prose, or layout is copied."
+      },
+      {
+        "title": "Unbiased Learning-to-Rank with Biased Feedback",
+        "url": "https://arxiv.org/abs/1608.04468",
+        "usage": "Used as a primary paper to verify that click observations are biased by examination propensity and require explicit correction or randomized evidence before being treated as relevance feedback.",
+        "license": "No source figure, theorem presentation, dataset, result, wording, or layout is reused. The paper is cited for mechanism provenance only."
+      },
+      {
+        "title": "Google Search Quality Rater Guidelines",
+        "url": "https://guidelines.raterhub.com/searchqualityevaluatorguidelines.pdf",
+        "usage": "Used as official documentation showing that human evaluation requires a documented rubric for interpreting query intent and grading result quality.",
+        "license": "The guidelines are publicly accessible but no permissive figure-reuse license was identified. No screenshot, rubric text, rating scale, example, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is evidence composition. Human judgments define rubric-based relevance and periodically audit absolute quality, but are slow and variable. Offline metrics reuse those labels to compare many candidates cheaply, but cannot establish user impact. Randomized A/B tests establish causal changes in mature behavioral and guardrail metrics; interleaving can provide a more sensitive relative ranker comparison, but raw clicks without controlled exposure conflate examination with relevance. The diagram intentionally makes the shipped decision depend on online evidence while sending failed production slices back to human review."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Independently reviewed the complete article, text-indexed all 214 deck pages, visually inspected both relevant slide neighborhoods, and checked two primary online-evaluation papers, a primary counterfactual-ranking paper, an authoritative IR textbook, and official rater guidance before selecting an original evaluation flywheel."
+  },
+  "implementation": {
+    "visualIds": [
+      "search-ranker-evidence-flywheel"
+    ],
+    "accessibility": "The Mermaid source provides an accessible title and detailed description. Node labels name each evidence source and its distinct question; numbered stage labels, explicit outcome edges, solid forward paths, and a dashed next-review path preserve all meaning without color. The established wide-diagram primitive preserves label size through horizontal scrolling at 390 CSS pixels, while print removes the width floor; shared theme tokens provide dark-mode and print contrast."
+  }
+}

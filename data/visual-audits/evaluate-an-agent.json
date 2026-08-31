@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "evaluate-an-agent",
+  "article": "src/content/posts/2025-11-11-evaluate-an-agent.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how outcome, trajectory, step, and resource evidence combine into a failure taxonomy that improves the offline suite and is validated against production behavior.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that turns the article's metric list into a diagnostic flywheel: repeated trials produce outcome, trajectory and step, and cost evidence; those signals converge into attributed failure modes; release decisions remain conditional on whether offline trends predict production. The established Mermaid renderer supplies accessible source and responsive dark, light, mobile, and print behavior.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is a many-to-one diagnostic flow followed by an offline-production feedback loop, with relationships more important than numeric geometry.",
+    "svg": "Rejected: a custom plot could show a cost-success frontier but would teach only one metric and omit the more difficult attribution and suite-refresh loop.",
+    "semanticHtml": "Rejected: cards or a table would compare evaluation levels but would not show how their evidence converges into failure modes and returns from production to the task suite.",
+    "interaction": "Rejected: simulated traces or adjustable thresholds would introduce fabricated data and state without improving the transferable evaluation architecture.",
+    "paperReuse": "Rejected: AgentBench and the official evaluation guides provide taxonomies, examples, and workflows, but no single figure matches this article's multi-granularity offline-online loop. Public availability is not treated as artwork reuse permission.",
+    "noVisual": "Rejected: prose names the right metrics but leaves them as a checklist. A spatial flywheel shows that task success, diagnostic attribution, efficiency, and production validity answer different questions and must feed one another."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline ranking metrics from production A/B-test engagement outcomes, establishing that offline success must be checked against online behavior."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide starts evaluation from explicit goals, user workflows, performance constraints, and inference-time reactions, which supports task definitions and production-aligned success criteria."
+      },
+      {
+        "page": 166,
+        "insight": "The adjacent data-pipeline slide asks about annotation quality, user feedback, dataset shift, and bias, all relevant to maintaining representative agent tasks and rubrics."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide requires random, human, or heuristic baselines and asks whether added complexity earns its cost, supporting comparative rather than isolated agent scores."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide calls for explicit gating tests, monitoring metrics, user feedback, update procedures, and latency, memory, and compute constraints."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide emphasizes human error analysis, patterns in measured errors, quantified undesirable behavior, multiple launch metrics, silent-failure monitoring, and training-serving skew."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 deck pages for agent, evaluation, offline, online, trajectory, tool call, failure, error analysis, human evaluation, production, and A/B-test terms. The deck has no agent-evaluation or tool-trajectory slide. It then read the complete relevant neighborhoods on pages 140-142 and 165-170. Page 141 and pages 165-169 supply transferable evaluation principles; pages 140 and 142 are search-ranker implementation examples, while page 170 changes to algorithms and data structures. No deck artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "AgentBench: Evaluating LLMs as Agents",
+        "url": "https://arxiv.org/abs/2308.03688",
+        "usage": "Used as a primary benchmark paper to verify that agent capability must be tested through multi-turn interaction with environments and that trajectory inspection exposes repeated actions, invalid behavior, and failures hidden by aggregate outcomes.",
+        "license": "The arXiv record permits repository distribution but does not establish a permissive third-party figure-reuse grant. No benchmark figure, table, environment layout, transcript, data, or wording is reproduced."
+      },
+      {
+        "title": "Demystifying evals for AI agents",
+        "url": "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents",
+        "usage": "Used as authoritative practitioner guidance to verify the distinction among tasks, repeated trials, transcripts or trajectories, outcomes, graders, and suites; the use of multiple grader types; and tracking latency, token usage, cost per task, and errors.",
+        "license": "Anthropic's public page does not provide a permissive artwork-reuse license. No diagram, example, prose, rubric, or page layout is copied; the source is cited only for evaluation definitions and practices."
+      },
+      {
+        "title": "OpenAI API documentation: Evaluate agent workflows",
+        "url": "https://developers.openai.com/api/docs/guides/agent-evals",
+        "usage": "Used as official product documentation to verify that trace grading can diagnose tool selection, handoffs, instruction violations, and workflow regressions, and that representative traces should become repeatable datasets and eval runs.",
+        "license": "The documentation page does not grant a specific permissive license for its visual presentation. No text, screenshot, workflow graphic, or code is reproduced; the article visual is independently authored."
+      }
+    ],
+    "notes": "The visual is an original synthesis, not an adaptation of a benchmark or vendor workflow. It does not imply that trajectory quality substitutes for environmental outcome checks: the three evidence lenses converge. It also keeps offline-production agreement as a question, not an assumed correlation, and routes divergence back into task, slice, taxonomy, and rubric updates."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant evaluation neighborhoods, then checked a primary agent benchmark and current Anthropic and OpenAI evaluation guidance. The hardest prose-only model is how multiple granularities become a closed diagnostic and production-calibration loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "agent-eval-diagnostic-flywheel"
+    ],
+    "accessibility": "The Mermaid source provides a complete title and description. Every evidence lane states the question it answers, the convergence node names failure attribution, and the production-mismatch return path is dashed and directly labelled, so meaning does not depend on color. A top-to-bottom layout, short node labels, and no forced minimum width support 390 CSS pixels; established Mermaid theme tokens provide dark-mode and print contrast."
+  }
+}

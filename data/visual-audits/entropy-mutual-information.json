@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "entropy-mutual-information",
+  "article": "src/content/posts/2026-08-29-entropy-mutual-information.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Read a binary noisy channel's joint distribution to distinguish marginal uncertainty, remaining conditional uncertainty, and the mutual information removed by observing the output.",
+  "mediumRationale": "Two semantic tables are the smallest medium that can align the binary channel's four joint outcomes with a before-after uncertainty budget. The shared 0.5 marginals remain visible while the diagonal concentration explains why observing Y still reduces uncertainty about X.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show X passing through noise to Y but cannot make the joint probabilities, unchanged marginals, or entropy subtraction directly inspectable.",
+    "svg": "Rejected because custom geometry adds no precision beyond real table cells and would make the probability data less accessible and selectable.",
+    "semanticHtml": "Selected because a joint-probability table and a compact entropy ledger preserve row and column semantics, exact arithmetic, natural reading order, and responsive stacking.",
+    "interaction": "Rejected because varying the crossover probability would add controls and mutable states when the article already provides changed-assumption practice; one deterministic 10% channel is enough to establish the decomposition.",
+    "paperReuse": "Rejected because textbook information diagrams and channel figures are unnecessary, and public access does not establish permission to reuse them. No external figure, layout, prose, or dataset is copied.",
+    "noVisual": "Rejected because the equations state H(X), H(X|Y), and I(X;Y), but prose alone makes it hard to see how both marginals can remain one full bit while their dependence still removes 0.531 bits of uncertainty."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 17,
+        "insight": "The parameter-learning slide connects maximum likelihood, cross-entropy, and KL divergence, but does not define entropy, conditional entropy, or mutual information."
+      },
+      {
+        "page": 25,
+        "insight": "The random-forest slide defines binary class entropy and says tree splits maximize entropy reduction, providing an application of information gain without deriving conditional entropy or mutual information."
+      },
+      {
+        "page": 26,
+        "insight": "The neighboring split-criterion slide names information gain for categorical targets but gives no weighted-child formula or worked split."
+      },
+      {
+        "page": 97,
+        "insight": "The preceding character-language-model slide supplies sequence-prediction context but does not discuss entropy or shared information."
+      },
+      {
+        "page": 98,
+        "insight": "The tokenization-and-perplexity slide relates perplexity to entropy and next-token uncertainty; it does not distinguish predictive cross-entropy from source entropy or explain mutual information."
+      },
+      {
+        "page": 99,
+        "insight": "The following representation-learning slide describes autoregressive and masked objectives but adds no information-theoretic decomposition."
+      },
+      {
+        "page": 147,
+        "insight": "The image-classification slide mentions differential entropy and dequantization, supplying a warning that continuous entropy differs from discrete entropy but no noisy-channel or mutual-information model."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for entropy, conditional entropy, mutual information, information gain, KL divergence, and information theory. Every match was reviewed. The complete relevant neighborhoods on pages 16-18, 24-27, 97-99, and 146-148 were extracted; none defines mutual information or a binary noisy channel. No deck artwork, equations, code, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Elements of Information Theory, Second Edition",
+        "url": "https://www.wiley.com/en-us/Elements+of+Information+Theory%2C+2nd+Edition-p-9780471241959",
+        "usage": "Used as the authoritative textbook source for discrete entropy, conditional entropy, mutual information as uncertainty reduction and KL divergence, symmetry, bounds, and the binary symmetric channel calculation.",
+        "license": "The book is commercially published by Wiley, and no permissive license for reproducing its figures was identified. No figure, example layout, wording, or table is copied; the visual is an original calculation from the article's stated channel."
+      },
+      {
+        "title": "A Mathematical Theory of Communication",
+        "url": "https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf",
+        "usage": "Used as the primary historical source for entropy as uncertainty, equivocation as remaining uncertainty after a received signal, and noisy-channel information rate.",
+        "license": "The hosted scan retains its original Bell System Technical Journal publication context and provides no clear permissive reuse grant. No paper figure, prose, typography, or channel diagram is reproduced."
+      },
+      {
+        "title": "scikit-learn mutual_info_score documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mutual_info_score.html",
+        "usage": "Used as official implementation documentation to cross-check the joint-table definition, nonnegativity, symmetry, label-invariance, and explicit log-base units.",
+        "license": "The scikit-learn project uses the BSD 3-Clause license. No documentation prose, code, example, or layout is copied; only the public mathematical API semantics are referenced."
+      }
+    ],
+    "notes": "The original worked example instantiates the article's fair binary symmetric channel at error probability 0.1. Independence of the fair input and noise gives joint probabilities P(0,0)=P(1,1)=0.45 and P(0,1)=P(1,0)=0.05, so both X and Y have 0.5/0.5 marginals and one bit of entropy. Given either Y value, X matches with probability 0.9 and flips with probability 0.1; therefore H2(X|Y)=h2(0.1)=0.469 bits and I2(X;Y)=1-0.469=0.531 bits. Values, wording, and layout are original."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every entropy-adjacent neighborhood, then checked Shannon's primary paper, Cover and Thomas's authoritative textbook, and official scikit-learn semantics. The selected visual targets the article's hardest mental model: unchanged marginal uncertainty can coexist with substantial shared information."
+  },
+  "implementation": {
+    "visualIds": [
+      "mutual-information-noisy-channel-budget"
+    ],
+    "accessibility": "The figure uses real tables with scoped row and column headers, explicit joint probabilities, written marginal totals, a textual entropy identity, and a caption that states the conclusion without color. The established two-panel primitive stacks below 640 CSS pixels for a 390-pixel viewport, theme tokens preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette."
+  }
+}

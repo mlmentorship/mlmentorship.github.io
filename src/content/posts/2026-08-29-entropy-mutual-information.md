@@ -187,6 +187,40 @@ $$
 
 For $\varepsilon=0.1$, $h_2(0.1)\approx0.469$, so the channel carries about $0.531$ bits per input bit. At $\varepsilon=0.5$, the output is independent of the input and mutual information is zero.
 
+<!-- visual:mutual-information-noisy-channel-budget -->
+<figure class="learning-figure" aria-labelledby="mutual-information-budget-title">
+	<p class="visual-kicker">Worked uncertainty budget</p>
+	<p class="visual-title" id="mutual-information-budget-title">If both bits stay fair, where do 0.531 bits of mutual information come from?</p>
+	<div class="visual-grid--two" role="group" aria-label="Binary channel with a fair input and ten percent flip probability, followed by its entropy decomposition">
+		<section class="visual-panel" aria-labelledby="mutual-information-joint-title">
+			<h4 id="mutual-information-joint-title">Joint distribution: outcomes agree 90% of the time</h4>
+			<p>Each marginal stays 50/50, but probability concentrates on the two matching outcomes.</p>
+			<table class="cm-grid" aria-label="Joint distribution of fair input X and output Y with ten percent crossover probability">
+				<thead><tr><th scope="col">X \ Y</th><th scope="col">Y = 0</th><th scope="col">Y = 1</th><th scope="col">P(X)</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">X = 0</th><td class="cm-selected"><strong>0.45</strong> match</td><td><strong>0.05</strong> flip</td><td><strong>0.50</strong></td></tr>
+					<tr><th scope="row">X = 1</th><td><strong>0.05</strong> flip</td><td class="cm-selected"><strong>0.45</strong> match</td><td><strong>0.50</strong></td></tr>
+					<tr><th scope="row">P(Y)</th><td><strong>0.50</strong></td><td><strong>0.50</strong></td><td><strong>1.00</strong></td></tr>
+				</tbody>
+			</table>
+		</section>
+		<section class="visual-panel" aria-labelledby="mutual-information-ledger-title">
+			<h4 id="mutual-information-ledger-title">Observe Y: uncertainty about X shrinks</h4>
+			<p>Given either output, X matches it with probability 0.9 and differs with probability 0.1.</p>
+			<table class="cm-grid" aria-label="Entropy ledger showing prior uncertainty, remaining uncertainty, and mutual information in bits">
+				<thead><tr><th scope="col">Quantity</th><th scope="col">Bits</th><th scope="col">Meaning</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">H(X)</th><td><strong>1.000</strong></td><td>before Y</td></tr>
+					<tr><th scope="row">H(X | Y)</th><td><strong>0.469</strong></td><td>left after Y</td></tr>
+					<tr><th scope="row">I(X; Y)</th><td class="cm-selected"><strong>0.531</strong></td><td>removed by Y</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">I(X; Y) = H(X) - H(X | Y) = 1 - 0.469 = 0.531 bits</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> fair marginals mean X and Y each have one bit of uncertainty; they do not mean independence. The diagonal 0.45 cells show that Y usually predicts X, leaving 0.469 bits unresolved and removing 0.531 bits. That removed uncertainty is their mutual information.</figcaption>
+</figure>
+
 ## Cross-entropy and KL divergence
 
 For a true distribution $p$ and model distribution $q$, cross-entropy is
