@@ -29,6 +29,43 @@ Knowing GAN training dynamics is also key to understanding why diffusion's stabl
 - **Generator $G$**: maps noise $z$ to a fake sample. Trained to fool $D$.
 - **Discriminator $D$**: binary classifier distinguishing real from fake. Trained to maximize correct classification.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace which network receives an update in each half of GAN training.</p>
+
+<!-- visual:gan-alternating-update-ownership -->
+```mermaid
+flowchart TB
+	accTitle: Alternating discriminator and generator updates in GAN training
+	accDescr: Phase one updates only the discriminator. A real sample goes directly to the discriminator, while noise passes through a frozen generator to make a generated sample for the same discriminator. The discriminator learns to score real samples toward one and generated samples toward zero. Phase two updates only the generator. Fresh noise passes through the generator and then a frozen discriminator. The generator receives gradients through that discriminator and learns to raise the generated sample's real score toward one. Training then repeats with the newly updated networks.
+
+	subgraph DSTEP["1 · DISCRIMINATOR STEP · UPDATE D, FREEZE G"]
+		direction TB
+		X["Real sample x"] --> DPAIR["Same discriminator D<br/>compares both sources"]
+		ZD["Noise z"] --> GF["Generator G(z)<br/>FROZEN"] --> DPAIR
+		DPAIR --> DT["D targets<br/>D(x) → 1 · D(G(z)) → 0"]
+		DT ==> DU["UPDATE D ONLY"]
+	end
+
+	subgraph GSTEP["2 · GENERATOR STEP · UPDATE G, FREEZE D"]
+		direction TB
+		ZG["Fresh noise z"] --> GG["Generator G(z)<br/>UPDATED"]
+		GG --> DF["Discriminator D(G(z))<br/>FROZEN"]
+		DF -->|"increase generated sample's real score"| GT["Non-saturating target<br/>D(G(z)) → 1"]
+		GT ==> GU["UPDATE G ONLY<br/>gradient passes through D"]
+	end
+
+	DU ==>|"then"| ZG
+	GU -.->|"repeat with updated networks"| X
+
+	class X,ZD,ZG viz-input
+	class GF,DF viz-state
+	class DPAIR,DT,GT viz-focus
+	class DU,GG,GU viz-output
+	class X viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> first train $D$ on both sources while $G$ is only a sample factory. Then freeze $D$ but keep it in the differentiable path: its judgment sends a gradient into $G$, whose practical non-saturating target is to push $D(G(z))$ toward “real.” Alternating changes who learns, not which networks participate in the forward pass.</p>
+
 At equilibrium (Nash), $G$ produces samples indistinguishable from real, and $D$ outputs $\tfrac{1}{2}$ everywhere.
 
 ## Why training is hard

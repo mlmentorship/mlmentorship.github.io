@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "gans-overview",
+  "article": "src/content/posts/2026-01-01-gans-overview.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace the two alternating GAN updates and identify which network changes, which network is frozen, and what target drives each phase.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest useful spatial explanation because the hard model is an alternating two-player process with shared sample paths but different update ownership: discriminator training uses real and generated examples, then generator training backpropagates through a frozen discriminator.",
+  "mediumComparison": {
+    "mermaid": "Selected because labelled nodes and edges directly express the two sequential phases, the frozen network in each phase, and the return to another alternating step. The established tall-flow marker keeps the graph responsive and theme-safe.",
+    "svg": "Rejected because the lesson needs qualitative data and gradient flow rather than quantitative geometry; fixed coordinates would add maintenance and less reliable text wrapping without improving the mechanism.",
+    "semanticHtml": "Rejected because two cards could list the losses, but would make it harder to follow noise through G and then D or see that the second update differentiates through D without updating D.",
+    "interaction": "Rejected because stepping between phases would hide one update while showing the other and add state to a mechanism that is clearest when both phases remain visible for comparison.",
+    "paperReuse": "Rejected because the original paper's Figure 1 depicts distribution-space dynamics rather than update ownership and has no permissive reuse grant. The shipped graph is an original synthesis and copies no figure geometry, artwork, values, or arrangement.",
+    "noVisual": "Rejected because the prose names both players and the minimax objective but leaves readers to mentally unpack which examples train D, how G receives a signal, and which parameters must remain fixed in each alternating phase."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 78,
+        "insight": "The modeling overview introduces parametric and non-parametric approaches but contains no adversarial training mechanism."
+      },
+      {
+        "page": 79,
+        "insight": "The parametric-model taxonomy names GANs as transformation models, distinguishing them from fully observed and latent-variable models without showing G, D, or either update."
+      },
+      {
+        "page": 80,
+        "insight": "The neighboring Bayesian inference slide moves into latent-variable learning, confirming that the first GAN mention has no local mechanism explanation."
+      },
+      {
+        "page": 86,
+        "insight": "The model-selection summary introduces the comparison immediately before a second GAN taxonomy slide."
+      },
+      {
+        "page": 87,
+        "insight": "The comparison labels GANs as transformation models beside VAEs and autoregressive models but does not explain adversarial objectives or alternating optimization."
+      },
+      {
+        "page": 88,
+        "insight": "The following references slide lists VAE and variational-inference sources, closing the generative-model neighborhood without a GAN source or training diagram."
+      },
+      {
+        "page": 149,
+        "insight": "The preceding Faster R-CNN slide is unrelated and establishes the immediate boundary before the dedicated GAN slide."
+      },
+      {
+        "page": 150,
+        "insight": "The dedicated GAN slide covers sigmoid saturation, WGAN critic scores, multiple critic steps, Lipschitz constraints, gradient penalty, mode dropping, minibatch statistics, conditioning, and radial GANs. It does not draw the baseline alternating update or clearly distinguish frozen from updated parameters."
+      },
+      {
+        "page": 151,
+        "insight": "The following slide is titled Stable Diffusion but describes numerical heat diffusion rather than the generative diffusion model, ending the GAN neighborhood without a useful comparison or update diagram."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for GAN, generative adversarial, generator, discriminator, mode collapse, and adversarial-training terms. Pages 77-89 and 147-152 were read as the complete matching neighborhoods, including boundary slides. Page 150 is the only substantive GAN slide; pages 79 and 87 only classify the model family. No deck screenshot, wording, artwork, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Generative Adversarial Nets",
+        "url": "https://papers.nips.cc/paper_files/paper/2014/hash/f033ed80deb0234979a61f95710dbe25-Abstract.html",
+        "usage": "Used as the primary source to verify the two-player minimax game, real and generated inputs to D, alternating k discriminator steps with one generator step, D = 1/2 at the ideal equilibrium, and the practical non-saturating generator objective that maximizes log D(G(z)).",
+        "license": "The official NeurIPS proceedings page provides public access but no permissive figure-reuse license was identified; the arXiv copy uses a non-exclusive distribution license rather than a general reuse license. No paper text, Algorithm 1 layout, Figure 1 geometry, data, or artwork is reproduced."
+      },
+      {
+        "title": "NIPS 2016 Tutorial: Generative Adversarial Networks",
+        "url": "https://arxiv.org/abs/1701.00160",
+        "usage": "Used as an authoritative tutorial by the original first author to cross-check alternating optimization, the distinction between minimax and non-saturating generator costs, mode collapse, and the difficulty of reaching equilibrium in parameterized games.",
+        "license": "The arXiv record does not establish a Creative Commons figure license. Public access is not treated as permission to adapt slides or figures, and no wording, examples, visual structure, or empirical result is copied."
+      },
+      {
+        "title": "Wasserstein GAN",
+        "url": "https://arxiv.org/abs/1701.07875",
+        "usage": "Used as a primary paper to verify why a critic with a constrained Lipschitz function supplies more useful gradients than a saturated discriminator, why the WGAN algorithm uses several critic updates per generator update, and why this changes the signal rather than the alternating ownership pattern.",
+        "license": "No permissive reuse license was identified on the paper record. No figure, algorithm layout, prose, plotted value, or experiment is reused; the source only checks claims already discussed in the article and deck."
+      }
+    ],
+    "notes": "The hardest prose-only model is update ownership. During the discriminator phase, generated samples pass through G but G is frozen; D alone learns to score real samples high and generated samples low. During the generator phase, gradients pass through frozen D into G; G alone learns to make generated samples receive a more-real score. The diagram uses the common non-saturating generator target because the original paper states that it has the same fixed point as the minimax generator loss but provides stronger early gradients."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both complete GAN neighborhoods, then checked the original GAN paper, the original author's GAN tutorial, and the WGAN paper before selecting an original alternating-update flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "gan-alternating-update-ownership"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description naming both phases, each input, both targets, gradient flow, and update ownership. Every node directly says updated or frozen, edges name the targets, and phase numbers and topology carry the lesson without color. The tall top-to-bottom layout uses the established mobile exception so it has no forced wide canvas at 390 CSS pixels; existing theme tokens provide dark-mode contrast, and print removes responsive width constraints and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the inference if rendering is unavailable."
+  }
+}
