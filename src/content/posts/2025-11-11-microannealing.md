@@ -26,6 +26,50 @@ This is the technique behind decisions like "include FineMath in the mix," "drop
 5. Evaluate both on downstream tasks (MMLU, HellaSwag, GSM8K, etc.), not just on per-domain perplexity.
 6. Decide based on task performance, not loss.
 
+<!-- visual:microannealing-controlled-fork -->
+<figure class="learning-figure plot-panel" aria-labelledby="microannealing-fork-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="microannealing-fork-title">Hold the cooldown fixed, change only the data mix, and let downstream tasks veto a misleading loss win.</p>
+	<svg viewBox="0 0 360 520" role="img" aria-labelledby="microannealing-fork-svg-title microannealing-fork-svg-desc">
+		<title id="microannealing-fork-svg-title">A controlled microannealing fork with conflicting evaluation signals</title>
+		<desc id="microannealing-fork-svg-desc">One mostly trained checkpoint forks into two disposable cooldown runs. The control uses one hundred percent of the normal pretraining mix. The candidate example uses seventy percent pretraining data and thirty percent high-quality data. Both runs keep the starting weights, learning-rate decay, token budget, and evaluation suite identical. In the Marin high-quality-only experiment, the candidate improved matched-domain validation loss but worsened downstream task performance relative to control, so the data mix was rejected despite its loss win.</desc>
+		<defs>
+			<marker id="microannealing-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker>
+			<marker id="microannealing-focus-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
+		</defs>
+		<text class="viz-axis-label" x="18" y="22">ONE LATE CHECKPOINT · TWO MATCHED COOLDOWNS</text>
+		<rect class="viz-node viz-node--input" x="64" y="38" width="232" height="52" rx="4"></rect>
+		<text class="viz-callout" x="180" y="58" text-anchor="middle">mostly trained checkpoint</text>
+		<text class="viz-node-value" x="180" y="78">same weights and optimizer state</text>
+		<path d="M180 90V112M180 112H91V132M180 112H269V132" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#microannealing-arrow)"></path>
+		<rect class="viz-node" x="18" y="136" width="146" height="72" rx="4"></rect>
+		<text class="viz-axis-label" x="91" y="157" text-anchor="middle">CONTROL</text>
+		<text class="viz-callout" x="91" y="179" text-anchor="middle">100% normal mix</text>
+		<text class="viz-node-value" x="91" y="197">reference cooldown</text>
+		<rect class="viz-node viz-node--focus" x="196" y="136" width="146" height="72" rx="4"></rect>
+		<text class="viz-axis-label" x="269" y="157" text-anchor="middle">CANDIDATE EXAMPLE</text>
+		<text class="viz-callout" x="269" y="179" text-anchor="middle">70% PT + 30% HQ</text>
+		<text class="viz-node-value" x="269" y="197">one changed factor</text>
+		<path d="M91 208V230H180M269 208V230H180V246" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#microannealing-focus-arrow)"></path>
+		<rect class="viz-node" x="28" y="250" width="304" height="72" rx="4" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke)"></rect>
+		<text class="viz-axis-label" x="180" y="270" text-anchor="middle">LOCKED IN BOTH RUNS</text>
+		<text class="viz-node-value" x="180" y="291">same LR decay · same token budget</text>
+		<text class="viz-node-value" x="180" y="309">same evaluation suite</text>
+		<path d="M180 322V342" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#microannealing-arrow)"></path>
+		<text class="viz-axis-label" x="18" y="363">MARIN HQ-ONLY RESULT RELATIVE TO CONTROL</text>
+		<rect class="viz-node" x="18" y="377" width="324" height="92" rx="4"></rect>
+		<text class="viz-label" x="30" y="400">MATCHED-DOMAIN LOSS</text>
+		<text class="viz-callout" x="330" y="400" text-anchor="end">lower · candidate looks better</text>
+		<path class="viz-gridline" d="M30 414H330"></path>
+		<text class="viz-label" x="30" y="439">DOWNSTREAM TASKS</text>
+		<text class="viz-callout" x="330" y="439" text-anchor="end">worse · candidate loses</text>
+		<path d="M180 469V487" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#microannealing-arrow)"></path>
+		<rect x="72" y="490" width="216" height="27" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2"></rect>
+		<text class="viz-callout" x="180" y="508" text-anchor="middle">reject the HQ-only mix</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> fork both runs from the same late checkpoint and lock the schedule, token budget, and eval suite; the data mixture should be the only changed factor. Then read both result rows. In Marin's HQ-only probes, validation loss on similar HQ domains improved while downstream tasks regressed, so loss alone would have selected the wrong mix. This is an original schematic checked against <a href="https://github.com/marin-community/marin/issues/820">Marin's experiment record</a>.</figcaption>
+</figure>
+
 ## What the experiments actually showed (Marin)
 
 Three findings from [GH#784](https://github.com/marin-community/marin/issues/784) and [GH#820](https://github.com/marin-community/marin/issues/820), worth memorizing because they are counterintuitive:

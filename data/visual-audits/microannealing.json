@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "microannealing",
+  "article": "src/content/posts/2025-11-11-microannealing.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Identify the controlled contrast in a microannealing study and explain why downstream task performance, rather than a matched-domain validation-loss improvement alone, determines whether the candidate data mix advances.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can show two cooldowns forking from one late checkpoint, the single changed factor, the conditions held equal, and the decisive disagreement between matched-domain loss and downstream tasks in one static experiment trace.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could express the fork, but automatic routing would devote space to topology while providing weak alignment between the locked conditions, two evaluation rows, and final decision.",
+    "svg": "Selected: a fixed narrow layout keeps the control and candidate symmetric, labels every held-constant condition, and aligns the conflicting signals with the decision they imply.",
+    "semanticHtml": "Rejected: a comparison table could list controls and outcomes, but would not make the same-checkpoint fork and disposable parallel cooldowns as immediate as a spatial trace.",
+    "interaction": "Rejected: changing mixture percentages or simulated outcomes would add controls and hidden states without improving the causal lesson; the historical result must not be mistaken for an interactive prediction model.",
+    "paperReuse": "Rejected: the Marin issue and retrospective include empirical charts, and OLMo 2 includes mixture tables and ablation plots, but no external figure is necessary. Repository licenses do not resolve every embedded attachment's provenance, so no source image, data trace, coordinates, wording, or layout is copied.",
+    "noVisual": "Rejected: the procedure is sequential in prose, leaving readers to mentally enforce that both branches share one checkpoint and all non-data conditions, then reconcile the counterintuitive case where loss and task metrics point in opposite directions."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The data-inspection slide emphasizes examining variation, bias, predictions, distributions, and outliers before changing a model, but does not define a late-training data-mixture experiment."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide is the closest experimental-method source: it calls for explicit-hypothesis ablations, fixed seeds, full evaluation, visualized loss, and human-interpretable metrics other than loss."
+      },
+      {
+        "page": 60,
+        "insight": "The neighboring sanity-check slide says to plot training and validation accuracy in addition to loss and several internal diagnostics, reinforcing the need for multiple signals rather than one loss number."
+      },
+      {
+        "page": 61,
+        "insight": "The next model-selection slide says to change one component at a time and retain the same initialization for comparisons, but it addresses architecture debugging rather than same-checkpoint cooldown branches."
+      },
+      {
+        "page": 62,
+        "insight": "The following regularization slide discusses adding and augmenting data, pretraining, and early stopping, but not controlled candidate-data evaluation late in pretraining."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer slide is the closest schedule source: it describes warmup and cooldown phases, but presents one planned run rather than parallel control and candidate cooldowns."
+      },
+      {
+        "page": 104,
+        "insight": "The adjacent instruction-tuning slide explicitly connects task-format diversity to in-context and zero-shot behavior, providing useful context for FLAN's structural effect without discussing microannealing."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring LLM slide distinguishes base, instruction-tuned, and RLHF models and describes synthetic tool-use data, but supplies no controlled data-mix comparison."
+      },
+      {
+        "page": 106,
+        "insight": "The LLM-data slide covers joint model/data scaling, preprocessing, batch changes, and mixtures of web and curated sources, motivating data-mix choices without showing how to test a candidate source."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for microannealing, midtraining, cooldown, annealing, data mix, training data, pretraining, perplexity, instruction tuning, learning rate, ablation, and evaluation. No slide names microannealing or midtraining. Pages 58-63 were read as the full practical experimentation neighborhood, and pages 102-107 were read around transformer scheduling, instruction tuning, and LLM data. Pages 59-61 supply the closest controlled-experiment principles; pages 103-106 supply the closest cooldown and data-mixture context. No slide combines one late checkpoint, matched cooldown branches, a candidate mixture, and conflicting loss/task outcomes. No deck artwork, wording, values, coordinates, or composition is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Marin 8B Retrospective: Interlude - Microannealing",
+        "url": "https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/#interlude-microannealing",
+        "usage": "Used as the primary retrospective source for the mostly trained checkpoint, short 70/30 candidate cooldowns, 100% pretraining control, OLMo 2's 50/50 comparison, conflicting HQ-domain loss and downstream task results, and the 70/15/15 PT-FLAN-HQ finding.",
+        "license": "The corresponding Marin repository is Apache-2.0 licensed, but documentation images and linked attachments may have separate provenance. No retrospective figure, table, empirical trace, values-as-geometry, prose, or layout is copied."
+      },
+      {
+        "title": "Marin issue 820: Evaluate High Quality Datasets for Cooldown Mix",
+        "url": "https://github.com/marin-community/marin/issues/820",
+        "usage": "Used as the primary experiment log to verify that HQ candidates improved Paloma validation loss without matching the strong downstream baseline, and that adding FLAN restored task-format exposure and produced a Pareto improvement in the tested budget.",
+        "license": "The Marin repository is Apache-2.0, but GitHub user attachments are not assumed to inherit repository licensing. No chart, attachment, data coordinate, wording, or layout is reproduced; only the qualitative documented outcome is summarized with attribution."
+      },
+      {
+        "title": "Marin issue 784: High Quality Data Annealing Experiments on Dolma and Dolmino",
+        "url": "https://github.com/marin-community/marin/issues/784",
+        "usage": "Used as the primary planning and decision record for the candidate-mixture hypothesis, the controlled shortened cooldown used to de-risk the release mix, and the later conclusion that FLAN-like structural tokens were needed.",
+        "license": "The issue belongs to the Apache-2.0 Marin project, but embedded third-party figures and user attachments were treated as independently licensed. No issue image, table, prose, or experiment value is copied into the visual."
+      },
+      {
+        "title": "2 OLMo 2 Furious",
+        "url": "https://arxiv.org/abs/2501.00656",
+        "usage": "Used as a primary technical report to verify the mid-training framing: restart from pretrained checkpoints, linearly decay learning rate, compare controlled data-mixture variants, and use capability benchmarks such as GSM8K as feedback rather than training loss alone.",
+        "license": "No permissive figure-reuse grant was established from the arXiv record. The AllenAI OLMo code repository is Apache-2.0, but that does not automatically license paper figures; no figure, table, curve, values, prose, or layout is reused."
+      },
+      {
+        "title": "The Llama 3 Herd of Models",
+        "url": "https://arxiv.org/abs/2407.21783",
+        "usage": "Used as a primary report to cross-check late-stage data-mixture adjustment and the role of high-quality sources in the final part of pretraining.",
+        "license": "The arXiv record is publicly readable, but public access alone is not treated as adaptation permission. No paper figure, table, recipe text, result, or visual structure is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the experimental contrast, not the schedule itself. Both branches must start from the same mostly trained checkpoint and keep learning-rate decay, token budget, and evaluation identical; only the data mix changes. The shipped figure uses Marin's documented qualitative HQ-only outcome as a worked caution: matched-domain validation loss improved while downstream benchmark performance degraded relative to the 100% PT control. This result is not presented as a universal numeric law or evidence that every HQ mixture fails. The schematic's positions, wording, and geometry are independently authored."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the full practical-training and transformer-data neighborhoods, reviewed Marin's retrospective and primary experiment issues plus the OLMo 2 and Llama 3 reports, verified repository licenses and attachment ambiguity, and selected an original controlled-fork schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "microannealing-controlled-fork"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming the checkpoint, both mixtures, every held-constant condition, both qualitative outcomes, and the decision. Symmetric branch position, dashed probe paths, headings, direct labels, row rules, and an explicit reject box carry the lesson without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
