@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "llm-deployment-healthcare",
+  "article": "src/content/posts/2026-03-07-llm-deployment-healthcare.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how intended use bounds an LLM's role, why a clinician must independently verify its evidence before any clinical action, and how the resulting decision and outcome return through one auditable operations loop.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that keeps the evidence path, clinician authority boundary, no-action exit, provenance trace, and operational feedback connected. The lesson is about responsibility and sequence rather than quantitative geometry.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled directed edges make the authority boundary, mutually exclusive review outcomes, audit evidence, and controlled feedback loop explicit. The established renderer supplies responsive sizing plus dark-mode and print themes.",
+    "svg": "Rejected: no scale, measurement, or fixed geometry carries the lesson, so manually positioned SVG would add maintenance without increasing technical precision.",
+    "semanticHtml": "Rejected: a checklist or comparison table could enumerate controls, but it would obscure the critical fact that clinical action is downstream of independent clinician review while rejected output still enters the same audit loop.",
+    "interaction": "Rejected: letting a reader toggle acceptance, refusal, or incident states would add hidden state and JavaScript without improving the fixed authority and evidence relationships.",
+    "paperReuse": "Rejected: the reviewed FDA, WHO, and NIST sources provide complementary regulatory, ethical, and lifecycle guidance, but no single figure expresses this article-specific clinician-gated evidence loop. Reuse rights were assessed explicitly, and no source figure, prose, icon, coordinates, or layout is copied.",
+    "noVisual": "Rejected: the prose names grounding, citations, confidence, human review, audit, evaluation, fairness, and incident response in separate paragraphs. Without a spatial explanation, a reader can miss both where action authority changes hands and how pre-action evidence connects to post-action governance."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The ML Design divider begins the nearest system-design neighborhood and contains no healthcare, clinical authority, regulation, or audit-loop treatment."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design interview overview asks about end-user workflow, logging, privacy, compliance, deployment, and metrics, but does not connect these concerns through a clinician decision boundary."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist is the closest broad match: it asks about regulatory requirements, fairness, privacy, downstream business actions, confidence suppression, reproducibility, overrides, and error analysis. It remains a checklist rather than an evidence-to-action architecture."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide uses medical vulnerability prediction to illustrate asymmetric false-negative cost and notes that generative-model evaluation is difficult. It does not establish safe clinical workflow or human decision authority."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers user data, feedback, privacy, and bias. These support minimum-necessary context and sliced evaluation, but the slide has no clinical provenance or incident-response path."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide covers task choice, simple baselines, human baselines, and scale. It supplies general modeling context only."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide is the closest operational match: it asks about gating tests, monitoring, user correction, low-confidence behavior, privacy, and interpretability. It does not show a clinician as the final decision-maker or bind each output to citations and a versioned trace."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring Rules of Machine Learning slide calls for independent infrastructure tests, silent-failure monitoring, externally handled policy, quantified undesirable behavior, saved serving features, and multi-metric launches. These motivate lifecycle controls but not the healthcare-specific authority boundary."
+      },
+      {
+        "page": 170,
+        "insight": "The Algorithms and Data Structures divider ends the relevant production neighborhood and confirms that no adjacent healthcare deployment treatment follows."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for healthcare, clinical, medical, HIPAA, FDA, regulation, privacy, human review, audit, monitoring, gating, confidence, safety, and related terms, then read pages 160-170 as the complete nearest ML-design and production neighborhood. The only medical example is the false-negative warning on page 165. The deck contains no healthcare LLM deployment or clinician-gated evidence figure. No deck image, wording, coordinates, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "FDA Clinical Decision Support Software: Guidance for Industry and Food and Drug Administration Staff",
+        "url": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software",
+        "usage": "Used as official regulatory guidance to verify that intended use determines whether a software function may fall within non-device clinical decision support criteria, and that a healthcare professional's ability to independently review the basis of recommendations is a central boundary.",
+        "license": "FDA guidance is a United States government publication, but the FDA page may contain third-party material and no figure reuse was needed. No FDA figure, example, prose, icon, or layout is reproduced; the original visual cites the guidance only."
+      },
+      {
+        "title": "WHO guidance: Ethics and governance of artificial intelligence for health",
+        "url": "https://www.who.int/publications/i/item/9789240029200",
+        "usage": "Used as authoritative health guidance to cross-check protection of human autonomy, safety and public interest, transparency, accountability, inclusiveness and equity, and responsiveness across deployment.",
+        "license": "The publication is issued under CC BY-NC-SA 3.0 IGO, with separate permission potentially required for credited third-party material. Although reuse is available under conditions, no WHO text, figure, data, icon, or composition is adapted; the source is cited for principles only."
+      },
+      {
+        "title": "NIST Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as official lifecycle risk-management guidance to cross-check governance, measurement, management, documented human oversight, ongoing monitoring, incident response, and change management.",
+        "license": "NIST publications created by federal employees are generally United States government works not subject to domestic copyright, while third-party and foreign rights may still apply. No NIST figure, table, prose, or layout is reused; the visual is an original article-specific synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the direction of decision authority across the complete lifecycle. Patient context and verified sources may inform a bounded LLM draft, but that draft remains evidence rather than a clinical action. A clinician must be able to inspect the basis and patient fit, reject or edit unsupported output, and own the resulting decision. Inputs, retrievals, outputs, decisions, and outcomes then form one versioned trace for evaluation, fairness analysis, incident response, rollback, and controlled change. Because no reviewed figure teaches that exact relationship and reuse was unnecessary, the shipped diagram is wholly original."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 source-deck pages and inspected the neighboring ML-design and production slides, then checked official FDA, WHO, and NIST guidance and their licensing treatment before selecting an original clinician-gated evidence and operations loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "healthcare-llm-clinician-gate"
+    ],
+    "accessibility": "The Mermaid source has a specific accessible title and a complete description of the intended-use boundary, evidence inputs, structured draft, clinician review outcomes, clinical workflow, audit record, and operations feedback. Every node and branch is directly labelled; solid, thick, and dashed arrows distinguish the primary decision path from provenance and feedback without relying on color. The top-to-bottom layout and established viz-tall marker remove the mobile minimum width and permit full-height rendering at 390 CSS pixels. Shared visual tokens provide dark-mode and print-safe contrast, and the caption preserves the core lesson if client-side rendering is unavailable."
+  }
+}
