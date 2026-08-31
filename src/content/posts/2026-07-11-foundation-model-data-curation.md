@@ -15,22 +15,25 @@ At large scale, data determines capability, memorization, bias, legal exposure, 
 
 A good pipeline can answer which source produced a sample, which transformations touched it, why it passed, which mixture version used it, and which trained checkpoints may contain it.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">How can one source sample remain traceable from raw input to every affected checkpoint?</p>
+
 <!-- visual:foundation-data-curation-lineage -->
 ```mermaid
 flowchart TB
 	accTitle: Curation preserves a sample's lineage from source to checkpoint
 	accDescr: A raw source sample receives a stable identifier before parsing and normalization. Versioned policy, quality, deduplication, and contamination gates either reject it with a recorded reason or retain it with decision evidence. Retained samples become curated source shards. Explicit source weights and effective-epoch limits combine those shards with other curated sources in an immutable mixture manifest. The manifest identifies a training run and its checkpoints. An audit ledger records the source, transformation and gate versions, exclusion reasons, mixture manifest, run, and checkpoints, making both rejected samples and retained samples traceable.
-	Raw["RAW SOURCE SAMPLE<br/>license · time · language"]
-	Identity["STABLE SAMPLE ID<br/>assigned before transforms"]
-	Normalize["PARSE + NORMALIZE<br/>preserve meaningful structure"]
-	Gates{"VERSIONED GATES<br/>policy · quality · dedup · contamination"}
-	Reject[("EXCLUSION RECORD<br/>sample ID · gate · reason")]
-	Shard["CURATED SOURCE SHARD<br/>retained IDs + decision evidence"]
-	Others["OTHER CURATED SOURCES<br/>each with provenance"]
-	Weights["MIXTURE DESIGN<br/>source weights + effective epochs"]
-	Manifest[("IMMUTABLE MIXTURE MANIFEST<br/>shards · transforms · weights")]
+	Raw["RAW SAMPLE<br/>license · time · language"]
+	Identity["STABLE ID<br/>assigned before transforms"]
+	Normalize["PARSE + NORMALIZE<br/>preserve structure"]
+	Gates{"VERSIONED GATES<br/>policy · quality<br/>dedup · contamination"}
+	Reject[("EXCLUSION RECORD<br/>ID · gate · reason")]
+	Shard["CURATED SHARD<br/>IDs + decision evidence"]
+	Others["OTHER SOURCES<br/>with provenance"]
+	Weights["MIXTURE DESIGN<br/>weights + effective epochs"]
+	Manifest[("MIXTURE MANIFEST<br/>shards · transforms · weights")]
 	Run["TRAINING RUN<br/>manifest version"]
-	Checkpoints[("AFFECTED CHECKPOINTS<br/>run + step")]
+	Checkpoints[("CHECKPOINTS<br/>run + step")]
 	Audit[("AUDIT LEDGER<br/>decisions + lineage")]
 
 	Raw --> Identity --> Normalize --> Gates

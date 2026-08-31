@@ -32,7 +32,7 @@ A 7B-parameter model therefore needs about 84–112 GB of persistent training st
 	<svg viewBox="0 0 360 520" role="img" aria-labelledby="fsdp-lifecycle-svg-title fsdp-lifecycle-svg-desc">
 		<title id="fsdp-lifecycle-svg-title">Lifecycle of one wrapped unit on one rank under FSDP full sharding</title>
 		<desc id="fsdp-lifecycle-svg-desc">At rest, rank i stores only parameter shard P i, a slot for gradient shard G i, and optimizer shard O i. Before forward, an all-gather reconstructs the current wrapped unit's full parameters P zero through P three temporarily. Forward compute runs, then the full parameters are freed while P i remains. Before backward, another all-gather reconstructs the full unit. Backward compute produces gradients, and reduce-scatter leaves gradient shard G i on this rank. The local optimizer shard O i uses G i to update P i. Activations and communication buffers are additional memory and are not shown.</desc>
-		<text class="viz-axis-label" x="20" y="22">ONE DATA-PARALLEL RANK i · ONE WRAPPED UNIT · FULL_SHARD</text>
+		<text class="viz-axis-label" x="20" y="22">RANK i · ONE WRAPPED UNIT · FULL_SHARD</text>
 		<text class="viz-callout" x="20" y="48">Persistent rank-local state</text>
 		<rect class="viz-node viz-node--input" x="20" y="60" width="96" height="52" rx="4"></rect>
 		<text class="viz-node-value" x="68" y="81">PARAMETER SHARD</text>

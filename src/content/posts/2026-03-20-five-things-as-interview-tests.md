@@ -120,7 +120,7 @@ A better prep is:
 
 ## A note on the AS-specific bar
 
-Applied Scientist roles, especially at Amazon and Microsoft, weight #2 (shipping) and #4 (communication) more than Research Scientist or pure-MLE roles do. AS is a hybrid: you need the science (#3) but you also need the production fluency (#2) and the influence (#4) to actually move things in a large organization.
+As a preparation heuristic, treat production-facing Applied Scientist roles at large organizations, including Amazon and Microsoft, as hybrids that may place more weight on #2 (shipping) and #4 (communication) than research-only roles do. This is not a claim about one universal company rubric. You need the science (#3), production fluency (#2), and influence (#4) to move work through a large organization.
 
 If you're transitioning from a research role to AS, your prep should disproportionately focus on #2 and #4. You probably already have #3 covered. The rejection mode for research-to-AS transitions is "brilliant but couldn't ship" or "great researcher but can't influence cross-functionally." Pre-empt both with concrete production stories and with examples of cross-team disagreement and resolution.
 

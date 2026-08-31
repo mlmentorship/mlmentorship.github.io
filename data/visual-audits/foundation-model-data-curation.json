@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Trace one source sample through identity-preserving curation decisions into a versioned weighted mixture, then use the same lineage to identify affected checkpoints.",
-  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that shows both the main transformation path and the two distinctions prose leaves spatially implicit: rejected samples branch out rather than vanish without evidence, and retained samples enter a versioned mixture whose manifest links them to training runs and checkpoints.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that shows both the main transformation path and the two distinctions prose leaves spatially implicit: rejected samples branch out rather than vanish without evidence, and retained samples enter a versioned mixture whose manifest links them to training runs and checkpoints. The diagram groups policy, quality, deduplication, and contamination into one labelled versioned gate so it can teach lineage rather than repeat the prose stage by stage.",
   "mediumComparison": {
     "mermaid": "Selected: labelled directed edges express gates, rejection records, weighted source branches, and forward lineage without fixed coordinates, while the established renderer supplies responsive layout and theme support.",
     "svg": "Rejected: the lesson is entity flow and provenance rather than quantitative geometry, so manually positioned vectors would add label and maintenance risk without improving the trace.",
@@ -86,7 +86,7 @@
         "license": "The policy is cited to document the conservative reuse decision. No arXiv policy text, icon, or layout is reproduced."
       }
     ],
-    "notes": "The hardest prose-only mental model is that curation is not a one-way cleaning funnel. Stable sample identity must survive transformations; each policy, quality, deduplication, and contamination decision must produce evidence; retained samples from multiple sources converge only through explicit mixture weights and a versioned manifest; and that manifest must connect to runs and checkpoints so later audits or removals have a defined blast radius. The visual is an original synthesis of the article and the reviewed primary literature, not a redraw of any source figure."
+    "notes": "The hardest prose-only mental model is that curation is not a one-way cleaning funnel. Stable sample identity must survive transformations; each policy, quality, deduplication, and contamination decision must produce evidence; retained samples from multiple sources converge only through explicit mixture weights and a versioned manifest; and that manifest must connect to runs and checkpoints so later audits or removals have a defined blast radius. The visual deliberately traces sampled source data and groups the four gate families; synthetic generation remains in the prose because it adds another provenance-bearing source rather than changing the lineage rule. The visual is an original synthesis of the article and the reviewed primary literature, not a redraw of any source figure."
   },
   "agentReview": {
     "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",

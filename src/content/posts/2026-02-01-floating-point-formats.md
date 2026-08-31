@@ -21,7 +21,7 @@ Modern training and inference use a mix of formats: FP32 master weights, BF16 ac
 | **FP16** (half) | 16 | 1 | 5 | 10 | $\pm 6.5 \times 10^{4}$ | $\sim 6.1 \times 10^{-5}$ |
 | **BF16** (brain float) | 16 | 1 | 8 | 7 | $\pm 3.4 \times 10^{38}$ | $\sim 1.2 \times 10^{-38}$ |
 | **TF32** (TensorFloat) | 19 (in 32-bit reg) | 1 | 8 | 10 | $\pm 3.4 \times 10^{38}$ | $\sim 1.2 \times 10^{-38}$ |
-| **FP8 E4M3** | 8 | 1 | 4 | 3 | $\pm 448$ | $\sim 0.0019$ |
+| **FP8 E4M3** | 8 | 1 | 4 | 3 | $\pm 448$ | $\sim 0.0156$ |
 | **FP8 E5M2** | 8 | 1 | 5 | 2 | $\pm 5.7 \times 10^{4}$ | $\sim 6.1 \times 10^{-5}$ |
 | **INT8** | 8 | 1 |. | 7 (integer) | $-128$ to $+127$ | step = 1 |
 | **FP64** (double) | 64 | 1 | 11 | 52 | $\pm 1.8 \times 10^{308}$ | $\sim 2.2 \times 10^{-308}$ |

@@ -132,7 +132,7 @@ class Cdp {
   }
 }
 
-async function waitForVisualLayout(cdp, visualId, theme) {
+async function waitForVisualLayout(cdp, visualId, theme, label) {
   const evaluation = await cdp.call('Runtime.evaluate', {
     expression: `(async () => {
       document.documentElement.dataset.theme = ${JSON.stringify(theme)};
@@ -157,7 +157,7 @@ async function waitForVisualLayout(cdp, visualId, theme) {
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
         window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
         const visual = locateVisual();
-        if (!visual) throw new Error('Visual not found');
+        if (!visual) throw new Error(${JSON.stringify(`${label}: visual not found`)});
         const rect = visual.getBoundingClientRect();
         const signature = [
           rect.left + scrollX,
@@ -282,7 +282,8 @@ try {
       }
 
       for (const visualId of entry.visualIds) {
-        await waitForVisualLayout(cdp, visualId, mode.theme);
+        const label = `${entry.slug}/${visualId}/${mode.name}`;
+        await waitForVisualLayout(cdp, visualId, mode.theme, label);
         const expression = `(() => new Promise((resolve) => {
           document.documentElement.dataset.theme = ${JSON.stringify(mode.theme)};
           requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -297,10 +298,17 @@ try {
             }
             let visual = marker?.nextElementSibling;
             while (visual && !visual.matches('figure.learning-figure, .mermaid')) visual = visual.nextElementSibling;
-            if (!visual) throw new Error('Visual not found');
+            if (!visual) throw new Error(${JSON.stringify(`${label}: visual not found`)});
             const caption = visual.matches('figure')
               ? visual.querySelector('figcaption')
               : visual.nextElementSibling?.matches('.diagram-caption') ? visual.nextElementSibling : null;
+            const captionText = caption?.textContent.trim() ?? '';
+            const visualTitle = visual.matches('figure')
+              ? visual.querySelector('.visual-title')
+              : marker?.previousElementSibling?.matches('.visual-title') ? marker.previousElementSibling : null;
+            const visualKicker = visual.matches('.mermaid') && visualTitle?.previousElementSibling?.matches('.visual-kicker')
+              ? visualTitle.previousElementSibling
+              : null;
             const scroll = visual.matches('.mermaid') ? visual : visual.querySelector('.visual-scroll');
             if (scroll) {
               scroll.scrollLeft = 0;
@@ -308,12 +316,18 @@ try {
             }
             const rect = visual.getBoundingClientRect();
             const captionRect = caption?.getBoundingClientRect();
-            const captureRect = captionRect ? {
-              left: Math.min(rect.left, captionRect.left),
-              top: Math.min(rect.top, captionRect.top),
-              right: Math.max(rect.right, captionRect.right),
-              bottom: Math.max(rect.bottom, captionRect.bottom),
-            } : rect;
+            const captureBoxes = [
+              visualKicker?.getBoundingClientRect(),
+              visualTitle?.getBoundingClientRect(),
+              rect,
+              captionRect,
+            ].filter(Boolean);
+            const captureRect = {
+              left: Math.min(...captureBoxes.map((box) => box.left)),
+              top: Math.min(...captureBoxes.map((box) => box.top)),
+              right: Math.max(...captureBoxes.map((box) => box.right)),
+              bottom: Math.max(...captureBoxes.map((box) => box.bottom)),
+            };
             const svgElements = [...visual.querySelectorAll('svg')];
             const scrollRect = scroll?.getBoundingClientRect();
             const scrollContentRects = scroll
@@ -398,7 +412,10 @@ try {
               titleCount: visual.querySelectorAll('svg > title').length,
               descCount: visual.querySelectorAll('svg > desc').length,
               minRenderedText: renderedTextSizes.length ? Math.min(...renderedTextSizes) : null,
-              caption: caption?.textContent.trim() ?? '',
+              visualTitle: visualTitle?.textContent.trim() ?? '',
+              visualTitleGlyphWidth: rangeWidth(visualTitle),
+              caption: captionText,
+              rawCaptionMath: captionText.split('$').length > 2 || captionText.includes(String.fromCharCode(92)),
               captionGlyphWidth: rangeWidth(caption),
               clippedText,
               printMinWidths: svgElements.map((svg) => getComputedStyle(svg).minWidth),
@@ -414,13 +431,16 @@ try {
           throw new Error(evaluation.exceptionDetails.exception?.description ?? evaluation.exceptionDetails.text);
         }
         const details = evaluation.result.value;
-        const label = `${entry.slug}/${visualId}/${mode.name}`;
         if (mode.mobile && details.innerWidth !== 390) throw new Error(`${label} reported innerWidth ${details.innerWidth}`);
         if (details.pageWidth > details.innerWidth + 1) throw new Error(`${label} creates page overflow (${details.pageWidth} > ${details.innerWidth})`);
         if (!details.figureFitsViewport) throw new Error(`${label} exceeds the viewport`);
         if (!details.caption.startsWith('Read it this way:') || details.captionGlyphWidth < 1) {
           throw new Error(`${label} lost its rendered direct caption`);
         }
+        if (!details.visualTitle || details.visualTitleGlyphWidth < 1) {
+          throw new Error(`${label} lost its rendered learning title`);
+        }
+        if (details.rawCaptionMath) throw new Error(`${label} retains raw math delimiters in its caption`);
         if (mode.media !== 'print' && details.minRenderedText !== null && details.minRenderedText < 8) {
           throw new Error(`${label} renders text at ${details.minRenderedText.toFixed(2)}px`);
         }

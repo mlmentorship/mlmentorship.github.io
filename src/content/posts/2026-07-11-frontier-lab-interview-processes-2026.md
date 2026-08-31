@@ -59,6 +59,8 @@ Do not turn one team's performance take-home into "the Anthropic interview." Do 
 
 ## Current format map
 
+The sources summarized below were last verified on August 28, 2026. Instructions from the recruiter for a specific role and round supersede this map.
+
 | Lab | Officially visible signal | Additional current report | Best targeted practice |
 | --- | --- | --- | --- |
 | OpenAI | Pair coding, take-home projects, technical tests, 4 to 6 final interviews | Practical multi-part coding, system design, presentation, agentic pilot | Codebase lab, presentation, inference design, math oral |

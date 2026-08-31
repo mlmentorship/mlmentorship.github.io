@@ -54,7 +54,7 @@ L4: "Fine-tune the model on examples." Misses that "fine-tune" covers different 
 			<p><strong>This choice is orthogonal to the objective.</strong><br />LoRA describes where trainable updates live. It does not specify whether the data is domain text, ideal responses, or preference pairs.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> read top to bottom on the left to choose what the data should teach, then move right to choose how broadly parameters should change. SFT and DPO name learning objectives; LoRA names an update mechanism, so they are not peer alternatives.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the numbered panels: first choose what the data should teach, then choose how broadly parameters should change. SFT and DPO name learning objectives; LoRA names an update mechanism, so they are not peer alternatives.</figcaption>
 </figure>
 
 This is L5. You've named the objectives and update scope, given use cases, and a decision tree.

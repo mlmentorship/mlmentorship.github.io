@@ -1,6 +1,6 @@
 ---
 title: "Gaussian processes"
-description: "A distribution over functions defined entirely by a covariance kernel. Predicts both a mean and a calibrated uncertainty. Beautiful theory, brutal scaling."
+description: "A distribution over functions defined by a mean and covariance kernel. Predicts a mean and kernel-conditional uncertainty. Beautiful theory, brutal scaling."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
@@ -11,7 +11,7 @@ category: "concepts"
 
 A **Gaussian process** (GP) places a prior over functions $f: \mathcal{X} \to \mathbb{R}$ such that any finite collection of values $\{f(x_1), \dots, f(x_n)\}$ is jointly Gaussian. The GP is fully specified by a mean function $m(x)$ (usually 0) and a covariance kernel $k(x, x')$.
 
-GPs are the canonical Bayesian regression model. They give a closed-form posterior over functions, with a predictive mean and a predictive variance per query point. The variance is calibrated and grows away from training data, which makes GPs the standard tool for **Bayesian optimization**, **active learning**, and any setting where uncertainty quantification matters as much as the prediction.
+GPs are the canonical Bayesian regression model. They give a closed-form posterior over functions, with a predictive mean and a predictive variance per query point. Under a suitable, well-specified kernel, that variance can be calibrated and returns toward the prior variance as kernel similarity to the observations falls. This makes GPs a standard tool for **Bayesian optimization**, **active learning**, and settings where uncertainty quantification matters as much as the prediction.
 
 The cost is brutal scaling: $O(n^3)$ exact inference. GPs are practical up to a few thousand training points without approximation; modern variants (sparse, structured kernel, deep kernel) push that to millions.
 
@@ -86,10 +86,10 @@ $$
 
 ## Scaling: sparse and approximate variants
 
-- **Inducing points** ([Snelson & Ghahramani, 2006](https://papers.nips.cc/paper_files/paper/2005/hash/4491777b1aa8b5b32c2e8666dbe1a495-Abstract.html)). Pick $m \ll n$ inducing inputs, approximate $K$ via a low-rank decomposition. $O(n m^2)$ training, $O(m^2)$ prediction.
+- **Inducing points** ([Snelson & Ghahramani, 2005](https://papers.nips.cc/paper_files/paper/2005/hash/4491777b1aa8b5b32c2e8666dbe1a495-Abstract.html)). Pick $m \ll n$ inducing inputs, approximate $K$ via a low-rank decomposition. $O(n m^2)$ training, $O(m^2)$ prediction.
 - **SVGP** ([Hensman et al., 2013](https://arxiv.org/abs/1309.6835)). Variational inference over inducing point values. Stochastic mini-batch training. The standard for large-data GPs.
 - **KISS-GP / structured kernels** ([Wilson & Nickisch, 2015](https://arxiv.org/abs/1503.01057)). Exploit grid structure for $O(n)$ inference.
-- **Deep kernels**. Replace $k(x, x')$ with $k(\phi(x), \phi(x'))$ where $\phi$ is a neural network. Combines deep features with calibrated uncertainty.
+- **Deep kernels**. Replace $k(x, x')$ with $k(\phi(x), \phi(x'))$ where $\phi$ is a neural network. Combines deep features with kernel-conditional uncertainty.
 
 ## Where GPs are still the right tool
 
