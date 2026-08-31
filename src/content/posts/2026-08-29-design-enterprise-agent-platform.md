@@ -176,32 +176,54 @@ These invariants give teams freedom inside a bounded system. They also define wh
 
 ## Separate control, execution, and evidence planes
 
+**Learning objective:** Distinguish the control plane's authorization and version decisions from execution work and from the evidence plane's durable record of decisions and effects.
+
+<!-- visual:enterprise-agent-three-plane-boundary -->
 ```mermaid
-flowchart LR
-  User[User or service identity] --> Entry[Agent entry API]
-  Entry --> Auth[Delegation and policy]
-  Auth --> Runtime[Agent runtime adapter]
-  Runtime --> Models[Model gateway]
-  Runtime --> Memory[Scoped memory service]
-  Runtime --> Tools[Tool gateway]
-  Tools --> Policy[Argument policy and approval]
-  Policy --> Exec[Tool executors]
-  Exec --> Systems[Enterprise systems]
-
-  Entry --> Events[Durable execution events]
-  Runtime --> Events
-  Models --> Events
-  Tools --> Events
-  Exec --> Events
-  Events --> Trace[Trace and audit store]
-  Events --> Eval[Evaluation and incident analysis]
-  Events --> Cost[Budget and cost accounting]
-
-  Registry[Tool, model, policy, and workflow registry] --> Auth
-  Registry --> Runtime
-  Registry --> Tools
-  Registry --> Eval
+flowchart TB
+  accTitle: Control, execution, and evidence planes for an enterprise agent action
+  accDescr: A user or service request enters an execution runtime only after the control plane checks identity and delegation. The runtime may call a model and scoped memory, but a structured tool proposal must return to the control plane for argument policy and approval. Only then does a tool executor receive narrow authority to affect an enterprise system. The entry decision, action decision, dispatch attempt, and authoritative outcome emit durable events to the evidence plane for audit, evaluation, and cost analysis.
+  User["User or service<br/>identity"]
+  subgraph Control["CONTROL PLANE · decides what may run"]
+    Registry[("Versions + registry")]
+    Admission{"2 · Identity +<br/>delegation valid?"}
+    Policy{"6 · Arguments +<br/>approval valid?"}
+  end
+  subgraph Execution["EXECUTION PLANE · performs bounded work"]
+    Entry["1 · Agent entry API"]
+    Runtime["3–4 · Runtime adapter<br/>model + scoped memory"]
+    Gateway["5 · Tool gateway"]
+    Executor["7 · Tool executor<br/>with narrow authority"]
+    Systems["8 · Enterprise system<br/>authoritative outcome"]
+  end
+  subgraph Evidence["EVIDENCE PLANE · records what happened"]
+    Events[("Durable execution events")]
+    Uses["Trace + audit<br/>evaluation + incidents<br/>budget + cost"]
+    Events --> Uses
+  end
+  User ==> Entry
+  Entry ==> Admission
+  Admission ==>|"allow workflow"| Runtime
+  Runtime ==>|"structured proposal"| Gateway
+  Gateway ==> Policy
+  Policy ==>|"allow + scoped capability"| Executor
+  Executor ==> Systems
+  Registry -. "approved versions" .-> Admission
+  Registry -. "contracts + policy" .-> Policy
+  Admission -. "decision" .-> Events
+  Gateway -. "request" .-> Events
+  Policy -. "decision" .-> Events
+  Executor -. "attempt" .-> Events
+  Systems -. "final state" .-> Events
+  class User,Entry viz-input
+  class Admission,Policy,Gateway viz-focus
+  class Registry,Events viz-state
+  class Runtime,Executor viz-neutral
+  class Systems,Uses viz-output
+  class User,Registry,Admission,Policy,Entry,Runtime,Gateway,Executor,Systems,Events,Uses viz-compact
 ```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the numbered solid path. Control checks identity before the runtime starts and checks structured arguments again before a side effect; the model never receives action authority. Then follow the dashed edges: decisions, attempts, and the enterprise system's final state become evidence, but the evidence store does not authorize the call. Original synthesis checked against <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>, <a href="https://www.rfc-editor.org/rfc/rfc8693.html">RFC 8693</a>, <a href="https://docs.temporal.io/workflow-execution">Temporal's durable-execution documentation</a>, and the <a href="https://github.com/open-telemetry/semantic-conventions-genai">OpenTelemetry GenAI semantic conventions</a>.</p>
 
 ### Control plane
 

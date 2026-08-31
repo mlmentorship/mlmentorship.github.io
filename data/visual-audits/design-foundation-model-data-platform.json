@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-foundation-model-data-platform",
+  "article": "src/content/posts/2026-08-29-design-foundation-model-data-platform.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace a source restriction through derived data, manifests, runs, checkpoints, and released models while distinguishing future-use exclusion, stored-artifact deletion, and model-level response.",
+  "mediumRationale": "A compact directed graph is the smallest medium that exposes both forward lineage and the point where deterministic data actions stop. It keeps one restriction connected to every affected layer, then labels the distinct evidence claim available at each layer.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is a forward dependency and impact-analysis path with one explicit branch between data-plane remediation and model-level response; labelled nodes and edges preserve that sequence responsively.",
+    "svg": "Rejected: no quantitative geometry or exact spatial measurement is needed, so hand-positioned vectors would add maintenance and fixed-label risk without adding meaning.",
+    "semanticHtml": "Rejected: a list or set of panels could name the layers, but it would make the source-to-derivative-to-model dependency less immediate and weaken the forward-trace mental model.",
+    "interaction": "Rejected: simulating deletion scopes would add controls and state without changing the fixed distinction among exclusion, artifact deletion, and model response.",
+    "paperReuse": "Rejected: W3C PROV includes generic provenance figures and the Machine Unlearning paper contains method-specific figures, but neither teaches this foundation-model release and deletion boundary. W3C derivative terms and the paper artwork license are not relied upon; no source composition is copied.",
+    "noVisual": "Rejected: prose carefully distinguishes several deletion meanings across distant subsections, but readers can still collapse them into one action. A single forward trace shows why a completed data deletion does not itself establish a model-weight claim."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 161,
+        "insight": "The ML design overview asks about training-data availability, validation, privacy, compliance, data ingestion, and experiment metrics, but provides no source-to-model provenance or deletion path."
+      },
+      {
+        "page": 162,
+        "insight": "The production-considerations slide asks about data-quality audits, retraining strategy, and checkpointing model objects and datasets, providing adjacent operational concerns without connecting their lineage."
+      },
+      {
+        "page": 166,
+        "insight": "The Data Pipeline slide covers collection, annotation, storage, data quality, privacy, and anonymization, but stops at pipeline questions rather than immutable manifests or forward impact analysis."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide requires model-gating tests, monitoring, model updates, and privacy constraints, supporting explicit release evidence without defining data-removal semantics."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning Engineering slide calls for independent infrastructure testing, checks for dropped data, and awareness of mutable joined data, but does not distinguish deleting artifacts from changing trained weights."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for data pipeline, ingestion, data quality, validation, privacy, duplicate, contamination, provenance, lineage, deletion, versioning, retraining, and checkpoint terms. The full neighboring system-design range on pages 159-170 was inspected: page 159 closes a robotics example; page 160 opens ML design; pages 161-162 cover design and production considerations; pages 163-164 walk through a feed-system interview; pages 165-169 cover project setup, data pipelines, modeling, serving, and engineering rules; page 170 begins algorithms and data structures. Pages 161, 162, 166, 168, and 169 are relevant context, but no slide represents immutable dataset lineage, forward tracing, or the distinction among future exclusion, stored deletion, checkpoint response, and model unlearning. No deck artwork, wording, data, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "W3C PROV-DM: The PROV Data Model",
+        "url": "https://www.w3.org/TR/prov-dm/",
+        "usage": "Used as the authoritative provenance standard to verify that provenance records entities, activities, responsible agents, and derivations between entities, enabling forward and backward reasoning across heterogeneous systems.",
+        "license": "W3C document terms permit copying with notice but restrict derivative technical specifications. No prose, notation, figure, shape convention, example, or layout is copied; the visual is an independently authored application-specific flow that cites the standard for concepts only."
+      },
+      {
+        "title": "W3C Document License",
+        "url": "https://www.w3.org/copyright/document-license-2023/",
+        "usage": "Used to verify the reuse terms applicable to W3C technical documents before deciding not to adapt the PROV figures.",
+        "license": "The terms permit copying with attribution and limit derivative works outside implementation materials. This article copies no W3C material and therefore does not rely on adaptation permission."
+      },
+      {
+        "title": "Machine Unlearning",
+        "url": "https://arxiv.org/abs/1912.03817",
+        "usage": "Used as a primary research source to verify that removing a data point's influence from a trained model is a distinct model-level problem and that retraining from scratch is the canonical baseline that unlearning methods seek to avoid.",
+        "license": "The preprint is publicly accessible, but no permissive artwork-reuse license was established from the landing page. No figure, experimental result, wording, visual grammar, or method-specific architecture is reused."
+      },
+      {
+        "title": "Regulation (EU) 2016/679, Article 17",
+        "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "usage": "Used as an authoritative legal source for the existence and limits of the right to erasure and the obligation, where applicable, to address recipients of disclosed personal data. The article does not interpret which technical response a particular request legally requires.",
+        "license": "No legal text, table, or official visual is reproduced or adapted. The regulation is cited only to ground why deletion scope must be explicit, so reuse permission is not relied upon."
+      },
+      {
+        "title": "NIST AI Risk Management Framework 1.0",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as authoritative risk-management guidance to cross-check that AI risks and responses should be governed, mapped, measured, and managed across the system lifecycle rather than reduced to one storage action.",
+        "license": "No NIST figure, table, text, or layout is reused. NIST works are generally not subject to U.S. copyright under 17 U.S.C. 105, but this original visual relies only on citation, not adaptation."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the deletion blast radius and its claim boundary. A source restriction must traverse recorded derivations to canonical samples, packed shards, immutable dataset and mixture manifests, active jobs, checkpoints, and released model families. Data-layer actions can prove future exclusion and named artifact removal; they cannot by themselves prove removal of learned influence from weights. The visual is an original synthesis of the article's mechanism, W3C provenance concepts, primary machine-unlearning research, and lifecycle risk guidance."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 159-170, then reviewed W3C PROV and its license, the primary Machine Unlearning paper, the official GDPR text, and NIST AI RMF guidance before selecting an original compact lineage graph."
+  },
+  "implementation": {
+    "visualIds": [
+      "foundation-data-deletion-blast-radius"
+    ],
+    "accessibility": "The Mermaid block provides a specific accessible title and a complete text description. Node text and edge labels state each artifact layer, action, evidence claim, and unresolved model-level decision, so meaning does not depend on color. A top-to-bottom layout and the established viz-compact class avoid the wide mobile minimum at 390 CSS pixels; shared Mermaid theme tokens provide dark-mode contrast and high-contrast print output with page-break protection."
+  }
+}

@@ -795,6 +795,36 @@ Test these queries through scheduled drills. A lineage graph that exists only on
 
 A request can mean several different technical actions. State which one the system completed.
 
+<!-- visual:foundation-data-deletion-blast-radius -->
+```mermaid
+flowchart TB
+  accTitle: A data restriction propagates through lineage but requires different actions at each layer
+  accDescr: A source restriction starts a forward-lineage query. One path reaches stored canonical samples and packed shards, which can be deleted or rewritten, then future manifests, which can block the excluded identity before publication. The other path reaches active training runs and checkpoints, which require a stop, isolation, retirement, or restart decision, then released model weights, which require a separately validated response such as retraining, approved unlearning, output controls, or risk acceptance. Evidence that stored artifacts were removed or future use was blocked does not prove that learned influence was removed from model weights.
+  Request["Restriction or deletion request<br/>source · record · content · policy"]
+  Trace["Forward-lineage query<br/>find every recorded descendant"]
+  Stored["Stored derivatives<br/>canonical samples · packed shards"]
+  Future["Future manifests<br/>resolve exclusion before publication"]
+  Runs["Consumed artifacts<br/>active runs · checkpoints"]
+  Models["Released model families<br/>possible learned influence"]
+  DataProof["Data-layer evidence<br/>named artifacts removed or rewritten"]
+  FutureProof["Future-use evidence<br/>new manifests block the identity"]
+  ModelDecision["Model-level decision<br/>retire · retrain · validated unlearning · controls"]
+  Request --> Trace
+  Trace --> Stored
+  Stored -->|"delete or rewrite"| DataProof
+  Stored --> Future
+  Future -->|"exclude before commit"| FutureProof
+  Trace --> Runs
+  Runs -->|"stop · isolate · restart · retire"| Models
+  Models -.->|"separate claim and validation"| ModelDecision
+  class Request,Trace viz-focus
+  class Stored,Future,Runs viz-state
+  class DataProof,FutureProof viz-output
+  class Models,ModelDecision viz-warning
+  class Trace viz-compact
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> trace the restricted identity forward before choosing an action. Stored derivatives can be removed or rewritten, and future manifests can prove that the identity is excluded. If a run or checkpoint already consumed those derivatives, the response becomes a model decision; file deletion alone does not prove removal from learned weights. Original synthesis informed by the <a href="https://www.w3.org/TR/prov-dm/">W3C PROV data model</a> and the primary <a href="https://arxiv.org/abs/1912.03817">Machine Unlearning paper</a>.</p>
+
 ### Future-use exclusion
 
 Add source, record, content, or policy identities to a versioned exclusion snapshot. New manifests resolve exclusions before publication. Long-running jobs check for urgent updates at declared boundaries.
