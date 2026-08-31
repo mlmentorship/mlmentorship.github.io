@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "forward-backward-and-viterbi",
+  "article": "src/content/posts/2026-05-07-forward-backward-and-viterbi.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Given one state lattice, distinguish how forward-backward forms a posterior for a state at one timestep from how Viterbi forms one globally consistent state path.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold the chain topology fixed while changing only the dynamic-programming objective. The first panel makes the left and right summaries meet at one state; the second makes predecessor storage and reverse backtracking visible as one connected path.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout would not reliably align identical timestep-state lattices or preserve the compact left-versus-right and backtracking geometry at phone width.",
+    "svg": "Selected: deterministic coordinates keep the same three-state, four-timestep lattice aligned across both objectives and make direction, selected state, path continuity, and backtracking explicit.",
+    "semanticHtml": "Rejected: a DP table could compare sum and max cells, but it would not show that a marginal joins all compatible prefixes and suffixes while a decoded sequence must remain connected across time.",
+    "interaction": "Rejected: changing transition scores could demonstrate different winners, but controls and state are unnecessary for the invariant distinction between a per-timestep marginal and a global path.",
+    "paperReuse": "Rejected: the reviewed IEEE papers and textbook contain useful HMM trellises and algorithm presentations, but no permissive figure-reuse license was established. The shipped lattice, wording, geometry, and teaching comparison are original.",
+    "noVisual": "Rejected: the equations specify each recurrence, yet readers must mentally align two opposite passes and understand why independent per-timestep posterior maxima are not equivalent to backtracking one feasible Viterbi path."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 67,
+        "insight": "The preceding Message Passing slide describes local sum-product messages moving forward and backward through a chain, providing the general inference context but conflating message passing with EM and showing no HMM trellis."
+      },
+      {
+        "page": 68,
+        "insight": "The GMM/HMM slide separates evaluation, decoding, and training: it assigns the forward or backward algorithm to evaluation, Viterbi to decoding, and forward-backward inside Baum-Welch to training."
+      },
+      {
+        "page": 69,
+        "insight": "The directly relevant Forward-Backward slide explains that conditioning on the state at time k separates the observations on its two sides, so cached forward and backward terms can be multiplied to obtain a state posterior. Its adjacent Baum-Welch column places that inference inside EM."
+      },
+      {
+        "page": 70,
+        "insight": "The following linear-chain CRF slide applies dynamic-programming caches and log-space normalization to dependent sequence labels, corroborating the modern structured-prediction use without comparing state marginals to Viterbi backtracking."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for forward-backward, Viterbi, hidden Markov models, HMM, message passing, and dynamic programming. Pages 67-70 form the only directly relevant contiguous neighborhood and were read in full. Page 69 supplies the key two-sided conditional-independence insight, but the deck does not spatially compare marginal inference with global path decoding. No slide pixels, wording, formulas, coordinates, or embedded artwork are reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition",
+        "url": "https://doi.org/10.1109/5.18626",
+        "usage": "Used as the authoritative HMM tutorial to verify the forward and backward variables, posterior-state combination, Viterbi recursion, predecessor tracking, backtracking, and O(T K squared) dynamic-programming structure.",
+        "license": "IEEE publication copyright applies and no permissive figure-reuse license was identified. No figure, table, prose, numeric example, or layout is reproduced; the implementation is an original teaching schematic."
+      },
+      {
+        "title": "Error Bounds for Convolutional Codes and an Asymptotically Optimum Decoding Algorithm",
+        "url": "https://doi.org/10.1109/TIT.1967.1054010",
+        "usage": "Used as the primary source for the maximum-likelihood dynamic-programming decoding principle now known as the Viterbi algorithm.",
+        "license": "IEEE publication copyright applies and the record exposes no permissive artwork-reuse grant. No paper figure, proof, notation layout, prose, or data is copied."
+      },
+      {
+        "title": "Probabilistic Machine Learning: An Introduction",
+        "url": "https://probml.github.io/pml-book/book1.html",
+        "usage": "Used as an authoritative textbook reference to cross-check HMM smoothing, sum-product on chains, max-product decoding, log-space computation, and the distinction between marginal and joint MAP estimates.",
+        "license": "The official MIT Press book page permits access and supplies separate code resources but does not state a blanket permissive license for book figures. No figure, text, code, data, or worked example is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that both algorithms traverse the same exponentially large path space with the same table shape but return different objects. Forward-backward combines sums of all compatible prefixes and suffixes at each state, whereas Viterbi keeps a maximizing predecessor for each partial endpoint and later follows those linked choices backward. The schematic uses no empirical values or source-specific figure structure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the exact pages 67-70 neighborhood, and checked the primary Viterbi paper, the canonical IEEE HMM tutorial, and an authoritative MIT Press textbook before selecting an original same-lattice comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "forward-backward-viterbi-chain-objectives"
+    ],
+    "accessibility": "Each panel has a linked title and complete description. State letters, timestep labels, opposing arrowheads, a double-ring target, line thickness, a continuous selected path, and a labelled backtracking arrow carry the lesson independently of color. The established two-panel primitive stacks below 640 pixels; each panel uses a compact 300-pixel viewBox with no minimum width, keeping labels readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid breaks inside the figure."
+  }
+}
