@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "matrix-factorization-recsys",
+  "article": "src/content/posts/2026-02-16-matrix-factorization-recsys.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one missing user-item rating through the matching user and item factor vectors and see their dot product become the predicted matrix entry.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align one missing cell in the sparse ratings matrix with the corresponding row of U and row of V, then expose the elementwise products and sum that fill that cell. Mermaid can show flow but cannot reliably align matrix indices or arithmetic. Semantic HTML could render a table, but connecting one cell to two factor vectors would be less direct. Interaction adds no necessary state because the same index-selection rule applies to every cell. Reusing a paper or deck figure would add licensing risk and more detail than the objective needs. No visual would leave the article's hardest mental model—the path from two latent vectors to one previously missing rating—as prose and notation alone.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 29,
+        "insight": "The preceding factorization-machines slide uses low-dimensional dot products for feature interactions, but it addresses a different model and does not explain a user-item matrix entry."
+      },
+      {
+        "page": 30,
+        "insight": "The matrix-factorization slide shows a sparse observed-ratings matrix, two latent-factor matrices, and dense predicted ratings, alongside non-negative matrix factorization."
+      },
+      {
+        "page": 31,
+        "insight": "The following algorithms overview compares unrelated model families and adds no matrix-factorization mechanism."
+      },
+      {
+        "page": 129,
+        "insight": "The preceding slide is the recommender-systems section divider and contains no instructional mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide states that user and item embeddings come from factorization and that their dot product predicts an unrated item; it also distinguishes factorization from nearest-neighbor matching."
+      },
+      {
+        "page": 131,
+        "insight": "The following slide covers content-based and hybrid recommenders, useful contrast but not the latent-factor dot-product mechanism."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-searched for matrix factorization, collaborative filtering, recommender systems, low rank, and latent factors. Pages 29-31 and 129-131 were then rendered and inspected directly. Pages 30 and 130 are the exact relevant slides; their neighboring pages confirm the conceptual boundary. No slide screenshot, layout, matrix values, or embedded third-party artwork was copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Matrix Factorization Techniques for Recommender Systems",
+        "url": "https://doi.org/10.1109/MC.2009.263",
+        "usage": "Used as the primary source for representing users and items in a shared latent-factor space and predicting a rating with the inner product of their factor vectors.",
+        "license": "No prose, data, equation layout, or figure was copied or adapted. IEEE publication access and a DOI are not treated as permission to reuse source artwork."
+      },
+      {
+        "title": "Collaborative Filtering for Implicit Feedback Datasets",
+        "url": "https://doi.org/10.1109/ICDM.2008.22",
+        "usage": "Used to verify the article's distinction between observed implicit preferences, confidence weights, and the all-user-item-pairs objective.",
+        "license": "No paper text, data, table, equation layout, or figure was copied or adapted. Reuse rights for IEEE artwork were not assumed."
+      },
+      {
+        "title": "Mining of Massive Datasets, Chapter 9: Recommendation Systems",
+        "url": "https://www.mmds.org/",
+        "usage": "Used as an authoritative textbook cross-check for decomposing a utility matrix into user and item factors and estimating missing entries from their product.",
+        "license": "The book is published under CC BY-NC-SA, but no text, example data, or figure was reused; only the general mathematical mechanism was consulted."
+      }
+    ],
+    "notes": "The shipped figure is an original two-factor numerical construction using invented vectors u_A = [2, 1] and v_3 = [1.5, 1]. Their displayed dot product is exactly 2 x 1.5 + 1 x 1 = 4, so the geometry and arithmetic are independently checkable. No external visual asset or empirical dataset is included."
+  },
+  "agentReview": {
+    "reviewer": "GPT-5.6 Sol matrix-factorization visual agent",
+    "reviewedAt": "2026-08-31",
+    "summary": "The complete article, the full deck index, six directly relevant or neighboring slides, and authoritative sources were reviewed. The hardest prose-only model is how selecting one user row and one item row in the factor matrices produces one missing entry, so the recommendation is one static worked dot-product trace."
+  },
+  "implementation": {
+    "visualIds": ["mf-missing-rating-dot-product"],
+    "accessibility": "The SVG has a programmatic title and detailed description. Matrix and vector names, matching A and 3 indices, solid connector paths, explicit multiplication signs, and the written arithmetic carry all meaning without color. The existing visual-scroll and visual-wide primitives preserve readable labels at 390 CSS pixels, theme variables support light and dark modes, and the established print override removes minimum width and forces high-contrast paper colors."
+  }
+}
