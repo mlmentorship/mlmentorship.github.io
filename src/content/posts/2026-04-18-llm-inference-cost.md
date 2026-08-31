@@ -24,6 +24,56 @@ LLM inference cost decomposes into:
 
 For a typical production LLM feature, the actual cost is dominated by layers 2-4, with layer 5 driving the variance. Optimizing layer 1 (the model choice) without addressing the rest is a common mistake.
 
+<!-- visual:llm-cost-compounds-across-agent-calls -->
+<figure class="learning-figure" aria-labelledby="llm-cost-compounding-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="llm-cost-compounding-title">Why can one user request become a growing stack of model input?</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 470" role="img" aria-labelledby="llm-cost-svg-title llm-cost-svg-desc">
+			<title id="llm-cost-svg-title">Input context compounds across three calls in an agent loop</title>
+			<desc id="llm-cost-svg-desc">One user request triggers three model calls. Each call includes the same fixed prompt and retrieved context. Call one adds the current turn. Call two also carries turn one as prior history. Call three carries turns one and two as prior history. The aligned bars therefore grow from 210 illustrative units to 260 and then 310. A dashed tail box shows that a retry would pay for another full call. The segment patterns and direct labels distinguish all categories without color.</desc>
+			<defs>
+				<pattern id="llm-cost-fixed-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--viz-state-bg)"></rect><path d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" stroke="var(--viz-state-stroke)" stroke-width="1"></path></pattern>
+				<pattern id="llm-cost-history-dots" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--viz-focus-bg)"></rect><circle cx="2" cy="2" r="1.2" fill="var(--viz-focus-stroke)"></circle><circle cx="6" cy="6" r="1.2" fill="var(--viz-focus-stroke)"></circle></pattern>
+				<marker id="llm-cost-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="var(--viz-edge)"></path></marker>
+			</defs>
+			<text class="viz-axis-label" x="18" y="24">ONE USER REQUEST</text>
+			<path d="M180 34 V58" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#llm-cost-arrow)"></path>
+			<text class="viz-axis-label" x="18" y="82">CALL 1 · plan</text>
+			<rect x="18" y="94" width="90" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
+			<rect class="viz-node viz-node--input" x="108" y="94" width="70" height="54"></rect>
+			<rect class="viz-node viz-node--output" x="178" y="94" width="50" height="54" rx="3"></rect>
+			<text class="viz-edge-label" x="63" y="117"><tspan x="63">fixed</tspan><tspan x="63" dy="13">prompt</tspan></text>
+			<text class="viz-edge-label" x="143" y="117"><tspan x="143">retrieved</tspan><tspan x="143" dy="13">context</tspan></text>
+			<text class="viz-edge-label" x="203" y="117"><tspan x="203">turn</tspan><tspan x="203" dy="13">1</tspan></text>
+			<path d="M180 157 V181" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#llm-cost-arrow)"></path>
+			<text class="viz-axis-label" x="18" y="205">CALL 2 · use tool</text>
+			<rect x="18" y="217" width="90" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
+			<rect class="viz-node viz-node--input" x="108" y="217" width="70" height="54"></rect>
+			<rect x="178" y="217" width="50" height="54" fill="url(#llm-cost-history-dots)" stroke="var(--viz-focus-stroke)" stroke-width="1.5"></rect>
+			<rect class="viz-node viz-node--output" x="228" y="217" width="50" height="54" rx="3"></rect>
+			<text class="viz-edge-label" x="63" y="240"><tspan x="63">fixed</tspan><tspan x="63" dy="13">prompt</tspan></text>
+			<text class="viz-edge-label" x="143" y="240"><tspan x="143">retrieved</tspan><tspan x="143" dy="13">context</tspan></text>
+			<text class="viz-edge-label" x="203" y="240"><tspan x="203">prior</tspan><tspan x="203" dy="13">turn 1</tspan></text>
+			<text class="viz-edge-label" x="253" y="240"><tspan x="253">turn</tspan><tspan x="253" dy="13">2</tspan></text>
+			<path d="M180 280 V304" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#llm-cost-arrow)"></path>
+			<text class="viz-axis-label" x="18" y="328">CALL 3 · synthesize</text>
+			<rect x="18" y="340" width="90" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
+			<rect class="viz-node viz-node--input" x="108" y="340" width="70" height="54"></rect>
+			<rect x="178" y="340" width="100" height="54" fill="url(#llm-cost-history-dots)" stroke="var(--viz-focus-stroke)" stroke-width="1.5"></rect>
+			<rect class="viz-node viz-node--output" x="278" y="340" width="50" height="54" rx="3"></rect>
+			<text class="viz-edge-label" x="63" y="363"><tspan x="63">fixed</tspan><tspan x="63" dy="13">prompt</tspan></text>
+			<text class="viz-edge-label" x="143" y="363"><tspan x="143">retrieved</tspan><tspan x="143" dy="13">context</tspan></text>
+			<text class="viz-edge-label" x="228" y="363"><tspan x="228">prior history</tspan><tspan x="228" dy="13">turns 1 + 2</tspan></text>
+			<text class="viz-edge-label" x="303" y="363"><tspan x="303">turn</tspan><tspan x="303" dy="13">3</tspan></text>
+			<path d="M328 367 H344 V420 H232" fill="none" stroke="var(--viz-warning-stroke)" stroke-width="2" stroke-dasharray="6 4"></path>
+			<rect x="18" y="411" width="214" height="40" rx="4" fill="var(--viz-warning-bg)" stroke="var(--viz-warning-stroke)" stroke-width="1.5" stroke-dasharray="5 3"></rect>
+			<text class="viz-gradient-label" x="125" y="428"><tspan x="125">TAIL: retry or extra step</tspan><tspan x="125" dy="13">pays for another full call</tspan></text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> scan downward. The fixed prompt and retrieved context recur in every model call, while prior turns accumulate before the next call. A retry in the tail repeats the largest request. Prefix caching can discount eligible repeated input, but it does not remove new history, output, tool, or miss costs. Original synthesis informed by <a href="https://developers.openai.com/api/docs/guides/prompt-caching">OpenAI</a>, <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching">Anthropic</a>, <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html">Amazon Bedrock</a>, and the <a href="https://arxiv.org/abs/2309.06180">PagedAttention paper</a>; segment widths are illustrative, not measurements.</figcaption>
+</figure>
+
 ## Layer 1: per-request token cost
 
 The naive calculation. Cost per request &asymp; (input_tokens + output_price_ratio &times; output_tokens) &times; price_per_token.

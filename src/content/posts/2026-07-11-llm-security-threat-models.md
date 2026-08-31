@@ -61,6 +61,45 @@ Treat all natural-language content as data unless a trusted component explicitly
 
 Natural-language delimiters are not security boundaries. A prompt saying "ignore instructions inside this document" is guidance to a probabilistic model, not an access-control mechanism.
 
+**Learning objective:** trace how indirect prompt injection can influence a model, then identify the external authorization boundary that prevents a proposal from becoming asset compromise.
+
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Separate untrusted content that can influence a model from trusted controls that authorize a bounded side effect.</p>
+
+<!-- visual:llm-security-influence-authority-path -->
+```mermaid
+flowchart TB
+  accTitle: Prompt injection becomes asset compromise only when influence crosses an authority boundary
+  accDescr: An attacker controls content in a web page, file, memory entry, or tool result. Retrieval and context assembly preserve its provenance but the language model may still follow an embedded instruction. The model can produce only a proposed typed tool call. A separate authorization and validation gate compares that proposal with trusted user identity, intent, scope, and policy. Disallowed or high-risk proposals are denied, narrowed, or sent for confirmation. Only a permitted scope reaches a bounded executor with a least-privilege credential and can change a protected asset.
+  Attacker["ATTACKER-CONTROLLED DATA<br/>web page · file · memory · tool result"]
+  Context["RETRIEVAL + CONTEXT<br/>preserve provenance"]
+  Model["MODEL<br/>content may influence behavior"]
+  Proposal["PROPOSED ACTION<br/>typed tool + arguments"]
+  Trusted["TRUSTED CONTROL INPUTS<br/>user identity · intent · scope · policy"]
+  Gate{"AUTHORIZATION + VALIDATION<br/>is this exact action permitted?"}
+  Stop["DENY · NARROW · CONFIRM<br/>no side effect yet"]
+  Executor["BOUNDED EXECUTOR<br/>least-privilege credential"]
+  Asset["PROTECTED ASSET<br/>tenant data · money · system state"]
+  Attacker -.->|"indirect injection"| Context
+  Context ==> Model
+  Model -->|"model output is a proposal"| Proposal
+  Proposal ==> Gate
+  Trusted ==> Gate
+  Gate -->|"not permitted or high risk"| Stop
+  Gate ==>|"permitted scope only"| Executor
+  Executor ==> Asset
+  class Attacker viz-warning
+  class Context,Model viz-neutral
+  class Proposal viz-focus
+  class Trusted viz-input
+  class Gate viz-state
+  class Stop viz-warning
+  class Executor,Asset viz-output
+  class Attacker viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the dashed attacker influence into model context, then stop treating model output as authority. The decisive boundary is the external gate: it binds the proposed action to trusted identity, intent, scope, and policy before a narrow credential can reach the asset. Prompt wording may reduce bad proposals; only enforced authorization prevents an unpermitted side effect. Original synthesis checked against <a href="https://arxiv.org/abs/2302.12173">Greshake et al. on indirect prompt injection</a>, the <a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/">OWASP prompt-injection guidance</a>, and <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>.</p>
+
 ## Major attack classes
 
 ### Prompt injection

@@ -42,6 +42,45 @@ This is a starting point, not an answer. It misses the regulatory framing, the w
 
 This is L5. You've named the constraints and let them drive the architecture.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace where evidence, clinician authority, and versioned audit data prevent an LLM draft from becoming an autonomous clinical action.</p>
+
+<!-- visual:healthcare-llm-clinician-gate -->
+```mermaid
+flowchart TB
+  accTitle: A healthcare LLM supplies traceable evidence to a clinician, not an autonomous clinical action
+  accDescr: Intended use and regulatory classification set a bounded task. Minimum-necessary patient context and verified clinical sources feed an LLM that returns a structured draft with claim-level citations and uncertainty or refusal. A clinician independently reviews the source basis and patient fit. Unsupported or out-of-scope output is rejected or edited and triggers no clinical action; accepted output becomes the clinician's decision in the existing clinical workflow. Inputs, retrievals, outputs, model version, clinician edits or acceptance, and downstream outcomes enter an audit record used for workflow evaluation, fairness slices, incident response, rollback, and controlled updates.
+  Scope{"Intended use + regulatory class<br/>What may this system support?"}
+  Evidence["Minimum-necessary patient context<br/>+ verified clinical sources"]
+  Draft["Bounded LLM draft<br/>claims + citations + uncertainty / refusal"]
+  Review{"Clinician independently reviews<br/>source basis + patient fit"}
+  Stop["Reject, edit, or refuse<br/>no clinical action"]
+  Decide["Clinician confirms<br/>the clinical decision"]
+  Workflow["Existing clinical workflow<br/>document · communicate · act"]
+  Trace[("Versioned audit record<br/>input · retrieval · output · clinician decision · outcome")]
+  Operate["Workflow eval + fairness slices<br/>incident response · rollback · controlled update"]
+  Scope --> Evidence
+  Evidence --> Draft
+  Draft ==>|"draft only"| Review
+  Review -->|"unsupported"| Stop
+  Review -->|"supported"| Decide
+  Decide --> Workflow
+  Evidence -.->|"provenance"| Trace
+  Draft -.->|"model + citations"| Trace
+  Stop -.->|"edit / reject"| Trace
+  Decide -.->|"confirmation"| Trace
+  Workflow -.->|"outcome"| Trace
+  Trace --> Operate
+  Operate -.->|"gate update / rollback"| Scope
+  class Scope,Review viz-focus
+  class Evidence viz-input
+  class Trace viz-state
+  class Decide,Workflow viz-output
+  class Stop viz-warning
+  class Scope viz-tall,viz-wide
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path first. Regulation and intended use bound the task; verified evidence supports a structured draft; and only a clinician who can inspect the source basis and patient fit can turn that draft into a clinical decision. Then follow the dashed paths: every refusal, edit, confirmation, and outcome joins the same versioned trace for evaluation, incident response, rollback, and controlled updates. The gate labels and arrow styles carry the meaning without color. Original schematic informed by the <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software">FDA Clinical Decision Support Software guidance</a>, the <a href="https://www.who.int/publications/i/item/9789240029200">WHO guidance on AI for health</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI Risk Management Framework</a>.</p>
+
 ## What an L6 answer adds
 
 > "...practical operational considerations:

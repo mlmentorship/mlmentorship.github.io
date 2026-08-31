@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "slug": "llm-as-judge",
+  "article": "src/content/posts/2026-08-28-llm-as-judge.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish an LLM judge's score from a validated evaluation decision by routing exact constraints to deterministic checks and uncertain semantic judgments through human calibration and review.",
+  "mediumRationale": "A two-lane semantic comparison is the smallest useful spatial explanation. It separates conditions code can prove from qualities that require a learned judge, then makes calibration, perturbation tests, abstention, and human escalation visible in the learned lane. Numbered text remains complete without a renderer and stacks naturally at narrow widths.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson needs two short, parallel evidence lanes rather than a relationship-heavy graph. Mermaid would add runtime rendering and make the compact labels harder to scan at phone width.",
+    "svg": "Rejected: there is no quantitative geometry, plotted value, or fixed spatial scale to preserve, so custom coordinates would add maintenance without teaching more.",
+    "semanticHtml": "Selected: two labelled, numbered panels express the deterministic and learned routes with ordinary text, preserve source order for assistive technology, and use an established responsive primitive.",
+    "interaction": "Rejected: no parameter sweep is needed. Invented judge scores or adjustable thresholds would imply unsupported quantitative behavior and would weaken the static fallback.",
+    "paperReuse": "Rejected: the reviewed papers contain relevant workflows, prompts, and experimental figures, but none expresses this article-specific split between exact gates and calibrated semantic evidence. The MT-Bench, FairEval, and JudgeDeceiver arXiv records use arXiv's non-exclusive distribution license, which restricts third-party reuse. G-Eval's ACL version is CC BY 4.0, but its figures remain broader than this learning objective. No source figure, data, wording, or layout is copied.",
+    "noVisual": "Rejected: the prose correctly lists deterministic checks, model judgment, calibration, bias tests, and escalation, but readers must assemble their dependency structure. The two-lane visual prevents the common mistake of allowing a plausible aggregate judge score to hide an exact hard-constraint failure."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The preceding slide is only a time-allocation outline for an ML design interview, marking the start of the evaluation neighborhood."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview begins with product need and distinguishes goal, leading, debug, and guardrail metrics, supporting the requirement to define intended behavior before choosing a grader."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for test-data strategy, baselines, confidence intervals, offline metrics, error analysis, business-impact estimates, and online success criteria rather than relying on one score."
+      },
+      {
+        "page": 164,
+        "insight": "The content-feed example requires a stated hypothesis plus both offline and online evaluation, showing that a scalable offline score is evidence for, not a substitute for, the target outcome."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide explicitly says evaluation can be very difficult for generative models and asks how dialogue responses should be evaluated; it also ties metric choice to goals, user experience, costs, and inference behavior."
+      },
+      {
+        "page": 166,
+        "insight": "The adjacent data-pipeline slide asks about annotation quality, the number of annotators, resolving annotator disagreement, user feedback, and train-test distribution mismatch, motivating independent human labels and slice checks."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide requires random, human, or heuristic baselines, reinforcing that judge performance must be measured comparatively rather than assumed from model strength."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide requires explicit gating experiments, monitoring metrics, user feedback, update procedures, and responses to low confidence, supporting abstention and continued revalidation."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide prioritizes metric design, human error analysis, measured error patterns, quantified undesirable behavior, and multiple launch metrics."
+      },
+      {
+        "page": 170,
+        "insight": "The following slide starts algorithms and data structures and contains no evaluation guidance, marking the end of the relevant neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 text-indexed all 214 pages of Basic_ML_CS_concepts for judge, LLM, language model, generative evaluation, human evaluation, human labels, annotation, rubric, bias, preference, ground truth, test set, validation, offline evaluation, online evaluation, user feedback, and prompt injection. It then read the complete neighboring sequences on pages 102-106, 140-142, and 160-170. Pages 102-106 discuss transformer language models but not model-based judging; pages 140-142 cover ranker evaluation; pages 160-170 contain the applicable evaluation lifecycle, with page 165 explicitly naming the difficulty of evaluating generative responses. The deck has no LLM-as-judge, rubric-calibration, pair-order-bias, or judge-manipulation visual. The deck states no reuse license and includes external material, so it was treated as review-only; no screenshot, artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+        "url": "https://arxiv.org/abs/2306.05685",
+        "usage": "Used as a primary paper to verify that strong model judges can show substantial agreement with human preferences while retaining position, verbosity, self-enhancement, and reasoning biases that require explicit validation and mitigation.",
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, which grants distribution rights to arXiv and limits reuse by others. No figure, prompt, result value, wording, or layout is reproduced."
+      },
+      {
+        "title": "Large Language Models are not Fair Evaluators",
+        "url": "https://arxiv.org/abs/2305.17926",
+        "usage": "Used as a primary paper to verify that answer order can change pairwise outcomes and that balanced-order checks plus human escalation on difficult examples are concrete calibration controls.",
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, not a permissive third-party artwork license. No calibration diagram, result, data, prose, or layout is reproduced."
+      },
+      {
+        "title": "G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment",
+        "url": "https://aclanthology.org/2023.emnlp-main.153/",
+        "usage": "Used as a peer-reviewed primary source to verify task-specific criteria, form-based scoring, correlation against human judgments, and the risk that model evaluators favor model-generated text.",
+        "license": "ACL Anthology materials published from 2016 onward are CC BY 4.0, while third-party material is excluded. Reuse was legally possible with attribution, but no paper figure, table, prompt, data, prose, or layout is used because the original two-lane synthesis is narrower."
+      },
+      {
+        "title": "Optimization-based Prompt Injection Attack to LLM-as-a-Judge",
+        "url": "https://arxiv.org/abs/2403.17710",
+        "usage": "Used as a primary security paper to verify that attacker-controlled candidate text can manipulate an LLM judge, supporting explicit injection tests, untrusted-data boundaries, and human review for consequential failures.",
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, which does not grant general adaptation rights. No attack suffix, experiment, figure, result, wording, or layout is reproduced."
+      }
+    ],
+    "notes": "The visual is an original conceptual synthesis and contains no paper-specific numbers or geometry. Its claim is deliberately bounded: deterministic checks should own exactly verifiable constraints; an LLM judge may provide scalable evidence for semantic criteria only after comparison with independent human labels, perturbation and manipulation tests, slice analysis, and an explicit abstention or escalation rule. Human review is not depicted as infallible ground truth; it is independent calibration evidence whose disagreements must be inspected."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full relevant neighborhoods, then checked four primary papers and their explicit licensing terms. The hardest prose-only model is that exact gates and uncertain semantic judgments produce different evidence and must not be collapsed into one judge score."
+  },
+  "implementation": {
+    "visualIds": [
+      "judge-calibration-gates"
+    ],
+    "accessibility": "The figure is linked to a direct learning question, and its two semantic sections form a labelled group. Numbered steps, explicit pass-or-fail and abstain-or-escalate language, separate outcomes, and the caption preserve every distinction without color. The established two-column primitive stacks below 640 CSS pixels with normal text wrapping and no minimum width, including at 390 CSS pixels; theme tokens support dark mode and shared print rules force high-contrast paper colors."
+  }
+}

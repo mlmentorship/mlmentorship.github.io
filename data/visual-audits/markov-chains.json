@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "markov-chains",
+  "article": "src/content/posts/2025-11-27-markov-chains.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish a finite-time marginal from a stationary fixed point, and verify on one two-state chain that equal pairwise detailed-balance flow implies stationarity.",
+  "mediumRationale": "A compact numeric ledger is the smallest medium that aligns repeated row-vector updates, the limiting fixed point, and the pairwise flow calculation. Native table semantics make the distinction countable and readable without requiring graph animation.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a state graph shows one-step transition probabilities well but does not naturally align successive marginals or demonstrate that applying P to pi leaves the distribution unchanged.",
+    "svg": "Rejected: fixed node and bar geometry could animate or plot convergence, but the learning task depends on exact probability updates and equal-flow arithmetic rather than geometric shape.",
+    "semanticHtml": "Selected: scoped headers align time, Pr(A), and Pr(B), while native text gives an accessible exact calculation. The existing cm-grid primitive supports narrow wrapping, dark mode, and print with no client runtime.",
+    "interaction": "Rejected: stepping or changing transition probabilities would add controls and hidden states when three updates, one fixed point, and one detailed-balance equality fit in a static ledger.",
+    "paperReuse": "Rejected: authoritative sources contain transition diagrams and convergence examples, but no external composition is needed. The author-hosted book remains copyrighted and the Berkeley text is CC BY-NC-ND 4.0, so no figure, prose, values, or layout is adapted.",
+    "noVisual": "Rejected: equations alone leave readers to reconcile three different objects mentally: a transition row, the changing marginal mu_t, and the stationary vector pi. The worked ledger makes their roles and multiplication convention explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 5,
+        "insight": "The preceding matrix-factorization slide contrasts eigendecomposition and SVD. It provides only general eigenvector context and does not connect eigenvalue 1 to a probability fixed point."
+      },
+      {
+        "page": 6,
+        "insight": "The Probability Theory divider begins the nearest foundational probability neighborhood and contains no Markov-chain mechanism."
+      },
+      {
+        "page": 7,
+        "insight": "The MCMC overview is the only direct Markov-chain introduction: it describes repeated transitions transforming an initial distribution toward a stationary target. It gives no transition matrix, convergence calculation, detailed balance, irreducibility, or aperiodicity."
+      },
+      {
+        "page": 8,
+        "insight": "The following discrete-distributions slide defines Bernoulli, categorical, binomial, and multinomial distributions but has no temporal transition or stationary-flow treatment."
+      },
+      {
+        "page": 9,
+        "insight": "The adjacent sampling slide uses a categorical cumulative distribution to sample an index. It concerns independent draws rather than repeated Markov transitions."
+      },
+      {
+        "page": 66,
+        "insight": "The later graphical-model overview introduces local conditional independence and tractable factorization, setting context for first-order chain structure without stationary dynamics."
+      },
+      {
+        "page": 67,
+        "insight": "The message-passing slide discusses local iterative inference on graphs but does not define a Markov transition matrix or stationary distribution."
+      },
+      {
+        "page": 68,
+        "insight": "The HMM slide says hidden switching dynamics have the Markov property and separates evaluation, decoding, and training. It concerns latent-state inference rather than long-run state occupancy."
+      },
+      {
+        "page": 69,
+        "insight": "The forward-backward slide uses the Markov property to separate past and future given a current hidden state. It does not discuss stationary distributions or reversibility."
+      },
+      {
+        "page": 70,
+        "insight": "The neighboring CRF slide contrasts dependent sequence labels and dynamic programming but adds no Markov-chain equilibrium material."
+      },
+      {
+        "page": 71,
+        "insight": "The linear-factor-model slide describes a first-order Gauss-Markov process and eigenvalue-driven shrinkage or growth, but not finite-state stationary flow."
+      },
+      {
+        "page": 72,
+        "insight": "The following normalizing-flows divider ends the relevant graphical-model neighborhood and confirms that no adjacent stationary-distribution treatment follows."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for Markov chain, stationary distribution, detailed balance, reversibility, transition matrix, mixing, random walk, and MCMC, then read pages 5-9 and 66-72 as the complete relevant neighborhoods. Page 7 gives the closest convergence intuition; pages 68-71 cover Markov structure only inside latent sequence models. No deck slide computes a stationary distribution or contrasts global balance with pairwise detailed balance. No deck artwork, wording, values, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Markov Chains and Mixing Times, Second Edition",
+        "url": "https://pages.uoregon.edu/dlevin/MARKOV/",
+        "usage": "Used as the authoritative textbook source to verify transition matrices, stationary distributions, irreducibility, aperiodicity, convergence, reversibility, detailed balance, eigenvalue-based mixing, and finite two-state examples.",
+        "license": "The authors provide the PDF from an official university page, but the AMS-published book remains copyrighted and no permissive figure-reuse license is stated. No figure, prose, worked example, values, or layout is copied."
+      },
+      {
+        "title": "Probability for Data Science: Balance and Detailed Balance",
+        "url": "https://data140.org/textbook/content/chapter-11/balance-and-detailed-balance/",
+        "usage": "Used as an authoritative Berkeley textbook cross-check for interpreting pi P equals pi as equality of total entering and leaving probability and detailed balance as equal flow in both directions for every state pair.",
+        "license": "The Data 140 textbook is licensed CC BY-NC-ND 4.0, which permits attributed noncommercial redistribution but not adaptations. No text, diagram, example values, or layout is adapted; the source is cited only for definitions."
+      },
+      {
+        "title": "Monte Carlo Sampling Methods Using Markov Chains and Their Applications",
+        "url": "https://doi.org/10.1093/biomet/57.1.97",
+        "usage": "Used as the primary source to verify the Hastings generalization of the Metropolis transition rule and its construction of a Markov chain with the desired invariant target distribution.",
+        "license": "The Biometrika article is publisher-copyrighted and no permissive figure-reuse license was identified. No source figure, algorithm wording, numerical example, table, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that P, mu_t, and pi are different objects. A row of P is a conditional next-state distribution given one current state; mu_t is the unconditional state distribution after t steps and depends on the start; pi is the special distribution satisfying pi P equals pi. In the original example, starting at (1,0) produces (0.8,0.2), (0.72,0.28), then (0.688,0.312), approaching (2/3,1/3). At pi, cross-state flows are both 2/15, so detailed balance holds and implies stationarity. Review also tightened two article claims: mixing depends on eigenvalue magnitude, and Metropolis-Hastings specifically—not every MCMC method—uses detailed balance."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then checked an authoritative Markov-chain textbook, Berkeley's probability textbook, and the primary Hastings paper before selecting an original stationary-flow ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "markov-chain-stationary-flow-ledger"
+    ],
+    "accessibility": "The figure has a linked title and detailed description, a semantic table with scoped row and column headers, and explicit equations for P, pi P, and both directional flows. Every value and relationship is textual, so the lesson does not depend on color. The established three-column cm-grid has no minimum width and wraps at 390 CSS pixels; shared theme tokens preserve dark-mode contrast, and existing print rules force a light high-contrast canvas and avoid page breaks inside the figure."
+  }
+}

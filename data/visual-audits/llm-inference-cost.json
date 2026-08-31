@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "llm-inference-cost",
+  "article": "src/content/posts/2026-04-18-llm-inference-cost.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how one user request becomes several model calls that repeatedly carry fixed prompt and retrieval tokens while accumulated history makes each later call larger.",
+  "mediumRationale": "A deterministic SVG with aligned, segmented request bars is the smallest medium that can preserve both dimensions of the mental model: repeated fixed context across calls and growing prior-turn context within later calls. A narrow vertical layout makes the compounding cost visible without implying vendor-specific prices.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show an agent loop, but automatic node sizing obscures the repeated token segments and their cumulative growth across aligned calls.",
+    "svg": "Selected: an original deterministic SVG can align three illustrative calls, repeat the fixed-context segment, grow prior-turn history, and distinguish a possible tail retry by both outline and label without runtime behavior.",
+    "semanticHtml": "Rejected: a table could enumerate the same inputs, but readers would still need to mentally compare repeated and accumulated widths across calls.",
+    "interaction": "Rejected: controls for step count, token volume, prices, or cache hit rate would require scenario-specific assumptions and add state without improving the core compounding-cost invariant.",
+    "paperReuse": "Rejected: the closest deck and paper figures address attention, KV-cache memory, or serving throughput rather than this article's request-level cost decomposition. Public access was not treated as reuse permission; the shipped composition, geometry, labels, and example are original.",
+    "noVisual": "Rejected: prose names five layers independently, but the hardest idea is their interaction inside one agentic request. The aligned calls reveal that fixed context is paid at every step, history accumulates, and a tail retry repeats the largest call."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 108,
+        "insight": "The LLM compute-optimization setup explains quadratic attention cost and the GPU memory hierarchy. It establishes why longer contexts consume more compute and memory, but it does not model request-level API cost or repeated agent calls."
+      },
+      {
+        "page": 109,
+        "insight": "The neighboring sequence-packing slide concerns training batches and padding waste, not repeated inference context."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide explains repeated autoregressive model passes and a latency optimization, but it does not decompose the billable input carried by an application-level agent loop."
+      },
+      {
+        "page": 114,
+        "insight": "The immediate predecessor to the serving summary covers mixed-precision training and contributes no request-cost model."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving summary lists prefill, paged KV cache, speculative decoding, continuous batching, and quantization. It is the closest serving slide, but it does not connect system prompts, retrieved context, accumulated tool history, multiple calls, and tail retries."
+      },
+      {
+        "page": 116,
+        "insight": "The following re-scoring title slide begins a different topic and contains no cost or serving detail."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for inference, tokens, prompts, retrieval, RAG, agents, serving, caching, latency, and cost. Physical pages 108-116 were then read as the only concentrated LLM-compute and serving neighborhood. Pages 108 and 115 provide adjacent context but no reusable figure for application-level inference cost. No deck pixels, wording, measurements, or layout are copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "OpenAI API: Prompt caching",
+        "url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+        "usage": "Used as official documentation to verify that a model processes the full rendered context, that an unchanged prefix can reuse stored KV state, and that only matching cached-prefix tokens receive the cached-input rate.",
+        "license": "OpenAI documentation was consulted for behavior and terminology only. No documentation prose, code, artwork, pricing table, or layout is reproduced."
+      },
+      {
+        "title": "Claude Platform: Prompt caching",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+        "usage": "Used as official vendor documentation to cross-check that tools, system instructions, and messages form an ordered prompt prefix and that cache reuse reduces the cost of repeated content rather than removing later dynamic input or output cost.",
+        "license": "Anthropic retains rights in its documentation and no figure-reuse permission is assumed. No documentation artwork, prose, code, prices, or layout is reused."
+      },
+      {
+        "title": "Amazon Bedrock: Prompt caching for faster model inference",
+        "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html",
+        "usage": "Used as official platform documentation to verify that cache hits are best-effort and model-specific, cached and uncached tokens are billed separately, and applications must inspect cache usage rather than assume every repeated prompt is discounted.",
+        "license": "AWS documentation is used as a factual reference only. No AWS figure, prose, code, pricing, or visual arrangement is reproduced."
+      },
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used as a primary systems paper to verify that long shared prompt prefixes create reusable KV state and that prefix sharing can reduce redundant prompt computation at the serving layer.",
+        "license": "The arXiv record identifies CC BY 4.0, so attributed reuse is permitted. No paper figure, example, result, wording, or layout is reproduced because the original call-ledger visual addresses a different learning objective."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is compounding across layers 2-5, not the five-item taxonomy itself. In a multi-step request, each model call receives fixed instructions and retrieved context plus the conversation or tool history accumulated so far. Without effective prefix caching or summarization, adding similarly sized history each step makes total input-token processing grow as a sum of increasing contexts; an extra retry or long tail request repeats the largest context. The visual is qualitative and deliberately omits dollar amounts, token counts, and universal cache discounts because prices, minimum cacheable lengths, write charges, TTLs, and hit rules vary by provider and model."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 source-deck pages and inspected the exact LLM-serving neighborhood, then checked three current official prompt-caching references and the PagedAttention systems paper before selecting an original request-expansion diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "llm-cost-compounds-across-agent-calls"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Every segment is directly labelled, repeated fixed context uses a hatch pattern, prior-turn history uses a dotted pattern, the current turn is solid and numbered, and the tail retry is dashed, so the lesson does not depend on color. A 360-pixel viewBox scales within the established responsive figure container at 390 CSS pixels; repository visual tokens provide light and dark contrast, and shared print rules switch to a light high-contrast palette."
+  }
+}

@@ -39,6 +39,31 @@ Use the most direct check available:
 
 Do not use a model judge for a condition that code can verify exactly.
 
+**Learning objective:** distinguish an LLM judge's score from a validated evaluation decision by routing exact constraints to deterministic checks and uncertain semantic judgments through human calibration and review.
+
+<!-- visual:judge-calibration-gates -->
+<figure class="learning-figure" aria-labelledby="judge-calibration-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="judge-calibration-title">Which evidence should control each part of the evaluation?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two evaluation lanes: deterministic checks for exact constraints and a calibrated model judge for semantic quality">
+		<section class="visual-panel" aria-labelledby="judge-exact-lane-title">
+			<h4 id="judge-exact-lane-title">EXACT CONSTRAINTS · PROVE THEM</h4>
+			<p><strong>1 · Encode the rule</strong><br />Test outputs, state, citations, permissions, or required fields directly.</p>
+			<p><strong>2 · Run the check</strong><br />The same condition produces the same pass or fail.</p>
+			<p><strong>3 · Keep failures separate</strong><br />A hard failure cannot be averaged away by a high quality score.</p>
+			<p><strong>Evidence: deterministic result</strong><br />No model judge is needed for this lane.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="judge-semantic-lane-title">
+			<h4 id="judge-semantic-lane-title">SEMANTIC QUALITY · CALIBRATE IT</h4>
+			<p><strong>1 · Fix the rubric</strong><br />Define criteria, slices, and independent human labels first.</p>
+			<p><strong>2 · Test the judge</strong><br />Measure agreement; swap order; vary harmless format; probe injection.</p>
+			<p><strong>3 · Inspect uncertainty</strong><br />Review disagreements and failures on consequential slices.</p>
+			<p><strong>Evidence: conditional judgment</strong><br />Abstain or escalate when the judge is unstable or the impact is high.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> branch by what can be verified. Code owns exact constraints, so its failures remain visible. A model judge handles meaning only after its rubric is anchored to independent human labels and survives order, formatting, slice, and manipulation tests; unstable or high-impact cases go to human review. Report the two lanes separately rather than hiding either one in an overall score. Original synthesis informed by <a href="https://arxiv.org/abs/2306.05685">Zheng et al. (2023)</a>, <a href="https://arxiv.org/abs/2305.17926">Wang et al. (2023)</a>, and <a href="https://arxiv.org/abs/2403.17710">Shi et al. (2024)</a>.</figcaption>
+</figure>
+
 ## Pointwise and pairwise judging
 
 A pointwise judge scores one output on a scale. A pairwise judge chooses the better of two outputs.
