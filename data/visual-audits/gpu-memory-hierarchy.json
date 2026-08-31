@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "slug": "gpu-memory-hierarchy",
+  "article": "src/content/posts/2026-04-27-gpu-memory-hierarchy.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Use arithmetic intensity to explain why batching raises decode's bandwidth-limited throughput ceiling and why only operations beyond the hardware ridge become compute-bound.",
+  "mediumRationale": "A deterministic log-scale Roofline is the smallest medium that turns the max-time equation into a spatial decision: the sloped HBM ceiling, flat compute ceiling, and their ridge are visible at once. Three directly labelled points make the article's batch-1 decode, batched decode, and large-matmul examples checkable against the same illustrative hardware.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart cannot encode the quantitative intersection of bandwidth, arithmetic intensity, and compute throughput or place workloads relative to the ridge.",
+    "svg": "Selected because fixed log-scale geometry can show both ceilings, the 330-FLOP/byte ridge, and a batching movement while remaining deterministic, responsive, and independent of client-side code.",
+    "semanticHtml": "Rejected because a table can compare numeric examples but cannot make the piecewise minimum or the transition from sloped to flat limiting performance perceptually immediate.",
+    "interaction": "Rejected because changing hardware peaks or batch size would add controls and hidden states before the reader understands the stable first-order model. The article already tells readers to use measured target-machine values.",
+    "paperReuse": "Rejected because the original report, NERSC documentation, NVIDIA documentation, and source deck contain related Roofline or hierarchy material without a necessary reusable figure. No source plot, coordinates, measurements, colors, wording, or layout is copied.",
+    "noVisual": "Rejected because the equation and prose define the two limits but require readers to mentally graph a piecewise minimum, locate the ridge, and infer how weight reuse changes decode's position."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding LLM-training slide motivates hardware scalability and BF16 mixed precision but contains no memory hierarchy or arithmetic-intensity model."
+      },
+      {
+        "page": 108,
+        "insight": "The direct compute-optimization slide contrasts large slower HBM with tiny faster SRAM, defines memory-bound work using FLOPs per byte versus a hardware ratio near 300, and names reduced I/O and fuller batches as levers. It provides prose only, not a Roofline plot."
+      },
+      {
+        "page": 109,
+        "insight": "The immediate following slide explains sequence packing as removal of padded-token work, a utilization mechanism distinct from reusing model weights across decode requests."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide applies the hierarchy by keeping tiles and running statistics in SRAM and avoiding quadratic HBM materialization, supporting the article's claim that fewer bytes can accelerate unchanged mathematical work."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide describes single-token generation as weight-read dominated and says a parallel verification pass adds arithmetic after weights are loaded."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide connects halved tensor bytes to memory headroom and bandwidth speedups, but focuses on numerical formats rather than the Roofline boundary."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving stack summarizes mixed precision, FlashAttention, speculative decoding, and quantization by the bottleneck each fixes, without a quantitative performance envelope."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for roofline, arithmetic intensity, memory hierarchy, HBM, SRAM, bandwidth, memory-bound, and compute-bound terminology. Matches on pages 108, 110, 113, 114, and 115 were reviewed. Pages 107-109 were rendered and visually inspected as the complete neighborhood around the strongest direct match; pages 110 and 113-115 were inspected as downstream applications. Page 108 cites an external social-media thread and contains no reusable figure. No deck screenshot, wording, numeric layout, or visual structure is reused.",
+    "license": "The local deck states no license, and the page 108 source link does not establish permission to republish the slide or any upstream material. The deck is treated as review-only. The shipped plot is an original construction from equations and illustrative values already stated in the article."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Roofline: An Insightful Visual Performance Model for Floating-Point Programs and Multicore Architectures",
+        "url": "https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.html",
+        "usage": "Used as the original technical report for attainable performance as the minimum of peak compute and peak bandwidth times operational intensity, and for the ridge separating memory- and compute-bound regions.",
+        "license": "The Berkeley report is publicly downloadable, but no permissive figure-reuse license was identified. No report figure, prose, benchmark, or coordinates are copied."
+      },
+      {
+        "title": "NERSC Roofline Performance Model",
+        "url": "https://docs.nersc.gov/tools/performance/roofline/",
+        "usage": "Used as authoritative laboratory documentation to verify arithmetic intensity, achieved throughput, machine balance, HBM-level bytes, and the recommendation to measure realistic ceilings rather than rely only on vendor peaks.",
+        "license": "No explicit permissive license for the page's figures was identified. No NERSC image, wording, data point, or layout is reproduced."
+      },
+      {
+        "title": "NVIDIA Deep Learning Performance: Matrix Multiplication Background",
+        "url": "https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html",
+        "usage": "Used as official documentation to verify the GEMM arithmetic-intensity equation, that matrix-vector products remain memory-limited near one FLOP per byte, and that large square GEMMs can exceed a machine's FLOPs-to-byte ratio.",
+        "license": "NVIDIA's documentation notice requires advance written approval for reproduction. The visual therefore does not copy any NVIDIA figure, prose, benchmark, or example dimensions beyond independently applying the equation to the article's 2048-square illustrative case."
+      },
+      {
+        "title": "Accelerating HPC Applications with NVIDIA Nsight Compute Roofline Analysis",
+        "url": "https://developer.nvidia.com/blog/accelerating-hpc-applications-with-nsight-compute-roofline-analysis/",
+        "usage": "Used as official profiler guidance to cross-check the sloped memory roof, horizontal compute roof, arithmetic-intensity movement, and the need to inspect achieved performance below the theoretical envelope.",
+        "license": "No permissive license for the article's screenshots or charts was identified. No chart, screenshot, application result, prose, or visual styling is copied."
+      },
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "usage": "Used as the primary source to verify the broader article claim that tiling around the GPU memory hierarchy reduces HBM reads and writes and can improve wall-clock time without changing exact attention results.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, not a permissive third-party figure license. No paper figure, algorithm, benchmark, or prose is reproduced."
+      }
+    ],
+    "notes": "The original worked plot applies the article's illustrative 989 BF16 TFLOP/s and 3 TB/s HBM peaks. Their ratio is 989/3 = 329.67 FLOPs/byte, giving the labelled ridge near 330. At one FLOP/byte, the bandwidth roof is 3 TFLOP/s. Idealized reuse across batch 64 raises decode to roughly 64 FLOPs/byte and a bandwidth ceiling of 192 TFLOP/s, still below the ridge; real KV-cache, activation, and output traffic lowers intensity. For a 2048-square BF16 matrix multiplication, the article's input-only approximation n/2 gives 1024 FLOPs/byte, beyond the ridge, while output traffic and implementation overhead lower the realized value. The chart is explicitly an upper-bound teaching model, not a performance prediction."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected the strongest hierarchy neighborhood, and checked the original Roofline report, NERSC guidance, official NVIDIA performance documentation, and the primary FlashAttention paper before selecting an original worked Roofline."
+  },
+  "implementation": {
+    "visualIds": [
+      "gpu-roofline-batching-ridge"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming the hardware assumptions, ceilings, ridge, workload positions, and batching movement. Every region, point, value, and inference is directly labelled; circle, diamond, square, line slope, dashed guide, and position preserve the lesson without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
