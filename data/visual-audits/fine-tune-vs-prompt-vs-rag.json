@@ -9,7 +9,7 @@
   "mediumComparison": {
     "mermaid": "Rejected because a branching flowchart would imply mutually exclusive terminal choices, contradicting the article's central point that prompting, retrieval, and tuning can be combined.",
     "svg": "Rejected because the lesson is categorical ownership and composition rather than quantitative geometry; fixed drawing text would also be less adaptable at phone width.",
-    "semanticHtml": "Selected because two labelled panels can separate diagnosis from composition, preserve ordinary reading order, stack at 390 CSS pixels, and remain accessible and printable without custom styling.",
+    "semanticHtml": "Selected because two labelled panels can separate diagnosis from composition, preserve ordinary reading order, stack below 640 CSS pixels, remain readable at 390 CSS pixels, and stay accessible and printable without custom styling.",
     "interaction": "Rejected because changing hypothetical failures adds controls and hidden states without improving the stable three-layer decision model.",
     "paperReuse": "Rejected because the OpenAI guide contains a related proprietary matrix and the foundational papers contain architecture figures, but no external layout is needed. No source figure, wording, data, or visual organization is copied.",
     "noVisual": "Rejected because the prose correctly says the methods solve different problems, but readers must still mentally map a failed eval to the intervention boundary and reconcile that routing with the fact that production systems stack all three."

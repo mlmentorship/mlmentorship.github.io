@@ -132,6 +132,59 @@ class Cdp {
   }
 }
 
+async function waitForVisualLayout(cdp, visualId, theme) {
+  const evaluation = await cdp.call('Runtime.evaluate', {
+    expression: `(async () => {
+      document.documentElement.dataset.theme = ${JSON.stringify(theme)};
+      await document.fonts.ready;
+      const locateVisual = () => {
+        const comments = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT);
+        let marker;
+        while (comments.nextNode()) {
+          if (comments.currentNode.data.trim() === ${JSON.stringify(`visual:${visualId}`)}) {
+            marker = comments.currentNode;
+            break;
+          }
+        }
+        let visual = marker?.nextElementSibling;
+        while (visual && !visual.matches('figure.learning-figure, .mermaid')) visual = visual.nextElementSibling;
+        return visual;
+      };
+      let previous = '';
+      let stableSince = performance.now();
+      for (let attempt = 0; attempt < 40; attempt += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
+        const visual = locateVisual();
+        if (!visual) throw new Error('Visual not found');
+        const rect = visual.getBoundingClientRect();
+        const signature = [
+          rect.left + scrollX,
+          rect.top + scrollY,
+          rect.width,
+          rect.height,
+          document.documentElement.scrollWidth,
+          document.documentElement.scrollHeight,
+        ].map((value) => Math.round(value * 100) / 100).join('|');
+        const now = performance.now();
+        if (signature !== previous) {
+          previous = signature;
+          stableSince = now;
+        } else if (now - stableSince >= 250) {
+          return true;
+        }
+      }
+      throw new Error('Visual layout did not stabilize');
+    })()`,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  if (evaluation.exceptionDetails) {
+    throw new Error(evaluation.exceptionDetails.exception?.description ?? evaluation.exceptionDetails.text);
+  }
+}
+
 const delay = (milliseconds) => new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
 const port = 9300 + (process.pid % 500);
 const profileDir = join(tmpdir(), `mlmentorship-visual-review-${process.pid}`);
@@ -229,9 +282,11 @@ try {
       }
 
       for (const visualId of entry.visualIds) {
+        await waitForVisualLayout(cdp, visualId, mode.theme);
         const expression = `(() => new Promise((resolve) => {
           document.documentElement.dataset.theme = ${JSON.stringify(mode.theme)};
           requestAnimationFrame(() => requestAnimationFrame(() => {
+            window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
             const comments = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT);
             let marker;
             while (comments.nextNode()) {

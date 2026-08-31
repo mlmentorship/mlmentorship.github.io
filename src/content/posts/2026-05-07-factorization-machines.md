@@ -27,7 +27,7 @@ Result: the FM has $O(d k)$ parameters instead of $O(d^2)$, and it generalizes t
 		<svg viewBox="0 0 360 430" role="img" aria-labelledby="fm-sharing-svg-title fm-sharing-svg-desc">
 			<title id="fm-sharing-svg-title">Pair-specific weights compared with shared feature embeddings for an unseen interaction</title>
 			<desc id="fm-sharing-svg-desc">An original three-feature example compares two parameterizations. In a polynomial model, training included pairs A-B and B-C, so their separate edge weights are learned, while the never-observed A-C edge has an unknown pair-specific weight. In a factorization machine, each feature instead owns one reusable two-dimensional vector: A is one-zero, B is point-eight-point-two, and C is point-six-point-four. The observed A-B and B-C pairs help learn those vectors. Even though A-C never appeared together, its coefficient is defined and computable as the dot product of A and C, one times point six plus zero times point four, which equals point six. This demonstrates availability of an estimate, not guaranteed accuracy on every unseen pair.</desc>
-			<text class="viz-axis-label" x="14" y="20">PAIR-SPECIFIC POLYNOMIAL MODEL · PARAMETERS LIVE ON EDGES</text>
+			<text class="viz-axis-label" x="14" y="20">PAIR-SPECIFIC MODEL · EDGE PARAMETERS</text>
 			<rect class="viz-node viz-node--input" x="18" y="42" width="76" height="38" rx="4"></rect>
 			<text class="viz-callout" x="56" y="65" text-anchor="middle">feature A</text>
 			<rect class="viz-node viz-node--input" x="142" y="42" width="76" height="38" rx="4"></rect>

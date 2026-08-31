@@ -68,7 +68,7 @@ $$
 			<text class="viz-node-label" x="300" y="450">PCA limit</text><text class="viz-node-value" x="300" y="468">σ² → 0</text><text class="viz-node-value" x="300" y="481">no noise</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the solid arrows first: one latent vector reaches every feature, so $WW^\top$ can fill both diagonal and off-diagonal covariance cells. Each dashed noise path reaches only one feature, so $\Psi$ adds variance only on the diagonal. FA lets those diagonal additions differ; PPCA ties them to one $\sigma^2$; PCA is the zero-noise limit. The construction is original and checked against Tipping and Bishop (1999) and Ghahramani and Hinton (1996).</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the solid arrows first: one latent vector reaches every feature, so WWᵀ can fill both diagonal and off-diagonal covariance cells. Each dashed noise path reaches only one feature, so Ψ adds variance only on the diagonal. FA lets those diagonal additions differ; PPCA ties them to one σ²; PCA is the zero-noise limit. The construction is original and checked against Tipping and Bishop (1999) and Ghahramani and Hinton (1996).</figcaption>
 </figure>
 
 The whole model is the claim: *the correlations between observed variables are explained by a few shared latent factors; whatever is left is independent per-feature noise.*
