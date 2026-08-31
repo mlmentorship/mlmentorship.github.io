@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "gradient-boosting",
+  "article": "src/content/posts/2026-02-21-gradient-boosting.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one squared-error boosting round from the current ensemble prediction, through signed residual targets, to a shrunken tree correction that moves every prediction toward its target.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can keep target values, current predictions, signed residual arrows, a fitted tree correction, and the updated predictions in one spatial trace. A four-point squared-error example makes both the direction and the learning-rate-scaled magnitude inspectable without controls.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the learning task depends on quantitative vertical distance and signed correction magnitude, which a relationship graph cannot encode precisely.",
+    "svg": "Selected because fixed geometry can show residuals as measured vertical gaps and verify that adding one half of the fitted correction shortens each gap by half.",
+    "semanticHtml": "Rejected because a table could expose the arithmetic but would make the key spatial equivalence between residual direction and prediction movement harder to see.",
+    "interaction": "Rejected because varying targets or the learning rate would add controls and hidden states without improving the single-round mental model.",
+    "paperReuse": "Rejected because the reviewed paper and official tutorial contain broader algorithm descriptions and figures, while no candidate figure exactly matches this worked residual-update objective. Public access was not treated as figure-reuse permission; no source artwork, data, wording, coordinates, or layout is copied.",
+    "noVisual": "Rejected because the prose states that each tree corrects the current ensemble, but readers must otherwise mentally connect a loss gradient's sign, the tree's fitted output, shrinkage, and the direction of the updated prediction."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 25,
+        "insight": "The preceding Random Forests slide introduces trees, feature-space splits, and bagging, providing the contrast that its trees are trained on bootstrap samples rather than sequential residual targets."
+      },
+      {
+        "page": 26,
+        "insight": "The decision-tree split-criterion slide lists variance, information gain, and Gini impurity but does not show how a boosting round constructs a new regression target."
+      },
+      {
+        "page": 27,
+        "insight": "The dedicated Gradient boosting slide describes sequential weak models, pseudo-residuals, and squared-error residuals y minus prediction. Its classification code is explicitly caveated and internally inconsistent, so it is not used as technical authority or copied."
+      },
+      {
+        "page": 28,
+        "insight": "The following Boosting vs Bagging slide is only a section title and adds no mechanism, geometry, or source figure."
+      },
+      {
+        "page": 29,
+        "insight": "The next substantive slide begins factorization machines, confirming that the deck's gradient-boosting treatment ends without a worked residual update."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for gradient boosting, boosting, XGBoost, LightGBM, CatBoost, residuals, and tree ensembles. Page 27 is the only dedicated gradient-boosting slide; pages 25-29 were reviewed as its complete neighboring method sequence. Later matches on pages 131 and 161-162 mention boosting only as a recommender combiner or an algorithm-choice prompt and add no mechanism. No deck artwork, code, wording, data, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Greedy Function Approximation: A Gradient Boosting Machine",
+        "url": "https://www.jstor.org/stable/2699986",
+        "usage": "Used as the primary source for stagewise additive function approximation, fitting a base learner to negative loss gradients, line search, and shrinkage.",
+        "license": "The journal record provides access for scholarship but no permissive license for adapting its figures was identified. No paper figure, experimental data, prose, or layout is reused; the four-point squared-error construction is an original derivation."
+      },
+      {
+        "title": "XGBoost documentation: Introduction to Boosted Trees",
+        "url": "https://xgboost.readthedocs.io/en/stable/tutorials/model.html",
+        "usage": "Used as official implementation documentation to verify additive tree predictions, stagewise tree training, objective optimization, shrinkage, and the distinction between the shared tree-ensemble model and boosting as its training procedure.",
+        "license": "The XGBoost project is distributed under Apache License 2.0, but no tutorial image, example, prose, code, or visual composition is copied. The documentation is cited only for algorithm semantics."
+      },
+      {
+        "title": "XGBoost: A Scalable Tree Boosting System",
+        "url": "https://arxiv.org/abs/1603.02754",
+        "usage": "Used as a primary systems paper to cross-check XGBoost's regularized second-order objective and additive tree formulation.",
+        "license": "The arXiv record is publicly readable, but arXiv supports submission-specific licenses and public access alone does not establish broad artwork reuse rights. No paper figure, benchmark value, wording, or layout is reused."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that arXiv papers may carry different licenses and that free download does not itself grant permission to adapt figures.",
+        "license": "The policy is cited only to document the conservative licensing decision; no policy text, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a tree is not fitted directly to y after the initial round: it is fitted to the negative loss gradient evaluated at the current ensemble. For the original example y = [2, 2, 8, 8], squared error gives F0 = 5 and residuals [-3, -3, +3, +3]. A stump separating the two pairs fits h1 = -3 on the left and +3 on the right. With eta = 0.5, F1 = F0 + 0.5 h1 gives [3.5, 3.5, 6.5, 6.5], so each remaining residual is half as long and still points toward its target. Direct labels, arrow direction, solid versus dashed lines, and numerical values carry the lesson without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact boosting neighborhood, then checked the primary gradient-boosting and XGBoost papers, official XGBoost documentation, and arXiv licensing guidance before selecting an original worked residual-update SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "gradient-boosting-residual-update"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that states all four targets, current predictions, residuals, stump outputs, learning rate, and updated predictions. Circles mark targets, solid and dashed rules distinguish current and updated predictions, arrows and signed labels show correction direction, and every quantity is textual rather than color-dependent. The 360-unit viewBox uses the established plot-panel primitive without a minimum width for 390 CSS-pixel readability; existing theme variables preserve dark-mode contrast and shared print rules force a light high-contrast palette."
+  }
+}

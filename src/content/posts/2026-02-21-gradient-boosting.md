@@ -27,6 +27,64 @@ Initialize with a constant prediction $F_0$ (mean target for regression, log-odd
 
 For squared error, $r_{i,t} = y_i - F_{t-1}(x_i)$. Literal residuals. For other losses (logistic, Huber, ranking) the residuals are the loss gradients.
 
+**Learning objective:** trace one squared-error boosting round from the current prediction, through signed residual targets, to the learning-rate-scaled correction.
+
+<!-- visual:gradient-boosting-residual-update -->
+<figure class="learning-figure plot-panel" aria-labelledby="gradient-boosting-update-title">
+	<p class="visual-kicker">One boosting round</p>
+	<p class="visual-title" id="gradient-boosting-update-title">The next tree predicts how to move the current ensemble.</p>
+	<svg viewBox="0 0 360 500" role="img" aria-labelledby="gradient-boosting-svg-title gradient-boosting-svg-desc">
+		<title id="gradient-boosting-svg-title">A squared-error gradient-boosting residual update</title>
+		<desc id="gradient-boosting-svg-desc">Four ordered samples have targets 2, 2, 8, and 8. The initial constant ensemble predicts 5 for every sample, producing residuals negative 3 for the first pair and positive 3 for the second pair. A decision stump splits after sample two and predicts those residual values. With learning rate one half, the stump contributes negative 1.5 on the left and positive 1.5 on the right. Adding that correction changes the predictions to 3.5, 3.5, 6.5, and 6.5, cutting every remaining target gap in half.</desc>
+		<defs>
+			<marker id="gradient-boosting-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
+		</defs>
+		<text class="viz-axis-label" x="18" y="20">1 · CURRENT ENSEMBLE F₀</text>
+		<rect class="viz-plot-bg" x="42" y="30" width="286" height="122" rx="4"></rect>
+		<path class="viz-gridline" d="M42 50H328M42 91H328M42 132H328"></path>
+		<path d="M53 91H317" style="fill:none;stroke:var(--viz-edge);stroke-width:2.5"></path>
+		<text class="viz-callout" x="313" y="84" text-anchor="end">F₀ = 5</text>
+		<g style="fill:var(--viz-surface);stroke:var(--viz-input-stroke);stroke-width:2.5">
+			<circle cx="76" cy="132" r="6"></circle><circle cx="137" cy="132" r="6"></circle><circle cx="223" cy="50" r="6"></circle><circle cx="284" cy="50" r="6"></circle>
+		</g>
+		<g style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#gradient-boosting-arrow)">
+			<path d="M76 94V122"></path><path d="M137 94V122"></path><path d="M223 88V60"></path><path d="M284 88V60"></path>
+		</g>
+		<text class="viz-callout" x="106" y="113" text-anchor="middle">r = −3 ↓</text>
+		<text class="viz-callout" x="253" y="73" text-anchor="middle">r = +3 ↑</text>
+		<text class="viz-label" x="185" y="148" text-anchor="middle">○ targets y = [2, 2, 8, 8]</text>
+		<text class="viz-axis-label" x="18" y="182">2 · FIT A TREE TO r, NOT TO y</text>
+		<path d="M180 218L99 250M180 218L261 250" style="fill:none;stroke:var(--viz-edge);stroke-width:1.8"></path>
+		<rect class="viz-node viz-node--focus" x="120" y="194" width="120" height="34" rx="4"></rect>
+		<text class="viz-callout" x="180" y="216" text-anchor="middle">sample ≤ 2?</text>
+		<text class="viz-label" x="115" y="242" text-anchor="end">yes</text>
+		<text class="viz-label" x="245" y="242">no</text>
+		<rect class="viz-node viz-node--input" x="44" y="250" width="110" height="45" rx="4"></rect>
+		<text class="viz-callout" x="99" y="269" text-anchor="middle">h₁ = −3</text>
+		<text class="viz-label" x="99" y="286" text-anchor="middle">fit samples 1–2</text>
+		<rect class="viz-node viz-node--input" x="206" y="250" width="110" height="45" rx="4"></rect>
+		<text class="viz-callout" x="261" y="269" text-anchor="middle">h₁ = +3</text>
+		<text class="viz-label" x="261" y="286" text-anchor="middle">fit samples 3–4</text>
+		<text class="viz-callout" x="180" y="318" text-anchor="middle">η = 0.5 ⇒ add ηh₁ = −1.5 | +1.5</text>
+		<text class="viz-axis-label" x="18" y="350">3 · ADD THE SHRUNKEN CORRECTION</text>
+		<rect class="viz-plot-bg" x="42" y="360" width="286" height="122" rx="4"></rect>
+		<path class="viz-gridline" d="M42 380H328M42 421H328M42 462H328"></path>
+		<path d="M53 421H317" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:5 4"></path>
+		<text class="viz-label" x="313" y="416" text-anchor="end">old F₀ = 5</text>
+		<path d="M53 442H180V400H317" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:3"></path>
+		<text class="viz-callout" x="58" y="437">F₁ = 3.5</text>
+		<text class="viz-callout" x="313" y="395" text-anchor="end">F₁ = 6.5</text>
+		<g style="fill:var(--viz-surface);stroke:var(--viz-input-stroke);stroke-width:2.5">
+			<circle cx="76" cy="462" r="6"></circle><circle cx="137" cy="462" r="6"></circle><circle cx="223" cy="380" r="6"></circle><circle cx="284" cy="380" r="6"></circle>
+		</g>
+		<g style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#gradient-boosting-arrow)">
+			<path d="M76 445V453"></path><path d="M137 445V453"></path><path d="M223 397V389"></path><path d="M284 397V389"></path>
+		</g>
+		<text class="viz-label" x="180" y="497" text-anchor="middle">remaining residuals: −1.5 | +1.5; half as long</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> start at the flat prediction $F_0=5$. Each signed arrow is both a target gap and, for squared error, a training label for the next tree. The stump fits $-3$ on the left and $+3$ on the right; shrinkage adds only half of that correction. The updated step $F_1$ therefore moves toward every target without jumping all the way there, and each residual is halved. Original schematic checked against <a href="https://www.jstor.org/stable/2699986">Friedman's gradient-boosting formulation</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost boosted-tree tutorial</a>.</figcaption>
+</figure>
+
 ## Newton boosting (xgboost)
 
 xgboost uses second-order information: each new tree minimizes a Taylor expansion of the loss including both the gradient and Hessian (diagonal). This gives faster convergence and tighter leaf-value updates than first-order GBDT.
