@@ -31,6 +31,50 @@ $$
 
 This is what "linear in the features" means here. Linear in the log-odds, not in the probability.
 
+<!-- visual:logit-odds-probability-map -->
+<figure class="learning-figure" aria-labelledby="logit-map-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="logit-map-title">See how a linear score becomes multiplicative odds and a saturating probability.</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 290" role="img" aria-labelledby="logit-map-svg-title logit-map-svg-desc">
+			<title id="logit-map-svg-title">Linear logits mapped to odds and sigmoid probabilities</title>
+			<desc id="logit-map-svg-desc">A sigmoid curve maps the linear score z from negative values to probabilities near zero and positive values to probabilities near one. Five equally spaced scores, minus two through two, are marked. Their probabilities are 0.12, 0.27, 0.50, 0.73, and 0.88, while their odds relative to the preceding unit scale by the constant factor e. A dashed vertical line at score zero marks even odds, probability one half, and the usual decision boundary.</desc>
+			<rect class="viz-plot-bg" x="34" y="26" width="310" height="204" rx="4"></rect>
+			<path class="viz-gridline" d="M34 128H344M34 77H344M34 179H344"></path>
+			<path class="viz-axis" d="M34 26V230H344"></path>
+			<text class="viz-label" x="16" y="231">0</text>
+			<text class="viz-label" x="8" y="132">0.5</text>
+			<text class="viz-label" x="16" y="31">1</text>
+			<text class="viz-axis-label" transform="translate(8 174) rotate(-90)">probability p</text>
+			<path d="M34 214.5C45 212.5 55 209.5 65 205.7S111 186 127 175.1S174 140 189 128S235 91.8 251 80.9S298 54.4 313 50.3S333 43.5 344 41.5" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-linecap:round"></path>
+			<path class="viz-operating-guide" d="M189 26V230"></path>
+			<circle class="viz-operating-point" cx="65" cy="205.7" r="5"></circle>
+			<circle class="viz-operating-point" cx="127" cy="175.1" r="5"></circle>
+			<path d="M189 121L196 128L189 135L182 128Z" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
+			<circle class="viz-operating-point" cx="251" cy="80.9" r="5"></circle>
+			<circle class="viz-operating-point" cx="313" cy="50.3" r="5"></circle>
+			<text class="viz-callout" x="70" y="197">p=.12</text>
+			<text class="viz-callout" x="132" y="167">p=.27</text>
+			<text class="viz-callout" x="197" y="122">p=.50</text>
+			<text class="viz-callout" x="244" y="72" text-anchor="end">p=.73</text>
+			<text class="viz-callout" x="306" y="42" text-anchor="end">p=.88</text>
+			<text class="viz-axis-label" x="197" y="145">decision boundary</text>
+			<path d="M65 238V244M127 238V244M189 238V244M251 238V244M313 238V244M65 241H313" style="fill:none;stroke:var(--c-text-soft);stroke-width:1.4"></path>
+			<text class="viz-axis-label" x="65" y="258" text-anchor="middle">z=-2</text>
+			<text class="viz-axis-label" x="127" y="258" text-anchor="middle">-1</text>
+			<text class="viz-axis-label" x="189" y="258" text-anchor="middle">0</text>
+			<text class="viz-axis-label" x="251" y="258" text-anchor="middle">1</text>
+			<text class="viz-axis-label" x="313" y="258" text-anchor="middle">2</text>
+			<text class="viz-label" x="65" y="276" text-anchor="middle">odds .14</text>
+			<text class="viz-label" x="127" y="276" text-anchor="middle">.37</text>
+			<text class="viz-label" x="189" y="276" text-anchor="middle">1</text>
+			<text class="viz-label" x="251" y="276" text-anchor="middle">2.72</text>
+			<text class="viz-label" x="313" y="276" text-anchor="middle">7.39</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move one equal step along the linear score z = w<sup>T</sup>x + b. Each step multiplies the odds by the same factor e (0.14, 0.37, 1, 2.72, 7.39), but the sigmoid compresses the resulting probabilities near 0 and 1. At z = 0, odds are 1:1 and p = 0.5, so the usual threshold is the linear boundary w<sup>T</sup>x + b = 0. Original schematic checked against <a href="https://www.statlearning.com/"><cite>An Introduction to Statistical Learning</cite></a> and the <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229 notes</a>.</figcaption>
+</figure>
+
 ## Training
 
 Negative log-likelihood (binary cross-entropy):

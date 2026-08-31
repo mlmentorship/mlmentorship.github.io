@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "slug": "logistic-regression",
+  "article": "src/content/posts/2026-04-17-logistic-regression.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See that logistic regression is linear on the log-odds scale: equal steps in the linear score multiply the odds, while the sigmoid compresses those steps into unequal probability changes near zero and one.",
+  "mediumRationale": "A single deterministic sigmoid plot is the smallest medium that can align the linear score, odds, and probability scales. Five fixed score positions show that one-unit score steps multiply odds by the same factor even though their vertical probability increments shrink toward the curve's ends.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart could list score, odds, and probability transformations but cannot show the sigmoid's continuous saturation or equal horizontal steps.",
+    "svg": "Selected because fixed axes, a mathematical curve, matched score markers, and a zero-score boundary can directly connect linear log-odds to nonlinear probability without a runtime dependency.",
+    "semanticHtml": "Rejected because a table of score, odds, and probability values would verify arithmetic but would not make saturation or the linear decision threshold spatially visible.",
+    "interaction": "Rejected because changing a coefficient or threshold could show additional cases, but controls add state when five deterministic score positions already expose the invariant transformation.",
+    "paperReuse": "Rejected because the canonical logistic curve and odds relationship can be constructed directly from the model equations. No deck, paper, textbook, or documentation figure, data, coordinates, wording, or layout is copied.",
+    "noVisual": "Rejected because the article states that the model is linear in log-odds rather than probability, but prose requires readers to mentally coordinate three scales and understand why equal feature-score changes do not produce equal probability changes."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 21,
+        "insight": "The linear-classifiers slide defines a linear score and hyperplane decision boundaries, establishing the feature-space side of the model but not the conversion from score to probability."
+      },
+      {
+        "page": 32,
+        "insight": "The classification-loss section divider provides the immediate context for the logistic-regression material but contains no mechanism."
+      },
+      {
+        "page": 33,
+        "insight": "The first logistic-regression slide connects maximum likelihood, binary negative log-likelihood, and cross-entropy, but does not visualize the score-to-odds-to-probability transformation."
+      },
+      {
+        "page": 34,
+        "insight": "The neighboring slide describes convex classification losses, including logistic loss, but its prose does not clarify what is linear about logistic regression."
+      },
+      {
+        "page": 35,
+        "insight": "The main logistic-regression slide explicitly states that log-odds are modeled as a linear function and that sigmoid maps linear scores to probabilities. It provides equations and code but no aligned view of equal logit steps, multiplicative odds, and saturating probability."
+      },
+      {
+        "page": 36,
+        "insight": "The following slide compares logistic, exponential, hinge, cross-entropy, and focal surrogate losses; it adds no interpretation of coefficients or the 0.5 boundary."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for logistic regression, log odds, log-odds, sigmoid, binary cross-entropy, BCE, logistic loss, and decision boundary. Exact matches occur on pages 21, 23, 33-36, 41, 85, 96, and 150. Page 23 only mentions sigmoid as a generic squashing function, while pages 41, 85, 96, and 150 use sigmoid in neural-network, recurrent-unit, sequence-model, or GAN contexts. The complete logistic neighborhood on pages 32-36 and the relevant linear-classifier page 21 were inspected. No deck artwork, code, equation layout, coordinates, or wording is reused.",
+    "license": "The local deck provides no explicit license suitable for figure reuse. It is treated as review-only material, and the implementation is an original construction."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The Regression Analysis of Binary Sequences",
+        "url": "https://doi.org/10.1111/j.2517-6161.1958.tb00292.x",
+        "usage": "Used as the primary Cox (1958) source for regression modeling of binary responses and the historical statistical basis of logistic regression.",
+        "license": "The publisher record does not establish a permissive figure-reuse license. No paper figure, example, data, prose, or visual composition is reproduced."
+      },
+      {
+        "title": "An Introduction to Statistical Learning, Second Edition",
+        "url": "https://www.statlearning.com/",
+        "usage": "Used as an authoritative statistical-learning textbook to verify the logistic function, log-odds representation, coefficient odds-ratio interpretation, maximum-likelihood fitting, and linear classification boundary.",
+        "license": "The authors make the book available online, but no permissive figure-adaptation license was established. No textbook figure, data, wording, example, or layout is copied."
+      },
+      {
+        "title": "scikit-learn User Guide: Logistic regression",
+        "url": "https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression",
+        "usage": "Used as official implementation documentation to cross-check the regularized Bernoulli and multinomial objectives, solver behavior, and probability prediction.",
+        "license": "scikit-learn documentation is distributed under the BSD 3-Clause license. No documentation figure, prose, code, or equation layout is reused; the source is consulted only to verify implementation semantics."
+      },
+      {
+        "title": "Stanford CS229 Lecture Notes",
+        "url": "https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true",
+        "usage": "Used as an authoritative course text to verify that the sigmoid is the inverse canonical link for Bernoulli responses, maps the linear hypothesis to a probability, and yields a linear zero-score decision boundary at probability one half.",
+        "license": "The notes are publicly readable, but no permissive grant for figure reuse was identified. No prose, figure, equation arrangement, or worked example is copied."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is the distinction between linear log-odds and nonlinear probability. If z=w^T x+b, then log(p/(1-p))=z, odds=e^z, and p=sigmoid(z). Advancing z by one always multiplies odds by e, but probability increments depend on location: moving from z=-2 to -1 changes p from about 0.12 to 0.27, while moving from z=0 to 1 changes it from 0.50 to 0.73. At z=0, odds are 1:1 and p=0.5, so the usual threshold creates the linear boundary w^T x+b=0. Direct labels, equal-step guides, marker shapes, the sigmoid curve, and a dashed boundary carry the lesson without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the linear-classifier and logistic-loss neighborhoods, then checked the primary Cox paper record, authoritative statistical-learning and course texts, and official scikit-learn documentation before selecting an original aligned-scale sigmoid SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "logit-odds-probability-map"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description, directly labels all five score positions with odds and probabilities, marks the zero-score boundary with a dashed line, and uses marker shapes, text, curve position, and line patterns so the lesson does not depend on color. Its 360-unit viewBox scales through the existing plot-panel primitive at 390 CSS pixels; established theme variables preserve dark-mode contrast, and shared print rules provide a light high-contrast palette."
+  }
+}
