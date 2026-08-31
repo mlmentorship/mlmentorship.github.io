@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "slug": "llm-security-threat-models",
+  "article": "src/content/posts/2026-07-11-llm-security-threat-models.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how indirect prompt injection can influence a model, then identify the external authorization boundary that prevents a proposal from becoming asset compromise.",
+  "mediumRationale": "A top-to-bottom Mermaid attack path is the smallest useful medium for separating probabilistic influence from deterministic authority. Labelled edges show how untrusted content can affect a model, while a second trusted input and explicit decision branch show why a proposed action cannot reach an asset without external authorization and validation.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is a directed path with two inputs to an authorization decision and mutually exclusive stop or execute outcomes. Mermaid expresses those relationships directly while reusing established responsive, accessible, themed, and printable flowchart primitives.",
+    "svg": "Rejected: no quantitative geometry or fixed spatial scale carries the lesson, so manual coordinates would add maintenance cost without explanatory precision.",
+    "semanticHtml": "Rejected: an ordered card stack could list the components but would not show attacker influence and trusted control inputs converging at different points, or the branch that terminates a side effect.",
+    "interaction": "Rejected: simulating malicious documents or permission toggles would add hidden state and potentially unsafe examples when one static path teaches the invariant.",
+    "paperReuse": "Rejected: the indirect-injection paper, OWASP guidance, and NIST architecture contain related examples and diagrams, but none expresses this article-specific influence-versus-authority path. No source figure, screenshot, data, prose, icon, coordinate, or layout is copied.",
+    "noVisual": "Rejected: the prose names trust boundaries and controls but leaves the central compositional failure distributed across sections. The diagram makes clear that content can influence the model without possessing authority, and that compromise requires a later enforcement failure."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The preceding slide is only an ML-design interview time allocation and contains no security or trust-boundary material."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview mentions privacy and compliance while separating data, model, evaluation, deployment, and metrics, but provides no attacker, asset, authorization, or attack-path model."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks about privacy, downstream impact, business actions, constraints, testing, and online evaluation. It supplies broad consequence context but no prompt-injection or tool-authority boundary."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide starts from user experience, costs of errors, inference behavior, and real-world constraints, but does not model adversarial control of inputs."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide discusses user-data privacy, storage location, anonymization, and data bias. It does not address malicious instructions embedded in retrieved content or cross-tenant authorization."
+      },
+      {
+        "page": 167,
+        "insight": "The neighboring modeling slide covers task choice, baselines, training, preprocessing, and scale, adding no security control boundary."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide asks about model gating, monitored feedback, low-confidence behavior, inference privacy, and deployment constraints, but does not separate a model proposal from external permission to act."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide recommends independent infrastructure tests, externally handled policy, silent-failure monitoring, and multi-metric launch decisions. These support defense in depth but do not form an LLM threat model."
+      },
+      {
+        "page": 170,
+        "insight": "The following algorithms-and-data-structures divider ends the closest production neighborhood and contains no additional security guidance."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for security, privacy, threat, attack, adversarial, prompt injection, jailbreak, authorization, access control, sandbox, secret, credential, and tenant terms. The only adversarial matches on pages 48, 79, and 87 concern model-training perturbations or generative adversarial networks, not LLM application security. The complete closest production and privacy neighborhood on pages 160-170 was then read. No slide covers indirect prompt injection, confused-deputy tool use, assets and actors, or a model-to-tool authorization boundary. No deck artwork, wording, values, or layout is reused.",
+    "license": "The local deck states no reuse license and contains externally sourced material. It is treated as review-only; the shipped flowchart is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection",
+        "url": "https://arxiv.org/abs/2302.12173",
+        "usage": "Used as a primary paper to verify the indirect-injection mechanism: attacker-controlled external content can enter an LLM application's context and redirect model behavior toward data theft, tool misuse, or other attacker-chosen outcomes.",
+        "license": "The arXiv paper is publicly accessible, but no permissive third-party figure-reuse grant was established. No source figure, attack prompt, screenshot, experimental result, wording, or layout is reproduced."
+      },
+      {
+        "title": "OWASP GenAI Security Project: LLM01 Prompt Injection",
+        "url": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "usage": "Used as authoritative application-security guidance to verify direct and indirect injection, the dependence of impact on application agency, and mitigations including least privilege, deterministic validation, external-content segregation, human approval, and adversarial testing.",
+        "license": "The OWASP project's repository explicitly licenses its material under CC BY-SA 4.0. The source is attributed, but the implementation remains an original synthesis and does not adapt its prose, scenarios, artwork, icons, or layout."
+      },
+      {
+        "title": "NIST Special Publication 800-207: Zero Trust Architecture",
+        "url": "https://doi.org/10.6028/NIST.SP.800-207",
+        "usage": "Used as official architecture guidance to verify per-request access decisions, separation of policy decision and enforcement, explicit identity and resource context, and least-privilege access rather than implicit trust.",
+        "license": "NIST identifies employee-created works as United States government works generally outside domestic copyright, subject to third-party and foreign-rights caveats. No NIST figure, prose, component naming, or architecture layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the difference between influence and authority. An attacker can control retrieved text and the model may treat embedded instructions as behavior-shaping input; provenance labels and system prompts can reduce this risk but do not make the model a policy enforcement point. The model therefore emits a typed proposal, while a separate gate evaluates the exact action against trusted identity, user intent, resource scope, and policy. Only a least-privilege executor receives credentials. The diagram does not claim that authorization prevents all leakage through ordinary model output; it isolates the tool-mediated asset-compromise path it depicts."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the nearest privacy and production neighborhood, then checked a primary indirect-injection paper plus OWASP and NIST guidance before selecting an original influence-to-authority attack path."
+  },
+  "implementation": {
+    "visualIds": [
+      "llm-security-influence-authority-path"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Every actor, boundary input, action state, branch outcome, and protected asset is directly labelled; the dashed injection edge distinguishes attacker influence from solid execution flow without relying on color. The top-to-bottom layout and established tall-flow marker avoid a forced minimum width and preserve readable labels at 390 CSS pixels. Shared Mermaid theme tokens provide dark-mode contrast and print-safe colors, while the adjacent caption preserves the central lesson if client-side rendering is unavailable."
+  }
+}
