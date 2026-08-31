@@ -38,6 +38,42 @@ you've read about hallucinations in tutorials but haven't fought them in product
 >
 > Importantly: the goal isn't zero hallucinations, that's not achievable with current technology. The goal is *acceptable hallucination rate for the use case*, with detection and graceful handling for the rest."
 
+**Learning objective:** Trace how evidence, claim-level verification, and consequence determine whether a generated answer is published, retried, refused, or reviewed by a human.
+
+<!-- visual:hallucination-claim-release-gates -->
+```mermaid
+flowchart TB
+	accTitle: A generated answer must pass evidence and claim-level release gates
+	accDescr: A user question first enters retrieval. If no sufficiently relevant evidence is found, the system refuses instead of asking the model to guess. With evidence, the model drafts a cited answer, which is split into atomic claims. Each claim is checked against its cited passage. If every claim is supported, the answer is published with citations. If any claim is unsupported, low-consequence requests are retried with stricter evidence or refused, while high-consequence requests go to human review. Production audits and adversarial evals update retrieval thresholds, prompts, and verifier tests. Direct action labels and solid versus dashed paths make the flow understandable without color.
+	Q["User question"]
+	R["Retrieve evidence<br/>with relevance threshold"]
+	E{"Enough relevant<br/>evidence?"}
+	G["Generate cited draft<br/>allow explicit “I don't know”"]
+	C["Split into atomic claims"]
+	V{"Does each cited passage<br/>support its claim?"}
+	P["PUBLISH<br/>answer + citations"]
+	K{"High-consequence<br/>use?"}
+	T["RETRY OR REFUSE<br/>tighten evidence"]
+	H["HUMAN REVIEW<br/>claim + passage + context"]
+	A[("Production audits +<br/>adversarial eval set")]
+	Q --> R --> E
+	E -->|"yes"| G --> C --> V
+	E -->|"no"| T
+	V -->|"all supported"| P
+	V -->|"any unsupported"| K
+	K -->|"no"| T
+	K -->|"yes"| H
+	A -. "tune thresholds, prompts,<br/>and verifier tests" .-> R
+	A -.-> V
+	class Q viz-input
+	class R,G,C,A viz-state
+	class E,V,K viz-focus
+	class P viz-output
+	class T,H viz-warning
+	class Q,R,E,G,C,V,P,K,T,H,A viz-compact
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path and notice that retrieval is only the first gate. A draft earns release only when each atomic claim is supported by its cited passage; unsupported claims branch by consequence into retry or refusal versus human review. The verifier is another imperfect model component, so dashed production audits improve its tests and thresholds rather than declaring the system solved. Original synthesis informed by <a href="https://arxiv.org/abs/2005.11401">Lewis et al. on retrieval-augmented generation</a>, <a href="https://aclanthology.org/2023.emnlp-main.398/">Gao et al. on citation correctness</a>, <a href="https://aclanthology.org/2023.emnlp-main.741/">Min et al. on atomic factual evaluation</a>, and the <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST Generative AI Profile</a>.</p>
+
 This is L5. You've decomposed the problem, named specific mitigations per type, and acknowledged the operational reality.
 
 ## What an L6 answer sounds like

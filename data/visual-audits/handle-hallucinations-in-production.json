@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "slug": "handle-hallucinations-in-production",
+  "article": "src/content/posts/2025-04-25-handle-hallucinations-in-production.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how evidence, claim-level verification, and consequence determine whether a generated answer is published, retried, refused, or reviewed by a human.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that shows retrieval as one imperfect layer, claim-level support as a separate release gate, consequence-aware escalation, and an out-of-band evaluation loop. Labelled branches make the operational decisions explicit while reusing the site's responsive themed diagram primitives.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a decision architecture with labelled gates, branching outcomes, and a feedback loop rather than quantitative geometry.",
+    "svg": "Rejected because fixed coordinates would add maintenance without improving a categorical system flow that Mermaid already expresses accessibly and responsively.",
+    "semanticHtml": "Rejected because a table could compare mitigations by failure type but would not show that retrieval, generation, verification, and routing are sequential defenses with different failure boundaries.",
+    "interaction": "Rejected because changing thresholds or risk levels would add hidden states and controls; the article's core operational policy should remain fully visible without JavaScript and in print.",
+    "paperReuse": "Rejected because the reviewed sources contain model architectures, evaluation frameworks, and risk taxonomies, but no single figure represents this article-specific release policy. Although the ACL papers permit reuse under CC BY 4.0 and NIST employee works are generally reusable, no source figure, wording, data, coordinates, icon, or layout is copied.",
+    "noVisual": "Rejected because the prose lists mitigations at several lifecycle stages, but readers must mentally compose where evidence insufficiency causes refusal, where claim support is tested, and why consequence changes the final escalation path."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 24,
+        "insight": "The nearest-neighbor slide describes distance-based retrieval and its accuracy-versus-cost tradeoff, but contains no document grounding, citation verification, refusal, or hallucination control."
+      },
+      {
+        "page": 37,
+        "insight": "The classification-metrics slide distinguishes precision and recall and warns that one aggregate such as AUC hides operating tradeoffs, relevant to evaluating a hallucination detector but not a production release flow."
+      },
+      {
+        "page": 38,
+        "insight": "The adjacent evaluation slide explains class imbalance and threshold tradeoffs, supporting the need to measure unsupported-claim detection rather than rely on overall accuracy."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration and out-of-distribution slide notes neural-network overconfidence and confidence-threshold rejection, the closest deck analogue to refusing low-evidence requests and not trusting raw model confidence."
+      },
+      {
+        "page": 104,
+        "insight": "The GPT and large-language-model slide discusses instruction tuning and alignment behavior but does not cover factual grounding, hallucination detection, or deployment controls."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring Toolformer slide describes language models calling external tools, which establishes that model output can depend on external information but provides no evidence-support gate."
+      },
+      {
+        "page": 106,
+        "insight": "The following LLM-data and scaling slide covers pretraining data scale rather than retrieval-time evidence, citations, verification, refusal, or human escalation."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for hallucination, confabulation, retrieval-augmented generation, grounding, citation, fact checking, refusal, abstention, uncertainty, human review, and language-model terminology. There is no direct hallucination-management or RAG production slide. Pages 23-25 were read around the only generic nearest-neighbor retrieval match; pages 36-40 were read as the complete classification, threshold, calibration, and out-of-distribution neighborhood; and pages 103-107 were read around the LLM, instruction-tuning, tool-use, data, and training slides. The neighboring pages move to clustering and random forests, loss functions and a neural-net divider, and transformer or LLM-training context respectively. No deck image, wording, example, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "url": "https://arxiv.org/abs/2005.11401",
+        "usage": "Used as the primary RAG source to verify that generation can be conditioned on retrieved non-parametric evidence while remaining a probabilistic generator rather than becoming a factual database.",
+        "license": "The arXiv record provides public access, but no permissive figure-reuse grant was established or relied on. No paper architecture, figure, result, prose, or notation is copied."
+      },
+      {
+        "title": "Enabling Large Language Models to Generate Text with Citations",
+        "url": "https://aclanthology.org/2023.emnlp-main.398/",
+        "usage": "Used as a primary source to verify that citation quality has distinct correctness and completeness dimensions and that a citation must entail the associated claim, not merely point to a topically related passage.",
+        "license": "ACL Anthology materials published after 2016 are licensed CC BY 4.0. The paper is cited for its evaluation concepts, but no figure, benchmark value, prose, example, or layout is adapted."
+      },
+      {
+        "title": "FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation",
+        "url": "https://aclanthology.org/2023.emnlp-main.741/",
+        "usage": "Used as the primary source for decomposing long-form output into atomic facts and checking each fact against a reliable knowledge source instead of assigning one coarse answer-level judgment.",
+        "license": "ACL Anthology materials published after 2016 are licensed CC BY 4.0. No paper figure, prompt, benchmark data, prose, or visual organization is reused."
+      },
+      {
+        "title": "SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for Generative Large Language Models",
+        "url": "https://aclanthology.org/2023.emnlp-main.557/",
+        "usage": "Used as a primary source to verify that disagreement across sampled responses can provide a black-box warning signal, while remaining a detector signal rather than proof of factuality.",
+        "license": "ACL Anthology materials published after 2016 are licensed CC BY 4.0. No source figure, method diagram, result, sample text, or layout is reused."
+      },
+      {
+        "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+        "url": "https://doi.org/10.6028/NIST.AI.600-1",
+        "usage": "Used as official risk-management guidance to verify confabulation as a generative-AI risk and the need for documented testing, monitoring, human oversight, incident learning, and controls proportionate to context and consequence.",
+        "license": "NIST states that employee-created works are generally not subject to U.S. copyright and grants broad reuse rights where it holds foreign copyright. No NIST figure, table, wording, or layout is reproduced; the diagram is an original application-specific synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that no single control establishes factuality. Retrieval can fail to find evidence; generation can add claims not supported by retrieved passages; citation presence does not imply entailment; an automated verifier can err; and the cost of a miss determines whether retry, refusal, or human review is appropriate. The diagram therefore separates evidence sufficiency, atomic claim support, and consequence into explicit gates. It presents a policy architecture, not a claim that these controls achieve zero hallucinations or calibrated probabilities."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected each relevant neighborhood, then reviewed primary work on RAG, citations, atomic factual evaluation, and sampling-based detection plus the official NIST GenAI risk profile before selecting an original release-gate flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "hallucination-claim-release-gates"
+    ],
+    "accessibility": "The Mermaid block provides a specific accessible title and a complete description of the evidence, claim-support, and consequence gates and every route to publish, retry, refuse, or human review. Direct branch labels, action verbs, node shapes, and solid versus dashed paths preserve all meaning without color. Every node uses the established viz-compact class so the graph has no forced minimum width at 390 CSS pixels; shared Mermaid theme variables provide dark-mode and print contrast, and the static source remains meaningful without interaction."
+  }
+}
