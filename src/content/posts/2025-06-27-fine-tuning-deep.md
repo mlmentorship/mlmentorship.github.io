@@ -14,11 +14,11 @@ The basic question ([fine-tune vs prompt vs RAG](/questions/fine-tune-vs-prompt-
 
 ## What the L4 candidate misses
 
-L4: "Fine-tune the model on examples." Misses that "fine-tune" covers at least four very different operations (SFT, LoRA, DPO, continued pretraining) with different costs, data requirements, and effects.
+L4: "Fine-tune the model on examples." Misses that "fine-tune" covers different training objectives (continued pretraining, SFT, preference optimization) and a separate choice about which parameters to update (full fine-tuning or a parameter-efficient method such as LoRA).
 
 ## What an L5 answer sounds like
 
-> "There are four common modes of fine-tuning, ordered roughly by cost and intrusiveness:
+> "There are three common training objectives, plus a separate choice about update scope:
 >
 > 1. **Continued pretraining**: continue the next-token-prediction objective on a domain corpus. Use case: shifting the model's underlying knowledge or vocabulary (e.g., medical, legal, code in a niche language). Expensive, requires lots of unlabeled data.
 >
@@ -26,7 +26,7 @@ L4: "Fine-tune the model on examples." Misses that "fine-tune" covers at least f
 >
 > 3. **Preference optimization (DPO, IPO, RLHF)**: train on pairwise preferences (A > B). Use case: shaping nuanced behavior that's hard to specify in SFT pairs (helpfulness, conciseness, tone). DPO has largely displaced RLHF in 2026 due to simpler training.
 >
-> 4. **Parameter-efficient (LoRA, QLoRA, prefix tuning)**: train a small set of additional parameters while freezing the base model. Use case: many specialized models on the same base, or training under tight memory constraints. Quality is usually slightly below full fine-tuning but the operational benefits are large.
+> 4. **Parameter-efficient methods (LoRA, QLoRA, prefix tuning)** are not a fourth objective. They change *how* you update a model: train a small set of additional parameters while freezing the base model. Use case: many specialized models on the same base, or training under tight memory constraints. The quality trade-off is task-dependent, while the memory and serving benefits can be large.
 >
 > The decision tree:
 > - Need new knowledge → continued pretraining + SFT, or RAG (usually RAG is cheaper).
@@ -35,7 +35,29 @@ L4: "Fine-tune the model on examples." Misses that "fine-tune" covers at least f
 > - Need many task-specific variants of the same base → LoRA.
 > - Need just a behavior tweak → prompting first, fine-tuning only if prompting can't get there."
 
-This is L5. You've named the modes, given use cases, and a decision tree.
+<!-- visual:fine-tuning-two-decisions -->
+<figure class="learning-figure" aria-labelledby="fine-tuning-two-decisions-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="fine-tuning-two-decisions-title">Which training signal do you need, and which parameters should it update?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two separate fine-tuning decisions: first select a training objective, then select full or parameter-efficient updates">
+		<section class="visual-panel">
+			<h4>1 · CHOOSE THE OBJECTIVE</h4>
+			<p><strong>Domain text → continued pretraining</strong><br />Learn next-token prediction from unlabeled text to adapt domain language and representations.</p>
+			<p><strong>Ideal responses → SFT</strong><br />Learn from prompt-response pairs to make target tasks and response patterns more reliable.</p>
+			<p><strong>Chosen vs rejected responses → preference optimization</strong><br />Learn relative preferences with DPO, IPO, or an RLHF pipeline.</p>
+			<p><strong>Possible sequence, not a required checklist:</strong><br />continued pretraining → SFT → preference optimization.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 · CHOOSE THE UPDATE SCOPE</h4>
+			<p><strong>Full fine-tuning</strong><br />Make the base weights trainable and produce a new model checkpoint.</p>
+			<p><strong>PEFT, such as LoRA</strong><br />Freeze the base weights and train a small adapter; keep the base model plus an adapter artifact.</p>
+			<p><strong>This choice is orthogonal to the objective.</strong><br />LoRA describes where trainable updates live. It does not specify whether the data is domain text, ideal responses, or preference pairs.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> read top to bottom on the left to choose what the data should teach, then move right to choose how broadly parameters should change. SFT and DPO name learning objectives; LoRA names an update mechanism, so they are not peer alternatives.</figcaption>
+</figure>
+
+This is L5. You've named the objectives and update scope, given use cases, and a decision tree.
 
 ## What an L6 answer adds
 
@@ -55,7 +77,7 @@ This is L5. You've named the modes, given use cases, and a decision tree.
 
 ## Tells that get you a strong-hire vote
 
-- You name **all four modes** (continued pretraining, SFT, preference optimization, parameter-efficient).
+- You separate **the three training objectives** (continued pretraining, SFT, preference optimization) from **parameter-efficient update methods**.
 - You bring up **DPO over RLHF** for operational simplicity.
 - You discuss **LoRA's serving advantages** (multi-tenant, memory).
 - You mention **lock-in cost** of fine-tuning.
