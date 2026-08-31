@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Distinguish the control plane's authorization and version decisions from execution work and from the evidence plane's durable record of decisions and effects.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that can separate three architectural planes while showing their necessary cross-plane contracts: control constrains execution before a side effect, and execution emits evidence at each boundary. The lesson is relational rather than geometric, and the established compact Mermaid primitive supplies responsive, themed, and printable rendering.",
+  "mediumRationale": "A full-width Mermaid flowchart is the smallest medium that can separate three architectural planes while showing their necessary cross-plane contracts: control constrains execution before a side effect, and execution emits evidence at each boundary. The lesson is relational rather than geometric, and the tall-flow primitive preserves readable labels with themed and printable rendering.",
   "mediumComparison": {
     "mermaid": "Selected because subgraphs and labelled solid and dashed edges directly express plane ownership, the governed execution path, and independent evidence emission without introducing a new rendering primitive.",
     "svg": "Rejected because fixed coordinates add maintenance cost without teaching a quantitative, geometric, or shape-based relationship.",
@@ -105,6 +105,6 @@
     "visualIds": [
       "enterprise-agent-three-plane-boundary"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and a full text description. Plane headings, direct node labels, arrow labels, numbered path nodes, subgraph boundaries, and solid versus dashed edges carry the meaning without color. A top-to-bottom compact layout removes the normal Mermaid minimum width at 390 CSS pixels, established theme tokens preserve dark-mode contrast, and shared print rules provide a light page-safe rendering."
+    "accessibility": "The Mermaid source provides an accessible title and a full text description. Plane headings, direct node labels, arrow labels, numbered path nodes, subgraph boundaries, and solid versus dashed edges carry the meaning without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; established theme tokens preserve dark-mode contrast and print resets the width floor for page-safe rendering."
   }
 }

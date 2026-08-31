@@ -34,6 +34,7 @@ flowchart TB
 	class E,O viz-warning
 	class R viz-state
 	class L,V viz-output
+	class S viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> move downward from the symptom, but do not choose a remedy until the consistency gate. Proven aligned state permits only an explicitly safe narrow action. Any disagreement or uncertainty sends the affected consistency domain back to a complete checkpoint; a half-written candidate is evidence to reject, not a recovery point.</p>

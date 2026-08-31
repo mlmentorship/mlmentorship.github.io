@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Trace how an already-authorized action can only retain or lose authority at the independent safety boundary, then see how authoritative outcomes and aggregate evidence can reduce authority for the next action.",
-  "mediumRationale": "The article already contains the necessary relationship-heavy architecture. Making that diagram the instructional figure is the smallest useful change: Mermaid keeps the proposal path, independent evidence inputs, two decision exits, post-action verification, and aggregate breaker feedback connected without adding a second redundant architecture or implying quantitative geometry.",
+  "mediumRationale": "A focused Mermaid authority loop is the smallest useful visual: it keeps the authorized envelope, pre-action evidence, two decision exits, bounded execution, post-action verification, and aggregate breaker feedback connected without reproducing the article's full component inventory or implying quantitative geometry.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a directed control loop with many-to-one evidence inputs, mutually exclusive decision exits, and post-action feedback. The existing Mermaid primitive preserves those labelled relationships and supports themed rendering and horizontal overflow at narrow widths.",
     "svg": "Rejected because no quantitative scale or fixed geometry carries the lesson; manually positioning this relationship graph would be less maintainable and would add no instructional precision.",
@@ -73,6 +73,6 @@
     "visualIds": [
       "agent-safety-authority-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description that traces authorization, all independent evidence inputs, both decision exits, execution, authoritative verification, evidence, aggregate detection, and breaker feedback. Every relationship and outcome is directly labelled, so color is not required. The established Mermaid renderer supplies light and dark theme tokens, print-safe colors, and horizontal overflow rather than label shrinkage at 390 CSS pixels; the prose immediately before and after the diagram preserves the same lesson if client-side rendering is unavailable."
+    "accessibility": "The Mermaid source provides a complete accessible title and description that traces the authorization ceiling, pre-action evidence bundle, both decision exits, bounded execution, authoritative verification, aggregate detection, and breaker feedback. Every relationship and outcome is directly labelled, so color is not required. The full-width tall-flow marker removes the screen height cap without forcing horizontal scrolling, preserving readable labels at 390 CSS pixels; theme tokens provide light, dark, and print-safe colors, and the surrounding prose preserves the lesson if client-side rendering is unavailable."
   }
 }

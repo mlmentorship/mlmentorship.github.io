@@ -166,6 +166,8 @@ These rules constrain publication rather than exploration. A researcher can test
 
 ```mermaid
 flowchart LR
+  accTitle: Control, processing, and evidence planes govern a foundation-model dataset build
+  accDescr: Sources enter quarantined intake and immutable storage. A source and policy registry constrains a build planner, while versioned workers parse, filter, deduplicate, select, tokenize, and publish immutable shards and manifests. A protected evaluation registry feeds contamination checks. Every processing and publication stage emits append-only lineage and observability events so a released training run can be traced back to its source, policy, and transformation evidence.
   Sources[Licensed, public, partner, internal, human, synthetic] --> Intake[Quarantined intake]
   Intake --> Registry[Source and policy registry]
   Intake --> Raw[Immutable raw object store]
@@ -821,7 +823,7 @@ flowchart TB
   class Stored,Future,Runs viz-state
   class DataProof,FutureProof viz-output
   class Models,ModelDecision viz-warning
-  class Trace viz-compact
+  class Trace viz-wide
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> trace the restricted identity forward before choosing an action. Stored derivatives can be removed or rewritten, and future manifests can prove that the identity is excluded. If a run or checkpoint already consumed those derivatives, the response becomes a model decision; file deletion alone does not prove removal from learned weights. Original synthesis informed by the <a href="https://www.w3.org/TR/prov-dm/">W3C PROV data model</a> and the primary <a href="https://arxiv.org/abs/1912.03817">Machine Unlearning paper</a>.</p>
 

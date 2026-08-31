@@ -96,7 +96,8 @@ flowchart TB
   class Mitigate,Coverage viz-neutral
   class Gate viz-output
   class Production viz-warning
-  class Threat,Campaign,Outcome,Coverage,Finding,Mitigate,Retest,Gate,Regression,Production viz-compact
+  class Threat viz-wide
+  class Threat viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the numbered solid loop to discover, own, mitigate, and retest a reachable failure before making a release decision. The dotted path turns that finding into a static recurrence check; it does not replace the adaptive campaign that found it. Production evidence can reopen the threat model even after release. Original synthesis checked against <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST AI 600-1</a>, <a href="https://arxiv.org/abs/2202.03286">Perez et al.</a>, <a href="https://arxiv.org/abs/2406.13352">AgentDojo</a>, <a href="https://atlas.mitre.org/">MITRE ATLAS</a>, and <a href="https://github.com/Azure/PyRIT">PyRIT</a>.</p>

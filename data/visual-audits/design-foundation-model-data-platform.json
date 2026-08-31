@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Trace a source restriction through derived data, manifests, runs, checkpoints, and released models while distinguishing future-use exclusion, stored-artifact deletion, and model-level response.",
-  "mediumRationale": "A compact directed graph is the smallest medium that exposes both forward lineage and the point where deterministic data actions stop. It keeps one restriction connected to every affected layer, then labels the distinct evidence claim available at each layer.",
+  "mediumRationale": "A wide directed graph is the smallest medium that exposes both forward lineage and the point where deterministic data actions stop without shrinking the action and evidence labels. It keeps one restriction connected to every affected layer, then labels the distinct evidence claim available at each layer.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a forward dependency and impact-analysis path with one explicit branch between data-plane remediation and model-level response; labelled nodes and edges preserve that sequence responsively.",
     "svg": "Rejected: no quantitative geometry or exact spatial measurement is needed, so hand-positioned vectors would add maintenance and fixed-label risk without adding meaning.",
@@ -77,12 +77,12 @@
   "agentReview": {
     "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
     "reviewedAt": "2026-08-30",
-    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 159-170, then reviewed W3C PROV and its license, the primary Machine Unlearning paper, the official GDPR text, and NIST AI RMF guidance before selecting an original compact lineage graph."
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 159-170, then reviewed W3C PROV and its license, the primary Machine Unlearning paper, the official GDPR text, and NIST AI RMF guidance before selecting an original lineage graph."
   },
   "implementation": {
     "visualIds": [
       "foundation-data-deletion-blast-radius"
     ],
-    "accessibility": "The Mermaid block provides a specific accessible title and a complete text description. Node text and edge labels state each artifact layer, action, evidence claim, and unresolved model-level decision, so meaning does not depend on color. A top-to-bottom layout and the established viz-compact class avoid the wide mobile minimum at 390 CSS pixels; shared Mermaid theme tokens provide dark-mode contrast and high-contrast print output with page-break protection."
+    "accessibility": "The Mermaid block provides a specific accessible title and a complete text description. Node text and edge labels state each artifact layer, action, evidence claim, and unresolved model-level decision, so meaning does not depend on color. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels; shared Mermaid theme tokens provide dark-mode contrast, while print resets the minimum width for high-contrast page-safe output."
   }
 }

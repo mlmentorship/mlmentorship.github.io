@@ -5,9 +5,9 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Separate the feature store's two time contracts: reconstruct the latest eligible historical value for every training example while retrieving the latest materialized value for a live serving request.",
-  "mediumRationale": "A compact two-lane Mermaid is the smallest medium that can keep one versioned definition visibly shared while separating the offline historical as-of path from the online latest-value path. It teaches why the two stores reduce skew together yet cannot be conflated, without repeating the neighboring article's detailed late-arrival timeline.",
+  "mediumRationale": "A full-width two-lane Mermaid is the smallest medium that can keep one versioned definition visibly shared while separating the offline historical as-of path from the online latest-value path without shrinking labels. It teaches why the two stores reduce skew together yet cannot be conflated, without repeating the neighboring article's detailed late-arrival timeline.",
   "mediumComparison": {
-    "mermaid": "Selected because the lesson is a branching dataflow with shared computation, distinct state stores, and two retrieval paths. Labelled edges and grouped lanes preserve the temporal and SLA relationships, while the established compact class supplies responsive themed rendering.",
+    "mermaid": "Selected because the lesson is a branching dataflow with shared computation, distinct state stores, and two retrieval paths. Labelled edges and grouped lanes preserve the temporal and SLA relationships, while the established full-width tall-flow class supplies readable themed rendering.",
     "svg": "Rejected because no scale, plotted quantity, or fixed geometry carries the lesson; hand-positioning the same boxes and arrows would add maintenance cost without technical precision.",
     "semanticHtml": "Rejected because a comparison table could list offline and online properties but would obscure that both paths originate from one definition and that training joins examples to history while serving performs a current key lookup.",
     "interaction": "Rejected because switching between historical timestamps could demonstrate individual lookup results, but controls and state add complexity when the article needs the stable architectural distinction rather than a query simulator.",
@@ -93,6 +93,6 @@
     "visualIds": [
       "feature-store-two-time-contract"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description naming both stores, requests, retrieval rules, and outputs. Group labels, cylinder store shapes, decision shape, direct text, and arrows carry the distinction without color. The viz-compact marker removes the shared mobile minimum width so the top-to-bottom diagram scales within 390 CSS pixels; established theme tokens provide dark-mode contrast and the shared print rule resets the diagram to a light, page-safe palette. The surrounding prose and caption preserve the lesson if client-side Mermaid rendering is unavailable."
+    "accessibility": "The Mermaid source includes a complete accessible title and description naming both stores, requests, retrieval rules, and outputs. Group labels, cylinder store shapes, decision shape, direct text, and arrows carry the distinction without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; established theme tokens provide dark-mode contrast and print resets the width floor for a light, page-safe palette. The surrounding prose and caption preserve the lesson if client-side Mermaid rendering is unavailable."
   }
 }

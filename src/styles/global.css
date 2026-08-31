@@ -306,6 +306,9 @@ mark {
   font-family: var(--font-ui) !important;
 }
 .mermaid svg.flowchart:has(.viz-wide) { min-width: 42rem; }
+@media screen {
+  .mermaid svg.flowchart:has(.viz-tall) { max-height: 64rem; }
+}
 .mermaid svg text,
 .mermaid svg span,
 .mermaid svg .label,
@@ -574,6 +577,7 @@ mark {
 @media (max-width: 640px) {
   .mermaid svg.flowchart { min-width: 42rem; }
   .mermaid svg.flowchart:has(.viz-compact) { min-width: 0; }
+  .mermaid svg.flowchart:has(.viz-tall):not(:has(.viz-wide)) { min-width: 0; }
   .visual-grid--two { grid-template-columns: 1fr; }
   .learning-figure { max-width: 100% !important; }
 }

@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Trace how an adaptive red-team finding becomes an owned mitigation, a residual-risk release decision, and a static regression test while production evidence updates the threat model.",
-  "mediumRationale": "A compact Mermaid loop is the smallest medium that distinguishes adaptive discovery from static recurrence testing and connects both to mitigation, release gates, and production feedback. The lesson is a lifecycle relationship rather than a quantity or geometry, so labelled paths and decision nodes carry more meaning than fixed coordinates.",
+  "mediumRationale": "A full-width Mermaid loop is the smallest medium that distinguishes adaptive discovery from static recurrence testing and connects both to mitigation, release gates, and production feedback without shrinking stage labels. The lesson is a lifecycle relationship rather than a quantity or geometry, so labelled paths and decision nodes carry more meaning than fixed coordinates.",
   "mediumComparison": {
     "mermaid": "Selected because a flowchart makes the operating loop and its two distinct feedback paths explicit: failed retests return to adaptive attack, while sanitized findings enter the static regression suite.",
     "svg": "Rejected because deterministic coordinates would add maintenance cost without teaching shape, scale, or a quantitative relationship.",
@@ -127,6 +127,6 @@
     "visualIds": [
       "adaptive-red-team-release-loop"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and complete description. Numbered stages, decision diamonds, explicit branch labels, node boundaries, and solid versus dashed feedback paths preserve the lesson without color. The top-to-bottom graph uses the established compact-node class to avoid horizontal minimum width at 390 CSS pixels; shared theme tokens support dark mode and print supplies a light page-safe palette."
+    "accessibility": "The Mermaid source provides an accessible title and complete description. Numbered stages, decision diamonds, explicit branch labels, node boundaries, and solid versus dashed feedback paths preserve the lesson without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; shared theme tokens support dark mode and print resets the width floor for a light page-safe palette."
   }
 }

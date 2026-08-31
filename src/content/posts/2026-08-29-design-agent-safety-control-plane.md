@@ -262,43 +262,35 @@ The company safety floor is the subset no product can lower alone: controls cann
 
 <!-- visual:agent-safety-authority-loop -->
 ```mermaid
-flowchart LR
+flowchart TB
   accTitle: An independent safety control loop can only preserve or reduce action authority
-  accDescr: The existing agent runtime first sends a proposal through its authorized tool gateway, which creates a signed action envelope only inside existing permission. Deterministic policy, data provenance, learned monitors, cumulative impact, signed policy, and active breaker state feed an independent safety decision point. The decision may allow or narrow the action through confirmation and approval to the high-impact executor, or block and freeze through the circuit-breaker controller. Authoritative external systems report outcomes to post-action verification. Verification updates safety state and breakers, while an append-only evidence stream supports aggregate detection that can also activate a breaker. Thus pre-action checks constrain the current action, and post-action plus aggregate checks can reduce authority for later actions.
-  Runtime[Existing agent runtime] --> Gateway[Authorized tool gateway]
-  Gateway --> Envelope[Signed action envelope]
-
-  Envelope --> Static[Deterministic policy checks]
-  Envelope --> Flow[Data-flow and provenance checks]
-  Envelope --> Learned[Learned and anomaly monitors]
-  Envelope --> Impact[Impact and cumulative-rate service]
-
-  Static --> Decision[Safety decision point]
-  Flow --> Decision
-  Learned --> Decision
-  Impact --> Decision
-  Policy[Signed policy snapshots] --> Decision
-  State[Safety state and active breakers] --> Decision
-
-  Decision -->|allow or narrow| Approval[Confirmation and approval]
-  Decision -->|block or freeze| Breaker[Circuit-breaker controller]
-  Approval --> Executor[High-impact executor]
-  Executor --> Systems[Authoritative external systems]
-  Systems --> Verify[Post-action verification]
-  Verify --> State
-  Verify --> Breaker
-
-  Envelope --> Evidence[Append-only evidence stream]
-  Decision --> Evidence
-  Approval --> Evidence
-  Executor --> Evidence
-  Verify --> Evidence
-  Breaker --> Evidence
-
-  Evidence --> Detect[Aggregate detection and incident console]
-  Detect --> Breaker
-  Registry[Safety cases, monitor, policy, and action registry] --> Policy
-  Registry --> Learned
+  accDescr: Existing authorization creates a signed action envelope and sets the maximum authority. Policy, provenance, monitors, cumulative impact, and active breaker state become pre-action evidence for an independent safety decision. That decision may preserve or narrow authority through confirmation and approval, or remove authority by blocking and freezing. A bounded executor performs an approved action, the authoritative external system reports the outcome, and post-action verification feeds aggregate detection. New evidence can activate a breaker that constrains the next action, but no safety check can expand the original authorization.
+  Envelope["AUTHORIZED ACTION ENVELOPE<br/>identity · scope · signed arguments"]
+  Checks["PRE-ACTION EVIDENCE<br/>policy · provenance · monitors · cumulative impact · breaker state"]
+  Decision{"SAFETY DECISION<br/>preserve, narrow, or remove authority"}
+  Approval["CONFIRM + APPROVE<br/>scoped capability"]
+  Breaker["BLOCK + FREEZE<br/>reduce later authority"]
+  Executor["BOUNDED EXECUTOR"]
+  Systems["AUTHORITATIVE OUTCOME"]
+  Verify["POST-ACTION VERIFICATION"]
+  Detect["EVIDENCE + AGGREGATE DETECTION<br/>rates · sequences · divergence"]
+  Envelope ==> Checks
+  Checks ==> Decision
+  Decision ==>|"allow or narrow"| Approval
+  Decision -->|"block or freeze"| Breaker
+  Approval ==> Executor
+  Executor ==> Systems
+  Systems ==> Verify
+  Verify ==> Detect
+  Detect -->|"activate when bounds cross"| Breaker
+  Breaker -.->|"constrains the next action"| Checks
+  class Envelope viz-input
+  class Checks,Decision viz-focus
+  class Approval,Detect viz-state
+  class Executor viz-neutral
+  class Systems,Verify viz-output
+  class Breaker viz-warning
+  class Envelope viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> authorization sets the ceiling; deterministic, semantic, and cumulative evidence can only preserve or lower it before execution. Authoritative outcomes and aggregate evidence feed breaker state, so the next action may have less authority than the last.</p>

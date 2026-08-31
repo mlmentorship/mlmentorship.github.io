@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Choose the narrowest safe recovery scope by testing whether ranks share one proven training state before retrying, rebuilding a group, or rolling back.",
-  "mediumRationale": "A compact Mermaid decision flow is the smallest medium that separates failure detection from recovery authorization and makes the state-consistency gate control every safe path. Labelled branches preserve the conditional logic without implying quantitative relationships.",
+  "mediumRationale": "A full-width Mermaid decision flow is the smallest medium that separates failure detection from recovery authorization and makes the state-consistency gate control every safe path. Labelled branches preserve the conditional logic without implying quantitative relationships, while the tall-flow marker prevents screen-height compression.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a decision graph with explicit evidence gates, recovery branches, and a single return to training; automatic layout keeps that relational structure maintainable.",
     "svg": "Rejected: the learning task is conditional rather than geometric or quantitative, so hand-positioned paths would duplicate Mermaid graph semantics without adding explanatory value.",
@@ -89,6 +89,6 @@
     "visualIds": [
       "distributed-recovery-consistency-gate"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. Decision diamonds, explicit yes/no edge labels, direct state labels, and solid versus dashed paths carry the logic without color. The compact top-to-bottom flow uses established theme-aware primitives, remains readable at 390 CSS pixels, and resets through shared Mermaid print behavior."
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Decision diamonds, explicit yes/no edge labels, direct state labels, and solid versus dashed paths carry the logic without color. The full-width tall-flow marker removes the screen height cap without forcing horizontal scrolling, preserving readable labels at 390 CSS pixels, and inherits shared theme-aware print behavior."
   }
 }

@@ -220,7 +220,8 @@ flowchart TB
   class Registry,Events viz-state
   class Runtime,Executor viz-neutral
   class Systems,Uses viz-output
-  class User,Registry,Admission,Policy,Entry,Runtime,Gateway,Executor,Systems,Events,Uses viz-compact
+  class User viz-wide
+  class User viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the numbered solid path. Control checks identity before the runtime starts and checks structured arguments again before a side effect; the model never receives action authority. Then follow the dashed edges: decisions, attempts, and the enterprise system's final state become evidence, but the evidence store does not authorize the call. Original synthesis checked against <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>, <a href="https://www.rfc-editor.org/rfc/rfc8693.html">RFC 8693</a>, <a href="https://docs.temporal.io/workflow-execution">Temporal's durable-execution documentation</a>, and the <a href="https://github.com/open-telemetry/semantic-conventions-genai">OpenTelemetry GenAI semantic conventions</a>.</p>

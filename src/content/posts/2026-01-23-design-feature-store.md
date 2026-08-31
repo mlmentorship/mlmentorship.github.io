@@ -66,7 +66,8 @@ flowchart TB
 	class D,J viz-focus
 	class H,O viz-state
 	class T,P viz-output
-	class D viz-compact
+	class D viz-wide
+	class D viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> start from the shared definition, then choose a clock. Training scans offline history backward from each example's timestamp; serving reads the latest materialized value from the online store. Sharing a definition reduces skew, but the stores cannot be conflated because their retrieval and latency contracts differ. Original synthesis checked against the <a href="https://docs.feast.dev/getting-started/concepts/point-in-time-joins">Feast point-in-time join</a>, <a href="https://docs.feast.dev/getting-started/components/online-store">online-store</a>, and <a href="https://arxiv.org/abs/2305.20077">managed feature-store architecture</a> descriptions.</p>

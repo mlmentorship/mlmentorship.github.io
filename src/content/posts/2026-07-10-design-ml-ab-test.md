@@ -31,6 +31,8 @@ flowchart TB
 	class V,E,G viz-focus
 	class D,I,H viz-warning
 	class R viz-output
+	class O viz-wide
+	class O viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the three numbered gates in order. Invalid assignment or telemetry blocks effect interpretation. Valid evidence must then clear the worthwhile-effect rule, not merely exclude zero, and any guardrail regression can still veto launch. Only the all-pass path reaches a monitored, reversible rollout.</p>

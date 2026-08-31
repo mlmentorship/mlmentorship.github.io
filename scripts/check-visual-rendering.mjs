@@ -217,6 +217,16 @@ try {
       await cdp.call('Page.navigate', { url: `${baseUrl}/${entry.category}/${entry.slug}/` });
       await loaded;
       await delay(500);
+      const settled = await cdp.call('Runtime.evaluate', {
+        expression: `document.fonts.ready.then(() => new Promise((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve(true)))
+        ))`,
+        returnByValue: true,
+        awaitPromise: true,
+      });
+      if (settled.exceptionDetails) {
+        throw new Error(settled.exceptionDetails.exception?.description ?? settled.exceptionDetails.text);
+      }
 
       for (const visualId of entry.visualIds) {
         const expression = `(() => new Promise((resolve) => {

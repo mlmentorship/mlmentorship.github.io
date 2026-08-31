@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Apply validity, practical-effect, and guardrail gates in order so a statistically significant result is not mistaken for a ship decision.",
-  "mediumRationale": "A compact Mermaid decision flow is the smallest medium that makes experiment validity a prerequisite for interpretation, separates a precommitted worthwhile effect from mere statistical significance, and gives guardrails an explicit veto before staged rollout.",
+  "mediumRationale": "A full-width Mermaid decision flow is the smallest medium that makes experiment validity a prerequisite for interpretation, separates a precommitted worthwhile effect from mere statistical significance, and gives guardrails an explicit veto before staged rollout without compressing the gate labels.",
   "mediumComparison": {
     "mermaid": "Selected: labelled decision branches express the ordered launch gates and their stop, diagnose, iterate, and ship outcomes directly using the established responsive diagram primitive.",
     "svg": "Rejected: this lesson is conditional rather than geometric or quantitative. A confidence-interval plot would teach one statistical gate while obscuring validity and guardrail vetoes.",
@@ -103,6 +103,6 @@
     "visualIds": [
       "ml-ab-test-launch-gates"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. Diamond shapes, explicit pass/fail branch labels, numbered gates, and outcome text carry all meaning without color. The compact top-to-bottom layout uses established theme-aware Mermaid classes, remains readable at 390 CSS pixels, and inherits the shared print reset."
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Diamond shapes, explicit pass/fail branch labels, numbered gates, and outcome text carry all meaning without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; print resets the width floor and inherits shared theme-aware behavior."
   }
 }
