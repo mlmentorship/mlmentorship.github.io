@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "slug": "grouped-query-attention",
+  "article": "src/content/posts/2025-12-23-grouped-query-attention.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "For eight query heads and two key/value heads, identify which queries share each key/value pair and derive the fourfold KV-cache reduction while all eight query heads remain distinct.",
+  "mediumRationale": "Two aligned semantic tables are the smallest medium that can make head sharing and its memory consequence independently checkable. The first maps every query head to a named key/value pair; the second holds the query-head count fixed while comparing the number of cached key/value pairs in MHA, GQA, and MQA.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson is a discrete many-to-one head mapping and count comparison, not a process graph. Eight query nodes and repeated edges would add routing clutter while weakening the cache arithmetic.",
+    "svg": "Rejected because fixed-position labels for eight query heads would be less adaptable at 390 CSS pixels. Real table cells preserve the same grouping geometry with native reflow, selectable text, and stronger assistive semantics.",
+    "semanticHtml": "Selected because scoped headers and compact rows express the exact query-to-KV assignment and cache ratio without runtime code. The established two-panel primitive stacks into ordinary reading order on narrow screens.",
+    "interaction": "Rejected because changing the number of groups would add controls and hidden states before the reader understands one concrete example. The article equation already generalizes the fixed eight-query, two-KV case.",
+    "paperReuse": "Rejected because the GQA paper contains a closely related architecture figure, but no permissive third-party figure-reuse grant was established. No source geometry, artwork, labels, or layout is copied; the implementation is an original semantic table construction.",
+    "noVisual": "Rejected because prose states that heads share K and V but asks the reader to mentally partition H queries, preserve distinct Q heads, and convert that partition into a cache ratio at the same time."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 100,
+        "insight": "The preceding recurrent-network slide explains query-to-memory attention but has no multi-head or KV-cache structure, establishing the boundary before the transformer material."
+      },
+      {
+        "page": 101,
+        "insight": "The transformer overview identifies multi-head self-attention and distinguishes the origins of decoder queries, keys, and values, but all heads remain standard MHA."
+      },
+      {
+        "page": 102,
+        "insight": "The adjacent BERT survey discusses bidirectional attention and multiple heads but provides no head-sharing or cache model."
+      },
+      {
+        "page": 103,
+        "insight": "The next transformer slide motivates multiple heads as different transformations of hidden features and discusses scaled dot-product attention; it does not distinguish the number of query heads from the number of key/value heads."
+      },
+      {
+        "page": 104,
+        "insight": "The following slide moves to GPT-X and instruction tuning, marking the end of the local transformer-mechanism neighborhood."
+      },
+      {
+        "page": 107,
+        "insight": "The later LLM-training overview lists throughput-oriented architecture choices but does not mention grouped-query or multi-query attention."
+      },
+      {
+        "page": 108,
+        "insight": "The following compute-optimization slide gives the standard self-attention formula and memory bottlenecks, then moves to packing, FlashAttention, and sub-quadratic methods without covering KV-head sharing."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed page by page for grouped-query attention, multi-query attention, GQA, MQA, KV cache, key/value cache, transformer, multi-head attention, and query/key/value terminology. No GQA-, MQA-, or KV-cache-specific slide was found. Pages 100-104, the complete local transformer neighborhood, and pages 107-112, the later attention-optimization neighborhood, were read with their boundaries. The closest slides, 101 and 103, cover ordinary multi-head attention; page 108 covers the quadratic attention matrix rather than autoregressive KV-cache head count. No deck screenshot, wording, artwork, coordinates, or layout is reused.",
+    "license": "The local deck does not state a reuse license and embeds externally derived diagrams. It is treated as review-only; the shipped semantic figure is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+        "url": "https://arxiv.org/abs/2305.13245",
+        "usage": "Used as the primary source to verify that G query-head groups each share one key head and one value head, that GQA-1 equals MQA, that GQA-H equals MHA, and that reducing KV heads reduces KV-cache loading proportionally.",
+        "license": "The public arXiv record does not establish a permissive figure-reuse license for this site. Figure 2 is not copied or adapted; the implementation uses original wording and a semantic table layout."
+      },
+      {
+        "title": "Fast Transformer Decoding: One Write-Head is All You Need",
+        "url": "https://arxiv.org/abs/1911.02150",
+        "usage": "Used as the primary MQA source to verify that query projections remain multi-head while keys and values use one shared head during incremental decoding.",
+        "license": "The public arXiv record does not provide a figure license relied upon here. No paper code, prose, result, figure, or layout is reproduced."
+      },
+      {
+        "title": "PyTorch scaled_dot_product_attention documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html",
+        "usage": "Used as official implementation documentation to cross-check that GQA repeats key and value heads across the query-head dimension and requires the query-head count to be divisible by the key/value-head count.",
+        "license": "Documentation is used only to verify public operator semantics. No PyTorch code, prose, branding, or artwork is reproduced."
+      },
+      {
+        "title": "Hugging Face Transformers Llama 2 documentation",
+        "url": "https://huggingface.co/docs/transformers/main/en/model_doc/llama2",
+        "usage": "Used as official library documentation to cross-check num_key_value_heads semantics: equality with query heads gives MHA, one gives MQA, and an intermediate count gives GQA.",
+        "license": "Documentation is used only for API semantics and model configuration facts. No code, prose, or artwork is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that GQA changes the cardinality and sharing pattern of K/V heads without merging or deleting Q heads. In the teaching example H = 8 and G = 2, Q1-Q4 use KV1 and Q5-Q8 use KV2. The cache stores two K/V head pairs where MHA stores eight, so its head-dependent portion is 2/8 = 1/4 as large, a fourfold reduction. MQA is the endpoint with one cached K/V pair, or 1/8 of MHA. The example is structural and makes no model-quality or benchmark claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected the relevant transformer and attention-optimization neighborhoods, and checked both primary papers plus official PyTorch and Hugging Face documentation before selecting an original semantic mapping."
+  },
+  "implementation": {
+    "visualIds": [
+      "gqa-eight-queries-two-kv-groups"
+    ],
+    "accessibility": "The figure uses semantic sections and real tables with scoped headers. Every query-to-KV assignment, count, fraction, and reduction is written explicitly; group labels and repeated KV names carry the meaning without color. The established two-panel primitive stacks below 640 CSS pixels with no minimum width, so cells wrap at 390 CSS pixels. Existing theme variables provide dark-mode contrast, while shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}

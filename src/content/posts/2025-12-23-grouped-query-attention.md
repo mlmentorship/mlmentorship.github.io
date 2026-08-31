@@ -32,6 +32,40 @@ In GQA with $G$ groups, the $H$ query heads are partitioned into $G$ contiguous 
 
 Implementation: project K and V to dimension $G \cdot d$ instead of $H \cdot d$, then broadcast (repeat) across the matching Q heads before the matmul.
 
+<!-- visual:gqa-eight-queries-two-kv-groups -->
+<figure class="learning-figure" aria-labelledby="gqa-sharing-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="gqa-sharing-title">Which heads are shared when 8 query heads use 2 K/V heads?</p>
+	<div class="visual-grid--two" role="group" aria-label="Worked grouped-query attention example and KV-cache comparison">
+		<section class="visual-panel" aria-labelledby="gqa-map-title">
+			<h4 id="gqa-map-title">The 8 query heads stay distinct</h4>
+			<p>Each group reuses one key head and one value head; it does not merge its queries.</p>
+			<table class="cm-grid" aria-label="Mapping from eight query heads to two shared key and value head pairs">
+				<thead><tr><th scope="col">Group</th><th scope="col">Query heads</th><th scope="col">Shared pair</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">1</th><td>Q<sub>1</sub>, Q<sub>2</sub>, Q<sub>3</sub>, Q<sub>4</sub></td><td class="cm-selected"><strong>K<sub>1</sub> + V<sub>1</sub></strong>reused 4×</td></tr>
+					<tr><th scope="row">2</th><td>Q<sub>5</sub>, Q<sub>6</sub>, Q<sub>7</sub>, Q<sub>8</sub></td><td class="cm-selected"><strong>K<sub>2</sub> + V<sub>2</sub></strong>reused 4×</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">H = 8 queries ÷ G = 2 groups = 4 queries per pair</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="gqa-cache-title">
+			<h4 id="gqa-cache-title">Only cached K/V head count shrinks</h4>
+			<p>Holding sequence length and head dimension fixed, cache size scales with the number of K/V pairs.</p>
+			<table class="cm-grid" aria-label="Comparison of query heads, cached key and value head pairs, and relative KV-cache size">
+				<thead><tr><th scope="col">Variant</th><th scope="col">Q heads</th><th scope="col">K/V pairs</th><th scope="col">Cache</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">MHA</th><td>8</td><td>8</td><td>8/8 = 1×</td></tr>
+					<tr><th scope="row">GQA</th><td><strong>8</strong></td><td class="cm-selected"><strong>2</strong></td><td class="cm-selected"><strong>2/8 = ¼×</strong>4× smaller</td></tr>
+					<tr><th scope="row">MQA</th><td>8</td><td>1</td><td>1/8 = ⅛×</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Q count: unchanged · cached K/V pairs: 8 → 2</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> read across the left table first: Q<sub>1</sub> through Q<sub>4</sub> remain four separate query heads but all use K<sub>1</sub> and V<sub>1</sub>; the next four queries use K<sub>2</sub> and V<sub>2</sub>. Then compare counts on the right: caching 2 K/V pairs instead of 8 makes the head-dependent cache one quarter as large without removing any query heads. MQA takes the same sharing idea to one K/V pair. Original comparison checked against the primary <a href="https://arxiv.org/abs/2305.13245">GQA paper</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">PyTorch GQA documentation</a>.</figcaption>
+</figure>
+
 ## Tradeoffs
 
 | Variant | KV heads | Cache size | Quality | Used by |
