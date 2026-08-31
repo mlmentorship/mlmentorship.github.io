@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-streaming-classification-metrics",
+  "article": "src/content/posts/2026-07-10-implement-streaming-classification-metrics.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why distributed evaluation must sum each shard's TP, FP, TN, and FN counts before computing F1 rather than averaging shard-level F1 values.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align two shard states with their elementwise sum and then contrast the correct global F1 with the incorrect average of nonlinear shard metrics. Fixed positions preserve the count correspondence and arithmetic without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show map and reduce stages but cannot compactly align all four count components or make the conflicting F1 calculations directly comparable.",
+    "svg": "Selected because fixed count vectors, addition marks, braces, and directly labelled equations make both the merge operation and nonlinear-metric trap inspectable in one worked example.",
+    "semanticHtml": "Rejected because three confusion-matrix tables plus two calculations would either be dense at phone width or require a longer vertical sequence that weakens the side-by-side contrast.",
+    "interaction": "Rejected because varying shard sizes or counts would add controls and input validation without improving the invariant that additive state must be reduced before nonlinear computation.",
+    "paperReuse": "Rejected because the reviewed sources define count conventions and distributed reductions but do not contain this synthetic two-shard counterexample. No source figure, data, wording, or layout is reused.",
+    "noVisual": "Rejected because the prose states that counts are sufficient statistics and warns against averaging F1, but it does not spatially demonstrate that the two procedures produce different answers on the same records."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 35,
+        "insight": "The classification-loss slide establishes probability outputs and numerical handling before evaluation, but does not address streaming state or distributed aggregation."
+      },
+      {
+        "page": 36,
+        "insight": "The neighboring surrogate-loss slide distinguishes several training objectives; it provides context for why training loss and reported classification metrics are separate concerns."
+      },
+      {
+        "page": 37,
+        "insight": "The classification-metrics slide defines precision, recall, F-score, TPR, and FPR from TP, FP, TN, and FN and explicitly shows that scaling negative counts can cancel inside FPR."
+      },
+      {
+        "page": 38,
+        "insight": "The worked binary-evaluation slide uses a 90-negative, 10-positive dataset to derive accuracy, precision, recall, and F1 and sweeps a threshold, but it assumes one in-memory dataset."
+      },
+      {
+        "page": 39,
+        "insight": "The following calibration slide bins predictions and computes a weighted average, illustrating another metric that needs retained bin statistics rather than the four fixed-threshold counts."
+      },
+      {
+        "page": 40,
+        "insight": "The next slide is the activation-functions section divider, confirming that the classification evaluation neighborhood ends at page 39."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for confusion matrix, precision, recall, F1, classification metrics, streaming, distributed, merge, shard, worker, sufficient statistics, and aggregation. Pages 35-40 were extracted as the complete classification-loss and evaluation neighborhood, and pages 36-39 were rendered for visual inspection. Pages 37-38 supply the relevant fixed-threshold count formulas, while no slide discusses bounded-memory accumulation, worker merges, or the invalidity of averaging shard F1. Page 39's calibration bins reinforce that different metrics require different retained state. No deck image, example values, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "scikit-learn confusion_matrix documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.confusion_matrix.html",
+        "usage": "Used as official documentation to verify the row-as-true and column-as-predicted convention and the binary ordering TN, FP, FN, TP.",
+        "license": "The scikit-learn repository and documentation are BSD-3-Clause licensed. Only operator semantics are referenced; no documentation prose, code, example, or layout is copied."
+      },
+      {
+        "title": "scikit-learn f1_score documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html",
+        "usage": "Used as official documentation to verify F1 = 2TP / (2TP + FP + FN), undefined-value policy options, and that micro averaging calculates globally from total counts.",
+        "license": "The documentation is BSD-3-Clause licensed. The visual uses an independently authored example and reproduces only the mathematical definition, not source text, code, or artwork."
+      },
+      {
+        "title": "TorchMetrics: How to implement your own Metric",
+        "url": "https://lightning.ai/docs/torchmetrics/stable/pages/implement.html",
+        "usage": "Used as official distributed-metric documentation to verify the update/compute state pattern and sum reduction of count states across devices before metric computation.",
+        "license": "TorchMetrics source and documentation are Apache-2.0 licensed. No source code, prose, example values, or page design is reused; the implementation is an original schematic."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that mergeability belongs to the retained state, not automatically to the reported scalar. For a fixed threshold, each observation contributes to exactly one of TP, FP, TN, or FN, so disjoint shard vectors add componentwise and in any order. F1 is a ratio of those totals and is nonlinear, so equal-weight averaging of shard F1 values generally changes the estimand. The original example uses shard A (TP=1, FP=0, TN=9, FN=0) and shard B (TP=1, FP=9, TN=1, FN=9). Their F1 values are 1.00 and 0.10, whose mean is 0.55. The merged state is TP=2, FP=9, TN=10, FN=9, yielding global F1 = 4/(4+9+9) = 4/22, approximately 0.18."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and visually inspected the full classification-evaluation neighborhood, then checked official scikit-learn count and F1 definitions plus TorchMetrics distributed-state guidance before selecting an original merge counterexample."
+  },
+  "implementation": {
+    "visualIds": [
+      "streaming-metrics-counts-before-f1"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description listing all shard counts and both F1 results. Count names, plus and equals signs, ordered rows, a crossed-out averaging path, and explicit CORRECT and WRONG labels carry the distinction without color. The established two-panel primitive stacks below 640 CSS pixels; each compact 300-unit viewBox has no minimum width and uses short labels for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print tokens produce a light high-contrast figure that stays together."
+  }
+}
