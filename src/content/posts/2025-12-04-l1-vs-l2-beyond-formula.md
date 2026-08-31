@@ -55,8 +55,8 @@ This is L5. You've named the prior interpretation, given the geometric intuition
 				<text class="viz-label" x="229" y="101" text-anchor="end">no penalty</text>
 				<circle class="viz-operating-point" cx="195" cy="145" r="6"></circle>
 				<path class="viz-operating-guide" d="M195 145V212"></path>
-				<text class="viz-callout" x="201" y="160">first contact</text>
-				<text class="viz-axis-label" x="201" y="176">w2 = 0</text>
+				<text class="viz-callout" x="202" y="191">first contact</text>
+				<text class="viz-axis-label" x="202" y="207">w2 = 0</text>
 			</svg>
 		</section>
 		<section class="visual-panel plot-panel">
@@ -76,12 +76,12 @@ This is L5. You've named the prior interpretation, given the geometric intuition
 				<text class="viz-label" x="229" y="101" text-anchor="end">no penalty</text>
 				<circle class="viz-operating-point" cx="193" cy="128" r="6"></circle>
 				<path class="viz-operating-guide" d="M193 128V212"></path>
-				<text class="viz-callout" x="199" y="144">first contact</text>
-				<text class="viz-axis-label" x="199" y="160">w1, w2 ≠ 0</text>
+				<text class="viz-callout" x="200" y="184">first contact</text>
+				<text class="viz-axis-label" x="200" y="200">w1, w2 ≠ 0</text>
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> imagine a loss contour expanding from the star until it first reaches the allowed coefficient region. With the L1 diamond, an axis-aligned corner can be the first contact, making one coefficient exactly zero. With the smooth L2 circle, contact is usually between the axes, so both coefficients shrink but remain nonzero. The geometry explains a tendency, not a guarantee that every L1 solution is sparse. This is an original schematic checked against <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12.pdf"><cite>The Elements of Statistical Learning</cite></a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> imagine a loss contour expanding from the star until it first reaches the allowed coefficient region. With the L1 diamond, an axis-aligned corner can be the first contact, making one coefficient exactly zero. With the smooth L2 circle, contact is usually between the axes, so both coefficients shrink but remain nonzero. The geometry explains a tendency, not a guarantee that every L1 solution is sparse. This is an original schematic checked against <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://hastie.su.domains/ElemStatLearn/"><cite>The Elements of Statistical Learning</cite></a>.</figcaption>
 </figure>
 
 ## What an L6 answer sounds like

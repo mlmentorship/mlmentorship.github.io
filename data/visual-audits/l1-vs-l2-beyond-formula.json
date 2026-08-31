@@ -59,7 +59,7 @@
       },
       {
         "title": "The Elements of Statistical Learning, Second Edition",
-        "url": "https://web.stanford.edu/~hastie/ElemStatLearn/printings/ESLII_print12.pdf",
+        "url": "https://hastie.su.domains/ElemStatLearn/",
         "usage": "Used as an authoritative textbook cross-check for the equivalent penalized and constrained forms and for the standard coefficient-space explanation of why lasso solutions can occur at corners.",
         "license": "The authors provide the book for download, but no permissive license for adapting Figure 3.11 was established. The site figure is not traced or copied: its coordinates, contour shapes, annotations, and panel composition are original."
       },

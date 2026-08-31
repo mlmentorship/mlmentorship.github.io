@@ -69,6 +69,6 @@
     "visualIds": [
       "kge-antisymmetry-score-swap"
     ],
-    "accessibility": "Each panel has a linked heading plus an SVG title and detailed description that state the true edge, false reversed edge, equations, and inference. Solid versus dashed arrows, arrow direction, direct true/false labels, written equations, and explicit outcomes preserve the lesson without color. The established two-panel primitive stacks below 640 pixels; each SVG uses a compact 300-unit viewBox with no minimum width or horizontal scroll for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette and keep the figure together."
+    "accessibility": "Each panel has a linked heading plus an SVG title and detailed description that state the true edge, false reversed edge, equations, and inference. Solid versus dashed arrows, arrow direction, direct true/false labels, written equations, and explicit outcomes preserve the lesson without color. The established two-panel primitive stacks below 640 pixels; each SVG uses a compact 300-unit viewBox with no minimum width or horizontal scroll, and its smallest edge labels are explicitly raised to 11 SVG units for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette and keep the figure together."
   }
 }

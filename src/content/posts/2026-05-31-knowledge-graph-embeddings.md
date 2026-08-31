@@ -65,10 +65,10 @@ The complex conjugate $\bar{\mathbf{t}}$ breaks the symmetry, so ComplEx handles
 				<text class="viz-node-label" x="235" y="57">Ben</text>
 				<path class="viz-roc-curve" d="M92 45 H199"></path>
 				<path class="viz-arrow-forward" d="M199 39 L211 45 L199 51 Z"></path>
-				<text class="viz-edge-label" x="150" y="36">parent_of · true</text>
+				<text class="viz-edge-label" x="150" y="36" style="font-size:11px">parent_of · true</text>
 				<path class="viz-baseline" d="M208 69 H101"></path>
 				<path class="viz-arrow-forward" d="M101 63 L89 69 L101 75 Z"></path>
-				<text class="viz-edge-label" x="150" y="87">parent_of · false</text>
+				<text class="viz-edge-label" x="150" y="87" style="font-size:11px">parent_of · false</text>
 				<text class="viz-callout" x="18" y="122">score(A, r, B) = Σ Aᵢ rᵢ Bᵢ</text>
 				<text class="viz-callout" x="18" y="147">score(B, r, A) = Σ Bᵢ rᵢ Aᵢ</text>
 				<path class="viz-operating-guide" d="M30 164 H270"></path>
@@ -89,10 +89,10 @@ The complex conjugate $\bar{\mathbf{t}}$ breaks the symmetry, so ComplEx handles
 				<text class="viz-node-label" x="235" y="57">Ben</text>
 				<path class="viz-roc-curve" d="M92 45 H199"></path>
 				<path class="viz-arrow-forward" d="M199 39 L211 45 L199 51 Z"></path>
-				<text class="viz-edge-label" x="150" y="36">parent_of · true</text>
+				<text class="viz-edge-label" x="150" y="36" style="font-size:11px">parent_of · true</text>
 				<path class="viz-baseline" d="M208 69 H101"></path>
 				<path class="viz-arrow-forward" d="M101 63 L89 69 L101 75 Z"></path>
-				<text class="viz-edge-label" x="150" y="87">parent_of · false</text>
+				<text class="viz-edge-label" x="150" y="87" style="font-size:11px">parent_of · false</text>
 				<text class="viz-callout" x="18" y="122">score(A, r, B) = Re Σ Aᵢ rᵢ B̄ᵢ</text>
 				<text class="viz-callout" x="18" y="147">score(B, r, A) = Re Σ Bᵢ rᵢ Āᵢ</text>
 				<path class="viz-operating-guide" d="M30 164 H270"></path>

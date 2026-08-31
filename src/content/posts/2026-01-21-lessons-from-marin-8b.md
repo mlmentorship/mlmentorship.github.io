@@ -54,11 +54,11 @@ The prerequisite is observability. You can only react if you can see. Marin had 
 		<text class="viz-axis-label" x="92" y="218" text-anchor="middle">CONTROL PROBE</text>
 		<text class="viz-label" x="92" y="237" text-anchor="middle">same checkpoint</text>
 		<text class="viz-label" x="92" y="251" text-anchor="middle">current recipe</text>
-		<rect class="viz-node viz-node--focus" x="196" y="200" width="144" height="58" rx="4"></rect>
-		<text class="viz-axis-label" x="268" y="218" text-anchor="middle">CANDIDATE PROBE</text>
-		<text class="viz-label" x="268" y="237" text-anchor="middle">same checkpoint</text>
-		<text class="viz-label" x="268" y="251" text-anchor="middle">change one factor</text>
-		<path d="M92 258V280H180M268 258V280H180V297" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#reactive-loop-focus-arrow)"></path>
+		<rect class="viz-node viz-node--focus" x="191" y="200" width="132" height="58" rx="4"></rect>
+		<text class="viz-axis-label" x="257" y="218" text-anchor="middle">CANDIDATE PROBE</text>
+		<text class="viz-label" x="257" y="237" text-anchor="middle">same checkpoint</text>
+		<text class="viz-label" x="257" y="251" text-anchor="middle">change one factor</text>
+		<path d="M92 258V280H180M257 258V280H180V297" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#reactive-loop-focus-arrow)"></path>
 		<rect class="viz-node" x="40" y="300" width="280" height="68" rx="4" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke)"></rect>
 		<text class="viz-callout" x="180" y="319" text-anchor="middle">3 · compare an evidence bundle</text>
 		<text class="viz-node-value" x="180" y="339">per-domain loss · downstream tasks</text>
@@ -69,16 +69,16 @@ The prerequisite is observability. You can only react if you can see. Marin had 
 		<text class="viz-node-value" x="180" y="442">a mainline change?</text>
 		<path d="M86 430H42V487" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#reactive-loop-arrow)"></path>
 		<path d="M180 467V487" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5;marker-end:url(#reactive-loop-focus-arrow)"></path>
-		<path d="M274 430H329V67H286" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#reactive-loop-warning-arrow)"></path>
-		<text class="viz-label" x="306" y="421">unsafe</text>
-		<text class="viz-label" x="306" y="437">or worse</text>
+		<path d="M274 430H344V67H286" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#reactive-loop-warning-arrow)"></path>
+		<text class="viz-label" x="335" y="421" text-anchor="end">unsafe</text>
+		<text class="viz-label" x="335" y="437" text-anchor="end">or worse</text>
 		<rect class="viz-node" x="13" y="490" width="116" height="47" rx="4"></rect>
 		<text class="viz-callout" x="71" y="509" text-anchor="middle">continue</text>
 		<text class="viz-node-value" x="71" y="526">current recipe</text>
 		<rect class="viz-node viz-node--output" x="139" y="490" width="154" height="47" rx="4"></rect>
 		<text class="viz-callout" x="216" y="509" text-anchor="middle">advance mainline</text>
 		<text class="viz-node-value" x="216" y="526">with one justified change</text>
-		<text class="viz-axis-label" x="327" y="291" text-anchor="middle" transform="rotate(90 327 291)">ROLL BACK TO CHECKPOINT</text>
+		<text class="viz-axis-label" x="332" y="291" text-anchor="middle" transform="rotate(90 332 291)">ROLL BACK TO CHECKPOINT</text>
 	</svg>
 	<figcaption><strong>Read it this way:</strong> preserve the solid mainline at a recoverable checkpoint, then branch short control and candidate probes from exactly the same state. Compare more than aggregate loss: domain losses, task evaluations, norms, and formatting checks must agree on the decision. Only evidence returns to the mainline; a worse or unsafe result follows the dashed rollback path. Marin's named phases were unplanned, but its checkpoints, microannealing runs, and diagnostics made adaptation inspectable rather than arbitrary. This is an original synthesis checked against the <a href="https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/">Marin 8B retrospective</a> and the <a href="https://arxiv.org/abs/2410.05192">WSD-S analysis</a>.</figcaption>
 </figure>
