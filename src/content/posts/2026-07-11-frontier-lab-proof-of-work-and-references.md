@@ -74,6 +74,29 @@ For every claim, know:
 
 The interviewer will often probe the boundary because inflated ownership is common and easy to detect.
 
+<!-- visual:proof-of-work-three-checks -->
+<figure class="learning-figure" aria-labelledby="proof-of-work-three-checks-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="proof-of-work-three-checks-title">Can three independent surfaces support the same bounded claim?</p>
+	<div class="visual-grid--two" role="group" aria-label="One bounded proof-of-work claim checked independently by a statement, an artifact, and a witness">
+		<section class="visual-panel">
+			<h4>THE CLAIM CORE</h4>
+			<p><strong>Problem and constraint</strong><br />What difficult situation made judgment necessary?</p>
+			<p><strong>Your decision</strong><br />What did you personally choose, build, or change, and what belonged to the team?</p>
+			<p><strong>Evidence and consequence</strong><br />What was observed, compared, shipped, adopted, or learned?</p>
+			<p><strong>Bounded caveat</strong><br />What remains uncertain, confidential, shared, or unresolved?</p>
+		</section>
+		<section class="visual-panel">
+			<h4>THREE INDEPENDENT CHECKS</h4>
+			<p><strong>1 · Statement: is it precise?</strong><br />Names the decision and outcome without expanding personal ownership.</p>
+			<p><strong>2 · Artifact: is it inspectable?</strong><br />Shows relevant reasoning, implementation, or measurement without exposing confidential work.</p>
+			<p><strong>3 · Witness: was it observed?</strong><br />A person close to the work can describe the same boundary and behavior in their own words.</p>
+			<p><strong>Pass condition</strong><br />The details may differ, but none of the three contradicts the claim core.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> define one claim with an explicit ownership boundary and caveat, then test it three times. The statement asserts it, the artifact makes relevant work inspectable, and the witness independently corroborates observed behavior; identical scripts are neither required nor desirable.</figcaption>
+</figure>
+
 ## References are independent evidence
 
 Choose people who directly observed the relevant behavior. A close collaborator who saw the decisions is usually more useful than a senior executive who knows only the outcome.
