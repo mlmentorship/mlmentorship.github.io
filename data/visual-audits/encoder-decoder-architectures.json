@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "encoder-decoder-architectures",
+  "article": "src/content/posts/2025-09-06-encoder-decoder-architectures.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace why the encoder runs once while every autoregressive decoder step uses both the growing output prefix through causal self-attention and the fixed encoder memory through cross-attention.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest useful medium for separating three relationships that prose and the existing ASCII sketch blur: one encoder pass creates reusable memory, decoder self-attention reads only the generated prefix, and decoder queries repeatedly cross-attend to encoder keys and values. Mermaid preserves explicit edge labels and a generation loop while reusing established responsive dark, light, mobile, and print behavior.",
+  "mediumComparison": {
+    "mermaid": "Selected: the learning task is a directional dataflow with a repeated decoding cycle, two differently sourced attention paths, and no quantitative geometry.",
+    "svg": "Rejected: hand-positioned geometry would duplicate flowchart semantics and require more maintenance without teaching an additional spatial or quantitative property.",
+    "semanticHtml": "Rejected: a table can compare encoder and decoder properties, but it cannot make the fixed-memory path and growing-prefix loop simultaneously visible.",
+    "interaction": "Rejected: stepping through fabricated tokens would add state and controls when a labelled static loop already explains what changes and what remains fixed.",
+    "paperReuse": "Rejected: the Transformer and sequence-to-sequence papers contain well-known architecture figures, but their arXiv availability does not by itself grant third-party figure reuse. The visual is an original synthesis rather than an adaptation.",
+    "noVisual": "Rejected: the article's prose and ASCII block name the components but do not clearly show that decoder self-attention and cross-attention draw from different sequences or that encoder memory is reused at every output step."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 99,
+        "insight": "The preceding text-representation slide distinguishes autoregressive language modeling, masked-language-model encoders, and unified sequence-to-sequence objectives, providing objective context but no encoder-decoder dataflow."
+      },
+      {
+        "page": 100,
+        "insight": "The recurrent-net slide covers LSTM, GRU, and memory-network recurrence, giving the immediate architectural predecessor but not the Transformer encoder-decoder split."
+      },
+      {
+        "page": 101,
+        "insight": "The Transformer slide is directly relevant: it states that decoder self-attention sees preceding outputs, while the next decoder sublayer receives queries from the decoder and keys and values from encoder output so it can attend to the entire input."
+      },
+      {
+        "page": 102,
+        "insight": "The following Transformer slide contrasts bidirectional encoder representations with left-context-only decoders and mentions cross-attention in a sentence-pair classifier, reinforcing that attention type is determined by input routing."
+      },
+      {
+        "page": 103,
+        "insight": "The adjacent overview classifies the original Transformer, GPT, and BERT and discusses multi-head attention, residuals, and feed-forward layers; it adds block context but no decoding-time memory-reuse explanation."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 deck pages for encoder-decoder, cross-attention, sequence-to-sequence, machine translation, and Transformer terms, then read pages 96-105 in full. Page 101 is the only direct encoder-decoder architecture treatment; pages 99-100 and 102-103 are its relevant neighboring objective and architecture context. No deck image, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary source for the Transformer encoder-decoder structure: masked decoder self-attention, encoder-decoder attention with queries from the decoder and keys and values from encoder output, and autoregressive generation.",
+        "license": "The arXiv record uses repository distribution terms that do not establish a permissive third-party figure-reuse grant. No paper figure, caption, wording, dimensions, or layout is reproduced."
+      },
+      {
+        "title": "Sequence to Sequence Learning with Neural Networks",
+        "url": "https://arxiv.org/abs/1409.3215",
+        "usage": "Used as the primary source for conditioning a variable-length target sequence on a representation of the input and factorizing generation so each target token depends on the input representation and prior target tokens.",
+        "license": "The arXiv posting permits access and distribution by arXiv but does not supply a clear permissive license for adapting its Figure 1. No figure, example token sequence, wording, or layout is reused."
+      },
+      {
+        "title": "Hugging Face Transformers: Encoder Decoder Models",
+        "url": "https://huggingface.co/docs/transformers/en/model_doc/encoder-decoder",
+        "usage": "Used as official implementation documentation to verify encoder outputs are passed to an autoregressive decoder with cross-attention enabled, and that generation begins from a decoder start token.",
+        "license": "The linked Transformers project is licensed under Apache License 2.0, but the shipped diagram does not copy documentation text, code, or artwork. It cites the documentation only for implementation-level verification."
+      }
+    ],
+    "notes": "The diagram is an original synthesis of the article and cited architecture semantics. It does not reproduce the canonical Transformer block-stack figure. The fixed encoder-memory node represents encoder hidden states (and the cross-attention K/V derived from them), while the loop explicitly shows that the generated prefix grows by one token and the encoder does not rerun."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full Transformer neighborhood, then checked the original Transformer and sequence-to-sequence papers plus official implementation documentation. The hardest prose-only model is the decoder's simultaneous use of a changing causal prefix and unchanged encoder memory."
+  },
+  "implementation": {
+    "visualIds": [
+      "encoder-once-decoder-loop"
+    ],
+    "accessibility": "The Mermaid source provides a complete title and description. Nodes and edges explicitly state which sequence supplies Q, K, and V, the fixed memory is labelled 'encode once' and 'reuse every step,' and the autoregressive return edge is dashed and labelled as prefix growth, so the lesson does not depend on color. Short labels and a top-to-bottom layout avoid a forced minimum width; established Mermaid tokens provide dark-mode and print contrast."
+  }
+}
