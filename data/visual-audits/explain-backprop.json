@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "explain-backprop",
+  "article": "src/content/posts/2026-04-13-explain-backprop.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain how one scalar-loss reverse sweep reuses cached forward values to produce a gradient for every parameter.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can keep one computation graph fixed while separating the forward value-and-cache path from the reverse gradient path and its parameter-gradient branches.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic routing cannot reliably align the same operations, cached values, and reverse branches in a compact interview-oriented trace.",
+    "svg": "Selected: fixed geometry can pair each operation with its cache, distinguish direction by arrowheads and line style, and remain a static accessible vector.",
+    "semanticHtml": "Rejected: a table can enumerate forward and backward work but cannot show that one reverse path branches into all parameter gradients as directly.",
+    "interaction": "Rejected: stepping through the passes adds controls and JavaScript without improving the single scalar-loss mental model.",
+    "paperReuse": "Rejected: no source figure with verified reuse permission isolates this article's cache-plus-one-reverse-sweep objective; the implementation is an original schematic.",
+    "noVisual": "Rejected: the prose gives the complexity result but leaves the reader to mentally connect the scalar seed, reverse traversal, cached activations, and simultaneous production of all parameter gradients."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 41,
+        "insight": "The activation-functions slide discusses killed, unstable, and exploding gradients, providing the immediate conceptual lead-in but not the backpropagation algorithm."
+      },
+      {
+        "page": 42,
+        "insight": "The Learning section divider begins the contiguous deck section that contains backpropagation and optimization."
+      },
+      {
+        "page": 43,
+        "insight": "The gradient-descent-and-backprop title slide introduces the exact topic without adding a mechanism."
+      },
+      {
+        "page": 44,
+        "insight": "The Backprop Algorithm slide explains computational graphs, cached forward variables, chain-rule composition, branch-gradient addition, and matrix-gradient shapes; it is the directly relevant source-deck page."
+      },
+      {
+        "page": 45,
+        "insight": "The neighboring optimization slide contrasts random search, random local search, numerical gradients that scale linearly with parameter count, and gradient descent."
+      },
+      {
+        "page": 46,
+        "insight": "The next optimization slide moves to momentum, adaptive learning rates, and second-order methods, so it no longer adds detail about the reverse sweep."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for backprop, automatic differentiation, chain rule, gradient, cache, and numerical differentiation. Pages 41-46 were then read as the contiguous neighborhood around the only Backprop Algorithm slide. Page 44 supports the computation-graph and cache framing, while page 45 supports the O(P) numerical-differentiation contrast. The deck does not explicitly compare forward- and reverse-mode AD or provide a narrow reusable one-loss-to-all-parameters diagram. No deck image, wording, code, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Automatic Differentiation in Machine Learning: a Survey",
+        "url": "https://jmlr.org/papers/v18/17-468.html",
+        "usage": "Used to verify reverse accumulation, the one-output-many-inputs efficiency argument, and the distinction between automatic and numerical differentiation.",
+        "license": "No permissive figure-reuse permission was established for the article. No survey figure, wording, notation, or layout is copied; the shipped diagram is an original synthesis."
+      },
+      {
+        "title": "PyTorch Autograd mechanics",
+        "url": "https://docs.pytorch.org/docs/stable/notes/autograd.html",
+        "usage": "Used as official framework documentation to verify that autograd records a directed acyclic graph, traces it backward with the chain rule, saves selected forward tensors for backward, and accumulates gradients into parameter leaves.",
+        "license": "PyTorch documentation is distributed with the BSD-3-Clause-licensed project. No documentation prose, code, or imagery is reproduced; only the documented semantics are cited."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why reverse mode gets every parameter gradient from one scalar loss without perturbing each parameter separately: the forward pass creates one chain of values and saves operation-specific intermediates, then a single reverse sweep starts at dL/dL = 1, reuses those saved values in local vector-Jacobian products, and emits a gradient at every parameter leaf. The schematic is an original abstract three-operation network rather than an adaptation of either source."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete interview article, indexed the full 214-page deck and inspected the exact backpropagation neighborhood, then checked an authoritative AD survey and current PyTorch autograd documentation before selecting an original forward-cache/reverse-gradient trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "explain-backprop-one-loss-all-gradients"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Forward flow is solid and points right; backward flow is dashed, points left, and terminates in three separately labelled parameter-gradient boxes, so meaning does not depend on color. Cache badges use both a distinct shape and explicit saved-value labels. The established backprop visual primitive provides a horizontally scrollable 42rem canvas at 390 CSS pixels, theme-token contrast in light and dark modes, and a print override that removes the minimum width and uses a high-contrast light palette."
+  }
+}

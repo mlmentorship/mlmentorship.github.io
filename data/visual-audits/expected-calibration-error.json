@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "expected-calibration-error",
+  "article": "src/content/posts/2025-08-18-expected-calibration-error.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compute ECE by weighting each confidence bin's absolute calibration gap by the fraction of examples in that bin.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align bin population, calibration gap, multiplication, and final summation while keeping the arithmetic visible. The fixed illustrative values make every contribution independently checkable without a plotting library or runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson depends on proportional magnitudes and aligned arithmetic, which a relationship graph cannot encode precisely.",
+    "svg": "Selected: deterministic widths and labelled equations connect each bin's sample share and absolute gap to its ECE contribution in one responsive view.",
+    "semanticHtml": "Rejected: a table could preserve the arithmetic but would not spatially expose why a sparse bin with a large gap can contribute no more than a dense bin with a smaller gap.",
+    "interaction": "Rejected: changing bin values is unnecessary for the single aggregation lesson and would add controls, state, and print-fallback complexity.",
+    "paperReuse": "Rejected: the primary papers' figure licenses do not establish permission needed for reuse, and their empirical plots are not required. The implementation uses original illustrative values, geometry, labels, and layout and cites sources only for the metric.",
+    "noVisual": "Rejected: the prose defines the weighted sum but leaves readers to coordinate bin size, gap size, and contribution mentally; one worked spatial equation directly resolves that difficulty."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 37,
+        "insight": "The neighboring classification-metrics slide warns that a single-number ROC AUC hides an operating tradeoff, motivating a decomposed view rather than another unexplained scalar."
+      },
+      {
+        "page": 38,
+        "insight": "The classification-evaluation example uses explicit counts to show why aggregate accuracy can hide class-level behavior."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration slide defines ECE as an approximation formed by equally spaced confidence bins and a weighted average of each bin's accuracy-confidence difference, but provides no worked weighting example."
+      },
+      {
+        "page": 40,
+        "insight": "The immediate following slide is only a section divider, confirming that the deck does not continue the ECE aggregation explanation."
+      }
+    ],
+    "notes": "All 214 pages were text-indexed for calibration, ECE, reliability, and confidence. Page 39 is the only direct ECE treatment; pages 37-40 were inspected as its full conceptual neighborhood. The source deck supplies no reusable ECE figure and no worked example showing how bin population changes each gap's contribution."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Obtaining Well Calibrated Probabilities Using Bayesian Binning into Quantiles",
+        "url": "https://doi.org/10.1609/aaai.v29i1.9602",
+        "usage": "Used as the primary source for the finite-bin expected calibration error definition and its sample-frequency weighting.",
+        "license": "The paper is openly accessible, but no permissive figure-reuse license was established from the official publication record. No wording, data, figure, or layout is copied."
+      },
+      {
+        "title": "On Calibration of Modern Neural Networks",
+        "url": "https://proceedings.mlr.press/v70/guo17a.html",
+        "usage": "Used to verify the confidence-bin formulation, reliability-diagram interpretation, ECE reporting, and modern neural-network calibration context.",
+        "license": "PMLR requires author permission-to-publish forms but its public FAQ does not grant a general permissive figure-reuse license. No empirical values, figure, wording, or layout is copied."
+      },
+      {
+        "title": "scikit-learn Probability calibration documentation",
+        "url": "https://scikit-learn.org/stable/modules/calibration.html",
+        "usage": "Used as official implementation documentation to verify that calibration curves pair each bin's mean predicted probability with its empirical positive fraction and that bin counts carry separate information.",
+        "license": "No documentation text, example data, screenshot, or figure is reused; the page is cited only to check terminology and implementation behavior."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the weighting step, not the already-covered diagonal: ECE is an average over examples represented through bins, not an unweighted average over bins. The shipped three-bin example is an original didactic construction with 100 examples, and its 13-point ECE is exactly 0.50×0.10 + 0.40×0.10 + 0.10×0.40."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed the full 214-page deck and inspected pages 37-40, then checked the original ECE paper, the principal modern calibration paper, and official library documentation before selecting an original worked aggregation graphic."
+  },
+  "implementation": {
+    "visualIds": [
+      "ece-weighted-bin-contributions"
+    ],
+    "accessibility": "The SVG title, description, direct labels, and caption state every sample count, confidence, accuracy, absolute gap, weighted contribution, and the 13-point total. Population and gap are distinguished by position, labels, outlined versus solid bars, and arithmetic rather than color. A 360-pixel viewBox scales without a minimum width at a 390 CSS-pixel viewport; shared theme variables supply dark-mode and print contrast, and the established figure primitive avoids page breaks in print."
+  }
+}

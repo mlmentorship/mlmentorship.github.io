@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "factorization-machines",
+  "article": "src/content/posts/2026-05-07-factorization-machines.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain how shared per-feature embeddings let a factorization machine estimate the interaction coefficient for a feature pair that never appeared together in training.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place the same three features in pair-specific and factorized models, then contrast a missing pair weight with a computable dot product. Fixed toy vectors make the inference checkable without runtime code or a plotting dependency.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a relationship graph could show observed and unseen pairs, but cannot clearly align reusable numeric vectors with their dot-product coefficient.",
+    "svg": "Selected: one responsive coordinate system aligns observed-pair evidence, shared feature vectors, an unseen edge, and its explicit dot product.",
+    "semanticHtml": "Rejected: a table can list coefficients but obscures that each node-level embedding is reused across every incident feature pair.",
+    "interaction": "Rejected: changing embeddings is not required to learn the parameter-sharing mechanism and would add controls, state, and a print fallback.",
+    "paperReuse": "Rejected: the IEEE and ACM publications do not grant a permissive figure-reuse license for this use. The implementation uses original toy values, geometry, labels, and layout and cites sources only for the mechanism.",
+    "noVisual": "Rejected: prose states that unseen pairs generalize but requires readers to mentally contrast edge-specific parameters with node-level shared parameters; the paired spatial explanation makes that distinction immediate."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 28,
+        "insight": "The preceding slide is a Boosting versus Bagging divider and contains no factorization context, establishing the beginning of the relevant neighborhood."
+      },
+      {
+        "page": 29,
+        "insight": "The factorization-machines slide defines pair weights as dot products of low-dimensional feature vectors, contrasts O(n squared) pair parameters with O(kn) factors, and says factorized parameters can estimate interactions under extreme sparsity."
+      },
+      {
+        "page": 30,
+        "insight": "The neighboring matrix-factorization slide depicts a low-dimensional matrix decomposition and collaborative-filtering context, but covers non-negative matrix factorization rather than the FM feature-interaction parameterization."
+      },
+      {
+        "page": 31,
+        "insight": "The following slide is an algorithms pros-and-cons section divider, confirming that the deck does not continue the FM mechanism or work an unseen-pair example."
+      }
+    ],
+    "notes": "All 214 pages were text-indexed for factorization machines, matrix factorization, collaborative filtering, sparse interactions, and recommender systems. Page 29 is the only direct FM treatment; pages 28-31 were inspected as its complete immediate neighborhood. The deck provides equations but no worked visual showing how shared feature vectors make an unseen pair coefficient computable, and no deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Factorization Machines",
+        "url": "https://doi.org/10.1109/ICDM.2010.127",
+        "usage": "Used as the primary source for the second-order FM equation, factorized interaction coefficients, linear-time computation, sparse-data motivation, and estimation of unseen interactions.",
+        "license": "The paper is an IEEE publication and no permissive artwork-reuse license was established. No paper text, equation layout, example data, figure, or geometry is copied."
+      },
+      {
+        "title": "Factorization Machines with libFM",
+        "url": "https://doi.org/10.1145/2168752.2168771",
+        "usage": "Used as the extended primary reference for FM parameter sharing, general factorization-model representation, optimization, and practical implementation.",
+        "license": "The article is published by ACM and no permissive figure-reuse license was established. No article wording, table, figure, or example is copied."
+      },
+      {
+        "title": "libFM: Factorization Machine Library",
+        "url": "https://libfm.org/",
+        "usage": "Used as the author's official implementation documentation to cross-check that feature engineering plus factorization estimates interactions between high-cardinality categorical variables.",
+        "license": "No manual text, source code, screenshot, or visual is reused; only the documented model semantics and bibliographic record were consulted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is what generalization to an unseen pair actually means. An FM does not recover a missing pair-specific parameter; after each feature vector has been learned through other training examples, it defines the pair coefficient as their dot product. The shipped vectors and scores are explicitly illustrative and show computability, not a guarantee that every unseen-pair prediction is accurate."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed the full 214-page deck and inspected pages 28-31, then checked the original IEEE paper, the extended ACM article, and the author's libFM documentation before selecting an original parameter-sharing comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "fm-shared-embeddings-unseen-pair"
+    ],
+    "accessibility": "The SVG title, full description, direct feature labels, solid observed edges, dashed unseen edge, question mark, vectors, and explicit dot-product equation carry the complete lesson without color. A compact 360-pixel viewBox has no minimum width and scales to a 390 CSS-pixel viewport; established theme variables provide dark-mode and print contrast, and the shared figure primitive prevents print page breaks."
+  }
+}
