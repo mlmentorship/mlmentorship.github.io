@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "mechanistic-interpretability",
+  "article": "src/content/posts/2026-07-11-mechanistic-interpretability.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how activation patching replaces one internal state in a corrupted run with the corresponding state from a clean run, and interpret output recovery as causal evidence for that specific contrast and intervention rather than proof of a complete mechanism.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align clean, corrupted, and patched runs at the same internal site while separating the observed output contrast from the intervention and recovery measurement. That spatial alignment makes the counterfactual comparison legible without implying that an attractive activation map alone establishes a circuit.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout cannot reliably align the same intervention site across three controlled runs, and a generic flowchart would underemphasize the matched comparison.",
+    "svg": "Selected for deterministic lane alignment, direct labels, a complete text alternative, responsive scaling, theme-token colors, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table could list the three outcomes but would not show that only one internal state is transferred while the corrupted run otherwise continues unchanged.",
+    "interaction": "Rejected because selecting different patch sites would add controls and implied empirical data without improving the single causal-comparison lesson.",
+    "paperReuse": "Rejected because the source papers contain model-specific heatmaps and causal-tracing figures, their figure-reuse permission was not established, and their quantitative layouts are unnecessary for this qualitative teaching objective.",
+    "noVisual": "Rejected because the prose defines activation patching, but readers must still mentally coordinate two baseline runs, a same-site state transfer, and a third output whose recovery has deliberately limited evidential scope."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 152,
+        "insight": "The section-divider slide establishes model interpretability as a deck topic but contains no method, visual, or causal claim."
+      },
+      {
+        "page": 153,
+        "insight": "The explainability slide treats input-feature importance and SHAP-style prediction decomposition, providing the correlational input-attribution baseline that the article contrasts with internal causal intervention."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for interpretability, explainability, SHAP, saliency, activation, neuron, attention, causal, ablation, and intervention terms. Pages 148-155 were inspected in full as the complete neighboring sequence around the interpretability section: pages 148-151 cover CNNs, Faster R-CNN, GANs, and diffusion; page 152 is the section divider; page 153 covers SHAP-style feature attribution; and pages 154-155 begin reinforcement learning. Page 56 mentions generic ablation experiments as a model-development diagnostic, not internal causal intervention. No slide presents activation patching, matched clean and corrupted runs, circuit localization, or an applicable reusable figure. No deck artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Locating and Editing Factual Associations in GPT",
+        "url": "https://arxiv.org/abs/2202.05262",
+        "usage": "Used as the primary causal-tracing source for the clean baseline, corrupted baseline, restoration of a selected internal state, and measurement of how the intervention changes the target output.",
+        "license": "The arXiv record does not establish permissive third-party figure-reuse rights. No heatmap, example, numerical result, wording, or figure layout is copied; the implementation is an independently authored qualitative three-run schematic."
+      },
+      {
+        "title": "Towards Best Practices of Activation Patching in Language Models: Metrics and Methods",
+        "url": "https://arxiv.org/abs/2309.16042",
+        "usage": "Used to verify that conclusions depend on the corruption method, patching metric, and experimental design, so recovery should be read as evidence for a particular contrast rather than an unconditional mechanistic claim.",
+        "license": "No paper figure, benchmark value, prompt example, wording, or layout is reproduced. Because reuse permission for the paper's figures was not verified, the article cites the method while using original artwork."
+      },
+      {
+        "title": "TransformerLens activation patching documentation",
+        "url": "https://transformerlensorg.github.io/TransformerLens/generated/code/transformer_lens.patching.html",
+        "usage": "Used as official implementation documentation to verify the clean-cache to corrupted-run patch direction, same-index replacement, output metric, and iteration over candidate activation sites.",
+        "license": "No documentation prose, code, example prompt, or visual is copied; only the documented operation semantics are used to check the schematic."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access to an arXiv paper does not by itself grant permission to reuse its figures and that individual submissions can carry different licenses.",
+        "license": "The official licensing guidance is cited only to document the reuse decision. No policy prose or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is activation patching as a controlled three-run counterfactual, not as another activation visualization. The clean and corrupted baselines establish an output contrast; the patched run keeps the corrupted input while replacing one corresponding internal state from the clean cache; movement of a predeclared output metric toward the clean result makes that state causally relevant under this intervention. It does not alone establish a complete circuit, naturalistic use, necessity, or standalone sufficiency. The SVG is an original abstraction with no source-specific prompts, data, heatmap, or geometry."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact interpretability neighborhood, then checked the primary ROME causal-tracing paper, activation-patching best-practices research, official TransformerLens documentation, and arXiv licensing guidance before selecting an original three-run SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "activation-patching-controlled-contrast"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that state all three runs, the clean-to-corrupted state transfer, the output comparison, and the limit on the conclusion. Every run, state, arrow, and result is directly labelled; the patch is additionally distinguished by a dashed transfer path and outlined intervention site, so no meaning depends on color. A 360-pixel viewBox scales to the content column without a minimum width for readability at 390 CSS pixels. Established theme variables provide dark-mode contrast, and shared print rules force a high-contrast light palette and prevent figure splitting."
+  }
+}
