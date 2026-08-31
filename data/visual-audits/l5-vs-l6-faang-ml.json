@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "l5-vs-l6-faang-ml",
+  "article": "src/content/posts/2026-04-23-l5-vs-l6-faang-ml.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish company-wide reach from senior-principal leverage by tracing which decisions principal owners make independently, which conflicts cross a shared interface, and which evidence reopens the doctrine.",
+  "mediumRationale": "A compact Mermaid topology is the smallest medium that contrasts two authority structures over the same broad scope. The first makes the candidate a fragile approval bottleneck; the second separates independent domain decisions, cross-boundary review, and doctrine-reopening evidence without implying that company levels form one universal numeric ladder.",
+  "mediumComparison": {
+    "mermaid": "Selected: the learning task is to follow authority, escalation, and evidence paths across ownership boundaries. A compact top-to-bottom graph preserves those relationships in source, mobile, dark mode, and print.",
+    "svg": "Rejected: fixed coordinates would add maintenance and accessibility cost without teaching geometry, quantity, or a mathematically exact relation.",
+    "semanticHtml": "Rejected: cards or another table could list decision rights but would make the escalation and doctrine-reopening paths less immediate; the article already provides detailed comparison and scoring tables.",
+    "interaction": "Rejected: toggling levels or scenarios would hide states and falsely suggest a deterministic company-level classifier. The single static contrast contains the complete inference.",
+    "paperReuse": "Rejected: the deck and career-framework sources contain lists, tables, or radar charts rather than this authority topology. Their public availability is not treated as permission to copy visual expression; no external figure, wording, layout, or branded element is reused.",
+    "noVisual": "Rejected: the prose explains delegated authority precisely, but readers must mentally contrast it with the common central-approver anti-pattern and separate ordinary domain decisions from cross-boundary escalation and doctrine reversal."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 207,
+        "insight": "The nearest section begins with a Behavioral/Culture interview title slide but supplies no level, scope, evidence, or ownership model."
+      },
+      {
+        "page": 208,
+        "insight": "The resource slide links general behavioral preparation, general interview advice, and coding problems. It contains no upper-IC calibration or delegated-authority guidance."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership title slide marks the only explicit leadership section but contains no substantive framework."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership content focuses on crucial conversations, psychological safety, acknowledging setbacks, follow-up, and documented commitments. These are useful behaviors but do not distinguish senior, staff, principal, or senior-principal scope."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for interview, career, level, senior, staff, principal, leadership, scope, promotion, behavioral, and delegation. Pages 207-210 were the only coherent behavioral/leadership neighborhood and were rendered and visually inspected. The deck contains no career ladder, upper-IC calibration, decision-rights topology, or reusable level figure. Its extracted metadata and visible slides provide no artwork-reuse license, so no deck wording, structure, or imagery is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Dropbox Engineering Career Framework, version 2.9.1",
+        "url": "https://dropbox.github.io/dbx-career-framework/",
+        "usage": "Used as a public company framework to verify that level expectations combine scope, collaborative reach, and impact levers; that craft responsibilities remain separate; and that the framework is guidance rather than a promotion checklist.",
+        "license": "The source repository declares Apache-2.0, but no framework prose, examples, page structure, or artwork is copied. The original topology does not rely on adaptation rights."
+      },
+      {
+        "title": "Dropbox IC5 Staff Software Engineer expectations",
+        "url": "https://dropbox.github.io/dbx-career-framework/ic5_staff_software_engineer.html",
+        "usage": "Used to verify one company-specific example of multi-year, multi-team technical strategy, influence over other teams' roadmaps, wider-organization optimization, and retained technical judgment.",
+        "license": "The source repository declares Apache-2.0. No level wording, examples, layout, or visual encoding is reproduced, and the article explicitly avoids mapping Dropbox's IC5 label to a universal level."
+      },
+      {
+        "title": "StaffEng: Staff archetypes",
+        "url": "https://staffeng.com/guides/staff-archetypes/",
+        "usage": "Used as an authoritative interview-based account to cross-check that Staff-plus work appears in distinct archetypes, that one title can hide different roles, and that effective technical leadership delegates complex projects rather than centralizing all execution.",
+        "license": "No permissive figure-reuse license was established for the page or its calendar graphics. No prose, taxonomy graphic, calendar, example, or layout is copied."
+      },
+      {
+        "title": "Engineering Ladders",
+        "url": "https://github.com/jorgef/engineeringladders",
+        "usage": "Used to cross-check the warnings that company ladders differ, high levels vary sharply, multiple axes should not become a checklist, and evidence combines scope of influence with technical and operating behaviors.",
+        "license": "The repository declares Apache-2.0, but its radar charts, role labels, prose, and level mappings are not reused. The implemented authority graph is an original construction."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that senior-principal scope is not demonstrated by personally approving more decisions. The original contrast keeps broad reach constant and changes the authority topology: central approval creates a queue and person-dependent succession, while shared constraints let principal owners decide independently. Cross-domain interface conflicts receive joint review, and explicit external or outcome evidence can reopen the doctrine itself. This is an article-specific scope archetype, not a claim that external frameworks share one title map."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete 433-line article, text-indexed all 214 deck pages and visually inspected pages 207-210, then checked public Dropbox, StaffEng, and Engineering Ladders frameworks before selecting an original delegated-authority topology."
+  },
+  "implementation": {
+    "visualIds": [
+      "senior-principal-delegated-coherence"
+    ],
+    "accessibility": "The Mermaid block provides an accessible title and a complete description of both authority structures. Node text explicitly names plural principal owners, independent choices, the central queue, interface review, and doctrine-reopening evidence; solid authority paths and dotted redesign, escalation, and reversal paths preserve meaning without color. The graph uses one top-to-bottom authority path and the established compact-node class to avoid a forced minimum width at 390 CSS pixels. Shared Mermaid tokens provide dark-mode contrast, and existing print rules force a light high-contrast, page-safe rendering."
+  }
+}
