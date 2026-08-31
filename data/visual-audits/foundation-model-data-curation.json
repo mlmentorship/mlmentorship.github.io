@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "slug": "foundation-model-data-curation",
+  "article": "src/content/posts/2026-07-11-foundation-model-data-curation.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace one source sample through identity-preserving curation decisions into a versioned weighted mixture, then use the same lineage to identify affected checkpoints.",
+  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that shows both the main transformation path and the two distinctions prose leaves spatially implicit: rejected samples branch out rather than vanish without evidence, and retained samples enter a versioned mixture whose manifest links them to training runs and checkpoints.",
+  "mediumComparison": {
+    "mermaid": "Selected: labelled directed edges express gates, rejection records, weighted source branches, and forward lineage without fixed coordinates, while the established renderer supplies responsive layout and theme support.",
+    "svg": "Rejected: the lesson is entity flow and provenance rather than quantitative geometry, so manually positioned vectors would add label and maintenance risk without improving the trace.",
+    "semanticHtml": "Rejected: a sequence of cards could list stages but would make rejection branches and the many-sources-to-one-mixture convergence harder to see.",
+    "interaction": "Rejected: changing filter thresholds or mixture weights could illustrate tradeoffs, but controls would add state and JavaScript without improving the fixed lineage lesson this article needs.",
+    "paperReuse": "Rejected: the reviewed papers contain corpus-specific pipelines, statistics, and experimental figures, but none exactly teaches this article's sample-to-checkpoint lineage. Reuse rights differ by source, and no figure composition, data, coordinates, wording, or layout is copied.",
+    "noVisual": "Rejected: prose presents curation as a stage list, which makes it easy to imagine an irreversible cleaning funnel. A visual is useful because operational curation instead preserves stable identity, records why samples leave, converges retained sources through explicit weights, and retains a manifest path to trained checkpoints."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 105,
+        "insight": "The Cramming discussion lists deduplication and heuristic sample removal as ways to improve training tokens after throughput is exhausted, but it does not preserve sample identity, rejection reasons, or downstream lineage."
+      },
+      {
+        "page": 106,
+        "insight": "The LLM data slide is the closest topical source: it connects scaling laws to aggregated corpora, source upsampling, filtering, deduplication, and synthetic textbook data. It motivates mixture design but provides no end-to-end curation or audit diagram."
+      },
+      {
+        "page": 107,
+        "insight": "The neighboring LLM Training slide moves to hardware throughput and continual learning, confirming that the deck's curation treatment ends without connecting a dataset version to training runs or checkpoints."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview asks about data sources, validation, privacy, ingestion, transformation, sampling bias, and train/validation/test splits, offering generic operational context but no foundation-model curation trace."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for data-quality audits and checkpointing model objects, datasets, and hyperparameters for reproducibility, but it does not connect those artifacts through a mixture manifest."
+      },
+      {
+        "page": 163,
+        "insight": "The adjacent interview walkthrough emphasizes training-data sources, bias, and transformations; it remains a question checklist rather than a sample-level decision and lineage model."
+      },
+      {
+        "page": 166,
+        "insight": "The Data Pipeline slide covers collection, annotation, storage, quality, privacy, and anonymization. It is the nearest generic pipeline analogue, but it omits deduplication, contamination control, weighted mixtures, versioned manifests, and checkpoint impact analysis."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for foundation models, LLM data, training data, datasets, curation, filtering, deduplication, contamination, provenance, mixtures, data quality, privacy, auditing, versioning, and checkpoints. Pages 104-107 were inspected as the full foundation-model neighborhood: page 104 discusses instruction tuning, page 105 mentions preprocessing, page 106 covers LLM data, and page 107 begins training systems. Pages 160-170 were inspected as the generic ML-system neighborhood: pages 161-163 cover design and production questions, pages 165-169 cover setup, data pipelines, modeling, serving, and engineering rules, and page 170 begins algorithms. No slide supplies the required sample-to-mixture-to-checkpoint lineage. No deck artwork, wording, data, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "DataComp-LM: In search of the next generation of training sets for language models",
+        "url": "https://arxiv.org/abs/2406.11794",
+        "usage": "Used as a primary benchmark and dataset paper to verify that model-training data design is an experimental variable encompassing filtering, deduplication, and mixing rather than a neutral token-count choice.",
+        "license": "The arXiv landing page provides public access, but public access alone does not establish permission to adapt every paper figure and the submission-specific artwork license was not relied upon. No figure, benchmark result, wording, or layout is reused."
+      },
+      {
+        "title": "Deduplicating Training Data Makes Language Models Better",
+        "url": "https://aclanthology.org/2022.acl-long.577/",
+        "usage": "Used as the primary study supporting the distinction between exact and approximate duplicate removal and the links among repeated training sequences, memorization, evaluation overlap, and model quality.",
+        "license": "ACL materials published from 2016 onward are available under CC BY 4.0 according to the ACL Anthology copyright policy. Although adaptation is permitted with attribution, no paper figure, experimental data, wording, visual grammar, or layout is reused because the article needs a different lineage-focused explanation."
+      },
+      {
+        "title": "The BigScience ROOTS Corpus: A 1.6TB Composite Multilingual Dataset",
+        "url": "https://arxiv.org/abs/2303.03915",
+        "usage": "Used as a primary corpus-construction report to cross-check source governance, language-aware cleaning and filtering, deduplication, personally identifiable information handling, and the importance of documenting a composite corpus.",
+        "license": "The arXiv record is publicly readable, but arXiv supports multiple submission licenses and no artwork reuse grant was assumed from access alone. No ROOTS figure, corpus statistic, wording, or layout is copied."
+      },
+      {
+        "title": "Training Compute-Optimal Large Language Models",
+        "url": "https://arxiv.org/abs/2203.15556",
+        "usage": "Used as a primary scaling study to verify that the number and repetition of training tokens interact with model scale and compute allocation, supporting explicit tracking of mixture weights and effective epochs.",
+        "license": "The public arXiv record was used for technical reference only. Because a permissive license for adapting its artwork was not established, no figure, result table, plotted value, wording, or composition is reused."
+      },
+      {
+        "title": "ACL Anthology copyright and licensing policy",
+        "url": "https://aclanthology.org/faq/copyright/",
+        "usage": "Used to verify the CC BY 4.0 terms applying to the 2022 ACL deduplication paper before choosing not to reuse its figures.",
+        "license": "The policy states that ACL materials from 2016 onward are licensed under CC BY 4.0 while excluding third-party material. The visual remains original and relies on citation rather than adaptation."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that arXiv hosts works under several possible licenses and that free download does not itself imply broad third-party reuse rights.",
+        "license": "The policy is cited to document the conservative reuse decision. No arXiv policy text, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that curation is not a one-way cleaning funnel. Stable sample identity must survive transformations; each policy, quality, deduplication, and contamination decision must produce evidence; retained samples from multiple sources converge only through explicit mixture weights and a versioned manifest; and that manifest must connect to runs and checkpoints so later audits or removals have a defined blast radius. The visual is an original synthesis of the article and the reviewed primary literature, not a redraw of any source figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant slide neighborhoods, then reviewed primary work on corpus benchmarking, deduplication, multilingual corpus construction, and compute-optimal token allocation plus the applicable licensing policies before selecting an original lineage flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "foundation-data-curation-lineage"
+    ],
+    "accessibility": "The Mermaid block provides a specific accessible title and complete description. Every stage, gate result, rejection reason, source weight, manifest, run, and checkpoint is directly labelled; branch shape, arrow direction, and dashed audit links preserve the lesson without color. The compact top-to-bottom layout fits the reading column at 390 CSS pixels, and the shared Mermaid theme supplies dark-mode and print behavior."
+  }
+}

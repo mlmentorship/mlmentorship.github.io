@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "fsdp-and-zero",
+  "article": "src/content/posts/2025-11-14-fsdp-and-zero.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the parameter, gradient, and optimizer shards that persist on each data-parallel rank from the full wrapped unit that exists only temporarily for forward and backward compute.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align one rank's persistent state with the ordered gather, compute, free, regather, reduce-scatter, and local-update lifecycle. This makes both the memory saving and its communication cost visible without implying that full parameters never reside on a rank.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout would show operation order but not reliably preserve the visual contrast between small persistent shards and a larger temporary full unit.",
+    "svg": "Selected for deterministic state sizes, operation order, direct labels, a complete text alternative, responsive scaling, theme-token colors, and print-safe vector output.",
+    "semanticHtml": "Rejected because a list or table can enumerate stages but weakens the spatial distinction between always-resident shards and transient reconstructed parameters.",
+    "interaction": "Rejected because stepping through the lifecycle would hide states and add controls without improving the fixed memory-lifetime lesson.",
+    "paperReuse": "Rejected because the ZeRO paper and PyTorch FSDP article contain related figures, but their layouts are broader than this one-rank lifecycle and their availability is not treated as permission to reuse artwork.",
+    "noVisual": "Rejected because the prose states that persistent state is sharded and parameters are gathered, but readers must still reconcile how full-layer compute can occur without permanently replicating the whole model."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The transformer slide identifies GPU memory limits and parameter-proportional distributed communication, motivating the memory-versus-communication trade."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM training slide mentions FSDP mixed-precision settings but does not explain what FSDP stores or communicates."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide lists BF16 parameters and gradients, optional FP32 master weights, and FP32 Adam state, then notes that ZeRO and FSDP shard optimizer state."
+      },
+      {
+        "page": 115,
+        "insight": "The adjacent training-stack slide combines BF16, FP32 master weights, and FSDP or ZeRO optimizer-state sharding, but does not show the three stages or transient parameter reconstruction."
+      },
+      {
+        "page": 167,
+        "insight": "The system-design slide defines ordinary data parallelism as every worker holding its own model copy, providing the replicated baseline that full sharding changes."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for FSDP, ZeRO, sharding, optimizer state, all-gather, reduce-scatter, data parallelism, and model parallelism. The complete neighboring ranges 102-104, 106-108, 113-116, and 166-168 were inspected. They cover parameter-driven memory and communication, mixed precision, a modern training stack, and replicated data parallelism, but no slide explains ZeRO stages, parameter reconstruction, resharding, or the lifecycle of one wrapped unit. The deck provides no explicit reuse license, so no artwork, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+        "url": "https://arxiv.org/abs/1910.02054",
+        "usage": "Used as the primary paper for progressive partitioning of optimizer state, gradients, and parameters across data-parallel processes while retaining data-parallel computation.",
+        "license": "The arXiv record uses arXiv's perpetual non-exclusive distribution license, which does not grant general figure-reuse rights. No paper figure, wording, data, or layout is copied."
+      },
+      {
+        "title": "PyTorch FullyShardedDataParallel documentation",
+        "url": "https://docs.pytorch.org/docs/2.13/fsdp.html",
+        "usage": "Used as current official documentation to verify that FULL_SHARD uses all-gather for parameters, reduce-scatter for gradients, resharding after forward, and an auto-wrap policy that controls communication and memory behavior.",
+        "license": "No documentation figure or prose is reused. The SVG uses independently authored labels and geometry, so its correctness does not depend on artwork-reuse permission."
+      },
+      {
+        "title": "DeepSpeed ZeRO documentation",
+        "url": "https://deepspeed.readthedocs.io/en/stable/zero3.html",
+        "usage": "Used as official implementation documentation to verify that Stage 1 partitions optimizer state, Stage 2 additionally partitions gradients, and Stage 3 additionally partitions parameters and collects them during forward and backward.",
+        "license": "No documentation diagram, code, prose, or configuration example is copied; it is used only to check operation semantics."
+      },
+      {
+        "title": "Introducing PyTorch Fully Sharded Data Parallel API",
+        "url": "https://pytorch.org/blog/introducing-pytorch-fully-sharded-data-parallel-api/",
+        "usage": "Used as first-party explanatory material to verify that nested wrapping limits full-parameter residency to the active FSDP unit and frees gathered parameters after compute.",
+        "license": "The article contains an FSDP workflow figure but does not state figure-reuse permission. That figure is not reproduced or redrawn; this visual independently focuses on one rank and one wrapped unit."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to interpret the primary paper's arXiv license instead of assuming that free access grants permission to adapt its figures.",
+        "license": "The page states that the arXiv perpetual non-exclusive license gives arXiv limited distribution rights and limits reuse by other entities. No page content is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is state lifetime under full sharding: each rank persistently owns only one partition of parameters, gradients, and optimizer state, yet must temporarily all-gather the current wrapped unit for ordinary layer computation. After backward, reduce-scatter leaves each rank with the gradient shard matching its parameter and optimizer shard, so the optimizer can update locally. The SVG is an original one-rank timeline and reproduces no source-specific figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every relevant neighborhood, then checked the primary ZeRO paper, current PyTorch FSDP documentation, DeepSpeed documentation, first-party PyTorch explanation, and explicit arXiv licensing before selecting an original lifecycle SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "fsdp-wrapped-unit-lifecycle"
+    ],
+    "accessibility": "The SVG provides a linked title and long description. Every state and transition is directly labelled with words and collective names; persistent versus temporary residency is distinguished by headings, outlines, size, and duration labels rather than color. A 360-pixel viewBox scales to the content column without a minimum width for readability at 390 CSS pixels, shared theme tokens provide dark-mode contrast, and shared print rules force a high-contrast light palette with page-break protection."
+  }
+}

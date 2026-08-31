@@ -15,6 +15,44 @@ At large scale, data determines capability, memorization, bias, legal exposure, 
 
 A good pipeline can answer which source produced a sample, which transformations touched it, why it passed, which mixture version used it, and which trained checkpoints may contain it.
 
+<!-- visual:foundation-data-curation-lineage -->
+```mermaid
+flowchart TB
+	accTitle: Curation preserves a sample's lineage from source to checkpoint
+	accDescr: A raw source sample receives a stable identifier before parsing and normalization. Versioned policy, quality, deduplication, and contamination gates either reject it with a recorded reason or retain it with decision evidence. Retained samples become curated source shards. Explicit source weights and effective-epoch limits combine those shards with other curated sources in an immutable mixture manifest. The manifest identifies a training run and its checkpoints. An audit ledger records the source, transformation and gate versions, exclusion reasons, mixture manifest, run, and checkpoints, making both rejected samples and retained samples traceable.
+	Raw["RAW SOURCE SAMPLE<br/>license · time · language"]
+	Identity["STABLE SAMPLE ID<br/>assigned before transforms"]
+	Normalize["PARSE + NORMALIZE<br/>preserve meaningful structure"]
+	Gates{"VERSIONED GATES<br/>policy · quality · dedup · contamination"}
+	Reject[("EXCLUSION RECORD<br/>sample ID · gate · reason")]
+	Shard["CURATED SOURCE SHARD<br/>retained IDs + decision evidence"]
+	Others["OTHER CURATED SOURCES<br/>each with provenance"]
+	Weights["MIXTURE DESIGN<br/>source weights + effective epochs"]
+	Manifest[("IMMUTABLE MIXTURE MANIFEST<br/>shards · transforms · weights")]
+	Run["TRAINING RUN<br/>manifest version"]
+	Checkpoints[("AFFECTED CHECKPOINTS<br/>run + step")]
+	Audit[("AUDIT LEDGER<br/>decisions + lineage")]
+
+	Raw --> Identity --> Normalize --> Gates
+	Gates -->|"REJECT + REASON"| Reject
+	Gates -->|"RETAIN + EVIDENCE"| Shard
+	Shard --> Weights
+	Others --> Weights
+	Weights --> Manifest --> Run --> Checkpoints
+	Reject -.->|"WHY ABSENT"| Audit
+	Manifest -.->|"WHAT ENTERED"| Audit
+	Checkpoints -.->|"WHERE LEARNED"| Audit
+
+	class Raw,Identity,Others viz-input
+	class Normalize,Gates,Weights viz-focus
+	class Reject viz-warning
+	class Shard,Checkpoints viz-output
+	class Manifest,Run,Audit viz-state
+	class Raw viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow one sample downward. A gate never merely “drops” it: rejection produces a reasoned exclusion record, while retention carries evidence into a weighted, versioned mixture. The mixture manifest then links that sample to runs and checkpoints, so later audits can answer both why data was absent and where retained data was used. Original synthesis informed by <a href="https://arxiv.org/abs/2406.11794">DataComp-LM</a>, <a href="https://aclanthology.org/2022.acl-long.577/">Lee et al. on deduplication</a>, <a href="https://arxiv.org/abs/2303.03915">the ROOTS corpus</a>, and <a href="https://arxiv.org/abs/2203.15556">Hoffmann et al. on compute-optimal training</a>.</p>
+
 ## Pipeline stages
 
 ### Acquisition and provenance

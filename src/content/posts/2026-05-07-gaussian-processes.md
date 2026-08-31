@@ -53,7 +53,7 @@ $$
 			<text class="viz-axis-label" x="30" y="38">OUTPUT f(x)</text>
 			<text class="viz-axis-label" x="340" y="221" text-anchor="end">INPUT x</text>
 			<text class="viz-callout" x="185" y="120">posterior mean &mu;(x)</text>
-			<text class="viz-callout" x="270" y="82">posterior uncertainty</text>
+			<text class="viz-callout" x="220" y="82">posterior uncertainty</text>
 			<text class="viz-axis-label" x="174" y="238" text-anchor="middle">OBSERVED INPUTS</text>
 			<path d="M77 62H119M77 57V67M119 57V67" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5"></path>
 			<text class="viz-label" x="98" y="53" text-anchor="middle">near X</text>

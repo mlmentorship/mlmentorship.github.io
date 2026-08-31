@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "gaussian-mixture-models",
+  "article": "src/content/posts/2026-04-20-gaussian-mixture-models.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain how one observation in an overlap region receives nonzero responsibility from multiple Gaussian components and therefore contributes fractionally to each component's M-step update.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place one observation inside two overlapping covariance ellipses, align each component with its prior-weighted density score, and show normalization into responsibilities that both feed the next parameter update.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show the E-step and M-step sequence, but it cannot accurately express an observation's spatial overlap with two continuous component densities.",
+    "svg": "Selected: fixed geometry can align overlap, component scores, normalization, and fractional update paths in one phone-width figure while direct labels and line styles keep color redundant.",
+    "semanticHtml": "Rejected: a table could compare hard and soft assignments, but it would repeat the article's existing comparison and omit the spatial reason both responsibilities can be nonzero.",
+    "interaction": "Rejected: dragging the observation could demonstrate changing responsibilities, but it would add controls and state to a relationship that one carefully chosen overlap case can teach statically.",
+    "paperReuse": "Rejected: the deck, textbook, original EM paper, and official implementation documentation contain broader mixture explanations or software examples, but no reviewed figure matches this overlap-to-weighted-update objective. No source figure, data, coordinates, wording, or layout is copied.",
+    "noVisual": "Rejected: the equations define responsibility precisely, but readers must still connect an overlap point to two prior-weighted density scores, their normalization, and fractional influence on both component updates."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 64,
+        "insight": "The Basic Probabilistic ML Algorithms divider opens the relevant neighborhood but contains no GMM mechanism."
+      },
+      {
+        "page": 65,
+        "insight": "The EM slide defines posterior inference in the E-step and parameter estimation in the M-step, including a lower-bound explanation, but its k-means analogy uses hard assignments and does not show GMM responsibilities."
+      },
+      {
+        "page": 66,
+        "insight": "The graphical-models slide explains observed and latent variables, marginalization, and posterior inference p(z given x), providing the immediate conceptual prerequisite for responsibility."
+      },
+      {
+        "page": 67,
+        "insight": "The message-passing slide describes alternating latent inference and parameter updates, but its graph-oriented treatment does not show overlapping Gaussian densities or weighted sufficient statistics."
+      },
+      {
+        "page": 68,
+        "insight": "The dedicated GMM/HMM slide states the GMM generative story, mixture parameters, marginalization over K latent choices, and EM fitting. It is the exact topical source, but it does not spatially distinguish prior mixture weights, component density at x, posterior responsibility, and fractional M-step influence."
+      },
+      {
+        "page": 69,
+        "insight": "The following slide moves to forward-backward and Baum-Welch for HMM sequences, confirming that no neighboring slide develops the GMM overlap case."
+      },
+      {
+        "page": 70,
+        "insight": "The next slide begins conditional random fields and Naive Bayes, ending the mixture-model neighborhood without a soft-clustering figure."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for Gaussian mixture, GMM, mixture model, expectation maximization, EM, soft clustering, latent variables, responsibility, and posterior inference. Pages 64-70 were extracted and inspected as the complete relevant neighborhood. Page 68 is the only dedicated GMM slide; pages 65-67 establish EM and latent-variable context, and pages 69-70 move to sequence inference and discriminative models. No deck pixels, equations, wording, plotted data, coordinates, or layout are reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Maximum Likelihood from Incomplete Data via the EM Algorithm",
+        "url": "https://www.jstor.org/stable/2984875",
+        "usage": "Used as the primary EM source to verify that the E-step forms conditional expectations of latent sufficient statistics under current parameters and the M-step maximizes using those expected statistics.",
+        "license": "The journal article is publisher-controlled, and JSTOR access does not provide a permissive figure-reuse grant. No figure, example, data, prose, notation layout, or geometry is copied."
+      },
+      {
+        "title": "Pattern Recognition and Machine Learning",
+        "url": "https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/",
+        "usage": "Used as an authoritative textbook reference to cross-check the finite Gaussian-mixture generative model, posterior responsibilities, EM's responsibility-weighted sufficient statistics, covariance forms, and likelihood singularities.",
+        "license": "Microsoft Research officially provides the book PDF, but the Springer copyright notice does not grant a permissive license to adapt its figures. No textbook figure, sample coordinates, prose, visual grammar, or worked values are reproduced."
+      },
+      {
+        "title": "scikit-learn GaussianMixture API reference",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html",
+        "usage": "Used as official implementation documentation to verify full, tied, diagonal, and spherical covariance options; posterior prediction; covariance regularization; multiple initializations; and lower-bound convergence behavior.",
+        "license": "The documentation and project source are distributed under the BSD 3-Clause license, but no documentation figure or example is needed or reused. The visual uses original geometry and symbolic labels."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the distinction between a mixture component's prior weight and its posterior responsibility for a particular observation. For each component, the E-step multiplies the prior pi k by that component's density at x, then normalizes all component scores so the responsibilities sum to one. An overlap point can therefore contribute to more than one component's effective count, mean, and covariance updates. The original schematic uses symbolic scores rather than fabricated probabilities, and it does not imply that geometric distance alone determines responsibility."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 64-70, then checked the original EM paper, an authoritative probabilistic-modeling textbook, and official GaussianMixture implementation documentation before selecting an original overlap-to-responsibility SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "gmm-soft-responsibility"
+    ],
+    "accessibility": "The SVG provides a linked title and complete description. Direct component labels, distinct solid and dashed ellipse outlines, score formulas, a normalization bracket, and two labelled update arrows carry all meaning without color. Its 360-unit viewBox has no minimum width and uses established visual primitives for legibility at 390 CSS pixels, dark-mode contrast, and high-contrast print output."
+  }
+}

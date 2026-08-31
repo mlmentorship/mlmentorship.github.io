@@ -28,6 +28,56 @@ Define a one-hot latent $z \in \{1, \dots, K\}$ with $p(z = k) = \pi_k$. Then $p
 
 The latent $z$ is what makes GMM a soft-clustering algorithm: posterior $p(z = k \mid x)$ tells you how much "responsibility" component $k$ has for $x$.
 
+<!-- visual:gmm-soft-responsibility -->
+<figure class="learning-figure plot-panel" aria-labelledby="gmm-responsibility-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="gmm-responsibility-title">See how one observation updates more than one Gaussian</p>
+	<svg viewBox="0 0 360 500" role="img" aria-labelledby="gmm-responsibility-svg-title gmm-responsibility-svg-desc">
+		<title id="gmm-responsibility-svg-title">An overlap point receives soft responsibility from two Gaussian components</title>
+		<desc id="gmm-responsibility-svg-desc">Two Gaussian density contours overlap around an observation x. Component one uses a solid contour and component two uses a dashed contour. Each component forms an unnormalized score by multiplying its prior mixture weight by its density at x. Normalizing the two scores produces posterior responsibilities r one and r two, which sum to one. The same observation then contributes weight r one to component one's effective count, mean, and covariance updates and weight r two to component two's updates. Neither responsibility is a hard zero or one assignment.</desc>
+		<defs><marker id="gmm-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0 0L7 3.5L0 7Z"></path></marker></defs>
+		<rect class="viz-plot-bg" x="8" y="8" width="344" height="174" rx="6"></rect>
+		<text class="viz-axis-label" x="18" y="27">ONE OBSERVATION IN AN OVERLAP REGION</text>
+		<ellipse cx="125" cy="104" rx="91" ry="49" transform="rotate(-12 125 104)" style="fill:var(--viz-input-bg);fill-opacity:.48;stroke:var(--viz-input-stroke);stroke-width:2.5"></ellipse>
+		<ellipse cx="235" cy="104" rx="91" ry="49" transform="rotate(12 235 104)" style="fill:var(--viz-focus-bg);fill-opacity:.42;stroke:var(--viz-focus-stroke);stroke-width:2.5;stroke-dasharray:7 4"></ellipse>
+		<circle cx="94" cy="112" r="5" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></circle>
+		<circle cx="266" cy="112" r="5" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
+		<text class="viz-callout" x="70" y="145">μ₁</text>
+		<text class="viz-label" x="26" y="162">component 1 · solid</text>
+		<text class="viz-callout" x="280" y="145">μ₂</text>
+		<text class="viz-label" x="334" y="162" text-anchor="end">component 2 · dashed</text>
+		<path d="M180 82L187 89L180 96L173 89Z" style="fill:var(--c-text);stroke:var(--viz-plot-bg);stroke-width:1.5"></path>
+		<text class="viz-callout" x="180" y="70" text-anchor="middle">observation x</text>
+		<path d="M180 182V198" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#gmm-arrow)"></path>
+		<rect class="viz-node viz-node--input" x="8" y="204" width="164" height="66" rx="5"></rect>
+		<text class="viz-node-label" x="90" y="223">COMPONENT 1 SCORE</text>
+		<text class="viz-node-value" x="90" y="243">s₁ = π₁ N(x; μ₁, Σ₁)</text>
+		<text class="viz-label" x="90" y="260" text-anchor="middle">prior × density at x</text>
+		<rect class="viz-node viz-node--focus" x="188" y="204" width="164" height="66" rx="5" style="stroke-dasharray:7 4"></rect>
+		<text class="viz-node-label" x="270" y="223">COMPONENT 2 SCORE</text>
+		<text class="viz-node-value" x="270" y="243">s₂ = π₂ N(x; μ₂, Σ₂)</text>
+		<text class="viz-label" x="270" y="260" text-anchor="middle">prior × density at x</text>
+		<path d="M90 270V288H174M270 270V288H186" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+		<path d="M174 282L182 288L174 294Z" style="fill:var(--viz-edge)"></path>
+		<rect class="viz-node" x="36" y="300" width="288" height="54" rx="5"></rect>
+		<text class="viz-node-label" x="180" y="319">NORMALIZE ACROSS COMPONENTS</text>
+		<text class="viz-node-value" x="180" y="339">r₁ = s₁/(s₁+s₂) · r₂ = s₂/(s₁+s₂)</text>
+		<path d="M180 354V370" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#gmm-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="8" y="376" width="164" height="52" rx="5"></rect>
+		<text class="viz-node-label" x="90" y="396">RESPONSIBILITY r₁</text>
+		<text class="viz-node-value" x="90" y="415">0 &lt; r₁ &lt; 1</text>
+		<rect class="viz-node viz-node--output" x="188" y="376" width="164" height="52" rx="5" style="stroke-dasharray:7 4"></rect>
+		<text class="viz-node-label" x="270" y="396">RESPONSIBILITY r₂</text>
+		<text class="viz-node-value" x="270" y="415">0 &lt; r₂ &lt; 1 · r₁+r₂=1</text>
+		<path d="M90 428V447H174M270 428V447H186" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+		<path d="M174 441L182 447L174 453Z" style="fill:var(--viz-edge)"></path>
+		<rect class="viz-node viz-node--focus" x="24" y="458" width="312" height="34" rx="17"></rect>
+		<text class="viz-node-label" x="180" y="473">x ENTERS BOTH M-STEP UPDATES</text>
+		<text class="viz-node-value" x="180" y="487">component 1 with weight r₁ · component 2 with weight r₂</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> the ellipses show where each component assigns density, not a hard boundary. At <code>x</code>, multiply each density by its prior weight <code>π</code>, then normalize those scores into <code>r₁</code> and <code>r₂</code>. Because both responsibilities are between zero and one, the same point contributes fractionally to both components' effective counts, means, and covariances. The construction is original and checked against Dempster, Laird, and Rubin (1977), Bishop (2006), and the scikit-learn GaussianMixture documentation.</figcaption>
+</figure>
+
 ## Training: EM
 
 Initialize $\pi_k, \mu_k, \Sigma_k$ (k-means++ for means, identity for covariances). Iterate until log-likelihood stabilizes.
