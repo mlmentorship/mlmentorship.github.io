@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "slug": "debug-offline-online-metric-gap",
+  "article": "src/content/posts/2026-07-10-debug-offline-online-metric-gap.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Order the investigation so each check eliminates an entire layer of causes before forming a narrower model-quality hypothesis.",
+  "mediumRationale": "A wide Mermaid decision path is the smallest medium that makes diagnostic precedence explicit: experiment validity and treatment delivery are gates, while model-quality causes are later hypotheses that reconverge on a discriminating test without shrinking branch labels.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a qualitative decision path with two stop branches, one hypothesis fan-out, and a final convergence; the established wide, scrollable primitive preserves readable semantic labels, theme support, and print behavior.",
+    "svg": "Rejected because the relationships are categorical rather than quantitative, and hand-positioned paths would duplicate Mermaid's graph semantics without adding explanatory geometry.",
+    "semanticHtml": "Rejected because a checklist or sequence of cards would not show that failed validity and delivery gates terminate the model-quality investigation.",
+    "interaction": "Rejected because revealing branches or checking boxes would add controls without changing the fixed evidence order.",
+    "paperReuse": "Rejected because the reviewed sources support individual checks but do not provide this article-specific diagnostic tree, and reuse rights for their figures were not assumed.",
+    "noVisual": "Rejected because the hardest mental model is ordering, not recalling possible causes; prose lists the checks but does not make the two early stop conditions and later hypothesis convergence as immediate."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The recommender-systems section divider establishes the context for the following evaluation and feedback-loop material."
+      },
+      {
+        "page": 130,
+        "insight": "The recommender overview notes that logged user-item observations are not missing at random and that presentation bias creates a feedback loop."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring collaborative-filtering slide defines NDCG and discusses ranking from historical interactions, but provides no offline-to-online diagnostic ordering."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide shows the model trained from past interactions, the logged-data dependency behind offline evaluation."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation-and-launch slide explicitly separates offline recall and mean reciprocal rank from online search engagement and days with a play, then places offline evaluation before an online experiment and launch."
+      },
+      {
+        "page": 142,
+        "insight": "The neighboring Rules of Machine Learning slide emphasizes measured model deltas, undesirable behavior, and the risk that short-term behavior differs from long-term behavior."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview distinguishes goal, leading, debug, and guardrail metrics and places experimentation after data, model, and deployment design."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for data-quality audits, target-leakage checks, feature-freshness analysis, offline error analysis, business-impact estimation, and an explicit online A/B design."
+      },
+      {
+        "page": 163,
+        "insight": "The adjacent feed-design example asks whether the optimized signal reflects the desired outcome and whether biased training data differs from live data."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide separates model-gating tests, monitored user reactions, update policy, and inference constraints such as latency."
+      },
+      {
+        "page": 169,
+        "insight": "The following section divider contains no metric-gap guidance."
+      },
+      {
+        "page": 170,
+        "insight": "The Rules of Machine Learning slide identifies pipeline discrepancies, temporal change, and feedback as training-serving skew; it also calls for measuring skew and using more than one launch metric."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 pages of the local Basic_ML_CS_concepts deck for offline, online, experiment, metric, A/B, training-serving skew, feedback loop, sample ratio, and counterfactual terms, then rendered and inspected the complete relevant neighborhoods on pages 129-131, 140-142, 161-163, and 168-170. The deck supplies the component checks but no ordered diagnosis for an offline gain paired with an online regression. No slide wording, layout, image, or figure is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as official engineering guidance for end-to-end pipeline checks, serving-time feature logging, explicit training-serving-skew measurement, feedback-loop risks, and launch decisions based on multiple metrics.",
+        "license": "Google Developers site content is generally licensed under CC BY 4.0 unless otherwise noted, but no prose, example, figure, or layout is copied. The visual is an original article-specific synthesis and the source is cited for concepts only."
+      },
+      {
+        "title": "Diagnosing Sample Ratio Mismatch in Online Controlled Experiments: A Taxonomy and Rules of Thumb for Practitioners",
+        "url": "https://www.microsoft.com/en-us/research/publication/diagnosing-sample-ratio-mismatch-in-online-controlled-experiments-a-taxonomy-and-rules-of-thumb-for-practitioners/",
+        "usage": "Used as a primary industry paper to verify that sample-ratio mismatch is a trustworthiness symptom that can expose assignment, logging, and data-quality failures before an experiment result is interpreted.",
+        "license": "The Microsoft Research landing page provides public access but does not grant this site permission to republish the paper's figures. No paper text, taxonomy, data, or artwork is reproduced."
+      },
+      {
+        "title": "Towards Understanding the Gaps of Offline and Online Evaluation Metrics in Recommender Systems",
+        "url": "https://dl.acm.org/doi/10.1145/3640457.3688056",
+        "usage": "Used as a primary RecSys case study confirming that large offline ranking improvements may fail to improve online engagement because logged evaluation is counterfactual and offline metrics can have a weak causal connection to business outcomes.",
+        "license": "ACM access is not treated as permission to reuse figures or tables. No source artwork, empirical values, wording, or visual arrangement is copied."
+      }
+    ],
+    "notes": "The visual is an original diagnostic synthesis of the article and reviewed evidence. Its technical claim is procedural: experiment validity must be established before interpreting treatment effects; production-path parity should be tested before attributing a gap to model quality; and only then should slices and controlled comparisons discriminate among objective mismatch, biased evaluation, system effects, and feedback. The displayed +8% and -2% values come from the article prompt, not from a source figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected four exact slide neighborhoods, then checked official Google guidance and primary experimentation and recommender-evaluation research before selecting an original evidence-ordered diagnostic path."
+  },
+  "implementation": {
+    "visualIds": [
+      "offline-online-gap-diagnostic-order"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description. Every gate, branch outcome, cause family, and test is directly labelled; heavy yes-path edges, ordinary stop branches, and dashed hypothesis branches preserve the structure without color. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width and shared Mermaid theme tokens provide dark-mode and print-compatible contrast."
+  }
+}

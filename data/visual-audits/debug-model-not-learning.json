@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "debug-model-not-learning",
+  "article": "src/content/posts/2025-05-14-debug-model-not-learning.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Use one tiny-batch memorization test to separate a broken training foundation from full-training optimization, overfitting, and underfitting problems, then choose the next check from the observed behavior.",
+  "mediumRationale": "A Mermaid decision path is the smallest medium that preserves the diagnostic ordering, the tiny-batch gate, and the later behavior-dependent branches without inventing quantitative thresholds. Its wide-canvas marker preserves readable labels for the full branch structure.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is an ordered qualitative procedure with a gate, feedback loop, and named branches, which the established wide, scrollable flowchart primitive expresses directly.",
+    "svg": "Rejected: the article does not need quantitative geometry, and hand-positioning a fixed flowchart would duplicate Mermaid's relationship semantics.",
+    "semanticHtml": "Rejected: a checklist or cards could preserve order but would make the decisive tiny-batch gate and the return-to-foundation loop less apparent.",
+    "interaction": "Rejected: revealing diagnoses after a click would hide branches that readers benefit from comparing simultaneously and would add controls without adding evidence.",
+    "paperReuse": "Rejected: the deck and reviewed sources contain related checklists and plots, but no reviewed figure has both a verified reuse grant and this article-specific diagnostic path. No source artwork, coordinates, or layout is copied.",
+    "noVisual": "Rejected: the prose intentionally contrasts an unordered list with a procedure, yet the reader must still hold the branch order in working memory. A compact path makes the procedure and its stop conditions spatially explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 56,
+        "insight": "The preceding notes slide collects initialization, normalization, regularization, and numerical cautions but presents them as independent notes rather than a diagnostic order."
+      },
+      {
+        "page": 57,
+        "insight": "The section divider introduces the deck's practical neural-network project sequence."
+      },
+      {
+        "page": 58,
+        "insight": "Data Inspection starts the sequence with label noise, imbalance, bias, outliers, and direct inspection of mispredictions."
+      },
+      {
+        "page": 59,
+        "insight": "Setup training skeleton recommends a simple model, fixed seed, expected initial loss, exact pre-model data inspection, fixed prediction monitoring, and overfitting one batch before escalation."
+      },
+      {
+        "page": 60,
+        "insight": "Sanity checks repeats the tiny-subset gate and shows loss-curve, train-validation, update-ratio, activation, gradient, and first-layer diagnostics."
+      },
+      {
+        "page": 61,
+        "insight": "Finding the right model (a) says to reduce bias first, change one factor at a time, preserve the seed, and distrust learning-rate decay defaults."
+      },
+      {
+        "page": 62,
+        "insight": "Finding the right model (b) follows with variance-reduction options once training fit is established."
+      },
+      {
+        "page": 63,
+        "insight": "Squeeze juice out and debug discusses log-scale learning-rate search and inspecting first-layer weights, activations, and gradients, but does not supply a single failure-routing tree."
+      },
+      {
+        "page": 64,
+        "insight": "The following section divider ends the practical neural-network project neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 pages for debugging, not learning, overfitting, single-batch tests, gradient checks, training loops, sanity checks, and learning rate, then rendered and inspected pages 56-64 as the complete relevant neighborhood. Pages 46-47 discuss optimizers and learning rates, while later matches on pages 103, 128, 148, 161, 167, and 169 are incidental transformer, compression, CNN, system-design, or rules-of-ML references. The implemented path is an original narrowing of the article's procedure; no slide text, embedded plot, screenshot, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Recipe for Training Neural Networks",
+        "url": "https://karpathy.github.io/2019/04/25/recipe/",
+        "usage": "Used as an authoritative practitioner reference for building from simple to complex, inspecting data, verifying initial loss, overfitting one batch, visualizing exact model inputs, and monitoring fixed predictions before adding complexity.",
+        "license": "The public article does not state a permissive license for copying its prose or presentation. No wording, code, image, or layout is reproduced; the visual independently organizes this article's own diagnostic sequence."
+      },
+      {
+        "title": "CS231n: Neural Networks Part 3 - Learning and Evaluation",
+        "url": "https://cs231n.github.io/neural-networks-3/",
+        "usage": "Used as an authoritative Stanford course text to verify the tiny-subset sanity check, gradient-check caveats, and the interpretation of loss, train-validation, update-ratio, activation, and gradient behavior.",
+        "license": "No clear figure-reuse grant was identified for the course page. Its loss curves, train-validation plot, code, prose, and layout are not copied or adapted."
+      },
+      {
+        "title": "PyTorch Module documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html",
+        "usage": "Used as official framework documentation to verify that training and evaluation mode changes the behavior of modules including Dropout and BatchNorm and that moving a module to CUDA changes parameter objects.",
+        "license": "PyTorch documentation is maintained with the BSD-3-Clause-licensed project. No documentation prose, source code, example, or figure is copied."
+      },
+      {
+        "title": "Deep Learning, Chapter 11: Practical Methodology",
+        "url": "https://www.deeplearningbook.org/contents/guidelines.html",
+        "usage": "Used as an authoritative textbook reference for an iterative methodology that diagnoses whether performance is limited by optimization, overfitting, or model and data capacity before selecting a remedy.",
+        "license": "The online book is available to read but does not grant general reuse of its copyrighted content. No text, figure, algorithm, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not any individual check but the information-gain order: a failed tiny-batch memorization test blocks all later hyperparameter and generalization conclusions, while a passed test makes full-training traces meaningful. The original diagram therefore uses the tiny batch as a gate, loops foundational failures back to the gate, and only then separates stuck or chaotic optimization from train-validation generalization patterns. Labels and line styles carry every distinction without relying on color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed the full 214-page deck and visually inspected the exact nine-page project-debugging neighborhood, then checked an authoritative training recipe, Stanford course notes, official PyTorch behavior, and a standard textbook before selecting an original compact diagnostic path."
+  },
+  "implementation": {
+    "visualIds": [
+      "model-not-learning-diagnostic-path"
+    ],
+    "accessibility": "Mermaid receives a complete accessible title and description. Every decision edge names its observed result, the failed foundation loop is dashed, the successful escalation edge is thick, and every terminal diagnosis is directly labelled, so meaning survives grayscale. The wide flowchart uses horizontal scrolling at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width; shared Mermaid theme variables support dark mode and print."
+  }
+}

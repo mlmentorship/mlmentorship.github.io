@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "derive-logistic-regression",
+  "article": "src/content/posts/2025-12-23-derive-logistic-regression.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how the Bernoulli negative-log-likelihood derivative and sigmoid derivative cancel under the chain rule to produce the logistic-regression gradient (p - y)x.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that keeps both chain-rule factors visible, aligns the reciprocal cancellations, and carries the simplified logit gradient into the weight gradient. Fixed stages make the omitted algebra inspectable without hiding steps behind interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can name likelihood, log, and gradient stages, but automatic layout does not align the reciprocal probability factors with the sigmoid factors they cancel.",
+    "svg": "Selected: fixed equation stages, arrows, a cancellation guide, and the final labelled residual preserve the exact algebra in one narrow-column trace.",
+    "semanticHtml": "Rejected: stacked cards could hold the equations, but SVG provides clearer visual continuity between the two chain-rule factors and their cancellation without requiring shared style changes.",
+    "interaction": "Rejected: changing p or y would demonstrate update magnitude, but controls and hidden states add complexity when the symbolic cancellation is the single learning objective.",
+    "paperReuse": "Rejected: the local deck's relevant slides include equations and an incorrect gradient code path, while the authoritative sources need only be cited. No external figure, equation layout, coordinates, wording, or example is copied.",
+    "noVisual": "Rejected: the article states the final gradient but omits the chain-rule steps that explain why sigmoid saturation does not add an extra p(1-p) factor to Bernoulli cross-entropy."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 8,
+        "insight": "The discrete-distributions slide gives the Bernoulli mass function p^y(1-p)^(1-y), the exact single-example likelihood used by logistic regression, but does not connect it to logits or gradients."
+      },
+      {
+        "page": 32,
+        "insight": "The section divider introduces classification losses and evaluation but contains no derivation."
+      },
+      {
+        "page": 33,
+        "insight": "The logistic-regression slide connects maximum likelihood, negative log-likelihood, cross-entropy, softmax, and a target-minus-output derivative, but does not show the binary sigmoid chain-rule cancellation."
+      },
+      {
+        "page": 34,
+        "insight": "The adjacent classification-loss slide discusses convexity and optimization but does not derive the Bernoulli objective or gradient."
+      },
+      {
+        "page": 35,
+        "insight": "The neighboring slide states that log-odds are linear and shows a sigmoid training loop, but its code treats out-y as dL/dout and multiplies by sigmoid_derivative again. For fused sigmoid plus BCE, out-y is already dL/dz, so this code path was explicitly rejected."
+      },
+      {
+        "page": 36,
+        "insight": "The following surrogate-loss slide compares logistic, exponential, hinge, cross-entropy, and focal losses but adds no MLE-to-gradient derivation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for logistic regression, Bernoulli, maximum likelihood, log-likelihood, cross-entropy, sigmoid, log-odds, canonical link, and gradient. Pages 7-10 and 31-37 were read as the full relevant neighborhoods. Later matches are applications rather than derivations. No deck artwork, equation layout, code, or wording is reused; page 35's extra sigmoid-derivative multiplication is specifically not propagated."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "CS229 Lecture Notes",
+        "url": "https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true",
+        "usage": "Used as an authoritative Stanford course text to verify the Bernoulli exponential-family form, logit natural parameter, sigmoid canonical response function, logistic hypothesis, log-likelihood, and gradient proportional to y minus the prediction when maximizing likelihood.",
+        "license": "The notes are publicly readable, but no permissive grant for figure reuse was identified. No prose, figure, equation arrangement, or worked example is copied; the visual independently derives the negative-log-likelihood gradient with the opposite sign convention."
+      },
+      {
+        "title": "Deep Learning, Chapter 6: Deep Feedforward Networks",
+        "url": "https://www.deeplearningbook.org/contents/mlp.html",
+        "usage": "Used as an authoritative textbook source to cross-check sigmoid output units, maximum likelihood for Bernoulli outputs, cross-entropy, and the favorable gradient behavior of the combined output and loss.",
+        "license": "The book is available to read online, but its site does not grant general copying permission. No text, figure, notation layout, or example is reproduced."
+      },
+      {
+        "title": "Logistic regression - Maximum Likelihood Estimation",
+        "url": "https://www.statlect.com/fundamentals-of-statistics/logistic-model-maximum-likelihood",
+        "usage": "Used as an authoritative statistics reference to verify the i.i.d. product likelihood, log-likelihood score, residual interpretation, lack of a general closed-form estimator, and numerical optimization requirement.",
+        "license": "The page is copyrighted educational material and no permissive figure-reuse license was identified. No image, prose, equation image, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why the final gradient lacks an additional sigmoid factor. For one example, L=-[y log p+(1-y)log(1-p)] gives dL/dp=-y/p+(1-y)/(1-p), while p=sigmoid(z) gives dp/dz=p(1-p). Multiplication cancels the denominators: -y(1-p)+(1-y)p=p-y. Since z=w^T x, dz/dw=x and dL/dw=(p-y)x. The two bottom labels also check the update direction under gradient descent: y=1 makes p-y negative and raises the logit; y=0 makes it positive and lowers the logit."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, rejected the deck's incorrect double application of the sigmoid derivative, and checked two authoritative textbooks plus a statistics derivation before selecting an original gradient-cancellation trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "logistic-gradient-cancellation"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description containing every chain-rule step and both update directions. Stage numbers, direct equation labels, box boundaries, arrows, and a dashed cancellation guide carry the lesson without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels, theme tokens preserve light and dark contrast, and shared print tokens force a light high-contrast palette."
+  }
+}

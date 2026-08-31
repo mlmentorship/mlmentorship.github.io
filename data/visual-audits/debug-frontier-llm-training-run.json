@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "debug-frontier-llm-training-run",
+  "article": "src/content/posts/2026-07-11-debug-frontier-llm-training-run.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Given an aggregate loss spike or rank-local NaN, localize the first bad transition across step, rank, layer, and tensor or sample before testing one causal family, while treating recovery as separate from root-cause evidence.",
+  "mediumRationale": "A compact Mermaid flow is the smallest medium that makes the diagnostic zoom and the separate recovery track spatially explicit without inventing quantitative data.",
+  "mediumComparison": {
+    "mermaid": "Selected because the hardest mental model is an ordered relationship: move backward from an aggregate symptom through progressively finer evidence boundaries, then test one cause, while recovery proceeds on a distinct track.",
+    "svg": "Rejected because there is no quantitative geometry, measured trajectory, or scale to encode; hand-positioned paths would duplicate Mermaid's relationship semantics and be harder to maintain responsively.",
+    "semanticHtml": "Rejected because a card stack would restate the checklist but would not express the thick localization spine, the dashed recovery branch, or the warning that recovery does not establish causality as directly.",
+    "interaction": "Rejected because an incident simulator would require unsupported assumptions about failure probabilities and probe outcomes; controls would add complexity without improving the transferable localization sequence.",
+    "paperReuse": "Rejected because PaLM documents a particular spike-and-rollback experience, not this article's diagnostic zoom. Reuse rights for its figures are not assumed, and no source figure, layout, data, or wording is copied.",
+    "noVisual": "Rejected because prose lists both actions and failure families but leaves readers to form the crucial spatial model themselves: an observed loss or NaN is downstream evidence, and diagnosis narrows toward the first abnormal transition while recovery remains a separate decision."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends a simple end-to-end loop, overfitting one batch, visualizing losses, and forming explicit hypotheses, supporting cheap controlled reproduction."
+      },
+      {
+        "page": 60,
+        "insight": "The adjacent sanity-check slide uses predicted outcomes such as chance loss and tiny-set overfitting to distinguish implementation failures from optimization failures."
+      },
+      {
+        "page": 63,
+        "insight": "The debugging slide recommends visualizing training dynamics and isolating data, loss, and optimization issues rather than changing many factors at once."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM-training slide places mixed precision, FSDP, gradient clipping, activation checkpointing, data mixing, and checkpointing in one large-scale training system, confirming that divergence can cross numerical, distributed, data, and state boundaries."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide compares FP16 and BF16 range, explains loss scaling and FP32 master weights, and identifies overflow and underflow as precision-specific failure mechanisms."
+      },
+      {
+        "page": 115,
+        "insight": "The neighboring training-stack slide combines distributed execution, mixed precision, checkpointing, and monitoring, but provides no incident-localization sequence."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for NaN, divergence, gradient, overflow, mixed precision, loss scaling, distributed training, checkpoint, debugging, and training loop. The complete neighboring ranges 58-64, 102-116, and 160-172 were extracted and visually inspected. Pages 58, 61-62, 64, 102-106, 108-113, 116, 160, and 161-172 provide surrounding data, modeling, optimization, architecture, interview, and production context but no procedure for narrowing a large-scale training incident from step to rank to layer to tensor. No deck image, layout, data, or wording is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "PaLM: Scaling Language Modeling with Pathways",
+        "url": "https://arxiv.org/abs/2204.02311",
+        "usage": "Used as a primary report that the 540B model experienced irregular loss spikes despite gradient clipping, and that replaying surrounding batches from a different earlier parameter state did not reproduce the spike. This supports testing interactions rather than declaring a batch causal from correlation alone.",
+        "license": "The arXiv record identifies the submission license as arXiv.org perpetual non-exclusive distribution. That permits hosting by arXiv, not general figure reuse. No prose, figure, loss trace, numeric result, or layout is copied; the visual is an original article-specific synthesis with citation-only use."
+      },
+      {
+        "title": "PyTorch Automatic Mixed Precision examples",
+        "url": "https://docs.pytorch.org/docs/stable/notes/amp_examples.html",
+        "usage": "Used as official framework documentation to verify that GradScaler checks optimizer gradients for Inf and NaN, can skip an optimizer step, and requires gradients to be unscaled before inspection or clipping.",
+        "license": "PyTorch documentation is part of the BSD-3-Clause-licensed PyTorch project. No documentation prose, sample code, diagram, or page structure is reproduced."
+      },
+      {
+        "title": "PyTorch Distributed communication package",
+        "url": "https://docs.pytorch.org/docs/stable/distributed.html",
+        "usage": "Used as official documentation to verify that distributed workers are separate processes with rank-local execution and optimizer state, and that NCCL collective and topology diagnostics expose distributed failure boundaries.",
+        "license": "PyTorch documentation is part of the BSD-3-Clause-licensed PyTorch project. No documentation prose, API table, source code, or visual design is copied."
+      }
+    ],
+    "notes": "The hardest mental model is not memorizing six failure families; it is reasoning backward from a downstream aggregate alarm to the first bad transition at progressively finer boundaries. The diagram is an original synthesis of the article's incident sequence. It deliberately avoids claiming that localization proves cause: one-condition replay supplies causal evidence, and successful rollback remains only recovery evidence."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and visually inspected three relevant slide neighborhoods, then checked the primary PaLM instability report and official PyTorch AMP and distributed documentation before selecting an original diagnostic zoom."
+  },
+  "implementation": {
+    "visualIds": [
+      "frontier-training-divergence-zoom"
+    ],
+    "accessibility": "The Mermaid source includes a complete title and description. Every boundary and relationship is directly labelled; thick arrows encode the diagnostic spine and dashed arrows encode the separate recovery track, so meaning does not depend on color. The viz-compact marker removes the mobile minimum width for a phone-width vertical layout at 390 CSS pixels. Established Mermaid theme tokens provide dark mode, and shared print rules force a light high-contrast palette and remove width constraints."
+  }
+}

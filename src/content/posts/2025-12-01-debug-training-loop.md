@@ -55,6 +55,31 @@ What's wrong (in order of severity):
 
 6. **No data movement to device**. If model is on GPU, `x` and `y` need to be moved (`x = x.to(device)`). Will crash or silently work on CPU.
 
+<!-- visual:training-loop-persistent-state -->
+```mermaid
+flowchart TB
+	accTitle: Missing resets let gradient and module-mode state leak into later training batches
+	accDescr: The diagram follows two independent pieces of persistent state. In the gradient lane, batch one backward sets parameter gradients to g one and the optimizer step uses them. Without zero grad, batch two backward adds g two to the old g one, so the next step uses both. In the module-mode lane, model eval switches the module to evaluation mode. Without a later model train call, the next training forward still uses evaluation behavior. No grad is a separate local setting and does not restore training mode.
+	subgraph G["PARAMETER .grad STATE"]
+		direction TB
+		G0["Start batch 1<br/>grad = None"] --> G1["backward()<br/>grad = g₁"]
+		G1 --> G2["step()<br/>update uses g₁"]
+		G2 -. "zero_grad() missing" .-> G3["Batch 2 backward()<br/>grad = g₁ + g₂"]
+		G3 --> G4["step()<br/>stale g₁ is reused"]
+	end
+	subgraph M["MODULE MODE STATE"]
+		direction TB
+		M0["Training forward<br/>mode = train"] --> M1["model.eval()<br/>mode = eval"]
+		M1 -. "model.train() missing" .-> M2["Next training forward<br/>still eval mode"]
+	end
+	class G0,M0 viz-input
+	class G1,G2,M1 viz-state
+	class G3,G4,M2 viz-warning
+	class G0 viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow each lane into the next batch. <code>optimizer.step()</code> changes parameters but does not clear their <code>.grad</code> buffers, and <code>model.eval()</code> changes module behavior until <code>model.train()</code> changes it back. These are separate state leaks; <code>torch.no_grad()</code> only disables gradient recording inside its own context.</p>
+
 ## Senior debugging procedure (the actual signal)
 
 > "I'd read the loop top to bottom and find issues in this order, by impact:

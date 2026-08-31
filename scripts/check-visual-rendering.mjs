@@ -237,7 +237,10 @@ try {
               ? visual.querySelector('figcaption')
               : visual.nextElementSibling?.matches('.diagram-caption') ? visual.nextElementSibling : null;
             const scroll = visual.matches('.mermaid') ? visual : visual.querySelector('.visual-scroll');
-            if (scroll) scroll.dataset.visualReviewScroll = ${JSON.stringify(visualId)};
+            if (scroll) {
+              scroll.scrollLeft = 0;
+              scroll.dataset.visualReviewScroll = ${JSON.stringify(visualId)};
+            }
             const rect = visual.getBoundingClientRect();
             const captionRect = caption?.getBoundingClientRect();
             const captureRect = captionRect ? {
@@ -247,15 +250,40 @@ try {
               bottom: Math.max(rect.bottom, captionRect.bottom),
             } : rect;
             const svgElements = [...visual.querySelectorAll('svg')];
+            const scrollRect = scroll?.getBoundingClientRect();
+            const scrollContentRects = scroll
+              ? [...scroll.querySelectorAll('svg')].map((svg) => svg.getBoundingClientRect())
+                .filter((box) => box.width > 0 || box.height > 0)
+              : [];
             const clippedText = ${JSON.stringify(entry.medium === 'svg')} ? svgElements.flatMap((svg) => {
               const viewBox = svg.viewBox.baseVal;
               if (!viewBox?.width) return [];
               return [...svg.querySelectorAll('text')].flatMap((text) => {
                 const box = text.getBBox();
+                const rootMatrix = svg.getCTM();
+                const textMatrix = text.getCTM();
+                const matrix = rootMatrix && textMatrix
+                  ? rootMatrix.inverse().multiply(textMatrix)
+                  : { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
+                const corners = [
+                  [box.x, box.y],
+                  [box.x + box.width, box.y],
+                  [box.x, box.y + box.height],
+                  [box.x + box.width, box.y + box.height],
+                ].map(([x, y]) => ({
+                  x: matrix.a * x + matrix.c * y + matrix.e,
+                  y: matrix.b * x + matrix.d * y + matrix.f,
+                }));
+                const bounds = {
+                  left: Math.min(...corners.map((point) => point.x)),
+                  top: Math.min(...corners.map((point) => point.y)),
+                  right: Math.max(...corners.map((point) => point.x)),
+                  bottom: Math.max(...corners.map((point) => point.y)),
+                };
                 const epsilon = 0.5;
-                return box.x < viewBox.x - epsilon || box.y < viewBox.y - epsilon ||
-                  box.x + box.width > viewBox.x + viewBox.width + epsilon ||
-                  box.y + box.height > viewBox.y + viewBox.height + epsilon
+                return bounds.left < viewBox.x - epsilon || bounds.top < viewBox.y - epsilon ||
+                  bounds.right > viewBox.x + viewBox.width + epsilon ||
+                  bounds.bottom > viewBox.y + viewBox.height + epsilon
                   ? [text.textContent.trim()]
                   : [];
               });
@@ -292,6 +320,14 @@ try {
                 clientWidth: scroll.clientWidth,
                 scrollWidth: scroll.scrollWidth,
                 overflowX: getComputedStyle(scroll).overflowX,
+                viewportLeft: scrollRect.left,
+                viewportRight: scrollRect.right,
+                contentLeft: scrollContentRects.length
+                  ? Math.min(...scrollContentRects.map((box) => box.left))
+                  : null,
+                contentRight: scrollContentRects.length
+                  ? Math.max(...scrollContentRects.map((box) => box.right))
+                  : null,
               } : null,
               svgCount: svgElements.length,
               titleCount: visual.querySelectorAll('svg > title').length,
@@ -342,12 +378,35 @@ try {
         writeFileSync(join(outputDir, `${prefix}.png`), Buffer.from(screenshot.data, 'base64'));
 
         if (details.scroll && details.scroll.scrollWidth > details.scroll.clientWidth + 1 && mode.media !== 'print') {
-          await cdp.call('Runtime.evaluate', {
+          if (details.scroll.contentLeft !== null && details.scroll.contentLeft < details.scroll.viewportLeft - 1) {
+            throw new Error(`${label} has content before its reachable scroll start`);
+          }
+          const endEvaluation = await cdp.call('Runtime.evaluate', {
             expression: `(() => {
               const scroll = document.querySelector(${JSON.stringify(`[data-visual-review-scroll="${visualId}"]`)});
               scroll.scrollLeft = scroll.scrollWidth;
+              const viewport = scroll.getBoundingClientRect();
+              const content = [...scroll.querySelectorAll('svg')].map((svg) => svg.getBoundingClientRect())
+                .filter((box) => box.width > 0 || box.height > 0);
+              return {
+                scrollLeft: scroll.scrollLeft,
+                maxScrollLeft: scroll.scrollWidth - scroll.clientWidth,
+                viewportRight: viewport.right,
+                contentRight: content.length ? Math.max(...content.map((box) => box.right)) : null,
+              };
             })()`,
+            returnByValue: true,
           });
+          if (endEvaluation.exceptionDetails) {
+            throw new Error(endEvaluation.exceptionDetails.exception?.description ?? endEvaluation.exceptionDetails.text);
+          }
+          const endDetails = endEvaluation.result.value;
+          if (endDetails.contentRight !== null && endDetails.contentRight > endDetails.viewportRight + 1) {
+            throw new Error(`${label} has content beyond its reachable scroll end`);
+          }
+          details.scroll.endScrollLeft = endDetails.scrollLeft;
+          details.scroll.maxScrollLeft = endDetails.maxScrollLeft;
+          details.scroll.endContentRight = endDetails.contentRight;
           const endScreenshot = await cdp.call('Page.captureScreenshot', {
             format: 'png',
             captureBeyondViewport: true,

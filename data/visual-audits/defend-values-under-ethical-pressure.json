@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "defend-values-under-ethical-pressure",
+  "article": "src/content/posts/2026-07-11-defend-values-under-ethical-pressure.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate the quality of a values decision based on evidence available at the time from its eventual outcome, while still using the outcome to improve the next decision.",
+  "mediumRationale": "A deterministic two-by-two SVG is the smallest medium that can keep process quality and observed outcome on independent axes, expose both lucky and unlucky cases, and show a separate feedback path into future decisions.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would suggest a temporal sequence, but the core lesson is an orthogonal comparison between process quality and outcome.",
+    "svg": "Selected: a fixed matrix makes the four combinations simultaneously visible and precisely separates retrospective evaluation from forward learning.",
+    "semanticHtml": "Rejected: four stacked cards would remain accessible but weaken the row-and-column comparison, especially the contrast between identical processes with different outcomes.",
+    "interaction": "Rejected: toggles for process and outcome would hide cases and add controls without improving the categorical distinction.",
+    "paperReuse": "Rejected: the primary outcome-bias paper contains publisher-controlled material and no verified permission for figure reuse; the article-specific matrix is original.",
+    "noVisual": "Rejected: the prose states that process and outcome differ, but the four possible combinations and the proper role of outcome evidence are difficult to hold together without a spatial model."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The ML Design section divider introduces the nearby decision-oriented material but contains no ethical-decision model."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design interview overview asks candidates to discuss tradeoffs, costs, downstream impacts, guardrail metrics, and why they made decisions, but it does not separate process quality from eventual outcome."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist covers customer action, fairness, privacy, downstream impact, cost-benefit framing, experimental outcomes, and success criteria, providing technical decision context but no treatment of hindsight."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring content-feed example focuses on requirements and data choices rather than ethical pressure or retrospective judgment."
+      },
+      {
+        "page": 164,
+        "insight": "The next example slide asks how a production bug and user satisfaction will be tracked, which supports learning from outcomes but does not distinguish that learning from judging the original decision."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider marks the only dedicated leadership neighborhood in the deck."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends facts-first dialogue, representing others' paths, confident humility, testing, and documented follow-up; it supports fair disagreement but gives no process-versus-outcome model."
+      },
+      {
+        "page": 211,
+        "insight": "The following DL Frameworks divider confirms that the leadership section ends without a values-decision or outcome-bias visual."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 deck pages for ethics, values, safety, risk, launch, rollback, reversibility, stakeholders, harm, fairness, responsibility, and decisions. The complete ML-design and production neighborhoods on pages 159-170 and the leadership neighborhood on pages 209-211 were read; pages 160-164 and 209-211 were also rendered and visually inspected. Pages 161, 162, 164, and 210 contain the nearest supporting ideas, but no slide addresses outcome bias or separates contemporaneous process quality from later results. No deck wording, layout, code, or artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Outcome bias in decision evaluation",
+        "url": "https://doi.org/10.1037/0022-3514.54.4.569",
+        "usage": "Used as the primary empirical source for the finding that people rate decision quality more favorably after favorable outcomes even when they know the information available to the decision maker was unchanged.",
+        "license": "The paper was published by the American Psychological Association and no reuse license for its figures or text was verified. No text, data, figure, coordinates, or layout is reproduced."
+      },
+      {
+        "title": "Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+        "url": "https://doi.org/10.6028/NIST.AI.100-1",
+        "usage": "Used as authoritative risk-management guidance for considering affected people, likelihood, impact, uncertainty, prioritization, monitoring, and responses throughout an AI system lifecycle.",
+        "license": "NIST employee works are generally not subject to U.S. copyright under 17 U.S.C. 105, with stated exceptions and possible foreign rights. No NIST wording, table, or figure is reproduced."
+      },
+      {
+        "title": "Copyright, Fair Use, and Licensing Statements for NIST Publications",
+        "url": "https://www.nist.gov/open/copyright-fair-use-and-licensing-statements-srd-data-software-and-technical-series-publications",
+        "usage": "Used to verify the licensing treatment of the reviewed NIST framework rather than assuming public access grants unrestricted figure reuse.",
+        "license": "The policy states that NIST employee works are generally outside U.S. copyright, while contractor works, standard reference data, and foreign rights can differ."
+      }
+    ],
+    "notes": "The shipped matrix is an original conceptual synthesis and reproduces no source figure or empirical data. The upper-left and lower-right cases make outcome bias visible: favorable results can follow weak reasoning, and adverse results can follow sound reasoning under uncertainty. The feedback box preserves the important qualification in Baron and Hershey: outcomes may appropriately update beliefs for similar future decisions even though they do not retroactively change which evidence was available for the original choice."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the relevant design and leadership neighborhoods, then checked the primary outcome-bias study and official NIST risk guidance before selecting an original process-versus-outcome matrix."
+  },
+  "implementation": {
+    "visualIds": [
+      "ethical-decision-process-outcome"
+    ],
+    "accessibility": "The SVG has a linked title and full description of both axes, all four cases, and the forward-learning path. Row and column labels, direct case names, explicit recommendations, border shapes, and dashed versus solid treatment carry the meaning without color. The compact 360-unit viewBox scales without horizontal scrolling at 390 CSS pixels; established theme variables preserve dark-mode contrast, and shared print rules provide a light high-contrast palette with page-break avoidance."
+  }
+}
