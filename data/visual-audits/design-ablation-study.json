@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-ablation-study",
+  "article": "src/content/posts/2026-07-10-design-ablation-study.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Choose an ablation where the claimed mechanism and the strongest resource-confound explanation make different, pre-specified predictions.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place two rival hypotheses side by side and preserve their diverging predictions through a matched-control test and a mechanism-specific dose or boundary test. The fixed narrow layout makes the inferential contrast visible without interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could connect experiments to outcomes, but automatic graph layout would emphasize procedure over the decisive side-by-side comparison of rival predictions.",
+    "svg": "Selected: fixed hypothesis columns align each controlled experiment with the two different outcomes it predicts, making identification rather than experiment enumeration the focal relationship.",
+    "semanticHtml": "Rejected: an HTML table could encode the same cells, but the observation branching into two live hypotheses and then into discriminating tests is easier to scan as one continuous SVG while reusing established visual primitives.",
+    "interaction": "Rejected: toggling resource matches or observed outcomes could support planning, but hidden states and controls add complexity without improving the single lesson of choosing a contrast before observing results.",
+    "paperReuse": "Rejected: the deck and reviewed sources provide principles and domain-specific experiments, not a licensed figure matching this article's rival-hypothesis contrast. No source artwork, values beyond the article's 3% prompt, layout, or wording is copied.",
+    "noVisual": "Rejected: the prose gives a strong experiment sequence but leaves its central causal logic distributed across eight steps. The side-by-side predictions show why the full-model gain is ambiguous and what makes a matched control informative."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The preceding data-inspection slide emphasizes biases, spurious variation, prediction inspection, and distribution checks, but does not connect those diagnostics to a mechanism claim."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide is the deck's only explicit ablation guidance: use a simple model, run ablations with explicit hypotheses, fix the random seed, simplify augmentation, check initialization, zero inputs, overfit a tiny batch, and inspect predictions. It does not show a control that separates mechanism from capacity, compute, or tuning."
+      },
+      {
+        "page": 60,
+        "insight": "The neighboring sanity-check slide covers chance loss, regularization, tiny-subset overfitting, and training diagnostics. These validate implementation behavior but do not identify why one architecture improves the final metric."
+      },
+      {
+        "page": 61,
+        "insight": "The model-selection slide recommends a simple related baseline, changing one component at a time, and holding seed and initialization fixed for gradient-flow comparisons. Those controls motivate the matched comparison, although a single fixed seed is not sufficient evidence for a performance claim."
+      },
+      {
+        "page": 62,
+        "insight": "The following slide lists interventions for variance and regularization, including data, augmentation, pretraining, dimensionality, model size, batch size, dropout, weight decay, and early stopping. The number of plausible alternative causes reinforces the need to name and match the strongest confound."
+      },
+      {
+        "page": 76,
+        "insight": "The scientific-method slide says to define the question, formulate a model, fit it, use it for inference, and criticize and revise it. It supports hypothesis-led testing but contains no ablation design or rival-prediction diagram."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical pages for ablation, baseline, hypothesis, confound, controlled experiment, causal, scientific method, and reproducibility terms. Pages 58-62 were read as the full ablation and model-selection neighborhood; pages 75-77 were read around the scientific-method match. Page 59 is directly relevant and page 61 adds one-change-at-a-time controls, but the deck never contrasts predictions from a claimed mechanism against a resource-matched rival. No deck image, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On the State of the Art of Evaluation in Neural Language Models",
+        "url": "https://arxiv.org/abs/1707.05589",
+        "usage": "Used as a primary ML study showing why architecture claims require controlled comparisons: Melis, Dyer, and Blunsom re-evaluate recurrent cells with a large, consistent hyperparameter search and find that tuned standard LSTMs outperform more recent models.",
+        "license": "The arXiv landing page provides public access but no permissive figure-reuse grant was identified. No figure, architecture drawing, result value, prose, or experimental layout is copied."
+      },
+      {
+        "title": "We need to talk about random seeds",
+        "url": "https://arxiv.org/abs/2210.13393",
+        "usage": "Used as a primary methodological study to check the article's variance guidance and to avoid presenting one fixed random seed as sufficient comparative evidence; the paper distinguishes sensitivity analysis from risky fixed-seed and seed-only performance comparisons.",
+        "license": "The arXiv landing page provides public access but does not establish permission to reuse the paper's figures. No figure, dataset, table, prose, or visual organization is reproduced."
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Randomized Block Designs",
+        "url": "https://www.itl.nist.gov/div898/handbook/pri/section3/pri332.htm",
+        "usage": "Used as an authoritative experimental-design reference to verify that nuisance factors can affect the response and should be identified and controlled or blocked so the factor of interest can be estimated more cleanly.",
+        "license": "NIST employee works are generally not copyright-protected in the United States under 17 U.S.C. 105, subject to NIST's stated qualifications. The implementation still uses the source only as a citation and reuses no table, diagram, example, or wording."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as official engineering guidance to cross-check the need for a simple model, trustworthy pipeline, baseline metrics, independent infrastructure tests, and an experiment framework before attributing gains to added complexity.",
+        "license": "Google Developers page content is generally licensed under CC BY 4.0 unless otherwise noted, while code samples use Apache 2.0. No text, code, brand asset, or figure is adapted; the visual is an original citation-only synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that an observed full-model gain is compatible with both the mechanism claim and resource confounds, so it carries little discriminating evidence by itself. The first contrast holds parameters, FLOPs, data, and tuning budget fixed while removing or replacing the mechanism: disappearance supports necessity under that intervention, while persistence supports the rival explanation. The second contrast varies mechanism strength or a pre-specified boundary at fixed resources: only a theory-predicted pattern adds mechanism-specific evidence. Neither test alone proves a universal causal mechanism; repeated runs, uncertainty, implementation checks, and claim-scoped replication remain necessary."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected both relevant neighborhoods, then checked two primary ML studies, an official statistical-design handbook, and official ML engineering guidance before selecting an original rival-hypothesis contrast."
+  },
+  "implementation": {
+    "visualIds": [
+      "ablation-rival-hypotheses"
+    ],
+    "accessibility": "The SVG has a linked title and a detailed description that states the observation, both hypotheses, both controlled tests, and every predicted outcome. Direct H1 and H2 labels, aligned columns, experiment numbering, borders, and arrows carry the reasoning without color. The established plot-panel primitive scales the 360-unit viewBox without a minimum width for readability at 390 CSS pixels; theme tokens provide dark-mode contrast, and shared print tokens force a light high-contrast palette and avoid page breaks."
+  }
+}

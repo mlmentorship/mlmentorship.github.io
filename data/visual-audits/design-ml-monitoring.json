@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-ml-monitoring",
+  "article": "src/content/posts/2025-03-17-design-ml-monitoring.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Locate the earliest monitoring layer that can detect a failure, and distinguish an early warning from delayed evidence that users were harmed.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that preserves the live serving sequence and attaches each monitoring layer exactly where its evidence first exists. Solid serving edges and dashed observation taps make it clear why healthy service telemetry, early drift warnings, and delayed outcome evidence are related but not interchangeable.",
+  "mediumComparison": {
+    "mermaid": "Selected: the lesson is relational and temporal—a serving path with three observation taps—so a compact top-to-bottom graph directly expresses where each signal originates and reuses established responsive, themed primitives.",
+    "svg": "Rejected: no quantitative geometry or fixed coordinates are required, and hand-positioning this categorical flow would duplicate Mermaid's graph semantics.",
+    "semanticHtml": "Rejected: a three-row table could compare metrics and latency but would obscure that each layer observes a different point in the same production path.",
+    "interaction": "Rejected: simulating failures or label arrival would add controls and hidden states without improving the single learning objective of locating available evidence.",
+    "paperReuse": "Rejected: the deck and sources contain checklists, product diagrams, and drift examples, but none supplies this article-specific three-tap observability path. No figure, layout, metric value, wording, or artwork is copied.",
+    "noVisual": "Rejected: the prose lists the three layers thoroughly, but readers must mentally align them with the serving sequence and evidence delay. The diagram makes visible why an upstream warning cannot substitute for downstream outcome measurement."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers collection, annotation, feedback, arrival cadence, preprocessing, missing data, train-test distribution mismatch, privacy, and bias. It establishes the input risks that a data-quality layer must observe."
+      },
+      {
+        "page": 167,
+        "insight": "The neighboring modeling slide covers task definition, simple baselines, distributed training, and scale but does not address live prediction distributions or outcome monitoring."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide explicitly asks which metrics to monitor, which user feedback to collect, how to infer whether the model performs well, how often to update it, and how to handle latency, cost, confidence, and interpretability."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning summary names freshness requirements, detecting problems before export, watching for silent failures, measuring model deltas, quantifying undesirable behavior, saving serving-time features, measuring training-serving skew, and using more than one launch metric."
+      },
+      {
+        "page": 170,
+        "insight": "The following algorithms-and-data-structures divider closes the production neighborhood and contains no monitoring guidance."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical deck pages for monitoring, drift, production, serving, alerts, freshness, shadowing, latency, data quality, model performance, and feedback. Pages 166-170 were read as the complete directly relevant neighborhood, with the preceding ML-design overview also checked for context. The deck names monitoring concerns and silent failures but does not align data, model-behavior, and delayed-outcome evidence along one live serving path. No slide image, wording, layout, or embedded source figure is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The ML Test Score: A Rubric for ML Production Readiness and Technical Debt Reduction",
+        "url": "https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/",
+        "usage": "Used as a primary production-ML paper to verify that reliable systems require distinct data, model, infrastructure, and monitoring tests, including checks on production data invariants and prediction quality rather than only service availability.",
+        "license": "The Google Research landing page provides public access but does not grant permission to republish the IEEE paper's figures. No table, rubric arrangement, prose, example, or artwork is reproduced."
+      },
+      {
+        "title": "Production ML systems: Monitoring pipelines",
+        "url": "https://developers.google.com/machine-learning/crash-course/production-ml-systems/monitoring",
+        "usage": "Used as official guidance to verify continuous schema and feature checks, important-slice metrics, real-world outcome metrics, training-serving-skew monitoring, model-age alerts, and live-quality testing when serving labels are unavailable or delayed.",
+        "license": "The page is licensed under CC BY 4.0 except where otherwise noted, while its images may have separate terms. No text, example, image, animation, or layout is adapted; the source is cited for concepts only."
+      },
+      {
+        "title": "Vertex AI Model Monitoring overview",
+        "url": "https://cloud.google.com/vertex-ai/docs/model-monitoring/overview",
+        "usage": "Used as official product documentation to cross-check the operational distinction between input-feature drift, output-inference drift, configurable baselines, monitoring windows, per-feature thresholds, and scheduled alerts.",
+        "license": "Google Cloud documentation is generally licensed under CC BY 4.0 except where otherwise noted, and embedded images may be excluded. The implementation reuses no screenshot, graph, prose, product UI, or visual organization."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as official engineering guidance to verify that infrastructure should be tested independently from ML, serving-time features should be logged, training-serving skew should be measured, undesirable behavior should be quantified, and launch decisions should use more than one metric.",
+        "license": "The page is licensed under CC BY 4.0 except where otherwise noted. No documentation text, example, figure, or branded material is copied; the diagram is an original citation-only synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the timing and evidentiary strength of the three layers. Data monitoring observes serving inputs and can detect schema, freshness, null, skew, or drift problems early. Model-behavior monitoring observes scores, confidence, and slices quickly, but distribution change is only a warning and does not establish degraded task quality. Outcome monitoring joins mature labels, user feedback, business metrics, or a control comparison back to predictions; it gives the strongest direct evidence of impact but is delayed and may be selectively observed. Service latency and error telemetry remains necessary, yet successful requests do not imply correct predictions. The diagram makes no claim that drift necessarily causes harm or that all outcome metrics are causal."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the exact production neighborhood, then checked a primary production-readiness paper and three official monitoring references before selecting an original three-tap observability path."
+  },
+  "implementation": {
+    "visualIds": [
+      "ml-monitoring-observability-layers"
+    ],
+    "accessibility": "Mermaid receives a complete accessible title and description naming the healthy serving path, all three monitoring taps, their signals, and their evidence timing. Numbered layers, direct labels, solid serving edges, dashed observation edges, and explicit early-versus-delayed wording preserve the lesson without color. Every node uses the established viz-compact class so the graph has no forced minimum width at 390 CSS pixels; shared Mermaid theme tokens provide light, dark, and print contrast, and print resets graph minimum widths."
+  }
+}
