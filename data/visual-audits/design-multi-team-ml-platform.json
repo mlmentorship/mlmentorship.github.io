@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-multi-team-ml-platform",
+  "article": "src/content/posts/2026-08-28-design-multi-team-ml-platform.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish the lifecycle contracts that need one organization-wide authority from the workload execution that product teams can keep behind adapters during incremental adoption.",
+  "mediumRationale": "A compact two-boundary Mermaid is the smallest useful visual because the lesson depends on both direction and ownership: teams submit one lifecycle contract to shared authority, while that authority delegates execution through adapters and receives evidence back. It replaces a broad component inventory with the specific boundary readers must defend.",
+  "mediumComparison": {
+    "mermaid": "Selected because the mental model is a directed handoff across an organizational boundary, with one shared state spine, several replaceable adapters, and an evidence return path. Labelled subgraphs and edges preserve ownership and direction while established rendering supplies responsive overflow and theme-safe tokens.",
+    "svg": "Rejected because no quantitative scale or exact geometry carries the lesson. Manually positioned boxes would be less maintainable than the existing directed-flow primitive without adding technical precision.",
+    "semanticHtml": "Rejected because cards or a table could compare shared and local responsibilities but would obscure that lifecycle authority flows down through adapters while execution evidence returns to the shared record.",
+    "interaction": "Rejected because switching among team runtimes would add controls and hidden states without changing the invariant: heterogeneous executors remain replaceable behind the same lifecycle contract.",
+    "paperReuse": "Rejected because the reviewed sources discuss lifecycle metadata, production debt, and incremental infrastructure at different scopes; none contains this article-specific contract-versus-execution boundary. Public availability was not treated as figure-reuse permission, and no source artwork, wording, coordinates, examples, or visual arrangement is reused.",
+    "noVisual": "Rejected because the article's prose and former component inventory require readers to infer which layer has organization-wide authority and which systems remain locally owned. The focused boundary prevents the common mistake of interpreting a shared ML platform as one mandatory runtime."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The section divider allocates interview time to ML design but contains no platform architecture or ownership boundary."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks candidates to draw an end-to-end pipeline and covers data ingestion, features, deployment, and metrics for one product; it does not address shared authority across teams or incremental migration."
+      },
+      {
+        "page": 162,
+        "insight": "The closest slide asks about shared team compute, standard frameworks with an established production path, consulting the ML platform team, checkpointing inputs and configuration for reproducibility, and future roadmaps. It motivates common infrastructure but gives no contract-first boundary or adapter strategy."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring worked example follows one personalized-feed design through requirements, a high-level system, and training/live data, with no multi-team platform ownership or control-plane state."
+      },
+      {
+        "page": 164,
+        "insight": "The next worked-example slide covers algorithm choice and offline/online experimentation. It provides lifecycle context but no shared platform boundary."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks about deployment time, available compute, staff, and reusable systems, supporting a constrained adoption decision without describing how to preserve local executors."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers collection, storage, preprocessing, feedback, privacy, and bias for a single workload; it has no organization-wide identity, evidence, or promotion authority."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide covers baselines, distributed training, and scale, representing the kind of specialized execution that can remain behind a platform adapter."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide covers model gating, monitoring, update procedures, inference constraints, and interpretability, but does not join these into a shared lifecycle record across product teams."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide emphasizes simple first models, independent infrastructure tests, monitoring, ownership, launch iteration, and training-serving skew. These support a paved path but do not prescribe one universal runtime."
+      },
+      {
+        "page": 170,
+        "insight": "The algorithms-and-data-structures divider closes the relevant ML-design neighborhood and contains no platform material."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for platform, shared compute, pipeline, registry, lineage, training, serving, deployment, governance, monitoring, ownership, and migration concepts. Pages 160-170 were then read as the complete closest ML-design neighborhood. Page 162 is the only direct platform-team reference, while pages 161 and 163-169 provide its surrounding workflow context. The deck has no multi-team control-plane, contract-first migration, or adapter-boundary figure, so no deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Hidden Technical Debt in Machine Learning Systems",
+        "url": "https://research.google/pubs/hidden-technical-debt-in-machine-learning-systems/",
+        "usage": "Used as a primary systems paper to cross-check that ML systems accumulate debt through entanglement, data dependencies, configuration, glue code, pipeline coupling, and changes in the external world, supporting a narrow stable contract rather than wholesale runtime consolidation.",
+        "license": "The paper is publicly readable, but no explicit permission to reuse its figures was established. No paper figure, prose, example, metaphor, or visual arrangement is reproduced; it is cited only."
+      },
+      {
+        "title": "MLflow Model Registry documentation",
+        "url": "https://mlflow.org/docs/latest/ml/model-registry/",
+        "usage": "Used as official implementation documentation to verify centralized model lifecycle concepts including immutable versions, lineage to producing runs, aliases, metadata, controlled deployment workflows, and rollback-oriented version management.",
+        "license": "MLflow repository documentation is distributed under Apache License 2.0. The visual does not copy or adapt any MLflow figure, UI, prose, object names, or layout; citation alone is used."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as authoritative production guidance to cross-check starting with a solid end-to-end pipeline, keeping the first model and infrastructure simple, testing infrastructure independently from ML, planning to launch and iterate, and preventing training-serving skew.",
+        "license": "The page states that its content is CC BY 4.0 except where otherwise noted and that separately licensed media may be excluded. No source text, image, example, or arrangement is reused, so the visual is an original citation-only synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the platform boundary: one organization-wide authority should own immutable identity, lineage, evaluation evidence, promotion state, and deployment intent, while teams can retain heterogeneous training, feature, and serving systems behind explicit adapters. Evidence returns from those data planes to the shared record. This distinction enables incremental adoption and prevents the platform from becoming a forced universal runtime."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read all 936 article lines, indexed the complete 214-page source deck and inspected pages 160-170 in full, then checked a primary ML-systems paper, official MLflow lifecycle documentation, and Google's authoritative production guidance before selecting an original focused boundary diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "multi-team-platform-contract-boundary"
+    ],
+    "accessibility": "The Mermaid source provides an accessible title and a complete description of both ownership zones, the shared lifecycle spine, replaceable team adapters, execution systems, and the returning evidence path. Subgraph headings, direct node labels, edge labels, line styles, and arrow direction carry the distinction without color. The established wide-canvas marker preserves readable labels through horizontal scrolling at 390 CSS pixels, theme tokens provide dark-mode contrast, and print removes the width floor and uses a light page-safe palette. The adjacent objective and caption preserve the lesson if client-side rendering is unavailable."
+  }
+}
