@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "mdps-and-bellman-equations",
+  "article": "src/content/posts/2026-08-28-mdps-and-bellman-equations.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one action-value Bellman backup from a current state through stochastic next states, then probability-weight their immediate-reward-plus-discounted-value returns.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that keeps state, chosen action, stochastic transition branches, branch-local arithmetic, and their weighted recombination in one inspectable path. A concrete two-outcome support example makes expectation and discounting visible without adding controls.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the learning task depends on keeping probabilities and branch-local arithmetic aligned; Mermaid is better for qualitative relationships and would not provide equally controlled compact geometry.",
+    "svg": "Selected because fixed, responsive geometry can show where uncertainty branches, where discounting applies, and where the branch returns recombine into one expectation.",
+    "semanticHtml": "Rejected because a table could verify the arithmetic but would weaken the essential spatial distinction between alternative stochastic next states and sequential time steps.",
+    "interaction": "Rejected because changing probabilities or discount factors would add controls and hidden states without improving the single-backup mental model.",
+    "paperReuse": "Rejected because the authoritative textbook contains broader backup diagrams, but no candidate figure exactly matches this article-specific support-agent example. The book is copyrighted and its free official PDF is not a permissive artwork license. No source artwork, wording, data, coordinates, or layout is copied.",
+    "noVisual": "Rejected because the prose gives the correct expectation equation, but readers must otherwise mentally locate action choice, environmental randomness, immediate reward, discounted continuation value, and probability weighting within one line of notation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding slide is about SHAP explainability and contains no sequential-decision or value-backup material, establishing the boundary before the reinforcement-learning section."
+      },
+      {
+        "page": 154,
+        "insight": "This is only a Reinforcement Learning section divider and supplies no MDP definition, Bellman equation, or reusable figure."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts conditional likelihood with expected reward and iid samples with trajectories, but does not define states, transition probabilities, value functions, or Bellman backups."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide describes policy gradients and discounted episode returns with a CartPole code example. It contrasts policy and value methods but never derives an MDP or Bellman expectation equation."
+      },
+      {
+        "page": 157,
+        "insight": "The following slide begins Past projects, confirming that the deck's reinforcement-learning sequence ends without an MDP transition diagram or Bellman backup."
+      }
+    ],
+    "notes": "All 214 pages of Basic_ML_CS_concepts were text-indexed for Markov decision process, MDP, Bellman equation, value function, Q-learning, reinforcement learning, and policy optimization. The only substantive reinforcement-learning neighborhood is pages 154-156, inspected together with boundary pages 153 and 157. Other Markov matches concern Markov-chain Monte Carlo and hidden Markov models; Bellman matches concern the Bellman-Ford shortest-path algorithm. The deck states no reuse license and includes externally sourced material, so it was treated as review-only. No screenshot, artwork, wording, code, values, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Reinforcement Learning: An Introduction, second edition",
+        "url": "https://incompleteideas.net/book/the-book-2nd.html",
+        "usage": "Used as the authoritative textbook source for finite MDPs, state and action values, Bellman expectation equations, transition-probability weighting, terminal values, and discounted continuation returns.",
+        "license": "The authors provide an official full PDF, but the book is copyrighted by MIT Press and no permissive figure-adaptation license is stated on the official book page. No textbook figure, example, prose, numerical data, or layout is reused; the support-agent backup and all values are original."
+      },
+      {
+        "title": "Reinforcement Learning: An Introduction, MIT Press catalog record",
+        "url": "https://mitpress.mit.edu/9780262039246/reinforcement-learning/",
+        "usage": "Used to verify the book's publisher, second-edition publication record, authorship, and status as an authoritative textbook.",
+        "license": "The publisher catalog identifies a conventionally published copyrighted work and provides no open figure-reuse license. It is cited for bibliographic verification only; no catalog or book content is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the location of each operation in a stochastic Bellman backup: fix s and a; let the environment select s' according to P; compute r plus gamma times V(s') separately on every branch; then take the probability-weighted sum. In the original example, gamma is 0.5. A terminal resolved branch has probability 0.75, reward 2, and continuation value 0, so its return is 2. A follow-up branch has probability 0.25, reward -1, and continuation value 4, so its return is 1. Therefore Q pi(s,a) is 0.75 times 2 plus 0.25 times 1, or 1.75. Labels, arrows, node roles, probabilities, and arithmetic carry the full lesson without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the complete reinforcement-learning neighborhood, then checked the authoritative Sutton and Barto textbook and its publisher record before selecting an original worked Bellman-backup SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "bellman-stochastic-backup"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description containing the state, action, both transition probabilities, rewards, continuation values, discount, branch returns, and final weighted result. Arrows and explicit labels distinguish sequence from alternatives, while every node role and quantity is textual rather than color-dependent. The 360-unit viewBox uses the established plot-panel and visual-node primitives without a minimum width for 390 CSS-pixel readability; theme variables preserve dark-mode contrast and shared print rules provide a light high-contrast palette."
+  }
+}

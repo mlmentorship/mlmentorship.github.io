@@ -78,6 +78,51 @@ $$
 
 These equations are recursive. They turn a long-horizon problem into a one-step target plus a value estimate.
 
+**Learning objective:** trace one action-value Bellman backup from a current state through stochastic next states, then probability-weight their immediate-reward-plus-discounted-value returns.
+
+<!-- visual:bellman-stochastic-backup -->
+<figure class="learning-figure plot-panel" aria-labelledby="bellman-backup-title">
+	<p class="visual-kicker">One Bellman backup</p>
+	<p class="visual-title" id="bellman-backup-title">Expectation combines every possible next-state return.</p>
+	<svg viewBox="0 0 360 400" role="img" aria-labelledby="bellman-backup-svg-title bellman-backup-svg-desc">
+		<title id="bellman-backup-svg-title">A stochastic action-value Bellman backup</title>
+		<desc id="bellman-backup-svg-desc">From the current support state, the agent takes the action ask for one missing fact. The environment then resolves the request with probability three quarters, giving immediate reward 2 and terminal continuation value 0, or needs follow-up with probability one quarter, giving immediate reward negative 1 and next-state value 4. With discount one half, the two branch returns are 2 and 1. Their probability-weighted average is Q pi of s comma a equals 1.75.</desc>
+		<defs>
+			<marker id="bellman-backup-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-edge)"></path></marker>
+		</defs>
+		<text class="viz-axis-label" x="18" y="22">1 · FIX THE CURRENT STATE AND ACTION</text>
+		<rect class="viz-node viz-node--input" x="27" y="38" width="130" height="55" rx="4"></rect>
+		<text class="viz-callout" x="92" y="61" text-anchor="middle">state s</text>
+		<text class="viz-label" x="92" y="79" text-anchor="middle">missing one fact</text>
+		<path d="M157 65H201" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#bellman-backup-arrow)"></path>
+		<text class="viz-label" x="179" y="54" text-anchor="middle">action a</text>
+		<rect class="viz-node viz-node--focus" x="202" y="38" width="131" height="55" rx="4"></rect>
+		<text class="viz-callout" x="268" y="61" text-anchor="middle">ask for fact</text>
+		<text class="viz-label" x="268" y="79" text-anchor="middle">environment responds</text>
+		<text class="viz-axis-label" x="18" y="112">2 · SCORE EACH POSSIBLE NEXT STATE</text>
+		<path d="M268 94V120L104 151M268 120L256 151" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#bellman-backup-arrow)"></path>
+		<text class="viz-callout" x="123" y="140">P = 0.75</text>
+		<text class="viz-callout" x="260" y="142">P = 0.25</text>
+		<rect class="viz-node viz-node--output" x="27" y="153" width="147" height="91" rx="4"></rect>
+		<text class="viz-callout" x="101" y="176" text-anchor="middle">resolved (terminal)</text>
+		<text class="viz-label" x="101" y="198" text-anchor="middle">reward r = +2</text>
+		<text class="viz-label" x="101" y="216" text-anchor="middle">next value V(s′) = 0</text>
+		<text class="viz-callout" x="101" y="237" text-anchor="middle">r + γV = 2</text>
+		<rect class="viz-node viz-node--state" x="186" y="153" width="147" height="91" rx="4"></rect>
+		<text class="viz-callout" x="260" y="176" text-anchor="middle">needs follow-up</text>
+		<text class="viz-label" x="260" y="198" text-anchor="middle">reward r = −1</text>
+		<text class="viz-label" x="260" y="216" text-anchor="middle">next value V(s′) = 4</text>
+		<text class="viz-callout" x="260" y="237" text-anchor="middle">r + γV = 1</text>
+		<text class="viz-label" x="180" y="268" text-anchor="middle">discount γ = 0.5 on both continuation values</text>
+		<path d="M101 245V292L180 316M260 245V292L180 316" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#bellman-backup-arrow)"></path>
+		<text class="viz-axis-label" x="18" y="301">3 · WEIGHT THE BRANCH RETURNS</text>
+		<rect class="viz-node viz-node--focus" x="27" y="320" width="306" height="60" rx="4"></rect>
+		<text class="viz-callout" x="180" y="344" text-anchor="middle">Qᵖⁱ(s,a) = 0.75(2) + 0.25(1)</text>
+		<text class="viz-callout" x="180" y="367" text-anchor="middle">= 1.75</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> fix the action first, then follow every transition the environment might produce. On each branch, add the immediate reward to the discounted next-state value; only then weight those branch returns by their transition probabilities. The backup is <em>not</em> the best-looking branch or an unweighted average: here it is <code>0.75 × 2 + 0.25 × 1 = 1.75</code>. Original schematic checked against <a href="https://incompleteideas.net/book/the-book-2nd.html">Sutton and Barto (2018)</a>.</figcaption>
+</figure>
+
 ## Bellman optimality
 
 The optimal action value satisfies:

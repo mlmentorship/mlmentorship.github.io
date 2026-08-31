@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "slug": "mixed-precision-deep",
+  "article": "src/content/posts/2025-12-08-mixed-precision-deep.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one FP16 training step in the order that preserves small gradients without letting scaled or non-finite values corrupt the FP32 parameters.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can distinguish temporary low-precision compute from persistent FP32 state while making the strict scale, backward, unscale, clip, finite-check, and update order visible. A single vertical path and one overflow branch fit a narrow reading column without controls.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson depends on compact dtype annotations and a strict operation order inside one training step; a generated flowchart would provide less control over narrow-screen label placement.",
+    "svg": "Selected because fixed responsive geometry can separate persistent state, autocast compute, loss scaling, and the guarded optimizer branch in one scan.",
+    "semanticHtml": "Rejected because an ordered list could repeat the prose but would not spatially expose the loop back to persistent FP32 parameters or the skipped-update branch.",
+    "interaction": "Rejected because varying S or gradient values would add hidden states and imply that readers should hand-tune the scaler rather than understand its invariant ordering.",
+    "paperReuse": "Rejected because the primary paper and official documentation contain broader algorithms and examples, while no candidate figure matches this interview-focused update-order objective. Public documentation access is not treated as artwork reuse permission; no source artwork, wording, data, code, coordinates, or layout is copied.",
+    "noVisual": "Rejected because the article lists all components but readers must otherwise assemble which values are temporary, when the scale is removed, where clipping belongs, and why a non-finite step cannot update persistent parameters."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The LLM-training slide says PyTorch AMP keeps operations such as softmax in full precision while most other operations use BF16, establishing op-specific precision but not the optimizer-step ordering."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization slide names BF16 and FP16 mixed precision as a numerical lever alongside attention optimizations, but contains no training-step mechanism."
+      },
+      {
+        "page": 113,
+        "insight": "The immediately preceding slide is about speculative decoding and contains no mixed-precision training content, establishing the local boundary."
+      },
+      {
+        "page": 114,
+        "insight": "The dedicated mixed-precision slide compares FP16, BF16, and FP32 ranges and gives the FP16 master-weight and dynamic-loss-scaling recipe, including skipping overflowed updates. It does not show the critical unscale-before-clipping order as one dataflow."
+      },
+      {
+        "page": 115,
+        "insight": "The following training-stack slide combines BF16, FP32 master weights, and FSDP or ZeRO optimizer-state sharding, confirming that reduced compute precision does not make all persistent training state low precision."
+      },
+      {
+        "page": 116,
+        "insight": "The next slide begins re-scoring and ends the mixed-precision neighborhood without adding numerical or optimizer-step detail."
+      },
+      {
+        "page": 206,
+        "insight": "The later floating-point slide explains the FP32 sign, exponent, and mantissa fields but does not cover mixed-precision execution, loss scaling, or optimizer state."
+      }
+    ],
+    "notes": "All 214 pages of Basic_ML_CS_concepts were text-indexed page by page for mixed precision, half precision, floating point, FP16, BF16, loss scaling, Tensor Cores, and master weights. Matches occurred on pages 103, 107, 108, 113-115, 128, 167, and 206. The complete direct neighborhood on pages 113-116 was read together, and pages 107-108 and 206 were inspected for op-selection and format context. Page 114 is the only complete mixed-precision recipe. The deck states no reuse license and includes externally sourced material, so it was treated as review-only. No screenshot, artwork, wording, code, values, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Mixed Precision Training",
+        "url": "https://arxiv.org/abs/1710.03740",
+        "usage": "Used as the primary paper for FP16 arithmetic with FP32 master weights, loss scaling before backpropagation, conversion to FP32 before unscaling, and skipping updates when scaled gradients overflow.",
+        "license": "The arXiv record is publicly readable but uses an arXiv distribution license rather than a permissive third-party figure license. No paper figure, pseudocode, numerical example, prose, or layout is reused."
+      },
+      {
+        "title": "PyTorch Automatic Mixed Precision package",
+        "url": "https://docs.pytorch.org/docs/stable/amp.html",
+        "usage": "Used as official framework documentation to verify op-specific autocast, FP16 use with GradScaler, BF16 autocast without required gradient scaling, and the recommendation that backward execute outside the autocast context.",
+        "license": "PyTorch documentation is distributed with the project under its BSD-style terms, but no text, code sample, diagram, or page layout is copied; the source is cited only for current API semantics."
+      },
+      {
+        "title": "PyTorch Automatic Mixed Precision examples: Gradient clipping",
+        "url": "https://docs.pytorch.org/docs/stable/notes/amp_examples.html#gradient-clipping",
+        "usage": "Used as official framework documentation to verify that gradients must be unscaled before their norm is inspected or clipped and that scaler.step skips optimizer.step when gradients contain infs or NaNs.",
+        "license": "PyTorch documentation is available under the project's BSD-style terms. No example code, wording, artwork, or layout is reproduced; the visual independently expresses the ordering invariant."
+      },
+      {
+        "title": "NVIDIA Deep Learning Performance: Mixed Precision Training",
+        "url": "https://docs.nvidia.com/deeplearning/performance/mixed-precision-training/index.html",
+        "usage": "Used as official hardware guidance to cross-check dynamic loss scaling, overflow detection, skipped updates, reduced scale after overflow, and FP32 execution for operations requiring greater range.",
+        "license": "NVIDIA documentation is copyrighted and no permissive figure-reuse grant was identified. No NVIDIA figure, benchmark, wording, code, or layout is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the lifetime and ordering of each precision boundary. Parameters and optimizer state persist in FP32 in the depicted standard recipe. Autocast chooses lower precision for eligible forward operations and FP32 for sensitive operations. With FP16, scaling the loss shifts gradients into representable range during backward; gradients are then converted to FP32 and divided by S before clipping, because clipping scaled gradients would use the wrong magnitude. A finite-value check gates optimizer.step: overflow skips the update and reduces S, while valid unscaled gradients update the FP32 parameters. BF16 generally removes gradient scaling because of its wider exponent range, but does not imply that every operation or persistent state becomes BF16."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full mixed-precision neighborhood, then checked the primary mixed-precision paper and current official PyTorch and NVIDIA documentation before selecting an original guarded-update SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "fp16-safe-update-order"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description stating every dtype boundary, scale and unscale operation, clipping position, finite-value branch, skipped-update behavior, and persistent-state update. Numbered regions, arrows, explicit yes and no labels, line style, and textual node roles preserve the lesson without color. The 360-unit vertical viewBox uses established plot-panel and visual-node primitives without a minimum width for 390 CSS-pixel readability; existing theme variables preserve dark-mode contrast and shared print rules provide a light high-contrast palette."
+  }
+}

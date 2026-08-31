@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "mixup-and-cutmix",
+  "article": "src/content/posts/2025-10-17-mixup-and-cutmix.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compare how Mixup and CutMix use the same 75/25 soft target while Mixup blends both examples at every input location and CutMix assigns the 25 percent contribution to a discrete patch occupying 4 of 16 equal cells.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can hold the two source examples constant, show whole-input interpolation beside a countable CutMix mask, and align each input construction with the identical 75/25 target. The fixed 4-by-4 grid makes the CutMix area arithmetic inspectable rather than merely asserted.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show pairing and output order but cannot accurately encode whole-input blending or a patch covering 4 of 16 equal cells.",
+    "svg": "Selected for deterministic area geometry, texture-based source identity, direct equations, a complete text alternative, responsive scaling, theme-token colors, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table can compare formulas but cannot make the difference between dense interpolation and spatial replacement immediate without recreating a graphic in CSS.",
+    "interaction": "Rejected because a lambda slider would add state and controls while hiding the stable arithmetic needed for the single comparison; a fixed 75/25 example is sufficient.",
+    "paperReuse": "Rejected because both primary papers contain photographic examples and model-specific figures, their figure-reuse permissions were not established, and neither artwork nor empirical data is needed for this abstract construction.",
+    "noVisual": "Rejected because the prose gives both formulas but leaves readers to coordinate the spatial input operation with the soft-label weights, especially why CutMix uses realized area rather than pixel blending."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends starting with no data augmentation while validating a model pipeline, providing process context but no mixing mechanism."
+      },
+      {
+        "page": 123,
+        "insight": "The audio augmentation slide describes Cutout-inspired time and frequency masks that remove contiguous spectrogram blocks; unlike CutMix, those blocks are not filled from a paired example and labels are not mixed by area."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for Mixup, CutMix, convex combination, Beta sampling, patch area, data augmentation, and augmentation. No slide names or defines Mixup or CutMix. Pages 56-60 were inspected in full around the generic neural-network project guidance: page 56 is a section divider, pages 57-60 cover initialization, data inspection, a no-augmentation training baseline, and sanity checks. Pages 119-123 were inspected around the only masking-related augmentation material; page 123 covers waveform deformation, noise, and Cutout-inspired spectrogram masking. Neither neighborhood shows paired-example interpolation, patch replacement, or corresponding soft targets. No deck artwork, wording, code, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "mixup: Beyond Empirical Risk Minimization",
+        "url": "https://arxiv.org/abs/1710.09412",
+        "usage": "Used as the primary source for drawing one lambda from a Beta distribution and applying the same convex weights to both paired inputs and paired one-hot targets.",
+        "license": "The arXiv record provides public access but does not establish permissive third-party figure-reuse rights. No paper image, plot, example, experimental value, wording, or layout is copied; the 75/25 texture schematic is original."
+      },
+      {
+        "title": "CutMix: Regularization Strategy to Train Strong Classifiers with Localizable Features",
+        "url": "https://arxiv.org/abs/1905.04899",
+        "usage": "Used as the primary source for replacing a rectangular input region with content from a paired example and mixing the target in proportion to the retained and inserted areas.",
+        "license": "The paper's public availability is not treated as permission to reuse its photographic examples or figures. No source image, plot, benchmark result, wording, or visual structure is reproduced; the countable 4-by-4 construction is independently authored."
+      },
+      {
+        "title": "Torchvision: How to use CutMix and MixUp",
+        "url": "https://docs.pytorch.org/vision/stable/auto_examples/transforms/plot_cutmix_mixup.html",
+        "usage": "Used as official implementation documentation to verify that both transforms operate on batches, transform class-index labels into soft class-probability targets, and return labels compatible with cross-entropy.",
+        "license": "No documentation prose, code, generated image, or example output is copied. Only the documented batch and target semantics are used to check the teaching graphic."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access to an arXiv submission does not itself grant third parties permission to adapt or redistribute its figures.",
+        "license": "The official guidance is cited only to document the licensing decision; no policy text or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that input construction and target construction must agree. The original fixed example sets lambda = 0.75. Mixup applies 0.75 of source A and 0.25 of source B at every input coordinate, with target 0.75 y_A + 0.25 y_B. CutMix keeps source A in 12 cells and inserts source B in a 2-by-2 patch covering 4 of 16 equal cells, so its realized retained-area coefficient is also 12/16 = 0.75 and its target is the same soft label. Texture, boundaries, counts, and equations carry all meaning without source photographs or paper-specific data."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both augmentation neighborhoods, then checked the originating Mixup and CutMix papers, current Torchvision behavior, and explicit arXiv licensing guidance before selecting an original fixed-area SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "mixup-cutmix-input-target-coupling"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description stating the source patterns, whole-input Mixup, 4-of-16 CutMix patch, and both target calculations. Source A uses horizontal stripes and source B uses dots; direct A/B labels, a solid patch boundary, cell counts, and printed equations preserve every distinction without color. The compact 360-pixel viewBox has no minimum width or horizontal scrolling at 390 CSS pixels. Established theme variables provide dark-mode contrast, and shared print rules force a high-contrast light palette and keep the figure together."
+  }
+}

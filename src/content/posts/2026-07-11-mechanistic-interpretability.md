@@ -38,6 +38,38 @@ Run a clean and corrupted input, then replace an internal activation in one run 
 
 Results depend on the corruption, metric, patch location, and distribution shift caused by the intervention.
 
+<!-- visual:activation-patching-controlled-contrast -->
+<figure class="learning-figure plot-panel" aria-labelledby="activation-patching-visual-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="activation-patching-visual-title">Trace one same-site state transfer, then limit the causal claim to that intervention.</p>
+	<svg viewBox="0 0 360 500" role="img" aria-labelledby="activation-patching-svg-title activation-patching-svg-desc">
+		<title id="activation-patching-svg-title">Activation patching as a controlled three-run comparison</title>
+		<desc id="activation-patching-svg-desc">In the clean baseline, a clean input produces activation a clean at site s and a high target metric. In the corrupted baseline, a matched corrupted input produces activation a corrupted at the same site and a low target metric. In the patched run, the corrupted input is used again, but activation a clean replaces a corrupted only at site s. The target metric recovers. This makes site s causally relevant for this contrast under this intervention, but does not by itself establish a complete circuit, necessity, sufficiency, or a natural model computation.</desc>
+		<text class="viz-axis-label" x="10" y="20">RUN</text><text class="viz-axis-label" x="68" y="20" text-anchor="middle">INPUT</text><text class="viz-axis-label" x="180" y="20" text-anchor="middle">SAME SITE s</text><text class="viz-axis-label" x="300" y="20" text-anchor="middle">TARGET METRIC</text>
+		<text class="viz-callout" x="10" y="54">1 · CLEAN BASELINE</text>
+		<rect class="viz-node viz-node--input" x="10" y="66" width="96" height="56" rx="4"></rect><text class="viz-node-value" x="58" y="87">CLEAN INPUT</text><text class="viz-node-label" x="58" y="108">x<tspan baseline-shift="sub" font-size="9">clean</tspan></text>
+		<path class="viz-axis" d="M106 94 H128"></path><path class="viz-arrow-forward" d="M134 94 l-9 -5 v10 Z"></path>
+		<rect class="viz-node" x="134" y="66" width="92" height="56" rx="4"></rect><text class="viz-node-value" x="180" y="87">ACTIVATION</text><text class="viz-node-label" x="180" y="108">a<tspan baseline-shift="sub" font-size="9">clean</tspan></text>
+		<path class="viz-axis" d="M226 94 H248"></path><path class="viz-arrow-forward" d="M254 94 l-9 -5 v10 Z"></path>
+		<rect class="viz-node viz-node--output" x="254" y="66" width="96" height="56" rx="4"></rect><text class="viz-node-value" x="302" y="87">EXPECTED TARGET</text><text class="viz-node-label" x="302" y="108">high</text>
+		<text class="viz-callout" x="10" y="158">2 · CORRUPTED BASELINE</text>
+		<rect class="viz-node viz-node--input" x="10" y="170" width="96" height="56" rx="4"></rect><text class="viz-node-value" x="58" y="191">MATCHED INPUT</text><text class="viz-node-label" x="58" y="212">x<tspan baseline-shift="sub" font-size="9">corr</tspan></text>
+		<path class="viz-axis" d="M106 198 H128"></path><path class="viz-arrow-forward" d="M134 198 l-9 -5 v10 Z"></path>
+		<rect class="viz-node" x="134" y="170" width="92" height="56" rx="4"></rect><text class="viz-node-value" x="180" y="191">ACTIVATION</text><text class="viz-node-label" x="180" y="212">a<tspan baseline-shift="sub" font-size="9">corr</tspan></text>
+		<path class="viz-axis" d="M226 198 H248"></path><path class="viz-arrow-forward" d="M254 198 l-9 -5 v10 Z"></path>
+		<rect class="viz-node" x="254" y="170" width="96" height="56" rx="4"></rect><text class="viz-node-value" x="302" y="191">EXPECTED TARGET</text><text class="viz-node-label" x="302" y="212">low</text>
+		<path d="M180 122 V278" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></path><path class="viz-arrow-backward" d="M180 286 l-5 -9 h10 Z"></path><rect class="viz-node viz-node--focus" x="108" y="242" width="144" height="30" rx="4"></rect><text class="viz-node-value" x="180" y="261">COPY CLEAN STATE AT s</text>
+		<text class="viz-callout" x="10" y="316">3 · PATCHED RUN</text>
+		<rect class="viz-node viz-node--input" x="10" y="328" width="96" height="64" rx="4"></rect><text class="viz-node-value" x="58" y="351">SAME CORRUPTED</text><text class="viz-node-label" x="58" y="374">x<tspan baseline-shift="sub" font-size="9">corr</tspan></text>
+		<path class="viz-axis" d="M106 360 H128"></path><path class="viz-arrow-forward" d="M134 360 l-9 -5 v10 Z"></path>
+		<rect class="viz-node viz-node--focus" x="134" y="328" width="92" height="64" rx="4"></rect><text class="viz-node-value" x="180" y="349">REPLACE ONLY s</text><text class="viz-node-label" x="180" y="370">a<tspan baseline-shift="sub" font-size="9">clean</tspan></text><text class="viz-edge-label" x="180" y="385">then continue</text>
+		<path class="viz-axis" d="M226 360 H248"></path><path class="viz-arrow-forward" d="M254 360 l-9 -5 v10 Z"></path>
+		<rect class="viz-node viz-node--output" x="254" y="328" width="96" height="64" rx="4"></rect><text class="viz-node-value" x="302" y="349">TARGET MOVES</text><text class="viz-node-label" x="302" y="370">toward clean</text><text class="viz-edge-label" x="302" y="385">recovery</text>
+		<rect class="viz-node" x="10" y="420" width="340" height="64" rx="4"></rect><text class="viz-callout" x="180" y="442" text-anchor="middle">SUPPORTED: s carries relevant information</text><text class="viz-node-value" x="180" y="461">for this contrast, metric, and intervention</text><text class="viz-edge-label" x="180" y="477">not yet a complete circuit, necessity, or natural use</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> establish the clean and corrupted outputs first. In the third run, keep the corrupted input and replace only the chosen same-site activation with its clean value. If the predeclared target metric moves toward the clean result, that site carries causally relevant information for this contrast under this intervention. It is a stronger result than observing an activation, but controls and generalization are still needed before claiming a mechanism. Original schematic checked against <a href="https://arxiv.org/abs/2202.05262">Meng et al.'s causal tracing</a>, <a href="https://arxiv.org/abs/2309.16042">activation-patching best practices</a>, and the <a href="https://transformerlensorg.github.io/TransformerLens/generated/code/transformer_lens.patching.html">TransformerLens documentation</a>.</figcaption>
+</figure>
+
 ### Ablation
 
 Zero, mean-replace, resample, or otherwise remove a component. A behavior change suggests necessity under that intervention. Redundant circuits and out-of-distribution ablations complicate interpretation.
