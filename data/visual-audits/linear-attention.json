@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "linear-attention",
+  "article": "src/content/posts/2025-12-06-linear-attention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the dimension each linear-attention family compresses and trace how that choice prevents an n-by-n attention matrix from being materialized.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align tensor shapes and contraction order for Linformer and Performer. The fixed geometry makes the missing n-by-n intermediate and Performer's normalization path checkable without runtime JavaScript.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout cannot reliably align matrix dimensions or make contraction order spatially precise at phone width.",
+    "svg": "Selected because two responsive vector panels can pair every operation with its tensor shape, show the differing compressed axes, and preserve a static print-safe explanation.",
+    "semanticHtml": "Rejected because a table could compare output shapes but would not show how each family reroutes the computation around the n-by-n matrix.",
+    "interaction": "Rejected because changing n, k, or r adds controls without improving the one invariant learners need first: neither route materializes all query-key pairs.",
+    "paperReuse": "Rejected because both arXiv records use the limited perpetual non-exclusive distribution license, which does not grant third-party adaptation rights. No paper or deck figure, prose, example, coordinates, data, or layout is reused.",
+    "noVisual": "Rejected because the prose gives two equations but requires readers to mentally infer different contraction orders and different compressed axes while tracking four matrix dimensions."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 108,
+        "insight": "Introduces the quadratic n-by-n attention matrix as the long-context bottleneck and separates exact I/O optimization from methods that change the mathematics."
+      },
+      {
+        "page": 109,
+        "insight": "Covers sequence packing, an orthogonal utilization technique that retains block-diagonal dense attention and therefore does not explain linear-attention factorization."
+      },
+      {
+        "page": 110,
+        "insight": "Explains FlashAttention as an exact tiled reordering that avoids storing the full matrix in HBM but still computes every query-key pair, providing the key contrast with approximation."
+      },
+      {
+        "page": 111,
+        "insight": "Presents sparse attention as selecting fewer token pairs, the immediately preceding alternative to approximating the dense operator."
+      },
+      {
+        "page": 112,
+        "insight": "The exact target slide states Linformer's n-to-k sequence projection and Performer's random-feature reassociation, including the n-by-k and r-by-d intermediates. It is text-only and omits Performer's explicit normalization denominator."
+      },
+      {
+        "page": 113,
+        "insight": "Moves to speculative decoding, marking the end of the sub-quadratic-attention neighborhood and adding no factorization detail."
+      }
+    ],
+    "notes": "The complete 214-page local PDF was text-indexed page by page for attention, self-attention, low-rank, Linformer, Performer, kernel, random feature, and sub-quadratic terminology. Pages 108-113 were read as the complete local optimization neighborhood, and pages 111-113 were rendered and visually inspected. Page 112 is the only slide that covers Linformer or Performer. Its dense text establishes useful scope but provides no spatial tensor trace. No deck image, wording, equation layout, coordinates, or visual composition is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Linformer: Self-Attention with Linear Complexity",
+        "url": "https://arxiv.org/abs/2006.04768",
+        "usage": "Used as the primary source for projecting keys and values along the sequence dimension from n positions to k positions and for the resulting linear dependence on sequence length.",
+        "license": "The arXiv record specifies the perpetual non-exclusive distribution license, which grants arXiv distribution rights but does not establish third-party figure adaptation permission. No figure, prose, data, or layout is reused."
+      },
+      {
+        "title": "Rethinking Attention with Performers",
+        "url": "https://arxiv.org/abs/2009.14794",
+        "usage": "Used as the primary source for FAVOR+ positive random features, right-to-left reassociation, the smaller feature summary, and the normalization term required to approximate softmax attention.",
+        "license": "The arXiv record specifies the perpetual non-exclusive distribution license, so public access is not treated as permission to adapt figures. No figure, prose, data, or layout is reused."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that the perpetual non-exclusive distribution license limits reuse by parties other than arXiv and that public availability alone is not adaptation permission.",
+        "license": "The policy is cited only to document the conservative licensing decision; no policy text, image, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that Linformer and Performer are both linear in n for different structural reasons. Linformer shrinks the token axis before scoring, so scores are n by k. Performer maps vectors to r random features and contracts keys with values first, producing an r by d numerator summary plus an r by 1 normalizer; each transformed query then reads those summaries. The article's original Performer equation omitted this denominator, so the implementation corrects it. The visual is an original shape trace, and labels, contraction order, panel headings, and a crossed-out n-by-n matrix carry all meaning without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected the exact six-page optimization neighborhood and rendered the target slide with its immediate boundaries, then checked both primary papers and their arXiv licensing before selecting an original two-panel tensor-shape trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "linear-attention-two-escape-routes"
+    ],
+    "accessibility": "Each SVG panel has a linked title and detailed description that names every input, intermediate shape, operation order, and output. Headings, labels, arrows, dashed bypasses, and an explicitly crossed-out n-by-n matrix make the lesson independent of color. The established two-panel primitive stacks below 640 CSS pixels; each SVG uses a 320-unit viewBox with no minimum width, theme tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette and keep the figure together."
+  }
+}
