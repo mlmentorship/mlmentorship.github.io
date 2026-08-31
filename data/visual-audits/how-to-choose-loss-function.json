@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Separate the training loss that elicits a predictive quantity from the deployment rule that converts that prediction into a cost-sensitive action.",
-  "mediumRationale": "A compact two-rail Mermaid flow is the smallest medium that separates estimation from decision-making while preserving their connection through held-out evaluation. One rail maps the required prediction to a compatible loss; the other maps calibrated predictions and deployment costs to an action rule. This teaches why a metric, class imbalance, and an error cost are related inputs but not interchangeable names for a loss.",
+  "mediumRationale": "A two-rail Mermaid flow is the smallest medium that separates estimation from decision-making while preserving their connection through held-out evaluation. One rail maps the required prediction to a compatible loss; the other maps calibrated predictions and deployment costs to an action rule. A scrollable narrow-screen canvas preserves the six-line quantity-to-loss mapping without collapsing its text.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a relationship among prediction targets, training objectives, validation metrics, and deployment decisions rather than quantitative curve geometry.",
     "svg": "Rejected because fixed coordinates add maintenance and mobile-label risk without improving the causal sequence.",
@@ -81,6 +81,6 @@
     "visualIds": [
       "loss-estimation-vs-decision"
     ],
-    "accessibility": "The Mermaid diagram provides a specific accessible title and a complete description of both rails. Every box names its role, arrow direction carries sequence, dashed feedback denotes held-out validation, and explicit labels distinguish training from deployment without relying on color. The narrow top-to-bottom layout keeps all six quantity-to-loss mappings in one vertically stacked card rather than shrinking a wide fan-out; the established compact Mermaid primitive therefore remains readable at 390 CSS pixels, with shared dark-mode theming and print-safe rendering."
+    "accessibility": "The rendered learning title and Mermaid diagram provide a visible question, a specific accessible title, and a complete description of both rails. Every box names its role, arrow direction carries sequence, dashed feedback denotes held-out validation, and explicit labels distinguish training from deployment without relying on color. The established wide primitive keeps text above 21 pixels at an exact 390 CSS pixel viewport and supplies start/end scroll captures; print removes the minimum width so the complete graph fits. Shared theme variables preserve dark-mode and print contrast."
   }
 }

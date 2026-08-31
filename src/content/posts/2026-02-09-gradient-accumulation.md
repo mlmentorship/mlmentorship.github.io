@@ -53,7 +53,8 @@ Key points:
 			<title id="gradient-accumulation-svg-title">Gradient and parameter state across four accumulated micro-batches</title>
 			<desc id="gradient-accumulation-svg-desc">Four numbered micro-batches run from left to right using the same parameter value theta t. Each backward pass adds one quarter of its gradient to the gradient buffer, which progresses from g1 over 4 to the sum of g1 through g4 over 4. A vertical boundary follows the fourth pass. Only then does optimizer step change the parameters from theta t to theta t plus 1, after which zero grad clears the buffer.</desc>
 			<defs>
-				<marker id="gradient-accumulation-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="viz-arrow-forward" d="M0 0 L10 5 L0 10 Z"></path></marker>
+				<marker id="arrow-forward" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="viz-arrow-forward" d="M0,0 L8,4 L0,8 Z"></path></marker>
+				<marker id="arrow-backward" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="viz-arrow-backward" d="M0,0 L8,4 L0,8 Z"></path></marker>
 			</defs>
 			<text class="viz-axis-label" x="18" y="24">FORWARD + BACKWARD ON FOUR EQUAL-SIZED MICRO-BATCHES</text>
 			<g aria-label="Four sequential micro-batches">

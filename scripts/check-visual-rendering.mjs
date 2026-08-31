@@ -378,6 +378,38 @@ try {
                 Number.parseFloat(getComputedStyle(label).fontSize) * renderedWidth / viewBoxWidth
               ).filter(Number.isFinite);
             });
+            const unresolvedSvgReferences = svgElements.flatMap((svg, svgIndex) => {
+              const ids = new Set([...svg.querySelectorAll('[id]')].map((element) => element.id));
+              const missing = new Set();
+              for (const element of [svg, ...svg.querySelectorAll('*')]) {
+                const style = getComputedStyle(element);
+                const candidates = [
+                  style.markerStart,
+                  style.markerMid,
+                  style.markerEnd,
+                  style.clipPath,
+                  style.filter,
+                  style.maskImage,
+                  style.fill,
+                  style.stroke,
+                  ...element.getAttributeNames().map((name) => element.getAttribute(name)),
+                ].filter(Boolean);
+                for (const candidate of candidates) {
+                  for (const match of candidate.matchAll(/url\(([^)]+)\)/g)) {
+                    const target = match[1].trim().replace(/^["']|["']$/g, '');
+                    const hash = target.lastIndexOf('#');
+                    if (hash < 0) continue;
+                    const id = target.slice(hash + 1);
+                    if (!ids.has(id)) missing.add(id);
+                  }
+                }
+                for (const name of ['href', 'xlink:href']) {
+                  const reference = element.getAttribute(name);
+                  if (reference?.startsWith('#') && !ids.has(reference.slice(1))) missing.add(reference.slice(1));
+                }
+              }
+              return [...missing].map((id) => 'svg ' + (svgIndex + 1) + ': #' + id);
+            });
             const rangeWidth = (element) => {
               if (!element) return 0;
               const range = document.createRange();
@@ -418,6 +450,7 @@ try {
               rawCaptionMath: captionText.split('$').length > 2 || captionText.includes(String.fromCharCode(92)),
               captionGlyphWidth: rangeWidth(caption),
               clippedText,
+              unresolvedSvgReferences,
               printMinWidths: svgElements.map((svg) => getComputedStyle(svg).minWidth),
             });
           }));
@@ -449,6 +482,9 @@ try {
             throw new Error(`${label} lost SVG accessibility markup`);
           }
           if (details.clippedText.length) throw new Error(`${label} has text outside its viewBox: ${details.clippedText.join(', ')}`);
+          if (details.unresolvedSvgReferences.length) {
+            throw new Error(`${label} has unresolved SVG references: ${details.unresolvedSvgReferences.join(', ')}`);
+          }
           if (mode.media === 'print' && details.printMinWidths.some((width) => width !== '0px')) {
             throw new Error(`${label} retains an SVG minimum width in print`);
           }

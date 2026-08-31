@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Trace how evidence, claim-level verification, and consequence determine whether a generated answer is published, retried, refused, or reviewed by a human.",
-  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that shows retrieval as one imperfect layer, claim-level support as a separate release gate, consequence-aware escalation, and an out-of-band evaluation loop. Labelled branches make the operational decisions explicit while reusing the site's responsive themed diagram primitives.",
+  "mediumRationale": "A top-to-bottom Mermaid flow is the smallest medium that shows retrieval as one imperfect layer, claim-level support as a separate release gate, consequence-aware escalation, and an out-of-band evaluation loop. Labelled branches make the operational decisions explicit while a scrollable canvas preserves readable node text on narrow screens.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a decision architecture with labelled gates, branching outcomes, and a feedback loop rather than quantitative geometry.",
     "svg": "Rejected because fixed coordinates would add maintenance without improving a categorical system flow that Mermaid already expresses accessibly and responsively.",
@@ -91,6 +91,6 @@
     "visualIds": [
       "hallucination-claim-release-gates"
     ],
-    "accessibility": "The Mermaid block provides a specific accessible title and a complete description of the evidence, claim-support, and consequence gates and every route to publish, retry, refuse, or human review. Direct branch labels, action verbs, node shapes, and solid versus dashed paths preserve all meaning without color. Every node uses the established viz-compact class so the graph has no forced minimum width at 390 CSS pixels; shared Mermaid theme variables provide dark-mode and print contrast, and the static source remains meaningful without interaction."
+    "accessibility": "The rendered learning title and Mermaid block provide a visible question, a specific accessible title, and a complete description of the evidence, claim-support, and consequence gates and every route to publish, retry, refuse, or human review. Direct branch labels, action verbs, node shapes, and solid versus dashed paths preserve all meaning without color. The established wide primitive keeps text above 12 pixels at an exact 390 CSS pixel viewport and supplies start/end scroll captures; print removes the minimum width so the full graph fits. Shared Mermaid theme variables provide dark-mode and print contrast, and the static source remains meaningful without interaction."
   }
 }

@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Trace how product objectives and human judgments calibrate scalable offline scoring, then use production evidence and drift to decide whether to trust or rebuild the evaluation system.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that turns the article's evaluation ingredients into a closed measurement loop. Labelled branches distinguish human grounding, automated scale, release evidence, and production validity, while the return edge makes eval maintenance part of the system rather than an afterthought.",
+  "mediumRationale": "A Mermaid flowchart is the smallest medium that turns the article's evaluation ingredients into a closed measurement loop. Labelled branches distinguish human grounding, automated scale, release evidence, and production validity, while the return edge makes eval maintenance part of the system rather than an afterthought. A scrollable narrow-screen canvas preserves the long evidence labels.",
   "mediumComparison": {
     "mermaid": "Selected because the core lesson is a sequence of evidence transformations and a feedback loop. The established renderer supplies labelled edges, accessible source, responsive layout, theme support, and print behavior.",
     "svg": "Rejected because there is no quantitative geometry to preserve. A custom SVG would reproduce flowchart semantics with more fixed-position text and weaker narrow-screen adaptation.",
@@ -98,6 +98,6 @@
     "visualIds": [
       "llm-eval-calibration-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete title and description. Numbered stages, explicit evidence labels, a decision question, solid forward edges, and a dashed mismatch-and-drift return path carry all meaning without color. The top-to-bottom graph uses short labels and no wide-layout marker for readability at 390 CSS pixels; established Mermaid theme tokens provide dark-mode and print contrast."
+    "accessibility": "The rendered learning title and Mermaid source provide a visible question plus a complete accessible title and description. Numbered stages, explicit evidence labels, a decision question, solid forward edges, and a dashed mismatch-and-drift return path carry all meaning without color. The established wide primitive keeps text above 20 pixels at an exact 390 CSS pixel viewport and supplies start/end scroll captures; print removes the minimum width so the full graph fits. Shared Mermaid theme tokens provide dark-mode and print contrast."
   }
 }
