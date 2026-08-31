@@ -64,7 +64,7 @@ $$
 		<g class="viz-node-label">
 			<text x="60" y="64">z₁</text><text x="140" y="64">z₂</text><text x="220" y="64">z₃</text><text x="300" y="64">z₄</text>
 		</g>
-		<text class="viz-axis-label" x="14" y="144">OBSERVED</text>
+		<text class="viz-axis-label" x="14" y="144">OBS.</text>
 		<path d="M60 73V118M140 76V118M220 73V118M300 73V118" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#hmm-factorization-arrow)"></path>
 		<g class="viz-label" text-anchor="middle">
 			<text x="60" y="94">p(x₁|z₁)</text><text x="140" y="94">p(x₂|z₂)</text><text x="220" y="94">p(x₃|z₃)</text><text x="300" y="94">p(x₄|z₄)</text>

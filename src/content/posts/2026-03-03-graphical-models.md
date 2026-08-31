@@ -71,8 +71,8 @@ This formalism explains the famous explaining-away phenomenon: conditioning on a
 			<text class="viz-node-label" x="298" y="55">B</text>
 			<path d="M160 50H202M238 50H280" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
 			<path d="M195 46L202 50L195 54ZM273 46L280 50L273 54Z" style="fill:var(--viz-edge)"></path>
-			<text class="viz-callout" x="181" y="81" text-anchor="middle">ACTIVE PATH</text>
-			<text class="viz-label" x="248" y="81" text-anchor="middle">A and B may depend</text>
+			<text class="viz-callout" x="142" y="81" text-anchor="middle">ACTIVE PATH</text>
+			<text class="viz-label" x="271" y="81" text-anchor="middle">A and B may depend</text>
 			<path class="viz-gridline" d="M18 96H342"></path>
 			<text class="viz-label" x="18" y="125">Observe M</text>
 			<circle class="viz-node" cx="142" cy="122" r="18"></circle>

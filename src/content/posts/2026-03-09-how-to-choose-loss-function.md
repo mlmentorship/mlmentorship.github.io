@@ -58,7 +58,7 @@ flowchart TB
 	class O,V,C viz-neutral
 	class K viz-state
 	class A viz-output
-	class Q viz-wide
+	class Q viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> go down the training rail first: name the statistical quantity you need, then choose a loss that elicits it. Only after checking held-out predictions should you enter the deployment rail, where calibration, costs, constraints, and capacity choose the action. A metric can send you back to revise the surrogate, but it is not automatically a differentiable loss. Original synthesis informed by <a href="https://doi.org/10.1198/016214506000001437">Gneiting and Raftery on proper scoring rules</a>, <a href="https://doi.org/10.1214/aoms/1177703732">Huber on robust location</a>, and <a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn's threshold guidance</a>.</p>

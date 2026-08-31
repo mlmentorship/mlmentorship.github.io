@@ -54,7 +54,7 @@ Choose from the available labeled audio, text-only domain data, latency target, 
 <figure class="learning-figure plot-panel" aria-labelledby="asr-boundaries-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="asr-boundaries-title">See which ASR knowledge sources can change without retraining the acoustic core.</p>
-	<svg viewBox="0 0 360 455" role="img" aria-labelledby="asr-boundaries-svg-title asr-boundaries-svg-desc">
+	<svg viewBox="0 0 360 468" role="img" aria-labelledby="asr-boundaries-svg-title asr-boundaries-svg-desc">
 		<title id="asr-boundaries-svg-title">Hybrid and end-to-end ASR adaptation boundaries</title>
 		<desc id="asr-boundaries-svg-desc">Two speech recognition paths receive audio and produce a transcript. The hybrid path passes acoustic scores into a decoder composed from HMM topology, a pronunciation lexicon, and a language model. Pronunciation and text updates enter separately and can be changed without retraining the acoustic model. The end-to-end path jointly trains an encoder and token model from paired audio and transcripts, then decodes tokens. Optional external language rescoring, contextual bias phrases, and endpointing still enter around this learned core. A final decision strip maps limited paired audio and explicit control toward hybrid systems, while abundant paired audio and simpler joint optimization favor end-to-end systems; production blends can combine both.</desc>
 		<defs><marker id="asr-boundary-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
@@ -112,7 +112,7 @@ Choose from the available labeled audio, text-only domain data, latency target, 
 		<text class="viz-callout" x="36" y="407">explicit control</text>
 		<text class="viz-callout" x="324" y="407" text-anchor="end">joint optimization</text>
 		<text class="viz-label" x="36" y="442">limited paired audio</text>
-		<text class="viz-label" x="180" y="442" text-anchor="middle">production blend</text>
+		<text class="viz-label" x="180" y="459" text-anchor="middle">production blend</text>
 		<text class="viz-label" x="324" y="442" text-anchor="end">abundant paired audio</text>
 	</svg>
 	<figcaption><strong>Read it this way:</strong> trace where new knowledge enters. In a hybrid system, pronunciation and domain-text changes can update the lexicon or language model behind an explicit decode boundary without retraining the acoustic model. An end-to-end system learns more of the audio-to-token mapping jointly from paired data, but production decoding can still add text-only rescoring, contextual biasing, and endpointing. Choose the boundary that matches your data and control needs; a blended system is a valid design, not a contradiction. Original schematic checked against <a href="https://kaldi-asr.org/doc/graph.html">Kaldi's HCLG documentation</a>, <a href="https://arxiv.org/abs/1508.01211">Listen, Attend and Spell</a>, and <a href="https://arxiv.org/abs/1211.3711">RNN-T</a>.</figcaption>

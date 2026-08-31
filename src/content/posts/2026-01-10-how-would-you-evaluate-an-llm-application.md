@@ -35,7 +35,6 @@ flowchart TB
 	class F,H viz-output
 	class G,I viz-warning
 	class A viz-tall
-	class A viz-wide
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> start with the product contract, not a metric. Human-scored representative cases ground the scalable checks and judge; those scorers provide fast offline evidence but only production can show whether the evidence predicts user outcomes. When production diverges or reveals a new failure, repair the cases and rubric, recalibrate, and rerun. Original synthesis checked against the primary <a href="https://arxiv.org/abs/2306.05685">LLM-as-judge study</a>, <a href="https://developers.openai.com/api/docs/guides/evaluation-best-practices">OpenAI's evaluation guidance</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
 
