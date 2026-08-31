@@ -27,6 +27,48 @@ $$
 
 Expand it. You will find this equals $\langle \phi(x), \phi(x') \rangle$ where $\phi$ maps to a $\binom{d+2}{2}$-dimensional space of monomials up to degree 2. Computing $\phi$ explicitly is $O(d^2)$ memory and compute; computing $k$ is $O(d)$.
 
+<!-- visual:kernel-trick-exact-shortcut -->
+<figure class="learning-figure plot-panel" aria-labelledby="kernel-shortcut-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="kernel-shortcut-title">Which work does the kernel trick skip?</p>
+	<svg viewBox="0 0 360 430" role="img" aria-labelledby="kernel-shortcut-svg-title kernel-shortcut-svg-desc">
+		<title id="kernel-shortcut-svg-title">Two exact routes to the same degree-two polynomial-kernel value</title>
+		<desc id="kernel-shortcut-svg-desc">For x equals 2 comma 1 and x prime equals 1 comma 3, the explicit route constructs two six-dimensional feature vectors and dots them to get 4 plus 12 plus 9 plus 4 plus 6 plus 1 equals 36. The kernel shortcut stays in two dimensions: x dot x prime equals 5, so open parenthesis 5 plus 1 close parenthesis squared also equals 36. The shortcut returns exactly the same scalar without materializing either feature vector.</desc>
+		<defs>
+			<marker id="kernel-shortcut-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-edge)"></path></marker>
+			<marker id="kernel-shortcut-focus-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
+		</defs>
+		<rect class="viz-plot-bg" x="8" y="8" width="344" height="233" rx="5"></rect>
+		<text class="viz-axis-label" x="20" y="31">EXPLICIT FEATURE ROUTE · EXACT, BUT MORE WORK</text>
+		<rect class="viz-node viz-node--input" x="73" y="44" width="214" height="36" rx="4"></rect>
+		<text class="viz-callout" x="180" y="67" text-anchor="middle">x = (2, 1) · x′ = (1, 3)</text>
+		<path d="M180 80V98" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#kernel-shortcut-arrow)"></path>
+		<rect class="viz-node" x="28" y="101" width="304" height="66" rx="4"></rect>
+		<text class="viz-axis-label" x="180" y="120" text-anchor="middle">MATERIALIZE BOTH 6-D VECTORS</text>
+		<text class="viz-label" x="180" y="140" text-anchor="middle">φ(x) = [4, 2√2, 1, 2√2, √2, 1]</text>
+		<text class="viz-label" x="180" y="157" text-anchor="middle">φ(x′) = [1, 3√2, 9, √2, 3√2, 1]</text>
+		<path d="M180 167V184" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#kernel-shortcut-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="51" y="187" width="258" height="39" rx="4"></rect>
+		<text class="viz-callout" x="180" y="203" text-anchor="middle">φ(x) · φ(x′)</text>
+		<text class="viz-node-value" x="180" y="219">4 + 12 + 9 + 4 + 6 + 1 = 36</text>
+		<rect class="viz-plot-bg" x="8" y="253" width="344" height="169" rx="5"></rect>
+		<text class="viz-axis-label" x="20" y="276">KERNEL ROUTE · SAME SCALAR, NO FEATURE VECTORS</text>
+		<rect class="viz-node viz-node--input" x="25" y="291" width="122" height="46" rx="4"></rect>
+		<text class="viz-callout" x="86" y="309" text-anchor="middle">stay in R²</text>
+		<text class="viz-node-value" x="86" y="327">x · x′ = 5</text>
+		<path d="M147 314H176" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5;stroke-dasharray:5 3;marker-end:url(#kernel-shortcut-focus-arrow)"></path>
+		<text class="viz-label" x="162" y="303" text-anchor="middle">skip φ</text>
+		<rect class="viz-node viz-node--focus" x="179" y="291" width="156" height="46" rx="4"></rect>
+		<text class="viz-callout" x="257" y="309" text-anchor="middle">k(x, x′)</text>
+		<text class="viz-node-value" x="257" y="327">(5 + 1)² = 36</text>
+		<path d="M257 337V357" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5;marker-end:url(#kernel-shortcut-focus-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="77" y="360" width="206" height="42" rx="4"></rect>
+		<text class="viz-callout" x="180" y="378" text-anchor="middle">same inner product: 36</text>
+		<text class="viz-node-value" x="180" y="395">exact shortcut, not an approximation</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> compare the routes from top to bottom. The explicit route builds two six-coordinate vectors and dots them. The kernel route keeps the original two coordinates, computes <var>x</var> · <var>x</var>′ = 5, and returns (5 + 1)² = 36 directly. Both routes produce exactly the same inner product; the trick skips materializing φ(<var>x</var>) and φ(<var>x</var>′), not mathematical accuracy. This is an original worked schematic checked against <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's SVM tutorial</a> and the <a href="https://scikit-learn.org/stable/modules/svm.html#svm-kernels">scikit-learn SVM formulation</a>.</figcaption>
+</figure>
+
 For the **RBF kernel** $k(x, x') = \exp(-\|x - x'\|^2 / 2\sigma^2)$, the implicit feature space is infinite-dimensional. You cannot compute $\phi$ explicitly even in principle.
 
 ## The Gram matrix

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "kernel-methods-and-the-kernel-trick",
+  "article": "src/content/posts/2026-05-07-kernel-methods-and-the-kernel-trick.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how a polynomial kernel replaces two explicit high-dimensional feature mappings and their dot product with one low-dimensional calculation that returns exactly the same scalar.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place the expensive explicit route and the kernel shortcut side by side, preserve their shared inputs and equal output, and attach a checkable degree-two numerical example to both paths.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show the bypass but cannot compactly align the numerical feature-map terms that prove both routes return the same inner product.",
+    "svg": "Selected because fixed geometry can show two parallel computational routes, a crossed-out materialization step, and the same scalar endpoint without requiring runtime JavaScript.",
+    "semanticHtml": "Rejected because a table can verify the arithmetic but weakens the central spatial lesson that the kernel route bypasses two larger feature vectors.",
+    "interaction": "Rejected because changing the points or polynomial degree would add controls and state without improving the single invariant the reader needs first: both routes compute the same scalar.",
+    "paperReuse": "Rejected because the learning objective does not require a paper-specific result or source figure. Public access to the reviewed sources is not treated as reuse permission, and no source artwork, data, wording, coordinates, or layout is copied.",
+    "noVisual": "Rejected because prose and equations state the equality but require readers to mentally hold two computation graphs at once: explicitly map both inputs and then dot them, or evaluate the kernel directly and never materialize either mapped vector."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 20,
+        "insight": "Frames machine-learning algorithms as linear-algebra operations and uses the word kernel for Fourier and wavelet operators; this is useful neighboring context but a different use of kernel from a positive-semidefinite similarity function."
+      },
+      {
+        "page": 21,
+        "insight": "The dedicated Kernel trick panel states that a directly computed similarity can bypass an intractable feature map, identifies dot-product-only algorithms as the enabling condition, and mentions Gaussian kernels' infinite-dimensional feature space. It is the deck's closest treatment of the article's hardest mental model."
+      },
+      {
+        "page": 22,
+        "insight": "The immediately following Kernel PCA panel applies the substitution to a covariance-style computation, confirming how downstream algorithms consume feature-space relationships without explicit nonlinear coordinates."
+      },
+      {
+        "page": 23,
+        "insight": "The next slide broadens the idea to similarity matrices in clustering and Gaussian processes, where kernel values become an affinity or covariance matrix rather than an explicit feature representation."
+      },
+      {
+        "page": 24,
+        "insight": "The neighboring K-nearest-neighbor slide returns to explicit distance calculations and embedding-space comparisons, providing contrast with the kernel trick rather than another kernel construction."
+      },
+      {
+        "page": 112,
+        "insight": "The later Performer panel uses a feature-map approximation to reassociate attention products; it is relevant to the article's attention section but addresses explicit random features for scaling, not the exact classical shortcut."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for kernel, kernel trick, feature space, support vector, SVM, similarity, Gram, Mercer, and positive-semidefinite terminology. Pages 20-24 were inspected as the complete immediate neighborhood around the sole dedicated classical kernel-trick treatment on page 21. Pages 29 and 36 only mention polynomial-kernel intuition in factorization machines and hinge loss in SVMs; pages 108 and 111 use kernel in the GPU or sparse-attention sense. Page 112 is the only later feature-map kernel mechanism. No deck image, wording, equation layout, code, coordinates, or visual composition is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Tutorial on Support Vector Machines for Pattern Recognition",
+        "url": "https://link.springer.com/article/10.1023/A:1009715923555",
+        "usage": "Used as an authoritative peer-reviewed tutorial for the dual representation in terms of training-example dot products, replacement by kernels, and the positive-semidefinite condition.",
+        "license": "The publisher record does not establish a permissive license for adapting figures. No figure, example, prose, data, or layout is reused; only the mathematical mechanism informs the original construction."
+      },
+      {
+        "title": "Gaussian Processes for Machine Learning, Chapter 4: Covariance Functions",
+        "url": "https://gaussianprocess.org/gpml/chapters/RW4.pdf",
+        "usage": "Used as an authoritative textbook source for covariance functions as Gram matrices and for the feature-space interpretation of kernels, including potentially infinite feature expansions.",
+        "license": "The book is available online for personal use, but that access is not treated as artwork-reuse permission. No textbook figure, prose, worked example, or visual arrangement is copied."
+      },
+      {
+        "title": "scikit-learn User Guide: SVM mathematical formulation and kernels",
+        "url": "https://scikit-learn.org/stable/modules/svm.html#svm-kernels",
+        "usage": "Used as official implementation documentation to verify that the SVC dual depends on the positive-semidefinite matrix with entries K(x_i, x_j), where K equals the feature-space inner product.",
+        "license": "scikit-learn documentation is distributed under the project's BSD license, but no documentation image, prose, code, or example is reused. The source is cited only to cross-check implementation semantics."
+      },
+      {
+        "title": "scikit-learn User Guide: Kernel Approximation",
+        "url": "https://scikit-learn.org/stable/modules/kernel_approximation.html",
+        "usage": "Used as official documentation to check the article's distinction between exact implicit kernels and approximate explicit feature maps used to scale linear estimators.",
+        "license": "The documentation is BSD-licensed, but the visual does not adapt its examples, code, figures, text, or layout."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that public availability alone does not determine permission to adapt a paper figure because arXiv submissions can carry different licenses.",
+        "license": "The policy is cited only to document the conservative licensing decision; no policy text, artwork, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the trick does not approximate the feature-space inner product: for a valid kernel it evaluates exactly the same scalar while skipping both explicit feature vectors. The original example uses x = (2, 1), x' = (1, 3), and phi(z) = [z1^2, sqrt(2) z1 z2, z2^2, sqrt(2) z1, sqrt(2) z2, 1], for which phi(x) dot phi(x') = 4 + 12 + 9 + 4 + 6 + 1 = 36 and k(x, x') = (x dot x' + 1)^2 = (5 + 1)^2 = 36. The equality is algebraically exact. Path position, explicit route labels, a dashed bypass, and identical textual endpoints carry the lesson without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact kernel neighborhood plus the later attention treatment, then checked an authoritative SVM tutorial, a standard Gaussian-process textbook, official scikit-learn documentation, and source-licensing guidance before selecting an original exact-equivalence SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "kernel-trick-exact-shortcut"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that narrate both routes, all inputs, the explicit six-term dot product, the direct kernel calculation, and their equal output. Route headings, line position, a dashed shortcut, equations, and duplicate 36 endpoints make meaning independent of color. A single 360-unit viewBox with no minimum width scales within the established plot-panel primitive at 390 CSS pixels; existing theme variables provide dark-mode contrast, and shared print rules switch to a light high-contrast palette and keep the figure together."
+  }
+}
