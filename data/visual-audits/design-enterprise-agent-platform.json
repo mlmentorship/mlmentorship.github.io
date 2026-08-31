@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-enterprise-agent-platform",
+  "article": "src/content/posts/2026-08-29-design-enterprise-agent-platform.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Distinguish the control plane's authorization and version decisions from execution work and from the evidence plane's durable record of decisions and effects.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that can separate three architectural planes while showing their necessary cross-plane contracts: control constrains execution before a side effect, and execution emits evidence at each boundary. The lesson is relational rather than geometric, and the established compact Mermaid primitive supplies responsive, themed, and printable rendering.",
+  "mediumComparison": {
+    "mermaid": "Selected because subgraphs and labelled solid and dashed edges directly express plane ownership, the governed execution path, and independent evidence emission without introducing a new rendering primitive.",
+    "svg": "Rejected because fixed coordinates add maintenance cost without teaching a quantitative, geometric, or shape-based relationship.",
+    "semanticHtml": "Rejected because a responsibility table can compare the planes but cannot show that control constrains the live path while evidence is emitted alongside it rather than after it.",
+    "interaction": "Rejected because stepping through a fixed architecture adds controls and hidden state without changing the inference the reader must make.",
+    "paperReuse": "Rejected because the authoritative sources describe individual contracts rather than this article-specific synthesis. No source figure, layout, wording, or artwork is copied.",
+    "noVisual": "Rejected because the long article names many services and responsibilities; prose alone makes it easy to mistake the control, execution, and evidence planes for three independent inventories instead of one enforceable action path."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 104,
+        "insight": "The instruction-tuning slide explains how models become responsive to instructions but provides no external authorization, execution, or evidence boundary."
+      },
+      {
+        "page": 105,
+        "insight": "The Toolformer slide defines a model that decides which API to call, when to call it, and which arguments to pass; it covers proposal behavior but not delegated authority, policy enforcement, durable execution, or audit evidence."
+      },
+      {
+        "page": 106,
+        "insight": "The neighboring LLM-data slide moves to pretraining corpora and scaling, adding no agent-platform mechanism."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design-interview slide separates requirements, data, algorithms, evaluation, and experimentation, but does not identify shared platform planes."
+      },
+      {
+        "page": 162,
+        "insight": "The production-considerations slide asks about global launch, standard platforms, deployment paths, ownership, privacy, testing, monitoring, and rollback; it is the closest broad platform checklist but gives no enforced request path."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring system-design walkthrough covers requirements and data flow, not agent identity, authorization, tool effects, or evidence."
+      },
+      {
+        "page": 164,
+        "insight": "The next walkthrough slide connects model choice to offline and online experimentation but does not distinguish control from execution."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide covers goals, user experience, constraints, evaluation, personalization, and time to deployment without an agent governance boundary."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers storage, privacy, user-data care, and representation, which are neighboring governance concerns but not an action-control path."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide discusses baselines, distributed training, and scale rather than runtime authority or side effects."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide covers model gating, monitoring, updates, inference placement, privacy, and interpretability, but not delegated authority or durable tool outcomes."
+      },
+      {
+        "page": 169,
+        "insight": "The adjacent Rules of Machine Learning slide emphasizes infrastructure, monitoring, policy layers, ownership, launch decisions, and training-serving skew; it provides operating context but no three-plane agent architecture."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for agents, Toolformer, tools, workflows, control planes, authorization, permissions, retries, idempotency, audit, observability, platforms, production, serving, deployment, and system design. Pages 104-106 and 161-169 were read as the two complete relevant neighborhoods. Page 105 stops at model-selected API calls, while pages 161-169 provide generic ML system and production checklists. No slide supplies the article's control/execution/evidence split, and no deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NIST Special Publication 800-207: Zero Trust Architecture",
+        "url": "https://doi.org/10.6028/NIST.SP.800-207",
+        "usage": "Used to verify the separation of policy decision and policy enforcement responsibilities, per-request access decisions, and least-privilege access rather than implicit trust.",
+        "license": "NIST states that employee-created works are generally not subject to U.S. copyright and grants broad reuse rights where it may hold foreign copyright, while warning that third-party material can differ. No NIST prose, figure, or layout is reused."
+      },
+      {
+        "title": "RFC 8693: OAuth 2.0 Token Exchange",
+        "url": "https://www.rfc-editor.org/rfc/rfc8693.html",
+        "usage": "Used as the standards source for keeping the requesting actor's identity distinct from the subject on whose behalf it acts and for expressing bounded delegation in a token exchange.",
+        "license": "RFC 8693 is governed by the IETF Trust Legal Provisions. The implementation cites the delegation semantics only; it reproduces no RFC prose, diagram, code component, or layout."
+      },
+      {
+        "title": "Temporal Workflow Execution overview",
+        "url": "https://docs.temporal.io/workflow-execution",
+        "usage": "Used as official durable-execution documentation to verify persisted workflow state, event-history replay, and recovery after worker or infrastructure failure.",
+        "license": "No clear page-level grant for reusing documentation figures was identified. No Temporal prose, figure, product architecture, example, or visual arrangement is copied."
+      },
+      {
+        "title": "OpenTelemetry Semantic Conventions for Generative AI",
+        "url": "https://github.com/open-telemetry/semantic-conventions-genai",
+        "usage": "Used as the official observability specification to verify that agent and model operations can emit portable spans, events, and metrics rather than treating a vendor runtime as the evidence contract.",
+        "license": "The repository is Apache-2.0 licensed, but the visual does not copy or adapt its schemas, prose, diagrams, or examples; the source is used only to validate the evidence-plane concept."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the boundary among the planes. The control plane determines which identities, versions, policies, and contracts may govern a call; the execution plane performs model, memory, and tool work under those decisions; the evidence plane durably records requests, decisions, attempts, and outcomes. The visual therefore avoids implying that the event store authorizes actions, that the model receives tool credentials, or that a control database should carry every sensitive payload."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant neighborhoods, then checked an IETF delegation standard and official NIST, Temporal, and OpenTelemetry sources before selecting an original three-plane boundary map."
+  },
+  "implementation": {
+    "visualIds": [
+      "enterprise-agent-three-plane-boundary"
+    ],
+    "accessibility": "The Mermaid source provides an accessible title and a full text description. Plane headings, direct node labels, arrow labels, numbered path nodes, subgraph boundaries, and solid versus dashed edges carry the meaning without color. A top-to-bottom compact layout removes the normal Mermaid minimum width at 390 CSS pixels, established theme tokens preserve dark-mode contrast, and shared print rules provide a light page-safe rendering."
+  }
+}
