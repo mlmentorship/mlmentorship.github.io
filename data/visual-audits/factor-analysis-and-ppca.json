@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "factor-analysis-and-ppca",
+  "article": "src/content/posts/2026-05-31-factor-analysis-and-ppca.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate cross-feature covariance created by shared latent factors from feature-specific variance created by diagonal noise, then identify the noise constraint for FA, PPCA, and PCA.",
+  "mediumRationale": "A deterministic stacked SVG is the smallest medium that can align the generative graph with its marginal covariance matrices. Solid shared-factor paths explain why WW transpose has off-diagonal entries; one-to-one dashed noise paths explain why Psi is diagonal; the final row changes only the diagonal-noise constraint.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart could show latent-to-observed edges but cannot compactly align those edges with exact full-versus-diagonal covariance structure.",
+    "svg": "Selected because one deterministic, phone-width coordinate system can connect a latent-variable graph, two three-by-three matrices, and the FA-to-PPCA-to-PCA noise constraints.",
+    "semanticHtml": "Rejected because a table already summarizes the three noise models in the article but does not reveal why shared factors generate off-diagonal covariance while independent noise cannot.",
+    "interaction": "Rejected because varying noise magnitudes would add controls without improving the prerequisite inference about which covariance entries each model component can create.",
+    "paperReuse": "Rejected because the primary sources contain broader derivations and figures, no reviewed figure matches this graph-to-matrix learning objective, and access to the papers was not treated as figure-reuse permission. No source figure, data, geometry, prose, or layout is copied.",
+    "noVisual": "Rejected because the equation WW transpose plus Psi is compact but asks readers to mentally connect latent paths to individual covariance cells and then hold three noise constraints in memory."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 22,
+        "insight": "Defines PCA through the sample covariance matrix, maximum projected variance, and minimum reconstruction error, supplying the classical baseline that PPCA recovers."
+      },
+      {
+        "page": 71,
+        "insight": "Introduces linear factor models as independent latent factors plus noise, names factor analysis and PCA as variants determined by the prior and noise choices, and connects linear-Gaussian latent models to EM."
+      },
+      {
+        "page": 72,
+        "insight": "Directly distinguishes factor analysis diagonal per-variable noise from PPCA equal conditional variances, states the zero-noise PCA limit, and connects PPCA maximum likelihood to eigendecomposition and EM."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for factor analysis, probabilistic PCA, principal components, latent factors, low rank, and covariance. Exact relevant pages 22, 71, and 72 were extracted and inspected with their neighbors. Page 21 covers linear classifiers and kernels; page 23 moves to clustering and Gaussian-process covariance; page 70 covers linear-chain CRFs; page 73 moves to latent Dirichlet allocation. The deck contains the relevant definitions but no graph-to-covariance decomposition, so no slide screenshot, figure, wording, geometry, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Probabilistic Principal Component Analysis",
+        "url": "https://doi.org/10.1111/1467-9868.00196",
+        "usage": "Used as the primary PPCA source to verify the latent linear-Gaussian model, covariance WW transpose plus sigma squared I, maximum-likelihood principal subspace, EM formulation, and PCA relationship.",
+        "license": "The journal article is copyrighted and no permissive figure-reuse grant was established. No figure, empirical data, wording, equation rendering, or layout is copied; the implementation is an original schematic of the mathematical model."
+      },
+      {
+        "title": "Probabilistic Principal Component Analysis — Microsoft Research publication record",
+        "url": "https://www.microsoft.com/en-us/research/publication/probabilistic-principal-component-analysis/",
+        "usage": "Used as an authoritative author-affiliated record to cross-check the paper's probabilistic latent-variable framing, maximum-likelihood principal axes, and iterative EM option.",
+        "license": "The public publication record does not grant general reuse rights for article figures. No Microsoft or paper artwork, prose, results, or visual structure is reused."
+      },
+      {
+        "title": "The EM Algorithm for Mixtures of Factor Analyzers",
+        "url": "https://www.cs.toronto.edu/~hinton/absps/tr-96-1.pdf",
+        "usage": "Used as a primary technical source for factor analysis as a low-dimensional latent-variable model of high-dimensional covariance and for EM parameter estimation.",
+        "license": "The author-hosted technical report establishes access, not a permissive figure license. No source figure, data, wording, or layout is reproduced."
+      },
+      {
+        "title": "General Intelligence, Objectively Determined and Measured",
+        "url": "https://doi.org/10.2307/1412107",
+        "usage": "Used as the foundational primary source for the distinction between variation attributable to a common factor and variation specific to individual measurements.",
+        "license": "The historical journal paper is not assumed to carry permissive reuse rights. The visual uses modern linear-Gaussian notation and original geometry, with no copied text, table, data, or figure."
+      }
+    ],
+    "notes": "The hardest mental model in the complete article is how the generative claim becomes the marginal covariance structure: shared latent factors can couple different observed features, whereas conditionally independent feature noise contributes only to each feature's own variance. The SVG uses symbolic labels only and no paper-specific empirical values. Solid versus dashed paths, one-to-many versus one-to-one topology, matrix position, zeros, and direct model labels preserve every distinction without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected pages 21-23 and 70-73, reviewed primary FA and PPCA sources, and selected an original graph-to-covariance decomposition rather than duplicating the article's comparison table."
+  },
+  "implementation": {
+    "visualIds": [
+      "factor-model-covariance-decomposition"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description covering every latent path, covariance contribution, and model constraint. Shared effects use solid one-to-many arrows; unique noise uses dashed one-to-one arrows; full and diagonal matrices contain direct symbolic labels and explicit zeros. The 360-unit viewBox scales fluidly with no width floor or horizontal scroll at 390 CSS pixels. Established theme variables provide dark-mode contrast, and shared print tokens force a light high-contrast canvas and keep the figure together."
+  }
+}
