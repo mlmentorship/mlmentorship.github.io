@@ -33,6 +33,57 @@ Correct, no depth. You've heard the rule, not the reason.
 
 This is L5. You've named the prior interpretation, given the geometric intuition, and made a practitioner recommendation.
 
+<!-- visual:l1-l2-first-contact-geometry -->
+<figure class="learning-figure" aria-labelledby="regularization-contact-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="regularization-contact-title">Where does the first loss contour touch the penalty boundary?</p>
+	<div class="visual-grid--two" role="group" aria-label="Matched coefficient-space comparison of L1 and L2 constrained optima">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 270" role="img" aria-labelledby="l1-contact-panel-title l1-contact-panel-desc">
+				<title id="l1-contact-panel-title">L1 contact at an axis corner</title>
+				<desc id="l1-contact-panel-desc">A diamond-shaped equal-L1 boundary is centered at the origin of a w1 and w2 coefficient plane. A circular loss contour centered on the shared unconstrained minimum first touches the diamond at its right corner on the w1 axis. The marked constrained optimum therefore has positive w1 and w2 exactly zero.</desc>
+				<rect class="viz-plot-bg" x="8" y="27" width="284" height="231" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="17">L1 · CORNER CAN ZERO A COEFFICIENT</text>
+				<path class="viz-axis" d="M30 145H276M130 238V43"></path>
+				<text class="viz-label" x="274" y="139" text-anchor="end">w1</text>
+				<text class="viz-label" x="137" y="51">w2</text>
+				<path d="M130 80L195 145L130 210L65 145Z" style="fill:var(--viz-focus-bg);fill-opacity:.45;stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
+				<text class="viz-callout" x="64" y="226">|w1| + |w2| ≤ t</text>
+				<circle cx="240" cy="115" r="54.1" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:5 3"></circle>
+				<text class="viz-label" x="205" y="70">loss contour</text>
+				<path d="M240 106L243 112L250 113L245 118L246 125L240 122L234 125L235 118L230 113L237 112Z" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.8"></path>
+				<text class="viz-label" x="229" y="101" text-anchor="end">no penalty</text>
+				<circle class="viz-operating-point" cx="195" cy="145" r="6"></circle>
+				<path class="viz-operating-guide" d="M195 145V212"></path>
+				<text class="viz-callout" x="202" y="191">first contact</text>
+				<text class="viz-axis-label" x="202" y="207">w2 = 0</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 270" role="img" aria-labelledby="l2-contact-panel-title l2-contact-panel-desc">
+				<title id="l2-contact-panel-title">L2 contact away from both axes</title>
+				<desc id="l2-contact-panel-desc">A circular equal-L2 boundary is centered at the origin of the same w1 and w2 coefficient plane. A loss contour centered on the same unconstrained minimum first touches the smooth boundary between the axes. The marked constrained optimum therefore keeps both w1 and w2 nonzero.</desc>
+				<rect class="viz-plot-bg" x="8" y="27" width="284" height="231" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="17">L2 · SMOOTH CONTACT IS USUALLY DENSE</text>
+				<path class="viz-axis" d="M30 145H276M130 238V43"></path>
+				<text class="viz-label" x="274" y="139" text-anchor="end">w1</text>
+				<text class="viz-label" x="137" y="51">w2</text>
+				<circle cx="130" cy="145" r="65" style="fill:var(--viz-focus-bg);fill-opacity:.45;stroke:var(--viz-focus-stroke);stroke-width:2.5"></circle>
+				<text class="viz-callout" x="64" y="226">w1² + w2² ≤ t</text>
+				<circle cx="240" cy="115" r="49" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2;stroke-dasharray:5 3"></circle>
+				<text class="viz-label" x="205" y="70">loss contour</text>
+				<path d="M240 106L243 112L250 113L245 118L246 125L240 122L234 125L235 118L230 113L237 112Z" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.8"></path>
+				<text class="viz-label" x="229" y="101" text-anchor="end">no penalty</text>
+				<circle class="viz-operating-point" cx="193" cy="128" r="6"></circle>
+				<path class="viz-operating-guide" d="M193 128V212"></path>
+				<text class="viz-callout" x="200" y="184">first contact</text>
+				<text class="viz-axis-label" x="200" y="200">w1, w2 ≠ 0</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> imagine a loss contour expanding from the star until it first reaches the allowed coefficient region. With the L1 diamond, an axis-aligned corner can be the first contact, making one coefficient exactly zero. With the smooth L2 circle, contact is usually between the axes, so both coefficients shrink but remain nonzero. The geometry explains a tendency, not a guarantee that every L1 solution is sparse. This is an original schematic checked against <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://hastie.su.domains/ElemStatLearn/"><cite>The Elements of Statistical Learning</cite></a>.</figcaption>
+</figure>
+
 ## What an L6 answer sounds like
 
 > "...a few more things worth saying:

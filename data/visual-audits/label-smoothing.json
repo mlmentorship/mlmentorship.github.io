@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "label-smoothing",
+  "article": "src/content/posts/2026-02-24-label-smoothing.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why one-hot cross-entropy keeps rewarding larger correct-class logit gaps while label-smoothed cross-entropy has a finite optimum at the smoothed target probability.",
+  "mediumRationale": "A deterministic SVG loss slice is the smallest medium that shows the opposite behavior near complete confidence: one-hot loss keeps falling toward zero, while smoothed loss bottoms out at the target and then rises.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show target construction but cannot show where either objective stops rewarding confidence.",
+    "svg": "Selected: two calculated curves on a shared probability axis make the finite smoothed optimum and the one-hot boundary optimum directly inspectable.",
+    "semanticHtml": "Rejected: a target-probability table would show the 92/2/2/2/2 allocation but not how loss changes on either side of the optimum.",
+    "interaction": "Rejected: sliders for class count or epsilon add controls without improving the core fixed-example comparison.",
+    "paperReuse": "Rejected: the primary papers inform the equations and side effects, but no source figure has verified reuse permission or presents this exact symmetric five-class loss slice.",
+    "noVisual": "Rejected: prose states that confidence is capped, but the distinction between a finite probability optimum and an endlessly growing one-hot logit gap is the article's hardest mental model."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 32,
+        "insight": "The classification-loss section divider establishes the relevant local deck neighborhood."
+      },
+      {
+        "page": 33,
+        "insight": "Relates categorical cross-entropy to target and model distributions and notes its simple target-minus-output derivative, but discusses only ordinary labels."
+      },
+      {
+        "page": 35,
+        "insight": "Covers softmax confidence, temperature, negative log-likelihood, and numerical stability, but not smoothed targets or their finite optimum."
+      },
+      {
+        "page": 39,
+        "insight": "Identifies neural-network overconfidence and calibration methods, providing downstream motivation but no label-smoothing mechanism."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 local deck pages for label smoothing, smoothing, confidence penalties, soft targets, one-hot labels, and overconfidence. No slide directly mentions label smoothing. The complete classification-loss neighborhood on pages 32-39 was extracted and reviewed; pages 33, 35, and 39 are the closest conceptual context. No deck screenshot, plot, layout, code, or wording is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Rethinking the Inception Architecture for Computer Vision",
+        "url": "https://arxiv.org/abs/1512.00567",
+        "usage": "Used as the primary source for mixing a one-hot label with a uniform prior, the resulting positive lower bound for every target class, the cross-entropy decomposition, and the prevention of unbounded correct-versus-incorrect logit gaps.",
+        "license": "The arXiv record provides public access but does not establish general permission to reuse figures or prose. No paper figure, experimental data, wording, or layout is copied; the plotted five-class loss slice is an original calculation."
+      },
+      {
+        "title": "When Does Label Smoothing Help?",
+        "url": "https://arxiv.org/abs/1906.02629",
+        "usage": "Used as a primary source for the representation-clustering and knowledge-distillation side effects, especially the loss of example-specific similarity information in a label-smoothed teacher.",
+        "license": "Public arXiv availability is not treated as figure-reuse permission. No source figure, CIFAR or MNIST result, data, prose, or visual structure is reproduced."
+      },
+      {
+        "title": "PyTorch CrossEntropyLoss documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+        "usage": "Used as official documentation to verify that label_smoothing mixes the ground truth with a uniform distribution and that cross-entropy accepts class-probability targets.",
+        "license": "PyTorch documentation accompanies the BSD-3-Clause-licensed project. No documentation text, example, source code, or figure is copied."
+      }
+    ],
+    "notes": "The hardest mental model is the location of the optimum, not merely moving epsilon mass. The original plot fixes K = 5 and epsilon = 0.1, so the smoothed target is [0.92, 0.02, 0.02, 0.02, 0.02]. Along a symmetric prediction slice, each wrong class receives (1 - p_c)/4. Hard loss is -log(p_c); smoothed loss is -0.92 log(p_c) - 0.08 log((1 - p_c)/4). The latter is minimized at p_c = 0.92, where the prediction equals the target. At p_c = 0.99, hard loss falls to 0.010 while smoothed loss rises to 0.489 because the four wrong-class predictions have been pushed below their 0.02 targets. One-hot cross-entropy is bounded below by zero; the diverging quantity is the correct-class logit gap needed to approach its unattainable p_c = 1 optimum."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and reviewed the full classification-loss neighborhood, checked the originating paper, the primary side-effect study, and official PyTorch behavior, then verified every plotted loss value."
+  },
+  "implementation": {
+    "visualIds": [
+      "label-smoothing-finite-confidence-optimum"
+    ],
+    "accessibility": "The SVG has a linked title and complete description with the target allocation, formulas, minimum, and two comparison values. Direct curve labels, solid versus dashed strokes, a vertical guide, a diamond minimum, and printed values carry the lesson without color. The compact 360-unit viewBox has no minimum width or horizontal scrolling at 390 CSS pixels. Established theme variables preserve dark-mode contrast, and shared print rules provide a light high-contrast palette and keep the figure together."
+  }
+}

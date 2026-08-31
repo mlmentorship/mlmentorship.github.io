@@ -105,6 +105,57 @@ Pairs near the top or with large relevance differences receive larger updates. L
 
 Lambda methods align updates with a ranking metric, but they still optimize a surrogate. Results depend on the chosen metric, cutoff $K$, label gains, and position discount.
 
+<!-- visual:lambdarank-swap-impact-weight -->
+<figure class="learning-figure" aria-labelledby="lambdarank-swap-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="lambdarank-swap-title">Why does LambdaRank push harder on the same ordering error near the top?</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 500" role="img" aria-labelledby="lambdarank-swap-svg-title lambdarank-swap-svg-desc">
+			<title id="lambdarank-swap-svg-title">The same pairwise error receives different LambdaRank weights at different ranks</title>
+			<desc id="lambdarank-swap-svg-desc">Two hypothetical rankings contain the same four items with relevance grades 3, 2, 1, and 0. In both, item B with grade 2 scores 0.6 and incorrectly ranks above item A with grade 3 scoring 0.4. When B and A occupy ranks 1 and 2, correcting their order changes NDCG by 0.157. When they occupy ranks 3 and 4, the same correction changes NDCG by 0.030. RankNet supplies the same pairwise signal because the score gap is unchanged. LambdaRank multiplies by swap impact, making the top correction about 5.3 times stronger.</desc>
+			<defs><marker id="lambdarank-swap-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+			<rect class="viz-plot-bg" x="4" y="4" width="352" height="492" rx="5"></rect>
+			<text class="viz-axis-label" x="20" y="27">SAME QUERY LABELS · SAME WRONG SCORE GAP</text>
+			<text class="viz-label" x="20" y="45">A: grade 3, score 0.4 · B: grade 2, score 0.6</text>
+			<rect class="viz-node" x="16" y="62" width="328" height="170" rx="5"></rect>
+			<text class="viz-callout" x="30" y="84">CASE 1 · WRONG PAIR AT RANKS 1 AND 2</text>
+			<text class="viz-axis-label" x="30" y="103">CURRENT RANK</text>
+			<rect class="viz-node viz-node--focus" x="30" y="112" width="176" height="25" rx="3"></rect>
+			<text class="viz-callout" x="40" y="129">1 · B · grade 2 · score 0.6</text>
+			<rect class="viz-node viz-node--input" x="30" y="141" width="176" height="25" rx="3"></rect>
+			<text class="viz-callout" x="40" y="158">2 · A · grade 3 · score 0.4</text>
+			<rect class="viz-node" x="30" y="170" width="176" height="20" rx="3"></rect>
+			<text class="viz-label" x="40" y="184">3 · C · grade 1</text>
+			<rect class="viz-node" x="30" y="194" width="176" height="20" rx="3"></rect>
+			<text class="viz-label" x="40" y="208">4 · D · grade 0</text>
+			<path d="M218 118 C246 118 246 158 218 158" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#lambdarank-swap-arrow)"></path>
+			<text class="viz-axis-label" x="250" y="120">SWAP 1 ↔ 2</text>
+			<text class="viz-callout" x="250" y="148">|ΔNDCG|</text>
+			<text class="viz-node-gradient" x="290" y="174">0.157</text>
+			<text class="viz-label" x="250" y="198">large top impact</text>
+			<rect class="viz-node" x="16" y="244" width="328" height="170" rx="5"></rect>
+			<text class="viz-callout" x="30" y="266">CASE 2 · SAME WRONG PAIR AT RANKS 3 AND 4</text>
+			<text class="viz-axis-label" x="30" y="285">CURRENT RANK</text>
+			<rect class="viz-node" x="30" y="294" width="176" height="20" rx="3"></rect>
+			<text class="viz-label" x="40" y="308">1 · C · grade 1</text>
+			<rect class="viz-node" x="30" y="318" width="176" height="20" rx="3"></rect>
+			<text class="viz-label" x="40" y="332">2 · D · grade 0</text>
+			<rect class="viz-node viz-node--focus" x="30" y="342" width="176" height="25" rx="3"></rect>
+			<text class="viz-callout" x="40" y="359">3 · B · grade 2 · score 0.6</text>
+			<rect class="viz-node viz-node--input" x="30" y="371" width="176" height="25" rx="3"></rect>
+			<text class="viz-callout" x="40" y="388">4 · A · grade 3 · score 0.4</text>
+			<path d="M218 348 C246 348 246 388 218 388" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#lambdarank-swap-arrow)"></path>
+			<text class="viz-axis-label" x="250" y="350">SWAP 3 ↔ 4</text>
+			<text class="viz-callout" x="250" y="378">|ΔNDCG|</text>
+			<text class="viz-node-value" x="290" y="400">0.030</text>
+			<rect class="viz-node viz-node--output" x="16" y="428" width="328" height="52" rx="5"></rect>
+			<text class="viz-callout" x="180" y="450" text-anchor="middle">LambdaRank = pair signal × swap impact</text>
+			<text class="viz-node-value" x="180" y="469">same RankNet signal · top correction gets 5.3× the weight</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> hold the pair fixed: B outranks A by the same 0.2 score gap in both cases, so RankNet supplies the same pairwise pressure. LambdaRank then asks what correcting that pair would do to NDCG. With gain <code>2<sup>rel</sup> - 1</code> and log discount, swapping ranks 1 and 2 changes NDCG by 0.157, while swapping ranks 3 and 4 changes it by 0.030. The top error therefore receives about 5.3× the metric weight; LambdaRank reweights a surrogate rather than differentiating NDCG directly. Original calculation checked against the <a href="https://proceedings.neurips.cc/paper/2006/hash/af44c4c56f385c43f2529f9b1b018f6a-Abstract.html">LambdaRank paper</a> and <a href="https://www.microsoft.com/en-us/research/publication/from-ranknet-to-lambdarank-to-lambdamart-an-overview/">Microsoft Research overview</a>.</figcaption>
+</figure>
+
 ## Surrogate mismatch
 
 A lower training loss does not guarantee a better product ranking.

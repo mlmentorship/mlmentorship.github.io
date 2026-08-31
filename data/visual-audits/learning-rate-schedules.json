@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "slug": "learning-rate-schedules",
+  "article": "src/content/posts/2026-01-05-learning-rate-schedules.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Read a linear-warmup-plus-cosine schedule at its three defining checkpoints: the peak at warmup end W, 55% of peak halfway through the decay interval, and the 10% floor at training end T.",
+  "mediumRationale": "One deterministic SVG is the smallest medium that can map the piecewise formula to a continuous schedule while keeping W, the midpoint of W-to-T, T, and their normalized learning rates spatially aligned.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson is quantitative curve geometry rather than entities or branching flow. Automatic graph routing cannot faithfully encode the cosine shape or the midpoint value.",
+    "svg": "Selected because a fixed viewBox can show the linear segment, cosine segment, phase boundary, normalized checkpoints, and 10% floor in one static, inspectable plot.",
+    "semanticHtml": "Rejected because a table can list checkpoint values but cannot show the smooth endpoint behavior or that the cosine fraction is measured over the W-to-T interval.",
+    "interaction": "Rejected because changing warmup length or floor would introduce controls and hidden states before the reader understands the default schedule. The single normalized example fully establishes the intended invariant and prints without JavaScript.",
+    "paperReuse": "Rejected because the SGDR paper and framework documentation contain related schedule plots, but no source figure with a permissive reuse grant was established for this site. The curve, labels, coordinates, and composition are independently constructed from the cited equation.",
+    "noVisual": "Rejected because the prose gives the equation but requires readers to mentally translate two differently normalized intervals into one curve and to infer the non-obvious 55% midpoint when the floor is 10%."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 45,
+        "insight": "The preceding optimization slide introduces loss surfaces, random search, and analytic gradients, establishing the section boundary before optimizer and schedule material."
+      },
+      {
+        "page": 46,
+        "insight": "The main optimization slide compares SGD, momentum, adaptive methods, and learning-rate annealing, but discusses stepwise reduction when validation stalls rather than warmup followed by cosine decay."
+      },
+      {
+        "page": 47,
+        "insight": "The adjacent RAdam slide describes early adaptive-optimizer variance and an adaptive warmup mechanism, supporting the need for startup care without plotting a fixed linear warmup or cosine phase."
+      },
+      {
+        "page": 48,
+        "insight": "The following slide moves to sharpness-aware minimization, marking the end of the direct optimizer neighborhood."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide asks whether loss behavior indicates a learning rate that is too high or too low, but does not define a schedule."
+      },
+      {
+        "page": 60,
+        "insight": "The sanity-check slide compares qualitative loss curves under different rates and gives an update-to-parameter ratio heuristic, focusing on diagnosis rather than schedule geometry."
+      },
+      {
+        "page": 61,
+        "insight": "The baseline slide recommends Adam at 3e-4 and warns not to trust inherited decay defaults, but contains no warmup-plus-cosine construction."
+      },
+      {
+        "page": 63,
+        "insight": "The tuning slide recommends log-scale learning-rate search; it concerns selecting a rate rather than varying it across one training horizon."
+      },
+      {
+        "page": 102,
+        "insight": "The preceding BERT slide discusses transformer pretraining objectives and architecture, setting the immediate boundary before the transformer-mechanism slide."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer slide is the closest schedule source: it explicitly says training commonly needs warm-up and cool-down and defines both phases qualitatively, but provides no formula, plotted checkpoints, or 10% floor."
+      },
+      {
+        "page": 104,
+        "insight": "The following GPT-X slide moves to scaling and instruction tuning, ending the local schedule discussion."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed for learning rate, warmup, warm-up, cosine, schedule, annealing, decay, and cool-down. Directly relevant matches occur on pages 46-47, 59-61, 63, and 103. Pages 45-48 were inspected as the complete optimizer neighborhood, pages 58-64 as the practical training and tuning neighborhood, and pages 102-104 around the transformer schedule mention. Page 103 is the only slide that places warm-up and cool-down together, but no slide teaches the normalized cosine checkpoints used in this article.",
+    "license": "The deck states no general reuse license and includes externally derived material. It is treated as review-only; no screenshot, wording, artwork, curve, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "SGDR: Stochastic Gradient Descent with Warm Restarts",
+        "url": "https://arxiv.org/abs/1608.03983",
+        "usage": "Used as the primary source for the closed-form cosine annealing equation between a maximum and minimum learning rate.",
+        "license": "The arXiv record is publicly accessible, but public access is not treated as permission to adapt its figures. No paper figure, empirical curve, prose, values, or composition is copied."
+      },
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary transformer source for a schedule with a linear warmup phase followed by decay, while noting that the paper itself uses inverse-square-root decay rather than cosine.",
+        "license": "Used for technical verification only. No paper figure, prose, equation layout, or numeric recipe is reproduced."
+      },
+      {
+        "title": "Why Warmup the Learning Rate? Underlying Mechanisms and Improvements",
+        "url": "https://arxiv.org/abs/2406.09405",
+        "usage": "Used as a recent primary study to verify that warmup can improve stability through interacting sharpness and optimizer dynamics, avoiding an overly narrow claim that one Adam denominator alone explains warmup.",
+        "license": "Used for conceptual verification only. No experimental result, figure, prose, or layout is reused."
+      },
+      {
+        "title": "PyTorch CosineAnnealingLR documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html",
+        "usage": "Used as official framework documentation to cross-check the closed-form schedule, eta_min floor, horizon parameter, and no-restart interpretation.",
+        "license": "Documentation is cited only for public scheduler semantics. No documentation code, plot, prose, branding, or styling is copied."
+      },
+      {
+        "title": "MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies",
+        "url": "https://arxiv.org/abs/2404.06395",
+        "usage": "Used as the primary source for the warmup-stable-decay alternative and its ability to begin a terminal decay from stable-stage checkpoints.",
+        "license": "Used for factual verification only. No paper plot, data, prose, or schedule layout is adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how the piecewise time normalization maps to shape. Warmup uses its own interval from the run start to W and reaches eta_max exactly at W. Cosine then resets its fraction to (t-W)/(T-W): at the halfway point of that decay interval, cos(pi/2) = 0, so eta = eta_min + 0.5(eta_max-eta_min). With eta_min = 0.1 eta_max, that is 0.55 eta_max, not one half of peak and not 0.1. At T, cos(pi) = -1 and the rate equals the 0.1 floor. The figure is a normalized mathematical construction, not a measured loss curve or a claim that one schedule dominates every workload."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact optimizer, practical-training, and transformer neighborhoods, then checked the primary cosine, transformer, warmup, and WSD papers plus official PyTorch scheduler semantics before choosing an original normalized schedule plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "warmup-cosine-three-checkpoints"
+    ],
+    "accessibility": "The SVG has a linked title and description that state both phases, axes, all three checkpoint values, and the 10% floor. Warmup and decay are directly labelled; W uses a circle, the decay midpoint a diamond, and T a square, so meaning does not depend on color. The 360-unit viewBox has no minimum width and uses short labels sized for 390 CSS pixels. Existing plot tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette and keep the figure together."
+  }
+}

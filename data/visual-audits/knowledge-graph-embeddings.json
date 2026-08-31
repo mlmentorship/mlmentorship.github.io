@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "knowledge-graph-embeddings",
+  "article": "src/content/posts/2026-05-31-knowledge-graph-embeddings.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why DistMult must assign the same score to an antisymmetric relation and its reversed triple, while the complex conjugate in ComplEx removes that forced equality.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can keep one directed fact fixed while aligning the two models' swapped score expressions. The side-by-side arrows and algebra expose an impossibility caused by the operator, not embedding width, without adding controls or repeating the article's broader capability table.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a graph can show the true and reversed edges, but Mermaid cannot align the exact score expressions closely enough to prove why one swap is invariant and the other is not.",
+    "svg": "Selected: deterministic coordinates align identical entity swaps, direct edge labels, and the two score pairs so the algebraic constraint is visible and checkable.",
+    "semanticHtml": "Rejected: a table could compare the equations accessibly, but it would not keep the true directed fact and false reversed fact spatially stable across both operators; the article already contains the appropriate broad comparison table.",
+    "interaction": "Rejected: changing entities, dimensions, or relation types would add state without changing the universal commutativity argument and would weaken print completeness.",
+    "paperReuse": "Rejected: the local deck and reviewed papers contain related tensor, model, and relation-pattern figures, but no external figure is needed. Figure reuse permission was not relied upon; the entities, edge example, layout, wording, and paired derivation are original.",
+    "noVisual": "Rejected: the prose states that DistMult is symmetric and ComplEx is not, but readers still have to mentally perform the entity swap and see why additional dimensions cannot change the equality."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 117,
+        "insight": "The preceding slide covers autoregressive language-model rescoring and numerical log-sum computation. It establishes the neighboring topic boundary but contains no graph, relation operator, or link-prediction comparison."
+      },
+      {
+        "page": 118,
+        "insight": "The only direct knowledge-graph-embedding slide introduces RESCAL adjacency-tensor factorization and HolE circular convolution. Its tensor-factorization artwork does not compare TransE, DistMult, ComplEx, or RotatE and does not explain symmetry under swapping head and tail."
+      },
+      {
+        "page": 119,
+        "insight": "The following slide is only the Automatic Speech Recognition section title, confirming that the deck's knowledge-graph treatment ends on page 118."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed for knowledge graph, link prediction, TransE, DistMult, ComplEx, RotatE, RESCAL, HolE, relation, symmetry, and antisymmetry. Page 118 was the only direct knowledge-graph-embedding match; pages 117-119 were then rendered and visually inspected as the complete local neighborhood. The page 118 tensor illustration has no visible license statement, so neither it nor the slide layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Translating Embeddings for Modeling Multi-relational Data",
+        "url": "https://proceedings.neurips.cc/paper/2013/hash/1cecc7a77928ca8133fa24680a88d2f9-Abstract.html",
+        "usage": "Used as the primary TransE paper to verify the relation-as-translation operator and ranking of valid triples by distance.",
+        "license": "The proceedings page is used only to verify the model definition. No paper prose, result, example, layout, or artwork is copied, and figure reuse permission is not relied upon."
+      },
+      {
+        "title": "Embedding Entities and Relations for Learning and Inference in Knowledge Bases",
+        "url": "https://arxiv.org/abs/1412.6575",
+        "usage": "Used as the primary DistMult source to verify the diagonal bilinear score whose real scalar products are invariant when head and tail are swapped.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established. No paper prose, data, numerical result, example, or artwork is reproduced."
+      },
+      {
+        "title": "Complex Embeddings for Simple Link Prediction",
+        "url": "https://proceedings.mlr.press/v48/trouillon16.html",
+        "usage": "Used as the primary ComplEx paper to verify the Hermitian product, the role of complex conjugation, and the ability to model symmetric and antisymmetric relations.",
+        "license": "The PMLR page is used to verify the mechanism and claims only. No paper figure, prose, dataset, result, example, or layout is copied; the implementation does not depend on reuse rights."
+      },
+      {
+        "title": "RotatE: Knowledge Graph Embedding by Relational Rotation in Complex Space",
+        "url": "https://arxiv.org/abs/1902.10197",
+        "usage": "Used as the primary RotatE source to cross-check the article's operator and its comparison of symmetry, antisymmetry, inversion, and composition across knowledge-graph embedding families.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established. No relation-pattern table, figure, prose, data, or visual encoding is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that representational limits follow from score algebra rather than model width. For DistMult, sum_i h_i r_i t_i equals sum_i t_i r_i h_i because multiplication of real scalars commutes in every dimension, so a true antisymmetric fact and its reversal must tie. ComplEx instead scores Re(sum_i h_i r_i conjugate(t_i)); swapping head and tail moves the conjugate, so equality is no longer an identity and the true direction may outrank its reversal. The original Ada-parent_of-Ben example isolates this one invariant; the existing article table retains the broader four-model comparison."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and visually inspected pages 117-119, then checked the primary TransE, DistMult, ComplEx, and RotatE sources before selecting an original score-swap proof."
+  },
+  "implementation": {
+    "visualIds": [
+      "kge-antisymmetry-score-swap"
+    ],
+    "accessibility": "Each panel has a linked heading plus an SVG title and detailed description that state the true edge, false reversed edge, equations, and inference. Solid versus dashed arrows, arrow direction, direct true/false labels, written equations, and explicit outcomes preserve the lesson without color. The established two-panel primitive stacks below 640 pixels; each SVG uses a compact 300-unit viewBox with no minimum width or horizontal scroll, and its smallest edge labels are explicitly raised to 11 SVG units for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette and keep the figure together."
+  }
+}

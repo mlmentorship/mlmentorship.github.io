@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "slug": "killed-ml-project",
+  "article": "src/content/posts/2026-07-10-killed-ml-project.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Decide whether to fund one more bounded experiment or stop and redirect by comparing only forward evidence, opportunity cost, and transition value rather than past spend.",
+  "mediumRationale": "A semantic decision ledger is the smallest medium that keeps the excluded sunk-cost argument above two forward-looking alternatives. It turns the article's checklist into a repeatable comparison without inventing numeric project economics.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is a side-by-side comparison under one rule, not a long process graph, and branches would make the decision look more mechanical than the evidence permits.",
+    "svg": "Rejected: fixed drawing geometry adds no quantitative shape; semantic headings and grouped evidence express the comparison more readably and reflow safely at 390 CSS pixels.",
+    "semanticHtml": "Selected: a labelled ledger separates inadmissible past spend from the evidence for one bounded iteration versus stopping and redirecting, while preserving native text wrapping and reading order.",
+    "interaction": "Rejected: editable costs, probabilities, or thresholds would imply a universal scoring formula and require project-specific data that the interview prompt does not supply.",
+    "paperReuse": "Rejected: the reviewed sources establish sunk-cost bias, opportunity cost, and disciplined decision analysis, but no source figure matches this article's stop-and-redirect judgment. Public access is not treated as permission to reproduce artwork.",
+    "noVisual": "Rejected: prose names the right ingredients but does not make the key exclusion visible—past investment explains the situation yet must not count as evidence for future investment—or align both alternatives under one rule."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 160,
+        "insight": "The ML Design divider introduces the relevant project-design neighborhood but contains no decision criteria."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview asks whether the product needs ML, sizes business value, names downstream impacts, and makes time, compute, headcount, and available systems explicit project constraints."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for strong ML and non-ML baselines, cost-benefit analysis, experiment outcomes, business-impact estimates, success criteria, and a future roadmap—the forward evidence needed to reassess a project."
+      },
+      {
+        "page": 163,
+        "insight": "The neighboring content-feed example clarifies requirements for a project already selected; it does not address whether continued investment is justified."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide requires model-gating tests, monitoring, update procedures, and low-confidence handling, useful evidence about whether execution risk remains fixable."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring Rules of Machine Learning slide says to keep the first model simple, measure model deltas, stop spending on features when objectives are misaligned, and seek qualitatively new information when performance plateaus."
+      },
+      {
+        "page": 170,
+        "insight": "The Algorithms and Data Structures divider ends the local production neighborhood and adds no project continuation guidance."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider introduces the organizational neighborhood but contains no substantive decision guidance."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends facts-first dialogue, representing other parties' views, acknowledging setbacks, combining competing goals, and documenting follow-up—relevant to stopping a sponsored project without blame."
+      },
+      {
+        "page": 211,
+        "insight": "The DL Frameworks divider closes the leadership neighborhood without adding transition or portfolio guidance."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for project, decision, evidence, experiment, stop, sunk, redirect, portfolio, trade-off, resources, roadmap, and leadership terms. Pages 159-163, 168-170, and 209-211 were then read in full as the relevant neighborhoods. Pages 161, 162, 168, 169, and 210 contribute ingredients, but no slide separates sunk cost from forward value or compares another bounded iteration with stopping and redirecting reusable work. No deck image, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The Psychology of Sunk Cost",
+        "url": "https://www.sciencedirect.com/science/article/abs/pii/0749597885900494",
+        "usage": "Used as the primary experimental reference for the sunk-cost effect: prior investments can bias people toward continuing an endeavor even when those investments cannot change the future payoff.",
+        "license": "The 1985 Academic Press article is under standard Elsevier copyright and no permissive figure-reuse license was identified. No paper text, data, experiment, figure, or layout is reproduced."
+      },
+      {
+        "title": "NASA Systems Engineering Handbook, Section 6.8: Decision Analysis",
+        "url": "https://www.nasa.gov/reference/6-8-decision-analysis/",
+        "usage": "Used as official engineering guidance to verify defining measurable criteria, comparing all viable alternatives including doing nothing, reducing uncertainty only when it could change the decision, identifying a decision authority, and documenting rationale.",
+        "license": "The handbook section is a United States government work and is not subject to domestic copyright protection under 17 U.S.C. 105, subject to any separately identified third-party material. No NASA figure, wording, insignia, or layout is copied."
+      },
+      {
+        "title": "OpenStax Principles of Economics 3e, Section 2.1",
+        "url": "https://openstax.org/books/principles-economics-3e/pages/2-1-how-individuals-make-choices-based-on-their-budget-constraint",
+        "usage": "Used as an authoritative economics textbook to verify that opportunity cost is the value of the next-best alternative forgone, which makes redirected people and infrastructure part of the continuation decision.",
+        "license": "The 2026 textbook is licensed CC BY-NC-SA 4.0, with separate restrictions for OpenStax marks. The visual does not adapt its examples, figures, wording, or visual structure; the source is cited only for conceptual verification."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the counterfactual comparison at the stopping point. Money and effort already spent explain why the choice is emotionally and organizationally difficult, but cannot improve either alternative's future return. One more iteration is justified only when a named uncertainty could reverse the recommendation and a bounded test can resolve it cheaply. Otherwise the relevant comparison is continued expected value versus the next-best use of the same people and infrastructure, while preserving users, reusable assets, and learning during transition. The visual is an original synthesis and states no empirical effect size or universal scoring rule."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected three relevant slide neighborhoods, then checked primary sunk-cost research, official NASA decision-analysis guidance, and an authoritative economics textbook before selecting an original semantic decision ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "project-stop-forward-evidence-ledger"
+    ],
+    "accessibility": "The figure uses a linked learning question and a labelled group of native semantic sections. Past spend is explicitly labelled as context rather than decision evidence; both alternatives have textual conditions and actions; and the shared rule is written in the caption, so meaning does not depend on color or position. The established two-column primitive stacks to one column below 640 pixels with ordinary text wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, print switches to a light high-contrast palette, and the figure avoids JavaScript and external assets."
+  }
+}

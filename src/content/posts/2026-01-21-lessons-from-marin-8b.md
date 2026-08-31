@@ -28,6 +28,61 @@ The transferable lesson is that the decision to keep training and fold in change
 
 The prerequisite is observability. You can only react if you can see. Marin had per-domain eval losses, per-layer norm tracking, and a checkpoint cadence that let them roll back. Without those, the same reactive style would have produced a worse model, not a better one. This is also why their schedule choice matters: WSD-S (see [reference](/concepts/wsd-and-wsd-s/)) is designed for reactive pretraining, because you can probe the model's quality with short cooldowns without committing to a final schedule.
 
+<!-- visual:reactive-pretraining-evidence-loop -->
+<figure class="learning-figure plot-panel" aria-labelledby="reactive-pretraining-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="reactive-pretraining-title">What makes reactive pretraining controlled rather than improvised?</p>
+	<svg viewBox="0 0 360 560" role="img" aria-labelledby="reactive-pretraining-svg-title reactive-pretraining-svg-desc">
+		<title id="reactive-pretraining-svg-title">A checkpoint, probe, evidence, and decision loop for reactive pretraining</title>
+		<desc id="reactive-pretraining-svg-desc">A solid mainline reaches a recoverable checkpoint. Two dashed side branches start from that same checkpoint: a control cooldown with the current mix and a candidate cooldown changing one factor. Their per-domain losses, downstream task evaluations, and parameter norms feed one evidence bundle. A decision gate can continue unchanged, change one factor in the next phase, or restore the checkpoint. Only continue or an evidence-backed change advances the solid mainline; rollback loops back to the saved checkpoint.</desc>
+		<defs>
+			<marker id="reactive-loop-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-edge)"></path></marker>
+			<marker id="reactive-loop-focus-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
+			<marker id="reactive-loop-warning-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-warning-stroke)"></path></marker>
+		</defs>
+		<rect class="viz-plot-bg" x="8" y="8" width="344" height="544" rx="5"></rect>
+		<text class="viz-axis-label" x="22" y="30">SOLID = EXPENSIVE MAINLINE · DASHED = DISPOSABLE PROBE</text>
+		<rect class="viz-node viz-node--input" x="77" y="45" width="206" height="44" rx="4"></rect>
+		<text class="viz-callout" x="180" y="63" text-anchor="middle">1 · recoverable checkpoint</text>
+		<text class="viz-node-value" x="180" y="80">saved weights + optimizer + data state</text>
+		<path d="M180 89V111" style="fill:none;stroke:var(--viz-edge);stroke-width:2.5;marker-end:url(#reactive-loop-arrow)"></path>
+		<rect class="viz-node" x="45" y="114" width="270" height="47" rx="4"></rect>
+		<text class="viz-callout" x="180" y="132" text-anchor="middle">2 · name one question</text>
+		<text class="viz-node-value" x="180" y="150">new data mix? deeper cooldown? z-loss?</text>
+		<path d="M180 161V181M180 181H92V197M180 181H268V197" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#reactive-loop-focus-arrow)"></path>
+		<rect class="viz-node" x="20" y="200" width="144" height="58" rx="4"></rect>
+		<text class="viz-axis-label" x="92" y="218" text-anchor="middle">CONTROL PROBE</text>
+		<text class="viz-label" x="92" y="237" text-anchor="middle">same checkpoint</text>
+		<text class="viz-label" x="92" y="251" text-anchor="middle">current recipe</text>
+		<rect class="viz-node viz-node--focus" x="191" y="200" width="132" height="58" rx="4"></rect>
+		<text class="viz-axis-label" x="257" y="218" text-anchor="middle">CANDIDATE PROBE</text>
+		<text class="viz-label" x="257" y="237" text-anchor="middle">same checkpoint</text>
+		<text class="viz-label" x="257" y="251" text-anchor="middle">change one factor</text>
+		<path d="M92 258V280H180M257 258V280H180V297" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#reactive-loop-focus-arrow)"></path>
+		<rect class="viz-node" x="40" y="300" width="280" height="68" rx="4" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke)"></rect>
+		<text class="viz-callout" x="180" y="319" text-anchor="middle">3 · compare an evidence bundle</text>
+		<text class="viz-node-value" x="180" y="339">per-domain loss · downstream tasks</text>
+		<text class="viz-node-value" x="180" y="356">parameter norms · formatting checks</text>
+		<path d="M180 368V390" style="fill:none;stroke:var(--viz-edge);stroke-width:2.5;marker-end:url(#reactive-loop-arrow)"></path>
+		<path class="viz-node viz-node--focus" d="M180 393L274 430L180 467L86 430Z"></path>
+		<text class="viz-callout" x="180" y="425" text-anchor="middle">4 · evidence supports</text>
+		<text class="viz-node-value" x="180" y="442">a mainline change?</text>
+		<path d="M86 430H42V487" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#reactive-loop-arrow)"></path>
+		<path d="M180 467V487" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5;marker-end:url(#reactive-loop-focus-arrow)"></path>
+		<path d="M274 430H344V67H286" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#reactive-loop-warning-arrow)"></path>
+		<text class="viz-label" x="335" y="421" text-anchor="end">unsafe</text>
+		<text class="viz-label" x="335" y="437" text-anchor="end">or worse</text>
+		<rect class="viz-node" x="13" y="490" width="116" height="47" rx="4"></rect>
+		<text class="viz-callout" x="71" y="509" text-anchor="middle">continue</text>
+		<text class="viz-node-value" x="71" y="526">current recipe</text>
+		<rect class="viz-node viz-node--output" x="139" y="490" width="154" height="47" rx="4"></rect>
+		<text class="viz-callout" x="216" y="509" text-anchor="middle">advance mainline</text>
+		<text class="viz-node-value" x="216" y="526">with one justified change</text>
+		<text class="viz-axis-label" x="332" y="291" text-anchor="middle" transform="rotate(90 332 291)">ROLL BACK TO CHECKPOINT</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> preserve the solid mainline at a recoverable checkpoint, then branch short control and candidate probes from exactly the same state. Compare more than aggregate loss: domain losses, task evaluations, norms, and formatting checks must agree on the decision. Only evidence returns to the mainline; a worse or unsafe result follows the dashed rollback path. Marin's named phases were unplanned, but its checkpoints, microannealing runs, and diagnostics made adaptation inspectable rather than arbitrary. This is an original synthesis checked against the <a href="https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/">Marin 8B retrospective</a> and the <a href="https://arxiv.org/abs/2410.05192">WSD-S analysis</a>.</figcaption>
+</figure>
+
 ## 2. Z-loss is a regularizer on logit scale, not a stability hack
 
 Standard advice says "use z-loss if you see logit blowup." Marin's actual finding is sharper: z-loss is the only regularizer pressuring the logit scale, so you need it whenever the rest of your training pressure relaxes.

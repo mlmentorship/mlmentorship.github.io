@@ -142,6 +142,31 @@ Consider an enterprise agent program. A principal candidate can choose the share
 
 The contribution is a technical operating system for direction. It includes interfaces, decision rights, compatibility, incident authority, and evidence. A committee or vision statement does not provide these properties.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Distinguish company-wide reach from senior-principal leverage by tracing which decisions principal owners make independently, which conflicts cross a shared interface, and which evidence reopens the doctrine.</p>
+
+<!-- visual:senior-principal-delegated-coherence -->
+```mermaid
+flowchart TB
+	accTitle: Central approval compared with delegated senior-principal coherence
+	accDescr: In the central-approver anti-pattern, every domain decision goes through one candidate, creating a queue and making the direction depend on one person. Replacing approval with explicit boundaries leads to delegated coherence. A shared doctrine defines constraints, interfaces, and evidence that can reopen the direction. Principal owners for runtime, evaluation, and safety then make independent choices inside their domains. Only an interface conflict crosses into joint review, while external or outcome evidence can reopen the shared doctrine.
+	Bottleneck["REACH WITHOUT DELEGATION"] ==> Requests["Every domain decision"] ==> Approver["Candidate approves<br/>each choice"] ==> Queue["Queue grows<br/>succession is fragile"]
+	Queue -. "replace approvals<br/>with boundaries" .-> Coherence["DELEGATED COHERENCE"]
+	Coherence ==> Doctrine["Shared doctrine<br/>constraints · interfaces · reopen evidence"]
+	Doctrine ==> Owners["Principal owners<br/>runtime · evaluation · safety"]
+	Owners ==> Decisions["Independent choices<br/>inside domain boundaries"]
+	Decisions -. "cross-boundary<br/>change" .-> Review{"Interface conflict?<br/>joint review"}
+	Review -. "external or outcome evidence<br/>reopens doctrine" .-> Doctrine
+	class Bottleneck,Approver,Queue viz-warning
+	class Requests viz-input
+	class Coherence,Doctrine,Review viz-focus
+	class Owners viz-state
+	class Decisions viz-output
+	class Bottleneck,Requests,Approver,Queue,Coherence,Doctrine,Owners,Decisions,Review viz-compact
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> count the decisions that require the senior-principal candidate. In the first path, every choice queues behind one approver, so broad reach hides weak delegation. In the second, principal owners decide within explicit boundaries; only interface conflicts require joint review, and named evidence can reopen the shared doctrine. The higher-level signal is coherent independent leadership, not more approvals. Original synthesis informed by the <a href="https://dropbox.github.io/dbx-career-framework/">Dropbox Engineering Career Framework</a> and <a href="https://staffeng.com/guides/staff-archetypes/">StaffEng's Staff-plus archetypes</a>.</p>
+
 ### Senior-principal depth test
 
 An interviewer may ask:
