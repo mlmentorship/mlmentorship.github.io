@@ -257,8 +257,14 @@ The company safety floor is the subset no product can lower alone: controls cann
 
 ## Architecture
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how an already-authorized action can only retain or lose authority, then see how observed outcomes can reduce authority for the next action.</p>
+
+<!-- visual:agent-safety-authority-loop -->
 ```mermaid
 flowchart LR
+  accTitle: An independent safety control loop can only preserve or reduce action authority
+  accDescr: The existing agent runtime first sends a proposal through its authorized tool gateway, which creates a signed action envelope only inside existing permission. Deterministic policy, data provenance, learned monitors, cumulative impact, signed policy, and active breaker state feed an independent safety decision point. The decision may allow or narrow the action through confirmation and approval to the high-impact executor, or block and freeze through the circuit-breaker controller. Authoritative external systems report outcomes to post-action verification. Verification updates safety state and breakers, while an append-only evidence stream supports aggregate detection that can also activate a breaker. Thus pre-action checks constrain the current action, and post-action plus aggregate checks can reduce authority for later actions.
   Runtime[Existing agent runtime] --> Gateway[Authorized tool gateway]
   Gateway --> Envelope[Signed action envelope]
 
@@ -294,6 +300,9 @@ flowchart LR
   Registry[Safety cases, monitor, policy, and action registry] --> Policy
   Registry --> Learned
 ```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> authorization sets the ceiling; deterministic, semantic, and cumulative evidence can only preserve or lower it before execution. Authoritative outcomes and aggregate evidence feed breaker state, so the next action may have less authority than the last.</p>
+<p class="diagram-source">Original synthesis informed by <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a> on policy decision and enforcement points, <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST AI 600-1</a> on continuous monitoring and incident handling, <a href="https://proceedings.mlr.press/v235/greenblatt24a.html">Greenblatt et al. on AI control protocols</a>, and the <a href="https://sre.google/sre-book/handling-overload/">Google SRE guidance on bounded degradation</a>.</p>
 
 ### Safety policy control plane
 

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-agent-safety-control-plane",
+  "article": "src/content/posts/2026-08-29-design-agent-safety-control-plane.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how an already-authorized action can only retain or lose authority at the independent safety boundary, then see how authoritative outcomes and aggregate evidence can reduce authority for the next action.",
+  "mediumRationale": "The article already contains the necessary relationship-heavy architecture. Making that diagram the instructional figure is the smallest useful change: Mermaid keeps the proposal path, independent evidence inputs, two decision exits, post-action verification, and aggregate breaker feedback connected without adding a second redundant architecture or implying quantitative geometry.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a directed control loop with many-to-one evidence inputs, mutually exclusive decision exits, and post-action feedback. The existing Mermaid primitive preserves those labelled relationships and supports themed rendering and horizontal overflow at narrow widths.",
+    "svg": "Rejected because no quantitative scale or fixed geometry carries the lesson; manually positioning this relationship graph would be less maintainable and would add no instructional precision.",
+    "semanticHtml": "Rejected because a table or stacked cards could list pre-action, post-action, and aggregate controls but would hide the feedback path by which verified outcomes and portfolio detection activate breakers for later actions.",
+    "interaction": "Rejected because simulating allow, narrow, block, and freeze states would introduce controls and hidden states when one static trace already exposes the authority invariant.",
+    "paperReuse": "Rejected because none of the reviewed sources presents this article-specific product gateway, safety decision, evidence, verification, and breaker loop. Public availability was not treated as figure-reuse permission, and no source artwork, coordinates, wording, examples, or visual arrangement is reused.",
+    "noVisual": "Rejected because the prose defines each component precisely but requires the reader to compose three enforcement times and two ownership boundaries mentally. The diagram makes the key invariant visible: authorization precedes safety, while safety evidence can only preserve or reduce the resulting envelope."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 167,
+        "insight": "The preceding modeling slide covers baselines, distributed training, preprocessing, and scale; it provides context for production deployment but no runtime safety boundary, action authority, or feedback control."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide is the closest direct match: it asks about model gating tests, monitoring signals, user feedback, low-confidence behavior, inference constraints, and interpretability, but does not define independent enforcement, post-action verification, or scoped authority reduction."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring Rules of Machine Learning slide calls for infrastructure tests independent from ML, silent-failure monitoring, externally handled heuristics and policy, quantified undesirable behavior, and multi-metric launch decisions; these support layered controls but stop short of an agent action control loop."
+      },
+      {
+        "page": 170,
+        "insight": "The following algorithms-and-data-structures divider ends the production-ML neighborhood and contains no safety-control material."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol) indexed all 214 physical PDF pages for agent, safety, monitor, circuit breaker, control plane, authorization, guardrail, policy, gating, production, and feedback terms. Matches on pages 59 and 156 concern training-loop correctness and reinforcement-learning policy optimization rather than runtime action safety. Pages 167-170 were read as the complete closest neighborhood. The deck has no agent safety control-plane figure, so no deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NIST Special Publication 800-207: Zero Trust Architecture",
+        "url": "https://doi.org/10.6028/NIST.SP.800-207",
+        "usage": "Used as official architecture guidance to cross-check the separation of policy decision and enforcement points, per-request evaluation, least-privilege access, and the requirement that enforcement not rely on implicit trust.",
+        "license": "NIST states that works created by its employees are generally not subject to United States copyright under 17 U.S.C. 105, while noting possible foreign or third-party rights. No NIST figure, prose, or architecture layout is reproduced; the publication is cited only."
+      },
+      {
+        "title": "NIST AI 600-1: Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+        "url": "https://doi.org/10.6028/NIST.AI.600-1",
+        "usage": "Used as official AI risk guidance to cross-check continuous monitoring, incident response, independent assessment, documented risk controls, and evaluation across deployment conditions.",
+        "license": "NIST's technical-series licensing statement generally places employee-created United States government works outside domestic copyright, subject to foreign and third-party caveats. No source figure, table, text, or arrangement is reused."
+      },
+      {
+        "title": "AI Control: Improving Safety Despite Intentional Subversion",
+        "url": "https://proceedings.mlr.press/v235/greenblatt24a.html",
+        "usage": "Used as a primary peer-reviewed source for the distinction between making a model intend safe behavior and evaluating control protocols that prevent harmful outcomes using monitors, trusted labor, and red-team attempts.",
+        "license": "The PMLR page is publicly accessible, but public access is not treated as permission to reproduce its figures. No paper figure, experiment, code, prose, or visual structure is copied."
+      },
+      {
+        "title": "Site Reliability Engineering: Handling Overload",
+        "url": "https://sre.google/sre-book/handling-overload/",
+        "usage": "Used as an authoritative operations text to cross-check per-customer limits, direct impact measures rather than raw request counts, and graceful degraded responses when normal service cannot safely continue.",
+        "license": "The online Google SRE book is available for reading, but no reuse grant is relied on here. No figure, example values, prose, or layout is reproduced; only the operational principles are cited."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the component inventory but the direction of authority across time. Authorization creates an upper bound; independent pre-action controls may preserve, narrow, delay, or remove that authority but cannot add to it. The executor's authoritative outcome then becomes post-action evidence, and aggregate evidence can activate a scoped breaker that constrains later decisions. The visual is an original synthesis of the article's architecture, checked against official policy-enforcement, AI risk-management, AI control, and reliability sources."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 source-deck pages and inspected the nearest production neighborhood, then checked two NIST publications, a peer-reviewed AI control paper, and the Google SRE text before turning the article's existing architecture into the single accessible learning figure."
+  },
+  "implementation": {
+    "visualIds": [
+      "agent-safety-authority-loop"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description that traces authorization, all independent evidence inputs, both decision exits, execution, authoritative verification, evidence, aggregate detection, and breaker feedback. Every relationship and outcome is directly labelled, so color is not required. The established Mermaid renderer supplies light and dark theme tokens, print-safe colors, and horizontal overflow rather than label shrinkage at 390 CSS pixels; the prose immediately before and after the diagram preserves the same lesson if client-side rendering is unavailable."
+  }
+}
