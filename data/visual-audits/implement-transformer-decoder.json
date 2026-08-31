@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-transformer-decoder",
+  "article": "src/content/posts/2026-07-11-implement-transformer-decoder.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace the unchanged residual stream through a pre-norm decoder block while normalized branches compute and add attention and MLP updates.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can keep one continuous identity rail visible while showing exactly where two LayerNorm-sublayer branches leave and rejoin it. The topology directly checks the article equations without adding runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show operation order, but its automatic layout makes the uninterrupted residual rail and the two precise additive rejoin points less explicit.",
+    "svg": "Selected: a fixed vertical identity rail, branch arrows, plus nodes, tensor labels, and ordered stages expose the pre-norm invariant in one compact static figure.",
+    "semanticHtml": "Rejected: a list or table can restate the equations but cannot make the bypass path visibly continuous across both sublayers.",
+    "interaction": "Rejected: stepping through operations would hide earlier paths and add controls when the full simultaneous topology is the learning objective.",
+    "paperReuse": "Rejected: reviewed papers contain broader architecture diagrams, reuse rights for every embedded element were not established, and none narrows the block to this implementation contract.",
+    "noVisual": "Rejected: the equations are concise, but readers must still mentally distinguish the raw residual state from each normalized branch and place both additions in the correct order."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 50,
+        "insight": "The LayerNorm slide distinguishes transformer normalization over the feature dimension from CNN normalization, but does not place LayerNorm relative to a residual branch."
+      },
+      {
+        "page": 100,
+        "insight": "The preceding recurrent-network slide marks the boundary before the deck's transformer architecture discussion."
+      },
+      {
+        "page": 101,
+        "insight": "The transformer overview shows the original encoder-decoder architecture and describes masked decoder self-attention, encoder-decoder attention, and a feed-forward sublayer."
+      },
+      {
+        "page": 102,
+        "insight": "The neighboring BERT slide contrasts bidirectional encoders with left-context-only decoders but adds no residual or normalization ordering."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer survey says residual connections wrap attention and feed-forward sublayers and describes normalization after attention, reflecting the original post-norm framing rather than the requested pre-norm block."
+      },
+      {
+        "page": 104,
+        "insight": "The following GPT-X slide moves to scaling, instruction tuning, and RLHF, ending the local block-architecture neighborhood."
+      },
+      {
+        "page": 107,
+        "insight": "The modern LLM-training slide lists OLMo changes such as non-parametric LayerNorm, SwiGLU, and RoPE, but does not draw the residual path or normalization order."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for transformer, decoder, causal or masked attention, multi-head attention, LayerNorm, and residual connections. Pages 100-104 were read as the main architecture neighborhood; page 50 and page 107 were read for transformer LayerNorm and modern decoder context. The source diagrams are dense, externally derived architecture composites and do not isolate the requested two-sublayer pre-norm identity path. No deck image, text, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the foundational primary source for decoder masked self-attention, position-wise feed-forward sublayers, residual connections, and the original post-norm ordering.",
+        "license": "Public arXiv access does not establish permission to republish the paper's figures. No figure, prose, notation layout, or artwork is copied; the source is cited only for architecture semantics."
+      },
+      {
+        "title": "On Layer Normalization in the Transformer Architecture",
+        "url": "https://proceedings.mlr.press/v119/xiong20b.html",
+        "usage": "Used as the primary source to verify that Pre-LN places LayerNorm inside residual blocks and provides better-behaved gradients at initialization than the original Post-LN arrangement.",
+        "license": "PMLR publishes under an author permission agreement, but the reviewed page does not grant this site a clear permissive figure-reuse license. No paper figure, empirical result graphic, prose, or layout is reused."
+      },
+      {
+        "title": "PyTorch TransformerDecoderLayer documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerDecoderLayer.html",
+        "usage": "Used as official implementation documentation to cross-check batch-first tensor shape, causal target masking, and norm_first semantics.",
+        "license": "No documentation code, prose, or figure is copied. API behavior is referenced only to verify that norm_first places normalization before decoder sublayers."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the pre-norm residual topology across the whole block: h passes unchanged to the first addition, h-prime then becomes the unchanged input to the second addition, while only branch copies are normalized before attention or the MLP. The original schematic encodes those two equations directly with synthetic tensor labels [B,T,C], no empirical values, and no paper-specific visual structure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete implementation article, indexed all deck pages and inspected the exact architecture, LayerNorm, and modern-LLM neighborhoods, then checked the original Transformer paper, the primary Pre-LN analysis, and official PyTorch decoder documentation before selecting a narrow original residual-stream schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "pre-norm-decoder-residual-stream"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Numbered stages, operation names, tensor shapes, solid identity arrows, dashed branch arrows, plus signs, and explicit equations communicate the complete topology without color. Its 360-unit viewBox has no minimum width and scales at 390 CSS pixels; established theme variables preserve dark-mode contrast, and shared print rules provide a light high-contrast palette and keep the figure together."
+  }
+}
