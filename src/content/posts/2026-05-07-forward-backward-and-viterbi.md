@@ -34,7 +34,9 @@ $$
 There are $K^T$ possible paths. Both algorithms factor through a $T \times K$ DP table.
 
 <!-- visual:forward-backward-viterbi-chain-objectives -->
-<figure class="visual-container" aria-label="Forward-backward and Viterbi objectives compared on the same state chain">
+<figure class="learning-figure" aria-labelledby="chain-objectives-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="chain-objectives-title">Does the dynamic program return one state marginal or one complete path?</p>
 	<div class="visual-grid--two" role="group" aria-label="The same four-timestep, three-state chain used for forward-backward state marginals and Viterbi path decoding">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 230" role="img" aria-labelledby="fb-chain-title fb-chain-desc">

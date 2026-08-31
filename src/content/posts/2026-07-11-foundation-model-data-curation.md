@@ -43,16 +43,12 @@ flowchart TB
 	Manifest -.->|"WHAT ENTERED"| Audit
 	Checkpoints -.->|"WHERE LEARNED"| Audit
 
-	classDef input fill:#e8f1ff,stroke:#2563a6,color:#102a43
-	classDef process fill:#fff7e6,stroke:#b45309,color:#3b2506
-	classDef state fill:#f1edff,stroke:#6d55a6,color:#2d2147
-	classDef outcome fill:#e8f7ee,stroke:#2f7d4a,color:#173d26
-	classDef warning fill:#fff0f0,stroke:#b64242,color:#4a1717
-	class Raw,Identity,Others input
-	class Normalize,Gates,Weights process
-	class Reject warning
-	class Shard,Checkpoints outcome
-	class Manifest,Run,Audit state
+	class Raw,Identity,Others viz-input
+	class Normalize,Gates,Weights viz-focus
+	class Reject viz-warning
+	class Shard,Checkpoints viz-output
+	class Manifest,Run,Audit viz-state
+	class Raw viz-tall
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow one sample downward. A gate never merely “drops” it: rejection produces a reasoned exclusion record, while retention carries evidence into a weighted, versioned mixture. The mixture manifest then links that sample to runs and checkpoints, so later audits can answer both why data was absent and where retained data was used. Original synthesis informed by <a href="https://arxiv.org/abs/2406.11794">DataComp-LM</a>, <a href="https://aclanthology.org/2022.acl-long.577/">Lee et al. on deduplication</a>, <a href="https://arxiv.org/abs/2303.03915">the ROOTS corpus</a>, and <a href="https://arxiv.org/abs/2203.15556">Hoffmann et al. on compute-optimal training</a>.</p>

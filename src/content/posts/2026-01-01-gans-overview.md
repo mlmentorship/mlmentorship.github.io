@@ -64,7 +64,7 @@ flowchart TB
 	class X viz-tall
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> first train $D$ on both sources while $G$ is only a sample factory. Then freeze $D$ but keep it in the differentiable path: its judgment sends a gradient into $G$, whose practical non-saturating target is to push $D(G(z))$ toward “real.” Alternating changes who learns, not which networks participate in the forward pass.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> first train <var>D</var> on both sources while <var>G</var> is only a sample factory. Then freeze <var>D</var> but keep it in the differentiable path: its judgment sends a gradient into <var>G</var>, whose practical non-saturating target is to push <var>D</var>(<var>G</var>(<var>z</var>)) toward “real.” Alternating changes who learns, not which networks participate in the forward pass.</p>
 
 At equilibrium (Nash), $G$ produces samples indistinguishable from real, and $D$ outputs $\tfrac{1}{2}$ everywhere.
 
