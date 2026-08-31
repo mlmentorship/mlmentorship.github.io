@@ -34,6 +34,23 @@ Normalize rows once, then process item blocks:
 
 The running state is only `O(num_queries × k)`, and each score block is `O(num_queries × block_size)`.
 
+<!-- visual:batched-top-k-running-invariant -->
+<figure class="learning-figure" aria-labelledby="batched-top-k-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="batched-top-k-title">Why is it exact to keep only 2 candidates after every block?</p>
+	<div class="visual-panel">
+		<table class="cm-grid" aria-label="Worked top-2 retrieval trace for one query across three item blocks">
+			<thead><tr><th scope="col">Pass</th><th scope="col">Score this block</th><th scope="col">Local top-2</th><th scope="col">Running top-2</th></tr></thead>
+			<tbody>
+				<tr><th scope="row">X[0:3]</th><td>0:.82 · 1:.31 · 2:.76</td><td>0:.82 · 2:.76</td><td class="cm-selected"><strong>0:.82 · 2:.76</strong>keep 2 of 3</td></tr>
+				<tr><th scope="row">X[3:6]</th><td>3:.91 · 4:.44 · 5:.68</td><td>3:.91 · 5:.68</td><td class="cm-selected"><strong>3:.91 · 0:.82</strong>merge 2 + 2 → keep 2</td></tr>
+				<tr><th scope="row">X[6:8]</th><td>6:.79 · 7:.95</td><td>7:.95 · 6:.79</td><td class="cm-selected"><strong>7:.95 · 3:.91</strong>final exact top-2</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move left to right within each row, then down. An item discarded from a block already has at least <em>k</em> items in that same block ranked ahead of it, so it cannot enter the global top-<em>k</em>. Only the previous 2 winners and the new 2 local winners reach the next merge; the full score row never exists. Original example based on the exact-selection semantics in <a href="https://numpy.org/doc/stable/reference/generated/numpy.argpartition.html">NumPy's <code>argpartition</code> documentation</a>.</figcaption>
+</figure>
+
 ## Reference implementation sketch
 
 ```python

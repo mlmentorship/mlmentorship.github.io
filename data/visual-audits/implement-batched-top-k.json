@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "implement-batched-top-k",
+  "article": "src/content/posts/2026-07-10-implement-batched-top-k.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace why keeping only each block's local top-k and merging it with the running top-k preserves the exact global top-k without storing the full query-by-item score matrix.",
+  "mediumRationale": "A semantic table is the smallest medium that keeps block boundaries, local candidates, and the evolving retained set aligned in one worked trace. Readers can verify the top-2 invariant row by row, while the table remains text-native, screen-reader accessible, responsive, and printable without a client-side runtime.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson depends on comparing concrete ranked scores at each pass; a flowchart would show control flow but hide the selection invariant.",
+    "svg": "Rejected because fixed-coordinate matrix cells add authoring and mobile-label risk when a native table expresses the discrete trace more accessibly.",
+    "semanticHtml": "Selected because a compact table aligns each scored block with its local top-2 and running top-2, exposes the exact numeric merge, and reflows within the established responsive figure primitive.",
+    "interaction": "Rejected because stepping through blocks would hide states that are more useful when shown together and would add controls without changing the invariant.",
+    "paperReuse": "Rejected because the reviewed sources establish cosine scoring and partition semantics but do not provide this memory-bounded merge trace. No external figure, data, wording, or layout is reused.",
+    "noVisual": "Rejected because prose states the loop but leaves readers to mentally prove why discarded non-top-k items can never enter the final top-k and how the persistent candidate set stays bounded."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 22,
+        "insight": "The preceding PCA slide ends with dimensionality reduction followed by K-nearest-neighbor clustering, providing embedding-space context but no retrieval execution detail."
+      },
+      {
+        "page": 23,
+        "insight": "The clustering slide lists cosine among similarity measures and discusses materializing similarity matrices, but does not address memory-bounded scoring or incremental top-k selection."
+      },
+      {
+        "page": 24,
+        "insight": "The K-nearest-neighbor slide describes comparing a query with every stored example and uses a full distance vector followed by argsort; it motivates exact retrieval but materializes and sorts all scores rather than blocking and merging candidates."
+      },
+      {
+        "page": 25,
+        "insight": "The following random-forest slide marks the end of the nearest-neighbor neighborhood and adds no retrieval or selection mechanism."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for top-k, nearest neighbor, retrieval, cosine, similarity, and batching. Pages 22-25 were then inspected as the complete relevant neighborhood: PCA and embedding context, clustering and similarity matrices, the KNN implementation, and the transition to random forests. No slide explains a memory-bounded exact top-k merge, and no deck wording, code, figure, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Introduction to Information Retrieval: Dot products",
+        "url": "https://nlp.stanford.edu/IR-book/html/htmledition/dot-products-1.html",
+        "usage": "Used as an authoritative textbook source to verify that cosine similarity is the dot product of length-normalized vectors and that retrieval chooses the items with the highest resulting similarities.",
+        "license": "The online Cambridge University Press textbook is used only for mathematical semantics. No permissive artwork reuse grant was established, so no figure, example data, prose, or layout is copied."
+      },
+      {
+        "title": "NumPy argpartition documentation",
+        "url": "https://numpy.org/doc/stable/reference/generated/numpy.argpartition.html",
+        "usage": "Used as official documentation to verify partial selection semantics and that values within the selected partition have undefined order, which is why the retained result needs a final explicit sort.",
+        "license": "NumPy documentation is available under the NumPy project's BSD license, but no documentation code, prose, values, or artwork is reproduced; only API behavior is cited."
+      },
+      {
+        "title": "scikit-learn cosine_similarity documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.pairwise.cosine_similarity.html",
+        "usage": "Used as official documentation to cross-check cosine similarity as the normalized dot product and the resulting query-by-item output shape.",
+        "license": "The documentation is used only to verify API and mathematical semantics. No example, code, prose, or figure is copied into the original trace."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the exactness invariant. After a block is scored, any item outside that block's local top-k has at least k items in the same block scoring no lower, so it cannot belong to the global top-k. Therefore the only candidates needed after each pass are the previous running top-k and the new block's local top-k. The original example follows one query with k = 2 across three blocks and makes persistent O(k) state distinct from transient block scores."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the full nearest-neighbor neighborhood, then checked an authoritative IR textbook and official NumPy and scikit-learn semantics before selecting an original semantic merge trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "batched-top-k-running-invariant"
+    ],
+    "accessibility": "The figure uses a native table with a descriptive aria-label, explicit block and item IDs, numeric scores, rank labels, and arrows in text. Borders, ordering, labels, and bold retained sets carry all meaning without color. The established learning-figure, visual-panel, and cm-grid primitives collapse safely within 390 CSS pixels, inherit dark-mode tokens, and switch to a high-contrast light palette for print."
+  }
+}
