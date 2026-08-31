@@ -36,6 +36,36 @@ $$
 \end{aligned}
 $$
 
+<!-- visual:gp-conditioning-local-uncertainty -->
+<figure class="learning-figure" aria-labelledby="gp-conditioning-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="gp-conditioning-title">See how kernel similarity makes observations reshape both the posterior mean and uncertainty.</p>
+	<div class="visual-panel plot-panel">
+		<svg viewBox="0 0 360 270" role="img" aria-labelledby="gp-posterior-title gp-posterior-desc">
+			<title id="gp-posterior-title">Gaussian process posterior mean and uncertainty around three observations</title>
+			<desc id="gp-posterior-desc">A horizontal input axis contains three observed points. A solid posterior mean bends through their neighborhood. A shaded uncertainty band is narrow near each observation and broad at the left and right edges, where there is little kernel similarity to the training inputs. Labels connect the narrow regions to a large covariance correction subtracted from prior variance and the broad regions to a near-zero correction.</desc>
+			<path d="M30 82C55 87 76 90 103 92C126 70 148 73 174 87C200 113 221 128 246 137C272 130 298 100 334 77L334 173C298 162 272 160 246 153C221 148 200 143 174 103C148 93 126 90 103 108C76 150 55 153 30 178Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.5"></path>
+			<path d="M30 130C55 120 76 111 103 100C126 80 148 83 174 95C200 126 221 138 246 145C272 140 298 131 334 125" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:3"></path>
+			<path class="viz-axis" d="M28 205H340"></path>
+			<path class="viz-axis" d="M30 48V205"></path>
+			<path d="M103 100V205M174 95V205M246 145V205" style="fill:none;stroke:var(--viz-edge);stroke-width:1;stroke-dasharray:3 3"></path>
+			<g style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"><circle cx="103" cy="100" r="5"></circle><circle cx="174" cy="95" r="5"></circle><circle cx="246" cy="145" r="5"></circle></g>
+			<text class="viz-axis-label" x="30" y="38">OUTPUT f(x)</text>
+			<text class="viz-axis-label" x="340" y="221" text-anchor="end">INPUT x</text>
+			<text class="viz-callout" x="185" y="120">posterior mean &mu;(x)</text>
+			<text class="viz-callout" x="270" y="82">posterior uncertainty</text>
+			<text class="viz-axis-label" x="174" y="238" text-anchor="middle">OBSERVED INPUTS</text>
+			<path d="M77 62H119M77 57V67M119 57V67" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5"></path>
+			<text class="viz-label" x="98" y="53" text-anchor="middle">near X</text>
+			<text class="viz-label" x="98" y="252" text-anchor="middle">large k* &rarr; large subtraction &rarr; narrow</text>
+			<path d="M291 55H334M291 50V60M334 50V60" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+			<text class="viz-label" x="313" y="46" text-anchor="middle">far from X</text>
+			<text class="viz-label" x="278" y="252" text-anchor="middle">k* &asymp; 0 &rarr; prior width remains</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> start at a query location and ask how similar it is to the observed inputs. Nearby, the covariance vector <var>k</var><sub>*</sub> is large: observations pull the mean and the subtracted correction in &Sigma;(x<sub>*</sub>) removes much of the prior uncertainty. Far away, <var>k</var><sub>*</sub> approaches zero, so the mean relaxes toward the prior and the uncertainty band widens toward the prior variance. This behavior is conditional on the chosen kernel; it is not a universal guarantee of calibration. Original schematic checked against <a href="https://gaussianprocess.org/gpml/">Rasmussen and Williams (2006)</a>.</figcaption>
+</figure>
+
 Two matrix-vector products against $(K + \sigma^2 I)^{-1}$ give you both the predictive mean and the predictive variance at any test point. The hard part is $(K + \sigma^2 I)^{-1}$, which costs $O(n^3)$ to compute and $O(n^2)$ to store.
 
 ## Choosing the kernel

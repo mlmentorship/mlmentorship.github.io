@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "gaussian-processes",
+  "article": "src/content/posts/2026-05-07-gaussian-processes.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain how kernel similarity to observed inputs simultaneously shapes a Gaussian process posterior mean and reduces posterior function uncertainty at a query location.",
+  "mediumRationale": "A deterministic SVG plot is the smallest medium that can align three observed inputs, a posterior mean, and spatially varying uncertainty with the two terms in the predictive-variance equation. Direct near-versus-far annotations make the covariance correction visible without requiring a numeric worked matrix inverse.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can sequence kernel, covariance matrix, and conditioning, but cannot express a continuous posterior mean or uncertainty width over input space.",
+    "svg": "Selected: deterministic paths show the posterior band narrowing near observed inputs and returning toward prior width where the test-training covariance vector is small.",
+    "semanticHtml": "Rejected: a table could compare near and far queries, but it would lose the spatial relationship between input distance, covariance, posterior mean, and uncertainty.",
+    "interaction": "Rejected: changing a lengthscale would teach an additional kernel-selection lesson, but controls and state are unnecessary for the core conditioning mechanism and weaken print completeness.",
+    "paperReuse": "Rejected: the canonical textbook and related references contain posterior plots, but no permissive figure-reuse grant was established. The shipped curve, observation locations, labels, and geometry are an original qualitative schematic.",
+    "noVisual": "Rejected: the block-matrix and conditioning equations are precise, yet prose alone makes it difficult to see that the same kernel cross-covariance both weights the observed targets in the mean and determines how much prior variance is removed locally."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 21,
+        "insight": "The kernel-trick slide defines a kernel as an efficiently computed similarity in an implicit feature space and introduces the Gaussian RBF kernel, establishing the similarity concept used by a GP covariance."
+      },
+      {
+        "page": 22,
+        "insight": "The adjacent kernel-PCA slide applies a kernelized covariance matrix to nonlinear dimension reduction, reinforcing covariance-matrix construction but not probabilistic conditioning."
+      },
+      {
+        "page": 23,
+        "insight": "The directly relevant clustering slide states that a Gaussian process uses a similarity matrix as the covariance of a multivariate Gaussian and predicts by conditioning joint train and test values. It does not show the posterior mean and variance or their near-versus-far behavior."
+      },
+      {
+        "page": 24,
+        "insight": "The following K-nearest-neighbor slide returns to distance-based nonparametric classification, marking the end of the GP neighborhood and providing no additional posterior treatment."
+      },
+      {
+        "page": 29,
+        "insight": "A later factorization-machines slide revisits the kernel trick and similarity functions, but does not discuss Gaussian processes, covariance conditioning, or predictive uncertainty."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for Gaussian process, covariance kernel, kernel trick, predictive variance, uncertainty, and Bayesian optimization. Exact matches occur in the kernel neighborhood on pages 21-23 and a later kernel mention on page 29. Pages 21-24 and 28-30 were read in full; page 23 is the only direct GP treatment. No deck image, wording, coordinates, numeric values, or embedded artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Gaussian Processes for Machine Learning",
+        "url": "https://gaussianprocess.org/gpml/",
+        "usage": "Used as the canonical authoritative textbook to verify the function-space definition, joint Gaussian conditioning equations, covariance-function role, posterior mean, and posterior variance as prior covariance minus a data-dependent correction.",
+        "license": "The authors provide the MIT Press book online for personal use and retain copyright; no blanket permissive figure-reuse license is stated. No book figure, prose, code, data, or example geometry is reproduced."
+      },
+      {
+        "title": "Introduction to Gaussian Processes",
+        "url": "https://doi.org/10.1162/089976698300017557",
+        "usage": "Used as an authoritative journal tutorial to cross-check the interpretation of a GP as a distribution over functions and Bayesian prediction by conditioning correlated function values.",
+        "license": "MIT Press publication copyright applies and no permissive artwork-reuse license was identified. No figure, derivation layout, prose, or example is copied."
+      },
+      {
+        "title": "scikit-learn Gaussian Processes documentation",
+        "url": "https://scikit-learn.org/stable/modules/gaussian_process.html",
+        "usage": "Used as official implementation documentation to verify that kernels determine GP prior and posterior shape, encode similarity assumptions, and expose predictive standard deviation or covariance.",
+        "license": "The documentation is consulted only for API and model semantics under the scikit-learn project's BSD terms. No documentation prose, code, gallery output, data, or artwork is reproduced."
+      },
+      {
+        "title": "Sparse Gaussian Processes using Pseudo-inputs",
+        "url": "https://papers.nips.cc/paper_files/paper/2005/hash/4491777b1aa8b5b32c2e8666dbe1a495-Abstract.html",
+        "usage": "Used as the primary sparse-GP source cited by the article to verify the inducing pseudo-input approximation and its motivation as a response to exact GP scaling.",
+        "license": "The proceedings page provides public access but no explicit permissive figure-reuse license. No paper figure, algorithm, prose, result, or data is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how conditioning a joint Gaussian turns a kernel similarity vector into both a weighted posterior mean and a local reduction from prior variance. The visual is qualitative: its three synthetic observations, mean path, and band are not measured data, posterior samples, or a claim that uncertainty must increase monotonically with Euclidean distance. Narrowing represents stronger covariance with the observed set under a local stationary kernel; the caption explicitly limits the interpretation to the chosen kernel."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 21-24 plus 28-30, then checked the canonical GP textbook, an authoritative journal tutorial, official scikit-learn documentation, and the article's primary sparse-GP source before selecting an original posterior-conditioning plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "gp-conditioning-local-uncertainty"
+    ],
+    "accessibility": "The SVG has a linked title and complete description naming the three observations, posterior mean, changing uncertainty width, and covariance correction. Point symbols, vertical guides, band width, line style, brackets, and direct text labels carry every distinction without color. A single 360-unit viewBox has no minimum width or scrolling and scales within the established panel at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, while shared print tokens force a light high-contrast palette and avoid breaks within the figure."
+  }
+}
