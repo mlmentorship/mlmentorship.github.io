@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "graph-neural-networks",
+  "article": "src/content/posts/2026-05-07-graph-neural-networks.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Connect a target node's graph neighborhood to the corresponding row of normalized adjacency, then trace how that row aggregates node features before the shared linear transform and activation.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align the same four nodes in graph space, one normalized adjacency row, the matching feature column, and a numeric GCN update. The worked row makes the otherwise abstract A-hat H W multiplication spatial and checkable without interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could sequence aggregate, transform, and activate, but cannot precisely align neighbors with adjacency-row entries and feature values.",
+    "svg": "Selected: deterministic node geometry, matrix cells, arrows, and a worked calculation connect graph topology to one exact output row in a single responsive figure.",
+    "semanticHtml": "Rejected: an HTML table could represent the adjacency row and arithmetic accessibly, but would not show why its nonzero positions correspond to the target node's one-hop neighborhood.",
+    "interaction": "Rejected: switching the target node could demonstrate equivariance, but controls and hidden states are unnecessary for learning the invariant row-to-neighborhood correspondence and would weaken print completeness.",
+    "paperReuse": "Rejected: the GCN paper, Distill explanations, PyTorch Geometric documentation, and local deck contain related diagrams, but no external figure is needed. Reuse permission was not relied upon; the four-node cycle, values, layout, labels, and arithmetic are an original worked example.",
+    "noVisual": "Rejected: the equations define the operation compactly, but prose requires readers to mentally align a graph neighborhood with a matrix row and then distinguish topology-driven aggregation from learned feature mixing."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 66,
+        "insight": "The graphical-models slide introduces graph factorization and local computation, but it concerns probabilistic inference rather than neural node-feature updates."
+      },
+      {
+        "page": 67,
+        "insight": "The message-passing slide describes probabilistic sum-product messages, forward and backward belief propagation, and EM. The shared term is relevant context, but the mechanism is not GNN neighborhood aggregation or A-hat H W."
+      },
+      {
+        "page": 68,
+        "insight": "The following GMM and HMM slide confirms that the preceding message-passing treatment belongs to latent-variable inference and provides no GNN mechanism."
+      },
+      {
+        "page": 117,
+        "insight": "The preceding rescoring slide ends the language-model section and provides no graph representation or neural message-passing content."
+      },
+      {
+        "page": 118,
+        "insight": "The knowledge-graph embedding slide discusses RESCAL adjacency-tensor factorization, multi-hop relational patterns, and HolE, but not graph convolution or neighborhood aggregation."
+      },
+      {
+        "page": 119,
+        "insight": "The following automatic-speech-recognition title slide marks the end of the knowledge-graph neighborhood and adds no GNN detail."
+      },
+      {
+        "page": 178,
+        "insight": "The preceding slide covers array-sorting algorithms and is unrelated, establishing the boundary before the deck's generic graph data-structure material."
+      },
+      {
+        "page": 179,
+        "insight": "The graph data-structure slide defines adjacency lists and adjacency matrices and explains neighbor lookup and BFS. This supports the topology-to-adjacency-row prerequisite but contains no node features, normalization, learned weights, or GCN."
+      },
+      {
+        "page": 180,
+        "insight": "The following graph-algorithms slide compares traversal and shortest-path algorithms, adding no neural graph computation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for graph neural network, GNN, graph convolution, adjacency, node embedding, knowledge graph, and message passing. No GNN or graph-convolution slide exists. Pages 66-68, 117-119, and 178-180 were read in full as the three closest neighborhoods. Page 67 uses message passing only for probabilistic graphical models, page 118 covers non-neural knowledge-graph factorization, and page 179 supplies only generic adjacency representations. No deck image, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Semi-Supervised Classification with Graph Convolutional Networks",
+        "url": "https://arxiv.org/abs/1609.02907",
+        "usage": "Used as the primary GCN source to verify self-loop renormalization, symmetric degree normalization, the Z = A-hat X Theta layer form, shared filter parameters, sparse complexity, and the relation between stacked layers and higher-order neighborhoods.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established from its metadata. No paper figure, prose, dataset, coordinates, or numerical example is reproduced."
+      },
+      {
+        "title": "Neural Message Passing for Quantum Chemistry",
+        "url": "https://arxiv.org/abs/1704.01212",
+        "usage": "Used as the primary message-passing source to cross-check the separation between edge-conditioned messages, permutation-invariant aggregation, and node updates.",
+        "license": "The arXiv record provides public access but no permissive figure-adaptation license was established from its metadata. No paper figure, molecular example, prose, data, or layout is reused."
+      },
+      {
+        "title": "PyTorch Geometric: Creating Message Passing Networks",
+        "url": "https://pytorch-geometric.readthedocs.io/en/latest/notes/create_gnn.html",
+        "usage": "Used as official implementation documentation to verify source-to-target neighborhood propagation, add aggregation, self-loop insertion, degree coefficients, and the stepwise implementation of GCNConv.",
+        "license": "PyTorch Geometric distributes its software and associated documentation under the MIT license. The documentation is used only to verify semantics; no code, prose, example, or artwork is copied."
+      },
+      {
+        "title": "Understanding Convolutions on Graphs",
+        "url": "https://distill.pub/2021/understanding-gnns/",
+        "usage": "Used as an authoritative technical exposition to cross-check adjacency-row notation, node-order equivariance, local neighborhoods, and the distinction between graph structure and node-feature matrices.",
+        "license": "The page includes third-party and publication artwork with source-specific treatment; no blanket reuse grant was relied upon. No Distill image, interactive, prose, values, styling, or geometry is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that each output node corresponds to one row of A-hat: graph edges determine which entries are nonzero, normalization determines their fixed coefficients, H supplies the aligned node features, and W is the learned feature mixer shared across nodes. The original example uses a four-node cycle with self-loops. Every self-added degree is 3, so symmetric normalization gives row B = [1/3, 1/3, 1/3, 0] in A, B, C, D order. With scalar features [3, 0, 6, 9], the aggregate is 3; W = [2, -1] gives [6, -3], and ReLU gives [6, 0]. The arithmetic and drawn neighborhood agree exactly. This equal-degree example is intentionally a mean; on irregular graphs symmetric GCN normalization is a degree-weighted sum and need not sum to one."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the three closest slide neighborhoods, then checked the primary GCN and message-passing papers, official PyTorch Geometric documentation, and an authoritative Distill exposition before selecting an original numeric neighborhood-to-row SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "gcn-neighborhood-to-matrix-row"
+    ],
+    "accessibility": "The SVG has a linked title and complete description that states the graph edges, target neighborhood, normalized row, input features, and every numeric result. Node labels, borders, matrix positions, a self-loop, arrows, and direct text carry all meaning without color. Its single 360-unit viewBox has no minimum width or horizontal scrolling and scales within the established plot-panel primitive at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, while shared print tokens force a light high-contrast palette and avoid breaks within the figure."
+  }
+}
