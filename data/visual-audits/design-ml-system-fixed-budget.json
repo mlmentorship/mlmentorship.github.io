@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "slug": "design-ml-system-fixed-budget",
+  "article": "src/content/posts/2026-07-10-design-ml-system-fixed-budget.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace how a narrowing ranking funnel reserves expensive scoring for fewer candidates while every request remains inside one end-to-end latency ceiling and one unit-cost ceiling.",
+  "mediumRationale": "A compact top-to-bottom Mermaid funnel is the smallest useful spatial explanation: it connects traffic arithmetic to progressively narrower ranking stages, makes cost per request increase as candidate count falls, and keeps the shared latency, cost, and overload constraints visible without inventing a hardware-specific allocation.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a directed serving path with a narrowing candidate set, labelled changes in relative work per candidate, and a fallback branch. The established tall-flow primitive keeps this relationship readable at narrow widths and inherits themed screen and print rendering.",
+    "svg": "Rejected because the article provides no measured candidate counts, stage timings, or cost shares from which to draw honest quantitative geometry. A bespoke funnel shape would suggest a scale the evidence does not support.",
+    "semanticHtml": "Rejected because cards or a table could compare stages but would make the end-to-end path, progressive narrowing, and overload bypass less immediate.",
+    "interaction": "Rejected because hypothetical sliders for traffic, candidate counts, or model prices would require unsupported assumptions and distract from the invariant that all stage choices must fit the same measured request envelope.",
+    "paperReuse": "Rejected because the closest paper and deck figures show particular recommender architectures rather than this article's budget-first reasoning. Public availability was not treated as permission to republish; no source figure, screenshot, wording, values, coordinates, or arrangement is reused.",
+    "noVisual": "Rejected because the prose gives the arithmetic and architecture progression separately, leaving readers to compose the hardest mental model themselves: expensive models become affordable only after cheap stages shrink their invocation volume, and even that path needs a cheaper overload fallback."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 134,
+        "insight": "The personalized instant-search prompt asks whether every request is worth personalizing and requires results within 100 ms, directly connecting selective model use to a serving-latency constraint."
+      },
+      {
+        "page": 135,
+        "insight": "The next slide separates large-catalogue discovery into candidate generation and ranking, but does not allocate latency or cost across those stages."
+      },
+      {
+        "page": 136,
+        "insight": "The system-overview diagram routes search candidates through content-based and personalized recommenders into a second-stage ranker. It is the closest architecture figure, but it has no traffic arithmetic, shrinking candidate counts, unit economics, or overload fallback."
+      },
+      {
+        "page": 137,
+        "insight": "The neighboring data slide defines interaction and successful-search datasets for the architecture but adds no serving-budget mechanism."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide concatenates query, user, and item representations before neural scoring, supporting the expensive final-stage role without quantifying its production cost."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide pairs offline ranking metrics with online engagement and play outcomes, but does not require incremental value and incremental serving cost to be reported together."
+      },
+      {
+        "page": 142,
+        "insight": "The following LLM-ranking prompt expands per-candidate reasoning substantially and thereby reinforces the need to bound expensive scoring, but supplies no latency or cost analysis."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks for latency-versus-accuracy requirements, project compute constraints, simple models, and progressively more sophisticated stages, but presents them as a checklist rather than one operating envelope."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly asks about infrastructure costs, latency and scaling constraints, baselines, and a cost-benefit framework, making it the strongest deck support for budget-first design."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example asks for user scale and target latency, then describes three increasingly expensive filtering layers that reduce roughly 1,000 posts to keep latency low."
+      },
+      {
+        "page": 164,
+        "insight": "The neighboring feed slide combines multiple candidate generators with one ranking model and policy layer, then asks for a measurable online value hypothesis; it does not connect value to unit serving cost."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide names performance and available-compute constraints, but treats them as separate interview prompts rather than simultaneous hard ceilings."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide recommends simple heuristic baselines and says added complexity must significantly outperform them, matching the article's quality-per-dollar progression."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide asks which gating tests prove all constraints are met and how low-confidence predictions behave, supporting measured admission and fallback behavior."
+      },
+      {
+        "page": 169,
+        "insight": "The following Rules of Machine Learning summary emphasizes simple first models, attributable metrics, infrastructure testing, and multi-metric launch decisions, but has no cost-constrained ranking funnel."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) indexed all 214 physical PDF pages for budget, cost, latency, serving, ranking, recommendation, candidate generation, traffic, scale, cache, and system-design concepts. It then read and visually inspected the complete closest neighborhoods on pages 134-142 and 161-169. The deck contains useful pieces but no figure that combines request-volume arithmetic, a narrowing multi-stage ranker, a shared unit-cost and latency envelope, and an overload fallback. No deck image, prose, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Neural Networks for YouTube Recommendations",
+        "url": "https://doi.org/10.1145/2959100.2959190",
+        "usage": "Used as the primary industrial paper for the classic two-stage recommender split: candidate generation reduces a very large corpus before a separate ranking model scores a much smaller set.",
+        "license": "The RecSys 2016 paper is an ACM publication. Its copyright notice permits limited personal or classroom copying but requires permission for broader republication. No paper figure, wording, result, example, or visual structure is copied."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml/",
+        "usage": "Used as official engineering guidance to cross-check starting with a simple baseline, instrumenting metrics first, keeping the pipeline solid, and adding complexity only after simpler gains are exhausted.",
+        "license": "Google Developers states that page content is licensed under CC BY 4.0 unless otherwise noted, while code samples use Apache 2.0. The visual is independently composed and does not reuse page text, code, or artwork."
+      },
+      {
+        "title": "Site Reliability Engineering: Handling Overload",
+        "url": "https://sre.google/sre-book/handling-overload/",
+        "usage": "Used as an authoritative operations text to verify that raw QPS can conceal unequal request costs, direct resource consumption should inform capacity, and cheaper degraded responses such as smaller candidate searches are appropriate under overload.",
+        "license": "The Google SRE book is publicly readable, but no general figure-reuse permission is relied on. No figure, prose, example values, or layout is reproduced."
+      },
+      {
+        "title": "Well-Architected Framework: AI and ML perspective—Cost optimization",
+        "url": "https://docs.cloud.google.com/architecture/framework/perspectives/ai-ml/cost-optimization",
+        "usage": "Used as official architecture guidance to cross-check measuring inference, storage, network, and task-level unit costs; attributing costs to owners; and evaluating technical choices against business value.",
+        "license": "Google Cloud documentation is generally available under the Google Developers Site Policies, but no artwork or text is reused. The diagram uses only an original article-specific synthesis and citation."
+      },
+      {
+        "title": "NVIDIA Triton Inference Server—Model Analyzer",
+        "url": "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/model_analyzer.html",
+        "usage": "Used as official serving documentation to verify that batching, model-instance configuration, GPU memory, compute utilization, latency, and throughput must be measured together rather than assumed from a model name.",
+        "license": "NVIDIA retains rights in its documentation and no permission to republish its diagrams is assumed. No documentation figure, benchmark result, wording, or configuration is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the coupling between unit economics and the ranking funnel. At 100 million requests per day, a $3 million annual ceiling is about $0.082 per thousand requests before feature storage, logging, retraining, and operations; the rounded $0.08 figure in the article is therefore sound. Candidate generation and light pre-ranking reduce how often expensive per-candidate scoring runs, but they do not waive the end-to-end p95 latency or cost ceiling. Stage allocations and hardware choices must come from load tests and current prices, so the visual deliberately states relative work and shared hard ceilings rather than inventing per-stage milliseconds or dollars. Under overload, a measured cheaper path should preserve service by using cached or reduced candidates and a simple scorer."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, indexed all 214 source-deck pages and inspected both relevant slide neighborhoods, checked a primary recommender paper and four official engineering sources, verified the article's unit-cost arithmetic, and selected one original budget-constrained ranking funnel."
+  },
+  "implementation": {
+    "visualIds": [
+      "fixed-budget-ranking-funnel"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Candidate-set changes, relative work, ceilings, and the overload branch are all expressed in text and line style, so color is not required. Combined tall-flow and wide-canvas markers prevent height compression and provide contained horizontal scrolling at 390 CSS pixels, while print removes the width floor and shared visual tokens supply light, dark, and print-safe rendering. The surrounding calculation and direct caption preserve the inference if client-side diagram rendering is unavailable."
+  }
+}
