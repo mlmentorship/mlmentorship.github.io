@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "embedding-spaces-and-similarity",
+  "article": "src/content/posts/2026-02-22-embedding-spaces-and-similarity.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See how L2 normalization removes vector magnitude from retrieval so dot product and cosine produce the same ranking, while Euclidean distance becomes a monotonic expression of the same angle.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can preserve the vectors' directions while moving their endpoints onto a unit circle. Explicit synthetic scores make the raw ranking reversal and normalized metric equivalence checkable without scripting.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a relationship diagram can sequence normalization and search but cannot faithfully show vector length, angle, or chord distance.",
+    "svg": "Selected: deterministic coordinates keep the same three vectors comparable before and after normalization and can label the exact scores next to the geometry.",
+    "semanticHtml": "Rejected: a table could compare scores but would not reveal why radial projection removes magnitude while preserving direction.",
+    "interaction": "Rejected: changing vector endpoints would add controls and state without improving the single contrast the learner needs to inspect.",
+    "paperReuse": "Rejected: the reviewed sources contain broader or denser treatments, and public availability is not treated as permission to reuse figures.",
+    "noVisual": "Rejected: the prose states the algebraic equivalence, but readers still have to imagine both the radial projection and why raw dot product can prefer a worse-aligned vector."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 23,
+        "insight": "The preceding clustering slide lists Euclidean and cosine among similarity measures and frames pairwise similarity as graph affinity, but does not compare vector magnitude with angle."
+      },
+      {
+        "page": 24,
+        "insight": "The K-nearest-neighbor slide lists L1, L2, and dot product distances, places retrieval in an embedding space, and calls out the curse of dimensionality; it is the closest general metric discussion."
+      },
+      {
+        "page": 25,
+        "insight": "The following random-forest slide changes topics and adds no embedding or similarity geometry."
+      },
+      {
+        "page": 129,
+        "insight": "The preceding page is only the recommender-systems section title."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide describes scoring user and item embeddings with a dot product and then using approximate nearest-neighbor search, connecting metric choice to retrieval."
+      },
+      {
+        "page": 131,
+        "insight": "The following content-based-filtering slide names cosine and Euclidean similarity but does not explain normalization or metric equivalence."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed for embedding, cosine, similarity, dot product, L2, normalization, anisotropy, and dimensionality. Pages 23-25 and 129-131 were then rendered and visually inspected as the two relevant neighborhoods. No slide shows radial L2 normalization or the resulting equivalence of dot, cosine, and Euclidean ranking, and no deck artwork is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Google for Developers: Supervised similarity measures",
+        "url": "https://developers.google.com/machine-learning/clustering/dnn-clustering/supervised-similarity",
+        "usage": "Used to verify that dot product includes vector length, cosine depends only on angle, and unit normalization gives dot = cosine with Euclidean distance equal to sqrt(2 - 2 cosine).",
+        "license": "The official documentation is used only to verify formulas and behavior. No prose, examples, layout, or artwork is reproduced; the visual uses independently chosen vectors and labels."
+      },
+      {
+        "title": "Sentence Transformers documentation: Semantic Textual Similarity",
+        "url": "https://www.sbert.net/docs/sentence_transformer/usage/semantic_textual_similarity.html",
+        "usage": "Used to verify cosine as the library default and its official guidance that dot product is equivalent and faster when embeddings are already normalized.",
+        "license": "No documentation prose, code, data, or artwork is copied. Documentation reuse rights are not relied upon."
+      },
+      {
+        "title": "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks",
+        "url": "https://arxiv.org/abs/1908.10084",
+        "usage": "Used as a primary paper connecting sentence embeddings with cosine-similarity comparison.",
+        "license": "No paper figure, result, prose, or layout is reused. Figure reuse permission was not established, so the implementation is an original schematic."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the ranking consequence of projecting embeddings radially onto the unit sphere. The original teaching example uses q = (1, 0), A = (1.8, 1.6), and B = (0.9, 0.2): raw dot product ranks A over B (1.80 versus 0.90), despite B's smaller angle; after normalization, cosine and dot rank B over A (0.976 versus 0.747), and unit-sphere L2 distances rank B nearer (0.218 versus 0.711). Values are rounded to three decimals and follow directly from the stated coordinates."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Independently reviewed the complete article, text-indexed all 214 deck pages, visually inspected both relevant slide neighborhoods, and checked one primary paper plus official Google and Sentence Transformers documentation before selecting an original normalization diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "embedding-normalization-metric-equivalence"
+    ],
+    "accessibility": "Each panel has its own linked SVG title and detailed description. Candidate A is a circle with a solid ray and candidate B is a diamond with a dashed ray; direct labels and written rankings preserve the lesson without color. The established two-panel primitive stacks below 640 pixels, each SVG scales from a compact viewBox without a minimum width for readability at 390 CSS pixels, theme tokens provide dark-mode contrast, and shared print tokens force a light high-contrast palette."
+  }
+}
