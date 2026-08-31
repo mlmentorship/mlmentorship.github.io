@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "expectation-maximization",
+  "article": "src/content/posts/2025-11-09-expectation-maximization.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why each E-step and M-step cannot decrease the observed-data log-likelihood.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align a likelihood curve, its tight lower bound, parameter movement, and the monotonicity inequalities in one phone-width figure. The plot supplies the spatial intuition while the labelled steps make the proof checkable.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show E-step/M-step alternation but cannot accurately express a continuous lower bound touching and remaining below the likelihood curve.",
+    "svg": "Selected: deterministic geometry can pair the bound plot with the exact inequality chain, scale to a narrow column, and distinguish curves using both direct labels and line style.",
+    "semanticHtml": "Rejected: semantic boxes could present the inequalities accessibly but would omit the central spatial relationship among the bound, likelihood, and successive parameter values.",
+    "interaction": "Rejected: moving an artificial parameter slider would add controls and state without improving the one invariant the reader needs to retain.",
+    "paperReuse": "Rejected: the primary paper, textbook, Stanford notes, and local deck were reviewed as references, but no permissive license covering candidate figures was established. The implementation uses original geometry, wording, and a qualitative curve rather than copied artwork or data.",
+    "noVisual": "Rejected: the prose states the ELBO identity and monotonicity correctly, but the reader must mentally coordinate when the bound is tight, what remains fixed during maximization, and how the two inequalities compose."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 64,
+        "insight": "The section divider introduces basic probabilistic ML algorithms and contains no instructional content."
+      },
+      {
+        "page": 65,
+        "insight": "The directly relevant EM slide defines the alternating inference and parameter-estimation steps, states that the M-step optimizes a lower bound and the E-step closes its gap to the likelihood, and illustrates a mixture fit. It does not spatially show the bound-likelihood inequalities."
+      },
+      {
+        "page": 66,
+        "insight": "The following graphical-models slide explains observed and latent variables, marginalization, and conditional-independence factorization, providing context for why latent inference is difficult but not for EM monotonicity."
+      },
+      {
+        "page": 67,
+        "insight": "The neighboring message-passing slide describes alternating inference and parameter updates in a graph. Its factor-graph artwork concerns message direction rather than the EM lower bound."
+      },
+      {
+        "page": 68,
+        "insight": "The GMM/HMM slide applies EM to mixture and sequence models and says to alternate until likelihood stops improving; it does not explain why improvement is guaranteed."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for expectation maximization, EM algorithm, latent variables, lower bound, mixture models, and likelihood. Pages 64-68 were then rendered and visually inspected as the complete relevant neighborhood. Page 65 is the only dedicated EM slide and directly motivates the chosen learning objective. No deck pixels, plot data, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Maximum Likelihood from Incomplete Data via the EM Algorithm",
+        "url": "https://www.jstor.org/stable/2984875",
+        "usage": "Used as the primary paper to verify the E/M definitions and the non-decreasing observed-data likelihood property.",
+        "license": "The JRSS paper is publisher-controlled and JSTOR access does not grant a permissive figure-reuse license. No figure, prose, notation layout, or example is copied."
+      },
+      {
+        "title": "Pattern Recognition and Machine Learning",
+        "url": "https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/",
+        "usage": "Used as an authoritative textbook reference to cross-check the latent-variable formulation, lower-bound view, Gaussian-mixture application, and local-optimum limitation.",
+        "license": "Microsoft Research officially provides the book PDF, but the Springer copyright notice restricts reproduction and no permissive figure license was identified. No textbook figure, prose, or worked example is reproduced."
+      },
+      {
+        "title": "CS229 course materials: The EM algorithm",
+        "url": "https://cs229.stanford.edu/materials.html-withcomments",
+        "usage": "Used as authoritative university course notes to check the Jensen lower bound, the posterior choice that makes the bound tight, and alternating maximization.",
+        "license": "The official course page provides the notes for study but states no permissive license for republishing figures. No note text, figure, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the monotonicity argument: the E-step does not move theta but chooses q so the ELBO touches the likelihood at the current theta; the M-step holds q fixed and raises that bound; the likelihood at the new theta must lie at least as high as the raised bound. The original schematic is qualitative and makes no empirical or scale claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-30",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, visually inspected pages 64-68, and checked the original EM paper, an authoritative textbook, and official Stanford course notes before selecting an original lower-bound schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "em-lower-bound-climb"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that explains the full monotonicity chain. Solid versus dashed lines, direct curve labels, numbered stages, point positions, and written inequalities preserve the lesson without color. A 360-unit viewBox has no minimum width and uses 11-14 unit labels for readability at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, and the shared print rules switch the figure to a light high-contrast palette and avoid breaks."
+  }
+}
