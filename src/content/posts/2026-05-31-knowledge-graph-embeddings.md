@@ -47,6 +47,63 @@ $$
 
 The complex conjugate $\bar{\mathbf{t}}$ breaks the symmetry, so ComplEx handles **symmetric *and* antisymmetric** relations, a strict generalization of DistMult.
 
+<!-- visual:kge-antisymmetry-score-swap -->
+<figure class="learning-figure" aria-labelledby="kge-antisymmetry-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="kge-antisymmetry-title">Why can no amount of width make DistMult represent an antisymmetric relation?</p>
+	<div class="visual-grid--two">
+		<section class="visual-panel plot-panel" aria-labelledby="distmult-swap-title">
+			<h4 id="distmult-swap-title">DistMult: swapping is invisible</h4>
+			<p>Real multiplication commutes in every dimension.</p>
+			<svg viewBox="0 0 300 250" role="img" aria-labelledby="distmult-swap-svg-title distmult-swap-svg-desc">
+				<title id="distmult-swap-svg-title">DistMult gives a parent relation and its reversal equal scores</title>
+				<desc id="distmult-swap-svg-desc">A solid arrow marks the true triple Ada parent of Ben, and a dashed arrow marks the false reversed triple Ben parent of Ada. DistMult multiplies the same three real values after swapping the entities, so both sums are equal and the model cannot rank the true direction above the false one.</desc>
+				<rect class="viz-plot-bg" x="5" y="5" width="290" height="240" rx="3"></rect>
+				<circle class="viz-node viz-node--input" cx="65" cy="52" r="25"></circle>
+				<text class="viz-node-label" x="65" y="57">Ada</text>
+				<circle class="viz-node viz-node--output" cx="235" cy="52" r="25"></circle>
+				<text class="viz-node-label" x="235" y="57">Ben</text>
+				<path class="viz-roc-curve" d="M92 45 H199"></path>
+				<path class="viz-arrow-forward" d="M199 39 L211 45 L199 51 Z"></path>
+				<text class="viz-edge-label" x="150" y="36">parent_of · true</text>
+				<path class="viz-baseline" d="M208 69 H101"></path>
+				<path class="viz-arrow-forward" d="M101 63 L89 69 L101 75 Z"></path>
+				<text class="viz-edge-label" x="150" y="87">parent_of · false</text>
+				<text class="viz-callout" x="18" y="122">score(A, r, B) = Σ Aᵢ rᵢ Bᵢ</text>
+				<text class="viz-callout" x="18" y="147">score(B, r, A) = Σ Bᵢ rᵢ Aᵢ</text>
+				<path class="viz-operating-guide" d="M30 164 H270"></path>
+				<text class="viz-node-label" x="150" y="194">forced equal</text>
+				<text class="viz-node-value" x="150" y="216">true cannot outrank reverse</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel" aria-labelledby="complex-swap-title">
+			<h4 id="complex-swap-title">ComplEx: conjugation preserves direction</h4>
+			<p>Swapping entities moves the conjugate to the other vector.</p>
+			<svg viewBox="0 0 300 250" role="img" aria-labelledby="complex-swap-svg-title complex-swap-svg-desc">
+				<title id="complex-swap-svg-title">ComplEx can give a parent relation and its reversal different scores</title>
+				<desc id="complex-swap-svg-desc">The same solid true arrow and dashed false reverse arrow connect Ada and Ben. In ComplEx, swapping the entities changes which entity vector is complex-conjugated. The two expressions are therefore not forced to match, allowing the model to score Ada parent of Ben above Ben parent of Ada.</desc>
+				<rect class="viz-plot-bg" x="5" y="5" width="290" height="240" rx="3"></rect>
+				<circle class="viz-node viz-node--input" cx="65" cy="52" r="25"></circle>
+				<text class="viz-node-label" x="65" y="57">Ada</text>
+				<circle class="viz-node viz-node--output" cx="235" cy="52" r="25"></circle>
+				<text class="viz-node-label" x="235" y="57">Ben</text>
+				<path class="viz-roc-curve" d="M92 45 H199"></path>
+				<path class="viz-arrow-forward" d="M199 39 L211 45 L199 51 Z"></path>
+				<text class="viz-edge-label" x="150" y="36">parent_of · true</text>
+				<path class="viz-baseline" d="M208 69 H101"></path>
+				<path class="viz-arrow-forward" d="M101 63 L89 69 L101 75 Z"></path>
+				<text class="viz-edge-label" x="150" y="87">parent_of · false</text>
+				<text class="viz-callout" x="18" y="122">score(A, r, B) = Re Σ Aᵢ rᵢ B̄ᵢ</text>
+				<text class="viz-callout" x="18" y="147">score(B, r, A) = Re Σ Bᵢ rᵢ Āᵢ</text>
+				<path class="viz-operating-guide" d="M30 164 H270"></path>
+				<text class="viz-node-label" x="150" y="194">free to differ</text>
+				<text class="viz-node-value" x="150" y="216">true can outrank reverse</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the two score pairs after swapping Ada and Ben. DistMult only reorders real scalar factors, so equality is unavoidable at every width. ComplEx moves the conjugate to the other entity; its score need not stay equal, so the directed fact can outrank its reversal. The broad pattern table below applies this same operator-first test to all four models. Original schematic checked against the <a href="https://proceedings.mlr.press/v48/trouillon16.html">ComplEx paper</a> and the <a href="https://arxiv.org/abs/1902.10197">RotatE comparison of relation patterns</a>.</figcaption>
+</figure>
+
 ### RotatE: rotation in complex space
 
 $$
