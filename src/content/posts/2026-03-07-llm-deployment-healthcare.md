@@ -42,6 +42,9 @@ This is a starting point, not an answer. It misses the regulatory framing, the w
 
 This is L5. You've named the constraints and let them drive the architecture.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace where evidence, clinician authority, and versioned audit data prevent an LLM draft from becoming an autonomous clinical action.</p>
+
 <!-- visual:healthcare-llm-clinician-gate -->
 ```mermaid
 flowchart TB
@@ -58,23 +61,23 @@ flowchart TB
   Operate["Workflow eval + fairness slices<br/>incident response · rollback · controlled update"]
   Scope --> Evidence
   Evidence --> Draft
-  Draft ==>|"decision support, not authority"| Review
-  Review -->|"unsupported / out of scope"| Stop
-  Review -->|"evidence sufficient"| Decide
+  Draft ==>|"draft only"| Review
+  Review -->|"unsupported"| Stop
+  Review -->|"supported"| Decide
   Decide --> Workflow
-  Evidence -.->|"record provenance"| Trace
-  Draft -.->|"record model + citations"| Trace
-  Stop -.->|"record edit / rejection"| Trace
-  Decide -.->|"record confirmation"| Trace
-  Workflow -.->|"observe outcomes"| Trace
+  Evidence -.->|"provenance"| Trace
+  Draft -.->|"model + citations"| Trace
+  Stop -.->|"edit / reject"| Trace
+  Decide -.->|"confirmation"| Trace
+  Workflow -.->|"outcome"| Trace
   Trace --> Operate
-  Operate -.->|"gate changes or roll back"| Scope
+  Operate -.->|"gate update / rollback"| Scope
   class Scope,Review viz-focus
   class Evidence viz-input
   class Trace viz-state
   class Decide,Workflow viz-output
   class Stop viz-warning
-  class Scope viz-tall
+  class Scope viz-tall,viz-wide
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path first. Regulation and intended use bound the task; verified evidence supports a structured draft; and only a clinician who can inspect the source basis and patient fit can turn that draft into a clinical decision. Then follow the dashed paths: every refusal, edit, confirmation, and outcome joins the same versioned trace for evaluation, incident response, rollback, and controlled updates. The gate labels and arrow styles carry the meaning without color. Original schematic informed by the <a href="https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software">FDA Clinical Decision Support Software guidance</a>, the <a href="https://www.who.int/publications/i/item/9789240029200">WHO guidance on AI for health</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI Risk Management Framework</a>.</p>
 

@@ -62,7 +62,7 @@
         "title": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection",
         "url": "https://arxiv.org/abs/2302.12173",
         "usage": "Used as a primary paper to verify the indirect-injection mechanism: attacker-controlled external content can enter an LLM application's context and redirect model behavior toward data theft, tool misuse, or other attacker-chosen outcomes.",
-        "license": "The arXiv paper is publicly accessible, but no permissive third-party figure-reuse grant was established. No source figure, attack prompt, screenshot, experimental result, wording, or layout is reproduced."
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, which is not a permissive third-party figure-reuse grant. No source figure, attack prompt, screenshot, experimental result, wording, or layout is reproduced."
       },
       {
         "title": "OWASP GenAI Security Project: LLM01 Prompt Injection",

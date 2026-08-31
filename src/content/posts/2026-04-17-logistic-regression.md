@@ -45,7 +45,7 @@ This is what "linear in the features" means here. Linear in the log-odds, not in
 			<text class="viz-label" x="16" y="231">0</text>
 			<text class="viz-label" x="8" y="132">0.5</text>
 			<text class="viz-label" x="16" y="31">1</text>
-			<text class="viz-axis-label" transform="translate(8 174) rotate(-90)">probability p</text>
+			<text class="viz-axis-label" transform="translate(16 174) rotate(-90)">probability p</text>
 			<path d="M34 214.5C45 212.5 55 209.5 65 205.7S111 186 127 175.1S174 140 189 128S235 91.8 251 80.9S298 54.4 313 50.3S333 43.5 344 41.5" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-linecap:round"></path>
 			<path class="viz-operating-guide" d="M189 26V230"></path>
 			<circle class="viz-operating-point" cx="65" cy="205.7" r="5"></circle>

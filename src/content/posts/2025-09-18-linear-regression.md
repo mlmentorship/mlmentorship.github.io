@@ -46,8 +46,8 @@ This is the **normal equations** solution. Derived by setting $\nabla_w L = 0$.
 				</marker>
 			</defs>
 			<path d="M24 206L224 105L337 155L137 256Z" style="fill:var(--viz-state-bg);fill-opacity:.72;stroke:var(--viz-state-stroke);stroke-width:2"></path>
-			<text class="viz-axis-label" x="276" y="183">Col(X)</text>
-			<text class="viz-label" x="277" y="199">all possible fitted vectors Xw</text>
+			<text class="viz-axis-label" x="340" y="183" text-anchor="end">Col(X)</text>
+			<text class="viz-label" x="340" y="199" text-anchor="end">all possible fitted vectors Xw</text>
 			<circle cx="67" cy="222" r="4" style="fill:var(--c-text);stroke:var(--c-text)"></circle>
 			<text class="viz-label" x="45" y="241">origin</text>
 			<path d="M67 222L207 148" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;marker-end:url(#ols-projection-arrow)"></path>

@@ -67,7 +67,7 @@
         "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
         "url": "https://arxiv.org/abs/2309.06180",
         "usage": "Used as a primary systems paper to verify that long shared prompt prefixes create reusable KV state and that prefix sharing can reduce redundant prompt computation at the serving layer.",
-        "license": "The arXiv record provides public access but does not establish a permissive license for figure republication. No paper figure, example, result, wording, or layout is reproduced."
+        "license": "The arXiv record identifies CC BY 4.0, so attributed reuse is permitted. No paper figure, example, result, wording, or layout is reproduced because the original call-ledger visual addresses a different learning objective."
       }
     ],
     "notes": "The hardest prose-only mental model is compounding across layers 2-5, not the five-item taxonomy itself. In a multi-step request, each model call receives fixed instructions and retrieved context plus the conversation or tool history accumulated so far. Without effective prefix caching or summarization, adding similarly sized history each step makes total input-token processing grow as a sum of increasing contexts; an extra retry or long tail request repeats the largest context. The visual is qualitative and deliberately omits dollar amounts, token counts, and universal cache discounts because prices, minimum cacheable lengths, write charges, TTLs, and hit rules vary by provider and model."

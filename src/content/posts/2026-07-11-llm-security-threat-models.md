@@ -63,6 +63,9 @@ Natural-language delimiters are not security boundaries. A prompt saying "ignore
 
 **Learning objective:** trace how indirect prompt injection can influence a model, then identify the external authorization boundary that prevents a proposal from becoming asset compromise.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Separate untrusted content that can influence a model from trusted controls that authorize a bounded side effect.</p>
+
 <!-- visual:llm-security-influence-authority-path -->
 ```mermaid
 flowchart TB

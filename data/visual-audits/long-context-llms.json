@@ -11,7 +11,7 @@
     "svg": "Rejected: fixed geometry adds no quantitative insight beyond the symbolic n and n-squared rates. Native text wrapping and table semantics are more robust at narrow widths.",
     "semanticHtml": "Selected: scoped headers align each bottleneck, growth mechanism, and matching lever in accessible reading order. The existing compact comparison-table primitive supplies responsive text, theme tokens, and print behavior without runtime rendering.",
     "interaction": "Rejected: toggling context length could animate cost growth, but it would hide the conceptual distinction and require assumptions about model dimensions. All three invariants fit in one static view.",
-    "paperReuse": "Rejected: the position-interpolation, FlashAttention, PagedAttention, and GQA papers each explain one component, but no single source figure provides the article's cross-layer comparison. Figure reuse permission was not established from the arXiv records, so no figure, prose, values, icons, or composition is copied.",
+    "paperReuse": "Rejected: the position-interpolation, FlashAttention, PagedAttention, and GQA papers each explain one component, but no single source figure provides the article's cross-layer comparison. Position Interpolation, PagedAttention, and GQA are CC BY 4.0; FlashAttention uses arXiv's non-exclusive distribution license. Even where reuse is permitted, no figure, prose, values, icons, or composition is copied because an original cross-layer comparison is narrower.",
     "noVisual": "Rejected: the prose lists techniques under three headings but readers can still transfer a benefit across boundaries—for example, assuming FlashAttention reduces quadratic arithmetic or PagedAttention shrinks the logical cache. The row-wise visual makes both the matching lever and its limit explicit."
   },
   "deckReview": {
@@ -69,25 +69,25 @@
         "title": "Extending Context Window of Large Language Models via Positional Interpolation",
         "url": "https://arxiv.org/abs/2306.15595",
         "usage": "Used as the primary source to verify that position interpolation rescales longer position indices into the original position range and uses limited long-context fine-tuning to extend usable context.",
-        "license": "The public arXiv record did not establish permissive figure-reuse rights. No paper figure, equation layout, prose, benchmark value, or composition is copied; the source is cited only for the mechanism."
+        "license": "The arXiv record identifies CC BY 4.0, so attributed reuse is permitted. No paper figure, equation layout, prose, benchmark value, or composition is copied; the source is cited only for the mechanism."
       },
       {
         "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
         "url": "https://arxiv.org/abs/2205.14135",
         "usage": "Used as the primary source to verify that tiled exact attention reduces HBM traffic and avoids materializing the full quadratic score and probability matrices while retaining exact dense-attention arithmetic.",
-        "license": "The paper's public availability and the repository's BSD-3-Clause software license were not treated as permission to reproduce paper artwork. No figure, algorithm text, benchmark, or layout is adapted."
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license; the repository's BSD-3-Clause software license does not license paper artwork. No figure, algorithm text, benchmark, or layout is adapted."
       },
       {
         "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
         "url": "https://arxiv.org/abs/2309.06180",
         "usage": "Used as the primary systems source to verify that block-based KV-cache allocation reduces fragmentation and enables sharing while leaving the attention computation and logical per-sequence state intact.",
-        "license": "The arXiv record did not establish a permissive license for paper figures. The vLLM codebase is Apache-2.0, but that software license is not assumed to license paper artwork. No source figure, code, values, prose, or layout is reused."
+        "license": "The arXiv record identifies CC BY 4.0, so attributed reuse of the paper is permitted; the vLLM codebase is separately Apache-2.0. No source figure, code, values, prose, or layout is reused."
       },
       {
         "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
         "url": "https://arxiv.org/abs/2305.13245",
         "usage": "Used as the primary source to verify that grouped-query attention uses fewer key/value heads than query heads, reducing the logical KV-cache footprint and memory bandwidth relative to multi-head attention.",
-        "license": "No permissive figure-reuse grant was established from the public paper record. The comparison table is independently authored and reproduces no paper figure, prose, data point, or visual arrangement."
+        "license": "The arXiv record identifies CC BY 4.0, so attributed reuse is permitted. The comparison table is independently authored and reproduces no paper figure, prose, data point, or visual arrangement."
       }
     ],
     "notes": "The hardest prose-only mental model is that a headline context length intersects three independent constraints. Position methods determine whether token distances remain meaningful beyond the training range. FlashAttention determines whether exact dense attention can execute without quadratic intermediate storage, but does not remove its quadratic arithmetic. GQA and quantization reduce logical per-request KV bytes, while PagedAttention primarily reduces allocator waste and enables block reuse rather than shrinking unique K/V state. Source review also caught and corrected the article's score-matrix arithmetic: 128,000 squared FP32 values occupy about 61 GiB (65.5 GB), not 16 GB."

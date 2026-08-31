@@ -92,7 +92,7 @@
         "title": "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation",
         "url": "https://arxiv.org/abs/1406.1078",
         "usage": "Used as the primary GRU source to verify update and reset gating, a single hidden state, and interpolation between the previous state and a candidate activation.",
-        "license": "The arXiv record is public, but no permissive third-party figure-reuse grant was established. No paper figure, architecture layout, experiment, phrase data, wording, or values are copied."
+        "license": "The arXiv record uses the arXiv.org perpetual, non-exclusive license, which is not a permissive third-party figure-reuse grant. No paper figure, architecture layout, experiment, phrase data, wording, or values are copied."
       },
       {
         "title": "On the difficulty of training recurrent neural networks",

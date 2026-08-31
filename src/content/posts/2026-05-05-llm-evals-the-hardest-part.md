@@ -40,6 +40,37 @@ Not all eval signals are equal. In rough order of trustworthiness (most → leas
 
 Most teams pick rows 5-6, automate, and stop. Good teams maintain signals at multiple levels and watch correlations between them.
 
+**Learning objective:** trace how production evidence grounds human judgment, human judgment calibrates scalable checks, and production drift can invalidate the offline eval.
+
+<!-- visual:llm-eval-chain-of-trust -->
+<figure class="learning-figure" aria-labelledby="llm-eval-trust-title">
+	<p class="visual-kicker">Chain of trust</p>
+	<p class="visual-title" id="llm-eval-trust-title">An automated score inherits trust; it does not create it.</p>
+	<div class="visual-panel" role="list" aria-label="Four stages that ground, encode, scale, and revalidate an LLM evaluation">
+		<section role="listitem">
+			<h4>1 · GROUND · OBSERVE USER OUTCOMES AND REAL OUTPUTS</h4>
+			<p><strong>Provides:</strong> the closest evidence that the product helps users, plus production cases and failure modes worth testing.</p>
+			<p><strong>Tradeoff:</strong> high validity, but slow, noisy, and expensive to diagnose.</p>
+		</section>
+		<section role="listitem">
+			<h4>2 · ENCODE · BUILD A GOLDEN SET AND CONCRETE RUBRIC</h4>
+			<p><strong>Provides:</strong> reproducible examples of success, edge cases, and known failures, with humans calibrated on what each rating means.</p>
+			<p><strong>Tradeoff:</strong> faster feedback, but only for the distribution and criteria represented in the set.</p>
+		</section>
+		<section role="listitem">
+			<h4>3 · SCALE · APPLY PROGRAMMATIC CHECKS AND A CALIBRATED JUDGE</h4>
+			<p><strong>Provides:</strong> frequent, inexpensive comparisons across model, prompt, and system changes.</p>
+			<p><strong>Tradeoff:</strong> a judge is a measured proxy for human ratings, not new ground truth; deterministic checks cover only explicit contracts.</p>
+		</section>
+		<section role="listitem">
+			<h4>4 · REVALIDATE · COMPARE OFFLINE MOVEMENT WITH PRODUCTION</h4>
+			<p><strong>Provides:</strong> evidence that offline gains predict user outcomes across important slices, cost, and latency constraints.</p>
+			<p><strong>If they diverge:</strong> inspect fresh outputs, add the missed cases, revise the rubric, and recalibrate the scorer before trusting it again.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move downward to gain speed and reproducibility, but carry validity from the layer above. Then close the loop: if an offline improvement does not predict production outcomes, repair the cases, rubric, or scorer instead of optimizing the misleading number. Original synthesis checked against <a href="https://arxiv.org/abs/2306.05685">Zheng et al. on LLM-judge agreement and bias</a>, <a href="https://developers.openai.com/api/docs/guides/evaluation-best-practices">OpenAI's evaluation guidance</a>, and <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF 1.0</a>.</figcaption>
+</figure>
+
 ## Building the eval, in order
 
 Build these in this sequence. Don't skip steps.
