@@ -29,15 +29,45 @@ Right inputs, no model. You've memorized which loss goes with which task type, b
 > - **Pairwise / listwise losses** for ranking: encode the ordering of items, not absolute scores.
 > - **Triplet / contrastive losses** for representation learning: encode that similar items should be close, dissimilar far.
 >
-> If the cost structure is asymmetric (e.g., false negatives much worse than false positives in fraud detection), I'd weight the loss accordingly or use a focal loss to focus on hard examples."
+> If the cost structure is asymmetric (e.g., false negatives much worse than false positives in fraud detection), I'd start with a calibrated probability model and tune the decision threshold for those costs. I might also weight the corresponding training examples. Focal loss is for down-weighting easy examples under severe imbalance; it does not specify which error is more costly."
 
 This is L5. You've connected losses to noise models and cost structures.
+
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Separate the quantity a loss estimates from the action a product takes</p>
+
+<!-- visual:loss-estimation-vs-decision -->
+```mermaid
+flowchart TB
+	accTitle: Choosing a training loss is separate from choosing a deployment action
+	accDescr: The training rail begins by asking what quantity the model must estimate. A probability distribution maps to log loss, a conditional mean to squared error, a conditional median to absolute error, a robust location to Huber loss, an ordering to a ranking loss, and embedding geometry to a contrastive loss. These produce predictions on held-out data. The deployment rail evaluates those predictions against the real metric, calibrates scores when probabilities are required, and combines predictions with error costs, constraints, and capacity to choose a threshold, ranking, abstention, or route. A dashed feedback arrow sends deployment evidence back to the prediction target and surrogate choice.
+	subgraph Train["TRAIN · estimate the right quantity"]
+		Q{"What must the output mean?"}
+		Q --> L["class probability → log loss<br/>conditional mean → squared error<br/>conditional median → absolute error<br/>robust location → Huber loss<br/>relative order → ranking loss<br/>embedding geometry → contrastive loss"]
+		L --> O["Predictions on held-out data"]
+	end
+	subgraph Deploy["DEPLOY · choose the right action"]
+		O --> V["Evaluate the real metric<br/>on representative data"]
+		V --> C["Calibrate if scores must<br/>represent probabilities"]
+		C --> K["Combine predictions with<br/>error costs · constraints · capacity"]
+		K --> A["Choose action rule<br/>threshold · rank · abstain · route"]
+	end
+	V -. "evidence may change the target or surrogate" .-> Q
+	class Q viz-focus
+	class L viz-input
+	class O,V,C viz-neutral
+	class K viz-state
+	class A viz-output
+	class Q viz-wide
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> go down the training rail first: name the statistical quantity you need, then choose a loss that elicits it. Only after checking held-out predictions should you enter the deployment rail, where calibration, costs, constraints, and capacity choose the action. A metric can send you back to revise the surrogate, but it is not automatically a differentiable loss. Original synthesis informed by <a href="https://doi.org/10.1198/016214506000001437">Gneiting and Raftery on proper scoring rules</a>, <a href="https://doi.org/10.1214/aoms/1177703732">Huber on robust location</a>, and <a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn's threshold guidance</a>.</p>
 
 ## What an L6 answer sounds like
 
 > "...a few practical considerations:
 >
-> **The loss should be calibrated for the metric you actually care about.** A model trained on cross-entropy is calibrated for log-likelihood, not for AUC or precision at K. If your downstream metric is AUC, you might benefit from a ranking-aware loss; if it's precision at K, focal loss or top-K cross-entropy.
+> **The loss should be a useful surrogate for the metric you actually care about.** Cross-entropy estimates class probabilities; AUC and precision at K evaluate ranking or a chosen operating region. Ranking-aware or top-K surrogates may align better, but I would verify that on representative held-out data.
 >
 > **Multi-task losses are weighted sums of per-task losses.** The weighting matters and is hard to set; uncertainty-weighted multi-task loss (Kendall et al.) and gradient-magnitude balancing (GradNorm) are principled approaches.
 >
@@ -50,7 +80,7 @@ This is L5. You've connected losses to noise models and cost structures.
 - You connect the loss to the **noise model** (Gaussian / Laplace / categorical).
 - You distinguish **mean** vs **median** targeting (MSE vs MAE).
 - You bring up **calibration vs the downstream metric** as separate concerns.
-- You mention **focal loss** or class weighting for asymmetric cost structures.
+- You separate **threshold tuning or explicit cost weighting** from focal loss for hard-example emphasis.
 
 ## Tells that get you down-leveled
 
@@ -65,7 +95,7 @@ This is L5. You've connected losses to noise models and cost structures.
 
 The L6 answer:
 
-> "Several options, ranked by complexity. (1) Threshold tuning on the original model. (2) Cost-sensitive loss: weight false positives much more than false negatives in cross-entropy. (3) Train with focal loss to focus on hard examples. (4) Train two-stage: a high-recall first stage, then a high-precision filter. The right answer depends on whether the precision/recall asymmetry is large enough to need a structural change or small enough that threshold tuning suffices."
+> "Several options, ranked by complexity. (1) Tune the threshold on representative validation data for the required precision, while checking the resulting recall and volume. (2) If retraining is justified, use a cost-sensitive loss that gives more weight to negative examples that become false positives. (3) For retrieval, optimize a ranking or top-K surrogate. (4) Train two-stage: a high-recall first stage, then a high-precision filter. The right answer depends on whether thresholding a calibrated model meets the operating constraint or the ranking itself must change."
 
 ---
 

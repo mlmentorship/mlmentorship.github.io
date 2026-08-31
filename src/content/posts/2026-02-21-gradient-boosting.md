@@ -82,7 +82,7 @@ For squared error, $r_{i,t} = y_i - F_{t-1}(x_i)$. Literal residuals. For other 
 		</g>
 		<text class="viz-label" x="180" y="497" text-anchor="middle">remaining residuals: −1.5 | +1.5; half as long</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> start at the flat prediction $F_0=5$. Each signed arrow is both a target gap and, for squared error, a training label for the next tree. The stump fits $-3$ on the left and $+3$ on the right; shrinkage adds only half of that correction. The updated step $F_1$ therefore moves toward every target without jumping all the way there, and each residual is halved. Original schematic checked against <a href="https://www.jstor.org/stable/2699986">Friedman's gradient-boosting formulation</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost boosted-tree tutorial</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at the flat prediction <var>F</var><sub>0</sub> = 5. Each signed arrow is both a target gap and, for squared error, a training label for the next tree. The stump fits −3 on the left and +3 on the right; shrinkage adds only half of that correction. The updated step <var>F</var><sub>1</sub> therefore moves toward every target without jumping all the way there, and each residual is halved. Original schematic checked against <a href="https://www.jstor.org/stable/2699986">Friedman's gradient-boosting formulation</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost boosted-tree tutorial</a>.</figcaption>
 </figure>
 
 ## Newton boosting (xgboost)

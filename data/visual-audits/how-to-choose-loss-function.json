@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "how-to-choose-loss-function",
+  "article": "src/content/posts/2026-03-09-how-to-choose-loss-function.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Separate the training loss that elicits a predictive quantity from the deployment rule that converts that prediction into a cost-sensitive action.",
+  "mediumRationale": "A compact two-rail Mermaid flow is the smallest medium that separates estimation from decision-making while preserving their connection through held-out evaluation. One rail maps the required prediction to a compatible loss; the other maps calibrated predictions and deployment costs to an action rule. This teaches why a metric, class imbalance, and an error cost are related inputs but not interchangeable names for a loss.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a relationship among prediction targets, training objectives, validation metrics, and deployment decisions rather than quantitative curve geometry.",
+    "svg": "Rejected because fixed coordinates add maintenance and mobile-label risk without improving the causal sequence.",
+    "semanticHtml": "Rejected because a table could list canonical pairings but would reinforce lookup-table thinking and obscure the separation between estimation and action.",
+    "interaction": "Rejected because swapping costs or thresholds would add controls without improving the prerequisite distinction between the two rails.",
+    "paperReuse": "Rejected because the reviewed sources contain broader mathematical treatments or domain-specific results, not this interview-oriented synthesis; no source figure has both the required scope and verified reuse permission.",
+    "noVisual": "Rejected because the prose interleaves noise models, surrogate metrics, class imbalance, costs, and thresholding, making it easy to treat them as one loss-selection step."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 33,
+        "insight": "The logistic-regression slide connects categorical likelihood, negative log-likelihood, and cross-entropy, supporting the training-loss side of the distinction."
+      },
+      {
+        "page": 36,
+        "insight": "The surrogate-loss slide lists triplet, hinge, logistic, exponential, cross-entropy, and focal losses, but presents them as a taxonomy rather than deriving a choice from the prediction target."
+      },
+      {
+        "page": 37,
+        "insight": "The evaluation slide separates precision, recall, ROC tradeoffs, and AUC from the fitted classifier, providing context for held-out operating-point evaluation."
+      },
+      {
+        "page": 38,
+        "insight": "The neighboring evaluation slide varies the classifier threshold to trade recall against false positives and plots precision-recall points, showing that decision policy can change after training."
+      },
+      {
+        "page": 39,
+        "insight": "The calibration slide distinguishes raw softmax confidence from calibrated probability and introduces validation-set temperature scaling before threshold-based use."
+      },
+      {
+        "page": 165,
+        "insight": "The system-design setup explicitly asks which error is costlier and notes that a non-differentiable deployment metric requires a separate training loss."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for loss functions, likelihood, MSE, MAE, Huber, cross-entropy, focal loss, triplet loss, ranking, precision, recall, metrics, and differentiability. Pages 31-41 were inspected as the complete loss-and-evaluation neighborhood: page 31 closes algorithm tradeoffs, page 32 is the section divider, pages 33-36 cover classification and surrogate losses, pages 37-39 cover metrics and calibration, page 40 is the next section divider, and page 41 begins activations. Pages 164-166 were inspected around the system-design framing on page 165; they cover experimentation, project setup, and data pipelines. The deck does not provide a visual that separates eliciting a prediction during training from choosing a cost-sensitive action after training. No deck wording, code, figure, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Strictly Proper Scoring Rules, Prediction, and Estimation",
+        "url": "https://doi.org/10.1198/016214506000001437",
+        "usage": "Used as the primary statistical source for the principle that a proper scoring rule elicits an honest predictive distribution, distinguishing forecast estimation from downstream utility.",
+        "license": "The JASA article is publisher-copyrighted and no permissive artwork license was established. No text, theorem statement, data, figure, or composition is copied; the visual is an original synthesis."
+      },
+      {
+        "title": "Robust Estimation of a Location Parameter",
+        "url": "https://doi.org/10.1214/aoms/1177703732",
+        "usage": "Used as the primary source for Huber's robust location objective, whose quadratic center and linear tails trade smooth local fitting against reduced outlier influence.",
+        "license": "No permissive figure-reuse grant was established from the publisher record. No paper figure, wording, notation, or data is reproduced."
+      },
+      {
+        "title": "Focal Loss for Dense Object Detection",
+        "url": "https://arxiv.org/abs/1708.02002",
+        "usage": "Used as the primary source to verify that focal loss down-weights easy examples to address extreme foreground-background imbalance; it does not directly encode a desired precision threshold or asymmetric action cost.",
+        "license": "The arXiv record is publicly readable, but public access is not treated as permission to adapt artwork. No figure, result, code, wording, or layout is reused."
+      },
+      {
+        "title": "scikit-learn User Guide: Post-tuning the decision threshold",
+        "url": "https://scikit-learn.org/stable/modules/classification_threshold.html",
+        "usage": "Used as official documentation to verify that identical probability outputs and ranking curves can produce different class actions after threshold tuning against a business utility or held-out metric.",
+        "license": "The documentation is used only for API semantics. No documentation text, example values, image, or layout is copied into the original diagram."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that loss selection and action selection answer different questions. A training loss should elicit the prediction the model must produce: a categorical distribution, conditional mean, conditional median, robust location, ordering, or embedding geometry. A held-out deployment metric then checks usefulness, while calibrated predictions, costs, constraints, and capacity determine thresholds or other actions. Cost-sensitive weighting can be appropriate during training, but focal loss primarily changes attention to easy versus hard examples and does not by itself specify whether false positives or false negatives are costlier. The diagram is an original synthesis and contains no source-specific data or visual structure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant neighborhoods, then checked primary work on proper scoring, robust loss, and focal loss plus official threshold-tuning documentation before choosing an original two-rail flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "loss-estimation-vs-decision"
+    ],
+    "accessibility": "The Mermaid diagram provides a specific accessible title and a complete description of both rails. Every box names its role, arrow direction carries sequence, dashed feedback denotes held-out validation, and explicit labels distinguish training from deployment without relying on color. The narrow top-to-bottom layout keeps all six quantity-to-loss mappings in one vertically stacked card rather than shrinking a wide fan-out; the established compact Mermaid primitive therefore remains readable at 390 CSS pixels, with shared dark-mode theming and print-safe rendering."
+  }
+}

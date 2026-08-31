@@ -47,7 +47,7 @@ Implementation: project K and V to dimension $G \cdot d$ instead of $H \cdot d$,
 					<tr><th scope="row">2</th><td>Q<sub>5</sub>, Q<sub>6</sub>, Q<sub>7</sub>, Q<sub>8</sub></td><td class="cm-selected"><strong>K<sub>2</sub> + V<sub>2</sub></strong>reused 4×</td></tr>
 				</tbody>
 			</table>
-			<p class="cm-equation">H = 8 queries ÷ G = 2 groups = 4 queries per pair</p>
+			<p class="cm-equation">H/G = 8 queries ÷ 2 groups = 4 queries per pair</p>
 		</section>
 		<section class="visual-panel" aria-labelledby="gqa-cache-title">
 			<h4 id="gqa-cache-title">Only cached K/V head count shrinks</h4>

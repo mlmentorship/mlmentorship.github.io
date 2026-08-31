@@ -38,7 +38,8 @@ you've read about hallucinations in tutorials but haven't fought them in product
 >
 > Importantly: the goal isn't zero hallucinations, that's not achievable with current technology. The goal is *acceptable hallucination rate for the use case*, with detection and graceful handling for the rest."
 
-**Learning objective:** Trace how evidence, claim-level verification, and consequence determine whether a generated answer is published, retried, refused, or reviewed by a human.
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace how evidence and consequence gate a generated answer</p>
 
 <!-- visual:hallucination-claim-release-gates -->
 ```mermaid
@@ -70,7 +71,7 @@ flowchart TB
 	class E,V,K viz-focus
 	class P viz-output
 	class T,H viz-warning
-	class Q,R,E,G,C,V,P,K,T,H,A viz-compact
+	class Q viz-wide
 ```
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path and notice that retrieval is only the first gate. A draft earns release only when each atomic claim is supported by its cited passage; unsupported claims branch by consequence into retry or refusal versus human review. The verifier is another imperfect model component, so dashed production audits improve its tests and thresholds rather than declaring the system solved. Original synthesis informed by <a href="https://arxiv.org/abs/2005.11401">Lewis et al. on retrieval-augmented generation</a>, <a href="https://aclanthology.org/2023.emnlp-main.398/">Gao et al. on citation correctness</a>, <a href="https://aclanthology.org/2023.emnlp-main.741/">Min et al. on atomic factual evaluation</a>, and the <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST Generative AI Profile</a>.</p>
 
