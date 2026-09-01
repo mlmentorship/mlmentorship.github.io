@@ -10,7 +10,7 @@
     "recognitionCue": "Unique node values are given in preorder and inorder, so root order and left/right membership complement each other to determine one binary tree.",
     "invariant": "build(left,right) consumes exactly the next preorder values belonging to inorder[left:right+1] and returns precisely that subtree. Empty ranges consume nothing and return None.",
     "stateModel": "Keep the inorder value-to-index map, one shared preorder_index, recursive left/right bounds, and constructed nodes. The call stack preserves unfinished parent assignments.",
-    "visualRationale": "A real edged binary-tree topology is paired with every active inorder range, preorder cursor value, split, base case, and return. Stable semantic node keys preserve identity as recursion progresses.",
+    "visualRationale": "A compact coordinate grid draws every binary-tree node and parent-child edge with ASCII geometry, while a stable active-root key moves through inorder ranges, splits, base cases, and returns at readable mobile size.",
     "rejectedAlternatives": [
       "A table of traversal lists does not depict parent-child topology or recursive returns.",
       "Repeated list slicing hides the shared preorder cursor and adds avoidable allocation.",

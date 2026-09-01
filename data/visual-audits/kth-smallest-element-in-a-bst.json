@@ -10,7 +10,7 @@
     "recognitionCue": "The input is a BST and the question asks for an order statistic, so inorder traversal produces the required sorted rank without sorting all values.",
     "invariant": "Before each pop, the stack top is the smallest unvisited node reachable from the processed search frontier; completed pops are in strictly ascending BST order.",
     "stateModel": "Keep only the current root pointer, the stack of deferred ancestors, and the remaining rank k; push a full left spine, pop once, decrement k, then explore the popped node’s right child.",
-    "visualRationale": "The complete tree remains fixed while one cursor moves along real parent-child edges and the visible stack and k arithmetic change at every push and pop.",
+    "visualRationale": "A compact coordinate grid keeps every BST node and ASCII parent-child edge fixed while a stable inorder cursor moves; stack and k arithmetic change at every push and pop.",
     "rejectedAlternatives": [
       "Flattening and sorting every value hides the BST ordering and costs extra O(n log n) time.",
       "A sorted output row omits the deferred-ancestor stack that makes iterative inorder work.",

@@ -4,19 +4,19 @@
   "article": "src/content/posts/2026-09-01-binary-precision-and-recall.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Route each pair with Boolean masks, then divide TP by predicted-positive and actual-positive totals safely.",
+  "learningObjective": "Build TP, FP, and FN with elementwise Boolean masks, then divide TP by predicted-positive and actual-positive totals with zero-denominator guards.",
   "mechanismReview": {
-    "pattern": "Vectorized Boolean masks for confusion counts followed by denominator-specific safe division.",
-    "recognitionCue": "Binary labels and predictions must be reduced to precision and recall, whose numerators overlap but whose predicted-positive and actual-positive populations differ.",
-    "invariant": "Each aligned example contributes to exactly one confusion cell; TP, FP, and FN masks count disjoint conditions, and each metric uses TP over its named population.",
-    "stateModel": "Retain aligned label/prediction arrays, three Boolean masks or their sums, precision_total, and recall_total. True negatives do not enter either denominator.",
-    "visualRationale": "A per-example routing table keeps every pair and confusion category visible while a stable metric cursor moves through masks, sums, denominators, and guarded divisions.",
+    "pattern": "Elementwise Boolean confusion masks followed by metric-specific safe division.",
+    "recognitionCue": "Use these masks when binary labels and predictions must be reduced into precision and recall, whose denominators answer different conditional questions.",
+    "invariant": "After each index, TP, FP, and FN equal the counts of their Boolean conjunctions over the processed prefix; TN affects neither precision nor recall numerator or denominator.",
+    "stateModel": "Retain aligned label and prediction arrays, three integer mask sums, predicted-positive total TP+FP, actual-positive total TP+FN, and guarded divisions.",
+    "visualRationale": "A concrete row per observation keeps label/prediction alignment visible while a stable cursor advances through every mask outcome, then a compact metric table contrasts denominator meanings and guards.",
     "rejectedAlternatives": [
-      "A bare formula triangle hides how Boolean array conditions produce TP, FP, and FN.",
-      "A 2x2 matrix alone loses per-example verification and the safe-division branches.",
-      "Two unrelated gauges obscure that precision and recall share TP but select different populations."
+      "A confusion-matrix template without input arrays cannot verify how observations produce counts.",
+      "Reporting only final ratios hides the critical difference between predicted-positive and actual-positive denominators.",
+      "Using one unconditional division can produce undefined metrics when a denominator is zero."
     ],
-    "transferLesson": "Define the population before dividing: precision conditions on predicted positives, recall on actual positives; the same discipline prevents denominator mistakes in rates and conditional metrics.",
+    "transferLesson": "Define classification metrics as Boolean event counts first, then name each denominator population and guard empty populations before division.",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

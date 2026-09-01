@@ -10,7 +10,7 @@
     "recognitionCue": "BST validity applies against every ancestor, so a local parent-child comparison is insufficient and each recursive call must carry the legal value interval.",
     "invariant": "At valid(node, low, high), every ancestor constraint is summarized by low < node.val < high; the left call tightens high and the right call tightens low.",
     "stateModel": "Retain the current node, its exclusive low/high bounds, and the recursion stack; null returns true and any out-of-range node returns false immediately.",
-    "visualRationale": "A fixed tree with a moving active-call marker and visible inherited intervals shows the actual topology, recursion path, bound tightening, and false return chain.",
+    "visualRationale": "A compact coordinate grid draws every node and parent-child edge with ASCII geometry; a stable active-call key moves through readable inherited bounds and the false return chain.",
     "rejectedAlternatives": [
       "An inorder value list can prove sortedness but hides how the supplied bound-carrying recursion works.",
       "A parent-versus-child comparison diagram misses violations such as node 4 below ancestor 5.",

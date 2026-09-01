@@ -4,19 +4,19 @@
   "article": "src/content/posts/2026-09-01-top-k-scores.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Partition establishes top-k membership; only those k candidates are sorted for descending output.",
+  "learningObjective": "Use partial partition only to select top-k membership, then sort those candidate indices by their scores for the required descending order.",
   "mechanismReview": {
-    "pattern": "Linear-average partial selection followed by sorting only the selected k entries.",
-    "recognitionCue": "The output needs a small ranked subset of a much larger score vector, so fully sorting all n scores performs unnecessary ordering.",
-    "invariant": "After argpartition, candidate membership contains the k largest values although internal order is unspecified; after argsort and reversal, those same candidates are descending.",
-    "stateModel": "Retain the original scores and indices, k candidate indices, their gathered values, and selected-only order. Noncandidate relative order is irrelevant.",
-    "visualRationale": "Indexed score cells preserve original identities while candidate keys move into a compact selected array and then back as ranked output.",
+    "pattern": "Partial top-k membership selection followed by sorting only the selected subset.",
+    "recognitionCue": "Use argpartition when k ranked elements are needed from a much larger score vector and fully sorting all n scores is unnecessary.",
+    "invariant": "After partition, every selected candidate belongs to the top-k score group although candidate order is unspecified; after subset argsort reversal, those same indices are descending by score.",
+    "stateModel": "Retain the score vector, valid k, k candidate indices, their gathered scores, and the permutation that orders only those candidates.",
+    "visualRationale": "Stable candidate identities move from their original score positions into the gathered subset and final index output, while labels explicitly separate unordered membership from descending order.",
     "rejectedAlternatives": [
-      "A fully sorted score array teaches O(n log n) work rather than partial selection.",
-      "A size-k heap is valid but depicts a different implementation and update mechanism.",
-      "Highlighting final winners alone conflates unordered membership with required output order."
+      "Sorting all scores is simpler but changes the supplied O(n + k log k) mechanism to O(n log n).",
+      "A heap can maintain top k but does not match the vectorized argpartition implementation.",
+      "Calling partition output already sorted is incorrect because argpartition guarantees membership, not candidate order."
     ],
-    "transferLesson": "Separate selecting which items qualify from ordering the small qualified set; this transfers to retrieval reranking, beam pruning, and percentile candidate generation.",
+    "transferLesson": "Separate selection from ordering: first isolate the small set that can contain the answer, then pay sorting cost only on that set.",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

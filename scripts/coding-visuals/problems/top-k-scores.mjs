@@ -1,30 +1,61 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
-const scores = ['0.20', '0.90', '0.40', '0.80', '0.70'];
-const example = 'scores = [0.20,0.90,0.40,0.80,0.70], k = 3';
-const state = (items, marks, extra = {}) => array(items, marks, { example, ...extra });
+const scores = ['0.1', '0.9', '0.4', '0.8'];
+const selectedMotion = (firstX, secondX, firstLabel, secondLabel) => [
+  { key: 'selected-index-1', kind: 'score', x: firstX, y: 0, label: firstLabel },
+  { key: 'selected-index-3', kind: 'score', x: secondX, y: 0, label: secondLabel },
+];
 
-const draft = visual('Partition establishes top-k membership; only those k candidates are sorted for descending output.', [
-  frame('Validate k', 'k=3 satisfies 1 <= 3 <= len(scores)=5, so partial selection is defined.', state(scores, [mark(0, 'validate', 'focus', 'phase-cursor')], { check: '1 <= 3 <= 5: true' }), 'validate-k'),
-  frame('Partition around the top group', 'argpartition(scores,-3) guarantees that the final three positions contain indices {1,3,4}; their scores 0.90, 0.80, 0.70 exceed the other group.', state(scores, [mark(1, 'candidate', 'state', 'candidate-1'), mark(3, 'candidate', 'state', 'candidate-3'), mark(4, 'candidate', 'state', 'candidate-4')], { operation: 'np.argpartition(scores, -3)[-3:]', candidates: '{1,3,4}; internal order unspecified' }), 'partition-membership'),
-  frame('Gather candidate scores', 'Indexing scores[candidates] gathers exactly 0.90, 0.80, and 0.70; no noncandidate enters the ordering step.', state(['1:0.90', '3:0.80', '4:0.70'], [mark(0, 'selected', 'state', 'candidate-1'), mark(1, 'selected', 'state', 'candidate-3'), mark(2, 'selected', 'state', 'candidate-4')], { selectedCount: '3' }), 'gather-candidates'),
-  frame('Sort the selected values ascending', 'argsort over the three selected scores orders them by 0.70 < 0.80 < 0.90, corresponding to indices [4,3,1].', state(['4:0.70', '3:0.80', '1:0.90'], [mark(0, 'lowest selected', 'focus', 'phase-cursor')], { operation: 'np.argsort(scores[candidates])', ascendingIndices: '[4,3,1]' }), 'sort-selected'),
-  frame('Reverse to descending order', 'The [::-1] slice reverses only the selected ordering, producing indices [1,3,4].', state(['1:0.90', '3:0.80', '4:0.70'], [mark(0, 'rank 1', 'output', 'rank-cursor')], { operation: '[::-1]', descendingScores: '0.90 >= 0.80 >= 0.70' }), 'reverse-ranking'),
-  frame('Return original indices', 'Return [1,3,4], which point back to the three largest values in the original score array.', state(scores, [mark(1, 'rank 1', 'output', 'candidate-1'), mark(3, 'rank 2', 'output', 'candidate-3'), mark(4, 'rank 3', 'output', 'candidate-4')], { verification: 'scores[[1,3,4]] = [0.90,0.80,0.70]', result: '[1,3,4]' }), 'return-top-k'),
+const draft = visual('Use partial partition only to select top-k membership, then sort those candidate indices by their scores for the required descending order.', [
+  frame('Validate k against score count', 'For scores [0.1,0.9,0.4,0.8] and k=2, the guard 1<=2<=4 passes.', array(scores, [
+    mark(0, 'input start', 'focus', 'selection-cursor'),
+  ], {
+    guard: '1 <= k=2 <= len(scores)=4',
+  }), 'validate'),
+  frame('Partition around the top-two boundary', 'np.argpartition(scores,-2)[-2:] selects indices 1 and 3 as an unordered candidate set; it does not promise their order.', array(scores, [
+    mark(1, 'candidate index 1', 'state', 'candidate-one'),
+    mark(3, 'candidate index 3', 'state', 'candidate-three'),
+  ], {
+    candidates: '{1,3}',
+    scoresAtCandidates: '{0.9,0.8}',
+    motion: selectedMotion(1, 3, 'index 1 score 0.9', 'index 3 score 0.8'),
+  }), 'partition'),
+  frame('Read only the selected scores', 'Advanced indexing scores[candidates] gives the two values 0.9 and 0.8; all other scores leave the ordering work.', array(['index 1: 0.9', 'index 3: 0.8'], [
+    mark(0, 'selected index 1', 'focus', 'candidate-one'),
+    mark(1, 'selected index 3', 'state', 'candidate-three'),
+  ], {
+    subsetSize: 'k=2',
+    motion: selectedMotion(0, 1, 'index 1 score 0.9', 'index 3 score 0.8'),
+  }), 'gather'),
+  frame('Sort candidate positions by score', 'argsort over [0.9,0.8] returns ascending positions [1,0]; reversing gives [0,1].', array(['position 0 -> index 1 -> 0.9', 'position 1 -> index 3 -> 0.8'], [
+    mark(0, 'descending first', 'focus', 'candidate-one'),
+    mark(1, 'descending second', 'state', 'candidate-three'),
+  ], {
+    arithmetic: 'argsort=[1,0]; reverse=[0,1]',
+    motion: selectedMotion(0, 1, 'index 1 first', 'index 3 second'),
+  }), 'sort-selected'),
+  frame('Index candidates in descending order', 'candidates[[0,1]] returns original score indices [1,3], whose values satisfy 0.9>=0.8.', array(['1', '3'], [
+    mark(0, 'score 0.9', 'output', 'candidate-one'),
+    mark(1, 'score 0.8', 'output', 'candidate-three'),
+  ], {
+    verification: 'scores[1]=0.9 >= scores[3]=0.8',
+    motion: selectedMotion(0, 1, 'output index 1', 'output index 3'),
+    result: '[1,3]',
+  }), 'return'),
 ]);
 
 const review = {
-  pattern: 'Linear-average partial selection followed by sorting only the selected k entries.',
-  recognitionCue: 'The output needs a small ranked subset of a much larger score vector, so fully sorting all n scores performs unnecessary ordering.',
-  invariant: 'After argpartition, candidate membership contains the k largest values although internal order is unspecified; after argsort and reversal, those same candidates are descending.',
-  stateModel: 'Retain the original scores and indices, k candidate indices, their gathered values, and selected-only order. Noncandidate relative order is irrelevant.',
-  visualRationale: 'Indexed score cells preserve original identities while candidate keys move into a compact selected array and then back as ranked output.',
+  pattern: 'Partial top-k membership selection followed by sorting only the selected subset.',
+  recognitionCue: 'Use argpartition when k ranked elements are needed from a much larger score vector and fully sorting all n scores is unnecessary.',
+  invariant: 'After partition, every selected candidate belongs to the top-k score group although candidate order is unspecified; after subset argsort reversal, those same indices are descending by score.',
+  stateModel: 'Retain the score vector, valid k, k candidate indices, their gathered scores, and the permutation that orders only those candidates.',
+  visualRationale: 'Stable candidate identities move from their original score positions into the gathered subset and final index output, while labels explicitly separate unordered membership from descending order.',
   rejectedAlternatives: [
-    'A fully sorted score array teaches O(n log n) work rather than partial selection.',
-    'A size-k heap is valid but depicts a different implementation and update mechanism.',
-    'Highlighting final winners alone conflates unordered membership with required output order.',
+    'Sorting all scores is simpler but changes the supplied O(n + k log k) mechanism to O(n log n).',
+    'A heap can maintain top k but does not match the vectorized argpartition implementation.',
+    'Calling partition output already sorted is incorrect because argpartition guarantees membership, not candidate order.',
   ],
-  transferLesson: 'Separate selecting which items qualify from ordering the small qualified set; this transfers to retrieval reranking, beam pruning, and percentile candidate generation.',
+  transferLesson: 'Separate selection from ordering: first isolate the small set that can contain the answer, then pay sorting cost only on that set.',
   reviewStatus: 'reviewed',
 };
 

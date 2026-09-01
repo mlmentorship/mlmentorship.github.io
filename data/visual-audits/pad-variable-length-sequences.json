@@ -4,19 +4,19 @@
   "article": "src/content/posts/2026-09-01-pad-variable-length-sequences.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Allocate one rectangle, then copy each row and mark the identical slice valid.",
+  "learningObjective": "Allocate one batch-width rectangle filled with pad values, then copy each sequence and mark the identical half-open slice as valid.",
   "mechanismReview": {
-    "pattern": "Measure maximum length, allocate dense arrays once, then fill matching row slices.",
-    "recognitionCue": "A batch contains variable-length sequences but downstream vectorized computation requires one rectangular tensor plus validity information.",
-    "invariant": "After row r is processed, its first len(sequence) token cells equal the input and the same mask cells are True; every remaining cell retains pad_value and False.",
-    "stateModel": "Retain batch size, maximum width, prefilled token and Boolean arrays, current row, and that row’s length. No per-token append structure is needed.",
-    "visualRationale": "A paired token|mask grid keeps shape, slice extent, copied values, and padding validity co-located while a stable row cursor moves through each assignment.",
+    "pattern": "Allocate a maximum-width batch rectangle once, then fill aligned token and validity slices.",
+    "recognitionCue": "Use padding plus a mask when variable-length sequences must enter rectangular tensor operations without treating synthetic pad cells as data.",
+    "invariant": "After processing row r, tokens[r,:len(sequence)] equals the original sequence and mask is true on exactly that slice; every remaining cell retains the pad value and false mask.",
+    "stateModel": "Keep the batch size, maximum width, prefilled token matrix, all-false mask, current row, and that sequence’s length.",
+    "visualRationale": "Each grid cell displays token and Boolean validity together while a stable fill cursor moves through real row slices, including the zero-length assignment and untouched padding.",
     "rejectedAlternatives": [
-      "Ragged list cards show input lengths but not the rectangular output coordinates.",
-      "Separate token and mask diagrams make corresponding cells harder to verify.",
-      "A tensor-shape arrow omits the actual slice writes and pad values."
+      "A shape-only tensor diagram cannot verify copied values or mask alignment.",
+      "Padding without a mask loses the distinction between a real pad-valued token and synthetic padding.",
+      "Appending rows dynamically hides the supplied allocate-once slice-assignment mechanism."
     ],
-    "transferLesson": "When rectangular storage introduces synthetic values, carry an aligned validity structure; this transfers to attention masks, packed batches, image padding, and missing-data arrays.",
+    "transferLesson": "For ragged-to-dense conversion, derive one shared extent, initialize safe defaults, and update data and validity metadata with the exact same slices.",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
