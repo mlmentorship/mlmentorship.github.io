@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "slug": "z-loss",
+  "article": "src/content/posts/2026-04-12-z-loss.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Recognize that a shared additive shift leaves softmax probabilities and cross-entropy unchanged but changes log Z, so z-loss selects an anchored representative of the same predictive distribution.",
+  "mediumRationale": "A three-column semantic table is the smallest medium that aligns two equivalent logit vectors row by row with their identical probabilities and cross-entropy but different log partitions and penalties. The exact arithmetic makes the otherwise invisible degree of freedom concrete.",
+  "mediumComparison": {
+    "mermaid": "Rejected: this is an arithmetic invariance rather than a process graph, and automatic routing would not align equal and unequal quantities precisely.",
+    "svg": "Rejected: no continuous geometry is needed, while fixed SVG text would make the worked values harder to select and reflow.",
+    "semanticHtml": "Selected: table headers expose the comparison relationships, values remain selectable, and the established table primitive fits the reading column and print.",
+    "interaction": "Rejected: an offset slider could generate more examples but would hide the invariant behind controls; one exact nonzero shift proves it statically.",
+    "paperReuse": "Rejected: the source figures show training dynamics and numerical formats rather than this invariance. No permission assumption or external artwork is needed for an original calculation.",
+    "noVisual": "Rejected: prose states cancellation algebraically, but readers must still hold five linked quantities in working memory to see what changes and what cannot change."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 32,
+        "insight": "The section divider opens the classification-loss sequence inspected for cross-entropy and softmax context."
+      },
+      {
+        "page": 33,
+        "insight": "The classification slide relates negative log-likelihood to cross-entropy, gives the softmax normalization equation, and recommends fused log-softmax for numerical stability."
+      },
+      {
+        "page": 34,
+        "insight": "The neighboring slide discusses convex and non-convex losses but adds no logit-shift or log-partition treatment."
+      },
+      {
+        "page": 35,
+        "insight": "The next classification slide explicitly demonstrates that subtracting one constant from every logit leaves softmax unchanged and prevents exponential overflow, the closest deck analogue to the shared-shift mental model."
+      },
+      {
+        "page": 36,
+        "insight": "The following slide moves to surrogate losses, ending the local softmax sequence without introducing z-loss."
+      },
+      {
+        "page": 106,
+        "insight": "The preceding LLM-data slide establishes the large-language-model context but contains no loss or precision mechanism."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM-training slide says softmax is run in full precision for stability while most operations use bfloat16, supplying relevant mixed-precision context without a logit penalty."
+      },
+      {
+        "page": 108,
+        "insight": "The neighboring compute-optimization slide introduces attention softmax and BF16/FP16 numerics, then moves from output-loss stability to attention systems."
+      },
+      {
+        "page": 109,
+        "insight": "The sequence-packing slide concerns masking and throughput and provides no additional z-loss evidence."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide tracks a running maximum and softmax denominator for stable normalization, reinforcing log-sum-exp numerics in a different softmax application."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide precedes the deck's dedicated mixed-precision treatment and contains no z-loss analogue."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide compares FP16, BF16, and FP32 and again recommends FP32 for LayerNorm, softmax, and loss, but does not constrain upstream logit magnitude."
+      },
+      {
+        "page": 115,
+        "insight": "The following training-and-serving summary closes the precision neighborhood without mentioning z-loss."
+      }
+    ],
+    "notes": "All 214 physical pages of the local PDF were text-indexed for z-loss, log partition, partition function, softmax, logit, numerical stability, BF16, and FP8. Every match was reviewed. The complete neighborhoods on pages 32-36, 106-115, and other isolated softmax references were examined. Page 35 is the closest conceptual source because it shows shared-shift invariance; pages 107 and 114 provide precision context. The deck contains no z-loss definition, final-logit penalty, or reusable figure.",
+    "license": "No general reuse license was identified in the local deck, and it includes externally sourced material. It is treated as review-only; no screenshot, artwork, wording, values, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "ST-MoE: Designing Stable and Transferable Sparse Expert Models",
+        "url": "https://arxiv.org/abs/2202.08906",
+        "usage": "Used as the primary derivation and stability source for squared log-partition z-loss, its gradient pressure on exponentiated logits, and its role in reducing low-precision roundoff. The paper applies it to router logits and identifies it as an adaptation of final-softmax z-loss.",
+        "license": "No permissive figure license was identified or relied upon. No paper figure, table, empirical result, wording, values, or composition is copied; the worked shift example is independently derived."
+      },
+      {
+        "title": "PaLM: Scaling Language Modeling with Pathways",
+        "url": "https://arxiv.org/abs/2204.02311",
+        "usage": "Used as the primary large-language-model source for a final-softmax auxiliary loss of 10^-4 log^2 Z and the reported goal of keeping log Z near zero to increase training stability.",
+        "license": "Public arXiv access is not treated as broad figure-reuse permission. No paper figure, table, prose, training result, equation layout, or visual organization is copied."
+      },
+      {
+        "title": "Marin 8B Retrospective",
+        "url": "https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/",
+        "usage": "Used as an authoritative project report for the Raccoon and Spoonbill cooldown observations: slow loss creep, growing lm_head norm, the 10^-4 final-logit intervention, and the later final-layer-norm finding.",
+        "license": "The Marin repository is Apache-2.0, but no report image, chart data, prose, or layout is reused. The visual teaches the mathematical invariant with original values rather than reproducing Marin's experiment."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to distinguish free access from permission to adapt figures in the reviewed ST-MoE and PaLM papers.",
+        "license": "The guidance is cited only to document the provenance decision; no text, icon, or design is reproduced."
+      }
+    ],
+    "notes": "The calculation starts from p = (0.70, 0.20, 0.10) and logits log p, for which Z = 1 and log Z = 0. Adding c = 5 to every logit multiplies every unnormalized exponential by e^5, so normalization cancels it and both p and target-A cross-entropy remain 0.357 nats. Log Z increases by exactly 5; with lambda_z = 10^-4 the added penalty is 10^-4 times 25 = 0.0025. This isolates the common-offset degree of freedom. It does not claim z-loss directly limits relative gaps, reproduces a paper experiment, or proves universal training gains."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact loss and mixed-precision neighborhoods, then verified the definition and coefficient in ST-MoE and PaLM and the cooldown evidence in Marin before selecting an original exact-arithmetic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "z-loss-shared-shift"
+    ],
+    "accessibility": "The figure has a linked learning question, a real table with scoped row and column headers, and a complete aria-label that states every value and inference. Explicit equal values and written labels carry the comparison without color. The established fixed-layout table uses wrapping text with no minimum width at 390 CSS pixels, theme tokens preserve dark-mode contrast, and shared print rules force a light, high-contrast, page-break-safe rendering."
+  }
+}
