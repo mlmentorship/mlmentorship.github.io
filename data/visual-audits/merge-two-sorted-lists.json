@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-merge-two-sorted-lists.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Attach the smaller current head and advance only that list.",
+  "learningObjective": "Rewire the smaller current node after tail, then advance only the list that supplied it.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to attach the smaller current head and advance only that list.",
-    "invariant": "Attach the smaller current head and advance only that list.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Two sorted linked-list cursors with a dummy output head and moving tail.",
+    "recognitionCue": "Two inputs are already sorted and must be merged by relinking nodes, so only the two current heads can be the next smallest output node.",
+    "invariant": "The chain after dummy is sorted and contains exactly the consumed nodes; tail is its final node, while first and second begin the two untouched sorted suffixes.",
+    "stateModel": "Keep first, second, and tail pointers plus the dummy head. Compare current values, attach one node, advance only its source cursor, then append the one remaining suffix.",
+    "visualRationale": "Stable node identities and explicit directed links show the initially separate chains, every changed next pointer, each cursor decision, and the constant-time suffix append.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Copying values into an array hides that the implementation reuses and rewires existing nodes.",
+      "A comparison table omits the evolving next-pointer chain and tail invariant.",
+      "A final merged snapshot skips which source pointer advances after each decision."
     ],
-    "transferLesson": "Transfer the invariant: Attach the smaller current head and advance only that list.",
-    "reviewStatus": "pending"
+    "transferLesson": "For sorted stream merges, emit the smaller frontier item, advance only its source, and preserve an output tail; the same invariant scales to k-way merging with a heap.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

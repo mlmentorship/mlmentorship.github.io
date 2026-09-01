@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-implement-trie.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A shared character path stores prefixes once, with a terminal marker for complete words.",
+  "learningObjective": "Represent each prefix once and mark nodes whose root path is a complete word.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a shared character path stores prefixes once, with a terminal marker for complete words.",
-    "invariant": "A shared character path stores prefixes once, with a terminal marker for complete words.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Trie represented as a tree of character-child maps with explicit terminal markers.",
+    "recognitionCue": "Many stored strings share prefixes and operations ask both exact-word and prefix membership, so prefix paths should be stored once and traversed character by character.",
+    "invariant": "The root-to-node path spells that node’s prefix; a node has the None marker exactly when that prefix was inserted as a complete word.",
+    "stateModel": "Keep one root dictionary and a current node while walking characters. Insert creates missing child maps and sets an end marker; queries reuse the same walk and differ only in terminal checking.",
+    "visualRationale": "A real prefix-node graph shows shared root-to-prefix edges and separate terminal-marked nodes, making app versus ap and path reuse understandable without code or color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Independent word rows falsely duplicate shared prefix nodes.",
+      "A flat hash set supports exact words but does not expose prefix traversal or storage sharing.",
+      "A character table hides parent-child topology and the semantic role of the end marker."
     ],
-    "transferLesson": "Transfer the invariant: A shared character path stores prefixes once, with a terminal marker for complete words.",
-    "reviewStatus": "pending"
+    "transferLesson": "Use tries whenever work can be shared by prefixes; attach payload or terminal state to prefix nodes and stop searches as soon as a required child is absent.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

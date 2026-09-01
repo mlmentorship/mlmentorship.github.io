@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-remove-nth-node-from-end.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A fixed pointer gap makes the left pointer stop just before the node to remove.",
+  "learningObjective": "Maintain a two-node gap so left stops immediately before the second node from the end.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a fixed pointer gap makes the left pointer stop just before the node to remove.",
-    "invariant": "A fixed pointer gap makes the left pointer stop just before the node to remove.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Two linked-list pointers separated by a fixed n-node gap, anchored by a dummy node.",
+    "recognitionCue": "The node is identified relative to the list end, but only one forward pass is allowed, so a leading pointer can convert distance-from-end into a simultaneous stopping position.",
+    "invariant": "After the initial advance, right remains exactly n links ahead of left. Therefore, when right is the tail, left.next is the nth node from the end.",
+    "stateModel": "Keep a dummy-to-head link plus left and right pointers. Advance right n times, move both while right.next exists, then replace left.next with left.next.next.",
+    "visualRationale": "A full linked chain with stable node and pointer identities directly shows the fixed gap, each synchronized move, the stopping condition, and the changed 3-to-5 link.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An indexed array suggests random access that the linked-list solution does not have.",
+      "A pointer-position table hides the actual next-link that is rewired.",
+      "Counting length in a first pass misses the one-pass fixed-gap mechanism."
     ],
-    "transferLesson": "Transfer the invariant: A fixed pointer gap makes the left pointer stop just before the node to remove.",
-    "reviewStatus": "pending"
+    "transferLesson": "Use a fixed lead whenever a linked-list target is defined by distance from the end; add a dummy when the operation may change the head.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

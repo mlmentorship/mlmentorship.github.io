@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-design-add-and-search-words.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A literal follows one trie child; a dot branches over every child.",
+  "learningObjective": "Follow one child for a literal, but recursively try every child for a dot.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a literal follows one trie child; a dot branches over every child.",
-    "invariant": "A literal follows one trie child; a dot branches over every child.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Trie search with depth-first branching at wildcard characters.",
+    "recognitionCue": "Words are stored by prefix, but a query character may match any one letter, so literal traversal remains deterministic while wildcard positions create a search frontier.",
+    "invariant": "match(index,node) is true exactly when some terminal word below node matches the query suffix starting at index; reaching query length succeeds only at a terminal node.",
+    "stateModel": "Keep the trie plus recursive state (query index, trie node). A literal makes one recursive call, a dot tries each real child, and any short-circuits after the first true branch.",
+    "visualRationale": "The full prefix topology stays fixed while the labelled DFS frontier moves from root to a failing b branch, backtracks, and reaches terminal dad*, exposing both branching and terminal-length logic.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Drawing dot as a literal trie node hides that it creates multiple recursive calls.",
+      "A regular-expression label skips the trie traversal and branch-by-branch failure.",
+      "Showing only the successful dad path omits the DFS backtrack that distinguishes wildcard search."
     ],
-    "transferLesson": "Transfer the invariant: A literal follows one trie child; a dot branches over every child.",
-    "reviewStatus": "pending"
+    "transferLesson": "When one pattern symbol can choose multiple edges, define recursion by position and node, preserve exact base-case semantics, and short-circuit once any branch satisfies the suffix.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
