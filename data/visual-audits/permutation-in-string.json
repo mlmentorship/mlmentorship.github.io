@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-permutation-in-string.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Compare each fixed-width window with the pattern counts.",
+  "learningObjective": "Slide one width-2 window over \"eidbaooo\"; add R, remove the outgoing L character, then compare counts.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to compare each fixed-width window with the pattern counts.",
-    "invariant": "Compare each fixed-width window with the pattern counts.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Fixed-size sliding window with a pattern counter and an incrementally maintained window counter.",
+    "recognitionCue": "Use it when a contiguous match may appear in any order: equal multisets require equal length, so only windows whose width equals the pattern length can qualify.",
+    "invariant": "Before each comparison, window contains exactly text[R - pattern_length + 1..R], because the new right character was added and the one character that fell off the left was removed.",
+    "stateModel": "The minimal state is the immutable need counter, current window counter, and width-sized L and R boundaries. Zero-count keys are deleted so Counter equality matches the source implementation.",
+    "visualRationale": "The indexed text keeps every candidate position visible while the adjacent counters explain order independence. Stable L and R labels show the fixed-width movement without relying on color or JavaScript.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A counters-only table was rejected because it hides which text character enters and which one leaves.",
+      "A sorted-substring animation was rejected because sorting every candidate is not the supplied algorithm.",
+      "A permutation tree was rejected because enumerating pattern orders adds factorial clutter and misses the count invariant."
     ],
-    "transferLesson": "Transfer the invariant: Compare each fixed-width window with the pattern counts.",
-    "reviewStatus": "pending"
+    "transferLesson": "When every candidate has a known width, maintain its summary by adding the entering item and removing the outgoing item; compare summaries instead of rebuilding or enumerating arrangements.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

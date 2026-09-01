@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-repeating-character-replacement.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A window is valid when every non-majority character fits inside the replacement budget.",
+  "learningObjective": "Keep a candidate length while window length - historical max frequency stays within k = 1.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a window is valid when every non-majority character fits inside the replacement budget.",
-    "invariant": "A window is valid when every non-majority character fits inside the replacement budget.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Variable-size sliding window with per-letter counts and a monotone historical maximum frequency.",
+    "recognitionCue": "Use it for a longest contiguous span that may change at most k items into one repeated value; window length minus its dominant frequency is the required edit count.",
+    "invariant": "After each shrink, window length is at most largest_count + k, where largest_count is the greatest frequency seen while expanding. best is the greatest retained candidate length seen so far.",
+    "stateModel": "The minimal state is L, R, counts, monotone largest_count, best, and k. The indexed array fixes positions while stable pointers show every expansion and forced left move.",
+    "visualRationale": "An indexed array plus the live frequency map makes both terms of length - largest_count visible. Named boundaries and written inequalities preserve the argument in print and without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A frequency bar chart was rejected because it hides which indices leave when L advances.",
+      "A table of window lengths was rejected because it does not depict the covered substring or boundary movement.",
+      "Animating replaced letters was rejected because the implementation never chooses actual replacement positions."
     ],
-    "transferLesson": "Transfer the invariant: A window is valid when every non-majority character fits inside the replacement budget.",
-    "reviewStatus": "pending"
+    "transferLesson": "When edits can homogenize a window, rewrite validity as window size minus the best keepable group. A monotone summary can be enough for maximizing length even when it overestimates a later window frequency.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

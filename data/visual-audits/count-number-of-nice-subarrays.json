@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-count-number-of-nice-subarrays.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Count exact odd counts by subtracting two at-most windows.",
+  "learningObjective": "Count endings with at most 3 odds and at most 2 odds at every R, then subtract 14 - 12.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to count exact odd counts by subtracting two at-most windows.",
-    "invariant": "Count exact odd counts by subtracting two at-most windows.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Exact-count subarrays obtained by subtracting two variable-size at-most sliding-window totals.",
+    "recognitionCue": "Use it when subarrays must contain exactly k nonnegative events, while an at-most-k window can be repaired monotonically by moving its left boundary right.",
+    "invariant": "For each R, every start from L through R satisfies the relevant at-most limit, so that pass adds exactly R - L + 1 valid endings. The running total includes all right endpoints processed so far.",
+    "stateModel": "Each pass needs only L, R, remaining odd budget, and total. The combined trace shows stable L<=3, L<=2, and R pointers over nums = [1,1,2,1,1] with both per-step additions.",
+    "visualRationale": "One indexed array with two explicitly named left boundaries reveals the nested windows and their cumulative arithmetic. Labels, ranges, and equations remain complete in monochrome static output.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A final 14-minus-12 equation alone was rejected because it hides how either cumulative total is formed.",
+      "Two disconnected animations were rejected because comparing the left boundaries at the same R exposes the exact-count difference more directly.",
+      "A table-only trace was rejected because it does not show the covered ranges or why a boundary moves after an odd value."
     ],
-    "transferLesson": "Transfer the invariant: Count exact odd counts by subtracting two at-most windows.",
-    "reviewStatus": "pending"
+    "transferLesson": "Convert exact monotone counts into at_most(k) - at_most(k - 1); at each right endpoint, the difference between the two valid-start ranges counts exactly-k subarrays ending there.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

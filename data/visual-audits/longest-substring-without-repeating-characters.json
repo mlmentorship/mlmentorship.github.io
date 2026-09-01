@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-substring-without-repeating-characters.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Keep the longest window whose characters are all distinct.",
+  "learningObjective": "Keep [L..R] duplicate-free by jumping L past a repeated character that is still inside the window.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to keep the longest window whose characters are all distinct.",
-    "invariant": "Keep the longest window whose characters are all distinct.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Variable-size sliding window with a map from each character to its latest index.",
+    "recognitionCue": "Use it when the answer is a longest contiguous span constrained by uniqueness and a repeated value tells exactly how far the left boundary can safely jump.",
+    "invariant": "After processing index R, [L..R] has no repeated character; L never moves backward, and best is the maximum length of every valid window ending at or before R.",
+    "stateModel": "The minimal state is L, R, best, and last_seen[character]. The trace keeps the indexed text fixed while the authored left and right pointers move and the map records exact indices.",
+    "visualRationale": "An indexed array beside the last-seen map directly exposes whether an old occurrence lies inside [L..R]. Pointer labels and arithmetic remain meaningful without color or playback.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A counts-only table was rejected because it hides character positions and cannot explain the direct left-boundary jump.",
+      "A substring-only animation was rejected because removing indices obscures stale occurrences outside the current window.",
+      "A prose timeline was rejected because readers would have to reconstruct the covered range and map in working memory."
     ],
-    "transferLesson": "Transfer the invariant: Keep the longest window whose characters are all distinct.",
-    "reviewStatus": "pending"
+    "transferLesson": "For longest windows repaired by the newest violation, store enough history to jump over the violating occurrence, but clamp the new left boundary so stale history can never move it backward.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
