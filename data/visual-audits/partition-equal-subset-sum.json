@@ -17,6 +17,7 @@
       "A boolean matrix is correct but heavier than the one-row reachable-set state used by the supplied implementation."
     ],
     "transferLesson": "Convert a partition condition into a target-reachability problem, then update from a snapshot when each item may be used once. The same state model solves 0/1 knapsack feasibility and constrained subset sums.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

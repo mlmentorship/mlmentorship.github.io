@@ -17,6 +17,7 @@
       "A full DP table is valid but conceals that the supplied implementation needs only two prior values."
     ],
     "transferLesson": "When choosing item i only conflicts with a fixed neighborhood, compare the optimum that excludes i with value[i] plus the last compatible optimum. This transfers to weighted independent sets on paths and cooldown scheduling.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

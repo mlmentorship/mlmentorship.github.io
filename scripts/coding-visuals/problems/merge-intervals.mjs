@@ -71,6 +71,7 @@ const review = {
     'A final merged picture was rejected because it omits the seed, extend, and append branches.',
   ],
   transferLesson: 'Sorting can turn a global overlap problem into a local frontier check: preserve a completed prefix and keep only the final component open for possible extension.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

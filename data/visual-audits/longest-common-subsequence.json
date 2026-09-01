@@ -17,6 +17,7 @@
       "A highlighted final subsequence alone was rejected because it does not explain mismatch skips or optimality."
     ],
     "transferLesson": "For ordered matching problems, define a state on two prefixes; matching endpoints consume both, while mismatching endpoints branch by skipping one side and combining optimal smaller states.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

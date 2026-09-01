@@ -17,6 +17,7 @@
       "A single before-and-after diagram was rejected because it skips repeated span growth and the suffix stopping condition."
     ],
     "transferLesson": "When ordered input surrounds one mutable object, scan an immutable prefix, absorb the contiguous interaction region into that object, then reuse the untouched suffix.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

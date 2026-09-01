@@ -53,6 +53,7 @@ const review = {
     'An answer-only list hides the append/recurse/pop restoration invariant.',
   ],
   transferLesson: 'When order should not create duplicates, advance a start boundary after each choice; this same skeleton generates combinations, k-subsets, and increasing-index selections.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

@@ -1,13 +1,34 @@
-import { defineVisual, frame, heap, visual } from '../primitives.mjs';
+import { defineVisual, frame, grid, visual } from '../primitives.mjs';
 
 const example = 'intervals = [[0,30], [5,10], [5,15], [20,25]]';
-const state = (values, extra = {}) => heap(values, { example, heapMeaning: 'active meeting end times (minimum at root)', ...extra });
+const state = (values, extra = {}) => {
+  const [root = '-', left = '-', right = '-'] = values;
+  return grid([
+    [`root ${root}`, '-'],
+    [`left ${left}`, `right ${right}`],
+  ], [{ row: 0, col: 0, label: 'minimum', tone: 'focus', key: 'heap-root' }], {
+    example,
+    heapArray: `[${values.join(',')}]`,
+    heapMeaning: 'root above its children; active meeting end times',
+    motion: [
+      { key: 'heap-root', kind: 'pointer', x: 0, y: 0, label: root },
+      ...values.map((value, index) => ({
+        key: `end-${value}`,
+        kind: 'heap-value',
+        x: index === 2 ? 1 : 0,
+        y: index === 0 ? 0 : 1,
+        label: value,
+      })),
+    ],
+    ...extra,
+  });
+};
 
 const draft = visual('Before each start, pop every ended meeting; then push the new end and record the largest heap size.', [
   frame(
     'Initialize the active heap',
     'Meetings are sorted by start as [0,30], [5,10], [5,15], [20,25]. end_times is empty and most_rooms=0.',
-    state(['empty'], { nextMeeting: '[0,30]', mostRooms: '0' }),
+    state([], { nextMeeting: '[0,30]', mostRooms: '0' }),
     'initialize-active-heap',
   ),
   frame(
@@ -65,13 +86,14 @@ const review = {
   recognitionCue: 'The question asks for the maximum number of simultaneous intervals, and meetings that end before the next start release reusable capacity.',
   invariant: 'Immediately before pushing a meeting, the heap contains exactly the end times greater than its start; after pushing, heap size equals active rooms and most_rooms is the largest size seen.',
   stateModel: 'Retain the start-sorted meetings, min-heap of active end times, current meeting, and scalar most_rooms. Room identities and a full timeline are unnecessary.',
-  visualRationale: 'A real binary min-heap makes the earliest releasable room the root and shows every repeated pop before the next end is pushed.',
+  visualRationale: 'A compact root-over-children heap grid makes the earliest releasable end the root and shows every repeated pop before the next end is pushed.',
   rejectedAlternatives: [
     'A timeline alone shows overlap but hides why a min-heap can release every ended room efficiently.',
     'Separate sorted start/end pointers solve the problem differently and would not match the supplied heap implementation.',
     'A room-assignment table invents room identities that the algorithm never stores.',
   ],
   transferLesson: 'For capacity over time, sweep arrivals and keep active expirations ordered by the next one to finish; this transfers to server concurrency, platform usage, and resource reservation.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

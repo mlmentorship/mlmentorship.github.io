@@ -17,6 +17,7 @@
       "Sorting by start and merging depicts a different goal and does not justify the earliest-finish exchange."
     ],
     "transferLesson": "When selecting the most compatible time ranges, an earlier finishing accepted choice never blocks a range that a later-finishing choice could keep; reuse this exchange argument for activity and reservation scheduling.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

@@ -84,6 +84,7 @@ const review = {
     'A highlighted final subsequence alone was rejected because it does not explain mismatch skips or optimality.',
   ],
   transferLesson: 'For ordered matching problems, define a state on two prefixes; matching endpoints consume both, while mismatching endpoints branch by skipping one side and combining optimal smaller states.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

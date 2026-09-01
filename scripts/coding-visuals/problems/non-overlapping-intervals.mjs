@@ -75,6 +75,7 @@ const review = {
     'Sorting by start and merging depicts a different goal and does not justify the earliest-finish exchange.',
   ],
   transferLesson: 'When selecting the most compatible time ranges, an earlier finishing accepted choice never blocks a range that a later-finishing choice could keep; reuse this exchange argument for activity and reservation scheduling.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

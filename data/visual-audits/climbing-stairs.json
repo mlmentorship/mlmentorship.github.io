@@ -17,6 +17,7 @@
       "A Fibonacci label alone requires memorizing the recurrence rather than seeing why the two predecessor counts add."
     ],
     "transferLesson": "Classify solutions by their final decision: if every state can only arrive from a fixed small set of predecessor states, add those disjoint counts and retain only the dependency horizon.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

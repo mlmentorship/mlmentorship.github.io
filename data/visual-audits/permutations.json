@@ -17,6 +17,7 @@
       "A factorial output table omits DFS order and the append/pop state transitions."
     ],
     "transferLesson": "When choices are reusable across sibling branches but forbidden within one path, mark before recursion and unmark after return; index-based flags also handle equal values more safely than value membership.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

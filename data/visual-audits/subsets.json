@@ -17,6 +17,7 @@
       "An answer-only list hides the append/recurse/pop restoration invariant."
     ],
     "transferLesson": "When order should not create duplicates, advance a start boundary after each choice; this same skeleton generates combinations, k-subsets, and increasing-index selections.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

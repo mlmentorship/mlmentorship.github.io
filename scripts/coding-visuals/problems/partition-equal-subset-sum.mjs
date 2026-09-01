@@ -73,5 +73,6 @@ export default defineVisual('partition-equal-subset-sum', draft, {
     'A boolean matrix is correct but heavier than the one-row reachable-set state used by the supplied implementation.',
   ],
   transferLesson: 'Convert a partition condition into a target-reachability problem, then update from a snapshot when each item may be used once. The same state model solves 0/1 knapsack feasibility and constrained subset sums.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 });

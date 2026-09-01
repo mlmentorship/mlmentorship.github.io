@@ -17,6 +17,7 @@
       "A result-only diagram hides same-index reuse and why one oversized sorted choice prunes all later choices."
     ],
     "transferLesson": "For reusable combination search, carry a decreasing feasibility measure and a nondecreasing choice boundary; sorted positive choices turn the first oversized option into a safe loop break.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

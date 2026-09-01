@@ -137,5 +137,6 @@ export default defineVisual('word-search', draft, {
     'A final highlighted word path omits failed directions, short-circuiting, and restoration.',
   ],
   transferLesson: 'For path-constrained search, choose one option, mark only the state owned by that choice, recurse, then undo before returning. The same choose-explore-unchoose discipline applies to mazes, permutations, and constraint search.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 });

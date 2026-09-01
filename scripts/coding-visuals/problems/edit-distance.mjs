@@ -132,6 +132,7 @@ const review = {
     'Two unlabeled rolling arrays were rejected because they hide the insert, delete, and replace coordinates.',
   ],
   transferLesson: 'For minimum transformation problems, define prefix states and map each allowed operation to the predecessor state it leaves behind; then add operation cost to the best predecessor.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

@@ -86,6 +86,7 @@ const review = {
     'A single before-and-after diagram was rejected because it skips repeated span growth and the suffix stopping condition.',
   ],
   transferLesson: 'When ordered input surrounds one mutable object, scan an immutable prefix, absorb the contiguous interaction region into that object, then reuse the untouched suffix.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

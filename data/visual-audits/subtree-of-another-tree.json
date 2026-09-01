@@ -10,13 +10,14 @@
     "recognitionCue": "Use this composition when one complete rooted tree must appear inside another: candidate roots may occur anywhere, but a candidate succeeds only if every value and missing-child position matches.",
     "invariant": "is_subtree searches every reachable candidate root until one same call succeeds; same(first, second) returns true exactly when the two rooted trees have equal values and recursively identical left and right topology.",
     "stateModel": "The recursion stack holds either a candidate-search node paired with the fixed subroot or a same-tree node pair; no visited set is needed because trees have unique parent paths.",
-    "visualRationale": "Two connected node-and-edge topologies stay visible while the labelled call frontier moves from main3 to main4 and through paired children, exposing both candidate search and structural equality.",
+    "visualRationale": "A compact child-slot topology keeps every real edge and null position visible while paired cursors move through candidate roots and corresponding children.",
     "rejectedAlternatives": [
       "Array serialization can support another algorithm, but it hides the recursive parent-child checks used by this implementation.",
       "A value-only node list cannot distinguish equal values with different missing-child topology.",
       "A prose call table records recursion but does not show which actual tree edges each call follows."
     ],
     "transferLesson": "Separate locate from verify: DFS locates candidate roots, then a stricter recursive predicate proves complete structure; the same composition applies to tree patterns, AST fragments, and directory subtrees.",
+    "independentReview": "3.3 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

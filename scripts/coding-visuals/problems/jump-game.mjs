@@ -57,6 +57,7 @@ const review = {
     'Showing only a successful leap path suggests committing to jumps, which the supplied greedy scan never does.',
   ],
   transferLesson: 'When all feasible positions form a prefix, summarize every prior choice by its farthest boundary; this transfers to interval coverage, refueling reach, and minimum-jump layer scans.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

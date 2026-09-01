@@ -67,5 +67,6 @@ export default defineVisual('house-robber', draft, {
     'A full DP table is valid but conceals that the supplied implementation needs only two prior values.',
   ],
   transferLesson: 'When choosing item i only conflicts with a fixed neighborhood, compare the optimum that excludes i with value[i] plus the last compatible optimum. This transfers to weighted independent sets on paths and cooldown scheduling.',
+  independentReview: '3.3 source-to-frame replay',
   reviewStatus: 'reviewed',
 });
