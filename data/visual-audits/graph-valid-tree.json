@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-graph-valid-tree.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A valid tree needs exactly n-1 edges and one connected component.",
+  "learningObjective": "With exactly n-1 undirected edges, reaching all n nodes proves the graph is one connected acyclic tree.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a valid tree needs exactly n-1 edges and one connected component.",
-    "invariant": "A valid tree needs exactly n-1 edges and one connected component.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Undirected tree validation by the n-1 edge-count gate followed by one iterative DFS reachability test.",
+    "recognitionCue": "Use this proof when an undirected graph must be exactly one tree: reject any edge count other than n-1, then test whether one traversal reaches every vertex.",
+    "invariant": "seen contains every discovered vertex and stack contains discovered vertices not yet expanded. After the n-1 gate passes, full reachability is equivalent to being a tree.",
+    "stateModel": "The minimal state is an adjacency list, a seen set, and a DFS stack. The trace follows the supplied neighbor order and shows every pop, seen-neighbor skip, discovery, push, and final cardinality comparison.",
+    "visualRationale": "A persistent edged graph exposes the candidate topology while explicit current-node, stack, and seen labels make iterative DFS readable without color. Stable node and edge keys preserve graph identity across all expansions.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Union-find was rejected because it would depict a different implementation and omit the supplied reachability proof.",
+      "An edge-count formula alone was rejected because n-1 edges can still be disconnected.",
+      "A traversal table was rejected because it hides which graph edge causes each discovery or seen-neighbor skip."
     ],
-    "transferLesson": "Transfer the invariant: A valid tree needs exactly n-1 edges and one connected component.",
-    "reviewStatus": "pending"
+    "transferLesson": "Combine a cheap global structural count with one local traversal invariant. Similar count-plus-connectivity proofs validate arborescences, spanning trees, and network skeletons.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-reorder-list.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Find the middle, reverse the second half, then interleave the two lists.",
+  "learningObjective": "Find the first-half tail, reverse the detached second half, then splice one reversed node after each first-half node.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to find the middle, reverse the second half, then interleave the two lists.",
-    "invariant": "Find the middle, reverse the second half, then interleave the two lists.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Three-phase in-place list transform: tortoise-hare midpoint, second-half reversal, then alternating pointer splices.",
+    "recognitionCue": "Use it when nodes must alternate from the front and back of a singly linked list without an auxiliary array or stack.",
+    "invariant": "The midpoint scan keeps fast twice as far along; reversal preserves a reversed prefix plus untouched suffix; merging preserves the final alternating prefix and two unconsumed chains.",
+    "stateModel": "The minimal state is slow/fast for splitting, previous/second/next_node for reversal, and first/second plus their saved next pointers for merging. Every destructive link write follows its required save.",
+    "visualRationale": "Persistent linked nodes show actual chain topology, detachment, reversal, and both splices. Named pointer labels and written links make each mutation understandable without color, and stable node keys visibly carry nodes into final positions.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An output value array was rejected because the algorithm rewires nodes rather than copying values.",
+      "A deque of nodes was rejected because it uses O(n) extra space and skips the supplied reversal mechanism.",
+      "Only split/reversed/final snapshots were rejected because they hide middle-pointer rounds and saved-next safety."
     ],
-    "transferLesson": "Transfer the invariant: Find the middle, reverse the second half, then interleave the two lists.",
-    "reviewStatus": "pending"
+    "transferLesson": "Complex list transforms become safe compositions of small invariants: locate a boundary, detach, reverse with a saved route, then splice only after saving both continuations.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

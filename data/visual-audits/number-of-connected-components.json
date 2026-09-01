@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-number-of-connected-components.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Every unseen node starts one DFS component and marks its whole group.",
+  "learningObjective": "Each unseen outer-loop vertex starts exactly one DFS and marks exactly one previously uncounted connected component.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to every unseen node starts one dfs component and marks its whole group.",
-    "invariant": "Every unseen node starts one DFS component and marks its whole group.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Connected-component counting by launching iterative DFS from every unseen vertex.",
+    "recognitionCue": "Use it when an undirected graph may contain multiple disconnected groups, including isolated vertices, and the task asks how many maximal reachable groups exist.",
+    "invariant": "After processing outer-loop starts below the current index, every vertex in their components is seen and components equals the number of DFS launches. A seen vertex can never launch another count.",
+    "stateModel": "The minimal state is the adjacency list, global seen set, component counter, and per-flood stack. The trace includes every launch, discovery, pop, continue branch, and the isolated vertex.",
+    "visualRationale": "One fixed graph keeps all three disconnected topologies visible while seen, current, stack, and count labels explain the nested loops. Stable node and edge keys preserve identity as each region is flooded.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Union-find was rejected because it does not match the supplied DFS implementation.",
+      "Three colored blobs were rejected because color alone cannot explain DFS launches or isolated-node handling.",
+      "A final component count was rejected because it hides why seen starts do not double-count a group."
     ],
-    "transferLesson": "Transfer the invariant: Every unseen node starts one DFS component and marks its whole group.",
-    "reviewStatus": "pending"
+    "transferLesson": "A global visited set partitions a graph: every new search root contributes one component and consumes all vertices that must not contribute again. This transfers to islands, provinces, and cluster counting.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

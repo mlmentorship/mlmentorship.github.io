@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-meeting-rooms.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "After sorting by start time, only the previous end can overlap the next meeting.",
+  "learningObjective": "Sorting by start time makes the first overlap appear between adjacent meetings, so Python all can stop at the first failed boundary check.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to after sorting by start time, only the previous end can overlap the next meeting.",
-    "invariant": "After sorting by start time, only the previous end can overlap the next meeting.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Sort intervals by start, then scan adjacent previous-end/current-start boundaries with early exit.",
+    "recognitionCue": "Use it when one resource must handle every interval and any temporal overlap makes the schedule invalid.",
+    "invariant": "Before checking index i, all adjacent boundaries before i are non-overlapping. In start-sorted order, any overlap must include an adjacent pair, so the first failed comparison proves impossibility.",
+    "stateModel": "The minimal state after in-place sorting is the interval array and generator index. Each step compares intervals[i-1][1] <= intervals[i][0], and all short-circuits on false.",
+    "visualRationale": "Aligned timeline bars expose actual duration and the overlap [9,10], while labels print the exact adjacent inequality and skipped generator step. The authored frames keep the same interval identities through sorting and comparison.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A start/end table was rejected because it hides the geometric overlap.",
+      "A sweep-line event counter was rejected because it depicts a different algorithm.",
+      "Only the conflicting pair was rejected because it omits sorting, the successful first check, and all short-circuiting."
     ],
-    "transferLesson": "Transfer the invariant: After sorting by start time, only the previous end can overlap the next meeting.",
-    "reviewStatus": "pending"
+    "transferLesson": "Sort to make a global conflict local, then compare neighboring boundaries and stop at the first violation. This transfers to overlap validation, booking conflicts, and disjoint-range checks.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
