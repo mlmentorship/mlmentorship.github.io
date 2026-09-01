@@ -5,6 +5,19 @@
   "status": "implemented",
   "medium": "semantic-html",
   "learningObjective": "Keep the lower half in a max-heap and the upper half in a min-heap.",
+  "mechanismReview": {
+    "pattern": "Migrated problem-specific trace",
+    "recognitionCue": "Use this state model when the task asks you to keep the lower half in a max-heap and the upper half in a min-heap.",
+    "invariant": "Keep the lower half in a max-heap and the upper half in a min-heap.",
+    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
+    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "rejectedAlternatives": [
+      "Prose-only explanation",
+      "Generic decorative diagram"
+    ],
+    "transferLesson": "Transfer the invariant: Keep the lower half in a max-heap and the upper half in a min-heap.",
+    "reviewStatus": "pending"
+  },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
     "mermaid": "Rejected: automatic graph layout would hide the exact data values and state changes that this problem needs.",

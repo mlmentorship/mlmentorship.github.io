@@ -5,9 +5,16 @@ import { codingQuestionVisuals } from './coding-question-visuals.mjs';
 const root = process.cwd();
 const postsDir = path.join(root, 'src/content/posts');
 const auditsDir = path.join(root, 'data/visual-audits');
-const allowedTypes = new Set(['array', 'array-map', 'table', 'grid', 'stack', 'queue-grid', 'graph', 'tree', 'intervals', 'linked', 'trie', 'bits', 'shapes', 'attention', 'buckets', 'prefix', 'dual-window', 'choices', 'lru', 'heap']);
+const allowedTypes = new Set(['array', 'array-map', 'table', 'grid', 'stack', 'queue-grid', 'graph', 'tree', 'intervals', 'linked', 'trie', 'bits', 'bars', 'shapes', 'attention', 'buckets', 'prefix', 'dual-window', 'choices', 'lru', 'heap']);
 const allowedTones = new Set(['focus', 'state', 'output', 'warning', 'neutral']);
 const failures = [];
+const argumentsList = process.argv.slice(2);
+const slugsArgumentIndex = argumentsList.findIndex((argument) => argument === '--slugs');
+const slugsArgument = argumentsList.find((argument) => argument.startsWith('--slugs='))
+  ?.slice('--slugs='.length) ?? (slugsArgumentIndex >= 0 ? argumentsList[slugsArgumentIndex + 1] : '');
+const requestedSlugs = new Set(slugsArgument.split(',').map((slug) => slug.trim()).filter(Boolean));
+const requireReviewed = argumentsList.includes('--require-reviewed');
+const reviewFields = ['pattern', 'recognitionCue', 'invariant', 'stateModel', 'visualRationale', 'transferLesson'];
 
 function fail(message) {
   failures.push(message);
@@ -33,11 +40,22 @@ function checkScene(scene, label) {
     fail(`${label}: unknown scene type ${scene?.type}`);
     return;
   }
+  if (!Array.isArray(scene.motion) || scene.motion.length < 1) fail(`${label}: scene needs stable motion entities`);
+  const motionKeys = new Set();
+  for (const entity of scene.motion ?? []) {
+    if (!nonEmpty(entity.key) || !nonEmpty(entity.kind) || !nonEmpty(entity.label)) fail(`${label}: invalid motion entity`);
+    if (motionKeys.has(entity.key)) fail(`${label}: duplicate motion key ${entity.key}`);
+    motionKeys.add(entity.key);
+    if (!Number.isFinite(entity.x) || !Number.isFinite(entity.y)) fail(`${label}: motion entity needs coordinates`);
+  }
   if (scene.type === 'array' || scene.type === 'array-map' || scene.type === 'bits') {
     if (!Array.isArray(scene.items) && !Array.isArray(scene.values)) fail(`${label}: array scene needs items`);
     const items = scene.items ?? scene.values;
     if (items.length < 1 || items.some((item) => typeof item !== 'string')) fail(`${label}: array scene has a non-string item`);
     checkMarks(scene.marks, 1, items.length, label);
+  }
+  if (scene.type === 'bars' && (!Array.isArray(scene.values) || scene.values.length < 1 || scene.values.some((value) => !Number.isFinite(Number(value))))) {
+    fail(`${label}: bars scene needs numeric values`);
   }
   if (scene.type === 'array-map') {
     if (!Array.isArray(scene.map)) fail(`${label}: array-map scene needs a map`);
@@ -99,17 +117,44 @@ function checkScene(scene, label) {
   }
 }
 
-const slugs = Object.keys(codingQuestionVisuals);
-if (slugs.length !== 106) fail(`expected 106 visual definitions, found ${slugs.length}`);
+const allSlugs = Object.keys(codingQuestionVisuals);
+if (allSlugs.length !== 106) fail(`expected 106 visual definitions, found ${allSlugs.length}`);
+const slugs = requestedSlugs.size > 0 ? allSlugs.filter((slug) => requestedSlugs.has(slug)) : allSlugs;
+for (const slug of requestedSlugs) if (!codingQuestionVisuals[slug]) fail(`unknown requested slug: ${slug}`);
+const reviewedFingerprints = new Map();
 for (const slug of slugs) {
   const definition = codingQuestionVisuals[slug];
   const label = `visuals/${slug}`;
   if (!nonEmpty(definition.objective)) fail(`${label}: missing objective`);
+  if (definition.slug !== slug) fail(`${label}: definition slug does not match registry key`);
+  for (const field of reviewFields) if (!nonEmpty(definition.review?.[field])) fail(`${label}: missing review.${field}`);
+  if (!Array.isArray(definition.review?.rejectedAlternatives) || definition.review.rejectedAlternatives.length < 2) fail(`${label}: review needs at least two rejected alternatives`);
+  if (!['pending', 'reviewed'].includes(definition.review?.reviewStatus)) fail(`${label}: invalid review status`);
+  if (requireReviewed) {
+    if (definition.review?.reviewStatus !== 'reviewed') fail(`${label}: review is pending`);
+    const metadata = reviewFields.map((field) => definition.review?.[field] ?? '').join(' ');
+    if (metadata.length < 220) fail(`${label}: reviewed mechanism metadata is under-specified`);
+    if (/migrated problem-specific trace|the visible authored frames/i.test(metadata)) fail(`${label}: reviewed metadata is generic migration copy`);
+    const fingerprint = JSON.stringify({ objective: definition.objective, frames: definition.frames });
+    const duplicate = reviewedFingerprints.get(fingerprint);
+    if (duplicate) fail(`${label}: duplicates reviewed trace ${duplicate}`);
+    reviewedFingerprints.set(fingerprint, slug);
+  }
   if (!Array.isArray(definition.frames) || definition.frames.length < 3) fail(`${label}: needs at least three frames`);
   if (!nonEmpty(definition.frames.at(-1)?.scene?.result)) fail(`${label}: final frame needs an explicit result`);
   for (const [index, item] of (definition.frames ?? []).entries()) {
     if (!nonEmpty(item.label) || !nonEmpty(item.note)) fail(`${label}/frame-${index}: missing label or note`);
+    if (!nonEmpty(item.key)) fail(`${label}/frame-${index}: missing stable frame key`);
     checkScene(item.scene, `${label}/frame-${index}`);
+  }
+  if (requireReviewed) {
+    const snapshots = definition.frames.map((item) => JSON.stringify(item.scene));
+    if (new Set(snapshots).size < 2) fail(`${label}: trace does not change between frames`);
+    const sharedMotionKeys = definition.frames.slice(1).some((item, index) => {
+      const previous = new Set(definition.frames[index].scene.motion.map((entity) => entity.key));
+      return item.scene.motion.some((entity) => previous.has(entity.key));
+    });
+    if (!sharedMotionKeys) fail(`${label}: trace has no stable moving entities`);
   }
   const articlePath = path.join(postsDir, `2026-09-01-${slug}.md`);
   const auditPath = path.join(auditsDir, `${slug}.json`);
@@ -132,4 +177,4 @@ if (failures.length > 0) {
   console.error(failures.join('\n'));
   process.exit(1);
 }
-console.log(`Coding visual check passed: ${slugs.length} problem-specific definitions, frames, generated pages, and audits are synchronized.`);
+console.log(`Coding visual check passed: ${slugs.length} problem-specific definitions, frames, generated pages, and audits are synchronized${requireReviewed ? ' and reviewed' : ''}.`);

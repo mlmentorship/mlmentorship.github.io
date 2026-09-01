@@ -28,6 +28,13 @@ function setFrame(
   announce: boolean,
 ): void {
   const boundedIndex = Math.max(0, Math.min(frames.length - 1, index));
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const previousPositions = new Map<string, DOMRect>();
+  if (!reducedMotion) {
+    visual.querySelectorAll<HTMLElement | SVGElement>('[data-motion-key]').forEach((element) => {
+      if (element.getClientRects().length > 0) previousPositions.set(element.dataset.motionKey ?? '', element.getBoundingClientRect());
+    });
+  }
   visual.dataset.activeFrame = String(boundedIndex);
   frames.forEach((frame, frameIndex) => {
     frame.hidden = frameIndex !== boundedIndex;
@@ -39,6 +46,23 @@ function setFrame(
     else button.removeAttribute('aria-current');
   });
   const activeFrame = frames[boundedIndex];
+  if (!reducedMotion && activeFrame) {
+    activeFrame.querySelectorAll<HTMLElement | SVGElement>('[data-motion-key]').forEach((element) => {
+      const previousPosition = previousPositions.get(element.dataset.motionKey ?? '');
+      if (!previousPosition) return;
+      const position = element.getBoundingClientRect();
+      const deltaX = previousPosition.left - position.left;
+      const deltaY = previousPosition.top - position.top;
+      if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+      element.animate(
+        [
+          { transform: `translate(${deltaX}px, ${deltaY}px)` },
+          { transform: 'translate(0, 0)' },
+        ],
+        { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' },
+      );
+    });
+  }
   const activeLabel = activeFrame?.getAttribute('aria-label') ?? '';
   const activeNote = activeFrame?.querySelector<HTMLElement>('.coding-trace-frame-heading strong')?.textContent?.trim() ?? '';
   progress.value = `Step ${boundedIndex + 1} of ${frames.length}`;
@@ -125,6 +149,26 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
       button.addEventListener('click', () => {
         stop();
         update(frameIndex);
+      });
+      visual.addEventListener('keydown', (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          stop();
+          update(currentStep - 1);
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          stop();
+          update(currentStep + 1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          stop();
+          update(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          stop();
+          update(frames.length - 1);
+        }
       });
     });
 

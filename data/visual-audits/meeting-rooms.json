@@ -5,6 +5,19 @@
   "status": "implemented",
   "medium": "semantic-html",
   "learningObjective": "After sorting by start time, only the previous end can overlap the next meeting.",
+  "mechanismReview": {
+    "pattern": "Migrated problem-specific trace",
+    "recognitionCue": "Use this state model when the task asks you to after sorting by start time, only the previous end can overlap the next meeting.",
+    "invariant": "After sorting by start time, only the previous end can overlap the next meeting.",
+    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
+    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "rejectedAlternatives": [
+      "Prose-only explanation",
+      "Generic decorative diagram"
+    ],
+    "transferLesson": "Transfer the invariant: After sorting by start time, only the previous end can overlap the next meeting.",
+    "reviewStatus": "pending"
+  },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
     "mermaid": "Rejected: automatic graph layout would hide the exact data values and state changes that this problem needs.",

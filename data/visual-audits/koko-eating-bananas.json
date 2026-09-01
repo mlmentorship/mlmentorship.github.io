@@ -5,6 +5,19 @@
   "status": "implemented",
   "medium": "semantic-html",
   "learningObjective": "Binary-search the smallest eating speed that finishes within the hour limit.",
+  "mechanismReview": {
+    "pattern": "Migrated problem-specific trace",
+    "recognitionCue": "Use this state model when the task asks you to binary-search the smallest eating speed that finishes within the hour limit.",
+    "invariant": "Binary-search the smallest eating speed that finishes within the hour limit.",
+    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
+    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "rejectedAlternatives": [
+      "Prose-only explanation",
+      "Generic decorative diagram"
+    ],
+    "transferLesson": "Transfer the invariant: Binary-search the smallest eating speed that finishes within the hour limit.",
+    "reviewStatus": "pending"
+  },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
     "mermaid": "Rejected: automatic graph layout would hide the exact data values and state changes that this problem needs.",

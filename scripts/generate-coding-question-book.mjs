@@ -3,7 +3,13 @@ import path from 'node:path';
 import { codingQuestionVisuals } from './coding-question-visuals.mjs';
 
 const root = process.cwd();
-const sourceArgument = process.argv.slice(2).find((argument) => !argument.startsWith('--'));
+const argumentsList = process.argv.slice(2);
+const slugsArgumentIndex = argumentsList.findIndex((argument) => argument === '--slugs');
+const slugsArgument = argumentsList.find((argument) => argument.startsWith('--slugs='))
+  ?.slice('--slugs='.length) ?? (slugsArgumentIndex >= 0 ? argumentsList[slugsArgumentIndex + 1] : '');
+const requestedSlugs = new Set(slugsArgument.split(',').map((slug) => slug.trim()).filter(Boolean));
+const sourceArgument = argumentsList.find((argument, index) =>
+  !argument.startsWith('--') && index !== slugsArgumentIndex + 1);
 const sourcePath = sourceArgument || path.resolve(root, '../ml_interview_book/docs/dsa/Coding_Questions_Phone_Guide.md');
 const postsDir = path.join(root, 'src/content/posts');
 const auditsDir = path.join(root, 'data/visual-audits');
@@ -31,6 +37,14 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+function renderBarsScene(scene) {
+  const values = scene.values.map(Number);
+  const max = Math.max(...values.map(Math.abs), 1);
+  const bars = values.map((value, index) => `<span class="coding-trace-bar" style="--bar-height:${Math.max(4, Math.abs(value) / max * 100)}%"${motionKey(`value-${index}`)}><b>${escapeHtml(scene.labels?.[index] ?? value)}</b><i></i><small>${index}</small></span>`).join('');
+  const area = scene.area ? `<div class="coding-trace-measured-area" style="--area-left:${scene.area.left};--area-right:${scene.area.right};--area-height:${scene.area.height}"><span>${escapeHtml(scene.area.label)}</span></div>` : '';
+  return `<div class="coding-trace-bars" role="img" aria-label="Vertical values and measured area">${area}${bars}</div>${renderMeta(scene, ['type', 'values', 'labels', 'area', 'motion'])}`;
 }
 
 function slugify(value) {
@@ -79,6 +93,10 @@ function toneClass(tone) {
   return allowedTones.has(tone) && tone !== 'neutral' ? ` trace-tone-${tone}` : '';
 }
 
+function motionKey(key) {
+  return ` data-motion-key="${escapeHtml(key)}"`;
+}
+
 function renderMeta(scene, excluded) {
   const items = Object.entries(scene)
     .filter(([key, value]) => !excluded.includes(key) && value !== undefined && value !== null && (typeof value === 'string' || typeof value === 'number'))
@@ -95,7 +113,8 @@ function renderArrayScene(scene) {
     const labels = cellMarks.map((item) => item.label).join(' · ');
     const classes = cellMarks.map((item) => toneClass(item.tone)).join('');
     const display = item === '' ? '""' : item;
-    return `<span class="coding-trace-array-item${classes}" role="listitem"><span class="coding-trace-array-mark">${escapeHtml(labels)}</span><span class="coding-trace-array-cell">${escapeHtml(display)}</span></span>`;
+    const pointers = cellMarks.map((mark) => `<span class="coding-trace-array-pointer"${motionKey(mark.key ?? `marker-${mark.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`)}>${escapeHtml(mark.label)}</span>`).join('');
+    return `<span class="coding-trace-array-item${classes}" role="listitem"${motionKey(`value-${index}`)}>${pointers || `<span class="coding-trace-array-mark">${escapeHtml(labels)}</span>`}<span class="coding-trace-array-cell">${escapeHtml(display)}</span><small class="coding-trace-array-index">${index}</small></span>`;
   }).join('');
   return `<div class="coding-trace-array" role="list" aria-label="Array state">${cells}</div>${renderMeta(scene, ['type', 'items', 'marks'])}`;
 }
@@ -116,7 +135,8 @@ function renderGridCells(scene) {
   const marks = new Map((scene.marks ?? []).map((item) => [`${item.row}:${item.col}`, item]));
   return scene.rows.map((row, rowIndex) => row.map((value, colIndex) => {
     const mark = marks.get(`${rowIndex}:${colIndex}`);
-    return `<span class="coding-trace-grid-cell${toneClass(mark?.tone)}"><span>${escapeHtml(value)}</span>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>`;
+    const key = mark?.key ?? (mark?.label ? `marker-${mark.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : `grid-${rowIndex}-${colIndex}`);
+    return `<span class="coding-trace-grid-cell${toneClass(mark?.tone)}"${motionKey(key)}><span>${escapeHtml(value)}</span>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>`;
   }).join('')).join('');
 }
 
@@ -136,21 +156,55 @@ function renderStackScene(scene) {
 }
 
 function renderGraphScene(scene) {
-  const nodes = scene.nodes.map((node) => `<span class="coding-trace-node${scene.start === node ? ' is-focus' : ''}${scene.visited?.some((item) => String(item).startsWith(`${node}:`) || item === node) ? ' is-state' : ''}">${escapeHtml(node)}</span>`).join('');
-  const edges = scene.edges.map((edge) => `<span class="coding-trace-edge">${escapeHtml(edge)}</span>`).join('');
+  const width = 480;
+  const height = 230;
+  const positions = scene.nodes.map((node, index) => ({
+    node,
+    x: width / 2 + Math.cos(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * Math.min(170, 45 * scene.nodes.length),
+    y: height / 2 + Math.sin(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * 78,
+  }));
+  const endpoint = (edge, first) => {
+    const tokens = String(edge).match(/[A-Za-z]*\s*\d+|[A-Za-z]+/g) ?? [];
+    const token = tokens[first ? 0 : tokens.length - 1]?.trim();
+    return positions.find((item) => item.node === token || String(item.node).split(' ').at(-1) === token)?.node;
+  };
+  const edges = scene.edges.map((edge, index) => {
+    const from = positions.find((item) => item.node === endpoint(edge, true)) ?? positions[index % positions.length];
+    const to = positions.find((item) => item.node === endpoint(edge, false)) ?? positions[(index + 1) % positions.length];
+    return `<g${motionKey(`edge-${edge}-${index}`)}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" /><text x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2 - 6}">${escapeHtml(edge)}</text></g>`;
+  }).join('');
+  const nodes = positions.map(({ node, x, y }, index) => {
+    const state = scene.start === node ? ' is-focus' : scene.visited?.some((item) => String(item).startsWith(`${node}:`) || item === node) ? ' is-state' : '';
+    return `<g class="coding-trace-graph-node${state}"${motionKey(`node-${node}-${index}`)}><circle cx="${x}" cy="${y}" r="23" /><text x="${x}" y="${y + 4}">${escapeHtml(node)}</text></g>`;
+  }).join('');
   const keys = ['visited', 'frontier', 'ready', 'order', 'roots', 'components', 'indegree'];
   const lists = keys.flatMap((key) => scene[key] ? [`<span><b>${key}</b>${escapeHtml(Array.isArray(scene[key]) ? scene[key].join(', ') : scene[key])}</span>`] : []).join('');
-  return `<div class="coding-trace-graph"><div class="coding-trace-node-row">${nodes}</div><div class="coding-trace-edge-row">${edges}</div>${lists ? `<div class="coding-trace-meta">${lists}</div>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'edges', 'start', ...keys])}`;
+  return `<div class="coding-trace-graph"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Connected graph topology">${edges}${nodes}</svg>${lists ? `<div class="coding-trace-meta">${lists}</div>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'edges', 'start', ...keys, 'motion'])}`;
 }
 
 function renderTreeScene(scene) {
+  const width = 640;
+  const rowHeight = 72;
   let nodeIndex = 0;
-  const rows = scene.levels.map((level, levelIndex) => `<div class="coding-trace-tree-level" data-level="${levelIndex}">${level.map((node) => {
-    const index = nodeIndex++;
-    const mark = scene.marks?.find((item) => item.index === index);
-    return `<span class="coding-trace-tree-node${toneClass(mark?.tone)}"><span>${escapeHtml(node)}</span>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>`;
-  }).join('')}</div>`).join('');
-  return `<div class="coding-trace-tree" role="group" aria-label="Tree state">${rows}</div>${renderMeta(scene, ['type', 'levels', 'marks'])}`;
+  const positions = scene.levels.flatMap((level, levelIndex) => level.map((node, index) => ({
+    node,
+    levelIndex,
+    index,
+    flatIndex: nodeIndex++,
+    x: (index + 0.5) * width / level.length,
+    y: 28 + levelIndex * rowHeight,
+  })));
+  const edges = positions.filter((item) => item.levelIndex > 0 && item.node !== '-').map((item) => {
+    const parent = positions.find((candidate) => candidate.levelIndex === item.levelIndex - 1 && candidate.index === Math.floor(item.index / 2));
+    return parent && parent.node !== '-' ? `<line class="coding-trace-edge-line" x1="${parent.x}" y1="${parent.y}" x2="${item.x}" y2="${item.y}" />` : '';
+  }).join('');
+  const nodes = positions.filter((item) => item.node !== '-').map((item) => {
+    const mark = scene.marks?.find((candidate) => candidate.index === item.flatIndex);
+    const label = mark?.label ? `<text class="coding-trace-node-state" x="${item.x}" y="${item.y + 30}">${escapeHtml(mark.label)}</text>` : '';
+    const occurrence = positions.slice(0, item.flatIndex).filter((candidate) => candidate.node === item.node).length;
+    return `<g class="coding-trace-tree-node${toneClass(mark?.tone)}"${motionKey(`tree-node-${item.node}-${occurrence}`)}><circle cx="${item.x}" cy="${item.y}" r="18" /><text x="${item.x}" y="${item.y + 4}">${escapeHtml(item.node)}</text>${label}</g>`;
+  }).join('');
+  return `<div class="coding-trace-tree"><svg viewBox="0 0 ${width} ${scene.levels.length * rowHeight}" role="img" aria-label="Binary tree with parent-child edges and call state">${edges}${nodes}</svg></div>${renderMeta(scene, ['type', 'levels', 'marks', 'motion'])}`;
 }
 
 function renderIntervalsScene(scene) {
@@ -164,7 +218,7 @@ function renderIntervalsScene(scene) {
 }
 
 function renderLinkedRow(nodes, label = '') {
-  const rendered = nodes.map((node, index) => `${index > 0 ? '<span class="coding-trace-link-arrow">&rarr;</span>' : ''}<span class="coding-trace-linked-node${toneClass(node.tone)}"><span>${escapeHtml(node.value)}</span>${node.pointer ? `<small>${escapeHtml(node.pointer)}</small>` : ''}</span>`).join('');
+  const rendered = nodes.map((node, index) => `${index > 0 ? `<span class="coding-trace-link-arrow"${motionKey(`link-${nodes[index - 1].value}-${node.value}`)}>&rarr;</span>` : ''}<span class="coding-trace-linked-node${toneClass(node.tone)}"${motionKey(node.key ?? `node-${node.value}`)}><span>${escapeHtml(node.value)}</span>${node.pointer ? `<small${motionKey(`pointer-${node.pointer}`)}>${escapeHtml(node.pointer)}</small>` : ''}</span>`).join('');
   return `<div class="coding-trace-linked-row">${label ? `<span class="coding-trace-label">${escapeHtml(label)}</span>` : ''}${rendered}</div>`;
 }
 
@@ -173,8 +227,15 @@ function renderLinkedScene(scene) {
 }
 
 function renderTrieScene(scene) {
-  const paths = scene.paths.map((item) => `<div class="coding-trace-trie-path"><span class="coding-trace-trie-word${toneClass(item.tone)}">${escapeHtml(item.word)}</span><span class="coding-trace-link-arrow">&rarr;</span><strong>${escapeHtml(item.prefix)}</strong></div>`).join('');
-  return `<div class="coding-trace-trie">${paths}</div>${renderMeta(scene, ['type', 'paths'])}`;
+  const width = 560;
+  const paths = scene.paths.map((item, index) => {
+    const letters = [...item.word];
+    const rowY = 30 + index * 58;
+    const edges = letters.slice(1).map((_, letterIndex) => `<line class="coding-trace-edge-line" x1="${55 + letterIndex * 55}" y1="${rowY}" x2="${110 + letterIndex * 55}" y2="${rowY}" />`).join('');
+    const nodes = letters.map((letter, letterIndex) => `<g${motionKey(`trie-${item.word}-${letterIndex}`)}><circle cx="${55 + letterIndex * 55}" cy="${rowY}" r="16" /><text x="${55 + letterIndex * 55}" y="${rowY + 4}">${escapeHtml(letter)}</text></g>`).join('');
+    return `${edges}${nodes}<text class="coding-trace-node-state" x="${Math.min(width - 80, 80 + letters.length * 55)}" y="${rowY + 4}">${escapeHtml(item.prefix)}</text>`;
+  }).join('');
+  return `<div class="coding-trace-trie"><svg viewBox="0 0 ${width} ${Math.max(80, scene.paths.length * 58)}" role="img" aria-label="Trie prefix topology">${paths}</svg></div>${renderMeta(scene, ['type', 'paths', 'motion'])}`;
 }
 
 function renderBitsScene(scene) {
@@ -219,8 +280,22 @@ function renderLruScene(scene) {
 }
 
 function renderHeapScene(scene) {
-  const values = scene.values.map((value, index) => `<span class="coding-trace-heap-node${index === 0 ? ' is-root' : ''}">${escapeHtml(value)}</span>`).join('');
-  return `<div class="coding-trace-heap"><div class="coding-trace-heap-tree">${values}</div></div>${renderMeta(scene, ['type', 'values'])}`;
+  const width = 480;
+  const levels = Math.ceil(Math.log2(scene.values.length + 1));
+  const positions = scene.values.map((value, index) => {
+    const level = Math.floor(Math.log2(index + 1));
+    const offset = index - (2 ** level - 1);
+    return { value, index, x: (offset + 1) * width / (2 ** level + 1), y: 32 + level * 72 };
+  });
+  const edges = positions.slice(1).map((item) => {
+    const parent = positions[Math.floor((item.index - 1) / 2)];
+    return `<line class="coding-trace-heap-edge coding-trace-edge-line" x1="${parent.x}" y1="${parent.y}" x2="${item.x}" y2="${item.y}" />`;
+  }).join('');
+  const nodes = positions.map((item) => {
+    const occurrence = positions.slice(0, item.index).filter((candidate) => candidate.value === item.value).length;
+    return `<g class="coding-trace-heap-node${item.index === 0 ? ' is-root' : ''}"${motionKey(`heap-value-${item.value}-${occurrence}`)}><circle cx="${item.x}" cy="${item.y}" r="21" /><text x="${item.x}" y="${item.y + 4}">${escapeHtml(item.value)}</text></g>`;
+  }).join('');
+  return `<div class="coding-trace-heap"><svg viewBox="0 0 ${width} ${Math.max(90, levels * 72)}" role="img" aria-label="Complete binary heap topology">${edges}${nodes}</svg></div>${renderMeta(scene, ['type', 'values', 'motion'])}`;
 }
 
 function renderScene(scene) {
@@ -237,6 +312,7 @@ function renderScene(scene) {
     linked: renderLinkedScene,
     trie: renderTrieScene,
     bits: renderBitsScene,
+    bars: renderBarsScene,
     shapes: renderShapesScene,
     attention: renderAttentionScene,
     buckets: renderBucketsScene,
@@ -256,12 +332,12 @@ function renderVisual(problem) {
   if (!definition) throw new Error(`Missing visual definition for ${problem.slug}`);
   const visualId = `${problem.slug}-state`;
   const titleId = `${visualId}-title`;
-  const frames = definition.frames.map((item, index) => `<div class="coding-trace-frame" data-coding-frame="${index}"${index > 0 ? ' hidden' : ''} role="group" aria-label="${escapeHtml(item.label)}"><div class="coding-trace-frame-heading"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.note)}</strong></div>${renderScene(item.scene)}</div>`).join('');
+  const frames = definition.frames.map((item, index) => `<div class="coding-trace-frame" data-coding-frame="${index}" data-frame-key="${escapeHtml(item.key)}"${index > 0 ? ' hidden' : ''} role="group" aria-label="${escapeHtml(item.label)}"><div class="coding-trace-frame-heading"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.note)}</strong></div>${renderScene(item.scene)}</div>`).join('');
   const buttons = definition.frames.map((item, index) => `<button type="button" data-coding-frame-button="${index}"${index === 0 ? ' aria-current="step"' : ''}><span>${index + 1}</span><strong>${escapeHtml(item.label)}</strong></button>`).join('');
   const controls = `<div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of ${definition.frames.length}</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps">${buttons}</div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p>`;
   return {
     visualId,
-    source: `<!-- visual:${visualId} -->\n<figure class="learning-figure coding-visual-figure" aria-labelledby="${titleId}"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="${titleId}">${escapeHtml(problem.title)}: ${escapeHtml(definition.objective)}</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="${problem.slug}" role="group" aria-label="${escapeHtml(`${problem.title}: ${definition.objective}`)}"><div class="coding-visual-example"><span>Input and goal</span><strong>${escapeHtml(problem.task)}</strong></div><div class="coding-trace" data-coding-trace>${frames}${controls}</div><p class="coding-visual-invariant"><span>Why this works</span>${escapeHtml(definition.objective)}</p></div><figcaption><strong>Read it this way:</strong> ${escapeHtml(definition.frames[0].note)} Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>`,
+    source: `<!-- visual:${visualId} -->\n<figure class="learning-figure coding-visual-figure" aria-labelledby="${titleId}"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="${titleId}">${escapeHtml(problem.title)}: ${escapeHtml(definition.objective)}</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="${problem.slug}" role="group" tabindex="0" aria-label="${escapeHtml(`${problem.title}: ${definition.objective}`)}"><div class="coding-visual-example"><span>Input and goal</span><strong>${escapeHtml(problem.task)}</strong></div><div class="coding-trace" data-coding-trace>${frames}${controls}</div><p class="coding-visual-invariant"><span>Why this works</span>${escapeHtml(definition.objective)}</p></div><figcaption><strong>Read it this way:</strong> ${escapeHtml(definition.frames[0].note)} Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>`,
     audit: {
       schemaVersion: 1,
       slug: problem.slug,
@@ -269,6 +345,7 @@ function renderVisual(problem) {
       status: 'implemented',
       medium: 'semantic-html',
       learningObjective: definition.objective,
+      mechanismReview: definition.review,
       mediumRationale: 'An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.',
       mediumComparison: {
         mermaid: 'Rejected: automatic graph layout would hide the exact data values and state changes that this problem needs.',
@@ -342,13 +419,20 @@ function writeProblem(problem) {
 }
 
 const source = fs.readFileSync(sourcePath, 'utf8');
-const problems = parseProblems(source);
+const allProblems = parseProblems(source);
+const problems = requestedSlugs.size > 0
+  ? allProblems.filter((problem) => requestedSlugs.has(problem.slug))
+  : allProblems;
 const force = process.argv.includes('--force');
-if (problems.length !== 106) throw new Error(`Expected 106 problems, found ${problems.length}`);
-if (Object.keys(codingQuestionVisuals).length !== problems.length) throw new Error(`Visual registry count does not match problem count`);
+if (allProblems.length !== 106) throw new Error(`Expected 106 problems, found ${allProblems.length}`);
+if (Object.keys(codingQuestionVisuals).length !== allProblems.length) throw new Error(`Visual registry count does not match problem count`);
+if (requestedSlugs.size > 0 && problems.length !== requestedSlugs.size) {
+  const found = new Set(problems.map((problem) => problem.slug));
+  throw new Error(`Unknown requested slug(s): ${[...requestedSlugs].filter((slug) => !found.has(slug)).join(', ')}`);
+}
 const existingSlugs = new Set(fs.readdirSync(postsDir).map((name) => name.replace(/\.mdx?$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, '')));
 for (const problem of problems) {
-  if (existingSlugs.has(problem.slug) && !force) throw new Error(`Slug already exists: ${problem.slug}`);
+  if (existingSlugs.has(problem.slug) && !force && requestedSlugs.size === 0) throw new Error(`Slug already exists: ${problem.slug}`);
   if (!problem.task || !problem.pattern) throw new Error(`Missing metadata for ${problem.identifier}`);
   if (!chapterFor(problem)) throw new Error(`No chapter for ${problem.identifier}`);
   if (!codingQuestionVisuals[problem.slug]) throw new Error(`No visual definition for ${problem.slug}`);
@@ -356,9 +440,9 @@ for (const problem of problems) {
 fs.mkdirSync(postsDir, { recursive: true });
 fs.mkdirSync(auditsDir, { recursive: true });
 const generated = problems.map(writeProblem);
-const registry = chapterDefinitions.map((chapter) => ({ ...chapter, slugs: generated.filter((problem) => chapter.numbers.includes(problem.identifier)).map((problem) => problem.slug) }));
+const registry = chapterDefinitions.map((chapter) => ({ ...chapter, slugs: allProblems.filter((problem) => chapter.numbers.includes(problem.identifier)).map((problem) => problem.slug) }));
 const registryPath = process.env.CODING_BOOK_REGISTRY || '/tmp/coding-interview-book-registry.json';
-fs.writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
+if (requestedSlugs.size === 0) fs.writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
 console.log(`Generated ${generated.length} coding question pages and audits.`);
-console.log(`Registry written to ${registryPath}.`);
+if (requestedSlugs.size === 0) console.log(`Registry written to ${registryPath}.`);
 console.log(`Visual scenes: ${[...new Set(Object.values(codingQuestionVisuals).flatMap((definition) => definition.frames.map((item) => item.scene.type)))].sort().join(', ')}.`);
