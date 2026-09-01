@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "rl-environments-and-graders",
+  "article": "src/content/posts/2026-07-11-rl-environments-and-graders.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace one agent episode across the environment and grader contracts, then explain why a hard policy failure must remain separate from quality scores.",
+  "mediumRationale": "A two-lane semantic handoff is the smallest useful spatial explanation. Numbered steps distinguish the environment's production of an evidence-bearing trajectory from the grader's conversion of that evidence into a gated, component-level training signal. Ordinary text preserves the complete lesson without a renderer and the established two-column primitive stacks naturally on narrow screens.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is a compact contract comparison with one ordered handoff, not a relationship-heavy graph. Mermaid would introduce runtime rendering and either a wide flowchart or smaller labels at phone width.",
+    "svg": "Rejected: no quantitative geometry, scale, or branching calculation needs fixed coordinates. A custom diagram would make six short textual obligations harder to reflow and maintain without adding instructional value.",
+    "semanticHtml": "Selected: two labelled, numbered panels make the environment-to-grader boundary explicit, preserve a logical reading order for assistive technology, and reuse the established responsive visual-grid--two and visual-panel primitives.",
+    "interaction": "Rejected: there is no parameter whose manipulation would reveal a new invariant. Interactive reward weights could incorrectly imply that hard permission failures are tradeable and would add hidden states without improving the core handoff.",
+    "paperReuse": "Rejected: the authoritative sources contain environment interfaces, general reinforcement-learning diagrams, and benchmark workflows, but no figure exactly expresses this article's environment-contract versus grader-contract handoff. Sutton and Barto is conventionally copyrighted; the SWE-bench paper's arXiv record does not grant a permissive figure-adaptation license. Gymnasium and SWE-bench code are MIT licensed, but no source artwork, prose, data, coordinates, or layout is reused.",
+    "noVisual": "Rejected: the prose lists environment and grader requirements separately, but readers must mentally connect the terminal state and event log produced by one contract to the gates and component evidence applied by the other. The visual prevents the central confusion that a correct final answer or high aggregate score can compensate for an invalid trajectory."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding slide covers SHAP feature attribution and contains no reinforcement-learning environment, episode, trajectory, or grader material, establishing the boundary before the RL section."
+      },
+      {
+        "page": 154,
+        "insight": "This is only a Reinforcement Learning section divider and provides no environment or evaluation model."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts iid supervised examples with dependent trajectories and conditional likelihood with expected reward. This supports treating an episode as a sequence rather than a prompt-answer pair, but it does not define agent tools, side effects, permissions, graders, or evidence."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide uses a CartPole Gym environment, state-action interaction, per-step rewards, episode termination, and discounted return. It demonstrates that optimization consumes environment-generated trajectories, but its scalar reward example does not cover language-model tools, structured grader evidence, or hard policy gates."
+      },
+      {
+        "page": 157,
+        "insight": "The following slide begins Past projects, confirming that the deck's RL neighborhood ends without a language-model agent environment or grader architecture."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 pages of Basic_ML_CS_concepts for environment, agent, grader, reward, reinforcement learning, and trajectory, then read the complete relevant neighborhood on pages 153-157. Pages 155-156 provide the only applicable trajectory and environment context; the deck contains no grader stack, structured-evidence, permission-gate, reward-hacking, or language-model agent visual. The deck states no reuse license and includes externally sourced material, so it was treated as review-only. No screenshot, artwork, code, wording, numerical value, coordinate, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Reinforcement Learning: An Introduction, second edition",
+        "url": "https://incompleteideas.net/book/the-book-2nd.html",
+        "usage": "Used as the authoritative textbook source for agent-environment interaction, trajectories, rewards, terminal states, policies, and the fact that a policy is optimized against cumulative reward generated through that interaction.",
+        "license": "The authors provide an official full PDF, but the book is copyrighted by MIT Press and the official page states no permissive figure-adaptation license. No figure, example, prose, data, notation, or layout is reproduced."
+      },
+      {
+        "title": "Gymnasium Env API",
+        "url": "https://gymnasium.farama.org/api/env/",
+        "usage": "Used as official environment documentation to verify the reset and step contract, including observations, actions, rewards, termination versus truncation, diagnostic information, reproducibility, and environment-specific state transitions.",
+        "license": "The Gymnasium repository licenses its software and associated documentation under the MIT License. Reuse would be permitted with the required notice, but no documentation text, code, artwork, values, or layout is copied; the visual is an original conceptual synthesis."
+      },
+      {
+        "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+        "url": "https://arxiv.org/abs/2310.06770",
+        "usage": "Used as a primary benchmark paper to verify that language-model coding evaluation depends on repository state and executable tests rather than final-answer text alone.",
+        "license": "The arXiv record is distributed under arXiv's perpetual, non-exclusive license, not a general permissive adaptation license. No paper figure, result, benchmark instance, prose, data, or layout is reproduced."
+      },
+      {
+        "title": "SWE-bench evaluation harness",
+        "url": "https://github.com/SWE-bench/SWE-bench",
+        "usage": "Used as the official implementation source to verify reproducible, containerized execution and test-based grading for coding-agent patches.",
+        "license": "The repository is MIT licensed. Although software reuse is permitted with attribution and notice, no code, image, documentation wording, benchmark data, or layout is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the contract handoff. The environment samples and constrains state, validates actions, causes side effects, determines termination, and records the trajectory; the grader then compares terminal state and process evidence with task truth and policy rules. Hard permission, policy, and integrity failures must make a trajectory ineligible before any softer quality components are considered. The policy is optimized against the resulting signal, so later on-policy trajectories can expose omissions in either contract. The visual is an original synthesis, and all meaning is carried by headings, numbering, and explicit text rather than color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full RL neighborhood, then reviewed an authoritative textbook, official environment documentation, and the SWE-bench paper and implementation with explicit licensing checks. The selected visual isolates the environment-to-grader evidence handoff that the prose otherwise requires readers to assemble."
+  },
+  "implementation": {
+    "visualIds": [
+      "environment-grader-contract-handoff"
+    ],
+    "accessibility": "The figure is linked to a direct learning question and contains a labelled group with two semantic sections. Six numbered steps, explicit contract outputs, and written failure consequences preserve every distinction without color. Source order remains meaningful when the established two-column primitive stacks below 640 CSS pixels, including at 390 CSS pixels; text wraps without a minimum width. Shared theme tokens provide dark-mode contrast, and the established print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}
