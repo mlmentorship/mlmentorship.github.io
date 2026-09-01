@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "slug": "universal-approximation-theorem",
+  "article": "src/content/posts/2025-12-29-universal-approximation-theorem.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Interpret universal approximation as an existence claim that some finite network stays within a chosen uniform error tolerance over a compact domain, without inferring guarantees about width, training, generalization, or behavior outside that domain.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can show a target function, an approximating network, a pointwise error band, and hard compact-domain boundaries while placing the theorem's one existence guarantee beside its omitted practical guarantees. A constructed piecewise-linear example makes every plotted deviation auditable.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could separate theorem assumptions from conclusions, but it cannot show what the supremum error bound means at every input in the domain.",
+    "svg": "Selected: fixed coordinates can show a target curve, an approximation entirely inside an epsilon tube, compact-domain boundaries, and an explicit boundary between existence and practical guarantees.",
+    "semanticHtml": "Rejected: a checklist can state what the theorem does and does not imply, but cannot spatially explain uniform approximation across a continuous domain.",
+    "interaction": "Rejected: varying epsilon or width would require an invented fitting algorithm and could falsely imply that the theorem constructs or trains the network.",
+    "paperReuse": "Rejected: the primary papers establish density results rather than supplying a narrow visual for these quantifiers. Reuse permission for journal artwork was not needed or established, and no source figure is copied.",
+    "noVisual": "Rejected: the formula states a supremum bound, but prose alone leaves readers to conflate one network's existence inside that bound with successful optimization or good predictions beyond the compact set."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 39,
+        "insight": "The preceding slide discusses model calibration and out-of-distribution samples. Its warning that behavior can differ off distribution is adjacent to, but not a statement of, approximation on a compact domain."
+      },
+      {
+        "page": 40,
+        "insight": "The General Neural Nets Concepts divider opens the closest relevant section but contains no theorem, network-capacity claim, or function approximation."
+      },
+      {
+        "page": 41,
+        "insight": "The activation-functions slide compares sigmoid, tanh, ReLU, leaky ReLU, PReLU, maxout, and GELU. It supplies activation context but makes no universal approximation claim and gives no target-versus-approximant construction."
+      },
+      {
+        "page": 42,
+        "insight": "The Learning divider closes the architecture subsection without adding approximation, compactness, width, or existence semantics."
+      },
+      {
+        "page": 43,
+        "insight": "The neighboring handwritten optimization slide covers gradient descent, Newton methods, and computational graphs, reinforcing that optimization is a separate question from representational existence."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for universal approximation, function approximation, shallow or one-hidden-layer networks, multilayer perceptrons, activation functions, ReLU, and sigmoid. No page states or illustrates the universal approximation theorem. Pages 39-43 were rendered and inspected as the nearest complete neural-network neighborhood. No deck image, curve, wording, numeric value, coordinate, or layout is reused.",
+    "license": "The local deck states no general reuse license and includes externally sourced plots. It is treated as review-only; the implementation is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Approximation by superpositions of a sigmoidal function",
+        "url": "https://hal.science/hal-03753170v1",
+        "usage": "Used as the original primary result to verify uniform approximation of continuous functions on the unit hypercube by finite sums with one hidden layer and a continuous sigmoidal nonlinearity.",
+        "license": "HAL provides a public manuscript deposit, but its API metadata supplies no explicit reuse license and the journal version remains publisher-controlled. Public access is not treated as figure-reuse permission. No paper text, proof layout, notation layout, data, or figure is adapted; the theorem is cited and the visual geometry is original."
+      },
+      {
+        "title": "Multilayer feedforward networks are universal approximators",
+        "url": "https://proceedings.neurips.cc/paper/1989/hash/53c3bce66e43be4f209556518c2fcb54-Abstract.html",
+        "usage": "Used as a primary independent result to cross-check that sufficiently general nonconstant bounded activation functions yield universal approximation and that the result concerns representational capability rather than training.",
+        "license": "The proceedings page provides public access but no permissive figure-reuse grant was relied upon. No prose, proof, figure, or visual structure is copied."
+      },
+      {
+        "title": "Deep Learning, Chapter 6: Deep Feedforward Networks",
+        "url": "https://www.deeplearningbook.org/contents/mlp.html",
+        "usage": "Used as an authoritative textbook to verify the practical interpretation: universal approximation establishes existence but does not specify network size, learning procedure, or generalization, and may require an infeasibly large model.",
+        "license": "The online book is copyright MIT Press and provided for personal online use. No text, equation, data, or figure is reproduced."
+      },
+      {
+        "title": "The Expressive Power of Neural Networks: A View from the Width",
+        "url": "https://arxiv.org/abs/1709.02540",
+        "usage": "Used as the primary source cited by the article to cross-check bounded-width universality for deep ReLU networks and to keep that extension separate from the classical shallow sigmoidal theorem.",
+        "license": "Public arXiv access is not treated as blanket figure-reuse permission. No figure, theorem layout, proof, or experimental result is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the quantifier boundary. Given a continuous target, compact domain K, and tolerance epsilon, the theorem says there exists some finite network whose maximum absolute error over K is below epsilon. It does not identify the width, construct weights, show SGD will find them, establish finite-sample generalization, or constrain extrapolation outside K. The original teaching plot uses a piecewise-linear target and approximation on a one-dimensional compact interval. At corresponding vertices the absolute vertical deviations are 4 or 6 SVG units, and linear interpolation keeps the deviation at most 6 everywhere, strictly inside the drawn 12-unit epsilon band."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages and rendered the nearest neural-network neighborhood, then checked two original universal-approximation results, an authoritative deep-learning textbook, and the article's bounded-width ReLU source before selecting an original quantifier-focused error-band plot."
+  },
+  "implementation": {
+    "visualIds": [
+      "uat-existence-error-band"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming the compact interval, target, approximation, epsilon band, maximum error, existence conclusion, and excluded guarantees. Boundary lines, direct labels, solid versus dashed curves, check and cross symbols, and complete text carry all meaning without color. Its 360-unit viewBox has no minimum width and scales to 390 CSS pixels; established theme variables preserve dark-mode contrast, and shared print rules provide a light high-contrast palette and keep the figure together."
+  }
+}
