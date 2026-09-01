@@ -1,13 +1,19 @@
 import { defineVisual, frame, linked, visual } from '../primitives.mjs';
 
-const node = (value, pointer) => ({ value: String(value), ...(pointer ? { pointer } : {}) });
+const node = (value, pointer) => ({ value: String(value), key: `list-node-${value}`, ...(pointer ? { pointer } : {}) });
 const pointerMotion = (positions) => Object.entries(positions).map(([key, x]) => ({
   key: `pointer-${key}`,
   kind: 'pointer',
   x,
   y: 0,
   label: `${key} at node ${x}`,
-}));
+})).concat([1, 2, 3, 4, 5].map((value) => ({
+  key: `list-node-${value}`,
+  kind: 'node',
+  x: value,
+  y: 0,
+  label: String(value),
+})));
 
 const draft = visual('Find the first-half tail, reverse the detached second half, then splice one reversed node after each first-half node.', [
   frame(
@@ -41,7 +47,7 @@ const draft = visual('Find the first-half tail, reverse the detached second half
   frame(
     'Detach the second half',
     'Save second = slow.next = 4, then write slow.next = null. The independent halves are 1->2->3 and 4->5.',
-    linked([node(1), node(2), node(3, 'slow')], { second: ['4', '5'], firstHalf: '1->2->3->null', secondHalf: '4->5->null' }),
+    linked([node(4, 'second'), node(5)], { firstHalf: '1->2->3->null', secondHalf: '4->5->null' }),
     'split-halves',
   ),
   frame(
@@ -59,8 +65,8 @@ const draft = visual('Find the first-half tail, reverse the detached second half
   frame(
     'Initialize the merge',
     'Set first = head = 1 and second = previous = 5. The two independent chains are 1->2->3 and 5->4.',
-    linked([node(1, 'first'), node(2), node(3)], {
-      second: ['5', '4'],
+    linked([node(5, 'second'), node(4)], {
+      firstHalf: '1->2->3',
       secondPointer: '5',
       motion: pointerMotion({ first: 1, second: 5 }),
     }),

@@ -1,8 +1,19 @@
-import { defineVisual, frame, graph, visual } from '../primitives.mjs';
+import { defineVisual, frame, queueGrid, visual } from '../primitives.mjs';
 
-const nodes = ['0', '1', '2', '3', '4', '5'];
 const edges = ['0-1', '0-2', '3-4'];
-const scene = (extra = {}) => graph(nodes, edges, extra);
+const adjacency = [['1', '2'], ['0'], ['0'], ['4'], ['3'], ['none']];
+const scene = (extra = {}) => {
+  const { frontier = [], ...metadata } = extra;
+  return queueGrid(adjacency, frontier, {
+    edgeTopology: `${edges.join(', ')}; node 5 isolated`,
+    rowMeaning: 'row index = node; cells = adjacent nodes',
+    ...metadata,
+    motion: [
+      { key: 'graph-topology', kind: 'state', x: 0, y: 0, label: edges.join(', ') },
+      ...frontier.map((item, index) => ({ key: `frontier-${item}`, kind: 'frontier', x: index, y: 1, label: item })),
+    ],
+  });
+};
 
 const draft = visual('Each unseen outer-loop vertex starts exactly one DFS and marks exactly one previously uncounted connected component.', [
   frame(
@@ -90,7 +101,7 @@ const review = {
   recognitionCue: 'Use it when an undirected graph may contain multiple disconnected groups, including isolated vertices, and the task asks how many maximal reachable groups exist.',
   invariant: 'After processing outer-loop starts below the current index, every vertex in their components is seen and components equals the number of DFS launches. A seen vertex can never launch another count.',
   stateModel: 'The minimal state is the adjacency list, global seen set, component counter, and per-flood stack. The trace includes every launch, discovery, pop, continue branch, and the isolated vertex.',
-  visualRationale: 'One fixed graph keeps all three disconnected topologies visible while seen, current, stack, and count labels explain the nested loops. Stable node and edge keys preserve identity as each region is flooded.',
+  visualRationale: 'Fixed adjacency rows keep both connected groups and the isolated node visible while the adjacent frontier, seen, current, and count labels explain the nested loops. A stable topology key preserves identity and stays legible at 390px.',
   rejectedAlternatives: [
     'Union-find was rejected because it does not match the supplied DFS implementation.',
     'Three colored blobs were rejected because color alone cannot explain DFS launches or isolated-node handling.',

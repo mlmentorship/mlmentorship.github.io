@@ -1,15 +1,21 @@
-import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
+import { defineVisual, frame, grid, visual } from '../primitives.mjs';
 
 const input = [10, 9, 2, 5, 3, 7, 101, 18];
 const example = 'nums = [10, 9, 2, 5, 3, 7, 101, 18]';
-const slots = (values) => [...values.map(String), ...Array(4 - values.length).fill('-')];
-const state = (tails, inputIndex, slot, extra = {}) => array(
-  slots(tails),
+const slots = (values) => [...values.map(String), ...Array(8 - values.length).fill('-')];
+const state = (tails, inputIndex, slot, extra = {}) => grid(
+  [input.map(String), slots(tails)],
   [
-    mark(slot, `bisect slot=${slot}`, 'focus', 'bisect-slot'),
-    mark(Math.min(inputIndex, 3), `input i=${inputIndex}`, 'state', 'input-cursor'),
+    { row: 0, col: inputIndex, label: `input i=${inputIndex}`, tone: 'state', key: 'input-cursor' },
+    { row: 1, col: slot, label: `bisect slot=${slot}`, tone: 'focus', key: 'bisect-slot' },
   ],
-  { example, nextValue: String(input[inputIndex] ?? 'done'), slotMeaning: 'smallest end for lengths 1..4', tails: `[${tails.join(',')}]`, ...extra },
+  {
+    example,
+    rowAxis: 'top = nums; bottom = smallest_end slots for lengths 1..8',
+    nextValue: String(input[inputIndex] ?? 'done'),
+    tails: `[${tails.join(',')}]`,
+    ...extra,
+  },
 );
 
 const draft = visual('For every achievable length, retain the smallest ending value found so far.', [
@@ -30,7 +36,7 @@ const review = {
   recognitionCue: 'The problem asks only for the length of a strictly increasing subsequence in a long array, suggesting O(n log n) tail compression rather than quadratic pair DP.',
   invariant: 'After each input prefix, smallest_end[k] is the minimum possible tail of any increasing subsequence of length k+1 in that prefix, and the tail array is increasing.',
   stateModel: 'Retain only the sorted smallest_end array, current input value, and bisect_left slot. These tails need not form one actual subsequence, but their count equals the optimum length.',
-  visualRationale: 'Length-indexed tail slots with stable input and bisect markers show append versus replacement and why lowering a tail preserves length while increasing future options.',
+  visualRationale: 'Two aligned rows keep every input index fixed above the length-indexed tail slots; independent stable input and bisect markers show append versus replacement and why lowering a tail preserves length while increasing future options.',
   rejectedAlternatives: [
     'Highlighting one final subsequence hides the alternative tails that justify replacements.',
     'An O(n^2) predecessor graph depicts a different algorithm and overwhelms the invariant.',

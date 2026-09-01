@@ -11,7 +11,7 @@ const draft = visual('Sweep a 3 by 3 grid row by row; each interior count is old
     ['1', '1', '1'],
     ['?', '?', '?'],
     ['?', '?', '?'],
-  ], [{ row: 0, col: 0, label: 'start', tone: 'state', key: 'start-cell' }], {
+  ], [{ row: 0, col: 0, label: 'start/current', tone: 'state', key: 'current-cell' }], {
     rollingRow: '[1,1,1]',
   }), 'initialize'),
   frame('Update row 1, column 1', 'The old ways[1] = 1 is from above and new ways[0] = 1 is from the left, so ways[1] becomes 1 + 1 = 2.', grid([

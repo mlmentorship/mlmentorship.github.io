@@ -1,9 +1,19 @@
-import { defineVisual, frame, graph, visual } from '../primitives.mjs';
+import { defineVisual, frame, queueGrid, visual } from '../primitives.mjs';
 
-const nodes = ['0', '1', '2', '3', '4'];
 const edges = ['0-1', '0-2', '1-3', '1-4'];
-
-const scene = (extra = {}) => graph(nodes, edges, extra);
+const adjacency = [['1', '2'], ['0', '3', '4'], ['0'], ['1'], ['1']];
+const scene = (extra = {}) => {
+  const { frontier = [], ...metadata } = extra;
+  return queueGrid(adjacency, frontier, {
+    edgeTopology: edges.join(', '),
+    rowMeaning: 'row index = node; cells = adjacent nodes',
+    ...metadata,
+    motion: [
+      { key: 'graph-topology', kind: 'state', x: 0, y: 0, label: edges.join(', ') },
+      ...frontier.map((item, index) => ({ key: `frontier-${item}`, kind: 'frontier', x: index, y: 1, label: item })),
+    ],
+  });
+};
 
 const draft = visual('With exactly n-1 undirected edges, reaching all n nodes proves the graph is one connected acyclic tree.', [
   frame(
@@ -61,11 +71,11 @@ const review = {
   recognitionCue: 'Use this proof when an undirected graph must be exactly one tree: reject any edge count other than n-1, then test whether one traversal reaches every vertex.',
   invariant: 'seen contains every discovered vertex and stack contains discovered vertices not yet expanded. After the n-1 gate passes, full reachability is equivalent to being a tree.',
   stateModel: 'The minimal state is an adjacency list, a seen set, and a DFS stack. The trace follows the supplied neighbor order and shows every pop, seen-neighbor skip, discovery, push, and final cardinality comparison.',
-  visualRationale: 'A persistent edged graph exposes the candidate topology while explicit current-node, stack, and seen labels make iterative DFS readable without color. Stable node and edge keys preserve graph identity across all expansions.',
+  visualRationale: 'Persistent adjacency rows expose every undirected edge in both directions while the adjacent frontier and seen labels make iterative DFS readable without color. A stable topology key preserves graph identity across all expansions and remains legible at 390px.',
   rejectedAlternatives: [
     'Union-find was rejected because it would depict a different implementation and omit the supplied reachability proof.',
     'An edge-count formula alone was rejected because n-1 edges can still be disconnected.',
-    'A traversal table was rejected because it hides which graph edge causes each discovery or seen-neighbor skip.',
+    'An edge-count and visited-count summary was rejected because it hides which adjacency causes each discovery or seen-neighbor skip.',
   ],
   transferLesson: 'Combine a cheap global structural count with one local traversal invariant. Similar count-plus-connectivity proofs validate arborescences, spanning trees, and network skeletons.',
   reviewStatus: 'reviewed',

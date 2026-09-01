@@ -10,7 +10,7 @@
     "recognitionCue": "The problem asks only for the length of a strictly increasing subsequence in a long array, suggesting O(n log n) tail compression rather than quadratic pair DP.",
     "invariant": "After each input prefix, smallest_end[k] is the minimum possible tail of any increasing subsequence of length k+1 in that prefix, and the tail array is increasing.",
     "stateModel": "Retain only the sorted smallest_end array, current input value, and bisect_left slot. These tails need not form one actual subsequence, but their count equals the optimum length.",
-    "visualRationale": "Length-indexed tail slots with stable input and bisect markers show append versus replacement and why lowering a tail preserves length while increasing future options.",
+    "visualRationale": "Two aligned rows keep every input index fixed above the length-indexed tail slots; independent stable input and bisect markers show append versus replacement and why lowering a tail preserves length while increasing future options.",
     "rejectedAlternatives": [
       "Highlighting one final subsequence hides the alternative tails that justify replacements.",
       "An O(n^2) predecessor graph depicts a different algorithm and overwhelms the invariant.",
