@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "slug": "resnet",
+  "article": "src/content/posts/2025-11-05-resnet.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Decide when a ResNet shortcut can remain an identity and when it must project the input so both branches have the same shape before addition.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align branch paths, tensor shapes, and the element-wise addition constraint. Contrasting one within-stage block with one stage transition makes the projection rule visible without duplicating the residual-gradient lesson owned by the related article.",
+  "mediumComparison": {
+    "mermaid": "Rejected: Mermaid can show a skip edge but cannot reliably align compact tensor-shape ledgers or make shape equality at the merge spatially precise.",
+    "svg": "Selected: deterministic SVG places both branch outputs beside the same plus operation and directly contrasts a free identity with a learned stride-2 projection.",
+    "semanticHtml": "Rejected: a comparison table could list input and output dimensions, but it would not reveal that both simultaneous branches must independently arrive at the same merge shape.",
+    "interaction": "Rejected: toggling stride or channels would add controls and hidden states when two fixed cases fully establish the invariant addition contract.",
+    "paperReuse": "Rejected: the original ResNet paper contains canonical block diagrams, but its arXiv availability does not establish a permissive adaptation license and its composition is unnecessary. No source figure, coordinates, typography, or layout is copied.",
+    "noVisual": "Rejected: the prose says to project when dimensions change but requires readers to mentally propagate height, width, and channels through two branches and diagnose why raw identity addition fails."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 147,
+        "insight": "The preceding image-classification slide defines images as three-dimensional width-height-channel arrays, providing shape context but no network branching or addition."
+      },
+      {
+        "page": 148,
+        "insight": "The CNN slide has the deck's only direct ResNet section. It says skip connections ease gradient flow and enable deeper networks, but gives no residual-block diagram, bottleneck, tensor dimensions, or projection-shortcut rule."
+      },
+      {
+        "page": 149,
+        "insight": "The following Faster R-CNN slide names ResNet-101 as a feature-extractor option and shows backbone feature-map dimensions, but does not expose internal ResNet blocks or shortcut compatibility."
+      },
+      {
+        "page": 150,
+        "insight": "The next slide begins GANs, confirming the end of the local CNN and ResNet teaching sequence."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for ResNet, residual, skip connection, shortcut, identity mapping, bottleneck, and projection. Page 148 is the only direct conceptual treatment; page 149 only names ResNet-101 as a Faster R-CNN backbone. Pages 147-150 were rendered and visually inspected as the complete neighborhood. Transformer-related page 103 discusses residual connections only as generic architecture context and does not add the ResNet shape contract. No deck artwork, wording, data, or layout is reused.",
+    "license": "The local deck provides no explicit reuse license and the page-148 CNN image is unattributed. The deck is treated as review-only material; the implementation is an original schematic."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://arxiv.org/abs/1512.03385",
+        "usage": "Used as the primary ResNet source to verify element-wise shortcut addition, identity shortcuts when dimensions match, projection shortcuts for increasing dimensions, bottleneck channel reduction and restoration, and option B for ResNet-50/101/152.",
+        "license": "The paper is freely readable on arXiv, but the reviewed record does not establish a permissive figure-adaptation license. No figure, wording, experimental data, or layout is copied; only architecture semantics inform the original construction."
+      },
+      {
+        "title": "TorchVision ResNet models",
+        "url": "https://docs.pytorch.org/vision/stable/models/resnet.html",
+        "usage": "Used as official implementation documentation to cross-check ResNet model families, bottleneck implementation context, pretrained model support, and the documented ResNet v1.5 stride placement difference.",
+        "license": "TorchVision is BSD 3-Clause licensed. The documentation is cited for behavior only; no source code, prose, weights, data, or artwork is reused."
+      },
+      {
+        "title": "Identity Mappings in Deep Residual Networks",
+        "url": "https://arxiv.org/abs/1603.05027",
+        "usage": "Used as the primary follow-up paper to verify the pre-activation bottleneck ordering and the importance of keeping the shortcut path as a clean identity where dimensions permit.",
+        "license": "Free arXiv access is not assumed to grant adaptation rights. No paper figure, equation sequence, text, result, or layout is reproduced."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Consulted to verify that public access to an arXiv paper does not itself grant permission to adapt figures; reuse depends on the submitter-selected license.",
+        "license": "Licensing guidance only. The implementation avoids paper-figure reuse."
+      }
+    ],
+    "notes": "The hardest ResNet-specific mental model is not the generic skip edge but its shape contract. Element-wise addition requires equal height, width, and channels on both paths. The original example shows a within-stage 56 by 56 by 256 bottleneck reducing to 64 channels and restoring 256, followed by a schematic stage transition to 28 by 28 by 512. The latter uses a one-by-one stride-2 shortcut projection. Dimensions are consistent with the ResNet-50 stage pattern; the exact stride may be placed in a different main-path convolution in ResNet v1 versus v1.5, without changing the shortcut's required output shape."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected pages 147-150, and checked the original ResNet paper, the pre-activation follow-up, official TorchVision documentation, and arXiv licensing guidance before selecting an original shortcut-shape comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "resnet-shortcut-shape-contract"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Every tensor shape is directly labelled; solid main paths, dashed shortcut paths, a crossed invalid identity, explicit valid labels, and separate identity and projection boxes encode the rule without color. Its 360-unit viewBox has no minimum width and scales at 390 CSS pixels; established theme variables preserve dark-mode contrast, and shared learning-figure print rules provide a light high-contrast rendering and prevent a page break inside the figure."
+  }
+}
