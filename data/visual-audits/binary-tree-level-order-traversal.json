@@ -4,33 +4,33 @@
   "article": "src/content/posts/2026-09-01-binary-tree-level-order-traversal.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Binary Tree Level Order Traversal: queue [3] -> read one layer, then append its children 9 and 20. The queue is ordered by nondecreasing distance from the starting frontier.",
-  "mediumRationale": "A compact semantic state map pairs a pattern-specific data-structure sketch with the algorithm invariant before code. It is responsive, printable, color-independent, and easier to revisit than a decorative algorithm illustration.",
+  "learningObjective": "Read exactly the queue length that existed before adding child nodes.",
+  "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
-    "mermaid": "Rejected: automatic graph layout would add structure without showing the changing local state clearly.",
-    "svg": "Rejected: the problem family benefits from labeled state cards rather than coordinate geometry.",
-    "semanticHtml": "Selected: a pattern-specific sketch plus labeled steps keeps the input shape, retained state, safe move, and completion condition readable at phone width.",
-    "interaction": "Selected as progressive enhancement: an explicit step player highlights the invariant path, while the static figure remains complete for print and no-JavaScript readers.",
-    "paperReuse": "Rejected: the visual is an original synthesis and does not reuse source artwork.",
-    "noVisual": "Rejected: prose alone makes the learner hold the state transition in working memory."
+    "mermaid": "Rejected: automatic graph layout would hide the exact data values and state changes that this problem needs.",
+    "svg": "Rejected: the trace is a changing data state, so semantic HTML keeps values selectable, readable, and responsive.",
+    "semanticHtml": "Selected: each problem owns concrete frames rendered as arrays, maps, grids, trees, stacks, queues, intervals, pointers, bits, or tensor shapes.",
+    "interaction": "Selected as progressive enhancement: Play, Previous, Next, and step buttons reveal the same authored frames while static HTML remains complete.",
+    "paperReuse": "Rejected: the visual is an original synthesis of the supplied implementation and does not reuse source artwork.",
+    "noVisual": "Rejected: prose alone would make the learner simulate the changing data structure in working memory."
   },
   "deckReview": {
     "pages": [],
-    "notes": "No source slide deck is part of the supplied coding guide. The visual was designed from the local problem explanation and the algorithm invariant."
+    "notes": "No source slide deck is part of the supplied coding guide. The visual was designed from this problem's source implementation and worked trace."
   },
   "sourceReview": {
     "sources": [],
-    "notes": "The supplied Coding_Questions_Phone_Guide.md is the curriculum source. The page preserves its task, pattern, simple idea, implementation sketch, and cost while adding an original visual state map."
+    "notes": "The supplied Coding_Questions_Phone_Guide.md is the curriculum source. The task, implementation sketch, and complexity statement are preserved; the trace frames are original explanatory artwork."
   },
   "agentReview": {
     "reviewer": "GitHub Copilot",
     "reviewedAt": "2026-09-01",
-    "summary": "Checked that the figure names a concrete algorithm state, includes an invariant, remains understandable without color, and appears before the implementation sketch."
+    "summary": "Checked each authored frame against the implementation path, verified that the displayed state changes are problem-specific, and checked the static and interactive accessibility paths."
   },
   "implementation": {
     "visualIds": [
       "binary-tree-level-order-traversal-state"
     ],
-    "accessibility": "The figure has a labelled title, a role=group state map with a complete aria-label, visible text labels, a direct Read it this way caption, and keyboard-sized controls that are hidden until enhanced."
+    "accessibility": "The figure has a labelled title, a complete group description, visible values and state labels, a direct Read it this way caption, keyboard controls, and a static first-frame fallback."
   }
 }

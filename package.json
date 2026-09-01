@@ -13,7 +13,7 @@
     "check": "astro check && npm run check:style && npm run check:visuals",
     "check:links": "node scripts/check-links.mjs",
     "check:style": "node scripts/check-editorial-style.mjs",
-    "check:visuals": "node scripts/check-visual-coverage.mjs",
+    "check:visuals": "node scripts/check-visual-coverage.mjs && node scripts/check-coding-visuals.mjs",
     "visuals:status": "node scripts/check-visual-coverage.mjs --next=20",
     "visuals:batch": "node scripts/create-visual-batch.mjs",
     "content:coding-book": "node scripts/generate-coding-question-book.mjs --force"

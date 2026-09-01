@@ -16,9 +16,10 @@ function bindLifecycle(): void {
   });
 }
 
-function setStep(
+function setFrame(
   visual: HTMLElement,
-  steps: HTMLElement[],
+  frames: HTMLElement[],
+  frameButtons: HTMLButtonElement[],
   progress: HTMLOutputElement,
   status: HTMLElement | null,
   previous: HTMLButtonElement,
@@ -26,21 +27,25 @@ function setStep(
   index: number,
   announce: boolean,
 ): void {
-  const boundedIndex = Math.max(0, Math.min(steps.length - 1, index));
-  visual.dataset.activeStep = String(boundedIndex);
-  steps.forEach((step, stepIndex) => {
-    step.classList.toggle('is-active', stepIndex === boundedIndex);
-    if (stepIndex === boundedIndex) step.setAttribute('aria-current', 'step');
-    else step.removeAttribute('aria-current');
+  const boundedIndex = Math.max(0, Math.min(frames.length - 1, index));
+  visual.dataset.activeFrame = String(boundedIndex);
+  frames.forEach((frame, frameIndex) => {
+    frame.hidden = frameIndex !== boundedIndex;
+    if (frameIndex === boundedIndex) frame.setAttribute('aria-current', 'step');
+    else frame.removeAttribute('aria-current');
   });
-  const activeStep = steps[boundedIndex];
-  const activeLabel = activeStep?.querySelector<HTMLElement>('.coding-visual-step-label')?.textContent?.trim() ?? '';
-  const activeValue = activeStep?.querySelector('strong')?.textContent?.trim() ?? '';
-  const activeDetail = activeStep?.querySelector('small')?.textContent?.trim() ?? '';
-  progress.value = `Step ${boundedIndex + 1} of ${steps.length}`;
+  frameButtons.forEach((button, buttonIndex) => {
+    if (buttonIndex === boundedIndex) button.setAttribute('aria-current', 'step');
+    else button.removeAttribute('aria-current');
+  });
+  const activeFrame = frames[boundedIndex];
+  const activeLabel = activeFrame?.getAttribute('aria-label') ?? '';
+  const activeNote = activeFrame?.querySelector<HTMLElement>('.coding-trace-frame-heading strong')?.textContent?.trim() ?? '';
+  progress.value = `Step ${boundedIndex + 1} of ${frames.length}`;
+  progress.textContent = progress.value;
   previous.disabled = boundedIndex === 0;
-  next.disabled = boundedIndex === steps.length - 1;
-  if (announce && status) status.textContent = `Step ${boundedIndex + 1} of ${steps.length}: ${activeLabel}, ${activeValue}. ${activeDetail}`;
+  next.disabled = boundedIndex === frames.length - 1;
+  if (announce && status) status.textContent = `Step ${boundedIndex + 1} of ${frames.length}: ${activeLabel}. ${activeNote}`;
 }
 
 export function enhanceCodingVisuals(root: ParentNode = document): void {
@@ -58,8 +63,10 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
     const playLabel = visual.querySelector<HTMLElement>('[data-coding-play-label]');
     const next = visual.querySelector<HTMLButtonElement>('[data-coding-next]');
     const status = visual.querySelector<HTMLElement>('[data-coding-status]');
-    const steps = [...visual.querySelectorAll<HTMLElement>('[data-coding-step]')];
-    if (!controls || !progress || !previous || !play || !playLabel || !next || steps.length < 2) continue;
+    const timeline = visual.querySelector<HTMLElement>('[data-coding-timeline]');
+    const frames = [...visual.querySelectorAll<HTMLElement>('[data-coding-frame]')];
+    const frameButtons = [...visual.querySelectorAll<HTMLButtonElement>('[data-coding-frame-button]')];
+    if (!controls || !progress || !previous || !play || !playLabel || !next || !timeline || frames.length < 2 || frameButtons.length !== frames.length) continue;
 
     let currentStep = 0;
     let timer: number | undefined;
@@ -68,25 +75,25 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
       stopTimer(timer);
       timer = undefined;
       visual.dataset.codingPlaying = 'false';
-      playLabel.textContent = currentStep === steps.length - 1 ? 'Replay trace' : 'Play trace';
+      playLabel.textContent = currentStep === frames.length - 1 ? 'Replay trace' : 'Play trace';
       play.setAttribute('aria-label', playLabel.textContent);
       play.querySelector('[aria-hidden="true"]')?.replaceChildren(document.createTextNode('>'));
     };
     const update = (index: number, announce = true) => {
-      currentStep = Math.max(0, Math.min(steps.length - 1, index));
-      setStep(visual, steps, progress, status, previous, next, currentStep, announce);
+      currentStep = Math.max(0, Math.min(frames.length - 1, index));
+      setFrame(visual, frames, frameButtons, progress, status, previous, next, currentStep, announce);
     };
     const tick = () => {
       if (!document.contains(visual)) {
         stop();
         return;
       }
-      if (currentStep >= steps.length - 1) {
+      if (currentStep >= frames.length - 1) {
         stop();
         return;
       }
       update(currentStep + 1);
-      if (currentStep >= steps.length - 1) stop();
+      if (currentStep >= frames.length - 1) stop();
     };
 
     previous.addEventListener('click', () => {
@@ -99,14 +106,14 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
     });
     play.addEventListener('click', () => {
       if (reducedMotion) {
-        update(currentStep >= steps.length - 1 ? 0 : currentStep + 1);
+        update(currentStep >= frames.length - 1 ? 0 : currentStep + 1);
         return;
       }
       if (timer !== undefined) {
         stop();
         return;
       }
-      if (currentStep >= steps.length - 1) update(0, false);
+      if (currentStep >= frames.length - 1) update(0, false);
       visual.dataset.codingPlaying = 'true';
       playLabel.textContent = 'Pause trace';
       play.setAttribute('aria-label', 'Pause trace');
@@ -114,22 +121,15 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
       timer = window.setInterval(tick, 900);
       activeTimers.add(timer);
     });
-    steps.forEach((step) => {
-      step.setAttribute('tabindex', '0');
-      step.setAttribute('role', 'button');
-      step.addEventListener('click', () => {
+    frameButtons.forEach((button, frameIndex) => {
+      button.addEventListener('click', () => {
         stop();
-        update(Number(step.dataset.codingStep));
-      });
-      step.addEventListener('keydown', (event) => {
-        if (event.key !== 'Enter' && event.key !== ' ') return;
-        event.preventDefault();
-        stop();
-        update(Number(step.dataset.codingStep));
+        update(frameIndex);
       });
     });
 
     controls.hidden = false;
+    timeline.hidden = false;
     visual.classList.add('is-enhanced');
     visual.dataset.codingEnhanced = 'true';
     visual.dataset.codingPlaying = 'false';
