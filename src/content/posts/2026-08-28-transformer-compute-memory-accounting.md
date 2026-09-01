@@ -44,6 +44,41 @@ Usually, $N H = D$. Grouped-query attention uses $K < N$.
 
 The number of tokens in one batch is $B T$.
 
+<!-- visual:transformer-training-inference-ledgers -->
+<figure class="learning-figure" aria-labelledby="transformer-ledgers-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="transformer-ledgers-title">Which dimensions and multiplicities belong in each transformer budget?</p>
+	<div class="visual-grid--two" role="group" aria-label="Training and inference accounting ledgers that separate compute from persistent and temporary memory">
+		<section class="visual-panel" aria-labelledby="training-ledger-title">
+			<h4 id="training-ledger-title">Training ledger</h4>
+			<p>Compute repeats over tokens; memory combines persistent model state with workload-dependent activations.</p>
+			<table class="cm-grid" aria-label="Training quantities, first estimates, and scaling drivers">
+				<thead><tr><th scope="col">Quantity</th><th scope="col">First estimate</th><th scope="col">Count or driver</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Parameter matmuls</th><td>≈ 6 × <var>P</var><sub>active</sub> × training tokens</td><td>Repeats per token; use active MoE parameters</td></tr>
+					<tr><th scope="row">Attention scores</th><td>≈ 12<var>BT</var><sup>2</sup><var>NHL</var></td><td>Quadratic in sequence length <var>T</var></td></tr>
+					<tr><th scope="row">Model state</th><td>2<var>P</var> weights + 2<var>P</var> gradients + 8<var>P</var> Adam = 12<var>P</var> bytes</td><td>Uses total stored <var>P</var>; add 4<var>P</var> for FP32 master weights</td></tr>
+					<tr><th scope="row">Saved activations</th><td>Add separately</td><td>Grows with <var>B</var>, <var>T</var>, <var>D</var>, <var>L</var>, and save policy</td></tr>
+				</tbody>
+			</table>
+		</section>
+		<section class="visual-panel" aria-labelledby="inference-ledger-title">
+			<h4 id="inference-ledger-title">Inference ledger</h4>
+			<p>No gradients or optimizer moments remain; weights and request-specific cache state dominate.</p>
+			<table class="cm-grid" aria-label="Inference quantities, first estimates, and scaling drivers">
+				<thead><tr><th scope="col">Quantity</th><th scope="col">First estimate</th><th scope="col">Count or driver</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Weights</th><td><var>P</var> × weight bytes</td><td>Uses total stored <var>P</var>, including all MoE experts</td></tr>
+					<tr><th scope="row">KV cache</th><td>2<var>TLKHs</var><sub>KV</sub></td><td>Per sequence; multiply by active sequences</td></tr>
+					<tr><th scope="row">Temporary activations</th><td>Add separately</td><td>Depends on batched tokens, scheduler, and kernels</td></tr>
+					<tr><th scope="row">Paging</th><td>Allocation policy, not a new byte formula</td><td>Reduces reservation waste; present tokens still need their K/V values</td></tr>
+				</tbody>
+			</table>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> choose the ledger before multiplying. Training compute repeats active parameters over tokens, while training model-state memory stores total parameters plus gradients and optimizer moments. Inference drops those training-only states but adds one KV allocation per active sequence. Sequence length enters attention compute as <var>T</var><sup>2</sup> and KV memory as <var>T</var>; activations and temporary buffers must still be measured separately. Original accounting summary checked against the <a href="https://jax-ml.github.io/scaling-book/transformers/">JAX Scaling Book's Transformer derivation</a>.</figcaption>
+</figure>
+
 ## Parameter count
 
 ### Gated feed-forward block
