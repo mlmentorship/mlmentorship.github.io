@@ -11,20 +11,20 @@ const draft = visual('Seeding every rotten cell makes BFS time equal the shortes
   ),
   frame(
     'Spread minute 1',
-    'Pop (0,0,0). Its fresh orthogonal neighbors (0,1) and (1,0) rot, fresh falls 6 -> 4, and both enter the queue at time 1.',
+    'Pop (0,0,0). The down neighbor (1,0) and then right neighbor (0,1) rot, fresh falls 6 -> 4, and both enter the queue at time 1.',
     grid([['2', '2', '1'], ['2', '1', '0'], ['0', '1', '1']], [
-      source(0, 1, 'frontier t=1', 'wave-a'),
-      source(1, 0, 'frontier t=1', 'wave-b'),
-    ], { queueState: '[(0,1,1),(1,0,1)]', fresh: '4', arithmetic: '6 - 2 = 4' }),
+      source(1, 0, 'queue front t=1', 'wave-a'),
+      source(0, 1, 'queue back t=1', 'wave-b'),
+    ], { queueState: '[(1,0,1),(0,1,1)]', fresh: '4', arithmetic: '6 - 2 = 4' }),
     'spread-minute-1',
   ),
   frame(
     'Spread minute 2',
-    'Pop both time-1 cells. They newly rot (0,2) and (1,1); the second visit to (1,1) sees 2 and does not enqueue it twice. Fresh falls 4 -> 2.',
+    'Pop (1,0,1) first and enqueue (1,1,2). Then pop (0,1,1), enqueue (0,2,2), and reject its second visit to already-rotten (1,1). Fresh falls 4 -> 2.',
     grid([['2', '2', '2'], ['2', '2', '0'], ['0', '1', '1']], [
-      source(0, 2, 'frontier t=2', 'wave-a'),
-      source(1, 1, 'frontier t=2', 'wave-b'),
-    ], { queueState: '[(0,2,2),(1,1,2)]', fresh: '2', arithmetic: '4 - 2 = 2' }),
+      source(1, 1, 'queue front t=2', 'wave-a'),
+      source(0, 2, 'queue back t=2', 'wave-b'),
+    ], { queueState: '[(1,1,2),(0,2,2)]', fresh: '2', arithmetic: '4 - 2 = 2' }),
     'spread-minute-2',
   ),
   frame(
