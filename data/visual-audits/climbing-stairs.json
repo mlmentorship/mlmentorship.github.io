@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-climbing-stairs.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each step can be reached from one step back or two steps back.",
+  "learningObjective": "The count for the next step is the sum of the counts for the two preceding positions.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to each step can be reached from one step back or two steps back.",
-    "invariant": "Each step can be reached from one step back or two steps back.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional dynamic programming compressed to the last two answers.",
+    "recognitionCue": "The task counts paths to position n, every final move has one of two fixed lengths, and paths ending with different final moves are disjoint.",
+    "invariant": "Before each iteration, previous and current are consecutive recurrence values. Parallel assignment shifts current into previous and stores previous + current as the complete count for the next step.",
+    "stateModel": "Only two integers are needed because ways(i) depends solely on ways(i - 1) and ways(i - 2). The loop index identifies which stair count current represents.",
+    "visualRationale": "An indexed stair sequence shows fill order and both predecessor dependencies, while stable previous/current keys visibly advance one position per update and printed equations preserve meaning without animation.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A full binary recursion tree repeats the same subproblems and obscures the linear recurrence.",
+      "A complete DP table stores more history than the implementation needs.",
+      "A Fibonacci label alone requires memorizing the recurrence rather than seeing why the two predecessor counts add."
     ],
-    "transferLesson": "Transfer the invariant: Each step can be reached from one step back or two steps back.",
-    "reviewStatus": "pending"
+    "transferLesson": "Classify solutions by their final decision: if every state can only arrive from a fixed small set of predecessor states, add those disjoint counts and retain only the dependency horizon.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

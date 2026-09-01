@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-house-robber.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "At each house, choose between skipping it and taking it after the previous house.",
+  "learningObjective": "For each prefix of houses, keep the better of skipping the current house or taking it after the best prefix ending two houses earlier.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to at each house, choose between skipping it and taking it after the previous house.",
-    "invariant": "At each house, choose between skipping it and taking it after the previous house.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional take-or-skip dynamic programming with two rolling prefix answers.",
+    "recognitionCue": "Items lie in a line, adjacent choices conflict, and the objective asks for a maximum total rather than the exact chosen sequence.",
+    "invariant": "Before house i, one_house_back is the optimum for houses through i - 1 and two_houses_back is the optimum through i - 2. Therefore max(one_back, two_back + money[i]) is the complete optimum through i.",
+    "stateModel": "Retain the current money plus two scalar prefix optima. Skip depends on dp[i - 1], take depends on dp[i - 2], and parallel shifting prepares the same meanings for the next index.",
+    "visualRationale": "The actual house line and stable current-house marker expose fill order; every frame prints both dependency values, the chosen branch, and the shifted rolling state, so color and JavaScript are optional.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A tree of all subsets emphasizes exponential choices and repeats identical prefix states.",
+      "Highlighting only the final houses hides the locally optimal skip at house 3.",
+      "A full DP table is valid but conceals that the supplied implementation needs only two prior values."
     ],
-    "transferLesson": "Transfer the invariant: At each house, choose between skipping it and taking it after the previous house.",
-    "reviewStatus": "pending"
+    "transferLesson": "When choosing item i only conflicts with a fixed neighborhood, compare the optimum that excludes i with value[i] plus the last compatible optimum. This transfers to weighted independent sets on paths and cooldown scheduling.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

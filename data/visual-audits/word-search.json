@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-word-search.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Mark a board cell while it belongs to the current path, then restore it on return.",
+  "learningObjective": "A recursive path owns its marked cells; failed directions return false, and every accepted cell is restored before that call returns.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to mark a board cell while it belongs to the current path, then restore it on return.",
-    "invariant": "Mark a board cell while it belongs to the current path, then restore it on return.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Depth-first backtracking over orthogonally adjacent grid cells.",
+    "recognitionCue": "A word must be assembled as one neighboring-cell path, choices branch in four directions, and a cell may be used once per candidate path but may be reused by later candidates.",
+    "invariant": "At search(row, col, index), every # cell is exactly one character of the current prefix word[0:index]. Before returning, the call restores its own cell, so sibling branches and later starts see the original board.",
+    "stateModel": "The minimal state is row, column, word index, and the recursion stack. In-place # marks encode the path-local visited set; each frame shows the board topology and active call stack.",
+    "visualRationale": "A labelled 3x4 grid directly preserves adjacency, marked ownership, the moving current cell, failed neighbor checks, call depth, and restoration. Text labels keep every state legible without color or playback.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A recursion tree shows branching but loses the physical neighbor and cell-reuse constraints.",
+      "A prose call log hides which board cells are adjacent and currently unavailable.",
+      "A final highlighted word path omits failed directions, short-circuiting, and restoration."
     ],
-    "transferLesson": "Transfer the invariant: Mark a board cell while it belongs to the current path, then restore it on return.",
-    "reviewStatus": "pending"
+    "transferLesson": "For path-constrained search, choose one option, mark only the state owned by that choice, recurse, then undo before returning. The same choose-explore-unchoose discipline applies to mazes, permutations, and constraint search.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

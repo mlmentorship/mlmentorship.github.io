@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-partition-equal-subset-sum.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Reach half the total; every reachable sum is a state.",
+  "learningObjective": "Each number extends a snapshot of previously reachable sums; reaching half the total proves an equal partition.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to reach half the total; every reachable sum is a state.",
-    "invariant": "Reach half the total; every reachable sum is a state.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Subset-sum dynamic programming represented as a set of reachable totals.",
+    "recognitionCue": "The input must split into equal-sum groups, so one group must realize exactly half the total; each positive number is either included once or excluded.",
+    "invariant": "After processing a prefix of nums, possible contains exactly the sums at most target realizable from that prefix. New sums are computed from an old-set snapshot, so the current number cannot be reused within its own iteration.",
+    "stateModel": "Keep target and the set of reachable sums. Each transition unions old sums with old sum + current number when it does not exceed target; the original elements need no other history.",
+    "visualRationale": "An input array paired with the explicit reachable-sum set shows which number moves, which old states generate new states, which sums are clipped, and the final membership proof in static text.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A final two-group picture proves one example but not how the algorithm discovers it.",
+      "A recursion tree duplicates equivalent remaining-sum states and obscures the set union.",
+      "A boolean matrix is correct but heavier than the one-row reachable-set state used by the supplied implementation."
     ],
-    "transferLesson": "Transfer the invariant: Reach half the total; every reachable sum is a state.",
-    "reviewStatus": "pending"
+    "transferLesson": "Convert a partition condition into a target-reachability problem, then update from a snapshot when each item may be used once. The same state model solves 0/1 knapsack feasibility and constrained subset sums.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
