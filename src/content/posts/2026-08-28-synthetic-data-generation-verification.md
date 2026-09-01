@@ -107,7 +107,7 @@ The goal determines the generator, verifier, filters, and held-out test.
 			<rect class="viz-node viz-node--output" x="81" y="292" width="190" height="60" rx="5"></rect>
 			<text class="viz-node-label" x="176" y="316">SCOPED CLAIM</text>
 			<text class="viz-node-value" x="176" y="335">learned capability, not verifier</text>
-			<text class="viz-gradient-label" x="28" y="370">NO RETURN ARROW: final evidence confirms; it does not select the system it evaluates.</text>
+			<text class="viz-gradient-label" x="380" y="370">NO RETURN ARROW · final evidence does not select the system.</text>
 		</svg>
 	</div>
 	<figcaption><strong>Read it this way:</strong> follow the top lane into training: correctness evidence and coverage checks decide which generated rows may teach the student. Then cross the heavy line only after freezing the student; fresh held-out families meet it at final evaluation and never flow back into development.</figcaption>
