@@ -55,6 +55,47 @@ Perfect scaling has efficiency 1. In practice, efficiency falls as each device g
 
 If a one-device baseline cannot fit, compare two valid cluster sizes. For example, going from 64 to 128 devices has ideal speedup 2. Use the measured speedup divided by 2 as the scaling efficiency for that change.
 
+**Learning objective:** see why adding devices can reduce wall time while increasing total accelerator-hours.
+
+<!-- visual:strong-scaling-wall-time-cost-knee -->
+<figure class="learning-figure plot-panel" aria-labelledby="strong-scaling-cost-title">
+	<p class="visual-kicker">Fixed-work scaling</p>
+	<p class="visual-title" id="strong-scaling-cost-title">Shorter rectangles can still have more total area.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 330" role="img" aria-labelledby="strong-scaling-cost-svg-title strong-scaling-cost-svg-desc">
+			<title id="strong-scaling-cost-svg-title">Wall time falls while accelerator-hours rise as strong-scaling efficiency drops</title>
+			<desc id="strong-scaling-cost-svg-desc">Three rectangles represent the same fixed workload on one, two, and four devices. Width encodes device count, height encodes normalized wall time, and area encodes normalized accelerator-hours. One device takes time 100 at 100 percent efficiency and costs 100 accelerator-hours. Two devices take time 60 at 83 percent efficiency and cost 120. Four devices take time 45 at 56 percent efficiency and cost 180. Thus every added device lowers wall time in this illustrative example, but declining efficiency expands total area and cost.</desc>
+			<text class="viz-axis-label" x="8" y="22">WIDTH = DEVICES · HEIGHT = WALL TIME · AREA = ACCELERATOR-HOURS</text>
+			<path class="viz-axis" d="M8 235 H352"></path>
+			<g aria-label="One device baseline">
+				<text class="viz-callout" x="60" y="58" text-anchor="middle">1 device</text>
+				<text class="viz-label" x="60" y="74" text-anchor="middle">time 100</text>
+				<text class="viz-label" x="60" y="88" text-anchor="middle">efficiency 100%</text>
+				<rect class="viz-node viz-node--input" x="49" y="115" width="22" height="120" rx="2"></rect>
+				<text class="viz-callout" x="60" y="258" text-anchor="middle">cost 100</text>
+			</g>
+			<g aria-label="Two-device scaling point">
+				<text class="viz-callout" x="180" y="106" text-anchor="middle">2 devices</text>
+				<text class="viz-label" x="180" y="122" text-anchor="middle">time 60</text>
+				<text class="viz-label" x="180" y="136" text-anchor="middle">efficiency 83%</text>
+				<rect class="viz-node viz-node--focus" x="158" y="163" width="44" height="72" rx="2"></rect>
+				<text class="viz-callout" x="180" y="258" text-anchor="middle">cost 120</text>
+			</g>
+			<g aria-label="Four-device scaling point">
+				<text class="viz-callout" x="300" y="124" text-anchor="middle">4 devices</text>
+				<text class="viz-label" x="300" y="140" text-anchor="middle">time 45</text>
+				<text class="viz-label" x="300" y="154" text-anchor="middle">efficiency 56%</text>
+				<rect class="viz-node viz-node--output" x="256" y="181" width="88" height="54" rx="2"></rect>
+				<text class="viz-callout" x="300" y="258" text-anchor="middle">cost 180</text>
+			</g>
+			<path class="viz-baseline" d="M20 282 H340"></path>
+			<text class="viz-axis-label" x="180" y="304" text-anchor="middle">R × tR = t1 ÷ efficiency</text>
+			<text class="viz-label" x="180" y="321" text-anchor="middle">Illustrative normalized measurements; lower time does not imply lower cost.</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> height falls because the run finishes sooner, but width grows with device count. Once efficiency falls, the rectangle’s area, and therefore accelerator-hours, grows. The normalized values are illustrative, not a hardware benchmark. Original construction informed by <a href="https://jax-ml.github.io/scaling-book/training/">Google DeepMind’s strong-scaling treatment</a>, <a href="https://arxiv.org/abs/2204.02311">PaLM’s MFU definition</a>, and <a href="https://dl.acm.org/doi/10.1145/1465482.1465560">Amdahl’s fixed-work scaling argument</a>.</figcaption>
+</figure>
+
 ## First check: what does not fit?
 
 ### Model state does not fit
