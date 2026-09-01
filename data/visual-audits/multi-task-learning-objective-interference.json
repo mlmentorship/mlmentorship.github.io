@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "multi-task-learning-objective-interference",
+  "article": "src/content/posts/2026-08-28-multi-task-learning-objective-interference.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish task-gradient magnitude imbalance from directional conflict so the diagnosis, rather than equal raw loss weights, determines the intervention.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can put task gradients in one shared parameter plane, preserve exact vector lengths and angles, and contrast a positive-dot-product scale imbalance with an equal-norm negative-dot-product conflict. The fixed geometry makes clear that norm balancing and conflict handling answer different questions.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can list diagnostic steps but cannot encode vector magnitude, angle, dot-product sign, or the weighted gradient sum faithfully.",
+    "svg": "Selected: fixed vector coordinates make the difference between unequal aligned gradients and equal-sized conflicting gradients directly inspectable, including exact toy calculations that agree with the drawn geometry.",
+    "semanticHtml": "Rejected: a table could compare norms and dot products but would require readers to reconstruct the direction and cancellation that are the article's hardest spatial relationships.",
+    "interaction": "Rejected: changing weights or angles could support exploration, but hidden states and controls are unnecessary for the single diagnostic contrast and would weaken print behavior.",
+    "paperReuse": "Rejected: GradNorm and PCGrad contain method-specific figures and empirical plots, but their layouts are not needed for this original mathematical construction. No source figure, benchmark value, prose, or visual organization is copied.",
+    "noVisual": "Rejected: the prose defines gradient conflict and magnitude balancing separately, but without shared vector geometry it is easy to assume that equalizing norms resolves every form of interference."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The preceding slide covers tokenization and perplexity. It establishes that page 99 begins a new representation-learning topic and supplies no multi-task optimization context."
+      },
+      {
+        "page": 99,
+        "insight": "The deck's direct multi-task section names knowledge transfer, regularization, task-specific heads, and unified NLP objectives. It presents only benefits and architecture examples; it does not discuss raw loss scale, per-task gradient norms, negative dot products, negative transfer, or balancing methods."
+      },
+      {
+        "page": 100,
+        "insight": "The following slide moves to recurrent networks, LSTM, GRU, and memory networks, confirming that the multi-task treatment ends on page 99 without an objective-interference diagram."
+      },
+      {
+        "page": 102,
+        "insight": "A later transformer slide notes BigBird multi-task pretraining followed by task-specific fine-tuning, but gives no shared-gradient analysis or per-task outcome comparison."
+      },
+      {
+        "page": 103,
+        "insight": "The neighboring transformer survey mentions BigBird with task-specific heads. It supports the shared-trunk and separate-head pattern but does not address when shared updates help or harm each task."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical pages for multi-task, multitask, task-specific, negative transfer, gradient conflict, loss weight, GradNorm, PCGrad, and auxiliary task terms. Page 99 is the sole dedicated multi-task learning slide; pages 98-100 were read in full as its immediate neighborhood. Pages 102-103 were also inspected because they contain the only nearby multi-task model references. The deck explains transfer benefits and separate heads but has no loss-balancing or gradient-interference treatment. No deck image, wording, formula, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Multitask Learning",
+        "url": "https://link.springer.com/article/10.1023/A:1007379606734",
+        "usage": "Used as the foundational primary source for multi-task learning as inductive transfer through shared representations, where training signals from related tasks can improve generalization.",
+        "license": "The Springer publication is copyrighted and no permissive figure-reuse license was identified. No figure, prose, experiment, data, or layout is reproduced."
+      },
+      {
+        "title": "GradNorm: Gradient Normalization for Adaptive Loss Balancing in Deep Multitask Networks",
+        "url": "https://proceedings.mlr.press/v80/chen18a.html",
+        "usage": "Used as the primary source for dynamically tuning task weights from gradient magnitudes and relative training rates, supporting the distinction between magnitude balancing and directional conflict.",
+        "license": "PMLR's publication agreement grants the public a CC BY 4.0 license while authors retain copyright, so reuse with attribution is permitted. The implementation nevertheless uses only method semantics and copies no figure, equation, benchmark result, wording, or layout."
+      },
+      {
+        "title": "Gradient Surgery for Multi-Task Learning",
+        "url": "https://arxiv.org/abs/2001.06782",
+        "usage": "Used as the primary source for identifying task-gradient conflict by negative cosine similarity and projecting away conflicting components, supporting the directional-conflict panel.",
+        "license": "The arXiv version uses the arXiv perpetual non-exclusive distribution license, which does not grant third-party figure reuse. No figure, method diagram, equation, result, prose, or layout is reproduced."
+      },
+      {
+        "title": "arXiv Permissions and Reuse",
+        "url": "https://info.arxiv.org/help/license/reuse.html",
+        "usage": "Used as official guidance to verify that public availability does not itself permit figure reuse and that the assigned paper license controls reuse.",
+        "license": "The policy is cited only to document licensing treatment. No policy text, icon, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that task dominance has two independent geometric dimensions. In the magnitude case, g_A = (4, 0) and g_B = (1, 0) have norms 4 and 1 but dot product 4, so both tasks favor the same local direction even though A supplies 80% of the unweighted sum. In the directional case, g_A = (3, 1) and g_B = (-3, 1) have equal norm sqrt(10), yet dot product -8; their horizontal components cancel and the sum is (0, 2). Equal raw weights or equal norms therefore do not diagnose or remove directional conflict. These exact toy vectors and all visual geometry are original."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact multi-task neighborhoods, then reviewed the foundational multi-task paper and primary GradNorm and PCGrad work plus official reuse guidance before selecting an original two-case gradient geometry."
+  },
+  "implementation": {
+    "visualIds": [
+      "multitask-gradient-diagnosis"
+    ],
+    "accessibility": "Each SVG panel has a linked title and detailed description that states the vectors, norms, dot product, sum, and diagnosis. Direct task labels, numeric equations, different endpoint shapes, solid versus dashed strokes, and explicit ALIGNED, CONFLICT, SCALE ISSUE, and DIRECTION ISSUE text carry all meaning without color. The established two-panel grid stacks below 640 CSS pixels; compact 300-unit viewBoxes have no minimum width and remain readable at 390 CSS pixels. Shared theme tokens preserve dark-mode contrast, and established print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
