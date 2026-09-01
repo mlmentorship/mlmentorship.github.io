@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "rlhf-and-dpo",
+  "article": "src/content/posts/2025-12-28-rlhf-and-dpo.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Starting from the same preference pairs, trace which learned components and data-generation steps RLHF adds that DPO removes.",
+  "mediumRationale": "A shared-input, two-column semantic comparison is the smallest medium that exposes the operational difference hidden by the phrase preference optimization: RLHF first learns an explicit reward and then runs an on-policy RL loop, whereas DPO applies an offline pairwise loss directly to the policy. Numbered text stages preserve exact reading order and remain legible when stacked on a narrow screen.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout could show two branches, but the essential lesson depends on concise stage-level qualifications such as explicit versus implicit reward, fresh versus stored responses, and what each path must maintain. Those labels become cramped in a 390 CSS-pixel flowchart.",
+    "svg": "Rejected: the comparison requires no quantitative geometry, plotted values, or fixed spatial coordinates. SVG would reduce text reflow and magnification quality without adding technical precision.",
+    "semanticHtml": "Selected: a shared starting panel followed by two numbered semantic sections directly compares learned artifacts, data generation, optimization, and maintenance. It uses the established learning-figure, visual-panel, and responsive two-column primitives.",
+    "interaction": "Rejected: toggling components could hide the side-by-side contrast and add JavaScript without revealing any additional state. The complete distinction should remain available in print and without interaction.",
+    "paperReuse": "Rejected: the primary papers contain related pipeline figures, but their layouts include paper-specific stages and were not needed for this focused comparison. The official records reviewed did not establish permission to adapt those figures, so no artwork, data, wording, or layout is reused.",
+    "noVisual": "Rejected: the prose lists RLHF and DPO sequentially, forcing readers to hold the shared input constant while mentally subtracting the reward model, fresh rollout, and PPO stages. The branch comparison makes that subtraction spatial and explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The preceding transformer survey describes language-model architectures and pretraining objectives but contains no instruction-tuning or preference-optimization pipeline."
+      },
+      {
+        "page": 104,
+        "insight": "The sole directly relevant slide contrasts supervised instruction tuning and RLHF at a high level, attributes several dialogue behaviors to RLHF, and discusses an alignment tax. It does not show preference pairs, a reward model, policy rollouts, PPO, DPO, or the fixed reference policy."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring slide classifies base, instruction-trained, and RLHF models before introducing Toolformer, but does not unpack how RLHF trains a policy or provide a DPO comparison."
+      },
+      {
+        "page": 106,
+        "insight": "The following slide begins an LLM-data and scaling-laws section, marking the end of the local instruction-tuning sequence without further preference-optimization mechanics."
+      }
+    ],
+    "notes": "All 214 physical pages of Basic_ML_CS_concepts (1).pdf were text-indexed for RLHF, reinforcement learning from human feedback, DPO, direct preference optimization, preference, and reward model. The only direct RLHF discussion occurs on physical page 104; pages 103-106 were then read in sequence to establish its full neighborhood. The deck has no DPO treatment or diagram of either optimization path. The PDF provides no reuse license and contains attributed third-party material, so it was used only to identify topic coverage; no screenshot, artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "usage": "Used as the primary implementation source for the RLHF sequence: collect demonstrations and ranked model outputs, train a reward model, and optimize the policy against that reward with PPO and a KL-related constraint.",
+        "license": "The official arXiv record provides public access but did not establish a permissive grant for adapting the paper's figures. No figure, table, experimental value, wording, or visual layout is copied."
+      },
+      {
+        "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+        "url": "https://arxiv.org/abs/2305.18290",
+        "usage": "Used as the primary source for DPO's derivation from the KL-constrained reward-maximization objective and its direct binary-classification loss over preferred and rejected responses relative to a reference policy.",
+        "license": "The official arXiv record was treated as access to the paper, not permission to adapt its figures. The implementation reproduces no paper artwork, data, wording, equation formatting, or layout."
+      },
+      {
+        "title": "Deep reinforcement learning from human preferences",
+        "url": "https://arxiv.org/abs/1706.03741",
+        "usage": "Used as the foundational primary source to cross-check the separation between learned human-preference reward prediction and reinforcement-learning optimization.",
+        "license": "No permissive figure-reuse license was established from the official arXiv record. No figure, result, text, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the controlled comparison between two paths that start with the same preference triple. RLHF materializes an explicit reward model, samples from the changing policy, and uses an RL optimizer with a reference constraint. DPO analytically parameterizes the implicit reward through policy-to-reference log ratios and trains directly on stored pairs. The original visual intentionally says DPO removes those training stages, not that it removes preference collection, a reference model, all regularization effects, or every possible online data-refresh workflow."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 source-deck pages and inspected pages 103-106 around its only RLHF discussion, then checked three primary papers before implementing an original shared-input comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "rlhf-dpo-training-paths"
+    ],
+    "accessibility": "The figure has a question-style accessible title, a semantic shared-input section, two separately labelled training-path sections, numbered stages, and a group label that states the complete contrast. Text labels, stage order, explicit versus implicit terminology, and maintenance summaries carry all meaning without color. The established two-column primitive stacks below 640 CSS pixels with no minimum width, including at 390 CSS pixels; theme variables provide dark-mode contrast and shared print rules preserve a high-contrast, break-resistant figure."
+  }
+}

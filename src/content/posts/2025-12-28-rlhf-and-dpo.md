@@ -19,6 +19,8 @@ Understanding the post-training stack matters because:
 - Many production fine-tuning decisions are about which post-training stage to invest in.
 - Interviewers test this because it's the live frontier of LLM development.
 
+**Learning objective:** starting from the same preference pairs, trace which learned components and data-generation steps RLHF adds that DPO removes.
+
 ## The stages
 
 ### Stage 0: Pretraining (for context)
@@ -41,6 +43,33 @@ The quality of SFT data is the dominant factor. A small (~10K) high-quality SFT 
 Train the SFT model to prefer responses that humans (or model judges) prefer over alternatives.
 
 Two main approaches:
+
+<!-- visual:rlhf-dpo-training-paths -->
+<figure class="learning-figure" aria-labelledby="rlhf-dpo-paths-title">
+	<p class="visual-kicker">Same judgments, different optimization paths</p>
+	<p class="visual-title" id="rlhf-dpo-paths-title">What machinery does RLHF add between preference pairs and the updated policy?</p>
+	<section class="visual-panel" aria-labelledby="rlhf-dpo-shared-input-title">
+		<h4 id="rlhf-dpo-shared-input-title">SHARED START · OFFLINE PREFERENCE DATA</h4>
+		<p><strong>Prompt <var>x</var> + preferred response <var>y<sub>w</sub></var> + rejected response <var>y<sub>l</sub></var></strong><br />Both paths can begin with the same pairwise judgments and a fixed SFT reference policy.</p>
+	</section>
+	<div class="visual-grid--two" role="group" aria-label="Two training paths from shared preference pairs: RLHF learns a reward model and performs on-policy reinforcement learning, while DPO updates the policy directly from offline pairs">
+		<section class="visual-panel" aria-labelledby="rlhf-training-path-title">
+			<h4 id="rlhf-training-path-title">RLHF · EXPLICIT REWARD, ON-POLICY LOOP</h4>
+			<p><strong>1 · Fit a reward model</strong><br />Learn a scalar score that ranks <var>y<sub>w</sub></var> above <var>y<sub>l</sub></var>.</p>
+			<p><strong>2 · Generate fresh responses</strong><br />Sample rollouts from the current policy; the training distribution moves as the policy changes.</p>
+			<p><strong>3 · Optimize with RL</strong><br />PPO or another RL algorithm raises predicted reward while an explicit KL penalty limits drift from the reference.</p>
+			<p><strong>Maintain</strong><br />Policy + separate reward model + rollout and RL infrastructure.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="dpo-training-path-title">
+			<h4 id="dpo-training-path-title">DPO · IMPLICIT REWARD, OFFLINE UPDATE</h4>
+			<p><strong>1 · Score a likelihood-ratio margin</strong><br />Compare how much the trainable policy favors <var>y<sub>w</sub></var> over <var>y<sub>l</sub></var>, relative to the fixed reference.</p>
+			<p><strong>2 · Optimize the policy directly</strong><br />Apply binary cross-entropy to the stored pairs; no reward-model fit is required.</p>
+			<p><strong>3 · Reuse offline comparisons</strong><br />No on-policy rollout or PPO loop is part of the DPO objective.</p>
+			<p><strong>Maintain</strong><br />Policy + fixed reference + preference dataset.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> begin at the shared preference triple, then read each column downward. RLHF converts the judgments into a separate reward model and repeatedly generates new policy samples for RL; DPO turns the same ranking signal into a direct policy loss against a fixed reference. “Direct” removes the reward-model and on-policy RL stages, not the need for preference data or reference regularization. Original synthesis based on <a href="https://arxiv.org/abs/2203.02155">Ouyang et al. (2022)</a> and <a href="https://arxiv.org/abs/2305.18290">Rafailov et al. (2023)</a>.</figcaption>
+</figure>
 
 **RLHF (Reinforcement Learning from Human Feedback)**: the original ([Christiano et al. 2017](https://arxiv.org/abs/1706.03741), [OpenAI 2022](https://arxiv.org/abs/2203.02155)):
 1. Collect pairs (prompt, response_A, response_B) with a human label of which is better.
