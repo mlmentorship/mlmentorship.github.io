@@ -12,6 +12,49 @@ category: "questions"
 
 Three valid explanations exist (regularization, implicit ensembling, Bayesian approximation) and which ones you reach for tells the level. Modern large models often use no dropout, which is also a tell.
 
+**Learning objective:** trace how changing only the dropout mask creates many weight-sharing subnetworks, then distinguish deterministic approximate model averaging from repeated stochastic passes for uncertainty.
+
+<!-- visual:why-dropout-shared-subnetworks -->
+<figure class="learning-figure plot-panel" aria-labelledby="why-dropout-visual-title">
+	<p class="visual-kicker">One network, many masks</p>
+	<p class="visual-title" id="why-dropout-visual-title">The subnetworks change; the learned weights are shared.</p>
+	<svg viewBox="0 0 360 444" role="img" aria-labelledby="why-dropout-svg-title why-dropout-svg-desc">
+		<title id="why-dropout-svg-title">Dropout masks create weight-sharing subnetworks with two test-time interpretations</title>
+		<desc id="why-dropout-svg-desc">One parameter set W feeds many training passes. Mask A keeps units one and three while mask B keeps units two and three, producing different thinned subnetworks that both update the same W. This discourages units from depending on one fixed partner and acts like training many weight-sharing models. At standard test time, dropout is off and one deterministic full-network prediction approximates averaging the subnetworks. For Monte Carlo dropout, dropout stays on for repeated predictions; their distribution provides an approximate Bayesian uncertainty signal.</desc>
+		<defs><marker id="why-dropout-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+		<text class="viz-axis-label" x="16" y="18">TRAINING · RESAMPLE A MASK, REUSE W</text>
+		<rect class="viz-node viz-node--input" x="92" y="30" width="176" height="46" rx="4"></rect>
+		<text class="viz-node-label" x="180" y="49">one parameter set W</text>
+		<text class="viz-node-value" x="180" y="66">shared by every masked pass</text>
+		<path d="M180 76V92M180 92H92V108M180 92H268V108" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#why-dropout-arrow)"></path>
+		<rect class="viz-node viz-node--focus" x="18" y="112" width="148" height="82" rx="4"></rect>
+		<text class="viz-axis-label" x="92" y="132" text-anchor="middle">MASK A · KEEP 1, 3</text>
+		<text class="viz-callout" x="92" y="154" text-anchor="middle">● × ●</text>
+		<text class="viz-node-value" x="92" y="176">thinned path · same W</text>
+		<rect class="viz-node viz-node--focus" x="194" y="112" width="148" height="82" rx="4"></rect>
+		<text class="viz-axis-label" x="268" y="132" text-anchor="middle">MASK B · KEEP 2, 3</text>
+		<text class="viz-callout" x="268" y="154" text-anchor="middle">× ● ●</text>
+		<text class="viz-node-value" x="268" y="176">different path · same W</text>
+		<path d="M92 194V216H180M268 194V216H180V230" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3;marker-end:url(#why-dropout-arrow)"></path>
+		<rect class="viz-node" x="44" y="234" width="272" height="50" rx="4" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke)"></rect>
+		<text class="viz-callout" x="180" y="254" text-anchor="middle">many masks → many weight-sharing models</text>
+		<text class="viz-node-value" x="180" y="274">no unit can always rely on one fixed partner</text>
+		<text class="viz-axis-label" x="16" y="310">TEST TIME · CHOOSE THE QUESTION</text>
+		<path d="M180 284V320M180 320H92V336M180 320H268V336" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#why-dropout-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="18" y="340" width="148" height="82" rx="4"></rect>
+		<text class="viz-axis-label" x="92" y="360" text-anchor="middle">STANDARD · DROPOUT OFF</text>
+		<text class="viz-callout" x="92" y="382" text-anchor="middle">one prediction</text>
+		<text class="viz-node-value" x="92" y="400">approximates the ensemble</text>
+		<text class="viz-node-value" x="92" y="415">average efficiently</text>
+		<rect class="viz-node" x="194" y="340" width="148" height="82" rx="4" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></rect>
+		<text class="viz-axis-label" x="268" y="360" text-anchor="middle">MC DROPOUT · ON</text>
+		<text class="viz-callout" x="268" y="382" text-anchor="middle">ŷ₁, ŷ₂, …, ŷₜ</text>
+		<text class="viz-node-value" x="268" y="400">average = prediction</text>
+		<text class="viz-node-value" x="268" y="415">spread ≈ uncertainty</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> keep your eye on <em>W</em>: every mask exposes a different thinned path, but all paths update the same parameters. That coupling both discourages co-adaptation and resembles an ensemble of weight-sharing models. At test time, turn dropout off for one efficient approximation to their average; leave it on for repeated MC-dropout passes when you want an approximate uncertainty signal. Original schematic checked against <a href="https://www.jmlr.org/papers/v15/srivastava14a.html">Srivastava et al.</a>, <a href="https://proceedings.mlr.press/v48/gal16.html">Gal and Ghahramani</a>, and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html">PyTorch dropout documentation</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "Dropout randomly sets some neurons to zero during training, which prevents overfitting by forcing the network not to rely on any single neuron."

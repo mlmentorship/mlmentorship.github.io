@@ -83,7 +83,7 @@ Empirically GloVe and Word2Vec produce comparable embeddings. GloVe is sometimes
 			<text class="viz-axis-label" x="199" y="134" transform="rotate(-63 199 134)">SAME Δ</text>
 			<rect class="viz-node viz-node--output" x="18" y="272" width="284" height="61" rx="4"></rect>
 			<text class="viz-callout" x="160" y="296" text-anchor="middle">king + (woman - man) ≈ queen</text>
-			<text class="viz-axis-label" x="160" y="317" text-anchor="middle">TRANSLATE THE RELATION, THEN FIND THE NEAREST WORD</text>
+			<text class="viz-axis-label" x="160" y="317" text-anchor="middle">TRANSLATE RELATION; FIND NEAREST WORD</text>
 		</svg>
 	</div>
 	<figcaption><strong>Read it this way:</strong> start with the arrow from <em>man</em> to <em>woman</em>, then move <em>king</em> by that same direction and distance. If the endpoint lands near <em>queen</em>, the two pairs encode a similar relation. This is an original 2D teaching construction, not measured coordinates: real embedding analogies are approximate, corpus-dependent, and do not imply reasoning.</figcaption>

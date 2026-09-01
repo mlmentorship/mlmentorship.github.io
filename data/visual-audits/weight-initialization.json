@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "slug": "weight-initialization",
+  "article": "src/content/posts/2026-05-05-weight-initialization.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Predict why a ReLU layer needs weight variance 2 divided by fan-in to preserve activation scale, and how a smaller or larger factor compounds through depth.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align the same input scale with three repeated ReLU-layer trajectories and show the exact per-layer multipliers and four-layer outcomes.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show layers but cannot encode the quantitative shrinking, preserved, and growing second moments with precise aligned values.",
+    "svg": "Selected because one responsive static coordinate system can compare three calculated trajectories, label every multiplier directly, and remain deterministic in dark mode and print.",
+    "semanticHtml": "Rejected because a table could list the powers but would make the repeated spatial divergence through depth less immediate.",
+    "interaction": "Rejected because a gain slider would add state and controls without improving the core inference taught by three representative fixed factors.",
+    "paperReuse": "Rejected because the primary papers contain experiment-specific plots and broader diagrams, while public paper access does not establish a clear right to republish their figures. No source figure, coordinates, data, wording, or layout is copied.",
+    "noVisual": "Rejected because the equations give one-layer rules, but prose alone asks readers to mentally compound a small scale mismatch across many layers."
+  },
+  "deckReview": {
+    "pages": [
+      {"page": 56, "insight": "The preceding slide is only the Practical steps to a neural net project section divider and contains no initialization mechanism."},
+      {"page": 57, "insight": "The relevant Note slide warns against identical weights and says random weight scale should depend on fan-in. It calls sqrt(2/fan-in) Xavier initialization, conflating the rectifier-aware Kaiming factor with the Xavier family."},
+      {"page": 58, "insight": "The following slide begins data inspection and adds no initialization, activation-scale, or gradient-scale explanation."}
+    ],
+    "notes": "All 214 physical pages of Basic_ML_CS_concepts were text-searched for initialization, Xavier, Glorot, Kaiming, He, and exploding or vanishing terminology. Exact page 57 and its complete page 56-58 neighborhood were extracted and rendered for direct inspection. Page 57 provides prose and an unrelated embedded normalization image rather than an initialization figure; its sqrt(2/fan-in) naming error is not adopted. No deck screenshot, image, wording, geometry, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {"title": "Understanding the difficulty of training deep feedforward neural networks", "url": "https://proceedings.mlr.press/v9/glorot10a.html", "usage": "Used as the primary source for balancing forward and backward signal scale and the Glorot fan-in plus fan-out initialization.", "license": "PMLR public access was not treated as figure-reuse permission. No paper figure, experimental data, prose, equation layout, or visual arrangement is copied."},
+      {"title": "Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification", "url": "https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html", "usage": "Used as the primary source for the rectifier-aware forward second-moment derivation and weight variance 2 divided by fan-in for ReLU.", "license": "CVF open access establishes access to the camera-ready paper but was not treated as a general figure-reuse license. No paper figure, result, wording, or layout is copied."},
+      {"title": "PyTorch torch.nn.init documentation", "url": "https://docs.pytorch.org/docs/stable/nn.init.html", "usage": "Used as official documentation to cross-check Xavier and Kaiming formulas, ReLU gain sqrt(2), and fan-in versus fan-out behavior.", "license": "No documentation text, code example, or figure is copied; API formulas and semantics are referenced only."}
+    ],
+    "notes": "The hardest mental model in the complete article is why ReLU changes the required weight scale and why a modest one-layer mismatch becomes severe with depth. Under the standard independent, zero-mean, symmetric preactivation assumptions, define q_l as the activation second moment E[x_l squared]. If fan-in times Var(W) equals c, the linear map multiplies q by c and ReLU retains half of that second moment, so q_l/q_(l-1) equals c/2. The original visual calculates four repeated layers for c equal to 1, 2, and 3: final ratios 1/16, 1, and 81/16, plotted on an explicitly labelled logarithmic vertical scale so equal multiplicative changes have equal spacing. It deliberately says second moment rather than variance because ReLU outputs are not zero-mean."
+  },
+  "agentReview": {"reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)", "reviewedAt": "2026-09-01", "summary": "Read the full article, searched all 214 deck pages and rendered the exact relevant slide with both neighbors, checked two primary papers and official PyTorch documentation, and selected an original compact scale-through-depth comparison."},
+  "implementation": {
+    "visualIds": ["relu-second-moment-through-depth"],
+    "accessibility": "The SVG has a linked title and detailed description containing the assumptions, all three per-layer multipliers, and exact four-layer outcomes. Direct labels, vertical position, distinct point shapes, and solid, dashed, or dotted strokes preserve every comparison without color. A 360-unit viewBox scales fluidly with no minimum width or horizontal scrolling at 390 CSS pixels. Established theme variables provide dark and light contrast, and shared print rules force a light high-contrast canvas and keep the figure together."
+  }
+}

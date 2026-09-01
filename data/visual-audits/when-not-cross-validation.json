@@ -3,13 +3,13 @@
   "slug": "when-not-cross-validation",
   "article": "src/content/posts/2025-05-25-when-not-cross-validation.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "semantic-html",
   "learningObjective": "Decide whether ordinary cross-validation answers the deployment question, and choose a structure-aware split, external evaluation, representative holdout, or nested evaluation when it does not.",
-  "mediumRationale": "A compact decision graph is the smallest medium that separates two often-confused questions: whether folds preserve the unit that must be unseen, and whether cross-validation measures the target deployment distribution at all. Directly labelled branches connect each failed assumption to its replacement without implying that one split is universally correct.",
+  "mediumRationale": "A compact semantic decision sequence is the smallest medium that separates two often-confused questions: whether folds preserve the unit that must be unseen, and whether cross-validation measures the target deployment distribution at all. Ordered checks connect each failed assumption to its replacement without implying that one split is universally correct, and remain legible without horizontal scrolling at 390 CSS pixels.",
   "mediumComparison": {
-    "mermaid": "Selected: the learning task is a conditional decision with several alternatives, and Mermaid expresses the branches, stopping conditions, and replacement evaluations clearly while reusing established responsive and print-safe primitives.",
+    "mermaid": "Rejected after pixel review: the branching graph required horizontal scrolling and made labels too small at an exact 390 CSS-pixel viewport.",
     "svg": "Rejected: fixed-coordinate split geometry would duplicate the site's dedicated cross-validation-strategies visual and add drawing complexity without improving this article's higher-level decision.",
-    "semanticHtml": "Rejected: a comparison table would list cases efficiently but would not make the gating order clear: first align the evaluation population, then preserve dependence, then consider compute and tuning leakage.",
+    "semanticHtml": "Selected: an ordered, directly labelled sequence preserves the gating order and stacks naturally: first align the evaluation population, then preserve dependence, then consider compute and tuning leakage.",
     "interaction": "Rejected: no parameter sweep or hidden state is needed; revealing branches interactively would conceal alternatives that should be compared at a glance.",
     "paperReuse": "Rejected: the reviewed sources establish methodological constraints, but no source figure combines deployment shift, dependence, cost, and nested evaluation for this interview question. Figure-reuse permission was not established, so no external artwork, layout, data, or prose is copied.",
     "noVisual": "Rejected: the prose names valid exceptions one by one, but readers must synthesize them into an ordered decision. The graph prevents the false shortcut that structure-aware CV fixes distribution shift or that nested CV eliminates deployment mismatch."
@@ -63,6 +63,6 @@
     "visualIds": [
       "cross-validation-fit-the-question"
     ],
-    "accessibility": "The Mermaid graph provides an explicit accessible title and description. Every branch names the condition and every destination names the evaluation method, so no inference relies on color. The compact top-to-bottom layout uses short labels and established wide-node primitives for readability at 390 CSS pixels; shared Mermaid theme tokens support dark mode, and existing print rules provide a light high-contrast rendering and keep the caption with the figure."
+    "accessibility": "The figure has a linked learning objective and an explicitly labelled semantic group. Four ordered checks name both the failed assumption and replacement evaluation, so no inference relies on color. The sequence uses ordinary wrapping text with no fixed width or horizontal scrolling at 390 CSS pixels; established theme tokens support dark mode, and existing print rules provide a light high-contrast rendering and keep the caption with the figure."
   }
 }
