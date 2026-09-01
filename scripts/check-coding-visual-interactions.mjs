@@ -188,10 +188,14 @@ const snapshotBody = `
 	const keyed = [...activeFrame.querySelectorAll('[data-motion-key]')].map((element) => {
 		const rect = element.getBoundingClientRect();
 		const style = getComputedStyle(element);
+		const descendantPaint = [...element.querySelectorAll('circle, rect, path, line, text')].map((child) => {
+			const childStyle = getComputedStyle(child);
+			return [childStyle.color, childStyle.backgroundColor, childStyle.borderColor, childStyle.fill, childStyle.stroke].join('|');
+		}).join('||');
 		return [element.dataset.motionKey, {
 			x: rect.x, y: rect.y, width: rect.width, height: rect.height,
 			text: element.textContent.trim(),
-			style: [style.color, style.backgroundColor, style.borderColor, style.fill, style.stroke].join('|'),
+			style: [style.color, style.backgroundColor, style.borderColor, style.fill, style.stroke, descendantPaint].join('|'),
 		}];
 	});
 	return {

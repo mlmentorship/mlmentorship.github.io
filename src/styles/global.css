@@ -653,6 +653,8 @@ mark {
 .coding-trace-queue-grid-row { display: flex; min-width: 0; align-items: center; justify-content: center; gap: .25rem; }
 .coding-trace-queue-grid-row > .coding-trace-label { flex: 0 0 1rem; }
 .coding-trace-queue-grid-row .coding-trace-grid-cell { flex: 0 1 4rem; min-width: 2.2rem; }
+.coding-trace-queue-grid-row.is-visited .coding-trace-grid-cell { border-color: var(--viz-state-stroke); background: var(--viz-state-bg); }
+.coding-trace-queue-grid-row.is-active .coding-trace-grid-cell { border-color: var(--viz-focus-stroke); background: var(--viz-focus-bg); color: var(--c-text); }
 .coding-trace-stack-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(8rem, 14rem); gap: .75rem; align-items: start; }
 .coding-trace-stack-input { display: grid; gap: .35rem; padding: .65rem; border: 1px solid var(--c-rule); background: var(--viz-neutral-bg); }
 .coding-trace-stack-input strong { color: var(--c-text); font-family: var(--font-mono); font-size: .72rem; overflow-wrap: anywhere; }

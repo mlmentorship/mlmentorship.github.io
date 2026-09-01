@@ -138,7 +138,7 @@ function renderArrayMapScene(scene) {
 function renderTableScene(scene) {
   const active = new Set(scene.active ?? []);
   const head = scene.columns.map((column) => `<th scope="col">${escapeHtml(column)}</th>`).join('');
-  const rows = scene.rows.map((row, rowIndex) => `<tr>${row.map((value, columnIndex) => `<td class="${active.has(rowIndex * row.length + columnIndex) ? 'is-active' : ''}">${escapeHtml(value)}</td>`).join('')}</tr>`).join('');
+  const rows = scene.rows.map((row, rowIndex) => `<tr>${row.map((value, columnIndex) => `<td class="${active.has(rowIndex * row.length + columnIndex) ? 'is-active' : ''}"${motionKey(`table-${rowIndex}-${columnIndex}`)}>${escapeHtml(value)}</td>`).join('')}</tr>`).join('');
   return `<div class="coding-trace-table-wrap"><table class="coding-trace-table"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>${renderMeta(scene, ['type', 'columns', 'rows', 'active'])}`;
 }
 
@@ -156,8 +156,12 @@ function renderGridScene(scene) {
 }
 
 function renderQueueGridScene(scene) {
-  const rows = scene.rows.map((row, rowIndex) => `<div class="coding-trace-queue-grid-row"><span class="coding-trace-label">${rowIndex}</span>${row.map((value) => `<span class="coding-trace-grid-cell">${escapeHtml(value)}</span>`).join('')}</div>`).join('');
-  const queue = (scene.queue ?? []).map((item) => `<span class="coding-trace-queue-item">${escapeHtml(item)}</span>`).join('');
+  const visited = new Set((scene.visited ?? []).map(String));
+  const rows = scene.rows.map((row, rowIndex) => {
+    const state = String(scene.start) === String(rowIndex) ? ' is-active' : visited.has(String(rowIndex)) ? ' is-visited' : '';
+    return `<div class="coding-trace-queue-grid-row${state}"${motionKey(`adjacency-row-${rowIndex}`)}><span class="coding-trace-label">${rowIndex}</span>${row.map((value, columnIndex) => `<span class="coding-trace-grid-cell"${motionKey(`adjacency-${rowIndex}-${columnIndex}`)}>${escapeHtml(value)}</span>`).join('')}</div>`;
+  }).join('');
+  const queue = (scene.queue ?? []).map((item) => `<span class="coding-trace-queue-item"${motionKey(`frontier-${item}`)}>${escapeHtml(item)}</span>`).join('');
   return `<div class="coding-trace-queue-grid">${rows}</div><div class="coding-trace-queue"><span class="coding-trace-label">queue</span>${queue || '<span class="coding-trace-empty">empty</span>'}</div>`;
 }
 
@@ -232,7 +236,8 @@ function renderIntervalsScene(scene) {
   const rows = scene.items.map((item) => {
     const left = Math.max(0, item.start / max * 100);
     const width = Math.max(2, (item.end - item.start) / max * 100);
-    return `<div class="coding-trace-interval-row"><span>${escapeHtml(item.label)}</span><div class="coding-trace-track"><i class="${toneClass(item.tone).trim()}" style="--trace-start:${left}%;--trace-width:${width}%"></i></div></div>`;
+    const key = item.key ?? `interval-${slugify(item.label)}`;
+    return `<div class="coding-trace-interval-row"${motionKey(key)}><span>${escapeHtml(item.label)}</span><div class="coding-trace-track"><i class="${toneClass(item.tone).trim()}" style="--trace-start:${left}%;--trace-width:${width}%"></i></div></div>`;
   }).join('');
   return `<div class="coding-trace-intervals">${rows}</div>${renderMeta(scene, ['type', 'items', 'max'])}`;
 }
@@ -314,7 +319,7 @@ function renderShapesScene(scene) {
 }
 
 function renderAttentionScene(scene) {
-  const cells = scene.rows.map((row) => row.map((value) => `<span class="coding-trace-attention-cell ${value === 'mask' ? 'is-mask' : value === 'read' ? 'is-read' : ''}">${escapeHtml(value)}</span>`).join('')).join('');
+  const cells = scene.rows.map((row, rowIndex) => row.map((value, columnIndex) => `<span class="coding-trace-attention-cell ${value === 'mask' ? 'is-mask' : value === 'read' ? 'is-read' : ''}"${motionKey(`attention-${rowIndex}-${columnIndex}`)}>${escapeHtml(value)}</span>`).join('')).join('');
   return `<div class="coding-trace-attention" style="--trace-cols:${Math.max(1, scene.rows[0]?.length ?? 1)}">${cells}</div>${renderMeta(scene, ['type', 'rows'])}`;
 }
 
