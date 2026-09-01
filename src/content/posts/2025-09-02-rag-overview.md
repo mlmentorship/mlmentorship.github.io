@@ -28,6 +28,28 @@ A production RAG system has roughly seven components:
 6. **Reranking**: cross-encoder reorders the top ~100 candidates to top ~5-10.
 7. **Generation**: LLM with retrieved chunks in context, instructed to cite sources.
 
+<!-- visual:rag-index-request-paths -->
+<figure class="learning-figure" aria-labelledby="rag-paths-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="rag-paths-title">How does an offline corpus become evidence for one live request?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two coordinated paths: an offline indexing path prepares lexical and dense indexes, then an online request path queries both, reranks the fused candidates, and gives a small evidence set to the language model">
+		<section class="visual-panel">
+			<h4>1 · OFFLINE: PREPARE KNOWLEDGE</h4>
+			<p><strong>Source documents</strong><br />Parse and split into citable chunks.</p>
+			<p><strong>Same chunks, two indexes</strong><br />Dense vectors preserve semantic similarity; a lexical index preserves exact terms.</p>
+			<p><strong>Refresh on change</strong><br />Update the indexes when the corpus changes, without retraining the LLM.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 · ONLINE: ANSWER THIS REQUEST</h4>
+			<p><strong>User query → understand</strong><br />Rewrite, expand, or decompose the request.</p>
+			<p><strong>Both indexes → retrieve and fuse</strong><br />Keep a broad candidate pool from complementary signals.</p>
+			<p><strong>Candidates → rerank</strong><br />Spend the slower query-passage model on the bounded pool and retain a small evidence set.</p>
+			<p><strong>Evidence + query → generate</strong><br />The LLM answers from the selected chunks and cites them.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> build the corpus path before requests arrive, then follow one query down the request path. The two indexes meet only at retrieval; reranking narrows their fused candidates before the LLM sees evidence. Updating knowledge changes the indexes, not the model weights. Original schematic checked against <a href="https://arxiv.org/abs/2005.11401">Lewis et al. (2020)</a>, <a href="https://aclanthology.org/2020.emnlp-main.550/">Karpukhin et al. (2020)</a>, and <a href="https://arxiv.org/abs/1901.04085">Nogueira and Cho (2019)</a>.</figcaption>
+</figure>
+
 Skipping any of 4-6 is typically why RAG systems underperform.
 
 ## What an interviewer expects you to say
