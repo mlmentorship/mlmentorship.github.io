@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "perplexity-and-bits-per-token",
+  "article": "src/content/posts/2025-10-02-perplexity-and-bits-per-token.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Explain why bits per token changes when the same byte string is split into a different number of tokens, while bits per byte retains a fixed denominator.",
+  "mediumRationale": "A paired semantic arithmetic ledger is the smallest medium that keeps the encoded string, token boundaries, total surprisal, denominators, and resulting units simultaneously inspectable.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show tokenization stages but would make the denominator arithmetic harder to compare.",
+    "svg": "Rejected: custom geometry adds no explanatory precision beyond selectable text and real table headers for this discrete calculation.",
+    "semanticHtml": "Selected: two responsive panels align exact token splits and arithmetic while preserving a natural screen-reader reading order.",
+    "interaction": "Rejected: swapping among tokenizers would add controls and states without improving the core fixed-denominator comparison.",
+    "paperReuse": "Rejected: no reviewed source figure is needed, and public availability does not establish permission to reuse paper or textbook artwork.",
+    "noVisual": "Rejected: the formulas define BPT and BPB, but prose alone does not make it obvious that changing token count changes the per-token denominator even when the underlying bytes and total surprisal are held fixed."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 97,
+        "insight": "The preceding slide implements a character-level language model and cross-entropy training loop, supplying token-granularity context but no comparison of evaluation units."
+      },
+      {
+        "page": 98,
+        "insight": "The dedicated Tokenization and perplexity slide gives the normalized inverse sequence-probability formula, states the exponentiated-entropy relation, and places subword tokenization beside perplexity, but does not warn that per-token values are not comparable across tokenizers."
+      },
+      {
+        "page": 99,
+        "insight": "The following text-representation slide describes autoregressive and masked objectives; it adds no normalization by characters or bytes."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 PDF pages for perplexity, cross-entropy, bits, and token references, then extracted and reviewed the complete relevant neighborhood on pages 97-99. Page 98 is the only dedicated perplexity slide. Its example code averages predictive entropy under the model distribution rather than held-out target negative log-likelihood, so that code was not reused. No deck artwork, wording, layout, or code is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Perplexity of fixed-length models — Hugging Face Transformers documentation",
+        "url": "https://huggingface.co/docs/transformers/en/perplexity",
+        "usage": "Used as official implementation documentation to verify perplexity as exponentiated average negative log-likelihood and the direct effect of tokenization on the metric.",
+        "license": "The Transformers repository is distributed under Apache License 2.0. No documentation prose, code, formula rendering, or figure is copied; the article uses an original worked example."
+      },
+      {
+        "title": "Elements of Information Theory, Second Edition",
+        "url": "https://www.wiley.com/en-us/Elements+of+Information+Theory%2C+2nd+Edition-p-9780471241959",
+        "usage": "Used as the authoritative textbook source for surprisal, coding length, log-base units, and normalization of total code length by a chosen symbol unit.",
+        "license": "The book is commercially published by Wiley, and no permissive license for reproducing its figures was identified. No figure, prose, example, or layout is copied."
+      },
+      {
+        "title": "Neural Machine Translation of Rare Words with Subword Units",
+        "url": "https://arxiv.org/abs/1508.07909",
+        "usage": "Used as a primary source for learned subword segmentation and the fact that one text can be represented as a variable-length sequence of subword units.",
+        "license": "The arXiv record provides public access but no figure-reuse permission was relied upon. No paper figure, algorithm text, data, or layout is reproduced."
+      }
+    ],
+    "notes": "The shipped ledger is an original deterministic construction. The ASCII string 'sunset' occupies six UTF-8 bytes. Tokenizer A assigns conditional token surprisals of 3 and 2 bits; Tokenizer B assigns 1, 1, and 3 bits. Both factorizations therefore assign 5 bits total, equivalent to sequence probability 2^-5, while BPT is 5/2=2.50 versus 5/3=1.67 and BPB is 5/6=0.83 in both. Equal total surprisal is a controlled premise used to isolate the denominator effect, not a claim that arbitrary models or tokenizers assign equal probabilities."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, inspected the full deck and exact three-slide language-model neighborhood, rejected the deck's predictive-entropy code as a perplexity implementation, and checked official documentation, an authoritative textbook, and a primary subword-tokenization paper before selecting an original denominator ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "perplexity-tokenizer-denominator"
+    ],
+    "accessibility": "The figure uses semantic sections and real tables with scoped column headers, explicit token boundaries, written arithmetic, and a caption that states the inference without relying on color. The selected BPT cells have both border emphasis and numeric labels. Established two-panel styles stack below 640 CSS pixels for a 390-pixel viewport, theme variables preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette."
+  }
+}
