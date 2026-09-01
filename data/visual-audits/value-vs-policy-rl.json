@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "value-vs-policy-rl",
+  "article": "src/content/posts/2026-04-22-value-vs-policy-rl.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how a state becomes an action in value-based and policy-based control, then locate the critic in an actor-critic without mistaking it for the action selector.",
+  "mediumRationale": "A semantic two-path comparison is the smallest medium that exposes which learned object sits directly upstream of an action. Aligned panels distinguish value estimates plus an external selector from an explicit policy, while a full-width hybrid panel separates the actor's decision path from the critic's training path.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show arrows but would devote most of its space to generic state and action nodes, while automatic layout makes the aligned score, probability, decision-path, and training-signal comparison less inspectable.",
+    "svg": "Rejected: deterministic geometry is unnecessary for three short symbolic paths and would make text wrapping and assistive reading less robust than native headings and paragraphs.",
+    "semanticHtml": "Selected: native sections preserve logical reading order, align the two paradigms on desktop, stack without horizontal scrolling at 390 CSS pixels, and state every score, probability, selector, and training role in accessible text.",
+    "interaction": "Rejected: toggling action values or probabilities would add state without improving the invariant distinction between learning action scores and learning the action selector itself.",
+    "paperReuse": "Rejected: the canonical textbook and policy-gradient paper contain broader mathematical treatments, and their public availability was not treated as blanket permission to reuse figures. OpenAI Spinning Up and TorchRL are MIT licensed, but no documentation figure, prose, code, example, or layout is copied. The shipped values, probabilities, paths, and composition are independently authored.",
+    "noVisual": "Rejected: prose lists strengths and weaknesses but leaves readers to infer where action selection occurs and how actor-critic combines the paradigms. The comparison makes the learned interfaces and hybrid boundary explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 51,
+        "insight": "The earlier gradient-estimator slide introduces REINFORCE for stochastic or non-differentiable sampling paths, including a discrete softmax policy and score-function update. It supplies estimator context but does not compare value and policy interfaces."
+      },
+      {
+        "page": 52,
+        "insight": "The neighboring estimator slide defines the likelihood-ratio or REINFORCE gradient and its Monte Carlo variance. It contributes policy-gradient background but no decision-time architecture."
+      },
+      {
+        "page": 154,
+        "insight": "The Reinforcement Learning divider begins the deck's dedicated RL neighborhood and contains no mechanism."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts supervised conditional likelihood with expected reward and iid examples with dependent trajectories. It frames the objective but does not distinguish learned values from a learned policy."
+      },
+      {
+        "page": 156,
+        "insight": "The only direct paradigm comparison says policy optimization directly parameterizes a state-to-action mapping unlike value-based methods, and pairs that prose with a REINFORCE-style CartPole implementation. It has no value-based branch, action-selector comparison, or actor-critic training path."
+      },
+      {
+        "page": 157,
+        "insight": "The following Past projects divider ends the dedicated RL teaching neighborhood, confirming that no adjacent slide adds actor-critic or value-control structure."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 physical pages of Basic_ML_CS_concepts for value-based, policy-based, actor-critic, policy gradient, Q-learning, and REINFORCE. Physical page 156 is the sole direct paradigm treatment; pages 154-157 were rendered and visually inspected as its complete neighborhood. Pages 51-52 were also rendered and inspected because the full-deck search found the earlier score-function derivation. The deck states no reuse license. Its relevant content is dense prose and source code rather than a two-path comparison, so no screenshot, wording, code, example, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Reinforcement Learning: An Introduction, second edition",
+        "url": "https://incompleteideas.net/book/RLbook2020.pdf",
+        "usage": "Used as the authoritative textbook source to verify the distinction between action-value methods that derive policies from value estimates, policy-gradient methods that parameterize policies, and actor-critic methods that learn both policy and value components.",
+        "license": "The authors provide an official complete PDF, but the book is copyrighted by MIT Press and no permissive figure-adaptation license was identified. No textbook figure, table, wording, numerical example, or layout is copied."
+      },
+      {
+        "title": "Policy Gradient Methods for Reinforcement Learning with Function Approximation",
+        "url": "https://proceedings.neurips.cc/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html",
+        "usage": "Used as the primary paper to verify the contrast between an implicitly greedy policy derived from an approximate value function and an explicitly represented differentiable policy, including actor-critic use of an action-value or advantage estimate.",
+        "license": "The NeurIPS proceedings provide public access, but no Creative Commons or other permissive figure-reuse grant was identified on the paper record. No source figure, prose, equation formatting, example, or layout is reused."
+      },
+      {
+        "title": "OpenAI Spinning Up: Soft Actor-Critic",
+        "url": "https://spinningup.openai.com/en/latest/algorithms/sac.html",
+        "usage": "Used as official implementation documentation to verify that SAC jointly learns a stochastic policy and Q-functions while operating off-policy, demonstrating that actor-critic does not imply on-policy data collection.",
+        "license": "The Spinning Up repository is MIT licensed. No documentation prose, formula image, code, benchmark, or visual structure is reproduced."
+      },
+      {
+        "title": "TorchRL PPO tutorial",
+        "url": "https://docs.pytorch.org/rl/main/tutorials/coding_ppo.html",
+        "usage": "Used as official framework documentation to cross-check the current-policy rollout, explicit probabilistic actor, value model, and advantage signal in a practical on-policy actor-critic implementation.",
+        "license": "The TorchRL repository is MIT licensed. No tutorial code, animation, wording, hyperparameter, output, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the interface boundary between learned object and action. In the original worked state, canonical value control learns Q scores 1.2, 0.4, and 2.1, then a separate greedy selector chooses right; an exploration selector could choose differently without changing what Q represents. Direct policy optimization instead represents probabilities 0.15, 0.10, and 0.75 and samples or selects from that policy. Actor-critic retains the policy as the decision mechanism while V or Q supplies an advantage, baseline, or target during training. The numbers are illustrative, sum correctly where required, and are not empirical claims."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected the full dedicated RL neighborhood plus the earlier REINFORCE derivation, and checked the authoritative textbook, foundational policy-gradient paper, and official on-policy and off-policy actor-critic documentation with explicit license treatment."
+  },
+  "implementation": {
+    "visualIds": [
+      "value-policy-action-interface"
+    ],
+    "accessibility": "The figure is linked to a direct learning question and its grouped child has a complete text alternative. Native headings and paragraphs state every score, probability, path, selector, and actor/critic role; numbered stages, literal arrows, code typography, and explicit Decision and Training labels carry all meaning without color. The established two-column grid stacks below 640 CSS pixels with no minimum width, preserving readable wrapping at an exact 390 CSS pixel viewport. Shared theme tokens provide dark-mode contrast, and established print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}

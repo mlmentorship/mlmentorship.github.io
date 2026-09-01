@@ -27,6 +27,36 @@ Original from text compression (1994), adapted for NLP. Algorithm:
 3. Merge that pair into a new vocabulary item.
 4. Repeat until target vocabulary size.
 
+**Learning objective:** trace how corpus-wide pair counts create ranked, reusable BPE tokens that compress common words while leaving rarer words as multiple pieces.
+
+<!-- visual:bpe-corpus-merge-trace -->
+<figure class="learning-figure" aria-labelledby="bpe-merge-trace-title">
+	<p class="visual-kicker">Learning objective · toy byte-level corpus</p>
+	<p class="visual-title" id="bpe-merge-trace-title">How does one frequent byte pair grow into reusable subword and whole-word tokens?</p>
+	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="list" aria-label="Three ranked BPE merge rounds followed by tokenization of three words">
+		<section class="visual-panel" role="listitem">
+			<h4>START · COUNT ADJACENT PAIRS ACROSS ALL OCCURRENCES</h4>
+			<p><strong>Corpus:</strong> <code>m a p × 5</code> · <code>m a p s × 3</code> · <code>c a p × 2</code></p>
+			<p><strong>Largest count:</strong> <code>a + p = 5 + 3 + 2 = 10</code><br /><strong>Rank 1 merge:</strong> add <code>ap</code> to the vocabulary.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>ROUND 2 · RECOUNT AFTER APPLYING <code>a + p → ap</code></h4>
+			<p><strong>Corpus now:</strong> <code>m ap × 5</code> · <code>m ap s × 3</code> · <code>c ap × 2</code></p>
+			<p><strong>Largest count:</strong> <code>m + ap = 5 + 3 = 8</code><br /><strong>Rank 2 merge:</strong> add <code>map</code> to the vocabulary.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>ROUND 3 · RECOUNT AFTER APPLYING <code>m + ap → map</code></h4>
+			<p><strong>Corpus now:</strong> <code>map × 5</code> · <code>map s × 3</code> · <code>c ap × 2</code></p>
+			<p><strong>Largest count:</strong> <code>map + s = 3</code><br /><strong>Rank 3 merge:</strong> add <code>maps</code> to the vocabulary.</p>
+		</section>
+		<section class="visual-panel" role="listitem">
+			<h4>APPLY · REPLAY MERGES IN LEARNED RANK ORDER</h4>
+			<p><code>maps</code> → <strong><code>[maps]</code></strong> · common whole word<br /><code>cap</code> → <strong><code>[c] [ap]</code></strong> · shared learned ending<br /><code>traps</code> → <strong><code>[t] [r] [ap] [s]</code></strong> · rarer word, more pieces</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> read downward. At each round, count pairs in the current segmentation, merge the largest count everywhere, then recount. The learned order matters at encoding time: <code>ap</code> forms before <code>map</code>, and <code>map</code> before <code>maps</code>. Frequent patterns therefore become larger tokens; an unfamiliar word still falls back to available byte pieces. Original worked example informed by <a href="https://aclanthology.org/P16-1162/">Sennrich et al. (2016)</a> and the <a href="https://github.com/openai/tiktoken">tiktoken documentation</a>.</figcaption>
+</figure>
+
 Result: common words become single tokens; rare words decompose into subwords; arbitrary text is always representable (down to characters).
 
 Used in: GPT-2/3/4, LLaMA family, most modern LLMs.
