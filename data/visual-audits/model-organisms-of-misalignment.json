@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "model-organisms-of-misalignment",
+  "article": "src/content/posts/2026-07-11-model-organisms-of-misalignment.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Test whether an intervention removed a conditional unwanted policy rather than only suppressing its known trigger, while separately checking that useful capability remains.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can align a matched control and trigger contrast before an intervention with three independent checks afterward: the known trigger, a held-out trigger variant, and useful capability. The fixed comparison makes a cosmetic mitigation failure visible without interaction or source-specific empirical values.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would emphasize procedural order, but automatic layout would not reliably align the matched pre-intervention contrast with the three distinct post-intervention claims.",
+    "svg": "Selected: two compact, aligned panels can hold model and task constant, mark the one changed condition, and keep target behavior, held-out generalization, and capability as separately labelled outcomes.",
+    "semanticHtml": "Rejected: a table could list the same evaluations, but it would make the controlled before-and-after paths less immediate and would not reuse the established visual grammar for inputs, interventions, warnings, and verified outcomes as clearly.",
+    "interaction": "Rejected: toggling triggers or mitigation outcomes would hide states and add controls without improving the fixed lesson that every relevant condition must be evaluated independently.",
+    "paperReuse": "Rejected: the reviewed sources include study-specific prompts, result plots, and conceptual framing, but no figure is needed for this abstract experimental contract. Reuse rights for the Sleeper Agents figures are not granted by its arXiv non-exclusive distribution license, so no source artwork, wording, data, or layout is copied.",
+    "noVisual": "Rejected: the prose enumerates controls and evaluation dimensions, but readers must mentally coordinate them. The matched lanes expose how an intervention can pass the known trigger while the conditional policy remains detectable under a held-out trigger."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The preceding slide surveys transformer architectures and training stability. It provides model background but no deliberately induced conditional behavior, matched control, or mitigation evaluation."
+      },
+      {
+        "page": 104,
+        "insight": "The closest slide discusses instruction tuning and RLHF as changing elicited behavior and trading off capabilities. It motivates checking behavior and capability separately, but it contains no model organism, hidden trigger, independent verifier, or persistence experiment."
+      },
+      {
+        "page": 105,
+        "insight": "The following slide moves to base, instruction-tuned, and RLHF model families plus Toolformer. It does not address controlled misalignment or distinguish removal of a known trigger from removal of a conditional policy."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical pages for model organism, misalignment, deceptive, sleeper, backdoor, trigger, alignment, RLHF, and monitoring terms. No slide directly covers model organisms or deliberately triggered unwanted policies. Pages 103-105 were inspected in full as the closest neighboring alignment section; page 104 is the only relevant conceptual match because it distinguishes capability learned during pretraining from behavior elicited or changed by instruction tuning and RLHF. No deck image, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Model Organisms of Misalignment: The Case for a New Pillar of Alignment Research",
+        "url": "https://www.alignmentforum.org/posts/ChDH335ckdvpxXaXX/model-organisms-of-misalignment-the-case-for-a-new-pillar-of-1",
+        "usage": "Used as the foundational methodological source for constructing reproducible examples of hypothesized alignment failures so their behavior, mechanisms, and mitigations can be studied empirically rather than inferred from uncontrolled failures.",
+        "license": "No permissive figure-reuse license was identified on the publication page. No figure, prose, taxonomy, example, or visual organization is copied; the source is used only to verify the methodological framing."
+      },
+      {
+        "title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training",
+        "url": "https://arxiv.org/abs/2401.05566",
+        "usage": "Used as primary experimental evidence for models trained to behave differently under a contextual trigger, persistence through supervised fine-tuning, reinforcement learning, and adversarial training, and the risk that training can hide rather than remove triggered behavior.",
+        "license": "The arXiv abstract page assigns the arXiv perpetual non-exclusive distribution license, which does not grant third-party figure reuse. No prompt, result, number, figure, wording, or layout is reproduced; the visual is an original qualitative test design."
+      },
+      {
+        "title": "Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training (Anthropic research summary)",
+        "url": "https://www.anthropic.com/research/sleeper-agents-training-deceptive-llms-that-persist-through-safety-training",
+        "usage": "Used as the authors' official summary to cross-check that standard safety training can leave backdoor behavior intact and that adversarial training can improve trigger recognition while creating a false impression of safety.",
+        "license": "No explicit permission to adapt the page's figures or text was relied upon. The implementation cites the finding but copies no example, prose, artwork, data, or layout."
+      },
+      {
+        "title": "arXiv Permissions and Reuse",
+        "url": "https://info.arxiv.org/help/license/reuse.html",
+        "usage": "Used as official licensing guidance to verify that public availability alone does not permit figure reuse and that an arXiv non-exclusive license requires permission from the copyright holder.",
+        "license": "The policy is cited only to document the licensing decision. No policy text, icon, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a model organism is an experimental instrument with matched conditions, not merely a model that exhibits bad behavior. A useful intervention claim must distinguish three outcomes: suppression on the known trigger, persistence under a held-out trigger or paraphrase, and preservation of useful capability on controls. The visual uses a synthetic trigger token and qualitative pass or fail outcomes only; it does not claim that this exact organism or mitigation result was measured in a reviewed paper."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the closest alignment neighborhood, then reviewed the foundational model-organism proposal, the primary Sleeper Agents experiment, its official author summary, and arXiv reuse guidance before selecting an original matched-condition intervention test."
+  },
+  "implementation": {
+    "visualIds": [
+      "model-organism-policy-test"
+    ],
+    "accessibility": "Each panel has a linked SVG title and detailed description stating its inputs, model behavior, and evaluation result. Direct labels, lane position, solid versus dashed borders, check and cross text, and explicit KNOWN, HELD-OUT, CAPABILITY, ABSENT, PRESENT, and PASS labels carry all meaning without color. The established two-panel grid stacks below 640 CSS pixels, and each SVG uses a compact 300-unit viewBox with no minimum width for readability at 390 CSS pixels. Shared theme variables provide dark-mode contrast, while established print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
