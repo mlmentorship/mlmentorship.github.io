@@ -11,6 +11,58 @@ category: "concepts"
 
 Streaming ASR is the difference between a voice assistant that feels responsive and one that feels broken: it has to emit transcript while the user is still speaking, with bounded latency. The catch is that the model cannot attend to unlimited future context, so it trades recognition quality against emission latency, compute, and transcript stability. Offline ASR has none of those constraints, which is why a system that scores well offline can still feel terrible live.
 
+**Learning objective:** trace why a token can appear before speech ends while remaining revisable, and distinguish first-token latency from finalization latency.
+
+<!-- visual:streaming-asr-provisional-to-final -->
+<figure class="learning-figure plot-panel" aria-labelledby="streaming-asr-timeline-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="streaming-asr-timeline-title">How can streaming ASR respond early without committing early?</p>
+	<svg viewBox="0 0 360 352" role="img" aria-labelledby="streaming-asr-svg-title streaming-asr-svg-desc">
+		<title id="streaming-asr-svg-title">A streaming transcript changes from provisional to final as audio arrives</title>
+		<desc id="streaming-asr-svg-desc">Audio arrives from left to right as the words play, their, and song, followed by a pause. After a bounded chunk and right-context wait, the recognizer emits the provisional words play the. Once the word song arrives, the recognizer revises the to their and adds song. Only after an endpointing wait during the pause does it mark play their song final. Thus first-token latency ends before speech ends, while finalization latency includes endpointing.</desc>
+		<text class="viz-axis-label" x="12" y="18">AUDIO ARRIVES LEFT TO RIGHT · CONCEPTUAL, NOT TO SCALE</text>
+		<path class="viz-axis" d="M18 72H342"></path>
+		<path d="M334 68L342 72L334 76" style="fill:none;stroke:var(--c-text-soft);stroke-width:1.4"></path>
+		<rect class="viz-node viz-node--input" x="25" y="37" width="62" height="27" rx="4"></rect>
+		<rect class="viz-node viz-node--input" x="94" y="37" width="62" height="27" rx="4"></rect>
+		<rect class="viz-node viz-node--input" x="163" y="37" width="62" height="27" rx="4"></rect>
+		<rect class="viz-node" x="232" y="37" width="94" height="27" rx="4" style="stroke-dasharray:4 3"></rect>
+		<text class="viz-node-value" x="56" y="55">/play/</text>
+		<text class="viz-node-value" x="125" y="55">/their/</text>
+		<text class="viz-node-value" x="194" y="55">/song/</text>
+		<text class="viz-node-value" x="279" y="55">pause · endpoint wait</text>
+		<path d="M156 68V326" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5;stroke-dasharray:4 4"></path>
+		<path d="M225 68V326" style="fill:none;stroke:var(--viz-edge);stroke-width:1.2;stroke-dasharray:4 4"></path>
+		<path d="M326 68V326" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.5;stroke-dasharray:4 4"></path>
+		<text class="viz-axis-label" x="12" y="102">CHECKPOINT 1 · EARLY PARTIAL</text>
+		<text class="viz-label" x="12" y="119">chunk + bounded right context are available</text>
+		<rect class="viz-node viz-node--input" x="44" y="132" width="72" height="32" rx="4"></rect>
+		<rect class="viz-node viz-node--focus" x="124" y="132" width="72" height="32" rx="4" style="stroke-dasharray:4 3"></rect>
+		<text class="viz-node-label" x="80" y="153">play</text>
+		<text class="viz-node-label" x="160" y="153">the…</text>
+		<text class="viz-callout" x="205" y="153">PROVISIONAL</text>
+		<path d="M160 170V195M156 187L160 195L164 187" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.8"></path>
+		<text class="viz-label" x="172" y="184">future audio may revise text</text>
+		<text class="viz-axis-label" x="12" y="215">CHECKPOINT 2 · LATER PARTIAL</text>
+		<rect class="viz-node viz-node--input" x="44" y="226" width="72" height="32" rx="4"></rect>
+		<rect class="viz-node viz-node--focus" x="124" y="226" width="72" height="32" rx="4"></rect>
+		<rect class="viz-node viz-node--input" x="204" y="226" width="72" height="32" rx="4"></rect>
+		<text class="viz-node-label" x="80" y="247">play</text>
+		<text class="viz-node-label" x="160" y="247">their</text>
+		<text class="viz-node-label" x="240" y="247">song</text>
+		<text class="viz-label" x="284" y="239">the → their</text>
+		<text class="viz-axis-label" x="284" y="254">REVISED</text>
+		<path d="M240 264V284M236 276L240 284L244 276" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.8"></path>
+		<text class="viz-label" x="12" y="278">speech stops; endpoint must fire</text>
+		<text class="viz-axis-label" x="12" y="301">FINAL RESULT</text>
+		<rect class="viz-node viz-node--output" x="44" y="309" width="232" height="32" rx="4"></rect>
+		<rect x="48" y="313" width="224" height="24" rx="2" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1"></rect>
+		<text class="viz-node-label" x="160" y="330">play their song</text>
+		<text class="viz-callout" x="286" y="330">FINAL</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> the first partial result appears once a chunk and its bounded right context are available, so <strong>time to first token</strong> can end while speech is still arriving. That text remains provisional: later audio changes <code>the</code> to <code>their</code>. <strong>Finalization latency</strong> ends only after the pause triggers endpointing and remaining processing completes. Measure both milestones and the revision between them. Original schematic informed by <a href="https://arxiv.org/abs/1811.06621">He et al. (2019)</a>, <a href="https://www.isca-archive.org/interspeech_2020/shangguan20_interspeech.html">Shangguan et al. (2020)</a>, and <a href="https://research.google/pubs/towards-fast-and-accurate-streaming-end-to-end-asr/">Li et al. (2020)</a>.</figcaption>
+</figure>
+
 ## Architecture choices
 
 - **Chunked encoder:** processes bounded windows with cached state or limited lookahead.

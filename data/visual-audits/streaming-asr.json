@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "streaming-asr",
+  "article": "src/content/posts/2026-07-10-streaming-asr.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace why streaming ASR can emit a token before speech ends while that token remains revisable, and distinguish the waits that determine first-token latency from endpoint finalization latency.",
+  "mediumRationale": "A deterministic timeline SVG is the smallest medium that can align arriving speech, bounded encoder availability, successive transcript states, and the endpoint on one time axis. Fixed geometry makes the difference between an early provisional result and a later final result visible without runtime behavior or arbitrary timing claims.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would show processing order, but automatic layout would not align audio arrival, lookahead, transcript revisions, and finalization on a shared time axis.",
+    "svg": "Selected: a fixed timeline can place three transcript snapshots beneath the same arriving utterance and directly distinguish retained words, a revised word, and the endpoint wait.",
+    "semanticHtml": "Rejected: a table could list successive hypotheses accessibly, but it would not show that each result is constrained by how much audio has arrived or that finalization follows an additional endpointing interval.",
+    "interaction": "Rejected: replaying or scrubbing the synthetic utterance would add controls and state without improving the single provisional-versus-final inference.",
+    "paperReuse": "Rejected: the reviewed papers contain system-specific plots and diagrams, and no permissive figure-reuse grant was established. The shipped timeline, example utterance, labels, and geometry are original; cited sources are used only to verify mechanisms.",
+    "noVisual": "Rejected: prose names lookahead, partial revision, and endpointing separately, but readers must mentally coordinate them on one clock. A timeline shows why low time-to-first-token does not imply either stable words or low finalization latency."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 119,
+        "insight": "The ASR section title marks the start of the deck's complete contiguous speech-recognition section but contains no streaming mechanism."
+      },
+      {
+        "page": 120,
+        "insight": "The speech-recognition title slide contains no architecture, latency, partial-result, or endpointing detail."
+      },
+      {
+        "page": 121,
+        "insight": "The slide contrasts end-to-end recognition with a traditional pipeline and explains 20-40 millisecond feature windows; it motivates chunked input but does not discuss bounded right context or live output."
+      },
+      {
+        "page": 122,
+        "insight": "The overview describes frame processing, traditional acoustic and language-model components, CTC, and Listen Attend and Spell; it provides ASR context but no streaming timeline."
+      },
+      {
+        "page": 123,
+        "insight": "The slide covers MFCC and log-mel features plus waveform and spectrogram augmentation, not streaming inference."
+      },
+      {
+        "page": 124,
+        "insight": "The acoustic-model slide discusses GMM-HMM and neural acoustic models and notes alignment, but not incremental hypotheses or latency."
+      },
+      {
+        "page": 125,
+        "insight": "The CTC slide explains blank-based monotonic alignment and prefix beam search, a streamable decoding foundation, but does not cover partial-result stability or endpointing."
+      },
+      {
+        "page": 126,
+        "insight": "The RNN-T slide explains transcription, prediction, and joint networks plus blank and label transitions on a T-by-U lattice; it supports incremental emission but does not show user-visible revision or finalization."
+      },
+      {
+        "page": 127,
+        "insight": "The following slide begins model compression, confirming that page 126 ends the contiguous ASR section and that no neighboring streaming-specific slide follows."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for automatic speech recognition, speech recognition, CTC, RNN-T, transducer, streaming, latency, endpointing, partial hypotheses, and audio. Pages 119-126 form the complete contiguous ASR section; neighboring pages 117-118 cover rescoring and knowledge-graph embeddings, while page 127 begins model compression. The deck contains useful ASR, CTC, and RNN-T foundations but no dedicated streaming-latency, partial-stability, or endpointing visual. No deck image, wording, layout, or embedded asset is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Streaming End-to-End Speech Recognition for Mobile Devices",
+        "url": "https://arxiv.org/abs/1811.06621",
+        "usage": "Used as a primary production paper to verify that a streaming RNN-T consumes speech and decodes in real time rather than waiting for a complete utterance.",
+        "license": "Public arXiv access does not establish a permissive figure-reuse license. No figure, table, wording, empirical result, or paper-specific layout is copied."
+      },
+      {
+        "title": "Analyzing the Quality and Stability of a Streaming End-to-End On-Device Speech Recognizer",
+        "url": "https://www.isca-archive.org/interspeech_2020/shangguan20_interspeech.html",
+        "usage": "Used as a primary paper to verify that incremental recognizers emit partial words before finalization, may revise those partial results, and require word- and segment-level stability metrics in addition to final quality.",
+        "license": "The ISCA archive provides publication access but no permissive figure-reuse grant was identified on the article record. No source figure, example, metric value, prose, or layout is reproduced."
+      },
+      {
+        "title": "Towards Fast and Accurate Streaming End-to-End ASR",
+        "url": "https://research.google/pubs/towards-fast-and-accurate-streaming-end-to-end-asr/",
+        "usage": "Used as a primary production paper to verify that endpointing policy contributes to user-visible latency and creates an explicit quality-latency tradeoff.",
+        "license": "The publication page is consulted only for mechanism and bibliographic facts. No paper figure, table, wording, numerical result, or layout is reused."
+      },
+      {
+        "title": "Google Cloud Speech-to-Text StreamingRecognitionResult reference",
+        "url": "https://cloud.google.com/speech-to-text/v2/docs/reference/rest/v2/StreamingRecognitionResult",
+        "usage": "Used as official API documentation to cross-check the distinction between interim and final streaming recognition results and the reporting of interim-result stability.",
+        "license": "The documentation states that page content is CC BY 4.0 except where noted, but no text or artwork is adapted. The independently authored visual uses only the general interim-versus-final API semantics."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that streaming has two different user-visible milestones. Bounded audio and right context can support an early partial transcript, but future audio may revise that text; after speech stops, endpointing and remaining processing still delay a final result. The original schematic uses a synthetic phrase, makes no measured-duration claim, and labels its spacing as conceptual rather than to scale."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the exact ASR slide neighborhood, and cross-checked primary streaming, stability, and endpointing papers plus official streaming-result documentation before selecting an original provisional-to-final timeline."
+  },
+  "implementation": {
+    "visualIds": [
+      "streaming-asr-provisional-to-final"
+    ],
+    "accessibility": "The SVG has a linked title and complete description that narrates audio arrival, three transcript states, revision, and finalization. Every state is directly labelled; retained words use solid outlines, the revised word uses a dashed outline and explicit 'revised' label, and the final state has a double outline and 'final' label, so color is redundant. The single 360-unit viewBox has no minimum width and uses established theme tokens for readability at 390 CSS pixels, dark mode, and high-contrast print."
+  }
+}
