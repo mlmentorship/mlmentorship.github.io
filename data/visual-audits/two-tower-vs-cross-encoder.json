@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "slug": "two-tower-vs-cross-encoder",
+  "article": "src/content/posts/2025-06-24-two-tower-vs-cross-encoder.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "See why independent item encoding can search an entire catalog, while joint query-item encoding becomes affordable only after retrieval has reduced the number of pairs.",
+  "mediumRationale": "A paired semantic fan-out is the smallest medium that can align the two-tower's reusable item index with the cross-encoder's per-candidate joint work and make the N-to-K boundary explicit without duplicating a detailed model architecture.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a generic left-to-right pipeline would show stage order but obscure the key contrast between one reusable catalog encoding and K fresh joint query-item evaluations.",
+    "svg": "Rejected because exact geometric scale is not needed, and fixed SVG text would wrap less naturally than semantic panels at 390 CSS pixels.",
+    "semanticHtml": "Selected because two responsive panels can directly compare what is computed once, once per query, and once per surviving pair while preserving ordinary text flow, screen-reader order, dark mode, and print.",
+    "interaction": "Rejected because changing N or K would add controls without changing the invariant: independent encodings permit indexed retrieval, whereas joint attention must be reserved for a bounded candidate set.",
+    "paperReuse": "Rejected because the reviewed DPR, BERT reranking, and Sentence Transformers sources contain related system illustrations, but no artwork is needed and public availability is not treated as permission to adapt figures.",
+    "noVisual": "Rejected because the article states that the methods should run in sequence, but prose alone leaves readers to mentally connect representation independence to precomputation, catalog-wide fan-out, and the bounded cost of joint reranking."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 116,
+        "insight": "The rescoring section divider marks the start of the closest candidate-to-second-model neighborhood but contains no mechanism."
+      },
+      {
+        "page": 117,
+        "insight": "The rescoring slide reconstructs one full input per candidate and sends each through a second model, directly supporting per-candidate joint work after an earlier model creates candidates."
+      },
+      {
+        "page": 118,
+        "insight": "The neighboring knowledge-graph embedding slide begins a new topic and confirms the end of the rescoring neighborhood."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider opens the closest retrieval and ranking sequence but contains no architecture."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide describes dot-product matching, ANN pruning, and ranking scores, establishing why independent vectors can avoid exhaustive catalog scoring."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid recommender slide combines signal sources but adds no query-item joint encoder or staged cost boundary."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search divider introduces the worked search-ranking neighborhood."
+      },
+      {
+        "page": 133,
+        "insight": "The overview lists problem formulation, system design, data, models, and experimentation without specifying stage mechanics."
+      },
+      {
+        "page": 134,
+        "insight": "The problem statement requires request-specific ranking within 100 milliseconds, providing the latency constraint that rules out exhaustive joint scoring."
+      },
+      {
+        "page": 135,
+        "insight": "The formulation explicitly separates candidate generation from ranking and assigns intent-based matching to retrieval and richer context to ranking."
+      },
+      {
+        "page": 136,
+        "insight": "The system-overview slide is a section heading with no extractable mechanism."
+      },
+      {
+        "page": 137,
+        "insight": "The data slide records K returned items per search session, reinforcing that downstream labels and scoring concern a bounded result set."
+      },
+      {
+        "page": 138,
+        "insight": "The personalized-recommender slide uses interaction representations and contrastive learning, but does not show independent query and item encoding."
+      },
+      {
+        "page": 139,
+        "insight": "The content-based recommender slide creates item representations and similarity scores, supporting reusable item-side features but not joint reranking."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide concatenates query, user, and item representations and feeds them to one scoring network, the closest deck analogue to joint candidate scoring."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide moves to offline and online metrics and closes the architecture sequence."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 PDF pages for two-tower, dual encoder, bi-encoder, cross-encoder, retrieval, candidate generation, rescoring, reranking, recommendation, ranking, and nearest neighbors. The complete relevant neighborhoods on pages 116-118 and 129-141 were extracted and reviewed. Pages 117, 130, 135, and 140 provide the closest ingredients, but no slide contrasts reusable independent encodings with K fresh joint evaluations or explains why the methods compose in that order. The deck provides no explicit artwork-reuse license, so no deck image, wording, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+        "url": "https://aclanthology.org/2020.emnlp-main.550/",
+        "usage": "Used as a primary source to verify separate question and passage encoders, offline passage indexing, dot-product retrieval, and contrastive training with in-batch and hard negatives.",
+        "license": "ACL Anthology materials published from 2016 onward are available under CC BY 4.0. Although reuse is permitted with attribution, no DPR figure, prose, benchmark value, or visual arrangement is adapted."
+      },
+      {
+        "title": "Passage Re-ranking with BERT",
+        "url": "https://arxiv.org/abs/1901.04085",
+        "usage": "Used as the primary reranking source to verify that a first-stage system supplies candidate passages and a BERT model jointly processes each query-passage pair to produce a relevance score.",
+        "license": "The arXiv record is publicly accessible, but no permissive figure-adaptation license was relied upon. No paper figure, wording, result, or layout is copied."
+      },
+      {
+        "title": "Sentence Transformers Retrieve & Re-Rank",
+        "url": "https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html",
+        "usage": "Used as official implementation documentation to cross-check that a bi-encoder efficiently searches a large collection and a CrossEncoder jointly scores only the retrieved candidate pairs.",
+        "license": "The sentence-transformers repository is Apache License 2.0, but no documentation image, code, prose, example value, or layout is reused. The shipped panels are independently authored."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access and download do not themselves grant permission to adapt figures from an arXiv paper.",
+        "license": "The policy is cited only to document the conservative licensing decision. No policy text, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the computational boundary created by representation independence. A two-tower can encode every item before the query arrives, index those vectors, and perform one query embedding plus ANN lookup over N items. A cross-encoder cannot reuse an item score across queries because each score comes from joint query-item attention, so it performs K fresh pair evaluations after retrieval. The original semantic panels teach this reuse-versus-interaction distinction without reproducing any source-specific architecture."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full rescoring and personalized-search neighborhoods, then checked primary dense-retrieval and BERT-reranking papers, current Sentence Transformers documentation, and explicit licensing guidance before selecting an original semantic fan-out."
+  },
+  "implementation": {
+    "visualIds": [
+      "two-tower-cross-encoder-fanout"
+    ],
+    "accessibility": "The figure uses two semantic sections with direct headings and ordered text for offline work, per-query work, fan-out, and output. N, K, reusable, and fresh-pair labels carry the complete distinction without color. Existing two-panel styles stack below 640 CSS pixels and allow normal wrapping at a 390-pixel viewport; established theme variables support dark mode, and shared print rules force a light high-contrast palette with page-break protection."
+  }
+}
