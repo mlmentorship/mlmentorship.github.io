@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "present-technical-ml-project",
+  "article": "src/content/posts/2026-07-11-present-technical-ml-project.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Reorganize a technical project from a chronological tour into three self-contained decisions that remain defensible when questions change the presentation's depth or order.",
+  "mediumRationale": "A semantic comparison is the smallest medium that places the fragile chronological structure beside a decision spine and shows that every decision carries its own constraint, alternatives, prior evidence, choice, result, and update. Native headings and ordered text preserve the model when the layout stacks at phone width or questions interrupt the expected sequence.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart would overemphasize forward sequence, while the lesson is that questions may enter any decision and change depth without breaking the argument.",
+    "svg": "Rejected: fixed connectors and embedded labels add no quantitative or geometric precision, and would make six-part decision records harder to read at 390 CSS pixels.",
+    "semanticHtml": "Selected: two labelled panels can contrast chronology with decision-led organization, while a separate depth-test panel makes interruption resilience explicit in ordinary, reflowable text.",
+    "interaction": "Rejected: simulated question selection or progressive disclosure would add state and hide information without improving the ownership-and-evidence model.",
+    "paperReuse": "Rejected: the reviewed sources support message-led presentations and structured probes, but neither contains a figure specific to organizing an ML project around decisions. Public access is not treated as permission to reproduce artwork.",
+    "noVisual": "Rejected: the prose defines the six fields of one decision but leaves readers to infer why repeating that record three times makes the deck navigable under non-chronological questioning."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 157,
+        "insight": "The Past projects divider opens the only project-specific neighborhood but contains no presentation structure."
+      },
+      {
+        "page": 158,
+        "insight": "The PhD and master's projects slide is a dense chronology and mechanism inventory; it illustrates the project-tour failure mode but gives no explicit alternatives, ownership, result, or update structure."
+      },
+      {
+        "page": 159,
+        "insight": "The neighboring RoboGoalie and HyQ slide lists components and implementation facts, with one ownership statement, but does not organize the project around consequential decisions or evidence available at decision time."
+      },
+      {
+        "page": 160,
+        "insight": "The transition slide shows a 5/5/10/10/5-minute allocation for an ML design interview, not a technical-project presentation or a question-resilient narrative."
+      },
+      {
+        "page": 161,
+        "insight": "The ML Design Interview overview explicitly says to discuss trade-offs, narrate decisions, explain why, and compare algorithm strengths and weaknesses; this supports decision-led explanation but addresses a design prompt rather than retrospective project ownership."
+      },
+      {
+        "page": 207,
+        "insight": "The Behavioral/Culture interview divider identifies the other relevant neighborhood but provides no content."
+      },
+      {
+        "page": 208,
+        "insight": "The resource slide links to behavioral and general interview material but contains no technical-project presentation model."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider provides no teaching content."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends facts-first dialogue, examining one's own role, acknowledging errors and setbacks, and speaking confidently while encouraging testing; these support honest attribution and updating under questions, but not deck structure."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for presentation, present, project, decision, trade-off, ownership, failure, impact, interview, and question terms. The full project neighborhood on pages 157-161 and behavioral/leadership neighborhood on pages 207-210 were read with their neighbors. Page 161 is the closest positive guidance; pages 158-159 supply project examples but mostly model the dense component tour the article warns against. No deck wording, visual, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "How the Design of Presentation Slides Affects Audience Comprehension: A Case for the Assertion-Evidence Approach",
+        "url": "https://pure.psu.edu/en/publications/how-the-design-of-presentation-slides-affects-audience-comprehens/",
+        "usage": "Used as primary presentation research to check that a technical presentation should lead with a complete message and support it with evidence rather than topic headings and bullet inventories.",
+        "license": "The publication record identifies the journal article but grants no permissive license for its figures. No wording, data, figure, slide template, or layout is reproduced; the article is cited only for its evaluated assertion-evidence principle."
+      },
+      {
+        "title": "Structured Interviews: A Practical Guide",
+        "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/guide.pdf",
+        "usage": "Used as official assessment guidance to verify that behavioral probes seek the situation, the interviewee's specific actions and role, involved people, outcomes, and lessons rather than accepting a polished general account.",
+        "license": "This U.S. Office of Personnel Management guide is a United States government work and is not subject to domestic copyright protection under 17 U.S.C. 105, subject to any separately credited material. No text, example, artwork, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is structural rather than graphical: a chronological deck has one fragile route, whereas three complete decision records provide three independent entry points for questions. The visual is an original synthesis of the article, checked against primary research on message-and-evidence slide design and official guidance on evidence-seeking interview probes. It copies no source expression and asserts no universal timing or leveling threshold."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the project and behavioral/leadership neighborhoods in full, and checked primary presentation research plus official structured-interview guidance before selecting an original semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "technical-project-decision-spine"
+    ],
+    "accessibility": "The figure uses a linked learning question, native section headings, numbered records, and a labelled comparison group in source order. Chronology, decisions, evidence, failure, and question paths are all named in text rather than encoded by color or position. The established two-column primitive stacks below 640 pixels with ordinary wrapping and no minimum width, while existing theme tokens provide dark-mode and print contrast and page-break protection without JavaScript or external assets."
+  }
+}
