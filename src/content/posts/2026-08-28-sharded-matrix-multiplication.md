@@ -99,6 +99,50 @@ This output layout is invalid. One mesh axis cannot independently select both ou
 
 With two devices, device 0 would compute the first row block with the first column block, while device 1 would compute the second row block with the second column block. No device computes the two off-diagonal blocks.
 
+<!-- visual:same-mesh-axis-diagonal-gap -->
+<figure class="learning-figure plot-panel visual-wide" aria-labelledby="same-axis-gap-heading">
+	<p class="visual-kicker">Two devices, one mesh axis</p>
+	<p class="visual-title" id="same-axis-gap-heading">Matching shard indices cover only the diagonal of the output.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 760 340" role="img" aria-labelledby="same-axis-gap-title same-axis-gap-desc">
+			<title id="same-axis-gap-title">Same-axis input shards leave two output blocks uncomputed</title>
+			<desc id="same-axis-gap-desc">Device zero owns row block A zero and column block B zero, so it computes only output block C zero zero. Device one owns row block A one and column block B one, so it computes only C one one. The required off-diagonal blocks C zero one and C one zero are missing. Gathering either A's row shards or B's column shards before multiplication makes those cross-index pairs available.</desc>
+			<text class="viz-axis-label" x="20" y="28">LOCAL PAIRS AVAILABLE</text>
+			<g aria-label="Device zero computes the top-left output block">
+				<rect class="viz-node viz-node--input" x="20" y="48" width="205" height="78" rx="4"></rect>
+				<text class="viz-node-value" x="122.5" y="72">DEVICE 0 OWNS</text>
+				<text class="viz-node-label" x="122.5" y="99">A₀,* × B*,₀ → C₀,₀</text>
+			</g>
+			<g aria-label="Device one computes the bottom-right output block">
+				<rect class="viz-node viz-node--input" x="20" y="148" width="205" height="78" rx="4"></rect>
+				<text class="viz-node-value" x="122.5" y="172">DEVICE 1 OWNS</text>
+				<text class="viz-node-label" x="122.5" y="199">A₁,* × B*,₁ → C₁,₁</text>
+			</g>
+			<path class="viz-axis" d="M250 137 H338"></path><path class="viz-arrow-forward" d="M338 137 l-10 -6 v12 Z"></path>
+			<text class="viz-edge-label" x="294" y="124">local matmuls</text>
+			<text class="viz-axis-label" x="365" y="28">GLOBAL OUTPUT C NEEDS FOUR BLOCKS</text>
+			<g aria-label="Two by two output block matrix">
+				<rect class="viz-node viz-node--output" x="365" y="48" width="155" height="88" rx="4"></rect>
+				<text class="viz-node-value" x="442.5" y="75">ROW 0 · COL 0</text>
+				<text class="viz-node-label" x="442.5" y="106">C₀,₀ computed</text>
+				<rect class="viz-node" x="535" y="48" width="155" height="88" rx="4" stroke-dasharray="7 5"></rect>
+				<text class="viz-node-value" x="612.5" y="75">ROW 0 · COL 1</text>
+				<text class="viz-node-gradient" x="612.5" y="106">C₀,₁ missing</text>
+				<rect class="viz-node" x="365" y="151" width="155" height="88" rx="4" stroke-dasharray="7 5"></rect>
+				<text class="viz-node-value" x="442.5" y="178">ROW 1 · COL 0</text>
+				<text class="viz-node-gradient" x="442.5" y="209">C₁,₀ missing</text>
+				<rect class="viz-node viz-node--output" x="535" y="151" width="155" height="88" rx="4"></rect>
+				<text class="viz-node-value" x="612.5" y="178">ROW 1 · COL 1</text>
+				<text class="viz-node-label" x="612.5" y="209">C₁,₁ computed</text>
+			</g>
+			<path class="viz-baseline" d="M20 264 H740"></path>
+			<text class="viz-label" x="20" y="290">Repair: all-gather A so each B column meets both A rows, or all-gather B so each A row meets both B columns.</text>
+			<text class="viz-label" x="20" y="316">The dashed cells are absent work, not partial sums: there is nothing to reduce.</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> one mesh coordinate selects both a row shard and the same-index column shard, so local work lands only on the diagonal. The dashed off-diagonal blocks require cross-index input pairs that no device owns. Original schematic checked against the <a href="https://jax-ml.github.io/scaling-book/sharding/">Google DeepMind scaling book’s sharded-matmul cases</a> and the <a href="https://arxiv.org/abs/2105.04663">GSPMD paper</a>.</figcaption>
+</figure>
+
 All-gather or reshard one input before multiplying. Pick the smaller movement or the layout needed by the next operation.
 
 ## Collective operations
