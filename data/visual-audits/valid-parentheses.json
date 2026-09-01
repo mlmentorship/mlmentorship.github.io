@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-valid-parentheses.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The newest unmatched opening bracket must match the next closing bracket.",
+  "learningObjective": "A closing bracket is valid only when it removes its matching newest unmatched opening bracket.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the newest unmatched opening bracket must match the next closing bracket.",
-    "invariant": "The newest unmatched opening bracket must match the next closing bracket.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "LIFO stack of unmatched opening brackets.",
+    "recognitionCue": "Use this pattern when nested delimiters must close in reverse opening order and each closer must validate the most recent unfinished opener.",
+    "invariant": "After each processed character, the stack contains exactly the unmatched opening brackets from the processed prefix, ordered oldest at the bottom and newest at the top.",
+    "stateModel": "The only changing state is the stack of opening characters; the fixed closer-to-opener map decides whether a closing character may pop its top.",
+    "visualRationale": "A bottom-to-top labelled grid is the simplest semantic-HTML stack: every push and pop changes real stack geometry, and the stable stack-top key moves with the active boundary.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A character table records events but hides the LIFO geometry that explains nesting.",
+      "A parse tree adds parent-child structure that this iterative implementation never stores.",
+      "Prose beside the code forces the reader to simulate the unmatched stack mentally."
     ],
-    "transferLesson": "Transfer the invariant: The newest unmatched opening bracket must match the next closing bracket.",
-    "reviewStatus": "pending"
+    "transferLesson": "For tags, expression delimiters, and nested scopes, store only unfinished openers and let each closer inspect the newest one; an empty stack at the end proves completion.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

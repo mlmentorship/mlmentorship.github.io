@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-daily-temperatures.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Keep colder days waiting until a warmer day resolves them.",
+  "learningObjective": "A decreasing stack keeps unresolved day indices until the first warmer temperature can pop them.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to keep colder days waiting until a warmer day resolves them.",
-    "invariant": "Keep colder days waiting until a warmer day resolves them.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Monotonic decreasing stack of unresolved indices.",
+    "recognitionCue": "Look for the first later greater value or the waiting distance to it; those words suggest keeping unresolved indices until a new value is large enough to answer them.",
+    "invariant": "After each day is appended, waiting indices increase from bottom to top while their temperatures are non-increasing, and every popped index receives its first strictly warmer later day.",
+    "stateModel": "Keep the answer array plus a stack of day indices whose answer is unknown; indices preserve distance arithmetic and temperature lookups, so stored values need not be duplicated.",
+    "visualRationale": "A labelled bottom-to-top stack directly shows decreasing temperatures and each while-loop pop; the answer array and subtraction stay visible, and stack-top moves under one stable key.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A temperature line chart emphasizes shape but obscures the exact unresolved index stack and day-distance subtraction.",
+      "A full pairwise comparison matrix visualizes the quadratic brute force rather than the supplied linear mechanism.",
+      "An answer-only array hides why one warmer day can resolve several waiting days in LIFO order."
     ],
-    "transferLesson": "Transfer the invariant: Keep colder days waiting until a warmer day resolves them.",
-    "reviewStatus": "pending"
+    "transferLesson": "For next-greater or next-smaller problems, store unresolved indices in a monotonic stack; the first value that violates the monotonic order resolves every eligible item popped from the top.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

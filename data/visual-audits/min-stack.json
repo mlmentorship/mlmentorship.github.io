@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-min-stack.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Store the minimum so far beside every stack value.",
+  "learningObjective": "Store each value with the minimum for its entire stack prefix, so the top pair always answers get_min().",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to store the minimum so far beside every stack value.",
-    "invariant": "Store the minimum so far beside every stack value.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Augmented stack that stores a prefix aggregate with every item.",
+    "recognitionCue": "Use this pattern when ordinary stack operations must also answer an aggregate such as the current minimum in constant time, including immediately after pops.",
+    "invariant": "For every stored pair (value, minimum), minimum equals the smallest value from the bottom through that pair; therefore the top pair summarizes the complete current stack.",
+    "stateModel": "One LIFO stack of (value, minimum-so-far) pairs is sufficient: push derives a new prefix minimum, pop removes one pair, and top/get_min read separate fields of the top pair.",
+    "visualRationale": "A two-column bottom-to-top stack keeps each value physically attached to its saved prefix minimum; labelled arithmetic proves pushes, while the stable stack-top key moves after pop.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A single running-min variable cannot restore the previous minimum after the minimum value is popped.",
+      "A separate min stack works but requires synchronizing duplicate minima and is less direct than the supplied pair implementation.",
+      "A plain operation table records outputs but hides how the earlier minimum is uncovered by a pop."
     ],
-    "transferLesson": "Transfer the invariant: Store the minimum so far beside every stack value.",
-    "reviewStatus": "pending"
+    "transferLesson": "Attach any reversible prefix summary needed later to each stack item; the same technique supports max stacks, depth summaries, and constant-time aggregate reads after rollback.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
