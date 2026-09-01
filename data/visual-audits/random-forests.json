@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "slug": "random-forests",
+  "article": "src/content/posts/2026-01-27-random-forests.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate ensemble variance into the correlated floor that remains as trees are added and the uncorrelated share that averaging can remove.",
+  "mediumRationale": "A deterministic stacked-bar SVG is the smallest medium that makes both terms of the variance equation spatially additive and shows which one changes with ensemble size. A fixed rho = 0.25 example permits every drawn height and total to be checked directly against the equation.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show bootstrap, train, and vote stages, but the article already states that sequence and Mermaid cannot encode the quantitative correlation floor precisely.",
+    "svg": "Selected: deterministic SVG maps the two algebraic terms to stacked heights at T = 1, T = 4, and the limit, with exact values, responsive geometry, and no runtime dependency.",
+    "semanticHtml": "Rejected: a table could list the three calculations but would not make the invariant floor and shrinking share perceptually separable.",
+    "interaction": "Rejected: a rho or tree-count slider would add controls and hidden states when three fixed cases already establish the limiting behavior and the role of decorrelation.",
+    "paperReuse": "Rejected: the deck and references contain random-forest illustrations, but no external artwork is needed and no permissive license for the Breiman paper or textbook figures was established. No figure, data, coordinates, or layout is copied.",
+    "noVisual": "Rejected: the equation gives the terms but leaves readers to mentally track that adding trees affects only one term while bootstrap and feature randomization target the other."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 24,
+        "insight": "The preceding K-nearest-neighbor slide discusses distance and the curse of dimensionality; it supplies no ensemble or variance-reduction context."
+      },
+      {
+        "page": 25,
+        "insight": "The Random Forests slide shows bootstrapped dataset versions, independently trained trees, and majority voting, but omits random feature subsets, pairwise tree correlation, and the nonzero variance floor."
+      },
+      {
+        "page": 26,
+        "insight": "The neighboring decision-tree slide lists variance, information gain, and Gini split criteria; its variance is within-node regression impurity, not variance across correlated tree predictions."
+      },
+      {
+        "page": 27,
+        "insight": "The following gradient-boosting slide switches to sequential residual correction and does not extend the random-forest mechanism."
+      },
+      {
+        "page": 28,
+        "insight": "The bagging-versus-boosting comparison reinforces independent bootstrap-trained learners and equal aggregation, but still does not explain feature randomization or why correlated errors limit averaging."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for random forest, bagging, bootstrap, decision tree, out-of-bag, correlation, and variance. Pages 24-28 were then rendered and visually inspected as the complete neighborhood around the only direct Random Forests treatment on page 25. Page 131 mentions gradient boosting only as a hybrid-recommender combiner and adds no relevant mechanism. The chosen correlation-floor model is absent from the deck, and no deck artwork, code, prose, data, or layout is reused.",
+    "license": "The local deck exposes no explicit reuse license and embeds several unattributed third-party-looking graphics. It is treated as review-only material; the implementation is an original mathematical schematic."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Random Forests",
+        "url": "https://doi.org/10.1023/A:1010933404324",
+        "usage": "Used as the primary Breiman (2001) source for random forests, the role of random feature selection in lowering tree strength correlation, and the limiting behavior of large forests.",
+        "license": "The Springer journal article is copyrighted and no permissive figure-reuse license was identified. No figure, prose, data, numerical example, or layout is copied; the paper is cited only for mechanism provenance."
+      },
+      {
+        "title": "scikit-learn API reference: RandomForestClassifier",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html",
+        "usage": "Used as official implementation documentation to verify that bootstrap controls row sampling, max_features controls per-split feature candidates, predictions aggregate across trees, and out-of-bag scoring requires bootstrap sampling.",
+        "license": "scikit-learn documentation is distributed with the BSD 3-Clause licensed project. It is cited for semantics only; no documentation text, code, example, data, or figure is reused."
+      },
+      {
+        "title": "The Elements of Statistical Learning, 2nd Edition",
+        "url": "https://hastie.su.domains/ElemStatLearn/",
+        "usage": "Used as an authoritative textbook cross-check for bagging, random forests, variance reduction by averaging correlated random variables, and random feature selection as decorrelation.",
+        "license": "The author-hosted book is free to read, but free access is not treated as permission to reproduce or adapt its artwork. No text, figure, data, numerical example, or visual composition is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that ensemble size and randomization act on different pieces of variance: averaging T trees divides only the uncorrelated share by T, while correlated error remains as rho times the single-tree variance. The original worked construction sets rho = 0.25 and sigma squared = 1. Its bars are exact: at T = 1, 0.25 + 0.75 = 1; at T = 4, 0.25 + 0.75/4 = 0.4375; and at the limit only 0.25 remains. Hatching, direct labels, position, and arithmetic carry the distinction without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected pages 24-28, and checked the primary Random Forests paper, official scikit-learn documentation, and an authoritative statistical-learning textbook before selecting an original variance-decomposition SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "random-forest-correlation-floor"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description, exact totals above each bar, direct labels for both variance terms, and a hatched correlated component contrasted with a solid uncorrelated component, so meaning does not rely on color. The 360-unit viewBox scales without a minimum width at 390 CSS pixels, established theme variables provide dark-mode contrast, and shared learning-figure print rules provide a light high-contrast rendering and keep the figure together."
+  }
+}
