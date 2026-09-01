@@ -50,6 +50,46 @@ A fair baseline should receive a reasonable version of the same resources:
 
 Exact matching is not always possible. Report the difference and explain why it is needed.
 
+<!-- visual:fair-comparison-evidence-ledger -->
+<figure class="learning-figure" aria-labelledby="fair-comparison-ledger-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="fair-comparison-ledger-title">Distinguish a lucky leaderboard win from evidence that estimates a method effect.</p>
+	<div class="visual-grid--two" role="group" aria-label="Side-by-side comparison of an unfair best-run leaderboard and a fair complete experiment ledger">
+		<section class="visual-panel" aria-labelledby="best-run-ledger-title">
+			<h4 id="best-run-ledger-title">Best-run leaderboard</h4>
+			<p>The methods receive different opportunities, then only each winner survives reporting.</p>
+			<table class="cm-grid" aria-label="Unequal comparison that cannot isolate a method effect">
+				<thead><tr><th scope="col">evidence choice</th><th scope="col">baseline</th><th scope="col">new method</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">data and tokens</th><td>smaller set</td><td>larger set</td></tr>
+					<tr><th scope="row">compute and capacity</th><td>lower</td><td>higher</td></tr>
+					<tr><th scope="row">tuning opportunity</th><td>few trials</td><td>many trials</td></tr>
+					<tr><th scope="row">selection rule</th><td>best observed</td><td class="cm-selected">best observed</td></tr>
+					<tr><th scope="row">failures</th><td>omitted</td><td>omitted</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">conclusion allowed: one selected setup scored higher</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="complete-ledger-title">
+			<h4 id="complete-ledger-title">Matched, complete evidence</h4>
+			<p>Predeclare one comparison contract, then retain every planned outcome under it.</p>
+			<table class="cm-grid" aria-label="Matched comparison contract and complete repeated-run record">
+				<thead><tr><th scope="col">record</th><th scope="col">baseline</th><th scope="col">new method</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">data · tokens · evaluation</th><td class="cm-selected">matched</td><td class="cm-selected">matched</td></tr>
+					<tr><th scope="row">capacity · compute · tuning</th><td class="cm-selected">matched</td><td class="cm-selected">matched</td></tr>
+					<tr><th scope="row">selection rule</th><td class="cm-selected">predeclared</td><td class="cm-selected">same rule</td></tr>
+					<tr><th scope="row">run 1</th><td>recorded</td><td>recorded</td></tr>
+					<tr><th scope="row">run 2</th><td>recorded</td><td>recorded</td></tr>
+					<tr><th scope="row">run 3</th><td>recorded</td><td>failed, retained</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">conclusion allowed: effect size + uncertainty + disclosed cost</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> read down the left panel before comparing scores: unequal data, compute, and search make the winning method ambiguous, and selecting only each best run hides stability. On the right, fairness starts before training with one declared opportunity contract and continues after training by retaining every planned run, including failures. Summarize that complete set with effect size, uncertainty, and cost, not the luckiest cell. Original synthesis informed by the <a href="https://arxiv.org/abs/2103.03098">benchmark-variance study</a>, <a href="https://aclanthology.org/D19-1224/">experimental-reporting study</a>, and <a href="https://jmlr.org/papers/v22/20-303.html">NeurIPS reproducibility report</a>.</figcaption>
+</figure>
+
 ## Repeat the sources of variation
 
 A single seed hides training variance. Several seeds help estimate it.

@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "slug": "reproducibility-fair-model-comparison",
+  "article": "src/content/posts/2026-08-28-reproducibility-fair-model-comparison.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish a best-run leaderboard from a fair comparison that predeclares matched opportunities, retains every repeated run, and reports an effect with uncertainty.",
+  "mediumRationale": "A two-panel semantic ledger is the smallest useful spatial explanation because the lesson is a discrete comparison of evidence structures, not a continuous quantity. Aligning resource opportunity, run retention, and conclusion makes it immediately visible why an isolated winning score cannot identify a method effect.",
+  "mediumComparison": {
+    "mermaid": "Rejected because arrows would turn the lesson into a procedure and obscure the row-by-row contrast between unequal opportunity and matched evidence.",
+    "svg": "Rejected because no geometric scale or plotted empirical distribution is available. Hand-positioned text would be less adaptable and accessible than real headings and tables.",
+    "semanticHtml": "Selected because two labelled panels and semantic tables align the comparison contract, repeated-run record, and allowed conclusion. The established two-panel primitive stacks at phone width and retains native reading and table semantics.",
+    "interaction": "Rejected because changing trial counts or selecting seeds would require invented scores and a statistical simulator. The invariant reporting structure is more useful than hidden interactive states.",
+    "paperReuse": "Rejected because the reviewed papers contain empirical plots and reporting frameworks tied to their own studies. No source figure is needed, and open access or author-retained copyright is not treated as blanket permission to copy artwork, values, examples, wording, or layout.",
+    "noVisual": "Rejected because the prose separately discusses matched resources, repeated seeds, failed runs, and uncertainty. The side-by-side ledger shows that these are one evidence design: equal opportunity before running, complete retention after running, and a distribution-level conclusion."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 58,
+        "insight": "The data-inspection slide asks which variation is real or spurious and recommends inspecting distributions and outliers, but does not define fair model comparison."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends explicit hypotheses, a fixed seed, simple settings, full-test evaluation, and inspectable metrics. Fixing one seed is useful for debugging but insufficient for a comparative performance claim."
+      },
+      {
+        "page": 60,
+        "insight": "The adjacent sanity-check slide validates chance loss, regularization effects, tiny-set overfitting, and training diagnostics. These improve implementation trust but do not estimate run-to-run uncertainty."
+      },
+      {
+        "page": 61,
+        "insight": "The model-selection slide says to start from a simple related baseline, change one component at a time, and hold seed and initialization fixed for early gradient-flow comparisons. It does not require matched tuning budgets or repeated comparative runs."
+      },
+      {
+        "page": 62,
+        "insight": "The following slide lists many interventions that alter variance, capacity, data, and stopping behavior, illustrating how easily a comparison can change more than the claimed method."
+      },
+      {
+        "page": 63,
+        "insight": "The tuning slide recommends random hyperparameter search, multiple initializations, ensembling top runs, and long training. It demonstrates that search and selection opportunity affect reported outcomes but does not require equal budgets across methods."
+      },
+      {
+        "page": 75,
+        "insight": "The generative-model setup slide introduces the neighboring scientific-method material and contains no experiment-reporting guidance."
+      },
+      {
+        "page": 76,
+        "insight": "The scientific-method slide closes the loop by criticizing and revising a fitted model, supporting evidence-driven iteration without specifying reproducibility artifacts or comparative controls."
+      },
+      {
+        "page": 77,
+        "insight": "The neighboring statistical-pipeline slide treats observations as random variables and introduces likelihood, but does not connect sampling variation to model benchmark claims."
+      },
+      {
+        "page": 160,
+        "insight": "The ML-design timing divider begins the later production and experimentation neighborhood without explanatory content."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks about logging, validation, data splits, hyperparameters, bias-variance, and metrics, but does not define a complete run record or matched comparison."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly requests strong baselines, confidence intervals, experiment summaries, tuning strategy, retraining cadence, checkpointed model/data/hyperparameters, and reproducible results. It is the deck's strongest direct match."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example separates requirements, design, training data, and live data and asks how quickly learning changes, but offers no repeated-run comparison."
+      },
+      {
+        "page": 164,
+        "insight": "The following feed slide asks for an offline-to-online hypothesis test, dataset size, and success criteria, but does not address seed or tuning selection."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks how to evaluate during training and inference and names real-world resource constraints, without showing how to match those resources."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide covers collection, storage, preprocessing, missingness, distribution shift, privacy, and bias, identifying recordable context but not experiment lineage."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide requires random, human, and heuristic baselines and says added complexity must significantly outperform them, but provides no uncertainty or search-budget protocol."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide asks which experiments gate a model and which metrics are monitored, moving from research evidence to production without adding reproducibility guidance."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of ML slide recommends measuring deltas, testing infrastructure independently, and using out-of-time evaluation. It supports trustworthy comparison but does not preserve every run or report selection opportunity."
+      },
+      {
+        "page": 170,
+        "insight": "The algorithms-and-data-structures divider closes the production neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for reproducibility, replicability, repeatability, fair comparison, random seed, variance, confidence interval, hyperparameter, ablation, baseline, and experiment terms. Pages 58-63, 75-77, and 160-170 were read as the complete matching training, scientific-method, and ML-production neighborhoods. Page 162 is the closest direct match; pages 59, 61, and 63 expose the difference between debugging with a fixed seed and supporting a claim across search and initialization variation. No deck image, wording, values, or layout is reused.",
+    "license": "The local deck states no license and contains externally sourced material with inconsistent attribution. It is treated as review-only; the shipped semantic figure uses original wording and arrangement."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Improving Reproducibility in Machine Learning Research",
+        "url": "https://jmlr.org/papers/v22/20-303.html",
+        "usage": "Used as the primary report from the NeurIPS reproducibility program to verify that sound findings need robust experimental workflows, code and data access where possible, clear reporting, and enough artifacts for others to obtain similar results.",
+        "license": "JMLR grants public CC BY 4.0 rights for its articles while authors retain copyright. No figure, checklist, prose, result, or layout is adapted; the source is cited only."
+      },
+      {
+        "title": "Accounting for Variance in Machine Learning Benchmarks",
+        "url": "https://arxiv.org/abs/2103.03098",
+        "usage": "Used as a primary benchmarking study to verify that data sampling, parameter initialization, and hyperparameter choice materially affect comparisons and that credible evidence must account for multiple sources of variation rather than only one fixed setup.",
+        "license": "MLSys states that authors retain copyright and grant the venue a non-exclusive publication license; no permissive third-party figure-reuse grant was established. No paper figure, data, numerical result, prose, or visual structure is reused."
+      },
+      {
+        "title": "Show Your Work: Improved Reporting of Experimental Results",
+        "url": "https://aclanthology.org/D19-1224/",
+        "usage": "Used as a primary reporting study to verify that best-score reporting hides variation and search opportunity, and that comparison should expose performance distributions and the computation budget used to discover selected configurations.",
+        "license": "The ACL Anthology provides public access, but no paper-specific reuse grant was relied upon. No source plot, values, example, prose, or layout is copied; the implementation is an original qualitative ledger."
+      },
+      {
+        "title": "NeurIPS Paper Checklist Guidelines",
+        "url": "https://neurips.cc/public/guides/PaperChecklist",
+        "usage": "Used as official research-reporting guidance to cross-check claim scope, assumptions, limitations, reproducibility, uncertainty, compute resources, experimental details, and justification when repeated runs are too expensive.",
+        "license": "NeurIPS does not provide a blanket open license for this page. No checklist wording, form structure, visual design, or example is reproduced; citation alone supports the reporting requirements."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that fairness has both a before-running and after-running contract. Before running, each method needs comparable data, capacity, compute, tuning opportunity, evaluation, and a predeclared selection rule. After running, the record must retain all planned outcomes, including failures, rather than selecting a favorable seed. Only the complete repeated-run evidence supports an effect size and uncertainty statement. Exact equality is not always possible, but asymmetries must be reported rather than hidden."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the full training, scientific-method, and production neighborhoods, compared the ablation visual to avoid duplicating mechanism identification, and checked three primary reproducibility and reporting studies plus official NeurIPS guidance before selecting an original semantic evidence ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "fair-comparison-evidence-ledger"
+    ],
+    "accessibility": "The figure uses two semantic sections with unique headings and real tables whose row and column headers identify opportunity, retained runs, and permissible conclusions. Every contrast is stated in text; borders and panel position are redundant, so meaning does not rely on color. The established two-panel grid stacks below 640 CSS pixels, tables have no minimum width, and text wraps normally for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, while shared print rules force a light high-contrast palette and avoid page breaks within the figure."
+  }
+}
