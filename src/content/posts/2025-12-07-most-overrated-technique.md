@@ -41,6 +41,41 @@ The key qualities:
 - Defends with a *reason*, not just dislikes the term.
 - Acknowledges where the technique *does* work.
 
+<!-- visual:overrated-technique-claim-stress-test -->
+<figure class="learning-figure" aria-labelledby="overrated-technique-stress-test-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="overrated-technique-stress-test-title">What turns a hot take into a defensible technical judgment?</p>
+	<div class="visual-grid--two" role="group" aria-label="Side-by-side comparison of an unsupported hot take and a bounded, testable critique">
+		<section class="visual-panel" aria-labelledby="hot-take-title">
+			<h4 id="hot-take-title">Hot take: “CoT is overrated.”</h4>
+			<p>A verdict without a scope or mechanism gives the interviewer nothing technical to test.</p>
+			<table class="cm-grid" aria-label="Missing parts of the unsupported claim">
+				<tbody>
+					<tr><th scope="row">Target</th><td>Which use?</td></tr>
+					<tr><th scope="row">Mechanism</th><td>Why?</td></tr>
+					<tr><th scope="row">Boundary</th><td>When useful?</td></tr>
+					<tr><th scope="row">Evidence</th><td>What changed?</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Result: contrarian preference</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="bounded-critique-title">
+			<h4 id="bounded-critique-title">Bounded critique: generic CoT use</h4>
+			<p>Make the claim narrower, causal, and falsifiable while preserving the case where the technique earns its cost.</p>
+			<table class="cm-grid" aria-label="Four parts of a defensible critique">
+				<tbody>
+					<tr><th scope="row">Target</th><td class="cm-selected">Generic use on every task</td></tr>
+					<tr><th scope="row">Mechanism</th><td>Extra reasoning tokens cannot supply missing knowledge</td></tr>
+					<tr><th scope="row">Boundary</th><td>Useful when explicit intermediate reasoning is the bottleneck</td></tr>
+					<tr><th scope="row">Evidence</th><td>Compare task metric and token cost with and without it</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">Result: a claim experience can update</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move down the right-hand column before defending the verdict: name the exact use you oppose, explain its failure mechanism, mark the boundary where it works, and state what evidence would change your mind. “Overrated” should mean over-applied beyond an evidence-backed envelope, not universally useless. This is an original comparison informed by the task-specific results in <a href="https://arxiv.org/abs/2201.11903">Wei et al.'s chain-of-thought study</a>, the deployment framing in <a href="https://arxiv.org/abs/1503.02531">Hinton et al.'s distillation paper</a>, and the failure conditions studied in <a href="https://arxiv.org/abs/2305.17493">Shumailov et al.'s generated-data work</a>.</figcaption>
+</figure>
+
 ## What an L6 answer adds
 
 The L6 version often:

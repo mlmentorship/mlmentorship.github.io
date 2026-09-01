@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "slug": "most-overrated-technique",
+  "article": "src/content/posts/2025-12-07-most-overrated-technique.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Convert a broad claim that a technique is overrated into a defensible judgment by naming the targeted use, failure mechanism, useful boundary, and evidence that could update the position.",
+  "mediumRationale": "A two-panel semantic HTML comparison is the smallest medium that can align an unsupported verdict with the four missing parts of a bounded critique. It keeps the reader focused on the structure of technical judgment rather than implying that the example techniques have a universal ranking.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson is a matched comparison, not a process with directional flow; arrows would falsely imply that every opinion is formed in one fixed sequence.",
+    "svg": "Rejected because there is no quantitative geometry to draw, and SVG text would be less adaptable than native table semantics at 390 CSS pixels.",
+    "semanticHtml": "Selected because two labelled panels and native row headers expose the exact correspondence between a vague claim and a bounded critique, remain readable without JavaScript, and stack using established responsive primitives.",
+    "interaction": "Rejected because toggling techniques or scoring an opinion would add state and imply a universal rubric; the evidence and boundary must remain use-case-specific.",
+    "paperReuse": "Rejected because the papers contain task-specific experiments rather than a general interview-answer structure. Public access is not treated as artwork permission, and no figure, data, wording, or layout is copied.",
+    "noVisual": "Rejected because the prose lists strong-answer qualities but leaves readers to mentally align them with a concrete claim. The matched rows make the missing scope, mechanism, boundary, and evidence immediately diagnosable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 62,
+        "insight": "The model-selection slide contrasts real data, augmentation, synthetic data, pretraining, dropout, weight decay, early stopping, and model size with explicit situational caveats; it demonstrates bounded recommendations but provides no interview-answer framework."
+      },
+      {
+        "page": 63,
+        "insight": "The neighboring training-practice slide recommends distilling an ensemble when test-time computation is unaffordable, presenting distillation as a deployment tradeoff rather than a universal quality gain."
+      },
+      {
+        "page": 64,
+        "insight": "The following slide begins basic probabilistic ML algorithms and adds no evidence-boundary or interview guidance."
+      },
+      {
+        "page": 103,
+        "insight": "The preceding transformer overview describes architecture families, scaling costs, and training stability but does not discuss chain-of-thought prompting."
+      },
+      {
+        "page": 104,
+        "insight": "The chain-of-thought slide proposes code training as an intuition for emergent step-by-step reasoning while explicitly noting that hard evidence is absent and the source remains open."
+      },
+      {
+        "page": 105,
+        "insight": "The following LLM slide discusses model families and Toolformer, including a bounded calculator-like benefit from tool use, but no generic prompting rule."
+      },
+      {
+        "page": 127,
+        "insight": "The preceding section divider introduces model compression and contains no technical comparison."
+      },
+      {
+        "page": 128,
+        "insight": "The compression slide defines distillation as a student mimicking teacher outputs or representations and discusses architecture-dependent transfer, alongside pruning and quantization tradeoffs."
+      },
+      {
+        "page": 129,
+        "insight": "The following slide changes to recommender systems and adds no distillation boundary."
+      },
+      {
+        "page": 206,
+        "insight": "The preceding slide covers binary representation and coding questions, not opinion formation or behavioral interviewing."
+      },
+      {
+        "page": 207,
+        "insight": "The deck's behavioral and culture interview page is only a section divider, so it supplies no model answer, evaluation rubric, or visual to reuse."
+      },
+      {
+        "page": 208,
+        "insight": "The following resources page links to behavioral and general interview material but contains no substantive guidance for defending a technical opinion."
+      }
+    ],
+    "notes": "The complete 214-page deck was text-indexed page by page for overrated, opinion, behavioral or culture, chain of thought, distillation, and synthetic data. Exact matches led to full review of pages 62-64, 103-105, 127-129, and 206-208. The deck contains technique-specific fragments and only a behavioral section divider; it never combines a scoped target, causal mechanism, useful boundary, and updating evidence. No slide artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+        "url": "https://arxiv.org/abs/2201.11903",
+        "usage": "Used as the primary source showing that chain-of-thought prompting was evaluated on specified arithmetic, symbolic, and commonsense benchmarks across model scales, supporting a task- and model-bounded claim rather than a generic quality guarantee.",
+        "license": "The arXiv record is freely viewable, but a permissive license for adapting its figures was not established. No prompt example, result, data, prose, figure, or layout is copied."
+      },
+      {
+        "title": "Distilling the Knowledge in a Neural Network",
+        "url": "https://arxiv.org/abs/1503.02531",
+        "usage": "Used as the primary source for distillation's deployment framing: transfer a cumbersome model's learned mapping and soft targets into a smaller model subject to deployment requirements, with the paper noting that the student typically cannot exactly match those targets.",
+        "license": "The paper is publicly accessible, but public access is not treated as figure-reuse permission. The visual reproduces no soft-target example, equation, experiment, wording, or artwork."
+      },
+      {
+        "title": "The Curse of Recursion: Training on Generated Data Makes Models Forget",
+        "url": "https://arxiv.org/abs/2305.17493",
+        "usage": "Used as primary evidence that generated-data risks depend on a concrete training regime: recursive replacement and approximation or sampling errors can compound, rather than synthetic data being uniformly beneficial or harmful.",
+        "license": "No permissive figure-reuse grant was established from the arXiv landing page. No source distribution, equation, result, dataset, prose, figure, or composition is reused."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used as the official licensing reference to verify that arXiv hosts works under multiple licenses and that free viewing alone does not establish adaptation rights.",
+        "license": "The policy is cited only to document licensing treatment. No policy text, icon, or page design is reproduced."
+      }
+    ],
+    "notes": "The complete article's hardest prose-only mental model is the difference between contrarian preference and evidence-bounded technical judgment. The figure is an original article-specific comparison, not a synthesis of any source figure. Its CoT row is explicitly an example critique to test in a use case, not a universal empirical law: target, mechanism, boundary, and metric must all be defended. The cited primary papers cross-check why the candidate techniques require scoped claims, while the original visual teaches the reusable answer structure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected four exact slide neighborhoods, then reviewed primary work on chain-of-thought prompting, knowledge distillation, and recursive generated-data training plus official arXiv licensing guidance before selecting an original matched semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "overrated-technique-claim-stress-test"
+    ],
+    "accessibility": "The figure uses native headings, sections, tables, row headers, and explicit accessible labels. Missing questions and completed answers carry the comparison without color; the highlighted target cell is supplementary. The established two-panel grid stacks below 640 pixels, and short native text wraps at 390 CSS pixels without horizontal scrolling. Existing theme variables provide dark-mode contrast, established print rules force a light high-contrast palette and avoid splitting the figure, and the lesson remains available with CSS or JavaScript disabled."
+  }
+}
