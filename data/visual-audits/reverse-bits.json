@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-reverse-bits.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Read one input bit from the right and append it to the answer on the left.",
+  "learningObjective": "Across exactly 32 iterations, consume input bits from least significant to most significant and append each bit to the growing answer.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to read one input bit from the right and append it to the answer on the left.",
-    "invariant": "Read one input bit from the right and append it to the answer on the left.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Fixed-width bit stream reversal by consume-and-append.",
+    "recognitionCue": "The task reverses all 32 positions, including leading zeros, so processing must run a fixed number of times rather than stopping when the numeric input becomes zero.",
+    "invariant": "After k iterations, answer contains the original k least-significant bits in reverse read order, while value contains the original bits not yet consumed after k right shifts.",
+    "stateModel": "Keep the remaining input integer, the growing answer integer, and a fixed loop counter from 0 through 31. Each step derives one low bit with value & 1.",
+    "visualRationale": "A 32-cell fixed-width bit row preserves leading zeros and bit positions. The authored read-cursor key moves from the least-significant end to the most-significant end while every append and shift is printed.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An 8-bit illustration does not verify the supplied 32-iteration implementation or its leading zeros.",
+      "Converting to a string and reversing characters depicts a different algorithm and storage model.",
+      "A single mirrored before-and-after row skips all consume, append, and shift transitions."
     ],
-    "transferLesson": "Transfer the invariant: Read one input bit from the right and append it to the answer on the left.",
-    "reviewStatus": "pending"
+    "transferLesson": "For fixed-width encodings, separate reading order from numeric termination: consume one boundary unit, shift the destination, append, and repeat for the declared width. The pattern transfers to radix conversion and stream packing.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

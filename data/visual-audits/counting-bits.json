@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-counting-bits.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Remove the lowest bit and reuse the answer for the shifted number.",
+  "learningObjective": "The set-bit count for value reuses the completed count for value >> 1 and adds value & 1.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to remove the lowest bit and reuse the answer for the shifted number.",
-    "invariant": "Remove the lowest bit and reuse the answer for the shifted number.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional DP using the number with its least-significant bit removed.",
+    "recognitionCue": "The task requests bit counts for every integer in an increasing range, so each answer can reuse a smaller already-computed integer instead of recounting from scratch.",
+    "invariant": "Before computing answer[value], all lower indices are correct. Because value >> 1 is smaller, its count is available, and value & 1 contributes exactly the removed low bit.",
+    "stateModel": "The output array is the DP state. The current value, dependency index value >> 1, and low bit derive the next entry; no auxiliary table is needed.",
+    "visualRationale": "An indexed answer array directly shows fill order and the backward dependency. Stable current-value and shifted-value keys move through all six writes, with binary and decimal recurrence text available statically.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Independent bit scans for every number hide reuse and cost more total work.",
+      "A binary tree of shifts duplicates the same smaller values across branches.",
+      "A final count table omits the ordered writes required by the implementation."
     ],
-    "transferLesson": "Transfer the invariant: Remove the lowest bit and reuse the answer for the shifted number.",
-    "reviewStatus": "pending"
+    "transferLesson": "When a bit operation maps each state to a smaller state, build answers in numeric order and append the removed-bit contribution; similar recurrences use x & (x - 1), highest powers of two, or parity.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-missing-number.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "XOR cancels every value that appears in both the expected and actual sets.",
+  "learningObjective": "Initialize with n, then XOR every expected index and actual value so matched numbers cancel and the missing value survives.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to xor cancels every value that appears in both the expected and actual sets.",
-    "invariant": "XOR cancels every value that appears in both the expected and actual sets.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "XOR cancellation across the expected domain and actual values.",
+    "recognitionCue": "Values should contain every integer from 0 through n exactly once except one, making the actual multiset differ from the expected multiset by a single value.",
+    "invariant": "After processing indices before i, missing equals n XOR every processed expected index XOR every processed actual value. Equal values may be regrouped and cancel because XOR is associative, commutative, and self-inverse.",
+    "stateModel": "Keep one XOR accumulator initialized to n plus the current index and array value. No set, sorting, or arithmetic sum is required.",
+    "visualRationale": "The actual indexed array keeps expected indices aligned with supplied values, a stable scan key moves through each pair, and every accumulator equation shows the exact intermediate binary result.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A set-difference diagram uses linear auxiliary space and does not trace the supplied code.",
+      "Sorting and scanning changes the input order and costs O(n log n).",
+      "The arithmetic-sum formula can overflow in fixed-width languages and hides XOR cancellation."
     ],
-    "transferLesson": "Transfer the invariant: XOR cancels every value that appears in both the expected and actual sets.",
-    "reviewStatus": "pending"
+    "transferLesson": "When all values occur in canceling pairs except one, XOR removes order and pair placement from the problem; the same invariant finds a unique element or separates parity-based membership differences.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
