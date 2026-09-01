@@ -720,9 +720,30 @@ mark {
 .coding-trace-graph text { font-size: 12px; }
 .coding-trace-node-state { fill: var(--c-muted) !important; font-size: 9px !important; }
 .coding-trace-tree { display: grid; gap: .42rem; }
+.coding-trace-tree-semantic,
+.coding-trace-tree-semantic ul { display: flex; justify-content: center; min-width: 0; margin: 0; padding: 0; position: relative; }
+.coding-trace-tree-semantic ul { padding-top: 1rem; }
+.coding-trace-tree-semantic li { position: relative; flex: 1 1 0; min-width: 0; padding: 1rem .12rem 0; list-style: none; text-align: center; }
+.coding-trace-tree-semantic > li { padding-top: 0; }
+.coding-trace-tree-semantic li::before,
+.coding-trace-tree-semantic li::after { position: absolute; top: 0; right: 50%; width: 50%; height: 1rem; border-top: 1px solid var(--viz-edge); content: ''; }
+.coding-trace-tree-semantic li::after { right: auto; left: 50%; border-left: 1px solid var(--viz-edge); }
+.coding-trace-tree-semantic li:only-child::before,
+.coding-trace-tree-semantic li:only-child::after,
+.coding-trace-tree-semantic > li::before,
+.coding-trace-tree-semantic > li::after { display: none; }
+.coding-trace-tree-semantic li:first-child::before,
+.coding-trace-tree-semantic li:last-child::after { border: 0; }
+.coding-trace-tree-semantic li:last-child::before { border-right: 1px solid var(--viz-edge); border-radius: 0 3px 0 0; }
+.coding-trace-tree-semantic li:first-child::after { border-radius: 3px 0 0; }
+.coding-trace-tree-semantic ul::before { position: absolute; top: 0; left: 50%; width: 0; height: 1rem; border-left: 1px solid var(--viz-edge); content: ''; }
+.coding-trace-tree-semantic .is-placeholder > span { display: block; min-height: 1px; visibility: hidden; }
+.coding-trace-tree-semantic .is-placeholder::before,
+.coding-trace-tree-semantic .is-placeholder::after { border-color: transparent; }
 .coding-trace-tree-level { display: grid; grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr)); gap: .35rem; position: relative; }
 .coding-trace-tree-level:not(:first-child)::before { position: absolute; top: -.25rem; right: 18%; left: 18%; height: 1px; background: var(--c-rule); content: ''; }
-.coding-trace-tree-node { display: grid; min-height: 2rem; place-items: center; align-content: center; gap: .12rem; padding: .3rem; border: 1px solid var(--viz-neutral-stroke); border-radius: 3px; background: var(--viz-neutral-bg); color: var(--c-text-soft); font-family: var(--font-mono); font-size: .61rem; text-align: center; overflow-wrap: anywhere; }
+.coding-trace-tree-node { display: inline-grid; width: min(100%, 6.5rem); min-height: 2rem; place-items: center; align-content: center; gap: .12rem; padding: .3rem .2rem; border: 1px solid var(--viz-neutral-stroke); border-radius: 3px; background: var(--viz-neutral-bg); color: var(--c-text-soft); font-family: var(--font-mono); font-size: .61rem; text-align: center; overflow-wrap: anywhere; }
+.coding-trace-tree-node b { font-size: .7rem; }
 .coding-trace-tree-node small { color: var(--c-muted); font-size: .5rem; }
 .coding-trace-tree-node.trace-tone-focus { border-color: var(--viz-focus-stroke); background: var(--viz-focus-bg); color: var(--c-text); }
 .coding-trace-tree-node.trace-tone-state { border-color: var(--viz-state-stroke); background: var(--viz-state-bg); }

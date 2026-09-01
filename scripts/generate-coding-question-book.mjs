@@ -207,28 +207,26 @@ function renderGraphScene(scene) {
 }
 
 function renderTreeScene(scene) {
-  const width = 640;
-  const rowHeight = 72;
-  let nodeIndex = 0;
-  const positions = scene.levels.flatMap((level, levelIndex) => level.map((node, index) => ({
-    node,
-    levelIndex,
-    index,
-    flatIndex: nodeIndex++,
-    x: (index + 0.5) * width / level.length,
-    y: 28 + levelIndex * rowHeight,
-  })));
-  const edges = positions.filter((item) => item.levelIndex > 0 && item.node !== '-').map((item) => {
-    const parent = positions.find((candidate) => candidate.levelIndex === item.levelIndex - 1 && candidate.index === Math.floor(item.index / 2));
-    return parent && parent.node !== '-' ? `<line class="coding-trace-edge-line" x1="${parent.x}" y1="${parent.y}" x2="${item.x}" y2="${item.y}" />` : '';
-  }).join('');
-  const nodes = positions.filter((item) => item.node !== '-').map((item) => {
-    const mark = scene.marks?.find((candidate) => candidate.index === item.flatIndex);
-    const label = mark?.label ? `<text class="coding-trace-node-state" x="${item.x}" y="${item.y + 30}">${escapeHtml(mark.label)}</text>` : '';
-    const occurrence = positions.slice(0, item.flatIndex).filter((candidate) => candidate.node === item.node).length;
-    return `<g class="coding-trace-tree-node${toneClass(mark?.tone)}"${motionKey(`tree-node-${item.node}-${occurrence}`)}><circle cx="${item.x}" cy="${item.y}" r="18" /><text x="${item.x}" y="${item.y + 4}">${escapeHtml(item.node)}</text>${label}</g>`;
-  }).join('');
-  return `<div class="coding-trace-tree"><svg viewBox="0 0 ${width} ${scene.levels.length * rowHeight}" role="img" aria-label="Binary tree with parent-child edges and call state">${edges}${nodes}</svg></div>${renderMeta(scene, ['type', 'levels', 'marks', 'motion'])}`;
+  const offsets = [];
+  let offset = 0;
+  for (const level of scene.levels) {
+    offsets.push(offset);
+    offset += level.length;
+  }
+  const occurrences = new Map();
+  const renderNode = (levelIndex, index) => {
+    const value = scene.levels[levelIndex]?.[index] ?? '-';
+    if (value === '-') return '<li class="is-placeholder" aria-hidden="true"><span></span></li>';
+    const flatIndex = offsets[levelIndex] + index;
+    const mark = scene.marks?.find((candidate) => candidate.index === flatIndex);
+    const occurrence = occurrences.get(value) ?? 0;
+    occurrences.set(value, occurrence + 1);
+    const nextLevel = scene.levels[levelIndex + 1];
+    const hasChildren = nextLevel && (nextLevel[index * 2] !== '-' || nextLevel[index * 2 + 1] !== '-');
+    const children = hasChildren ? `<ul>${renderNode(levelIndex + 1, index * 2)}${renderNode(levelIndex + 1, index * 2 + 1)}</ul>` : '';
+    return `<li><span class="coding-trace-tree-node${toneClass(mark?.tone)}"${motionKey(`tree-node-${value}-${occurrence}`)}><b>${escapeHtml(value)}</b>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>${children}</li>`;
+  };
+  return `<div class="coding-trace-tree" role="img" aria-label="Binary tree with parent-child edges and call state"><ul class="coding-trace-tree-semantic">${renderNode(0, 0)}</ul></div>${renderMeta(scene, ['type', 'levels', 'marks', 'motion'])}`;
 }
 
 function renderIntervalsScene(scene) {

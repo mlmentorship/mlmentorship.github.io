@@ -562,7 +562,11 @@ try {
               });
               writeFileSync(join(outputDir, `${prefix}--frame-${String(frameIndex + 1).padStart(3, '0')}--motion.png`), Buffer.from(motionScreenshot.data, 'base64'));
             }
-            await delay(frameIndex > 0 ? 440 : 20);
+            await cdp.call('Runtime.evaluate', {
+              expression: `document.querySelector(${JSON.stringify(`[data-coding-slug="${entry.slug}"]`)})?.getAnimations({ subtree: true }).forEach((animation) => animation.finish())`,
+              returnByValue: true,
+            });
+            await delay(20);
 
             const frameEvaluation = await cdp.call('Runtime.evaluate', {
               expression: `(() => {
