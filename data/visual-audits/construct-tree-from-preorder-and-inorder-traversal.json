@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-construct-tree-from-preorder-and-inorder-traversal.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Preorder gives the next root; inorder splits the left and right ranges.",
+  "learningObjective": "The next preorder value becomes a root, and its inorder position partitions the exact ranges passed to its left and right recursive calls.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to preorder gives the next root; inorder splits the left and right ranges.",
-    "invariant": "Preorder gives the next root; inorder splits the left and right ranges.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Recursive reconstruction: preorder chooses roots and inorder partitions subtree ranges.",
+    "recognitionCue": "Unique node values are given in preorder and inorder, so root order and left/right membership complement each other to determine one binary tree.",
+    "invariant": "build(left,right) consumes exactly the next preorder values belonging to inorder[left:right+1] and returns precisely that subtree. Empty ranges consume nothing and return None.",
+    "stateModel": "Keep the inorder value-to-index map, one shared preorder_index, recursive left/right bounds, and constructed nodes. The call stack preserves unfinished parent assignments.",
+    "visualRationale": "A real edged binary-tree topology is paired with every active inorder range, preorder cursor value, split, base case, and return. Stable semantic node keys preserve identity as recursion progresses.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A table of traversal lists does not depict parent-child topology or recursive returns.",
+      "Repeated list slicing hides the shared preorder cursor and adds avoidable allocation.",
+      "A final tree alone does not prove how inorder ranges assign left versus right children."
     ],
-    "transferLesson": "Transfer the invariant: Preorder gives the next root; inorder splits the left and right ranges.",
-    "reviewStatus": "pending"
+    "transferLesson": "Combine one traversal that selects the next root with another that partitions membership, and recurse on index ranges; the same decomposition works with inorder plus postorder by choosing roots from the opposite end.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

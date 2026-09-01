@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-palindromic-substring.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Every palindrome grows from one character center or one gap center.",
+  "learningObjective": "Every odd or even palindrome is discovered by expanding its unique center; update the saved range only when an expansion is strictly longer.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to every palindrome grows from one character center or one gap center.",
-    "invariant": "Every palindrome grows from one character center or one gap center.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Expand around every character center and every gap center.",
+    "recognitionCue": "The answer is a contiguous palindrome, whose symmetry guarantees one unique odd character center or even gap center.",
+    "invariant": "Within expand(left,right), text[left:right+1] is palindromic before the pointers move outward. After each completed center, the saved range is the longest palindrome seen at any processed center.",
+    "stateModel": "Keep the current middle, expanding left/right boundaries, and global best_left/best_right. No substring copies or DP table are required.",
+    "visualRationale": "The actual indexed string with stable middle, left, and right keys shows center geometry, outward movement, mismatch stops, and the strict tie rule; printed ranges preserve meaning without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A final highlighted substring hides the center scans and why aba does not replace bab.",
+      "A two-dimensional palindrome DP grid uses more space than the supplied center expansion.",
+      "A list of substrings obscures symmetry and repeats character comparisons."
     ],
-    "transferLesson": "Transfer the invariant: Every palindrome grows from one character center or one gap center.",
-    "reviewStatus": "pending"
+    "transferLesson": "When validity is symmetric around a center, enumerate both center types and expand until the invariant breaks; change only the aggregation to find a longest value, count all values, or validate radii.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

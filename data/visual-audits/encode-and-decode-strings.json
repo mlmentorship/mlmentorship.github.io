@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-encode-and-decode-strings.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A length prefix tells the decoder exactly how many characters belong to each string.",
+  "learningObjective": "A decimal length before # makes each payload boundary explicit, even when the payload contains # or is empty.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a length prefix tells the decoder exactly how many characters belong to each string.",
-    "invariant": "A length prefix tells the decoder exactly how many characters belong to each string.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Self-delimiting length-prefix framing.",
+    "recognitionCue": "Arbitrary strings, including empty strings and delimiter characters, must be concatenated and later recovered without escaping ambiguity.",
+    "invariant": "At the start of each decode loop, index points to the first decimal length digit. After locating # and consuming exactly length payload characters, index points to the next length or end of data.",
+    "stateModel": "Encoding needs each text and its length. Decoding keeps the encoded data, index, separator, parsed length, and output list; payload content never affects boundary detection.",
+    "visualRationale": "The exact encoded character stream and stable decoder-index key show header scan, payload slice, and cursor advance for every item, including # and the zero-length slice.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Joining with # fails when a payload contains # and cannot distinguish some empty-string lists.",
+      "Escaping delimiters adds a second grammar and more error-prone scanning.",
+      "A result-only round trip hides the separator and slice arithmetic."
     ],
-    "transferLesson": "Transfer the invariant: A length prefix tells the decoder exactly how many characters belong to each string.",
-    "reviewStatus": "pending"
+    "transferLesson": "Prefix variable-length records with a parseable size so payload bytes remain opaque; this framing pattern transfers to network protocols, file formats, and binary serialization.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

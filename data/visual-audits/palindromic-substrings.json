@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-palindromic-substrings.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each successful center expansion contributes exactly one palindrome.",
+  "learningObjective": "Each successful radius around each odd or even center identifies exactly one distinct palindromic substring occurrence.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to each successful center expansion contributes exactly one palindrome.",
-    "invariant": "Each successful center expansion contributes exactly one palindrome.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Count successful expansions from every odd and even center.",
+    "recognitionCue": "The task counts contiguous palindrome occurrences, including equal text at different positions, so each center-radius pair should contribute separately.",
+    "invariant": "Each successful while iteration adds one new palindrome for that center and then expands one cell outward. Completed centers contribute disjoint occurrences because every palindrome has one unique center.",
+    "stateModel": "Keep middle, left, right, a local expansion count, and the outer sum. Characters remain unchanged and no set is needed because occurrences, not distinct values, are counted.",
+    "visualRationale": "An indexed character row with stable middle/L/R keys exposes odd and even center geometry and lists every accepted range, contribution, mismatch or boundary stop, and running sum.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A set of palindrome strings incorrectly merges duplicate occurrences.",
+      "A final count of six does not show the three singles, two pairs, and one triple.",
+      "A DP matrix is valid but heavier than the constant-space implementation."
     ],
-    "transferLesson": "Transfer the invariant: Each successful center expansion contributes exactly one palindrome.",
-    "reviewStatus": "pending"
+    "transferLesson": "Map each combinatorial object to a unique center and radius, then count every successful expansion once; the same enumeration underlies longest-palindrome and palindrome-radius algorithms.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
