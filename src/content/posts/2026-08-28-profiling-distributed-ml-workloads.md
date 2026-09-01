@@ -91,6 +91,48 @@ Ask what each accelerator is waiting for:
 
 An operation can consume much total time without extending the step if it overlaps with other work. Focus on the critical path.
 
+**Learning objective:** distinguish an operation's total duration from the exposed portion that extends synchronized step time.
+
+<!-- visual:profiling-exposed-collective-tail -->
+<figure class="learning-figure plot-panel" aria-labelledby="profiling-overlap-title">
+	<p class="visual-kicker">Critical-path accounting</p>
+	<p class="visual-title" id="profiling-overlap-title">The same collective duration can have a different step-time cost.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 300" role="img" aria-labelledby="profiling-overlap-svg-title profiling-overlap-svg-desc">
+			<title id="profiling-overlap-svg-title">Two step traces with the same collective duration but different exposed time</title>
+			<desc id="profiling-overlap-svg-desc">The upper trace has a long backward-compute bar and a shorter rounded collective bar on a second lane. The collective finishes before backward compute, so it contributes no exposed tail. The lower trace has a shorter backward-compute bar followed by a collective of exactly the same drawn length as the upper collective. A bracket labels that collective's full duration as exposed, and its step boundary is later. Direct labels identify all bars, boundaries, and conclusions.</desc>
+			<rect class="viz-plot-bg" x="76" y="28" width="254" height="236" rx="3"></rect>
+			<path class="viz-gridline" d="M76 56H330 M76 128H330 M76 164H330 M76 236H330"></path>
+			<text class="viz-callout" x="10" y="50">OVERLAPPED</text>
+			<text class="viz-label" x="10" y="68">collective hidden</text>
+			<text class="viz-axis-label" x="10" y="92">compute</text>
+			<text class="viz-axis-label" x="10" y="120">network</text>
+			<rect class="viz-node--input" x="108" y="76" width="144" height="20" rx="2"></rect>
+			<text class="viz-callout" x="180" y="90" text-anchor="middle">backward compute</text>
+			<rect class="viz-node--focus" x="164" y="104" width="80" height="20" rx="10"></rect>
+			<text class="viz-callout" x="204" y="118" text-anchor="middle">collective</text>
+			<path class="viz-axis" d="M76 136H268 M108 132V140 M164 132V140 M244 132V140 M268 128V144"></path>
+			<text class="viz-label" x="108" y="153" text-anchor="middle">start</text>
+			<text class="viz-label" x="268" y="153" text-anchor="middle">step end</text>
+			<text class="viz-callout" x="322" y="118" text-anchor="end">exposed: 0</text>
+			<text class="viz-callout" x="10" y="184">SERIALIZED</text>
+			<text class="viz-label" x="10" y="202">collective exposed</text>
+			<text class="viz-axis-label" x="10" y="226">compute</text>
+			<text class="viz-axis-label" x="10" y="254">network</text>
+			<rect class="viz-node--input" x="108" y="210" width="112" height="20" rx="2"></rect>
+			<text class="viz-callout" x="164" y="224" text-anchor="middle">backward compute</text>
+			<rect class="viz-node--focus" x="220" y="238" width="80" height="20" rx="10"></rect>
+			<text class="viz-callout" x="260" y="252" text-anchor="middle">same collective</text>
+			<path class="viz-operating-guide" d="M220 204V272 M300 204V272 M220 270H300"></path>
+			<text class="viz-callout" x="260" y="287" text-anchor="middle">exposed tail: full duration</text>
+			<path class="viz-axis" d="M76 272H320 M108 268V276 M220 268V276 M320 264V280"></path>
+			<text class="viz-label" x="108" y="287" text-anchor="middle">start</text>
+			<text class="viz-label" x="320" y="287" text-anchor="middle">step end</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare the rounded collective bars: their duration is identical. In the upper trace, communication finishes under backward compute and does not move the step boundary. In the lower trace, it begins after compute and the whole bar extends the step. Optimize the exposed tail on the critical path, not a large cumulative time that is already hidden. This original schematic is informed by the <a href="https://docs.pytorch.org/docs/2.13/notes/ddp.html">PyTorch DDP design note</a>, the <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX Scaling Book profiling guide</a>, and the <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">NVIDIA Nsight Systems Analysis Guide</a>.</figcaption>
+</figure>
+
 ### 4. Group kernels by type
 
 Classify matrix multiplications, attention, elementwise operations, memory copies, and collectives. Many tiny elementwise kernels may point to missing fusion. Poorly shaped matrix multiplications may fail to use tensor units well.

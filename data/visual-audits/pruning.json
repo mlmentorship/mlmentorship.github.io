@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "pruning",
+  "article": "src/content/posts/2026-05-07-pruning.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish pruning individual weights from removing whole output channels by seeing whether the matrix shape presented to dense hardware changes.",
+  "mediumRationale": "Two semantic matrix tables are the smallest useful spatial explanation: they align equal 50% weight removal while exposing the unchanged 4 by 4 unstructured shape versus the smaller dense 4 by 2 structured shape. The established two-panel primitive stacks at phone width and needs no runtime.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson is matrix occupancy and dimensions, not a process or relationship graph.",
+    "svg": "Rejected because a fixed drawing would duplicate a table's row-column semantics while making individual cells and headers less accessible.",
+    "semanticHtml": "Selected because real tables preserve exact matrix dimensions, scoped headers, explicit zero and weight labels, responsive reflow, and print readability.",
+    "interaction": "Rejected because changing a sparsity slider would add controls without changing the invariant: arbitrary zeros preserve shape, while complete channel removal changes it.",
+    "paperReuse": "Rejected because the cited papers and NVIDIA material contain denser, source-specific figures, and clear permission to republish those figures was not established. No source figure is copied.",
+    "noVisual": "Rejected because prose can state that sparse storage differs from sparse compute, but it does not make the unchanged-versus-reduced matrix shape immediately visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 61,
+        "insight": "A model-selection slide mentions the Lottery Ticket Hypothesis only as an analogy for controlled architecture changes; it contains no pruning mechanism or useful figure."
+      },
+      {
+        "page": 127,
+        "insight": "The preceding page is the model-compression section divider and provides no technical visual."
+      },
+      {
+        "page": 128,
+        "insight": "The model-compression slide distinguishes weight pruning, which needs sparse storage and sparse kernels, from neuron pruning, which removes matrix rows or columns and reduces memory and computation. It also warns that compression rate alone does not guarantee acceleration."
+      },
+      {
+        "page": 129,
+        "insight": "The following page starts the recommender-systems section and does not extend the model-pruning comparison."
+      },
+      {
+        "page": 130,
+        "insight": "This slide uses pruning to mean restricting approximate-nearest-neighbor search buckets, not neural-network weight pruning."
+      },
+      {
+        "page": 184,
+        "insight": "This slide names a generic prune-and-search algorithmic framework; it is unrelated to neural-network sparsity."
+      }
+    ],
+    "notes": "All 214 PDF pages were text-searched for prune, pruning, structured sparsity, unstructured sparsity, sparse network, lottery ticket, and 2:4 sparsity. Every match was reviewed. Page 128 is the only directly relevant technical slide, and its neighboring pages 127 and 129 were inspected. The site visual narrows its key hardware distinction into one original, count-matched matrix comparison."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Learning both Weights and Connections for Efficient Neural Networks",
+        "url": "https://arxiv.org/abs/1506.02626",
+        "usage": "Used as the primary source for magnitude-based connection pruning, iterative prune-and-retrain, sparse storage overhead, and the limitation of general-purpose hardware for sparse computation.",
+        "license": "The arXiv record does not grant a reusable license for the paper's figures. No figure, experimental data, prose, or layout is copied; the matrices are an original schematic."
+      },
+      {
+        "title": "Pruning Filters for Efficient ConvNets",
+        "url": "https://arxiv.org/abs/1608.08710",
+        "usage": "Used as a primary source for structured filter removal that reduces feature maps and computation rather than leaving arbitrary zero connections.",
+        "license": "The arXiv record does not establish permission to republish source figures. No source artwork, values, or layout is reused."
+      },
+      {
+        "title": "Matrix Multiplication Background User's Guide",
+        "url": "https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html",
+        "usage": "Used as official hardware documentation to verify that dense GEMM work is determined by matrix dimensions M, N, and K and that practical throughput also depends on tiling, alignment, and utilization.",
+        "license": "No NVIDIA figure, prose, code, or benchmark is copied. The source is cited only for GEMM dimension and hardware-efficiency facts."
+      },
+      {
+        "title": "Structured Sparsity in the NVIDIA Ampere Architecture and Applications in Search Engines",
+        "url": "https://developer.nvidia.com/blog/structured-sparsity-in-the-nvidia-ampere-architecture-and-applications-in-search-engines/",
+        "usage": "Used as official documentation to verify the 2:4 requirement and that sparse Tensor Cores provide theoretically twice the compute throughput, while reported application acceleration is lower and workload-dependent.",
+        "license": "No NVIDIA image, benchmark, code, prose, or layout is reused. The article visual is an original construction and does not reproduce the 2:4 source figure."
+      }
+    ],
+    "notes": "The original example treats W as a 4-input by 4-output weight matrix. Both alternatives retain eight weights. Arbitrary element removal leaves a 4 by 4 logical operator with zeros in eight of sixteen positions; removing two complete output channels yields a dense 4 by 2 operator with eight positions. The figure does not claim equal accuracy or universal latency proportionality."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, reviewed every full-deck term match and the relevant slide neighborhood, and checked two primary papers plus official NVIDIA GEMM and 2:4 guidance. The selected visual targets the article's hardest prose-only distinction: zero count is not the same as hardware-visible shape reduction."
+  },
+  "implementation": {
+    "visualIds": [
+      "pruning-shape-versus-zeros"
+    ],
+    "accessibility": "Both matrices are real tables with scoped input/output headers, explicit w and 0 cell text, dimensions in headings, and written execution consequences. Meaning does not depend on fill color. Existing panels stack below 640 CSS pixels for a 390-pixel viewport, use theme tokens in dark mode, and switch to the established high-contrast print palette."
+  }
+}

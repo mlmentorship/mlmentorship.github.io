@@ -22,6 +22,35 @@ What changes for legal:
 4. **Refusal is a feature.** "I can't answer this from the available sources" is the right answer when retrieval is uncertain. Better than a confident wrong answer.
 5. **Audit trails are required.** Every retrieved passage and every generated answer needs to be logged for review.
 
+<!-- visual:legal-rag-claim-lineage -->
+<figure class="learning-figure" aria-labelledby="legal-rag-claim-lineage-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="legal-rag-claim-lineage-title">What evidence must survive before a legal RAG claim can be released?</p>
+	<div class="visual-grid--two" role="group" aria-label="Four-stage legal RAG claim-lineage record from versioned source to release">
+		<section class="visual-panel">
+			<h4>1 · PRESERVE THE AUTHORITY</h4>
+			<p><strong>Corpus version:</strong> 2026-08-15<br /><strong>Hierarchy:</strong> authority &rsaquo; section &rsaquo; clause<br /><strong>Passage:</strong> P-017</p>
+			<p>Keep the source version and parent headings with every chunk; text alone is not enough to locate the authority later.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 · REQUIRE SUFFICIENT RETRIEVAL</h4>
+			<p><strong>Exact identifiers:</strong> lexical path<br /><strong>Meaning and paraphrase:</strong> dense path<br /><strong>Reranked evidence:</strong> P-017, P-042</p>
+			<p>No passage clears the retrieval gate? Refuse before generation rather than invite a plausible legal answer.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>3 · BUILD THE CLAIM LEDGER</h4>
+			<p><strong>Claim C-1 &rarr; P-017:</strong> supported<br /><strong>Claim C-2 &rarr; P-042:</strong> unsupported</p>
+			<p>A citation that exists is not yet evidence. Check whether the cited passage supports its atomic claim; strip, retrieve again, or refuse when it does not.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>4 · RELEASE WITH LINEAGE</h4>
+			<p><strong>Answer:</strong> supported claims + passage IDs<br /><strong>High stakes:</strong> attorney review<br /><strong>Audit:</strong> query, retrieval, draft, verdicts, final output</p>
+			<p>The durable record preserves what the system saw, what it rejected, which source version it used, and who approved release.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow one claim backward from release. It is defensible only if its citation resolves to an exact passage in the recorded corpus version and that passage supports the claim. Missing retrieval stops generation; failed support triggers removal, another retrieval, refusal, or attorney review, not a confidence-shaped citation. This original ledger was checked against <a href="https://arxiv.org/abs/2408.10343">LegalBench-RAG</a>, <a href="https://aclanthology.org/2023.emnlp-main.398/">Gao et al.'s citation-evaluation work</a>, and the <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST Generative AI Profile</a>.</figcaption>
+</figure>
+
 ## What an L5 answer sounds like
 
 > "I'd build the standard 7-component RAG architecture (chunking, embedding, lexical index, query understanding, hybrid retrieval, reranking, generation), with these legal-specific changes:

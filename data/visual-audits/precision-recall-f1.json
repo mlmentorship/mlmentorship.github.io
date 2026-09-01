@@ -6,6 +6,14 @@
   "medium": "semantic-html",
   "learningObjective": "See why F1 falls toward the smaller of precision and recall instead of rewarding a high arithmetic average.",
   "mediumRationale": "Semantic HTML is the smallest useful medium: two labelled, count-free comparison tables expose equal arithmetic means but different F1 scores, remain readable without JavaScript, and reflow through the established mobile primitive. Mermaid would imply a process that does not exist; deterministic SVG would turn exact values into less accessible drawing coordinates; interaction would add controls without improving this two-case comparison; reusing a paper or textbook figure would add provenance and permission risk for a simple mathematical construction; and no visual would leave the harmonic-mean penalty as an equation-only claim.",
+  "mediumComparison": {
+    "mermaid": "Rejected because there is no process or graph topology to follow; automatic layout would obscure the direct numeric comparison.",
+    "svg": "Rejected because exact table values and equations are more accessible, selectable, and naturally responsive as semantic HTML than as positioned SVG text.",
+    "semanticHtml": "Selected because two native tables can align precision, recall, arithmetic mean, F1, and the calculation while stacking through the established mobile primitive.",
+    "interaction": "Rejected because changing the two inputs adds controls and state without improving the single equal-arithmetic-mean contrast the reader needs.",
+    "paperReuse": "Rejected because the arithmetic is an original construction and candidate textbook figure reuse permission is unclear; no external artwork, data, example, or layout is needed.",
+    "noVisual": "Rejected because the equation alone does not make it immediate that equal arithmetic means can hide radically different harmonic means."
+  },
   "deckReview": {
     "pages": [
       {

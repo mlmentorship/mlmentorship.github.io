@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "profiling-distributed-ml-workloads",
+  "article": "src/content/posts/2026-08-28-profiling-distributed-ml-workloads.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish an operation's total duration from the exposed portion that extends synchronized step time.",
+  "mediumRationale": "A deterministic two-trace SVG is the smallest medium that can hold collective duration constant, align compute and network lanes, and show whether the collective moves the step boundary. The fixed qualitative geometry makes total versus exposed time directly inspectable without a profiler dependency or invented benchmark claim.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a dependency graph could identify the critical path, but automatic node layout cannot accurately align overlapping time intervals or preserve equal collective durations.",
+    "svg": "Selected: deterministic bars and step boundaries make identical collective duration, overlap, and exposed tail spatially checkable in one phone-width timeline.",
+    "semanticHtml": "Rejected: a table could state total and exposed time, but would make the reader infer the concurrency that causes the values to differ.",
+    "interaction": "Rejected: dragging communication start time could demonstrate continuously changing exposure, but one paired counterexample completely teaches the invariant and remains simpler, printable, and dependency-free.",
+    "paperReuse": "Rejected: the reviewed sources contain profiler screenshots, DDP diagrams, and broader performance models, but none is required for this article-specific equal-duration comparison. Their artwork reuse permissions were either absent or unnecessary, so no source figure, trace, data, wording, or layout is copied.",
+    "noVisual": "Rejected: prose warns that total operation time can be hidden, but the reader must mentally align concurrent lanes and determine which interval moves the synchronized boundary. The paired traces resolve that exact ambiguity."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The LLM-training slide argues for hardware scalability and throughput and names mixed precision, architecture choices, and tensor-friendly dimensions, but supplies no measurement workflow or device timeline."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization overview distinguishes compute cost, memory cost, HBM and SRAM bandwidth, and arithmetic intensity. It supports roofline-style bottleneck classification but does not show distributed communication, overlap, ranks, or critical-path exposure."
+      },
+      {
+        "page": 109,
+        "insight": "The sequence-packing slide presents a specific utilization repair for padding waste rather than a trace method for diagnosing the limiting interval."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide explains reducing HBM traffic and gives algorithmic speedup claims, but it neither profiles a distributed step nor distinguishes cumulative operation time from exposed wall time."
+      }
+    ],
+    "notes": "All 214 pages of Basic_ML_CS_concepts were text-indexed for profiling, trace, roofline, critical path, utilization, throughput, bandwidth, all-reduce, communication-compute overlap, and pipeline bubbles. Pages 107-110 were then inspected in sequence as the closest performance-analysis neighborhood. Page 108 contains the only direct arithmetic-intensity and machine-ratio discussion; the neighboring slides move from general throughput to specific optimizations without a profiler timeline. The deck has no distributed step trace, per-rank comparison, collective-overlap example, or exposed-time visual. The deck states no reuse license and identifies external material, so it was treated as review-only; no screenshot, numbers, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Distributed Data Parallel design note",
+        "url": "https://docs.pytorch.org/docs/2.13/notes/ddp.html",
+        "usage": "Used as official framework documentation to verify that DDP launches asynchronous all-reduce when gradient buckets become ready, overlaps those collectives with backward computation, and waits for unfinished reductions after all buckets are ready.",
+        "license": "No PyTorch diagram, code, prose, timing, or layout is reproduced. The original timeline cites the documented scheduling behavior rather than adapting the page's gradient-synchronization figure."
+      },
+      {
+        "title": "Profiling in the JAX Scaling Book",
+        "url": "https://jax-ml.github.io/scaling-book/profiling/",
+        "usage": "Used as authoritative systems guidance to verify chronological device-trace inspection, mapping compiled operations back to source, comparing measured durations with hardware expectations, and checking communication and layout operations.",
+        "license": "The guide and its profiler screenshots are publicly readable, but no figure-reuse permission was relied upon. No screenshot, trace, worked-example number, prose, or layout is copied."
+      },
+      {
+        "title": "NVIDIA Nsight Systems Analysis Guide",
+        "url": "https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html",
+        "usage": "Used as official profiler documentation to verify the distinction between summary 'Total Time' percentages and application wall time, and the need for chronological trace records when reasoning about concurrency.",
+        "license": "NVIDIA documentation is cited for tool semantics only. No screenshot, report output, example data, prose, or visual structure is reproduced."
+      },
+      {
+        "title": "Roofline: An Insightful Visual Performance Model for Multicore Architectures",
+        "url": "https://doi.org/10.1145/1498765.1498785",
+        "usage": "Used as the primary paper for the article's compute-versus-memory lower-bound framing through arithmetic intensity, attainable compute performance, peak compute, and memory-bandwidth ceilings.",
+        "license": "The ACM publication record did not establish a permissive license for third-party figure adaptation. The shipped visual is not a roofline plot and copies no paper figure, axis, data, wording, or layout."
+      }
+    ],
+    "notes": "The hardest prose-only model is critical-path exposure rather than the three lower-bound formulas. In the original schematic, both collectives have the same drawn duration. The upper collective is fully concurrent with backward compute and finishes first, so it adds zero to the illustrated step boundary; the lower collective begins when compute ends, so its entire duration is exposed. These are qualitative normalized intervals, not measured milliseconds. Real traces can have partial overlap, dependencies, asynchronous launch costs, rank skew, and a final synchronization; the exposed portion is the interval whose removal would actually shorten the synchronized step."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 107-110, then checked maintained PyTorch, JAX, and NVIDIA profiler guidance plus the primary Roofline paper before selecting an original paired timeline."
+  },
+  "implementation": {
+    "visualIds": [
+      "profiling-exposed-collective-tail"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that states every interval and conclusion. Direct lane labels, rectangular versus rounded bars, aligned positions, step-end ticks, a bracket, and explicit exposed-time text carry the lesson without color. Its 360-unit viewBox scales without a minimum width at 390 CSS pixels; existing theme variables provide dark-mode contrast, and established print rules force a high-contrast light palette and avoid splitting the figure."
+  }
+}

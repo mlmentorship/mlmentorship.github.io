@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "rag-for-legal-docs",
+  "article": "src/content/posts/2025-09-26-rag-for-legal-docs.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace every atomic claim in a legal RAG answer to an exact passage in a versioned legal source, and route missing or unsupported evidence to remediation, refusal, or attorney review before release.",
+  "mediumRationale": "A semantic claim-lineage ledger is the smallest medium that keeps source hierarchy and version, passage identity, claim-level support, release routing, and audit evidence visible together. Numbered native-text panels make the legal evidence contract inspectable without implying that one model confidence score proves correctness.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the repository already has a general hallucination release-gate flow. Another flowchart would duplicate that lesson while making the legal-specific source-version and claim-to-passage ledger harder to inspect.",
+    "svg": "Rejected: the task is to read exact categorical records rather than quantitative geometry, and fixed embedded labels would wrap less reliably at 390 CSS pixels.",
+    "semanticHtml": "Selected: labelled native sections can expose a compact evidence ledger, retain ordinary reading order, and stack into one column while preserving every identifier and outcome in text.",
+    "interaction": "Rejected: toggling supported and unsupported claims would hide part of the fixed release contract and add state without improving the comparison.",
+    "paperReuse": "Rejected: the reviewed papers contain benchmark and system figures, but none represents this article-specific legal claim-lineage record. No external figure, benchmark example, wording, data, or layout is reused.",
+    "noVisual": "Rejected: the prose names source versioning, mandatory citations, a verifier, refusal, human review, and logs in separate sections. Readers must otherwise mentally connect those controls into one claim-level evidence record."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 24,
+        "insight": "The K-nearest-neighbor slide describes distance-based retrieval and an accuracy-versus-cost trade-off, but contains no document hierarchy, lexical retrieval, citations, or evidence verification."
+      },
+      {
+        "page": 98,
+        "insight": "The tokenization slide discusses subwords and rare vocabulary, relevant background for legal terminology, but provides no retrieval or claim-lineage mechanism."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide covers bag-of-words, TF-IDF, embeddings, and question answering. It is the closest lexical-versus-representation background but does not address hybrid retrieval, source versions, or citations."
+      },
+      {
+        "page": 100,
+        "insight": "The neighboring memory-network slide retrieves embedded context for a query, but its latent memory has no exact legal passage identity or verifiable citation."
+      },
+      {
+        "page": 111,
+        "insight": "The long-document attention slide identifies long-document question answering as a use case for sparse attention, but does not preserve legal hierarchy or replace document and section retrieval."
+      },
+      {
+        "page": 130,
+        "insight": "The approximate-nearest-neighbor and ranking slide explains fast embedding retrieval and nDCG, but does not cover lexical exact matches, legal relevance judgments, or claim support."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide asks about storage, preprocessing, privacy, annotation, and feedback, supporting corpus governance but not source-version lineage."
+      },
+      {
+        "page": 168,
+        "insight": "The production-serving slide asks for model gates, low-confidence behavior, monitoring, privacy, and interpretability. It supports refusal and review controls but does not bind answer claims to passages."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring engineering-rules slide recommends independent infrastructure tests, ownership, measured errors, and quantified undesirable behavior, useful for operations but not a legal citation contract."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for RAG, retrieval, legal, citation, grounding, hallucination, audit, document, BM25, vector, and embedding terms. No legal-RAG or citation-verification slide exists. The full text-representation neighborhood on pages 98-100, long-context neighborhood on pages 110-112, retrieval/ranking neighborhood on pages 129-131, and production neighborhood on pages 166-169 were read; page 24 was also reviewed as the generic nearest-neighbor retrieval treatment. The deck states no reuse license and contains incompletely attributed embedded material, so it was treated as review-only. No deck artwork, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "LegalBench-RAG: A Benchmark for Retrieval-Augmented Generation in the Legal Domain",
+        "url": "https://arxiv.org/abs/2408.10343",
+        "usage": "Used as the primary legal-retrieval source to verify that legal corpora require domain-specific retrieval evaluation and precise, small relevant snippets rather than merely broad contextual chunks, including support for efficient human verification.",
+        "license": "The arXiv record provides public access, but no permissive figure-reuse grant was established or relied on. No paper figure, benchmark sample, result, prose, annotation, or layout is copied."
+      },
+      {
+        "title": "Enabling Large Language Models to Generate Text with Citations",
+        "url": "https://aclanthology.org/2023.emnlp-main.398/",
+        "usage": "Used as the primary citation-evaluation source to verify that citation correctness and completeness are separate from fluency and answer correctness, and that retrieved evidence must support the associated claim.",
+        "license": "ACL Anthology materials published after 2016 are licensed under CC BY 4.0. The source is cited for its evaluation concepts, but no figure, benchmark value, example, wording, or layout is adapted."
+      },
+      {
+        "title": "Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+        "url": "https://doi.org/10.6028/NIST.AI.600-1",
+        "usage": "Used as official risk-management guidance to check the need for documented provenance, testing, monitoring, human oversight, incident learning, and controls proportionate to consequence for confabulation and information-integrity risks.",
+        "license": "NIST states that employee-created works are generally not subject to U.S. copyright and grants broad reuse rights where it holds foreign copyright. No NIST figure, table, wording, or layout is reproduced; the visual is an original legal-RAG synthesis."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that legal grounding is a lineage contract, not the presence of citations. Each atomic claim needs an exact passage identifier tied to a source version; citation existence and passage entailment are separate checks; missing or unsupported evidence changes the allowed outcome; and every intermediate decision remains available for audit or attorney review. The visual uses generic identifiers and no legal assertion, benchmark value, or claim of zero hallucinations."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every relevant neighborhood, then checked primary legal-retrieval and citation-evaluation research plus official NIST risk guidance before selecting an original semantic claim-lineage ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "legal-rag-claim-lineage"
+    ],
+    "accessibility": "The figure uses a linked learning question, four numbered native sections, explicit passage and claim identifiers, and a labelled group in source order. Supported, unsupported, refusal, and review outcomes are written directly rather than encoded by color or position. The established two-column primitive stacks below 640 pixels with ordinary wrapping and no minimum width for a 390 CSS-pixel viewport; theme tokens supply dark-mode contrast and shared print rules supply a high-contrast light rendering with page-break protection."
+  }
+}
