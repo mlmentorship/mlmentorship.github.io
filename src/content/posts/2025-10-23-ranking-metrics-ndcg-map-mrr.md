@@ -63,6 +63,42 @@ $$
 
 **MRR** = mean of RR across queries. Used in: question answering (one correct answer per question), passage retrieval (one gold passage per query), some entity disambiguation.
 
+<!-- visual:ranking-metrics-per-rank-credit -->
+<figure class="learning-figure" aria-labelledby="ranking-metrics-credit-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="ranking-metrics-credit-title">Trace what each metric counts as credit while scanning from rank 1 downward.</p>
+	<div class="visual-grid--two" role="group" aria-label="Worked per-rank comparison of NDCG and average precision beside a reciprocal-rank stopping example">
+		<section class="visual-panel">
+			<h4>Many relevant items: graded or binary?</h4>
+			<p>The same four results support two different judgments.</p>
+			<table class="cm-grid" aria-label="At ranks one through four, graded relevance is 3, 0, 2, 1; NDCG credit is 7.00, 0, 1.50, 0.43; MAP precision checkpoints are 1 over 1, none, 2 over 3, and 3 over 4">
+				<thead><tr><th scope="col">Rank</th><th scope="col">Grade</th><th scope="col">NDCG credit</th><th scope="col">AP checkpoint</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">1</th><td><strong>3</strong> · relevant</td><td>(2³−1) / 1 = <strong>7.00</strong></td><td><strong>1 / 1</strong></td></tr>
+					<tr><th scope="row">2</th><td><strong>0</strong> · not relevant</td><td><strong>0</strong></td><td>Skip</td></tr>
+					<tr><th scope="row">3</th><td><strong>2</strong> · relevant</td><td>(2²−1) / 2 = <strong>1.50</strong></td><td><strong>2 / 3</strong></td></tr>
+					<tr><th scope="row">4</th><td><strong>1</strong> · relevant</td><td>(2¹−1) / 2.32 = <strong>0.43</strong></td><td><strong>3 / 4</strong></td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">NDCG@4 = 8.93 / 9.39 = 0.95<br>AP = (1 + 2/3 + 3/4) / 3 = 0.81</p>
+		</section>
+		<section class="visual-panel">
+			<h4>One correct answer: stop at the first hit</h4>
+			<p>MRR ignores later ranks once the answer is found.</p>
+			<table class="cm-grid" aria-label="The first two ranked results are wrong, the third is correct, and reciprocal rank is one third">
+				<thead><tr><th scope="col">Rank</th><th scope="col">Answer?</th><th scope="col">MRR action</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">1</th><td>Wrong</td><td>Continue</td></tr>
+					<tr><th scope="row">2</th><td>Wrong</td><td>Continue</td></tr>
+					<tr><th class="cm-selected" scope="row">3</th><td class="cm-selected"><strong>Correct</strong></td><td class="cm-selected"><strong>Stop</strong></td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">RR = 1 / first correct rank = 1 / 3 = 0.33</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> scan the left table by row. NDCG uses every grade and discounts lower ranks; AP uses only relevant rows and records precision at each hit. Use the right table only when one answer matters: MRR stops at the first correct result. The calculations are an original example checked against the <a href="https://doi.org/10.1145/582415.582418">original cumulative-gain paper</a>, the <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">IR textbook definition of MAP</a>, and the <a href="https://trec.nist.gov/pubs/trec8/papers/qa8.pdf">TREC-8 QA evaluation</a>.</figcaption>
+</figure>
+
 ## Hit rate and recall@K
 
 **Hit rate@K** (or recall@K): fraction of queries where a relevant item appears in the top $K$. Used heavily in retrieval / candidate-generation evaluation, where the goal is "get the gold into the candidate pool" and a downstream ranker handles ordering.

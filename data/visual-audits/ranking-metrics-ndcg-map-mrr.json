@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "slug": "ranking-metrics-ndcg-map-mrr",
+  "article": "src/content/posts/2025-10-23-ranking-metrics-ndcg-map-mrr.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace what NDCG, MAP, and MRR count as credit while scanning a ranked list, then choose the metric whose relevance labels and stopping behavior match the task.",
+  "mediumRationale": "A two-panel semantic worked example is the smallest medium that aligns rank, relevance judgments, and per-rank credit. Native tables make the arithmetic selectable and preserve a linear reading order when the panels stack at phone width.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is aligned per-rank arithmetic and a stopping rule, not a graph or branching system. Automatic node placement would separate contributions that readers need to compare row by row.",
+    "svg": "Rejected: fixed coordinates add no explanatory geometry to discrete ranks and would make formulas and wrapped labels less robust at 390 CSS pixels.",
+    "semanticHtml": "Selected: responsive panels and semantic tables align each rank with graded gain, binary precision checkpoints, or the first-answer stopping decision while retaining native text and scoped headers.",
+    "interaction": "Rejected: changing labels or moving results would add controls and state, but one carefully chosen static list already exposes each metric's distinct credit rule.",
+    "paperReuse": "Rejected: the reviewed paper, textbook, and TREC report contain definitions and examples, but no source artwork is needed and permissive reuse rights were not established for the copyrighted sources. The values, wording, arrangement, and tables are independently authored.",
+    "noVisual": "Rejected: the prose defines each formula separately, leaving readers to mentally simulate where each metric awards credit. The worked rows make the graded-gain, relevant-hit, and first-answer behaviors directly comparable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The preceding page is the recommender-systems section divider and contains no ranking-metric definition or visual."
+      },
+      {
+        "page": 130,
+        "insight": "The relevant slide combines collaborative filtering with a five-document nDCG calculation. It introduces cumulative gain, logarithmic discount, an ideal ordering, and normalization, but uses linear relevance gain rather than this article's exponential gain and contains an inconsistent Doc_2 value in the IDCG arithmetic."
+      },
+      {
+        "page": 131,
+        "insight": "The following slide moves to content-based and hybrid recommenders and adds no NDCG, MAP, MRR, or ranked-evaluation explanation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for ranking, rank, NDCG, DCG, ideal DCG, average precision, MAP, reciprocal rank, MRR, relevance, and retrieval metrics. Page 130 was the only direct ranking-metric example, and its complete page 129-131 neighborhood was read page by page. The slide does not compare label regimes or per-rank credit across NDCG, MAP, and MRR. Its calculation was treated as review evidence rather than a source to copy because it uses a different DCG gain convention and includes an internal relevance-value inconsistency.",
+    "license": "The local deck states no general reuse license and includes externally attributed material. It is review-only: no screenshot, artwork, wording, example values, coordinates, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Cumulated Gain-Based Evaluation of IR Techniques",
+        "url": "https://doi.org/10.1145/582415.582418",
+        "usage": "Used as the primary source for cumulative-gain evaluation with graded relevance, rank discount, ideal-order normalization, and the interpretation of normalized discounted gain.",
+        "license": "The 2002 ACM article remains copyrighted under its original publication terms. No figure, table, prose, result, data, or layout is copied; permission for artwork adaptation was not established."
+      },
+      {
+        "title": "Introduction to Information Retrieval: Evaluation of ranked retrieval results",
+        "url": "https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html",
+        "usage": "Used as an authoritative textbook source to verify that average precision averages precision at the ranks where relevant documents are retrieved, and MAP averages per-information-need AP with equal query weight.",
+        "license": "Cambridge University Press retains copyright. The online text was consulted for definitions only; no figure, table, wording, equation layout, or example is reproduced."
+      },
+      {
+        "title": "The TREC-8 Question Answering Track Evaluation",
+        "url": "https://trec.nist.gov/pubs/trec8/papers/qa8.pdf",
+        "usage": "Used as the primary evaluation report to verify reciprocal rank as credit determined by the rank of the first correct answer in a question-answering result list.",
+        "license": "The report is hosted by NIST, but no artwork-reuse permission is needed or relied upon. No source figure, table, wording, result, or example is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is what each formula notices while moving down a list. The original worked example uses grades [3, 0, 2, 1], with binary relevance defined as grade greater than zero. Under the article's exponential-gain DCG, per-rank contributions are 7.00, 0, 1.50, and 0.43, so DCG@4 is 8.93; the ideal [3, 2, 1, 0] gives IDCG@4 of 9.39 and NDCG@4 of 0.95 after rounding. AP checkpoints at relevant ranks 1, 3, and 4 are 1/1, 2/3, and 3/4, yielding AP 0.81. A separate one-answer list with the correct answer at rank 3 yields RR 1/3 = 0.33. These are illustrative calculations, not empirical results."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the only matching slide with both neighbors, checked the primary NDCG paper, authoritative IR textbook, and primary TREC QA report, independently verified every displayed calculation, and selected an original semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "ranking-metrics-per-rank-credit"
+    ],
+    "accessibility": "The labelled figure uses two native tables with column headers, scoped rank-row headers, explicit accessible names, and written formulas. Grades, relevant markers, rank numbers, checkpoint labels, and a stop instruction carry all meaning without color. The established two-panel primitive stacks below 640 pixels for readability at 390 CSS pixels; theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks within the figure."
+  }
+}
