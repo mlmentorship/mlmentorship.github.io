@@ -299,6 +299,12 @@ try {
             let visual = marker?.nextElementSibling;
             while (visual && !visual.matches('figure.learning-figure, .mermaid')) visual = visual.nextElementSibling;
             if (!visual) throw new Error(${JSON.stringify(`${label}: visual not found`)});
+            const visualHost = visual.closest('.visual-review-visual');
+            const visualHostStyle = visualHost ? getComputedStyle(visualHost) : null;
+            if (visualHost) {
+              visualHost.scrollTop = 0;
+              visualHost.dataset.visualReviewVerticalHost = ${JSON.stringify(visualId)};
+            }
             const caption = visual.matches('figure')
               ? visual.querySelector('figcaption')
               : visual.nextElementSibling?.matches('.diagram-caption') ? visual.nextElementSibling : null;
@@ -427,6 +433,17 @@ try {
                 height: captureRect.bottom - captureRect.top,
               },
               figureFitsViewport: rect.left >= -0.5 && rect.right <= innerWidth + 0.5,
+              verticalClip: visualHost ? {
+                clientHeight: visualHost.clientHeight,
+                scrollHeight: visualHost.scrollHeight,
+                overflowY: visualHostStyle.overflowY,
+                captureRect: {
+                  x: visualHost.getBoundingClientRect().left + scrollX,
+                  y: visualHost.getBoundingClientRect().top + scrollY,
+                  width: visualHost.getBoundingClientRect().width,
+                  height: visualHost.getBoundingClientRect().height,
+                },
+              } : null,
               scroll: scroll ? {
                 clientWidth: scroll.clientWidth,
                 scrollWidth: scroll.scrollWidth,
@@ -467,6 +484,14 @@ try {
         if (mode.mobile && details.innerWidth !== 390) throw new Error(`${label} reported innerWidth ${details.innerWidth}`);
         if (details.pageWidth > details.innerWidth + 1) throw new Error(`${label} creates page overflow (${details.pageWidth} > ${details.innerWidth})`);
         if (!details.figureFitsViewport) throw new Error(`${label} exceeds the viewport`);
+        if (mode.mobile && details.verticalClip &&
+          details.verticalClip.scrollHeight > details.verticalClip.clientHeight + 1 &&
+          ['auto', 'scroll', 'hidden', 'clip'].includes(details.verticalClip.overflowY)) {
+          throw new Error(
+            `${label} clips the promoted visual vertically ` +
+            `(${details.verticalClip.scrollHeight} > ${details.verticalClip.clientHeight}, overflow-y ${details.verticalClip.overflowY})`
+          );
+        }
         if (!details.caption.startsWith('Read it this way:') || details.captionGlyphWidth < 1) {
           throw new Error(`${label} lost its rendered direct caption`);
         }
@@ -490,13 +515,60 @@ try {
           }
         }
 
+        const hasVerticalScroll = details.verticalClip &&
+          details.verticalClip.scrollHeight > details.verticalClip.clientHeight + 1 &&
+          ['auto', 'scroll'].includes(details.verticalClip.overflowY) &&
+          mode.media !== 'print';
         const screenshot = await cdp.call('Page.captureScreenshot', {
           format: 'png',
           captureBeyondViewport: true,
-          clip: { ...details.captureRect, scale: 1 },
+          clip: { ...(hasVerticalScroll ? details.verticalClip.captureRect : details.captureRect), scale: 1 },
         });
         const prefix = `${mode.name}--${entry.slug}--${visualId}`;
         writeFileSync(join(outputDir, `${prefix}.png`), Buffer.from(screenshot.data, 'base64'));
+
+        if (hasVerticalScroll) {
+          const verticalEndEvaluation = await cdp.call('Runtime.evaluate', {
+            expression: `(() => {
+              const host = document.querySelector(${JSON.stringify(`[data-visual-review-vertical-host="${visualId}"]`)});
+              host.scrollTop = host.scrollHeight;
+              const visual = host.querySelector('figure.learning-figure, .mermaid');
+              const viewport = host.getBoundingClientRect();
+              const content = visual.getBoundingClientRect();
+              return {
+                scrollTop: host.scrollTop,
+                maxScrollTop: host.scrollHeight - host.clientHeight,
+                viewportBottom: viewport.bottom,
+                contentBottom: content.bottom,
+              };
+            })()`,
+            returnByValue: true,
+          });
+          if (verticalEndEvaluation.exceptionDetails) {
+            throw new Error(
+              verticalEndEvaluation.exceptionDetails.exception?.description ??
+              verticalEndEvaluation.exceptionDetails.text
+            );
+          }
+          const verticalEnd = verticalEndEvaluation.result.value;
+          if (Math.abs(verticalEnd.scrollTop - verticalEnd.maxScrollTop) > 1) {
+            throw new Error(`${label} cannot reach its vertical scroll end`);
+          }
+          if (verticalEnd.contentBottom > verticalEnd.viewportBottom + 1) {
+            throw new Error(`${label} has content beyond its reachable vertical scroll end`);
+          }
+          details.verticalClip.endScrollTop = verticalEnd.scrollTop;
+          details.verticalClip.maxScrollTop = verticalEnd.maxScrollTop;
+          const verticalEndScreenshot = await cdp.call('Page.captureScreenshot', {
+            format: 'png',
+            captureBeyondViewport: true,
+            clip: { ...details.verticalClip.captureRect, scale: 1 },
+          });
+          writeFileSync(
+            join(outputDir, `${prefix}--vertical-scroll-end.png`),
+            Buffer.from(verticalEndScreenshot.data, 'base64')
+          );
+        }
 
         if (details.scroll && details.scroll.scrollWidth <= details.scroll.clientWidth + 1) {
           if (details.scroll.contentLeft !== null && details.scroll.contentLeft < details.scroll.viewportLeft - 1) {

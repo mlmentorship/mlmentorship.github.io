@@ -30,7 +30,7 @@ Input: image $x \in \mathbb{R}^{H \times W \times 3}$.
 <figure class="learning-figure plot-panel" aria-labelledby="vit-patch-sequence-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="vit-patch-sequence-title">How does a two-dimensional image become an ordered transformer sequence?</p>
-	<svg viewBox="0 0 360 640" role="img" aria-labelledby="vit-patch-svg-title vit-patch-svg-desc">
+	<svg viewBox="0 0 360 640" role="img" aria-labelledby="vit-patch-svg-title vit-patch-svg-desc" style="width:auto;max-width:100%;max-height:7in;margin-inline:auto">
 		<title id="vit-patch-svg-title">Image patches become positioned Vision Transformer tokens</title>
 		<desc id="vit-patch-svg-desc">A toy four by four RGB image is divided into four non-overlapping two by two patches in row-major order: P1 top-left, P2 top-right, P3 bottom-left, and P4 bottom-right. Each patch contains twelve channel values and is flattened and linearly projected to one width-d embedding. A class token is prepended to embeddings e1 through e4. Learned position vectors p0 through p4 are added slot by slot, producing five positioned tokens z0 through z4 for a standard transformer encoder. The encoder's z0 class-token output feeds the classifier.</desc>
 		<defs><marker id="vit-patch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path class="viz-arrow-forward" d="M0 0L8 4L0 8Z"></path></marker></defs>

@@ -214,7 +214,8 @@ const {
   }
 
   @media (max-width: 640px) {
-    .visual-review-card--article { height: 34rem; }
+    .visual-review-card--article { height: auto; display: block; }
+    .visual-review-card--article .visual-review-visual { overflow-y: visible; }
     .visual-review-card--deck { max-height: none; display: block; padding: .8rem; }
     .visual-review-card--deck .visual-review-visual { max-height: none; overflow-y: visible; }
     .visual-review-actions :global(a),

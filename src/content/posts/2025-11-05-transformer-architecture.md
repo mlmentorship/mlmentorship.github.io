@@ -33,14 +33,14 @@ Stack L of these. Add an embedding layer at the bottom and an output projection 
 	<p class="visual-title" id="transformer-mixing-title">Which dimension does each transformer sublayer connect?</p>
 	<svg viewBox="0 0 360 420" role="img" aria-labelledby="transformer-mixing-svg-title transformer-mixing-svg-desc">
 		<title id="transformer-mixing-svg-title">Attention connects token positions while the feed-forward network transforms each token independently</title>
-		<desc id="transformer-mixing-svg-desc">The input is a token-by-feature tensor with three token rows and four feature columns. In stage one, arrows from token rows one, two, and three converge on the updated representation of token two, showing that self-attention can gather information across positions. In stage two, three separate horizontal paths apply the same feed-forward network to each token row, with no path between rows, showing independent feature transformation at every position. Both sublayers preserve the token-by-feature shape and add their updates through pre-norm residual connections.</desc>
+		<desc id="transformer-mixing-svg-desc">The input is a token-by-feature tensor with three token rows and four feature columns. In the unmasked encoder example in stage one, arrows from token rows one, two, and three converge on the updated representation of token two, showing that self-attention can gather information across positions allowed by its mask. In stage two, three separate horizontal paths apply the same feed-forward network to each token row, with no path between rows, showing independent feature transformation at every position. Both sublayers preserve the token-by-feature shape and add their updates through pre-norm residual connections.</desc>
 		<defs>
 			<marker id="transformer-mixing-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" style="fill:var(--viz-edge)"></path></marker>
 			<marker id="transformer-mixing-focus-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
 		</defs>
 		<rect class="viz-plot-bg" x="8" y="30" width="344" height="176" rx="5"></rect>
 		<text class="viz-axis-label" x="14" y="18">1 · ATTENTION COMMUNICATES ACROSS TOKEN POSITIONS</text>
-		<text class="viz-label" x="22" y="49">input rows</text>
+		<text class="viz-label" x="22" y="49">unmasked encoder rows</text>
 		<text class="viz-label" x="262" y="49">updated token 2</text>
 		<g aria-label="Three input token rows, each with four feature cells">
 			<rect class="viz-node viz-node--input" x="22" y="60" width="118" height="30" rx="3"></rect>
@@ -56,7 +56,7 @@ Stack L of these. Add an embedding layer at the bottom and an output projection 
 		<path d="M140 75C190 75 199 108 247 118M140 121H247M140 167C190 167 199 134 247 124" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#transformer-mixing-focus-arrow)"></path>
 		<rect class="viz-node viz-node--output" x="249" y="106" width="90" height="30" rx="3"></rect>
 		<path d="M271.5 106V136M294 106V136M316.5 106V136" class="viz-gridline"></path>
-		<text class="viz-callout" x="294" y="157" text-anchor="middle">token 2 can use all rows</text>
+		<text class="viz-callout" x="294" y="157" text-anchor="middle">mask permits all rows</text>
 		<text class="viz-label" x="180" y="194" text-anchor="middle">shape stays T × d; attention returns an update for every token row</text>
 		<rect class="viz-plot-bg" x="8" y="228" width="344" height="140" rx="5"></rect>
 		<text class="viz-axis-label" x="14" y="218">2 · THE FFN TRANSFORMS FEATURES WITHIN EACH TOKEN</text>
@@ -84,7 +84,7 @@ Stack L of these. Add an embedding layer at the bottom and an output projection 
 		<text class="viz-label" x="180" y="384" text-anchor="middle">no row-to-row path: each position is processed independently</text>
 		<text class="viz-callout" x="180" y="405" text-anchor="middle">x′ = x + Attention(LN(x))  →  x″ = x′ + FFN(LN(x′))</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> hold the <code>T × d</code> tensor shape fixed. Attention lets each token row gather context from other rows; then the same FFN transforms the features inside each row independently. Each sublayer contributes an update through its own residual addition. The primary communication roles, not every internal projection, are shown. Original schematic checked against <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. (2017)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">PyTorch encoder-layer documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> hold the <code>T × d</code> tensor shape fixed. In this unmasked encoder example, attention lets each token row gather context from every row; a causal decoder would omit future-token links. The same FFN then transforms features inside each row independently. Each sublayer contributes an update through its own residual addition. The primary communication roles, not every internal projection, are shown. Original schematic checked against <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. (2017)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">PyTorch encoder-layer documentation</a>.</figcaption>
 </figure>
 
 The two information-mixing operations:

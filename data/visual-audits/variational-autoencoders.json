@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "slug": "variational-autoencoders",
+  "article": "src/content/posts/2025-11-22-variational-autoencoders.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace the VAE training path from an observed input through the approximate posterior and both ELBO terms, then contrast it with generation, which samples the prior and uses only the decoder.",
+  "mediumRationale": "A deterministic two-stage SVG is the smallest medium that can keep the encoder, approximate posterior, prior, latent sample, decoder, reconstruction term, and KL term spatially aligned while showing that generation bypasses the encoder. Fixed routing makes the two uses of the model inspectable without runtime state.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a compact flowchart could show the two routes, but automatic routing gives weak control over placing the KL comparison beside q_phi and p(z) while aligning the shared decoder across training and generation.",
+    "svg": "Selected: exact node and arrow placement can distinguish the posterior-sampled training route from the prior-sampled generation route and attach each ELBO term to the variables it scores.",
+    "semanticHtml": "Rejected: cards or a table could enumerate components, but would leave the reader to reconstruct which networks participate in training, which distribution supplies z during generation, and where each objective term acts.",
+    "interaction": "Rejected: toggling between train and generate modes would hide one state at a time and add controls without teaching more than an aligned static comparison.",
+    "paperReuse": "Rejected: the primary papers and local deck contain relevant model diagrams and equations, but no source artwork is needed. Their figures, data, coordinates, wording, and layouts are not copied or adapted.",
+    "noVisual": "Rejected: the prose defines the prior, encoder, decoder, ELBO, and reparameterization separately, requiring readers to mentally assemble two distinct execution paths and place the two training pressures on that graph."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 79,
+        "insight": "The generative-model section divider classifies VAEs as latent-variable models, establishing the model-family context without showing an execution path."
+      },
+      {
+        "page": 80,
+        "insight": "The inference overview distinguishes prior belief, posterior belief, evidence, and likelihood, providing the Bayesian roles that the VAE later parameterizes."
+      },
+      {
+        "page": 81,
+        "insight": "The preceding learning slide contrasts MLE, Bayesian estimation, and MAP but adds no VAE-specific mechanism."
+      },
+      {
+        "page": 82,
+        "insight": "The first dedicated VAE slide states that each observation is generated from a latent variable and that the intractable posterior must be approximated."
+      },
+      {
+        "page": 83,
+        "insight": "The variational-inference slide derives the ELBO by introducing q and minimizing KL to the true posterior, but does not connect the bound's terms to encoder and decoder execution."
+      },
+      {
+        "page": 84,
+        "insight": "The VAE summary slide names neural conditional distributions, reparameterized sampling, amortized inference, and end-to-end SGD as four core ideas."
+      },
+      {
+        "page": 85,
+        "insight": "The PyTorch code slide shows encode to mu and log-variance, reparameterize, decode, and combine binary cross-entropy with KL, but does not contrast training with prior-sampled generation."
+      },
+      {
+        "page": 86,
+        "insight": "The following model-selection slide changes from VAE mechanics to a taxonomy based on available X and Y data."
+      },
+      {
+        "page": 87,
+        "insight": "The generative-model taxonomy labels GANs as transformation models, VAEs as latent-variable models, and LSTMs as autoregressive models, without adding VAE execution detail."
+      },
+      {
+        "page": 88,
+        "insight": "The sequence closes with references to the original VAE, stochastic-backpropagation, IWAE, and black-box variational-inference papers."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for VAE, variational autoencoder, variational inference, ELBO, evidence lower bound, reparameterization, autoencoder, and latent variable. Pages 79-88 form the complete relevant generative-model sequence and were reviewed page by page. Pages 82-85 directly cover VAE mechanics; none aligns the posterior-sampled training path and prior-sampled generation path while locating both ELBO terms. No deck screenshot, artwork, code, prose, coordinates, or layout is reused.",
+    "license": "The local deck states no general reuse license and page 85 explicitly describes its code as taken from the internet. The deck is used for review only; uncertain provenance is not propagated into the original schematic."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Auto-Encoding Variational Bayes",
+        "url": "https://arxiv.org/abs/1312.6114",
+        "usage": "Used as the primary source for the recognition model q_phi(z|x), generative model p_theta(x|z), prior p(z), reparameterized Monte Carlo training, amortized inference, and variational lower bound.",
+        "license": "The arXiv preprint is distributed under arXiv's non-exclusive distribution license, not a general third-party adaptation license. No paper figure, prose, data, equation layout, coordinates, or composition is reproduced."
+      },
+      {
+        "title": "Stochastic Backpropagation and Approximate Inference in Deep Generative Models",
+        "url": "https://arxiv.org/abs/1401.4082",
+        "usage": "Used as an independent primary source to cross-check stochastic backpropagation through continuous latent variables and optimization of a variational lower bound with recognition and generative models.",
+        "license": "No permissive figure-reuse grant was established or relied upon. The paper is used only for technical verification; no figure, wording, experiment, data, or layout is copied."
+      },
+      {
+        "title": "An Introduction to Variational Autoencoders",
+        "url": "https://arxiv.org/abs/1906.02691",
+        "usage": "Used as an authoritative tutorial by the original VAE authors to verify the distinction between approximate-posterior inference during training and ancestral generation from the prior through the decoder.",
+        "license": "The tutorial is used as a conceptual reference only. No general adaptation right for its figures was assumed, and no source artwork, prose, notation layout, or example is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a VAE has two related but distinct paths. During training, x enters the encoder, q_phi supplies a reparameterized z, the decoder reconstruction term scores x under p_theta(x|z), and KL compares q_phi(z|x) with p(z). During unconditional generation, z is sampled directly from p(z), so neither x nor the encoder is needed; the decoder maps that latent sample to a distribution for a new observation. The original schematic describes these roles without implying that the drawn boxes are a specific neural architecture."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and reviewed the full pages 79-88 sequence, checked two independent primary papers and an authoritative tutorial, and selected an original aligned training-versus-generation SVG rather than duplicating the site's existing reparameterization visual."
+  },
+  "implementation": {
+    "visualIds": [
+      "vae-training-and-generation-paths"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Solid arrows and numbered labels identify the training path, dashed arrows and a separate generation region identify prior sampling, and both objective terms are written directly, so meaning does not depend on color. A single 360-unit viewBox has no minimum width or horizontal scrolling and reuses established node, plot, label, theme, and print primitives for readability at 390 CSS pixels, dark mode, and print."
+  }
+}

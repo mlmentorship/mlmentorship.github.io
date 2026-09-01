@@ -84,6 +84,6 @@
     "visualIds": [
       "vision-patches-to-positioned-tokens"
     ],
-    "accessibility": "The SVG has a linked title and detailed description stating the toy image dimensions, four patch locations, row-major token order, projection shapes, positional additions, class token, and encoder input length. Patch numbers, row-and-column labels, arrows, plus signs, and matching text carry every correspondence without relying on color. The compact 360-unit viewBox has no minimum width and uses established text sizes for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and keep the figure together."
+    "accessibility": "The SVG has a linked title and detailed description stating the toy image dimensions, four patch locations, row-major token order, projection shapes, positional additions, class token, and encoder input length. Patch numbers, row-and-column labels, arrows, plus signs, and matching text carry every correspondence without relying on color. The compact 360-unit viewBox has no minimum width and uses established text sizes for readability at 390 CSS pixels. A seven-inch maximum height keeps the complete title, SVG, and caption within a standard printed page without shrinking the phone layout; existing theme variables preserve dark-mode contrast and shared print rules force a light high-contrast palette."
   }
 }

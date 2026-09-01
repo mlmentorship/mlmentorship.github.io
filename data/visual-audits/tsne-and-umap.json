@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "tsne-and-umap",
+  "article": "src/content/posts/2026-05-07-tsne-and-umap.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the local-neighborhood relationships that t-SNE and UMAP are designed to preserve from inter-cluster gaps and rendered cluster footprints that the 2D map does not reliably preserve.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold local neighbor links constant while visibly changing cluster placement and footprint. The paired layouts turn the article's interpretation warning into a spatial comparison without implying that either schematic is measured output.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could list trustworthy and untrustworthy readings, but its automatic layout cannot make changed distance and footprint the evidence for that distinction.",
+    "svg": "Selected: fixed coordinates can show the same labelled groups and same local neighbor links in two deliberately different global arrangements, making both the preserved and distorted relationships inspectable.",
+    "semanticHtml": "Rejected: a table can classify local versus global claims but cannot demonstrate how two convincing maps can support the same local reading while inviting contradictory global readings.",
+    "interaction": "Rejected: parameter or seed controls would require computed examples, state, and additional validation; two static schematics already expose the single interpretive contrast and remain available in print.",
+    "paperReuse": "Rejected: the t-SNE paper, UMAP paper and documentation, and Distill essay contain relevant figures, but their data, coordinates, artwork, and layouts are unnecessary for this lesson. No source figure is copied or adapted, regardless of whether a source permits reuse.",
+    "noVisual": "Rejected: prose can state that local neighborhoods are meaningful and global geometry is not, but readers still have to imagine how both statements can be true in plots that look like ordinary metric maps."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 21,
+        "insight": "The preceding linear-classifier and kernel slide introduces nonlinear feature mappings, but does not discuss dimensionality-reduction embeddings or their interpretation."
+      },
+      {
+        "page": 22,
+        "insight": "The PCA and variants slide is the deck's dimensionality-reduction treatment. It contrasts PCA's global linear projection with graph-based kernel PCA methods that retain local properties and names Isomap, LLE, and Laplacian eigenmaps, but not t-SNE or UMAP."
+      },
+      {
+        "page": 23,
+        "insight": "The neighboring clustering slide describes high-affinity pairs through a similarity graph and lists distance measures, providing the closest deck analogue to neighborhood preservation without showing nonlinear embedding distortion."
+      },
+      {
+        "page": 24,
+        "insight": "The following K-nearest-neighbor slide discusses local distance in embedding space and the curse of dimensionality, but covers supervised classification rather than constructing or interpreting a 2D map."
+      },
+      {
+        "page": 25,
+        "insight": "The next slide begins random forests and confirms the relevant dimensionality-reduction and neighborhood sequence has ended."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for t-SNE, TSNE, UMAP, dimensionality reduction, manifold, embedding, local properties, nearest neighbors, and clustering. No t-SNE- or UMAP-specific slide or figure exists. Pages 21-25 were reviewed as the complete neighboring sequence around the sole PCA slide: nonlinear mappings, PCA and local manifold methods, similarity-graph clustering, KNN, then an unrelated topic. The implementation uses no deck artwork, wording, coordinates, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Visualizing Data using t-SNE",
+        "url": "https://www.jmlr.org/papers/v9/vandermaaten08a.html",
+        "usage": "Used as the primary t-SNE source for probability-based neighborhood preservation, the asymmetric KL objective, the heavy-tailed low-dimensional distribution, and the method's intended role as a map for visualization.",
+        "license": "The JMLR article is used only as a technical citation. No explicit figure-reuse grant was relied upon, and no paper figure, dataset, coordinates, wording, or composition is reproduced."
+      },
+      {
+        "title": "UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction",
+        "url": "https://arxiv.org/abs/1802.03426",
+        "usage": "Used as the primary UMAP source for constructing a weighted high-dimensional neighborhood graph and optimizing a low-dimensional representation against its fuzzy-set cross-entropy.",
+        "license": "The preprint is used only to verify the algorithm. No figure-reuse permission was assumed, and no paper figure, data, coordinates, wording, or layout is copied."
+      },
+      {
+        "title": "How to Use t-SNE Effectively",
+        "url": "https://distill.pub/2016/misread-tsne/",
+        "usage": "Used as an authoritative interpretive source for the effects of perplexity and optimization, density equalization, and the unreliability of cluster footprint and between-cluster distance.",
+        "license": "No essay figure, animation, data, coordinates, prose, or composition is reused. The implementation is an original schematic, so its provenance does not depend on the publication's reuse terms."
+      },
+      {
+        "title": "How UMAP Works",
+        "url": "https://umap-learn.readthedocs.io/en/latest/how_umap_works.html",
+        "usage": "Used as official project documentation to cross-check the operational interpretation of UMAP as building a local neighborhood graph and finding a low-dimensional layout with a similar graph.",
+        "license": "The UMAP software repository uses the BSD 3-Clause license, but no documentation image, code, data, or prose is reused. The source supports semantics only."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the output looks like an ordinary metric scatter plot even though the objectives emphasize neighborhood probabilities or edges, not faithful cluster-level geometry. The original schematic therefore repeats three shape-coded groups and the same selected within-group neighbor links across two synthetic layouts, while changing only global placement and rendered footprint. It is explicitly labelled as a schematic rather than algorithm output and makes no claim that all local neighbors, cluster identity, topology, or global structure are guaranteed in every run."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and reviewed the exact PCA-to-KNN neighborhood, then checked both primary papers, official UMAP documentation, and the authoritative Distill interpretation guide before selecting an original paired-layout SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "nonlinear-embedding-local-vs-global"
+    ],
+    "accessibility": "Each panel has a linked SVG title and detailed description. Groups A, B, and C use circles, squares, and diamonds respectively; direct labels and solid within-group neighbor links make color redundant. The established two-panel primitive stacks below 640 pixels, both SVGs scale from a 300-unit viewBox with no minimum width for readability at 390 CSS pixels, theme tokens provide dark-mode contrast, and shared print rules force a light high-contrast palette."
+  }
+}
