@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "slug": "transformer-compute-memory-accounting",
+  "article": "src/content/posts/2026-08-28-transformer-compute-memory-accounting.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Given a transformer configuration, separate training compute, training model state, inference weights, and per-sequence KV cache by identifying the dimensions and multiplicities that belong in each budget.",
+  "mediumRationale": "Two aligned semantic ledgers are the smallest medium that can separate training from inference while keeping each quantity, formula, scaling driver, and multiplicity in one row. The side-by-side layout makes omissions visible on wide screens and stacks into the same reading order on narrow screens.",
+  "mediumComparison": {
+    "mermaid": "Rejected because accounting is an aligned quantitative comparison, not a routed process or dependency graph; automatic node layout would make formulas harder to compare.",
+    "svg": "Rejected because fixed coordinates add no necessary geometry and would make formula wrapping or horizontal scrolling more fragile at 390 CSS pixels.",
+    "semanticHtml": "Selected because native tables align quantities with formulas and scaling drivers, expose row and column semantics to assistive technology, wrap without a minimum width, and use existing mobile, theme, and print primitives.",
+    "interaction": "Rejected because changing model dimensions would turn a mental-model check into a calculator, hide assumptions behind controls, and add runtime behavior without improving the core classification task.",
+    "paperReuse": "Rejected because none of the reviewed sources contains a figure with both the required narrow learning objective and established reuse permission. No source artwork, wording, coordinates, or layout is copied.",
+    "noVisual": "Rejected because the prose presents correct equations in separate sections but requires readers to remember which terms use total versus active parameters, which repeat per token or sequence, and which state exists only in training."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding LLM-training slide discusses architecture and mixed precision but provides no compute or memory ledger."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization setup states quadratic attention compute and memory costs and contrasts HBM with SRAM, but it does not account for parameters, optimizer state, or KV cache."
+      },
+      {
+        "page": 109,
+        "insight": "The neighboring sequence-packing slide shows that padded batch positions still consume FLOPs and memory, reinforcing token multiplicity without providing a complete model budget."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide distinguishes recomputation from materializing the quadratic attention matrix, establishing that implementation choices change activation memory beyond first-order formulas."
+      },
+      {
+        "page": 113,
+        "insight": "The neighboring speculative-decoding slide describes single-token decoding as weight-bandwidth-bound, but does not quantify weight or cache storage."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide states that BF16 activations and gradients use two bytes and that FP32 Adam moments and optional master weights add memory, but it does not total the bytes per parameter."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving summary names optimizer-state sharding, activation checkpointing, paged KV cache, and weight quantization, but does not align their distinct scaling drivers."
+      },
+      {
+        "page": 116,
+        "insight": "The following slide begins re-scoring and is unrelated, establishing the end of the relevant compute-and-serving neighborhood."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for transformer, FLOPs, memory, parameters, KV cache, sequence or context length, optimizer or Adam, and activation checkpointing. Pages 107-115 were extracted as the complete contiguous LLM compute neighborhood; pages 107-109 and 113-115 were also rendered and visually inspected, and page 116 was checked as the following boundary. Pages 108, 109, 110, 114, and 115 contain relevant ingredients. No slide supplies the selected training-versus-inference accounting ledger.",
+    "license": "The local deck states no general reuse license and includes externally sourced material. It is review-only: no screenshot, wording, artwork, numerical example, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "How to Scale Your Model: Transformer Math 101",
+        "url": "https://jax-ml.github.io/scaling-book/transformers/",
+        "usage": "Used as an authoritative derivation for two FLOPs per multiply-add, the three-forward-pass training cost, gated-MLP and grouped-query-attention parameter counts, quadratic attention work, activation rematerialization, and KV-cache shape.",
+        "license": "The JAX Scaling Book repository is MIT licensed. The source is cited for technical verification only; no prose, image, table, example, or layout is copied."
+      },
+      {
+        "title": "GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints",
+        "url": "https://arxiv.org/abs/2305.13245",
+        "usage": "Used as the primary source to verify that reducing key/value heads reduces KV-cache size and bandwidth while query-head count can remain larger.",
+        "license": "The arXiv record does not establish a permissive third-party figure-reuse grant. No paper figure, prose, result, or layout is reproduced."
+      },
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used as the primary systems source to verify that KV-cache memory grows dynamically per sequence and that paging reduces fragmentation and reservation waste rather than the bytes required by present tokens.",
+        "license": "Used for factual verification only. No paper figure, block diagram, prose, measurement, or page layout is copied, and no figure-reuse permission is assumed."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not any single formula but selecting the correct ledger and multiplicity. Parameter-derived training compute repeats over training tokens and uses active parameters for MoE; model-state bytes use stored parameters and add gradients and optimizer moments; inference retains weights but not those training-only states; KV cache scales per active sequence as 2TLKHs. Activation and temporary-buffer memory remains implementation-dependent and must be added rather than disguised as a fixed per-parameter constant."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages, inspected the full relevant slide neighborhood, and checked an authoritative derivation plus primary GQA and PagedAttention papers before selecting an original semantic accounting ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "transformer-training-inference-ledgers"
+    ],
+    "accessibility": "The figure uses two labelled sections and native tables with scoped row and column headers. Every quantity, formula, multiplier, and caveat is written explicitly, so no meaning depends on color. The existing two-panel primitive stacks below 640 CSS pixels, and the tables have no minimum width, preserving readable wrapping at 390 CSS pixels. Existing theme variables provide dark-mode contrast; shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}
