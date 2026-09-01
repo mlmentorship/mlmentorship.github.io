@@ -57,7 +57,7 @@
         "title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
         "url": "https://arxiv.org/abs/2310.06770",
         "usage": "Used as a primary benchmark paper to verify that language-model coding evaluation depends on repository state and executable tests rather than final-answer text alone.",
-        "license": "The arXiv record is distributed under arXiv's perpetual, non-exclusive license, not a general permissive adaptation license. No paper figure, result, benchmark instance, prose, data, or layout is reproduced."
+        "license": "The arXiv record links CC BY 4.0, which permits attributed adaptation. No paper figure, result, benchmark instance, prose, data, or layout is reproduced."
       },
       {
         "title": "SWE-bench evaluation harness",

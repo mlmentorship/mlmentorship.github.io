@@ -222,6 +222,8 @@ const {
   }
   @media print {
     .visual-review-card { break-inside: avoid; border: 0; }
+    .visual-review-card--article { height: auto; display: block; break-inside: auto; }
+    .visual-review-card--article .visual-review-visual { overflow: visible; }
     .visual-review-actions,
     .visual-review-sources { display: none; }
     .visual-review-card--deck .visual-review-visual { max-height: none; overflow: visible; }

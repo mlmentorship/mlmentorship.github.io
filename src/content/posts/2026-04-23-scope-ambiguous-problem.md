@@ -49,10 +49,11 @@ Reasonable for L4 (execution within someone else's scope). Failure at L5+ where 
 This is L5. Process is named, output is documented, the 'this isn't an ML problem' option is on the table.
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Turn an ambiguous symptom into a bounded, evidence-backed decision before committing to a solution.</p>
+<p class="visual-title">How does an ambiguous request become an evidence-backed v1 decision?</p>
 
 <!-- visual:ambiguous-problem-scope-loop -->
 ```mermaid
+%%{init: {"themeVariables": {"fontSize": "19px"}}}%%
 flowchart TB
 	accTitle: A senior scoping loop from an ambiguous request to an evidence-backed decision
 	accDescr: Start with a stakeholder's symptom, interrogate it to identify the actual user or business outcome, then define success, constraints, data, and non-goals. Decide whether machine learning is justified. If not, choose a non-ML baseline or stop. If it is, write a time-boxed one-pager that names scope, metrics, risks, and open questions. Select the biggest unknown, run the smallest experiment that can resolve it, and use evidence to proceed, rescope and repeat, or stop.

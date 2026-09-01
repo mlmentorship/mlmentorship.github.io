@@ -498,6 +498,14 @@ try {
         const prefix = `${mode.name}--${entry.slug}--${visualId}`;
         writeFileSync(join(outputDir, `${prefix}.png`), Buffer.from(screenshot.data, 'base64'));
 
+        if (details.scroll && details.scroll.scrollWidth <= details.scroll.clientWidth + 1) {
+          if (details.scroll.contentLeft !== null && details.scroll.contentLeft < details.scroll.viewportLeft - 1) {
+            throw new Error(`${label} paints content before its viewport without a reachable scroll range`);
+          }
+          if (details.scroll.contentRight !== null && details.scroll.contentRight > details.scroll.viewportRight + 1) {
+            throw new Error(`${label} paints content after its viewport without a reachable scroll range`);
+          }
+        }
         if (details.scroll && details.scroll.scrollWidth > details.scroll.clientWidth + 1 && mode.media !== 'print') {
           if (details.scroll.contentLeft !== null && details.scroll.contentLeft < details.scroll.viewportLeft - 1) {
             throw new Error(`${label} has content before its reachable scroll start`);

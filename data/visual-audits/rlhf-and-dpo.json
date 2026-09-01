@@ -47,7 +47,7 @@
         "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
         "url": "https://arxiv.org/abs/2305.18290",
         "usage": "Used as the primary source for DPO's derivation from the KL-constrained reward-maximization objective and its direct binary-classification loss over preferred and rejected responses relative to a reference policy.",
-        "license": "The official arXiv record was treated as access to the paper, not permission to adapt its figures. The implementation reproduces no paper artwork, data, wording, equation formatting, or layout."
+        "license": "The official arXiv record links CC BY 4.0, which permits attributed adaptation. The implementation nevertheless reproduces no paper artwork, data, wording, equation formatting, or layout."
       },
       {
         "title": "Deep reinforcement learning from human preferences",
