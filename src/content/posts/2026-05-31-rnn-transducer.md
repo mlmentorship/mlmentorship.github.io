@@ -42,6 +42,65 @@ RNN-T defines a 2D grid indexed by acoustic frame $t$ and label position $u$. At
 
 A path from bottom-left to top-right is one alignment. The training loss sums over **all** monotonic paths through this lattice:
 
+<!-- visual:rnnt-two-axis-alignment-lattice -->
+<figure class="learning-figure" aria-labelledby="rnnt-lattice-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="rnnt-lattice-title">How can different RNN-T paths emit the same transcript?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two RNN-T lattice paths that both emit A then B">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 245" role="img" aria-labelledby="rnnt-early-title rnnt-early-desc">
+				<title id="rnnt-early-title">Alignment one emits A before advancing acoustic time</title>
+				<desc id="rnnt-early-desc">Starting at time zero and output position zero, the path moves up to emit A, right twice on blanks, up to emit B, and right once on a blank. It ends at time three and output position two.</desc>
+				<rect class="viz-plot-bg" x="26" y="30" width="248" height="188" rx="5"></rect>
+				<text class="viz-axis-label" x="150" y="18" text-anchor="middle">PATH 1 · EMIT A EARLY</text>
+				<path d="M45 196H255M45 121H255M45 46H255M45 46V196M115 46V196M185 46V196M255 46V196" style="fill:none;stroke:var(--c-rule);stroke-width:1"></path>
+				<text class="viz-axis-label" x="45" y="232" text-anchor="middle">t=0</text>
+				<text class="viz-axis-label" x="115" y="232" text-anchor="middle">t=1</text>
+				<text class="viz-axis-label" x="185" y="232" text-anchor="middle">t=2</text>
+				<text class="viz-axis-label" x="255" y="232" text-anchor="middle">t=3</text>
+				<text class="viz-axis-label" x="17" y="200" text-anchor="middle">u=0</text>
+				<text class="viz-axis-label" x="17" y="125" text-anchor="middle">u=1</text>
+				<text class="viz-axis-label" x="17" y="50" text-anchor="middle">u=2</text>
+				<path d="M45 196V121H185V46H255" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:4;stroke-linejoin:round"></path>
+				<path d="M41 130L45 121L49 130M106 117L115 121L106 125M176 117L185 121L176 125M181 55L185 46L189 55M246 42L255 46L246 50" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<text class="viz-node-label" x="55" y="161">A</text>
+				<text class="viz-node-label" x="80" y="111">∅</text>
+				<text class="viz-node-label" x="150" y="111">∅</text>
+				<text class="viz-node-label" x="195" y="86">B</text>
+				<text class="viz-node-label" x="220" y="36">∅</text>
+				<circle cx="45" cy="196" r="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:2"></circle>
+				<circle cx="255" cy="46" r="5" style="fill:var(--viz-output-bg);stroke:var(--viz-edge);stroke-width:2"></circle>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 245" role="img" aria-labelledby="rnnt-late-title rnnt-late-desc">
+				<title id="rnnt-late-title">Alignment two advances acoustic time before emitting A</title>
+				<desc id="rnnt-late-desc">Starting at time zero and output position zero, the path moves right on a blank, up to emit A, right on a blank, up to emit B, and right once more on a blank. It reaches the same endpoint and emits the same A B transcript as alignment one.</desc>
+				<rect class="viz-plot-bg" x="26" y="30" width="248" height="188" rx="5"></rect>
+				<text class="viz-axis-label" x="150" y="18" text-anchor="middle">PATH 2 · EMIT A LATER</text>
+				<path d="M45 196H255M45 121H255M45 46H255M45 46V196M115 46V196M185 46V196M255 46V196" style="fill:none;stroke:var(--c-rule);stroke-width:1"></path>
+				<text class="viz-axis-label" x="45" y="232" text-anchor="middle">t=0</text>
+				<text class="viz-axis-label" x="115" y="232" text-anchor="middle">t=1</text>
+				<text class="viz-axis-label" x="185" y="232" text-anchor="middle">t=2</text>
+				<text class="viz-axis-label" x="255" y="232" text-anchor="middle">t=3</text>
+				<text class="viz-axis-label" x="17" y="200" text-anchor="middle">u=0</text>
+				<text class="viz-axis-label" x="17" y="125" text-anchor="middle">u=1</text>
+				<text class="viz-axis-label" x="17" y="50" text-anchor="middle">u=2</text>
+				<path d="M45 196H115V121H185V46H255" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:4;stroke-dasharray:8 4;stroke-linejoin:round"></path>
+				<path d="M106 192L115 196L106 200M111 130L115 121L119 130M176 117L185 121L176 125M181 55L185 46L189 55M246 42L255 46L246 50" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<text class="viz-node-label" x="80" y="186">∅</text>
+				<text class="viz-node-label" x="125" y="161">A</text>
+				<text class="viz-node-label" x="150" y="111">∅</text>
+				<text class="viz-node-label" x="195" y="86">B</text>
+				<text class="viz-node-label" x="220" y="36">∅</text>
+				<circle cx="45" cy="196" r="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:2"></circle>
+				<circle cx="255" cy="46" r="5" style="fill:var(--viz-output-bg);stroke:var(--viz-edge);stroke-width:2"></circle>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move right only on <strong>blank ∅</strong> to consume an acoustic frame; move up only on a <strong>token</strong> to extend the transcript without consuming time. Both labelled paths end at (t=3, u=2) and emit <code>A B</code>, so training adds both path probabilities rather than choosing one alignment. This original schematic was checked against <a href="https://arxiv.org/abs/1211.3711">Graves (2012)</a> and <a href="https://arxiv.org/abs/1811.06621">He et al. (2019)</a>.</figcaption>
+</figure>
+
 $$
 p(\mathbf{y} \mid X) = \sum_{\text{paths}} \prod p(\cdot),
 $$

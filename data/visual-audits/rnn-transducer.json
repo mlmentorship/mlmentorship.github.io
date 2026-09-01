@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "slug": "rnn-transducer",
+  "article": "src/content/posts/2026-05-31-rnn-transducer.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how blank and token transitions consume different axes of the RNN-T lattice, and explain why many monotonic paths can emit the same transcript.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align acoustic time, emitted-label position, two transition types, and two complete paths on one fixed lattice. The geometry is the lesson: horizontal blank edges advance time, while vertical token edges advance output without consuming another frame.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout does not preserve a regular T-by-U coordinate system or make axis consumption visually exact.",
+    "svg": "Selected: fixed coordinates keep each node at a precise (t, u) state and permit directly labelled solid and dashed example paths.",
+    "semanticHtml": "Rejected: a table can name lattice states, but connected transitions and alternate monotonic paths would be harder to trace across cell boundaries.",
+    "interaction": "Rejected: path stepping would add controls and runtime state without teaching more than two static, fully labelled example alignments.",
+    "paperReuse": "Rejected: Graves's paper and the local deck include related lattice figures, but no permissive figure-reuse license was established. The shipped lattice, paths, labels, wording, and proportions are independently authored.",
+    "noVisual": "Rejected: prose asks readers to mentally coordinate two asynchronous axes and a sum over paths. A small lattice makes the blank-versus-token invariant and alignment marginalization directly inspectable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 125,
+        "insight": "The preceding CTC slide introduces blank-labelled alignments and dynamic-programming summation, establishing the one-dimensional mechanism that RNN-T extends."
+      },
+      {
+        "page": 126,
+        "insight": "The dedicated RNN-T slide names the transcription, prediction, and joint networks; describes all T-by-U joint combinations; and states that horizontal blank transitions consume frames while vertical non-blank transitions consume labels."
+      },
+      {
+        "page": 127,
+        "insight": "The following slide begins a new topic and contains no additional RNN-T architecture, alignment, or decoding material."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 text-indexed the complete 214-page local deck for RNN-T, transducer, CTC, speech recognition, blank, and forward-backward references, then inspected the exact page 125-127 neighborhood. Page 126 is the sole dedicated RNN-T slide. Its text explicitly refers to Graves's lattice figure, but the deck gives no asset-level reuse license, so no deck image, wording, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Sequence Transduction with Recurrent Neural Networks",
+        "url": "https://arxiv.org/abs/1211.3711",
+        "usage": "Used as the primary source for the transcription, prediction, and joint-network factorization; the output lattice; blank and non-blank transitions; and forward-backward summation over alignments.",
+        "license": "The arXiv record provides public access but does not establish a permissive license for reusing the paper's figures. No figure, prose, example path, or paper-specific layout is copied or adapted."
+      },
+      {
+        "title": "Streaming End-to-End Speech Recognition for Mobile Devices",
+        "url": "https://arxiv.org/abs/1811.06621",
+        "usage": "Used as a primary production reference to verify the use of RNN-T for streaming, on-device speech recognition and the modern encoder, prediction-network, and joint-network formulation.",
+        "license": "No paper figure, table, prose, or empirical result is reused. The source is consulted only for technical claims, and public arXiv access is not treated as figure-reuse permission."
+      }
+    ],
+    "notes": "The hardest prose-only model is the asynchronous T-by-U lattice: a blank consumes acoustic time without emitting a label, while a token emits a label without advancing acoustic time. The original schematic uses a synthetic two-token target and no paper data. Both example paths are monotonic and contain exactly three blank transitions and two token transitions."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, inspected the full deck index and exact RNN-T slide neighborhood, and checked the foundational and production RNN-T papers before selecting an original two-path lattice."
+  },
+  "implementation": {
+    "visualIds": [
+      "rnnt-two-axis-alignment-lattice"
+    ],
+    "accessibility": "Each SVG panel has a linked title and complete description. Axes, transition labels, node coordinates, and both path sequences are written explicitly; blank transitions use horizontal arrows and the blank symbol, while token transitions use vertical arrows and token text, so color is redundant. The established two-panel primitive stacks below 640 pixels, allowing each compact 300-pixel viewBox to use the full article width at 390 CSS pixels; theme variables support dark mode, and shared print rules provide a light high-contrast rendering."
+  }
+}
