@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "slug": "precision-recall-f1",
+  "article": "src/content/posts/2025-09-20-precision-recall-f1.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "See why F1 falls toward the smaller of precision and recall instead of rewarding a high arithmetic average.",
+  "mediumRationale": "Semantic HTML is the smallest useful medium: two labelled, count-free comparison tables expose equal arithmetic means but different F1 scores, remain readable without JavaScript, and reflow through the established mobile primitive. Mermaid would imply a process that does not exist; deterministic SVG would turn exact values into less accessible drawing coordinates; interaction would add controls without improving this two-case comparison; reusing a paper or textbook figure would add provenance and permission risk for a simple mathematical construction; and no visual would leave the harmonic-mean penalty as an equation-only claim.",
+  "deckReview": {
+    "pages": [
+      {
+        "page": 36,
+        "insight": "The preceding slide covers classification surrogate losses; it supplies neighboring context but no precision-recall or F-score visual to reuse."
+      },
+      {
+        "page": 37,
+        "insight": "The classification-metrics slide defines precision and recall from TP, FP, and FN, gives a fire-alarm example, describes F-score as a harmonic mean, and introduces threshold tradeoffs through ROC."
+      },
+      {
+        "page": 38,
+        "insight": "The follow-on classification-evaluation slide uses a 90/10 imbalance example and opposite all-negative/all-positive extremes to contrast precision and recall, then states that F1 punishes extreme values."
+      },
+      {
+        "page": 39,
+        "insight": "The next slide moves to calibration and out-of-distribution detection; it does not develop the F1 harmonic-mean mental model."
+      }
+    ],
+    "notes": "All 214 PDF pages were text-searched for precision, recall, confusion matrix, F1, and F-score, then the complete pages 36–39 sequence was read. Pages 37–38 are directly relevant and their neighbors were checked. The deck states the penalty but does not spatially compare balanced and imbalanced pairs with the same arithmetic mean, which is the gap addressed here."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "scikit-learn f1_score documentation",
+        "url": "https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html",
+        "usage": "Used to verify the binary F1 definition, its equivalence to 2TP/(2TP+FP+FN), and the interpretation of its best and worst values.",
+        "license": "No documentation prose, code, or figure is copied. Only mathematical facts are referenced; scikit-learn documentation is distributed under the project BSD license."
+      },
+      {
+        "title": "Introduction to Information Retrieval, Evaluation of unranked retrieval sets",
+        "url": "https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-unranked-retrieval-sets-1.html",
+        "usage": "Used as an authoritative textbook source to verify precision, recall, the harmonic mean, and the beta-weighted F measure.",
+        "license": "No textbook text or figure is reused because figure-reuse permission is not explicit on the cited page. The implementation is an original numerical comparison derived from the published equations."
+      }
+    ],
+    "notes": "The visual uses original values: (0.50, 0.50) and (0.90, 0.10). Both pairs have arithmetic mean 0.50; their F1 scores are respectively 0.50 and 0.18 after rounding. No source artwork, layout, data, or code is reused."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3",
+    "reviewedAt": "2026-08-31",
+    "summary": "Reviewed the complete article, the full-deck term matches and adjacent pages, both authoritative sources, the arithmetic, licensing treatment, and all six medium choices. Chose a static semantic comparison because the article's distinct visual-learning gap is the harmonic-mean penalty, while linked entries already visualize confusion-matrix denominators and threshold curves."
+  },
+  "implementation": {
+    "visualIds": [
+      "precision-recall-f1-harmonic-penalty"
+    ],
+    "accessibility": "The figure uses a labelled heading, two real tables with explicit row headers and aria-labels, written equations, and a direct caption. Labels and numeric values carry all meaning without color. Existing visual panels stack below 640 pixels, theme tokens support dark mode, and print tokens preserve borders and text contrast."
+  }
+}
