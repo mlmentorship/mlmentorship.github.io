@@ -10,7 +10,7 @@
     "recognitionCue": "Use a trie when many dictionary words must be searched on the same board and their prefixes can share traversal work.",
     "invariant": "At each recursive call, the marked board path contains distinct adjacent cells spelling exactly the trie path to node; every emitted terminal has been removed, and every pruned trie branch can no longer produce an unseen word.",
     "stateModel": "Retain the shared mutable trie, current trie node, board coordinate, in-place visited marks, answer list, and recursion path; restore each board character before returning.",
-    "visualRationale": "The first frame exposes every real trie prefix edge in a narrow-width shared-prefix list, then fixed board geometry shows a stable cursor and ordered path cells moving with trie-prefix labels, terminal pops, restoration, and pruning.",
+    "visualRationale": "The first frame draws one node per shared prefix, including oat continuing to oath, then fixed board geometry shows a stable cursor and ordered path cells moving with trie-prefix labels, terminal pops, restoration, and pruning.",
     "rejectedAlternatives": [
       "Running independent Word Search for every word repeats shared prefixes and ignores the supplied trie optimization.",
       "A board-only path animation hides why impossible prefixes stop and why found words are emitted once.",

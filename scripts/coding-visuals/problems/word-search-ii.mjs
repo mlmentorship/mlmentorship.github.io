@@ -1,6 +1,27 @@
-import { array, defineVisual, frame, grid, visual } from '../primitives.mjs';
+import { defineVisual, frame, grid, trie, visual } from '../primitives.mjs';
 
 const board = [['o', 'a', 't'], ['e', 't', 'h'], ['e', 'a', 't']];
+const trieNodes = [
+  { key: 'root', label: 'root', x: 240, y: 28 },
+  { key: 'o', label: 'o', x: 80, y: 82 },
+  { key: 'e', label: 'e', x: 240, y: 82 },
+  { key: 'p', label: 'p', x: 400, y: 82 },
+  { key: 'oa', label: 'oa', x: 80, y: 136 },
+  { key: 'ea', label: 'ea', x: 240, y: 136 },
+  { key: 'pe', label: 'pe', x: 400, y: 136 },
+  { key: 'oat', label: 'oat', x: 80, y: 190, terminal: true },
+  { key: 'eat', label: 'eat', x: 240, y: 190, terminal: true },
+  { key: 'pea', label: 'pea', x: 400, y: 190, terminal: true },
+  { key: 'oath', label: 'oath', x: 80, y: 244, terminal: true },
+];
+const trieEdge = (from, to, label) => ({ key: `edge-${from}-${to}`, from, to, label });
+const trieEdges = [
+  trieEdge('root', 'o', 'o'), trieEdge('root', 'e', 'e'), trieEdge('root', 'p', 'p'),
+  trieEdge('o', 'oa', 'a'), trieEdge('e', 'ea', 'a'), trieEdge('p', 'pe', 'e'),
+  trieEdge('oa', 'oat', 't'), trieEdge('ea', 'eat', 't'), trieEdge('pe', 'pea', 'a'),
+  trieEdge('oat', 'oath', 'h'),
+];
+const triePaths = ['oat', 'oath', 'eat', 'pea'].map((word) => ({ word, prefix: 'terminal' }));
 const boardState = (row, col, path, extra = {}) => {
   const coordinates = new Map(path.map(([pathRow, pathCol], index) => [`${pathRow},${pathCol}`, index]));
   const marks = [];
@@ -21,14 +42,15 @@ const boardState = (row, col, path, extra = {}) => {
 };
 
 const draft = visual('Follow board cells and trie children together, mark the current path in place, emit terminal words once, and prune exhausted trie branches while backtracking.', [
-  frame('Build the shared prefix trie', 'Insert words oat, oath, eat, and pea. oat is terminal at t while oath continues from that same t to h.', array([
-    'root -> o -> a -> t*',
-    't -> h*',
-    'root -> e -> a -> t*',
-    'root -> p -> e -> a*',
-  ], [], {
+  frame('Build the shared prefix trie', 'Insert words oat, oath, eat, and pea. oat is terminal at t while oath continues from that same t to h.', trie(triePaths, {
+    nodes: trieNodes,
+    edges: trieEdges,
+    active: ['root'],
+    width: 480,
+    height: 275,
     board: '[[o,a,t],[e,t,h],[e,a,t]]',
-    terminals: '* marks oat, oath, eat, and pea',
+    terminals: 'double borders mark oat, oath, eat, and pea',
+    motion: [{ key: 'trie-cursor', kind: 'pointer', x: 240, y: 28, label: 'current root' }],
   }), 'build-trie'),
   frame('Start at board (0,0)=o', 'Root has child o, so descend into that trie node and temporarily mark board (0,0) as visited.', boardState(0, 0, [[0, 0]], {
     triePrefix: 'o',
@@ -82,7 +104,7 @@ const review = {
   recognitionCue: 'Use a trie when many dictionary words must be searched on the same board and their prefixes can share traversal work.',
   invariant: 'At each recursive call, the marked board path contains distinct adjacent cells spelling exactly the trie path to node; every emitted terminal has been removed, and every pruned trie branch can no longer produce an unseen word.',
   stateModel: 'Retain the shared mutable trie, current trie node, board coordinate, in-place visited marks, answer list, and recursion path; restore each board character before returning.',
-  visualRationale: 'The first frame exposes every real trie prefix edge in a narrow-width shared-prefix list, then fixed board geometry shows a stable cursor and ordered path cells moving with trie-prefix labels, terminal pops, restoration, and pruning.',
+  visualRationale: 'The first frame draws one node per shared prefix, including oat continuing to oath, then fixed board geometry shows a stable cursor and ordered path cells moving with trie-prefix labels, terminal pops, restoration, and pruning.',
   rejectedAlternatives: [
     'Running independent Word Search for every word repeats shared prefixes and ignores the supplied trie optimization.',
     'A board-only path animation hides why impossible prefixes stop and why found words are emitted once.',
