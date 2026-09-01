@@ -100,6 +100,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
 
 <script>
   import { absolutizeVisualLinks, extractLearningVisual } from '../../../../utils/visualReviewClient';
+  import { enhanceCodingVisuals } from '../../../../utils/codingVisuals';
 
   interface ReviewEntry {
     slug: string;
@@ -224,6 +225,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
         const figure = document.importNode(extracted.figure, true);
         absolutizeVisualLinks(figure, entry.href);
         visualHost.replaceChildren(figure);
+        enhanceCodingVisuals(visualHost);
         if (extracted.source && sourceHost && sourceDetails) {
           const note = document.importNode(extracted.source, true);
           absolutizeVisualLinks(note, entry.href);

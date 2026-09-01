@@ -227,6 +227,7 @@ const chapterReviewHref = libraryLocation
 
 <script>
   import { extractLearningVisual } from '../utils/visualReviewClient';
+  import { enhanceCodingVisuals } from '../utils/codingVisuals';
 
   function promoteArticleVisual() {
     const wrapper = document.querySelector<HTMLElement>('[data-article-quick-review]');
@@ -260,7 +261,9 @@ const chapterReviewHref = libraryLocation
   }
 
   promoteArticleVisual();
+  enhanceCodingVisuals();
   document.addEventListener('astro:page-load', promoteArticleVisual);
+  document.addEventListener('astro:page-load', () => enhanceCodingVisuals());
 </script>
 
 <style>

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "slug": "coding-interview-method",
+  "article": "src/content/posts/2026-09-01-coding-interview-method.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Use the four-question rehearsal cue, state, invariant, and move to rebuild a solution instead of memorizing its code.",
+  "mediumRationale": "A compact loop of labeled questions makes the retrieval routine visible and gives the learner one stable mental scaffold for all 106 problem pages.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a process graph would show sequence but would not give each question a clear retrieval job.",
+    "svg": "Rejected: the learning method is a set of readable prompts, not coordinate geometry.",
+    "semanticHtml": "Selected: semantic step panels keep the rehearsal usable at phone width, in print, and without color.",
+    "interaction": "Rejected: the method should remain visible while the learner practices and should not hide its prompts behind controls.",
+    "paperReuse": "Rejected: the visual is an original synthesis of the supplied guide's learning method.",
+    "noVisual": "Rejected: prose names the four questions, but the visual sequence makes their order and handoff easier to retrieve."
+  },
+  "deckReview": {
+    "pages": [],
+    "notes": "No source slide deck is part of the supplied coding guide. The visual was designed from its cue, state, rule, move, and spaced-review method."
+  },
+  "sourceReview": {
+    "sources": [],
+    "notes": "The supplied Coding_Questions_Phone_Guide.md is the source for the method and practice sequence. No source artwork is reused."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot",
+    "reviewedAt": "2026-09-01",
+    "summary": "Checked that the guide visual makes the retrieval loop explicit, names an invariant, and remains useful without depending on the exact wording of any one problem."
+  },
+  "implementation": {
+    "visualIds": [
+      "coding-interview-method-state"
+    ],
+    "accessibility": "The figure has a labelled title, a role=img with a complete description, visible question labels, a rebuild invariant, and a direct Read it this way caption."
+  }
+}

@@ -389,6 +389,70 @@ export const LIBRARY_VOLUMES: LibraryVolume[] = [
       },
     ],
   },
+  {
+    id: 'coding-interview',
+    number: 'X',
+    title: 'Coding interview practice',
+    shortTitle: 'Coding practice',
+    description: 'A visual-first coding field guide for data structures, algorithms, and practical AI coding. Learn each problem by seeing the state it preserves, the move it makes, and the invariant that makes the move safe.',
+    chapters: [
+      {
+        id: 'method', title: 'Learn by rebuilding', description: 'Use cues, state, invariants, and spaced rebuilding to turn unfamiliar prompts into recognizable mental models.',
+        difficulty: 'Foundation', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['coding-interview-method'],
+      },
+      {
+        id: 'remember-the-past', title: 'Remember the past', description: 'Use maps, sets, and saved boundary values to turn repeated searching into one pass.',
+        difficulty: 'Foundation', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['two-sum', 'valid-anagram', 'group-anagrams', 'longest-consecutive-sequence', 'product-of-array-except-self', 'subarray-sum-equals-k'],
+      },
+      {
+        id: 'move-boundaries', title: 'Move boundaries', description: 'Use sorted order, windows, and answer-space search to discard impossible regions safely.',
+        difficulty: 'Foundation', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['3sum', 'container-with-most-water', 'longest-substring-without-repeating-characters', 'longest-repeating-character-replacement', 'permutation-in-string', 'count-number-of-nice-subarrays', 'binary-search', 'search-in-rotated-sorted-array', 'koko-eating-bananas', 'find-minimum-in-rotated-sorted-array'],
+      },
+      {
+        id: 'unfinished-work', title: 'Keep unfinished work', description: 'Use stacks and monotonic state when the newest unresolved item must be handled first.',
+        difficulty: 'Foundation', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['valid-parentheses', 'decode-string', 'daily-temperatures', 'min-stack'],
+      },
+      {
+        id: 'next-best-item', title: 'Process the next best item', description: 'Let queues, heaps, and shortest-path frontiers decide which reachable item comes next.',
+        difficulty: 'Intermediate', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['kth-largest-element', 'top-k-frequent-elements', 'rotting-oranges', 'binary-tree-level-order-traversal', 'network-delay-time'],
+      },
+      {
+        id: 'explore-choices', title: 'Explore choices', description: 'Traverse graphs, trees, choice paths, and smaller dynamic-programming states without losing the invariant.',
+        difficulty: 'Intermediate', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['clone-graph', 'number-of-islands', 'pacific-atlantic-water-flow', 'maximum-depth-of-binary-tree', 'same-tree', 'invert-binary-tree', 'balanced-binary-tree', 'subtree-of-another-tree', 'subsets', 'permutations', 'combination-sum', 'word-search', 'climbing-stairs', 'house-robber', 'partition-equal-subset-sum', 'longest-common-subsequence', 'edit-distance'],
+      },
+      {
+        id: 'useful-order', title: 'Create a useful order', description: 'Sort ranges, commit safe greedy choices, remove prerequisites, and join connected groups.',
+        difficulty: 'Intermediate', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['merge-intervals', 'insert-interval', 'non-overlapping-intervals', 'meeting-rooms-ii', 'jump-game', 'course-schedule', 'course-schedule-ii', 'redundant-connection'],
+      },
+      {
+        id: 'change-links', title: 'Change links', description: 'Rewire linked lists and prefix trees while preserving the pointer or path you still need.',
+        difficulty: 'Intermediate', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['reverse-linked-list', 'linked-list-cycle', 'remove-nth-node-from-end', 'merge-two-sorted-lists', 'implement-trie', 'design-add-and-search-words'],
+      },
+      {
+        id: 'core-coverage', title: 'Complete core coverage', description: 'Reuse the main patterns across bits, strings, matrices, trees, graphs, intervals, and caches.',
+        difficulty: 'Mixed', priority: 'Core', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation'],
+        slugs: ['contains-duplicate', 'maximum-subarray', 'best-time-to-buy-and-sell-stock', 'maximum-product-subarray', 'number-of-1-bits', 'counting-bits', 'missing-number', 'reverse-bits', 'sum-of-two-integers', 'coin-change', 'longest-increasing-subsequence', 'word-break', 'combination-sum-iv', 'house-robber-ii', 'decode-ways', 'unique-paths', 'graph-valid-tree', 'number-of-connected-components', 'meeting-rooms', 'reorder-list', 'set-matrix-zeroes', 'spiral-matrix', 'rotate-image', 'valid-palindrome', 'longest-palindromic-substring', 'palindromic-substrings', 'encode-and-decode-strings', 'construct-tree-from-preorder-and-inorder-traversal', 'validate-binary-search-tree', 'kth-smallest-element-in-a-bst', 'lowest-common-ancestor-in-a-bst', 'lru-cache'],
+      },
+      {
+        id: 'practical-ai-coding', title: 'Practical AI coding', description: 'Make array shapes, masks, numerical stability, batching, selection, and metrics visible before coding.',
+        difficulty: 'Intermediate', priority: 'Role-specific', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'ML implementation', 'ML breadth'],
+        slugs: ['pairwise-squared-distances', 'stable-softmax', 'cross-entropy-from-logits', 'causal-attention', 'pad-variable-length-sequences', 'mini-batches', 'top-k-scores', 'binary-precision-and-recall'],
+      },
+      {
+        id: 'hard-problems', title: 'Hard problems', description: 'Combine boundaries, stacks, trees, grids, tries, heaps, and answer search after the core patterns feel natural.',
+        difficulty: 'Advanced', priority: 'Specialist', roles: ['MLE', 'RE', 'AS'], rounds: ['Coding', 'Work sample'],
+        slugs: ['minimum-window-substring', 'split-array-largest-sum', 'largest-rectangle-in-histogram', 'binary-tree-maximum-path-sum', 'serialize-and-deserialize-binary-tree', 'longest-increasing-path-in-a-matrix', 'alien-dictionary', 'word-search-ii', 'merge-k-sorted-lists', 'find-median-from-data-stream'],
+      },
+    ],
+  },
 ];
 
 export const LIBRARY_SHELVES: LibraryShelf[] = [
@@ -414,7 +478,7 @@ export const LIBRARY_SHELVES: LibraryShelf[] = [
     id: 'interview-execution',
     title: 'Interview execution',
     description: 'Prepare role choice, project evidence, behavioral judgment, and senior-level communication.',
-    volumeIds: ['interview-practice'],
+    volumeIds: ['interview-practice', 'coding-interview'],
   },
 ];
 

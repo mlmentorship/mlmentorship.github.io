@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "slug": "meeting-rooms-ii",
+  "article": "src/content/posts/2026-09-01-meeting-rooms-ii.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Meeting Rooms II: start 1, start 2, end 3 -> two active meetings need two rooms. The heap root is the next candidate whose priority is safe to process.",
+  "mediumRationale": "A compact semantic state map pairs a pattern-specific data-structure sketch with the algorithm invariant before code. It is responsive, printable, color-independent, and easier to revisit than a decorative algorithm illustration.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout would add structure without showing the changing local state clearly.",
+    "svg": "Rejected: the problem family benefits from labeled state cards rather than coordinate geometry.",
+    "semanticHtml": "Selected: a pattern-specific sketch plus labeled steps keeps the input shape, retained state, safe move, and completion condition readable at phone width.",
+    "interaction": "Selected as progressive enhancement: an explicit step player highlights the invariant path, while the static figure remains complete for print and no-JavaScript readers.",
+    "paperReuse": "Rejected: the visual is an original synthesis and does not reuse source artwork.",
+    "noVisual": "Rejected: prose alone makes the learner hold the state transition in working memory."
+  },
+  "deckReview": {
+    "pages": [],
+    "notes": "No source slide deck is part of the supplied coding guide. The visual was designed from the local problem explanation and the algorithm invariant."
+  },
+  "sourceReview": {
+    "sources": [],
+    "notes": "The supplied Coding_Questions_Phone_Guide.md is the curriculum source. The page preserves its task, pattern, simple idea, implementation sketch, and cost while adding an original visual state map."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot",
+    "reviewedAt": "2026-09-01",
+    "summary": "Checked that the figure names a concrete algorithm state, includes an invariant, remains understandable without color, and appears before the implementation sketch."
+  },
+  "implementation": {
+    "visualIds": [
+      "meeting-rooms-ii-state"
+    ],
+    "accessibility": "The figure has a labelled title, a role=group state map with a complete aria-label, visible text labels, a direct Read it this way caption, and keyboard-sized controls that are hidden until enhanced."
+  }
+}

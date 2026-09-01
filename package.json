@@ -15,7 +15,8 @@
     "check:style": "node scripts/check-editorial-style.mjs",
     "check:visuals": "node scripts/check-visual-coverage.mjs",
     "visuals:status": "node scripts/check-visual-coverage.mjs --next=20",
-    "visuals:batch": "node scripts/create-visual-batch.mjs"
+    "visuals:batch": "node scripts/create-visual-batch.mjs",
+    "content:coding-book": "node scripts/generate-coding-question-book.mjs --force"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
