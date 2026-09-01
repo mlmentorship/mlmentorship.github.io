@@ -12,6 +12,27 @@ category: "questions"
 
 The textbook answer is "two-tower is faster, cross-encoder is more accurate." The senior answer is "both, in sequence: bi-encoder for retrieval, cross-encoder for reranking." Trade-offs and training discipline are where the level signal sits.
 
+<!-- visual:two-tower-cross-encoder-fanout -->
+<figure class="learning-figure" aria-labelledby="two-stage-fanout-title">
+<p class="visual-kicker">Learning objective</p>
+<h3 class="visual-title" id="two-stage-fanout-title">Why does joint scoring belong after retrieval?</h3>
+<div class="visual-grid--two" role="group" aria-label="A two-stage comparison: the two-tower reuses precomputed item vectors to reduce a catalog of N items to K candidates, then the cross-encoder performs K fresh joint query-item evaluations to produce the final ranking">
+<section class="visual-panel">
+<h4>1 &#183; RETRIEVE: REUSE</h4>
+<p><strong>Before the query</strong><br />Encode each of the <var>N</var> items independently once, then store its vector in an ANN index.</p>
+<p><strong>For this query</strong><br />Encode the query once. Vector similarity searches the reusable index.</p>
+<p><strong>Output: <var>N</var> &#8594; <var>K</var></strong><br />Keep a broad candidate set. No query-item token interaction has happened yet.</p>
+</section>
+<section class="visual-panel">
+<h4>2 &#183; RERANK: INTERACT</h4>
+<p><strong>For candidate 1</strong><br />Jointly encode <q>query + item 1</q> &#8594; relevance score.</p>
+<p><strong>Repeat through candidate <var>K</var></strong><br />Cross-attention can inspect fine-grained token matches, but every pair is fresh work.</p>
+<p><strong>Output: <var>K</var> &#8594; final few</strong><br />Spend the expressive model only where retrieval made its cost bounded.</p>
+</section>
+</div>
+<figcaption><strong>Read it this way:</strong> the two-tower earns scale by making item representations reusable before any query arrives; that independence is also what hides fine-grained query-item interactions. Retrieve broadly with those cached vectors, then pay for <var>K</var> joint cross-encoder passes rather than <var>N</var>. Original schematic checked against <a href="https://aclanthology.org/2020.emnlp-main.550/">Dense Passage Retrieval</a> and <a href="https://arxiv.org/abs/1901.04085">Passage Re-ranking with BERT</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "Two-tower is faster but less accurate. Cross-encoder is more accurate but slower. So you use two-tower when speed matters and cross-encoder when accuracy matters."
