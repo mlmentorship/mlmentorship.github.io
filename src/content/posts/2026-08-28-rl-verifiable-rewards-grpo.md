@@ -50,6 +50,68 @@ where $\bar{r}$ is the group mean and $s_r$ is the group standard deviation.
 
 Outputs above the group average get positive advantage. Outputs below it get negative advantage.
 
+<!-- visual:grpo-group-relative-signal -->
+<figure class="learning-figure visual-wide plot-panel" aria-labelledby="grpo-group-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="grpo-group-title">When does a group of verified outputs create a learning direction?</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 760 390" role="img" aria-labelledby="grpo-group-svg-title grpo-group-svg-desc">
+			<title id="grpo-group-svg-title">GRPO relative advantages for a mixed-reward group and an equal-reward group</title>
+			<desc id="grpo-group-svg-desc">Two panels each contain four outputs sampled for one prompt. In the first panel, two outputs fail with reward zero and two pass with reward one. Their group mean is one half, so the failed outputs have negative relative advantage and the passing outputs have positive relative advantage. In the second panel, all four outputs pass with reward one. The mean is one and every reward equals it, so every relative advantage is zero and the group supplies no preference direction.</desc>
+			<defs>
+				<marker id="grpo-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="viz-arrow-forward" d="M0 0L10 5L0 10Z"></path></marker>
+			</defs>
+			<rect class="viz-plot-bg" x="20" y="42" width="350" height="300" rx="4"></rect>
+			<rect class="viz-plot-bg" x="390" y="42" width="350" height="300" rx="4"></rect>
+			<text class="viz-callout" x="195" y="25" text-anchor="middle">Prompt A · mixed verifier outcomes</text>
+			<text class="viz-callout" x="565" y="25" text-anchor="middle">Prompt B · every output gets the same reward</text>
+			<text class="viz-axis-label" x="42" y="72">1. Verify each sampled output</text>
+			<text class="viz-axis-label" x="412" y="72">1. Verify each sampled output</text>
+			<rect class="viz-node viz-node--input" x="42" y="88" width="66" height="54" rx="4"></rect>
+			<rect class="viz-node viz-node--input" x="122" y="88" width="66" height="54" rx="4"></rect>
+			<rect class="viz-node viz-node--output" x="202" y="88" width="66" height="54" rx="4"></rect>
+			<rect class="viz-node viz-node--output" x="282" y="88" width="66" height="54" rx="4"></rect>
+			<text class="viz-node-label" x="75" y="111">Fail</text><text class="viz-node-value" x="75" y="130">reward 0</text>
+			<text class="viz-node-label" x="155" y="111">Fail</text><text class="viz-node-value" x="155" y="130">reward 0</text>
+			<text class="viz-node-label" x="235" y="111">Pass</text><text class="viz-node-value" x="235" y="130">reward 1</text>
+			<text class="viz-node-label" x="315" y="111">Pass</text><text class="viz-node-value" x="315" y="130">reward 1</text>
+			<rect class="viz-node viz-node--output" x="412" y="88" width="66" height="54" rx="4"></rect>
+			<rect class="viz-node viz-node--output" x="492" y="88" width="66" height="54" rx="4"></rect>
+			<rect class="viz-node viz-node--output" x="572" y="88" width="66" height="54" rx="4"></rect>
+			<rect class="viz-node viz-node--output" x="652" y="88" width="66" height="54" rx="4"></rect>
+			<text class="viz-node-label" x="445" y="111">Pass</text><text class="viz-node-value" x="445" y="130">reward 1</text>
+			<text class="viz-node-label" x="525" y="111">Pass</text><text class="viz-node-value" x="525" y="130">reward 1</text>
+			<text class="viz-node-label" x="605" y="111">Pass</text><text class="viz-node-value" x="605" y="130">reward 1</text>
+			<text class="viz-node-label" x="685" y="111">Pass</text><text class="viz-node-value" x="685" y="130">reward 1</text>
+			<path class="viz-forward" style="marker-end:url(#grpo-arrow)" d="M195 150V174"></path>
+			<path class="viz-forward" style="marker-end:url(#grpo-arrow)" d="M565 150V174"></path>
+			<rect class="viz-node viz-node--focus" x="105" y="178" width="180" height="48" rx="4"></rect>
+			<rect class="viz-node viz-node--focus" x="475" y="178" width="180" height="48" rx="4"></rect>
+			<text class="viz-node-label" x="195" y="199">2. Group baseline</text><text class="viz-node-value" x="195" y="216">mean reward = 0.5</text>
+			<text class="viz-node-label" x="565" y="199">2. Group baseline</text><text class="viz-node-value" x="565" y="216">mean reward = 1</text>
+			<path class="viz-forward" style="marker-end:url(#grpo-arrow)" d="M195 234V258"></path>
+			<path class="viz-forward" style="marker-end:url(#grpo-arrow)" d="M565 234V258"></path>
+			<text class="viz-axis-label" x="42" y="278">3. Relative advantages</text>
+			<text class="viz-axis-label" x="412" y="278">3. Relative advantages</text>
+			<text class="viz-callout" x="75" y="306" text-anchor="middle">A₁ &lt; 0</text>
+			<text class="viz-callout" x="155" y="306" text-anchor="middle">A₂ &lt; 0</text>
+			<text class="viz-callout" x="235" y="306" text-anchor="middle">A₃ &gt; 0</text>
+			<text class="viz-callout" x="315" y="306" text-anchor="middle">A₄ &gt; 0</text>
+			<path class="viz-baseline" d="M42 318H348"></path>
+			<text class="viz-label" x="195" y="334" text-anchor="middle">decrease failed outputs · increase passing outputs</text>
+			<text class="viz-callout" x="445" y="306" text-anchor="middle">A₁ = 0</text>
+			<text class="viz-callout" x="525" y="306" text-anchor="middle">A₂ = 0</text>
+			<text class="viz-callout" x="605" y="306" text-anchor="middle">A₃ = 0</text>
+			<text class="viz-callout" x="685" y="306" text-anchor="middle">A₄ = 0</text>
+			<path class="viz-baseline" d="M412 318H718"></path>
+			<text class="viz-label" x="565" y="334" text-anchor="middle">no within-group preference direction</text>
+			<text class="viz-axis-label" x="195" y="368" text-anchor="middle">Variation creates a relative signal</text>
+			<text class="viz-axis-label" x="565" y="368" text-anchor="middle">Equal rewards collapse the relative signal</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare each reward only with the mean for its own prompt. Prompt A has outcomes on both sides of 0.5, so GRPO gets negative and positive advantages without a learned value model. For Prompt B, every reward equals the mean; all numerators are zero, so this group says nothing about which output to prefer. The original example is checked against <a href="https://arxiv.org/abs/2402.03300">DeepSeekMath’s GRPO formulation</a> and the <a href="https://huggingface.co/docs/trl/main/en/grpo_trainer">TRL GRPO documentation</a>.</figcaption>
+</figure>
+
 GRPO then uses a clipped policy update, similar to PPO, and often adds a penalty that keeps the new policy near a reference policy. The exact loss differs across implementations.
 
 The group reward provides a local baseline for the outputs sampled for one task. This removes the need to train a separate value function. A reference-policy penalty may still limit how far the policy changes.
