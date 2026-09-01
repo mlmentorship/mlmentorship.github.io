@@ -69,9 +69,6 @@ After training, the optimal $w = \sum_i \alpha_i y_i x_i$ (in primal) or its ker
 		<text class="viz-label" x="116" y="66" text-anchor="end">f(x) = −1</text>
 		<text class="viz-label" x="184" y="66">f(x) = 0</text>
 		<text class="viz-label" x="244" y="66">f(x) = +1</text>
-		<path d="M120 82H240" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5"></path>
-		<path d="M120 77V87M240 77V87" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5"></path>
-		<text class="viz-callout" x="180" y="78" text-anchor="middle">margin width = 2 / ‖w‖</text>
 		<circle cx="58" cy="112" r="6" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></circle>
 		<circle cx="74" cy="211" r="6" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></circle>
 		<text class="viz-label" x="38" y="132">beyond margin</text>

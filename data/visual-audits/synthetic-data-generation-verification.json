@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "synthetic-data-generation-verification",
+  "article": "src/content/posts/2026-08-28-synthetic-data-generation-verification.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate evidence used to admit synthetic examples into training from fresh held-out evidence used only to confirm that the trained model learned the target capability.",
+  "mediumRationale": "A deterministic two-lane SVG is the smallest medium that can show both independence boundaries at once. The development lane admits generated candidates only through executable or otherwise external evidence plus coverage and decontamination checks; the confirmation lane combines the frozen student with fresh held-out families that never feed generation, filtering, or training.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could represent both paths, but automatic layout would make the no-feedback boundary between held-out evidence and the development loop less reliable and could shrink the lane labels.",
+    "svg": "Selected: fixed lanes, a labelled separation rule, explicit evidence examples, and directional arrows preserve the two different roles of verification and final evaluation without runtime code.",
+    "semanticHtml": "Rejected: paired cards can list the stages, but they do not make the one-way held-out boundary or the convergence of a frozen student and fresh tasks into confirmation as spatially immediate.",
+    "interaction": "Rejected: changing generators, pass rates, or mixture ratios would add controls and unsupported quantitative implications without improving the single independence lesson.",
+    "paperReuse": "Rejected: the reviewed sources contain generation pipelines and empirical figures, but none teaches this exact two-boundary distinction. Although the Self-Instruct and model-collapse articles are CC BY 4.0, the ReST EM and Phi-1 arXiv records did not establish a permissive figure-adaptation license. No figure, data, wording, coordinates, or layout is copied.",
+    "noVisual": "Rejected: the prose names independent verification and held-out evaluation in separate sections, leaving it easy to treat both as one generic quality score. A spatial explanation shows that verifier evidence may select training rows, whereas final evaluation must not feed the generator, filters, or training mixture."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 105,
+        "insight": "The Toolformer discussion describes model-generated API calls that are retained only when calls work and help future-token prediction. It is a concrete generate-check-train example, but the slide does not separate a final held-out evaluation."
+      },
+      {
+        "page": 106,
+        "insight": "The LLM-data slide is the closest topical source. It describes Phi-1's generated textbook and exercise data, strategic topic selection, knowledge-gap coverage, injected prompt randomness, and the need for quality and diversity, but provides no verification or evaluation-boundary diagram."
+      },
+      {
+        "page": 107,
+        "insight": "The following LLM-training slide moves to compute throughput, continual learning, and systems choices, confirming that the synthetic-data discussion ends without a held-out verification model."
+      },
+      {
+        "page": 128,
+        "insight": "The model-compression slide defines teacher-student distillation as matching teacher outputs or internal representations. It supplies context for one synthetic-data use case but does not independently verify generated examples or protect evaluation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for synthetic data, generated data, generation, verification, verifier, filtering, textbook quality, distillation, diversity, and model collapse. Pages 104-107 were read as the LLM-data neighborhood, and pages 127-129 were read around the distillation mention. Page 106 is the only dedicated generated-training-data treatment; page 105 adds a checked Toolformer example and page 128 adds distillation context. No slide provides the required independent-evidence and held-out-confirmation lanes. No deck pixels, wording, examples, data, coordinates, or layout are reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Self-Instruct: Aligning Language Models with Self-Generated Instructions",
+        "url": "https://aclanthology.org/2023.acl-long.754/",
+        "usage": "Used as a primary example of bootstrapping model-generated instructions with validity filtering and similarity-based removal, and as evidence that generation requires explicit filtering and diversity controls.",
+        "license": "ACL materials published from 2016 onward are CC BY 4.0. Adaptation is permitted with attribution, but no paper figure, prompt, example, empirical value, prose, or layout is reused because the article needs a different evidence-boundary lesson."
+      },
+      {
+        "title": "Beyond Human Data: Scaling Self-Training for Problem-Solving with Language Models",
+        "url": "https://arxiv.org/abs/2312.06585",
+        "usage": "Used as the primary source for generating multiple math and code solutions, filtering them with external binary feedback, training on accepted samples, and evaluating transfer on held-out tasks.",
+        "license": "The arXiv record provides public access but was not treated as a permissive third-party figure-adaptation license. No figure, algorithm formatting, benchmark result, wording, or layout is copied."
+      },
+      {
+        "title": "Textbooks Are All You Need",
+        "url": "https://arxiv.org/abs/2306.11644",
+        "usage": "Used to cross-check synthetic textbook and exercise generation, deliberate coverage and balance, and the reported limitations from restricted language and style diversity.",
+        "license": "The arXiv record provides public access but did not establish a permissive figure-reuse grant. No dataset statistic, result, figure, wording, prompt, or visual structure is reproduced."
+      },
+      {
+        "title": "AI models collapse when trained on recursively generated data",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11269175/",
+        "usage": "Used as the primary source for the risk that indiscriminate recursive training loses low-probability behavior and narrows the learned distribution, supporting retained real data and explicit coverage audits.",
+        "license": "The article is CC BY 4.0 and permits adaptation with attribution. No figure, experiment, plotted value, prose, or layout is reused; the implementation is an original process diagram."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free arXiv access can use several different submission licenses and does not by itself imply broad third-party reuse rights.",
+        "license": "The policy supports the conservative no-reuse treatment for the reviewed arXiv sources. No policy text, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that verification and evaluation are independent in different directions. A deterministic test, solver, simulator, trusted database, or calibrated review can decide whether a candidate enters the training pool; that decision is part of development. A fresh held-out family must bypass generation and filtering, meet only the frozen student at final evaluation, and support a capability claim only within its tested scope. Diversity and decontamination remain a distinct admission gate because correctness alone can admit repetitive or leaked examples."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant neighborhoods, then reviewed primary work on self-generated instructions, externally verified self-training, synthetic textbook data, and recursive model collapse plus applicable licensing policies before selecting an original two-lane evidence diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "synthetic-data-two-independent-evidence-gates"
+    ],
+    "accessibility": "The SVG has a linked title and complete description of both lanes. Every node and arrow is directly labelled, the development lane is numbered, the held-out lane is separated by a heavy rule and explicit never-used-for-development text, and verifier examples are written out, so color is redundant. The established wide scroll wrapper keeps labels readable at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette."
+  }
+}

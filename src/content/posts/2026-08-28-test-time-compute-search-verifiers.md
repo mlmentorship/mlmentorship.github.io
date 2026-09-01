@@ -75,10 +75,10 @@ Use a calculator, code runner, search index, theorem checker, or external enviro
 		<rect class="viz-node viz-node--output" x="108" y="59" width="82" height="43" rx="4"></rect>
 		<rect class="viz-node" x="18" y="110" width="82" height="43" rx="4"></rect>
 		<rect class="viz-node" x="108" y="110" width="82" height="43" rx="4"></rect>
-		<text class="viz-axis-label" x="27" y="76">A</text><text class="viz-label" x="59" y="77" text-anchor="middle">wrong</text><text class="viz-label" x="59" y="92" text-anchor="middle">arithmetic</text>
-		<text class="viz-axis-label" x="117" y="76">B</text><text class="viz-callout" x="149" y="77" text-anchor="middle">CORRECT</text><text class="viz-label" x="149" y="92" text-anchor="middle">solution</text>
-		<text class="viz-axis-label" x="27" y="127">C</text><text class="viz-label" x="59" y="129" text-anchor="middle">incomplete</text>
-		<text class="viz-axis-label" x="117" y="127">D</text><text class="viz-label" x="149" y="128" text-anchor="middle">polished</text><text class="viz-label" x="149" y="143" text-anchor="middle">wrong shortcut</text>
+		<text class="viz-label" x="59" y="77" text-anchor="middle">A · wrong</text><text class="viz-label" x="59" y="92" text-anchor="middle">arithmetic</text>
+		<text class="viz-callout" x="149" y="77" text-anchor="middle">B · CORRECT</text><text class="viz-label" x="149" y="92" text-anchor="middle">solution</text>
+		<text class="viz-label" x="59" y="132" text-anchor="middle">C · incomplete</text>
+		<text class="viz-label" x="149" y="128" text-anchor="middle">D · polished</text><text class="viz-label" x="149" y="143" text-anchor="middle">wrong shortcut</text>
 		<path d="M198 105H216" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#test-time-arrow)"></path>
 		<rect class="viz-node viz-node--focus" x="222" y="59" width="118" height="43" rx="4"></rect>
 		<text class="viz-axis-label" x="281" y="76" text-anchor="middle">PROTECTED TESTS</text>
@@ -95,10 +95,10 @@ Use a calculator, code runner, search index, theorem checker, or external enviro
 		<rect class="viz-node viz-node--output" x="108" y="261" width="82" height="43" rx="4"></rect>
 		<rect class="viz-node" x="18" y="312" width="82" height="43" rx="4"></rect>
 		<rect class="viz-node viz-node--warning" x="108" y="312" width="82" height="43" rx="4"></rect>
-		<text class="viz-axis-label" x="27" y="278">A</text><text class="viz-label" x="59" y="279" text-anchor="middle">wrong</text><text class="viz-label" x="59" y="294" text-anchor="middle">arithmetic</text>
-		<text class="viz-axis-label" x="117" y="278">B</text><text class="viz-callout" x="149" y="279" text-anchor="middle">CORRECT</text><text class="viz-label" x="149" y="294" text-anchor="middle">solution</text>
-		<text class="viz-axis-label" x="27" y="329">C</text><text class="viz-label" x="59" y="331" text-anchor="middle">incomplete</text>
-		<text class="viz-axis-label" x="117" y="329">D</text><text class="viz-label" x="149" y="330" text-anchor="middle">polished</text><text class="viz-label" x="149" y="345" text-anchor="middle">wrong shortcut</text>
+		<text class="viz-label" x="59" y="279" text-anchor="middle">A · wrong</text><text class="viz-label" x="59" y="294" text-anchor="middle">arithmetic</text>
+		<text class="viz-callout" x="149" y="279" text-anchor="middle">B · CORRECT</text><text class="viz-label" x="149" y="294" text-anchor="middle">solution</text>
+		<text class="viz-label" x="59" y="334" text-anchor="middle">C · incomplete</text>
+		<text class="viz-label" x="149" y="330" text-anchor="middle">D · polished</text><text class="viz-label" x="149" y="345" text-anchor="middle">wrong shortcut</text>
 		<path d="M198 307H216" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#test-time-arrow)"></path>
 		<rect class="viz-node viz-node--focus" x="222" y="261" width="118" height="43" rx="4"></rect>
 		<text class="viz-axis-label" x="281" y="278" text-anchor="middle">WEAK MODEL JUDGE</text>

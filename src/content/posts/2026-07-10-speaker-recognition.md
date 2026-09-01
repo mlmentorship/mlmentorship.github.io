@@ -47,7 +47,7 @@ Classifying over training speakers can learn embeddings, but metric losses align
 			<text class="viz-label" x="340" y="70" text-anchor="end">accept claimed speaker</text>
 			<path class="viz-axis" d="M30 102H330" marker-end="url(#speaker-score-arrow)"></path>
 			<path class="viz-operating-guide" d="M248 66V139"></path>
-			<text class="viz-callout" x="243" y="84" text-anchor="end">strict threshold</text>
+			<text class="viz-callout" x="340" y="151" text-anchor="end">strict threshold</text>
 			<rect class="viz-node viz-node--input" x="54" y="77" width="24" height="24" rx="2"></rect>
 			<rect class="viz-node viz-node--input" x="89" y="77" width="24" height="24" rx="2"></rect>
 			<rect class="viz-node viz-node--input" x="131" y="77" width="24" height="24" rx="2"></rect>
