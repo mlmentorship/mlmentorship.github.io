@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "semantic-segmentation",
+  "article": "src/content/posts/2026-07-10-semantic-segmentation.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace why decoder upsampling can restore output size but not an erased object boundary, and explain how a same-scale encoder skip supplies the fine spatial evidence needed to place that boundary.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align a fine input edge, a coarse semantic bottleneck, an ambiguous upsampled boundary, and the sharpened result after same-scale feature fusion. The fixed geometry makes information loss and recovery directly comparable.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can name encoder, decoder, and skip stages but cannot show the boundary becoming spatially ambiguous after downsampling and sharper after fusion.",
+    "svg": "Selected because deterministic aligned grids and paths can distinguish restored canvas size from restored boundary evidence while retaining direct labels, responsive scaling, and accessible text.",
+    "semanticHtml": "Rejected because cards or a table would restate the architecture but would not spatially reveal that interpolation creates more pixels without recreating the missing edge location.",
+    "interaction": "Rejected because toggling skip features would hide one comparison state at a time and add controls to a fixed causal explanation.",
+    "paperReuse": "Rejected because the FCN and U-Net papers contain detailed architecture figures, but no permissive figure-adaptation license was established and their full layouts exceed this learning objective. No source artwork, layout, wording, dimensions, or empirical result is reused.",
+    "noVisual": "Rejected because the article states that upsampling alone cannot recover detail but leaves readers to mentally separate output resolution from retained spatial information."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 146,
+        "insight": "The Computer Vision divider opens the only relevant neighborhood but contains no segmentation concept or architecture."
+      },
+      {
+        "page": 147,
+        "insight": "The image-classification slide names segmentation as a computer-vision task and defines image tensors, but provides no dense output, mask, decoder, or boundary mechanism."
+      },
+      {
+        "page": 148,
+        "insight": "The CNN slide explains that pooling reduces spatial resolution and makes features less sensitive to precise location. This establishes why semantic context grows while boundary position is weakened, but its ResNet skip discussion concerns gradient flow rather than encoder-decoder detail fusion."
+      },
+      {
+        "page": 149,
+        "insight": "The Faster R-CNN slide gives a concrete backbone reduction from a 640 by 800 image to a 40 by 50 feature map. It confirms coarse spatial features in a neighboring vision task but has no pixelwise decoder or segmentation skip."
+      },
+      {
+        "page": 150,
+        "insight": "The GANs slide begins a new topic and establishes the end of the relevant computer-vision neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for semantic segmentation, segmentation, U-Net, FCN, DeepLab, pixelwise prediction, masks, and intersection over union. Page 147 is the only vision use of segmentation; page 200 is the unrelated string-segmentation problem. Physical pages 146-150 were read in full as the exact neighboring sequence. Pages 148-149 supply coarse-feature context, but no slide explains semantic segmentation, decoding, output masks, or same-scale encoder feature fusion. No deck image, wording, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Fully Convolutional Networks for Semantic Segmentation",
+        "url": "https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html",
+        "usage": "Used as the primary source for dense end-to-end prediction and for skip architectures that combine deep, coarse semantic information with shallow, fine appearance information to produce detailed segmentation.",
+        "license": "The CVF Open Access page provides public access but does not state a permissive license for adapting the paper's figures. No figure, prose, architecture dimensions, result, sample image, or layout is copied."
+      },
+      {
+        "title": "U-Net: Convolutional Networks for Biomedical Image Segmentation",
+        "url": "https://arxiv.org/abs/1505.04597",
+        "usage": "Used as the primary source for the contracting path that captures context and the symmetric expanding path that combines upsampled features with cropped high-resolution features from the contracting path for precise localization.",
+        "license": "The arXiv record makes the paper publicly readable, but public access was not treated as permission to adapt its architecture figure. The visual is independently composed and reuses no artwork, geometry, dimensions, biomedical image, wording, or result."
+      },
+      {
+        "title": "arXiv reuse requests",
+        "url": "https://info.arxiv.org/help/license/reuse.html",
+        "usage": "Used as authoritative licensing guidance that reuse rights depend on the work's assigned license and may require permission from the copyright holder.",
+        "license": "Licensing guidance only; no arXiv or paper asset is included or adapted."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that spatial output size and spatial information are different. Downsampling can encode that an object exists while making its exact edge uncertain. Interpolation or learned upsampling can enlarge that coarse representation, but it cannot infer which of several nearby pixel boundaries was discarded from that representation alone. A same-scale encoder skip contributes retained high-resolution evidence; the decoder fuses it with coarse semantics to classify a sharper boundary. The original schematic is qualitative and does not claim skips perfectly reconstruct all details or that every segmentation architecture must use U-Net-style concatenation."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the complete pages 146-150 vision neighborhood, then checked the primary FCN and U-Net records plus arXiv reuse guidance before selecting an original boundary-information schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "semantic-segmentation-boundary-fusion"
+    ],
+    "accessibility": "The SVG has a programmatic title and complete description. Direct stage labels, explicit coarse versus fine annotations, grid geometry, solid processing arrows, and a dashed skip path carry the full distinction without color. Its 360-unit viewBox has no fixed or minimum width and scales within a 390 CSS-pixel viewport. Established theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
