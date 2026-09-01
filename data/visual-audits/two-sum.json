@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-two-sum.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Find the complement in the values already scanned.",
+  "learningObjective": "Check each complement before saving the current value.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to find the complement in the values already scanned.",
-    "invariant": "Find the complement in the values already scanned.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-pass hash map from a previously seen value to its index.",
+    "recognitionCue": "The prompt asks for two positions whose values satisfy a target sum, so each current value determines one exact complement that can be looked up.",
+    "invariant": "Before processing index i, seen contains exactly the useful values from indices below i; therefore a hit is an earlier, distinct element.",
+    "stateModel": "Keep the input array, target, moving index i, computed needed value, and seen[value] = earlier index. No pair list or nested search is needed.",
+    "visualRationale": "An indexed array beside the evolving value-to-index map makes the check-before-save order and the moving current index directly visible.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A pair-sum matrix shows quadratic combinations and obscures why one lookup replaces the inner loop.",
+      "A sorted two-pointer line loses the original indices and depicts a different algorithm.",
+      "A prose table can list iterations but does not visibly move the same scan cursor across stable array cells."
     ],
-    "transferLesson": "Transfer the invariant: Find the complement in the values already scanned.",
-    "reviewStatus": "pending"
+    "transferLesson": "When a current item determines one exact missing partner, store only prior facts needed to recognize that partner; this transfers to complement, difference, and prefix-sum lookup problems.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

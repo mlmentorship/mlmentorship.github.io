@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-consecutive-sequence.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Start a run only at a value with no predecessor.",
+  "learningObjective": "Only values without a predecessor start a run; then advance one value at a time.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to start a run only at a value with no predecessor.",
-    "invariant": "Start a run only at a value with no predecessor.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Hash-set membership with run-start filtering.",
+    "recognitionCue": "The input is unsorted and asks for consecutive integer values, not consecutive positions, while near-linear time rules out sorting as the intended mechanism.",
+    "invariant": "A run is expanded only from its unique smallest value, identified by missing predecessor; best is the maximum completed run length seen so far.",
+    "stateModel": "Retain the deduplicated value set, outer candidate start, moving end for the current run, and scalar best. No input ordering or visited set is required.",
+    "visualRationale": "A sorted-for-reading set strip preserves actual membership while stable candidate and end keys visibly separate skipped interior values from forward run expansion.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Sorting the original array makes adjacency easy but depicts an O(n log n) algorithm instead of the supplied set solution.",
+      "A graph with edges between consecutive values adds topology that membership queries already express more simply.",
+      "A final highlighted run hides the predecessor gate that prevents repeated expansion and establishes average O(n) work."
     ],
-    "transferLesson": "Transfer the invariant: Start a run only at a value with no predecessor.",
-    "reviewStatus": "pending"
+    "transferLesson": "Before expanding a component, find a unique boundary that only one member can satisfy; this avoids duplicate work in runs, intervals, and component scans.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

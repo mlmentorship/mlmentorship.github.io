@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-valid-anagram.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Compare letter counts, not letter positions.",
+  "learningObjective": "Two strings are anagrams exactly when their character-count maps are equal.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to compare letter counts, not letter positions.",
-    "invariant": "Compare letter counts, not letter positions.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Frequency-map equality using one character count per distinct symbol.",
+    "recognitionCue": "Order may differ, but the question asks whether two strings contain exactly the same characters with the same multiplicities.",
+    "invariant": "After each Counter scan step, the visible count for a character equals its occurrences in the processed prefix; complete equal maps are necessary and sufficient for anagrams.",
+    "stateModel": "Retain two maps from character to count and a cursor for the string currently counted. Positions and permutations do not need to be retained.",
+    "visualRationale": "A stable character strip plus the two evolving counts exposes repeated letters, order independence, and the final map equality without requiring code recall.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Drawing lines between matching letters becomes ambiguous with duplicates and suggests positional pairing.",
+      "Sorting both strings is valid but teaches a different O(n log n) mechanism than the supplied Counter solution.",
+      "Showing only the two final maps hides how repeated characters change the state."
     ],
-    "transferLesson": "Transfer the invariant: Compare letter counts, not letter positions.",
-    "reviewStatus": "pending"
+    "transferLesson": "Replace irrelevant order with a canonical frequency summary; the same idea supports ransom-note checks, multiset equality, permutation detection, and histogram comparison.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

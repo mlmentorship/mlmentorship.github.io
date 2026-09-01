@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-group-anagrams.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Use one frequency signature as the address for each word group.",
+  "learningObjective": "Use each word's 26-letter frequency tuple as its bucket address.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to use one frequency signature as the address for each word group.",
-    "invariant": "Use one frequency signature as the address for each word group.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Hash map from a canonical 26-letter frequency tuple to a list of words.",
+    "recognitionCue": "Many lowercase words must be partitioned by equal letter multiplicities while their original letter order is irrelevant.",
+    "invariant": "After each word, every processed word appears once in the bucket keyed by its exact 26-count tuple; two words share a bucket exactly when they are anagrams.",
+    "stateModel": "For the current word retain a reset 26-slot count array; globally retain groups[tuple(counts)] as the buckets. The word itself is appended only after its signature is complete.",
+    "visualRationale": "The moving character cursor, visible sparse form of the exact 26-slot tuple, and tuple-to-bucket map show both signature construction and the existing-key/new-key branch.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A sorted-word bucket diagram uses a different O(m log m) key and would disagree with the supplied implementation.",
+      "Lines connecting anagram words do not show the canonical key or how a new bucket is selected.",
+      "Final buckets alone skip every count-array transition and the defaultdict branch."
     ],
-    "transferLesson": "Transfer the invariant: Use one frequency signature as the address for each word group.",
-    "reviewStatus": "pending"
+    "transferLesson": "Canonicalize each item into an equality-preserving key, then group by that key; this transfers to shifted-string groups, normalized records, and equivalence-class indexing.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
