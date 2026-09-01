@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "multi-agent-reinforcement-learning",
+  "article": "src/content/posts/2026-07-10-multi-agent-reinforcement-learning.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate the global state and joint actions available to a centralized learner during training from the local observation available to each policy during decentralized execution.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align two agents, distinguish action paths from training-only update paths, and place a hard divider between training and execution. Fixed geometry keeps the privileged-information boundary explicit without requiring interaction.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show connectivity, but reliably aligning two actor lanes above an execution boundary while distinguishing training-only feedback would require more layout complexity than the concept warrants.",
+    "svg": "Selected: a compact, deterministic two-phase schematic directly aligns each local observation, policy, and action while using labeled solid and dashed paths to expose the training-only critic.",
+    "semanticHtml": "Rejected: a table could list which inputs are available, but it would not make the joint critic input and the disappearance of its feedback path spatially traceable.",
+    "interaction": "Rejected: toggling between train and deploy would hide one state at a time and add controls without improving the side-by-side comparison.",
+    "paperReuse": "Rejected: MADDPG and QMIX figures are method-specific and denser than this article needs; permissive reuse permission was not established for the candidate paper artwork.",
+    "noVisual": "Rejected: prose names centralized training and decentralized execution but does not make it immediately apparent which information crosses into policy decisions and which exists only to shape training."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding page concludes model explainability with a SHAP example and contains no reinforcement-learning or multi-agent mechanism."
+      },
+      {
+        "page": 154,
+        "insight": "This is the deck's Reinforcement Learning section divider and contains no technical figure."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts iid supervised samples with dependent trajectories and describes learning a state-to-action mapping, but it discusses only the single-agent setting."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide presents a single CartPole policy network, sampled action, reward trajectory, and policy-gradient update; it has no other agents, centralized critic, or train/deploy information boundary."
+      },
+      {
+        "page": 157,
+        "insight": "The following page begins Past projects, confirming the local RL section ends without a multi-agent treatment."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 text-indexed all 214 pages of the local PDF for multi-agent, reinforcement learning, MADDPG, QMIX, centralized, and decentralized terms, then inspected pages 153-157 individually. Only pages 154-156 concern RL, and they cover section context, ML-versus-RL, and a single-agent policy-gradient example. No slide depicts multi-agent learning or CTDE, so no deck figure applies and no deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Multi-Agent Actor-Critic for Mixed Cooperative-Competitive Environments",
+        "url": "https://arxiv.org/abs/1706.02275",
+        "usage": "Used to verify the MADDPG pattern: decentralized actors use local observations while a centralized critic can use all agents' actions and additional state information during training.",
+        "license": "The paper is publicly readable on arXiv, but permissive figure-reuse permission was not established. No figure, geometry, prose, data, or artwork was copied or adapted."
+      },
+      {
+        "title": "QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning",
+        "url": "https://proceedings.mlr.press/v80/rashid18a.html",
+        "usage": "Used to verify the broader CTDE distinction: centralized learning may condition on extra state while the learned per-agent values and resulting policies remain decentralized.",
+        "license": "The PMLR paper is publicly accessible, but no paper figure is reused. The article's actor-critic schematic is independently composed and does not reproduce QMIX's mixing-network architecture."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free viewing and downloading do not by themselves establish third-party figure reuse rights and that copyright generally remains with the holder.",
+        "license": "This official licensing guidance is cited only to determine reuse treatment; no text or visual asset is reproduced."
+      }
+    ],
+    "notes": "The hardest mental model in the article is the asymmetry in CTDE: privileged global information can influence parameter learning without becoming an input to deployed decisions. The shipped SVG is an original abstraction rather than a redraw of a paper architecture. It makes no empirical claim and uses the primary papers only to check the information paths."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed the complete 214-page deck and inspected the full neighboring RL section, then checked the primary MADDPG and QMIX papers plus official arXiv licensing guidance before selecting an original CTDE information-boundary schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "multi-agent-ctde-information-boundary"
+    ],
+    "accessibility": "The SVG has a programmatic title and detailed description. Every observation, policy, action, critic input, and phase is directly labeled; solid forward paths, dashed learning paths, and a ruled train/execution divider preserve the lesson without color. The established visual-wide and visual-scroll primitives keep a readable fixed label size through intentional horizontal scrolling at 390 CSS pixels, theme variables provide light and dark contrast, and existing print overrides provide a light high-contrast rendering."
+  }
+}
