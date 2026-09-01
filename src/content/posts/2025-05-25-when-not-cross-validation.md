@@ -12,6 +12,21 @@ category: "questions"
 
 The interviewer is checking whether you treat cross-validation as a reflex or as a choice. The L4 candidate uses it everywhere. The L6 candidate names specific cases where it's the wrong tool.
 
+<!-- visual:cross-validation-fit-the-question -->
+<figure class="learning-figure" aria-labelledby="cross-validation-question-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="cross-validation-question-title">Choose an evaluation that matches the deployment question before choosing folds.</p>
+	<div class="visual-panel" role="group" aria-label="Four ordered checks for choosing an evaluation. First check deployment representation, then dependency structure, then repeated-fit cost, and finally whether scores select the model. Each failed assumption names its replacement evaluation.">
+		<ol>
+			<li><strong>Does labelled data represent deployment?</strong><br>If no, use a production sample, expert set, or online experiment. Cross-validation cannot repair distribution shift.</li>
+			<li><strong>Would random folds preserve dependencies?</strong><br>If no, use walk-forward splits, group folds, or spatial blocks so future, entities, and nearby locations stay separated.</li>
+			<li><strong>Can you afford repeated model fits?</strong><br>If no, use one representative holdout. If yes and rows are exchangeable, ordinary cross-validation is appropriate.</li>
+			<li><strong>Will these scores choose the model?</strong><br>If yes, tune inside the split and reserve an outer fold or final test. Selection must not grade itself.</li>
+		</ol>
+	</div>
+	<figcaption><strong>Read it this way:</strong> move from population to boundary to cost to selection. Stop at the first assumption that fails and use the named replacement; structure-aware folds solve dependency leakage, not deployment shift. Original synthesis informed by <a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn's cross-validation guide</a> and <a href="https://jmlr.org/papers/v11/cawley10a.html">Cawley and Talbot's analysis of selection bias</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "Cross-validation is the standard way to evaluate a model. I'd always use 5-fold or 10-fold CV unless the dataset is really large."

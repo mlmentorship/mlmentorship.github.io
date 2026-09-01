@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "slug": "weight-decay-vs-l2",
+  "article": "src/content/posts/2026-02-27-weight-decay-vs-l2.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace where the regularization term enters each adaptive update and explain why L2 inherits Adam's coordinate-wise gradient history while AdamW applies one direct fractional shrinkage rate.",
+  "mediumRationale": "Two ordered semantic panels are the smallest spatial explanation that keeps the coupled and decoupled paths adjacent and makes the bypass around Adam's moments visible. The design complements the equations without introducing a second numerical example.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic flowchart routing would add runtime and visual weight to two short, strictly ordered paths.",
+    "svg": "Rejected: the lesson is path placement rather than quantitative geometry, and fixed SVG text would be less adaptable at phone width.",
+    "semanticHtml": "Selected: labelled steps preserve source order for assistive technology, stack naturally at 390 CSS pixels, and reuse the established theme-aware and print-safe two-panel primitive.",
+    "interaction": "Rejected: there is no parameter sweep or hidden state to reveal; interaction would obscure a static invariant.",
+    "paperReuse": "Rejected: no external figure is needed, and public access to the reviewed papers does not by itself establish permission to adapt their figures.",
+    "noVisual": "Rejected: the prose equations show different formulas but require readers to mentally track whether λθ passes through Adam's moments and coordinate-wise preconditioner."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 35,
+        "insight": "The preceding classification-loss slide notes that softmax scores depend on weight regularization, but does not define L2 or optimizer behavior."
+      },
+      {
+        "page": 36,
+        "insight": "The neighboring surrogate-loss slide states that adding L2 discourages large weights, providing penalty context without discussing adaptive scaling."
+      },
+      {
+        "page": 37,
+        "insight": "The following slide moves to evaluation metrics, confirming that the local loss section contains no weight-decay update comparison."
+      },
+      {
+        "page": 45,
+        "insight": "The optimization section begins with movement through a loss surface and gradient descent, establishing the update context for the next slide."
+      },
+      {
+        "page": 46,
+        "insight": "The optimizer slide places SGD, momentum, RMSProp, and Adam equations together and shows Adam dividing by a per-parameter second-moment estimate."
+      },
+      {
+        "page": 47,
+        "insight": "The adjacent RAdam slide focuses on early second-moment variance and warmup; it reinforces history-dependent step sizes but does not mention regularization."
+      },
+      {
+        "page": 48,
+        "insight": "The following slide switches to sharpness-aware minimization, ending the relevant optimizer neighborhood without introducing AdamW."
+      },
+      {
+        "page": 56,
+        "insight": "The section divider opens the practical neural-network training sequence inspected for regularization guidance."
+      },
+      {
+        "page": 57,
+        "insight": "The training notes contrast diffuse weights from L2, sparse weights from L1, max-norm constraints, and dropout, but do not distinguish L2 from decay."
+      },
+      {
+        "page": 58,
+        "insight": "The neighboring data-inspection slide moves upstream to dataset quality and adds no optimizer-specific regularization mechanism."
+      },
+      {
+        "page": 62,
+        "insight": "The model-selection checklist recommends increasing a weight-decay penalty for overfitting, but does not distinguish coupled L2 from decoupled weight decay."
+      },
+      {
+        "page": 63,
+        "insight": "The following tuning slide recommends log-scale regularization search and closes the neighborhood without specifying AdamW."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for Adam, optimizer, regularization, L1, L2, and weight decay. Every match was reviewed, and the complete neighboring sequences on pages 35-37, 45-48, and 56-63 were examined. Page 46 supplies the adaptive-preconditioner context; pages 36, 57, and 62 supply regularization context. No slide explains decoupled weight decay or provides a reusable comparison.",
+    "license": "No general reuse license was identified in the deck, and it contains embedded third-party material. The deck is treated as review-only: no screenshot, artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Decoupled Weight Decay Regularization",
+        "url": "https://arxiv.org/abs/1711.05101",
+        "usage": "Used as the primary source for the equivalence under standard SGD, inequivalence under adaptive gradient methods, and the placement of decoupled decay outside the gradient update.",
+        "license": "No paper figure, table, experimental result, prose, or layout is copied. Public arXiv access is not treated as permission to adapt figures; the path comparison is independently authored."
+      },
+      {
+        "title": "Adam: A Method for Stochastic Optimization",
+        "url": "https://arxiv.org/abs/1412.6980",
+        "usage": "Used as the primary source for Adam's first- and second-moment histories and coordinate-wise adaptive denominator.",
+        "license": "No figure, equation rendering, prose, data, or layout is copied. Only the published algorithmic facts are used."
+      },
+      {
+        "title": "PyTorch Adam documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.Adam.html",
+        "usage": "Used to verify that the default coupled implementation adds λθ to the gradient before updating both first and second moments, and that decoupled_weight_decay defaults to false.",
+        "license": "Official API semantics are referenced only. No documentation code, equation layout, branding, prose, or artwork is reproduced."
+      },
+      {
+        "title": "PyTorch AdamW documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.AdamW.html",
+        "usage": "Used to verify that direct parameter decay occurs separately and does not accumulate in momentum or variance.",
+        "license": "Official API semantics are referenced only. No documentation code, equation layout, branding, prose, or artwork is reproduced."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to distinguish public availability from broad permission to reuse or adapt paper figures.",
+        "license": "The licensing guidance is cited only for the provenance decision; no text, icon, or page design is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not that the two formulas differ, but exactly where they stop being equivalent. In coupled Adam, λθ is part of g before m and v are updated, so its effect depends on coordinate-wise history. In AdamW, moments contain only the data gradient and the direct ηλθ path bypasses the preconditioner. The visual states this path invariant rather than implying that Adam's full recurrence is merely a one-step division of a standalone penalty."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact loss, optimizer, and training neighborhoods, then checked the primary Adam and AdamW papers, current official PyTorch algorithms, and arXiv licensing guidance before selecting an original static path comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "weight-decay-adaptive-paths"
+    ],
+    "accessibility": "The figure has a linked learning question and a labelled group whose source order presents each full path. Explicit method names, numbered steps, arrows, and written results carry all meaning without color. The established two-column primitive stacks below 640 pixels for readable text at 390 CSS pixels, uses theme tokens for dark mode, and has existing print overrides for a light high-contrast, page-break-safe rendering."
+  }
+}

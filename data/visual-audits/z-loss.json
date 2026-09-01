@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "slug": "z-loss",
+  "article": "src/content/posts/2026-04-12-z-loss.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Explain why adding one constant to every logit leaves softmax cross-entropy unchanged while changing log Z, and identify the common offset that z-loss anchors.",
+  "mediumRationale": "Two semantic calculation panels are the smallest medium that can hold probabilities and cross-entropy fixed while changing only the common logit offset and partition value. Row-for-row comparison makes the invariance inspectable without implying that z-loss suppresses class-separating logit differences.",
+  "mediumComparison": {
+    "mermaid": "Rejected: this is a numerical invariance rather than a process or causal graph.",
+    "svg": "Rejected: plotted geometry would add axes without clarifying the four exact values that must remain aligned.",
+    "semanticHtml": "Selected: two responsive panels preserve exact text and arithmetic, stack naturally on a 390-pixel viewport, and remain readable in print and assistive technology.",
+    "interaction": "Rejected: an offset slider would reproduce the same invariant with hidden states and unnecessary JavaScript.",
+    "paperReuse": "Rejected: PaLM and ST-MoE define related z-loss objectives but no source figure is necessary. Public paper access is not treated as permission to adapt figures, and no artwork, data, prose, or layout is copied.",
+    "noVisual": "Rejected: the prose states shift invariance, but readers must mentally verify that probabilities and cross-entropy stay fixed while log Z changes. One exact counterfactual makes that distinction immediate."
+  },
+  "deckReview": {
+    "pages": [
+      {"page": 32, "insight": "The preceding classification slide introduces discriminative classifiers but contains no softmax partition or logit-shift argument."},
+      {"page": 33, "insight": "The relevant logistic-regression slide defines softmax with its exponential normalizer and cross-entropy as negative log likelihood, providing the only direct partition-function context in the deck."},
+      {"page": 34, "insight": "The following slide discusses convexity and optimization of cross-entropy but does not mention common logit shifts, z-loss, or numerical stabilization."},
+      {"page": 59, "insight": "The training-debugging slide recommends checking the initial softmax loss and setting output bias for class imbalance, but does not constrain log Z during training."}
+    ],
+    "notes": "The complete 214-page deck was text-indexed page by page for z-loss, z loss, log partition, partition function, softmax, logits, and cross-entropy. Z-loss does not occur. Pages 32-34 were inspected around the core softmax definition, and page 59 was reviewed as the only practical logit-initialization guidance. No deck screenshot, equation rendering, wording, numbers, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "PaLM: Scaling Language Modeling with Pathways",
+        "url": "https://arxiv.org/abs/2204.02311",
+        "usage": "Used as the primary language-model source for the auxiliary 10^-4 times log-squared Z objective, its goal of keeping log Z near zero, and the reported training-stability motivation.",
+        "license": "The arXiv paper is publicly readable, but no permissive figure-adaptation right was assumed. No figure, empirical result, prose, equation image, or layout is copied; the two-class arithmetic is original."
+      },
+      {
+        "title": "ST-MoE: Designing Stable and Transferable Sparse Expert Models",
+        "url": "https://arxiv.org/abs/2202.08906",
+        "usage": "Used as a primary source for the closely related router z-loss definition and evidence that penalizing squared log-sum-exp stabilizes large-scale training.",
+        "license": "No source figure, table, benchmark value, prose, or composition is reused. The source is cited only to verify the mechanism and stability context."
+      },
+      {
+        "title": "Marin 8B Retrospective",
+        "url": "https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/",
+        "usage": "Used as an authoritative implementation report for z-loss behavior during deep cooldown experiments and the interaction between final normalization and output-head norms.",
+        "license": "The Marin code repository is Apache-2.0, but that does not establish blanket licensing for every rendered documentation attachment. No image, run trace, prose, or measured value is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the exact degree of freedom regularized by squared log Z. For logits [0, 1], the second-class probability is e/(1+e), target cross-entropy is log(1+e)-1 about 0.313, and log Z is about 1.313. Subtracting log Z from both logits yields [-1.313, -0.313], preserves their difference, probabilities, and cross-entropy, and makes the new partition exactly one. The visual therefore says common offset, not absolute scale or bounded logit differences."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 cross-review (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed the 214-page deck and inspected its softmax neighborhood, then checked PaLM's language-model z-loss, ST-MoE's primary stability analysis, and Marin's implementation retrospective before correcting the offset-versus-scale distinction and authoring an exact two-class comparison."
+  },
+  "implementation": {
+    "visualIds": ["z-loss-anchors-common-offset"],
+    "accessibility": "The figure has a linked learning question and a labelled semantic group. Each panel repeats logits, probabilities, target cross-entropy, and log Z in the same order, so text and position carry the complete comparison without color. Existing two-panel styles stack at narrow widths, use dark-mode theme tokens, and have print-safe light borders and page-break behavior."
+  }
+}

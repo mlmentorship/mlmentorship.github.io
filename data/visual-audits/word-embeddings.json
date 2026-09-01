@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "word-embeddings",
+  "article": "src/content/posts/2026-05-07-word-embeddings.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Interpret a word analogy as an approximately shared displacement between two pairs, rather than as four words that merely occupy nearby points.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place two word pairs in one coordinate frame and make their relation vectors visibly parallel. Fixed coordinates keep the analogy arithmetic consistent with the drawn translation, while the caption can distinguish an exact teaching construction from approximate learned geometry.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can sequence the arithmetic but cannot faithfully encode equal direction and distance in a vector space.",
+    "svg": "Selected: deterministic coordinates make the two displacement arrows exactly parallel and equal in the schematic, with the analogy equation attached to the geometry.",
+    "semanticHtml": "Rejected: a table could list vector differences but would require the learner to reconstruct the translation and shared direction mentally.",
+    "interaction": "Rejected: dragging points could demonstrate broken and valid analogies, but controls and hidden states are unnecessary for the single shared-displacement model and would weaken print behavior.",
+    "paperReuse": "Rejected: the primary sources and Stanford project page contain paper-specific plots and examples, but no source figure is needed. Public availability was not treated as figure-reuse permission, and no source artwork, coordinates, data, wording, or layout is copied.",
+    "noVisual": "Rejected: the prose gives the famous equation but does not show that subtraction extracts one pair's displacement and addition translates that displacement onto the second pair."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 94,
+        "insight": "The preceding slide covers token normalization, stemming, and lemmatization. It establishes the preprocessing context but contains no learned vector geometry."
+      },
+      {
+        "page": 95,
+        "insight": "The bag-of-words, CBOW, and TF-IDF slide says to use CBOW to learn embeddings and includes a compact PyTorch CBOW model, but it does not explain skip-gram, relation vectors, or analogies."
+      },
+      {
+        "page": 96,
+        "insight": "The direct Word2Vec slide includes target and context embedding tables plus a negative-sampling implementation. It supports the article's two-embedding and efficiency discussion but shows no semantic-space coordinates or shared displacement."
+      },
+      {
+        "page": 97,
+        "insight": "The following slide moves to a character-level LSTM language model. It uses an embedding layer but adds no Word2Vec or GloVe geometry."
+      },
+      {
+        "page": 98,
+        "insight": "The next slide covers subword tokenization and perplexity, providing the transition toward modern token representations without discussing static word analogies."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide contrasts feature-based contextual embeddings with fine-tuned Transformer representations. It motivates what replaced static embeddings but does not show relation-vector arithmetic."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical pages for Word2Vec, GloVe, CBOW, skip-gram, negative sampling, embeddings, analogy, semantic, context, and text representation. Pages 94-99 were read as the complete local neighborhood around the only direct Word2Vec implementation on page 96. Pages 95-96 are relevant to training, while pages 94 and 97-99 establish the neighboring preprocessing and contextual-representation topics. No slide depicts analogy geometry, and no deck image, code, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Estimation of Word Representations in Vector Space",
+        "url": "https://arxiv.org/abs/1301.3781",
+        "usage": "Used as the primary Word2Vec source for the continuous bag-of-words and skip-gram architectures and their computational motivation.",
+        "license": "The abstract page does not establish a permissive third-party figure license. No paper figure, result, prose, notation, or layout is reused; the shipped geometry is an original schematic."
+      },
+      {
+        "title": "GloVe: Global Vectors for Word Representation",
+        "url": "https://aclanthology.org/D14-1162/",
+        "usage": "Used as the primary GloVe source for global word-word co-occurrence statistics, the weighted least-squares objective, and linear structure in learned word-vector spaces.",
+        "license": "No permissive figure-reuse right was relied upon for this 2014 publication. No paper figure, table, corpus statistic, prose, coordinates, or layout is reproduced."
+      },
+      {
+        "title": "Stanford NLP: GloVe project",
+        "url": "https://nlp.stanford.edu/projects/glove/",
+        "usage": "Used as the official project explanation that vector differences can represent pairwise relations and that corresponding differences across word pairs may be approximately equal.",
+        "license": "The page identifies the downloadable GloVe code as Apache-2.0, but that software license is not assumed to license the page's figures or datasets. No page artwork, example coordinates, prose, or layout is copied."
+      },
+      {
+        "title": "arXiv Permissions and Reuse",
+        "url": "https://info.arxiv.org/help/license/reuse.html",
+        "usage": "Used as official guidance that arXiv availability alone does not grant figure reuse and that the license assigned to each work controls reuse.",
+        "license": "The policy is cited only to document the licensing decision. No policy text or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that an analogy compares displacement vectors, not just nearest-neighbor similarity. The original schematic assigns man=(0,0), woman=(1,2), king=(3,0), and queen=(4,2), so woman-man and queen-king are both (1,2), and king-man+woman equals queen exactly in the teaching construction. The article and visual retain the approximately-equal sign because learned high-dimensional embeddings only approximate this relation; a 2D projection, corpus choice, training method, and nearest-neighbor search can all alter the result. The geometry is illustrative and reproduces no measured embedding coordinates."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the exact Word2Vec neighborhood, then checked both primary model papers, the official Stanford GloVe explanation, and official arXiv reuse guidance before selecting an original shared-displacement schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "word-analogy-shared-displacement"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that names all four points, both relation arrows, the equation, and the fact that coordinates are schematic. Direct word labels, identical arrow geometry, square start points, circular endpoints, dashed pair guides, and written SAME DELTA text preserve the lesson without color. The compact 320-unit viewBox has no minimum width and uses established responsive figure primitives, so it remains readable at 390 CSS pixels. Existing theme variables supply dark-mode contrast, and established print rules force a light high-contrast palette and keep the figure together."
+  }
+}

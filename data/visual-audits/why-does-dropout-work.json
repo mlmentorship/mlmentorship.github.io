@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "slug": "why-does-dropout-work",
+  "article": "src/content/posts/2025-03-16-why-does-dropout-work.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how changing only the dropout mask creates many weight-sharing subnetworks, then distinguish deterministic approximate model averaging from repeated stochastic passes for uncertainty.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can keep one shared set of weights visually fixed while masks branch into different subnetworks and then separate the two test-time interpretations. The branching geometry makes the ensemble relationship visible without runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a generic flowchart would obscure the crucial distinction between fixed shared weights and changing masks, and would spend more space on boxes than on that spatial invariant.",
+    "svg": "Selected because deterministic branches, repeated weight labels, mask labels, line styles, and two explicitly named test-time paths show weight sharing and the inference distinction in one responsive figure.",
+    "semanticHtml": "Rejected because cards or a table could list the three explanations but would not show how multiple subnetworks arise from one parameter set or why repeated stochastic passes differ from one deterministic pass.",
+    "interaction": "Rejected because sampling masks interactively adds controls and chance variation without improving the core inference; two fixed illustrative masks plus explicit many-mask notation are sufficient.",
+    "paperReuse": "Rejected because the reviewed papers' public availability does not establish permission to republish their figures, and their denser figures teach broader claims than this article needs. No source figure, layout, prose, data, or experimental result is copied.",
+    "noVisual": "Rejected because prose names implicit ensembling and Bayesian approximation but requires readers to mentally reconcile apparently different models with shared weights and two different test-time dropout settings."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 56,
+        "insight": "The preceding section divider introduces practical neural-network project guidance but contains no dropout mechanism."
+      },
+      {
+        "page": 57,
+        "insight": "The notes slide states that dropout masks units during training and moves retention scaling into training. It explains scaling, not shared-weight subnetworks or uncertainty, and uses p ambiguously for the retained fraction."
+      },
+      {
+        "page": 58,
+        "insight": "The following data-inspection slide contributes no dropout, ensemble, or uncertainty explanation."
+      },
+      {
+        "page": 61,
+        "insight": "The preceding model-selection slide discusses reducing optimization bias but does not mention dropout."
+      },
+      {
+        "page": 62,
+        "insight": "The regularization checklist recommends dropout sparingly, suggests spatial dropout for ConvNets, and warns that dropout does not interact well with batch normalization; it does not explain implicit ensembling."
+      },
+      {
+        "page": 63,
+        "insight": "The neighboring tuning slide treats dropout rate as a zero-to-one hyperparameter and separately recommends explicit ensembles, but does not connect dropout masks to weight-sharing subnetworks."
+      },
+      {
+        "page": 102,
+        "insight": "A text-search match for dropping predictions belongs to a transformer and SAN-classifier survey; neighboring pages 101 and 103 confirm that it is unrelated to dropout's regularization, ensemble, or Bayesian interpretations."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were searched page by page for dropout and co-adaptation, with ensemble matches reviewed for conceptual context. The complete neighborhoods 56-58, 61-63, and 101-103 were inspected. Pages 57 and 62-63 are the only relevant dropout guidance; none depicts shared-weight subnetworks or Monte Carlo dropout. The visual therefore does not reuse deck artwork, wording, notation, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+        "url": "https://www.jmlr.org/papers/v15/srivastava14a.html",
+        "usage": "Used as the primary source for random unit removal, reduced co-adaptation, sampling an exponential number of thinned networks with shared parameters, and approximating their prediction average with one unthinned network at test time.",
+        "license": "The JMLR landing page provides public access but does not state a permissive license for republishing paper figures. No figure, prose, example, data, or layout is copied; the branch diagram and labels are an original synthesis of the method."
+      },
+      {
+        "title": "Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning",
+        "url": "https://proceedings.mlr.press/v48/gal16.html",
+        "usage": "Used as the primary source for interpreting dropout training as approximate Bayesian inference and for retaining dropout during repeated test-time passes to obtain predictive uncertainty information.",
+        "license": "The PMLR page provides public access but no explicit figure-reuse permission was identified. No paper figure, prose, dataset, or result is reproduced; the stochastic-pass output strip is original and makes no quantitative uncertainty claim."
+      },
+      {
+        "title": "PyTorch Dropout documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.Dropout.html",
+        "usage": "Used as official implementation documentation to verify independent Bernoulli masking during training, inverted scaling, and identity behavior during evaluation.",
+        "license": "No documentation text, code, figure, or interface is copied. Only the documented train-versus-evaluation semantics are used to check the labels in the original schematic."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that dropout does not train independent models: masks choose different paths through one network while every path updates the same weights. Standard evaluation turns masking off and uses one scaled network as an approximation to ensemble averaging; MC dropout instead leaves masking on for repeated stochastic predictions whose spread can inform uncertainty. The figure carefully labels the latter as an approximate Bayesian use rather than claiming that ordinary dropout is exact Bayesian model averaging."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every relevant neighborhood, then checked the foundational dropout paper, the primary MC-dropout paper, and official PyTorch behavior before choosing an original shared-subnetwork schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "why-dropout-shared-subnetworks"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Every mask, shared-weight relationship, test-time setting, output interpretation, and branch is directly labeled; solid versus dashed paths and repeated W labels preserve the lesson without color. Its 360-pixel viewBox scales below a 390 CSS-pixel viewport, established theme tokens provide dark-mode contrast, and shared print rules switch the figure to a light high-contrast palette and prevent page breaks inside it."
+  }
+}
