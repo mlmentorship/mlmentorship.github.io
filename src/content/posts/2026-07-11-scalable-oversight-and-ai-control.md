@@ -19,6 +19,35 @@ Control asks a harsher question: if the model may be actively untrusted, what co
 
 A better judge is not automatically a control protocol. A sandbox is not automatically an evaluation method.
 
+**Learning objective:** given a proposed safety technique, identify whether it improves judgment under a capability gap, limits harm under intentional subversion, or contributes evidence to both.
+
+<!-- visual:oversight-control-assumption-test -->
+<figure class="learning-figure" aria-labelledby="oversight-control-title">
+	<p class="visual-kicker">Same capability gap, different contract</p>
+	<p class="visual-title" id="oversight-control-title">What must a safety technique accomplish when the stronger model may be merely hard to judge versus actively untrusted?</p>
+	<section class="visual-panel" aria-labelledby="oversight-control-shared-title">
+		<h4 id="oversight-control-shared-title">SHARED CHALLENGE · MODEL CAPABILITY EXCEEDS UNAIDED HUMAN EVALUATION</h4>
+		<p><strong>A human cannot simply redo every task.</strong><br />Both fields can use decomposition, trusted models, monitors, tests, and selective human review, but the threat assumption determines what counts as success.</p>
+	</section>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of scalable oversight and AI control by threat assumption, intervention, failure mode, and success test">
+		<section class="visual-panel" aria-labelledby="oversight-path-title">
+			<h4 id="oversight-path-title">SCALABLE OVERSIGHT · MAKE HARD WORK JUDGEABLE</h4>
+			<p><strong>Threat assumption</strong><br />The stronger model may be wrong, misleading, or difficult to evaluate; the method does not need to assume a deliberate attacker.</p>
+			<p><strong>Intervention target</strong><br />Increase evaluator competence with decomposition, debate, critique, recursive assistance, process evidence, or verification.</p>
+			<p><strong>Characteristic failure</strong><br />The evaluator accepts a bad answer because local checks do not compose, evidence is biased, or both systems share a blind spot.</p>
+			<p><strong>Success test</strong><br />On tasks beyond unaided human ability, the assisted evaluator more reliably distinguishes correct or acceptable work from failures.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="control-path-title">
+			<h4 id="control-path-title">AI CONTROL · CONTAIN AN INTENTIONAL ATTACKER</h4>
+			<p><strong>Threat assumption</strong><br />The capable model may knowingly search for ways to cause harm while appearing benign to trusted components.</p>
+			<p><strong>Intervention target</strong><br />Constrain actions with least privilege, trusted monitoring, randomized audits, escalation, blocking, logging, and containment.</p>
+			<p><strong>Characteristic failure</strong><br />An adaptive attack finds a route through tools, side channels, monitor blind spots, or a predictable audit policy.</p>
+			<p><strong>Success test</strong><br />Under adaptive red-team strategies, the protocol keeps catastrophic failure acceptably low while retaining measured usefulness.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> start with the shared capability gap, then choose the column whose threat assumption matches the claim. Oversight evidence shows whether hard outputs become more judgeable; control evidence shows whether a useful protocol resists an intentionally subverting model. A monitor can support both, but higher judgment accuracy alone does not establish containment, and restricting actions alone does not show that an answer was evaluated correctly. Original synthesis informed by <a href="https://arxiv.org/abs/2211.03540">Bowman et al. (2022)</a> and <a href="https://proceedings.mlr.press/v235/greenblatt24a.html">Greenblatt et al. (2024)</a>.</figcaption>
+</figure>
+
 ## Scalable oversight methods
 
 ### Decomposition
