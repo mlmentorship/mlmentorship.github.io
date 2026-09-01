@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "ppo",
+  "article": "src/content/posts/2026-05-01-ppo.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Given the sign of one sample's advantage, identify which probability-ratio boundary creates PPO's plateau and explain why moving farther in that beneficial direction gives no additional clipped-objective gain.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can put the positive- and negative-advantage cases on matched ratio axes, overlay the unclipped line and clipped minimum, and locate the opposite one-sided plateaus at 1 + epsilon and 1 - epsilon.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the learning task is quantitative piecewise geometry, not an entity or process flow; automatic graph layout cannot faithfully encode slopes, thresholds, and plateaus.",
+    "svg": "Selected because fixed axes and paths make the sign-dependent clipping geometry directly comparable, remain editable and deterministic, and reuse established responsive, theme-aware, and print-safe plot primitives.",
+    "semanticHtml": "Rejected because a table or case cards can state the two rules but cannot show why the minimum follows a line on one side and a plateau on the other.",
+    "interaction": "Rejected because changing epsilon would only slide the two boundaries; a fixed epsilon of 0.2 already teaches the invariant sign logic without controls, JavaScript, or hidden states.",
+    "paperReuse": "Rejected because the PPO paper is publicly available but no permissive license for adapting its Figure 1 was established. The shipped plots use no paper artwork, data, wording, or layout.",
+    "noVisual": "Rejected because the equation and prose require readers to mentally resolve a minimum with a sign-changing multiplier. The paired plots expose the reversal and prevent the common mistaken model that clipping creates a symmetric hard constraint."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding explainability slide establishes the boundary before the reinforcement-learning section and contains no policy-update mechanism."
+      },
+      {
+        "page": 154,
+        "insight": "The Reinforcement Learning divider starts the only locally relevant section but contains no PPO content."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts conditional-likelihood and expected-reward objectives and iid samples with trajectories; it provides broad context but no probability ratio, surrogate objective, or clipping."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide describes vanilla policy gradients and shows a CartPole REINFORCE-style implementation. It is the closest relevant slide, but it has no old-versus-new policy ratio, PPO surrogate, epsilon boundary, or clipped plateau."
+      },
+      {
+        "page": 157,
+        "insight": "The Past projects divider ends the RL teaching neighborhood, confirming that the adjacent deck sequence contains no PPO mechanism."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for proximal policy optimization, PPO, policy optimization, policy gradient, reinforcement learning, surrogate loss, and clipping, then directly read pages 153-158 around every relevant RL match. Only pages 154-156 concern RL or policy optimization; no slide presents PPO or its clipped surrogate. No deck image, code, wording, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Proximal Policy Optimization Algorithms",
+        "url": "https://arxiv.org/abs/1707.06347",
+        "usage": "Used as the primary source for the clipped surrogate in Equation 7, the piecewise behavior illustrated for positive and negative advantages, and the warning that clipping is a lower bound on the unclipped objective rather than a hard policy constraint.",
+        "license": "The paper is publicly accessible on arXiv, but no Creative Commons or other permissive figure-adaptation license was established from its record. Figure 1 is not copied or adapted; the shipped two-panel construction, labels, coordinates, and caption are original."
+      },
+      {
+        "title": "OpenAI Spinning Up: Proximal Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/algorithms/ppo.html",
+        "usage": "Used as official technical documentation to cross-check the simplified sign cases: positive advantage plateaus above 1 + epsilon, negative advantage plateaus below 1 - epsilon, and approximate-KL early stopping may still be needed.",
+        "license": "The Spinning Up repository and its documentation are MIT licensed. No documentation prose, equation image, code, or visual arrangement is reproduced; the visual is independently authored and cites the documentation only as a technical cross-check."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that multiplying by a negative advantage reverses which branch the minimum selects. For A greater than zero, the objective follows rA until r reaches 1 + epsilon and then plateaus; for A less than zero, it plateaus below 1 - epsilon and follows rA thereafter. The original SVG shows only this per-sample objective contribution and explicitly avoids claiming that PPO hard-bounds the full policy update."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the full neighboring RL sequence, then checked the PPO primary paper and official OpenAI documentation before selecting an original deterministic sign comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "ppo-clipped-surrogate-plateaus"
+    ],
+    "accessibility": "The SVG has a programmatic title and a full description of both piecewise cases. Panel headings, threshold labels, solid-versus-dashed line styles, plateau callouts, axis labels, and explicit direction words carry the full lesson without color. The established visual-wide scroll wrapper preserves readable labels at 390 CSS pixels, existing theme variables provide dark-mode contrast, and existing print rules remove the minimum width, force a light high-contrast palette, and avoid splitting the figure."
+  }
+}
