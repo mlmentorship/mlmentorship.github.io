@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-alien-dictionary.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The first differing character in adjacent words creates a directed ordering edge.",
+  "learningObjective": "Use the first difference of each adjacent word pair as a directed edge, then emit zero-indegree letters with Kahn topological sorting.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the first differing character in adjacent words creates a directed ordering edge.",
-    "invariant": "The first differing character in adjacent words creates a directed ordering edge.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Constraint extraction from adjacent sorted items followed by Kahn topological sort.",
+    "recognitionCue": "Use this pattern when sorted composite values imply a hidden ordering among symbols and only the earliest differing position can establish precedence.",
+    "invariant": "After processing each word pair, every recorded edge is a necessary character precedence; during Kahn traversal, ready contains exactly known zero-indegree un-emitted characters and emitted never violates an edge.",
+    "stateModel": "Retain every character as a graph node, deduplicated outgoing-edge sets, indegree counts, a zero-indegree queue, and the emitted order.",
+    "visualRationale": "A directed graph keeps real precedence topology visible while stable letter nodes persist as edges are added and removed; queue, indegree, and emitted labels make every safe topological move explicit.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Sorting characters by first appearance invents constraints not implied by adjacent words.",
+      "A pairwise comparison table hides the graph paths and cycle-detection condition.",
+      "DFS topological sort is valid but does not match the supplied zero-indegree queue transitions."
     ],
-    "transferLesson": "Transfer the invariant: The first differing character in adjacent words creates a directed ordering edge.",
-    "reviewStatus": "pending"
+    "transferLesson": "Extract only logically forced local precedence constraints, include unconstrained nodes, reject malformed prefix input, then topologically order and verify every node was emitted.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

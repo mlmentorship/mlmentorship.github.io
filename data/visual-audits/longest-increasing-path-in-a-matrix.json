@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-increasing-path-in-a-matrix.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Memoize the best increasing path starting at each cell; larger-only moves cannot cycle.",
+  "learningObjective": "Treat larger-neighbor moves as a DAG, recursively solve each cell once, and memoize the longest suffix length returned to its predecessors.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to memoize the best increasing path starting at each cell; larger-only moves cannot cycle.",
-    "invariant": "Memoize the best increasing path starting at each cell; larger-only moves cannot cycle.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "DFS dynamic programming on the acyclic graph induced by strictly increasing grid edges.",
+    "recognitionCue": "Use memoized DFS when every cell asks for an optimal path through neighboring states and a strict monotone move rule prevents cycles.",
+    "invariant": "Once path_from(r,c) returns, its memo value is the longest increasing path starting at that cell; every candidate is 1 plus an already correct recursively computed larger-neighbor suffix.",
+    "stateModel": "Retain the immutable matrix, a cache keyed by coordinates, the current DFS call stack, and a local best initialized to one.",
+    "visualRationale": "The fixed grid preserves adjacency while a stable DFS cursor moves along real coordinate dependencies; visible cache states and recurrence arithmetic expose both recursion and reuse.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Enumerating every increasing path repeats the same suffixes exponentially.",
+      "Sorting cells and filling iteratively is valid but does not match the supplied DFS call order.",
+      "A final heatmap hides the dependency returns and cache-hit mechanism."
     ],
-    "transferLesson": "Transfer the invariant: Memoize the best increasing path starting at each cell; larger-only moves cannot cycle.",
-    "reviewStatus": "pending"
+    "transferLesson": "A strict ranking function can turn implicit neighbor moves into a DAG; memoize the optimal suffix at each state and combine it from higher-ranked neighbors.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

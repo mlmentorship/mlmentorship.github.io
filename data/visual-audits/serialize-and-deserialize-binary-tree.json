@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-serialize-and-deserialize-binary-tree.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Preorder plus explicit null markers preserves both node values and tree shape.",
+  "learningObjective": "Preorder records each node and each missing child, so the decoder can consume one token per recursive slot and recover the exact topology.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to preorder plus explicit null markers preserves both node values and tree shape.",
-    "invariant": "Preorder plus explicit null markers preserves both node values and tree shape.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Preorder DFS serialization with explicit null-child markers.",
+    "recognitionCue": "Use structural sentinels when a tree must round-trip through a linear stream and node values alone do not uniquely identify its shape.",
+    "invariant": "Each recursive serialize call emits exactly one leading token for its slot, and each deserialize call consumes exactly one leading token before recursively rebuilding the same left and right slots.",
+    "stateModel": "Serialization retains an output token list and recursion stack; deserialization retains only the token iterator and the recursive parent slot currently being filled.",
+    "visualRationale": "A real binary-tree topology remains visible while one stable preorder cursor moves through calls; the growing and consumed token streams expose why each null marker is required without relying on color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Preorder values without null markers cannot distinguish different tree shapes.",
+      "Level-order serialization is valid but does not match the supplied recursive implementation.",
+      "A token array alone hides which parent-child slot each # closes."
     ],
-    "transferLesson": "Transfer the invariant: Preorder plus explicit null markers preserves both node values and tree shape.",
-    "reviewStatus": "pending"
+    "transferLesson": "To encode recursive structure linearly, emit a token for every recursive slot, including empty ones, and make the decoder consume tokens in the identical traversal order.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

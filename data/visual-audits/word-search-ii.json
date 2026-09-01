@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-word-search-ii.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A trie shares word prefixes and stops a board search as soon as the path leaves the trie.",
+  "learningObjective": "Follow board cells and trie children together, mark the current path in place, emit terminal words once, and prune exhausted trie branches while backtracking.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a trie shares word prefixes and stops a board search as soon as the path leaves the trie.",
-    "invariant": "A trie shares word prefixes and stops a board search as soon as the path leaves the trie.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Trie-guided grid backtracking with terminal deduplication and branch pruning.",
+    "recognitionCue": "Use a trie when many dictionary words must be searched on the same board and their prefixes can share traversal work.",
+    "invariant": "At each recursive call, the marked board path contains distinct adjacent cells spelling exactly the trie path to node; every emitted terminal has been removed, and every pruned trie branch can no longer produce an unseen word.",
+    "stateModel": "Retain the shared mutable trie, current trie node, board coordinate, in-place visited marks, answer list, and recursion path; restore each board character before returning.",
+    "visualRationale": "The first frame exposes real trie prefix edges, then fixed board geometry shows a stable cursor and ordered path cells moving together with trie-prefix labels, terminal pops, restoration, and pruning.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Running independent Word Search for every word repeats shared prefixes and ignores the supplied trie optimization.",
+      "A board-only path animation hides why impossible prefixes stop and why found words are emitted once.",
+      "A trie-only diagram hides adjacency, visited-cell exclusion, and backtracking restoration."
     ],
-    "transferLesson": "Transfer the invariant: A trie shares word prefixes and stops a board search as soon as the path leaves the trie.",
-    "reviewStatus": "pending"
+    "transferLesson": "When many searches share prefixes, traverse input and trie in lockstep, encode path-local visited state reversibly, remove consumed outputs, and prune nodes only after their subtree is exhausted.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
