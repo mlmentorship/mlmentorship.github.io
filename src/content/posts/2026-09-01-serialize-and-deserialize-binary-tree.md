@@ -57,3 +57,5 @@ class TreeCodec:
 ```
 
 **Cost:** $O(n)$ time and $O(n)$ space.
+
+The platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.

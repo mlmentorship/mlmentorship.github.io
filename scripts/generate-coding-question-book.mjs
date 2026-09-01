@@ -774,7 +774,12 @@ function chapterFor(problem) {
 function writeProblem(problem) {
   const visual = renderVisual(problem);
   const opening = 'Start with the concrete trace below. It shows the state the algorithm must carry as it runs.';
-  const body = `> ${problem.task}\n\n${opening}\n\n${visual.source}\n\n${wrapParagraphs(problem.section)}`;
+  const platformNote = problem.section.includes('TreeNode') && !problem.section.includes('class TreeNode')
+    ? '\n\nThe platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.'
+    : problem.section.includes('ListNode') && !problem.section.includes('class ListNode')
+      ? '\n\nThe platform supplies `ListNode` with `val` and `next`; this snippet assumes that definition.'
+      : '';
+  const body = `> ${problem.task}\n\n${opening}\n\n${visual.source}\n\n${wrapParagraphs(problem.section)}${platformNote}`;
   const difficulty = problem.identifier.startsWith('H') ? 'Advanced' : problem.identifier.startsWith('AI') ? 'Intermediate' : chapterFor(problem).difficulty;
   const priority = problem.identifier.startsWith('AI') ? 'Role-specific' : problem.identifier.startsWith('H') ? 'Specialist' : 'Core';
   const frontmatter = [

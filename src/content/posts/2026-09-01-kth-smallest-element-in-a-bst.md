@@ -42,3 +42,5 @@ def kth_smallest(root: TreeNode | None, k: int) -> int:
 ```
 
 **Cost:** $O(h + k)$ time and $O(h)$ space.
+
+The platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.

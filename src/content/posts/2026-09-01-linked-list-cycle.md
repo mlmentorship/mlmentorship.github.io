@@ -39,3 +39,5 @@ def has_cycle(head: ListNode | None) -> bool:
 ```
 
 **Cost:** $O(n)$ time and $O(1)$ space.
+
+The platform supplies `ListNode` with `val` and `next`; this snippet assumes that definition.

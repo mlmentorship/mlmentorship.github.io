@@ -47,3 +47,5 @@ def remove_nth_from_end(head: ListNode | None, n: int) -> ListNode | None:
 ```
 
 **Cost:** $O(n)$ time and $O(1)$ space.
+
+The platform supplies `ListNode` with `val` and `next`; this snippet assumes that definition.

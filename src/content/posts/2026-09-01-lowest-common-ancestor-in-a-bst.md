@@ -39,3 +39,5 @@ def lowest_common_ancestor_bst(
 ```
 
 **Cost:** $O(h)$ time and $O(1)$ space.
+
+The platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.

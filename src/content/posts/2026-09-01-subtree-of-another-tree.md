@@ -48,3 +48,5 @@ def is_subtree(root: TreeNode | None, subroot: TreeNode | None) -> bool:
 ```
 
 **Cost:** $O(mn)$ time in the worst case and $O(h)$ call-stack space.
+
+The platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.

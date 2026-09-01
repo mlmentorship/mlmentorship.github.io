@@ -46,3 +46,5 @@ def merge_k_lists(lists: list[ListNode | None]) -> ListNode | None:
 ```
 
 **Cost:** $O(n\log k)$ time and $O(k)$ space, where $n$ is the total node count.
+
+The platform supplies `ListNode` with `val` and `next`; this snippet assumes that definition.

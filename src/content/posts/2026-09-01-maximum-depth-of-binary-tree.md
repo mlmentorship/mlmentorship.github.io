@@ -32,3 +32,5 @@ def max_depth(root: TreeNode | None) -> int:
 ```
 
 **Cost:** $O(n)$ time and $O(h)$ call-stack space, where $h$ is tree height.
+
+The platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.

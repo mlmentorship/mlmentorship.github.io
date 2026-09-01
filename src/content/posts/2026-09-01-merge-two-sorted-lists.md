@@ -42,3 +42,5 @@ def merge_two_lists(first: ListNode | None, second: ListNode | None) -> ListNode
 ```
 
 **Cost:** $O(m + n)$ time and $O(1)$ extra space.
+
+The platform supplies `ListNode` with `val` and `next`; this snippet assumes that definition.
