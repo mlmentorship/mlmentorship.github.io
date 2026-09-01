@@ -29,6 +29,43 @@ For C4-like web text this is often 50–80%. Padded positions cost full FLOPs an
 
 Position IDs reset at each example boundary so position 0 is the start of each packed example.
 
+**Learning objective:** map packed-example boundaries to reset position IDs and a causal block-diagonal attention mask that permits no cross-example attention.
+
+<!-- visual:packed-sequence-mask-boundaries -->
+<figure class="learning-figure" aria-labelledby="packed-sequence-mask-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="packed-sequence-mask-title">How can one token row still behave like three separate examples?</p>
+	<div class="visual-grid--two" role="group" aria-label="A six-token packed row and its six-by-six causal block-diagonal attention mask">
+		<section class="visual-panel" aria-labelledby="packed-row-title">
+			<h4 id="packed-row-title">1 · PACK TOKENS, KEEP BOUNDARIES</h4>
+			<table class="cm-grid" aria-label="Six packed tokens from examples e1, e2, and e3">
+				<thead><tr><th scope="col">slot</th><th scope="col">0</th><th scope="col">1</th><th scope="col">2</th><th scope="col">3</th><th scope="col">4</th><th scope="col">5</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">example</th><td>e1</td><td>e1</td><td>e1</td><td>e2</td><td>e2</td><td>e3</td></tr>
+					<tr><th scope="row">position</th><td>0</td><td>1</td><td>2</td><td>0</td><td>1</td><td>0</td></tr>
+				</tbody>
+			</table>
+			<p><strong>Boundaries: `cu_seqlens = [0, 3, 5, 6]`</strong><br />The intervals [0, 3), [3, 5), and [5, 6) recover the three examples without padding.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="packed-mask-title">
+			<h4 id="packed-mask-title">2 · MASK BY EXAMPLE AND TIME</h4>
+			<table class="cm-grid" aria-label="Causal attention mask with query tokens as rows and key tokens as columns; A means allowed, F means a future token in the same example, and X means a different example">
+				<thead><tr><th scope="col">q \ k</th><th scope="col">e1:0</th><th scope="col">e1:1</th><th scope="col">e1:2</th><th scope="col">e2:0</th><th scope="col">e2:1</th><th scope="col">e3:0</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">e1:0</th><td class="cm-selected">A</td><td>F</td><td>F</td><td>X</td><td>X</td><td>X</td></tr>
+					<tr><th scope="row">e1:1</th><td class="cm-selected">A</td><td class="cm-selected">A</td><td>F</td><td>X</td><td>X</td><td>X</td></tr>
+					<tr><th scope="row">e1:2</th><td class="cm-selected">A</td><td class="cm-selected">A</td><td class="cm-selected">A</td><td>X</td><td>X</td><td>X</td></tr>
+					<tr><th scope="row">e2:0</th><td>X</td><td>X</td><td>X</td><td class="cm-selected">A</td><td>F</td><td>X</td></tr>
+					<tr><th scope="row">e2:1</th><td>X</td><td>X</td><td>X</td><td class="cm-selected">A</td><td class="cm-selected">A</td><td>X</td></tr>
+					<tr><th scope="row">e3:0</th><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td class="cm-selected">A</td></tr>
+				</tbody>
+			</table>
+			<p><strong>A = attend · F = future · X = other example</strong><br />Only the three lower-triangular diagonal blocks participate in attention.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> first use the cumulative boundaries to split the physical row into logical examples and restart positions at each boundary. Then read each mask row as one query: it may attend backward inside its own example (A), never forward in causal training (F), and never across an example boundary (X). Packing removes padding; boundaries preserve the same attention problem each example had before concatenation. Loss masking is a separate per-token decision. Original worked example informed by <a href="https://arxiv.org/abs/2107.02027">Krell et al. (2021)</a> and the <a href="https://github.com/Dao-AILab/flash-attention">FlashAttention variable-length interface</a>.</figcaption>
+</figure>
+
 ## Numbers
 
 For pretraining on web text packed at $L = 8192$:
