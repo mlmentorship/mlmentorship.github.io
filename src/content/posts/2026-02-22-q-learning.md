@@ -79,8 +79,8 @@ For small finite state-action spaces, store $Q$ as a table. Sample transitions $
 		<text class="viz-callout" x="266" y="226" text-anchor="middle">6 · MAX</text>
 		<text class="viz-callout" x="266" y="254" text-anchor="middle">1</text>
 		<path d="M90 271V297" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></path>
-		<text class="viz-gradient-label" x="180" y="289">behavior samples down; not used in this target</text>
-		<text class="viz-axis-label" x="18" y="318">3 · MOVE THE CURRENT VALUE TOWARD THE TARGET</text>
+		<text class="viz-gradient-label" x="180" y="289">behavior picks down; excluded from target</text>
+		<text class="viz-axis-label" x="18" y="318">3 · UPDATE THE CURRENT VALUE</text>
 		<rect class="viz-node viz-node--focus" x="24" y="335" width="312" height="45" rx="4"></rect>
 		<text class="viz-callout" x="180" y="354" text-anchor="middle">target = r + γ max Q(s′, a′) = 2 + 0.5 × 6 = 5</text>
 		<text class="viz-label" x="180" y="371" text-anchor="middle">TD error = target − current = 5 − 4 = 1</text>
@@ -88,7 +88,7 @@ For small finite state-action spaces, store $Q$ as a table. Sample transitions $
 		<rect class="viz-node viz-node--output" x="68" y="400" width="224" height="32" rx="4"></rect>
 		<text class="viz-callout" x="180" y="421" text-anchor="middle">Q(s, a) ← 4 + 0.25 × 1 = 4.25</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> use the sampled transition to obtain $s'$ and $r$, then scan every action value at $s'$ for the maximum. Here exploration samples down, but the target uses right because its value is 6. That mismatch is intentional: behavior gathers data, while the greedy target defines what Q-learning learns.</figcaption>
+	<figcaption><strong>Read it this way:</strong> use the sampled transition to obtain <var>s′</var> and <var>r</var>, then scan every action value at <var>s′</var> for the maximum. Here exploration samples down, but the target uses right because its value is 6. That mismatch is intentional: behavior gathers data, while the greedy target defines what Q-learning learns.</figcaption>
 </figure>
 
 ## Deep Q-Networks (DQN)
