@@ -48,6 +48,27 @@ For each major decision, use the same compact structure:
 
 One decision should support a technical descent. Show a bottleneck calculation, loss or metric choice, failure trace, data-contract issue, ablation, or serving invariant. The detail proves that the architecture slide reflects work you understand.
 
+<!-- visual:technical-project-decision-spine -->
+<figure class="learning-figure" aria-labelledby="technical-project-decision-spine-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="technical-project-decision-spine-title">How does a decision spine keep a project presentation coherent under questions?</p>
+	<div class="visual-grid--two" role="group" aria-label="Chronological project tour compared with three self-contained decision records">
+		<section class="visual-panel">
+			<h4>FRAGILE: ONE CHRONOLOGICAL ROUTE</h4>
+			<p><strong>Setup &rarr; data &rarr; model &rarr; launch</strong><br />Ownership and alternatives are scattered across stages. A question about why the model changed forces the story to backtrack.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>DEFENSIBLE: THREE DECISION RECORDS</h4>
+			<p><strong>Decision 1 &middot; Decision 2 &middot; Decision 3</strong><br />Each carries its own constraint, alternatives, evidence then, choice, result, and update. Questions can enter any record without losing the claim.</p>
+		</section>
+	</div>
+	<section class="visual-panel" role="note" aria-label="Question paths that test each decision record">
+		<h4>CHANGE DEPTH, NOT STRUCTURE</h4>
+		<p><strong>Why this choice?</strong> Compare alternatives and prior evidence. <strong>What failed?</strong> Trace the result and update. <strong>Was it yours?</strong> Name your choice and collaborators. <strong>Can you prove it?</strong> Descend into one calculation, trace, ablation, or invariant.</p>
+	</section>
+	<figcaption><strong>Read it this way:</strong> the left-hand deck works only in delivery order. The right-hand deck has three independent evidence units, so an interruption changes which decision you open or how deeply you inspect it, not the logic of the presentation. This original comparison was checked against <a href="https://pure.psu.edu/en/publications/how-the-design-of-presentation-slides-affects-audience-comprehens/">Garner and Alley's assertion-evidence presentation study</a> and the <a href="https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/guide.pdf">U.S. Office of Personnel Management's structured-interview guide</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "We built a recommendation model. I will explain the data pipeline, architecture, training, and launch. Engagement increased 8%."
