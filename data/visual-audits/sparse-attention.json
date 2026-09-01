@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "sparse-attention",
+  "article": "src/content/posts/2026-02-08-sparse-attention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how local, global, and random attention links let distant information reach a query while each query retains only a fixed number of allowed links.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can keep token positions aligned while distinguishing Longformer's local-plus-global pattern from BigBird's added random shortcut. The same geometry makes both graph reach and the fixed-edge-count argument visible without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic routing would obscure which links are local, global, or random and could not reliably preserve the aligned token positions at phone width.",
+    "svg": "Selected: fixed token geometry, labelled line styles, a two-layer route, and the explicit n times constant edge count expose the spatial and asymptotic ideas in one static figure.",
+    "semanticHtml": "Rejected: a comparison table could list the three edge types but would not let readers trace how distant information crosses the sparse graph.",
+    "interaction": "Rejected: changing window width or resampling random links would add state and controls without improving the core invariant that each query retains a bounded set of links.",
+    "paperReuse": "Rejected: both papers contain attention-pattern figures, but their arXiv records use the non-exclusive distribution license, which does not clearly grant third-party figure reuse. The Apache-2.0 licenses on the official code repositories cover software, not paper artwork. No figure, wording, coordinates, or visual composition is copied.",
+    "noVisual": "Rejected: prose can enumerate window, global, and random components, but it leaves the learner to mentally reconcile sparse per-query degree with short long-range information paths."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 108,
+        "insight": "The optimization setup states the dense attention formula and separates quadratic compute from quadratic score-matrix memory, establishing the bottleneck that sparse attention changes."
+      },
+      {
+        "page": 109,
+        "insight": "The sequence-packing slide uses a block-diagonal mask to remove cross-example attention, a neighboring mask example whose purpose is isolation rather than long-range connectivity."
+      },
+      {
+        "page": 110,
+        "insight": "The immediately preceding FlashAttention slide retains exact dense attention while tiling computation to avoid materializing the full score and probability matrices; it changes execution, not the allowed attention pairs."
+      },
+      {
+        "page": 111,
+        "insight": "The directly relevant sparse-attention slide describes BigBird's window, random, and global links; Longformer's sliding, dilated, and global links; linear fixed-degree cost; receptive-field growth; theoretical claims; kernel caveats; and task fit."
+      },
+      {
+        "page": 112,
+        "insight": "The immediately following slide moves to low-rank and kernel methods, which approximate or restructure the attention matrix rather than retaining exact softmax on a sparse set of pairs."
+      },
+      {
+        "page": 115,
+        "insight": "The optimization summary distinguishes sparse or low-rank attention, which changes the math, from packing, FlashAttention, speculative decoding, and mixed precision."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for sparse attention, BigBird, Longformer, sliding window, and global attention, read the complete optimization run on pages 108-115, and rendered pages 110-112 for visual inspection. Page 111 is the only directly relevant slide; pages 110 and 112 establish the exact-dense and approximation boundaries. The slide is dense prose without a spatial attention graph, so no deck artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Longformer: The Long-Document Transformer",
+        "url": "https://arxiv.org/abs/2004.05150",
+        "usage": "Used as the primary source to verify the combination of local windowed attention and task-motivated global attention, linear scaling with fixed window size, linear receptive-field growth across layers, and symmetric connectivity between globally attended tokens and all positions.",
+        "license": "The arXiv record links the arXiv perpetual non-exclusive distribution license, which does not clearly permit third-party figure reuse. The official allenai/longformer repository is Apache-2.0, but that software license does not license paper figures. No paper figure, text, values, or layout is copied."
+      },
+      {
+        "title": "Big Bird: Transformers for Longer Sequences",
+        "url": "https://arxiv.org/abs/2007.14062",
+        "usage": "Used as the primary source to verify BigBird's local, random, and global sparse components; linear fixed-degree attention; the role of global tokens; and the universal-approximation and Turing-completeness claims.",
+        "license": "The arXiv record links the arXiv perpetual non-exclusive distribution license, which does not clearly permit third-party figure reuse. The official google-research/bigbird repository is Apache-2.0, but that software license does not license paper artwork. The shipped visual is an original schematic and copies no figure, prose, data, or composition."
+      },
+      {
+        "title": "Longformer official implementation",
+        "url": "https://github.com/allenai/longformer",
+        "usage": "Used as official implementation documentation to cross-check that exploiting sliding-window sparsity depends on specialized implementations and that the convenient PyTorch sliding-chunks implementation has different memory and feature tradeoffs from the custom kernel.",
+        "license": "The repository is Apache-2.0. It is consulted only for implementation behavior and licensing boundaries; no code, documentation prose, or artwork is reproduced."
+      },
+      {
+        "title": "BigBird official implementation",
+        "url": "https://github.com/google-research/bigbird",
+        "usage": "Used as official implementation documentation to cross-check that the released model implements block-sparse attention for long-sequence encoder and encoder-decoder variants.",
+        "license": "The repository is Apache-2.0. It is consulted only for implementation behavior and licensing boundaries; no code, documentation prose, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how a mask can have only O(n) allowed pairs yet preserve useful long-range communication. The original schematic separates three mechanisms: local links preserve neighborhood context, a bidirectional global token provides a two-layer route from a distant token to an ordinary query, and BigBird adds random shortcuts. The seven-token graph is intentionally schematic rather than a sampled model mask. The asymptotic label assumes fixed w, r, and g as sequence length n grows."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages, visually inspected the relevant slide and both neighbors, checked the two primary papers and official implementations, verified paper-versus-software licensing boundaries, and selected an original sparse-graph reach schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "sparse-attention-reach-patterns"
+    ],
+    "accessibility": "Each SVG has a linked title and complete description, while the figure has a visible learning objective and direct reading caption. Solid, dotted, and long-dashed links are directly named, and every role and asymptotic conclusion is stated in text, so meaning does not depend on color. The established two-panel primitive stacks below 640 pixels; each panel scales from a 300-pixel viewBox with no minimum width for readability at 390 CSS pixels. Shared theme variables preserve dark-mode contrast, and the existing print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}

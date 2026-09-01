@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "tensor-parallelism",
+  "article": "src/content/posts/2025-12-23-tensor-parallelism.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Follow matching hidden-channel shards through a column-parallel first projection and row-parallel second projection, then identify why only the second projection requires an all-reduce.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that keeps GPU ownership, matching channel shards, local products, and the final reduction aligned. The staged geometry shows why an elementwise activation does not force communication but a contraction over split hidden channels does.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can name the two projections but cannot reliably align matrix shard orientation, GPU ownership, and matching hidden-channel slices at phone width.",
+    "svg": "Selected: fixed two-GPU geometry, direct equations, border patterns, and an explicit sum node make the communication boundary spatially checkable.",
+    "semanticHtml": "Rejected: a table could list column- and row-parallel properties, but it would weaken the handoff from each first-layer channel shard into its matching second-layer row shard.",
+    "interaction": "Rejected: changing tensor-parallel degree or matrix sizes would add controls without changing the invariant demonstrated by the two-device example.",
+    "paperReuse": "Rejected: the Megatron-LM paper and PyTorch tutorial contain related transformer partition figures, but the paper's arXiv license does not clearly permit third-party figure reuse. The PyTorch tutorial is BSD-3-Clause, yet its reproduced paper figure is attributed to Megatron-LM rather than licensed as original tutorial artwork. No source figure, wording, equations, coordinates, or composition is copied.",
+    "noVisual": "Rejected: the prose names column and row splits but requires readers to mentally track why the intermediate remains sharded while the second products share an output shape and therefore need summation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 166,
+        "insight": "The preceding data-pipeline slide discusses collection, storage, preprocessing, privacy, and bias; it contains no model partitioning or distributed computation."
+      },
+      {
+        "page": 167,
+        "insight": "The deck's only model-parallel reference contrasts replicated-model data parallelism with evaluating different model components on different machines. It does not distinguish tensor from pipeline parallelism or explain column and row sharding."
+      },
+      {
+        "page": 168,
+        "insight": "The following production-serving slide covers gating, monitoring, updates, inference placement, compression, and interpretability, confirming that the model-parallel mention has no technical continuation."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol) searched all 214 physical PDF pages for tensor parallelism, model parallelism, Megatron, column parallel, row parallel, and 3D parallelism. Physical page 167 is the only relevant hit, so pages 166-168 were read as its complete neighborhood. The deck provides only a broad data-versus-model-parallel distinction and no reusable matrix-sharding visual. No deck artwork, wording, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism",
+        "url": "https://arxiv.org/abs/1909.08053",
+        "usage": "Used as the primary source to verify the paired MLP partition: split the first GEMM along output columns, apply the elementwise nonlinearity locally, split the second GEMM along input rows, and reduce its partial outputs with one all-reduce.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, which does not clearly grant third-party figure adaptation rights. No paper figure, prose, benchmark, equation layout, or composition is copied."
+      },
+      {
+        "title": "Large Scale Transformer model training with Tensor Parallel",
+        "url": "https://docs.pytorch.org/tutorials/intermediate/TP_tutorial.html",
+        "usage": "Used as official framework documentation to cross-check that ColwiseParallel first projections feed RowwiseParallel second projections, yielding one all-reduce at the end of the feed-forward group, and that sequence parallelism shards normalization and residual activations along sequence.",
+        "license": "The PyTorch tutorials repository is BSD-3-Clause. The tutorial's Megatron figure is explicitly attributed to the paper, so it is not reused. No tutorial figure, prose, or code is copied."
+      },
+      {
+        "title": "Megatron Core Parallelism Strategies Guide",
+        "url": "https://docs.nvidia.com/megatron-core/developer-guide/latest/user-guide/parallelism-guide.html",
+        "usage": "Used as official implementation guidance to verify that tensor parallelism splits individual layers, is recommended when large layers or hidden dimensions require it, and is commonly combined with sequence, data, and pipeline parallelism.",
+        "license": "NVIDIA documentation is consulted only for current implementation semantics. No documentation text, command, figure, or layout is reproduced."
+      },
+      {
+        "title": "Megatron Core tensor-parallel API",
+        "url": "https://docs.nvidia.com/megatron-core/developer-guide/nightly/apidocs/core/core.tensor_parallel.html",
+        "usage": "Used as the official API reference to confirm the ColumnParallelLinear and RowParallelLinear abstractions and their partitioned linear-layer semantics.",
+        "license": "The Megatron-LM software repository uses a BSD-3-Clause-style license, but software licensing is not treated as permission to reuse paper artwork. No code, prose, or figure is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the complementary partition of the two FFN matrices. For W1 shaped d by m, splitting its m output columns yields independent hidden shards h-a and h-b; an elementwise activation preserves that partition. W2 shaped m by d is split along the same hidden axis into row shards, so h-a W2-a and h-b W2-b each have the full d-wide output shape but contain disjoint terms of the contraction over m. Their sum is the unsharded result. The two-GPU labels and equations are original and schematic."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, searched every physical deck page and inspected the only relevant slide with both neighbors, checked the primary Megatron-LM paper and official PyTorch and NVIDIA documentation, verified licensing boundaries, and selected an original two-stage FFN shard trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "tensor-parallel-ffn-handoff"
+    ],
+    "accessibility": "Each SVG has a linked title and complete description; the visible equations, GPU labels, communication label, and direct reading caption state the full transformation. GPU shards are redundantly distinguished by a solid or dashed border, so no meaning depends on color. The established two-panel primitive stacks below 640 pixels, and each SVG scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels. Shared theme variables preserve dark-mode contrast, while existing print rules force a light high-contrast palette and keep the figure together."
+  }
+}
