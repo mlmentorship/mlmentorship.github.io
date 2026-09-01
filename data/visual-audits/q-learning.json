@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "q-learning",
+  "article": "src/content/posts/2026-02-22-q-learning.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Given one transition and the next state's action values, distinguish the action sampled by the behavior policy from the greedy action used to construct the Q-learning target.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can trace one sampled transition, align all candidate next actions and values, separate the exploratory behavior choice from the greedy target choice, and verify the resulting temporal-difference update.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the central lesson depends on aligned action values and exact backup arithmetic; automatic graph layout would obscure the maximum operation and make the worked update harder to verify.",
+    "svg": "Selected because fixed geometry keeps the transition, action-value comparison, behavior branch, greedy selection, and arithmetic in one inspectable path while reusing established responsive and theme-aware primitives.",
+    "semanticHtml": "Rejected because a table can compare next-action values but cannot as clearly separate the sampled trajectory from the counterfactual greedy branch that supplies the target.",
+    "interaction": "Rejected because changing the synthetic values would add controls and hidden states without improving the durable distinction between behavior and target policies.",
+    "paperReuse": "Rejected because neither the original thesis nor the authoritative textbook provides a permissively licensed figure that exactly teaches this behavior-versus-target distinction. No source artwork, wording, example, data, or layout is reused.",
+    "noVisual": "Rejected because the prose states that the maximum is independent of the next sampled action, but readers must otherwise hold two policies and two different action choices in the same mental trace."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding explainability slide establishes the boundary before the reinforcement-learning section and contains no value-learning mechanism."
+      },
+      {
+        "page": 154,
+        "insight": "The Reinforcement Learning divider starts the only relevant local section but contains no algorithm or value backup."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts supervised objectives and iid samples with expected rewards and dependent trajectories; it provides broad context but no action values, behavior policy, or Bellman target."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide describes a policy-gradient approach and explicitly contrasts it with value-based methods. It contains no Q-learning update, greedy next-action maximum, or off-policy distinction."
+      },
+      {
+        "page": 157,
+        "insight": "The Past projects divider ends the RL teaching neighborhood, confirming that the adjacent sequence contains no Q-learning mechanism."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for Q-learning, Q learning, Bellman, temporal difference, value-based methods, policy optimization, and reinforcement learning, then directly read pages 153-157 around the only substantive RL matches. Pages 190-191 discuss the unrelated Bellman-Ford graph algorithm. No slide teaches Q-learning or an off-policy backup, and no deck image, code, wording, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Learning from Delayed Rewards",
+        "url": "https://www.cs.rhul.ac.uk/~chrisw/new_thesis.pdf",
+        "usage": "Used as the primary source for Watkins's Q-learning rule, which updates the experienced state-action pair toward immediate reward plus the discounted maximum action value in the resulting state.",
+        "license": "The thesis is publicly hosted by Royal Holloway, but no Creative Commons or other permissive figure-adaptation license was identified. No thesis figure, prose, example, numerical value, or layout is copied or adapted."
+      },
+      {
+        "title": "Reinforcement Learning: An Introduction, second edition",
+        "url": "https://incompleteideas.net/book/the-book-2nd.html",
+        "usage": "Used as the authoritative textbook source for Section 6.5's treatment of Q-learning as off-policy temporal-difference control, where the learned action-value function approximates the optimal function independently of the policy being followed.",
+        "license": "The authors provide an official online edition, but the book is copyrighted by MIT Press and the official page states no permissive figure-adaptation license. No textbook figure, wording, example, data, or layout is reused."
+      },
+      {
+        "title": "Gymnasium: Deep Dive into the Step API",
+        "url": "https://farama.org/Gymnasium-Terminated-Truncated-Step-API",
+        "usage": "Used as official environment documentation to cross-check the sampled Q-learning target form and the requirement to bootstrap after truncation but not after true termination.",
+        "license": "The documentation was consulted for implementation semantics only. No documentation code, prose, visual asset, or layout is reproduced in the figure."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the intentional mismatch at the next state: an exploratory behavior policy may sample one action, while the Q-learning target evaluates every available next action and uses the largest current Q-value. The original worked example has Q(s,a) = 4, reward 2, gamma = 0.5, next-action values 2, 6, and 1, alpha = 0.25, and a behavior sample of the value-1 action. The greedy target is 2 + 0.5 times 6 = 5, the TD error is 1, and the updated value is 4.25. The sampled next action does not enter this one-step Q-learning target."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the complete neighboring RL sequence, then checked the original Q-learning thesis, the authoritative Sutton and Barto textbook, and official Gymnasium bootstrapping guidance before selecting an original compact backup trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "q-learning-off-policy-backup"
+    ],
+    "accessibility": "The SVG has a linked title and a complete description containing the transition, all candidate next-action values, the distinct behavior and target choices, and every arithmetic step. Direct row labels, MAX text, arrows, a dashed behavior branch, numbered stages, and explicit not-used wording carry the full lesson without color. The compact 360-unit viewBox has no minimum width and uses established plot and node primitives for readable scaling at 390 CSS pixels; theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
