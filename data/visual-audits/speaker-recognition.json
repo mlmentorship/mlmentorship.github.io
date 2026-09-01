@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "speaker-recognition",
+  "article": "src/content/posts/2026-07-10-speaker-recognition.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how moving one speaker-verification threshold changes false rejects and false accepts on the same set of target and non-target trials.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can hold trial scores fixed while moving only the decision boundary, making the operating-point tradeoff causal rather than merely verbal. Direct labels and repeated geometry keep the comparison readable without interaction or color.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show enrollment and scoring stages, but automatic layout cannot preserve a shared score axis or demonstrate which fixed trials cross a moved threshold.",
+    "svg": "Selected: deterministic coordinates place the same target and non-target trials on aligned score strips, so changing only the threshold visibly changes the two error types.",
+    "semanticHtml": "Rejected: a table could list decisions at two thresholds, but readers would still need to reconstruct score order, boundary movement, and the traded errors.",
+    "interaction": "Rejected: a threshold slider could expose more operating points, but adds controls and hidden states when two static, aligned examples establish the intended inference.",
+    "paperReuse": "Rejected: authoritative sources define detection errors, costs, and calibration, but no permissive license to adapt their figures was established. The shipped visual uses original geometry, labels, and illustrative trial positions.",
+    "noVisual": "Rejected: the prose says thresholds depend on risk but does not let a reader hold scores constant and see why reducing false rejects necessarily risks accepting more non-target trials."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 119,
+        "insight": "The Automatic Speech Recognition divider begins the deck's only contiguous speech-focused section; it concerns transcription rather than speaker identity."
+      },
+      {
+        "page": 120,
+        "insight": "The Speech recognition title slide contains no speaker verification, enrollment, similarity score, or decision threshold."
+      },
+      {
+        "page": 121,
+        "insight": "The slide contrasts end-to-end and traditional speech-to-text pipelines and therefore helps distinguish word recognition from the identity decision discussed in this article."
+      },
+      {
+        "page": 122,
+        "insight": "The slide defines waveform-to-text recognition and lists acoustic, pronunciation, and language-model components, none of which supplies a speaker-verification operating-point model."
+      },
+      {
+        "page": 126,
+        "insight": "The RNN-T slide closes the speech section with transcription and prediction networks; it does not address speaker embeddings, target versus non-target trials, or verification thresholds."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for speaker, voiceprint, verification, identification, impostor, enrollment, and threshold. No speaker-recognition slide or relevant figure was found. Pages 119-126 were then reviewed as the complete contiguous speech neighborhood. Neighboring page 118 is knowledge-graph embeddings and page 127 begins model compression, confirming the topic boundary. No deck image, wording, numerical value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "NIST Speaker Recognition",
+        "url": "https://www.nist.gov/itl/iad/mltg/speaker-recognition",
+        "usage": "Used as the official source for text-independent speaker-recognition evaluation goals, evaluation plans, and calibration of technical capabilities.",
+        "license": "The NIST page is publicly accessible, but no figure is reused or adapted. The visual contains no NIST data, benchmark result, wording, or layout."
+      },
+      {
+        "title": "NIST 2021 Speaker Recognition Evaluation Plan",
+        "url": "https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=932697",
+        "usage": "Used to verify target and non-target trials, misses and false alarms, system decisions from score thresholds, and detection cost as an operating-point metric.",
+        "license": "The U.S. government evaluation plan is used only to verify definitions. No source figure, table, test data, result, or prose is copied."
+      },
+      {
+        "title": "X-Vectors: Robust DNN Embeddings for Speaker Recognition",
+        "url": "https://www.danielpovey.com/files/2018_icassp_xvectors.pdf",
+        "usage": "Used as a primary source to verify fixed-dimensional neural speaker embeddings and their use with a scoring backend for text-independent speaker recognition.",
+        "license": "The author-hosted paper is publicly readable, but no permissive figure-adaptation license was identified. No figure, architecture, experiment, value, wording, or layout is reused."
+      },
+      {
+        "title": "Application-independent evaluation of speaker detection",
+        "url": "https://doi.org/10.1016/j.csl.2005.08.001",
+        "usage": "Used as the primary source for the distinction between application-independent speaker-detector scores and application-dependent Bayesian decisions, including calibration across operating costs and priors.",
+        "license": "The publisher page does not grant permission to adapt the paper's figures. The visual is an original qualitative score strip and copies no figure, data, equation, wording, or layout."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the operating-point tradeoff after scoring: the embedding and backend produce an ordered match score, but the application chooses a threshold, and moving that single boundary changes both false-reject and false-accept exposure. The two rows deliberately reuse identical, invented trial positions; only the threshold moves. They make no empirical claim about score distributions, EER, calibration quality, or any deployed system."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed the full 214-page deck and inspected its contiguous speech neighborhood, then checked official NIST material and primary speaker-embedding and calibration papers before selecting an original threshold tradeoff schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "speaker-verification-threshold-tradeoff"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Target trials are circles labeled T, non-target trials are squares labeled N, thresholds are vertical boundary lines, and each error is directly bracketed and named, so color is redundant. The 360-unit viewBox scales without a fixed or minimum width for a 390 CSS-pixel viewport. Existing theme variables preserve dark-mode contrast, shared print rules force a light high-contrast palette, and the established visual-scroll wrapper prevents clipping."
+  }
+}
