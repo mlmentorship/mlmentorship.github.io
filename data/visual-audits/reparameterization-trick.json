@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "slug": "reparameterization-trick",
+  "article": "src/content/posts/2025-10-29-reparameterization-trick.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See how replacing a parameterized random sample with fixed-distribution noise plus a deterministic transform creates an ordinary backpropagation path from the loss to the encoder parameters.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can hold the naive and reparameterized computation graphs in aligned panels, distinguish forward computation from the reverse gradient path, and show exactly where ordinary backpropagation stops or continues.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show connectivity, but automatic routing gives weak control over the aligned forward and backward paths that form the lesson.",
+    "svg": "Selected: two fixed computation graphs can align parameter, sampling, noise, transform, and loss nodes while solid and dashed arrows distinguish forward values from reverse gradients at phone width.",
+    "semanticHtml": "Rejected: cards or a comparison table could list the two formulations but would not spatially expose the missing versus continuous gradient path.",
+    "interaction": "Rejected: resampling epsilon or changing mu and sigma would add controls without improving the core invariant that epsilon is independent of phi and the transform is differentiable.",
+    "paperReuse": "Rejected: the primary papers contain equations and technical figures, but no source artwork is needed. The original VAE preprint uses arXiv's limited non-exclusive distribution license, and although the PMLR sources use a reusable publication agreement, their figures do not match this article-specific two-path lesson. No source figure, wording, coordinates, data, or layout is copied.",
+    "noVisual": "Rejected: the prose states both formulas but requires readers to mentally redraw the computation graph to understand why the same sampling distribution gains a pathwise derivative."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 50,
+        "insight": "The preceding slide concludes the normalization section and contains no stochastic-gradient mechanism."
+      },
+      {
+        "page": 51,
+        "insight": "The gradient-estimator sequence begins by explaining that ordinary backpropagation applies to deterministic differentiable objectives and motivates Monte Carlo estimators when expectations contain stochastic or non-differentiable operations."
+      },
+      {
+        "page": 52,
+        "insight": "The score-function slide derives the likelihood-ratio estimator and identifies high variance from rare samples, setting up the motivation for pathwise gradients."
+      },
+      {
+        "page": 53,
+        "insight": "The directly relevant slide states the pathwise assumptions z=f(epsilon,v), parameter-independent noise, differentiability in z, and generally better variance; it also discusses the distinct local reparameterization trick."
+      },
+      {
+        "page": 54,
+        "insight": "The next slide extends pathwise differentiation to a continuous Gumbel-Softmax relaxation for discrete variables and describes its bias-variance tradeoff."
+      },
+      {
+        "page": 55,
+        "insight": "The following slide combines REINFORCE and reparameterization gradients inside REBAR and RELAX control-variate estimators, confirming that the methods are alternatives and composable tools."
+      },
+      {
+        "page": 56,
+        "insight": "The sequence ends with a neural-network project divider and adds no gradient-estimator content."
+      },
+      {
+        "page": 81,
+        "insight": "The preceding learning slide contrasts MLE, Bayesian estimation, and MAP before the latent-variable sequence."
+      },
+      {
+        "page": 82,
+        "insight": "The VAE sequence motivates approximating an intractable latent posterior but does not yet explain sampling or gradients."
+      },
+      {
+        "page": 83,
+        "insight": "The variational-inference slide derives the ELBO and KL objective, providing the expectation whose gradient the trick makes practical."
+      },
+      {
+        "page": 84,
+        "insight": "The directly relevant VAE slide names reparameterizing sampling to make it differentiable as one of four core ideas, but does not draw the old and new gradient paths."
+      },
+      {
+        "page": 85,
+        "insight": "The code slide implements std=exp(0.5 logvar), epsilon sampled like std, and z=mu+epsilon*std, verifying the diagonal-Gaussian computation used by the article."
+      },
+      {
+        "page": 86,
+        "insight": "The following slide moves to a taxonomy of models and adds no reparameterization detail."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for reparameterization, pathwise gradients, gradient estimators, score functions, epsilon, variational inference, VAE, and ELBO. The complete matching neighborhoods on pages 50-56 and 81-86 were then read page by page. Pages 53, 84, and 85 directly address the mechanism; the deck states the formula and assumptions but never aligns the naive and reparameterized forward and backward computation paths. The visual is an original synthesis rather than a slide redraw.",
+    "license": "The local deck states no general reuse license and includes externally sourced figures and code. It is review-only: no screenshot, artwork, code, prose, example, coordinates, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Auto-Encoding Variational Bayes",
+        "url": "https://arxiv.org/abs/1312.6114",
+        "usage": "Used as the primary VAE source to verify rewriting z sampled from q_phi(z|x) as z=g_phi(epsilon,x) with epsilon from a parameter-independent distribution, enabling a differentiable Monte Carlo estimator of the variational bound.",
+        "license": "The preprint uses arXiv's perpetual non-exclusive distribution license, which grants distribution rights to arXiv rather than general adaptation rights to third parties. No paper figure, prose, equation layout, result, or example is reproduced."
+      },
+      {
+        "title": "Pathwise Derivatives Beyond the Reparameterization Trick",
+        "url": "https://proceedings.mlr.press/v80/jankowiak18a.html",
+        "usage": "Used as a primary pathwise-gradient source to verify that reparameterization gradients are pathwise derivatives associated with transport of samples and that extensions exist for distributions not directly amenable to a simple explicit transform.",
+        "license": "PMLR's publication agreement permits reuse with attribution, but no figure is reused because the implementation is an independently authored computation graph."
+      },
+      {
+        "title": "Variance reduction properties of the reparameterization trick",
+        "url": "https://proceedings.mlr.press/v89/xu19a.html",
+        "usage": "Used as a primary analysis to qualify the variance claim: under stated mean-field Gaussian and quadratic-target assumptions, marginal variances of the reparameterization estimator are smaller than those of the score-function estimator.",
+        "license": "PMLR's publication agreement permits reuse with attribution. The source is used only for technical verification; no figure, data, theorem presentation, wording, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why moving randomness changes differentiability without changing the Gaussian sample distribution. In the naive graph, phi parameterizes q_phi and a draw z is a stochastic node, so ordinary backpropagation has no deterministic local derivative through that draw. In the reparameterized graph, epsilon is drawn independently from N(0,I); holding that draw fixed, z=mu_phi(x)+sigma_phi(x)epsilon is a differentiable deterministic function, so the loss gradient reaches mu, sigma, and phi by chain rule. This is a pathwise estimator for suitable continuous distributions, not a claim that every stochastic node becomes differentiable."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both complete matching neighborhoods, checked the original VAE paper plus two primary pathwise-gradient analyses, verified licensing at the repository and publisher level, and selected an original two-path SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "reparameterization-gradient-path"
+    ],
+    "accessibility": "The SVG provides a linked title and detailed description. Solid rightward arrows encode forward computation, dashed reverse arrows encode gradients, and an X plus the words 'ordinary backprop stops' marks the naive break, so no distinction relies on color. The single 360-unit viewBox has no minimum width or horizontal scrolling and uses existing node, text, arrow, theme, and print primitives for readability at 390 CSS pixels, dark mode, and print."
+  }
+}
