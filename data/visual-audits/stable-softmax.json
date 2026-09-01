@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-stable-softmax.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Subtract the row maximum before exponentiating; relative gaps do not change.",
+  "learningObjective": "Subtract the row maximum, exponentiate nonpositive shifts, and divide by their shared sum.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to subtract the row maximum before exponentiating; relative gaps do not change.",
-    "invariant": "Subtract the row maximum before exponentiating; relative gaps do not change.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Numerically stable row-wise normalization by max shifting before exponentiation.",
+    "recognitionCue": "Use it when exponentials normalize scores into probabilities and large positive logits may overflow even though only relative differences should affect the result.",
+    "invariant": "Subtracting one constant from every row element leaves every exponential ratio unchanged; after max shifting, the largest exponent is exp(0)=1 and none can overflow.",
+    "stateModel": "The minimal state is the logits vector, row maximum retained along the normalized axis, shifted logits, exponentials, and their keep-dimension sum.",
+    "visualRationale": "A stable three-cell row keeps class identity fixed while values move through max, shift, exponent, and division stages. Equations make the trace independent of color or JavaScript.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A probability bar chart alone was rejected because it hides the overflow-prevention step.",
+      "A raw exp(1000) calculation was rejected because it demonstrates failure rather than the supplied stable implementation.",
+      "Shape-only tensor boxes were rejected because numerical stability depends on actual value magnitudes."
     ],
-    "transferLesson": "Transfer the invariant: Subtract the row maximum before exponentiating; relative gaps do not change.",
-    "reviewStatus": "pending"
+    "transferLesson": "Before exponentiating normalized scores, exploit shift invariance to center at the maximum; preserve the reduced dimension so broadcasting back across the row is explicit.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

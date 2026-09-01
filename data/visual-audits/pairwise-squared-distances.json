@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-pairwise-squared-distances.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Singleton axes create every point-center pair before reducing feature coordinates.",
+  "learningObjective": "Broadcast every point-center pair across a feature axis, square coordinate differences, then reduce that axis.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to singleton axes create every point-center pair before reducing feature coordinates.",
-    "invariant": "Singleton axes create every point-center pair before reducing feature coordinates.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Tensor broadcasting with complementary singleton axes followed by an elementwise transform and feature-axis reduction.",
+    "recognitionCue": "Use it when every item in one batch must pair with every item in another batch and the per-pair calculation is identical across a shared feature dimension.",
+    "invariant": "Cell [i,j,:] always belongs to point i and center j; broadcasting changes alignment, not values, and reducing only the final feature axis preserves the pair grid.",
+    "stateModel": "The minimal state is points [n,d], centers [k,d], broadcast differences [n,k,d], and output [n,k]. The fixed 2-by-2 grid maintains pair identity across stages.",
+    "visualRationale": "A point-by-center grid containing actual feature vectors exposes pair geometry and the reduced axis. Labels and arithmetic remain complete in monochrome static output.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Shape labels alone were rejected because they cannot verify signs, squares, or resulting distances.",
+      "Nested Python loops were rejected because they hide how singleton axes vectorize the same pair grid.",
+      "A scatterplot was rejected because it shows Euclidean geometry but not tensor axis alignment or output indexing."
     ],
-    "transferLesson": "Transfer the invariant: Singleton axes create every point-center pair before reducing feature coordinates.",
-    "reviewStatus": "pending"
+    "transferLesson": "For all-pairs tensor operations, insert singleton axes where each operand should repeat, verify the broadcasted axis meaning, and reduce only the intended feature axes.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-cross-entropy-from-logits.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Cross-entropy from logits is a stable log-sum-exp minus the selected logit.",
+  "learningObjective": "Compute stable log-normalizers per example, subtract the indexed correct logits, then average example losses.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to cross-entropy from logits is a stable log-sum-exp minus the selected logit.",
-    "invariant": "Cross-entropy from logits is a stable log-sum-exp minus the selected logit.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Stable row-wise log-softmax combined with indexed correct-class selection and batch reduction.",
+    "recognitionCue": "Use it when multiclass logits and integer labels require negative log likelihood without explicitly forming potentially unstable probabilities.",
+    "invariant": "For each row, log_normalizer minus the shifted selected logit equals negative log probability of the label; max shifting cancels from both terms.",
+    "stateModel": "The minimal state is shifted logits, one log-normalizer per example, labels for advanced indexing, selected shifted logits, per-example losses, and their mean.",
+    "visualRationale": "A batch-by-class table keeps row and class axes visible through shifting and indexed selection, then narrows to per-example loss. Arithmetic remains explicit in static monochrome form.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A single-example trace was rejected because the source returns a batch mean and uses row-wise indexing.",
+      "Building softmax probabilities first was rejected because it obscures the stable log-sum-exp formulation.",
+      "A loss curve was rejected because it does not depict class selection or batch reduction."
     ],
-    "transferLesson": "Transfer the invariant: Cross-entropy from logits is a stable log-sum-exp minus the selected logit.",
-    "reviewStatus": "pending"
+    "transferLesson": "For stable classification losses, compute log-normalization in score space, gather the target score by aligned row indices, and reduce only after producing per-example losses.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

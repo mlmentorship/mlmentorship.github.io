@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-causal-attention.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each attention row can read its own position and every earlier position, never a future one.",
+  "learningObjective": "Form scaled query-key scores, mask the strict upper triangle before softmax, then use prefix-only weights to mix values.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to each attention row can read its own position and every earlier position, never a future one.",
-    "invariant": "Each attention row can read its own position and every earlier position, never a future one.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Scaled dot-product attention with a strict upper-triangular causal mask applied before row-wise softmax.",
+    "recognitionCue": "Use it when each sequence position may aggregate only its own and earlier value rows, requiring future key positions to receive exactly zero normalized weight.",
+    "invariant": "Attention row i contains scores for query i against every key; after masking and softmax, entries j>i are zero and allowed prefix weights j<=i sum to one.",
+    "stateModel": "The minimal state is Q, K, V, square score matrix, upper-triangular Boolean mask, normalized weight matrix, and weight-value product.",
+    "visualRationale": "A query-by-key matrix directly exposes causal topology, the masked upper triangle, and row normalization before the output mix. Numeric cells work without color or JavaScript.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A token-arrow diagram was rejected because it hides scaling, score values, and row normalization.",
+      "A generic triangular mask was rejected because it does not verify that masking occurs before softmax or show resulting weights.",
+      "Shape-only tensor boxes were rejected because they cannot validate the weighted value arithmetic."
     ],
-    "transferLesson": "Transfer the invariant: Each attention row can read its own position and every earlier position, never a future one.",
-    "reviewStatus": "pending"
+    "transferLesson": "For constrained attention, encode allowed information flow as a score-space mask before normalization so forbidden positions receive zero mass, then mix values with the resulting row-stochastic weights.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
