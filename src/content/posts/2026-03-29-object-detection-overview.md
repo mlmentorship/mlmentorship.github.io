@@ -59,6 +59,69 @@ A transformer encoder-decoder that outputs a **fixed set** of $N$ predictions (e
 
 **Used when**: research / leaderboard work; integration with vision-language pretraining (Grounding DINO, OWL-ViT).
 
+<!-- visual:detector-candidate-resolution -->
+<figure class="learning-figure" aria-labelledby="detector-resolution-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="detector-resolution-title">Where does each detector family resolve duplicate predictions?</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of inference-time non-maximum suppression and DETR's training-time one-to-one assignment">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 264" role="img" aria-labelledby="detector-nms-title detector-nms-desc">
+				<title id="detector-nms-title">Classic proposal and dense detectors resolve duplicates after prediction</title>
+				<desc id="detector-nms-desc">Faster R-CNN proposals and the dense predictions used by RetinaNet and most YOLO versions can produce three overlapping boxes for one object. At inference, non-maximum suppression keeps the highest-scoring box and removes the two lower-scoring duplicates.</desc>
+				<text class="viz-axis-label" x="150" y="17" text-anchor="middle">CLASSIC PROPOSAL / DENSE PIPELINE</text>
+				<rect class="viz-plot-bg" x="9" y="28" width="282" height="226" rx="5"></rect>
+				<text class="viz-label" x="150" y="48" text-anchor="middle">many scored candidates for one object</text>
+				<rect x="83" y="61" width="116" height="66" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:4"></rect>
+				<rect x="94" y="67" width="116" height="66" rx="3" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:3;stroke-dasharray:8 5"></rect>
+				<rect x="73" y="69" width="116" height="66" rx="3" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-dasharray:2 5"></rect>
+				<text class="viz-callout" x="77" y="59">0.94 · highest</text>
+				<text class="viz-axis-label" x="150" y="148" text-anchor="middle">overlap is expected, not three objects</text>
+				<path d="M150 155V169M144 163L150 169L156 163" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<rect x="77" y="174" width="146" height="31" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2"></rect>
+				<text class="viz-callout" x="150" y="194" text-anchor="middle">INFERENCE · NMS keeps 0.94</text>
+				<path d="M150 205V219M144 213L150 219L156 213" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<rect x="112" y="224" width="76" height="22" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:3"></rect>
+				<text class="viz-axis-label" x="150" y="240" text-anchor="middle">one kept box</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 264" role="img" aria-labelledby="detector-detr-title detector-detr-desc">
+				<title id="detector-detr-title">DETR learns distinct prediction slots before direct inference</title>
+				<desc id="detector-detr-desc">Four learned object-query slots predict a dog box, a car box, and two no-object values in parallel. During training only, Hungarian bipartite matching assigns at most one query to each ground-truth object. At inference, the slots directly emit the final set and there is no NMS gate.</desc>
+				<text class="viz-axis-label" x="150" y="17" text-anchor="middle">DETR · SET-PREDICTION PIPELINE</text>
+				<rect class="viz-plot-bg" x="9" y="28" width="282" height="226" rx="5"></rect>
+				<text class="viz-label" x="150" y="48" text-anchor="middle">fixed learned query slots predict in parallel</text>
+				<rect x="30" y="59" width="48" height="27" rx="4" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></rect>
+				<rect x="94" y="59" width="48" height="27" rx="4" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></rect>
+				<rect x="158" y="59" width="48" height="27" rx="4" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:2;stroke-dasharray:5 3"></rect>
+				<rect x="222" y="59" width="48" height="27" rx="4" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:2;stroke-dasharray:5 3"></rect>
+				<text class="viz-callout" x="54" y="77" text-anchor="middle">Q1</text>
+				<text class="viz-callout" x="118" y="77" text-anchor="middle">Q2</text>
+				<text class="viz-callout" x="182" y="77" text-anchor="middle">Q3</text>
+				<text class="viz-callout" x="246" y="77" text-anchor="middle">Q4</text>
+				<path d="M54 86V103M118 86V103M182 86V103M246 86V103" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<rect x="30" y="105" width="48" height="30" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:3"></rect>
+				<rect x="94" y="105" width="48" height="30" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:3"></rect>
+				<rect x="158" y="105" width="48" height="30" rx="3" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:2;stroke-dasharray:5 3"></rect>
+				<rect x="222" y="105" width="48" height="30" rx="3" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:2;stroke-dasharray:5 3"></rect>
+				<text class="viz-axis-label" x="54" y="124" text-anchor="middle">dog box</text>
+				<text class="viz-axis-label" x="118" y="124" text-anchor="middle">car box</text>
+				<text class="viz-axis-label" x="182" y="119" text-anchor="middle">no</text>
+				<text class="viz-axis-label" x="182" y="130" text-anchor="middle">object</text>
+				<text class="viz-axis-label" x="246" y="119" text-anchor="middle">no</text>
+				<text class="viz-axis-label" x="246" y="130" text-anchor="middle">object</text>
+				<path d="M54 146V163M118 146V163M54 155H118" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;stroke-dasharray:5 3"></path>
+				<text class="viz-axis-label" x="150" y="177" text-anchor="middle">TRAINING ONLY · one-to-one Hungarian match</text>
+				<path d="M150 184V201M144 195L150 201L156 195" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+				<rect x="66" y="206" width="168" height="40" rx="4" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:2"></rect>
+				<text class="viz-callout" x="150" y="223" text-anchor="middle">INFERENCE · direct final set</text>
+				<text class="viz-axis-label" x="150" y="239" text-anchor="middle">dog + car · no NMS gate</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> classic proposal and dense detectors may score several boxes for the same object, so NMS removes lower-scoring overlaps at inference. DETR moves uniqueness into training: Hungarian matching gives each ground-truth object at most one query slot, unused slots learn “no object,” and inference emits the resulting set directly.</figcaption>
+</figure>
+
 ## Key shared components
 
 ### Bounding box parameterization

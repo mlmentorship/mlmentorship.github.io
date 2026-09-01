@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "slug": "object-detection-overview",
+  "article": "src/content/posts/2026-03-29-object-detection-overview.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Contrast how proposal- and grid-based detectors collapse redundant candidates with NMS against how DETR learns distinct prediction slots through one-to-one matching and emits its set without NMS.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can hold duplicate box geometry, the NMS bottleneck, and DETR's distinct prediction slots side by side. It makes the location and purpose of duplicate resolution visible without expanding into a complete architecture diagram.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can compare stage names but cannot show several overlapping candidate boxes collapsing to one retained detection.",
+    "svg": "Selected: fixed geometry can align redundant boxes, an explicit NMS gate, query slots, training-only matching, and the final sets while retaining direct labels and responsive scaling.",
+    "semanticHtml": "Rejected: cards or a table could summarize the families but would not spatially connect duplicate boxes to the cleanup operation that removes them.",
+    "interaction": "Rejected: toggling detector families would hide the side-by-side comparison and add state to a fixed conceptual distinction.",
+    "paperReuse": "Rejected: the reviewed papers and local slide contain denser architecture figures, and public availability does not establish permission to adapt their artwork. No external figure, image, data, or layout is reused.",
+    "noVisual": "Rejected: the prose lists NMS for anchor-based detectors and one-to-one matching for DETR in separate sections, leaving readers to infer why one pipeline needs duplicate cleanup and the other does not."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 146,
+        "insight": "The section divider introduces computer vision but contains no detector architecture or candidate-assignment mechanism."
+      },
+      {
+        "page": 147,
+        "insight": "The image-classification overview names object detection and illustrates visual variation, but does not explain localization or duplicate predictions."
+      },
+      {
+        "page": 148,
+        "insight": "The neighboring CNN slide explains the shared feature-extraction backbone used by the article's detector families, but not their output assignment or post-processing."
+      },
+      {
+        "page": 149,
+        "insight": "The Faster R-CNN slide describes backbone features, sliding anchors, the RPN, proposal cropping, box regression, and score-ordered NMS. Its dense, unattributed collage covers only the two-stage family and does not compare YOLO or DETR."
+      },
+      {
+        "page": 150,
+        "insight": "The following slide begins GANs, confirming that the deck's local detection treatment ends with Faster R-CNN."
+      }
+    ],
+    "notes": "The complete 214-page deck was text-indexed for object detection, Faster R-CNN, YOLO, DETR, bounding box, anchor, and non-maximum suppression. Pages 146-150 were extracted as text and visually inspected as the exact topic neighborhood. Page 149 is the sole detector-mechanism slide; there are no YOLO or DETR slides. Its NMS description informs the research question, but no deck artwork or layout is reused.",
+    "license": "The local deck provides no explicit reuse license or reliable attribution for the images and diagrams embedded on page 149. It is treated as review-only material."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks",
+        "url": "https://arxiv.org/abs/1506.01497",
+        "usage": "Used to verify the two-stage sequence in which an RPN generates scored proposals that are reduced with NMS before region classification and box refinement.",
+        "license": "No paper text, figure, result, or layout is copied. The arXiv record is treated as access, not permission to adapt artwork."
+      },
+      {
+        "title": "You Only Look Once: Unified, Real-Time Object Detection",
+        "url": "https://arxiv.org/abs/1506.02640",
+        "usage": "Used to verify YOLO v1's single-network prediction of bounding boxes and class probabilities from the full image and its use of NMS to remove duplicate detections.",
+        "license": "No paper text, figure, result, sample image, or layout is copied. The synthetic boxes and pipeline composition are original."
+      },
+      {
+        "title": "End-to-End Object Detection with Transformers",
+        "url": "https://arxiv.org/abs/2005.12872",
+        "usage": "Used to verify DETR's fixed prediction set, no-object class, training-time bipartite matching, and removal of hand-designed components such as anchor generation and NMS.",
+        "license": "No paper figure, attention visualization, result, text, or layout is copied. The query-slot schematic is an original explanation of the mechanism."
+      },
+      {
+        "title": "DETR official implementation",
+        "url": "https://github.com/facebookresearch/detr",
+        "usage": "Used as official implementation documentation to confirm that the set-based global loss forces unique predictions through bipartite matching and that learned object queries output the final set in parallel.",
+        "license": "The repository code is Apache-2.0 licensed, but no code, README prose, model artifact, or image is reproduced."
+      },
+      {
+        "title": "arXiv reuse requests",
+        "url": "https://info.arxiv.org/help/license/reuse.html",
+        "usage": "Used to verify that figure reuse depends on the work's assigned license and otherwise requires permission from the submitter or copyright holder.",
+        "license": "Licensing guidance only; the implementation avoids reuse and adaptation of all reviewed source figures."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the stage count itself, but where duplicate resolution happens. Faster R-CNN proposals and YOLO dense predictions can assign several boxes to one object and therefore use NMS at inference. DETR instead uses Hungarian bipartite matching during training to make target assignment one-to-one; at inference its learned queries directly emit a fixed set, with unused slots predicting no-object. The original visual intentionally does not imply that Hungarian matching runs at inference."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, visually inspected the exact pages 146-150 neighborhood, and checked the three primary detector papers, official DETR implementation documentation, and arXiv reuse guidance before selecting an original candidate-resolution comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "detector-candidate-resolution"
+    ],
+    "accessibility": "Both responsive SVG panels have independent titles and detailed descriptions. Direct family, stage, box, query, keep, and no-object labels; overlapping versus separated geometry; distinct solid, dashed, and dotted outlines; and explicit NMS and training-only matching text preserve meaning without color. The two-panel shared primitive stacks at narrow widths, each 300-unit viewBox scales within the article column at 390 CSS pixels, theme variables preserve dark-mode contrast, and established print tokens force a light high-contrast rendering."
+  }
+}
