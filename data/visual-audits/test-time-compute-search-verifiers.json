@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "test-time-compute-search-verifiers",
+  "article": "src/content/posts/2026-08-28-test-time-compute-search-verifiers.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate proposal coverage from selection quality by explaining how extra compute can generate a correct candidate yet still return a wrong answer when the verifier ranks a proxy instead of correctness.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can hold the candidate set fixed while changing only the verifier, isolating proposal coverage from selection quality. Repeated labels, aligned geometry, and explicit returned outcomes make the verifier bottleneck directly inspectable without interaction or fabricated performance curves.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can describe sample, score, and select stages, but automatic layout would not reliably align the identical candidate sets needed for the controlled comparison.",
+    "svg": "Selected: fixed coordinates repeat the same four candidate truths in two panels and change only the verifier and selected output, making the causal contrast visible.",
+    "semanticHtml": "Rejected: cards or a table could list candidate and verifier outcomes, but would weaken the spatial invariant that candidate B is present in both paths while only the selection mechanism changes.",
+    "interaction": "Rejected: sliders for sample count or verifier error would introduce controls and synthetic quantitative assumptions. Two fully visible static cases establish the transferable distinction.",
+    "paperReuse": "Rejected: the primary papers contain experiment-specific plots and search diagrams, but no permissive figure-adaptation license was established. No paper artwork, data, coordinates, wording, or layout is reused.",
+    "noVisual": "Rejected: the article names generation and verification failure modes separately, but prose alone makes it easy to attribute the final error to weak generation even when the correct candidate was already available."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide is the closest proposal-and-verification example: a small model proposes token blocks and the target model verifies them, but its modified rejection sampling preserves the target distribution rather than ranking independently generated solutions for correctness."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving stack names speculative decoding as a serving optimization but contains no best-of-n, reasoning search, verifier quality, or adaptive compute allocation."
+      },
+      {
+        "page": 116,
+        "insight": "The Re-scoring divider begins the closest candidate-selection neighborhood but contains no mechanism."
+      },
+      {
+        "page": 117,
+        "insight": "The re-scoring slide constructs alternative candidate inputs and applies a second model, demonstrating proposal followed by ranking, but it does not discuss correctness verifiers, search budgets, or proxy exploitation."
+      },
+      {
+        "page": 190,
+        "insight": "The advanced-algorithms slide introduces A-star, breadth-first search, and depth-first search, supplying generic state-search context without learned proposals or verifiers."
+      },
+      {
+        "page": 192,
+        "insight": "The graph-algorithms-in-practice slide mentions best-first search and MCTS and discusses choosing search algorithms from graph properties, but has no language-model candidate scoring, verifier error, or compute-quality stopping rule."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for test-time compute, best-of-n, self-consistency, verifier, process reward, outcome reward, tree search, MCTS, beam search, and reasoning. It then read the complete relevant neighborhoods on pages 111-117 and 189-193. Pages 111-112 and 114 concern attention and mixed precision; page 118 changes to knowledge-graph embeddings. Pages 189 and 191 provide generic graph context, while page 193 changes to formal languages. The deck has no test-time reasoning-compute or verifier-bottleneck visual. No deck image, prose, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Training Verifiers to Solve Math Word Problems",
+        "url": "https://arxiv.org/abs/2110.14168",
+        "usage": "Used as the primary source for generating many candidate solutions and selecting among them with a learned verifier, including the dependence of best-of-n gains on verifier ranking quality.",
+        "license": "The arXiv record establishes public distribution, not a general permissive figure-adaptation grant. No figure, benchmark result, candidate text, prose, or layout is copied."
+      },
+      {
+        "title": "Self-Consistency Improves Chain of Thought Reasoning in Language Models",
+        "url": "https://arxiv.org/abs/2203.11171",
+        "usage": "Used as the primary source for sampling diverse reasoning paths and selecting the most consistent final answer, and to distinguish agreement-based aggregation from an external correctness check.",
+        "license": "No permissive license to adapt the paper's figures was established from the arXiv record. No figure, result, reasoning trace, wording, or arrangement is reused."
+      },
+      {
+        "title": "Let's Verify Step by Step",
+        "url": "https://arxiv.org/abs/2305.20050",
+        "usage": "Used as the primary source for outcome versus process supervision and for using learned reward models to rank candidate solutions, reinforcing that the supervision target determines what the verifier can detect.",
+        "license": "Public access is not treated as permission to reuse artwork. The implementation copies no paper figure, PRM800K example, experimental value, wording, or geometry."
+      },
+      {
+        "title": "Scaling LLM Test-Time Compute Optimally can be More Effective than Scaling Model Parameters",
+        "url": "https://arxiv.org/abs/2408.03314",
+        "usage": "Used as the primary source for scaling inference compute through verifier-guided search and adaptive response strategies, and for allocating test-time compute according to question difficulty rather than uniformly.",
+        "license": "No permissive figure-adaptation license was established from the arXiv record. The visual makes no empirical scaling claim and reuses no source plot, data, labels, wording, or layout."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that test-time success has two separable requirements: the proposal policy must place a correct solution in the candidate set, and the verifier must preserve it through selection. The original visual controls the first requirement by repeating the same four invented candidates. Only the evidence source changes. Candidate B is correct in both panels; candidate D is explicitly a polished but wrong shortcut. The schematic makes no empirical claim about model-judge error rates, sample efficiency, or any benchmark."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed the full 214-page deck and inspected its proposal-verification, re-scoring, and graph-search neighborhoods, then checked primary best-of-n, self-consistency, process-supervision, and compute-scaling papers before selecting an original controlled verifier comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "test-time-compute-verifier-bottleneck"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Every candidate has a letter and truth label, each verifier states what evidence it uses, and both selected outcomes are directly named. The successful path is solid and the failed proxy path is dashed, so color is redundant. The 360-unit viewBox scales without a fixed or minimum width at 390 CSS pixels. Established theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
