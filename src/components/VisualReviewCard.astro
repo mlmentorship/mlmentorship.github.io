@@ -1,0 +1,229 @@
+---
+interface Props {
+  eyebrow: string;
+  title?: string;
+  summary?: string;
+  headingLevel?: 1 | 2;
+  variant?: 'article' | 'deck';
+  hidden?: boolean;
+  loading?: boolean;
+  id?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  summary,
+  headingLevel = 2,
+  variant = 'article',
+  hidden = false,
+  loading = false,
+  id,
+} = Astro.props as Props;
+---
+
+<section
+  id={id}
+  class:list={['visual-review-card', `visual-review-card--${variant}`]}
+  data-visual-review-card
+  hidden={hidden}
+>
+  <header class="visual-review-head">
+    <div class="visual-review-overline">
+      <p data-review-eyebrow>{eyebrow}</p>
+      <slot name="status" />
+    </div>
+    {title && headingLevel === 1 && <h1 tabindex="-1" data-review-title>{title}</h1>}
+    {title && headingLevel === 2 && <h2 data-review-title>{title}</h2>}
+    {summary && <p class="visual-review-summary" data-review-summary>{summary}</p>}
+  </header>
+
+  <div class="visual-review-visual" data-review-visual-host aria-busy={loading ? 'true' : 'false'}>
+    <slot name="visual"><p class="visual-review-loading">Preparing the visual…</p></slot>
+  </div>
+
+  <details class="visual-review-sources" data-review-source-details hidden>
+    <summary>Sources and provenance</summary>
+    <div data-review-source-host></div>
+  </details>
+
+  {Astro.slots.has('actions') && <footer class="visual-review-actions"><slot name="actions" /></footer>}
+</section>
+
+<style>
+  .visual-review-card {
+    min-width: 0;
+    margin: 0 auto 1.35rem;
+    padding: .9rem 0 1rem;
+    border-top: 1px solid var(--c-rule);
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .visual-review-card[hidden] { display: none; }
+  .visual-review-head { margin-bottom: .7rem; }
+  .visual-review-overline {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .visual-review-overline p {
+    margin: 0;
+    color: var(--c-accent);
+    font-family: var(--font-ui);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+  }
+  .visual-review-overline :global(*) {
+    margin: 0;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .66rem;
+  }
+  h1,
+  h2 {
+    margin: .35rem 0 .25rem;
+    color: var(--c-text);
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 3vw, 1.8rem);
+    line-height: 1.2;
+    letter-spacing: -.018em;
+  }
+  .visual-review-summary {
+    max-width: 48rem;
+    margin: .35rem 0 0;
+    color: var(--c-text-soft);
+    font-family: var(--font-reading);
+    font-size: clamp(.94rem, 1.8vw, 1.04rem);
+    line-height: 1.5;
+  }
+  .visual-review-visual { min-width: 0; }
+  .visual-review-visual :global(.learning-figure) {
+    width: 100%;
+    max-width: 100% !important;
+    margin: .75rem 0 0 !important;
+  }
+  .visual-review-visual :global(.learning-figure > .visual-kicker),
+  .visual-review-visual :global(.learning-figure > .visual-title) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+  .visual-review-loading {
+    min-height: 14rem;
+    display: grid;
+    place-items: center;
+    margin: .75rem 0 0;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .78rem;
+  }
+  .visual-review-sources {
+    margin-top: .55rem;
+    color: var(--c-muted);
+    font-family: var(--font-ui);
+    font-size: .68rem;
+  }
+  .visual-review-sources[hidden] { display: none; }
+  .visual-review-sources summary {
+    width: fit-content;
+    cursor: pointer;
+    color: var(--c-text-soft);
+  }
+  .visual-review-sources :global(.diagram-source) {
+    margin: .55rem 0 0;
+    color: var(--c-muted);
+    font-size: .68rem;
+    line-height: 1.5;
+  }
+  .visual-review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .45rem .9rem;
+    margin-top: .75rem;
+  }
+  .visual-review-actions :global(a),
+  .visual-review-actions :global(button) {
+    min-height: 2.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .45rem .75rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius);
+    background: var(--c-surface);
+    color: var(--c-text-soft);
+    font-family: var(--font-ui);
+    font-size: .72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-decoration: none;
+  }
+  .visual-review-actions :global(a:hover),
+  .visual-review-actions :global(button:hover:not(:disabled)) {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+  .visual-review-actions :global(button) { cursor: pointer; }
+  .visual-review-actions :global(button:disabled) { cursor: default; opacity: .4; }
+  .visual-review-card--deck {
+    width: min(100%, 68rem);
+    max-height: calc(100dvh - var(--header-height) - 4.8rem);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    padding: clamp(.9rem, 2.5vw, 1.35rem);
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-lg);
+    background: var(--c-bg);
+  }
+  .visual-review-card--article {
+    height: clamp(32rem, calc(100dvh - 10rem), 46rem);
+    display: flex;
+    flex-direction: column;
+  }
+  .visual-review-card--article .visual-review-visual {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .visual-review-card--article .visual-review-actions {
+    flex: 0 0 auto;
+  }
+  .visual-review-card--deck .visual-review-visual {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .visual-review-card--deck .visual-review-actions {
+    justify-content: space-between;
+    border-top: 1px solid var(--c-rule);
+    padding-top: .75rem;
+  }
+
+  @media (max-width: 640px) {
+    .visual-review-card--article { height: 34rem; }
+    .visual-review-card--deck { max-height: none; display: block; padding: .8rem; }
+    .visual-review-card--deck .visual-review-visual { max-height: none; overflow-y: visible; }
+    .visual-review-actions :global(a),
+    .visual-review-actions :global(button) { min-height: 2.75rem; }
+  }
+  @media print {
+    .visual-review-card { break-inside: avoid; border: 0; }
+    .visual-review-actions,
+    .visual-review-sources { display: none; }
+    .visual-review-card--deck .visual-review-visual { max-height: none; overflow: visible; }
+  }
+</style>

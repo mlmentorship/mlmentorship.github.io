@@ -1,0 +1,359 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import VisualReviewCard from '../../../../components/VisualReviewCard.astro';
+import { LIBRARY_VOLUMES, type LibraryChapter, type LibraryVolume } from '../../../../data/library';
+import { entriesForChapter, getLibraryEntries } from '../../../../utils/library';
+import { getImplementedVisualAudit } from '../../../../utils/visualAudits';
+
+export function getStaticPaths() {
+  return LIBRARY_VOLUMES.flatMap((volume) => volume.chapters
+    .filter((chapter) => chapter.slugs.some((slug) => getImplementedVisualAudit(slug)))
+    .map((chapter) => ({
+      params: { volume: volume.id, chapter: chapter.id },
+      props: { volume, chapter },
+    })));
+}
+
+interface Props { volume: LibraryVolume; chapter: LibraryChapter; }
+const { volume, chapter } = Astro.props as Props;
+const allEntries = await getLibraryEntries();
+const chapterEntries = entriesForChapter(allEntries, chapter);
+const reviewEntries = chapterEntries.flatMap((entry) => {
+  const audit = getImplementedVisualAudit(entry.slug);
+  if (!audit) return [];
+  return [{
+    slug: entry.slug,
+    title: entry.title,
+    href: entry.href,
+    category: entry.category,
+    objective: audit.learningObjective || entry.description || entry.title,
+    medium: audit.medium,
+    visualId: audit.visualIds[0],
+  }];
+});
+const firstEntry = reviewEntries[0];
+const chapterIndex = volume.chapters.findIndex((item) => item.id === chapter.id);
+const reviewData = JSON.stringify(reviewEntries).replace(/</g, '\\u003c');
+const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Guide' } as const;
+---
+
+<BaseLayout
+  title={`Visual review: ${chapter.title}`}
+  description={`Review ${chapter.title} one visual mental model at a time.`}
+  noindex
+  immersive
+  pagefindIgnore
+>
+  <div class="visual-review-mode" data-visual-review-mode data-pagefind-ignore="all">
+    <nav class="review-toolbar" aria-label="Visual review navigation">
+      <a href={`/library/${volume.id}/${chapter.id}/`}><span aria-hidden="true">←</span> Chapter</a>
+      <p><span>Book {volume.number} · Chapter {chapterIndex + 1}</span><strong>{chapter.title}</strong></p>
+      <div class="review-progress-wrap">
+        <span data-review-counter>{reviewEntries.length > 0 ? `1 / ${reviewEntries.length}` : '0 / 0'}</span>
+        <progress max={Math.max(1, reviewEntries.length)} value={reviewEntries.length > 0 ? 1 : 0} data-review-progress>
+          {reviewEntries.length > 0 ? 1 : 0} of {reviewEntries.length}
+        </progress>
+      </div>
+    </nav>
+
+    {firstEntry ? (
+      <>
+        <section class="review-stage" data-review-stage hidden aria-busy="true">
+          <VisualReviewCard
+            eyebrow={`${categoryLabel[firstEntry.category]} · Visual review`}
+            title={firstEntry.title}
+            summary={firstEntry.objective}
+            headingLevel={1}
+            variant="deck"
+          >
+            <span slot="status" data-review-position>Card 1 of {reviewEntries.length}</span>
+            <p slot="visual" class="review-loading" data-review-loading>Loading the visual…</p>
+            <button slot="actions" type="button" data-review-previous aria-keyshortcuts="ArrowLeft">← Previous</button>
+            <a slot="actions" href={firstEntry.href} data-review-full>Open full explanation</a>
+            <button slot="actions" type="button" data-review-next aria-keyshortcuts="ArrowRight">Next →</button>
+          </VisualReviewCard>
+        </section>
+
+        <section class="review-fallback" data-review-fallback>
+          <p class="fallback-kicker">Visual review</p>
+          <h1>{chapter.title}</h1>
+          <p>JavaScript adds one-card navigation. Every complete article remains available below.</p>
+          <ol>
+            {reviewEntries.map((entry) => <li><a href={entry.href}>{entry.title}</a><span>{entry.objective}</span></li>)}
+          </ol>
+        </section>
+
+        <p class="review-help">Use <kbd>←</kbd> <kbd>→</kbd>, swipe, or the buttons. Open the full article whenever the visual is not enough.</p>
+        <p class="sr-only" aria-live="polite" data-review-announcer></p>
+        <script id="visual-review-data" type="application/json" is:inline set:html={reviewData}></script>
+      </>
+    ) : (
+      <section class="empty-review">
+        <p>Visual review</p>
+        <h1>{chapter.title}</h1>
+        <p>This chapter does not have a completed visual review card yet.</p>
+        <a href={`/library/${volume.id}/${chapter.id}/`}>Return to the chapter</a>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  import { absolutizeVisualLinks, extractLearningVisual } from '../../../../utils/visualReviewClient';
+
+  interface ReviewEntry {
+    slug: string;
+    title: string;
+    href: string;
+    category: 'concepts' | 'questions' | 'guides';
+    objective: string;
+    medium: string;
+    visualId: string;
+  }
+
+  const root = document.querySelector<HTMLElement>('[data-visual-review-mode]');
+  const dataNode = document.querySelector<HTMLScriptElement>('#visual-review-data');
+  let entries: ReviewEntry[] = [];
+  try {
+    const parsed = JSON.parse(dataNode?.textContent ?? '[]');
+    if (Array.isArray(parsed)) entries = parsed as ReviewEntry[];
+  } catch (error) {
+    console.error('Visual review data could not be read.', error);
+  }
+
+  if (root && entries.length > 0) {
+    const stage = root.querySelector<HTMLElement>('[data-review-stage]');
+    const fallback = root.querySelector<HTMLElement>('[data-review-fallback]');
+    const card = root.querySelector<HTMLElement>('[data-visual-review-card]');
+    const title = root.querySelector<HTMLElement>('[data-review-title]');
+    const eyebrow = root.querySelector<HTMLElement>('[data-review-eyebrow]');
+    const summary = root.querySelector<HTMLElement>('[data-review-summary]');
+    const visualHost = root.querySelector<HTMLElement>('[data-review-visual-host]');
+    const sourceHost = root.querySelector<HTMLElement>('[data-review-source-host]');
+    const sourceDetails = root.querySelector<HTMLDetailsElement>('[data-review-source-details]');
+    const position = root.querySelector<HTMLElement>('[data-review-position]');
+    const counter = root.querySelector<HTMLElement>('[data-review-counter]');
+    const progress = root.querySelector<HTMLProgressElement>('[data-review-progress]');
+    const previous = root.querySelector<HTMLButtonElement>('[data-review-previous]');
+    const next = root.querySelector<HTMLButtonElement>('[data-review-next]');
+    const full = root.querySelector<HTMLAnchorElement>('[data-review-full]');
+    const announcer = root.querySelector<HTMLElement>('[data-review-announcer]');
+    const cache = new Map<string, Promise<Document>>();
+    const labels = {
+      concepts: ['Concept · Visual quick review', 'Open full explanation'],
+      questions: ['Question · 30-second answer map', 'Open full interview answer'],
+      guides: ['Guide · Decision map', 'Open full guide'],
+    } as const;
+    let currentIndex = 0;
+    let requestToken = 0;
+    let touchStartX: number | undefined;
+
+    function fetchArticle(entry: ReviewEntry): Promise<Document> {
+      const cached = cache.get(entry.href);
+      if (cached) return cached;
+      const request = fetch(entry.href, { headers: { Accept: 'text/html' } })
+        .then((response) => {
+          if (!response.ok) throw new Error(`Article returned ${response.status}`);
+          return response.text();
+        })
+        .then((html) => new DOMParser().parseFromString(html, 'text/html'))
+        .catch((error) => {
+          cache.delete(entry.href);
+          throw error;
+        });
+      cache.set(entry.href, request);
+      return request;
+    }
+
+    async function renderMermaid(container: HTMLElement, slug: string) {
+      const nodes = [...container.querySelectorAll<HTMLElement>('pre.mermaid')];
+      if (nodes.length === 0) return;
+      const { default: mermaid } = await import('mermaid');
+      const explicitTheme = document.documentElement.dataset.theme;
+      const dark = explicitTheme === 'dark' || (!explicitTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: dark ? 'dark' : 'default',
+        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+        flowchart: { curve: 'basis', nodeSpacing: 30, rankSpacing: 42, padding: 12, useMaxWidth: true },
+      });
+      for (const [index, node] of nodes.entries()) {
+        const diagram = node.dataset.diagram ?? node.textContent ?? '';
+        node.dataset.diagram = diagram;
+        const renderId = `review-${slug}-${index}-${Date.now()}`;
+        const { svg, bindFunctions } = await mermaid.render(renderId, diagram);
+        node.innerHTML = svg;
+        node.dataset.processed = 'true';
+        bindFunctions?.(node);
+      }
+    }
+
+    function indexFromHash(): number {
+      const slug = decodeURIComponent(window.location.hash.slice(1));
+      const index = entries.findIndex((entry) => entry.slug === slug);
+      return index >= 0 ? index : 0;
+    }
+
+    async function showEntry(index: number, options: { push?: boolean; focus?: boolean } = {}) {
+      if (!stage || !card || !title || !eyebrow || !summary || !visualHost || !position || !counter || !progress || !previous || !next || !full) return;
+      const boundedIndex = Math.max(0, Math.min(entries.length - 1, index));
+      const entry = entries[boundedIndex];
+      const token = ++requestToken;
+      currentIndex = boundedIndex;
+      stage.setAttribute('aria-busy', 'true');
+      visualHost.setAttribute('aria-busy', 'true');
+      visualHost.innerHTML = '<p class="review-loading">Loading the visual…</p>';
+      title.textContent = entry.title;
+      eyebrow.textContent = labels[entry.category][0];
+      summary.textContent = entry.objective;
+      position.textContent = `Card ${boundedIndex + 1} of ${entries.length}`;
+      counter.textContent = `${boundedIndex + 1} / ${entries.length}`;
+      progress.value = boundedIndex + 1;
+      previous.disabled = boundedIndex === 0;
+      next.disabled = boundedIndex === entries.length - 1;
+      full.href = entry.href;
+      full.textContent = labels[entry.category][1];
+      if (sourceHost) sourceHost.replaceChildren();
+      if (sourceDetails) { sourceDetails.hidden = true; sourceDetails.open = false; }
+
+      try {
+        const article = await fetchArticle(entry);
+        if (token !== requestToken) return;
+        const extracted = extractLearningVisual(article, entry.visualId);
+        if (!extracted) throw new Error('No completed learning visual was found');
+        const figure = document.importNode(extracted.figure, true);
+        absolutizeVisualLinks(figure, entry.href);
+        visualHost.replaceChildren(figure);
+        if (extracted.source && sourceHost && sourceDetails) {
+          const note = document.importNode(extracted.source, true);
+          absolutizeVisualLinks(note, entry.href);
+          sourceHost.append(note);
+          sourceDetails.hidden = false;
+        }
+        await renderMermaid(visualHost, entry.slug);
+        if (token !== requestToken) return;
+        stage.hidden = false;
+        if (fallback) fallback.hidden = true;
+        stage.setAttribute('aria-busy', 'false');
+        visualHost.setAttribute('aria-busy', 'false');
+        if (options.push) history.pushState({ slug: entry.slug }, '', `#${encodeURIComponent(entry.slug)}`);
+        else if (!window.location.hash) history.replaceState({ slug: entry.slug }, '', `#${encodeURIComponent(entry.slug)}`);
+        if (announcer) announcer.textContent = `${entry.title}, card ${boundedIndex + 1} of ${entries.length}`;
+        if (options.focus) title.focus({ preventScroll: true });
+        for (const adjacent of [entries[boundedIndex - 1], entries[boundedIndex + 1]]) {
+          if (adjacent) void fetchArticle(adjacent).catch(() => undefined);
+        }
+      } catch (error) {
+        if (token !== requestToken) return;
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        const errorPanel = document.createElement('div');
+        const errorTitle = document.createElement('strong');
+        const errorDetail = document.createElement('span');
+        const articleLink = document.createElement('a');
+        errorPanel.className = 'review-error';
+        errorTitle.textContent = 'This visual could not be loaded.';
+        errorDetail.textContent = message;
+        articleLink.href = entry.href;
+        articleLink.textContent = 'Open the full article';
+        errorPanel.append(errorTitle, errorDetail, articleLink);
+        visualHost.replaceChildren(errorPanel);
+        stage.hidden = false;
+        stage.setAttribute('aria-busy', 'false');
+        visualHost.setAttribute('aria-busy', 'false');
+      }
+    }
+
+    previous?.addEventListener('click', () => void showEntry(currentIndex - 1, { push: true, focus: true }));
+    next?.addEventListener('click', () => void showEntry(currentIndex + 1, { push: true, focus: true }));
+    window.addEventListener('popstate', () => void showEntry(indexFromHash()));
+    document.addEventListener('keydown', (event) => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
+      if (event.key === 'ArrowLeft' && currentIndex > 0) { event.preventDefault(); void showEntry(currentIndex - 1, { push: true, focus: true }); }
+      if (event.key === 'ArrowRight' && currentIndex < entries.length - 1) { event.preventDefault(); void showEntry(currentIndex + 1, { push: true, focus: true }); }
+    });
+    stage?.addEventListener('touchstart', (event) => { touchStartX = event.changedTouches[0]?.clientX; }, { passive: true });
+    stage?.addEventListener('touchend', (event) => {
+      if (touchStartX === undefined) return;
+      const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
+      touchStartX = undefined;
+      if (Math.abs(distance) < 60) return;
+      if (distance > 0 && currentIndex > 0) void showEntry(currentIndex - 1, { push: true, focus: true });
+      if (distance < 0 && currentIndex < entries.length - 1) void showEntry(currentIndex + 1, { push: true, focus: true });
+    }, { passive: true });
+
+    void showEntry(indexFromHash());
+  }
+</script>
+
+<style>
+  .visual-review-mode {
+    min-height: calc(100dvh - var(--header-height));
+    background: var(--c-bg-tint);
+  }
+  .review-toolbar {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 40;
+    display: grid;
+    grid-template-columns: minmax(5rem, 1fr) minmax(0, 2fr) minmax(5rem, 1fr);
+    align-items: center;
+    gap: 1rem;
+    min-height: 3.2rem;
+    padding: .45rem max(var(--gutter), calc((100vw - 72rem) / 2));
+    border-bottom: 1px solid var(--c-rule);
+    background: color-mix(in srgb, var(--c-bg) 94%, transparent);
+    backdrop-filter: blur(12px);
+  }
+  .review-toolbar > a { color: var(--c-text-soft); font-size: .72rem; text-decoration: none; }
+  .review-toolbar > a:hover { color: var(--c-accent); }
+  .review-toolbar p { min-width: 0; margin: 0; text-align: center; }
+  .review-toolbar p span,
+  .review-toolbar p strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .review-toolbar p span { color: var(--c-muted); font-size: .6rem; }
+  .review-toolbar p strong { margin-top: .05rem; color: var(--c-text); font-size: .76rem; }
+  .review-progress-wrap { display: grid; justify-items: end; gap: .2rem; }
+  .review-progress-wrap span { color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; }
+  .review-progress-wrap progress { width: min(7rem, 100%); height: .22rem; accent-color: var(--c-accent); }
+  .review-stage { min-height: calc(100dvh - var(--header-height) - 3.2rem); padding: clamp(.8rem, 2vw, 1.5rem) var(--gutter); }
+  .review-stage[hidden] { display: none; }
+  .review-fallback,
+  .empty-review {
+    width: min(100%, 44rem);
+    margin: 0 auto;
+    padding: 2rem var(--gutter) 4rem;
+  }
+  .review-fallback[hidden] { display: none; }
+  .fallback-kicker,
+  .empty-review > p:first-child { margin: 0; color: var(--c-accent); font-size: .68rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .review-fallback h1,
+  .empty-review h1 { margin: .4rem 0; font-size: 1.8rem; }
+  .review-fallback > p:not(.fallback-kicker),
+  .empty-review > p:not(:first-child) { color: var(--c-text-soft); }
+  .review-fallback ol { margin: 1.5rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
+  .review-fallback li { padding: .75rem 0; border-bottom: 1px solid var(--c-rule); }
+  .review-fallback li a { display: block; color: var(--c-text); font-weight: 650; }
+  .review-fallback li span { display: block; margin-top: .2rem; color: var(--c-muted); font-size: .78rem; }
+  .review-help { margin: 0; padding: 0 var(--gutter) 1rem; color: var(--c-muted); font-size: .65rem; text-align: center; }
+  kbd { padding: .08rem .28rem; border: 1px solid var(--c-rule); border-radius: 3px; background: var(--c-bg); font-family: var(--font-mono); }
+  :global(.review-loading) { min-height: 14rem; display: grid; place-items: center; color: var(--c-muted); font-size: .78rem; }
+  :global(.review-error) { min-height: 14rem; display: grid; place-content: center; gap: .4rem; text-align: center; }
+  :global(.review-error strong) { color: var(--c-text); }
+  :global(.review-error span) { color: var(--c-muted); font-size: .75rem; }
+
+  @media (max-width: 640px) {
+    .review-toolbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: .55rem; padding: .4rem var(--gutter); }
+    .review-toolbar > a { font-size: 0; }
+    .review-toolbar > a span { font-size: 1rem; }
+    .review-progress-wrap progress { width: 3.2rem; }
+    .review-stage { padding: .65rem var(--gutter) 1rem; }
+    .review-help { display: none; }
+  }
+  @media print {
+    .review-toolbar,
+    .review-help,
+    .review-fallback { display: none; }
+    .visual-review-mode { min-height: 0; background: #fff; }
+    .review-stage { min-height: 0; padding: 0; }
+  }
+</style>

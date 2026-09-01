@@ -11,12 +11,15 @@ interface Props {
   description?: string;
   image?: string;
   article?: boolean;
+  noindex?: boolean;
+  immersive?: boolean;
+  pagefindIgnore?: boolean;
   publishedTime?: Date;
   modifiedTime?: Date;
   tags?: string[];
 }
 
-const props = Astro.props;
+const { immersive = false, pagefindIgnore = false, ...headProps } = Astro.props;
 const pathParts = Astro.url.pathname.split('/').filter(Boolean);
 const isArticleRoute = pathParts.length === 2 && ['concepts', 'questions', 'guides'].includes(pathParts[0]);
 const articleSlug = isArticleRoute ? pathParts[1] : undefined;
@@ -28,18 +31,18 @@ const currentChapterId = articleLocation?.chapter.id ?? (isLibraryRoute ? pathPa
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead {...props} />
+    <BaseHead {...headProps} />
   </head>
-  <body>
+  <body class:list={[immersive && 'is-immersive']} data-pagefind-ignore={pagefindIgnore ? 'all' : undefined}>
     <a class="sr-only" href="#main">Skip to content</a>
     <Header />
-    <main id="main" class="site-shell">
-      <LibrarySidebar currentBookId={currentBookId} currentChapterId={currentChapterId} currentSlug={articleSlug} />
+    <main id="main" class:list={['site-shell', immersive && 'site-shell--immersive']}>
+      {!immersive && <LibrarySidebar currentBookId={currentBookId} currentChapterId={currentChapterId} currentSlug={articleSlug} />}
       <div class="site-page">
         <slot />
       </div>
     </main>
-    <Footer />
+    {!immersive && <Footer />}
   </body>
 </html>
 
@@ -53,6 +56,7 @@ const currentChapterId = articleLocation?.chapter.id ?? (isLibraryRoute ? pathPa
     padding-left: var(--gutter);
   }
   .site-page { min-width: 0; }
+  .site-shell--immersive { display: block; width: 100%; padding: 0; }
 
   @media (max-width: 860px) {
     .site-shell {

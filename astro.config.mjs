@@ -38,7 +38,7 @@ export default defineConfig({
       },
     }),
     mdx(),
-    sitemap(),
+    sitemap({ filter: (page) => !page.endsWith('/review/') }),
   ],
   markdown: {
     remarkPlugins: [remarkMath],

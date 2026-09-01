@@ -137,4 +137,15 @@ After these twelve, measure article completion, figure visibility, search landin
 6. Commit editable source, not only a raster export.
 7. Treat article text and its visual as one unit during future edits.
 
+## Visual-first review experience
+
+The full article remains the source of truth, but an implemented visual also powers two faster review surfaces:
+
+- Article pages promote the marker-linked figure immediately below the article header. The learning objective frames it, the existing “Read it this way” caption explains the inference, and a Full explanation boundary preserves the complete curated article below.
+- Chapter pages link to a focused Review visually mode. It presents one article visual at a time with previous/next, arrow-key, swipe, progress, and a direct route back to the full explanation.
+
+Do not maintain a second copy of a figure or caption for review mode. The article marker, audit sidecar, and article visual remain one unit; review mode loads that unit from the static article page. Review routes are progressive enhancements with a complete article-link fallback, are excluded from Pagefind and the sitemap, and must remain compatible with GitHub Pages.
+
+An implemented visual must use either `figure.learning-figure` immediately after its marker or a marker-linked Mermaid block with its direct caption. Build validation rejects other shapes so an article cannot silently disappear from visual review.
+
 Copilot CLI can inspect reference images and PDFs, write Mermaid or SVG source, and run render and validation tools. It is not, by itself, a dedicated image-generation model. An external image model could be connected, but core technical figures should remain deterministic, editable, and reviewable.

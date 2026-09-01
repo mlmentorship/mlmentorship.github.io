@@ -5,6 +5,7 @@ import BaseLayout from './BaseLayout.astro';
 import PracticeMode from '../components/PracticeMode.astro';
 import CompletionToggle from '../components/CompletionToggle.astro';
 import BookReaderNav from '../components/BookReaderNav.astro';
+import VisualReviewCard from '../components/VisualReviewCard.astro';
 import Subscribe from '../components/Subscribe.astro';
 import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
@@ -13,6 +14,7 @@ import { getSubcategoryMap, type Category } from '../utils/subcategories';
 import { getPracticeMode } from '../data/prepCurriculum';
 import { findLibraryLocation, getLibraryShelf } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
+import { getImplementedVisualAudit } from '../utils/visualAudits';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -24,6 +26,7 @@ const { title, description, date, updated, reviewed, aliases, difficulty, priori
 const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 const category = post.data.category as Category;
+const visualAudit = getImplementedVisualAudit(slug);
 
 const CATEGORY_META: Record<Category, { singular: string; plural: string }> = {
   questions: { singular: 'Question', plural: 'Questions' },
@@ -84,6 +87,19 @@ const nextPost = navigationIndex >= 0 && navigationIndex < navigationPosts.lengt
   : undefined;
 const pageHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? categoryMeta.plural;
+const quickReviewLabel: Record<Category, string> = {
+  concepts: 'Visual quick review',
+  questions: '30-second answer map',
+  guides: 'Decision map',
+};
+const fullContentLabel: Record<Category, string> = {
+  concepts: 'Full explanation',
+  questions: 'Full interview answer',
+  guides: 'Full guide',
+};
+const chapterReviewHref = libraryLocation
+  ? `/library/${libraryLocation.volume.id}/${libraryLocation.chapter.id}/review/#${slug}`
+  : undefined;
 ---
 <BaseLayout
   title={title}
@@ -135,6 +151,31 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
         </div>
       </header>
 
+      {visualAudit && (
+        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-pagefind-ignore="all">
+          <VisualReviewCard
+            id="quick-review"
+            eyebrow={quickReviewLabel[category]}
+            summary={visualAudit.learningObjective || description}
+            loading
+          >
+            <span slot="status">Visual first · depth when needed</span>
+            <a slot="actions" href="#full-explanation">{fullContentLabel[category]} ↓</a>
+            {chapterReviewHref && <a slot="actions" href={chapterReviewHref}>Review this chapter →</a>}
+          </VisualReviewCard>
+          <noscript><style is:inline>[data-article-quick-review] { display: none !important; }</style></noscript>
+        </div>
+      )}
+
+      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
+
+      {visualAudit && (
+        <div id="full-explanation" class="full-explanation-divider" data-full-explanation hidden data-pagefind-ignore="all">
+          <span>{fullContentLabel[category]}</span>
+          <small>{Math.max(1, Math.round(stats.minutes))} min read</small>
+        </div>
+      )}
+
       {pageHeadings.length > 2 && <nav class="reader-tools" aria-label="On this page" data-pagefind-ignore="all">
         <details class="reader-tool">
           <summary>
@@ -148,8 +189,6 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
           </div>
         </details>
       </nav>}
-
-      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
 
       <div id="answer" class="prose docs-body" itemprop="articleBody">
         <slot />
@@ -185,6 +224,44 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  import { extractLearningVisual } from '../utils/visualReviewClient';
+
+  function promoteArticleVisual() {
+    const wrapper = document.querySelector<HTMLElement>('[data-article-quick-review]');
+    const articleBody = document.querySelector<HTMLElement>('#answer');
+    if (!wrapper || !articleBody || wrapper.dataset.ready === 'true') return;
+
+    const card = wrapper.querySelector<HTMLElement>('[data-visual-review-card]');
+    const host = wrapper.querySelector<HTMLElement>('[data-review-visual-host]');
+    const extracted = extractLearningVisual(articleBody, wrapper.dataset.visualId);
+    if (!card || !host || !extracted) {
+      wrapper.hidden = true;
+      return;
+    }
+
+    const visualNodes: Node[] = extracted.marker
+      ? [extracted.marker, extracted.figure]
+      : [extracted.figure];
+    host.replaceChildren(...visualNodes);
+    host.setAttribute('aria-busy', 'false');
+    if (extracted.source) {
+      const sourceHost = wrapper.querySelector<HTMLElement>('[data-review-source-host]');
+      const sourceDetails = wrapper.querySelector<HTMLDetailsElement>('[data-review-source-details]');
+      sourceHost?.append(extracted.source);
+      if (sourceDetails) sourceDetails.hidden = false;
+    }
+
+    card.hidden = false;
+    const divider = document.querySelector<HTMLElement>('[data-full-explanation]');
+    if (divider) divider.hidden = false;
+    wrapper.dataset.ready = 'true';
+  }
+
+  promoteArticleVisual();
+  document.addEventListener('astro:page-load', promoteArticleVisual);
+</script>
 
 <style>
   .docs-shell {
@@ -280,6 +357,21 @@ const chapterTitle = libraryLocation?.chapter.title ?? currentSubcategory ?? cat
   .reader-tool a { color: var(--c-text-soft); text-decoration: none; }
   .reader-tool a:hover { color: var(--c-accent); text-decoration: underline; }
   .reader-tool a[aria-current='page'] { color: var(--c-accent); font-weight: 650; }
+
+  .full-explanation-divider {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 1.5rem 0 .75rem;
+    padding-bottom: .45rem;
+    border-bottom: 1px solid var(--c-rule);
+    color: var(--c-text);
+    font-family: var(--font-ui);
+  }
+  .full-explanation-divider[hidden] { display: none; }
+  .full-explanation-divider span { font-size: .78rem; font-weight: 650; }
+  .full-explanation-divider small { color: var(--c-muted); font-size: .67rem; }
 
   .journey-nav {
     max-width: var(--measure);
