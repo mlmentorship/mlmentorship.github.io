@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "tf-idf-and-bm25",
+  "article": "src/content/posts/2026-05-31-tf-idf-and-bm25.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Separate BM25's diminishing return for repeated matches from its penalty for finding the same number of matches in a longer document.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can hold one variable constant in each of two aligned bar groups. Formula-derived lengths and direct values make term-frequency saturation and document-length normalization independently inspectable.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can name TF, IDF, saturation, and length normalization but cannot represent diminishing numeric increments or controlled comparisons.",
+    "svg": "Selected for deterministic proportional bars, exact derived labels, a compact 360-unit viewBox, established theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table could preserve the six values but would make readers infer the flattening gains and shrinking length-normalized contribution rather than seeing both patterns.",
+    "interaction": "Rejected because adjustable k1 and b controls would teach tuning before the two base mechanisms and add state, controls, and testing beyond the fixed learning objective.",
+    "paperReuse": "Rejected because neither a historical paper figure nor a textbook rendering is needed. The primary review and textbook do not grant clear permissive figure-reuse rights, and no source artwork, data, wording, or layout is copied.",
+    "noVisual": "Rejected because the formula combines frequency, saturation, and length into one denominator; prose alone leaves readers to mentally isolate which variable creates each effect."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 130,
+        "insight": "The recommender-systems slide ranks embedding similarities and works through NDCG, but it does not cover lexical term weighting, inverted indexes, or BM25."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring hybrid-recommender slide combines content-based and collaborative outputs through blending or boosting; it provides general hybrid context but not lexical-plus-dense retrieval."
+      },
+      {
+        "page": 135,
+        "insight": "The personalized-search slide separates candidate generation into exact matching, query expansion, and semantic matching before ranking, but does not identify TF-IDF, BM25, or a lexical scoring formula."
+      },
+      {
+        "page": 139,
+        "insight": "The content-based recommender slide builds feature representations from a knowledge graph and scores title similarity, rather than using corpus term statistics."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage ranker concatenates query word embeddings with user and item representations and emits a learned score, providing a dense contrast but no lexical baseline."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview names ranking metrics and asks for baselines, objectives, algorithms, and metrics, but supplies no retrieval baseline or BM25 mechanism."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for TF-IDF, BM25, inverse document frequency, term frequency, lexical, exact matching, information retrieval, search, retrieval, and ranking. The complete neighboring sequences on pages 129-142 and 160-162 were inspected. Pages 132-134 set up personalized search; pages 136-138 cover system and data design; pages 141-142 cover experimentation and recommendation prompts. The deck contains exact, semantic, hybrid, and learned-ranking context but no TF-IDF or BM25 treatment, so no deck image, text, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "The Probabilistic Relevance Framework: BM25 and Beyond",
+        "url": "https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf",
+        "usage": "Used as the authoritative primary-author review for BM25's probabilistic relevance framework, nonlinear within-document term-frequency treatment, document-length normalization, and parameter roles.",
+        "license": "The hosted paper does not state a permissive figure-reuse license. No figure, table, prose, data, or layout is reproduced; the six bar values are independently calculated from the article's formula."
+      },
+      {
+        "title": "Introduction to Information Retrieval: Okapi BM25",
+        "url": "https://nlp.stanford.edu/IR-book/html/htmledition/okapi-bm25-a-non-binary-model-1.html",
+        "usage": "Used as an authoritative textbook cross-check that k1 calibrates document term-frequency scaling, b controls document-length scaling, and typical untuned values include k1 between 1.2 and 2 and b equal to 0.75.",
+        "license": "The online chapter is copyright Cambridge University Press and does not grant adaptation rights for its figures or equation images. No artwork, prose, example, or layout is copied."
+      },
+      {
+        "title": "Apache Lucene BM25Similarity",
+        "url": "https://lucene.apache.org/core/10_3_1/core/org/apache/lucene/search/similarities/BM25Similarity.html",
+        "usage": "Used as official implementation documentation to verify that Lucene exposes k1 for nonlinear term-frequency saturation, b for document-length normalization, defaults to k1 1.2 and b 0.75, and uses a positive smoothed IDF.",
+        "license": "Lucene source and documentation are Apache-2.0 licensed. No code, documentation text, or page layout is copied; the source validates implementation terminology and defaults only."
+      }
+    ],
+    "notes": "The hardest prose-only model is how two separate controls coexist in the BM25 denominator. The original visual plots the term-frequency factor before multiplying by IDF, using k1=1.2 and b=0.75. For an average-length document, f values 1, 3, and 10 yield 1.000, 1.571, and 1.964, approaching k1+1=2.2. Holding f=3, document lengths 0.5, 1, and 2 times average yield 1.760, 1.571, and 1.294. These values are deterministic calculations, not empirical relevance judgments or copied source data. Direct variable labels, numeric scores, bar lengths, and group headings preserve the lesson without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the full search and ranking neighborhood, then checked a primary-author BM25 review, an authoritative IR textbook, and official Lucene documentation before deriving an original controlled comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "bm25-saturation-length-penalty"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description stating all six inputs, scores, fixed variables, and conclusions. Group numbers, direct frequency and length labels, proportional bars, exact values, and the labeled saturation ceiling carry the meaning without color. Its 360-unit viewBox has no minimum width and scales within 390 CSS pixels; shared visual variables support dark and light themes, and established print rules force a high-contrast light palette without splitting the figure."
+  }
+}
