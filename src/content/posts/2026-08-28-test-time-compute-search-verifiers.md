@@ -69,7 +69,7 @@ Use a calculator, code runner, search index, theorem checker, or external enviro
 			<marker id="test-time-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="viz-arrow-forward"></path></marker>
 		</defs>
 		<rect class="viz-plot-bg" x="8" y="27" width="344" height="174" rx="5"></rect>
-		<text class="viz-axis-label" x="18" y="18">1 · DIRECT CHECK: COVERAGE + SELECTION BOTH SUCCEED</text>
+		<text class="viz-axis-label" x="18" y="18">1 · DIRECT CHECK: FINDS AND SELECTS B</text>
 		<text class="viz-label" x="18" y="48">SAME FOUR SAMPLES</text>
 		<rect class="viz-node" x="18" y="59" width="82" height="43" rx="4"></rect>
 		<rect class="viz-node viz-node--output" x="108" y="59" width="82" height="43" rx="4"></rect>
@@ -89,7 +89,7 @@ Use a calculator, code runner, search index, theorem checker, or external enviro
 		<text class="viz-label" x="281" y="163" text-anchor="middle">return correct answer</text>
 		<text class="viz-label" x="18" y="187">Sampling found B; direct evidence preserved it.</text>
 		<rect class="viz-plot-bg" x="8" y="229" width="344" height="174" rx="5"></rect>
-		<text class="viz-axis-label" x="18" y="220">2 · PROXY CHECK: COVERAGE SUCCEEDS, SELECTION FAILS</text>
+		<text class="viz-axis-label" x="18" y="220">2 · PROXY CHECK: FINDS B, SELECTS D</text>
 		<text class="viz-label" x="18" y="250">SAME FOUR SAMPLES</text>
 		<rect class="viz-node" x="18" y="261" width="82" height="43" rx="4"></rect>
 		<rect class="viz-node viz-node--output" x="108" y="261" width="82" height="43" rx="4"></rect>
