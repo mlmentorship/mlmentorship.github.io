@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "sequence-packing",
+  "article": "src/content/posts/2026-01-25-sequence-packing.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Map packed-example boundaries to reset position IDs and a causal block-diagonal attention mask that permits no cross-example attention.",
+  "mediumRationale": "Two compact semantic tables are the smallest medium that aligns the physical packed row, cumulative boundaries, reset positions, and query-by-key mask. A six-token example makes every permitted and forbidden relationship inspectable while native row and column headers preserve the matrix semantics for assistive technology.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could show concatenation but cannot precisely align each query row with every key column or reveal the three lower-triangular diagonal blocks.",
+    "svg": "Rejected: deterministic geometry would show the same discrete matrix with more markup and weaker native row-column semantics. A table reflows more reliably and keeps labels readable at phone width.",
+    "semanticHtml": "Selected: two native tables preserve exact cell correspondence, explicit headers, symbol-based meaning, and logical source order while reusing the established responsive two-panel and matrix primitives.",
+    "interaction": "Rejected: changing example lengths would add controls and state but would not improve the invariant that cumulative boundaries define isolated causal attention blocks and reset position IDs.",
+    "paperReuse": "Rejected: the sequence-packing paper is CC BY-SA 4.0 and could be adapted with attribution and ShareAlike treatment, but its figures cover broader algorithms and empirical results rather than this article-specific six-token trace. The deck has no stated reuse license. No source figure, table, wording, data, coordinates, or layout is copied.",
+    "noVisual": "Rejected: prose states that the mask is block diagonal and positions reset, but readers must mentally align a one-dimensional packed row with two-dimensional query-key permissions. The matrix exposes cross-example contamination and the causal substructure directly."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding training slide surveys throughput-oriented architecture and mixed precision but contains no sequence-packing mechanism, establishing the boundary before the compute-optimization sequence."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization setup names sequence packing as the lever that fills the GPU with useful tokens and distinguishes it from FlashAttention I/O reduction and sub-quadratic changes to attention math."
+      },
+      {
+        "page": 109,
+        "insight": "The directly relevant slide defines fixed-length concatenation, block-diagonal attention, reset position IDs, cumulative sequence lengths, bin-packing strategies, padding reduction, and equivalence of per-example loss when cross-contamination is prevented."
+      },
+      {
+        "page": 110,
+        "insight": "The following FlashAttention slide explains exact tiled attention and its I/O savings. It supports the adjacent kernel context but does not draw the variable-length block mask or packed boundaries."
+      },
+      {
+        "page": 111,
+        "insight": "The next slide introduces sparse attention patterns that intentionally change connectivity and computation, clarifying that sequence packing instead preserves dense causal attention independently inside each example."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 pages of Basic_ML_CS_concepts for sequence packing, padding, block-diagonal masks, variable length, cumulative sequence lengths, and FlashAttention, then read pages 107-111 as the complete relevant neighborhood. Page 109 is directly applicable and pages 108 and 110 establish the distinction between utilization and kernel I/O optimization. The deck states no reuse license and page 108 cites an external X thread, so the entire deck was treated as review-only. No screenshot, artwork, prose, numerical result, table, coordinate, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Sequence Packing without Cross-contamination: Accelerating Large Language Models without Impacting Performance",
+        "url": "https://arxiv.org/abs/2107.02027",
+        "usage": "Used as the primary paper to verify the bin-packing formulation, block-diagonal isolation between examples, position handling, mathematical equivalence, padding prevalence, and measured training-throughput benefit.",
+        "license": "The arXiv record explicitly licenses this paper under CC BY-SA 4.0, permitting adaptation with attribution and ShareAlike terms. No figure, table, experiment value, wording, or layout is reused; the six-token causal example is original."
+      },
+      {
+        "title": "FlashAttention official implementation",
+        "url": "https://github.com/Dao-AILab/flash-attention",
+        "usage": "Used as the official implementation source to verify the variable-length attention interface and its cumulative sequence-length inputs for isolating flattened sequences without materializing a dense global mask.",
+        "license": "The repository is BSD 3-Clause licensed. Code reuse is permitted under its conditions, but no code, documentation prose, logo, benchmark, data, or visual layout is reproduced."
+      },
+      {
+        "title": "Hugging Face TRL SFTTrainer documentation",
+        "url": "https://huggingface.co/docs/trl/main/en/sft_trainer",
+        "usage": "Used as official toolkit documentation to verify current SFT packing support, fixed-length grouping, padding-free flattened batches with FlashAttention, prompt-completion loss options, and packing configuration.",
+        "license": "The TRL repository and its documentation source are Apache License 2.0. No code, prose, image, configuration example, or documentation layout is copied."
+      }
+    ],
+    "notes": "The original worked example packs lengths 3, 2, and 1 into six slots, yielding cu_seqlens [0, 3, 5, 6] and reset position IDs [0, 1, 2, 0, 1, 0]. For causal language-model attention, each diagonal example block is itself lower triangular: a query may attend to its own and earlier keys in the same example, future keys remain causally masked, and all keys from other examples remain blocked. This produces allowed-block sizes 3-by-3, 2-by-2, and 1-by-1 with 10 allowed cells total. Loss masking remains orthogonal and is stated separately so the visual does not imply that attention permission determines which labels contribute to SFT loss."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full sequence-packing neighborhood, then checked the primary packing paper, official FlashAttention implementation, and official TRL documentation with explicit license treatment. The selected visual resolves the difficult mapping from packed boundaries to isolated causal matrix blocks."
+  },
+  "implementation": {
+    "visualIds": [
+      "packed-sequence-mask-boundaries"
+    ],
+    "accessibility": "The labelled figure contains two native tables with explicit row and column headers. Every cell uses a written A, F, or X symbol defined both beside the matrix and in its accessible label, so color is redundant. The established two-column primitive stacks below 640 CSS pixels, including at 390 CSS pixels; the six-column fixed-layout tables fit the available width without a minimum width. Shared theme tokens provide dark-mode contrast, and established print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}
