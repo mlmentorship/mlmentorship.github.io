@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-largest-rectangle-in-histogram.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A shorter bar ends every taller increasing-stack bar and reveals its maximal width.",
+  "learningObjective": "Keep increasing (start,height) candidates; the first shorter bar closes each taller candidate at its exact maximal width.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a shorter bar ends every taller increasing-stack bar and reveals its maximal width.",
-    "invariant": "A shorter bar ends every taller increasing-stack bar and reveals its maximal width.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Monotonic increasing stack of each height and its earliest valid start index.",
+    "recognitionCue": "Use it when each element needs the widest contiguous span for which it remains the limiting minimum, and the first smaller boundary finalizes that span.",
+    "invariant": "Stack heights are nondecreasing; each pair (start,height) can extend from start through index-1, and every popped height receives index as its first smaller right boundary while propagating its start to the incoming shorter bar.",
+    "stateModel": "The minimal state is the scan index, best area, current carried start, and a stack of (start,height) pairs. The visible stack preserves unresolved bars and exact width arithmetic at every pop.",
+    "visualRationale": "A literal stack beside the fixed histogram input directly shows candidate lifetime, LIFO closures, carried starts, and the sentinel flush; labels and formulas carry the meaning without relying on color or animation.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A bar chart with only the winning rectangle was rejected because it hides when other candidates become final.",
+      "A nearest-smaller table was rejected because it obscures the one-pass stack mechanism and carried start.",
+      "A brute-force interval grid was rejected because it adds quadratic clutter instead of exposing monotonic candidate elimination."
     ],
-    "transferLesson": "Transfer the invariant: A shorter bar ends every taller increasing-stack bar and reveals its maximal width.",
-    "reviewStatus": "pending"
+    "transferLesson": "When the first violating element determines an unresolved candidate’s right boundary, keep candidates monotone and finalize them in reverse order; propagate the oldest valid start across every pop.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

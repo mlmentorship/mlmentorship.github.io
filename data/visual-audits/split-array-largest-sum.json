@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-split-array-largest-sum.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Guess a maximum part sum, greedily count required parts, and binary-search the smallest feasible guess.",
+  "learningObjective": "Binary-search the first feasible capacity because the greedy number of contiguous parts never increases when capacity grows.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to guess a maximum part sum, greedily count required parts, and binary-search the smallest feasible guess.",
-    "invariant": "Guess a maximum part sum, greedily count required parts, and binary-search the smallest feasible guess.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Binary search on a monotone answer with a greedy feasibility scan.",
+    "recognitionCue": "Use it when asked to minimize a numeric capacity or maximum load, and a candidate limit can be checked greedily with feasibility changing only once as the limit increases.",
+    "invariant": "Every limit below lo is infeasible, at least one feasible answer lies at or below hi, and parts_needed(limit) is nonincreasing; each midpoint decision preserves the smallest feasible limit inside [lo, hi].",
+    "stateModel": "The minimal search state is lo, hi, midpoint, and the greedy scan state used, running sum, and cut positions. The fixed array and explicit partitions show the evidence behind every bound movement.",
+    "visualRationale": "The actual indexed values with cut markers expose contiguous greedy packing, while bound arithmetic explains the outer binary search; this is simpler than plotting every capacity and remains readable without color or playback.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A number-line-only binary search was rejected because it hides how feasibility is computed.",
+      "A partition tree was rejected because the greedy predicate avoids enumerating all possible cuts.",
+      "A final optimal partition alone was rejected because it does not prove that limit 17 is infeasible."
     ],
-    "transferLesson": "Transfer the invariant: Guess a maximum part sum, greedily count required parts, and binary-search the smallest feasible guess.",
-    "reviewStatus": "pending"
+    "transferLesson": "For minimize-the-maximum problems, search the answer when a greedy capacity check is monotone: feasible moves the upper bound down, infeasible moves the lower bound above the candidate.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-minimum-window-substring.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Grow until all required characters are present, then shrink while the window remains valid.",
+  "learningObjective": "Maintain the exact deficit count while the right boundary gains characters and the left boundary removes only proven surplus.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to grow until all required characters are present, then shrink while the window remains valid.",
-    "invariant": "Grow until all required characters are present, then shrink while the window remains valid.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Variable-size sliding window that grows to feasibility and shrinks to minimality.",
+    "recognitionCue": "Use it when a contiguous result must cover a multiset of required values and validity can be updated by adding or removing one boundary value.",
+    "invariant": "need[x] is the remaining deficit for x (negative means surplus), missing is the total number of required copies absent from [L..R], and best is the shortest valid window seen before the current transition.",
+    "stateModel": "The minimal state is L, R, need, missing, best_start, and best_length. The fixed indexed text, moving authored pointers, covered range, and signed deficits expose every gain and loss of validity.",
+    "visualRationale": "An indexed array paired with the signed need map shows both boundary geometry and duplicate counts; explicit directions and reasons remain understandable without color, JavaScript, or source-code recall.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A substring-only animation was rejected because it hides stable indices and why each boundary moves.",
+      "A counts-only table was rejected because it hides which concrete contiguous range the counts describe.",
+      "A final-window highlight was rejected because it omits the grow-until-valid and shrink-until-invalid mechanism."
     ],
-    "transferLesson": "Transfer the invariant: Grow until all required characters are present, then shrink while the window remains valid.",
-    "reviewStatus": "pending"
+    "transferLesson": "When validity is monotone under expansion, grow until feasible, then remove leftmost surplus while feasible; a deficit counter can collapse a full multiset comparison into constant-time boundary updates.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

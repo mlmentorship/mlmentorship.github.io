@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-binary-tree-maximum-path-sum.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A node returns one child branch upward but can score both child branches locally.",
+  "learningObjective": "Postorder returns one extendable branch to a parent while scoring a complete path through each node with both nonnegative child gains.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a node returns one child branch upward but can score both child branches locally.",
-    "invariant": "A node returns one child branch upward but can score both child branches locally.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Postorder tree DP: return one branch upward, but score two branches locally.",
+    "recognitionCue": "Use it when a connected tree path may bend once at a highest node, while any value returned to a parent must remain a single non-branching chain.",
+    "invariant": "After a node finishes, its return is the maximum sum of one downward branch starting there; global best is the maximum complete path in every finished subtree, and negative child returns contribute zero.",
+    "stateModel": "The minimal recursive state is each node’s left and right clamped gains plus one global best. The trace retains real parent-child edges, active call position, postorder return, local two-branch score, and best update.",
+    "visualRationale": "A stable tree topology with an authored active-node key exposes the distinction between returned branch and locally completed path; formulas and call-stack labels remain complete without color, JavaScript, or memorized code.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A values-only postorder table was rejected because it hides which child gains feed each parent.",
+      "A recursion tree of function calls was rejected because it duplicates the actual binary-tree topology.",
+      "A final highlighted path was rejected because it does not explain why only one branch may return upward."
     ],
-    "transferLesson": "Transfer the invariant: A node returns one child branch upward but can score both child branches locally.",
-    "reviewStatus": "pending"
+    "transferLesson": "In tree DP, separate what a parent is allowed to extend from what may finish at the current node; clamp harmful optional branches, return the extendable shape, and update a global answer with the richer local shape.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
