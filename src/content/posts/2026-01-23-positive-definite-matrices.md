@@ -21,9 +21,9 @@ For symmetric $A$:
 - All eigenvalues $\lambda_i \ge 0$.
 - $A = B^\top B$ for some matrix $B$ (factorization, e.g., Cholesky $B = L^\top$ with $L$ lower triangular).
 - $A$ is the covariance matrix of some random vector.
-- All principal minors (determinants of upper-left $k \times k$ blocks) are non-negative.
+- All principal minors are non-negative. For PD matrices, Sylvester's criterion gives the simpler equivalent test that every leading (upper-left) principal minor is positive.
 
-For PD: same with strict inequalities everywhere.
+For PD: replace non-negative eigenvalues and quadratic forms with strictly positive ones, and require $B$ to be invertible in the factorization.
 
 ## The Cholesky factorization
 
@@ -53,7 +53,48 @@ Operations *not* preserving PSD:
 
 ## Geometric intuition
 
-For $A$ PD, the set $\{x : x^\top A x \le 1\}$ is a closed ellipsoid centered at the origin. Eigenvectors of $A$ give the axes; eigenvalues give $1/\text{axis-length}^2$. PSD matrices that are not PD give degenerate ellipsoids (flat in some direction).
+For $A$ PD, the set $\{x : x^\top A x \le 1\}$ is a closed ellipsoid centered at the origin. Eigenvectors of $A$ give the axes; eigenvalues give $1/\text{axis-length}^2$. If $A$ is PSD but singular, a zero eigenvalue leaves its eigenvector direction unpenalized, so the same sublevel set is an **unbounded cylinder** (a strip in 2D), not a flat ellipsoid. A singular covariance distribution is instead supported on a lower-dimensional subspace; that is the setting in which its probability contours collapse.
+
+<!-- visual:positive-definite-boundedness -->
+<figure class="learning-figure" aria-labelledby="pd-boundedness-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="pd-boundedness-title">Predict whether a quadratic sublevel set is bounded by checking whether every eigenvalue penalizes its eigenvector direction.</p>
+	<div class="visual-panel">
+		<svg viewBox="0 0 360 480" role="img" aria-labelledby="pd-boundedness-svg-title pd-boundedness-svg-desc">
+			<title id="pd-boundedness-svg-title">Positive definite ellipse compared with a singular positive semidefinite strip</title>
+			<desc id="pd-boundedness-svg-desc">Two numbered coordinate plots use the same threshold x transpose A x less than or equal to one. In the first, A equals diagonal four comma one, so the quadratic form is four u squared plus v squared. Both eigenvalues are positive, and the feasible set is a bounded ellipse with u semiaxis one half and v semiaxis one. In the second, A equals diagonal four comma zero, so the form is four u squared. The v coordinate has zero cost, and the feasible set is the unbounded vertical strip from u equals negative one half to positive one half. Direct equations, boundary labels, solid axes, dashed strip edges, and continuation arrows communicate the distinction without color.</desc>
+			<defs>
+				<marker id="pd-arrow-open" markerWidth="7" markerHeight="7" refX="3.5" refY="1" orient="auto"><path class="viz-arrow-forward" d="M0 7L3.5 0L7 7Z"></path></marker>
+			</defs>
+			<rect class="viz-plot-bg" x="12" y="12" width="336" height="214" rx="4"></rect>
+			<text class="viz-callout" x="24" y="35">1 · PD: every direction has positive cost</text>
+			<text class="viz-label" x="24" y="56">A = diag(4, 1) · xᵀAx = 4u² + v² ≤ 1</text>
+			<path class="viz-axis" d="M55 144H305 M180 210V72"></path>
+			<ellipse class="viz-node viz-node--focus" cx="180" cy="144" rx="31" ry="62"></ellipse>
+			<path class="viz-operating-guide" d="M149 137V151 M211 137V151 M173 82H187 M173 206H187"></path>
+			<text class="viz-label" x="133" y="166">−½</text>
+			<text class="viz-label" x="207" y="166">½</text>
+			<text class="viz-label" x="190" y="88">1</text>
+			<text class="viz-axis-label" x="298" y="137">u</text>
+			<text class="viz-axis-label" x="188" y="78">v</text>
+			<text class="viz-callout" x="24" y="218">λ = (4, 1) → bounded ellipse</text>
+			<rect class="viz-plot-bg" x="12" y="240" width="336" height="228" rx="4"></rect>
+			<text class="viz-callout" x="24" y="263">2 · PSD, not PD: one direction has zero cost</text>
+			<text class="viz-label" x="24" y="284">A = diag(4, 0) · xᵀAx = 4u² ≤ 1</text>
+			<rect class="viz-node viz-node--focus" x="149" y="308" width="62" height="126"></rect>
+			<path class="viz-axis" d="M55 372H305 M180 446V296"></path>
+			<path class="viz-operating-guide" d="M149 308V434 M211 308V434"></path>
+			<path class="viz-pr-curve" d="M180 336V302 M180 406V440" marker-start="url(#pd-arrow-open)" marker-end="url(#pd-arrow-open)"></path>
+			<text class="viz-label" x="93" y="389">u = −½</text>
+			<text class="viz-label" x="214" y="389">u = ½</text>
+			<text class="viz-axis-label" x="298" y="365">u</text>
+			<text class="viz-axis-label" x="188" y="304">v</text>
+			<text class="viz-callout" x="24" y="459">λ = (4, 0) → v is free → unbounded strip</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> diagonalize first, then inspect one eigendirection at a time. In the top panel, moving along either axis increases the quadratic form, so the threshold closes into an ellipse. In the bottom panel, moving along <var>v</var> adds nothing because its eigenvalue is zero; only <var>u</var> is bounded, and the strip continues forever.</figcaption>
+</figure>
+<p class="diagram-source">Original coordinate construction checked against <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-25-symmetric-matrices-and-positive-definiteness/">MIT OpenCourseWare 18.06</a> and Boyd and Vandenberghe's <a href="https://web.stanford.edu/~boyd/cvxbook/">Convex Optimization</a>.</p>
 
 ## Common pitfalls
 

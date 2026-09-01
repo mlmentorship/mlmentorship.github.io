@@ -31,6 +31,70 @@ Ask five questions:
 
 A familiar distribution with wrong support is already wrong. A Gaussian model can assign negative probability to a quantity that must be positive. A Poisson model cannot represent count data whose variance is far above its mean without an extension.
 
+<!-- visual:distribution-observation-unit -->
+<figure class="learning-figure" aria-labelledby="distribution-unit-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="distribution-unit-title">Choose among Bernoulli, binomial, Poisson, and exponential models by defining what one observation records.</p>
+	<div class="visual-panel">
+		<svg viewBox="0 0 360 590" role="img" aria-labelledby="distribution-unit-svg-title distribution-unit-svg-desc">
+			<title id="distribution-unit-svg-title">Observation units select different distributions for trial and time processes</title>
+			<desc id="distribution-unit-svg-desc">The first panel starts with five independent visits that share conversion probability p and have outcomes one, zero, one, zero, zero. Recording one visit gives a binary value with support zero or one and a Bernoulli p model. Recording the total from all five visits gives a count with support zero through five and a binomial five comma p model. The second panel starts with a constant-rate independent event process marked by three events on a timeline. Recording the number in a ten-minute window gives a nonnegative integer and a Poisson ten lambda model. Recording the time until the next event gives a nonnegative real value and an exponential lambda model. Numbered choices, explicit supports, process assumptions, distinct box outlines, and arrows communicate the selection without relying on color.</desc>
+			<defs>
+				<marker id="distribution-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0 0L7 3.5L0 7Z"></path></marker>
+			</defs>
+			<rect class="viz-plot-bg" x="12" y="12" width="336" height="270" rx="4"></rect>
+			<text class="viz-callout" x="24" y="36">A · Trial process: independent visits, same p</text>
+			<text class="viz-label" x="24" y="57">five visit outcomes</text>
+			<rect class="viz-node" x="32" y="70" width="42" height="34" rx="4"></rect>
+			<rect class="viz-node" x="94" y="70" width="42" height="34" rx="4"></rect>
+			<rect class="viz-node" x="156" y="70" width="42" height="34" rx="4"></rect>
+			<rect class="viz-node" x="218" y="70" width="42" height="34" rx="4"></rect>
+			<rect class="viz-node" x="280" y="70" width="42" height="34" rx="4"></rect>
+			<text class="viz-node-label" x="53" y="93">1</text>
+			<text class="viz-node-label" x="115" y="93">0</text>
+			<text class="viz-node-label" x="177" y="93">1</text>
+			<text class="viz-node-label" x="239" y="93">0</text>
+			<text class="viz-node-label" x="301" y="93">0</text>
+			<path class="viz-baseline" d="M177 104V122H94V140" marker-end="url(#distribution-arrow)"></path>
+			<path class="viz-baseline" d="M177 122H266V140" marker-end="url(#distribution-arrow)"></path>
+			<rect class="viz-node viz-node--focus" x="24" y="142" width="140" height="112" rx="4"></rect>
+			<text class="viz-callout" x="94" y="164" text-anchor="middle">1 · Record one visit</text>
+			<text class="viz-node-value" x="94" y="187">X ∈ {0, 1}</text>
+			<text class="viz-node-label" x="94" y="214">Bernoulli(p)</text>
+			<text class="viz-node-value" x="94" y="237">one binary outcome</text>
+			<rect class="viz-node viz-node--focus" x="196" y="142" width="140" height="112" rx="4"></rect>
+			<text class="viz-callout" x="266" y="164" text-anchor="middle">2 · Total five visits</text>
+			<text class="viz-node-value" x="266" y="187">S ∈ {0, 1, …, 5}</text>
+			<text class="viz-node-label" x="266" y="214">Binomial(5, p)</text>
+			<text class="viz-node-value" x="266" y="237">success count</text>
+			<rect class="viz-plot-bg" x="12" y="298" width="336" height="280" rx="4"></rect>
+			<text class="viz-callout" x="24" y="322">B · Time process: independent events, constant rate λ</text>
+			<path class="viz-axis" d="M38 372H322"></path>
+			<path class="viz-operating-guide" d="M54 354V390 M306 354V390"></path>
+			<circle class="viz-operating-point" cx="103" cy="372" r="6"></circle>
+			<circle class="viz-operating-point" cx="177" cy="372" r="6"></circle>
+			<circle class="viz-operating-point" cx="268" cy="372" r="6"></circle>
+			<text class="viz-label" x="54" y="407" text-anchor="middle">0 min</text>
+			<text class="viz-label" x="306" y="407" text-anchor="middle">10 min</text>
+			<text class="viz-label" x="177" y="348" text-anchor="middle">three event times</text>
+			<path class="viz-baseline" d="M177 408V426H94V444" marker-end="url(#distribution-arrow)"></path>
+			<path class="viz-baseline" d="M177 426H266V444" marker-end="url(#distribution-arrow)"></path>
+			<rect class="viz-node viz-node--focus" x="24" y="446" width="140" height="112" rx="4"></rect>
+			<text class="viz-callout" x="94" y="468" text-anchor="middle">3 · Count in window</text>
+			<text class="viz-node-value" x="94" y="491">K ∈ {0, 1, 2, …}</text>
+			<text class="viz-node-label" x="94" y="518">Poisson(10λ)</text>
+			<text class="viz-node-value" x="94" y="541">events per 10 min</text>
+			<rect class="viz-node viz-node--focus" x="196" y="446" width="140" height="112" rx="4"></rect>
+			<text class="viz-callout" x="266" y="468" text-anchor="middle">4 · Wait to next event</text>
+			<text class="viz-node-value" x="266" y="491">T ∈ [0, ∞)</text>
+			<text class="viz-node-label" x="266" y="518">Exponential(λ)</text>
+			<text class="viz-node-value" x="266" y="541">continuous duration</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> choose the process first, then draw a box around exactly what one training row records. For repeated visits with the same independent success probability, one outcome is Bernoulli while a fixed-size total is binomial. For independent constant-rate events, a fixed-time count is Poisson while the wait to the next event is exponential. The distribution follows the observation unit and assumptions, not the noun “conversion” or “arrival.”</figcaption>
+</figure>
+<p class="diagram-source">Original process-and-observation construction checked against the open <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-3-binomial-distribution">OpenStax binomial</a>, <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-6-poisson-distribution">Poisson</a>, and <a href="https://openstax.org/books/introductory-statistics-2e/pages/5-3-the-exponential-distribution">exponential</a> textbook sections and the <a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda366j.htm">NIST Poisson reference</a>.</p>
+
 ## Bernoulli and binomial
 
 A Bernoulli variable $X \in \{0,1\}$ has

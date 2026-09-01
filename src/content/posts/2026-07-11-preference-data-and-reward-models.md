@@ -15,6 +15,31 @@ RLHF diagrams often compress the hardest part into "collect preferences." The si
 
 A powerful optimizer amplifies measurement defects. Better preference-data design can matter more than another RL algorithm.
 
+**Learning objective:** explain why reward-model validation on collected comparisons does not guarantee reliable rewards after the policy is optimized.
+
+<!-- visual:reward-model-distribution-shift -->
+<figure class="learning-figure" aria-labelledby="reward-shift-title">
+	<p class="visual-kicker">Proxy shift</p>
+	<p class="visual-title" id="reward-shift-title">Why can a validated reward model fail during policy optimization?</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison between fitting a reward model on sampled responses and optimizing a policy into a shifted response distribution">
+		<section class="visual-panel" aria-labelledby="reward-fit-panel-title">
+			<h4 id="reward-fit-panel-title">1 · FIT ON SAMPLED RESPONSES</h4>
+			<p><strong>Coverage is chosen</strong><br />Prompts, policy checkpoints, temperatures, and failure slices determine which response pairs appear.</p>
+			<p><strong>Judgments define the target</strong><br />Annotators apply a rubric, including ties, both-bad labels, and disagreements.</p>
+			<p><strong>The proxy learns locally</strong><br />The reward model learns which sampled response wins; held-out pairs test that same measurement process.</p>
+			<p><strong>Known evidence</strong><br />Accuracy, calibration, and slice results describe behavior on represented comparisons.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="reward-optimize-panel-title">
+			<h4 id="reward-optimize-panel-title">2 · OPTIMIZE INTO NEW RESPONSES</h4>
+			<p><strong>The policy follows the proxy</strong><br />Updates increase outputs that the fixed reward model scores highly.</p>
+			<p><strong>The response distribution moves</strong><br />New outputs can leave the comparisons on which the proxy was trained and validated.</p>
+			<p><strong>Search exposes shortcuts</strong><br />The optimizer can find verbosity, style, or other features that raise predicted reward without improving the rubric's target.</p>
+			<p><strong>Required response</strong><br />Audit optimized outputs, refresh on-policy comparisons, and revalidate by slice before trusting the next update.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> read the left panel as a bounded measurement claim, then move right. Validation says the reward model predicts judgments on represented comparisons; optimization changes which responses it sees and searches specifically for high scores. That is why held-out pair accuracy cannot close the loop: inspect optimized outputs, collect fresh comparisons, and recalibrate the proxy. This original synthesis is informed by <a href="https://arxiv.org/abs/1909.08593">Ziegler et al. (2019)</a>, <a href="https://arxiv.org/abs/2203.02155">Ouyang et al. (2022)</a>, and <a href="https://arxiv.org/abs/2210.10760">Gao et al. (2023)</a>.</figcaption>
+</figure>
+
 ## Constructing comparisons
 
 For prompt $x$, sample responses $y_a$ and $y_b$ from policies and decoding settings chosen to expose meaningful differences. Ask an annotator which response better satisfies an explicit rubric, allows a tie, or marks both unacceptable.

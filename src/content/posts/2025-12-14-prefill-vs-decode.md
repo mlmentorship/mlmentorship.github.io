@@ -15,6 +15,39 @@ Prefill can process many tokens at once with high arithmetic intensity. A single
 
 Picking the wrong cost model leads to wrong decisions: batching helps decode but barely affects prefill latency; quantization helps decode bandwidth but not prefill compute; speculative decoding only accelerates the decode phase.
 
+<!-- visual:prefill-decode-weight-reuse -->
+<figure class="learning-figure" aria-labelledby="prefill-decode-visual-title" aria-describedby="prefill-decode-visual-description">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="prefill-decode-visual-title">Trace why the same model weights create two different hardware regimes.</p>
+	<p id="prefill-decode-visual-description">Compare reuse of one representative weight tile during a four-token prefill with repeated streaming of that tile across four serial, batch-one decode steps.</p>
+	<div class="visual-grid--two" role="group" aria-label="Prefill and decode weight-reuse comparison">
+		<section class="visual-panel" aria-labelledby="prefill-weight-reuse-title">
+			<h4 id="prefill-weight-reuse-title">Prefill · one parallel pass</h4>
+			<p>Four prompt-token rows are available together.</p>
+			<table class="cm-grid" aria-label="One prefill weight tile reused across four prompt rows">
+				<thead><tr><th scope="col">HBM supplies</th><th scope="col">Matrix work</th></tr></thead>
+				<tbody><tr><td><strong>weight tile W</strong><br>load for this tile</td><td class="cm-selected"><strong>rows 1 · 2 · 3 · 4</strong><br>reuse W across prompt rows</td></tr></tbody>
+			</table>
+			<p><strong>High reuse:</strong> more arithmetic per byte can make compute the limit.</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="decode-weight-stream-title">
+			<h4 id="decode-weight-stream-title">Decode · four serial passes</h4>
+			<p>At batch 1, only one new-token row exists per step.</p>
+			<table class="cm-grid" aria-label="The same decode weight tile streamed again for each serial output step">
+				<thead><tr><th scope="col">Output step</th><th scope="col">HBM and matrix work</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">1</th><td>load W → row 1</td></tr>
+					<tr><th scope="row">2</th><td>load W again → row 2</td></tr>
+					<tr><th scope="row">3</th><td>load W again → row 3</td></tr>
+					<tr><th scope="row">4</th><td>load W again → row 4</td></tr>
+				</tbody>
+			</table>
+			<p><strong>Low reuse:</strong> repeated weight traffic can make bandwidth the limit.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow one representative weight tile. Prefill exposes many prompt-token rows to one matrix operation, so a loaded tile can serve all of them before eviction. Batch-one decode exposes only the newest-token row, then the next token waits for another model pass that streams the weights again. The model is unchanged; available parallel rows, and therefore arithmetic per byte, change. These are common large-prefill and small-batch-decode regimes, not guarantees for every shape or device. Original comparison checked against <a href="https://arxiv.org/abs/2211.05102">Pope et al.’s transformer-inference analysis</a> and the <a href="https://www.usenix.org/conference/osdi22/presentation/yu">Orca serving paper</a>.</figcaption>
+</figure>
+
 ## Prefill
 
 For a prompt of length $P$:

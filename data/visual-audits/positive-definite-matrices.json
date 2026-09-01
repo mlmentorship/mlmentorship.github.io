@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "slug": "positive-definite-matrices",
+  "article": "src/content/posts/2026-01-23-positive-definite-matrices.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Predict whether a quadratic sublevel set is bounded by checking whether every eigenvalue penalizes its eigenvector direction.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can preserve axis direction, relative semiaxis length, and the strip's explicit continuation. One matched PD/PSD example turns the eigenvalue condition into a spatial test and corrects the tempting but false idea that a zero eigenvalue makes this particular sublevel set flat.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout cannot preserve semiaxis ratios, parallel boundaries, or an unbounded eigendirection; those spatial facts are the lesson.",
+    "svg": "Selected because fixed coordinates make the PD ellipse and singular PSD strip directly comparable under the same threshold. A stacked 360-unit viewBox keeps equations and boundary labels readable without horizontal scrolling at 390 CSS pixels.",
+    "semanticHtml": "Rejected because cards or a table could state the eigenvalues and outcomes but would not demonstrate boundedness in both eigendirections versus continuation along a null direction.",
+    "interaction": "Rejected because changing eigenvalues dynamically adds controls and state without improving the single boundary case readers need to understand. The exact static pair exposes every calculation.",
+    "paperReuse": "Rejected because no source-specific result or artwork is needed, and neither official hosting nor open-course access was treated as blanket permission to reuse figures. The coordinates, examples, wording, and arrangement are original.",
+    "noVisual": "Rejected because the hardest mental model is spatial and the original prose was technically misleading: the set defined by x transpose A x less than or equal to one becomes unbounded, rather than flat, when an eigenvalue reaches zero."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 3,
+        "insight": "The closest preceding material says the determinant is the product of eigenvalues and that a zero determinant contracts space along at least one dimension. It motivates checking zero eigenvalues but does not discuss quadratic forms, positive definiteness, or sublevel-set geometry."
+      },
+      {
+        "page": 4,
+        "insight": "The neighboring slide compares matrix products, trace, and L1/L2 norm balls. Its bounded norm contours provide geometric context, but it contains no PSD criterion and no zero-eigenvalue case."
+      },
+      {
+        "page": 5,
+        "insight": "The next slide describes eigenvalues as magnitudes and eigenvectors as orthogonal bases for real symmetric matrices. It supports reading the quadratic form in an eigenbasis but does not cover definiteness, Cholesky factorization, or boundedness."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for positive definite, positive semidefinite, semidefinite, PSD cone, quadratic form, and Cholesky; none occurs. Physical pages 3-5 were then read as the complete nearest linear-algebra neighborhood. The remainder of the deck uses covariance matrices, eigendecomposition, and semidefinite embedding only as application references, without explaining definiteness. The visual reproduces no deck artwork, prose, coordinates, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "MIT OpenCourseWare 18.06, Lecture 25: Symmetric Matrices and Positive Definiteness",
+        "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-25-symmetric-matrices-and-positive-definiteness/",
+        "usage": "Used as authoritative university course material to cross-check the equivalence between positive eigenvalues, positive quadratic forms, and positive definiteness for real symmetric matrices.",
+        "license": "MIT OpenCourseWare identifies course materials as CC BY-NC-SA 4.0 except where otherwise noted. No video frame, transcript, figure, example, or wording is copied or adapted; the source is cited only."
+      },
+      {
+        "title": "Convex Optimization",
+        "url": "https://web.stanford.edu/~boyd/cvxbook/",
+        "usage": "Used as an authoritative textbook to cross-check positive semidefinite notation, quadratic forms, generalized ellipsoids, and the unbounded-cylinder case when the defining PSD matrix is singular.",
+        "license": "Copyright is held by Cambridge University Press, which permits the authors to host the book online. Hosting permission is not assumed to grant figure-reuse rights; no figure, prose, example, or layout is copied or adapted."
+      }
+    ],
+    "notes": "The complete article's hardest mental model is how eigenvalue positivity controls geometry. In eigen-coordinates, x transpose A x is the sum of lambda i times u i squared. For A = diag(4, 1), the threshold 4u squared plus v squared less than or equal to one has semiaxes one half and one. For A = diag(4, 0), the threshold reduces to absolute u less than or equal to one half and places no restriction on v, so it is an unbounded strip. These calculations and the drawing were checked directly. This also distinguishes a quadratic sublevel set from a singular Gaussian's lower-dimensional support."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed the full 214-page deck and inspected physical pages 3-5, then checked an MIT course and an authoritative convex-optimization textbook before selecting an original matched ellipse-and-strip construction."
+  },
+  "implementation": {
+    "visualIds": [
+      "positive-definite-boundedness"
+    ],
+    "accessibility": "The SVG provides a programmatic title and detailed description containing both matrices, quadratic forms, eigenvalues, boundaries, and geometric outcomes. Numbered panels, direct equations, axis labels, numeric boundary labels, solid axes, dashed strip edges, and continuation arrows carry all meaning without color. Its 360-unit-wide stacked viewBox has no minimum width and scales to 390 CSS pixels without horizontal scrolling. Existing semantic visual tokens supply light- and dark-mode contrast and explicit light-page print treatment."
+  }
+}

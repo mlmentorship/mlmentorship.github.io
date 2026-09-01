@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "preference-data-and-reward-models",
+  "article": "src/content/posts/2026-07-11-preference-data-and-reward-models.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Explain why reward-model validation on collected comparisons does not guarantee reliable rewards after the policy is optimized.",
+  "mediumRationale": "A semantic two-state comparison is the smallest medium that separates what validation establishes on sampled responses from what changes when a policy searches against the proxy. Numbered headings preserve the temporal order, while ordinary text makes the complete distinction available without JavaScript, fixed coordinates, or color.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is one before-and-after contrast rather than a relationship-heavy graph. A cycle diagram would make the refresh step prominent but would leave less room to distinguish the scope of validation from optimizer search at 390 CSS pixels.",
+    "svg": "Rejected: no quantitative geometry, continuous scale, or plotted result is needed. Fixed coordinates would shrink explanatory text and add maintenance without increasing technical precision.",
+    "semanticHtml": "Selected: two labelled, numbered panels directly compare training-time evidence with optimization-time shift, preserve a logical reading order for assistive technology, and use an established primitive that stacks on narrow screens.",
+    "interaction": "Rejected: an adjustable optimization-strength control would require invented quantitative behavior. The single causal distinction is complete in a static comparison and must survive print.",
+    "paperReuse": "Rejected: the reviewed papers contain related RLHF pipelines and empirical overoptimization plots, but none exactly expresses this article's bounded-measurement claim. Reuse permission for candidate figures was not established from the official records, so no paper figure, data, wording, or layout is copied.",
+    "noVisual": "Rejected: the prose names distribution shift and reward hacking separately, but readers must mentally connect validation scope, optimizer search, and fresh on-policy measurement. The two-state comparison makes that dependency explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The preceding slide surveys transformer language-model architectures and objectives but contains no preference collection, reward model, or policy-optimization mechanism."
+      },
+      {
+        "page": 104,
+        "insight": "The only direct RLHF slide attributes changes in informativeness, impartiality, refusal, and dialogue behavior to RLHF and discusses an alignment tax, but it compresses RLHF into a named tuning method and provides no preference-data, reward-model, or distribution-shift explanation."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring slide classifies base, instruction-tuned, and RLHF models before moving to Toolformer; it does not unpack comparisons, proxy validation, or reward hacking."
+      },
+      {
+        "page": 106,
+        "insight": "The following slide begins an LLM-data section with pretraining scaling laws, marking the end of the local RLHF neighborhood without a reward-model visual."
+      }
+    ],
+    "notes": "All 214 pages of Basic_ML_CS_concepts were text-indexed for preference, reward model, RLHF, human feedback, Bradley-Terry, alignment, and instruction tuning. Pages 103-106 were then inspected in sequence around the sole direct RLHF treatment on page 104. The deck offers only high-level claimed outcomes and model taxonomy; it has no comparison-collection protocol, reward-model objective, held-out validation boundary, on-policy response shift, or reward-hacking figure. The deck states no reuse license and includes externally sourced material, so it was used for review only; no screenshot, artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Fine-Tuning Language Models from Human Preferences",
+        "url": "https://arxiv.org/abs/1909.08593",
+        "usage": "Used as a primary source to verify pairwise human comparisons, reward-model fitting from those comparisons, and subsequent policy optimization against the learned reward.",
+        "license": "The official arXiv record provides public access but did not establish a permissive third-party figure-reuse grant for this audit. No figure, result value, text, data, or layout is reproduced."
+      },
+      {
+        "title": "Training language models to follow instructions with human feedback",
+        "url": "https://arxiv.org/abs/2203.02155",
+        "usage": "Used as a primary source to verify the practical sequence of collecting ranked model outputs, training a reward model, optimizing a policy, and evaluating the resulting policy with held-out human judgments.",
+        "license": "The official arXiv record was treated as access to the paper, not as permission to adapt its figures. No pipeline figure, experimental result, wording, data, or layout is copied."
+      },
+      {
+        "title": "Scaling Laws for Reward Model Overoptimization",
+        "url": "https://arxiv.org/abs/2210.10760",
+        "usage": "Used as a primary source to verify the distinction between a proxy reward model and an independent gold reward model, and the finding that stronger optimization of the proxy can eventually reduce gold reward.",
+        "license": "Reuse permission for the paper's empirical plots was not established from the official arXiv record. The implementation copies no curve, coefficient, value, wording, geometry, or layout."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the Bradley-Terry equation itself but the change in epistemic scope across the optimization boundary. Held-out accuracy and calibration summarize a chosen comparison distribution; once the policy is updated to maximize the learned proxy, its outputs both shift away from that distribution and become selected for proxy score. The visual is an original qualitative synthesis with no paper-specific numbers or graphical structure. It deliberately does not claim that every policy update causes hacking, only that static validation cannot rule it out and on-policy audit plus refreshed comparisons are required."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed the 214-page source deck and inspected pages 103-106, then checked three primary reward-model and overoptimization papers before selecting an original two-state semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "reward-model-distribution-shift"
+    ],
+    "accessibility": "The figure has a direct learning question, two semantically labelled sections, numbered temporal headings, and an explicit group description. Each state and inference is written in text; order, labels, and the before-and-after structure carry the lesson without color. The established two-column primitive stacks below 640 CSS pixels with no minimum width, including at 390 CSS pixels; theme variables support dark mode and shared print rules force high-contrast paper colors and avoid splitting the figure."
+  }
+}

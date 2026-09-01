@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "slug": "quantization",
+  "article": "src/content/posts/2025-08-21-quantization.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Compare shared-scale and per-channel symmetric INT4 quantization to see how a high-range channel can make ordinary values collapse and how finer scale granularity restores useful code levels.",
+  "mediumRationale": "A paired semantic-HTML ledger is the smallest medium that keeps original values, integer codes, and dequantized values aligned for two scale choices. The arithmetic is directly inspectable, selectable, and readable in stacked panels without runtime code.",
+  "mediumComparison": {
+    "mermaid": "Rejected: quantization is a numerical mapping with aligned before-and-after values, not a branching process. Automatic graph layout would separate values that readers need to compare cell by cell.",
+    "svg": "Rejected: a number-line drawing would either need small labels or horizontal scrolling at 390 CSS pixels, while fixed geometry adds no essential information beyond the exact ledger.",
+    "semanticHtml": "Selected: two labelled tables preserve row and column semantics, expose every rounded code and restored value as text, and reuse the established responsive two-panel primitive.",
+    "interaction": "Rejected: controls for bit width, clipping range, grouping, and zero point would create an underspecified calculator and hide the initial comparison. One deterministic example is enough to teach scale granularity.",
+    "paperReuse": "Rejected: primary sources contain relevant quantization diagrams and empirical plots, but no external artwork is needed and no permissive figure-reuse grant was established for each candidate. Public access and citation rights were not treated as artwork reuse permission; all values, wording, and layout shipped here are original.",
+    "noVisual": "Rejected: prose names per-tensor, per-channel, and per-group scales but asks readers to infer why granularity changes error. The aligned calculation makes the loss and recovery of two ordinary values directly countable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 71,
+        "insight": "The match is vector quantization in a list of linear factor model variants, not numerical precision reduction for neural-network inference."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM-training slide mentions BF16 mixed precision for throughput and stability but does not cover post-training integer quantization or scale granularity."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization setup introduces memory-bound operations and arithmetic intensity, providing hardware context for quantization benefits without explaining numerical mapping."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide mentions FP8 support as a kernel feature, but does not distinguish quantized tensors, scales, or rounding error."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide explains why single-token generation is weight-bandwidth-bound, establishing why fewer weight bits can help decode."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide compares floating-point formats for training. It is adjacent numerical-format context but does not teach affine integer quantization."
+      },
+      {
+        "page": 115,
+        "insight": "The serving-stack summary names INT8, INT4, and FP8 weight-only quantization as a way to shrink the weight-loading bottleneck. It provides the systems motivation but no scale, code, or error model."
+      },
+      {
+        "page": 116,
+        "insight": "The following re-scoring divider ends the LLM serving neighborhood and contains no quantization content."
+      },
+      {
+        "page": 127,
+        "insight": "The model-compression divider introduces the direct compression neighborhood."
+      },
+      {
+        "page": 128,
+        "insight": "The dedicated model-compression slide defines lower-bit weights or activations and mentions k-means weight quantization, pruning, and distillation. It does not cover uniform affine mapping, channel outliers, or scale granularity."
+      },
+      {
+        "page": 129,
+        "insight": "The following recommender-systems divider ends the model-compression neighborhood."
+      },
+      {
+        "page": 130,
+        "insight": "The match is product quantization for approximate nearest-neighbor retrieval, a different compression mechanism from neural-network numeric quantization."
+      },
+      {
+        "page": 147,
+        "insight": "The match is dequantization of discrete image pixels for density modeling, not reduced-precision inference."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed page by page for quantization, quantize, INT8, INT4, FP8, weight-only, zero point, and mixed precision. Matches occurred on pages 71, 107, 108, 110, 114, 115, 128, 130, and 147. The complete relevant neighborhoods on pages 106-116 and 127-130 were read, with pages 71 and 146-148 inspected to classify false-positive terminology. Page 128 is the only dedicated neural-network model-quantization slide; pages 113 and 115 supply the closest LLM-serving context. The deck states no general reuse license and includes externally sourced material, so it was treated as review-only. No screenshot, wording, values, artwork, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference",
+        "url": "https://arxiv.org/abs/1712.05877",
+        "usage": "Used as the primary source for affine quantization, scale and zero-point semantics, integer codes, dequantization, rounding, and the distinction between simulated quantization during training and integer inference.",
+        "license": "The arXiv paper is publicly accessible, but no permissive third-party figure license was established. No paper figure, example values, prose, result, equation layout, or artwork is copied."
+      },
+      {
+        "title": "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models",
+        "url": "https://arxiv.org/abs/2211.10438",
+        "usage": "Used as the primary LLM source to verify that systematic activation outliers stretch a shared quantization range, leave fewer effective levels for ordinary values, and motivate channel-wise transformations and scaling.",
+        "license": "The public preprint was used for technical verification only. No clear permissive figure-reuse grant was relied upon, and no figure, model result, prose, visual structure, or example is reproduced."
+      },
+      {
+        "title": "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers",
+        "url": "https://arxiv.org/abs/2210.17323",
+        "usage": "Used as a primary weight-only quantization source to verify blockwise post-training quantization with approximate second-order information and compensation for accumulated rounding error.",
+        "license": "The arXiv record provides public access but was not treated as permission to reuse figures. No algorithm listing, benchmark, equation layout, prose, or artwork is copied."
+      },
+      {
+        "title": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration",
+        "url": "https://arxiv.org/abs/2306.00978",
+        "usage": "Used as a primary LLM source to verify groupwise low-bit weight quantization, activation-aware per-channel scaling, the role of the group maximum in setting the quantization step, and the need to balance salient and non-salient error.",
+        "license": "The paper was consulted for mechanism and terminology. No permissive candidate-figure reuse permission was established, and no figure, table, numerical result, prose, equation layout, or visual design is reproduced."
+      },
+      {
+        "title": "PyTorch Quantization",
+        "url": "https://docs.pytorch.org/docs/stable/quantization.html",
+        "usage": "Used as current official framework documentation to check the supported quantization surface and the migration of maintained quantization development to torchao.",
+        "license": "PyTorch documentation is associated with the project's BSD-style open-source terms, but no documentation text, code, image, or layout is copied; it is used only as current implementation context."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why scale granularity changes approximation quality. The original example uses symmetric INT4 codes q in [-7, 7], zero point 0, and q = clamp(round(x divided by delta), -7, 7). With one scale across both channels, max absolute value 8 sets delta = 8/7. In the ordinary channel [-1, -0.5, 0.5, 1], the middle values both map to code 0 and lose their signs. With a separate ordinary-channel scale delta = 1/7, those values map to distinct codes -4 and 4 and restore to approximately -0.57 and 0.57. The high-range channel keeps delta = 8/7. This illustrates rounding error rather than clipping; real schemes may use asymmetric ranges, include code -8, clip outliers, choose different axes or group sizes, and store scale metadata. Finer granularity usually improves fidelity but may increase metadata, calibration, and kernel complexity, and only workload-specific evaluation establishes acceptable quality."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant neighborhoods plus false-positive matches, then checked foundational affine quantization work, three primary LLM quantization papers, and current official PyTorch documentation before selecting an original scale-granularity ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "quantization-scale-granularity"
+    ],
+    "accessibility": "The figure has a linked title and full textual description, a labelled panel group, semantic section headings, and two labelled tables with scoped row and column headers. Original values, signed integer codes, restored values, scales, and the collapsed or recovered detail are written explicitly, so color is redundant. The established two-panel primitive stacks below 640 CSS pixels, tables have no minimum width and allow short numeric labels to wrap at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette without runtime behavior."
+  }
+}
