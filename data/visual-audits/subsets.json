@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-subsets.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Every partial path is already one valid subset; branch by choosing the next index.",
+  "learningObjective": "Save every current path, then recurse only to larger indices and pop the chosen value on return.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to every partial path is already one valid subset; branch by choosing the next index.",
-    "invariant": "Every partial path is already one valid subset; branch by choosing the next index.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Backtracking with a monotonically increasing start index.",
+    "recognitionCue": "Use this pattern when every combination of distinct input positions is valid and order does not matter, so each partial selection must be emitted once.",
+    "invariant": "On entry to choose(start), path contains indices in strictly increasing order, answer already contains every path visited earlier in DFS order, and only indices start or greater may extend this path.",
+    "stateModel": "Keep the mutable path, the next allowed index, the recursion call stack, and copied result paths; append before recursion and pop exactly once after return.",
+    "visualRationale": "A labelled recursion-stack grid shows each active path and start boundary together; the stable call-top key moves with depth, while textual append, save, return, and pop actions remain color-independent.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A bitmask table lists subsets compactly but does not explain this start-index backtracking implementation.",
+      "A complete choice tree becomes wide and obscures the mutable call stack and DFS output order.",
+      "An answer-only list hides the append/recurse/pop restoration invariant."
     ],
-    "transferLesson": "Transfer the invariant: Every partial path is already one valid subset; branch by choosing the next index.",
-    "reviewStatus": "pending"
+    "transferLesson": "When order should not create duplicates, advance a start boundary after each choice; this same skeleton generates combinations, k-subsets, and increasing-index selections.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

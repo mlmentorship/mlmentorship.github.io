@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-permutations.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Fill one position with each unused value, then undo it for the next branch.",
+  "learningObjective": "Fill each path position with every unused index, then pop and clear that same index before the next branch.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to fill one position with each unused value, then undo it for the next branch.",
-    "invariant": "Fill one position with each unused value, then undo it for the next branch.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Backtracking with one used flag per input index.",
+    "recognitionCue": "Use this pattern when every ordering is required and each input position may appear exactly once in each complete path.",
+    "invariant": "At every choose call, used[index] is true exactly when nums[index] appears in path, path length is the next output position, and returning from a branch restores both structures to their entry state.",
+    "stateModel": "Maintain a mutable path, a boolean used array keyed by index, copied complete answers, and the recursion call stack; each branch performs mark, append, recurse, pop, unmark.",
+    "visualRationale": "The recursion-stack grid binds every partial ordering to its exact used flags and visibly deepens to each leaf; the stable call-top key tracks depth without relying on color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A six-leaf result tree shows outputs but can hide the used-index restoration that makes sibling branches legal.",
+      "In-place swapping is a valid alternative algorithm but would not match the supplied used-list implementation.",
+      "A factorial output table omits DFS order and the append/pop state transitions."
     ],
-    "transferLesson": "Transfer the invariant: Fill one position with each unused value, then undo it for the next branch.",
-    "reviewStatus": "pending"
+    "transferLesson": "When choices are reusable across sibling branches but forbidden within one path, mark before recursion and unmark after return; index-based flags also handle equal values more safely than value membership.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

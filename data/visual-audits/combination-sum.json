@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-combination-sum.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Choose in nondecreasing index order and carry the remaining target.",
+  "learningObjective": "Carry the remaining target, reuse the current sorted index, and break when the next choice is too large.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to choose in nondecreasing index order and carry the remaining target.",
-    "invariant": "Choose in nondecreasing index order and carry the remaining target.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Backtracking with a sorted start index and remaining target.",
+    "recognitionCue": "Use this pattern when combinations must sum to a target, order should not duplicate answers, and the same positive candidate may be selected repeatedly.",
+    "invariant": "Every path is nondecreasing by choice index, sum(path) + remaining equals the original target, and choose(start, remaining) may use only start or later indices; remaining zero is exactly a solution.",
+    "stateModel": "Keep sorted positive unique choices, mutable path, start index, remaining target, result copies, and recursion stack; recurse with the same index for reuse and pop after return.",
+    "visualRationale": "A recursion-stack grid places path, start, and remaining on every active call, making reuse, arithmetic, zero completion, and sorted break pruning readable while call-top moves with depth.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A dynamic-programming table can count or decide sums but does not enumerate the supplied combination paths.",
+      "An unrestricted choice tree generates order duplicates such as [2,2,3] and [3,2,2].",
+      "A result-only diagram hides same-index reuse and why one oversized sorted choice prunes all later choices."
     ],
-    "transferLesson": "Transfer the invariant: Choose in nondecreasing index order and carry the remaining target.",
-    "reviewStatus": "pending"
+    "transferLesson": "For reusable combination search, carry a decreasing feasibility measure and a nondecreasing choice boundary; sorted positive choices turn the first oversized option into a safe loop break.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
