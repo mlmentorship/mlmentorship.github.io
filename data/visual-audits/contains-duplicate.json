@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-contains-duplicate.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The first repeated value is visible when it is already in the seen set.",
+  "learningObjective": "A set keeps one entry per distinct value, so any duplicate makes its final size smaller than the input size.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the first repeated value is visible when it is already in the seen set.",
-    "invariant": "The first repeated value is visible when it is already in the seen set.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Distinct-value set and cardinality comparison.",
+    "recognitionCue": "Use a set when the question asks whether any equality collision exists and the values themselves, not their positions or counts, determine duplication.",
+    "invariant": "After set construction has consumed a prefix, the set contains exactly one entry for every distinct value in that prefix, so its size grows only on first occurrences.",
+    "stateModel": "The supplied expression materializes one set of unique values, then compares its cardinality with the original list length; no index map or frequency counts are required.",
+    "visualRationale": "An indexed input beside explicit set entries shows the many-to-one collapse of the second 4; a stable set-cursor moves through every value and visible cardinalities prove the final inequality.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A sorting timeline would expose adjacent duplicates but changes order and uses a different O(n log n) algorithm.",
+      "A frequency table stores counts the boolean question never needs.",
+      "An early-return seen-set scan is valid but does not match the supplied whole-set cardinality implementation."
     ],
-    "transferLesson": "Transfer the invariant: The first repeated value is visible when it is already in the seen set.",
-    "reviewStatus": "pending"
+    "transferLesson": "When only uniqueness matters, canonicalize values into a set and compare cardinality; retain counts or positions only when the follow-up question actually needs them.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

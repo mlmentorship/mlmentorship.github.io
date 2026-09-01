@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-maximum-subarray.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Discard a negative running prefix before extending a future subarray.",
+  "learningObjective": "At each index, keep the best sum ending exactly there by either extending the prior range or restarting at the current value.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to discard a negative running prefix before extending a future subarray.",
-    "invariant": "Discard a negative running prefix before extending a future subarray.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional dynamic programming with a best-ending-here state (Kadane algorithm).",
+    "recognitionCue": "Use this recurrence when optimizing a nonempty contiguous subarray and extending a negative accumulated prefix can only hurt every future range.",
+    "invariant": "After processing index i, current is the maximum sum of any nonempty subarray ending exactly at i, while best is the maximum sum of any subarray contained in indices 0 through i.",
+    "stateModel": "Only current and best are required for the value; the visual additionally tracks current start and best endpoints to expose contiguous geometry without changing the supplied recurrence.",
+    "visualRationale": "The full indexed array remains fixed while stable scan and current-start pointers show the covered range; each frame displays both recurrence candidates and the chosen sum.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A DP table lists numbers but hides which contiguous input range each state represents.",
+      "A prefix-sum chart can solve the problem through minimum prefixes but does not match the supplied ending-here recurrence.",
+      "Highlighting only the final [4,-1,2,1] skips the restart decisions that explain correctness."
     ],
-    "transferLesson": "Transfer the invariant: Discard a negative running prefix before extending a future subarray.",
-    "reviewStatus": "pending"
+    "transferLesson": "For contiguous optimization, define the best solution forced to end at the current position, decide extend versus restart, and separately preserve the best endpoint seen anywhere.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-maximum-product-subarray.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Keep both product extremes because a negative number can swap their roles.",
+  "learningObjective": "Track both extreme products ending at each index because multiplying by a negative swaps which extreme can become largest.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to keep both product extremes because a negative number can swap their roles.",
-    "invariant": "Keep both product extremes because a negative number can swap their roles.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional DP with maximum and minimum products ending at the current index.",
+    "recognitionCue": "Use paired extremes for contiguous products when negative values can reverse ordering and zero or a single value may force a restart.",
+    "invariant": "After each index, current_max and current_min are respectively the largest and smallest products of nonempty subarrays ending exactly there, and best is the largest current_max seen in the processed prefix.",
+    "stateModel": "Keep current_max, current_min, and best; before a negative multiplier, swap the two ending extremes, then independently choose restart-at-num versus extend-by-multiplication.",
+    "visualRationale": "The fixed indexed array and stable scan cursor preserve contiguous geometry, while separate swap and multiply frames make the sign reversal and every candidate product explicit.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Tracking only the current maximum loses a large negative product that a later negative can turn positive.",
+      "Prefix and suffix product passes are another approach but do not match the supplied constant-state recurrence.",
+      "A final highlighted range cannot explain the essential extreme swap at negative values."
     ],
-    "transferLesson": "Transfer the invariant: Keep both product extremes because a negative number can swap their roles.",
-    "reviewStatus": "pending"
+    "transferLesson": "When a transition is not monotone, retain every extreme that can become optimal after the next operation; sign-changing multiplication is the canonical max/min pair example.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
