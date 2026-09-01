@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "rl-verifiable-rewards-grpo",
+  "article": "src/content/posts/2026-08-28-rl-verifiable-rewards-grpo.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Given one prompt's verifier rewards, identify which outputs receive positive, negative, or zero relative advantage and explain why an equal-reward group supplies no preference direction.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that keeps candidates grouped by prompt while aligning verifier outcomes, the local mean, and resulting advantage signs. The spatial parallel makes the mixed-versus-equal contrast immediate without implying that raw rewards are compared across prompts.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the learning task depends on aligned numeric cases and a repeated within-group computation; automatic graph layout would obscure the correspondence between each reward and its advantage sign.",
+    "svg": "Selected because fixed geometry can align four candidates, one prompt-local baseline, and four resulting signs in two directly comparable panels while remaining deterministic, responsive, theme-aware, and print-safe.",
+    "semanticHtml": "Rejected because cards or tables could enumerate rewards and signs but would make the shared baseline and the mixed-versus-collapsed signal less immediate.",
+    "interaction": "Rejected because changing rewards interactively is unnecessary to learn the invariant: subtract the prompt-local mean, and equal rewards yield zero numerators. Controls would add hidden states without a stronger learning outcome.",
+    "paperReuse": "Rejected because no permissive license for adapting the DeepSeekMath paper's Figure 4 was established from the arXiv record. The shipped visual copies no paper artwork, wording, coordinates, empirical data, or layout.",
+    "noVisual": "Rejected because prose states the normalization rule but requires readers to simulate a group mentally. The side-by-side cases expose both the useful relative signal and its equal-reward failure mode."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding explainability slide closes the supervised-learning material and contains no reinforcement-learning reward or grouped sampling mechanism."
+      },
+      {
+        "page": 154,
+        "insight": "The Reinforcement Learning divider begins the only locally relevant section but contains no technical content."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts conditional-likelihood and expected-reward objectives and notes trajectory dependence; it supplies broad context but no verifier, grouped outputs, baseline, or relative advantage."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide presents vanilla policy gradients and a CartPole implementation whose discounted rewards are normalized across an episode. It is the closest analogue to centering rewards, but it does not sample multiple outputs for one prompt or define GRPO."
+      },
+      {
+        "page": 157,
+        "insight": "The Past projects divider ends the deck's RL teaching neighborhood, confirming there is no adjacent RLVR or GRPO slide."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for GRPO, group relative, RLVR, verifiable reward, reinforcement learning, and policy optimization, then directly read pages 153-158 around the complete RL section. GRPO, RLVR, group-relative optimization, and verifiable rewards have zero matches. Pages 154-156 are the only relevant sequence; no deck image, code, wording, number, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language Models",
+        "url": "https://arxiv.org/abs/2402.03300",
+        "usage": "Used as the primary source for GRPO's critic-free group baseline, reward normalization within the set of outputs generated for one question, and the clipped policy objective.",
+        "license": "The arXiv record establishes public access but did not establish a Creative Commons or other permissive figure-adaptation license. Figure 4 is not copied or adapted; the two synthetic groups, arrangement, labels, and caption are original."
+      },
+      {
+        "title": "Hugging Face TRL GRPO Trainer documentation",
+        "url": "https://huggingface.co/docs/trl/main/en/grpo_trainer",
+        "usage": "Used as official implementation documentation to cross-check grouped completion generation, prompt-local reward centering and scaling, the zero relative signal when rewards are equal, and current loss variants.",
+        "license": "TRL documentation source is distributed under Apache License 2.0. No documentation image, prose, code, or layout is reproduced; it is cited only as a technical cross-check."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that GRPO does not turn a verifier score into an absolute training direction: the score is centered against other outputs for the same prompt. The original SVG isolates that step with synthetic binary rewards. For rewards [0, 0, 1, 1], the mean is 0.5 and the advantage signs split; for [1, 1, 1, 1], every numerator is zero, so every advantage is zero despite every output passing."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the full neighboring RL sequence, then checked the primary DeepSeekMath paper and official TRL documentation before selecting an original deterministic within-group comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "grpo-group-relative-signal"
+    ],
+    "accessibility": "The SVG has a programmatic title and a full description of both four-output cases. Every candidate is explicitly labelled Pass or Fail with its numeric reward; each baseline and advantage sign is printed; panel headings and concluding sentences carry the full lesson without color. The established visual-wide scroll wrapper preserves readable labels at 390 CSS pixels, theme variables provide dark-mode contrast, and existing print rules remove the minimum width, force a light high-contrast palette, and avoid splitting the figure."
+  }
+}
