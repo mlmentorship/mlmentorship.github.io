@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "slug": "wsd-and-wsd-s",
+  "article": "src/content/posts/2025-08-31-wsd-and-wsd-s.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish WSD's rollback to a hot main branch after an intermediate cooldown from WSD-S's single-path continuation from each cooled checkpoint.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align learning rate with training progress and contrast a forked WSD probe against WSD-S's sequential decay-and-return path without implying measured loss or a fixed total horizon.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the decisive information is quantitative schedule shape and aligned time, which automatic graph routing would distort.",
+    "svg": "Selected because two compact, aligned traces can encode the plateau, cooldown endpoints, rollback branch, continuation point, and terminal decay with inspectable static geometry.",
+    "semanticHtml": "Rejected because a table could name the phases but would leave the reader to reconstruct which checkpoint supplies the next stable phase.",
+    "interaction": "Rejected because selecting arbitrary probe times adds controls and hidden states without improving the one invariant; the static comparison already supports an unknown horizon and prints without JavaScript.",
+    "paperReuse": "Rejected because the papers and Marin retrospective contain related schedule figures, but no external figure is needed and public access does not establish adaptation rights for every figure. The traces, labels, coordinates, and composition are independently authored from the cited mechanisms.",
+    "noVisual": "Rejected because prose collapses learning-rate shape and checkpoint lineage into one sequence, making it easy to assume that WSD-S rolls back like WSD or that an intermediate cooldown must terminate training."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 45,
+        "insight": "The optimization overview introduces loss-surface search and gradients, establishing the beginning of the relevant optimization neighborhood but not learning-rate schedules."
+      },
+      {
+        "page": 46,
+        "insight": "The optimizer comparison mentions learning-rate annealing when validation improvement stalls, but does not show warmup, a stable plateau, cooldown branches, or horizon-free continuation."
+      },
+      {
+        "page": 47,
+        "insight": "The neighboring RAdam slide discusses adaptive warmup for early optimizer variance, providing startup context without a stable-and-decay schedule."
+      },
+      {
+        "page": 48,
+        "insight": "The next slide moves to sharpness-aware minimization, marking the end of the local optimizer neighborhood."
+      },
+      {
+        "page": 102,
+        "insight": "The preceding transformer slide covers BERT-family objectives and training choices but contains no schedule construction."
+      },
+      {
+        "page": 103,
+        "insight": "The closest deck source says transformer training usually uses schedulers with warm-up and cool-down, and defines those endpoint phases qualitatively; it does not include a stable plateau, WSD, WSD-S, probes, or checkpoint lineage."
+      },
+      {
+        "page": 104,
+        "insight": "The following GPT-X slide moves to instruction tuning and in-context learning, ending the immediate schedule neighborhood."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed for WSD, Warmup-Stable, learning-rate schedule, cosine decay, cooldown, rewarm, and related variants. WSD and WSD-S do not occur. Pages 45-48 were inspected as the complete optimizer neighborhood and pages 102-104 around the only transformer warm-up/cool-down mention. Page 103 is relevant background, but no deck slide teaches the branch-versus-continuation distinction implemented here.",
+    "license": "The deck provides no general reuse license and contains externally derived material. It is review-only: no screenshot, wording, artwork, curve, coordinates, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "MiniCPM: Unveiling the Potential of Small Language Models with Scalable Training Strategies",
+        "url": "https://arxiv.org/abs/2404.06395",
+        "usage": "Used as the primary source for WSD's warmup, stable, and decay stages and for obtaining cooled models by starting decay from stable-stage checkpoints.",
+        "license": "Used for technical verification only. The arXiv record's public availability is not treated as permission to adapt figures; no figure, empirical trace, prose, equation layout, or coordinates are reused."
+      },
+      {
+        "title": "Understanding Warmup-Stable-Decay Learning Rates: A River Valley Loss Landscape Perspective",
+        "url": "https://arxiv.org/abs/2410.05192",
+        "usage": "Used as the primary source for the name Warmup-Stable-Decay-Simplified, the single-path schedule, continuation from the end of each decay rather than rollback, direct return to the peak outside decay intervals, and the approximately ten-percent decay allocation used in its experiments.",
+        "license": "Used for technical verification only. No permissive figure-adaptation grant was established from the arXiv record, so no paper figure, plotted result, prose, values-as-geometry, or visual composition is copied."
+      },
+      {
+        "title": "Marin 8B Retrospective",
+        "url": "https://marin.readthedocs.io/en/latest/reports/marin-8b-retro/",
+        "usage": "Used as an authoritative implementation report for reactive training, the initial 10k/1k and later 20k/2k WSD-S cycles, peak learning rate during about ninety percent of steps, and the later continuation and cooldown decisions.",
+        "license": "Marin's repository is Apache-2.0, but rendered documentation images and linked attachments may have separate provenance. No retrospective image, data trace, wording, or layout is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is checkpoint lineage. In WSD, an intermediate cooldown can branch from a stable-stage checkpoint while the hot main branch remains available for continued training. In the WSD-S paper, training instead continues from the cooled endpoint itself; outside a declared decay interval Equation 7 sets the rate back to eta_max. Thus 'rewarm' must not be presented as a required gradual phase, and WSD-S expands to Simplified rather than Stable. The visual shows schematic normalized learning rate, not empirical loss, exact duration, or a claim that every implementation must use an instantaneous return."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact optimization and transformer-schedule neighborhoods, then checked both primary papers and Marin's implementation retrospective before selecting an original checkpoint-lineage comparison and correcting the article's WSD-S terminology."
+  },
+  "implementation": {
+    "visualIds": [
+      "wsd-checkpoint-lineage"
+    ],
+    "accessibility": "The SVG has a linked title and description that name both schedules, the WSD branch and rollback, both WSD-S cooled checkpoints, and each continuation rule. Direct row labels, endpoint shapes, solid versus dashed paths, numbered checkpoints, and text labels preserve meaning without color. The 360-unit viewBox has no minimum width and uses short labels for 390 CSS pixels; established theme tokens provide dark-mode contrast, while shared print rules force a light high-contrast palette and keep the figure together."
+  }
+}
