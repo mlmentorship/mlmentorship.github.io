@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "plan-70b-training-run",
+  "article": "src/content/posts/2026-08-28-plan-70b-training-run.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish the tensor-parallel axis that divides each model replica from the data-parallel axis that creates independent data replicas, then apply the correct axis to model-state and global-batch accounting.",
+  "mediumRationale": "A paired semantic ledger is the smallest medium that can align the physical 8-GPU-by-64-node rank geometry with the exact memory divisors and batch multiplier without introducing a dense cluster diagram.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a rank graph would emphasize 512 repeated nodes while making the arithmetic and same-sequence versus different-sequence distinction harder to scan.",
+    "svg": "Rejected: drawing all nodes or a symbolic grid adds geometry but less precision than directly aligned rank-role and accounting tables.",
+    "semanticHtml": "Selected: two responsive panels connect the two parallel axes to exact state and token calculations using semantic row and column headers.",
+    "interaction": "Rejected: changing TP and DP degrees would require a topology and performance model beyond the stated hardware, while one fixed plan is sufficient to teach correct accounting.",
+    "paperReuse": "Rejected: the reviewed Megatron and ZeRO sources contain broader system figures, but their public availability is not treated as permission to reproduce artwork and none targets this exact TP-8, DP-64 accounting error.",
+    "noVisual": "Rejected: the article gives every formula, but readers must mentally reconstruct that each node is one tensor-sharded replica and that tensor ranks share sequences rather than multiplying the global batch."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The transformer overview identifies GPU memory, training time, and parameter-proportional distributed communication as model-scaling constraints, but gives no parallel rank layout."
+      },
+      {
+        "page": 106,
+        "insight": "The LLM data slide connects model scale to compute-appropriate token counts, providing training-volume context without cluster or batch accounting."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM training slide emphasizes hardware scalability, throughput, BF16, and FSDP, but does not assign tensor and data parallel groups to topology."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide distinguishes half-precision activations and gradients from FP32 optimizer state and mentions ZeRO or FSDP sharding, supplying state-size context but no per-axis divisor."
+      },
+      {
+        "page": 115,
+        "insight": "The neighboring training-stack slide combines BF16, optimizer-state sharding, activation checkpointing, and gradient accumulation, but presents techniques as a list rather than a measured layout."
+      },
+      {
+        "page": 167,
+        "insight": "The system-design modeling slide defines data parallelism as replicated models and model parallelism as components on different machines; it does not explain tensor-parallel replicas, hybrid process groups, or global-batch counting."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 PDF pages for model, tensor, pipeline, and data parallelism; FSDP, ZeRO, optimizer state, FLOPs, MFU, and distributed training. The complete relevant neighborhoods on pages 102-108, 113-116, and 166-168 were extracted and reviewed. The deck contains no worked multidimensional rank layout or batch calculation. No deck artwork, prose, code, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM",
+        "url": "https://arxiv.org/abs/2104.04473",
+        "usage": "Used as the primary systems paper for composing tensor, pipeline, and data parallelism and for topology-aware placement of communication-intensive tensor parallelism.",
+        "license": "The arXiv record is publicly accessible, but no permissive figure-reuse grant was relied upon. No paper figure, measured result, wording, or layout is copied."
+      },
+      {
+        "title": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+        "url": "https://arxiv.org/abs/1910.02054",
+        "usage": "Used as the primary source for partitioning optimizer state across data-parallel ranks while retaining data-parallel computation.",
+        "license": "The arXiv perpetual non-exclusive distribution license grants limited distribution rights to arXiv and is not a general third-party adaptation license. No paper figure, data, prose, or layout is reused."
+      },
+      {
+        "title": "Megatron Core Parallelism Strategies Guide",
+        "url": "https://docs.nvidia.com/megatron-core/developer-guide/nightly/user-guide/parallelism-guide.html",
+        "usage": "Used as official implementation documentation to verify that total GPUs factor across parallel dimensions, TP splits individual layers, DP replicates models and splits batches, and optimizer-only DP sharding corresponds to ZeRO-1.",
+        "license": "Megatron-LM source is distributed under Apache License 2.0. No documentation prose, commands, tables, or diagrams are copied; the shipped ledger is independently authored."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access and download do not themselves grant permission to adapt source figures.",
+        "license": "The policy is cited only to document the conservative licensing decision. No policy wording, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The visual is an original calculation from the article's stated plan. World size 512 factors as TP 8 times DP 64. Each node's eight ranks cooperate on the same sequence and hold one eighth of 140 GB BF16 weights plus one eighth of 140 GB BF16 gradients, totaling 35 GB per GPU. ZeRO-1 shards the 560 GB FP32 Adam moments over both the eight tensor slices and 64 data replicas, giving 560/512=1.09375 GB per GPU. The global token batch counts 64 independent data replicas, not 512 cooperating ranks: 64 times one sequence times eight accumulation steps times 8,192 tokens equals 4,194,304."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, inspected all 214 deck pages and the exact scaling, training-state, and generic parallelism neighborhoods, then checked primary Megatron and ZeRO papers, current NVIDIA Megatron Core documentation, and arXiv licensing before selecting an original rank-accounting ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "plan-70b-parallel-accounting"
+    ],
+    "accessibility": "The figure uses semantic sections and real tables with scoped row and column headers, explicit equations, and a caption that states the overcounting failure without relying on color. Selected cells also use borders, placement, and text labels. Existing two-panel styles stack below 640 CSS pixels for a 390-pixel viewport, theme variables preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette with page-break protection."
+  }
+}
