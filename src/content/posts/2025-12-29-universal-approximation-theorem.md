@@ -28,7 +28,43 @@ $$
 g(x) = \sum_{i=1}^{N} c_i \sigma(w_i^\top x + b_i)
 $$
 
-with finite width $N$ such that $\sup_{x \in K} |g(x) - f(x)| < \varepsilon$, where $\sigma$ is any non-polynomial bounded activation.
+with finite width $N$ such that $\sup_{x \in K} |g(x) - f(x)| < \varepsilon$, where $\sigma$ is a continuous sigmoidal activation in Cybenko's formulation. Later results broaden the sufficient activation conditions.
+
+**Learning objective:** read universal approximation as a uniform error guarantee for some finite network on a compact domain, then separate that existence claim from width, optimization, generalization, and extrapolation.
+
+<!-- visual:uat-existence-error-band -->
+<figure class="learning-figure plot-panel" aria-labelledby="uat-error-band-title">
+	<p class="visual-kicker">The quantifiers are the lesson</p>
+	<p class="visual-title" id="uat-error-band-title">What does “there exists an approximating network” actually guarantee?</p>
+	<svg viewBox="0 0 360 430" role="img" aria-labelledby="uat-error-band-svg-title uat-error-band-svg-desc">
+		<title id="uat-error-band-svg-title">A network approximation stays inside a uniform error band only on a compact domain</title>
+		<desc id="uat-error-band-svg-desc">On the compact interval K from a to b, a solid piecewise-linear target function is surrounded by a shaded tolerance band extending twelve drawing units above and below it. A dashed piecewise-linear network approximation stays inside the band. Its vertical error at every point is at most six units, so the maximum error is below epsilon. Below the plot, one box states what the theorem provides: some finite width and weights exist. A second box states what it does not provide: a small width, weights found by SGD, generalization from samples, or behavior outside K.</desc>
+		<rect class="viz-plot-bg" x="8" y="30" width="344" height="246" rx="5"></rect>
+		<text class="viz-axis-label" x="14" y="18">ON K, THE APPROXIMATION MUST STAY INSIDE THE ε BAND EVERYWHERE</text>
+		<path d="M35 118L70 63L105 43L140 118L175 173L210 193L245 118L280 63L325 118L325 142L280 87L245 142L210 217L175 197L140 142L105 67L70 87L35 142Z" style="fill:var(--viz-focus-bg);stroke:none"></path>
+		<path d="M35 130L70 75L105 55L140 130L175 185L210 205L245 130L280 75L325 130" class="viz-roc-curve"></path>
+		<path d="M35 126L70 81L105 61L140 124L175 179L210 199L245 136L280 69L325 124" class="viz-pr-curve" stroke-dasharray="7 5"></path>
+		<path d="M35 38V250M325 38V250" class="viz-baseline"></path>
+		<path d="M27 250H333" class="viz-axis"></path>
+		<text class="viz-callout" x="40" y="109">target f: solid</text>
+		<text class="viz-callout" x="214" y="188">network g: dashed</text>
+		<text class="viz-label" x="176" y="47">upper tolerance f(x) + ε</text>
+		<text class="viz-label" x="177" y="221">lower tolerance f(x) − ε</text>
+		<path d="M105 55H119M105 61H119M116 55V61" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+		<text class="viz-callout" x="123" y="62">|g − f| ≤ 6 &lt; ε = 12</text>
+		<text class="viz-callout" x="31" y="268">a</text>
+		<text class="viz-callout" x="321" y="268">b</text>
+		<text class="viz-axis-label" x="180" y="268" text-anchor="middle">COMPACT DOMAIN K = [a, b]</text>
+		<rect class="viz-node viz-node--output" x="12" y="296" width="336" height="48" rx="4"></rect>
+		<text class="viz-callout" x="24" y="316">THE THEOREM PROVIDES EXISTENCE</text>
+		<text class="viz-label" x="24" y="334">Some finite width N and some weights make supₓ∈K |g(x) − f(x)| &lt; ε.</text>
+		<rect class="viz-node viz-node--warning" x="12" y="356" width="336" height="62" rx="4"></rect>
+		<text class="viz-callout" x="24" y="376">THE THEOREM DOES NOT PROVIDE A PRACTICAL RECIPE</text>
+		<text class="viz-label" x="24" y="395">No small N · no SGD guarantee · no finite-sample generalization</text>
+		<text class="viz-label" x="24" y="410">No constraint outside K</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> choose the compact domain and tolerance first. The theorem says that some finite network can keep its largest vertical error below that tolerance everywhere in the domain. It does not tell you how wide the network is, how to find its weights, whether it generalizes from samples, or what happens outside the domain. The target, approximation, and coordinates are an original construction checked against <a href="https://hal.science/hal-03753170v1">Cybenko (1989)</a>.</figcaption>
+</figure>
 
 Modern extensions:
 
