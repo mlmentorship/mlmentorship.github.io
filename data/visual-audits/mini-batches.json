@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-mini-batches.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A single cursor yields non-overlapping slices and keeps the final short slice.",
+  "learningObjective": "Advance start by batch_size and let slicing clamp the final exclusive stop to the sequence length.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a single cursor yields non-overlapping slices and keeps the final short slice.",
-    "invariant": "A single cursor yields non-overlapping slices and keeps the final short slice.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Fixed-stride iteration with half-open sequence slices.",
+    "recognitionCue": "Examples must be emitted in bounded groups while preserving order and retaining a remainder smaller than the requested batch size.",
+    "invariant": "Before each yield, indices below start were yielded exactly once; the next slice covers [start,min(start+batch_size,n)), and the next start equals the previous requested stop.",
+    "stateModel": "Retain the input sequence, positive batch_size, moving start, and exclusive requested stop. Slicing itself handles the final boundary.",
+    "visualRationale": "An indexed array with stable start and stop markers shows half-open coverage, +batch_size movement, and why the final slice safely clamps.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Pre-drawn batch boxes hide the generator’s moving start and slice semantics.",
+      "A modulo grouping table complicates a direct stride-and-slice loop.",
+      "A full tensor diagram implies equal batch shapes and can conceal the short remainder."
     ],
-    "transferLesson": "Transfer the invariant: A single cursor yields non-overlapping slices and keeps the final short slice.",
-    "reviewStatus": "pending"
+    "transferLesson": "Use half-open slices and a fixed stride to partition ordered data exactly once; this transfers to pagination, chunked I/O, windowed inference, and streaming uploads.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

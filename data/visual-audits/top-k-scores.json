@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-top-k-scores.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Partition finds membership in the top group; sort only that group for output order.",
+  "learningObjective": "Partition establishes top-k membership; only those k candidates are sorted for descending output.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to partition finds membership in the top group; sort only that group for output order.",
-    "invariant": "Partition finds membership in the top group; sort only that group for output order.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Linear-average partial selection followed by sorting only the selected k entries.",
+    "recognitionCue": "The output needs a small ranked subset of a much larger score vector, so fully sorting all n scores performs unnecessary ordering.",
+    "invariant": "After argpartition, candidate membership contains the k largest values although internal order is unspecified; after argsort and reversal, those same candidates are descending.",
+    "stateModel": "Retain the original scores and indices, k candidate indices, their gathered values, and selected-only order. Noncandidate relative order is irrelevant.",
+    "visualRationale": "Indexed score cells preserve original identities while candidate keys move into a compact selected array and then back as ranked output.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A fully sorted score array teaches O(n log n) work rather than partial selection.",
+      "A size-k heap is valid but depicts a different implementation and update mechanism.",
+      "Highlighting final winners alone conflates unordered membership with required output order."
     ],
-    "transferLesson": "Transfer the invariant: Partition finds membership in the top group; sort only that group for output order.",
-    "reviewStatus": "pending"
+    "transferLesson": "Separate selecting which items qualify from ordering the small qualified set; this transfers to retrieval reranking, beam pruning, and percentile candidate generation.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-binary-precision-and-recall.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each example enters one confusion cell; the metric chooses its denominator afterward.",
+  "learningObjective": "Route each pair with Boolean masks, then divide TP by predicted-positive and actual-positive totals safely.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to each example enters one confusion cell; the metric chooses its denominator afterward.",
-    "invariant": "Each example enters one confusion cell; the metric chooses its denominator afterward.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Vectorized Boolean masks for confusion counts followed by denominator-specific safe division.",
+    "recognitionCue": "Binary labels and predictions must be reduced to precision and recall, whose numerators overlap but whose predicted-positive and actual-positive populations differ.",
+    "invariant": "Each aligned example contributes to exactly one confusion cell; TP, FP, and FN masks count disjoint conditions, and each metric uses TP over its named population.",
+    "stateModel": "Retain aligned label/prediction arrays, three Boolean masks or their sums, precision_total, and recall_total. True negatives do not enter either denominator.",
+    "visualRationale": "A per-example routing table keeps every pair and confusion category visible while a stable metric cursor moves through masks, sums, denominators, and guarded divisions.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A bare formula triangle hides how Boolean array conditions produce TP, FP, and FN.",
+      "A 2x2 matrix alone loses per-example verification and the safe-division branches.",
+      "Two unrelated gauges obscure that precision and recall share TP but select different populations."
     ],
-    "transferLesson": "Transfer the invariant: Each example enters one confusion cell; the metric chooses its denominator afterward.",
-    "reviewStatus": "pending"
+    "transferLesson": "Define the population before dividing: precision conditions on predicted positives, recall on actual positives; the same discipline prevents denominator mistakes in rates and conditional metrics.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
