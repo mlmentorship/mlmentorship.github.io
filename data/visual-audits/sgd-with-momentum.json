@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "sgd-with-momentum",
+  "article": "src/content/posts/2026-04-18-sgd-with-momentum.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Compare raw SGD with momentum on an alternating gradient sequence and explain how momentum amplifies the consistent component while reducing the relative cross-valley oscillation.",
+  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can keep an exact update sequence, common coordinate scale, trajectory, and component arithmetic aligned. The reader can verify every plotted endpoint from the labelled descent directions rather than trusting a qualitative loss-surface sketch.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show recurrence dependencies but cannot preserve a quantitative coordinate system or verify trajectory endpoints.",
+    "svg": "Selected: fixed geometry puts raw and momentum trajectories on the same scale and directly ties their endpoints to exact vector components.",
+    "semanticHtml": "Rejected: a table could present the vectors, but it would not make the reduced zigzag and increased along-valley displacement spatially immediate.",
+    "interaction": "Rejected: varying beta adds controls and edge cases without improving the one invariant the article needs to teach.",
+    "paperReuse": "Rejected: authoritative sources contain optimizer equations and related intuition, but no figure-specific permissive reuse license was established. The synthetic sequence, calculations, geometry, and wording are original.",
+    "noVisual": "Rejected: prose states that perpendicular components cancel and consistent components accumulate, but readers must mentally integrate a vector recurrence to see both effects at once."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 45,
+        "insight": "The preceding loss-optimization slide introduces parameters as points in a loss space and gradient descent as following a local direction."
+      },
+      {
+        "page": 46,
+        "insight": "The dedicated optimizer slide contrasts vanilla SGD, momentum, and Nesterov updates; describes momentum as integrating previous velocity; and places momentum beside adaptive methods."
+      },
+      {
+        "page": 47,
+        "insight": "The following RAdam slide discusses early adaptive-momentum variance and warmup, not the cross-valley component behavior of classical momentum."
+      },
+      {
+        "page": 48,
+        "insight": "The next slide moves to sharpness-aware minimization and adversarial weights, confirming the end of the momentum-specific neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 text-indexed all 214 pages for momentum, Nesterov, Polyak, SGD, gradient descent, velocity, ravines, and narrow valleys, then inspected pages 44-48. Page 46 is the only dedicated momentum treatment. It provides equations and a physical analogy but no narrow-valley component diagram. The slide gives no asset-level reuse license, so no deck wording, code, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Some methods of speeding up the convergence of iteration methods",
+        "url": "https://doi.org/10.1016/0041-5553(64)90137-5",
+        "usage": "Used as the foundational primary citation for Polyak's momentum method.",
+        "license": "The publisher record does not establish a permissive figure-reuse license. No paper figure, prose, notation layout, or example is copied or adapted."
+      },
+      {
+        "title": "On the importance of initialization and momentum in deep learning",
+        "url": "https://proceedings.mlr.press/v28/sutskever13.html",
+        "usage": "Used as a primary modern source for momentum's role in handling curvature and for the classical and Nesterov momentum formulations in deep-network training.",
+        "license": "The PMLR paper is openly accessible, but no figure is needed or reused. The visual is an independently calculated synthetic sequence rather than an adaptation of paper artwork or results."
+      },
+      {
+        "title": "PyTorch SGD documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html",
+        "usage": "Used as official implementation documentation to cross-check momentum-buffer accumulation, learning-rate application, dampening, and Nesterov options.",
+        "license": "No documentation prose, code, or artwork is copied. Only public operator semantics were consulted."
+      }
+    ],
+    "notes": "The hardest prose-only model is component-wise accumulation in a narrow valley. The shipped example defines descent directions d_t = -g_t that alternate between (1, 2) and (1, -2). Raw SGD therefore takes those exact steps. For beta = 0.5 in the steady alternating regime, u_t = beta u_(t-1) + d_t alternates between (2, 4/3) and (2, -4/3): the consistent component doubles while the cross-valley-to-forward ratio falls from 2 to 2/3. Every displayed endpoint follows from those vectors; no empirical result is claimed."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, inspected the full deck index and exact optimizer neighborhood, and reviewed the foundational paper, a primary deep-learning study, and official framework documentation before selecting an original exact vector trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "momentum-alternating-components"
+    ],
+    "accessibility": "Each SVG has a linked title and complete description. Coordinates, update vectors, endpoint labels, direction arrows, and solid-versus-dashed paths make the comparison independent of color. The established two-panel primitive stacks below 640 pixels, giving each compact viewBox the full article width at 390 CSS pixels; shared theme variables preserve dark-mode contrast and print rules produce a light high-contrast rendering."
+  }
+}
