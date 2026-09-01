@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "people-also-bought",
+  "article": "src/content/posts/2026-02-13-people-also-bought.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Given one anchor product, distinguish the evidence and candidate produced by co-purchase, co-view, and attribute similarity, then select the signal that best serves a complementary “people also bought” shelf.",
+  "mediumRationale": "A four-card semantic comparison is the smallest medium that keeps one anchor product fixed while changing the evidence source, resulting candidate, and product purpose. Direct text labels make the key contrast inspectable without implying quantitative distances or a universal model architecture.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the learning task compares three parallel meanings of “related,” not a long process or causal loop. A flowchart would repeat the anchor and add arrows without making the evidence-versus-purpose contrast clearer.",
+    "svg": "Rejected because no quantitative geometry or fixed spatial relationship carries the claim. Hand-positioned text would be less responsive and less directly accessible than semantic cards.",
+    "semanticHtml": "Selected because an anchor card plus three directly labelled signal cards exposes the evidence, candidate, and appropriate surface for each interpretation. The established card primitive reflows naturally and requires no runtime rendering.",
+    "interaction": "Rejected because switching among signals would hide comparisons one at a time and require controls without adding a parameter-dependent behavior to explore.",
+    "paperReuse": "Rejected because the reviewed IEEE and ACM papers establish item-to-item recommendation and complement-versus-substitute semantics, but no permissive license for reusing their figures was established. The visual uses no source artwork, layout, wording, values, or coordinates.",
+    "noVisual": "Rejected because the prose lists three signals sequentially, leaving the reader to hold the anchor fixed and mentally map each evidence source to a different candidate and product purpose. The compact comparison makes that product decision explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 128,
+        "insight": "The preceding model-compression slide establishes the boundary before the recommender section and contains no recommendation mechanism."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider introduces the relevant local section but contains no explanatory content."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide is directly relevant to behavioral evidence: it describes interaction-only item matching, presentation-bias feedback loops, popularity risk, ranking, and learned item relatedness. It does not distinguish a co-purchase complement from a co-view or attribute-similar substitute."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid slide defines recommendations from item attributes and similarity measures, then combines content and collaborative outputs. It supplies the third signal family but does not connect signal choice to the purpose of a post-purchase shelf."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search divider begins the next topic and marks the end of the contiguous recommender-method neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for recommender, recommendation, collaborative filtering, content-based filtering, co-purchase, people also bought, ranking, position bias, and feedback loop. Pages 128-132 were read as the complete local recommender neighborhood. Pages 130 and 131 contain the closest ingredients, but no slide distinguishes co-purchase, co-view, and attribute similarity by the candidate relationship and product surface they serve. No deck image, prose, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Amazon.com Recommendations: Item-to-Item Collaborative Filtering",
+        "url": "https://doi.org/10.1109/MIC.2003.1167344",
+        "usage": "Used as the primary industrial source for Amazon's item-to-item method: build related-item evidence from customers' purchase and rating histories, then aggregate related candidates around a user's known items.",
+        "license": "The 2003 IEEE article is copyrighted, and no permissive figure-adaptation license was identified. IEEE permission guidance was treated as requiring authorization for republication; no paper figure, prose, example, data, or layout is reproduced."
+      },
+      {
+        "title": "Inferring Networks of Substitutable and Complementary Products",
+        "url": "https://doi.org/10.1145/2783258.2783381",
+        "usage": "Used as the primary source for the product-semantic distinction: substitutes can be purchased instead of one another, while complements are purchased in addition to one another; browsing and co-purchasing logs provide different relationship evidence.",
+        "license": "This 2015 ACM paper predates ACM's default open-access transition, and no Creative Commons license or permission to adapt its figures was established. No source figure, wording, mobile-phone example, result, value, or layout is copied."
+      },
+      {
+        "title": "The history of Amazon's recommendation algorithm",
+        "url": "https://www.amazon.science/the-history-of-amazons-recommendation-algorithm",
+        "usage": "Used as Amazon's official retrospective to verify that item B is related to item A when purchasers of A are unusually likely to buy B, and that raw co-purchase counts must be adjusted so bestsellers do not dominate every recommendation.",
+        "license": "The page is cited as official documentation, but no permissive license for its text or media was identified. The visual is an independently authored schematic and reproduces no Amazon artwork, prose, values, or arrangement."
+      },
+      {
+        "title": "Google for Developers: Content-based filtering basics",
+        "url": "https://developers.google.com/machine-learning/recommendation/content-based/basics",
+        "usage": "Used as official technical documentation to verify that content-based recommendation compares users and items through shared item features and a similarity metric rather than other users' co-behavior.",
+        "license": "Google Developers content is generally available under CC BY 4.0 unless noted, but the page's feature matrix, wording, labels, and example are not adapted. The shipped comparison is independently authored."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that “related” is not one relation. Holding an anchor printer fixed, same-order evidence can surface ink as a complement, same-session viewing can surface another printer as a substitute, and shared attributes can surface a similar printer without behavioral co-occurrence. The shelf objective chooses which relation is useful: a post-decision “also bought” surface usually prioritizes complementary co-purchase candidates, while the other signals remain useful on comparison surfaces or as cold-item fallbacks. The schematic states these qualitative roles and invents no score, probability, or universal exclusivity claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full recommender neighborhood, then checked two primary papers, Amazon's official retrospective, and Google's official content-based-filtering documentation before selecting an original semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "people-also-bought-three-relations"
+    ],
+    "accessibility": "The figure uses a linked learning question, a labelled group, four semantic sections, numbered signal labels, and direct Evidence, Candidate, Relationship, and Best use text. Meaning does not depend on color, and the recommended relation is explicitly named. The established two-column card primitive has no fixed or minimum width and stacks below 640 pixels, preserving readable text at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
