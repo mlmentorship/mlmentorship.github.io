@@ -15,7 +15,8 @@ Most failed training runs aren't caused by a bad architecture; they're caused by
 
 The governing principle: **neural net training fails silently.** A wrong label map, an off-by-one in masking, or unnormalized inputs won't crash; they just quietly cap your accuracy. So the recipe is built around *verification at every step*, not speed.
 
-**Learning objective:** use each training phase as an evidence gate, and return to the earliest failed assumption instead of tuning around an unverified pipeline.
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Use each training phase as an evidence gate; return to the earliest failed assumption instead of tuning around an unverified pipeline.</p>
 
 <!-- visual:training-recipe-evidence-gates -->
 ```mermaid
@@ -44,7 +45,7 @@ flowchart TB
 	class R1,R2,R3,R4 viz-warning
 	class H viz-state
 	class S viz-output
-	class D viz-tall
+	class D viz-wide
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> follow the heavy “yes” spine downward. Every gate earns the next kind of work: trustworthy data earns a tiny-batch test, memorizing that batch earns full-set fitting, fitting earns regularization, and credible validation earns tuning. A “no” loops locally to repair evidence; it never skips ahead to hyperparameter search. Original synthesis checked against <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy’s training recipe</a>, <a href="https://www.deeplearningbook.org/contents/guidelines.html"><cite>Deep Learning</cite>’s practical methodology</a>, and <a href="https://jmlr.org/papers/v13/bergstra12a.html">Bergstra and Bengio’s random-search paper</a>.</p>

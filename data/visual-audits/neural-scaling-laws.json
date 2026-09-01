@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "neural-scaling-laws",
+  "article": "src/content/posts/2026-08-28-neural-scaling-laws.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace why fixed training compute creates an interior loss-minimizing allocation between model parameters and training tokens rather than rewarding either extreme.",
+  "mediumRationale": "A deterministic SVG curve is the smallest medium that makes the fixed-compute trade-off spatial: moving right spends more of the same budget on parameters and therefore fewer tokens, producing a U-shaped total loss with capacity limitation at one end and undertraining at the other. Exact coordinates are illustrative, not fitted research data.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show a study workflow but cannot accurately express a continuous allocation axis, opposing loss pressures, or an interior minimum.",
+    "svg": "Selected: a compact deterministic plot directly shows loss versus allocation under one fixed budget, labels both failure regimes, and marks the empirical optimum without requiring runtime layout.",
+    "semanticHtml": "Rejected: comparison cards could name the two extremes but would hide continuity and make the balanced allocation look like a third category rather than a minimum along one constraint.",
+    "interaction": "Rejected: an allocation slider could animate the trade-off, but it would require invented numeric parameters and JavaScript while adding little to the single fixed-budget inference.",
+    "paperReuse": "Rejected: Kaplan et al. and Hoffmann et al. contain paper-specific fitted plots and experimental data, but both arXiv records use the limited perpetual non-exclusive distribution license. Public access is not permission to adapt their figures, and no source coordinates, data, or composition are reused.",
+    "noVisual": "Rejected: the prose states that parameters and tokens compete, but readers must mentally substitute the compute constraint into the loss relation to see why either extreme raises loss and why the optimum lies between them."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The transformer overview states that language-model loss follows power-law trends with model size, dataset size, and training compute across more than seven orders of magnitude, but it does not show the fixed-compute allocation trade-off."
+      },
+      {
+        "page": 104,
+        "insight": "The neighboring GPT-X slide discusses instruction tuning, scale, and elicited capabilities; it confirms the topic neighborhood but adds no compute-optimal loss model."
+      },
+      {
+        "page": 105,
+        "insight": "The Cramming section restates a power-law relation among performance, model size, and data, then shifts to throughput and data preprocessing. It motivates efficient training but does not balance parameter and token allocations under fixed compute."
+      },
+      {
+        "page": 106,
+        "insight": "The LLM data slide is the closest source: it contrasts Hoffmann et al.'s joint scaling of model and dataset size with Kaplan et al.'s greater emphasis on model size, and notes the large token requirement implied for compute-optimal training of a GPT-3-sized model."
+      },
+      {
+        "page": 107,
+        "insight": "The neighboring LLM Training slide moves from scaling-law motivation to throughput, architecture, mixed precision, and continual learning, confirming that the local scaling-law treatment ends without an allocation curve."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for scaling, compute-optimal, Chinchilla, power law, parameter count, model size, dataset size, training tokens, and compute budget. Pages 103-107 were then read in full as the only concentrated transformer scaling-law neighborhood. Pages 103, 105, and 106 contribute relevant claims; pages 104 and 107 establish adjacent context. No slide plots validation loss along a fixed-compute parameter/token constraint, and no deck artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Scaling Laws for Neural Language Models",
+        "url": "https://arxiv.org/abs/2001.08361",
+        "usage": "Used as the primary study establishing empirical power-law relationships among language-model loss, model size, dataset size, and training compute, and as the earlier compute-allocation result later revisited by Hoffmann et al.",
+        "license": "The arXiv record uses the arXiv.org perpetual non-exclusive distribution license, which grants distribution rights to arXiv and limits third-party reuse. No figure, fitted value, wording, data point, or layout is reproduced."
+      },
+      {
+        "title": "Training Compute-Optimal Large Language Models",
+        "url": "https://arxiv.org/abs/2203.15556",
+        "usage": "Used as the primary compute-optimal study verifying that model size and training tokens should be chosen jointly for a fixed compute budget and that many large language models studied were too large for the amount of data used.",
+        "license": "The arXiv record uses the arXiv.org perpetual non-exclusive distribution license, not a Creative Commons adaptation license. No Chinchilla figure, curve, experimental coordinate, wording, or visual composition is reused."
+      },
+      {
+        "title": "An empirical analysis of compute-optimal large language model training",
+        "url": "https://deepmind.google/blog/an-empirical-analysis-of-compute-optimal-large-language-model-training/",
+        "usage": "Used as official author-organization documentation to cross-check that transformer training compute depends on model size and training-token count and that the study estimates their optimal trade-off empirically.",
+        "license": "The Google DeepMind page is copyrighted and no permissive artwork license was identified. It is cited for conceptual verification only; no page text, chart, icon, or layout is copied."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free viewing and download do not imply reuse rights and that the perpetual non-exclusive distribution license limits reuse by other entities.",
+        "license": "The policy is cited solely to document the conservative licensing decision. No policy wording, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the constrained geometry. With dense-transformer compute approximately proportional to N times D, holding compute fixed means that increasing parameter count forces training-token count down. Substituting that constraint into the article's two-resource loss model produces opposing terms: too little capacity raises the parameter-limited term on the left, while too few tokens raises the data-limited undertraining term on the right. The resulting interior minimum is an empirical planning target, not a universal token-to-parameter ratio. The visual is an original qualitative construction and contains no paper-specific measurements."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 103-107 in full, then checked the foundational Kaplan and Hoffmann papers, official DeepMind explanation, and arXiv licensing policy before selecting an original deterministic curve."
+  },
+  "implementation": {
+    "visualIds": [
+      "scaling-fixed-compute-allocation"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. The horizontal axis directly labels the exchange between fewer parameters/more tokens and more parameters/fewer tokens; both failure regimes, the curve, and the minimum are text-labelled; and guide lines use dashed strokes, so the inference does not depend on color. A 360-pixel viewBox scales to the reading column with no minimum width, shared plot and learning-figure tokens preserve dark-mode contrast, and existing print overrides switch those tokens to a light high-contrast palette."
+  }
+}

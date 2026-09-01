@@ -100,7 +100,7 @@ $$
 		<text class="viz-callout" x="180" y="359" text-anchor="middle">nominal n = 5, but ESS = 10² / (1² + 1² + 1² + 1² + 6²)</text>
 		<text class="viz-node-label" x="180" y="375">= 2.5 effective samples</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> draw from $q$, then let $p(x)/q(x)$ set each sample's contribution. Here sample 5 supplies 60% of the estimate, so five draws have an ESS diagnostic of only 2.5; ESS is a warning about concentration, not a literal new sample count. Definitions checked against <a href="https://artowen.su.domains/mc/Ch-var-is.pdf"><cite>Monte Carlo theory, methods and examples</cite></a>, <a href="https://jmlr.org/papers/v25/19-556.html">Vehtari et al.</a>, and <a href="https://arxiv.org/abs/1809.04129">Elvira et al.</a>; the weights and graphic are original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> draw from <code>q</code>, then let <code>p(x) / q(x)</code> set each sample's contribution. Here sample 5 supplies 60% of the estimate, so five draws have an ESS diagnostic of only 2.5; ESS is a warning about concentration, not a literal new sample count. Definitions checked against <a href="https://artowen.su.domains/mc/Ch-var-is.pdf"><cite>Monte Carlo theory, methods and examples</cite></a>, <a href="https://jmlr.org/papers/v25/19-556.html">Vehtari et al.</a>, and <a href="https://arxiv.org/abs/1809.04129">Elvira et al.</a>; the weights and graphic are original.</figcaption>
 </figure>
 
 If most weight concentrates on a single sample, ESS $\approx 1$ even when $n = 10^4$. Check ESS before trusting an IS estimate.

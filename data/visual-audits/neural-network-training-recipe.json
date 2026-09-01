@@ -91,6 +91,6 @@
     "visualIds": [
       "training-recipe-evidence-gates"
     ],
-    "accessibility": "The Mermaid diagram includes a concise accessible title and a full description of every phase, pass condition, and repair loop. Node text, gate shapes, labelled yes/no branches, line weight, and order carry the lesson without color. The established tall-diagram primitive removes the mobile minimum width so the flow remains readable at 390 CSS pixels; shared Mermaid theme and print rules provide dark-mode contrast and a light printable palette."
+    "accessibility": "The Mermaid diagram includes a concise accessible title and a full description of every phase, pass condition, and repair loop. Node text, gate shapes, labelled yes/no branches, line weight, and order carry the lesson without color. The established wide-diagram primitive preserves readable labels inside a keyboard-accessible horizontal scroller at 390 CSS pixels, while the direct caption states the full inference outside the scroller; shared Mermaid theme and print rules provide dark-mode contrast and remove the minimum width for a light printable layout."
   }
 }
