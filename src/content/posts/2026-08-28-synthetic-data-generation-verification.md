@@ -46,6 +46,73 @@ The goal determines the generator, verifier, filters, and held-out test.
 7. **Evaluate:** use held-out real and synthetic tests that were not part of generation or filtering.
 8. **Audit:** inspect model failures and update the pipeline.
 
+<!-- visual:synthetic-data-two-independent-evidence-gates -->
+<figure class="learning-figure plot-panel visual-wide" aria-labelledby="synthetic-evidence-visual-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="synthetic-evidence-visual-title">Separate evidence that selects training rows from evidence that confirms the learned capability.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 760 390" role="img" aria-labelledby="synthetic-evidence-svg-title synthetic-evidence-svg-desc">
+			<title id="synthetic-evidence-svg-title">Two independent evidence gates for synthetic training data</title>
+			<desc id="synthetic-evidence-svg-desc">In the development lane, a capability specification guides a generator that creates candidates. Independent evidence such as tests, a solver, or simulator state checks correctness. A separate coverage and decontamination gate rejects repetitive or leaked examples. Accepted examples enter a provenance-tracked training mixture and produce a frozen student. Below a heavy boundary, fresh held-out task families that were never used for generation, filtering, or training meet the frozen student only at final evaluation. That evaluation supports a scoped capability claim and has no feedback arrow into development.</desc>
+			<rect class="viz-plot-bg" x="12" y="12" width="736" height="366" rx="5"></rect>
+			<text class="viz-axis-label" x="28" y="38">DEVELOPMENT LANE · EVIDENCE MAY SELECT TRAINING ROWS</text>
+			<rect class="viz-node viz-node--input" x="28" y="55" width="132" height="60" rx="5"></rect>
+			<text class="viz-node-label" x="94" y="79">1 · CAPABILITY</text>
+			<text class="viz-node-value" x="94" y="98">families · difficulty</text>
+			<path d="M160 85H192" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M192 80L205 85L192 90Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node viz-node--input" x="205" y="55" width="132" height="60" rx="5"></rect>
+			<text class="viz-node-label" x="271" y="79">2 · GENERATE</text>
+			<text class="viz-node-value" x="271" y="98">model · program · sim</text>
+			<path d="M337 85H369" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M369 80L382 85L369 90Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node" x="382" y="55" width="132" height="60" rx="5"></rect>
+			<text class="viz-node-label" x="448" y="79">CANDIDATES</text>
+			<text class="viz-node-value" x="448" y="98">large count ≠ quality</text>
+			<path d="M514 85H546" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M546 80L559 85L546 90Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node viz-node--focus" x="559" y="48" width="165" height="74" rx="5"></rect>
+			<text class="viz-node-label" x="641" y="72">3 · VERIFY</text>
+			<text class="viz-node-value" x="641" y="91">tests · solver · simulator</text>
+			<text class="viz-node-value" x="641" y="106">not generator confidence</text>
+			<path d="M641 122V145" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M636 145L641 158L646 145Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node viz-node--focus" x="559" y="158" width="165" height="64" rx="5"></rect>
+			<text class="viz-node-label" x="641" y="182">4 · COVERAGE GATE</text>
+			<text class="viz-node-value" x="641" y="201">balance · dedup · decontam</text>
+			<path d="M559 190H519" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M519 185L506 190L519 195Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node viz-node--output" x="341" y="158" width="165" height="64" rx="5"></rect>
+			<text class="viz-node-label" x="423" y="182">TRAINING MIX</text>
+			<text class="viz-node-value" x="423" y="201">accepted + real · provenance</text>
+			<path d="M341 190H301" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M301 185L288 190L301 195Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node" x="123" y="158" width="165" height="64" rx="5"></rect>
+			<text class="viz-node-label" x="205" y="182">FROZEN STUDENT</text>
+			<text class="viz-node-value" x="205" y="201">chosen before final test</text>
+			<path d="M28 249H724" style="fill:none;stroke:var(--c-text-soft);stroke-width:3"></path>
+			<text class="viz-axis-label" x="28" y="270">CONFIRMATION LANE · FRESH TASKS NEVER FEED GENERATION, FILTERING, OR TRAINING</text>
+			<rect class="viz-node viz-node--input" x="493" y="292" width="190" height="60" rx="5" style="stroke-dasharray:5 3"></rect>
+			<text class="viz-node-label" x="588" y="316">FRESH HELD-OUT FAMILIES</text>
+			<text class="viz-node-value" x="588" y="335">new sources · tasks · difficulty</text>
+			<path d="M493 322H438" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 3"></path>
+			<path d="M438 317L425 322L438 327Z" style="fill:var(--viz-edge)"></path>
+			<path d="M205 222V272L330 292" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M326 286L339 294L324 296Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node viz-node--focus" x="339" y="292" width="86" height="60" rx="5"></rect>
+			<text class="viz-node-label" x="382" y="316">FINAL</text>
+			<text class="viz-node-label" x="382" y="335">EVALUATION</text>
+			<path d="M339 322H284" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<path d="M284 317L271 322L284 327Z" style="fill:var(--viz-edge)"></path>
+			<rect class="viz-node viz-node--output" x="81" y="292" width="190" height="60" rx="5"></rect>
+			<text class="viz-node-label" x="176" y="316">SCOPED CLAIM</text>
+			<text class="viz-node-value" x="176" y="335">learned capability, not verifier</text>
+			<text class="viz-gradient-label" x="28" y="370">NO RETURN ARROW: final evidence confirms; it does not select the system it evaluates.</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> follow the top lane into training: correctness evidence and coverage checks decide which generated rows may teach the student. Then cross the heavy line only after freezing the student; fresh held-out families meet it at final evaluation and never flow back into development.</figcaption>
+</figure>
+
 ## Verification methods
 
 Use the strongest available evidence:
