@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "slug": "policy-gradient",
+  "article": "src/content/posts/2025-11-20-policy-gradient.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Given one sampled action and a baseline, use the sign of its advantage to determine whether a policy-gradient step raises, leaves unchanged, or lowers that action's log-probability.",
+  "mediumRationale": "A four-card semantic comparison is the smallest medium that can hold the sampled action fixed, define the baseline-relative advantage once, and show the three sign cases side by side. Direct equations and update directions avoid implying a quantitative probability curve or a particular policy architecture.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the learning task is a three-case comparison around one update rule, not a multi-stage process. Automatic graph layout would add arrows and repeated nodes without sharpening the sign logic.",
+    "svg": "Rejected because no fixed geometry or quantitative scale carries the claim. Hand-positioned equations would be less responsive and less directly accessible than semantic cards.",
+    "semanticHtml": "Selected because directly labelled cards can pair each advantage sign with its baseline comparison and update direction. The established card primitive reflows at phone width and preserves equations as readable text.",
+    "interaction": "Rejected because changing a synthetic return or baseline would add controls and invented magnitudes while the durable lesson depends only on the sign of their difference.",
+    "paperReuse": "Rejected because the reviewed papers and textbook establish the theorem, REINFORCE estimator, and baseline result, but no permissive figure-adaptation license was established. No source artwork, wording, values, or layout is reused.",
+    "noVisual": "Rejected because the prose presents the gradient product and baseline subtraction algebraically but does not spatially connect positive, zero, and negative advantage to opposite changes in the sampled action's probability."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 50,
+        "insight": "The preceding normalization slide establishes the boundary before the gradient-estimator section and contains no policy-gradient mechanism."
+      },
+      {
+        "page": 51,
+        "insight": "The general REINFORCE slide explains sampling a discrete policy action, taking its log-probability, weighting by reward, and backpropagating through the sampled path. It summarizes the intuition as keeping what worked but does not introduce a baseline-relative sign."
+      },
+      {
+        "page": 52,
+        "insight": "The adjacent score-function slide gives the likelihood-ratio identity, notes that the expected score is zero, and identifies the estimator as noisy and unbiased. This is the mathematical reason an action-independent baseline can be subtracted without changing the expected gradient."
+      },
+      {
+        "page": 53,
+        "insight": "The following slide changes to local reparameterization and pathwise ELBO gradients, marking the end of the directly relevant score-function sequence."
+      },
+      {
+        "page": 153,
+        "insight": "The preceding explainability slide establishes the boundary before the reinforcement-learning section."
+      },
+      {
+        "page": 154,
+        "insight": "The reinforcement-learning divider introduces the second relevant local section but contains no mechanism."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts supervised likelihood with expected reward and iid samples with dependent trajectories, providing objective-level context rather than an action update."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide is directly relevant: it samples CartPole actions, computes discounted returns, normalizes them around the batch mean, and minimizes negative log-probability times the normalized weight. It does not explicitly trace how positive and negative weights produce opposite probability updates or distinguish a learned state baseline from batch normalization."
+      },
+      {
+        "page": 157,
+        "insight": "The following Past projects divider ends the RL neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for policy gradient, REINFORCE, score-function and likelihood-ratio gradients, actor-critic, advantage, baseline, reward-to-go, PPO, and trust region. All matches were checked; pages 51-52 and 154-156 are the directly relevant mechanisms, and their neighboring boundary pages were read to establish context. The remaining text matches use words such as advantage or baseline in unrelated topics. No deck image, code, wording, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Policy Gradient Methods for Reinforcement Learning with Function Approximation",
+        "url": "https://papers.nips.cc/paper_files/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html",
+        "usage": "Used as the primary source for the policy-gradient theorem and its estimable form using an action-value or advantage function.",
+        "license": "The NeurIPS proceedings page provides public access, but no permissive figure-adaptation license was identified. No paper figure, proof text, result, value, or layout is reproduced."
+      },
+      {
+        "title": "Simple Statistical Gradient-Following Algorithms for Connectionist Reinforcement Learning",
+        "url": "https://doi.org/10.1007/BF00992696",
+        "usage": "Used as the primary REINFORCE source for stochastic gradient-following updates based on sampled actions and reinforcement signals, including baseline-based variance reduction.",
+        "license": "The Springer article is copyrighted and no Creative Commons figure-reuse grant was identified. No source figure, prose, example, data, or layout is copied."
+      },
+      {
+        "title": "Reinforcement Learning: An Introduction, second edition",
+        "url": "https://www.incompleteideas.net/book/RLbook2020.pdf",
+        "usage": "Used as the authoritative textbook reference for the policy-gradient-with-baseline result: an action-independent state baseline leaves the expected update unchanged, while the state value yields the advantage form.",
+        "license": "The authors provide the book for online reading, but the PDF remains copyrighted and no permission to adapt its figures was assumed. No textbook figure, wording, example, or layout is reproduced."
+      },
+      {
+        "title": "OpenAI Spinning Up: Part 3, Intro to Policy Optimization",
+        "url": "https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html",
+        "usage": "Used as official technical documentation to cross-check the log-derivative derivation, expected-grad-log-prob identity, reward-to-go form, and action-independent baseline argument.",
+        "license": "The associated OpenAI Spinning Up repository is MIT licensed, but no documentation prose, equation image, code, or visual arrangement is copied. The shipped card is independently authored."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the local meaning of the product in the update. For a sampled action, the score term points in the direction that raises its log-probability. Multiplying by a positive advantage keeps that direction; multiplying by a negative advantage reverses it; a zero advantage contributes no policy update. The advantage compares observed return or an action-value estimate with an action-independent baseline, commonly V(s). Subtracting that baseline changes sample weights and can reduce variance, but its expected score-weighted contribution is zero. The visual states only this first-order gradient direction and does not claim that other actions' probabilities remain fixed under normalization."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant neighborhoods, then checked the theorem paper, original REINFORCE paper, authoritative textbook, and official implementation-oriented documentation before selecting an original semantic sign comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "policy-gradient-advantage-sign"
+    ],
+    "accessibility": "The figure uses a linked learning question, a labelled group, four semantic sections, and direct Return, Baseline, Advantage, and Update labels. Plus, zero, and minus signs and explicit increase/no-change/decrease wording carry the complete lesson without color. The established two-column card primitive has no fixed or minimum width and stacks below 640 pixels, preserving readable text at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}

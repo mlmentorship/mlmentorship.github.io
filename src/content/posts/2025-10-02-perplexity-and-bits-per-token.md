@@ -43,6 +43,31 @@ $$
 
 This is invariant to tokenization and is the proper cross-tokenizer comparison metric.
 
+<!-- visual:perplexity-tokenizer-denominator -->
+<figure class="learning-figure" aria-labelledby="perplexity-denominator-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="perplexity-denominator-title">How can the same encoded text have different bits per token?</p>
+	<div class="visual-grid--two" role="group" aria-label="Two tokenizations of the six-byte ASCII string sunset, each assigned five total bits of surprisal">
+		<section class="visual-panel" aria-labelledby="perplexity-two-token-title">
+			<h4 id="perplexity-two-token-title">Tokenizer A: 2 tokens</h4>
+			<p><code>[sun] [set]</code> with surprisals 3 + 2 bits</p>
+			<table class="cm-grid" aria-label="Metrics for the two-token segmentation">
+				<thead><tr><th scope="col">Total</th><th scope="col">BPT</th><th scope="col">BPB</th></tr></thead>
+				<tbody><tr><td><strong>5 bits</strong></td><td class="cm-selected"><strong>2.50</strong>5 / 2 tokens</td><td><strong>0.83</strong>5 / 6 bytes</td></tr></tbody>
+			</table>
+		</section>
+		<section class="visual-panel" aria-labelledby="perplexity-three-token-title">
+			<h4 id="perplexity-three-token-title">Tokenizer B: 3 tokens</h4>
+			<p><code>[s] [un] [set]</code> with surprisals 1 + 1 + 3 bits</p>
+			<table class="cm-grid" aria-label="Metrics for the three-token segmentation">
+				<thead><tr><th scope="col">Total</th><th scope="col">BPT</th><th scope="col">BPB</th></tr></thead>
+				<tbody><tr><td><strong>5 bits</strong></td><td class="cm-selected"><strong>1.67</strong>5 / 3 tokens</td><td><strong>0.83</strong>5 / 6 bytes</td></tr></tbody>
+			</table>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> both rows encode the same six UTF-8 bytes with the same five bits of total surprisal. BPT changes from 2.50 to 1.67 only because each tokenizer chooses a different denominator; BPB divides by the fixed byte count and stays 0.83. Real models need not assign equal total surprisal, but byte normalization makes their reported unit comparable.</figcaption>
+</figure>
+
 ## Typical numbers (for context)
 
 On a clean English text corpus:

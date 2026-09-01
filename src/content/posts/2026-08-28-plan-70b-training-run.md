@@ -131,6 +131,38 @@ This ZeRO-1 style estimate uses about 36.1 GB per GPU for model state. It leaves
 
 This may fit with activation checkpointing. If measured peak memory is safe, it avoids the parameter all-gathers required by full parameter sharding.
 
+<!-- visual:plan-70b-parallel-accounting -->
+<figure class="learning-figure" aria-labelledby="plan-70b-parallel-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="plan-70b-parallel-title">Which parallel axis divides model state, and which one multiplies the batch?</p>
+	<div class="visual-grid--two" role="group" aria-label="A 512-GPU layout with tensor parallel degree eight inside each of 64 nodes and data parallel degree 64 across nodes, followed by its memory and batch accounting">
+		<section class="visual-panel" aria-labelledby="plan-70b-ranks-title">
+			<h4 id="plan-70b-ranks-title">512 ranks = TP 8 × DP 64</h4>
+			<p>Each node is one tensor-sharded model replica; corresponding tensor ranks synchronize across nodes.</p>
+			<table class="cm-grid" aria-label="Tensor and data parallel rank roles">
+				<thead><tr><th scope="col">Axis</th><th scope="col">Placement</th><th scope="col">Data</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">TP = 8</th><td class="cm-selected"><strong>within node</strong>fast links</td><td><strong>same</strong>sequence</td></tr>
+					<tr><th scope="row">DP = 64</th><td><strong>across nodes</strong>64 replicas</td><td><strong>different</strong>sequences</td></tr>
+				</tbody>
+			</table>
+		</section>
+		<section class="visual-panel" aria-labelledby="plan-70b-ledger-title">
+			<h4 id="plan-70b-ledger-title">Apply the right divisor</h4>
+			<p>TP slices layer state. ZeRO-1 additionally slices Adam state over DP. Only DP creates extra data replicas.</p>
+			<table class="cm-grid" aria-label="Per-GPU model-state and global-batch accounting">
+				<thead><tr><th scope="col">Quantity</th><th scope="col">Divide or multiply by</th><th scope="col">Result</th></tr></thead>
+				<tbody>
+					<tr><th scope="row">Weights + gradients</th><td>÷ TP 8</td><td><strong>35 GB/GPU</strong></td></tr>
+					<tr><th scope="row">Adam moments</th><td>÷ TP 8 ÷ DP 64</td><td><strong>1.1 GB/GPU</strong></td></tr>
+					<tr><th scope="row">Tokens/step</th><td class="cm-selected">× DP 64, not TP</td><td><strong>4.194M</strong></td></tr>
+				</tbody>
+			</table>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> first form one eight-GPU tensor-parallel replica inside every node, then replicate that sharded model across 64 nodes. TP ranks cooperate on the same sequences, so the batch is <code>64 DP × 1 sequence × 8 accumulations × 8,192 tokens = 4,194,304</code>; multiplying by all 512 ranks would overcount it by eight.</figcaption>
+</figure>
+
 If activations still do not fit:
 
 1. reduce the local micro-batch;

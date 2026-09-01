@@ -40,6 +40,47 @@ On a VLIW-like simulator, instruction packing and dependencies add another ceili
 
 State one hypothesis and predicted direction before changing code. "Vectorize" is not a hypothesis. "Packing eight independent comparisons into one SIMD instruction should remove roughly seven scalar compare slots from each tree level, unless gathers dominate" is.
 
+<!-- visual:accelerator-critical-path-trace -->
+<figure class="learning-figure plot-panel" aria-labelledby="accelerator-trace-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="accelerator-trace-title">Which optimization actually shortens the dependent chain?</p>
+	<svg viewBox="0 0 360 390" role="img" aria-labelledby="accelerator-trace-svg-title accelerator-trace-svg-desc">
+		<title id="accelerator-trace-svg-title">Three accelerator traces compare removing off-path work with shortening the critical path</title>
+		<desc id="accelerator-trace-svg-desc">All rows use the same zero-to-twelve-cycle scale. In the baseline, a four-cycle load, four-cycle dependent compute operation, and four-cycle dependent store form a solid critical chain ending at cycle twelve. A dashed three-cycle helper overlaps the load and is not on that chain. Experiment A removes the helper, reducing instruction work but retaining the same twelve-cycle critical chain. Experiment B retains the helper but shortens the exposed load to two cycles, so dependent compute runs from cycles two to six and the store from six to ten, ending two cycles earlier.</desc>
+		<defs><marker id="accelerator-trace-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="viz-arrow-forward" d="M0 0L10 5L0 10Z"></path></marker></defs>
+		<text class="viz-axis-label" x="18" y="25">cycle</text>
+		<path class="viz-axis" d="M88 24H328"></path>
+		<path class="viz-gridline" d="M88 20V372 M128 20V372 M168 20V372 M208 20V372 M248 20V372 M288 20V372 M328 20V372"></path>
+		<text class="viz-label" x="88" y="15" text-anchor="middle">0</text><text class="viz-label" x="168" y="15" text-anchor="middle">4</text><text class="viz-label" x="248" y="15" text-anchor="middle">8</text><text class="viz-label" x="288" y="15" text-anchor="middle">10</text><text class="viz-label" x="328" y="15" text-anchor="middle">12</text>
+		<rect class="viz-plot-bg" x="8" y="35" width="340" height="94" rx="4"></rect>
+		<text class="viz-callout" x="18" y="53">Baseline</text><text class="viz-label" x="18" y="67">12 cycles</text>
+		<rect class="viz-node--focus" x="88" y="45" width="80" height="30" rx="3"></rect><text class="viz-callout" x="128" y="64" text-anchor="middle">load · 4</text>
+		<rect class="viz-node--focus" x="168" y="45" width="80" height="30" rx="3"></rect><text class="viz-callout" x="208" y="64" text-anchor="middle">compute · 4</text>
+		<rect class="viz-node--focus" x="248" y="45" width="80" height="30" rx="3"></rect><text class="viz-callout" x="288" y="64" text-anchor="middle">store · 4</text>
+		<path d="M158 40H178 M238 40H258" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#accelerator-trace-arrow)"></path>
+		<rect class="viz-node" x="88" y="88" width="60" height="25" rx="3" style="stroke-dasharray:5 3"></rect><text class="viz-label" x="118" y="104" text-anchor="middle">helper · 3</text><text class="viz-label" x="155" y="104">off-path</text>
+		<path class="viz-operating-guide" d="M328 37V121"></path><text class="viz-callout" x="326" y="124" text-anchor="end">end · 12</text>
+		<rect class="viz-plot-bg" x="8" y="140" width="340" height="94" rx="4"></rect>
+		<text class="viz-callout" x="18" y="158">A · less work</text><text class="viz-label" x="18" y="172">still 12 cycles</text>
+		<rect class="viz-node--focus" x="88" y="150" width="80" height="30" rx="3"></rect><text class="viz-callout" x="128" y="169" text-anchor="middle">load · 4</text>
+		<rect class="viz-node--focus" x="168" y="150" width="80" height="30" rx="3"></rect><text class="viz-callout" x="208" y="169" text-anchor="middle">compute · 4</text>
+		<rect class="viz-node--focus" x="248" y="150" width="80" height="30" rx="3"></rect><text class="viz-callout" x="288" y="169" text-anchor="middle">store · 4</text>
+		<path d="M158 145H178 M238 145H258" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#accelerator-trace-arrow)"></path>
+		<rect class="viz-node" x="88" y="193" width="60" height="25" rx="3" style="fill:none;stroke-dasharray:5 3"></rect><path d="M93 198L143 213M143 198L93 213" style="stroke:var(--viz-edge);stroke-width:1.5"></path><text class="viz-label" x="155" y="209">helper removed</text>
+		<path class="viz-operating-guide" d="M328 142V226"></path><text class="viz-callout" x="326" y="229" text-anchor="end">end · 12</text>
+		<rect class="viz-plot-bg" x="8" y="245" width="340" height="127" rx="4"></rect>
+		<text class="viz-callout" x="18" y="263">B · shorter chain</text><text class="viz-label" x="18" y="277">10 cycles</text>
+		<rect class="viz-node--input" x="88" y="282" width="40" height="30" rx="3" style="stroke-width:2"></rect><text class="viz-callout" x="108" y="301" text-anchor="middle">load · 2</text>
+		<rect class="viz-node--focus" x="128" y="282" width="80" height="30" rx="3"></rect><text class="viz-callout" x="168" y="301" text-anchor="middle">compute · 4</text>
+		<rect class="viz-node--focus" x="208" y="282" width="80" height="30" rx="3"></rect><text class="viz-callout" x="248" y="301" text-anchor="middle">store · 4</text>
+		<path d="M118 277H138 M198 277H218" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#accelerator-trace-arrow)"></path>
+		<rect class="viz-node" x="88" y="325" width="60" height="25" rx="3" style="stroke-dasharray:5 3"></rect><text class="viz-label" x="118" y="341" text-anchor="middle">helper · 3</text><text class="viz-label" x="155" y="341">still overlaps</text>
+		<path class="viz-operating-guide" d="M288 247V365"></path><text class="viz-callout" x="286" y="368" text-anchor="end">end · 10</text>
+		<text class="viz-axis-label" x="180" y="384" text-anchor="middle">solid + arrows = dependent chain · dashed = off-path</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> compare end markers before counting blocks. Removing the dashed helper lowers total work but leaves the solid 12-cycle load → compute → store chain untouched. Shortening the exposed load advances every dependent operation, so the same remaining work ends at cycle 10. The trace is an original synthetic example; the distinction between elapsed time and summed operation time is checked against the <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">NVIDIA Nsight Systems analysis guide</a>, with bottleneck classification informed by the <a href="https://doi.org/10.1145/1498765.1498785">Roofline model</a> and the <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX Scaling Book profiling guide</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "I would vectorize the loops, unroll them, use all cores, and reduce memory allocations."

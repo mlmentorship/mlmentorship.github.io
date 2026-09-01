@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "slug": "optimize-accelerator-workload",
+  "article": "src/content/posts/2026-07-11-optimize-accelerator-workload.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish reducing total instruction work from shortening the dependent chain that determines elapsed cycles in an accelerator trace.",
+  "mediumRationale": "A deterministic three-row trace is the smallest spatial explanation that lets readers compare the same cycle axis before and after two optimizations. Directly aligned end markers show why deleting off-path work leaves latency unchanged while shortening a dependency-bound load advances all downstream work.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a relationship graph can show dependencies but cannot align three measured schedules on one cycle scale precisely enough to compare elapsed time.",
+    "svg": "Selected because fixed geometry can encode operation duration, overlap, dependency order, and the unchanged or shortened end cycle in a compact responsive trace.",
+    "semanticHtml": "Rejected because a table could report 12 versus 12 versus 10 cycles, but it would make readers reconstruct overlap and the critical chain from text.",
+    "interaction": "Rejected because changing arbitrary operation durations would introduce controls and unsupported simulator assumptions before the stable lesson is understood.",
+    "paperReuse": "Rejected because the reviewed sources explain Roofline limits and profiler timelines but do not provide an article-specific before-and-after trace with reusable licensing and the required teaching comparison. No source figure, data, coordinates, wording, or visual layout is copied.",
+    "noVisual": "Rejected because the article's central follow-up asks why a 30% instruction-count reduction may produce no cycle reduction; prose states the answer but does not expose the off-path work and dependent chain simultaneously."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding LLM-training slide names throughput-oriented architecture choices but provides no execution trace or critical-path model."
+      },
+      {
+        "page": 108,
+        "insight": "The strongest direct match distinguishes compute and HBM-bandwidth bottlenecks through arithmetic intensity and lists utilization, I/O, and algorithmic levers; it does not show dependency depth or an execution timeline."
+      },
+      {
+        "page": 109,
+        "insight": "The immediate neighboring slide shows sequence packing as removal of padded work, a useful contrast to removing work that is not on the elapsed-time critical path."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide explains an optimization that reduces HBM traffic while preserving exact output and explicitly trades recomputation for less data movement."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide identifies a serial token dependency and a weight-loading bottleneck, then adds parallel verification work to reduce elapsed decoding cycles rather than merely minimizing operation count."
+      },
+      {
+        "page": 115,
+        "insight": "The stack summary maps each technique to the bottleneck it addresses, reinforcing that an optimization must target the current limiter."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for accelerator, GPU, SIMD, VLIW, scratchpad, roofline, arithmetic intensity, bandwidth, throughput, dependency, trace, and kernel terminology. Pages 107-115 were extracted as the complete neighborhood around the strongest direct match on page 108 and inspected page by page. Pages 108-110 and 113-115 provide related bottleneck examples, but no slide contains a cycle trace, execution-unit schedule, VLIW packing example, or critical-path comparison applicable to this article. No deck screenshot, wording, numeric example, or layout is reused.",
+    "license": "The local deck states no reuse license, and page 108 attributes an external social-media thread without establishing permission to republish either source. The deck is treated as review-only. The shipped trace, operation names, durations, and geometry are an original synthetic construction."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Roofline: An Insightful Visual Performance Model for Multicore Architectures",
+        "url": "https://doi.org/10.1145/1498765.1498785",
+        "usage": "Used as the primary source for bounding attainable performance by the active compute or memory ceiling and for diagnosing the limiting resource before optimizing.",
+        "license": "The ACM publication is copyrighted and no permissive figure-reuse license was identified. No paper figure, prose, benchmark, numeric result, or layout is reproduced."
+      },
+      {
+        "title": "How To Scale Your Model: Profiling Computation",
+        "url": "https://jax-ml.github.io/scaling-book/profiling/",
+        "usage": "Used as authoritative accelerator guidance that a trace viewer presents operations chronologically, while graph and memory views expose dependencies, compiled operations, and memory placement needed to explain timeline behavior.",
+        "license": "The JAX Scaling Book repository is Apache-2.0 licensed. No screenshot, diagram, prose, code, trace data, or page layout is reused; the source is cited only to verify the profiling workflow."
+      },
+      {
+        "title": "NVIDIA Nsight Systems Post-Collection Analysis Guide",
+        "url": "https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html",
+        "usage": "Used as official profiler documentation to verify that summed kernel or memory-operation time is not application wall time, supporting the distinction between aggregate work and exposed elapsed time.",
+        "license": "NVIDIA documentation is copyrighted and no permissive figure-reuse license was identified. No screenshot, report output, wording, example, or visual styling is copied."
+      }
+    ],
+    "notes": "The hardest mental model is that elapsed cycles follow the longest dependency-constrained schedule, not the sum of all issued instructions. The synthetic example fixes a 12-cycle baseline: a 4-cycle load, 4-cycle dependent compute block, and 4-cycle dependent store form the full critical chain, while a 3-cycle independent helper overlaps the load. Removing that helper reduces work but leaves the 12-cycle chain unchanged. Shortening the exposed load from four cycles to two advances compute and store by two cycles, ending at cycle 10. These values teach causality and are not measurements or speedup claims about a real device."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the full page 107-115 neighborhood, and checked the primary Roofline publication plus official JAX and NVIDIA profiler guidance before selecting an original synthetic critical-path trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "accelerator-critical-path-trace"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that states every operation duration, dependency, overlap, and outcome. Solid outlined blocks and arrows identify the critical chain; the independent helper uses a dashed outline and is directly labelled off-path, so no inference relies on color. A 360-unit viewBox uses established SVG text sizes without a minimum width, preserving readability at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}

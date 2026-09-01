@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "slug": "paged-attention",
+  "article": "src/content/posts/2025-08-13-paged-attention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace two logical KV caches through their block tables to scattered physical blocks, and identify why a shared prefix occupies one physical copy with two references.",
+  "mediumRationale": "A deterministic narrow SVG is the smallest medium that preserves three spatial relationships at once: contiguous logical order, non-contiguous physical placement, and two block-table entries converging on one shared block. Explicit mapping labels keep the lesson readable even when connector paths cross.",
+  "mediumComparison": {
+    "mermaid": "Rejected: automatic graph layout can show indirection, but it cannot reliably align both logical sequences and the indexed physical pool or keep repeated mappings stable at phone width.",
+    "svg": "Selected: fixed geometry makes logical order, scattered physical indices, free slots, private ownership, and shared reference counts simultaneously inspectable without runtime code.",
+    "semanticHtml": "Rejected: a table would provide strong mapping semantics but would make the physical holes and the many-to-one prefix mapping less immediate; the SVG still spells out every mapping and state in text.",
+    "interaction": "Rejected: changing block assignments or sequence lengths would add controls and hidden states without improving the single indirection-and-sharing invariant.",
+    "paperReuse": "Rejected: the PagedAttention paper contains closely related block-table figures, but its arXiv distribution does not establish a permissive figure-reuse grant. The shipped requests, physical indices, wording, geometry, and styling are independently authored.",
+    "noVisual": "Rejected: prose requires the reader to hold logical order, scattered allocation, and aliasing in memory at once. One aligned block-table schematic makes the lookup and shared-prefix invariant directly traceable."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide explains draft-token verification and the serial generation bottleneck. It supplies adjacent inference context but does not discuss KV-cache allocation or block tables."
+      },
+      {
+        "page": 114,
+        "insight": "The immediate predecessor covers mixed-precision training, datatype layouts, and loss scaling; it contains no serving-memory model."
+      },
+      {
+        "page": 115,
+        "insight": "The serving-stack summary names a vLLM-style paged KV cache and says fixed-size blocks avoid fragmentation across requests, but it does not show logical-to-physical translation, scattered placement, or shared references."
+      },
+      {
+        "page": 116,
+        "insight": "The following slide begins the re-scoring topic and contains no attention-serving or cache-management detail."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for PagedAttention, paged KV cache, KV cache, block table, virtual memory, vLLM, attention, and serving. Page 115 is the only slide that mentions a paged KV cache; pages 113-116 were then read page-by-page as its neighborhood. The relevant line is text-only and provides no reusable visual. No deck pixels, wording, layout, or examples are copied.",
+    "license": "The local deck states no general reuse license and includes attributed external material. It is treated as review-only; no screenshot, artwork, prose, coordinates, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+        "url": "https://arxiv.org/abs/2309.06180",
+        "usage": "Used as the primary systems source to verify fixed-size KV blocks, per-sequence logical-to-physical block tables, on-demand allocation, non-contiguous storage, reference-counted sharing, and copy-on-write for partially filled shared blocks.",
+        "license": "The arXiv record makes the paper publicly accessible but does not establish a permissive license for reusing its figures. No paper figure, prose, measurements, example indices, or layout is copied; the site visual is an original schematic."
+      },
+      {
+        "title": "vLLM stable documentation: Paged Attention",
+        "url": "https://docs.vllm.ai/en/stable/design/paged_attention/",
+        "usage": "Used as official implementation documentation to cross-check that the attention kernel resolves KV-cache storage through block indices rather than assuming one contiguous per-sequence tensor.",
+        "license": "The documentation is used only to verify public implementation semantics. No documentation prose, code, artwork, or layout is reproduced."
+      },
+      {
+        "title": "vLLM stable documentation: Automatic Prefix Caching",
+        "url": "https://docs.vllm.ai/en/stable/design/prefix_caching/",
+        "usage": "Used as official documentation to distinguish physical KV-block reuse for matching prefixes from recomputation and to confirm that cache blocks are identified and reused at block granularity.",
+        "license": "The documentation is cited for mechanism only. No documentation figure, prose, code, example, or visual treatment is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that paging does not reorder a request's tokens. Request A's logical blocks 0, 1, and 2 remain sequential while its block table maps them to scattered physical blocks 7, 1, and 5. Request B can map its matching logical prefix to the same physical blocks 7 and 1, whose reference counts become two, then map its divergent block to a private block. The illustrative indices are synthetic and make no performance claim. A writable partially filled shared block may require copy-on-write; the figure intentionally isolates the stable full-prefix mapping before that mutation."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the exact page 113-116 neighborhood, and checked the primary PagedAttention paper plus official vLLM implementation and prefix-caching documentation before selecting an original block-table schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "paged-attention-block-table-indirection"
+    ],
+    "accessibility": "The SVG has a linked title and complete description that states every logical-to-physical mapping, ownership state, and reference count. Mapping text, labels, double-use counts, solid occupied shapes, and dashed free slots make color redundant. The 360-pixel viewBox is designed for 390 CSS-pixel screens with no minimum width; established theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}

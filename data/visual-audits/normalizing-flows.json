@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "slug": "normalizing-flows",
+  "article": "src/content/posts/2025-10-26-normalizing-flows.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one probability-mass patch through two invertible flow layers and explain why local area expansion divides its density while the layers' log-determinants add.",
+  "mediumRationale": "A narrow deterministic SVG is the smallest medium that can preserve exact patch-area ratios across layers, pair each spatial expansion with its reciprocal density change, and show sampling and density evaluation as opposite traversals of the same bijection.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout can show forward and inverse stages but cannot guarantee geometrically exact 1:2:3 patch areas, which are the evidence for the density ratios.",
+    "svg": "Selected because fixed coordinates make the successive rectangles exactly A, 2A, and 3A while direct labels connect determinants 2 and 3/2 to densities p0, p0/2, and p0/3. A stacked 360-unit viewBox avoids horizontal scrolling at 390 CSS pixels.",
+    "semanticHtml": "Rejected because cards or a table can state the determinant arithmetic but cannot make local volume expansion and conserved probability mass spatially apparent.",
+    "interaction": "Rejected because manipulating scale factors would add controls and state without improving the single invariant needed here: probability mass stays fixed while density changes inversely with local volume.",
+    "paperReuse": "Rejected because the reviewed papers contain broader architectures and transformation figures whose publication access does not establish permissive artwork adaptation rights. No source figure, data, coordinates, wording, or layout is copied.",
+    "noVisual": "Rejected because the equations state the reciprocal determinant factor but leave the hardest step implicit: density is mass per local volume, so stretching the same mass over more area must lower the density."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 74,
+        "insight": "The Generative Models divider begins the only relevant deck section but contains no normalizing-flow mechanism."
+      },
+      {
+        "page": 75,
+        "insight": "The section defines a generative model as approximating the natural data distribution; it supplies context but no transformation or density correction."
+      },
+      {
+        "page": 78,
+        "insight": "The modeling slide contrasts non-parametric and parametric approximations to a joint distribution, motivating density models without discussing invertibility."
+      },
+      {
+        "page": 79,
+        "insight": "The parametric-model taxonomy includes a transformations category and names GANs, plus fully observed and latent-variable models, but does not mention normalizing flows or change of variables."
+      },
+      {
+        "page": 80,
+        "insight": "The likelihood and inference slide explains parameterized density functions and maximum-likelihood fitting; it does not show how a transformed density receives a Jacobian correction."
+      },
+      {
+        "page": 82,
+        "insight": "The neighboring VAE slide begins a latent-variable alternative and emphasizes approximate posterior inference rather than an exact invertible map."
+      },
+      {
+        "page": 83,
+        "insight": "The variational-inference slide derives an ELBO around an approximate posterior, clarifying the contrast with the article's exact flow likelihood."
+      },
+      {
+        "page": 84,
+        "insight": "The VAE continuation covers neural parameterization, reparameterized sampling, amortized inference, and SGD, with no local volume or determinant explanation."
+      },
+      {
+        "page": 87,
+        "insight": "The summary diagram labels GAN as a transformation model, VAE as a latent-variable model, and LSTM as autoregressive. It confirms that the deck's generative-model neighborhood has no normalizing-flow treatment."
+      },
+      {
+        "page": 88,
+        "insight": "The section references list VAE and variational-inference sources but no normalizing-flow source, ending the relevant neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for normalizing flow, flow, change of variables, Jacobian, invertible, generative model, VAE, GAN, and transformation terms. No page contains a normalizing-flow or change-of-variables treatment. Pages 74-88 were extracted and read as the complete generative-model neighborhood; the listed pages capture its topical boundaries and substantive adjacent material. The visual is an original mathematical construction and reuses no deck pixels, prose, equations, coordinates, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Density Estimation Using Real NVP",
+        "url": "https://arxiv.org/abs/1605.08803",
+        "usage": "Used as the primary Real NVP source to verify exact sampling, exact log-likelihood, invertible transformations, tractable Jacobian determinants, and affine coupling layers.",
+        "license": "The arXiv record provides access to the authors' manuscript but was not treated as a permissive license to adapt its figures. No paper artwork, examples, data, prose, notation layout, or architecture diagram is reused."
+      },
+      {
+        "title": "Variational Inference with Normalizing Flows",
+        "url": "https://proceedings.mlr.press/v37/rezende15.html",
+        "usage": "Used as a primary source to cross-check the construction of complex densities by composing invertible transformations of a simple initial density.",
+        "license": "PMLR provides the paper openly, but open access was not treated as permission to adapt figures. No source figure, transformation sequence, wording, values, or visual arrangement is copied."
+      },
+      {
+        "title": "Normalizing Flows for Probabilistic Modeling and Inference",
+        "url": "https://jmlr.org/papers/v22/19-1028.html",
+        "usage": "Used as an authoritative review to verify the change-of-variables density rule, composition of bijections, log-determinant accumulation, and the forward-versus-inverse computational trade-off.",
+        "license": "JMLR makes the review freely available, but no permissive figure-adaptation grant was relied upon. The implementation cites concepts only and reproduces no figure, prose, examples, coordinates, or layout."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why a determinant appears in a probability density at all. A bijection preserves the probability mass associated with a small patch, but if a layer doubles that patch's local area, the same mass occupies twice the volume and its density halves. For composed layers, area multipliers multiply while their logarithms add. The original schematic uses two simple anisotropic scaling maps solely to make exact area ratios visually checkable; it does not claim that practical flows are globally linear."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the full pages 74-88 generative-model neighborhood, then checked two primary papers and an authoritative review before selecting an original local-volume SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "flow-local-volume-density"
+    ],
+    "accessibility": "The SVG has a linked title and description that state every patch area, layer determinant, density, direction, and final log-density calculation. Stage numbers, dimensions, formulas, solid forward arrows, and dashed inverse arrows carry all meaning without color. Its 360-unit-wide stacked viewBox has no minimum width and reuses established semantic visual tokens for light and dark contrast; labelled outlines and text remain meaningful in grayscale and print."
+  }
+}
