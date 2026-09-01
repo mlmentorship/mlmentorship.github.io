@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "slug": "self-attention-vs-cross-attention",
+  "article": "src/content/posts/2026-05-07-self-attention-vs-cross-attention.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish self-attention from cross-attention by tracing which sequence supplies Q, K, and V and predicting the resulting attention-matrix shape.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can keep source-to-projection arrows aligned with square and rectangular score matrices, making routing and shape inspectable together at phone width.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show where X and Y enter but cannot express the 3-by-3 versus 2-by-3 matrix shapes precisely without awkward labels.",
+    "svg": "Selected because fixed source nodes, projection arrows, and discrete matrix cells expose both sequence ownership and the resulting score dimensions.",
+    "semanticHtml": "Rejected because a comparison table could list Q/K/V sources and shapes but would not spatially connect each source to its projections and output rows.",
+    "interaction": "Rejected because changing sequence lengths would add controls before the stable routing rule is learned; two fixed examples are sufficient.",
+    "paperReuse": "Rejected because the original Transformer architecture figures are much denser than this narrow comparison and the arXiv non-exclusive distribution license does not grant general figure reuse. No source figure, coordinates, prose, or layout is copied.",
+    "noVisual": "Rejected because the formulas state the source difference but require readers to mentally route three projections and infer why one score matrix is square while the other can be rectangular."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 99,
+        "insight": "The preceding text-representation slide contrasts encoder-style and decoder-style pretraining but contains no Q/K/V routing."
+      },
+      {
+        "page": 100,
+        "insight": "The memory-network slide distinguishes an embedded query from context memories, providing conceptual background but not transformer self- versus cross-attention."
+      },
+      {
+        "page": 101,
+        "insight": "The central transformer slide states that decoder self-attention reads previous decoder output while its next attention sublayer takes queries from the decoder and keys and values from encoder output. This is the most directly relevant deck page."
+      },
+      {
+        "page": 102,
+        "insight": "The adjacent BERT and SAN slide names self-attention and cross-attention for separate sentence representations but does not trace Q/K/V ownership or matrix shape."
+      },
+      {
+        "page": 103,
+        "insight": "The following transformer-family slide discusses multi-head attention, causal language modeling, scaling, and normalization without clarifying cross-attention routing."
+      },
+      {
+        "page": 108,
+        "insight": "A later optimization slide gives standard self-attention with Q, K, and V all shaped by the same n and emphasizes its square n-by-n score matrix; it contains no cross-attention comparison."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for self-attention, cross-attention, encoder-decoder, query, key, and value references. Pages 99-103 were extracted as the complete local transformer neighborhood, and page 108 was inspected as the later explicit self-attention formula. Page 101 is the direct architectural match; page 102 has a separate SAN mention. Neither isolates source ownership and matrix dimensions in a narrow mobile-readable comparison.",
+    "license": "The local deck states no reuse license and includes dense externally derived diagrams. It is treated as review-only. No screenshot, artwork, wording, coordinates, or layout is republished; the shipped nodes, matrices, labels, and composition are original."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Primary source for verifying that encoder-decoder attention takes queries from the preceding decoder sublayer and keys and values from encoder output, while self-attention takes all three from the same place.",
+        "license": "The arXiv record links the arXiv perpetual non-exclusive distribution license, which does not grant general third-party figure reuse. No paper figure, prose, equation layout, data, or visual arrangement is adapted."
+      },
+      {
+        "title": "PyTorch MultiheadAttention documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.MultiheadAttention.html",
+        "usage": "Official implementation documentation used to verify separate query, key, and value inputs and output dimensions, including target length L and source length S.",
+        "license": "PyTorch source and documentation are distributed under the BSD 3-Clause license. The documentation is cited for API semantics only; no code, prose, example, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that self- and cross-attention use the same computation but route tensors from different sequence owners. The original schematic uses X with three tokens for self-attention, so QK-transpose has three query rows and three key columns. Cross-attention uses two X queries and three Y key-value pairs, producing two-by-three scores and two output rows. This also makes clear that K and V must share the source-length axis. Source review prompted two related precision fixes: decoder-only prompt RAG usually uses self-attention rather than a separate retrieval cross-attention path, and cross-attention masking is not inherently causal merely because the query side is autoregressive."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the transformer neighborhood and later self-attention formula, checked the original Transformer paper and official PyTorch documentation with their licensing terms, corrected two routing-adjacent claims, and reviewed the original matrix geometry."
+  },
+  "implementation": {
+    "visualIds": [
+      "attention-source-routing"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description naming each sequence owner, token count, projection source, score shape, and output-row rule. Direct X/Y and Q/K/V labels, arrows, panel headings, and discrete cell counts carry all meaning without color. The 360-unit viewBox has no minimum width and uses established 11-pixel SVG text primitives for readability at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette and keep the figure together."
+  }
+}
