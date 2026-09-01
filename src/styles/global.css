@@ -715,6 +715,7 @@ mark {
 .coding-trace-tree text,
 .coding-trace-heap text,
 .coding-trace-trie text { fill: var(--c-text-soft); font-family: var(--font-mono); font-size: 11px; text-anchor: middle; }
+.coding-trace-graph text { font-size: 12px; }
 .coding-trace-node-state { fill: var(--c-muted) !important; font-size: 9px !important; }
 .coding-trace-tree { display: grid; gap: .42rem; }
 .coding-trace-tree-level { display: grid; grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr)); gap: .35rem; position: relative; }
