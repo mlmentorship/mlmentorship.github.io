@@ -17,7 +17,7 @@ const draft = visual('Binary-search the first speed whose ceiling-division total
   ),
   frame(
     'Speed 3 is too slow',
-    'At speed 3, hours are 1+2+3+4=10. Since 10 > 8, speeds 1..3 are infeasible; set left=3+1=4 and next test speed 5.',
+    'At speed 3, hours are 1+2+3+4=10. Since 10 > 8, speeds 1..3 are infeasible; set left=3+1=4.',
     bounds(1, 3, 6, { tested: 'k=3: ceil(3/3)+ceil(6/3)+ceil(7/3)+ceil(11/3)=1+2+3+4=10', decision: '10 > 8: left = 4' }),
     'discard-through-three',
   ),
