@@ -42,6 +42,33 @@ The exact form and exponents depend on the model family, data, tokenizer, traini
 
 For a dense transformer, training compute is roughly proportional to $N D$. This makes model size and token count compete for the same budget.
 
+<!-- visual:scaling-fixed-compute-allocation -->
+<figure class="learning-figure plot-panel" aria-labelledby="scaling-allocation-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="scaling-allocation-title">Why does one fixed compute budget have an interior best allocation?</p>
+	<svg viewBox="0 0 360 300" role="img" aria-labelledby="scaling-allocation-svg-title scaling-allocation-svg-desc">
+		<title id="scaling-allocation-svg-title">Validation loss across parameter and token allocations at fixed compute</title>
+		<desc id="scaling-allocation-svg-desc">A U-shaped qualitative curve shows validation loss falling as allocation moves away from a small capacity-limited model trained on many tokens, reaching a compute-optimal allocation in the middle, then rising when a large model receives too few training tokens and is undertrained. The horizontal axis keeps compute approximately equal to a constant times parameters times tokens.</desc>
+		<rect class="viz-plot-bg" x="43" y="24" width="287" height="198" rx="3"></rect>
+		<path class="viz-gridline" d="M43 73H330 M43 122H330 M43 171H330"></path>
+		<path class="viz-axis" d="M43 24V222H330"></path>
+		<path class="viz-roc-curve" d="M55 52 C82 132 116 190 180 190 C244 190 283 133 324 52"></path>
+		<path class="viz-operating-guide" d="M180 190V222"></path>
+		<circle class="viz-operating-point" cx="180" cy="190" r="5"></circle>
+		<text class="viz-callout" x="59" y="47">capacity-limited</text>
+		<text class="viz-label" x="59" y="62">too few parameters</text>
+		<text class="viz-callout" x="238" y="47">undertrained</text>
+		<text class="viz-label" x="238" y="62">too few tokens</text>
+		<text class="viz-callout" x="180" y="180" text-anchor="middle">lowest predicted loss</text>
+		<text class="viz-label" x="180" y="206" text-anchor="middle">compute-optimal allocation</text>
+		<text class="viz-axis-label" x="43" y="244">smaller N / more tokens</text>
+		<text class="viz-axis-label" x="330" y="244" text-anchor="end">larger N / fewer tokens</text>
+		<text class="viz-label" x="186" y="269" text-anchor="middle">allocation along fixed C ~ k N D</text>
+		<text class="viz-axis-label" transform="translate(15 151) rotate(-90)">validation loss</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> move right while holding training compute fixed: parameter count rises, so token count must fall. Too far left, insufficient capacity dominates loss; too far right, insufficient training data dominates. Fit the interior minimum for the current model, data, and recipe rather than copying a universal ratio. This original qualitative curve was checked against <a href="https://arxiv.org/abs/2001.08361">Kaplan et al.'s scaling-law study</a> and <a href="https://arxiv.org/abs/2203.15556">Hoffmann et al.'s compute-optimal study</a>; it reproduces no paper data or figure.</figcaption>
+</figure>
+
 ## Compute-optimal allocation
 
 A model that is too large for its token budget is undertrained. A model that is too small may use many tokens with limited capacity.
