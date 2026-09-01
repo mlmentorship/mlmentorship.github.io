@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "slug": "svm-and-kernels",
+  "article": "src/content/posts/2025-11-16-svm-and-kernels.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Identify which training points can determine an SVM decision boundary: points on or inside the margin have nonzero dual weight, while correctly classified points beyond the margin have zero weight and can be removed without changing the fitted boundary.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align the decision boundary, both margin rails, geometric point locations, support-vector rings, and zero-versus-nonzero dual coefficients in one inspectable construction.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout cannot preserve the metric geometry that distinguishes beyond-margin, on-margin, and inside-margin points.",
+    "svg": "Selected because fixed coordinates can place points relative to the two margin rails and redundantly encode support status with rings, labels, and alpha values.",
+    "semanticHtml": "Rejected because a table can list KKT cases but cannot make distance to the boundary and the identity of the nearest constraining points immediately visible.",
+    "interaction": "Rejected because dragging points or refitting a classifier adds controls and hidden states without improving the first invariant: only on- or inside-margin points survive in the decision function.",
+    "paperReuse": "Rejected because standard SVM figures in reviewed sources do not have clearly established adaptation permission needed here, and the objective does not require paper-specific data. No source artwork, point coordinates, labels, values, or layout is reused.",
+    "noVisual": "Rejected because the prose states both the margin constraints and sparse dual representation, but readers must mentally connect geometric location, hinge activity, nonzero alpha, and influence on the final boundary."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 20,
+        "insight": "The preceding algebraic-view slide frames algorithms as linear algebra and introduces nearby kernel terminology, but contains no SVM margin or support-vector geometry."
+      },
+      {
+        "page": 21,
+        "insight": "The linear-classifier and kernel-trick slide gives the kernelized SVM decision expression and explicitly says classification only evaluates kernels against support vectors because other examples do not contribute."
+      },
+      {
+        "page": 22,
+        "insight": "The neighboring Kernel PCA slide applies kernel substitution to covariance-style structure, but does not discuss margins, hinge activity, or sparse SVM coefficients."
+      },
+      {
+        "page": 35,
+        "insight": "The preceding classification-loss slide covers NLL, softmax stability, and logistic regression, establishing loss context without SVM support-vector geometry."
+      },
+      {
+        "page": 36,
+        "insight": "The surrogate-loss slide states that hinge loss penalizes points within the margin or on the wrong side and calls the violating points support vectors. It supplies the closest deck link between margin location and active training examples."
+      },
+      {
+        "page": 37,
+        "insight": "The following evaluation section leaves optimization losses for classifier metrics and adds no explanation of which samples determine an SVM boundary."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for support vector, SVM, kernel trick, hinge loss, maximum margin, hard margin, and soft margin. Pages 21 and 36 are the only substantive SVM matches; their immediate conceptual neighborhoods on pages 20-22 and 35-37 were read as boundaries. The deck has no complete diagram connecting point position, alpha_i, and prediction-time sparsity. No slide image, wording, equation layout, code, point placement, or visual composition is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Tutorial on Support Vector Machines for Pattern Recognition",
+        "url": "https://link.springer.com/article/10.1023/A:1009715923555",
+        "usage": "Used as an authoritative peer-reviewed tutorial for maximum-margin geometry, the dual expansion in training examples, complementary-slackness conditions, and the definition of support vectors by nonzero multipliers.",
+        "license": "The Springer publisher record does not establish a permissive license for adapting figures. No figure, prose, equations, examples, coordinates, or layout is reproduced."
+      },
+      {
+        "title": "scikit-learn User Guide: Support Vector Machines",
+        "url": "https://scikit-learn.org/stable/modules/svm.html",
+        "usage": "Used as official implementation documentation to verify the soft-margin primal, dual coefficient bounds, kernelized decision function, and that only samples within the margin have nonzero coefficients in the prediction sum.",
+        "license": "scikit-learn documentation and examples are BSD-3-Clause licensed. The shipped figure remains an independent construction; no documentation image, code, generated dataset, point coordinates, wording, or layout is adapted."
+      }
+    ],
+    "notes": "The original schematic uses a vertical decision boundary f(x) = 0 with margin rails f(x) = -1 and f(x) = +1. Two ringed points sit on the rails and one ringed point lies inside the margin; all are labeled alpha_i > 0. Unringed points lie correctly classified beyond their rail and are labeled alpha_i = 0. This illustrates the soft-margin prediction representation, not a claim that every arbitrary visual arrangement is the optimum of an unstated dataset. For separable hard-margin SVMs, support vectors lie on the rails; under soft margin, points inside them can also be support vectors."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, separated its support-vector lesson from the site's existing kernel-shortcut visual, indexed all 214 deck pages and inspected both exact SVM neighborhoods, then checked an authoritative SVM tutorial and official scikit-learn formulation before selecting an original margin schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "svm-support-vectors-set-boundary"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Support vectors use outer rings and explicit alpha_i > 0 labels, while inactive points lack rings and carry alpha_i = 0 labels; class signs, line styles, positions, and direct annotations make color redundant. A single 360-unit viewBox has no fixed or minimum width and scales at 390 CSS pixels. Established theme variables preserve dark-mode contrast, and shared print rules produce a light high-contrast rendering."
+  }
+}
