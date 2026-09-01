@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "two-tower-retrieval",
+  "article": "src/content/posts/2025-08-23-two-tower-retrieval.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace which half of two-tower inference is paid offline for the whole catalog and which half is paid once per request, explaining why retrieval can search millions of items without running the item tower millions of times.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align the offline catalog path and online request path around one persistent ANN index. Direct stage labels and distinct solid and dashed routes make the asymmetry inspectable without interaction or deployment-specific measurements.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart could name both paths, but automatic layout would make it harder to align their shared ANN index and emphasize that stored item vectors cross the offline-to-online boundary.",
+    "svg": "Selected: fixed geometry can place offline work above online work, reuse one visibly persistent index, and show that the online request runs only the query tower before ANN lookup.",
+    "semanticHtml": "Rejected: cards or a table could list offline and online steps, but would weaken the shared-index handoff that creates the serving advantage.",
+    "interaction": "Rejected: toggling training, refresh, or serving states would hide one path at a time and add state without improving the single lifecycle distinction.",
+    "paperReuse": "Rejected: the reviewed sources contain broader, product-specific architectures, and public availability is not treated as permission to adapt their figures. No source artwork, layout, wording, values, or examples are reused.",
+    "noVisual": "Rejected: the prose states that item embeddings can be precomputed, but readers still have to mentally separate model training, catalog refresh, and the work performed on every request."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The preceding page is the recommender-systems section title and provides no retrieval mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide describes dot-product matching between user and item embeddings and ANN search over bucketed or compressed item vectors, but it does not distinguish offline item encoding from online query encoding."
+      },
+      {
+        "page": 131,
+        "insight": "The following content-based and hybrid recommender slide discusses item similarity and combining recommenders, but adds no two-tower serving lifecycle."
+      },
+      {
+        "page": 135,
+        "insight": "The personalized-search problem formulation explicitly divides the system into candidate generation and ranking, establishing the retrieval stage's role."
+      },
+      {
+        "page": 136,
+        "insight": "The neighboring system-overview slide is a divider with no readable mechanism or deployment detail."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide concatenates query, user, and item representations for joint scoring, clarifying that this later interaction-heavy stage is distinct from candidate generation."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for two-tower, dual encoder, retrieval, candidate generation, nearest neighbor, sampled softmax, and semantic matching. Pages 129-131 and 135-140 were then extracted and read as the complete relevant neighborhoods. The deck connects embeddings to ANN and candidate generation to ranking, but contains no two-tower diagram and no offline-item versus online-query serving split. No deck artwork, prose, values, or layout is copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Neural Networks for YouTube Recommendations",
+        "url": "https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/",
+        "usage": "Used as a primary industrial source to verify the two-stage candidate-generation then ranking architecture and the need to score a very large corpus efficiently.",
+        "license": "The Google Research publication record provides public access but no permissive figure-adaptation grant was identified. No paper figure, architecture layout, result, prose, or example is copied."
+      },
+      {
+        "title": "Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations",
+        "url": "https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/",
+        "usage": "Used as the primary source to verify separate query and item towers, in-batch negatives, sampling bias correction, and deployment for retrieval from tens of millions of videos.",
+        "license": "The publication record does not establish a permissive license for adapting paper figures. No source figure, frequency estimator, empirical result, wording, or visual composition is reused."
+      },
+      {
+        "title": "TensorFlow Recommenders: Basic retrieval",
+        "url": "https://www.tensorflow.org/recommenders/examples/basic_retrieval",
+        "usage": "Used as official framework documentation to verify equal-width query and candidate representations, dot-product affinity, a retrieval-first pipeline, and export to an ANN index for efficient serving.",
+        "license": "TensorFlow documentation is available under CC BY 4.0 except as otherwise noted, but no text, code, dataset example, or artwork is adapted. The SVG is independently authored."
+      },
+      {
+        "title": "Implement two-tower retrieval for large-scale candidate generation",
+        "url": "https://cloud.google.com/architecture/implement-two-tower-retrieval-large-scale-candidate-generation",
+        "usage": "Used as official architecture guidance to verify that the candidate tower batch-computes catalog embeddings into an ANN index while the query tower is deployed for online embedding and lookup.",
+        "license": "Google Cloud documentation is used only to verify the serving split. Although site documentation is generally licensed under CC BY 4.0 except where noted, no source diagram, product topology, prose, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the operational asymmetry created after joint training: item-tower inference is amortized across catalog refreshes, while each request runs one query-tower inference and searches stored item vectors. The original schematic uses generic labels and makes no empirical latency, recall, corpus-size, or throughput claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant neighborhoods, then checked two primary industrial papers and official TensorFlow and Google Cloud guidance before selecting an original offline-versus-online serving diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "two-tower-offline-online-split"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Offline and online lanes are explicitly named; every box names its data or operation; solid arrows carry request-time flow while the dashed refresh arrow carries batch updates, so meaning does not depend on color. The compact 360-unit viewBox has no fixed or minimum width and uses established visual tokens for dark mode. At narrow widths it scales within the article column with direct labels, and shared print rules provide a light high-contrast palette and keep the figure together."
+  }
+}
