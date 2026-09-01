@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "slug": "real-time-personalization",
+  "article": "src/content/posts/2026-04-28-real-time-personalization.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Classify each feature by its required freshness and trace batch, streaming, and request-time values into one feature vector without forcing every signal onto the most expensive clock.",
+  "mediumRationale": "A compact three-lane Mermaid is the smallest useful explanation because the lesson is a convergence of differently timed dataflows, not a quantitative plot. It keeps the daily profile, seconds-old session state, and current request context separate until one bounded-latency assembly step, making the freshness-versus-cost decision visible without duplicating the feature-store article's historical-versus-latest retrieval diagram.",
+  "mediumComparison": {
+    "mermaid": "Selected because the mental model is a labelled many-to-one dataflow across three clocks. Distinct lane headings, direct freshness labels, storage shape, and arrows preserve the timing and convergence without relying on color, while established wide and tall markers support constrained screens, themes, and print.",
+    "svg": "Rejected because no measured scale, plotted magnitude, or fixed geometry carries the lesson. Hand-positioning the same lanes and arrows would add maintenance cost without improving technical precision.",
+    "semanticHtml": "Rejected because a table could compare freshness tiers and a card grid could stack on mobile, but neither would show as directly that persisted batch and streaming state join live context inside one request latency budget.",
+    "interaction": "Rejected because adjustable update intervals would imply an unsupported cost or quality model. The article needs the stable architectural choice—assign each feature the least-fresh clock its product value permits—not a speculative simulator.",
+    "paperReuse": "Rejected because the reviewed sources contain product-specific architecture and timing figures that are denser than this article requires. Public access was not treated as permission to copy artwork, examples, coordinates, prose, or visual arrangement; the implementation is an original citation-only synthesis.",
+    "noVisual": "Rejected because the prose lists batch, streaming, and request-time features separately but leaves the reader to mentally compose how values produced on different clocks can coexist in one online prediction without making the whole stack real-time."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 130,
+        "insight": "The recommender-systems slide covers user-item interactions, ranking, cold start, feedback loops, context, and real-time matrix-factorization updates, but does not separate feature freshness tiers."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid recommender slide combines recommendation signals at ranking time, but it does not identify batch, streaming, or request-time clocks."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search divider begins the closest application-specific neighborhood and has no architecture content."
+      },
+      {
+        "page": 134,
+        "insight": "The personalized instant-search problem requires a response for every keystroke within 100 milliseconds, directly motivating a bounded serving path."
+      },
+      {
+        "page": 135,
+        "insight": "The search formulation separates candidate generation from ranking and names temporal context, trends, and past user behavior, but does not assign those signals to freshness tiers."
+      },
+      {
+        "page": 136,
+        "insight": "The system-overview slide is blank in the text layer and provides no inspectable feature-pipeline explanation."
+      },
+      {
+        "page": 137,
+        "insight": "The data slide distinguishes knowledge-graph, interaction-history, and successful-session datasets, establishing differently sourced signals without explaining their online update cadence."
+      },
+      {
+        "page": 138,
+        "insight": "The personalized-recommender slide derives a model from accumulated user-item history but does not show live feature refresh."
+      },
+      {
+        "page": 139,
+        "insight": "The adjacent content-based recommender slide derives item representations from a knowledge graph, a comparatively slow-changing source, without connecting it to serving."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage ranker concatenates query embeddings with user and item representations, the closest example of current request context converging with stored state."
+      },
+      {
+        "page": 141,
+        "insight": "The following experimentation slide moves to offline and online metrics and adds no freshness or serving mechanism."
+      },
+      {
+        "page": 145,
+        "insight": "The final personalized-search slide fuses search and recommendation streams through re-ranking and voting, but still does not distinguish feature update clocks."
+      },
+      {
+        "page": 146,
+        "insight": "The computer-vision divider closes the personalized-search neighborhood."
+      },
+      {
+        "page": 160,
+        "insight": "The ML-design timing divider begins the production-system neighborhood without explanatory content."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks about feature repositories, data availability lag, fresh-data cold starts, and latency requirements, but provides no multi-cadence serving flow."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly asks for feature-freshness sensitivity analysis, missing-value handling, cold start, latency, and retraining cadence, directly supporting per-feature freshness SLAs."
+      },
+      {
+        "page": 163,
+        "insight": "The worked feed example separates training and live data, asks whether changes occur within ten minutes or ten hours, and places relevance evaluation at app launch, but does not show how the clocks converge."
+      },
+      {
+        "page": 164,
+        "insight": "The neighboring feed slide covers model choice and experimentation and adds no online data path."
+      },
+      {
+        "page": 165,
+        "insight": "The project-setup slide asks when predictions are consumed, how fast they must be, and how much personalization is needed, reinforcing that real-time is a product contract rather than one architecture."
+      },
+      {
+        "page": 166,
+        "insight": "The data-pipeline slide asks how often new data arrives and whether feedback improves the system online or periodically, but does not allocate features among those choices."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide moves from data into algorithms and training scale and contains no feature-freshness mechanism."
+      },
+      {
+        "page": 168,
+        "insight": "The serving slide asks whether models update per event, how often personalized state changes, and what inference latency costs, but conflates model update cadence with feature freshness."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of ML slide names freshness requirements, silent failures, training-serving skew, serving-feature logging, code reuse, and skew measurement, supplying the closest reliability guidance without a three-clock architecture."
+      },
+      {
+        "page": 170,
+        "insight": "The algorithms-and-data-structures divider ends the production-system neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for real-time, personalization, feature store, training-serving skew, streaming, recommendation, freshness, latency, and update terms. Pages 130-146 and 160-170 were read as the complete matching recommender, personalized-search, and ML-production neighborhoods, including title and boundary slides. Pages 140, 162, 163, 168, and 169 are the strongest partial matches, but the deck contains no diagram showing batch, streaming, and request-time features converging under one serving SLA. No deck image, wording, values, or layout is reused.",
+    "license": "The local deck states no license and contains externally sourced material with inconsistent attribution. It is treated as review-only; the shipped Mermaid uses original wording and arrangement."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as authoritative production guidance to verify that freshness requirements should be known and monitored, serving-time features should be logged for training, training and serving code should be reused, and training-serving skew should be measured.",
+        "license": "Google Developers page content is CC BY 4.0 except where otherwise noted, with separate terms for code samples and media. No text, image, code, or layout is adapted; citation alone supports the reliability claims."
+      },
+      {
+        "title": "Feast: Feature Serving and Model Inference",
+        "url": "https://docs.feast.dev/getting-started/architecture/model-inference",
+        "usage": "Used as official feature-store documentation to verify that online features may come from batch, streaming, or request data sources and that online inference, precomputed predictions, and cached predictions make different freshness and latency trade-offs.",
+        "license": "Feast documentation source is distributed in its Apache License 2.0 repository. No documentation diagram, code sample, prose, example, or layout is copied; the visual is an independently authored synthesis."
+      },
+      {
+        "title": "Apache Flink: Timely Stream Processing",
+        "url": "https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/",
+        "usage": "Used as official stream-processing documentation to verify the distinction between event time and processing time, the latency cost of waiting for out-of-order events, and why freshness must be monitored rather than inferred from successful processing.",
+        "license": "Apache Flink documentation is provided under the Apache License 2.0. No source figure, example, wording, code, or arrangement is reused."
+      },
+      {
+        "title": "QuickUpdate: A Real-Time Personalization System for Large-Scale Recommendation Models",
+        "url": "https://www.usenix.org/conference/nsdi24/presentation/matam",
+        "usage": "Used as a primary systems paper to cross-check that freshness can apply separately to model parameters and features, that full updates are expensive at recommendation scale, and that systems deliberately trade freshness against communication and serving cost.",
+        "license": "USENIX provides open access, but authors retain copyright and no permissive third-party figure-reuse license was established. No paper figure, results, data, prose, or visual structure is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a real-time prediction can combine signals produced on different clocks. Stable user history and item embeddings may be refreshed in batch, recent session behavior may be aggregated by a stream processor, and query, device, and time context may exist only on the request. The correct design assigns each feature the least-fresh update path that still meets measured product quality, materializes reusable state before the request, and keeps only current context and bounded lookups on the critical path. This avoids paying streaming cost for every feature while preserving a fresh personalized response."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed the full 214-page deck and inspected the complete recommender, personalized-search, and ML-production neighborhoods, compared the existing feature-store visual to avoid duplication, and checked official Google, Feast, and Flink guidance plus the primary QuickUpdate systems paper before selecting an original three-clock serving flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "personalization-three-feature-clocks"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description naming all three feature clocks, their example signals, the stored versus request-time paths, and the bounded assembly step. Lane headings, direct freshness labels, a cylinder for persisted online state, and labelled arrows carry meaning without color. Established wide and tall markers preserve readable labels through horizontal scrolling at 390 CSS pixels, existing theme tokens provide light and dark contrast, and print removes the width floor and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the lesson if client-side rendering is unavailable."
+  }
+}

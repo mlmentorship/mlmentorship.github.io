@@ -22,6 +22,47 @@ The L4 candidate jumps to model architecture. The L6 candidate first asks how fr
 
 Each has very different infrastructure costs and use cases. Scope first.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Assign each feature the least-fresh clock that meets its product need, then trace all three clocks into one online prediction.</p>
+
+<!-- visual:personalization-three-feature-clocks -->
+```mermaid
+flowchart TB
+	accTitle: Three feature clocks converge in one real-time personalization request
+	accDescr: A batch clock updates stable user history, item embeddings, and long-window counts every hour or day. A streaming clock aggregates recent clicks, session activity, and short-window counts within seconds or minutes. Both paths materialize reusable values in online feature state before a request arrives. A request clock computes the current query, device, location, and time only when the request arrives. The serving path performs a bounded lookup of stored state, combines it with current context, runs model inference, and returns a personalized ranking within the request latency budget. The assembled vector also reports feature timestamps to freshness monitoring. Real-time therefore describes the response, not a requirement that every feature use the fastest update path.
+
+	subgraph BATCH["BATCH CLOCK · HOURS TO DAYS"]
+		B["Stable history<br/>item embeddings · long-window counts"] --> BC["Scheduled computation<br/>refresh only as quality requires"]
+	end
+
+	subgraph STREAM["STREAM CLOCK · SECONDS TO MINUTES"]
+		S["Recent events<br/>clicks · session activity"] --> SC["Windowed aggregation<br/>event-time state"]
+	end
+
+	BC -->|"materialize versioned values"| O[("ONLINE FEATURE STATE<br/>latest batch + streaming values")]
+	SC -->|"push fresh values"| O
+
+	subgraph REQUEST["REQUEST CLOCK · NOW"]
+		R["Live request<br/>query · device · location · time"] --> RC["Compute current context"]
+	end
+
+	O -->|"bounded lookup"| A{"ASSEMBLE ONE FEATURE VECTOR<br/>values + timestamps"}
+	RC ==> A
+	A ==> I["MODEL INFERENCE<br/>within request latency budget"]
+	I ==> P["PERSONALIZED RANKING"]
+	A -.->|"lag and null-rate signals"| M["FRESHNESS MONITOR<br/>alert before stale state is silent"]
+
+	class B,S,R viz-input
+	class BC,SC,I viz-neutral
+	class O viz-state
+	class A viz-focus
+	class P,M viz-output
+	class B viz-wide
+	class B viz-tall
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the two left clocks into stored online state before following the request clock. Stable history can be hours old, session activity seconds old, and query context current; they become “real-time” together only when the bounded serving path assembles them for this request. Promote a feature to streaming only when measured quality needs that freshness, and carry timestamps so a delayed pipeline cannot fail silently. Original synthesis checked against <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google's Rules of ML</a>, the <a href="https://docs.feast.dev/getting-started/architecture/model-inference">Feast serving contracts</a>, and <a href="https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/">Flink's time model</a>.</p>
+
 ## What an L5 answer sounds like
 
 > "Architecture, in three pieces:
