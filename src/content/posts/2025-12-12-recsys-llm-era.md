@@ -29,7 +29,7 @@ LLMs don't replace any of this. They augment specific stages.
 
 <!-- visual:recsys-llm-bounded-augmentation -->
 ```mermaid
-flowchart LR
+flowchart TB
   accTitle: LLMs augment bounded stages around a recommender backbone
   accDescr: A production request can pass through an LLM intent helper before fast retrieval. Item text can separately pass through an offline LLM content encoder into stored item vectors and features. Fast two-tower and approximate-nearest-neighbor retrieval narrows the catalog, then a learned ranker combines behavioral and content evidence. Only the small top-N result may go through an optional LLM reranker and explanation step before the final slate; the learned ranker can also serve the slate directly when latency requires it. A separate dashed research branch maps intent to semantic item identifiers through generative retrieval and is not part of the default production path.
 

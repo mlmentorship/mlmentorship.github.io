@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "reward-shaping",
+  "article": "src/content/posts/2026-07-10-reward-shaping.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See why potential-based shaping can give dense progress feedback without making a waypoint loop profitable, while an arbitrary positive event bonus can be farmed and change the task.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align the same start, waypoint, goal, and return path under two shaping rules; attach signed rewards to each transition; and make cancellation versus accumulation directly inspectable. A worked finite-episode example exposes the telescoping invariant without requiring interaction or suggesting a paper-specific empirical result.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a state graph could show the two routes, but automatic layout would not reliably align identical states across the safe and unsafe cases or keep transition-level arithmetic and path totals legible.",
+    "svg": "Selected: fixed responsive geometry preserves the repeated state layout, signed shaping terms, return edge, and arithmetic comparison, so readers can verify that a potential increase is reversed when the agent backtracks.",
+    "semanticHtml": "Rejected: a transition table could verify each number but would weaken the spatial fact that the unsafe bonus is attached only to entering a waypoint, whereas the potential difference scores both forward and backward motion.",
+    "interaction": "Rejected: sliders for potentials, discount, bonus size, or lap count would add hidden states and edge cases. One exact counterexample and one exact invariant teach the transferable distinction more clearly.",
+    "paperReuse": "Rejected: the foundational and episodic papers contain theorem statements and their own MDP examples, but no candidate figure matches this article-specific paired path. The publication records do not provide a permissive figure-reuse license, so no source artwork, values, wording, or layout is copied.",
+    "noVisual": "Rejected: the prose states the potential-difference formula and policy invariance, but readers must otherwise derive why positive progress feedback does not create a repeatable reward source. The aligned paths make cancellation and reward farming visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 153,
+        "insight": "The preceding SHAP explainability slide establishes the boundary before the reinforcement-learning section and contains no sequential reward or shaping mechanism."
+      },
+      {
+        "page": 154,
+        "insight": "The Reinforcement Learning divider starts the deck's only substantive RL neighborhood but supplies no reward definition, credit-assignment treatment, or figure."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide contrasts supervised conditional likelihood with expected reward and iid samples with trajectories. It provides broad objective context but does not discuss sparse rewards, shaping, potentials, or policy invariance."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide describes policy gradients, discounted episode returns, and a CartPole implementation. It uses environment rewards as given and contains no auxiliary shaping term, reward-hacking check, or terminal-potential condition."
+      },
+      {
+        "page": 157,
+        "insight": "The following Past projects divider ends the RL teaching neighborhood, confirming that the adjacent sequence contains no reward-shaping treatment."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 physical pages for reward, reward shaping, reinforcement learning, potential, policy invariance, temporal difference, credit assignment, MDP, and Bellman. The only concentrated reinforcement-learning sequence is pages 154-156, which was read together with boundary pages 153 and 157. Other potential matches concern mathematical or engineering issues, and Bellman matches on pages 190-191 concern the unrelated Bellman-Ford graph algorithm. The deck states no general reuse license and embeds externally sourced material, so it was treated as review-only; no deck screenshot, prose, code, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Policy Invariance Under Reward Transformations: Theory and Application to Reward Shaping",
+        "url": "https://www.cs.utexas.edu/~shivaram/readings/b2hd-NgHR1999.html",
+        "usage": "Used as the bibliographic record for the foundational ICML 1999 paper by Ng, Harada, and Russell and its result that potential-difference shaping is the policy-invariant transition-reward construction under the stated MDP assumptions.",
+        "license": "The record identifies a Morgan Kaufmann conference publication and provides no Creative Commons or other permissive artwork license. No paper figure, proof wording, example, numerical value, or layout is reproduced."
+      },
+      {
+        "title": "Reinforcement Learning: An Introduction, second edition",
+        "url": "https://incompleteideas.net/book/the-book-2nd.html",
+        "usage": "Used as the authoritative textbook source for discounted return, value functions, episodic tasks, and the relationship between potential-based shaping and value-function initialization.",
+        "license": "The authors provide an official full PDF, but the book is copyrighted by MIT Press and the official page states no permissive figure-adaptation license. No textbook figure, example, prose, value, or layout is reused."
+      },
+      {
+        "title": "Reward Shaping in Episodic Reinforcement Learning",
+        "url": "https://www.ifaamas.org/Proceedings/aamas2017/pdfs/p565.pdf",
+        "usage": "Used as a primary paper to verify the finite-episode telescoping return, the action-dependent terminal boundary term, the need to set the potential to zero where a trajectory terminates, and the failure mode where positive area rewards are profitable to revisit if departures are not penalized.",
+        "license": "The AAMAS proceedings PDF is publicly accessible but states no permissive figure-reuse license. No source figure, MDP, reward value, wording, equation rendering, or layout is copied."
+      },
+      {
+        "title": "Specification gaming: the flip side of AI ingenuity",
+        "url": "https://deepmind.google/blog/specification-gaming-the-flip-side-of-ai-ingenuity/",
+        "usage": "Used as authoritative safety guidance to cross-check that high measured reward can represent exploitation of a misspecified proxy rather than successful completion of the intended task.",
+        "license": "Google DeepMind retains rights in the article and its examples. The source is used only for the specification-gaming distinction; no prose, image, example, or page structure is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how dense shaping feedback can coexist with an unchanged task. For discounted returns, summing F_t = gamma Phi(s_{t+1}) minus Phi(s_t), with each F_t itself weighted by gamma^t in the return, cancels every intermediate potential and leaves only minus Phi(s_0) plus gamma^T Phi(s_T). The original worked finite-episode example sets gamma to 1 and terminal potential to zero. Start, waypoint, and goal have potentials -2, -1, and 0. Moving forward receives shaping +1 at each step; moving from the waypoint back to start receives -1, so a complete backtrack lap is -1 + 1 = 0. The goal path has original rewards 0 and 10 and shaped rewards 1 and 11, shifting every fixed-start goal trajectory by the same constant +2. By contrast, an arbitrary +1 bonus paid whenever the waypoint is entered has no compensating departure term, so every return lap can add another +1 without completing the task. Values and geometry are original and qualitative; the example does not claim that potential shaping solves misspecified base rewards."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the complete RL neighborhood, then checked the foundational policy-invariance record, the authoritative Sutton and Barto textbook, a primary episodic-shaping analysis, and DeepMind specification-gaming guidance before selecting an original paired path."
+  },
+  "implementation": {
+    "visualIds": [
+      "potential-shaping-cancels-backtracking"
+    ],
+    "accessibility": "The SVG has a linked title and complete description containing every state potential, transition reward, path total, and loop total. Both panels reuse identical positions, while direct SAFE POTENTIAL DIFFERENCE and UNSAFE EVENT BONUS headings, signed edge labels, solid goal arrows, a dashed backtrack arrow, and explicit zero versus positive lap totals carry the lesson without color. The 360-unit viewBox uses established plot-panel and visual-node primitives with no minimum width for 390 CSS-pixel readability; repository theme variables preserve dark-mode contrast and shared print rules provide a light high-contrast palette."
+  }
+}
