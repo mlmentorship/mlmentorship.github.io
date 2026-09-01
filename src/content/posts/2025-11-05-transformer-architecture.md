@@ -25,6 +25,68 @@ x = x + FFN(LayerNorm(x))         # mix across features
 
 Stack L of these. Add an embedding layer at the bottom and an output projection at the top. That's it.
 
+**Learning objective:** distinguish attention's cross-position communication from the FFN's independent, per-position feature transformation while tracing the unchanged token-by-feature tensor shape through a pre-norm block.
+
+<!-- visual:transformer-two-mixing-axes -->
+<figure class="learning-figure plot-panel" aria-labelledby="transformer-mixing-title">
+	<p class="visual-kicker">One tensor, two dependency patterns</p>
+	<p class="visual-title" id="transformer-mixing-title">Which dimension does each transformer sublayer connect?</p>
+	<svg viewBox="0 0 360 420" role="img" aria-labelledby="transformer-mixing-svg-title transformer-mixing-svg-desc">
+		<title id="transformer-mixing-svg-title">Attention connects token positions while the feed-forward network transforms each token independently</title>
+		<desc id="transformer-mixing-svg-desc">The input is a token-by-feature tensor with three token rows and four feature columns. In stage one, arrows from token rows one, two, and three converge on the updated representation of token two, showing that self-attention can gather information across positions. In stage two, three separate horizontal paths apply the same feed-forward network to each token row, with no path between rows, showing independent feature transformation at every position. Both sublayers preserve the token-by-feature shape and add their updates through pre-norm residual connections.</desc>
+		<defs>
+			<marker id="transformer-mixing-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" style="fill:var(--viz-edge)"></path></marker>
+			<marker id="transformer-mixing-focus-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
+		</defs>
+		<rect class="viz-plot-bg" x="8" y="30" width="344" height="176" rx="5"></rect>
+		<text class="viz-axis-label" x="14" y="18">1 · ATTENTION COMMUNICATES ACROSS TOKEN POSITIONS</text>
+		<text class="viz-label" x="22" y="49">input rows</text>
+		<text class="viz-label" x="262" y="49">updated token 2</text>
+		<g aria-label="Three input token rows, each with four feature cells">
+			<rect class="viz-node viz-node--input" x="22" y="60" width="118" height="30" rx="3"></rect>
+			<path d="M51.5 60V90M81 60V90M110.5 60V90" class="viz-gridline"></path>
+			<rect class="viz-node viz-node--focus" x="22" y="106" width="118" height="30" rx="3"></rect>
+			<path d="M51.5 106V136M81 106V136M110.5 106V136" class="viz-gridline"></path>
+			<rect class="viz-node viz-node--input" x="22" y="152" width="118" height="30" rx="3"></rect>
+			<path d="M51.5 152V182M81 152V182M110.5 152V182" class="viz-gridline"></path>
+			<text class="viz-callout" x="10" y="79">t₁</text>
+			<text class="viz-callout" x="10" y="125">t₂</text>
+			<text class="viz-callout" x="10" y="171">t₃</text>
+		</g>
+		<path d="M140 75C190 75 199 108 247 118M140 121H247M140 167C190 167 199 134 247 124" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#transformer-mixing-focus-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="249" y="106" width="90" height="30" rx="3"></rect>
+		<path d="M271.5 106V136M294 106V136M316.5 106V136" class="viz-gridline"></path>
+		<text class="viz-callout" x="294" y="157" text-anchor="middle">token 2 can use all rows</text>
+		<text class="viz-label" x="180" y="194" text-anchor="middle">shape stays T × d; attention returns an update for every token row</text>
+		<rect class="viz-plot-bg" x="8" y="228" width="344" height="140" rx="5"></rect>
+		<text class="viz-axis-label" x="14" y="218">2 · THE FFN TRANSFORMS FEATURES WITHIN EACH TOKEN</text>
+		<text class="viz-label" x="20" y="247">one row at a time</text>
+		<text class="viz-label" x="253" y="247">same T × d shape</text>
+		<g aria-label="Three isolated token paths through the same feed-forward network">
+			<rect class="viz-node viz-node--input" x="20" y="258" width="76" height="24" rx="3"></rect>
+			<rect class="viz-node viz-node--input" x="20" y="295" width="76" height="24" rx="3"></rect>
+			<rect class="viz-node viz-node--input" x="20" y="332" width="76" height="24" rx="3"></rect>
+			<path d="M96 270H128M96 307H128M96 344H128" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;marker-end:url(#transformer-mixing-arrow)"></path>
+			<rect class="viz-node viz-node--focus" x="130" y="256" width="92" height="28" rx="3"></rect>
+			<rect class="viz-node viz-node--focus" x="130" y="293" width="92" height="28" rx="3"></rect>
+			<rect class="viz-node viz-node--focus" x="130" y="330" width="92" height="28" rx="3"></rect>
+			<text class="viz-callout" x="176" y="274" text-anchor="middle">same FFN</text>
+			<text class="viz-callout" x="176" y="311" text-anchor="middle">same FFN</text>
+			<text class="viz-callout" x="176" y="348" text-anchor="middle">same FFN</text>
+			<path d="M222 270H250M222 307H250M222 344H250" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;marker-end:url(#transformer-mixing-arrow)"></path>
+			<rect class="viz-node viz-node--output" x="252" y="258" width="76" height="24" rx="3"></rect>
+			<rect class="viz-node viz-node--output" x="252" y="295" width="76" height="24" rx="3"></rect>
+			<rect class="viz-node viz-node--output" x="252" y="332" width="76" height="24" rx="3"></rect>
+			<text class="viz-callout" x="10" y="274">t₁</text>
+			<text class="viz-callout" x="10" y="311">t₂</text>
+			<text class="viz-callout" x="10" y="348">t₃</text>
+		</g>
+		<text class="viz-label" x="180" y="384" text-anchor="middle">no row-to-row path: each position is processed independently</text>
+		<text class="viz-callout" x="180" y="405" text-anchor="middle">x′ = x + Attention(LN(x))  →  x″ = x′ + FFN(LN(x′))</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> hold the <code>T × d</code> tensor shape fixed. Attention lets each token row gather context from other rows; then the same FFN transforms the features inside each row independently. Each sublayer contributes an update through its own residual addition. The primary communication roles, not every internal projection, are shown. Original schematic checked against <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. (2017)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">PyTorch encoder-layer documentation</a>.</figcaption>
+</figure>
+
 The two information-mixing operations:
 - **Attention**: a learned, content-dependent weighted sum across positions. The weights come from a (query, key) dot product.
 - **FFN**: a position-wise MLP, typically `Linear → activation (GELU/SwiGLU) → Linear`. Same weights applied at every position.

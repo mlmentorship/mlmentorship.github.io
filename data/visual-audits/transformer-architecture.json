@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "slug": "transformer-architecture",
+  "article": "src/content/posts/2025-11-05-transformer-architecture.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish the two complementary mixing operations in a transformer block: attention communicates across token positions, while the position-wise FFN transforms features independently within each token row.",
+  "mediumRationale": "A compact deterministic SVG can hold the same token-by-feature tensor beside two different dependency patterns. Direct row labels, feature labels, cross-row attention paths, isolated FFN row boxes, and the two residual equations expose the complementary spatial roles without implying that the tensor changes shape.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can show LayerNorm, attention, addition, LayerNorm, FFN, and addition, but automatic layout does not clearly distinguish communication between token rows from independent within-row feature transforms.",
+    "svg": "Selected: fixed tensor geometry can align identical token rows across both panels, draw cross-position paths for attention, fence each FFN row separately, and retain the residual equations in one phone-width figure.",
+    "semanticHtml": "Rejected: a table could state which axis each operation mixes, but it would not make cross-row communication versus row-wise independence immediately spatial.",
+    "interaction": "Rejected: selecting tokens or features would add controls and hidden states to a static architectural invariant that is clearer when both dependency patterns remain visible together.",
+    "paperReuse": "Rejected: the reviewed sources use broad encoder-decoder or sublayer diagrams, and no permissive reuse grant was established for the paper artwork. None isolates this article's token-axis versus feature-axis mental model.",
+    "noVisual": "Rejected: the prose names both operations but requires readers to rotate mentally between positions and features while also preserving the unchanged token-by-feature tensor shape."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 100,
+        "insight": "The preceding recurrent-network slide contrasts sequential LSTM and GRU state flow with attention-like memory networks, providing the architecture boundary before transformers."
+      },
+      {
+        "page": 101,
+        "insight": "The main transformer slide combines the original encoder-decoder stack, multi-head and scaled dot-product attention expansions, residual Add-and-Norm blocks, and decoder prose; it shows operation order but not the complementary tensor axes mixed by attention and the FFN."
+      },
+      {
+        "page": 102,
+        "insight": "The neighboring BERT slide shifts to masked-language-model objectives and applications, with no explanation of attention-versus-FFN dependency structure."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer survey repeats multi-head attention, residual, LayerNorm, and feed-forward components in a dense collage and says the FFN projects features up and back down, but does not contrast cross-position communication with per-position feature mixing."
+      },
+      {
+        "page": 104,
+        "insight": "The following GPT-X slide moves from architecture to scaling, instruction tuning, in-context learning, and RLHF, closing the immediate transformer-architecture neighborhood."
+      },
+      {
+        "page": 107,
+        "insight": "The later LLM-training slide lists modern changes including non-parametric LayerNorm, SwiGLU, RoPE, and removed biases, but provides no block topology or mixing-axis visual."
+      },
+      {
+        "page": 108,
+        "insight": "The adjacent optimization slide gives the standard attention equation and its quadratic sequence-length costs, reinforcing cross-position interaction but omitting the complementary position-wise FFN."
+      }
+    ],
+    "notes": "The complete 214-page Basic_ML_CS_concepts deck was text-indexed page by page for transformer, self-attention, multi-head attention, positional encoding, residual, LayerNorm, and feed-forward references. Pages 100-104 were rendered and inspected as the complete architecture neighborhood; pages 107-108 were rendered for modern-component and attention-cost context. The deck's relevant slides are dense composites containing externally sourced figures and do not isolate the requested mixing-axis lesson. No image, wording, coordinates, data, or layout from the deck is reused.",
+    "license": "The local deck states no general reuse license and embeds externally attributed or linked diagrams. It is treated as review-only; the implementation is independently authored."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "usage": "Used as the primary source to verify that each layer contains a multi-head self-attention sublayer and a position-wise feed-forward network, with residual connections around each sublayer, and that the same FFN is applied separately and identically at every position.",
+        "license": "The arXiv record provides public access under arXiv's non-exclusive distribution terms, not a clear permissive grant to republish its figures. No figure, prose, equation layout, data, or visual arrangement is copied."
+      },
+      {
+        "title": "Dive into Deep Learning: The Transformer Architecture",
+        "url": "https://d2l.ai/chapter_attention-mechanisms-and-transformers/transformer.html",
+        "usage": "Used as an authoritative open textbook to cross-check the token-by-feature tensor interpretation, self-attention's sequence-wide contextualization, and the position-wise FFN's independent transformation of each sequence position.",
+        "license": "The textbook is licensed CC BY-SA 4.0, but no text, code, or figure is adapted. The new visual is an independent construction, so the textbook's share-alike terms are not relied upon."
+      },
+      {
+        "title": "PyTorch TransformerEncoderLayer documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html",
+        "usage": "Used as official implementation documentation to cross-check the self-attention-plus-feed-forward composition and norm_first behavior for the article's pre-norm equations.",
+        "license": "No documentation code, prose, or artwork is copied; API semantics are cited only as an implementation cross-check."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that a block alternates two dependency patterns over one [tokens, features] tensor. Self-attention lets a token representation incorporate information from other token positions; the position-wise FFN then applies the same learned feature transformation independently to each token. The visual deliberately says each operation's primary communication role rather than claiming attention performs no feature projections. Its generic three-token, four-feature geometry is original and carries no empirical values."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed all 214 deck pages and rendered the exact transformer neighborhood plus modern follow-up slides, then checked the primary Transformer paper, an authoritative open textbook, and official PyTorch documentation before selecting an original mixing-axis schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "transformer-two-mixing-axes"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Numbered panels, token-row labels, feature-column labels, explicit cross-token arrows, separate same-weights FFN row boxes, operation names, and residual equations communicate the distinction without color. A 360-unit viewBox with no minimum width scales to 390 CSS pixels; established theme variables preserve light and dark contrast, and shared print rules provide a light high-contrast palette and keep the figure together."
+  }
+}
