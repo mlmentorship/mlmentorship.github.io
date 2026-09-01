@@ -68,7 +68,7 @@ A familiar distribution with wrong support is already wrong. A Gaussian model ca
 			<text class="viz-node-label" x="266" y="214">Binomial(5, p)</text>
 			<text class="viz-node-value" x="266" y="237">success count</text>
 			<rect class="viz-plot-bg" x="12" y="298" width="336" height="280" rx="4"></rect>
-			<text class="viz-callout" x="24" y="322">B · Time process: independent events, constant rate λ</text>
+			<text class="viz-callout" x="24" y="322">B · Events: independent, constant rate λ</text>
 			<path class="viz-axis" d="M38 372H322"></path>
 			<path class="viz-operating-guide" d="M54 354V390 M306 354V390"></path>
 			<circle class="viz-operating-point" cx="103" cy="372" r="6"></circle>
