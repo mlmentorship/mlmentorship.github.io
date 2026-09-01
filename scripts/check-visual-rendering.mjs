@@ -35,6 +35,7 @@ if (slugs.length === 0 || new Set(slugs).size !== slugs.length) {
 
 const baseUrl = option('base-url', 'http://127.0.0.1:8123').replace(/\/$/, '');
 const outputDir = resolve(root, option('output', 'scratch/visual-render-review'));
+const allFrames = process.argv.includes('--all-frames');
 const auditsDir = join(root, 'data', 'visual-audits');
 const auditedEntries = slugs.map((slug) => {
   const auditPath = join(auditsDir, `${slug}.json`);
@@ -526,6 +527,91 @@ try {
         });
         const prefix = `${mode.name}--${entry.slug}--${visualId}`;
         writeFileSync(join(outputDir, `${prefix}.png`), Buffer.from(screenshot.data, 'base64'));
+
+        if (allFrames && mode.media === 'screen') {
+          const frameCountEvaluation = await cdp.call('Runtime.evaluate', {
+            expression: `document.querySelector(${JSON.stringify(`[data-coding-slug="${entry.slug}"]`)})?.querySelectorAll('[data-coding-frame-button]').length ?? 0`,
+            returnByValue: true,
+          });
+          const frameCount = frameCountEvaluation.result.value;
+          details.frameCaptures = [];
+          for (let frameIndex = 0; frameIndex < frameCount; frameIndex += 1) {
+            const transitionEvaluation = await cdp.call('Runtime.evaluate', {
+              expression: `(() => new Promise((resolve) => {
+                const visual = document.querySelector(${JSON.stringify(`[data-coding-slug="${entry.slug}"]`)});
+                visual.querySelectorAll('[data-coding-frame-button]')[${frameIndex}].click();
+                requestAnimationFrame(() => requestAnimationFrame(() => resolve({
+                  activeFrame: Number(visual.dataset.activeFrame),
+                  animationCount: visual.getAnimations({ subtree: true }).filter((animation) => animation.playState === 'running').length,
+                })));
+              }))()`,
+              returnByValue: true,
+              awaitPromise: true,
+            });
+            if (transitionEvaluation.exceptionDetails) {
+              throw new Error(transitionEvaluation.exceptionDetails.exception?.description ?? transitionEvaluation.exceptionDetails.text);
+            }
+            const transition = transitionEvaluation.result.value;
+            if (transition.activeFrame !== frameIndex) throw new Error(`${label}/frame-${frameIndex}: direct selection activated frame ${transition.activeFrame}`);
+
+            if (frameIndex > 0 && transition.animationCount > 0) {
+              const motionScreenshot = await cdp.call('Page.captureScreenshot', {
+                format: 'png',
+                captureBeyondViewport: true,
+                clip: { ...details.captureRect, scale: 1 },
+              });
+              writeFileSync(join(outputDir, `${prefix}--frame-${String(frameIndex + 1).padStart(3, '0')}--motion.png`), Buffer.from(motionScreenshot.data, 'base64'));
+            }
+            await delay(frameIndex > 0 ? 440 : 20);
+
+            const frameEvaluation = await cdp.call('Runtime.evaluate', {
+              expression: `(() => {
+                const visual = document.querySelector(${JSON.stringify(`[data-coding-slug="${entry.slug}"]`)});
+                const figure = visual.closest('figure.learning-figure');
+                const frames = [...visual.querySelectorAll('[data-coding-frame]')];
+                const visibleFrames = frames.filter((frame) => !frame.hidden && getComputedStyle(frame).display !== 'none');
+                const rect = figure.getBoundingClientRect();
+                const renderedTextSizes = [...visibleFrames[0].querySelectorAll('svg')].flatMap((svg) => {
+                  const viewBoxWidth = svg.viewBox.baseVal.width;
+                  const renderedWidth = svg.getBoundingClientRect().width;
+                  if (!viewBoxWidth || !renderedWidth) return [];
+                  return [...svg.querySelectorAll('text')].filter((text) => text.textContent.trim()).map((text) =>
+                    Number.parseFloat(getComputedStyle(text).fontSize) * renderedWidth / viewBoxWidth
+                  ).filter(Number.isFinite);
+                });
+                const motionKeys = [...visibleFrames[0].querySelectorAll('[data-motion-key]')].map((element) => element.dataset.motionKey);
+                return {
+                  activeFrame: Number(visual.dataset.activeFrame),
+                  visibleFrames: visibleFrames.length,
+                  pageWidth: document.documentElement.scrollWidth,
+                  innerWidth,
+                  figureFitsViewport: rect.left >= -0.5 && rect.right <= innerWidth + 0.5,
+                  minRenderedText: renderedTextSizes.length ? Math.min(...renderedTextSizes) : null,
+                  duplicateMotionKeys: motionKeys.filter((key, index) => motionKeys.indexOf(key) !== index),
+                  captureRect: { x: rect.left + scrollX, y: rect.top + scrollY, width: rect.width, height: rect.height },
+                };
+              })()`,
+              returnByValue: true,
+            });
+            if (frameEvaluation.exceptionDetails) {
+              throw new Error(frameEvaluation.exceptionDetails.exception?.description ?? frameEvaluation.exceptionDetails.text);
+            }
+            const frameDetails = frameEvaluation.result.value;
+            const frameLabel = `${label}/frame-${frameIndex}`;
+            if (frameDetails.activeFrame !== frameIndex || frameDetails.visibleFrames !== 1) throw new Error(`${frameLabel} is not the sole active frame`);
+            if (frameDetails.pageWidth > frameDetails.innerWidth + 1 || !frameDetails.figureFitsViewport) throw new Error(`${frameLabel} creates horizontal overflow`);
+            if (mode.mobile && frameDetails.minRenderedText !== null && frameDetails.minRenderedText < 8) throw new Error(`${frameLabel} renders text at ${frameDetails.minRenderedText.toFixed(2)}px`);
+            if (frameDetails.duplicateMotionKeys.length > 0) throw new Error(`${frameLabel} duplicates motion keys: ${[...new Set(frameDetails.duplicateMotionKeys)].join(', ')}`);
+            const frameScreenshot = await cdp.call('Page.captureScreenshot', {
+              format: 'png',
+              captureBeyondViewport: true,
+              clip: { ...frameDetails.captureRect, scale: 1 },
+            });
+            const frameFile = `${prefix}--frame-${String(frameIndex + 1).padStart(3, '0')}.png`;
+            writeFileSync(join(outputDir, frameFile), Buffer.from(frameScreenshot.data, 'base64'));
+            details.frameCaptures.push({ frameIndex, file: frameFile, animationCount: transition.animationCount, ...frameDetails });
+          }
+        }
 
         if (hasVerticalScroll) {
           const verticalEndEvaluation = await cdp.call('Runtime.evaluate', {

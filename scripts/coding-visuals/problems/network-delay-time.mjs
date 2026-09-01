@@ -2,48 +2,50 @@ import { defineVisual, frame, graph, visual } from '../primitives.mjs';
 
 const nodes = ['1', '2', '3', '4'];
 const edges = ['1 -1-> 2', '1 -4-> 3', '2 -2-> 3', '2 -6-> 4', '3 -1-> 4'];
+const positions = { 1: { x: 58, y: 115 }, 2: { x: 190, y: 52 }, 3: { x: 190, y: 178 }, 4: { x: 410, y: 115 } };
+const state = (extra) => graph(nodes, edges, { positions, edgeLabelMode: 'weight', ...extra });
 
 const draft = visual('Finalize shortest signal times by always popping the cheapest pending path.', [
   frame(
     'Initialize the source path',
     'For start=1, the min-heap contains only (distance 0, node 1); no node has a finalized distance yet.',
-    graph(nodes, edges, { start: '1', frontier: ['(0,1)'], visited: [], input: 'n=4, start=1' }),
+    state({ start: '1', frontier: ['(0,1)'], visited: [], input: 'n=4, start=1' }),
     'initialize-source',
   ),
   frame(
     'Finalize node 1 and relax its edges',
     'Pop (0,1), finalize distance[1]=0, then push (0+1,2)=(1,2) and (0+4,3)=(4,3).',
-    graph(nodes, edges, { start: '1', frontier: ['(1,2)', '(4,3)'], visited: ['1:0'], relaxation: '1->2 gives 1; 1->3 gives 4' }),
+    state({ start: '1', frontier: ['(1,2)', '(4,3)'], visited: ['1:0'], relaxation: '1->2 gives 1; 1->3 gives 4' }),
     'finalize-one',
   ),
   frame(
     'Finalize node 2',
     'Pop (1,2), finalize distance[2]=1, and push (1+2,3)=(3,3) plus (1+6,4)=(7,4).',
-    graph(nodes, edges, { start: '2', frontier: ['(3,3)', '(4,3)', '(7,4)'], visited: ['1:0', '2:1'], relaxation: '2->3 gives 3; 2->4 gives 7' }),
+    state({ start: '2', frontier: ['(3,3)', '(4,3)', '(7,4)'], visited: ['1:0', '2:1'], relaxation: '2->3 gives 3; 2->4 gives 7' }),
     'finalize-two',
   ),
   frame(
     'Improve the route to node 4',
     'Pop (3,3), finalize distance[3]=3, then edge 3->4 pushes (3+1,4)=(4,4), cheaper than the pending (7,4).',
-    graph(nodes, edges, { start: '3', frontier: ['(4,3)', '(4,4)', '(7,4)'], visited: ['1:0', '2:1', '3:3'], relaxation: '3->4 gives 4' }),
+    state({ start: '3', frontier: ['(4,3)', '(4,4)', '(7,4)'], visited: ['1:0', '2:1', '3:3'], relaxation: '3->4 gives 4' }),
     'finalize-three',
   ),
   frame(
     'Skip the stale path',
     'Pop (4,3). Node 3 is already finalized at distance 3, so the implementation takes the continue branch and adds no edges.',
-    graph(nodes, edges, { start: '3', frontier: ['(4,4)', '(7,4)'], visited: ['1:0', '2:1', '3:3'], decision: 'skip duplicate node 3' }),
+    state({ start: '3', frontier: ['(4,4)', '(7,4)'], visited: ['1:0', '2:1', '3:3'], decision: 'skip duplicate node 3' }),
     'skip-stale-three',
   ),
   frame(
     'Finalize the last node',
     'Pop (4,4) and finalize distance[4]=4. The later (7,4) is stale and skipped; all four nodes are reached.',
-    graph(nodes, edges, { start: '4', frontier: [], visited: ['1:0', '2:1', '3:3', '4:4'], decision: 'skip later (7,4)' }),
+    state({ start: '4', frontier: [], visited: ['1:0', '2:1', '3:3', '4:4'], decision: 'skip later (7,4)' }),
     'finalize-four',
   ),
   frame(
     'Return the network delay',
     'The signal arrival times are {1:0, 2:1, 3:3, 4:4}; the last arrival is max(0,1,3,4)=4.',
-    graph(nodes, edges, { visited: ['1:0', '2:1', '3:3', '4:4'], frontier: [], result: '4' }),
+    state({ visited: ['1:0', '2:1', '3:3', '4:4'], frontier: [], result: '4' }),
     'return-delay',
   ),
 ]);

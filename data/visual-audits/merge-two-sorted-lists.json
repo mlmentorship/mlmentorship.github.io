@@ -10,11 +10,11 @@
     "recognitionCue": "Two sorted node streams must be merged by relinking existing nodes.",
     "invariant": "The path from dummy through tail is the consumed sorted prefix; first and second begin untouched suffixes. The old link after tail may remain until the next attachment overwrites it.",
     "stateModel": "Dummy, tail, first, second, and each node next pointer.",
-    "visualRationale": "A next-pointer grid preserves every node identity and changed link without a shrinking SVG.",
+    "visualRationale": "Two source chains keep their unconsumed suffixes visible while stable node identities move into the growing output chain. Drawn next edges and pointer labels expose each rewire directly.",
     "rejectedAlternatives": [
       "Copying values hides rewiring.",
       "A final chain skips decisions.",
-      "A prose table omits pointer identity."
+      "A pointer table omits the physical source and output chains."
     ],
     "transferLesson": "Emit the smaller frontier and advance only its source; append the remaining sorted suffix in constant time.",
     "independentReview": "3.4 source-to-frame replay",

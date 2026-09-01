@@ -15,6 +15,7 @@ const slugsArgument = argumentsList.find((argument) => argument.startsWith('--sl
 const requestedSlugs = new Set(slugsArgument.split(',').map((slug) => slug.trim()).filter(Boolean));
 const requireReviewed = argumentsList.includes('--require-reviewed');
 const reviewFields = ['pattern', 'recognitionCue', 'invariant', 'stateModel', 'visualRationale', 'transferLesson'];
+const visibleReviewFields = ['recognitionCue', 'invariant', 'transferLesson'];
 
 function fail(message) {
   failures.push(message);
@@ -22,6 +23,15 @@ function fail(message) {
 
 function nonEmpty(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 function checkMarks(marks, rows, columns, label) {
@@ -54,8 +64,11 @@ function checkScene(scene, label) {
     if (items.length < 1 || items.some((item) => typeof item !== 'string')) fail(`${label}: array scene has a non-string item`);
     checkMarks(scene.marks, 1, items.length, label);
   }
-  if (scene.type === 'bars' && (!Array.isArray(scene.values) || scene.values.length < 1 || scene.values.some((value) => !Number.isFinite(Number(value))))) {
-    fail(`${label}: bars scene needs numeric values`);
+  if (scene.type === 'bars') {
+    if (!Array.isArray(scene.values) || scene.values.length < 1 || scene.values.some((value) => !Number.isFinite(Number(value)))) fail(`${label}: bars scene needs numeric values`);
+    if (scene.scan !== undefined && (!Number.isInteger(scene.scan) || scene.scan < 0 || scene.scan >= scene.values.length)) fail(`${label}: bar scan is outside the input`);
+    if (scene.stack !== undefined && !Array.isArray(scene.stack)) fail(`${label}: bar stack must be an array`);
+    if (scene.area !== undefined && (!Number.isInteger(scene.area.left) || !Number.isInteger(scene.area.right) || scene.area.left < 0 || scene.area.right < scene.area.left || scene.area.right >= scene.values.length || !Number.isFinite(scene.area.height))) fail(`${label}: measured bar area is invalid`);
   }
   if (scene.type === 'array-map') {
     if (!Array.isArray(scene.map)) fail(`${label}: array-map scene needs a map`);
@@ -78,6 +91,7 @@ function checkScene(scene, label) {
   }
   if (scene.type === 'graph') {
     if (!Array.isArray(scene.nodes) || scene.nodes.length < 1 || !Array.isArray(scene.edges)) fail(`${label}: graph needs nodes and edges`);
+    if (scene.positions !== undefined && scene.nodes.some((node) => !Number.isFinite(scene.positions[node]?.x) || !Number.isFinite(scene.positions[node]?.y))) fail(`${label}: authored graph topology needs every node position`);
   }
   if (scene.type === 'tree') {
     if (!Array.isArray(scene.levels) || scene.levels.length < 1 || scene.levels.some((level) => !Array.isArray(level) || level.length < 1)) fail(`${label}: tree needs nonempty levels`);
@@ -89,9 +103,26 @@ function checkScene(scene, label) {
   }
   if (scene.type === 'linked') {
     if (!Array.isArray(scene.nodes) || scene.nodes.length < 1 || scene.nodes.some((node) => !nonEmpty(node.value))) fail(`${label}: linked scene needs labelled nodes`);
+    if (scene.edges !== undefined) {
+      const nodeKeys = new Set(scene.nodes.map((node) => node.key));
+      if (!Array.isArray(scene.edges) || scene.edges.length < 1) fail(`${label}: linked topology needs edges`);
+      if (scene.nodes.some((node) => !nonEmpty(node.key) || !Number.isFinite(node.x) || !Number.isFinite(node.y))) fail(`${label}: linked topology nodes need stable keys and coordinates`);
+      for (const edge of scene.edges ?? []) {
+        if (!nonEmpty(edge.key) || !nodeKeys.has(edge.from) || !nodeKeys.has(edge.to)) fail(`${label}: linked topology has an invalid edge`);
+      }
+    }
   }
   if (scene.type === 'trie') {
     if (!Array.isArray(scene.paths) || scene.paths.length < 1 || scene.paths.some((item) => !nonEmpty(item.word) || !nonEmpty(item.prefix))) fail(`${label}: trie scene needs word paths`);
+    if (scene.nodes !== undefined) {
+      const nodeKeys = new Set(scene.nodes.map((node) => node.key));
+      if (!Array.isArray(scene.nodes) || scene.nodes.length < 1 || scene.nodes.some((node) => !nonEmpty(node.key) || !nonEmpty(node.label) || !Number.isFinite(node.x) || !Number.isFinite(node.y))) fail(`${label}: trie topology nodes need labels, stable keys, and coordinates`);
+      if (!Array.isArray(scene.edges) || scene.edges.length < 1) fail(`${label}: trie topology needs edges`);
+      for (const edge of scene.edges ?? []) {
+        if (!nonEmpty(edge.key) || !nodeKeys.has(edge.from) || !nodeKeys.has(edge.to) || !nonEmpty(edge.label)) fail(`${label}: trie topology has an invalid edge`);
+      }
+      if ((scene.active ?? []).some((key) => !nodeKeys.has(key)) || (scene.queued ?? []).some((key) => !nodeKeys.has(key))) fail(`${label}: trie cursor points outside topology`);
+    }
   }
   if (scene.type === 'shapes') {
     if (!Array.isArray(scene.items) || scene.items.length < 2 || scene.items.some((item) => !nonEmpty(item))) fail(`${label}: shape scene needs at least two labelled shapes`);
@@ -114,6 +145,7 @@ function checkScene(scene, label) {
   }
   if (scene.type === 'heap') {
     if (!Array.isArray(scene.values) || scene.values.length < 1 || scene.values.some((value) => !nonEmpty(value))) fail(`${label}: heap scene needs values`);
+    if (scene.groups !== undefined && (!Array.isArray(scene.groups) || scene.groups.length < 1 || scene.groups.some((group) => !nonEmpty(group.label) || !Array.isArray(group.values)))) fail(`${label}: heap groups need labels and value arrays`);
   }
 }
 
@@ -165,6 +197,10 @@ for (const slug of slugs) {
     const frameCount = (article.match(/data-coding-frame="\d+"/g) ?? []).length;
     if (frameCount !== definition.frames.length) fail(`${label}: generated frame count ${frameCount} differs from ${definition.frames.length}`);
     if (!article.includes(`<!-- visual:${slug}-state -->`)) fail(`${label}: marker missing`);
+    for (const field of visibleReviewFields) {
+      if (!article.includes(`data-coding-review="${field}"`)) fail(`${label}: generated article hides review.${field}`);
+      if (!article.includes(escapeHtml(definition.review[field]))) fail(`${label}: generated review.${field} drift`);
+    }
   }
   if (fs.existsSync(auditPath)) {
     const audit = JSON.parse(fs.readFileSync(auditPath, 'utf8'));

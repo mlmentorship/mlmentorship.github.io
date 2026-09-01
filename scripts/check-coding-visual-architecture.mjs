@@ -47,20 +47,26 @@ for (const definition of definitions) {
 const generator = fs.readFileSync(path.join(root, 'scripts/generate-coding-question-book.mjs'), 'utf8');
 const checker = fs.readFileSync(path.join(root, 'scripts/check-coding-visuals.mjs'), 'utf8');
 const interactions = fs.readFileSync(path.join(root, 'scripts/check-coding-visual-interactions.mjs'), 'utf8');
+const renderer = fs.readFileSync(path.join(root, 'scripts/check-visual-rendering.mjs'), 'utf8');
 const client = fs.readFileSync(path.join(root, 'src/utils/codingVisuals.ts'), 'utf8');
 
 assert.match(generator, /--slugs/);
 assert.match(checker, /--slugs/);
 assert.match(checker, /--require-reviewed/);
 assert.match(generator, /data-motion-key/);
+assert.match(generator, /data-coding-review/);
 assert.match(generator, /<svg/);
 assert.match(generator, /coding-trace-edge-line/);
-assert.match(generator, /coding-trace-heap-edge/);
+assert.match(generator, /coding-trace-heap-tree/);
 assert.match(client, /keydown/);
 assert.match(client, /prefers-reduced-motion/);
 assert.match(client, /data-motion-key/);
 assert.match(interactions, /no-JS/);
 assert.match(interactions, /print/);
+assert.match(interactions, /Page\.navigate/);
+assert.match(interactions, /setScriptExecutionDisabled/);
+assert.match(renderer, /--all-frames/);
+assert.match(renderer, /frameCaptures/);
 assert.ok(fs.existsSync(path.join(root, 'docs/CODING_VISUAL_STANDARD.md')));
 
 console.log('Coding visual architecture check passed.');

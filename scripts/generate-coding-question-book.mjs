@@ -42,9 +42,20 @@ function escapeHtml(value) {
 function renderBarsScene(scene) {
   const values = scene.values.map(Number);
   const max = Math.max(...values.map(Math.abs), 1);
-  const bars = values.map((value, index) => `<span class="coding-trace-bar" style="--bar-height:${Math.max(4, Math.abs(value) / max * 100)}%"${motionKey(`value-${index}`)}><b>${escapeHtml(scene.labels?.[index] ?? value)}</b><i></i><small>${index}</small></span>`).join('');
-  const area = scene.area ? `<div class="coding-trace-measured-area" style="--area-left:${scene.area.left};--area-right:${scene.area.right};--area-height:${scene.area.height}"><span>${escapeHtml(scene.area.label)}</span></div>` : '';
-  return `<div class="coding-trace-bars" role="img" aria-label="Vertical values and measured area">${area}${bars}</div>${renderMeta(scene, ['type', 'values', 'labels', 'area', 'motion'])}`;
+  const bars = values.map((value, index) => {
+    const scan = scene.scan === index ? `<em class="coding-trace-bar-scan"${motionKey('scan-index')}>scan</em>` : '';
+    const sentinel = scene.sentinel === index ? ' is-sentinel' : '';
+    return `<span class="coding-trace-bar${sentinel}" style="--bar-height:${Math.max(4, Math.abs(value) / max * 100)}%"${motionKey(`value-${index}`)}><b>${scan}${escapeHtml(scene.labels?.[index] ?? value)}</b><i></i><small>${index}</small></span>`;
+  }).join('');
+  const area = scene.area ? (() => {
+    const spansBars = scene.area.mode === 'bars';
+    const left = (spansBars ? scene.area.left : scene.area.left + 0.5) / values.length * 100;
+    const width = (spansBars ? scene.area.right - scene.area.left + 1 : scene.area.right - scene.area.left) / values.length * 100;
+    const height = Math.abs(scene.area.height) / max * 100;
+    return `<div class="coding-trace-measured-area" style="--area-left:${left}%;--area-width:${width}%;--area-height:${height}%"><span>${escapeHtml(scene.area.label)}</span></div>`;
+  })() : '';
+  const stack = Array.isArray(scene.stack) ? `<div class="coding-trace-bar-stack"><span class="coding-trace-label">unresolved stack</span>${scene.stack.map((entry, index) => { const start = String(entry).match(/\d+/)?.[0] ?? index; return `<span class="coding-trace-bar-stack-entry"${motionKey(`stack-entry-${start}`)}>${escapeHtml(entry)}</span>`; }).join('') || '<span class="coding-trace-empty">empty</span>'}<span class="coding-trace-label">top &rarr;</span></div>` : '';
+  return `<div class="coding-trace-bars-wrap"><div class="coding-trace-bars" role="img" aria-label="Vertical values and measured area">${area}${bars}</div>${stack}</div>${renderMeta(scene, ['type', 'values', 'labels', 'area', 'scan', 'sentinel', 'stack', 'motion'])}`;
 }
 
 function slugify(value) {
@@ -155,14 +166,17 @@ function renderStackScene(scene) {
   return `<div class="coding-trace-stack-layout"><div class="coding-trace-stack-input"><span class="coding-trace-label">input</span><strong>${escapeHtml(scene.input)}</strong></div><div class="coding-trace-stack-column"><span class="coding-trace-label">top</span>${values || '<span class="coding-trace-empty">empty</span>'}</div></div>${renderMeta(scene, ['type', 'input', 'values'])}`;
 }
 
+let graphTopologyId = 0;
+
 function renderGraphScene(scene) {
   const width = 480;
   const height = 230;
   const positions = scene.nodes.map((node, index) => ({
     node,
-    x: width / 2 + Math.cos(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * Math.min(170, 45 * scene.nodes.length),
-    y: height / 2 + Math.sin(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * 78,
+    x: scene.positions?.[node]?.x ?? width / 2 + Math.cos(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * Math.min(170, 45 * scene.nodes.length),
+    y: scene.positions?.[node]?.y ?? height / 2 + Math.sin(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * 78,
   }));
+  const markerId = `coding-graph-arrow-${graphTopologyId++}`;
   const endpoint = (edge, first) => {
     const tokens = String(edge).match(/[A-Za-z]*\s*\d+|[A-Za-z]+/g) ?? [];
     const token = tokens[first ? 0 : tokens.length - 1]?.trim();
@@ -171,15 +185,21 @@ function renderGraphScene(scene) {
   const edges = scene.edges.map((edge, index) => {
     const from = positions.find((item) => item.node === endpoint(edge, true)) ?? positions[index % positions.length];
     const to = positions.find((item) => item.node === endpoint(edge, false)) ?? positions[(index + 1) % positions.length];
-    return `<g${motionKey(`edge-${edge}-${index}`)}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" /><text x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2 - 6}">${escapeHtml(edge)}</text></g>`;
+    const deltaX = to.x - from.x;
+    const deltaY = to.y - from.y;
+    const length = Math.hypot(deltaX, deltaY) || 1;
+    const directed = String(edge).includes('->') && !String(edge).includes('<->');
+    const label = scene.edgeLabels === false ? '' : scene.edgeLabelMode === 'weight' ? String(edge).match(/-(\d+)->/)?.[1] ?? edge : edge;
+    return `<g${motionKey(`edge-${edge}-${index}`)}><line class="coding-trace-edge-line" x1="${from.x + deltaX / length * 26}" y1="${from.y + deltaY / length * 26}" x2="${to.x - deltaX / length * 29}" y2="${to.y - deltaY / length * 29}"${directed ? ` marker-end="url(#${markerId})"` : ''} />${label ? `<text class="coding-trace-graph-edge-label" x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2 - 7}">${escapeHtml(label)}</text>` : ''}</g>`;
   }).join('');
   const nodes = positions.map(({ node, x, y }, index) => {
     const state = scene.start === node ? ' is-focus' : scene.visited?.some((item) => String(item).startsWith(`${node}:`) || item === node) ? ' is-state' : '';
-    return `<g class="coding-trace-graph-node${state}"${motionKey(`node-${node}-${index}`)}><circle cx="${x}" cy="${y}" r="23" /><text x="${x}" y="${y + 4}">${escapeHtml(node)}</text></g>`;
+    return `<g class="coding-trace-graph-node${state}"${motionKey(`node-${node}`)}><circle cx="${x}" cy="${y}" r="23" /><text x="${x}" y="${y + 4}">${escapeHtml(node)}</text></g>`;
   }).join('');
+  const regions = (scene.regions ?? []).map((region) => `<text class="coding-trace-graph-region" x="${region.x}" y="${region.y}">${escapeHtml(region.label)}</text>`).join('');
   const keys = ['visited', 'frontier', 'ready', 'order', 'roots', 'components', 'indegree'];
   const lists = keys.flatMap((key) => scene[key] ? [`<span><b>${key}</b>${escapeHtml(Array.isArray(scene[key]) ? scene[key].join(', ') : scene[key])}</span>`] : []).join('');
-  return `<div class="coding-trace-graph"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Connected graph topology">${edges}${nodes}</svg>${lists ? `<div class="coding-trace-meta">${lists}</div>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'edges', 'start', ...keys, 'motion'])}`;
+  return `<div class="coding-trace-graph"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Connected graph topology"><defs><marker id="${markerId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="coding-trace-graph-marker" d="M 0 0 L 8 4 L 0 8 z" /></marker></defs>${regions}${edges}${nodes}</svg>${lists ? `<div class="coding-trace-meta">${lists}</div>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'edges', 'positions', 'regions', 'edgeLabels', 'edgeLabelMode', 'start', ...keys, 'motion'])}`;
 }
 
 function renderTreeScene(scene) {
@@ -222,11 +242,56 @@ function renderLinkedRow(nodes, label = '') {
   return `<div class="coding-trace-linked-row">${label ? `<span class="coding-trace-label">${escapeHtml(label)}</span>` : ''}${rendered}</div>`;
 }
 
+let linkedTopologyId = 0;
+
+function renderLinkedTopology(scene) {
+  const width = Number(scene.width ?? 480);
+  const height = Number(scene.height ?? 210);
+  const markerId = `coding-linked-arrow-${linkedTopologyId++}`;
+  const warningMarkerId = `${markerId}-warning`;
+  const nodes = new Map(scene.nodes.map((node) => [node.key, node]));
+  const rows = (scene.rowLabels ?? []).map((row) => `<text class="coding-trace-topology-row-label" x="8" y="${row.y}">${escapeHtml(row.label)}</text>`).join('');
+  const edges = scene.edges.map((edge) => {
+    const from = nodes.get(edge.from);
+    const to = nodes.get(edge.to);
+    const path = edge.curve
+      ? `M ${from.x} ${from.y + 18} C ${from.x} ${from.y + edge.curve} ${to.x} ${to.y + edge.curve} ${to.x} ${to.y + 22}`
+      : `M ${from.x + Math.sign(to.x - from.x) * 28} ${from.y} L ${to.x - Math.sign(to.x - from.x) * 31} ${to.y}`;
+    const label = edge.label ? `<text class="coding-trace-topology-edge-label" x="${edge.labelX ?? (from.x + to.x) / 2}" y="${edge.labelY ?? (from.y + to.y) / 2 - 8}">${escapeHtml(edge.label)}</text>` : '';
+    return `<g class="coding-trace-topology-edge${toneClass(edge.tone)}"${motionKey(edge.key)}><path d="${path}" marker-end="url(#${edge.tone === 'warning' ? warningMarkerId : markerId})" />${label}</g>`;
+  }).join('');
+  const renderedNodes = scene.nodes.map((node) => {
+    const pointers = (Array.isArray(node.pointer) ? node.pointer : [node.pointer]).filter(Boolean);
+    const pointerLabels = pointers.map((pointer, index) => `<text class="coding-trace-topology-pointer" x="${node.x}" y="${node.y - 25 - index * 13}"${motionKey(`pointer-${slugify(pointer)}`)}>${escapeHtml(pointer)}</text>`).join('');
+    return `<g class="coding-trace-topology-node${toneClass(node.tone)}"${motionKey(node.key)}>${pointerLabels}<rect x="${node.x - 25}" y="${node.y - 17}" width="50" height="34" rx="3" /><text x="${node.x}" y="${node.y + 5}">${escapeHtml(node.value)}</text></g>`;
+  }).join('');
+  return `<div class="coding-trace-linked-topology"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Linked nodes and next-pointer edges"><title>Linked-list topology</title><desc>Nodes, next pointers, and moving algorithm pointers.</desc><defs><marker id="${markerId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="coding-trace-topology-marker" d="M 0 0 L 8 4 L 0 8 z" /></marker><marker id="${warningMarkerId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="coding-trace-topology-marker is-warning" d="M 0 0 L 8 4 L 0 8 z" /></marker></defs>${rows}${edges}${renderedNodes}</svg></div>${renderMeta(scene, ['type', 'nodes', 'edges', 'rowLabels', 'width', 'height', 'motion'])}`;
+}
+
 function renderLinkedScene(scene) {
+  if (scene.edges) return renderLinkedTopology(scene);
   return `<div class="coding-trace-linked">${renderLinkedRow(scene.nodes)}${scene.second ? renderLinkedRow(scene.second.map((value) => ({ value })), 'second') : ''}${scene.arrows ? `<p class="coding-trace-inline-note">${escapeHtml(scene.arrows.join(' · '))}</p>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'second', 'arrows'])}`;
 }
 
+function renderTrieTopology(scene) {
+  const nodes = new Map(scene.nodes.map((node) => [node.key, node]));
+  const active = new Set(scene.active ?? []);
+  const queued = new Set(scene.queued ?? []);
+  const edges = scene.edges.map((edge) => {
+    const from = nodes.get(edge.from);
+    const to = nodes.get(edge.to);
+    return `<g${motionKey(edge.key)}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y + 16}" x2="${to.x}" y2="${to.y - 16}" /><text class="coding-trace-trie-edge-label" x="${(from.x + to.x) / 2 + 14}" y="${(from.y + to.y) / 2 + 4}">${escapeHtml(edge.label)}</text></g>`;
+  }).join('');
+  const renderedNodes = scene.nodes.map((node) => {
+    const cursor = active.has(node.key) ? `<text class="coding-trace-trie-cursor" x="${node.x}" y="${node.y - 23}"${motionKey('trie-cursor')}>current</text>` : '';
+    const classes = `${active.has(node.key) ? ' is-focus' : ''}${queued.has(node.key) ? ' is-state' : ''}${node.terminal ? ' is-terminal' : ''}`;
+    return `<g class="coding-trace-trie-node${classes}"${motionKey(node.key)}>${cursor}<rect x="${node.x - 33}" y="${node.y - 16}" width="66" height="32" rx="3" /><text x="${node.x}" y="${node.y + 5}">${escapeHtml(node.label)}</text></g>`;
+  }).join('');
+  return `<div class="coding-trace-trie-topology"><svg viewBox="0 0 ${scene.width ?? 480} ${scene.height ?? 260}" role="img" aria-label="Shared-prefix trie topology"><title>Shared-prefix trie</title><desc>One node per shared prefix; double borders mark complete words.</desc>${edges}${renderedNodes}</svg><p class="coding-trace-trie-key"><span>double border</span> complete word${queued.size ? '<span>muted fill</span> queued wildcard branch' : ''}</p></div>${renderMeta(scene, ['type', 'paths', 'nodes', 'edges', 'active', 'queued', 'width', 'height', 'motion'])}`;
+}
+
 function renderTrieScene(scene) {
+  if (scene.nodes) return renderTrieTopology(scene);
   const width = 560;
   const paths = scene.paths.map((item, index) => {
     const letters = [...item.word];
@@ -280,22 +345,27 @@ function renderLruScene(scene) {
 }
 
 function renderHeapScene(scene) {
-  const width = 480;
-  const levels = Math.ceil(Math.log2(scene.values.length + 1));
-  const positions = scene.values.map((value, index) => {
-    const level = Math.floor(Math.log2(index + 1));
-    const offset = index - (2 ** level - 1);
-    return { value, index, x: (offset + 1) * width / (2 ** level + 1), y: 32 + level * 72 };
-  });
-  const edges = positions.slice(1).map((item) => {
-    const parent = positions[Math.floor((item.index - 1) / 2)];
-    return `<line class="coding-trace-heap-edge coding-trace-edge-line" x1="${parent.x}" y1="${parent.y}" x2="${item.x}" y2="${item.y}" />`;
-  }).join('');
-  const nodes = positions.map((item) => {
-    const occurrence = positions.slice(0, item.index).filter((candidate) => candidate.value === item.value).length;
-    return `<g class="coding-trace-heap-node${item.index === 0 ? ' is-root' : ''}"${motionKey(`heap-value-${item.value}-${occurrence}`)}><circle cx="${item.x}" cy="${item.y}" r="21" /><text x="${item.x}" y="${item.y + 4}">${escapeHtml(item.value)}</text></g>`;
-  }).join('');
-  return `<div class="coding-trace-heap"><svg viewBox="0 0 ${width} ${Math.max(90, levels * 72)}" role="img" aria-label="Complete binary heap topology">${edges}${nodes}</svg></div>${renderMeta(scene, ['type', 'values', 'motion'])}`;
+  const groups = scene.groups ?? [{ label: scene.label ?? 'heap', values: scene.values }];
+  const occurrences = new Map();
+  const keyedGroups = groups.map((group) => ({
+    ...group,
+    values: group.values.map((value) => {
+      const count = occurrences.get(value) ?? 0;
+      occurrences.set(value, count + 1);
+      return { value, key: `heap-value-${value}-${count}` };
+    }),
+  }));
+  const renderNode = (values, index) => {
+    if (index >= values.length) return '';
+    const item = values[index];
+    const left = index * 2 + 1;
+    const right = index * 2 + 2;
+    const children = [renderNode(values, left), renderNode(values, right)].filter(Boolean).join('');
+    const current = String(item.value) === String(scene.current) ? ' is-current' : '';
+    return `<li><span class="coding-trace-heap-value${index === 0 ? ' is-root' : ''}${current}"${motionKey(item.key)}>${escapeHtml(item.value)}</span>${children ? `<ul>${children}</ul>` : ''}</li>`;
+  };
+  const renderedGroups = keyedGroups.map((group) => `<section class="coding-trace-heap-group"><h4>${escapeHtml(group.label)}</h4>${group.values.length ? `<ul class="coding-trace-heap-tree">${renderNode(group.values, 0)}</ul>` : '<span class="coding-trace-empty">empty</span>'}</section>`).join('');
+  return `<div class="coding-trace-heap-groups" role="img" aria-label="Complete binary heap topology">${renderedGroups}</div>${renderMeta(scene, ['type', 'values', 'groups', 'label', 'motion'])}`;
 }
 
 function renderScene(scene) {
@@ -335,9 +405,10 @@ function renderVisual(problem) {
   const frames = definition.frames.map((item, index) => `<div class="coding-trace-frame" data-coding-frame="${index}" data-frame-key="${escapeHtml(item.key)}"${index > 0 ? ' hidden' : ''} role="group" aria-label="${escapeHtml(item.label)}"><div class="coding-trace-frame-heading"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.note)}</strong></div>${renderScene(item.scene)}</div>`).join('');
   const buttons = definition.frames.map((item, index) => `<button type="button" data-coding-frame-button="${index}"${index === 0 ? ' aria-current="step"' : ''}><span>${index + 1}</span><strong>${escapeHtml(item.label)}</strong></button>`).join('');
   const controls = `<div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of ${definition.frames.length}</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps">${buttons}</div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p>`;
+  const lessons = `<dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">${escapeHtml(definition.review.recognitionCue)}</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">${escapeHtml(definition.review.invariant)}</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">${escapeHtml(definition.review.transferLesson)}</dd></div></dl>`;
   return {
     visualId,
-    source: `<!-- visual:${visualId} -->\n<figure class="learning-figure coding-visual-figure" aria-labelledby="${titleId}"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="${titleId}">${escapeHtml(problem.title)}: ${escapeHtml(definition.objective)}</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="${problem.slug}" role="group" tabindex="0" aria-label="${escapeHtml(`${problem.title}: ${definition.objective}`)}"><div class="coding-visual-example"><span>Input and goal</span><strong>${escapeHtml(problem.task)}</strong></div><div class="coding-trace" data-coding-trace>${frames}${controls}</div><p class="coding-visual-invariant"><span>Why this works</span>${escapeHtml(definition.objective)}</p></div><figcaption><strong>Read it this way:</strong> ${escapeHtml(definition.frames[0].note)} Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>`,
+    source: `<!-- visual:${visualId} -->\n<figure class="learning-figure coding-visual-figure" aria-labelledby="${titleId}"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="${titleId}">${escapeHtml(problem.title)}: ${escapeHtml(definition.objective)}</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="${problem.slug}" role="group" tabindex="0" aria-label="${escapeHtml(`${problem.title}: ${definition.objective}`)}"><div class="coding-visual-example"><span>Input and goal</span><strong>${escapeHtml(problem.task)}</strong></div><div class="coding-trace" data-coding-trace>${frames}${controls}</div>${lessons}</div><figcaption><strong>Read it this way:</strong> ${escapeHtml(definition.frames[0].note)} Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>`,
     audit: {
       schemaVersion: 1,
       slug: problem.slug,

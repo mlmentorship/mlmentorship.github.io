@@ -40,7 +40,11 @@ function motionEntities(scene) {
     const value = typeof node === 'object' ? node.value ?? node.id : node;
     add(typeof node === 'object' && node.key ? node.key : `node-${text(value)}-${index}`, 'node', index, 0, value);
   }
-  for (const [index, edge] of (scene.edges ?? []).entries()) add(`edge-${text(edge)}-${index}`, 'link', index, 1, edge);
+  for (const [index, edge] of (scene.edges ?? []).entries()) {
+    const label = typeof edge === 'object' ? edge.label ?? `${edge.from}->${edge.to}` : edge;
+    const key = typeof edge === 'object' ? edge.key ?? `edge-${label}-${index}` : `edge-${text(edge)}-${index}`;
+    add(key, 'link', index, 1, label);
+  }
   const treeValueCounts = new Map();
   for (const [levelIndex, level] of (scene.levels ?? []).entries()) {
     level.forEach((value, index) => {

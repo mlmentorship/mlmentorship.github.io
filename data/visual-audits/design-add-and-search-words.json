@@ -10,11 +10,11 @@
     "recognitionCue": "A stored-prefix query contains a symbol matching any one character.",
     "invariant": "match(index,node) is true exactly when a terminal descendant matches the remaining suffix.",
     "stateModel": "Trie plus recursive query index, current node, and wildcard branch frontier.",
-    "visualRationale": "A readable prefix-child table keeps all branches visible while current and queued keys show DFS and backtracking.",
+    "visualRationale": "One shared root branches to all stored words; a stable cursor and queued-node fill expose wildcard DFS, failure, backtracking, and terminal success.",
     "rejectedAlternatives": [
       "A dot node hides branching.",
       "Regex skips trie mechanics.",
-      "Only the successful path hides backtracking."
+      "A prefix table hides shared ancestry and backtracking."
     ],
     "transferLesson": "Branch recursion only at ambiguous symbols and preserve terminal semantics at exact query length.",
     "independentReview": "3.4 source-to-frame replay",

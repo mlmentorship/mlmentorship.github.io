@@ -10,11 +10,11 @@
     "recognitionCue": "Many words share prefixes and queries distinguish prefix existence from complete-word membership.",
     "invariant": "The root-to-node edge labels spell its prefix; terminal is true exactly for inserted complete words.",
     "stateModel": "Root dictionary, current prefix node, child maps, and terminal marker.",
-    "visualRationale": "A prefix/child/terminal grid shows sharing and exact-word semantics at readable mobile size.",
+    "visualRationale": "A single hierarchy stores app once inside apple, marks both terminal nodes, and moves a stable cursor along the exact character edges.",
     "rejectedAlternatives": [
       "Independent word rows duplicate prefixes.",
       "A flat set cannot answer prefixes.",
-      "A final tree skips character walking."
+      "A prefix table hides the root-to-node hierarchy."
     ],
     "transferLesson": "Store shared prefixes once and attach terminal or payload state to nodes.",
     "independentReview": "3.4 source-to-frame replay",

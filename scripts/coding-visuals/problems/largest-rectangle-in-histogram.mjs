@@ -1,12 +1,17 @@
-import { defineVisual, frame, stack, visual } from '../primitives.mjs';
+import { bars, defineVisual, frame, visual } from '../primitives.mjs';
 
-const input = '[2,1,5,6,2,3] + sentinel 0';
-const stackScene = (index, values, extra) => stack(input, values, {
+const heights = [2, 1, 5, 6, 2, 3, 0];
+const stackScene = (index, values, extra) => bars(heights, {
+  labels: heights.map((height, position) => position === heights.length - 1 ? '0 sentinel' : String(height)),
+  scan: index,
+  sentinel: heights.length - 1,
+  stack: values,
   ...extra,
   motion: [
     { key: 'scan-index', kind: 'pointer', x: index, y: 0, label: `i=${index}` },
+    ...heights.map((height, position) => ({ key: `value-${position}`, kind: 'bar', x: position, y: height, label: String(height) })),
     ...values.map((value, position) => ({
-      key: `stack-entry-${value.split(':')[0]}`,
+      key: `stack-entry-${value.match(/\d+/)?.[0] ?? position}`,
       kind: 'state',
       x: position,
       y: 1,
@@ -26,7 +31,8 @@ const draft = visual('Keep increasing (start,height) candidates; the first short
   }), 'push-2'),
   frame('Height 1 closes height 2', 'At index 1, 2 > 1, so pop (0,2): area = 2 * (1 - 0) = 2. Carry start = 0 for the shorter bar.', stackScene(1, [], {
     current: 'height 1',
-    area: '2 * (1 - 0) = 2',
+    area: { mode: 'bars', left: 0, right: 0, height: 2, label: '2 x 1 = 2' },
+    calculation: '2 * (1 - 0) = 2',
     carriedStart: 'start: 1 -> 0',
     best: '0 -> 2',
   }), 'pop-2'),
@@ -44,13 +50,15 @@ const draft = visual('Keep increasing (start,height) candidates; the first short
   }), 'push-6'),
   frame('Height 2 closes height 6', 'At index 4, pop (3,6): 6 cannot cross the shorter height 2, so area = 6 * (4 - 3) = 6 and start becomes 3.', stackScene(4, ['0: height 1', '2: height 5'], {
     current: 'height 2',
-    area: '6 * (4 - 3) = 6',
+    area: { mode: 'bars', left: 3, right: 3, height: 6, label: '6 x 1 = 6' },
+    calculation: '6 * (4 - 3) = 6',
     carriedStart: 'start: 4 -> 3',
     best: '2 -> 6',
   }), 'pop-6'),
   frame('The same bar closes height 5', 'Stack top 5 is still taller than 2, so pop (2,5): area = 5 * (4 - 2) = 10. Carry start back to 2.', stackScene(4, ['0: height 1'], {
     current: 'height 2',
-    area: '5 * (4 - 2) = 10',
+    area: { mode: 'bars', left: 2, right: 3, height: 5, label: '5 x 2 = 10' },
+    calculation: '5 * (4 - 2) = 10',
     carriedStart: 'start: 3 -> 2',
     best: '6 -> 10',
   }), 'pop-5'),
@@ -64,17 +72,20 @@ const draft = visual('Keep increasing (start,height) candidates; the first short
   }), 'push-3'),
   frame('Sentinel closes height 3', 'The appended 0 at index 6 is shorter than 3, so pop (5,3): area = 3 * (6 - 5) = 3.', stackScene(6, ['0: height 1', '2: height 2'], {
     current: 'sentinel height 0',
-    area: '3 * (6 - 5) = 3',
+    area: { mode: 'bars', left: 5, right: 5, height: 3, label: '3 x 1 = 3' },
+    calculation: '3 * (6 - 5) = 3',
     best: '10',
   }), 'flush-3'),
   frame('Sentinel closes height 2', 'Pop (2,2): height 2 spans indices 2 through 5, so area = 2 * (6 - 2) = 8.', stackScene(6, ['0: height 1'], {
     current: 'sentinel height 0',
-    area: '2 * (6 - 2) = 8',
+    area: { mode: 'bars', left: 2, right: 5, height: 2, label: '2 x 4 = 8' },
+    calculation: '2 * (6 - 2) = 8',
     best: '10',
   }), 'flush-2'),
   frame('Sentinel closes height 1', 'Pop (0,1): height 1 spans the full histogram, so area = 1 * (6 - 0) = 6. No candidate remains unresolved.', stackScene(6, [], {
     current: 'sentinel height 0',
-    area: '1 * (6 - 0) = 6',
+    area: { mode: 'bars', left: 0, right: 5, height: 1, label: '1 x 6 = 6' },
+    calculation: '1 * (6 - 0) = 6',
     best: '10',
   }), 'flush-1'),
   frame('Push the sentinel', 'After the pop loop, the implementation pushes (0,0). It contributes no area but leaves the loop transition fully represented.', stackScene(6, ['0: height 0'], {
@@ -82,6 +93,7 @@ const draft = visual('Keep increasing (start,height) candidates; the first short
     best: '10',
   }), 'push-sentinel'),
   frame('Return the largest closed area', 'Every bar has now met its first shorter right boundary. The largest recorded rectangle has height 5, width 2, and area 10.', stackScene(6, [], {
+    area: { mode: 'bars', left: 2, right: 3, height: 5, label: 'winner: 5 x 2 = 10' },
     rectangle: 'indices [2..3], minimum height 5',
     arithmetic: '5 * 2 = 10',
     result: '10',

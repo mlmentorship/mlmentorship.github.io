@@ -1,14 +1,30 @@
 import { defineVisual, frame, linked, visual } from '../primitives.mjs';
 
-const cycleLinks = ['1->2', '2->3', '3->4', '4->2'];
+const positions = [
+  { key: 'node-1', value: '1', x: 62, y: 74 },
+  { key: 'node-2', value: '2', x: 158, y: 74 },
+  { key: 'node-3', value: '3', x: 254, y: 74 },
+  { key: 'node-4', value: '4', x: 350, y: 74 },
+];
+const edges = [
+  { key: 'edge-1-2', from: 'node-1', to: 'node-2' },
+  { key: 'edge-2-3', from: 'node-2', to: 'node-3' },
+  { key: 'edge-3-4', from: 'node-3', to: 'node-4' },
+  { key: 'edge-4-2', from: 'node-4', to: 'node-2', curve: 82, label: '4.next -> 2', labelX: 254, labelY: 168, tone: 'warning' },
+];
 
-const state = (slowNode, fastNode, extra = {}) => linked([
-  { value: '1', pointer: slowNode === '1' ? 'slow' : fastNode === '1' ? 'fast' : undefined },
-  { value: '2', pointer: slowNode === '2' ? 'slow' : fastNode === '2' ? 'fast' : undefined },
-  { value: '3', pointer: slowNode === '3' ? 'slow' : fastNode === '3' ? 'fast' : undefined },
-  { value: '4', pointer: slowNode === '4' ? 'slow' : fastNode === '4' ? 'fast' : undefined },
-], {
-  arrows: cycleLinks,
+const state = (slowNode, fastNode, extra = {}) => linked(positions.map((node) => {
+  const pointers = [node.value === slowNode ? 'slow' : '', node.value === fastNode ? 'fast' : ''].filter(Boolean);
+  return {
+    ...node,
+    pointer: pointers,
+    tone: pointers.length === 2 ? 'output' : pointers[0] === 'slow' ? 'focus' : pointers[0] === 'fast' ? 'state' : 'neutral',
+  };
+}), {
+  edges,
+  rowLabels: [{ label: 'next', y: 78 }],
+  width: 420,
+  height: 190,
   slowAt: slowNode,
   fastAt: fastNode,
   motion: [

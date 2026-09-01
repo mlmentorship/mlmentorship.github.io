@@ -1,16 +1,19 @@
-import { arrayMap, defineVisual, frame, mark, table, visual } from '../primitives.mjs';
+import { defineVisual, frame, heap, table, visual } from '../primitives.mjs';
 
-const scene = (nodes, edges, extra = {}) => arrayMap(nodes, [
-  ['lower stored', extra.lowerStored ?? '[]'],
-  ['lower logical', extra.lowerLogical ?? '[]'],
-  ['upper', extra.upper ?? '[]'],
-], extra.current === undefined ? [] : [
-  mark(nodes.lastIndexOf(String(extra.current)), 'new value', 'focus', 'stream-cursor'),
-], {
+const valuesFrom = (value) => String(value ?? '[]').slice(1, -1).split(',').map((item) => item.trim()).filter(Boolean);
+const scene = (nodes, _edges, extra = {}) => {
+  const lower = valuesFrom(extra.lowerLogical);
+  const upper = valuesFrom(extra.upper);
+  return heap([...lower, ...upper], {
+    groups: [
+      { label: 'lower max-heap', values: lower },
+      { label: 'upper min-heap', values: upper },
+    ],
   stream: '[5,2,10,4]',
-  heapTopology: edges.length ? edges.join(', ') : 'roots only',
+    seen: nodes.join(', '),
   ...extra,
-});
+  });
+};
 
 const draft = visual('The lower max-heap owns the extra item, and its root plus the upper min-heap root are always the middle value or values.', [
   frame(
@@ -113,7 +116,7 @@ const review = {
   recognitionCue: 'Use two heaps when numbers arrive online and every median query must avoid sorting the entire history.',
   invariant: 'Every lower value is at most every upper value, and lower has either the same size as upper or exactly one extra item. Therefore the middle values are always heap roots.',
   stateModel: 'The minimal state is lower and upper. Each insertion pushes a negated value to lower, transfers its maximum to upper, then moves upper minimum back only if upper became larger.',
-  visualRationale: 'A stable stream row paired with explicit lower-stored, lower-logical, upper, root, and parent-relation state keeps both heaps readable at narrow widths. Every transfer, rebalance, size branch, and median calculation remains visible without color.',
+  visualRationale: 'Two semantic heap trees keep every parent-child edge and root readable at narrow widths. Stored negatives remain explicit in metadata while values visibly transfer between lower and upper during balancing.',
   rejectedAlternatives: [
     'A fully sorted array was rejected because insertion would be linear and would not expose the supplied heap mechanism.',
     'One heap was rejected because it cannot expose both middle boundaries efficiently.',
