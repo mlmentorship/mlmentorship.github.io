@@ -12,6 +12,42 @@ category: "questions"
 
 The interviewer is checking whether you treat cross-validation as a reflex or as a choice. The L4 candidate uses it everywhere. The L6 candidate names specific cases where it's the wrong tool.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Choose an evaluation that matches the deployment question before choosing folds.</p>
+
+<!-- visual:cross-validation-fit-the-question -->
+```mermaid
+flowchart TB
+	accTitle: Decide when ordinary cross-validation answers the wrong question
+	accDescr: Start by asking whether the available labelled data represents the deployment population. If not, use a held-out production sample, domain-expert set, or online experiment instead of cross-validation alone. If it does, ask whether random folds preserve time order, groups, and spatial dependence. If not, use structure-aware folds. If observations are exchangeable, ask whether repeated model fits are affordable; use an ordinary cross-validation estimate when they are and a representative holdout when they are not. For any resampling score used to choose hyperparameters, tune only inside the evaluation split and reserve an outer fold or untouched test set. Branch labels and method names carry all meaning without color.
+	Q{"Does labelled data represent<br/>the deployment population?"}
+	E["USE EXTERNAL EVALUATION<br/>production sample, expert set, or A/B test"]
+	D{"Would random folds preserve<br/>time, groups, and spatial dependence?"}
+	S["USE STRUCTURE-AWARE FOLDS<br/>walk-forward, grouped, or spatial blocks"]
+	C{"Can you afford<br/>repeated model fits?"}
+	H["USE ONE REPRESENTATIVE HOLDOUT"]
+	K["USE ORDINARY CROSS-VALIDATION"]
+	T{"Will these scores choose<br/>hyperparameters or models?"}
+	N["SEPARATE SELECTION FROM EVALUATION<br/>tune inside; reserve outer fold or final test"]
+	R["REPORT THE RESAMPLED ESTIMATE"]
+	Q -->|"no: distribution shift"| E
+	Q -->|"yes"| D
+	D -->|"no: dependent rows"| S
+	D -->|"yes: exchangeable rows"| C
+	C -->|"no"| H
+	C -->|"yes"| K
+	S --> T
+	K --> T
+	T -->|"yes"| N
+	T -->|"no"| R
+	class Q,D,C,T viz-focus
+	class E,H,N viz-warning
+	class S,K viz-state
+	class R viz-output
+	class E,S,H,K,N,R viz-wide
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> decide what must remain unseen before deciding how many folds to run. Distribution shift calls for evaluation on the target population, dependence calls for boundaries that keep future, groups, or nearby locations out of training, and prohibitive cost calls for one representative holdout. If a resampled score selects the model, keep an outer fold or final test untouched so selection does not grade itself. Original synthesis informed by <a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn's cross-validation guide</a> and <a href="https://jmlr.org/papers/v11/cawley10a.html">Cawley and Talbot's analysis of selection bias</a>.</p>
+
 ## What an L4 answer sounds like
 
 > "Cross-validation is the standard way to evaluate a model. I'd always use 5-fold or 10-fold CV unless the dataset is really large."

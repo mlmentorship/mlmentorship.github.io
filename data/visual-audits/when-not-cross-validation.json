@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "when-not-cross-validation",
+  "article": "src/content/posts/2025-05-25-when-not-cross-validation.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Decide whether ordinary cross-validation answers the deployment question, and choose a structure-aware split, external evaluation, representative holdout, or nested evaluation when it does not.",
+  "mediumRationale": "A compact decision graph is the smallest medium that separates two often-confused questions: whether folds preserve the unit that must be unseen, and whether cross-validation measures the target deployment distribution at all. Directly labelled branches connect each failed assumption to its replacement without implying that one split is universally correct.",
+  "mediumComparison": {
+    "mermaid": "Selected: the learning task is a conditional decision with several alternatives, and Mermaid expresses the branches, stopping conditions, and replacement evaluations clearly while reusing established responsive and print-safe primitives.",
+    "svg": "Rejected: fixed-coordinate split geometry would duplicate the site's dedicated cross-validation-strategies visual and add drawing complexity without improving this article's higher-level decision.",
+    "semanticHtml": "Rejected: a comparison table would list cases efficiently but would not make the gating order clear: first align the evaluation population, then preserve dependence, then consider compute and tuning leakage.",
+    "interaction": "Rejected: no parameter sweep or hidden state is needed; revealing branches interactively would conceal alternatives that should be compared at a glance.",
+    "paperReuse": "Rejected: the reviewed sources establish methodological constraints, but no source figure combines deployment shift, dependence, cost, and nested evaluation for this interview question. Figure-reuse permission was not established, so no external artwork, layout, data, or prose is copied.",
+    "noVisual": "Rejected: the prose names valid exceptions one by one, but readers must synthesize them into an ordered decision. The graph prevents the false shortcut that structure-aware CV fixes distribution shift or that nested CV eliminates deployment mismatch."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 62,
+        "insight": "The preceding slide recommends regularization and validation-loss early stopping but does not discuss fold construction, deployment shift, grouped observations, or temporal ordering."
+      },
+      {
+        "page": 63,
+        "insight": "The deck's only explicit cross-validation guidance says to use cross-validation to determine hyperparameters before ensembling; it does not distinguish tuning from unbiased evaluation or identify cases where ordinary random folds answer the wrong question."
+      },
+      {
+        "page": 64,
+        "insight": "The following slide starts a new section on basic probabilistic ML algorithms, confirming that page 63's recommendation has no neighboring qualification or explanatory figure."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for cross-validation, cross validation, nested CV, time-series splits, grouped splits, validation, leakage, distribution shift, and held-out evaluation. Page 63 was the only explicit cross-validation result, so pages 62-64 were read in full. Other validation references concern ordinary train/validation/test practice and do not add a relevant cross-validation exception. No deck artwork, wording, coordinates, or examples are reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "scikit-learn User Guide: Cross-validation—evaluating estimator performance",
+        "url": "https://scikit-learn.org/stable/modules/cross_validation.html",
+        "usage": "Used as official documentation to verify the held-out-test role, computational cost of k-fold evaluation, non-overlapping group splits, and chronological time-series splits.",
+        "license": "scikit-learn documentation is distributed under the project's BSD-3-Clause license. No documentation prose, code, images, data, or layout is reused; the decision graph is an original synthesis."
+      },
+      {
+        "title": "On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation",
+        "url": "https://jmlr.org/papers/v11/cawley10a.html",
+        "usage": "Used as a primary methodological paper to verify that optimizing a finite-sample cross-validation criterion can overfit that criterion and bias subsequent performance evaluation, motivating separation of selection and evaluation.",
+        "license": "The JMLR article is publisher-hosted and no permissive figure-reuse license was identified. No figure, result, wording, numerical value, or layout is copied; only the methodological conclusion informs the original graph."
+      },
+      {
+        "title": "Nested versus non-nested cross-validation",
+        "url": "https://scikit-learn.org/stable/auto_examples/model_selection/plot_nested_cross_validation_iris.html",
+        "usage": "Used as an official worked example to verify that the inner loop selects hyperparameters while the independent outer loop estimates generalization for the selection procedure.",
+        "license": "The example identifies its code as BSD-3-Clause. No code, Iris results, chart, colors, prose, or geometry is reused; the article uses a newly authored qualitative decision graph."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that cross-validation is useful only after the evaluation target and split boundary match deployment. Structure-aware folds can prevent future, group, or spatial leakage, but they still estimate performance on the sampled distribution; they cannot substitute for a deployment sample or online experiment under shift. Separately, when cross-validation scores drive hyperparameter selection, an untouched outer loop or final test is needed for honest evaluation. The visual makes these constraints sequential and makes no empirical performance claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 source-deck pages and inspected the only relevant three-page neighborhood, then checked official scikit-learn guidance and the primary Cawley–Talbot model-selection study before selecting an original decision graph."
+  },
+  "implementation": {
+    "visualIds": [
+      "cross-validation-fit-the-question"
+    ],
+    "accessibility": "The Mermaid graph provides an explicit accessible title and description. Every branch names the condition and every destination names the evaluation method, so no inference relies on color. The compact top-to-bottom layout uses short labels and established wide-node primitives for readability at 390 CSS pixels; shared Mermaid theme tokens support dark mode, and existing print rules provide a light high-contrast rendering and keep the caption with the figure."
+  }
+}
