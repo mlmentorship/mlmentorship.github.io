@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "tokenization",
+  "article": "src/content/posts/2026-01-20-tokenization.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how corpus-wide pair counts create ranked, reusable BPE tokens that compress common words while leaving rarer words as multiple pieces.",
+  "mediumRationale": "A vertical semantic trace is the smallest medium that keeps each corpus segmentation beside the pair count and vocabulary addition it causes. Four labelled panels expose the otherwise hidden loop: merge the most frequent current pair everywhere, recount, retain the learned rank, and replay those ranked merges on new text.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can repeat count and merge stages, but automatic node layout would not preserve the exact token segmentation and arithmetic within each round as clearly as ordered text panels.",
+    "svg": "Rejected: deterministic geometry could align token chips, but the lesson is a discrete sequence of corpus states rather than a geometric relationship. SVG would add markup and make text wrapping at phone width less robust.",
+    "semanticHtml": "Selected: semantic headings, code fragments, explicit arithmetic, and logical source order make every merge inspectable, stack naturally at 390 CSS pixels, and remain useful without color or client-side code.",
+    "interaction": "Rejected: changing frequencies or stepping through merges would add controls and state when one carefully chosen three-round trace is enough to reveal the counting and rank-order invariants.",
+    "paperReuse": "Rejected: the 2016 ACL paper is available under CC BY 4.0 and could be adapted with attribution, while the Hugging Face course documentation is Apache 2.0 and tiktoken is MIT licensed. Their figures, examples, code, wording, data, and layouts were not reused. The shipped map/maps/cap corpus, counts, structure, and application examples are independently authored.",
+    "noVisual": "Rejected: the prose lists the BPE loop but requires readers to mentally update a corpus after every merge, aggregate a pair across word frequencies, and connect learned merge rank to later segmentation. The trace makes those state transitions explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 97,
+        "insight": "The preceding slide implements a character-level LSTM language model. It establishes the character baseline that subword tokenization improves on, but provides no tokenizer mechanism or reusable visual."
+      },
+      {
+        "page": 98,
+        "insight": "The only dedicated tokenization slide defines subword fragments and lists an iterative BPE procedure beside perplexity. It provides no worked merge state. Its statement that WordPiece repeatedly merges the most frequent pair is too loose, so that wording was not carried into the visual."
+      },
+      {
+        "page": 99,
+        "insight": "The following slide moves to text representation learning and contrasts autoregressive, masked-language-model, and multitask objectives. It does not explain token construction."
+      },
+      {
+        "page": 102,
+        "insight": "A later RoBERTa slide mentions its larger GPT-2 byte-level BPE vocabulary, supporting model-family context but adding no algorithm trace."
+      },
+      {
+        "page": 107,
+        "insight": "A later OLMo slide records a modified GPT-NeoX BPE tokenizer and vocabulary padding to a multiple of 128. This is implementation context, not an explanation of merge learning."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 text-indexed all 214 physical pages of Basic_ML_CS_concepts for tokenization, tokenizer, byte-pair encoding, WordPiece, SentencePiece, subword, and vocabulary. Physical page 98 is the sole direct treatment; pages 97-99 were also rendered and visually inspected as its complete neighborhood. Pages 102 and 107 are incidental architecture references found by the full-deck search. The deck states no reuse license, and the relevant slide is prose rather than a worked spatial explanation, so it was treated as review-only. No deck screenshot, visual composition, wording, code, example, or numeric claim is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Neural Machine Translation of Rare Words with Subword Units",
+        "url": "https://aclanthology.org/P16-1162/",
+        "usage": "Used as the primary NLP paper to verify adapting byte-pair encoding to character sequences, iteratively merging the most frequent symbol pair, representing open-vocabulary words as variable-length subword sequences, and applying learned merge operations to new text.",
+        "license": "ACL Anthology identifies 2016 materials as CC BY 4.0, which permits adaptation with attribution. No paper figure, table, algorithm wording, corpus, result, or layout is reused; the article links the paper as conceptual attribution."
+      },
+      {
+        "title": "OpenAI tiktoken",
+        "url": "https://github.com/openai/tiktoken",
+        "usage": "Used as official implementation documentation to verify modern byte-level BPE properties: reversibility, arbitrary-input coverage, compression into fewer tokens than bytes, reusable common subwords, and rank-ordered merge application.",
+        "license": "The repository is MIT licensed. No source code, educational visualization, example string, benchmark, prose, or visual layout is copied."
+      },
+      {
+        "title": "Hugging Face LLM Course: Byte-Pair Encoding tokenization",
+        "url": "https://huggingface.co/learn/llm-course/chapter6/5",
+        "usage": "Used as authoritative implementation-oriented documentation to cross-check corpus-frequency aggregation, recounting after each merge, vocabulary growth, and replaying merge rules in learned order during tokenization.",
+        "license": "The course source repository is Apache License 2.0. No course corpus, worked counts, implementation, prose, exercise, or visual structure is reused."
+      },
+      {
+        "title": "SentencePiece official implementation",
+        "url": "https://github.com/google/sentencepiece",
+        "usage": "Used to verify the article's distinction between BPE and unigram subword models and SentencePiece training directly from raw Unicode sentences with a fixed vocabulary size.",
+        "license": "The repository is Apache License 2.0. No code, example, documentation wording, benchmark, or visual asset is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that BPE does not independently chunk each word into intuitive morphemes. It learns a global ranked merge list by repeatedly counting adjacent symbols in the current corpus segmentation. In the original toy byte-level corpus, map occurs five times, maps three times, and cap twice. The pair a+p therefore occurs 10 times and becomes ap; m+ap then occurs eight times and becomes map; map+s occurs three times and becomes maps. Replaying those ranks yields [maps], [c][ap], and [t][r][ap][s]. Counts and segmentations were recalculated manually and are explanatory rather than empirical tokenizer claims."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed the full 214-page deck, rendered and inspected physical pages 97-99, reviewed incidental matches on pages 102 and 107, and cross-checked the merge mechanism against the primary NLP paper and official tokenizer documentation with explicit license treatment."
+  },
+  "implementation": {
+    "visualIds": [
+      "bpe-corpus-merge-trace"
+    ],
+    "accessibility": "The figure has a linked learning-question title and a role=list child with a complete accessible label. Every panel states its round, current segmentation, exact pair arithmetic, and resulting vocabulary token in text; learned order and output boundaries use headings, rank numbers, brackets, and code typography rather than color. The established one-column responsive grid has no minimum width and wraps at 390 CSS pixels. Shared theme variables supply dark-mode contrast, while established print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
