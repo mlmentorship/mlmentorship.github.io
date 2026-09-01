@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-redundant-connection.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "An edge is redundant when both endpoints already have the same representative root.",
+  "learningObjective": "Union-find accepts edges between different representative roots and identifies the first edge whose endpoints already share one root.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to an edge is redundant when both endpoints already have the same representative root.",
-    "invariant": "An edge is redundant when both endpoints already have the same representative root.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Disjoint-set union with path halving and union by component size for incremental cycle detection.",
+    "recognitionCue": "Use union-find when undirected edges arrive over time and each edge needs a fast “already connected?” decision without repeatedly traversing the whole graph.",
+    "invariant": "Following parent links from any node reaches the unique representative of its connected component; component_size is authoritative at roots. Union changes connectivity only when roots differ.",
+    "stateModel": "The minimal state is parent and component_size arrays. Each edge performs two finds, optional path compression, optional size-based root swap, and one parent/size update or immediate false return.",
+    "visualRationale": "The accepted undirected edges show the actual component topology while root paths and parent arrays expose union-find’s hidden forest. Stable graph keys preserve vertices and accepted links as components merge.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Repeated DFS was rejected because it depicts a different O(EV) style connectivity check.",
+      "Only parent arrays were rejected because they hide the graph cycle that the rejected edge would close.",
+      "Only the final triangle was rejected because it skips union-by-size and path compression."
     ],
-    "transferLesson": "Transfer the invariant: An edge is redundant when both endpoints already have the same representative root.",
-    "reviewStatus": "pending"
+    "transferLesson": "Ask whether roots differ before adding connectivity; attach the smaller tree under the larger and shorten paths during find. The same state supports component counts, Kruskal MST, and dynamic grouping.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

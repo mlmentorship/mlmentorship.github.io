@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-reverse-linked-list.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Save the outgoing link, reverse the current link, then advance.",
+  "learningObjective": "Preserve the unreversed suffix before redirecting each current.next, then advance the previous/current boundary one node.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to save the outgoing link, reverse the current link, then advance.",
-    "invariant": "Save the outgoing link, reverse the current link, then advance.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "In-place singly linked-list reversal with previous, current, and saved-next pointers.",
+    "recognitionCue": "Use it when a forward-only chain must reverse direction in constant extra space and changing current.next would otherwise destroy access to the unprocessed suffix.",
+    "invariant": "Before each iteration, previous heads a fully reversed prefix, head heads the untouched forward suffix, and together those disjoint regions contain every original node exactly once.",
+    "stateModel": "The minimal state is previous, current/head, and next_node. Each iteration must save next, redirect current.next, move previous, and move current in that exact order.",
+    "visualRationale": "Two visible linked rows separate the reversed prefix from the unreversed suffix while text states the real outgoing links. Stable node identities and current/previous labels show nodes crossing the boundary without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A value array was rejected because reversing values is not reversing node links.",
+      "A recursive call stack was rejected because it depicts a different O(n) stack-space implementation.",
+      "A before/after list was rejected because it omits the saved-next safety requirement and intermediate disconnected regions."
     ],
-    "transferLesson": "Transfer the invariant: Save the outgoing link, reverse the current link, then advance.",
-    "reviewStatus": "pending"
+    "transferLesson": "Before mutating the only route to remaining work, save that route; then rewire and advance the boundary. This applies to list splicing, segment reversal, and in-place pointer transformations.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

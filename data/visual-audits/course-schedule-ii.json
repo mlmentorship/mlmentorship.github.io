@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-course-schedule-ii.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The topological queue is also the feasible course order.",
+  "learningObjective": "Kahn’s queue emits a valid order because a course enters it only after every incoming prerequisite edge has been removed.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the topological queue is also the feasible course order.",
-    "invariant": "The topological queue is also the feasible course order.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Kahn topological sort with an indegree array, FIFO zero-indegree frontier, and emitted order.",
+    "recognitionCue": "Use it when directed prerequisites or dependencies require one valid linear order, and cycles must be detected because they prevent some vertices from ever becoming ready.",
+    "invariant": "Every vertex in ready has zero incoming edges from un-emitted vertices, and order is a valid topological prefix. Decrementing an outgoing neighbor once per removed edge preserves both facts.",
+    "stateModel": "The minimal state is the directed adjacency list, one indegree per course, a FIFO ready queue, and the emitted order. The trace shows every pop, edge removal, decrement, zero test, and enqueue.",
+    "visualRationale": "A connected directed graph exposes prerequisite topology and the converging edges into course 3. Persistent node/edge keys accompany explicit ready, indegree, removed-edge, and order labels, so meaning does not depend on color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An indegree table alone was rejected because it hides which outgoing edge causes each decrement.",
+      "A final ordered list was rejected because it does not explain readiness or cycle detection.",
+      "A DFS finishing-time stack was rejected because it depicts a different topological-sort implementation."
     ],
-    "transferLesson": "Transfer the invariant: The topological queue is also the feasible course order.",
-    "reviewStatus": "pending"
+    "transferLesson": "Maintain the number of unresolved incoming dependencies, enqueue exactly on the transition to zero, and compare emitted count with vertex count; this transfers to build systems and workflow scheduling.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
