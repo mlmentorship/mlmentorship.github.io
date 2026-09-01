@@ -51,7 +51,7 @@ DAgger-style data collection asks an expert to label states visited by the learn
 			<marker id="robotics-dagger-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="viz-arrow-forward"></path></marker>
 		</defs>
 		<rect class="viz-plot-bg" x="8" y="27" width="344" height="194" rx="5"></rect>
-		<text class="viz-axis-label" x="16" y="18">1 · BEHAVIOR CLONING: THE POLICY CHOOSES ITS NEXT INPUT</text>
+		<text class="viz-axis-label" x="16" y="18">1 · BEHAVIOR CLONING: POLICY-INDUCED SHIFT</text>
 		<text class="viz-axis-label" x="18" y="52">EXPERT DEMONSTRATIONS</text>
 		<path d="M 53 89 L 126 89 L 199 89 L 272 89" fill="none" stroke="var(--viz-output-stroke)" stroke-width="3" marker-end="url(#robotics-dagger-arrow)"></path>
 		<circle class="viz-node viz-node--output" cx="45" cy="89" r="15"></circle>
@@ -76,7 +76,7 @@ DAgger-style data collection asks an expert to label states visited by the learn
 		<text class="viz-label" x="192" y="166">changes the next state</text>
 		<text class="viz-axis-label" x="235" y="177">NO DEMO LABELS</text>
 		<rect class="viz-plot-bg" x="8" y="250" width="344" height="172" rx="5"></rect>
-		<text class="viz-axis-label" x="16" y="241">2 · DAGGER: TRAIN ON THE STATES THE CURRENT POLICY INDUCES</text>
+		<text class="viz-axis-label" x="16" y="241">2 · DAGGER: LABEL LEARNER-VISITED STATES</text>
 		<rect class="viz-node viz-node--input" x="22" y="273" width="132" height="51" rx="5"></rect>
 		<rect class="viz-node viz-node--focus" x="206" y="273" width="132" height="51" rx="5"></rect>
 		<rect class="viz-node viz-node--output" x="206" y="352" width="132" height="51" rx="5"></rect>

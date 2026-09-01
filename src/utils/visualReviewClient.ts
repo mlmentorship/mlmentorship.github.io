@@ -56,9 +56,8 @@ export function extractLearningVisual(root: ParentNode, visualId?: string): Extr
   const documentRoot = mermaid.ownerDocument;
   const figure = documentRoot.createElement('figure');
   const figcaption = caption ? documentRoot.createElement('figcaption') : undefined;
-  const scroll = documentRoot.createElement('div');
   figure.className = 'learning-figure review-generated-figure';
-  scroll.className = 'visual-scroll';
+  mermaid.classList.add('visual-scroll');
   mermaid.parentNode?.insertBefore(figure, mermaid);
 
   if (visualKicker?.classList.contains('visual-kicker')) figure.append(visualKicker);
@@ -67,8 +66,7 @@ export function extractLearningVisual(root: ParentNode, visualId?: string): Extr
     figure.setAttribute('aria-labelledby', visualTitle.id);
     figure.append(visualTitle);
   }
-  scroll.append(mermaid);
-  figure.append(scroll);
+  figure.append(mermaid);
   if (caption && figcaption) {
     figcaption.className = caption.className;
     while (caption.firstChild) figcaption.append(caption.firstChild);

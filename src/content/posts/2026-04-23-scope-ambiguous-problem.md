@@ -53,7 +53,7 @@ This is L5. Process is named, output is documented, the 'this isn't an ML proble
 
 <!-- visual:ambiguous-problem-scope-loop -->
 ```mermaid
-%%{init: {"themeVariables": {"fontSize": "19px"}}}%%
+%%{init: {"themeVariables": {"fontSize": "19px"}, "flowchart": {"nodeSpacing": 12}}}%%
 flowchart TB
 	accTitle: A senior scoping loop from an ambiguous request to an evidence-backed decision
 	accDescr: Start with a stakeholder's symptom, interrogate it to identify the actual user or business outcome, then define success, constraints, data, and non-goals. Decide whether machine learning is justified. If not, choose a non-ML baseline or stop. If it is, write a time-boxed one-pager that names scope, metrics, risks, and open questions. Select the biggest unknown, run the smallest experiment that can resolve it, and use evidence to proceed, rescope and repeat, or stop.
@@ -69,7 +69,8 @@ flowchart TB
 	J -->|"supports"| K["Proceed to v1<br/>with agreed scope"]
 	J -. "changes assumptions" .-> D
 	J -->|"invalidates"| L["Stop or choose<br/>a different approach"]
-	class A viz-input,viz-tall
+	class A viz-input
+	class A viz-tall
 	class C,E,H,J viz-focus
 	class D,G viz-state
 	class F,L viz-warning
