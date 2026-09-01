@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-course-schedule.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A course becomes ready when its remaining prerequisite count reaches zero.",
+  "learningObjective": "Only dequeue zero-indegree courses; removing their outgoing edges may make new courses ready.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a course becomes ready when its remaining prerequisite count reaches zero.",
-    "invariant": "A course becomes ready when its remaining prerequisite count reaches zero.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Kahn topological sort using adjacency lists, indegree counts, and a zero-indegree queue.",
+    "recognitionCue": "Directed prerequisite pairs ask whether every node can be placed after all requirements; failure to process every node means a directed cycle blocks the remainder.",
+    "invariant": "Every queued course has indegree zero in the remaining graph, completed counts dequeued courses, and each outgoing edge is removed exactly once when its prerequisite completes.",
+    "stateModel": "Retain the directed adjacency graph, one indegree per course, FIFO ready queue, and completed count. A full ordering is unnecessary for this boolean variant.",
+    "visualRationale": "A real four-node directed topology stays fixed while ready, completed nodes, and indegrees change, exposing both converging prerequisites and the exact zero transition.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An indegree table without edges hides which completed prerequisite decrements which course.",
+      "A generic queue flowchart omits the dependency topology and cannot explain a blocked cycle.",
+      "DFS recursion can detect cycles but would depict a different state model from the supplied Kahn implementation."
     ],
-    "transferLesson": "Transfer the invariant: A course becomes ready when its remaining prerequisite count reaches zero.",
-    "reviewStatus": "pending"
+    "transferLesson": "Repeatedly remove entities with no unmet requirements and decrement their dependents; the same mechanism orders builds, recipes, jobs, and dependency migrations, while leftovers certify a cycle.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

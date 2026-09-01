@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-non-overlapping-intervals.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "When intervals overlap, keep the one with the earlier end.",
+  "learningObjective": "Sort by end time; keep a candidate exactly when its start reaches the last kept end.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to when intervals overlap, keep the one with the earlier end.",
-    "invariant": "When intervals overlap, keep the one with the earlier end.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Greedy interval scheduling after sorting candidates by ascending end time.",
+    "recognitionCue": "The task asks for the fewest removals needed to leave non-overlapping ranges, which is equivalent to keeping the largest compatible subset.",
+    "invariant": "After each candidate, the kept intervals do not overlap, last_end is the end of the latest kept interval, and the greedy choices leave at least as much future room as any alternative of the same size.",
+    "stateModel": "Retain only the end-sorted intervals, the moving candidate, last_end, and removed count. The complete kept list is shown for explanation but is not required by the implementation.",
+    "visualRationale": "Ranges drawn to scale on one time axis make overlap and endpoint touching visible; a moving candidate and last_end boundary explain each keep/remove branch.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A prose iteration table hides the geometric meaning of start < last_end.",
+      "An overlap graph adds edges and a graph-selection problem when one timeline boundary is sufficient.",
+      "Sorting by start and merging depicts a different goal and does not justify the earliest-finish exchange."
     ],
-    "transferLesson": "Transfer the invariant: When intervals overlap, keep the one with the earlier end.",
-    "reviewStatus": "pending"
+    "transferLesson": "When selecting the most compatible time ranges, an earlier finishing accepted choice never blocks a range that a later-finishing choice could keep; reuse this exchange argument for activity and reservation scheduling.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

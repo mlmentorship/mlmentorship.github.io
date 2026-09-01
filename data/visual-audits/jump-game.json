@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-jump-game.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Carry the farthest index reachable from everything scanned so far.",
+  "learningObjective": "Scan only reachable positions and preserve the farthest index any processed jump can reach.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to carry the farthest index reachable from everything scanned so far.",
-    "invariant": "Carry the farthest index reachable from everything scanned so far.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Greedy scan with a farthest-reachable frontier.",
+    "recognitionCue": "Each array value is a maximum forward jump and the question asks only whether the final position is reachable, not for a path or minimum jump count.",
+    "invariant": "Before index i is processed, every position through farthest is reachable using processed jumps; if i exceeds farthest, no earlier choice can reach i or anything beyond it.",
+    "stateModel": "Retain the immutable jump array, moving scan index, and one scalar farthest. Individual paths and predecessor choices are irrelevant to the yes/no result.",
+    "visualRationale": "Indexed cells with independently keyed scan and farthest markers show the covered range, frontier movement, and the exact failing comparison without relying on color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A graph of every possible jump creates quadratic-looking edges and obscures the single frontier summary.",
+      "Dynamic programming reachability stores one boolean per index although the reachable prefix is represented by one boundary.",
+      "Showing only a successful leap path suggests committing to jumps, which the supplied greedy scan never does."
     ],
-    "transferLesson": "Transfer the invariant: Carry the farthest index reachable from everything scanned so far.",
-    "reviewStatus": "pending"
+    "transferLesson": "When all feasible positions form a prefix, summarize every prior choice by its farthest boundary; this transfers to interval coverage, refueling reach, and minimum-jump layer scans.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
