@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "slug": "prefill-vs-decode",
+  "article": "src/content/posts/2025-12-14-prefill-vs-decode.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace one representative weight tile through a multi-row prefill operation and four batch-one decode steps to see why weight reuse, arithmetic intensity, and the likely hardware bottleneck differ.",
+  "mediumRationale": "A paired semantic-HTML ledger is the smallest medium that keeps weight traffic and useful token rows aligned while preserving selectable text and native table semantics. The panels stack at phone width, and the repeated words “load W again” make the decode asymmetry countable without animation.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the distinction is repeated weight reuse versus repeated weight streaming, not a branching dependency graph. Routed edges and automatic layout would obscure the aligned token-row comparison.",
+    "svg": "Rejected: fixed coordinates add no essential geometry to this discrete two-case ledger. Native text wraps more reliably at 390 CSS pixels and exposes stronger table and heading semantics.",
+    "semanticHtml": "Selected: two established responsive panels can align one representative weight tile with the prompt rows or serial output steps, remain legible as selectable text, and communicate the lesson without runtime code.",
+    "interaction": "Rejected: controls for prompt length, decode batch size, dtype, or hardware balance would turn one invariant into an underspecified performance simulator. The article already qualifies that actual bottlenecks depend on shape and device.",
+    "paperReuse": "Rejected: the reviewed papers contain system and performance figures, but no permissive figure-reuse grant was established for the candidate artwork. Public access and permission to cite were not treated as permission to copy; the shipped wording, values, layout, and visual construction are original.",
+    "noVisual": "Rejected: prose states the two bottlenecks but leaves the reader to infer why an unchanged parameter tensor produces different arithmetic intensity. Following the same weight tile through many parallel rows versus one row per serial pass makes the causal mechanism explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding LLM-training slide frames hardware scalability and throughput, but it does not separate prompt processing from token generation."
+      },
+      {
+        "page": 108,
+        "insight": "The compute-optimization setup introduces arithmetic intensity, HBM versus SRAM, and memory-bound execution. It discusses full-sequence attention and provides the hardware vocabulary needed for the phase comparison, but not weight-tile reuse during prefill versus decode."
+      },
+      {
+        "page": 109,
+        "insight": "The neighboring sequence-packing slide concerns training-time padding waste and does not describe either inference phase."
+      },
+      {
+        "page": 110,
+        "insight": "The FlashAttention slide explains exact tiled attention and reduced HBM traffic for full sequences. It is relevant to long prefills but does not compare matrix-row availability or model-weight traffic between inference phases."
+      },
+      {
+        "page": 111,
+        "insight": "The sparse-attention slide changes the attention pattern for long sequences; it adds no prefill-versus-decode execution model."
+      },
+      {
+        "page": 112,
+        "insight": "The low-rank and kernel-attention slide continues long-sequence algorithm changes and does not address serial generation or weight streaming."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide directly states that batch-one generation is serial, reads the large model’s weights for each single-token pass, and is commonly memory-bound. Its proposed optimization is adjacent context, not a complete comparison with prefill."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision neighbor explains datatype throughput and bytes moved but is about training numerics, not the two inference phases."
+      },
+      {
+        "page": 115,
+        "insight": "The serving-stack summary explicitly labels prefill as compute-bound and single-token decode as dominated by weight loading, then maps FlashAttention and weight-only quantization to those regimes. It gives the conclusion but no spatial explanation of changing weight reuse."
+      },
+      {
+        "page": 116,
+        "insight": "The following re-scoring title slide begins a new topic and establishes the end of the relevant LLM-compute neighborhood."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for prefill, decode-adjacent autoregressive generation, single-token execution, memory-bound work, weight loading, speculative decoding, and serving. Matches occurred on pages 87, 99, 108, 113-115, and 117; pages 87, 99, and 117 use autoregressive terminology for unrelated model topics. Physical pages 107-116 were then read as the complete LLM compute, attention, decoding, and serving neighborhood. Pages 108, 113, and 115 are directly relevant, with pages 107, 109-112, 114, and 116 establishing context. The local deck states no general reuse license and includes externally sourced material, so it was treated as review-only; no pixels, wording, measurements, artwork, or layout were copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficiently Scaling Transformer Inference",
+        "url": "https://arxiv.org/abs/2211.05102",
+        "usage": "Used as the primary inference-analysis source to verify the distinction between parallel processing of an input sequence and iterative autoregressive generation, and to check how operation shape, batch size, model-weight reads, KV-cache traffic, and hardware balance determine memory- or compute-bound execution.",
+        "license": "The arXiv record was used for technical review and citation. No permissive license for reusing a candidate figure was established, so no figure, benchmark, prose, equation layout, or visual structure is reproduced."
+      },
+      {
+        "title": "Orca: A Distributed Serving System for Transformer-Based Generative Models",
+        "url": "https://www.usenix.org/conference/osdi22/presentation/yu",
+        "usage": "Used as a peer-reviewed primary systems source to verify that prompt initialization can process all input tokens together while generation advances iteratively because each new token depends on the prior output.",
+        "license": "USENIX provides open access to the paper and presentation, but no permissive figure-reuse license was identified for candidate artwork. No Orca figure, request trace, measurements, wording, or layout is adapted."
+      },
+      {
+        "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+        "url": "https://arxiv.org/abs/2205.14135",
+        "usage": "Used as the primary attention-kernel source to verify that HBM traffic and on-chip reuse are essential to performance analysis, and that long-sequence prefill attention has an additional I/O-aware optimization distinct from model-weight streaming.",
+        "license": "Consulted for mechanism and terminology only. A permissive grant for reproducing paper figures was not established, and no plot, algorithm layout, prose, result, or artwork is reused."
+      },
+      {
+        "title": "SARATHI: Efficient LLM Inference by Piggybacking Decodes with Chunked Prefills",
+        "url": "https://arxiv.org/abs/2308.16369",
+        "usage": "Used as a primary serving paper to cross-check that prefills and decodes have different compute characteristics and that chunking and batching can alter their effective shapes, so compute-bound prefill and memory-bound decode must be presented as common regimes rather than universal laws.",
+        "license": "The public preprint was reviewed as a factual source. No clear permissive permission for candidate figure reuse was relied upon, and no figure, trace, measurements, prose, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why the same parameter tensor can be compute-bound in one phase and bandwidth-bound in another. In a large prefill matrix multiplication, many prompt-token rows are available simultaneously, so a weight tile loaded into the accelerator’s working memory can participate in many multiply-accumulates before eviction. At batch-one decode, only one newest-token row is ready; producing the next row requires the current output first, and another model pass streams the weights again. This lowers arithmetic per weight byte. Larger decode batches increase reuse, while short prefills, small or inefficient shapes, attention and KV-cache traffic, kernels, and hardware balance can shift either phase into another regime. The four-row construction is qualitative and illustrative; it makes no empirical latency, throughput, or cache-residency claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 source-deck pages, reviewed the exact pages 107-116 neighborhood, and checked three primary systems papers plus the original FlashAttention paper before selecting an original paired weight-reuse ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "prefill-decode-weight-reuse"
+    ],
+    "accessibility": "The figure has a linked title and description, region and section headings, a labelled group, and two labelled semantic tables with scoped headers. Every load, reuse, serial step, and likely bottleneck is written explicitly, so the lesson does not rely on color. The established two-panel primitive stacks to one column below 640 pixels, the tables have no minimum width and use short wrapping labels for a 390 CSS-pixel viewport, theme variables preserve light and dark contrast, and shared print rules force a light high-contrast palette and keep the figure readable without runtime behavior."
+  }
+}
