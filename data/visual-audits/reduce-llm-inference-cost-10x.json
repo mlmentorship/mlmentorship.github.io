@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "slug": "reduce-llm-inference-cost-10x",
+  "article": "src/content/posts/2026-02-05-reduce-llm-inference-cost-10x.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Apply cost-reduction levers in the senior sequence: measure request-level cost, diagnose the dominant layer, test the matching intervention, and compound only savings that preserve quality on important slices.",
+  "mediumRationale": "A compact Mermaid feedback loop is the smallest medium that can connect diagnosis, layer-specific intervention, a cost-and-quality decision gate, rollback, and repeated optimization. The directed sequence teaches prioritization without inventing universal prices, savings percentages, or effort estimates.",
+  "mediumComparison": {
+    "mermaid": "Selected: the core lesson is an ordered operational process with a decision and return path. The established top-to-bottom flow primitive provides responsive layout, accessible source, theme support, and print behavior.",
+    "svg": "Rejected: there is no stable quantitative geometry to plot. Fixed bar widths, a 10x waterfall, or an effort-impact matrix would imply evidence the article does not provide and would be harder to maintain than a semantic flow.",
+    "semanticHtml": "Rejected: a checklist or comparison table could list levers, but would not show that measurement precedes selection, every change passes the same quality gate, and rejected changes return to diagnosis.",
+    "interaction": "Rejected: editable token prices, cache hit rates, traffic mixes, and quality thresholds could model one deployment, but require provider- and workload-specific inputs beyond this interview answer. Hidden control states would add complexity without strengthening the invariant sequence.",
+    "paperReuse": "Rejected: the reviewed deck, papers, and official documentation contain serving architectures, routing results, and product-specific cost behavior, but no source figure expresses this article-specific measure-diagnose-test-compound loop. Public access was not treated as permission to reuse artwork.",
+    "noVisual": "Rejected: the prose names the right levers, but the difference between technique shopping and senior judgment remains distributed across the L5 and L6 sections. The loop makes the order, conditionality, and repeated quality gate visible in one scan."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The preceding LLM-training slide discusses mixed precision and EWC, establishing that its optimizations concern training rather than request-level inference cost."
+      },
+      {
+        "page": 108,
+        "insight": "The LLM compute-optimization slide explains quadratic attention cost and the GPU memory hierarchy. It motivates measuring context-related compute but does not provide an application-level cost diagnosis or quality gate."
+      },
+      {
+        "page": 109,
+        "insight": "The neighboring sequence-packing slide reduces padding waste in training batches, not repeated prompts, retrieval context, agent steps, or tail inference requests."
+      },
+      {
+        "page": 114,
+        "insight": "The slide before the serving summary returns to mixed-precision training and contributes no request-cost decision process."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving summary names prefill, paged KV cache, speculative decoding, continuous batching, and quantization. It is the closest serving slide, but lists mechanisms without showing how to diagnose the dominant product cost or gate a change on quality."
+      },
+      {
+        "page": 116,
+        "insight": "The following re-scoring divider begins a different topic, marking the end of the concentrated LLM-serving neighborhood."
+      },
+      {
+        "page": 160,
+        "insight": "The slide before the ML-design checklist only allocates interview time and contains no optimization or evaluation mechanism."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview starts with product need and objective, asks for latency-versus-accuracy and compute constraints, and recommends simple then progressively sophisticated models."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist asks for infrastructure costs, latency and scaling constraints, baselines, offline evaluation, error analysis, online success criteria, and a cost-benefit framework, supporting measurement before intervention."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide requires gating tests, monitoring metrics, update procedures, user feedback, and latency, memory, compute, and privacy constraints, supporting a release gate rather than cost-only acceptance."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide emphasizes attributable metrics, simple first models, infrastructure testing, human error analysis, and multi-metric launch decisions."
+      },
+      {
+        "page": 170,
+        "insight": "The next slide starts algorithms and data structures and contains no cost-optimization guidance, marking the end of the evaluation neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol) text-indexed all 214 physical pages for LLM, inference, cost, serving, cache, retrieval, RAG, distillation, quantization, evaluation, latency, and monitoring. It then read the complete closest LLM-compute neighborhood on pages 107-116 and the relevant ML-design neighborhood on pages 160-170, including adjacent boundary slides. Pages 108, 115, 161-162, and 168-169 provide useful ingredients, but no deck figure combines request-level telemetry, dominant-layer diagnosis, a matched intervention, slice-level quality gating, rollback, and repeated compounding. The local deck states no general reuse license and embeds externally sourced material, so it was treated as review-only; no deck pixels, prose, values, or layout are copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "RouteLLM: Learning to Route LLMs with Preference Data",
+        "url": "https://arxiv.org/abs/2406.18665",
+        "usage": "Used as a primary systems paper to verify that routing can minimize cost for a target quality by reserving a stronger model for queries predicted to need it, and that routing must be evaluated against performance targets rather than assumed safe.",
+        "license": "The arXiv paper is publicly accessible, but public access was not treated as permission to republish its figures. No plot, benchmark value, model pairing, wording, or visual arrangement is reproduced."
+      },
+      {
+        "title": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance",
+        "url": "https://arxiv.org/abs/2305.05176",
+        "usage": "Used as a primary paper to verify that prompt selection and model cascades are application-level cost levers distinct from modifying model weights, and that affordability must be considered together with task accuracy.",
+        "license": "The arXiv record provides public access but no figure-reuse permission was relied on. No source figure, API comparison, result, prose, or layout is copied."
+      },
+      {
+        "title": "OpenAI API: Prompt caching",
+        "url": "https://developers.openai.com/api/docs/guides/prompt-caching",
+        "usage": "Used as official documentation to verify that caching reuses matching prompt-prefix work, only discounts eligible cached input, and should be monitored through cache-hit telemetry rather than treated as a universal fixed saving.",
+        "license": "OpenAI documentation was consulted for behavior and terminology only. No documentation text, code, price table, screenshot, artwork, or layout is reproduced."
+      },
+      {
+        "title": "Claude Platform: Prompt caching",
+        "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-caching",
+        "usage": "Used as official documentation to cross-check that cache behavior depends on ordered prompt prefixes, breakpoints, and time-to-live, reinforcing that the lever must be matched to measured repeated context.",
+        "license": "Anthropic retains rights in its documentation and no artwork-reuse permission was assumed. No prose, code sample, pricing, screenshot, or visual structure is copied."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml/",
+        "usage": "Used as official engineering guidance to verify the operational sequence of instrumenting metrics, starting with simple changes, testing infrastructure independently, examining errors, and making launch decisions across multiple metrics.",
+        "license": "Google Developers states that page content is CC BY 4.0 unless otherwise noted and code samples are Apache 2.0. The source is cited, but the diagram is independently authored and reuses no page prose, code, or artwork."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is prioritization under uncertainty, not the list of techniques. A senior response first instruments cost per successful request by feature, request type, user segment, and tail percentile; identifies whether repeated prompt, retrieval, agent steps, tail behavior, or model serving dominates; then chooses the lowest-risk lever that attacks that measured layer. Prompt caching is only relevant to eligible repeated prefixes, routing is only safe relative to a task-quality target, and deeper model changes carry larger validation and operational costs. Every candidate change therefore runs against a baseline and is kept only when both cost and high-stakes slice quality pass. The loop intentionally contains no universal 10x arithmetic because provider rules, prices, traffic mixes, and quality sensitivity vary."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both closest neighborhoods, then checked two primary cost-aware routing and cascade papers plus current OpenAI, Anthropic, and Google engineering guidance before selecting an original decision loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "inference-cost-measure-test-compound-loop"
+    ],
+    "accessibility": "The visible learning objective and Mermaid source provide a complete accessible title and description. Numbered stages, explicit layer-to-lever mappings, yes/no edge labels, solid forward arrows, and a dashed rollback path carry the complete lesson without color. The established wide-flow primitive preserves readable label size inside a contained horizontal scroll region at 390 CSS pixels, while the tall marker prevents vertical compression. Repository theme tokens provide dark-mode contrast, and shared print rules remove the screen width floor and render a light high-contrast static diagram."
+  }
+}
