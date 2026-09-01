@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "slug": "position-bias-counterfactual-learning-to-rank",
+  "article": "src/content/posts/2026-08-28-position-bias-counterfactual-learning-to-rank.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Separate relevance from exposure, then trace how inverse examination weighting makes two positions with identical latent relevance contribute equal expected signal under a position-based examination model.",
+  "mediumRationale": "A two-panel semantic calculation is the smallest medium that aligns the same relevance rate with two examination propensities, the resulting click counts, inverse weights, and corrected signals. Native text and scoped row headers keep every step readable and inspectable at phone width.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is aligned arithmetic under one observation model, not a branching process. Routed edges would obscure the cancellation between examination propensity and inverse weight.",
+    "svg": "Rejected: fixed coordinates add no explanatory geometry to four labelled calculation steps and would make wrapping numeric expressions less robust at 390 CSS pixels.",
+    "semanticHtml": "Selected: two established responsive panels with semantic tables preserve row correspondence, selectable text, scoped headers, and a complete accessible reading order without runtime code.",
+    "interaction": "Rejected: changing relevance or propensity values would add controls and state, but the invariant that e multiplied by 1/e cancels is fully visible in one static worked example.",
+    "paperReuse": "Rejected: the primary counterfactual LTR paper contains formal estimators and experimental figures, but no permissive figure-reuse grant was established and no source artwork is needed. The values, wording, arrangement, and calculation are independently authored.",
+    "noVisual": "Rejected: prose gives the examination factorization and inverse weights separately, leaving readers to mentally connect lower raw clicks to a larger correction. The paired calculation makes that cancellation explicit while preserving the model assumptions."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider establishes the boundary before the nearest presentation-bias discussion and contains no substantive mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide says observed positives are not missing at random and that presentation bias creates a feedback loop requiring exploration, but it does not separate examination from relevance or define propensity weighting."
+      },
+      {
+        "page": 131,
+        "insight": "The adjacent content-based and hybrid-recommender slide moves to similarity and model blending without adding click, exposure, or counterfactual semantics."
+      },
+      {
+        "page": 161,
+        "insight": "The ML-design overview asks about logging, sampling bias, offline metrics, and online experimentation but supplies no position-bias model or estimator."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist explicitly asks whether position, selection, and labeling bias were corrected and whether explore-exploit is used, but it does not explain how propensities correct observations."
+      },
+      {
+        "page": 163,
+        "insight": "The following content-feed walkthrough asks how training data will be kept unbiased and when behavioral signals fail to reflect the goal; it remains a checklist rather than a causal or arithmetic explanation."
+      },
+      {
+        "page": 168,
+        "insight": "The production-serving slide discusses monitoring user reactions and model updates, providing nearby feedback-loop context but no ranking-specific correction."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning Engineering slide warns about skew in ranking, positional-feature feedback loops, and importance weighting sampled data. It names the hazards but does not distinguish examination and policy propensities or derive IPS."
+      },
+      {
+        "page": 170,
+        "insight": "The following Algorithms and Data Structures divider begins a new section and contains no relevance, exposure, or counterfactual material."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for position bias, presentation bias, propensity, counterfactual, inverse propensity, examination, click models, feedback loops, ranking bias, and importance weighting. Only pages 130, 162, and 169 directly matched the topic; their complete neighborhoods at pages 129-131, 161-163, and 168-170 were read page-by-page. The deck names presentation bias, correction as a design requirement, importance weighting, and positional feedback loops, but provides no estimator or reusable explanatory figure. No deck image, wording, values, or layout is copied.",
+    "license": "The local deck states no general reuse license and includes externally attributed material. It is treated as review-only; no screenshot, artwork, prose, example, coordinates, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Unbiased Learning-to-Rank with Biased Feedback",
+        "url": "https://arxiv.org/abs/1608.04468",
+        "usage": "Used as the primary ranking source to verify that presentation-biased implicit feedback is not missing completely at random, observation probabilities are propensities, and inverse propensity weighting yields an unbiased ranking-risk estimate when relevant outcomes have positive observation probability and propensities depend on observable information.",
+        "license": "The author preprint is publicly accessible, but public access does not establish permission to adapt its figures. No paper equation layout, prose, data, experiment, figure, or example values are reproduced."
+      },
+      {
+        "title": "Counterfactual Risk Minimization: Learning from Logged Bandit Feedback",
+        "url": "https://proceedings.mlr.press/v37/swaminathan15.html",
+        "usage": "Used as the primary counterfactual-learning source to verify propensity-scored learning from logged clicks and the importance of controlling variance in propensity-weighted empirical risk.",
+        "license": "PMLR provides the paper for public reading, but no permissive artwork-reuse grant was relied upon. No theorem, equation, algorithm, result, prose, or figure is adapted."
+      },
+      {
+        "title": "Doubly Robust Policy Evaluation and Learning",
+        "url": "https://arxiv.org/abs/1103.4601",
+        "usage": "Used as the primary source to verify the article's broader estimator context: doubly robust evaluation combines a reward model with inverse-propensity correction and can reduce variance when the reward model is useful.",
+        "license": "The paper is consulted for technical verification only. No permissive figure license was established, and no source figure, prose, equation layout, result, or data is reproduced."
+      }
+    ],
+    "notes": "The hardest article-specific mental model is why a lower click rate need not mean lower relevance and how inverse examination weighting corrects that difference in expectation. In the original synthetic example, each position has 100 impressions and the same assumed relevance probability 0.60. Under the article's simple examination model, examination propensities 1.00 and 0.25 produce 60 and 15 expected clicks. Weighting clicks by 1/e gives 60 times 1 and 15 times 4, so both positions contribute 60 expected relevance units. The example isolates examination propensity rather than target-to-logging policy propensity. It assumes the position-based factorization, correct positive propensities, and stable relevance; it is not an empirical estimate of user behavior and does not solve hidden confounding, slate interference, or zero support."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected every matching neighborhood, checked the primary unbiased LTR, counterfactual risk, and doubly robust papers, and verified the worked expectation arithmetic before selecting an original semantic comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "position-bias-inverse-examination-weight"
+    ],
+    "accessibility": "The labelled figure uses two semantic tables with scoped row headers and explicit accessible names. Every assumption, propensity, multiplication, inverse weight, and corrected result is written as text; panel headings and repeated values carry the comparison without color. The established two-panel primitive stacks below 640 pixels, each table has only two columns and no minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+  }
+}
