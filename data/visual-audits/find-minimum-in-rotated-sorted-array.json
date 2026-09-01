@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-find-minimum-in-rotated-sorted-array.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The drop lies on the side where the middle value exceeds the right boundary.",
+  "learningObjective": "Retain the minimum by comparing middle with the current right boundary.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the drop lies on the side where the middle value exceeds the right boundary.",
-    "invariant": "The drop lies on the side where the middle value exceeds the right boundary.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Binary search for a rotation pivot by comparing middle with the current right endpoint.",
+    "recognitionCue": "Distinct values form two increasing runs after one rotation, and the task asks for the smallest value rather than a particular target.",
+    "invariant": "The minimum is always inside inclusive [left, right]. If nums[middle] exceeds nums[right], middle is on the high run; otherwise middle may be the minimum and must be retained.",
+    "stateModel": "Track only left and right indices and derive middle. The right endpoint supplies the reference run; each comparison either advances left past middle or moves right onto middle.",
+    "visualRationale": "The indexed rotated array displays both increasing runs and the drop, while stable left, middle, and right pointers show why middle is excluded in one branch but retained in the other.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A circular rotation diagram makes the contiguous search interval harder to follow.",
+      "A line chart overstates numeric magnitude when only ordering and the single drop matter.",
+      "A comparison table hides the exact indices removed and the crucial right=middle asymmetry."
     ],
-    "transferLesson": "Transfer the invariant: The drop lies on the side where the middle value exceeds the right boundary.",
-    "reviewStatus": "pending"
+    "transferLesson": "Pivot searches depend on choosing an endpoint reference and preserving the candidate when equality or ordering does not prove it impossible; this same boundary discipline applies to first-occurrence searches.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

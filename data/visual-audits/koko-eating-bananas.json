@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-koko-eating-bananas.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Binary-search the smallest eating speed that finishes within the hour limit.",
+  "learningObjective": "Binary-search the first speed whose ceiling-division total is at most 8 hours.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to binary-search the smallest eating speed that finishes within the hour limit.",
-    "invariant": "Binary-search the smallest eating speed that finishes within the hour limit.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Binary search on a monotone answer predicate, seeking the first feasible speed.",
+    "recognitionCue": "The answer is numeric, bounded from 1 to max(piles), and feasibility changes only once: if speed k finishes in time, every faster speed also finishes.",
+    "invariant": "The minimum feasible speed always remains in inclusive [left, right]. An infeasible midpoint and every slower speed are removed; a feasible midpoint is retained as right.",
+    "stateModel": "Keep left and right speed bounds, derive the tested speed, and evaluate total hours with ceiling division for each pile; no per-pile state persists between tests.",
+    "visualRationale": "An ordered speed line with stable bound and probe pointers exposes the false-to-true boundary, while each frame prints the real piles and complete ceiling-hour arithmetic.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Animating bananas being eaten emphasizes simulation rather than the monotone feasibility boundary.",
+      "A pile-height bar chart shows the input but not the ordered answer space being searched.",
+      "A feasibility table without moving bounds lists calculations but hides why half the speeds are safely discarded."
     ],
-    "transferLesson": "Transfer the invariant: Binary-search the smallest eating speed that finishes within the hour limit.",
-    "reviewStatus": "pending"
+    "transferLesson": "For capacity, rate, and threshold problems, define a monotone yes/no test, choose bounds that contain the answer, and retain the midpoint on the side that may hold the first true value.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-search-in-rotated-sorted-array.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Use the sorted half to decide which side of the rotation can contain the target.",
+  "learningObjective": "Keep the interval containing target 0 by identifying one sorted half at each probe.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to use the sorted half to decide which side of the rotation can contain the target.",
-    "invariant": "Use the sorted half to decide which side of the rotation can contain the target.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Modified binary search that first identifies the sorted half around middle.",
+    "recognitionCue": "The array was sorted and rotated once with distinct values, so although the whole interval may cross the pivot, at least one side of middle remains sorted.",
+    "invariant": "If target 0 exists, it remains in inclusive [left, right]. A half is discarded only after its sorted value range proves whether target can occur there.",
+    "stateModel": "Track left, middle, and right indices plus the immutable target. The endpoint-to-middle comparison identifies a sorted half; a target-range comparison chooses the next interval.",
+    "visualRationale": "The indexed rotated array keeps the pivot geometry visible while stable boundary pointers move across it, making both sorted-half tests readable without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A circular diagram emphasizes rotation but makes index intervals and return coordinates harder to read.",
+      "A branch flowchart shows conditions without showing which concrete values justify them.",
+      "A table of left, middle, and right values hides the contiguous half removed after each branch."
     ],
-    "transferLesson": "Transfer the invariant: Use the sorted half to decide which side of the rotation can contain the target.",
-    "reviewStatus": "pending"
+    "transferLesson": "When a monotone ordering is disrupted once, find a locally ordered region and use its endpoint values to make the same safe-elimination argument as ordinary binary search.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
