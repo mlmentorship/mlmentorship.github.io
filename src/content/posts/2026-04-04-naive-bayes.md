@@ -61,6 +61,41 @@ Even though words are clearly correlated, naive Bayes can still rank classes cor
 
 For pure classification accuracy, NB is competitive. For calibrated probabilities, prefer logistic regression with proper regularization.
 
+<!-- visual:naive-bayes-evidence-ledger -->
+<figure class="learning-figure" aria-labelledby="naive-bayes-ledger-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="naive-bayes-ledger-title">How can naive Bayes choose the right class but be too confident?</p>
+	<div class="visual-grid--two" role="group" aria-label="An illustrative Naive Bayes evidence ledger beside the conditional-independence caveat">
+		<section class="visual-panel" aria-labelledby="nb-score-title">
+			<h4 id="nb-score-title">Model score: count every token separately</h4>
+			<p>For two equally likely classes, suppose a text model learned these illustrative likelihood ratios for a document containing “free prize.”</p>
+			<table class="cm-grid" aria-label="Illustrative spam to ham odds calculation">
+				<tbody>
+					<tr><th scope="row">Prior odds</th><td>1 : 1</td></tr>
+					<tr><th scope="row">“free”</th><td>× 8</td></tr>
+					<tr><th scope="row">“prize”</th><td>× 7</td></tr>
+					<tr><th scope="row">NB odds</th><td class="cm-selected"><strong>56 : 1</strong> spam</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">1 × 8 × 7 = 56 → choose spam</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="nb-caveat-title">
+			<h4 id="nb-caveat-title">Reality check: evidence can overlap</h4>
+			<p>“Free” and “prize” may come from the same promotional phrase, so their occurrences can remain correlated even after the class is known.</p>
+			<table class="cm-grid" aria-label="Difference between the Naive Bayes assumption and correlated text">
+				<tbody>
+					<tr><th scope="row">NB assumes</th><td>two conditionally independent contributions</td></tr>
+					<tr><th scope="row">Text may contain</th><td>one underlying signal expressed twice</td></tr>
+					<tr><th scope="row">Class decision</th><td class="cm-selected"><strong>spam can still win</strong></td></tr>
+					<tr><th scope="row">Probability</th><td>56 : 1 can overstate certainty</td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">use the argmax; distrust uncalibrated probability</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> multiply down the left ledger first: naive Bayes gives each observed token its own likelihood-ratio contribution, so the class score can separate sharply. Then read the right panel: if correlated tokens repeat one underlying signal, multiplying them as independent evidence exaggerates the odds. The winning class can remain correct even when the reported probability is overconfident. The numbers are an original illustrative calculation, checked against the <a href="https://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html"><cite>Introduction to Information Retrieval</cite> treatment of multinomial naive Bayes</a> and <a href="https://scikit-learn.org/stable/modules/naive_bayes.html">scikit-learn's official model guidance</a>.</figcaption>
+</figure>
+
 ## Generative vs. discriminative
 
 Naive Bayes models the joint $p(x, y)$. Logistic regression models $p(y \mid x)$ directly. Asymptotic results [(Ng & Jordan, 2002)](https://papers.nips.cc/paper/2001/hash/7b7a53e239400a13bd6be6c91c4f6c4e-Abstract.html):
