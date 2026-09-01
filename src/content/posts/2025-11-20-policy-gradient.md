@@ -48,6 +48,36 @@ $$
 
 Optimal baseline: a value function $V(s_t)$. This leads directly to actor-critic.
 
+<!-- visual:policy-gradient-advantage-sign -->
+<figure class="learning-figure" aria-labelledby="policy-gradient-sign-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="policy-gradient-sign-title">How does the sign of advantage change the sampled action’s probability?</p>
+	<div class="visual-grid--two" role="group" aria-label="One policy-gradient update rule followed by positive, zero, and negative advantage cases">
+		<section class="visual-panel">
+			<h4>SAMPLED ACTION · COMPARE WITH BASELINE</h4>
+			<p><strong>Observed</strong><br /><var>G</var><sub>t</sub> is the return-to-go after sampling action <var>a</var><sub>t</sub> in state <var>s</var><sub>t</sub>.</p>
+			<p><strong>Expected</strong><br /><var>b</var>(<var>s</var><sub>t</sub>) is an action-independent baseline, commonly <var>V</var>(<var>s</var><sub>t</sub>).</p>
+			<p><strong>Weight</strong><br /><var>A</var><sub>t</sub> = <var>G</var><sub>t</sub> − <var>b</var>(<var>s</var><sub>t</sub>).</p>
+		</section>
+		<section class="visual-panel">
+			<h4>+ · BETTER THAN EXPECTED</h4>
+			<p><strong>Advantage</strong><br /><var>A</var><sub>t</sub> &gt; 0.</p>
+			<p><strong>Gradient-ascent update</strong><br />Move along the score direction: increase log π(<var>a</var><sub>t</sub> | <var>s</var><sub>t</sub>) and reinforce the sampled action.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>0 · MATCHED EXPECTATION</h4>
+			<p><strong>Advantage</strong><br /><var>A</var><sub>t</sub> = 0.</p>
+			<p><strong>Gradient-ascent update</strong><br />This sample contributes zero to the policy gradient.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>− · WORSE THAN EXPECTED</h4>
+			<p><strong>Advantage</strong><br /><var>A</var><sub>t</sub> &lt; 0.</p>
+			<p><strong>Gradient-ascent update</strong><br />Reverse the score direction: decrease log π(<var>a</var><sub>t</sub> | <var>s</var><sub>t</sub>) and suppress the sampled action.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> start with the sampled action, subtract what the policy expected in that state, then follow the sign. Positive advantage reinforces that action; negative advantage reverses the score direction; zero advantage supplies no update. Because policy probabilities are normalized, changing the sampled action can also redistribute probability among other actions. The action-independent baseline changes variance, not the expected policy gradient. Original schematic checked against <a href="https://papers.nips.cc/paper_files/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html">Sutton et al.'s policy-gradient theorem</a> and <a href="https://doi.org/10.1007/BF00992696">Williams's REINFORCE analysis</a>.</figcaption>
+</figure>
+
 ## Actor-critic
 
 Two networks:
