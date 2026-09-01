@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "probability-distributions-in-ml",
+  "article": "src/content/posts/2026-08-28-probability-distributions-in-ml.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Choose among Bernoulli, binomial, Poisson, and exponential models by defining what one observation records.",
+  "mediumRationale": "A deterministic two-process SVG is the smallest medium that can keep each data-generating assumption attached to two alternative observation windows. The split makes support and aggregation visible without repeating the article's catalog of formulas or implying that all four families arise from one process.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can route labels but cannot compactly show the five fixed trials, bounded count support, event timeline, fixed exposure window, and continuous waiting interval together.",
+    "svg": "Selected because fixed coordinates align each process with its two observation units and preserve the distinction between discrete boxes, a countable event stream, and continuous time. A 360-unit stacked viewBox avoids horizontal scrolling and keeps labels readable at 390 CSS pixels.",
+    "semanticHtml": "Rejected because cards could list the four families but would weaken the spatial operation of drawing a different observation window around the same kind of process.",
+    "interaction": "Rejected because controls for changing trial count or exposure would add state without changing the core selection rule. The four static cases already expose the relevant support and assumptions.",
+    "paperReuse": "Rejected because no paper-specific empirical result is involved. Reuse rights for candidate lecture and textbook figures were not assumed; the event positions, outcomes, wording, geometry, and arrangement are original.",
+    "noVisual": "Rejected because the article's hardest mental model is relational rather than algebraic: distribution choice depends jointly on process assumptions and what one row records. Prose lists the distinctions, but does not hold the process fixed while changing the observation unit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 7,
+        "insight": "The preceding probability-measures slide distinguishes probability mass from density and introduces expectations. It gives foundational context but does not connect a data-generating process or observation unit to a distribution family."
+      },
+      {
+        "page": 8,
+        "insight": "The exact discrete-distributions slide defines Bernoulli as one binary outcome, categorical as one of K outcomes, binomial as successes across n Bernoulli trials, and multinomial as class counts across n categorical trials. This directly supports the visual's one-trial versus fixed-trial-total comparison."
+      },
+      {
+        "page": 9,
+        "insight": "The neighboring slide repeats the page 8 definitions and adds inverse-CDF-style discrete sampling pseudocode. It adds implementation material but no model-selection guidance, continuous waiting-time counterpart, or assumption check."
+      },
+      {
+        "page": 10,
+        "insight": "The following page contains only an R-squared identity and ends the local distribution sequence; it contributes no distribution-selection material."
+      },
+      {
+        "page": 73,
+        "insight": "A later LDA slide describes the Dirichlet as a distribution over distributions and applies it to topic proportions. It is relevant to the article's Dirichlet section but does not help with the harder observation-unit selection model."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for Bernoulli, binomial, categorical, multinomial, Poisson, exponential, Gamma, Beta, Dirichlet, Gaussian, and Laplace. Direct distribution-family definitions occur on pages 8-9; page 73 supplies the only Dirichlet-specific application. Pages 7-10 were read as the complete local neighborhood around the definitions. The deck has no Poisson, exponential, Gamma, Beta, Gaussian-distribution, or Laplace-distribution treatment matching this article. No deck prose, artwork, example, code, or layout is reproduced."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "OpenStax Introductory Statistics 2e: Binomial, Poisson, and Exponential Distributions",
+        "url": "https://openstax.org/books/introductory-statistics-2e/pages/5-3-the-exponential-distribution",
+        "usage": "Used as an authoritative open textbook to cross-check bounded binomial count support, Poisson counts in a fixed interval, exponential waiting times, and the Poisson-exponential relationship under independent inter-event times.",
+        "license": "OpenStax publishes Introductory Statistics 2e under CC BY 4.0. No graph, prose, exercise, numerical example, or layout is copied or adapted; the textbook sections are cited only."
+      },
+      {
+        "title": "NIST/SEMATECH e-Handbook of Statistical Methods: Poisson Distribution",
+        "url": "https://www.itl.nist.gov/div898/handbook/eda/section3/eda366j.htm",
+        "usage": "Used as an authoritative government reference to cross-check that a Poisson variable records the number of events in a given interval and has nonnegative-integer support.",
+        "license": "NIST states that employee-created non-SRD works are generally not subject to U.S. copyright under 17 USC 105, while noting possible foreign and third-party rights. No NIST plot, wording, data, or visual arrangement is reused; citation alone is used."
+      }
+    ],
+    "notes": "The article's hardest prose-only mental model is that a distribution is attached to a random variable, not merely to a domain noun. Under independent equal-probability trials, one visit outcome Xi is Bernoulli(p), while the sum of five outcomes is Binomial(5,p). Under a homogeneous independent event process with rate lambda per minute, the count in ten minutes is Poisson(10 lambda), while the waiting time to the next event is Exponential(lambda). These are separate process assumptions, deliberately shown in separate panels. The supports and parameter scaling were recalculated directly."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed the full 214-page deck and inspected physical pages 7-10 plus page 73, then checked an open statistics textbook and NIST reference before selecting one original process-to-observation construction."
+  },
+  "implementation": {
+    "visualIds": [
+      "distribution-observation-unit"
+    ],
+    "accessibility": "The SVG includes a programmatic title and detailed description naming both process assumptions, all four observation units, supports, and resulting families. Lettered process panels, numbered choices, direct support notation, outlined observation boxes, branching connectors, event marks, and a timeline communicate every distinction without color. The 360-unit-wide stacked viewBox has no minimum width and scales to 390 CSS pixels without horizontal scrolling; its 11-unit minimum labels remain above the project's 8-pixel rendered threshold. Existing semantic visual tokens provide dark-mode contrast and explicit light-page print styling."
+  }
+}
