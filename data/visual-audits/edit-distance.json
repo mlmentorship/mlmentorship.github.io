@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-edit-distance.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each mismatch chooses the cheapest of insert, delete, and replace.",
+  "learningObjective": "Fill prefix edit costs: matches copy the diagonal; mismatches add one to min(insert, delete, replace).",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to each mismatch chooses the cheapest of insert, delete, and replace.",
-    "invariant": "Each mismatch chooses the cheapest of insert, delete, and replace.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Two-dimensional prefix edit-distance dynamic programming, compressed to previous and current rows.",
+    "recognitionCue": "Use it when transforming one sequence prefix into another permits local insert, delete, and replace operations and asks for the minimum total operation count.",
+    "invariant": "After current[j] is appended, it is the minimum edits from the processed first prefix to second[:j]; its left, up, and diagonal dependencies are already final.",
+    "stateModel": "Only previous, the growing current row, and the two loop indices are required. The conceptual grid shows the three predecessor states represented by insert, delete, and replace.",
+    "visualRationale": "A prefix grid exposes operation geometry and base cases directly. Every cell shows its arithmetic and chosen predecessor, so the trace remains understandable in static monochrome output.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An edit-script animation was rejected because one optimal script does not prove the minimum recurrence.",
+      "A recursion tree was rejected because repeated prefix pairs obscure memoized state reuse.",
+      "Two unlabeled rolling arrays were rejected because they hide the insert, delete, and replace coordinates."
     ],
-    "transferLesson": "Transfer the invariant: Each mismatch chooses the cheapest of insert, delete, and replace.",
-    "reviewStatus": "pending"
+    "transferLesson": "For minimum transformation problems, define prefix states and map each allowed operation to the predecessor state it leaves behind; then add operation cost to the best predecessor.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

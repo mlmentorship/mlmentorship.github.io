@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-merge-intervals.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Sort by start and extend the last merged interval whenever ranges overlap.",
+  "learningObjective": "Sort ranges by start; compare each range with the last merged end, extending on overlap or appending on a gap.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to sort by start and extend the last merged interval whenever ranges overlap.",
-    "invariant": "Sort by start and extend the last merged interval whenever ranges overlap.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Sort intervals by start, then scan while maintaining the last merged interval.",
+    "recognitionCue": "Use it when arbitrary ranges must be coalesced by overlap; sorting by start guarantees that any range able to overlap the current merged component appears before a later gap.",
+    "invariant": "Before each current interval, merged is sorted, disjoint, and exactly covers all processed ranges; only merged[-1] can overlap current because starts are nondecreasing.",
+    "stateModel": "The minimal scan state is the sorted intervals, current index, and merged output whose final element is mutable. The timeline fixes all endpoints on one common number line.",
+    "visualRationale": "Aligned interval tracks make overlap and gaps geometric rather than verbal. Explicit comparison equations and ordered labels remain readable without color or playback.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A start/end table was rejected because it hides physical overlap and gaps.",
+      "A graph of pairwise overlaps was rejected because sorting removes the need to compare all pairs.",
+      "A final merged picture was rejected because it omits the seed, extend, and append branches."
     ],
-    "transferLesson": "Transfer the invariant: Sort by start and extend the last merged interval whenever ranges overlap.",
-    "reviewStatus": "pending"
+    "transferLesson": "Sorting can turn a global overlap problem into a local frontier check: preserve a completed prefix and keep only the final component open for possible extension.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

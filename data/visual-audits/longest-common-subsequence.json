@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-common-subsequence.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A matching pair advances both prefixes; a mismatch keeps the better skipped prefix.",
+  "learningObjective": "Fill prefix states left to right: a match takes diagonal + 1; a mismatch takes max(left, up).",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a matching pair advances both prefixes; a mismatch keeps the better skipped prefix.",
-    "invariant": "A matching pair advances both prefixes; a mismatch keeps the better skipped prefix.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Two-dimensional prefix dynamic programming, stored as a previous row and a current row.",
+    "recognitionCue": "Use it when two sequences must retain relative order while allowing skips, and the answer for two prefixes depends only on shorter prefixes of one or both sequences.",
+    "invariant": "After writing current[index], it is the LCS length for the processed first-string prefix and second[:index]; previous holds the complete answers for the prior first-string prefix.",
+    "stateModel": "The implementation stores previous and current rows, while the visual expands those rows into a prefix grid so diagonal, left, and up dependencies remain explicit for every cell.",
+    "visualRationale": "A labelled grid is the simplest form that exposes both prefix axes and the recurrence geometry. Values, dependency labels, and equations remain complete without color or JavaScript.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A two-row values-only table was rejected because it hides which string prefixes each index represents.",
+      "A recursion tree was rejected because it duplicates overlapping subproblems and obscures the bottom-up fill order.",
+      "A highlighted final subsequence alone was rejected because it does not explain mismatch skips or optimality."
     ],
-    "transferLesson": "Transfer the invariant: A matching pair advances both prefixes; a mismatch keeps the better skipped prefix.",
-    "reviewStatus": "pending"
+    "transferLesson": "For ordered matching problems, define a state on two prefixes; matching endpoints consume both, while mismatching endpoints branch by skipping one side and combining optimal smaller states.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

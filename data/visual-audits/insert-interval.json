@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-insert-interval.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Copy intervals before the new range, merge overlaps, then copy the suffix.",
+  "learningObjective": "Partition sorted ranges into a copied prefix, one growing overlap span, and an untouched suffix.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to copy intervals before the new range, merge overlaps, then copy the suffix.",
-    "invariant": "Copy intervals before the new range, merge overlaps, then copy the suffix.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "A linear three-phase interval scan over sorted, non-overlapping input: prefix, overlap span, suffix.",
+    "recognitionCue": "Use it when inserting one range into already sorted disjoint ranges; their order partitions them into intervals ending before, overlapping, or starting after the growing span.",
+    "invariant": "answer contains every interval strictly before the span, span is the union of the new interval and all consumed overlaps, and intervals from index onward remain untouched and sorted.",
+    "stateModel": "The minimal state is answer, index, and mutable span endpoints start and end. The shared number line shows the current interval moving through each of the three groups.",
+    "visualRationale": "Aligned interval tracks expose before, overlap, containment, touching, and after relations directly. Branch equations and labels preserve meaning in monochrome static output.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Calling the general merge routine was rejected because it adds sorting and hides the useful pre-sorted three-phase structure.",
+      "A table of endpoint comparisons was rejected because it makes overlap geometry harder to see.",
+      "A single before-and-after diagram was rejected because it skips repeated span growth and the suffix stopping condition."
     ],
-    "transferLesson": "Transfer the invariant: Copy intervals before the new range, merge overlaps, then copy the suffix.",
-    "reviewStatus": "pending"
+    "transferLesson": "When ordered input surrounds one mutable object, scan an immutable prefix, absorb the contiguous interaction region into that object, then reuse the untouched suffix.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
