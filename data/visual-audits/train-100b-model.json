@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "slug": "train-100b-model",
+  "article": "src/content/posts/2025-11-28-train-100b-model.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish data, tensor, and pipeline parallelism as composable compute-placement axes from FSDP or ZeRO-3 as the state-sharding policy applied across data-parallel ranks.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can keep the three compute axes spatially distinct while placing state sharding in a separate overlay instead of incorrectly presenting FSDP as a fourth axis.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout would emphasize a process sequence and could visually promote FSDP to a peer stage or axis rather than a storage policy over data-parallel ranks.",
+    "svg": "Selected because fixed geometry can show tensor slices within a layer, pipeline stages across model depth, data replicas across batches, and a separately bounded state-sharding overlay in one narrow-column composition.",
+    "semanticHtml": "Rejected because a comparison table names each split precisely but makes the reader reconstruct the nested spatial relationships among operation, depth, replica, and stored state.",
+    "interaction": "Rejected because changing parallel degrees would require hardware, memory, and performance assumptions absent from the article; controls would add complexity without improving the classification lesson.",
+    "paperReuse": "Rejected because the reviewed Megatron-LM and ZeRO sources contain broader system figures, but public access is not treated as permission to reproduce them and neither teaches this exact axis-versus-policy distinction.",
+    "noVisual": "Rejected because the article explicitly warns that FSDP is not an independent mesh axis, yet prose alone requires readers to mentally place it relative to three different forms of parallel compute."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The transformer overview identifies GPU memory, training time, and parameter-proportional distributed communication as scaling constraints, but does not separate parallel placement axes."
+      },
+      {
+        "page": 107,
+        "insight": "The LLM training slide emphasizes hardware scalability, throughput, BF16, and FSDP settings, but provides no rank topology or distinction between compute placement and state storage."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide identifies BF16 activations and gradients, FP32 optimizer state, and ZeRO or FSDP sharding across data-parallel ranks, supplying the memory motivation for the overlay."
+      },
+      {
+        "page": 115,
+        "insight": "The adjacent stack summary combines mixed precision, state sharding, checkpointing, and accumulation as a list, but does not show how TP, PP, and DP compose."
+      },
+      {
+        "page": 167,
+        "insight": "The system-design slide contrasts replicated data parallelism with components placed on different machines, but collapses tensor and pipeline parallelism into generic model parallelism."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 PDF pages for distributed training, data/model/tensor/pipeline parallelism, FSDP, ZeRO, sharding, optimizer state, memory, and communication. The complete neighboring ranges 102-116 and 166-168 were extracted and reviewed. Those neighborhoods cover transformer scaling constraints, LLM training, mixed precision, the training stack, and generic distributed modeling, but contain no multidimensional rank layout or axis-versus-state-policy explanation. The deck provides no explicit artwork-reuse license, so no deck artwork, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM",
+        "url": "https://arxiv.org/abs/2104.04473",
+        "usage": "Used as the primary systems paper for composing tensor, pipeline, and data parallelism and for placing communication-intensive tensor parallelism on high-bandwidth links.",
+        "license": "The arXiv record is publicly accessible, but no permissive third-party figure-reuse grant was relied upon. No figure, prose, measured result, or layout is copied."
+      },
+      {
+        "title": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+        "url": "https://arxiv.org/abs/1910.02054",
+        "usage": "Used as the primary source for progressively partitioning optimizer state, gradients, and parameters across data-parallel processes while retaining data-parallel computation.",
+        "license": "The arXiv perpetual non-exclusive distribution license grants limited rights to arXiv rather than a general adaptation right. No paper figure, prose, data, or layout is reused."
+      },
+      {
+        "title": "Megatron Core Parallelism Strategies Guide",
+        "url": "https://docs.nvidia.com/megatron-core/developer-guide/nightly/user-guide/parallelism-guide.html",
+        "usage": "Used as current official implementation documentation to verify that TP splits individual layers, PP splits model depth, DP replicates the model and batch, the dimensions compose multiplicatively, and FSDP is configured as data-parallel state sharding.",
+        "license": "No documentation prose, commands, table, or diagram is copied. The visual is independently authored and relies on the guide only to check terminology and composition."
+      },
+      {
+        "title": "Getting Started with DeviceMesh",
+        "url": "https://docs.pytorch.org/tutorials/recipes/distributed_device_mesh.html",
+        "usage": "Used as official PyTorch documentation to verify that multidimensional parallelism creates distinct process groups for parallel dimensions and that shard and replicate groups can coexist.",
+        "license": "No tutorial image, code, prose, or layout is reused; the source is cited only for the process-group mental model."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access and download do not themselves grant permission to adapt figures from primary papers.",
+        "license": "The policy is cited only to document the conservative licensing decision. No policy wording, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that TP, PP, and DP answer where computation is placed at three different scopes, while FSDP or ZeRO answers which model state persists on the ranks of the DP group. The original visual therefore shows TP inside one operation, PP across model depth, and DP across batches, then separates the FSDP all-gather and reduce-scatter lifecycle beneath them. It reproduces no source-specific geometry or benchmark."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected every relevant neighboring sequence, then checked primary Megatron-LM and ZeRO papers, current NVIDIA and PyTorch documentation, and explicit arXiv licensing before selecting an original axis-versus-policy SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "train-100b-parallelism-map"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Every technique, split scope, communication action, and the axis-versus-policy conclusion is directly labelled; containment, position, borders, and a dashed separator preserve the lesson without color. Its 360-unit viewBox has no minimum width and scales within a 390 CSS pixel viewport. Established theme variables preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette with page-break protection."
+  }
+}
