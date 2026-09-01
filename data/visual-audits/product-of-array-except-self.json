@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-product-of-array-except-self.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Build each answer from the product to its left and the product to its right.",
+  "learningObjective": "At index i, combine the product strictly before i with the product strictly after i.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to build each answer from the product to its left and the product to its right.",
-    "invariant": "Build each answer from the product to its left and the product to its right.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Prefix and suffix accumulation without division.",
+    "recognitionCue": "Each output excludes exactly one array position, division is forbidden, and multiplication can be accumulated from either boundary.",
+    "invariant": "Before prefix index i, prefix is the product of nums[0..i-1]. Before suffix index i, suffix is the product of nums[i+1..n-1], while out[i] already stores the left product.",
+    "stateModel": "The output array stores completed left products; one scalar prefix scans right, then one scalar suffix scans left. No separate prefix or suffix arrays are required.",
+    "visualRationale": "An indexed array whose cells pair each input with its current output makes both passes and every multiplication readable in static HTML; the stable scan key visibly reverses direction between passes.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A final prefix/suffix table hides the order in which the implementation writes and multiplies each cell.",
+      "A division formula does not represent the supplied algorithm and breaks on zeros.",
+      "A prose-only trace forces the reader to remember four changing output values."
     ],
-    "transferLesson": "Transfer the invariant: Build each answer from the product to its left and the product to its right.",
-    "reviewStatus": "pending"
+    "transferLesson": "When every answer excludes one position and the operation is associative, save the contribution from one side and sweep the other side with a scalar; the same decomposition works for left/right minima, maxima, and cumulative constraints.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

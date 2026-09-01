@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-container-with-most-water.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The shorter wall limits area, so move that wall inward.",
+  "learningObjective": "Evaluate both boundary walls, then move only the shorter wall because keeping it cannot produce a taller container at a smaller width.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the shorter wall limits area, so move that wall inward.",
-    "invariant": "The shorter wall limits area, so move that wall inward.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Greedy two pointers at opposite ends of a height array.",
+    "recognitionCue": "Choose two boundary positions to maximize width times the smaller boundary height; moving inward always loses width, so only a taller limiting wall can compensate.",
+    "invariant": "Before each iteration, best is the largest area among discarded boundary pairs. Moving the shorter wall cannot discard a better pair because every pair that keeps it has smaller width and height no greater than that same short wall.",
+    "stateModel": "Keep left and right indices plus the best area seen. Current width and limiting height are derived from those indices, so no window contents or auxiliary collection is needed.",
+    "visualRationale": "Vertical bars preserve the height geometry, the measured rectangle prints width x limiting height, L and R labels stay visible on the boundary bars, and authored pointer motion keys track both boundaries across every iteration.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A plain indexed array shows pointer positions but hides that the shorter vertical wall determines water height.",
+      "A pair-by-pair area table lists arithmetic without exposing the geometric discard argument.",
+      "A brute-force matrix of all pairs visualizes O(n^2) work rather than the supplied greedy scan."
     ],
-    "transferLesson": "Transfer the invariant: The shorter wall limits area, so move that wall inward.",
-    "reviewStatus": "pending"
+    "transferLesson": "When moving either boundary worsens one factor, move the boundary responsible for the current bottleneck; retaining that bottleneck cannot improve the objective as the other factor shrinks.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

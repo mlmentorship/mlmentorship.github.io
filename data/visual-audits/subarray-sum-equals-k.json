@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-subarray-sum-equals-k.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Turn a target subarray into a lookup between two prefix sums.",
+  "learningObjective": "Count earlier prefix sums equal to current prefix minus target.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to turn a target subarray into a lookup between two prefix sums.",
-    "invariant": "Turn a target subarray into a lookup between two prefix sums.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Running prefix sum plus a frequency map of earlier prefix sums.",
+    "recognitionCue": "The task counts contiguous ranges with an exact sum, values may be negative, and many ranges can end at the same index, so a monotone sliding window is unsafe.",
+    "invariant": "Before processing nums[i], the map counts every prefix ending before i. After prefix is updated, count(prefix - target) is exactly the number of valid subarrays ending at i; only then is the current prefix inserted.",
+    "stateModel": "Keep the current prefix sum, the accumulated answer, and a map from each earlier prefix sum to its frequency. Frequencies, rather than a set, preserve multiple valid starts.",
+    "visualRationale": "The actual signed array, a stable scan pointer, and the prefix-frequency map expose the subtraction identity and show every answer increment without relying on color or animation.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A sliding-window diagram suggests monotone growth and shrinkage, which negative values invalidate.",
+      "A prefix-sum line without frequencies cannot explain why one endpoint can add two matches.",
+      "A quadratic subarray grid displays candidates but obscures the constant-time lookup used by the solution."
     ],
-    "transferLesson": "Transfer the invariant: Turn a target subarray into a lookup between two prefix sums.",
-    "reviewStatus": "pending"
+    "transferLesson": "Rewrite a range equation as current prefix minus earlier prefix. Store counts when duplicate earlier states represent distinct starts; this also transfers to subarray sums divisible by k and equal-count prefix signatures.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-3sum.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Fix one value, then solve the remaining pair with two sorted pointers.",
+  "learningObjective": "After sorting and fixing one value, pointer moves discard pairs that cannot sum to its complement.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to fix one value, then solve the remaining pair with two sorted pointers.",
-    "invariant": "Fix one value, then solve the remaining pair with two sorted pointers.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Sort, fix one value, then run a two-pointer complement search.",
+    "recognitionCue": "The result needs unique triples satisfying a sum equation; sorting is allowed, and fixing one member reduces the remaining choice to a pair with an ordered sum.",
+    "invariant": "For a fixed index, every pair outside [L, R] is already emitted or safely discarded. If the total is low, no pair using the current L can work; if high, no pair using the current R can work.",
+    "stateModel": "Retain the sorted array, fixed index, left and right pair boundaries, and accumulated unique triples. Duplicate fixed values are skipped, and duplicate left values are skipped after a hit.",
+    "visualRationale": "An indexed sorted array with independently keyed fixed, L, and R markers shows the active pair range, direction of every safe move, equality hits, and duplicate branch in reading order.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A hash-set view can find complements but hides the ordered discard proof and uniqueness handling.",
+      "A triangle of all O(n^3) combinations emphasizes enumeration rather than why two pointers are safe.",
+      "A result-only table omits the low, high, equality, and duplicate branches executed by the code."
     ],
-    "transferLesson": "Transfer the invariant: Fix one value, then solve the remaining pair with two sorted pointers.",
-    "reviewStatus": "pending"
+    "transferLesson": "After sorting, fix enough values to reduce k-sum to 2-sum, then use order to discard an entire boundary at once; carry duplicate-skipping rules at every fixed level.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
