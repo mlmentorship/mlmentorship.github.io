@@ -14,6 +14,29 @@ Regularization constrains effective model capacity to reduce overfitting. It inc
 
 Overfitting is the most common failure mode of moderately-sized models on moderately-sized datasets. Regularization is the response. Modern large-scale models often don't need explicit regularization (they're underfitting at trillion-token scale), but for almost everything outside frontier LLM pretraining, regularization choices matter.
 
+<!-- visual:regularization-diagnose-and-target -->
+<figure class="learning-figure" aria-labelledby="regularization-choice-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="regularization-choice-title">Does the evidence call for regularization, and which lever targets the failure?</p>
+	<div class="visual-grid--two" role="group" aria-label="A diagnosis panel compares training and validation behavior before a second panel matches an observed overfitting mechanism to one regularization lever">
+		<section class="visual-panel">
+			<h4>1 - DIAGNOSE BEFORE ADDING</h4>
+			<p><strong>Train poor + validation poor</strong><br />Both sets are underfit. Fix optimization, representation, capacity, or data quality; stronger regularization usually worsens this.</p>
+			<p><strong>Train good + validation worse</strong><br />A persistent generalization gap is evidence of overfitting. Regularize and judge the change on held-out data.</p>
+			<p><strong>Train good + validation good</strong><br />Do not add a penalty by default. More regularization can create underfitting.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 - TARGET ONE SOURCE OF CAPACITY</h4>
+			<p><strong>Missing known invariance &rarr; augmentation</strong><br />Teach label-preserving input variation.</p>
+			<p><strong>Large weights &rarr; decoupled weight decay</strong><br />Shrink parameters directly; use AdamW with Adam.</p>
+			<p><strong>Co-adapted activations &rarr; dropout</strong><br />Randomly mask training-time activations.</p>
+			<p><strong>Validation degrades with more steps &rarr; early stopping</strong><br />Restore the best held-out checkpoint.</p>
+			<p><strong>Exact feature sparsity required &rarr; L1</strong><br />Use a nonsmooth penalty that can produce zeros.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> first compare training with validation. Only the middle pattern is evidence that fitting the training set has outrun generalization. Then choose the lever whose intervention matches the failure instead of stacking every regularizer; batch size, optimizer, and architecture already add implicit effects that change the amount you need. Original synthesis checked against <a href="https://www.deeplearningbook.org/contents/regularization.html">Goodfellow et al., chapter 7</a>, <a href="https://www.jmlr.org/papers/v15/srivastava14a.html">Srivastava et al. (2014)</a>, and <a href="https://arxiv.org/abs/1711.05101">Loshchilov and Hutter (2019)</a>.</figcaption>
+</figure>
+
 ## The classical lineup
 
 ### L2 regularization (weight decay)

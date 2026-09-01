@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "slug": "regularization",
+  "article": "src/content/posts/2026-01-30-regularization.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish a train-validation overfitting gap from underfitting or adequate fit, then match the diagnosed failure to one targeted regularization lever.",
+  "mediumRationale": "A two-panel semantic decision card is the smallest medium that makes the prerequisite diagnosis adjacent to intervention selection. It avoids duplicating the geometry and arithmetic already taught by linked L1/L2, dropout, and AdamW articles while keeping every decision readable as ordinary responsive text.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a branching flowchart would overstate a rigid sequence and produce a tall or horizontally scrolling graph for choices that are evidence-dependent and can overlap.",
+    "svg": "Rejected because no quantitative curve or geometry is needed for the chosen objective. A fixed train-validation plot would show only one symptom and leave the mechanism-to-lever mapping in prose.",
+    "semanticHtml": "Selected because paired labelled panels preserve the diagnose-then-target order, expose all cases to assistive technology, wrap naturally at phone width, and reuse the established printable visual-panel primitive.",
+    "interaction": "Rejected because adjustable regularization strength could teach a bias-variance sweep, but controls and hidden states are unnecessary for deciding whether to regularize and which mechanism to target.",
+    "paperReuse": "Rejected because the reviewed textbook and papers contain mechanism-specific figures rather than this article-wide decision synthesis. No external artwork, wording, examples, data, or visual organization is copied.",
+    "noVisual": "Rejected because the prose lists several techniques and later gives a hierarchy, but readers must still connect observed train-validation evidence to a specific intervention and recognize when regularization is the wrong response."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 35,
+        "insight": "The classification-loss slide notes that softmax confidence changes with weight regularization, but it neither diagnoses overfitting nor compares interventions."
+      },
+      {
+        "page": 36,
+        "insight": "The neighboring surrogate-loss slide describes L2 as discouraging large weights in a max-margin classifier. It provides one penalty mechanism but no selection rule."
+      },
+      {
+        "page": 37,
+        "insight": "The following evaluation slide moves to classification metrics and adds no regularization guidance."
+      },
+      {
+        "page": 56,
+        "insight": "The section divider opens the deck's practical neural-network training sequence."
+      },
+      {
+        "page": 57,
+        "insight": "The notes slide contrasts L2's diffuse small weights, L1's sparse inputs, and dropout's train-time masking and scaling. It covers individual mechanisms but not evidence-driven choice."
+      },
+      {
+        "page": 58,
+        "insight": "The data-inspection slide emphasizes data variation, spurious features, label noise, and mispredictions, supplying upstream causes to investigate before adding penalties."
+      },
+      {
+        "page": 59,
+        "insight": "The training-skeleton slide recommends starting without augmentation and increasing complexity only after establishing a trustworthy baseline, reinforcing diagnosis before intervention."
+      },
+      {
+        "page": 60,
+        "insight": "The sanity-check slide directly distinguishes a training-validation accuracy gap as overfitting from both curves tracking poorly as inadequate capacity, and recommends plotting both."
+      },
+      {
+        "page": 61,
+        "insight": "The first model-selection slide says to reduce bias until training loss can become small before focusing on generalization, establishing the prerequisite for interpreting a gap."
+      },
+      {
+        "page": 62,
+        "insight": "The second model-selection slide explicitly defines regularization as giving up some training fit to improve validation performance and orders data, augmentation, model size, batch size, dropout, weight decay, and early stopping options."
+      },
+      {
+        "page": 63,
+        "insight": "The following tuning slide recommends searching learning rate and regularization strength on logarithmic scales and warns against stopping only because validation loss appears level."
+      }
+    ],
+    "notes": "All 214 physical pages of the local PDF were text-indexed page by page for regularization, regularizer, overfitting, weight decay, L1, L2, dropout, early stopping, data augmentation, batch size, and AdamW. Every match was reviewed. Pages 35-37 and the complete practical-training sequence on pages 56-63 were rendered and visually inspected with neighboring context. Pages 60-62 most directly support the diagnosis-first hierarchy; page 57 supplies mechanism background. The deck does not contain the shipped two-stage decision card, and no slide wording, screenshots, values, artwork, or layout is reused.",
+    "license": "The local deck states no license and contains embedded third-party figures with incomplete attribution. It is treated as review-only material. The implementation is independently authored semantic HTML and reproduces no deck asset."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Learning, Chapter 7: Regularization for Deep Learning",
+        "url": "https://www.deeplearningbook.org/contents/regularization.html",
+        "usage": "Used as an authoritative textbook source for regularization as reducing generalization error rather than training error, norm penalties, dataset augmentation, early stopping, dropout, and the fact that different techniques constrain different aspects of learning.",
+        "license": "The authors provide the chapter online, but no permissive license for adapting its figures was identified. No textbook figure, equation layout, example, prose, or visual arrangement is reproduced."
+      },
+      {
+        "title": "Dropout: A Simple Way to Prevent Neural Networks from Overfitting",
+        "url": "https://www.jmlr.org/papers/v15/srivastava14a.html",
+        "usage": "Used as the primary source to verify that dropout randomly removes units during training to reduce co-adaptation and approximates averaging many thinned networks at inference.",
+        "license": "The JMLR article is publicly accessible, but no figure-reuse permission is relied upon. No network diagram, experimental result, prose, or layout is copied."
+      },
+      {
+        "title": "Decoupled Weight Decay Regularization",
+        "url": "https://arxiv.org/abs/1711.05101",
+        "usage": "Used as the primary source to verify that L2 regularization and weight decay are not equivalent for adaptive optimizers and that AdamW decouples parameter shrinkage from the gradient update.",
+        "license": "The arXiv record uses a distribution license that is not treated as broad third-party figure-reuse permission. No paper figure, benchmark result, formula presentation, prose, or layout is reproduced."
+      },
+      {
+        "title": "Early Stopping - but when?",
+        "url": "https://doi.org/10.1007/3-540-49430-8_3",
+        "usage": "Used as a primary practical source for monitoring validation behavior, retaining the best checkpoint, and treating the stopping rule as a regularization choice rather than simply running to convergence.",
+        "license": "The Springer publication is copyright-protected and no permissive figure license was identified. No figure, table, result, wording, or visual organization is copied."
+      },
+      {
+        "title": "On Large-Batch Training for Deep Learning: Generalization Gap and Sharp Minima",
+        "url": "https://arxiv.org/abs/1609.04836",
+        "usage": "Used as a primary source for the article's modern-view context that optimization regime and batch size can change generalization, so explicit regularization strength cannot be selected independently of the training setup.",
+        "license": "Public arXiv availability is not treated as permission to reuse figures. No loss-landscape figure, experiment, numerical result, prose, or layout is reproduced, and the visual makes no universal sharp-minimum claim."
+      },
+      {
+        "title": "PyTorch AdamW documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.optim.AdamW.html",
+        "usage": "Used as official implementation documentation to cross-check direct decoupled weight decay in the production optimizer named by the article.",
+        "license": "The documentation is used only to verify API semantics. No code, equation rendering, prose, interface, or artwork is copied."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to distinguish free access from permission to adapt figures when reviewing the AdamW and large-batch papers.",
+        "license": "The licensing page is cited only to document the provenance decision; no text, icon, or page artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is intervention selection under evidence. High validation error alone is not proof of overfitting: if training performance is also poor, stronger constraints generally move in the wrong direction. A persistent train-validation gap motivates regularization, after which the intervention should match the suspected capacity source: input variation, weight magnitude, activation co-adaptation, excessive training duration, or a requirement for exact sparsity. The final caption also preserves the article's modern caveat that optimizer, batch size, and architecture contribute implicit effects, without claiming that any one flatness account universally explains generalization."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected both exact regularization neighborhoods, and checked an authoritative textbook, primary dropout, AdamW, early-stopping, and large-batch sources plus official optimizer and licensing guidance before selecting an original diagnosis-and-target card."
+  },
+  "implementation": {
+    "visualIds": [
+      "regularization-diagnose-and-target"
+    ],
+    "accessibility": "The figure has a linked learning question and a labelled group of two semantic sections. Written train and validation states, numbered DIAGNOSE and TARGET headings, explicit mechanism-to-lever arrows, and direct consequences carry all meaning without color. The source order presents diagnosis before selection. The established two-column primitive has no minimum width and stacks below 640 CSS pixels for normal text wrapping at 390 CSS pixels; existing theme tokens preserve dark-mode contrast and shared print rules force a light, high-contrast, page-break-safe rendering."
+  }
+}
