@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-house-robber-ii.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A circular solution is the larger of two lines: exclude the first house or exclude the last.",
+  "learningObjective": "Break the circle into two endpoint-excluding lines, run take-or-skip DP on each, and keep the larger result.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a circular solution is the larger of two lines: exclude the first house or exclude the last.",
-    "invariant": "A circular solution is the larger of two lines: exclude the first house or exclude the last.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Reduce circular adjacency to two linear House Robber dynamic programs, each with rolling take-or-skip state.",
+    "recognitionCue": "Use it when a linear adjacency DP gains one wraparound conflict between the first and last items; every feasible solution must omit at least one endpoint.",
+    "invariant": "Within each line, one_back is the best value through the current processed prefix and two_back is the prior prefix optimum; the two cases jointly cover every circularly valid plan.",
+    "stateModel": "The minimal state is two endpoint ranges plus two_back and one_back for each linear pass. The fixed indexed circle shows the excluded endpoint and current house throughout both scans.",
+    "visualRationale": "An indexed house row makes endpoint conflict and take-or-skip transitions explicit. Case labels and numeric transitions remain complete in monochrome static output.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A circle drawing alone was rejected because it shows adjacency but not either linear DP transition.",
+      "A final two-case table was rejected because it hides how each case value is computed.",
+      "A full subset tree was rejected because it obscures the constant-state recurrence with exponential branches."
     ],
-    "transferLesson": "Transfer the invariant: A circular solution is the larger of two lines: exclude the first house or exclude the last.",
-    "reviewStatus": "pending"
+    "transferLesson": "When one wraparound edge breaks a linear DP, condition on excluding either endpoint, solve the resulting linear instances, and combine their optima.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-decode-ways.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A digit can extend one prior decoding; a valid two-digit number can extend two prior decodings.",
+  "learningObjective": "At each digit, add one-back decodings for a valid single digit and two-back decodings for a valid 10..26 pair.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a digit can extend one prior decoding; a valid two-digit number can extend two prior decodings.",
-    "invariant": "A digit can extend one prior decoding; a valid two-digit number can extend two prior decodings.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional counting DP with one-digit and two-digit transitions compressed to two rolling values.",
+    "recognitionCue": "Use it when each encoded token consumes one or two adjacent symbols, validity depends on the local symbol or pair, and the task asks for the number of complete parses.",
+    "invariant": "Before index i, one_back counts decodings through i-1 and two_back through i-2; current sums exactly the valid single-digit and two-digit ways ending at i.",
+    "stateModel": "The minimal state is index, two_back, one_back, and current. The indexed digit row exposes the current symbol and adjacent pair, including zero-specific invalid branches.",
+    "visualRationale": "A fixed digit row with explicit rolling-state arithmetic directly shows which token widths contribute. It remains understandable without color, JavaScript, or memorized code.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A letter-mapping chart was rejected because it does not explain how parse counts combine.",
+      "A decode tree was rejected because shared suffix states duplicate work and become exponential.",
+      "Using only \"226\" was rejected because it never exercises the decisive zero and invalid-leading-zero branches."
     ],
-    "transferLesson": "Transfer the invariant: A digit can extend one prior decoding; a valid two-digit number can extend two prior decodings.",
-    "reviewStatus": "pending"
+    "transferLesson": "For variable-width parsing, sum counts from earlier boundaries only when the token ending at the current boundary is valid; zeros often eliminate the width-one transition.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

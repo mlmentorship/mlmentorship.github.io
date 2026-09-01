@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-combination-sum-iv.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Count ordered sequences by choosing the final number of each target.",
+  "learningObjective": "Build ways[total] by choosing each eligible final number and adding ways[total - number].",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to count ordered sequences by choosing the final number of each target.",
-    "invariant": "Count ordered sequences by choosing the final number of each target.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "One-dimensional counting dynamic programming over increasing totals, partitioned by the final chosen number.",
+    "recognitionCue": "Use it when order matters, values may be reused, and every sequence reaching a total has one unambiguous final value that reduces it to a smaller solved total.",
+    "invariant": "Before processing total t, ways[0..t-1] contain exact ordered-sequence counts; after trying every num <= t, ways[t] counts each sequence exactly once by its final number.",
+    "stateModel": "The minimal state is the ways array and nested loop variables total and num. The indexed array exposes every dependency ways[total-num] and the current target cell.",
+    "visualRationale": "A growing indexed DP row directly shows solved smaller totals feeding the current total. Written recurrences preserve ordering and arithmetic without relying on color or animation.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A recursion tree was rejected because repeated totals create duplicate subtrees and hide memoized reuse.",
+      "A list of seven final sequences was rejected because it does not generalize the recurrence or explain the base case.",
+      "A combinations-style coin table was rejected because iterating numbers outside totals would count unordered combinations instead."
     ],
-    "transferLesson": "Transfer the invariant: Count ordered sequences by choosing the final number of each target.",
-    "reviewStatus": "pending"
+    "transferLesson": "To count ordered constructions, partition answers by the last decision and iterate states before choices; changing loop order can change the combinatorial object being counted.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

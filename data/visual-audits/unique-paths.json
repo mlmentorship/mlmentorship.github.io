@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-unique-paths.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each cell receives paths from the cell above and the cell to its left.",
+  "learningObjective": "Sweep a 3 by 3 grid row by row; each interior count is old ways[col] from above plus new ways[col-1] from the left.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to each cell receives paths from the cell above and the cell to its left.",
-    "invariant": "Each cell receives paths from the cell above and the cell to its left.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Grid path-counting dynamic programming compressed to one row and updated left to right.",
+    "recognitionCue": "Use it when movement forms an acyclic grid and every path into a cell must arrive through a small fixed set of predecessor directions such as above and left.",
+    "invariant": "During a row sweep, ways[col] before update is the count from above and ways[col-1] after update is the count from the left; their sum is the current cell count.",
+    "stateModel": "The implementation needs only a cols-length ways array and row/column indices. The conceptual grid retains spatial dependencies while each frame also shows the exact rolling row.",
+    "visualRationale": "A real grid is simpler than a prose table because it locates above and left predecessors geometrically. Labels and equations keep the mechanism clear in print and monochrome.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A paths enumeration tree was rejected because it grows exponentially and repeats grid positions.",
+      "A one-row array alone was rejected because it hides which value means above and which means left.",
+      "A combinatorial binomial formula was rejected because it does not explain the supplied DP implementation."
     ],
-    "transferLesson": "Transfer the invariant: Each cell receives paths from the cell above and the cell to its left.",
-    "reviewStatus": "pending"
+    "transferLesson": "When dependencies come from the previous row and current row prefix, sweep in the direction that preserves both and compress the grid to one mutable row.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
