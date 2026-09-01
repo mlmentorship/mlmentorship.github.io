@@ -35,6 +35,39 @@ This factorization is an assumption. Trust, snippets, neighboring results, devic
 
 The useful lesson remains: no click can mean either “seen and rejected” or “not seen.” Raw logs do not identify which case occurred.
 
+<!-- visual:position-bias-inverse-examination-weight -->
+<figure class="learning-figure" aria-labelledby="position-bias-visual-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="position-bias-visual-title">Separate relevance from exposure, then trace how inverse examination weighting restores equal expected signal.</p>
+	<div class="visual-grid--two" role="group" aria-label="The same illustrative relevance rate shown at a fully examined first position and a less frequently examined fourth position">
+		<section class="visual-panel">
+			<h4>Position 1 · usually examined</h4>
+			<p>100 impressions with the same assumed 60% relevance rate</p>
+			<table class="cm-grid" aria-label="Expected clicks and inverse-weighted signal at position one">
+				<tbody>
+					<tr><th scope="row">Examination propensity</th><td><strong>e = 1.00</strong></td></tr>
+					<tr><th scope="row">Expected clicks</th><td>100 × 0.60 × 1.00 = <strong>60</strong></td></tr>
+					<tr><th scope="row">Inverse weight</th><td>1 / 1.00 = <strong>1×</strong></td></tr>
+					<tr><th scope="row">Weighted click signal</th><td class="cm-selected">60 × 1 = <strong>60</strong></td></tr>
+				</tbody>
+			</table>
+		</section>
+		<section class="visual-panel">
+			<h4>Position 4 · often skipped</h4>
+			<p>100 impressions with the same assumed 60% relevance rate</p>
+			<table class="cm-grid" aria-label="Expected clicks and inverse-weighted signal at position four">
+				<tbody>
+					<tr><th scope="row">Examination propensity</th><td><strong>e = 0.25</strong></td></tr>
+					<tr><th scope="row">Expected clicks</th><td>100 × 0.60 × 0.25 = <strong>15</strong></td></tr>
+					<tr><th scope="row">Inverse weight</th><td>1 / 0.25 = <strong>4×</strong></td></tr>
+					<tr><th scope="row">Weighted click signal</th><td class="cm-selected">15 × 4 = <strong>60</strong></td></tr>
+				</tbody>
+			</table>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare “Expected clicks” first: identical relevance produces 60 clicks at position 1 but only 15 at position 4 because fewer users examine the lower result. Then apply the inverse examination weight: each lower-position click represents four exposure opportunities, so both positions contribute 60 in expectation. This is an illustrative calculation under the stated position-based examination model, not a claim that real users examine position 4 exactly 25% of the time. Original example checked against <a href="https://arxiv.org/abs/1608.04468">Joachims, Swaminathan, and Schnabel’s counterfactual LTR formulation</a>.</figcaption>
+</figure>
+
 ## Estimate propensities
 
 A propensity is the probability that the logging process creates an observation used by the estimator.
