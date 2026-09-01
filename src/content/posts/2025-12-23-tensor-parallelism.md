@@ -23,6 +23,61 @@ The standard sharding from Megatron-LM [(Shoeybi et al., 2019)](https://arxiv.or
 y = GeLU(x @ W_1) @ W_2
 ```
 
+<!-- visual:tensor-parallel-ffn-handoff -->
+<figure class="learning-figure" aria-labelledby="tensor-parallel-ffn-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="tensor-parallel-ffn-title">Follow two matching channel shards through an FFN and identify the first point that requires communication.</p>
+	<div class="visual-grid--two" role="group" aria-label="Column-parallel first projection followed by row-parallel second projection">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 245" role="img" aria-labelledby="tp-column-title tp-column-desc">
+				<title id="tp-column-title">The column-parallel first projection creates independent channel shards</title>
+				<desc id="tp-column-desc">The replicated input x is multiplied independently by the left and right column shards of W one. GPU zero produces activated channel shard h zero, and GPU one produces activated channel shard h one. GeLU is elementwise, so no collective is needed between the first projection and activation.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="212" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">1 · COLUMN-SPLIT W₁ · OUTPUT CHANNELS SPLIT</text>
+				<rect class="viz-node viz-node--input" x="113" y="38" width="74" height="34" rx="4"></rect>
+				<text class="viz-node-label" x="150" y="59">x replicated</text>
+				<path d="M136 72L87 98M164 72L213 98" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<rect class="viz-node" x="23" y="99" width="124" height="55" rx="4"></rect>
+				<rect class="viz-node" x="153" y="99" width="124" height="55" rx="4" style="stroke-dasharray:5 3"></rect>
+				<text class="viz-node-value" x="85" y="119">GPU 0 · LEFT COLUMNS</text>
+				<text class="viz-node-label" x="85" y="140">x W₁ᵃ</text>
+				<text class="viz-node-value" x="215" y="119">GPU 1 · RIGHT COLUMNS</text>
+				<text class="viz-node-label" x="215" y="140">x W₁ᵇ</text>
+				<path d="M85 154V176M215 154V176" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<rect class="viz-node viz-node--output" x="38" y="177" width="94" height="36" rx="4"></rect>
+				<rect class="viz-node viz-node--output" x="168" y="177" width="94" height="36" rx="4" style="stroke-dasharray:5 3"></rect>
+				<text class="viz-node-label" x="85" y="199">hᵃ = GeLU(·)</text>
+				<text class="viz-node-label" x="215" y="199">hᵇ = GeLU(·)</text>
+				<text class="viz-axis-label" x="150" y="229" text-anchor="middle">NO COLLECTIVE · CHANNEL SHARDS STAY SEPARATE</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 245" role="img" aria-labelledby="tp-row-title tp-row-desc">
+				<title id="tp-row-title">The row-parallel second projection creates partial sums that must be reduced</title>
+				<desc id="tp-row-desc">Channel shard h zero multiplies the matching top row shard W two a on GPU zero. Channel shard h one multiplies the matching bottom row shard W two b on GPU one. Both products have the full output shape but each sums over only half the hidden channels. An all-reduce adds the partial outputs p zero and p one to form y.</desc>
+				<rect class="viz-plot-bg" x="8" y="25" width="284" height="212" rx="5"></rect>
+				<text class="viz-axis-label" x="12" y="16">2 · ROW-SPLIT W₂ · PARTIAL OUTPUTS SUM</text>
+				<rect class="viz-node viz-node--input" x="22" y="39" width="125" height="46" rx="4"></rect>
+				<rect class="viz-node viz-node--input" x="153" y="39" width="125" height="46" rx="4" style="stroke-dasharray:5 3"></rect>
+				<text class="viz-node-value" x="84.5" y="57">GPU 0 · MATCH SHARD a</text>
+				<text class="viz-node-label" x="84.5" y="75">pᵃ = hᵃ W₂ᵃ</text>
+				<text class="viz-node-value" x="215.5" y="57">GPU 1 · MATCH SHARD b</text>
+				<text class="viz-node-label" x="215.5" y="75">pᵇ = hᵇ W₂ᵇ</text>
+				<path d="M84 85V112H132M216 85V112H168" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<circle cx="150" cy="112" r="18" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
+				<text class="viz-node-label" x="150" y="118">+</text>
+				<text class="viz-axis-label" x="150" y="147" text-anchor="middle">ALL-REDUCE ACROSS THE TP GROUP</text>
+				<path d="M150 130V162" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+				<rect class="viz-node viz-node--output" x="69" y="163" width="162" height="43" rx="4"></rect>
+				<text class="viz-node-value" x="150" y="181">REPLICATED OUTPUT</text>
+				<text class="viz-node-label" x="150" y="198">y = pᵃ + pᵇ</text>
+				<text class="viz-axis-label" x="150" y="229" text-anchor="middle">SAME OUTPUT SHAPE · DISJOINT SUM TERMS</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> split <em>W₁</em> by output channels, so each GPU can apply GeLU to its own <em>h</em> shard. Feed each shard directly into the matching rows of <em>W₂</em>. Those second products are partial sums over the hidden dimension, so add them with one all-reduce to recover <em>y</em>.</figcaption>
+</figure>
+
 - $W_1$ split column-wise: each GPU holds $W_1[:, c_i:c_{i+1}]$. Produces a partial output for its slice of channels. No communication needed up to the GeLU (elementwise).
 - $W_2$ split row-wise: each GPU holds $W_2[r_i:r_{i+1}, :]$. Multiplies its slice. Output is summed across GPUs via all-reduce.
 
