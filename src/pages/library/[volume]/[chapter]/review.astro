@@ -170,7 +170,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       if (nodes.length === 0) return;
       const { default: mermaid } = await import('mermaid');
       const explicitTheme = document.documentElement.dataset.theme;
-      const dark = explicitTheme === 'dark' || (!explicitTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const dark = explicitTheme === 'dark';
       mermaid.initialize({
         startOnLoad: false,
         theme: dark ? 'dark' : 'default',
