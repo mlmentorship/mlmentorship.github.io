@@ -1,7 +1,14 @@
-import { defineVisual, frame, graph, table, visual } from '../primitives.mjs';
+import { arrayMap, defineVisual, frame, mark, table, visual } from '../primitives.mjs';
 
-const scene = (nodes, edges, extra = {}) => graph(nodes, edges, {
+const scene = (nodes, edges, extra = {}) => arrayMap(nodes, [
+  ['lower stored', extra.lowerStored ?? '[]'],
+  ['lower logical', extra.lowerLogical ?? '[]'],
+  ['upper', extra.upper ?? '[]'],
+], extra.current === undefined ? [] : [
+  mark(nodes.lastIndexOf(String(extra.current)), 'new value', 'focus', 'stream-cursor'),
+], {
   stream: '[5,2,10,4]',
+  heapTopology: edges.length ? edges.join(', ') : 'roots only',
   ...extra,
 });
 
@@ -106,7 +113,7 @@ const review = {
   recognitionCue: 'Use two heaps when numbers arrive online and every median query must avoid sorting the entire history.',
   invariant: 'Every lower value is at most every upper value, and lower has either the same size as upper or exactly one extra item. Therefore the middle values are always heap roots.',
   stateModel: 'The minimal state is lower and upper. Each insertion pushes a negated value to lower, transfers its maximum to upper, then moves upper minimum back only if upper became larger.',
-  visualRationale: 'Explicit parent-child edges depict each live heap topology while labels show Python stored negatives, logical lower values, upper values, roots, sizes, and median arithmetic. Stable value nodes persist as ownership changes.',
+  visualRationale: 'A stable stream row paired with explicit lower-stored, lower-logical, upper, root, and parent-relation state keeps both heaps readable at narrow widths. Every transfer, rebalance, size branch, and median calculation remains visible without color.',
   rejectedAlternatives: [
     'A fully sorted array was rejected because insertion would be linear and would not expose the supplied heap mechanism.',
     'One heap was rejected because it cannot expose both middle boundaries efficiently.',

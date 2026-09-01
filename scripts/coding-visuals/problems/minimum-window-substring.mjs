@@ -46,13 +46,13 @@ const draft = visual('Maintain the exact deficit count while the right boundary 
     missing: '1 -> 0',
     best: '"ABAAC" (length 5)',
   }), 'expand-c-4'),
-  frame('Remove the surplus A', 'Increment need[A] from -1 to 0. No required copy is lost, so missing remains 0 and L moves right.', windowScene(1, 4, [['A', '0'], ['B', '-1'], ['C', '0']], {
+  frame('Remove surplus A, then measure again', 'Increment need[A] from -1 to 0 and move L to 1. Missing stays 0, so the next while iteration measures "BAAC" and saves its length 4.', windowScene(1, 4, [['A', '0'], ['B', '-1'], ['C', '0']], {
     range: '[1..4] = "BAAC"',
     direction: 'L: 0 -> 1',
     reason: 'removed surplus A; still valid',
     best: '"BAAC" (length 4)',
   }), 'shrink-a-0'),
-  frame('Remove the irrelevant B', 'Increment need[B] from -1 to 0. The window remains valid, so L advances and the best becomes "AAC".', windowScene(2, 4, [['A', '0'], ['B', '0'], ['C', '0']], {
+  frame('Remove surplus B, then measure again', 'After measuring "BAAC", increment need[B] from -1 to 0 and move L to 2. The next while iteration measures "AAC" and saves its length 3.', windowScene(2, 4, [['A', '0'], ['B', '0'], ['C', '0']], {
     range: '[2..4] = "AAC"',
     direction: 'L: 1 -> 2',
     reason: 'removed surplus B; still valid',

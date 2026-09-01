@@ -10,7 +10,7 @@
     "recognitionCue": "Use structural sentinels when a tree must round-trip through a linear stream and node values alone do not uniquely identify its shape.",
     "invariant": "Each recursive serialize call emits exactly one leading token for its slot, and each deserialize call consumes exactly one leading token before recursively rebuilding the same left and right slots.",
     "stateModel": "Serialization retains an output token list and recursion stack; deserialization retains only the token iterator and the recursive parent slot currently being filled.",
-    "visualRationale": "A real binary-tree topology remains visible while one stable preorder cursor moves through calls; the growing and consumed token streams expose why each null marker is required without relying on color.",
+    "visualRationale": "A stable node strip paired with the explicit parent-child edge list keeps the full tree topology readable at narrow widths; one authored cursor plus the growing and consumed token streams exposes why each null marker is required.",
     "rejectedAlternatives": [
       "Preorder values without null markers cannot distinguish different tree shapes.",
       "Level-order serialization is valid but does not match the supplied recursive implementation.",

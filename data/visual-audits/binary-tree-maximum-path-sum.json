@@ -10,7 +10,7 @@
     "recognitionCue": "Use it when a connected tree path may bend once at a highest node, while any value returned to a parent must remain a single non-branching chain.",
     "invariant": "After a node finishes, its return is the maximum sum of one downward branch starting there; global best is the maximum complete path in every finished subtree, and negative child returns contribute zero.",
     "stateModel": "The minimal recursive state is each node’s left and right clamped gains plus one global best. The trace retains real parent-child edges, active call position, postorder return, local two-branch score, and best update.",
-    "visualRationale": "A stable tree topology with an authored active-node key exposes the distinction between returned branch and locally completed path; formulas and call-stack labels remain complete without color, JavaScript, or memorized code.",
+    "visualRationale": "A stable node strip paired with the explicit parent-child edge list preserves the complete tree topology at narrow widths; active-node marks, formulas, and call-stack labels expose returned branches versus locally completed paths without color.",
     "rejectedAlternatives": [
       "A values-only postorder table was rejected because it hides which child gains feed each parent.",
       "A recursion tree of function calls was rejected because it duplicates the actual binary-tree topology.",

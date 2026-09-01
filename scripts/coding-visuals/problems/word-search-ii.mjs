@@ -1,4 +1,4 @@
-import { defineVisual, frame, grid, trie, visual } from '../primitives.mjs';
+import { array, defineVisual, frame, grid, visual } from '../primitives.mjs';
 
 const board = [['o', 'a', 't'], ['e', 't', 'h'], ['e', 'a', 't']];
 const boardState = (row, col, path, extra = {}) => {
@@ -21,13 +21,14 @@ const boardState = (row, col, path, extra = {}) => {
 };
 
 const draft = visual('Follow board cells and trie children together, mark the current path in place, emit terminal words once, and prune exhausted trie branches while backtracking.', [
-  frame('Build the shared prefix trie', 'Insert words oat, oath, eat, and pea. oat is terminal at t while oath continues from that same t to h.', trie([
-    { word: 'oat', prefix: 'root-o-a-t-[word oat]' },
-    { word: 'oath', prefix: 'root-o-a-t-h-[word oath]' },
-    { word: 'eat', prefix: 'root-e-a-t-[word eat]' },
-    { word: 'pea', prefix: 'root-p-e-a-[word pea]' },
-  ], {
+  frame('Build the shared prefix trie', 'Insert words oat, oath, eat, and pea. oat is terminal at t while oath continues from that same t to h.', array([
+    'root -> o -> a -> t*',
+    't -> h*',
+    'root -> e -> a -> t*',
+    'root -> p -> e -> a*',
+  ], [], {
     board: '[[o,a,t],[e,t,h],[e,a,t]]',
+    terminals: '* marks oat, oath, eat, and pea',
   }), 'build-trie'),
   frame('Start at board (0,0)=o', 'Root has child o, so descend into that trie node and temporarily mark board (0,0) as visited.', boardState(0, 0, [[0, 0]], {
     triePrefix: 'o',
@@ -81,7 +82,7 @@ const review = {
   recognitionCue: 'Use a trie when many dictionary words must be searched on the same board and their prefixes can share traversal work.',
   invariant: 'At each recursive call, the marked board path contains distinct adjacent cells spelling exactly the trie path to node; every emitted terminal has been removed, and every pruned trie branch can no longer produce an unseen word.',
   stateModel: 'Retain the shared mutable trie, current trie node, board coordinate, in-place visited marks, answer list, and recursion path; restore each board character before returning.',
-  visualRationale: 'The first frame exposes real trie prefix edges, then fixed board geometry shows a stable cursor and ordered path cells moving together with trie-prefix labels, terminal pops, restoration, and pruning.',
+  visualRationale: 'The first frame exposes every real trie prefix edge in a narrow-width shared-prefix list, then fixed board geometry shows a stable cursor and ordered path cells moving with trie-prefix labels, terminal pops, restoration, and pruning.',
   rejectedAlternatives: [
     'Running independent Word Search for every word repeats shared prefixes and ignores the supplied trie optimization.',
     'A board-only path animation hides why impossible prefixes stop and why found words are emitted once.',

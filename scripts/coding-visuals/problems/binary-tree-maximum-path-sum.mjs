@@ -1,15 +1,23 @@
-import { defineVisual, frame, mark, tree, visual } from '../primitives.mjs';
+import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
-const levels = [['-10'], ['9', '20'], ['-4', '-', '15', '7']];
-const nodeIndexes = { '-10': 0, '9': 1, '20': 2, '-4': 3, '15': 5, '7': 6 };
-const treeScene = (active, label, extra = {}, output = []) => tree(levels, [
+const nodeNames = {
+  '-10': '-10 root',
+  '9': '9',
+  '20': '20',
+  '-4': '-4 leaf',
+  '15': '15',
+  '7': '7',
+};
+const nodes = Object.values(nodeNames);
+const nodeIndexes = Object.fromEntries(Object.keys(nodeNames).map((value, index) => [value, index]));
+const edges = ['root -> 9', 'root -> 20', '9 -> leaf', '20 -> 15', '20 -> 7'];
+const treeScene = (active, label, extra = {}, output = []) => array(nodes, [
   mark(nodeIndexes[active], label, output.includes(active) ? 'output' : 'focus', 'active-node'),
-  ...output.filter((value) => value !== active).map((value) => mark(nodeIndexes[value], 'best path', 'output', `path-${value}`)),
+  ...output.filter((value) => value !== active).map((value) => mark(nodeIndexes[value], 'path', 'output', `path-${value}`)),
 ], {
   ...extra,
-  motion: [
-    { key: 'active-node', kind: 'pointer', x: nodeIndexes[active], y: 0, label: active },
-  ],
+  activeState: label,
+  topology: edges.join(', '),
 });
 
 const draft = visual('Postorder returns one extendable branch to a parent while scoring a complete path through each node with both nonnegative child gains.', [
@@ -43,13 +51,13 @@ const draft = visual('Postorder returns one extendable branch to a parent while 
     returnedGain: 'return 7',
     best: '15',
   }), 'visit-7'),
-  frame('Score both branches at node 20', 'Both child gains are positive, so the complete path through 20 scores 20 + 15 + 7 = 42; only the larger branch can continue upward, so return 35.', treeScene('20', 'score 42; return 35', {
+  frame('Score both branches at node 20', 'Both child gains are positive, so the complete path through 20 scores 20 + 15 + 7 = 42; only the larger branch can continue upward, so return 35.', treeScene('20', 'score 42', {
     callStack: '-10 -> 20',
     localScore: '20 + 15 + 7 = 42',
     returnedGain: '20 + max(15, 7) = 35; return 35',
     best: '15 -> 42',
   }, ['15', '20', '7']), 'visit-20'),
-  frame('Finish at the root', 'The root receives gains 9 and 35. Its through-path is -10 + 9 + 35 = 34, which cannot beat 42; it returns -10 + 35 = 25.', treeScene('-10', 'score 34; return 25', {
+  frame('Finish at the root', 'The root receives gains 9 and 35. Its through-path is -10 + 9 + 35 = 34, which cannot beat 42; it returns -10 + 35 = 25.', treeScene('-10', 'score 34', {
     callStack: 'one_branch(-10)',
     localScore: '-10 + 9 + 35 = 34',
     returnedGain: '-10 + max(9, 35) = 25; return 25',
@@ -67,7 +75,7 @@ const review = {
   recognitionCue: 'Use it when a connected tree path may bend once at a highest node, while any value returned to a parent must remain a single non-branching chain.',
   invariant: 'After a node finishes, its return is the maximum sum of one downward branch starting there; global best is the maximum complete path in every finished subtree, and negative child returns contribute zero.',
   stateModel: 'The minimal recursive state is each node’s left and right clamped gains plus one global best. The trace retains real parent-child edges, active call position, postorder return, local two-branch score, and best update.',
-  visualRationale: 'A stable tree topology with an authored active-node key exposes the distinction between returned branch and locally completed path; formulas and call-stack labels remain complete without color, JavaScript, or memorized code.',
+  visualRationale: 'A stable node strip paired with the explicit parent-child edge list preserves the complete tree topology at narrow widths; active-node marks, formulas, and call-stack labels expose returned branches versus locally completed paths without color.',
   rejectedAlternatives: [
     'A values-only postorder table was rejected because it hides which child gains feed each parent.',
     'A recursion tree of function calls was rejected because it duplicates the actual binary-tree topology.',

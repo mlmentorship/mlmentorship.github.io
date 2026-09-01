@@ -1,8 +1,9 @@
-import { defineVisual, frame, graph, visual } from '../primitives.mjs';
+import { array, defineVisual, frame, visual } from '../primitives.mjs';
 
-const nodes = ['w', 'e', 'r', 't', 'f'].map((value) => ({ value, key: `letter-${value}` }));
-const scene = (edges, extra = {}) => graph(nodes, edges, {
+const nodes = ['w', 'e', 'r', 't', 'f'];
+const scene = (edges, extra = {}) => array(nodes, [], {
   words: '[wrt, wrf, er, ett, rftt]',
+  rules: edges.length ? edges.join(', ') : 'none yet',
   ...extra,
 });
 
@@ -60,7 +61,7 @@ const review = {
   recognitionCue: 'Use this pattern when sorted composite values imply a hidden ordering among symbols and only the earliest differing position can establish precedence.',
   invariant: 'After processing each word pair, every recorded edge is a necessary character precedence; during Kahn traversal, ready contains exactly known zero-indegree un-emitted characters and emitted never violates an edge.',
   stateModel: 'Retain every character as a graph node, deduplicated outgoing-edge sets, indegree counts, a zero-indegree queue, and the emitted order.',
-  visualRationale: 'A directed graph keeps real precedence topology visible while stable letter nodes persist as edges are added and removed; queue, indegree, and emitted labels make every safe topological move explicit.',
+  visualRationale: 'A stable indexed letter row paired with an explicit directed-edge list keeps the precedence topology readable at narrow widths; queue, indegree, and emitted labels make every safe topological move explicit.',
   rejectedAlternatives: [
     'Sorting characters by first appearance invents constraints not implied by adjacent words.',
     'A pairwise comparison table hides the graph paths and cycle-detection condition.',

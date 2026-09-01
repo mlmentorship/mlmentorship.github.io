@@ -1,7 +1,10 @@
-import { defineVisual, frame, heap, linked, visual } from '../primitives.mjs';
+import { array, defineVisual, frame, linked, mark, visual } from '../primitives.mjs';
 
-const state = (values, extra) => heap(values, {
+const state = (values, extra) => array(values, values.length ? [
+  mark(0, 'min root', 'focus', 'heap-root'),
+] : [], {
   inputLists: 'A:1->4->5; B:1->3->4; C:2->6',
+  heapLayout: values.length > 1 ? 'level order: slot 0 parent of slots 1 and 2' : 'level order: slot 0 is root',
   ...extra,
 });
 
@@ -79,7 +82,7 @@ const review = {
   recognitionCue: 'Use it when k individually sorted streams must be merged and only their current heads can be candidates for the next global minimum.',
   invariant: 'The heap contains exactly the first unmerged node of each nonexhausted list, and the tail follows all nodes already popped in nondecreasing tuple order.',
   stateModel: 'The minimal state is a heap of (value, list index, node) tuples plus dummy and tail pointers. Each loop pops one node, links it after tail, and pushes only that node next.',
-  visualRationale: 'Complete-binary-heap geometry exposes the live frontier while tuple labels preserve value, tie-break index, and node identity. The source chains, popped tuple, pushed tuple, tail, and emitted node order remain explicit without color.',
+  visualRationale: 'A narrow-width level-order heap row exposes the live frontier with a stable min-root pointer and explicit parent-slot relation, while tuple labels preserve value, tie-break index, and node identity. Popped, pushed, tail, and emitted states remain explicit without color.',
   rejectedAlternatives: [
     'Scanning all k current heads was rejected because it hides the supplied logarithmic heap selection.',
     'Pairwise divide-and-conquer merging was rejected because it depicts a different algorithm.',
