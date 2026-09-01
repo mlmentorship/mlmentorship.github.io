@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "slug": "personalized-search-ranking",
+  "article": "src/content/posts/2026-04-14-personalized-search-ranking.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace one personalized-search request into an exposure record and explain why that record, including the candidates and policy that produced it, is the necessary seam between serving, counterfactual evaluation, and retraining.",
+  "mediumRationale": "The article already contains a request-and-learning-loop graph at the exact point where the two paths are introduced. Upgrading that graph with explicit online and learning boundaries, accessible text, stable visual roles, and a direct caption is smaller and more coherent than adding a second visual to an already comprehensive guide.",
+  "mediumComparison": {
+    "mermaid": "Selected because the lesson is a directed system path that closes into a learning loop. Labelled edges and grouped serving-versus-learning regions expose the key seam without implying quantitative scale.",
+    "svg": "Rejected because no fixed geometry, plotted magnitude, or numerical relationship carries the claim; a hand-positioned SVG would duplicate a graph layout with substantially more markup.",
+    "semanticHtml": "Rejected because a table could inventory request and log fields but would not show that displayed results create selective observations which then update both ranking stages.",
+    "interaction": "Rejected because toggling missing log fields or retriever failures would add state to a fixed architectural invariant: evaluation and learning depend on reconstructing the policy-created exposure.",
+    "paperReuse": "Rejected because the reviewed system and counterfactual-learning sources contain broader or paper-specific figures, and public access does not establish permissive adaptation rights for all of them. No source artwork, wording, coordinates, values, or layout is copied.",
+    "noVisual": "Rejected because the 1,031-line article explains request serving, exposure bias, counterfactual evaluation, and retraining in separate sections. The hardest mental model is their composition into one closed control loop with exposure logging as its evidentiary seam."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 132,
+        "insight": "The Personalized search ranking divider opens the exact local source sequence but contains no system mechanism."
+      },
+      {
+        "page": 133,
+        "insight": "The overview lists problem formulation, system design, datasets, models, and experimentation, establishing the sequence inspected in full."
+      },
+      {
+        "page": 134,
+        "insight": "The prompt defines keystroke-level streaming search, query-country-locale context, a non-personalized baseline, deployment questions, and a 100-millisecond latency target."
+      },
+      {
+        "page": 135,
+        "insight": "The formulation separates candidate generation driven by query intent from ranking driven by context and past behavior; this is the closest deck statement of the serving funnel."
+      },
+      {
+        "page": 136,
+        "insight": "The System overview divider contains no extractable architecture details and leads into the data and model slides."
+      },
+      {
+        "page": 137,
+        "insight": "The data slide assumes all interaction data is available and defines successful search-session rows only for returned items, exposing a selection boundary but not recording propensities or unshown candidates."
+      },
+      {
+        "page": 138,
+        "insight": "The personalized-recommender slide derives user representations from past interactions and proposes contrastive learning, forming one candidate source."
+      },
+      {
+        "page": 139,
+        "insight": "The content-based slide derives item representations from a knowledge graph, supplying a complementary source that does not require item interactions."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage ranker combines query embeddings with user and item representations and trains from prior interaction labels, but does not show the policy-created observation loop."
+      },
+      {
+        "page": 141,
+        "insight": "The experimentation slide separates offline recall and reciprocal rank from online search engagement and days-with-a-play, then gates launch through an A/B test."
+      },
+      {
+        "page": 142,
+        "insight": "The first LLM exploration example begins a speculative personalized-query detour after the production ranking sequence."
+      },
+      {
+        "page": 143,
+        "insight": "The second LLM example varies user history for the same natural-language query but adds no exposure-logging or learning-loop mechanism."
+      },
+      {
+        "page": 144,
+        "insight": "The comparison screenshot contrasts results for the same query across products; it is illustrative output, not an architecture or evaluation contract."
+      },
+      {
+        "page": 145,
+        "insight": "The final simpler-model slide combines a query-relevance stream and a recommendation stream through reranking and voting, closing the personalized-search neighborhood before the deck changes to computer vision."
+      },
+      {
+        "page": 161,
+        "insight": "The later ML-design overview explicitly requires logging, sampling-bias analysis, offline metrics, goal metrics, guardrails, and A/B experimentation."
+      },
+      {
+        "page": 162,
+        "insight": "The adjacent production checklist asks how exploration adapts, how position, selection, and labeling bias are corrected, and how experiment costs and global launch risks are handled."
+      },
+      {
+        "page": 169,
+        "insight": "The Rules of Machine Learning slide warns about ranking skew and feedback loops from positional features, reinforcing that serving decisions alter later observations."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for personalized search, search, ranking, retrieval, recommendation, candidate generation, exposure, propensity, counterfactual, position bias, selection bias, exploration, and feedback-loop terms. Pages 132-145 were extracted and read as the complete personalized-search sequence through its topic boundary; pages 161-162 and 169 were inspected as the directly matching design and production guidance. The deck contains the serving stages and evaluation ingredients but no closed request-to-exposure-to-retraining graph and no sufficient logging contract. The implementation upgrades the article's original graph and reuses no deck pixels, prose, screenshots, values, or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Unbiased Learning-to-Rank with Biased Feedback",
+        "url": "https://arxiv.org/abs/1608.04468",
+        "usage": "Used as the primary learning-to-rank source to verify that clicks are biased by examination and that propensity-weighted learning requires an explicit observation model.",
+        "license": "The arXiv manuscript is publicly accessible, but access was not treated as permission to adapt its figures. No paper figure, theorem layout, example, result, wording, or visual arrangement is reused."
+      },
+      {
+        "title": "Counterfactual Risk Minimization: Learning from Logged Bandit Feedback",
+        "url": "https://proceedings.mlr.press/v37/swaminathan15.html",
+        "usage": "Used as a primary source to verify that search and recommendation policies create logged bandit feedback and that propensity scoring addresses the counterfactual learning problem only where logged actions provide support.",
+        "license": "PMLR provides open access to the paper, but no figure is adapted. The graph contains no source artwork, equations, experimental values, prose, or paper-specific layout."
+      },
+      {
+        "title": "Netflix Recommendations: Beyond the 5 stars (Part 2)",
+        "url": "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-2-2-d9b96aa399f5",
+        "usage": "Used as official industrial documentation to cross-check personalized ranking, interaction and presentation logs, contextual signals, and A/B testing as part of the production learning process.",
+        "license": "The Netflix Technology Blog is publicly readable but does not provide a general permissive license for adapting its figures. No screenshot, chart, prose, ranking example, data, or layout is copied."
+      },
+      {
+        "title": "Rules of Machine Learning: Best Practices for ML Engineering",
+        "url": "https://developers.google.com/machine-learning/guides/rules-of-ml",
+        "usage": "Used as official production guidance to cross-check end-to-end pipeline integrity, metric instrumentation, serving-time logging, dropped-data hazards, training-serving skew, and ranking feedback loops.",
+        "license": "Google Developers documentation is generally available under CC BY 4.0 unless otherwise noted. No documentation text, code, brand asset, or visual is adapted; the source is cited only for production concepts."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that the online ranker is also a data-collection policy. Query understanding and four retrievers create candidates; two rankers and list constraints decide what becomes visible; only then can ordinary interaction outcomes be observed. A useful exposure record therefore needs candidates, displayed positions, scores, features, and model and policy identities—not merely clicks. Those records support point-in-time datasets and bounded counterfactual claims, then update both rankers. The graph does not claim that logging removes confounding, creates support for unshown actions, or makes observational evaluation causal by itself."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete 1,031-line article, text-indexed all 214 deck pages and inspected the full personalized-search and matching production neighborhoods, then checked two primary counterfactual-learning papers and official Netflix and Google production guidance before selecting an accessibility-focused upgrade of the existing request-and-learning-loop graph."
+  },
+  "implementation": {
+    "visualIds": [
+      "personalized-search-request-learning-loop"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Explicit ONLINE REQUEST PATH and LEARNING PATH groups, numbered stage labels, direct edge labels, and a dashed policy-update return path preserve the inference without color. The established wide-node marker keeps labels readable through horizontal scrolling at 390 CSS pixels, while shared Mermaid theme tokens provide dark-mode contrast and print removes the minimum width. The adjacent prose and caption preserve the lesson if client-side rendering is unavailable."
+  }
+}

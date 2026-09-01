@@ -151,27 +151,51 @@ Assume each retriever returns hundreds or low thousands of candidates. The merge
 
 ## Draw the request and learning loops
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace one request into an exposure record, then explain why that record links serving, evaluation, and retraining.</p>
+
+<!-- visual:personalized-search-request-learning-loop -->
 ```mermaid
 flowchart LR
-  Q[Query and request context] --> U[Query understanding]
-  U --> L[Lexical retrieval]
-  U --> S[Semantic retrieval]
-  U --> P[Query-conditioned personalized retrieval]
-  U --> F[Fresh and popular retrieval]
-  L --> M[Merge, deduplicate, source features]
-  S --> M
-  P --> M
-  F --> M
-  M --> R1[First-pass ranker]
-  R1 --> R2[Final multi-task ranker]
-  R2 --> C[List constraints and policy]
-  C --> O[Results]
-  O --> E[Exposure and interaction log]
-  E --> D[Point-in-time datasets]
-  D --> T[Training and evaluation]
-  T --> R1
-  T --> R2
+  accTitle: Personalized search serving and learning meet at the exposure record
+  accDescr: In the online request path, a query and request context enter query understanding, then lexical, semantic, query-conditioned personalized, and fresh or popular retrievers run in parallel. Their candidates are merged with source evidence, reduced by a first-pass ranker, scored by a final multi-task ranker, and checked by list constraints and policy before results are displayed. Displayed positions, the full candidate set, source evidence, scores, point-in-time features, and model and policy versions enter an exposure and interaction record. In the learning path, those records become point-in-time datasets for evaluation and training. Versioned updates return to both rankers, closing a selective feedback loop. Logging makes the serving decision reconstructable but does not reveal outcomes for unsupported, unshown actions.
+
+  subgraph Online["ONLINE REQUEST PATH"]
+    Q["1 · Query + request context"] --> U["2 · Query understanding"]
+    U --> L["Lexical retrieval"]
+    U --> S["Semantic retrieval"]
+    U --> P["Query-conditioned<br/>personalized retrieval"]
+    U --> F["Fresh + popular retrieval"]
+    L --> M["3 · Merge + deduplicate<br/>retain every source"]
+    S --> M
+    P --> M
+    F --> M
+    M --> R1["4 · First-pass ranker"]
+    R1 --> R2["5 · Final multi-task ranker"]
+    R2 --> C["6 · List constraints + policy"]
+    C --> O["7 · Displayed results"]
+  end
+
+  subgraph Learn["LEARNING PATH"]
+    E["8 · Exposure + interaction record<br/>candidates · positions · scores<br/>features · model + policy versions"]
+    D["9 · Point-in-time datasets"]
+    T["10 · Training + evaluation"]
+    E -->|reconstruct what was eligible and shown| D
+    D -->|supported evidence| T
+  end
+
+  O -->|display creates observable outcomes| E
+  T -.->|versioned policy update| R1
+  T -.->|versioned policy update| R2
+
+  class Q,L,S,P,F viz-input
+  class U,M,R1,R2,C viz-focus
+  class O viz-output
+  class E,D,T viz-state
+  class Q viz-wide
 ```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path through displayed results, then cross the exposure-record boundary. The learner does not observe free-standing preference: it observes outcomes under the candidates, positions, features, model, and policy that produced the page. Logging that context makes the decision reconstructable; it does not invent outcomes or support for items the policy never exposed. The dashed arrows show the consequence: those selected observations update the next serving policy. Original synthesis checked against <a href="https://arxiv.org/abs/1608.04468">Joachims et al. on unbiased learning-to-rank</a>, <a href="https://proceedings.mlr.press/v37/swaminathan15.html">counterfactual risk minimization</a>, and Google's <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Rules of Machine Learning</a>.</p>
 
 The online path ends at results. The learning path begins with the exact candidates, positions, scores, model versions, and features used to create those results.
 
