@@ -37,6 +37,58 @@ $$
 \log p_X(x) = \log p_Z(z) - \sum_{k=1}^{K} \log \left| \det J_{f_k}(z_{k-1}) \right|.
 $$
 
+<!-- visual:flow-local-volume-density -->
+<figure class="learning-figure plot-panel" aria-labelledby="flow-volume-visual-title">
+	<p class="visual-kicker">Change of variables</p>
+	<p class="visual-title" id="flow-volume-visual-title">The same local probability mass spreads over more area, so its density falls.</p>
+	<svg viewBox="0 0 360 630" role="img" aria-labelledby="flow-volume-svg-title flow-volume-svg-desc">
+		<title id="flow-volume-svg-title">Local volume and density through two invertible flow layers</title>
+		<desc id="flow-volume-svg-desc">A small patch around z zero has relative area A, probability mass m, and density p zero. The first invertible layer stretches the patch horizontally by two, so its Jacobian determinant is two, its area is 2A, and its density is p zero divided by two. The second layer stretches vertically by three halves, so the total area is 3A and the final density is p zero divided by three. Solid downward arrows mark forward sampling. Dashed upward arrows mark inverse density evaluation. The log-density ledger subtracts log two and log three halves, which equals subtracting log three.</desc>
+		<defs>
+			<marker id="flow-volume-forward-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-focus-stroke)"></path></marker>
+			<marker id="flow-volume-inverse-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" style="fill:var(--viz-edge)"></path></marker>
+		</defs>
+		<text class="viz-axis-label" x="18" y="24">1 · BASE SPACE z₀</text>
+		<rect class="viz-node viz-node--input" x="150" y="42" width="60" height="60" rx="3"></rect>
+		<g style="fill:var(--viz-input-stroke)">
+			<circle cx="165" cy="58" r="3"></circle><circle cx="180" cy="58" r="3"></circle><circle cx="195" cy="58" r="3"></circle>
+			<circle cx="165" cy="86" r="3"></circle><circle cx="180" cy="86" r="3"></circle><circle cx="195" cy="86" r="3"></circle>
+		</g>
+		<text class="viz-callout" x="180" y="119" text-anchor="middle">area A · mass m · density p₀ = m/A</text>
+		<path d="M274 125V177" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5;marker-end:url(#flow-volume-forward-arrow)"></path>
+		<text class="viz-callout" x="268" y="145" text-anchor="end">sample forward</text>
+		<text class="viz-label" x="268" y="163" text-anchor="end">f₁ · |det J₁| = 2</text>
+		<path d="M86 177V125" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#flow-volume-inverse-arrow)"></path>
+		<text class="viz-callout" x="92" y="145">evaluate density</text>
+		<text class="viz-label" x="92" y="163">with f₁⁻¹</text>
+		<text class="viz-axis-label" x="18" y="205">2 · AFTER HORIZONTAL STRETCH z₁</text>
+		<rect class="viz-node viz-node--focus" x="120" y="222" width="120" height="60" rx="3"></rect>
+		<g style="fill:var(--viz-focus-stroke)">
+			<circle cx="150" cy="238" r="3"></circle><circle cx="180" cy="238" r="3"></circle><circle cx="210" cy="238" r="3"></circle>
+			<circle cx="150" cy="266" r="3"></circle><circle cx="180" cy="266" r="3"></circle><circle cx="210" cy="266" r="3"></circle>
+		</g>
+		<text class="viz-callout" x="180" y="299" text-anchor="middle">area 2A · same mass m · density p₀/2</text>
+		<path d="M274 305V357" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5;marker-end:url(#flow-volume-forward-arrow)"></path>
+		<text class="viz-callout" x="268" y="325" text-anchor="end">sample forward</text>
+		<text class="viz-label" x="268" y="343" text-anchor="end">f₂ · |det J₂| = 3/2</text>
+		<path d="M86 357V305" style="fill:none;stroke:var(--viz-edge);stroke-width:2;stroke-dasharray:5 4;marker-end:url(#flow-volume-inverse-arrow)"></path>
+		<text class="viz-callout" x="92" y="325">evaluate density</text>
+		<text class="viz-label" x="92" y="343">with f₂⁻¹</text>
+		<text class="viz-axis-label" x="18" y="385">3 · DATA SPACE x</text>
+		<rect class="viz-node viz-node--output" x="120" y="402" width="120" height="90" rx="3"></rect>
+		<g style="fill:var(--viz-output-stroke)">
+			<circle cx="150" cy="426" r="3"></circle><circle cx="180" cy="426" r="3"></circle><circle cx="210" cy="426" r="3"></circle>
+			<circle cx="150" cy="468" r="3"></circle><circle cx="180" cy="468" r="3"></circle><circle cx="210" cy="468" r="3"></circle>
+		</g>
+		<text class="viz-callout" x="180" y="510" text-anchor="middle">area 3A · same mass m · density pₓ = p₀/3</text>
+		<rect class="viz-plot-bg" x="18" y="532" width="324" height="78" rx="6"></rect>
+		<text class="viz-axis-label" x="32" y="553">LOG-DENSITY LEDGER</text>
+		<text class="viz-callout" x="180" y="578" text-anchor="middle">log pₓ = log p₀ − log 2 − log(3/2)</text>
+		<text class="viz-node-value" x="180" y="598" text-anchor="middle">= log p₀ − log 3</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> follow the solid arrows down to sample: each bijection stretches the same six-point probability-mass patch. Read the dashed arrows up to evaluate density: divide by each layer's local volume multiplier. Here the areas multiply, $2 \times \frac{3}{2} = 3$, while the log corrections add, $\log 2 + \log \frac{3}{2} = \log 3$. This is an original local construction checked against <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">JMLR normalizing-flows review</a>.</figcaption>
+</figure>
+
 The engineering challenge: design each $f_k$ to be (a) invertible, (b) expressive, and (c) have a **cheap-to-compute log-determinant**.
 
 ## Common flow families
