@@ -56,6 +56,62 @@ Examples include beam-like search, tree search, and planning with tools. Search 
 
 Use a calculator, code runner, search index, theorem checker, or external environment. Tool results can provide stronger evidence than internal confidence.
 
+**Learning objective:** separate proposal coverage from selection quality by explaining how extra compute can generate a correct candidate yet still return a wrong answer when the verifier ranks a proxy instead of correctness.
+
+<!-- visual:test-time-compute-verifier-bottleneck -->
+<figure class="learning-figure" aria-labelledby="test-time-verifier-heading">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="test-time-verifier-heading">More candidates help only if the verifier selects the right one.</p>
+	<svg viewBox="0 0 360 410" role="img" aria-labelledby="test-time-verifier-title test-time-verifier-desc">
+		<title id="test-time-verifier-title">The same candidate set succeeds with a direct checker and fails with a weak proxy verifier</title>
+		<desc id="test-time-verifier-desc">Two panels contain the same four sampled candidates: A has wrong arithmetic, B is correct, C is incomplete, and D is a polished shortcut with a wrong answer. In the upper panel, protected tests directly check the task and select candidate B, so the returned answer is correct. In the lower panel, a weak model judge rewards plausibility and selects candidate D, so the returned answer is wrong even though candidate B was available. Candidate letters, truth labels, verifier labels, selection text, and solid versus dashed arrows communicate the result without color.</desc>
+		<defs>
+			<marker id="test-time-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="viz-arrow-forward"></path></marker>
+		</defs>
+		<rect class="viz-plot-bg" x="8" y="27" width="344" height="174" rx="5"></rect>
+		<text class="viz-axis-label" x="18" y="18">1 · DIRECT CHECK: COVERAGE + SELECTION BOTH SUCCEED</text>
+		<text class="viz-label" x="18" y="48">SAME FOUR SAMPLES</text>
+		<rect class="viz-node" x="18" y="59" width="82" height="43" rx="4"></rect>
+		<rect class="viz-node viz-node--output" x="108" y="59" width="82" height="43" rx="4"></rect>
+		<rect class="viz-node" x="18" y="110" width="82" height="43" rx="4"></rect>
+		<rect class="viz-node" x="108" y="110" width="82" height="43" rx="4"></rect>
+		<text class="viz-axis-label" x="27" y="76">A</text><text class="viz-label" x="59" y="77" text-anchor="middle">wrong</text><text class="viz-label" x="59" y="92" text-anchor="middle">arithmetic</text>
+		<text class="viz-axis-label" x="117" y="76">B</text><text class="viz-callout" x="149" y="77" text-anchor="middle">CORRECT</text><text class="viz-label" x="149" y="92" text-anchor="middle">solution</text>
+		<text class="viz-axis-label" x="27" y="127">C</text><text class="viz-label" x="59" y="129" text-anchor="middle">incomplete</text>
+		<text class="viz-axis-label" x="117" y="127">D</text><text class="viz-label" x="149" y="128" text-anchor="middle">polished</text><text class="viz-label" x="149" y="143" text-anchor="middle">wrong shortcut</text>
+		<path d="M198 105H216" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#test-time-arrow)"></path>
+		<rect class="viz-node viz-node--focus" x="222" y="59" width="118" height="43" rx="4"></rect>
+		<text class="viz-axis-label" x="281" y="76" text-anchor="middle">PROTECTED TESTS</text>
+		<text class="viz-label" x="281" y="92" text-anchor="middle">check task outcome</text>
+		<path d="M281 103V119" fill="none" stroke="var(--viz-output-stroke)" stroke-width="3" marker-end="url(#test-time-arrow)"></path>
+		<rect class="viz-node viz-node--output" x="222" y="127" width="118" height="47" rx="4"></rect>
+		<text class="viz-callout" x="281" y="146" text-anchor="middle">SELECT B · PASS</text>
+		<text class="viz-label" x="281" y="163" text-anchor="middle">return correct answer</text>
+		<text class="viz-label" x="18" y="187">Sampling found B; direct evidence preserved it.</text>
+		<rect class="viz-plot-bg" x="8" y="229" width="344" height="174" rx="5"></rect>
+		<text class="viz-axis-label" x="18" y="220">2 · PROXY CHECK: COVERAGE SUCCEEDS, SELECTION FAILS</text>
+		<text class="viz-label" x="18" y="250">SAME FOUR SAMPLES</text>
+		<rect class="viz-node" x="18" y="261" width="82" height="43" rx="4"></rect>
+		<rect class="viz-node viz-node--output" x="108" y="261" width="82" height="43" rx="4"></rect>
+		<rect class="viz-node" x="18" y="312" width="82" height="43" rx="4"></rect>
+		<rect class="viz-node viz-node--warning" x="108" y="312" width="82" height="43" rx="4"></rect>
+		<text class="viz-axis-label" x="27" y="278">A</text><text class="viz-label" x="59" y="279" text-anchor="middle">wrong</text><text class="viz-label" x="59" y="294" text-anchor="middle">arithmetic</text>
+		<text class="viz-axis-label" x="117" y="278">B</text><text class="viz-callout" x="149" y="279" text-anchor="middle">CORRECT</text><text class="viz-label" x="149" y="294" text-anchor="middle">solution</text>
+		<text class="viz-axis-label" x="27" y="329">C</text><text class="viz-label" x="59" y="331" text-anchor="middle">incomplete</text>
+		<text class="viz-axis-label" x="117" y="329">D</text><text class="viz-label" x="149" y="330" text-anchor="middle">polished</text><text class="viz-label" x="149" y="345" text-anchor="middle">wrong shortcut</text>
+		<path d="M198 307H216" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#test-time-arrow)"></path>
+		<rect class="viz-node viz-node--focus" x="222" y="261" width="118" height="43" rx="4"></rect>
+		<text class="viz-axis-label" x="281" y="278" text-anchor="middle">WEAK MODEL JUDGE</text>
+		<text class="viz-label" x="281" y="294" text-anchor="middle">rewards plausibility</text>
+		<path d="M281 305V321" fill="none" stroke="var(--viz-warning-stroke)" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#test-time-arrow)"></path>
+		<rect class="viz-node viz-node--warning" x="222" y="329" width="118" height="47" rx="4"></rect>
+		<text class="viz-callout" x="281" y="348" text-anchor="middle">SELECT D · FAIL</text>
+		<text class="viz-label" x="281" y="365" text-anchor="middle">return wrong answer</text>
+		<text class="viz-label" x="18" y="389">Sampling still found B; the proxy discarded it.</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> candidate B exists in both panels, so generation coverage is identical. Protected tests select B by checking the outcome; a plausibility judge selects polished-but-wrong D. More samples cannot rescue a selection rule that rewards the wrong thing.</figcaption>
+</figure>
+
 ## The verifier is the bottleneck
 
 A strong policy with a weak verifier may generate a correct answer and then reject it. A weak policy with an exploitable verifier may learn to produce high-scoring failures.
