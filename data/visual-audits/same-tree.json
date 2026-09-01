@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-same-tree.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Compare both trees at the same position before recursing to children.",
+  "learningObjective": "Two trees match only if the same-position node pair passes the null, value, left-pair, and right-pair checks.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to compare both trees at the same position before recursing to children.",
-    "invariant": "Compare both trees at the same position before recursing to children.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Lockstep depth-first recursion over corresponding node pairs in two trees.",
+    "recognitionCue": "Use paired DFS when equality, symmetry, or structural correspondence requires comparing both value and shape at the same tree positions rather than comparing traversed value sequences.",
+    "invariant": "same_tree(first, second) returns true exactly when the two subtrees rooted at that pair have identical shape and equal values at every corresponding node.",
+    "stateModel": "The minimal state is the recursion stack of node pairs. Each call resolves one of three cases: both missing, exactly one missing, or two real nodes whose value and child pairs must all match.",
+    "visualRationale": "A paired-node tree preserves the shared positions and edges while each label shows both values at that position. Explicit null and boolean annotations make shape mismatches readable without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Two preorder value arrays were rejected because equal values can still hide different null positions and therefore different shapes.",
+      "A comparison table was rejected because it removes parent-child topology and recursive pairing.",
+      "Serialized strings were rejected because they depict a different encoding-based implementation."
     ],
-    "transferLesson": "Transfer the invariant: Compare both trees at the same position before recursing to children.",
-    "reviewStatus": "pending"
+    "transferLesson": "When comparing recursive structures, recurse on aligned pairs and make missing-object cases explicit before reading values; this transfers to mirror symmetry, subtree equality, and AST comparison.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

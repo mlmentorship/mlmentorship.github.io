@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-invert-binary-tree.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Swap the two child links at every node.",
+  "learningObjective": "Postorder recursion returns inverted child subtrees, then the parent assigns old right to left and old left to right.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to swap the two child links at every node.",
-    "invariant": "Swap the two child links at every node.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Postorder tree transformation that recursively rewrites child subtrees before assigning their links at the parent.",
+    "recognitionCue": "Use this pattern when every node applies the same local child-pointer transformation and the parent needs transformed child roots returned from recursion.",
+    "invariant": "invert_tree(node) returns the same node object after every edge in its subtree is mirrored: its new left is the fully inverted old right and its new right is the fully inverted old left.",
+    "stateModel": "The minimal state is the recursion stack and the two returned child roots held while tuple assignment rewires a node. No copied tree or auxiliary map is needed.",
+    "visualRationale": "A real edged tree makes each pointer rewire visible. Semantic node keys persist while 9/6, 3/1, and whole subtrees 7/2 move to mirrored positions, so motion communicates identity preservation.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A before/after pair was rejected because it skips recursive evaluation order and all intermediate rewires.",
+      "An array representation was rejected because heap-like indices distract from mutable parent-child links.",
+      "A breadth-first queue animation was rejected because it does not match the supplied recursive postorder implementation."
     ],
-    "transferLesson": "Transfer the invariant: Swap the two child links at every node.",
-    "reviewStatus": "pending"
+    "transferLesson": "For recursive structural edits, first obtain transformed child roots, then reconnect them locally and return the current root; this transfers to pruning, flattening, and persistent tree rewrites.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

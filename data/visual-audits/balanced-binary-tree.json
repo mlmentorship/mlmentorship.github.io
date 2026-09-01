@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-balanced-binary-tree.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Return a failure sentinel as soon as child heights differ by more than one.",
+  "learningObjective": "A postorder height function returns a nonnegative height for a balanced subtree and -1 as a failure sentinel that ancestors propagate immediately.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to return a failure sentinel as soon as child heights differ by more than one.",
-    "invariant": "Return a failure sentinel as soon as child heights differ by more than one.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Bottom-up tree DFS that fuses height computation and validation by reserving -1 as an error sentinel.",
+    "recognitionCue": "Use a sentinel summary when a parent needs a normal child aggregate but any descendant failure should abort remaining work, as in balanced-height checks or invalid-subtree detection.",
+    "invariant": "height(node) returns the exact nonnegative subtree height if every node below is balanced; otherwise it returns -1. Thus ancestors can distinguish valid data from failure without a second traversal.",
+    "stateModel": "The minimal state is the recursion stack and each child integer return. The left result is checked before the right call, enabling the supplied implementation to skip the entire right subtree after failure.",
+    "visualRationale": "An edged, asymmetric tree shows the height-producing left chain and the untouched right subtree. Return labels and explicit arithmetic distinguish heights, the -1 sentinel, and skipped calls without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A height table was rejected because it hides postorder call flow and early sentinel propagation.",
+      "Two separate passes for height and balance were rejected because they depict a different, potentially repeated-work algorithm.",
+      "A simple balanced/unbalanced icon was rejected because it does not reveal where the first violation occurs or why work stops."
     ],
-    "transferLesson": "Transfer the invariant: Return a failure sentinel as soon as child heights differ by more than one.",
-    "reviewStatus": "pending"
+    "transferLesson": "Fuse a subtree summary with validation by reserving an impossible summary value for failure, then check it before doing more recursion; this generalizes to BST validation and parse-tree error propagation.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
