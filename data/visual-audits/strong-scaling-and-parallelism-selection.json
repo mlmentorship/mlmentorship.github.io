@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "slug": "strong-scaling-and-parallelism-selection",
+  "article": "src/content/posts/2026-08-28-strong-scaling-and-parallelism-selection.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See why adding devices to a fixed workload can reduce wall time while increasing total accelerator-hours when strong-scaling efficiency falls.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can encode device count as width, wall time as height, and accelerator-hours as area. Three normalized rectangles make the cost consequence of falling efficiency directly visible without claiming a hardware benchmark.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can describe the decision to stop scaling but cannot encode the multiplicative relationship among device count, wall time, and accelerator-hours as inspectable geometry.",
+    "svg": "Selected for deterministic proportional rectangles, direct numeric labels, a compact 360-unit viewBox, shared theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table can calculate speedup and efficiency but makes the reader mentally reconstruct why shorter elapsed time can occupy more device-time area.",
+    "interaction": "Rejected because sweeping device count would require synthetic curve assumptions and controls; three explicit normalized observations teach the invariant with a complete static fallback.",
+    "paperReuse": "Rejected because the learning objective needs a new area encoding rather than any source figure. No chart, data series, figure layout, caption, or artwork from the reviewed sources is reused.",
+    "noVisual": "Rejected because the prose states that lower step time can cost more, but does not spatially connect accelerator-hours to the product of device count and elapsed time."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 107,
+        "insight": "The LLM-training slide emphasizes hardware scalability, token throughput, tensor-friendly dimensions, mixed precision, and FSDP, but gives no fixed-work speedup, efficiency, or device-hour comparison."
+      },
+      {
+        "page": 108,
+        "insight": "The neighboring compute-optimization slide separates compute and memory bottlenecks and introduces arithmetic intensity, but remains a single-accelerator model rather than a cluster scaling curve."
+      },
+      {
+        "page": 114,
+        "insight": "The mixed-precision slide compares peak throughput and memory footprints and mentions ZeRO/FSDP state sharding, without measuring useful model FLOPs or scaling efficiency."
+      },
+      {
+        "page": 115,
+        "insight": "The training-stack summary lists FSDP/ZeRO, FlashAttention, packing, checkpointing, and accumulation, but does not explain how to select parallelism or when added devices increase cost."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide distinguishes data parallelism from model parallelism and mentions scale constraints, but provides no topology placement, MFU, speedup, or accelerator-hour analysis."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for strong scaling, scaling efficiency, utilization, MFU, throughput, communication, distributed training, data/model/tensor/pipeline parallelism, FSDP, and ZeRO. The complete neighboring sequences on pages 106-116 and 166-168 were inspected. Pages 106 and 116 concern training data and re-scoring; pages 109-113 cover specific long-context and decoding optimizations; pages 166 and 168 cover data pipelines and serving. The deck has no fixed-work scaling or accelerator-cost visual, so no deck artwork, values, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "How to Scale Your Model: Training",
+        "url": "https://jax-ml.github.io/scaling-book/training/",
+        "usage": "Used as an authoritative systems text to verify that strong scaling seeks proportional throughput gains, while more chips reduce per-device compute available to hide growing communication and eventually become inefficient.",
+        "license": "The scaling-book repository licenses its documentation under MIT. No source figure, prose, formula layout, or benchmark value is copied; the three-rectangle normalized example is an original construction with a citation."
+      },
+      {
+        "title": "PaLM: Scaling Language Modeling with Pathways",
+        "url": "https://arxiv.org/abs/2204.02311",
+        "usage": "Used as the primary paper for model FLOPs utilization: observed throughput divided by theoretical maximum throughput, with model FLOPs based on forward and backward computation rather than rematerialization.",
+        "license": "The arXiv record does not state permissive figure-reuse terms. No PaLM figure, table, measured value, prose, or layout is reproduced; the paper is cited only for the MFU definition."
+      },
+      {
+        "title": "Validity of the Single Processor Approach to Achieving Large Scale Computing Capabilities",
+        "url": "https://dl.acm.org/doi/10.1145/1465482.1465560",
+        "usage": "Used as the primary source for the fixed-work scaling limit: serial or non-parallelizable overhead bounds the useful speedup obtained by adding processors.",
+        "license": "The ACM record does not provide permissive reuse rights for the paper's content or figures. No figure, wording, numerical example, or layout is copied; the source is used only to validate the fixed-work interpretation."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that elapsed time and accelerator cost are different projections of the same run. In the original schematic, width is device count R, height is normalized time t_R, and rectangle area is R times t_R. The illustrative observations are internally consistent: efficiencies are 100/(1*100)=100%, 100/(2*60)=83.3%, and 100/(4*45)=55.6%; corresponding normalized accelerator-hours are 100, 120, and 180. The example demonstrates monotonic wall-time improvement alongside rising cost, not a universal scaling curve or recommendation for a specific device count."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the relevant neighboring sequences, then checked the Google DeepMind scaling text, the primary PaLM paper, and Amdahl's original fixed-work argument before selecting an original area diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "strong-scaling-wall-time-cost-knee"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that states all three observations, encoding rules, and the conclusion. Device counts, times, efficiencies, costs, rectangle dimensions, and the explicit formula carry the lesson without color. Its 360-unit viewBox has no minimum width and scales directly within a 390 CSS pixel viewport; shared visual variables support dark and light themes, while established print rules force a high-contrast light palette and prevent figure splitting."
+  }
+}
