@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "slug": "positional-encoding",
+  "article": "src/content/posts/2026-03-15-positional-encoding.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why shifting both token positions by the same amount leaves the RoPE angle gap and the ALiBi distance penalty unchanged, while identifying where each method injects relative position.",
+  "mediumRationale": "A deterministic two-part SVG is the smallest medium that can show both mechanisms on aligned examples: paired 2D rotations make RoPE's common-angle cancellation spatial, while a directly labelled score strip shows ALiBi subtracting a head-specific penalty after the content dot product.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart could locate the operations but cannot preserve equal angular gaps or linear distance magnitudes accurately.",
+    "svg": "Selected because fixed vector geometry and a measured distance strip can make the same-shift invariance and the different injection points inspectable in one responsive figure.",
+    "semanticHtml": "Rejected because a table could list formulas and implementation stages but would require readers to imagine why common rotations cancel in a dot product.",
+    "interaction": "Rejected because dragging positions or changing slopes would add controls and state before the stable relative-offset invariant is understood.",
+    "paperReuse": "Rejected because the primary papers contain method-specific figures rather than this narrow cross-method comparison, and ALiBi's arXiv distribution license does not grant general figure reuse. No source figure, data, coordinates, prose, or layout is copied.",
+    "noVisual": "Rejected because the prose gives both formulas but leaves readers to form the central geometric distinction themselves: RoPE changes the angle between query and key before their dot product, whereas ALiBi leaves content vectors unchanged and modifies the resulting score."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 101,
+        "insight": "The transformer overview says positional information augments decoder input and distinguishes causal from full attention, but it does not explain any positional encoding mechanism."
+      },
+      {
+        "page": 102,
+        "insight": "The adjacent BERT and RoBERTa slide discusses contiguous segments, masking, and fixed token lengths without comparing absolute or relative position methods."
+      },
+      {
+        "page": 103,
+        "insight": "The transformer-family summary covers attention scaling, normalization, residuals, and model variants but contains no RoPE, ALiBi, or positional geometry."
+      },
+      {
+        "page": 106,
+        "insight": "The preceding LLM-data slide provides the transition into modern model training and contains no positional encoding content."
+      },
+      {
+        "page": 107,
+        "insight": "The only direct RoPE match says OLMo replaces absolute positional embeddings with RoPE, following LLaMA and PaLM; it names the architectural choice without explaining rotation or relative offsets."
+      },
+      {
+        "page": 108,
+        "insight": "The following compute-optimization slide writes the attention equation and discusses long-sequence bottlenecks, but it does not show where positional information enters the score."
+      },
+      {
+        "page": 109,
+        "insight": "The next slide requires resetting position IDs at packed-example boundaries, demonstrating that position semantics matter operationally while offering no encoding comparison."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed for positional encoding, position embedding, RoPE, rotary, ALiBi, sinusoidal, relative position, Transformer-XL, and T5. Page 107 was the sole direct RoPE match. Pages 101-103 and 106-109 were extracted and inspected as the full transformer and immediate LLM-training neighborhoods around that match. The deck contains no ALiBi match, rotation geometry, relative-offset derivation, or context-scaling treatment. No slide screenshot, artwork, wording, numeric example, or layout is reused.",
+    "license": "The local deck states no reuse license. It is treated as review-only, and none of its artwork or prose is republished. The shipped geometry, token positions, score example, and composition are original."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+        "url": "https://arxiv.org/abs/2104.09864",
+        "usage": "Used as the primary source for rotating each query and key dimension pair by a position-dependent angle and for the resulting inner product's dependence on the relative offset.",
+        "license": "The arXiv record identifies CC BY-NC-ND 4.0. The article is cited for factual verification only; no figure, equation layout, prose, result, or visual arrangement is adapted."
+      },
+      {
+        "title": "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation",
+        "url": "https://arxiv.org/abs/2108.12409",
+        "usage": "Used as the primary source for ALiBi's fixed head-specific slopes and its distance-proportional negative bias applied to attention scores rather than token embeddings.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, which does not grant general third-party figure reuse. No paper figure, benchmark, prose, or layout is copied."
+      },
+      {
+        "title": "Extending Context Window of Large Language Models via Positional Interpolation",
+        "url": "https://arxiv.org/abs/2306.15595",
+        "usage": "Used as the primary source to verify that position interpolation maps a longer index range back into the pretrained range before applying RoPE and then fine-tunes the model for long context.",
+        "license": "The arXiv record identifies CC BY 4.0. Although attributed reuse is permitted, no figure, equation layout, benchmark, prose, or composition is copied."
+      },
+      {
+        "title": "YaRN: Efficient Context Window Extension of Large Language Models",
+        "url": "https://arxiv.org/abs/2309.00071",
+        "usage": "Used as the primary source for frequency-dependent RoPE interpolation that preserves short-wavelength dimensions, interpolates long-wavelength dimensions, and ramps between them.",
+        "license": "The arXiv record identifies CC BY 4.0. No paper figure, data, parameter setting, prose, or visual structure is reused."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is how RoPE and ALiBi can both be relative while intervening at different stages. The original RoPE toy uses identical unit content vectors and one frequency theta. Positions (1, 3) and shifted positions (4, 6) both differ by two, so their encoded angle gap is 2 theta and their dot product is cos(2 theta): algebraically, (R_m q)^T(R_n k) = q^T R_m^T R_n k = q^T R_(n-m) k. The ALiBi toy uses a causal query at position 6 and keys at positions 2, 4, and 6, producing distances 4, 2, and 0 and biases -4s_h, -2s_h, and 0 for positive per-head slope s_h. Source review also caught an ambiguity in the article's ALiBi equation; the implementation changes it to an explicit subtraction so greater causal distance cannot be misread as a reward."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected both relevant transformer neighborhoods, verified four primary papers and their arXiv licenses, corrected the ALiBi sign convention, and selected an original mechanism comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "positional-relative-mechanisms"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description stating both position pairs, their equal offset, the RoPE cancellation identity, and all three ALiBi penalties. Every vector, position, distance, operation stage, and conclusion is directly labelled; solid versus dashed vectors, arrowheads, braces, signs, and spatial position carry the lesson without color. The compact 360-unit viewBox has no minimum width and uses established SVG text sizes for readability at 390 CSS pixels. Existing theme variables provide dark-mode contrast, while shared print rules force a light high-contrast palette and keep the figure together."
+  }
+}

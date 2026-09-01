@@ -44,7 +44,7 @@ State one hypothesis and predicted direction before changing code. "Vectorize" i
 <figure class="learning-figure plot-panel" aria-labelledby="accelerator-trace-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="accelerator-trace-title">Which optimization actually shortens the dependent chain?</p>
-	<svg viewBox="0 0 360 382" role="img" aria-labelledby="accelerator-trace-svg-title accelerator-trace-svg-desc">
+	<svg viewBox="0 0 360 390" role="img" aria-labelledby="accelerator-trace-svg-title accelerator-trace-svg-desc">
 		<title id="accelerator-trace-svg-title">Three accelerator traces compare removing off-path work with shortening the critical path</title>
 		<desc id="accelerator-trace-svg-desc">All rows use the same zero-to-twelve-cycle scale. In the baseline, a four-cycle load, four-cycle dependent compute operation, and four-cycle dependent store form a solid critical chain ending at cycle twelve. A dashed three-cycle helper overlaps the load and is not on that chain. Experiment A removes the helper, reducing instruction work but retaining the same twelve-cycle critical chain. Experiment B retains the helper but shortens the exposed load to two cycles, so dependent compute runs from cycles two to six and the store from six to ten, ending two cycles earlier.</desc>
 		<defs><marker id="accelerator-trace-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="viz-arrow-forward" d="M0 0L10 5L0 10Z"></path></marker></defs>
@@ -76,7 +76,7 @@ State one hypothesis and predicted direction before changing code. "Vectorize" i
 		<path d="M118 277H138 M198 277H218" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#accelerator-trace-arrow)"></path>
 		<rect class="viz-node" x="88" y="325" width="60" height="25" rx="3" style="stroke-dasharray:5 3"></rect><text class="viz-label" x="118" y="341" text-anchor="middle">helper · 3</text><text class="viz-label" x="155" y="341">still overlaps</text>
 		<path class="viz-operating-guide" d="M288 247V365"></path><text class="viz-callout" x="286" y="368" text-anchor="end">end · 10</text>
-		<text class="viz-axis-label" x="208" y="379" text-anchor="middle">solid outline + arrows = dependent critical chain · dashed = off-path</text>
+		<text class="viz-axis-label" x="180" y="384" text-anchor="middle">solid + arrows = dependent chain · dashed = off-path</text>
 	</svg>
 	<figcaption><strong>Read it this way:</strong> compare end markers before counting blocks. Removing the dashed helper lowers total work but leaves the solid 12-cycle load → compute → store chain untouched. Shortening the exposed load advances every dependent operation, so the same remaining work ends at cycle 10. The trace is an original synthetic example; the distinction between elapsed time and summed operation time is checked against the <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">NVIDIA Nsight Systems analysis guide</a>, with bottleneck classification informed by the <a href="https://doi.org/10.1145/1498765.1498785">Roofline model</a> and the <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX Scaling Book profiling guide</a>.</figcaption>
 </figure>

@@ -86,7 +86,7 @@ $$
 		<text class="viz-callout" x="180" y="578" text-anchor="middle">log pₓ = log p₀ − log 2 − log(3/2)</text>
 		<text class="viz-node-value" x="180" y="598" text-anchor="middle">= log p₀ − log 3</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the solid arrows down to sample: each bijection stretches the same six-point probability-mass patch. Read the dashed arrows up to evaluate density: divide by each layer's local volume multiplier. Here the areas multiply, $2 \times \frac{3}{2} = 3$, while the log corrections add, $\log 2 + \log \frac{3}{2} = \log 3$. This is an original local construction checked against <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">JMLR normalizing-flows review</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the solid arrows down to sample: each bijection stretches the same six-point probability-mass patch. Read the dashed arrows up to evaluate density: divide by each layer's local volume multiplier. Here the areas multiply, <code>2 × 3/2 = 3</code>, while the log corrections add, <code>log 2 + log(3/2) = log 3</code>. This is an original local construction checked against <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">JMLR normalizing-flows review</a>.</figcaption>
 </figure>
 
 The engineering challenge: design each $f_k$ to be (a) invertible, (b) expressive, and (c) have a **cheap-to-compute log-determinant**.

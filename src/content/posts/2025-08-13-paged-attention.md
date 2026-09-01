@@ -66,7 +66,7 @@ Internal fragmentation is at most $B - 1$ tokens per request (vs. potentially th
 		<path class="viz-forward" d="M214 142 C214 200 134 210 134 244"></path>
 		<path class="viz-forward" d="M302 82 C350 170 134 280 134 324"></path>
 		<path class="viz-forward" d="M302 142 C302 190 278 205 278 244"></path>
-		<text class="viz-node-label" x="30" y="235" text-anchor="start">physical KV-block pool · non-contiguous allocation</text>
+		<text class="viz-node-label" x="180" y="235" text-anchor="middle">physical KV blocks · scattered</text>
 		<rect x="30" y="250" width="64" height="58" rx="4" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
 		<rect class="viz-node viz-node--focus" x="102" y="250" width="64" height="58" rx="4"></rect>
 		<rect x="174" y="250" width="64" height="58" rx="4" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>

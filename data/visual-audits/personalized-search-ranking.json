@@ -125,6 +125,6 @@
     "visualIds": [
       "personalized-search-request-learning-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. Explicit ONLINE REQUEST PATH and LEARNING PATH groups, numbered stage labels, direct edge labels, and a dashed policy-update return path preserve the inference without color. The established wide-node marker keeps labels readable through horizontal scrolling at 390 CSS pixels, while shared Mermaid theme tokens provide dark-mode contrast and print removes the minimum width. The adjacent prose and caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "The Mermaid source provides a complete accessible title and description. Explicit ONLINE REQUEST PATH and LEARNING PATH groups, numbered stage labels, direct edge labels, and a dashed publication path to the next versioned request preserve the inference without color. The established tall-flow marker keeps the compact top-to-bottom graph readable without horizontal scrolling at 390 CSS pixels, while shared Mermaid theme tokens provide dark-mode and print contrast. The adjacent prose and caption preserve the lesson if client-side rendering is unavailable."
   }
 }
