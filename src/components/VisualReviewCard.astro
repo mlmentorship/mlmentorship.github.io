@@ -198,6 +198,14 @@ const {
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+  .visual-review-card--article:has(.coding-visual) {
+    height: auto;
+    max-height: none;
+    display: block;
+  }
+  .visual-review-card--article:has(.coding-visual) .visual-review-visual {
+    overflow: visible;
+  }
   .visual-review-card--article .visual-review-actions {
     flex: 0 0 auto;
   }
