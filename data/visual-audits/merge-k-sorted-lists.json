@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-merge-k-sorted-lists.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The heap holds one current head per list; pop the smallest and replace it with that list next.",
+  "learningObjective": "A min-heap containing one current head per nonempty list always exposes the globally smallest unmerged node.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the heap holds one current head per list; pop the smallest and replace it with that list next.",
-    "invariant": "The heap holds one current head per list; pop the smallest and replace it with that list next.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "K-way linked-list merge using a min-heap with one current node tuple per nonempty source list.",
+    "recognitionCue": "Use it when k individually sorted streams must be merged and only their current heads can be candidates for the next global minimum.",
+    "invariant": "The heap contains exactly the first unmerged node of each nonexhausted list, and the tail follows all nodes already popped in nondecreasing tuple order.",
+    "stateModel": "The minimal state is a heap of (value, list index, node) tuples plus dummy and tail pointers. Each loop pops one node, links it after tail, and pushes only that node next.",
+    "visualRationale": "Complete-binary-heap geometry exposes the live frontier while tuple labels preserve value, tie-break index, and node identity. The source chains, popped tuple, pushed tuple, tail, and emitted node order remain explicit without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Scanning all k current heads was rejected because it hides the supplied logarithmic heap selection.",
+      "Pairwise divide-and-conquer merging was rejected because it depicts a different algorithm.",
+      "A final merged list alone was rejected because it omits heap replacements, null-next branches, and tuple tie-breaking."
     ],
-    "transferLesson": "Transfer the invariant: The heap holds one current head per list; pop the smallest and replace it with that list next.",
-    "reviewStatus": "pending"
+    "transferLesson": "For sorted sources, keep only one frontier item per source and replace it from the same source after extraction. The pattern transfers to external merge, log aggregation, and k-way iterators.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

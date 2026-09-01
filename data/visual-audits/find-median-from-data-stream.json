@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-find-median-from-data-stream.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Keep the lower half in a max-heap and the upper half in a min-heap.",
+  "learningObjective": "The lower max-heap owns the extra item, and its root plus the upper min-heap root are always the middle value or values.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to keep the lower half in a max-heap and the upper half in a min-heap.",
-    "invariant": "Keep the lower half in a max-heap and the upper half in a min-heap.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Online median maintenance with a negated max-heap for the lower half and a min-heap for the upper half.",
+    "recognitionCue": "Use two heaps when numbers arrive online and every median query must avoid sorting the entire history.",
+    "invariant": "Every lower value is at most every upper value, and lower has either the same size as upper or exactly one extra item. Therefore the middle values are always heap roots.",
+    "stateModel": "The minimal state is lower and upper. Each insertion pushes a negated value to lower, transfers its maximum to upper, then moves upper minimum back only if upper became larger.",
+    "visualRationale": "Explicit parent-child edges depict each live heap topology while labels show Python stored negatives, logical lower values, upper values, roots, sizes, and median arithmetic. Stable value nodes persist as ownership changes.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A fully sorted array was rejected because insertion would be linear and would not expose the supplied heap mechanism.",
+      "One heap was rejected because it cannot expose both middle boundaries efficiently.",
+      "Only post-insertion snapshots were rejected because they hide the mandatory lower-to-upper transfer and conditional rebalance."
     ],
-    "transferLesson": "Transfer the invariant: Keep the lower half in a max-heap and the upper half in a min-heap.",
-    "reviewStatus": "pending"
+    "transferLesson": "Maintain an ordered partition whose size difference is bounded, then answer rank queries from boundary roots. The same balancing idea supports streaming quantiles and running order statistics.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
