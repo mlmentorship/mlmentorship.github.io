@@ -24,6 +24,47 @@ Most of recsys is the same in 2026 as it was in 2020:
 
 LLMs don't replace any of this. They augment specific stages.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Trace where an LLM can enrich a production recommender while the high-throughput retrieve-then-rank backbone and behavioral personalization remain in control.</p>
+
+<!-- visual:recsys-llm-bounded-augmentation -->
+```mermaid
+flowchart TB
+  accTitle: LLMs augment bounded stages around a recommender backbone
+  accDescr: A production request can pass through an LLM intent helper before fast retrieval. Item text can separately pass through an offline LLM content encoder into stored item vectors and features. Fast two-tower and approximate-nearest-neighbor retrieval narrows the catalog, then a learned ranker combines behavioral and content evidence. Only the small top-N result may go through an optional LLM reranker and explanation step before the final slate; the learned ranker can also serve the slate directly when latency requires it. A separate dashed research branch maps intent to semantic item identifiers through generative retrieval and is not part of the default production path.
+
+  Request["REQUEST<br/>query · session context"] --> Intent["LLM HELPER<br/>rewrite · expand · disambiguate"]
+  Behavior["BEHAVIORAL HISTORY<br/>clicks · watches · purchases"] ==> Retrieve
+  Content["ITEM CONTENT<br/>title · description · transcript"] -.->|"offline"| Encode["LLM CONTENT ENCODER<br/>represent new and long-tail items"]
+  Encode --> Catalog[("STORED ITEM VECTORS + FEATURES")]
+
+  subgraph Core["UNCHANGED HIGH-THROUGHPUT BACKBONE"]
+    Retrieve["FAST RETRIEVAL<br/>two-tower + ANN<br/>catalog → candidates"]
+    Rank["LEARNED RANKER<br/>behavior + content + context<br/>candidates → top N"]
+    Retrieve ==> Rank
+  end
+
+  Intent --> Retrieve
+  Catalog ==> Retrieve
+  Catalog --> Rank
+  Behavior ==> Rank
+  Rank ==>|"small top N only"| Rerank["OPTIONAL LLM RERANK + EXPLAIN<br/>fine-grained context · natural language"]
+  Rerank --> Slate["FINAL SLATE"]
+  Rank -->|"latency-sensitive path"| Slate
+
+  Intent -.->|"research frontier"| Generate["GENERATIVE RETRIEVAL<br/>predict semantic IDs"]
+  Generate -.-> IDs["CATALOG ITEM IDs"]
+
+  class Request,Behavior,Content viz-input
+  class Intent,Encode,Rerank viz-focus
+  class Catalog viz-state
+  class Slate viz-output
+  class Generate,IDs viz-state
+  class Retrieve viz-wide
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path through retrieval and ranking first: that fast behavioral backbone still does the catalog-scale work. LLMs sit at bounded edges: understanding the request, encoding item content offline, and optionally inspecting only the small top-N set. The dashed semantic-ID path is a separate research frontier, not a reason to remove the production backbone. Original synthesis checked against the <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/">YouTube retrieve-then-rank architecture</a>, primary work on <a href="https://arxiv.org/abs/2305.13731">language-based item representations</a> and <a href="https://arxiv.org/abs/2305.08845">LLM reranking</a>, and <a href="https://arxiv.org/abs/2305.05065">generative retrieval with semantic IDs</a>.</p>
+
 ## What an L5 answer sounds like
 
 > "LLMs are most useful at three stages of the recsys stack:

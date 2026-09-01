@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "slug": "rag-overview",
+  "article": "src/content/posts/2025-09-02-rag-overview.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how the offline corpus-indexing path prepares lexical and dense indexes, then follow one online query through understanding, retrieval, fusion, reranking, and evidence-grounded generation.",
+  "mediumRationale": "A two-panel semantic path is the smallest medium that exposes the boundary hidden by the seven-component list: components 1-3 prepare reusable knowledge before traffic, while components 4-7 execute for each request and read from both indexes. Ordinary text wrapping and document order preserve the complete lesson without fixed-width drawing labels.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout would add a wide crossing edge between two index stores and the request path, requiring horizontal scrolling or smaller labels at 390 CSS pixels for a distinction that two ordered panels express directly.",
+    "svg": "Rejected because the lesson is lifecycle and responsibility rather than quantitative geometry. Fixed SVG text would be less adaptable at phone width, and a more detailed architecture drawing would duplicate the longer linked RAG essay.",
+    "semanticHtml": "Selected because two labelled panels make the offline-online boundary spatially immediate, retain ordinary reading order, stack through the established mobile breakpoint, and keep every stage available to screen readers and print without scripting.",
+    "interaction": "Rejected because simulating corpus updates or candidate counts would introduce controls and hidden states without improving the single stable mental model of when each path runs and where they meet.",
+    "paperReuse": "Rejected because the RAG and DPR papers contain model-specific architecture figures and the local deck contains unrelated recommender diagrams. No external figure, visual organization, wording, data, or artwork is needed or copied.",
+    "noVisual": "Rejected because the prose presents seven components as one flat sequence, leaving readers to infer that indexing is asynchronous and reusable while query processing, hybrid retrieval, reranking, and generation form a per-request path."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 98,
+        "insight": "The preceding tokenization and perplexity slide explains text preparation and language-model evaluation but has no document index or retrieval path."
+      },
+      {
+        "page": 99,
+        "insight": "The text-representation slide covers bag-of-words, TF-IDF, pretrained embeddings, and question-answering formulations. It provides representation background but does not connect an external corpus to an LLM request."
+      },
+      {
+        "page": 100,
+        "insight": "The following recurrent-network slide includes a memory-network query attending to embedded context, but the context is internal model memory rather than a separately refreshed retrieval index."
+      },
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider opens the deck neighborhood containing its closest candidate-retrieval material."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide discusses embedding similarity, ANN buckets, and approximate candidate retrieval. It supplies search-stage background but not lexical retrieval, external document ingestion, or grounded generation."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid-recommender slide combines recommendation signals, not lexical and dense document indexes, and has no generation stage."
+      },
+      {
+        "page": 139,
+        "insight": "The preceding experimentation slide separates offline metrics from online launch behavior, reinforcing lifecycle separation but adding no RAG mechanism."
+      },
+      {
+        "page": 140,
+        "insight": "The second-stage-ranker slide joins a query with candidate representations and scores a bounded item set. It is the closest direct analogy to query-aware reranking, but it is a recommender example rather than document retrieval."
+      },
+      {
+        "page": 141,
+        "insight": "The following LLM recommendation example places user context directly into a prompt; it does not retrieve from a maintained corpus or verify supporting evidence."
+      }
+    ],
+    "notes": "All 214 physical pages of the local PDF were text-indexed page by page for retrieval-augmented generation, RAG, document retrieval, information retrieval, BM25, lexical search, dense retrieval, vector databases, embeddings, nearest neighbors, query understanding, reranking, and generation. No direct RAG treatment exists. Pages 98-100, 129-131, and 138-142 were rendered and visually inspected as the complete neighborhoods around the closest representation, ANN candidate-retrieval, and second-stage-ranker material. Pages 99, 130, and 140 are the strongest partial matches; none shows the offline corpus path meeting the online request path. No deck wording, values, screenshots, artwork, or layout is reused.",
+    "license": "The local deck states no license and embeds diagrams and screenshots with incomplete provenance. It is treated as review-only material. The shipped figure is independently authored semantic HTML and does not reproduce any deck asset or layout."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "url": "https://arxiv.org/abs/2005.11401",
+        "usage": "Used as the primary RAG source to verify the separation between parametric model memory and an explicit non-parametric document index, with generation conditioned on retrieved passages.",
+        "license": "The arXiv record uses the arXiv perpetual non-exclusive distribution license, which grants arXiv limited distribution rights and is not treated as permission for third-party figure reuse. No paper figure, notation, result, prose, or layout is reproduced."
+      },
+      {
+        "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+        "url": "https://aclanthology.org/2020.emnlp-main.550/",
+        "usage": "Used as a primary source to verify offline passage encoding and indexing followed by online query encoding and retrieval before downstream answer extraction or generation.",
+        "license": "ACL Anthology states that ACL materials published from 2016 onward are licensed CC BY 4.0. Although reuse is permitted with attribution, this implementation cites the paper but does not adapt its figures, benchmark values, prose, or visual arrangement."
+      },
+      {
+        "title": "Passage Re-ranking with BERT",
+        "url": "https://arxiv.org/abs/1901.04085",
+        "usage": "Used as a primary reranking source to verify a two-stage design in which an initial retrieval system supplies a bounded candidate set and a query-passage model reorders it.",
+        "license": "Public arXiv access was not treated as figure-reuse permission. No architecture figure, benchmark result, wording, or visual organization is copied."
+      },
+      {
+        "title": "Elasticsearch semantic reranking documentation",
+        "url": "https://www.elastic.co/docs/solutions/search/ranking/semantic-reranking",
+        "usage": "Used as current official implementation documentation to cross-check that semantic reranking operates in real time on a small top-k set produced by keyword, semantic, or hybrid retrieval and that cross-encoders jointly process query and document text.",
+        "license": "The documentation is used only to verify implementation semantics. No Elastic code, prose, examples, branding, diagrams, or product-specific visual treatment is reproduced."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access and the arXiv perpetual non-exclusive license do not by themselves grant broad third-party reuse rights.",
+        "license": "This licensing guidance is cited only to document provenance decisions. No text, icon, or artwork from the page is reproduced."
+      },
+      {
+        "title": "ACL Anthology copyright and licensing FAQ",
+        "url": "https://aclanthology.org/faq/copyright/",
+        "usage": "Used to verify the CC BY 4.0 treatment of ACL materials published from 2016 onward, including the DPR paper.",
+        "license": "The page confirms the applicable license but is not itself reproduced; the implementation does not depend on copying any ACL figure or text."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is temporal and architectural: the article's numbered list can be misread as seven serial request-time steps. In practice, source documents are chunked and indexed asynchronously, those indexes persist and refresh independently of model weights, and each live query reads both indexes before fusion and reranking narrow evidence for generation. The figure uses only original wording and the repository's existing semantic-panel grammar."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, rendered and inspected three relevant slide neighborhoods, and checked primary RAG, dense-retrieval, and reranking papers plus official implementation and licensing guidance before selecting an original two-path semantic figure."
+  },
+  "implementation": {
+    "visualIds": [
+      "rag-index-request-paths"
+    ],
+    "accessibility": "The figure has a linked learning question and an explicitly labelled group containing two semantic sections. OFFLINE and ONLINE headings, numbered panels, direct stage names, and written transitions carry the full meaning without color. In source and assistive-technology reading order, the complete offline path precedes the complete online path. The established two-column primitive has no minimum width and stacks below 640 CSS pixels, so text wraps normally at 390 CSS pixels; existing theme tokens preserve dark-mode contrast and shared print rules force a light, high-contrast, page-break-safe rendering."
+  }
+}

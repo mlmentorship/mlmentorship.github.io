@@ -12,6 +12,39 @@ category: "questions"
 
 The L4 answer picks one technique. The L6 answer diagnoses where the cost actually is, then picks the highest-leverage levers in order. Engineering judgment matters more than technique knowledge.
 
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title">Measure, test, and compound cost reductions without hiding a quality regression</p>
+
+<!-- visual:inference-cost-measure-test-compound-loop -->
+```mermaid
+flowchart TB
+	accTitle: The measure, test, and compound loop for LLM inference cost
+	accDescr: First measure cost per successful request by feature, request type, user segment, and tail percentile while recording baseline quality. Diagnose the dominant layer: repeated prompt, retrieved context, agent steps, tail behavior, or model serving. Match that layer to a lever: cache or trim repeated prompts, rerank or compress retrieval, tier models or cap steps, enforce tail limits, and only then consider distillation or quantization. Run an A/B test against the baseline and ask whether cost fell while quality held on high-stakes and tail slices. If both pass, keep the change, update the baseline, and measure again so verified gains compound. If either fails, roll back and return to diagnosis.
+	A["1 · MEASURE THE BASELINE<br/>cost per successful request<br/>feature · request type · segment · p50/p95/p99<br/>plus quality by slice"]
+	B{"2 · WHERE DOES<br/>COST DOMINATE?"}
+	C["3 · MATCH THE LEVER TO THE LAYER<br/>prompt → cache or trim<br/>retrieval → rerank or compress<br/>agent steps → tier models or cap loops<br/>tail → hard limits<br/>model serving → distill or quantize last"]
+	D["4 · RUN A CONTROLLED A/B<br/>one change against the baseline"]
+	E{"COST DOWN<br/>AND QUALITY HOLDS<br/>ON IMPORTANT SLICES?"}
+	F["5 · KEEP + UPDATE BASELINE<br/>verified savings now compound"]
+	R["ROLL BACK<br/>inspect the failed slice<br/>choose a different lever"]
+	A --> B
+	B --> C
+	C --> D
+	D --> E
+	E ==>|"yes · both pass"| F
+	F ==>|"measure the next bottleneck"| A
+	E -. "no · either fails" .-> R
+	R -. "return to diagnosis" .-> B
+	class A viz-input
+	class B,C viz-focus
+	class D viz-state
+	class E,R viz-warning
+	class F viz-output
+	class A viz-tall
+	class C viz-wide
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path from measurement to one layer-matched change. Savings count only when the same experiment lowers cost and preserves quality on important and tail slices; otherwise the dashed path rolls back. After a pass, update the baseline and measure again. The verified wins compound, not the untested techniques. Original synthesis informed by <a href="https://arxiv.org/abs/2406.18665">RouteLLM</a>, <a href="https://arxiv.org/abs/2305.05176">FrugalGPT</a>, <a href="https://developers.openai.com/api/docs/guides/prompt-caching">OpenAI prompt-caching documentation</a>, and <a href="https://developers.google.com/machine-learning/guides/rules-of-ml/">Google's Rules of ML</a>; no universal savings are implied.</p>
+
 ## What an L4 answer sounds like
 
 > "We could use a smaller model, or quantize to INT8 or INT4. We could also use a cheaper API."

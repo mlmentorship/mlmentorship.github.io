@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "slug": "residual-connections",
+  "article": "src/content/posts/2025-11-27-residual-connections.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how the add node creates both an exact identity-gradient route and a residual-Jacobian route from the same upstream gradient.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align the forward split, the add node, and the corresponding two backward contributions while keeping the algebra next to the path that produces each term. This teaches the mechanism behind I plus the residual Jacobian without expanding into a full ResNet architecture.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show a skip edge but offers less control over aligning forward and backward paths with the exact local derivative labels g times I and g times J_f.",
+    "svg": "Selected because one deterministic computation graph can show the identity and residual branches, distinguish forward from backward direction by both line style and labels, and place the exact gradient sum beside the merge point.",
+    "semanticHtml": "Rejected because stacked cards could state the two terms but would not directly tie each term to the branch and local derivative that creates it.",
+    "interaction": "Rejected because changing f or its Jacobian would require invented values and controls. The general chain-rule decomposition is the stable learning objective and needs no state.",
+    "paperReuse": "Rejected because the primary papers contain architecture drawings and training curves with broader claims. Their arXiv records use non-exclusive distribution licenses, which were not treated as figure-reuse permission, and no paper geometry or layout is needed.",
+    "noVisual": "Rejected because the article gives the equation but leaves readers to infer why addition creates I and why that term avoids multiplication by the residual branch's Jacobian."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 43,
+        "insight": "The backpropagation divider introduces the relevant computation-graph neighborhood but contains no mechanism."
+      },
+      {
+        "page": 44,
+        "insight": "The backpropagation slide states that gradients from branches add at a shared variable and that backpropagation through a sum copies the upstream gradient equally to every input. This is the local rule that creates the residual block's identity term."
+      },
+      {
+        "page": 45,
+        "insight": "The following slide moves to loss functions and optimization, closing the backpropagation neighborhood without applying the sum rule to a residual block."
+      },
+      {
+        "page": 147,
+        "insight": "The image-classification slide immediately before the CNN overview supplies application context but contains no residual or gradient-path explanation."
+      },
+      {
+        "page": 148,
+        "insight": "The only residual-specific deck slide says skip connections let gradients flow more easily, alleviate vanishing gradients, and enable deeper networks. Direct rendering confirms that its sole image is a generic historical CNN, not a residual block."
+      },
+      {
+        "page": 149,
+        "insight": "The neighboring Faster R-CNN slide mentions ResNet-101 only as a possible feature extractor and adds no residual mechanism."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for residual, ResNet, skip connection, identity mapping, gradient, backpropagation, and vanishing-gradient concepts. All matches were reviewed; pages 43-45 and 147-149 were read as the complete relevant neighborhoods, and pages 44 and 148 were rendered for direct visual inspection. The deck never connects the addition rule on page 44 to the skip claim on page 148, so no deck screenshot, CNN image, computation-graph values, text, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html",
+        "usage": "Used as the primary source for residual learning, identity shortcuts, the degradation experiment, and the formulation y equals F of x plus x.",
+        "license": "The CVF paper is publicly accessible, but its arXiv record uses the non-exclusive distribution license and no general figure-reuse grant was established. No paper block diagram, data, curve, prose, or layout is copied."
+      },
+      {
+        "title": "Identity Mappings in Deep Residual Networks",
+        "url": "https://arxiv.org/abs/1603.05027",
+        "usage": "Used as the primary derivation that separates the backward signal into a direct additive term and a term propagated through residual weight layers, and to qualify that a clean identity path depends on identity skip and after-addition mappings.",
+        "license": "The arXiv record uses the non-exclusive distribution license, which was not treated as permission to reproduce figures. No residual-unit drawing, training curve, equation layout, prose, or visual arrangement is copied."
+      },
+      {
+        "title": "On Layer Normalization in the Transformer Architecture",
+        "url": "https://arxiv.org/abs/2002.04745",
+        "usage": "Used as a primary cross-check for the article's distinction between post-normalization and pre-normalization residual blocks and their different gradient behavior at initialization.",
+        "license": "A permissive figure-reuse license was not established from the arXiv record. No architecture figure, theorem presentation, experimental result, wording, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the local chain-rule origin of the gradient highway. If g is the upstream row-vector gradient at y equals x plus f of x, the add node sends g down both inputs. The identity branch contributes g times I equals g; the residual branch contributes g times J_f. Their sum is g times the quantity I plus J_f. The direct term avoids a product through f, but the total can still be affected by the residual term and exact cancellation is mathematically possible; the visual therefore says direct route rather than guaranteed nonzero gradient. The drawing, labels, and arrangement are original."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and rendered the two exact relevant slides, then checked the original residual-learning paper, the primary identity-mapping derivation, and a primary pre-norm versus post-norm analysis before selecting an original compact gradient-split computation graph."
+  },
+  "implementation": {
+    "visualIds": [
+      "residual-add-gradient-split"
+    ],
+    "accessibility": "The SVG has a linked learning title and a detailed description that states the forward equation, both backward branches, their local derivatives, and the final sum. Solid forward arrows and dashed backward arrows, direct branch names, multiplication labels, and explicit algebra preserve all meaning without color. The 360-unit-wide viewBox scales to the content column without a minimum width, keeping labels readable at 390 CSS pixels. Existing theme variables provide light and dark contrast, while the established print rules force a light high-contrast palette and keep the figure together."
+  }
+}

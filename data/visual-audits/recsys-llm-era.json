@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "slug": "recsys-llm-era",
+  "article": "src/content/posts/2025-12-12-recsys-llm-era.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Trace where an LLM can enrich a production recommender while the high-throughput retrieve-then-rank backbone and behavioral personalization remain in control.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest useful spatial explanation because the lesson is about boundaries in a staged system: LLMs can interpret the request, encode item content offline, and inspect a small final set, but fast retrieval and the behavioral ranker still carry the catalog-scale path. A dashed frontier branch can distinguish generative retrieval from the production-default backbone without presenting it as a proven replacement.",
+  "mediumComparison": {
+    "mermaid": "Selected because labelled nodes and edges directly expose the main production path, two bounded LLM augmentations, the offline content path, and a clearly dashed research branch. The established renderer supplies accessible metadata, responsive overflow, dark-mode tokens, and print behavior.",
+    "svg": "Rejected because the lesson does not depend on measured geometry, a quantitative axis, or exact scale. A custom pipeline drawing would duplicate Mermaid's relationship layout and established theme behavior.",
+    "semanticHtml": "Rejected because cards could list what changes and what stays, but would make it harder to follow which LLM work happens before retrieval, offline during item preparation, or only after the candidate set is small.",
+    "interaction": "Rejected because changing candidate counts or latency budgets would require invented values and hidden state. The durable lesson is the placement and bounded scope of each intervention, not a simulator.",
+    "paperReuse": "Rejected because the reviewed sources answer adjacent architectural questions with source-specific figures. Public access was not treated as permission to copy artwork, layout, examples, or wording; the shipped flow is independently authored.",
+    "noVisual": "Rejected because the prose distributes the unchanged backbone, three augmentation points, and a generative frontier across several sections. Readers otherwise have to mentally reconcile those claims into one execution path and may infer that every stage is replaced."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 129,
+        "insight": "The recommender-systems divider opens the relevant neighborhood but contains no mechanism."
+      },
+      {
+        "page": 130,
+        "insight": "The collaborative-filtering slide supplies the unchanged core: user-item behavior, learned user and item embeddings, approximate nearest-neighbor candidate retrieval, scoring, and ranking."
+      },
+      {
+        "page": 131,
+        "insight": "The neighboring content-based and hybrid slide uses item titles, descriptions, and attributes to complement collaborative signal, but predates and does not identify an LLM-specific content encoder."
+      },
+      {
+        "page": 132,
+        "insight": "The personalized-search divider begins the closest application sequence and confirms that the previous two pages are the complete general-recommender neighborhood."
+      },
+      {
+        "page": 141,
+        "insight": "The slide immediately before the LLM examples separates offline ranking metrics from online engagement and retention outcomes; this supports retaining ordinary evaluation and experimentation rather than delegating launch decisions to an LLM."
+      },
+      {
+        "page": 142,
+        "insight": "The first personalized descriptive-search example prompts an LLM with a natural-language query and compact viewing context to return and explain ten ranked titles. It illustrates intent understanding and small-set reasoning, not catalog-scale retrieval."
+      },
+      {
+        "page": 143,
+        "insight": "The second example repeats the same prompt structure for a different user context, reinforcing contextual reranking and explanation while providing no scalable candidate-generation mechanism."
+      },
+      {
+        "page": 144,
+        "insight": "The adjacent comparison slide shows the same descriptive query against existing search products, but contains no architecture or reusable explanatory figure."
+      },
+      {
+        "page": 145,
+        "insight": "The closest architectural slide proposes reranking recommendation candidates with search relevance, reranking search candidates with personalization, and fusing the streams. It supports bounded late-stage augmentation rather than replacing retrieval."
+      },
+      {
+        "page": 146,
+        "insight": "The computer-vision divider closes the personalized-search sequence, confirming that the deck has no semantic-ID or end-to-end generative recommendation slide."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for recommender, recommendation, collaborative filtering, content-based filtering, retrieval, ranking, reranking, language model, LLM, and GPT concepts. Pages 129-132 and 141-146 were read as the complete matching recommender and LLM-personalized-search neighborhoods. Page 145 is the nearest pipeline treatment; the deck contains no visual that maps LLM interventions onto a catalog-scale retrieve-then-rank backbone and no generative-retrieval or semantic-ID mechanism. No deck screenshot, wording, prompt, title example, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Neural Networks for YouTube Recommendations",
+        "url": "https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/",
+        "usage": "Used as a primary industrial paper to verify the classic large-scale split between candidate generation over the corpus and a separate ranking model over hundreds of candidates.",
+        "license": "The public Google Research record does not grant permission to reproduce the ACM paper's figures. No figure, architecture layout, result, prose, or example is copied."
+      },
+      {
+        "title": "Google Machine Learning: Candidate generation overview",
+        "url": "https://developers.google.com/machine-learning/recommendation/overview/candidate-generation",
+        "usage": "Used as official documentation to cross-check candidate generation as the first stage and the use of shared query-item embedding spaces for scalable retrieval.",
+        "license": "The page states that its content is CC BY 4.0 except where noted. Although reuse with attribution is permitted, no text, equation, example, or artwork is adapted; only the general mechanism is cited."
+      },
+      {
+        "title": "Large Language Models are Zero-Shot Rankers for Recommender Systems",
+        "url": "https://arxiv.org/abs/2305.08845",
+        "usage": "Used as a primary study of applying an LLM to ranking a bounded list of recommendation candidates, including the importance of candidate ordering and position-aware prompting.",
+        "license": "A permissive figure-reuse license was not established from the arXiv record. No prompt, dataset, result, figure, wording, or arrangement is copied."
+      },
+      {
+        "title": "Text Is All You Need: Learning Language Representations for Sequential Recommendation",
+        "url": "https://arxiv.org/abs/2305.13731",
+        "usage": "Used as a primary study to verify that item text can provide transferable language representations for recommendation, including items unseen during training.",
+        "license": "A permissive figure-reuse license was not established from the arXiv record. No model diagram, dataset, result, prose, or visual arrangement is copied."
+      },
+      {
+        "title": "Recommender Systems with Generative Retrieval",
+        "url": "https://arxiv.org/abs/2305.05065",
+        "usage": "Used as the primary source for the distinct frontier path in which a sequence model predicts semantic item identifiers instead of performing approximate-nearest-neighbor retrieval over arbitrary item IDs.",
+        "license": "The arXiv record uses the non-exclusive distribution license, which was not treated as permission to reuse figures. No semantic-ID example, model diagram, empirical result, prose, or layout is copied."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the augmentation boundary. A production request may gain an LLM-based intent representation; item text may be encoded offline into content features; and a small top-N set may receive expensive contextual reranking or explanations. Those additions feed or follow the existing catalog-scale path rather than removing it: approximate retrieval narrows the corpus, a learned ranker combines behavioral and content evidence, and online experiments still decide what ships. Semantic-ID generation is shown only as a separate research branch so it cannot be mistaken for the default serving path."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant slide neighborhoods, then checked a primary industrial retrieve-rank paper, official recommendation documentation, primary item-language and LLM-reranking studies, and the primary semantic-ID generative-retrieval paper before selecting an original bounded-augmentation flow."
+  },
+  "implementation": {
+    "visualIds": [
+      "recsys-llm-bounded-augmentation"
+    ],
+    "accessibility": "The Mermaid source provides a complete accessible title and description that names the production backbone, each bounded LLM role, the offline item-content path, and the separate generative frontier. Direct labels, node shapes, stage order, solid production arrows, and dashed optional or research arrows carry the meaning without color. The established wide-canvas marker preserves readable labels through horizontal scrolling at 390 CSS pixels; existing theme tokens provide light and dark contrast, and print removes the width floor and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the lesson if client-side rendering is unavailable."
+  }
+}
