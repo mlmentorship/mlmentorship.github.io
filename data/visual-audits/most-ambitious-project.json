@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "most-ambitious-project",
+  "article": "src/content/posts/2025-05-11-most-ambitious-project.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Distinguish a merely large project from a senior-level ambitious-project story by checking project scale, personal decision ownership, and depth under follow-up together.",
+  "mediumRationale": "A semantic evidence map is the smallest medium that places project scale beside the candidate's personal ownership and then makes follow-up depth a separate gate. It corrects the prose-only temptation to treat duration or launch size as sufficient evidence of senior scope without inventing a scoring formula.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is a simultaneous comparison of three evidence dimensions, not a process or state transition, and arrows would imply a required chronology beyond the existing STAR(L) guidance.",
+    "svg": "Rejected: fixed geometry adds no quantitative or spatial precision. Native text panels preserve the hierarchy while wrapping more reliably at 390 CSS pixels.",
+    "semanticHtml": "Selected: labelled native sections can contrast project scale with personal ownership and keep follow-up depth visible as an independent requirement, using the established learning-figure, visual-panel, and two-column primitives.",
+    "interaction": "Rejected: sliders for duration, team count, impact, or ownership would imply transferable level thresholds that the article and sources do not establish.",
+    "paperReuse": "Rejected: the authoritative sources support structured behavioral probing and broad ownership, long-term direction, and delivery criteria, but neither supplies a figure specific to this answer-selection problem. Public access is not treated as permission to reproduce artwork.",
+    "noVisual": "Rejected: prose lists all of the ingredients, but readers must mentally integrate two distinct questions—was the project consequential, and did the candidate personally exercise senior judgment—while anticipating how both claims survive deeper probing."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 207,
+        "insight": "The Behavioral/Culture interview divider identifies the relevant section but provides no answer structure, project-selection criteria, or probing guidance."
+      },
+      {
+        "page": 208,
+        "insight": "The neighboring resource slide links to behavioral and general interview-preparation material but contains no substantive guidance about ambitious-project scope or ownership."
+      },
+      {
+        "page": 209,
+        "insight": "The Leadership divider opens the adjacent leadership section but contains no teaching content."
+      },
+      {
+        "page": 210,
+        "insight": "The leadership slide recommends facts-first dialogue, examining one's own role, combining competing goals, acknowledging setbacks, speaking confidently and humbly, and documenting follow-up. These support evidence, reflection, and organizational ownership, but not a model for selecting or structuring an ambitious-project story."
+      },
+      {
+        "page": 211,
+        "insight": "The neighboring DL Frameworks divider closes the leadership neighborhood and confirms that no additional behavioral-project material follows."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for ambitious, behavioral, STAR, ownership, scope, leadership, cross-functional, project, impact, and failure terms. Pages 207-211 were then read in full as the only behavioral/leadership neighborhood. Page 210 contributes general leadership behaviors; pages 207, 209, and 211 are dividers, while page 208 is a resource list. No slide explains how project scale, personal ownership, and probe depth combine, and no deck image, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Structured Interviews: A Practical Guide",
+        "url": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/guide.pdf",
+        "usage": "Used as official assessment guidance to verify that behavioral questions ask for actual past behavior and that standardized probes elicit the situation, the interviewee's specific actions, involved people, and outcomes rather than accepting a broad project claim at face value.",
+        "license": "This U.S. Office of Personnel Management guide is a United States government work and is not subject to domestic copyright protection under 17 U.S.C. 105, subject to any separately credited material. No text, example, artwork, or layout is reproduced."
+      },
+      {
+        "title": "Amazon Leadership Principles",
+        "url": "https://www.amazon.jobs/content/en/our-workplace/leadership-principles",
+        "usage": "Used as official employer documentation to check the article's senior-scope dimensions against explicit expectations to think long term beyond one's own team, communicate bold direction, focus on key inputs, and deliver despite setbacks.",
+        "license": "The page is Amazon copyrighted content and no permissive figure-reuse license was identified. No wording, icon, figure, or layout is copied; the source is cited only for conceptual comparison."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that ambition is not one axis. Large duration, headcount, or user impact establishes consequential scope, but a senior story also needs a traceable personal decision thread and enough strategic, technical, and organizational depth to survive sustained probes. The visual is an original synthesis of the article, checked against official structured-interview and employer leadership guidance. It states no universal leveling threshold and uses no source-specific data."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages, inspected the full behavioral and leadership neighborhood on pages 207-211, and checked official OPM assessment guidance and Amazon leadership documentation before selecting an original semantic evidence map."
+  },
+  "implementation": {
+    "visualIds": [
+      "ambitious-project-three-evidence-test"
+    ],
+    "accessibility": "The figure uses a linked learning question, native sections, headings, and a labelled evidence group in source reading order. Each dimension is named and explained in text, and the caption states the combined inference, so no meaning depends on color or two-column position. The established two-column primitive stacks below 640 pixels, all panels permit ordinary text wrapping with no minimum width, and existing theme tokens provide dark-mode and print contrast without JavaScript or external assets."
+  }
+}

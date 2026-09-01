@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "monte-carlo-and-importance-sampling",
+  "article": "src/content/posts/2025-10-01-monte-carlo-and-importance-sampling.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace how equal draws from a proposal become unequal contributions after multiplying by p(x)/q(x), and use effective sample size to recognize weight concentration.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align five proposal draws with their importance ratios, normalized contributions, and the resulting effective sample size. Fixed synthetic weights make the arithmetic inspectable while bar height and direct labels make concentration visible without interaction or color.",
+  "mediumComparison": {
+    "mermaid": "Rejected: importance weighting is a quantitative change in relative contribution, not primarily a graph of discrete entities or process stages.",
+    "svg": "Selected: aligned sample columns can show equal draws becoming contributions of different magnitudes and can place the exact ESS arithmetic beside the geometry.",
+    "semanticHtml": "Rejected: a table could list weights and percentages, but it would leave readers to mentally reconstruct the concentration that ESS summarizes.",
+    "interaction": "Rejected: changing the proposal or dragging weights would add controls and runtime behavior when one exact concentrated-weight example teaches the diagnostic.",
+    "paperReuse": "Rejected: candidate textbook and paper figures are broader than this learning objective. Reuse permission is unclear for the textbook, and even though the JMLR paper is CC BY 4.0, no source artwork is needed; the shipped geometry and synthetic example are original.",
+    "noVisual": "Rejected: the article states that one sample can dominate and ESS can collapse, but prose and the formula do not show how equal proposal draws turn into unequal target contributions."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 6,
+        "insight": "The preceding slide is only a section divider titled Probability theory and adds no sampling mechanism or importance-weight interpretation."
+      },
+      {
+        "page": 7,
+        "insight": "The probability overview defines Monte Carlo as estimating an integral from samples where probability mass lies, states dimension-independent variance behavior, and connects Monte Carlo to expectations and MCMC; it does not cover proposal distributions, importance ratios, or ESS."
+      },
+      {
+        "page": 8,
+        "insight": "The following slide introduces Bernoulli, categorical, binomial, and multinomial distributions but adds no importance-sampling correction or weight diagnostic."
+      },
+      {
+        "page": 51,
+        "insight": "The gradient-estimator slide motivates Monte Carlo estimates for intractable expectation gradients and REINFORCE, providing the application context immediately before the score-function details."
+      },
+      {
+        "page": 52,
+        "insight": "The score-function slide replaces an expectation with a Monte Carlo average and warns that rare samples can produce large scores and high variance, closely paralleling the article's warning about concentrated importance weights."
+      },
+      {
+        "page": 53,
+        "insight": "The neighboring local-reparameterization slide explains why high gradient variance impedes optimization and contrasts a lower-variance estimator, but it does not introduce p/q weights or ESS."
+      },
+      {
+        "page": 54,
+        "insight": "The discrete-gradient slide discusses the Gumbel-Softmax bias-variance tradeoff and natural gradients, not importance sampling."
+      },
+      {
+        "page": 55,
+        "insight": "The control-variate slide gives a variance-reduction construction for Monte Carlo estimators, matching the article's later variance-reduction section but not its proposal-weight mental model."
+      },
+      {
+        "page": 56,
+        "insight": "The following slide begins a practical neural-network-project section and supplies no additional Monte Carlo or weighting context."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed for Monte Carlo, importance sampling, proposal distribution, effective sample size, and related variance language. The only direct Monte Carlo overview is page 7; its neighbors 6 and 8 were inspected. The related gradient-estimator neighborhood on pages 51-56 was also inspected because pages 52 and 55 discuss Monte Carlo variance. No slide explains sampling from q, multiplying by p/q, normalized contribution, or ESS, and no deck artwork, wording, examples, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Monte Carlo theory, methods and examples, Chapter 9: Importance sampling",
+        "url": "https://artowen.su.domains/mc/Ch-var-is.pdf",
+        "usage": "Used as an authoritative textbook source to verify basic and self-normalized importance sampling, support requirements, variance behavior, and importance-sampling diagnostics.",
+        "license": "The author-hosted draft is publicly readable, but no permissive figure-reuse license was identified. No prose, figure, data, visual structure, or worked example is copied; only the statistical definitions inform the original schematic."
+      },
+      {
+        "title": "Pareto Smoothed Importance Sampling",
+        "url": "https://jmlr.org/papers/v25/19-556.html",
+        "usage": "Used as a primary paper to verify that a heavy right tail in importance ratios arises when a proposal poorly captures the target and can make importance-weighted Monte Carlo estimates highly variable.",
+        "license": "JMLR papers are published under CC BY 4.0 under the journal's current license agreement. No paper figure, text, data, or layout is reused; the citation supports the mechanism while the five-weight example is original."
+      },
+      {
+        "title": "Rethinking the Effective Sample Size",
+        "url": "https://arxiv.org/abs/1809.04129",
+        "usage": "Used as a focused research reference for the conventional importance-sampling ESS approximation and its limitations as a diagnostic rather than a literal count of independent target draws.",
+        "license": "The arXiv record provides distribution access but does not establish a permissive license for reusing its figures. No figure, prose, derivation layout, or example is reused; the standard formula is applied independently to synthetic weights."
+      }
+    ],
+    "notes": "The hardest mental model is the transformation from equally counted proposal draws to unequally weighted target contributions. The original example uses five synthetic unnormalized weights [1, 1, 1, 1, 6]: they normalize to [10%, 10%, 10%, 10%, 60%], and the standard diagnostic gives ESS = 10^2 / 40 = 2.5. The values are chosen solely for transparent arithmetic and make no empirical claim. The caption calls ESS a diagnostic so it is not mistaken for an exact number of independent target samples."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both relevant slide neighborhoods, then checked an authoritative Monte Carlo textbook and primary research on heavy-tailed weights and ESS before selecting an original aligned weight-concentration schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "importance-weights-effective-sample-size"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description. Sample numbers, p/q ratios, normalized percentages, bar heights, and the explicit ESS calculation encode the full lesson without color. Its 360-pixel viewBox has no minimum width and scales below 390 CSS pixels; established theme variables provide dark-mode contrast, and shared print rules switch the figure to a high-contrast light palette and keep it together on the page."
+  }
+}

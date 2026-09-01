@@ -45,6 +45,64 @@ $$
 \mathrm{ESS} = \frac{(\sum w_i)^2}{\sum w_i^2}.
 $$
 
+**Learning objective:** trace how equal draws from a proposal become unequal contributions after multiplying by $p(x)/q(x)$, and use effective sample size to recognize weight concentration.
+
+<!-- visual:importance-weights-effective-sample-size -->
+<figure class="learning-figure plot-panel" aria-labelledby="importance-weights-title">
+	<p class="visual-kicker">Importance weights</p>
+	<p class="visual-title" id="importance-weights-title">Five proposal draws can carry much less than five draws' worth of information.</p>
+	<svg viewBox="0 0 360 390" role="img" aria-labelledby="importance-weights-svg-title importance-weights-svg-desc">
+		<title id="importance-weights-svg-title">Five proposal samples become unequal weighted contributions</title>
+		<desc id="importance-weights-svg-desc">Five samples drawn from proposal q initially count once each. Their p over q importance ratios are 1, 1, 1, 1, and 6. After normalization, the first four samples each contribute 10 percent and the fifth contributes 60 percent. The effective sample size is 10 squared divided by 40, or 2.5, despite a nominal sample count of five.</desc>
+		<text class="viz-axis-label" x="12" y="18">DRAW FROM PROPOSAL q · FIVE SAMPLES, EACH COUNTED ONCE</text>
+		<rect class="viz-plot-bg" x="10" y="28" width="340" height="62" rx="5"></rect>
+		<circle class="viz-node viz-node--input" cx="64" cy="56" r="16"></circle>
+		<circle class="viz-node viz-node--input" cx="122" cy="56" r="16"></circle>
+		<circle class="viz-node viz-node--input" cx="180" cy="56" r="16"></circle>
+		<circle class="viz-node viz-node--input" cx="238" cy="56" r="16"></circle>
+		<circle class="viz-node viz-node--input" cx="296" cy="56" r="16"></circle>
+		<text class="viz-node-label" x="64" y="61">1</text>
+		<text class="viz-node-label" x="122" y="61">2</text>
+		<text class="viz-node-label" x="180" y="61">3</text>
+		<text class="viz-node-label" x="238" y="61">4</text>
+		<text class="viz-node-label" x="296" y="61">5</text>
+		<text class="viz-axis-label" x="12" y="116">MULTIPLY BY IMPORTANCE RATIO w = p(x) / q(x)</text>
+		<rect class="viz-plot-bg" x="10" y="126" width="340" height="54" rx="5"></rect>
+		<rect class="viz-node viz-node--focus" x="43" y="137" width="42" height="30" rx="4"></rect>
+		<rect class="viz-node viz-node--focus" x="101" y="137" width="42" height="30" rx="4"></rect>
+		<rect class="viz-node viz-node--focus" x="159" y="137" width="42" height="30" rx="4"></rect>
+		<rect class="viz-node viz-node--focus" x="217" y="137" width="42" height="30" rx="4"></rect>
+		<rect class="viz-node viz-node--focus" x="275" y="137" width="42" height="30" rx="4"></rect>
+		<text class="viz-node-label" x="64" y="157">1</text>
+		<text class="viz-node-label" x="122" y="157">1</text>
+		<text class="viz-node-label" x="180" y="157">1</text>
+		<text class="viz-node-label" x="238" y="157">1</text>
+		<text class="viz-node-label" x="296" y="157">6</text>
+		<text class="viz-axis-label" x="12" y="206">NORMALIZE · EACH BAR'S SHARE OF THE ESTIMATE</text>
+		<rect class="viz-plot-bg" x="10" y="216" width="340" height="112" rx="5"></rect>
+		<path class="viz-axis" d="M36 307H324"></path>
+		<rect class="viz-node viz-node--output" x="45" y="292" width="38" height="15"></rect>
+		<rect class="viz-node viz-node--output" x="103" y="292" width="38" height="15"></rect>
+		<rect class="viz-node viz-node--output" x="161" y="292" width="38" height="15"></rect>
+		<rect class="viz-node viz-node--output" x="219" y="292" width="38" height="15"></rect>
+		<rect class="viz-node viz-node--output" x="277" y="217" width="38" height="90"></rect>
+		<text class="viz-callout" x="64" y="284" text-anchor="middle">10%</text>
+		<text class="viz-callout" x="122" y="284" text-anchor="middle">10%</text>
+		<text class="viz-callout" x="180" y="284" text-anchor="middle">10%</text>
+		<text class="viz-callout" x="238" y="284" text-anchor="middle">10%</text>
+		<text class="viz-callout" x="296" y="238" text-anchor="middle">60%</text>
+		<text class="viz-label" x="64" y="321" text-anchor="middle">sample 1</text>
+		<text class="viz-label" x="122" y="321" text-anchor="middle">2</text>
+		<text class="viz-label" x="180" y="321" text-anchor="middle">3</text>
+		<text class="viz-label" x="238" y="321" text-anchor="middle">4</text>
+		<text class="viz-label" x="296" y="321" text-anchor="middle">5</text>
+		<rect class="viz-node viz-node--focus" x="10" y="344" width="340" height="36" rx="5"></rect>
+		<text class="viz-callout" x="180" y="359" text-anchor="middle">nominal n = 5, but ESS = 10² / (1² + 1² + 1² + 1² + 6²)</text>
+		<text class="viz-node-label" x="180" y="375">= 2.5 effective samples</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> draw from <code>q</code>, then let <code>p(x) / q(x)</code> set each sample's contribution. Here sample 5 supplies 60% of the estimate, so five draws have an ESS diagnostic of only 2.5; ESS is a warning about concentration, not a literal new sample count. Definitions checked against <a href="https://artowen.su.domains/mc/Ch-var-is.pdf"><cite>Monte Carlo theory, methods and examples</cite></a>, <a href="https://jmlr.org/papers/v25/19-556.html">Vehtari et al.</a>, and <a href="https://arxiv.org/abs/1809.04129">Elvira et al.</a>; the weights and graphic are original.</figcaption>
+</figure>
+
 If most weight concentrates on a single sample, ESS $\approx 1$ even when $n = 10^4$. Check ESS before trusting an IS estimate.
 
 ## Where it shows up in ML

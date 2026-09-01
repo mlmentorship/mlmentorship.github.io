@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "slug": "naive-bayes",
+  "article": "src/content/posts/2026-04-04-naive-bayes.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Trace how naive Bayes multiplies token likelihood ratios into a decisive class score, then see why correlated features can preserve the winning argmax while making the resulting probability overconfident.",
+  "mediumRationale": "A matched semantic HTML evidence ledger is the smallest medium that can expose both the arithmetic and its modeling caveat. Native row headers align each likelihood-ratio contribution with the final odds, while the adjacent panel distinguishes classification from calibration without implying a quantitative true posterior that the example does not provide.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a flowchart can show class-to-feature structure but is poor at displaying the aligned odds arithmetic and would not make double-counted evidence as concrete.",
+    "svg": "Rejected because the core lesson is a short discrete ledger rather than continuous geometry; native text and table semantics wrap more reliably at 390 CSS pixels.",
+    "semanticHtml": "Selected because two native tables directly align the score calculation with the independence caveat, remain accessible without scripting, and use established responsive, theme, and print primitives.",
+    "interaction": "Rejected because changing likelihood ratios could demonstrate score sensitivity, but controls would add state without resolving the central distinction between a useful argmax and an untrustworthy probability.",
+    "paperReuse": "Rejected because the sources contain equations, algorithms, examples, and empirical analyses rather than artwork needed for this lesson. Online availability is not treated as permission to adapt figures, and no source data, wording, example, or layout is copied.",
+    "noVisual": "Rejected because the prose states that the argmax may be right while probabilities are overconfident, but does not make visible how separately multiplied, correlated clues can produce both outcomes at once."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 69,
+        "insight": "The preceding slide explains forward-backward and Baum-Welch for HMMs, including conditional independence across a chain, but contains no Naive Bayes class-to-feature factorization."
+      },
+      {
+        "page": 70,
+        "insight": "The only conceptual Naive Bayes treatment is a small note beside a CRF slide stating that features are independent given the class; it provides no scoring example, smoothing, or calibration consequence."
+      },
+      {
+        "page": 71,
+        "insight": "The following slide introduces linear factor models and conditional independence in state-space models, not classification or independent feature evidence."
+      },
+      {
+        "page": 95,
+        "insight": "The preceding NLP slide introduces bag-of-words, CBOW, and tf-idf representations that can supply text features, but it does not derive a classifier."
+      },
+      {
+        "page": 96,
+        "insight": "The implementation slide fits scikit-learn MultinomialNB to count or tf-idf features and reports predictions, but does not expose learned likelihoods, the product rule, smoothing, or overconfidence."
+      },
+      {
+        "page": 97,
+        "insight": "The following slide changes to a character-level language model and provides no Naive Bayes content."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed page by page for Naive Bayes, conditional independence, multinomial, Laplace smoothing, and text-classifier implementations. Exact Naive Bayes coverage occurs on page 70 and page 96; both complete neighborhoods, pages 69-71 and 95-97, were read in full. The deck never shows how independent likelihood contributions can yield a useful class decision and an overconfident probability simultaneously. No slide artwork, code, wording, example values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "On Discriminative vs. Generative Classifiers: A comparison of logistic regression and naive Bayes",
+        "url": "https://papers.nips.cc/paper/2001/hash/7b7a53e239400a13bd6be6c91c4f6c4e-Abstract.html",
+        "usage": "Used as the primary source for the generative-versus-discriminative learning comparison and the different small-sample and asymptotic behavior of Naive Bayes and logistic regression.",
+        "license": "The proceedings page provides access to the paper but does not establish a permissive license for adapting its figures. No theorem statement, plot, data, prose, or layout is reproduced."
+      },
+      {
+        "title": "The Optimality of Naive Bayes",
+        "url": "https://www.cs.unb.ca/~hzhang/publications/FLAIRS04ZhangH.pdf",
+        "usage": "Used as a primary analysis of why violations of feature independence do not necessarily prevent correct classification, including the role of how dependencies affect class decision boundaries.",
+        "license": "The publicly hosted conference PDF does not state a permissive figure-reuse license. No figure, proof, example, wording, or data is copied."
+      },
+      {
+        "title": "Introduction to Information Retrieval: Naive Bayes text classification",
+        "url": "https://nlp.stanford.edu/IR-book/html/htmledition/naive-bayes-text-classification-1.html",
+        "usage": "Used as an authoritative textbook source for interpreting log conditional probabilities as additive term evidence, MAP class selection, multinomial counting, log-space computation, and add-one smoothing.",
+        "license": "The online edition is copyrighted textbook material from Cambridge University Press and gives no blanket artwork-adaptation permission. The implementation uses independently chosen tokens and likelihood ratios and copies no equation image, worked example, prose, figure, or layout."
+      },
+      {
+        "title": "scikit-learn User Guide: Naive Bayes",
+        "url": "https://scikit-learn.org/stable/modules/naive_bayes.html",
+        "usage": "Used as official implementation guidance to verify the conditional-independence factorization, model variants, additive smoothing, strong text-classification baseline behavior, and warning that probability outputs should not be taken too seriously.",
+        "license": "Documentation access is used only to verify semantics. No documentation prose, code sample, equation rendering, or page design is reproduced."
+      },
+      {
+        "title": "Probabilistic Machine Learning: An Introduction",
+        "url": "https://probml.github.io/pml-book/book1.html",
+        "usage": "Used as an authoritative probabilistic-modeling textbook cross-check for class-conditional generative classifiers, directed factorization, and the distinction between decisions and calibrated posterior estimates.",
+        "license": "The official companion site links figure-generation code but does not grant a blanket permissive license for published book figures. No figure, code, example, text, or composition is reused."
+      }
+    ],
+    "notes": "The complete article's hardest prose-only mental model is how an incorrect independence assumption can leave a useful decision boundary while damaging probability calibration. The original example uses two classes with equal prior odds and invented likelihood ratios of 8 and 7, so the Naive Bayes odds are exactly 1 × 8 × 7 = 56 to 1. It does not claim a true posterior for correlated text. Instead, the second panel identifies the omitted dependence qualitatively: two tokens can reflect overlapping evidence, making the model odds too extreme even when spam remains the argmax."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both exact Naive Bayes neighborhoods, then checked primary analyses of generative classification and independence violations, two authoritative textbooks, and official scikit-learn guidance before selecting an original evidence ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "naive-bayes-evidence-ledger"
+    ],
+    "accessibility": "The figure uses native headings, sections, tables, row headers, and explicit accessible labels. Every likelihood contribution, assumption, decision, and calibration warning is written directly; highlighting only reinforces the final class outcome, so meaning does not depend on color. The established two-panel grid stacks below 640 pixels, and short table cells wrap at 390 CSS pixels without horizontal scrolling. Shared theme variables preserve dark-mode contrast, print rules provide a light high-contrast palette and avoid splitting the figure, and the complete lesson remains available when CSS or JavaScript is disabled."
+  }
+}

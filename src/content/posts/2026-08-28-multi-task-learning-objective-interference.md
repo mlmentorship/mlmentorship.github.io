@@ -89,8 +89,8 @@ Track per-task validation metrics before and after adding each task.
 				<text class="viz-axis-label" x="10" y="17">CASE 1 - MAGNITUDE IMBALANCE</text>
 				<rect class="viz-plot-bg" x="8" y="28" width="284" height="205" rx="5"></rect>
 				<path d="M50 145H268M50 200V55" style="fill:none;stroke:var(--viz-edge);stroke-width:1"></path>
-				<text class="viz-edge-label" x="270" y="159">θ₁</text>
-				<text class="viz-edge-label" x="39" y="58">θ₂</text>
+				<text class="viz-label" x="270" y="159">θ₁</text>
+				<text class="viz-label" x="39" y="58">θ₂</text>
 				<circle cx="50" cy="145" r="4" style="fill:var(--c-text-soft)"></circle>
 				<path d="M50 145H250" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:3;marker-end:url(#gradient-scale-arrow)"></path>
 				<path d="M50 145H100" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:4;stroke-dasharray:5 3;marker-end:url(#gradient-scale-arrow)"></path>
@@ -113,8 +113,8 @@ Track per-task validation metrics before and after adding each task.
 				<text class="viz-axis-label" x="10" y="17">CASE 2 - DIRECTIONAL CONFLICT</text>
 				<rect class="viz-plot-bg" x="8" y="28" width="284" height="205" rx="5"></rect>
 				<path d="M28 175H272M150 213V48" style="fill:none;stroke:var(--viz-edge);stroke-width:1"></path>
-				<text class="viz-edge-label" x="274" y="189">θ₁</text>
-				<text class="viz-edge-label" x="139" y="51">θ₂</text>
+				<text class="viz-label" x="274" y="189">θ₁</text>
+				<text class="viz-label" x="139" y="51">θ₂</text>
 				<circle cx="150" cy="175" r="4" style="fill:var(--c-text-soft)"></circle>
 				<path d="M150 175L240 145" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:3;marker-end:url(#gradient-conflict-arrow)"></path>
 				<path d="M150 175L60 145" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-dasharray:6 3;marker-end:url(#gradient-conflict-arrow)"></path>

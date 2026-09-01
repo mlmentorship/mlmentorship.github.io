@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "slug": "multimodal-foundation-models",
+  "article": "src/content/posts/2026-07-11-multimodal-foundation-models.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Locate where image and text information first meet in a dual encoder, an encoder-plus-language-model system, and a unified token model, then connect that meeting point to each pattern's output capability.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align three input-to-output paths and keep their first convergence points visually comparable. Directly labeled nodes and fixed routing expose the architectural distinction without requiring controls or paper-specific detail.",
+  "mediumComparison": {
+    "mermaid": "Rejected: three separate flowcharts would allow automatic routing but make row alignment and the precise first-convergence comparison less predictable.",
+    "svg": "Selected: deterministic aligned rows make the location of cross-modal interaction and the resulting retrieval or generation output directly comparable.",
+    "semanticHtml": "Rejected: a table can list components and capabilities, but it cannot make separate paths and their first convergence spatially traceable.",
+    "interaction": "Rejected: switching among patterns would hide the comparison and add state to a lesson that benefits from seeing all three routes simultaneously.",
+    "paperReuse": "Rejected: CLIP, Flamingo, and Chameleon contain denser method-specific architecture figures, and permissive reuse permission was not established for their artwork.",
+    "noVisual": "Rejected: the prose names the components but leaves the reader to mentally assemble where modality streams first interact, which is the distinction that explains retrieval efficiency versus joint reasoning and generation."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 101,
+        "insight": "The Transformer slide explains self-attention and encoder-decoder cross-attention, providing the closest general mechanism for routing one representation into another stream, but it is not multimodal."
+      },
+      {
+        "page": 102,
+        "insight": "The following slide mentions sentence-pair cross-attention and model variants, again using two text streams rather than different modalities."
+      },
+      {
+        "page": 103,
+        "insight": "The adjacent Transformer overview compares encoder and decoder families and multi-head attention but does not cover modality-specific encoders, connectors, or unified modality tokens."
+      },
+      {
+        "page": 119,
+        "insight": "The Automatic Speech Recognition section divider begins the deck's closest non-text modality neighborhood but contains no multimodal architecture."
+      },
+      {
+        "page": 120,
+        "insight": "The first speech slide defines phonemes as basic acoustic units; it does not present a learned architecture or combine modality streams."
+      },
+      {
+        "page": 121,
+        "insight": "The next speech slide contrasts end-to-end and traditional audio-to-text pipelines with acoustic features, an acoustic model, pronunciation model, language model, and decoder. It is a one-way conversion pipeline rather than a foundation model that jointly reasons over modalities."
+      },
+      {
+        "page": 123,
+        "insight": "The audio-feature slide covers MFCCs and waveform augmentation, illustrating modality-specific preprocessing but not alignment, fusion, or shared token modeling."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-6 text-indexed all 214 pages of the local PDF for multimodal, multi-modal, vision-language, image-text, CLIP, Flamingo, visual question answering, fusion, and cross-attention terms. Matches were either unrelated uses of 'multimodal distributions' and sensor fusion or the text-only and unimodal neighborhoods recorded above. Pages 101-103 and 119-123 were inspected directly as the closest architectural and modality context. The deck has no multimodal foundation-model figure, so no deck artwork is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Learning Transferable Visual Models From Natural Language Supervision",
+        "url": "https://arxiv.org/abs/2103.00020",
+        "usage": "Used to verify the dual-encoder pattern: image and text are encoded separately and aligned with a contrastive objective for efficient similarity-based transfer and retrieval.",
+        "license": "The paper is publicly readable on arXiv, but permissive figure-reuse permission was not established. No figure, layout, prose, examples, data, or artwork was copied or adapted."
+      },
+      {
+        "title": "Flamingo: a Visual Language Model for Few-Shot Learning",
+        "url": "https://arxiv.org/abs/2204.14198",
+        "usage": "Used to verify the encoder-plus-language-model pattern: visual inputs are encoded and resampled before gated cross-attention layers condition an autoregressive language model that generates text.",
+        "license": "The paper is publicly readable on arXiv, but permissive figure-reuse permission was not established. The schematic does not reproduce Flamingo's gated-layer arrangement or paper geometry."
+      },
+      {
+        "title": "Chameleon: Mixed-Modal Early-Fusion Foundation Models",
+        "url": "https://arxiv.org/abs/2405.09818",
+        "usage": "Used to verify the unified-token pattern: image and text are represented as discrete tokens in interleaved sequences processed by one shared Transformer for multimodal reasoning and generation.",
+        "license": "The paper is publicly readable on arXiv, but permissive figure-reuse permission was not established. No figure, sample output, token colors, layout, or wording was reused."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access does not by itself establish third-party figure reuse rights and that copyright generally remains with the holder.",
+        "license": "This official policy is used only for licensing treatment. No policy text or visual asset is reproduced."
+      }
+    ],
+    "notes": "The hardest mental model is not the names of the three patterns but the location of their first cross-modal interaction and how that constrains the output. The shipped SVG is an original abstraction that deliberately omits method-specific layers and empirical claims. The primary papers verify the three routing patterns; unclear artwork permissions are handled by reusing no source figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-6 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the closest Transformer and speech neighborhoods, then checked the primary CLIP, Flamingo, and Chameleon papers plus official arXiv licensing guidance before selecting an original aligned architecture comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "multimodal-architectures-meeting-point"
+    ],
+    "accessibility": "The SVG has a programmatic title and detailed description. Every modality, encoder, connector, convergence point, shared model, and output is directly labeled; independent paths, node shapes, row position, and convergence geometry preserve the lesson without color. The established visual-wide and visual-scroll primitives keep labels readable through intentional horizontal scrolling at 390 CSS pixels, theme variables support light and dark contrast, and existing print overrides fit the complete view to a light high-contrast page."
+  }
+}
