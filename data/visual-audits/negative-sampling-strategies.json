@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "slug": "negative-sampling-strategies",
+  "article": "src/content/posts/2026-04-17-negative-sampling-strategies.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Distinguish negative hardness from label validity: mine candidates the current model confuses with the positive, but apply a negative gradient only after evidence says the candidate is truly non-relevant.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can hold one query constant while aligning an easy random negative, a useful verified hard negative, and a harmful unlabeled positive with their opposite training consequences. The shared rows expose that model similarity selects candidates but cannot authorize their labels.",
+  "mediumComparison": {
+    "mermaid": "Rejected because the lesson depends on comparing three candidates against the same query and aligning similarity, relevance status, and gradient decision; automatic flowchart layout would emphasize process over the decisive row-wise contrast.",
+    "svg": "Selected for deterministic alignment, direct candidate and decision labels, redundant border treatments, responsive scaling, theme-token colors, and print-safe static output.",
+    "semanticHtml": "Rejected because a table could enumerate the cases, but would read as another strategy list rather than spatially pairing the two similarly hard candidates with opposite valid actions.",
+    "interaction": "Rejected because changing mining thresholds or teacher scores would imply a universal cutoff and add controls without improving the core distinction between hardness and relevance evidence.",
+    "paperReuse": "Rejected even though the reviewed ACL papers are CC BY 4.0, because their architecture diagrams and empirical tables do not isolate this article's hardness-versus-validity lesson. No paper figure, result, example, wording, or layout is copied; the visual is an original synthetic comparison.",
+    "noVisual": "Rejected because prose explains easy, hard, and false negatives in separate sections, leaving readers to conflate high model similarity with evidence that a candidate is non-relevant. The aligned mined cases make that category error visible."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 35,
+        "insight": "The classification-loss slide introduces softmax negative log likelihood, providing objective context but no candidate-mining or label-validity treatment."
+      },
+      {
+        "page": 36,
+        "insight": "The neighboring surrogate-loss slide depicts anchor, positive, and negative roles for triplet loss and states that the negative should be separated by a margin, but assumes the negative label is correct and does not discuss mining or false negatives."
+      },
+      {
+        "page": 37,
+        "insight": "The following slide moves to classification metrics, ending the deck's only explicit anchor-positive-negative neighborhood."
+      },
+      {
+        "page": 135,
+        "insight": "The catalogue-discovery slide separates candidate generation from ranking and names exact, related, and semantic matching, establishing where retrieval candidates originate without addressing training negatives."
+      },
+      {
+        "page": 136,
+        "insight": "The system overview carries search candidates through recommender and ranking components but includes no contrastive sampling or relevance filter for mined negatives."
+      },
+      {
+        "page": 137,
+        "insight": "The data slide defines successful search sessions and outcome labels, making incomplete behavioral supervision relevant to the false-negative risk, but it does not specify how unlabeled candidates should be treated."
+      },
+      {
+        "page": 138,
+        "insight": "The personalized-recommender slide recommends contrastive learning over a user-item matrix and shows a two-tower scorer, but gives no negative source, hardness criterion, or false-negative control."
+      },
+      {
+        "page": 139,
+        "insight": "The next slide switches to content-based recommendation, closing the personalized contrastive-learning neighborhood."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for negative sampling, hard negatives, in-batch negatives, BM25, contrastive learning, triplet loss, retrieval, two-tower, candidate generation, and recommender terms. Pages 35-37 and 135-139 were inspected in full and pages 36, 135-138 were rendered for visual review. Page 36 is the only explicit positive-negative loss treatment; pages 135-139 are the closest retrieval and recommendation sequence. The deck contains no negative-mining strategy, hardness curriculum, or false-negative filter. No deck artwork, examples, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+        "url": "https://aclanthology.org/2020.emnlp-main.550/",
+        "usage": "Used as the primary source for comparing random corpus passages, BM25-retrieved passages that do not contain the answer, and in-batch positives from other questions as negative sources; the reported training recipe combines in-batch and BM25 negatives.",
+        "license": "ACL Anthology states that materials published from 2016 onward are CC BY 4.0. The paper could be reused with attribution, but no figure, benchmark number, passage, wording, or layout is adapted; only the negative-selection mechanism is cited."
+      },
+      {
+        "title": "RocketQA: An Optimized Training Approach to Dense Passage Retrieval for Open-Domain Question Answering",
+        "url": "https://aclanthology.org/2021.naacl-main.466/",
+        "usage": "Used as the primary source to verify that top retrieved candidates can contain unlabeled positives, that unfiltered hard negatives can degrade training, and that a stronger cross-encoder can denoise mined candidates before dual-encoder training.",
+        "license": "ACL Anthology identifies the 2021 paper as CC BY 4.0. No architecture figure, table, empirical value, example, prose, or visual composition is reused; the visual is a new qualitative construction."
+      },
+      {
+        "title": "Sentence Transformers: Training MS MARCO",
+        "url": "https://www.sbert.net/examples/sentence_transformer/training/ms_marco/README.html",
+        "usage": "Used as official implementation documentation to verify in-batch candidate construction, retrieval-based hard-negative mining, the need to exclude relevant but unlabeled passages, and cross-encoder score filtering.",
+        "license": "The documentation is used only to check implementation semantics. No documentation image, code, dataset row, numeric threshold, prose, or layout is copied, so the visual does not rely on documentation reuse permission."
+      },
+      {
+        "title": "ACL Anthology Copyright FAQ",
+        "url": "https://aclanthology.org/faq/copyright/",
+        "usage": "Used to verify explicitly that ACL materials from 2016 onward are distributed under Creative Commons Attribution 4.0 while third-party material may have separate rights.",
+        "license": "The policy is cited only as licensing evidence. No policy wording, logo, or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that hardness and negative-label validity are independent. Similarity-based mining deliberately finds candidates that the current model scores highly; this creates strong corrective signal only when supervision establishes that the candidate is not relevant. Annotation gaps can make the highest-ranked mined item a valid answer, in which case assigning it the negative role reverses the intended learning signal. The SVG uses an invented query and passages, makes no empirical performance claim, and directly distinguishes weak-correct, strong-correct, and strong-wrong gradients."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both exact neighboring sequences, then checked the primary DPR and RocketQA papers, official Sentence Transformers training guidance, and ACL licensing policy before selecting an original three-candidate SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "negative-hardness-label-gate"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that name the query, all three candidate cases, their relevance status, and each training decision. Every distinction is written directly; check and cross symbols, solid versus dashed borders, source labels, and explicit PUSH DOWN or DO NOT PUSH actions make color redundant. The 360-pixel viewBox has no minimum width and scales within a 390 CSS-pixel viewport. Established visual classes and theme variables provide dark-mode contrast, and shared print rules force a high-contrast light palette and keep the figure together."
+  }
+}
