@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-clone-graph.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Map each original node to one copy, then connect copies using the map.",
+  "learningObjective": "Create one mapped copy per original node, then reproduce every adjacency entry between copies.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to map each original node to one copy, then connect copies using the map.",
-    "invariant": "Map each original node to one copy, then connect copies using the map.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Breadth-first graph traversal plus an original-node to copied-node identity map.",
+    "recognitionCue": "A cyclic connected object must be deep-copied while preserving adjacency, so each original identity needs exactly one reusable copied identity before edges are wired.",
+    "invariant": "Every key in copies maps to exactly one clone, and after an original node is processed, its clone has one copied neighbor entry for every original neighbor processed in order.",
+    "stateModel": "Keep a queue of discovered originals and a map from each original object to its clone. The map doubles as the visited set and as the lookup used to build clone-to-clone edges.",
+    "visualRationale": "Showing original and copied nodes together with real edges, the queue, and the identity map makes cycles, reuse, and the prohibition on edges back to originals directly visible.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A node-value table cannot show whether copied adjacency points to originals or clones.",
+      "A recursive call tree duplicates shared graph nodes and misrepresents cyclic topology.",
+      "A final before-and-after snapshot hides when the map prevents duplicate copies."
     ],
-    "transferLesson": "Transfer the invariant: Map each original node to one copy, then connect copies using the map.",
-    "reviewStatus": "pending"
+    "transferLesson": "When copying any cyclic object graph, allocate and memoize an object before traversing its references, then resolve every copied reference through that memo.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

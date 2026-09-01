@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-pacific-atlantic-water-flow.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Reverse the water direction: start at each ocean and walk uphill.",
+  "learningObjective": "Reverse both flow searches from their ocean borders, move uphill, then intersect the reached cells.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to reverse the water direction: start at each ocean and walk uphill.",
-    "invariant": "Reverse the water direction: start at each ocean and walk uphill.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Two reverse graph searches from destination borders followed by set intersection.",
+    "recognitionCue": "Many grid cells ask whether they can reach either of two fixed boundary goals; reversing the edges lets each goal share one traversal across all possible starts.",
+    "invariant": "Each ocean’s seen set contains exactly cells with a nonincreasing forward path to that ocean. Reverse traversal may move only to an equal-or-higher neighbor, preserving that path witness.",
+    "stateModel": "Keep immutable heights plus one seen set and DFS stack per ocean. Seed the appropriate borders, grow each set under the reversed height rule, then intersect the two sets.",
+    "visualRationale": "A fixed height grid directly shows adjacency, border seeds, legal uphill expansions, blocked lower neighbors, independent frontiers, and the coordinate intersection without relying on color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Running a path animation from every cell repeats work and obscures the shared destination structure.",
+      "A reachability table loses the spatial neighbor relation and ocean-border geometry.",
+      "A final highlighted grid alone does not explain the reversed inequality or how either reached set was formed."
     ],
-    "transferLesson": "Transfer the invariant: Reverse the water direction: start at each ocean and walk uphill.",
-    "reviewStatus": "pending"
+    "transferLesson": "When many sources query reachability to a small set of goals, reverse the graph, traverse once from each goal class, and combine the resulting reachable sets.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

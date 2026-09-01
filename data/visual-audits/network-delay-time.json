@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-network-delay-time.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Dijkstra finalizes the node whose total path cost is smallest.",
+  "learningObjective": "Finalize shortest signal times by always popping the cheapest pending path.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to dijkstra finalizes the node whose total path cost is smallest.",
-    "invariant": "Dijkstra finalizes the node whose total path cost is smallest.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Dijkstra traversal with a min-heap of total path cost and a finalized-distance map.",
+    "recognitionCue": "The input is a directed graph with nonnegative edge costs, and the task asks when a source reaches every node, so shortest paths from one source determine the answer.",
+    "invariant": "Whenever an unfinalized node is popped with the globally smallest pending cost, that cost is its shortest distance; duplicate heap entries for finalized nodes are safely ignored.",
+    "stateModel": "Keep the weighted adjacency list, a min-heap of (total cost, node) paths, and one finalized distance per reached node. The answer is the maximum finalized distance only if all nodes were reached.",
+    "visualRationale": "A connected weighted graph preserves edge direction and cost while the visible heap frontier and finalized labels expose each pop, relaxation, stale-entry skip, and final maximum.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A distance table alone hides the directed graph paths that create each candidate cost.",
+      "An unweighted BFS wave incorrectly suggests that edge count, rather than total cost, determines processing order.",
+      "A heap-only view hides which outgoing edges generate the pending entries."
     ],
-    "transferLesson": "Transfer the invariant: Dijkstra finalizes the node whose total path cost is smallest.",
-    "reviewStatus": "pending"
+    "transferLesson": "Reuse Dijkstra for nonnegative weighted routing: enqueue improved path candidates, trust only the first pop of each node, and derive the requested aggregate from finalized shortest distances.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

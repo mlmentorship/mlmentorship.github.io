@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-number-of-islands.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Start a flood only at unseen land, then mark the whole component.",
+  "learningObjective": "Count each unseen land seed once, then erase its entire four-neighbor component with DFS.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to start a flood only at unseen land, then mark the whole component.",
-    "invariant": "Start a flood only at unseen land, then mark the whole component.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Outer grid scan with iterative depth-first flood fill for each unseen component.",
+    "recognitionCue": "The task asks for connected groups in a binary grid under four-direction adjacency, so every unseen land cell identifies exactly one not-yet-counted component.",
+    "invariant": "Before the scan advances, every visited land cell has been changed to 0; each stack contains only cells from the current island, and each completed island can never be counted again.",
+    "stateModel": "Keep the mutable grid, island count, row-major scan coordinates, and a DFS stack. Mark neighbors when pushed so no land coordinate enters the stack twice.",
+    "visualRationale": "A fixed-coordinate grid preserves adjacency while visible 1-to-0 mutations, a moving DFS-top key, stack contents, and count show both component topology and traversal state.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A count-only table hides which cells are connected and why a seed is new.",
+      "A generic graph conversion adds labels and edges that the grid already expresses spatially.",
+      "A single before-and-after grid skips every DFS frontier transition and component boundary."
     ],
-    "transferLesson": "Transfer the invariant: Start a flood only at unseen land, then mark the whole component.",
-    "reviewStatus": "pending"
+    "transferLesson": "For regions, blobs, and connected-component problems, scan for unseen seeds, count seeds rather than cells, and exhaustively mark each seed’s reachable component before continuing.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
