@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "slug": "speculative-decoding",
+  "article": "src/content/posts/2026-02-13-speculative-decoding.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace what survives a speculative-decoding cycle when the target model accepts an initial draft prefix but rejects a later token.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can keep the draft positions aligned with their verification outcomes and make the first-rejection boundary spatially explicit. The fixed trace shows that accepted tokens remain, the rejected position is replaced from the corrected distribution, and every later unverified draft is discarded.",
+  "mediumComparison": {
+    "mermaid": "Rejected: a flowchart can enumerate draft, verify, and resample, but automatic layout obscures the positional boundary between the retained prefix and discarded suffix.",
+    "svg": "Selected: deterministic token alignment, explicit outcome labels, distinct solid and dashed outlines, and a fixed first-rejection boundary communicate the prefix invariant without runtime code or color dependence.",
+    "semanticHtml": "Rejected: a table can list each token's outcome, but it makes the causal boundary at the first rejection and the replacement token's position less immediate.",
+    "interaction": "Rejected: controls for probabilities or acceptance draws would add state and imply a simulation lesson when one concrete, correctly labelled cycle is sufficient.",
+    "paperReuse": "Rejected: both primary papers contain algorithm figures, but their arXiv availability was not treated as permissive figure-reuse permission. No paper or deck artwork, geometry, wording, numeric example, or empirical result is copied; the shipped token trace is independently authored.",
+    "noVisual": "Rejected: the prose states the sweep rule, but readers must mentally track three different outcomes after the first rejection: retain the accepted prefix, replace the rejected position, and invalidate the untouched suffix."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 112,
+        "insight": "The preceding slide covers low-rank, kernel, and dilated attention methods. It changes attention complexity rather than autoregressive verification and contributes no speculative-decoding visual."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide states the memory-bound motivation, K-token draft, one parallel target pass, modified rejection-sampling rule, corrected resampling distribution, suffix discard rule, losslessness theorem, speed estimate, and variants. It is text-only and does not spatially show what survives the first rejection."
+      },
+      {
+        "page": 114,
+        "insight": "The following slide begins mixed-precision training and contains no speculative-decoding mechanism or reusable visual."
+      },
+      {
+        "page": 115,
+        "insight": "The later training-and-serving summary lists speculative decoding as a 2-3x latency optimization and says it addresses autoregressive serial dependency, but does not explain acceptance or correction."
+      }
+    ],
+    "notes": "The complete 214-page local deck was text-indexed for speculative decoding, speculative sampling, rejection, autoregressive decoding, and inference. Physical page 113 is the only detailed treatment; physical page 115 contains a one-line serving-stack summary. Pages 112-115 were read as the relevant neighborhood. The relevant slides are text-only, so there is no source visual to reuse. No deck pixels, layout, wording, or examples are copied."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Fast Inference from Transformers via Speculative Decoding",
+        "url": "https://arxiv.org/abs/2211.17192",
+        "usage": "Used as the primary source for the sequential draft, parallel target evaluation, acceptance probability, adjusted residual distribution after rejection, extra target token after full acceptance, and proof that outputs follow the target distribution.",
+        "license": "The arXiv record provides public access under arXiv's distribution terms, which are not treated here as a permissive figure-adaptation license. No source figure, prose, pseudocode, measurements, or layout is reused."
+      },
+      {
+        "title": "Accelerating Large Language Model Decoding with Speculative Sampling",
+        "url": "https://arxiv.org/abs/2302.01318",
+        "usage": "Independently cross-checked the draft-and-verify construction, modified rejection sampling, lossless target distribution, and the rule that tokens after the first rejection do not survive the cycle.",
+        "license": "Public access on arXiv is not assumed to grant permissive figure reuse. No source artwork, wording, data, algorithm formatting, or visual composition is copied."
+      },
+      {
+        "title": "vLLM Speculative Decoding documentation",
+        "url": "https://docs.vllm.ai/en/stable/features/speculative_decoding/",
+        "usage": "Checked the serving-system terminology and current implementation context for draft-model and related speculative methods.",
+        "license": "The official documentation is used only to verify implementation context. No documentation prose, code, screenshots, diagrams, or examples are reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is the first-rejection boundary. For a concrete K=5 trace, positions 1 and 2 are accepted; position 3 is rejected and replaced by a fresh draw from the corrected residual distribution; positions 4 and 5 were scored in the parallel target pass but depend on the rejected prefix, so they are discarded. The resulting committed prefix still has exactly the target model's distribution. This trace is explanatory, not an empirical acceptance-rate claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, text-indexed the full 214-page deck and inspected physical pages 112-115, then checked both foundational papers and official vLLM documentation before selecting an original first-rejection token trace."
+  },
+  "implementation": {
+    "visualIds": [
+      "speculative-decoding-first-rejection-boundary"
+    ],
+    "accessibility": "The SVG has a linked title and description that narrate all five draft positions and the committed output. Each position is numbered and directly labelled ACCEPT, REJECT, REPLACE, or DISCARD; solid accepted tokens, a heavy rejection mark, and dashed discarded tokens make color redundant. The established scrollable wide-figure primitive preserves legible text at 390 CSS pixels, theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette."
+  }
+}

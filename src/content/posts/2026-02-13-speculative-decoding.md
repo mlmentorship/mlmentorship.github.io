@@ -18,6 +18,64 @@ Speculative decoding turns this serial work into batched work. The large model r
 
 Speculative decoding is a standard optimization for LLM serving in 2026. Major serving systems (vLLM, TGI, SGLang, TensorRT-LLM) support it.
 
+<!-- visual:speculative-decoding-first-rejection-boundary -->
+<figure class="learning-figure plot-panel visual-wide" aria-labelledby="speculative-rejection-visual-title">
+	<p class="visual-kicker">Learning objective · one cycle with K = 5</p>
+	<p class="visual-title" id="speculative-rejection-visual-title">Trace what survives when the target rejects the third draft token.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 760 330" role="img" aria-labelledby="speculative-rejection-svg-title speculative-rejection-svg-desc">
+			<title id="speculative-rejection-svg-title">First-rejection boundary in one speculative-decoding cycle</title>
+			<desc id="speculative-rejection-svg-desc">The draft model proposes five ordered tokens. One parallel target-model pass scores all five positions. Drafts one and two are accepted and committed. Draft three is rejected and replaced by a sample from the corrected residual distribution q. Drafts four and five are discarded because they follow the rejected draft prefix. The cycle commits the two accepted drafts and the replacement, then restarts after that replacement.</desc>
+			<rect class="viz-plot-bg" x="12" y="12" width="736" height="306" rx="5"></rect>
+			<text class="viz-axis-label" x="24" y="38">DRAFT MODEL PROPOSES SERIALLY</text>
+			<text class="viz-label" x="24" y="92">draft</text>
+			<text class="viz-axis-label" x="138" y="67" text-anchor="middle">position 1</text>
+			<text class="viz-axis-label" x="258" y="67" text-anchor="middle">position 2</text>
+			<text class="viz-axis-label" x="378" y="67" text-anchor="middle">position 3</text>
+			<text class="viz-axis-label" x="498" y="67" text-anchor="middle">position 4</text>
+			<text class="viz-axis-label" x="618" y="67" text-anchor="middle">position 5</text>
+			<rect class="viz-node viz-node--input" x="93" y="76" width="90" height="42" rx="4"></rect>
+			<rect class="viz-node viz-node--input" x="213" y="76" width="90" height="42" rx="4"></rect>
+			<rect class="viz-node viz-node--input" x="333" y="76" width="90" height="42" rx="4"></rect>
+			<rect class="viz-node" x="453" y="76" width="90" height="42" rx="4" style="stroke-dasharray:5 3"></rect>
+			<rect class="viz-node" x="573" y="76" width="90" height="42" rx="4" style="stroke-dasharray:5 3"></rect>
+			<text class="viz-node-label" x="138" y="102">draft 1</text>
+			<text class="viz-node-label" x="258" y="102">draft 2</text>
+			<text class="viz-node-label" x="378" y="102">draft 3</text>
+			<text class="viz-node-label" x="498" y="102">draft 4</text>
+			<text class="viz-node-label" x="618" y="102">draft 5</text>
+			<path d="M81 132H675" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<text class="viz-axis-label" x="378" y="148" text-anchor="middle">ONE TARGET PASS SCORES ALL FIVE POSITIONS IN PARALLEL</text>
+			<path d="M138 119V165" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
+			<path d="M258 119V165" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
+			<path d="M378 119V165" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:3"></path>
+			<path d="M498 119V165" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></path>
+			<path d="M618 119V165" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></path>
+			<text class="viz-callout" x="138" y="181" text-anchor="middle">ACCEPT</text>
+			<text class="viz-callout" x="258" y="181" text-anchor="middle">ACCEPT</text>
+			<text class="viz-callout" x="378" y="181" text-anchor="middle">REJECT</text>
+			<text class="viz-label" x="498" y="181" text-anchor="middle">DISCARD</text>
+			<text class="viz-label" x="618" y="181" text-anchor="middle">DISCARD</text>
+			<path d="M318 55V294" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.5;stroke-dasharray:5 4"></path>
+			<text class="viz-gradient-label" x="326" y="213">FIRST REJECTION</text>
+			<text class="viz-label" x="24" y="252">commit</text>
+			<rect class="viz-node viz-node--output" x="93" y="226" width="90" height="42" rx="4"></rect>
+			<rect class="viz-node viz-node--output" x="213" y="226" width="90" height="42" rx="4"></rect>
+			<rect class="viz-node viz-node--focus" x="333" y="226" width="90" height="42" rx="4"></rect>
+			<text class="viz-node-label" x="138" y="252">draft 1</text>
+			<text class="viz-node-label" x="258" y="252">draft 2</text>
+			<text class="viz-node-label" x="378" y="245">replacement</text>
+			<text class="viz-node-value" x="378" y="260">sample from q</text>
+			<text class="viz-axis-label" x="498" y="240" text-anchor="middle">cycle stops here;</text>
+			<text class="viz-axis-label" x="498" y="256" text-anchor="middle">restart after replacement</text>
+			<path d="M108 286H408" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
+			<path d="M408 281L422 286L408 291Z" style="fill:var(--viz-output-stroke)"></path>
+			<text class="viz-axis-label" x="258" y="307" text-anchor="middle">COMMITTED OUTPUT STILL FOLLOWS TARGET M</text>
+		</svg>
+	</div>
+	<figcaption><strong>Read it this way:</strong> scan left to right. The accepted prefix stays. At the first rejection, replace that draft from the corrected distribution q; discard every later draft because each was conditioned on a prefix that no longer exists.</figcaption>
+</figure>
+
 ## The mechanism
 
 Setup: large target model **M** (the one whose distribution we want to sample from), small draft model **m** (cheap; e.g., a 1B distilled version of a 70B M).
@@ -93,7 +151,7 @@ If you can also discuss how speculative decoding interacts with KV-cache, batchi
 ## Reading list
 
 - *Fast Inference from Transformers via Speculative Decoding* [(Leviathan et al., 2023)](https://arxiv.org/abs/2211.17192)
-- *Accelerating Large Language Model Decoding with Speculative Sampling* [(Chen et al., 2023)](https://arxiv.org/abs/2306.15595)
+- *Accelerating Large Language Model Decoding with Speculative Sampling* [(Chen et al., 2023)](https://arxiv.org/abs/2302.01318)
 - *Medusa: Simple LLM Inference Acceleration with Multiple Decoding Heads* [(Cai et al., 2024)](https://arxiv.org/abs/2401.10774)
 - *EAGLE: Speculative Sampling Requires Rethinking Feature Uncertainty* [(Li et al., 2024)](https://arxiv.org/abs/2401.15077)
 
