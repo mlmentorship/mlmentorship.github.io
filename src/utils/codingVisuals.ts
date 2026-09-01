@@ -150,26 +150,26 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
         stop();
         update(frameIndex);
       });
-      visual.addEventListener('keydown', (event) => {
-        if (event.altKey || event.ctrlKey || event.metaKey) return;
-        if (event.key === 'ArrowLeft') {
-          event.preventDefault();
-          stop();
-          update(currentStep - 1);
-        } else if (event.key === 'ArrowRight') {
-          event.preventDefault();
-          stop();
-          update(currentStep + 1);
-        } else if (event.key === 'Home') {
-          event.preventDefault();
-          stop();
-          update(0);
-        } else if (event.key === 'End') {
-          event.preventDefault();
-          stop();
-          update(frames.length - 1);
-        }
-      });
+    });
+    visual.addEventListener('keydown', (event) => {
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        stop();
+        update(currentStep - 1);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        stop();
+        update(currentStep + 1);
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        stop();
+        update(0);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        stop();
+        update(frames.length - 1);
+      }
     });
 
     controls.hidden = false;
