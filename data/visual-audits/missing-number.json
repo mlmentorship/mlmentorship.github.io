@@ -17,6 +17,7 @@
       "The arithmetic-sum formula can overflow in fixed-width languages and hides XOR cancellation."
     ],
     "transferLesson": "When all values occur in canceling pairs except one, XOR removes order and pair placement from the problem; the same invariant finds a unique element or separates parity-based membership differences.",
+    "independentReview": "3.4 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

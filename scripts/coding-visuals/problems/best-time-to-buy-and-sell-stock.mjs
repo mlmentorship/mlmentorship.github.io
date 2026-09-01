@@ -41,6 +41,7 @@ const review = {
     'Highlighting only prices 1 and 6 hides why earlier and later candidate days cannot improve the answer.',
   ],
   transferLesson: 'For maximum ordered differences, summarize the best earlier baseline while treating each new value as the right endpoint; analogous scans find maximum rise, minimum spread, and best prefix-relative gain.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

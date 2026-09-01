@@ -17,6 +17,7 @@
       "An early-return seen-set scan is valid but does not match the supplied whole-set cardinality implementation."
     ],
     "transferLesson": "When only uniqueness matters, canonicalize values into a set and compare cardinality; retain counts or positions only when the follow-up question actually needs them.",
+    "independentReview": "3.4 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

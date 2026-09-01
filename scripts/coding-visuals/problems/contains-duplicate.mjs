@@ -47,6 +47,7 @@ const review = {
     'An early-return seen-set scan is valid but does not match the supplied whole-set cardinality implementation.',
   ],
   transferLesson: 'When only uniqueness matters, canonicalize values into a set and compare cardinality; retain counts or positions only when the follow-up question actually needs them.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

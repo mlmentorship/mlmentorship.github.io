@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-merge-two-sorted-lists.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Rewire the smaller current node after tail, then advance only the list that supplied it.",
+  "learningObjective": "Compare the two frontier nodes, link the smaller after tail, and advance only its source cursor.",
   "mechanismReview": {
     "pattern": "Two sorted linked-list cursors with a dummy output head and moving tail.",
-    "recognitionCue": "Two inputs are already sorted and must be merged by relinking nodes, so only the two current heads can be the next smallest output node.",
-    "invariant": "The chain after dummy is sorted and contains exactly the consumed nodes; tail is its final node, while first and second begin the two untouched sorted suffixes.",
-    "stateModel": "Keep first, second, and tail pointers plus the dummy head. Compare current values, attach one node, advance only its source cursor, then append the one remaining suffix.",
-    "visualRationale": "Stable node identities and explicit directed links show the initially separate chains, every changed next pointer, each cursor decision, and the constant-time suffix append.",
+    "recognitionCue": "Two sorted node streams must be merged by relinking existing nodes.",
+    "invariant": "The path from dummy through tail is the consumed sorted prefix; first and second begin untouched suffixes. The old link after tail may remain until the next attachment overwrites it.",
+    "stateModel": "Dummy, tail, first, second, and each node next pointer.",
+    "visualRationale": "A next-pointer grid preserves every node identity and changed link without a shrinking SVG.",
     "rejectedAlternatives": [
-      "Copying values into an array hides that the implementation reuses and rewires existing nodes.",
-      "A comparison table omits the evolving next-pointer chain and tail invariant.",
-      "A final merged snapshot skips which source pointer advances after each decision."
+      "Copying values hides rewiring.",
+      "A final chain skips decisions.",
+      "A prose table omits pointer identity."
     ],
-    "transferLesson": "For sorted stream merges, emit the smaller frontier item, advance only its source, and preserve an output tail; the same invariant scales to k-way merging with a heap.",
+    "transferLesson": "Emit the smaller frontier and advance only its source; append the remaining sorted suffix in constant time.",
+    "independentReview": "3.4 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

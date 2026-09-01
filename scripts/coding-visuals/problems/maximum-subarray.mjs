@@ -58,6 +58,7 @@ const review = {
     'Highlighting only the final [4,-1,2,1] skips the restart decisions that explain correctness.',
   ],
   transferLesson: 'For contiguous optimization, define the best solution forced to end at the current position, decide extend versus restart, and separately preserve the best endpoint seen anywhere.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

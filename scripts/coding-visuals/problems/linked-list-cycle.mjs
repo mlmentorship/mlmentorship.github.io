@@ -64,6 +64,7 @@ const review = {
     'A circular ring alone was rejected because it omits the non-cyclic stem from node 1.',
   ],
   transferLesson: 'Different traversal speeds convert a hidden cycle into an inevitable identity collision; guard every fast hop. The technique transfers to repeated-state sequences and cycle-entry algorithms.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

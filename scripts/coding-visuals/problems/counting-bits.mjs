@@ -47,5 +47,6 @@ export default defineVisual('counting-bits', draft, {
     'A final count table omits the ordered writes required by the implementation.',
   ],
   transferLesson: 'When a bit operation maps each state to a smaller state, build answers in numeric order and append the removed-bit contribution; similar recurrences use x & (x - 1), highest powers of two, or parity.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 });

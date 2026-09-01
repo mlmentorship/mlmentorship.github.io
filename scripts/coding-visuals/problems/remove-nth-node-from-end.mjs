@@ -73,6 +73,7 @@ const review = {
     'Counting length in a first pass misses the one-pass fixed-gap mechanism.',
   ],
   transferLesson: 'Use a fixed lead whenever a linked-list target is defined by distance from the end; add a dummy when the operation may change the head.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

@@ -17,6 +17,7 @@
       "A final highlighted range cannot explain the essential extreme swap at negative values."
     ],
     "transferLesson": "When a transition is not monotone, retain every extreme that can become optimal after the next operation; sign-changing multiplication is the canonical max/min pair example.",
+    "independentReview": "3.4 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

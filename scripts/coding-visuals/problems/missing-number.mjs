@@ -43,5 +43,6 @@ export default defineVisual('missing-number', draft, {
     'The arithmetic-sum formula can overflow in fixed-width languages and hides XOR cancellation.',
   ],
   transferLesson: 'When all values occur in canceling pairs except one, XOR removes order and pair placement from the problem; the same invariant finds a unique element or separates parity-based membership differences.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 });

@@ -61,5 +61,6 @@ export default defineVisual('reverse-bits', draft, {
     'A single mirrored before-and-after row skips all consume, append, and shift transitions.',
   ],
   transferLesson: 'For fixed-width encodings, separate reading order from numeric termination: consume one boundary unit, shift the destination, append, and repeat for the declared width. The pattern transfers to radix conversion and stream packing.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 });

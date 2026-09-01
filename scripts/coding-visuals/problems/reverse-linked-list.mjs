@@ -74,6 +74,7 @@ const review = {
     'A before/after list was rejected because it omits the saved-next safety requirement and intermediate disconnected regions.',
   ],
   transferLesson: 'Before mutating the only route to remaining work, save that route; then rewire and advance the boundary. This applies to list splicing, segment reversal, and in-place pointer transformations.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 };
 

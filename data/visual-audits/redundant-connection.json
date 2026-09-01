@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-redundant-connection.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Union-find accepts edges between different representative roots and identifies the first edge whose endpoints already share one root.",
+  "learningObjective": "Accept an edge only when its endpoints have different representative roots; otherwise it closes a cycle.",
   "mechanismReview": {
-    "pattern": "Disjoint-set union with path halving and union by component size for incremental cycle detection.",
-    "recognitionCue": "Use union-find when undirected edges arrive over time and each edge needs a fast “already connected?” decision without repeatedly traversing the whole graph.",
-    "invariant": "Following parent links from any node reaches the unique representative of its connected component; component_size is authoritative at roots. Union changes connectivity only when roots differ.",
-    "stateModel": "The minimal state is parent and component_size arrays. Each edge performs two finds, optional path compression, optional size-based root swap, and one parent/size update or immediate false return.",
-    "visualRationale": "The accepted undirected edges show the actual component topology while root paths and parent arrays expose union-find’s hidden forest. Stable graph keys preserve vertices and accepted links as components merge.",
+    "pattern": "Disjoint-set union with path halving and union by component size.",
+    "recognitionCue": "Undirected edges arrive incrementally and each needs an already-connected cycle check.",
+    "invariant": "Following parent links reaches one representative per component; size is authoritative at roots, and accepted edges join only different roots.",
+    "stateModel": "Parent and root-size arrays plus the current edge; accepted edges remain visible to explain the graph cycle.",
+    "visualRationale": "One compact grid aligns node, parent, root size, and accepted topology while endpoint cursors move through finds and unions.",
     "rejectedAlternatives": [
-      "Repeated DFS was rejected because it depicts a different O(EV) style connectivity check.",
-      "Only parent arrays were rejected because they hide the graph cycle that the rejected edge would close.",
-      "Only the final triangle was rejected because it skips union-by-size and path compression."
+      "A final cycle skips union state.",
+      "Repeated DFS is a different algorithm.",
+      "A parent array alone hides the accepted graph path."
     ],
-    "transferLesson": "Ask whether roots differ before adding connectivity; attach the smaller tree under the larger and shorten paths during find. The same state supports component counts, Kruskal MST, and dynamic grouping.",
+    "transferLesson": "Compare roots before adding connectivity, attach the smaller tree under the larger, and compress paths during find.",
+    "independentReview": "3.4 source-to-frame replay",
     "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",

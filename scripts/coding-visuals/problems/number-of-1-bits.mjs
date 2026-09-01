@@ -43,5 +43,6 @@ export default defineVisual('number-of-1-bits', draft, {
     'A single before-and-after diagram skips three executed loop transitions.',
   ],
   transferLesson: 'Use x & (x - 1) whenever progress is defined by deleting one set bit; related uses include power-of-two tests, iterating subsets, and finding the lowest set-bit contribution.',
+  independentReview: '3.4 source-to-frame replay',
   reviewStatus: 'reviewed',
 });
