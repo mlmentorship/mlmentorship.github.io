@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "sharded-matrix-multiplication",
+  "article": "src/content/posts/2026-08-28-sharded-matrix-multiplication.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "See why sharding both non-contracting output axes over the same two-device mesh axis computes only C[0,0] and C[1,1], and why an input must be gathered or resharded before the missing cross-index blocks can be formed.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can align each device's owned input pair with its exact destination in a two-by-two output block matrix. The fixed geometry exposes missing work rather than merely labeling the layout invalid.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout can connect devices to outputs but cannot reliably preserve the row-and-column geometry that makes the diagonal-only failure self-evident.",
+    "svg": "Selected for deterministic block geometry, explicit device equations, dashed missing cells, a responsive horizontal scroll container, shared theme variables, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table could mark computed and missing cells but would separate the output grid from the two local input-pair equations that explain why those cells differ.",
+    "interaction": "Rejected because there is no parameter to explore; revealing devices or cells in sequence would hide a comparison that fits in one static view and would require unnecessary controls and fallback behavior.",
+    "paperReuse": "Rejected because no source figure is needed. The scaling book repository is MIT licensed, but copying its broader case diagrams would add detail beyond this learning objective; GSPMD's arXiv page does not state clear figure-reuse terms.",
+    "noVisual": "Rejected because prose names the missing off-diagonal blocks but does not spatially show that same-index shard ownership maps local products onto only the output diagonal."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 114,
+        "insight": "The mixed-precision training slide notes that ZeRO and FSDP shard optimizer state across data-parallel ranks, but it does not discuss tensor axes, local matrix products, or collective selection."
+      },
+      {
+        "page": 115,
+        "insight": "The neighboring training-stack slide lists FSDP and ZeRO sharding alongside FlashAttention, packing, checkpointing, and accumulation, but provides no matrix-sharding layout."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide distinguishes data parallelism from model parallelism at a high level, without showing block matrix multiplication or how a mesh axis maps to tensor axes."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-searched for shard, partition, matrix multiplication, tensor parallel, model parallel, all-gather, all-reduce, reduce-scatter, collective, FSDP, and ZeRO. The candidate sequences on pages 113-116 and 166-168 were read in full. Pages 113 and 116 cover speculative decoding and LLM data; pages 166 and 168 cover data pipelines and serving. No slide explains sharded matrix multiplication or supplies reusable artwork, so the deck contributes only high-level distributed-training context."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "How to Scale Your Model: Partitioning Notation and Collective Operations",
+        "url": "https://jax-ml.github.io/scaling-book/sharding/",
+        "usage": "Verified the named-axis notation, the four sharded-matmul cases, and specifically that sharding both non-contracting dimensions over the same mesh axis requires gathering one input before multiplication.",
+        "license": "The scaling-book repository is MIT licensed, including its documentation, but no figure, text, layout, or example is copied. The shipped two-device diagonal-gap schematic is an original, narrower construction with a source link."
+      },
+      {
+        "title": "GSPMD: General and Scalable Parallelization for ML Computation Graphs",
+        "url": "https://arxiv.org/abs/2105.04663",
+        "usage": "Cross-checked the compiler model in which tensor dimensions are partitioned over a logical device mesh and collective communication completes partitioned operators.",
+        "license": "The arXiv record does not state a permissive license for paper figures. No paper figure, prose, numeric result, or layout is reproduced; the paper is used only as a primary technical reference."
+      },
+      {
+        "title": "JAX: Distributed arrays and automatic parallelization",
+        "url": "https://docs.jax.dev/en/latest/parallel.html",
+        "usage": "Verified official JAX semantics for named device meshes, PartitionSpec mappings, replicated mesh axes, and compiler-inserted collectives.",
+        "license": "JAX source and documentation are Apache-2.0 licensed, but no documentation figure, code, or prose is copied. The source is consulted only to validate terminology and framework behavior."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is not the common contracting-axis partial sum, but why A[I_X,J] times B[J,K_X] is structurally incomplete: device x owns only row block x and column block x, so no device can form cross-index output blocks. The SVG was authored independently as a two-device block proof. Solid labeled cells, dashed borders, the word 'missing', and device equations carry every distinction without color."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, searched the full 214-page deck and inspected relevant neighboring slides, then checked the Google DeepMind scaling book, the primary GSPMD paper, and official JAX documentation before selecting an original deterministic block diagram."
+  },
+  "implementation": {
+    "visualIds": [
+      "same-mesh-axis-diagonal-gap"
+    ],
+    "accessibility": "The SVG has a linked title and description that enumerate both computed and both missing output blocks. Device labels, explicit local equations, row and column coordinates, dashed missing-cell borders, and the word 'missing' preserve meaning without color. The shared visual-wide scroll primitive keeps labels at their authored size at 390 CSS pixels, shared theme variables support dark and light modes, and shared print rules remove the minimum width and force a high-contrast light palette."
+  }
+}
