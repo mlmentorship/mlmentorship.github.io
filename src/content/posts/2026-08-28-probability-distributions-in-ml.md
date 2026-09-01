@@ -55,7 +55,8 @@ A familiar distribution with wrong support is already wrong. A Gaussian model ca
 			<text class="viz-node-label" x="177" y="93">1</text>
 			<text class="viz-node-label" x="239" y="93">0</text>
 			<text class="viz-node-label" x="301" y="93">0</text>
-			<path class="viz-baseline" d="M177 104V122 M177 122H94 M177 122H266 M94 122V140 M266 122V140" marker-end="url(#distribution-arrow)"></path>
+			<path class="viz-baseline" d="M177 104V122H94V140" marker-end="url(#distribution-arrow)"></path>
+			<path class="viz-baseline" d="M177 122H266V140" marker-end="url(#distribution-arrow)"></path>
 			<rect class="viz-node viz-node--focus" x="24" y="142" width="140" height="112" rx="4"></rect>
 			<text class="viz-callout" x="94" y="164" text-anchor="middle">1 · Record one visit</text>
 			<text class="viz-node-value" x="94" y="187">X ∈ {0, 1}</text>
@@ -76,7 +77,8 @@ A familiar distribution with wrong support is already wrong. A Gaussian model ca
 			<text class="viz-label" x="54" y="407" text-anchor="middle">0 min</text>
 			<text class="viz-label" x="306" y="407" text-anchor="middle">10 min</text>
 			<text class="viz-label" x="177" y="348" text-anchor="middle">three event times</text>
-			<path class="viz-baseline" d="M177 408V426 M177 426H94 M177 426H266 M94 426V444 M266 426V444" marker-end="url(#distribution-arrow)"></path>
+			<path class="viz-baseline" d="M177 408V426H94V444" marker-end="url(#distribution-arrow)"></path>
+			<path class="viz-baseline" d="M177 426H266V444" marker-end="url(#distribution-arrow)"></path>
 			<rect class="viz-node viz-node--focus" x="24" y="446" width="140" height="112" rx="4"></rect>
 			<text class="viz-callout" x="94" y="468" text-anchor="middle">3 · Count in window</text>
 			<text class="viz-node-value" x="94" y="491">K ∈ {0, 1, 2, …}</text>

@@ -70,10 +70,10 @@ For $A$ PD, the set $\{x : x^\top A x \le 1\}$ is a closed ellipsoid centered at
 			<text class="viz-callout" x="24" y="35">1 · PD: every direction has positive cost</text>
 			<text class="viz-label" x="24" y="56">A = diag(4, 1) · xᵀAx = 4u² + v² ≤ 1</text>
 			<path class="viz-axis" d="M55 144H305 M180 210V72"></path>
-			<ellipse class="viz-node viz-node--focus" cx="180" cy="144" rx="48" ry="62"></ellipse>
-			<path class="viz-operating-guide" d="M132 137V151 M228 137V151 M173 82H187 M173 206H187"></path>
-			<text class="viz-label" x="116" y="166">−½</text>
-			<text class="viz-label" x="224" y="166">½</text>
+			<ellipse class="viz-node viz-node--focus" cx="180" cy="144" rx="31" ry="62"></ellipse>
+			<path class="viz-operating-guide" d="M149 137V151 M211 137V151 M173 82H187 M173 206H187"></path>
+			<text class="viz-label" x="133" y="166">−½</text>
+			<text class="viz-label" x="207" y="166">½</text>
 			<text class="viz-label" x="190" y="88">1</text>
 			<text class="viz-axis-label" x="298" y="137">u</text>
 			<text class="viz-axis-label" x="188" y="78">v</text>
@@ -81,12 +81,12 @@ For $A$ PD, the set $\{x : x^\top A x \le 1\}$ is a closed ellipsoid centered at
 			<rect class="viz-plot-bg" x="12" y="240" width="336" height="228" rx="4"></rect>
 			<text class="viz-callout" x="24" y="263">2 · PSD, not PD: one direction has zero cost</text>
 			<text class="viz-label" x="24" y="284">A = diag(4, 0) · xᵀAx = 4u² ≤ 1</text>
-			<rect class="viz-node viz-node--focus" x="132" y="308" width="96" height="126"></rect>
+			<rect class="viz-node viz-node--focus" x="149" y="308" width="62" height="126"></rect>
 			<path class="viz-axis" d="M55 372H305 M180 446V296"></path>
-			<path class="viz-operating-guide" d="M132 308V434 M228 308V434"></path>
+			<path class="viz-operating-guide" d="M149 308V434 M211 308V434"></path>
 			<path class="viz-pr-curve" d="M180 336V302 M180 406V440" marker-start="url(#pd-arrow-open)" marker-end="url(#pd-arrow-open)"></path>
-			<text class="viz-label" x="104" y="389">u = −½</text>
-			<text class="viz-label" x="230" y="389">u = ½</text>
+			<text class="viz-label" x="93" y="389">u = −½</text>
+			<text class="viz-label" x="214" y="389">u = ½</text>
 			<text class="viz-axis-label" x="298" y="365">u</text>
 			<text class="viz-axis-label" x="188" y="304">v</text>
 			<text class="viz-callout" x="24" y="459">λ = (4, 0) → v is free → unbounded strip</text>

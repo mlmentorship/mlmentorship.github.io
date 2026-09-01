@@ -3,6 +3,8 @@ import { execFileSync } from 'node:child_process';
 import { basename, join, relative, resolve } from 'node:path';
 import process from 'node:process';
 
+import { unresolvedAccessibilityReferences } from './visual-accessibility.mjs';
+
 const root = resolve(import.meta.dirname, '..');
 const postsDir = join(root, 'src/content/posts');
 const auditsDir = join(root, 'data/visual-audits');
@@ -161,6 +163,10 @@ function validateAudit(audit, file, entry) {
       if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
         fail(`${label} SVG visual ${id} needs a direct "Read it this way" caption`);
       }
+      const accessibilityProblems = unresolvedAccessibilityReferences(figure);
+      if (accessibilityProblems.length > 0) {
+        fail(`${label} SVG visual ${id} has broken accessibility markup: ${accessibilityProblems.join(', ')}`);
+      }
     }
   }
   if (audit.status === 'implemented' && audit.medium === 'semantic-html') {
@@ -180,6 +186,10 @@ function validateAudit(audit, file, entry) {
       }
       if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
         fail(`${label} semantic visual ${id} needs a direct "Read it this way" caption`);
+      }
+      const accessibilityProblems = unresolvedAccessibilityReferences(figure);
+      if (accessibilityProblems.length > 0) {
+        fail(`${label} semantic visual ${id} has broken accessibility markup: ${accessibilityProblems.join(', ')}`);
       }
     }
   }
@@ -328,6 +338,10 @@ if (process.argv.includes('--dist')) {
       }
       if (audit.medium === 'svg' && (!figure.includes('<svg') || !figure.includes('<title') || !figure.includes('<desc'))) {
         fail(`generated SVG visual ${id} on ${slug} lost accessible markup`);
+      }
+      const accessibilityProblems = unresolvedAccessibilityReferences(figure);
+      if (accessibilityProblems.length > 0) {
+        fail(`generated visual ${id} on ${slug} has broken accessibility markup: ${accessibilityProblems.join(', ')}`);
       }
       if (!figure.includes('<figcaption><strong>Read it this way:</strong>')) {
         fail(`generated visual ${id} on ${slug} lost its direct caption`);

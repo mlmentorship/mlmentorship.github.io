@@ -111,9 +111,9 @@ An operation can consume much total time without extending the step if it overla
 			<text class="viz-callout" x="180" y="90" text-anchor="middle">backward compute</text>
 			<rect class="viz-node--focus" x="164" y="104" width="80" height="20" rx="10"></rect>
 			<text class="viz-callout" x="204" y="118" text-anchor="middle">collective</text>
-			<path class="viz-axis" d="M76 136H268 M108 132V140 M164 132V140 M244 132V140 M268 128V144"></path>
+			<path class="viz-axis" d="M76 136H252 M108 132V140 M164 132V140 M244 132V140 M252 128V144"></path>
 			<text class="viz-label" x="108" y="153" text-anchor="middle">start</text>
-			<text class="viz-label" x="268" y="153" text-anchor="middle">step end</text>
+			<text class="viz-label" x="252" y="153" text-anchor="middle">step end</text>
 			<text class="viz-callout" x="322" y="118" text-anchor="end">exposed: 0</text>
 			<text class="viz-callout" x="10" y="184">SERIALIZED</text>
 			<text class="viz-label" x="10" y="202">collective exposed</text>
@@ -124,10 +124,10 @@ An operation can consume much total time without extending the step if it overla
 			<rect class="viz-node--focus" x="220" y="238" width="80" height="20" rx="10"></rect>
 			<text class="viz-callout" x="260" y="252" text-anchor="middle">same collective</text>
 			<path class="viz-operating-guide" d="M220 204V272 M300 204V272 M220 270H300"></path>
-			<text class="viz-callout" x="260" y="287" text-anchor="middle">exposed tail: full duration</text>
-			<path class="viz-axis" d="M76 272H320 M108 268V276 M220 268V276 M320 264V280"></path>
+			<text class="viz-callout" x="260" y="202" text-anchor="middle">exposed tail: full duration</text>
+			<path class="viz-axis" d="M76 272H300 M108 268V276 M220 268V276 M300 264V280"></path>
 			<text class="viz-label" x="108" y="287" text-anchor="middle">start</text>
-			<text class="viz-label" x="320" y="287" text-anchor="middle">step end</text>
+			<text class="viz-label" x="300" y="287" text-anchor="middle">step end</text>
 		</svg>
 	</div>
 	<figcaption><strong>Read it this way:</strong> compare the rounded collective bars: their duration is identical. In the upper trace, communication finishes under backward compute and does not move the step boundary. In the lower trace, it begins after compute and the whole bar extends the step. Optimize the exposed tail on the critical path, not a large cumulative time that is already hidden. This original schematic is informed by the <a href="https://docs.pytorch.org/docs/2.13/notes/ddp.html">PyTorch DDP design note</a>, the <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX Scaling Book profiling guide</a>, and the <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">NVIDIA Nsight Systems Analysis Guide</a>.</figcaption>

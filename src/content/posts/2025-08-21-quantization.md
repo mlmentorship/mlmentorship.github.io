@@ -43,7 +43,7 @@ Quantize during training (with simulated quantization noise) so the model learns
 
 ## The mechanism
 
-Naive quantization: pick a scale `s` and zero-point `z`; quantize as `q = round((x - z) / s)`; dequantize as `x' = s * q + z`. Per-tensor scaling fails for LLMs because activation magnitudes vary wildly across channels.
+Naive affine quantization: pick a scale `s` and integer zero-point `z`; quantize as `q = round(x / s) + z` (then clamp to the integer range), and dequantize as `x' = s * (q - z)`. Per-tensor scaling fails for LLMs because activation magnitudes vary wildly across channels.
 
 <!-- visual:quantization-scale-granularity -->
 <figure class="learning-figure" aria-labelledby="quantization-scale-title" aria-describedby="quantization-scale-description">
