@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-valid-palindrome.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Move inward while comparing the next alphanumeric character from each end.",
+  "learningObjective": "Keep raw text in place, skip non-alphanumeric endpoints one at a time, and move both pointers only after a case-insensitive match.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to move inward while comparing the next alphanumeric character from each end.",
-    "invariant": "Move inward while comparing the next alphanumeric character from each end.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Two pointers moving inward over filtered endpoint characters.",
+    "recognitionCue": "Use opposite-end pointers when equality must hold symmetrically after ignoring characters, case, or other endpoint noise.",
+    "invariant": "Before each loop iteration, every accepted alphanumeric pair outside [left,right] matches case-insensitively; discarded outside characters are non-alphanumeric and cannot affect the answer.",
+    "stateModel": "Keep only left and right indices into the original text; skip exactly one invalid endpoint per iteration, compare valid endpoints, and move both only after equality.",
+    "visualRationale": "The full raw character array preserves punctuation and spacing while stable L and R keys visibly move inward; range, branch reason, and direction labels make each boundary movement explicit.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Building a normalized copy and reversing it is concise but uses O(n) extra space and hides endpoint skipping.",
+      "A normalized-only array erases the punctuation branches executed by the supplied implementation.",
+      "A prose comparison list cannot show that only one pointer moves on each skip branch."
     ],
-    "transferLesson": "Transfer the invariant: Move inward while comparing the next alphanumeric character from each end.",
-    "reviewStatus": "pending"
+    "transferLesson": "When irrelevant data appears at either boundary, repair one endpoint at a time until both are comparable; only then apply the symmetric predicate and advance both.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

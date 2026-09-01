@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-set-matrix-zeroes.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Use the first row and column as markers, then apply the marked rows and columns.",
+  "learningObjective": "Preserve first-row and first-column facts, store interior zero instructions in those borders, then apply markers before restoring the borders.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to use the first row and column as markers, then apply the marked rows and columns.",
-    "invariant": "Use the first row and column as markers, then apply the marked rows and columns.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "In-place matrix marking with the first row and first column as storage.",
+    "recognitionCue": "Use border markers when entire rows and columns must change from discovered cells, but the required extra space must remain constant.",
+    "invariant": "After the marker pass, matrix[r][0]=0 means interior row r must be zeroed and matrix[0][c]=0 means interior column c must be zeroed; saved booleans independently preserve the original first-border obligations.",
+    "stateModel": "Retain two booleans plus marker cells already inside the matrix; process interior cells first, apply interior markers second, and mutate the first row and column only at the end.",
+    "visualRationale": "A coordinate-preserving grid shows real cells serving as both data and marker storage; the stable matrix-cursor moves through each phase while explicit labels distinguish saved border facts from marker writes.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Separate row and column sets are simpler but violate the supplied O(1) extra-space mechanism.",
+      "Immediately zeroing a row while scanning destroys information needed to discover later original zeroes.",
+      "A prose table cannot show the dual role of first-border cells as matrix data and marker memory."
     ],
-    "transferLesson": "Transfer the invariant: Use the first row and column as markers, then apply the marked rows and columns.",
-    "reviewStatus": "pending"
+    "transferLesson": "When output overwrites input, identify safe in-place metadata cells and separately save any original facts those cells represented before reusing them.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

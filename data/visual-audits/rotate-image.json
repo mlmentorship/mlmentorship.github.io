@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-rotate-image.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Reverse the row order, then transpose across the main diagonal.",
+  "learningObjective": "Reverse row order, then swap every above-diagonal cell with its reflected below-diagonal partner.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to reverse the row order, then transpose across the main diagonal.",
-    "invariant": "Reverse the row order, then transpose across the main diagonal.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "In-place geometric composition: vertical reflection followed by main-diagonal transpose.",
+    "recognitionCue": "Use this transformation for a square matrix that must rotate 90 degrees clockwise without allocating a second matrix.",
+    "invariant": "After row reversal, values have moved from (r,c) to (n-1-r,c); after transposition, each reaches (c,n-1-r), exactly its clockwise coordinate.",
+    "stateModel": "The matrix itself is the only storage; reverse its row list, then visit each pair strictly above the diagonal once and swap it with (col,row).",
+    "visualRationale": "A coordinate-stable grid assigns each numeric value a persistent motion key, so rows visibly reflect and each transpose pair crosses the diagonal in source loop order.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Writing into a second matrix makes coordinate mapping simple but violates O(1) space.",
+      "Four-way layer cycles are valid but more complex than the supplied reverse-then-transpose proof.",
+      "Showing only before and after matrices hides the three decisive in-place swaps."
     ],
-    "transferLesson": "Transfer the invariant: Reverse the row order, then transpose across the main diagonal.",
-    "reviewStatus": "pending"
+    "transferLesson": "Derive a target coordinate mapping, then factor it into simple reversible transforms whose in-place loops visit each swap pair exactly once.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

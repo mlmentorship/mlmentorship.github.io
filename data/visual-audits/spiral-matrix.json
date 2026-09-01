@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-spiral-matrix.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Read the four current boundaries, then shrink them after each side.",
+  "learningObjective": "Read one side of the current rectangle at a time, shrink that boundary, and guard sides that may have disappeared.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to read the four current boundaries, then shrink them after each side.",
-    "invariant": "Read the four current boundaries, then shrink them after each side.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Four shrinking boundaries around an unvisited matrix rectangle.",
+    "recognitionCue": "Use boundary peeling when a rectangular grid must be traversed layer by layer around its perimeter in directional order.",
+    "invariant": "At each while-loop entry, every cell outside top..bottom and left..right has been emitted exactly once, and every unvisited cell lies inside that closed rectangle.",
+    "stateModel": "Maintain answer plus top, bottom, left, and right; each side traversal consumes one boundary and moves it inward, with guards before bottom and left prevent rereading a collapsed row or column.",
+    "visualRationale": "The unchanged 3x4 grid preserves geometry while a stable cursor follows each directed edge; visible bounds and answer prefixes explain both movement and collapse guards without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A flattened list shows output order but erases the rectangular boundary geometry.",
+      "A visited-cell simulation adds O(rows*cols) memory and uses a different turning rule.",
+      "Showing only one square layer misses the asymmetric collapse guards required by rectangular matrices."
     ],
-    "transferLesson": "Transfer the invariant: Read the four current boundaries, then shrink them after each side.",
-    "reviewStatus": "pending"
+    "transferLesson": "For perimeter traversals, represent remaining work as explicit inclusive bounds, consume one edge, shrink it immediately, and guard later edges because earlier moves may collapse the region.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
