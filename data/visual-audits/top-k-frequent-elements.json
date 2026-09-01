@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-top-k-frequent-elements.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Use frequency as a bucket coordinate, then scan from the highest bucket.",
+  "learningObjective": "Frequency is a bounded coordinate: place each value at its count, then scan counts from n down until k values are collected.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to use frequency as a bucket coordinate, then scan from the highest bucket.",
-    "invariant": "Use frequency as a bucket coordinate, then scan from the highest bucket.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Frequency counting followed by reverse traversal of an n-bounded bucket array.",
+    "recognitionCue": "Use frequency buckets when the answer ranks values by occurrence count, counts cannot exceed the input length n, and linear time matters more than ordering values within equal-frequency buckets.",
+    "invariant": "Before scanning bucket f, the answer contains every value from frequencies greater than f and no value from a lower frequency. Therefore the first k collected values are among the k most frequent.",
+    "stateModel": "The minimal state is a Counter, n+1 buckets indexed by frequency, a descending frequency cursor, and the collected answer. The trace shows counting, placement, empty-bucket skips, extension, and the len(answer) >= k return branch.",
+    "visualRationale": "An indexed array is the bucket geometry: position is frequency, cell content is the values with that count, and one named scan marker moves from n toward zero. Labels make frequency and direction readable without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A bar chart was rejected because it emphasizes magnitudes but obscures the actual n+1 bucket array used by the implementation.",
+      "A min-heap was rejected because it would depict a different O(n log k) algorithm.",
+      "A frequency table alone was rejected because it hides the reverse bucket scan and early-stop condition."
     ],
-    "transferLesson": "Transfer the invariant: Use frequency as a bucket coordinate, then scan from the highest bucket.",
-    "reviewStatus": "pending"
+    "transferLesson": "Whenever a ranking key is a small bounded integer, use that key as an array coordinate and scan coordinates in answer order; this transfers to counting sort, histogram selection, and bounded-score ranking.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

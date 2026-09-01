@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-kth-largest-element.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Keep only the largest k values; the smallest of those is the kth largest.",
+  "learningObjective": "A size-k min-heap retains the k largest values seen, so its root is the kth largest.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to keep only the largest k values; the smallest of those is the kth largest.",
-    "invariant": "Keep only the largest k values; the smallest of those is the kth largest.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Streaming top-k selection with a min-heap capped at k entries.",
+    "recognitionCue": "Use it when an unsorted or streaming input asks for the kth largest item or the largest k items, while sorting every value would retain more order than the answer needs.",
+    "invariant": "After each input is pushed and any size-(k+1) overflow root is popped, the heap contains exactly the largest min(k, processed) values seen; its root is the weakest retained candidate.",
+    "stateModel": "The minimal state is the input cursor, k, and a min-heap of at most k values. The trace shows every push branch, each overflow heap, the removed root, and the new threshold.",
+    "visualRationale": "An actual complete binary min-heap makes the parent-child ordering and changing root threshold visible. Stable value keys carry 3, 5, and 6 as they move to new heap positions.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A fully sorted array was rejected because it hides the bounded-memory invariant and suggests O(n log n) work.",
+      "A table of heap contents was rejected because it does not expose the root or complete-tree geometry.",
+      "Quickselect partitions were rejected because they do not match the supplied heap implementation."
     ],
-    "transferLesson": "Transfer the invariant: Keep only the largest k values; the smallest of those is the kth largest.",
-    "reviewStatus": "pending"
+    "transferLesson": "For a bounded best-k set, choose the opposite heap polarity: a min-heap protects the largest k and a max-heap protects the smallest k; the root is always the next item to evict.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-rotting-oranges.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Multi-source BFS makes each queue layer one minute of spread.",
+  "learningObjective": "Seeding every rotten cell makes BFS time equal the shortest orthogonal distance from any source; the last timestamp is the required minute.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to multi-source bfs makes each queue layer one minute of spread.",
-    "invariant": "Multi-source BFS makes each queue layer one minute of spread.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Multi-source breadth-first search on a four-neighbor grid with distance timestamps.",
+    "recognitionCue": "Use multi-source BFS for simultaneous unweighted spreading, infection, nearest-source distance, or minimum elapsed steps when every source acts at time zero and each move has equal cost.",
+    "invariant": "When (row,col,time) is popped, time is its minimum distance from any initial rotten cell. Marking a fresh neighbor rotten before enqueueing ensures that cell is queued once at time + 1.",
+    "stateModel": "The minimal state is the mutated grid as visited state, a queue of (row,col,time), the remaining fresh count, and the last popped time. Each frame shows the exact queue frontier and fresh-count decrement.",
+    "visualRationale": "A coordinate grid preserves orthogonal adjacency, obstacles, changed cells, and the advancing wave. Stable wave-a and wave-b markers move through successive frontier cells, while text labels expose time without relying on color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A queue-only table was rejected because it hides which cells are adjacent and why diagonal cells cannot spread rot.",
+      "A graph node-link diagram was rejected because the regular grid already gives simpler, exact topology.",
+      "A single before/after heatmap was rejected because it skips queue order, timestamps, and fresh-count updates."
     ],
-    "transferLesson": "Transfer the invariant: Multi-source BFS makes each queue layer one minute of spread.",
-    "reviewStatus": "pending"
+    "transferLesson": "Seed all equal-priority sources before BFS, mark neighbors when enqueued, and carry distance in the queue; the same mechanism solves nearest gate, fire spread, and shortest distance to any facility.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

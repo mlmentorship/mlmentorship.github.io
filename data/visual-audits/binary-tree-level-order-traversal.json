@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-binary-tree-level-order-traversal.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Read exactly the queue length that existed before adding child nodes.",
+  "learningObjective": "Snapshotting the queue length separates the current tree level from children appended for the next level.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to read exactly the queue length that existed before adding child nodes.",
-    "invariant": "Read exactly the queue length that existed before adding child nodes.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Breadth-first tree traversal with a queue-length snapshot for level boundaries.",
+    "recognitionCue": "Use this BFS form when a tree answer is grouped by depth, processed left-to-right by level, or must compute one aggregate per level rather than one flat visitation order.",
+    "invariant": "At each while-loop start, the queue contains exactly one complete next level in left-to-right order. Iterating the captured length consumes only that level while appending its children for the following level.",
+    "stateModel": "The minimal state is a FIFO queue, one frozen queue length, the current level list, and the accumulated answer. Child links determine enqueue order: left before right.",
+    "visualRationale": "An edged binary tree exposes parent-child topology while node labels identify the current and next queue levels. The explicit queue and frozen-size annotations make the boundary understandable without color or code.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A queue-only strip was rejected because it hides the parent-child edges that produce enqueue order.",
+      "A depth table was rejected because it presents the answer but not the traversal mechanism.",
+      "Recursive DFS was rejected because it does not match the supplied queue implementation or its O(w) frontier state."
     ],
-    "transferLesson": "Transfer the invariant: Read exactly the queue length that existed before adding child nodes.",
-    "reviewStatus": "pending"
+    "transferLesson": "Capture the frontier size before expanding it whenever output or timing is grouped by BFS depth; this transfers to right-side view, level averages, shortest unweighted paths, and wave simulations.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
