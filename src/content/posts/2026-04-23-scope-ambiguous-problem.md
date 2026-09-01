@@ -48,6 +48,32 @@ Reasonable for L4 (execution within someone else's scope). Failure at L5+ where 
 
 This is L5. Process is named, output is documented, the 'this isn't an ML problem' option is on the table.
 
+<!-- visual:ambiguous-problem-scope-loop -->
+```mermaid
+flowchart LR
+	accTitle: A senior scoping loop from an ambiguous request to an evidence-backed decision
+	accDescr: Start with a stakeholder's symptom, interrogate it to identify the actual user or business outcome, then define success, constraints, data, and non-goals. Decide whether machine learning is justified. If not, choose a non-ML baseline or stop. If it is, write a time-boxed one-pager that names scope, metrics, risks, and open questions. Select the biggest unknown, run the smallest experiment that can resolve it, and use evidence to proceed, rescope and repeat, or stop.
+	A["Stated symptom<br/>“recommendations are bad”"] --> B["Interrogate the request<br/>users · costs · context"]
+	B ==> C["Actual outcome<br/>what must change for whom?"]
+	C --> D["Define the boundary<br/>success · constraints · data<br/>in · out · deferred"]
+	D --> E{"Is ML justified<br/>and measurable?"}
+	E -->|"no"| F["Use a non-ML baseline<br/>or stop"]
+	E ==>|"yes"| G["Time-boxed one-pager<br/>metric · scope · risks<br/>owners · open questions"]
+	G --> H["Name the biggest unknown<br/>that could invalidate the plan"]
+	H ==> I["Smallest experiment<br/>that resolves that unknown"]
+	I --> J{"What did the<br/>evidence change?"}
+	J -->|"supports"| K["Proceed to v1<br/>with agreed scope"]
+	J -. "changes assumptions" .-> D
+	J -->|"invalidates"| L["Stop or choose<br/>a different approach"]
+	class A viz-input
+	class C,E,H,J viz-focus
+	class D,G viz-state
+	class F,L viz-warning
+	class I,K viz-output
+	class A viz-wide
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> do not turn the first request directly into a model. Move from the stated symptom to an agreed outcome and explicit boundary, then allow “non-ML” or “stop” as valid decisions. If ML remains justified, the first build is not v1: it is the smallest time-boxed experiment that can retire the plan’s biggest unknown. Its evidence either supports proceeding to v1, changes the scope, or ends the approach. Original synthesis checked against the <a href="https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works">GOV.UK discovery guidance</a>, the <a href="https://www.gov.uk/service-manual/agile-delivery/how-the-alpha-phase-works">GOV.UK alpha guidance</a>, and <a href="https://developers.google.com/machine-learning/problem-framing/problem">Google’s ML problem-framing guidance</a>.</p>
+
 ## What an L6 answer adds
 
 > "...practical things:
