@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "slug": "softmax-cross-entropy-pairing",
+  "article": "src/content/posts/2026-04-26-softmax-cross-entropy-pairing.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Given a multiclass probability vector and one-hot target, interpret p - y as the logit update: gradient descent raises the true-class logit, lowers every competing logit in proportion to its probability, and preserves a zero-sum shift.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align one worked probability vector with its target, gradient, and signed gradient-descent update while keeping each class contribution and the zero-sum invariant simultaneously visible.",
+  "mediumComparison": {
+    "mermaid": "Rejected because this is aligned vector arithmetic, not an entity-flow problem; automatic graph layout would obscure row correspondence and signed magnitudes.",
+    "svg": "Selected because fixed columns can align p, y, p - y, and -eta(p - y), while arrow direction and explicit signs communicate the update without depending on color.",
+    "semanticHtml": "Rejected because a table would preserve the arithmetic but make the opposing logit motions and the focal true-class correction less immediately spatial.",
+    "interaction": "Rejected because changing probabilities with controls adds hidden states and validation complexity without improving the invariant lesson supplied by one normalized worked example.",
+    "paperReuse": "Rejected because the learning objective needs no paper-specific result, and neither reviewed source grants clear permission to adapt a figure for this exact vector-update explanation. No source artwork, layout, wording, or worked example is reused.",
+    "noVisual": "Rejected because the prose derives each component but leaves readers to mentally translate the signed gradient into the opposite-signed optimizer step and recognize that all class updates balance to zero."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 32,
+        "insight": "The section divider establishes the start of the deck's classification-loss neighborhood."
+      },
+      {
+        "page": 33,
+        "insight": "The logistic-regression slide connects maximum likelihood, cross-entropy, softmax, stable log-softmax, and a simplified target-minus-output derivative, but does not spatially unpack the multiclass vector update."
+      },
+      {
+        "page": 34,
+        "insight": "The neighboring overview discusses convex classification losses but provides no class-by-class softmax gradient interpretation."
+      },
+      {
+        "page": 35,
+        "insight": "The softmax-classifier slide presents max-shift stabilization and a binary sigmoid training loop. Its code multiplies an out-minus-target term by the sigmoid derivative after labeling that term as the loss derivative with respect to the probability, so it is not reused as a fused cross-entropy gradient explanation."
+      },
+      {
+        "page": 36,
+        "insight": "The following surrogate-loss slide compares several classification losses and focal loss but adds no probability-vector-to-logit-update geometry."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for softmax, cross-entropy, categorical loss, negative log-likelihood, and log-sum-exp, then read the complete dedicated classification-loss neighborhood on pages 32-36. Page 33 is the strongest conceptual match, while page 35 contains a derivative-labeling error and is explicitly excluded. No deck image, code, wording, values, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Deep Learning, Chapter 6: Deep Feedforward Networks",
+        "url": "https://www.deeplearningbook.org/contents/mlp.html",
+        "usage": "Used as an authoritative textbook source for softmax output units, log-likelihood training, the log-sum-exp form, and the cancellation that yields the negative-log-likelihood gradient with respect to logits.",
+        "license": "The authors make the online book available for personal, noncommercial reading and do not grant general permission to reproduce it. No text, figure, coordinates, layout, or worked example is copied."
+      },
+      {
+        "title": "PyTorch CrossEntropyLoss documentation",
+        "url": "https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html",
+        "usage": "Used as official framework documentation to verify that CrossEntropyLoss consumes unnormalized logits and is equivalent to LogSoftmax followed by NLLLoss for class-index targets.",
+        "license": "PyTorch documentation is maintained with the BSD-3-Clause-licensed project. No documentation prose, code, example, or figure is reused."
+      }
+    ],
+    "notes": "The shipped construction is original and follows directly from the article's formula. For p = [0.70, 0.20, 0.10] and true class B, y = [0, 1, 0], so dL/dz = p - y = [0.70, -0.80, 0.10]. A gradient-descent step moves logits in the opposite direction, proportional to [-0.70, +0.80, -0.10]. Both the gradient and update sum to zero, consistent with softmax being unchanged by adding the same constant to every logit. The example illustrates one optimizer step and does not claim that probability changes equal logit changes."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete article, indexed the full source deck and inspected its exact loss neighborhood, checked an authoritative textbook and official PyTorch behavior, and selected an original aligned vector-update schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "softmax-ce-logit-update"
+    ],
+    "accessibility": "The SVG has a linked title and complete description. Every probability, target, gradient component, and update direction is directly labeled; plus and minus signs and left/right arrows preserve the lesson without color. Its 360-unit viewBox has no fixed or minimum width and fits a 390 CSS-pixel viewport. Established visual theme variables support dark mode, and shared print rules provide a light high-contrast palette."
+  }
+}

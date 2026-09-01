@@ -49,6 +49,51 @@ Combining: `dL / dz_k = p_k - y_k` where `y_k = 1` for `k = y`, `0` otherwise.
 
 The full gradient is `p - y` (predicted probabilities minus the one-hot true label). Three lines of algebra; the cleanest gradient in deep learning.
 
+<!-- visual:softmax-ce-logit-update -->
+<figure class="learning-figure" aria-labelledby="softmax-ce-update-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="softmax-ce-update-title">What does <code>p - y</code> make gradient descent do to each logit?</p>
+	<svg viewBox="0 0 360 300" role="img" aria-labelledby="softmax-ce-update-svg-title softmax-ce-update-svg-desc">
+		<title id="softmax-ce-update-svg-title">A three-class softmax cross-entropy gradient and its opposite-signed logit update</title>
+		<desc id="softmax-ce-update-svg-desc">For predicted probabilities A 0.70, B 0.20, and C 0.10 with B as the true class, subtracting the one-hot target gives gradient components positive 0.70, negative 0.80, and positive 0.10. A gradient-descent step moves in the opposite direction: A left by 0.70 eta, B right by 0.80 eta, and C left by 0.10 eta. The two competitor logits decrease, the true-class logit increases, and all three changes sum to zero.</desc>
+		<rect class="viz-plot-bg" x="12" y="30" width="336" height="226" rx="4"></rect>
+		<path class="viz-gridline" d="M12 65H348M12 119H348M12 173H348M12 227H348M55 30V227M111 30V227M158 30V227M216 30V256"></path>
+		<text class="viz-axis-label" x="33" y="50" text-anchor="middle">CLASS</text>
+		<text class="viz-axis-label" x="83" y="50" text-anchor="middle">p</text>
+		<text class="viz-axis-label" x="134" y="50" text-anchor="middle">y</text>
+		<text class="viz-axis-label" x="187" y="44" text-anchor="middle">g = p − y</text>
+		<text class="viz-axis-label" x="282" y="44" text-anchor="middle">LOGIT STEP −ηg</text>
+		<text class="viz-label" x="33" y="92" text-anchor="middle">A</text>
+		<text class="viz-label" x="83" y="92" text-anchor="middle">0.70</text>
+		<text class="viz-label" x="134" y="92" text-anchor="middle">0</text>
+		<text class="viz-callout" x="187" y="92" text-anchor="middle">+0.70</text>
+		<path d="M320 86H244" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:3;stroke-linecap:round"></path>
+		<path d="M244 86L253 80V92Z" style="fill:var(--viz-warning-stroke)"></path>
+		<text class="viz-callout" x="282" y="108" text-anchor="middle">lower A: −0.70η</text>
+		<text class="viz-label" x="33" y="146" text-anchor="middle">B (true)</text>
+		<text class="viz-label" x="83" y="146" text-anchor="middle">0.20</text>
+		<text class="viz-label" x="134" y="146" text-anchor="middle">1</text>
+		<text class="viz-callout" x="187" y="146" text-anchor="middle">−0.80</text>
+		<path d="M238 140H326" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:4;stroke-linecap:round"></path>
+		<path d="M326 140L317 134V146Z" style="fill:var(--viz-output-stroke)"></path>
+		<text class="viz-callout" x="282" y="162" text-anchor="middle">raise B: +0.80η</text>
+		<text class="viz-label" x="33" y="200" text-anchor="middle">C</text>
+		<text class="viz-label" x="83" y="200" text-anchor="middle">0.10</text>
+		<text class="viz-label" x="134" y="200" text-anchor="middle">0</text>
+		<text class="viz-callout" x="187" y="200" text-anchor="middle">+0.10</text>
+		<path d="M285 194H274" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:3;stroke-linecap:round"></path>
+		<path d="M274 194L283 188V200Z" style="fill:var(--viz-warning-stroke)"></path>
+		<text class="viz-callout" x="314" y="200" text-anchor="middle">−0.10η</text>
+		<text class="viz-axis-label" x="18" y="246">CHECK</text>
+		<text class="viz-label" x="70" y="246">Σp = 1</text>
+		<text class="viz-label" x="123" y="246">Σy = 1</text>
+		<text class="viz-callout" x="181" y="246" text-anchor="middle">Σg = 0</text>
+		<text class="viz-callout" x="282" y="246" text-anchor="middle">Σ(−ηg) = 0</text>
+		<text class="viz-axis-label" x="180" y="284" text-anchor="middle">left = lower logit · right = raise logit · η &gt; 0</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> subtract the one-hot target row by row, then reverse each sign for gradient descent. The two wrong-class logits move left, in proportion to their current probabilities; the true-class logit moves right by <code>0.80η</code>. The updates sum to zero, matching softmax's invariance to a shared logit shift. These are logit changes, not direct probability changes. Original worked example checked against <a href="https://www.deeplearningbook.org/contents/mlp.html">Goodfellow, Bengio, and Courville</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html">PyTorch CrossEntropyLoss documentation</a>.</figcaption>
+</figure>
+
 ## Benefits of the fused operation
 
 > "Three reasons the joint operation is preferred:
