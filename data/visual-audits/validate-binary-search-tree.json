@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-validate-binary-search-tree.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Pass the full inherited lower and upper bounds down each tree branch.",
+  "learningObjective": "Validate each node against the complete interval inherited from every ancestor.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to pass the full inherited lower and upper bounds down each tree branch.",
-    "invariant": "Pass the full inherited lower and upper bounds down each tree branch.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Depth-first traversal with inherited exclusive lower and upper bounds.",
+    "recognitionCue": "BST validity applies against every ancestor, so a local parent-child comparison is insufficient and each recursive call must carry the legal value interval.",
+    "invariant": "At valid(node, low, high), every ancestor constraint is summarized by low < node.val < high; the left call tightens high and the right call tightens low.",
+    "stateModel": "Retain the current node, its exclusive low/high bounds, and the recursion stack; null returns true and any out-of-range node returns false immediately.",
+    "visualRationale": "A fixed tree with a moving active-call marker and visible inherited intervals shows the actual topology, recursion path, bound tightening, and false return chain.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "An inorder value list can prove sortedness but hides how the supplied bound-carrying recursion works.",
+      "A parent-versus-child comparison diagram misses violations such as node 4 below ancestor 5.",
+      "A prose call table hides which ancestor edges created the interval (5,7)."
     ],
-    "transferLesson": "Transfer the invariant: Pass the full inherited lower and upper bounds down each tree branch.",
-    "reviewStatus": "pending"
+    "transferLesson": "When a recursive descendant must satisfy all ancestor decisions, summarize those decisions as constraints in the call state rather than rechecking only the parent.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

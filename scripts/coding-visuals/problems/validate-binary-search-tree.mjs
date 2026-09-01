@@ -1,9 +1,67 @@
-import { array, arrayMap, attention, bits, buckets, choices, defineVisual, dualWindow, frame, graph, grid, heap, intervals, linked, lru, mark, pendingReview, prefix, queueGrid, shapes, stack, table, tree, trie, visual } from '../primitives.mjs';
+import { defineVisual, frame, mark, tree, visual } from '../primitives.mjs';
 
-const draft = visual('Pass the full inherited lower and upper bounds down each tree branch.', [
-    frame('Set the root bounds', 'Root 5 must lie between negative and positive infinity.', tree([['5'], ['1', '7'], ['-', '-', '4', '-']], [mark(0, 'bounds (-inf,inf)', 'focus')])),
-    frame('Carry an ancestor bound', 'Node 4 is in the right subtree of 5, so its lower bound is 5.', tree([['5'], ['1', '7'], ['-', '-', '4', '-']], [mark(5, '4 not > 5', 'warning')], { bounds: '4 must be > 5' })),
-    frame('Reject the tree', 'A parent-only check would miss this violation; inherited bounds catch it.', tree([['5'], ['1', '7'], ['-', '-', '4', '-']], [mark(5, 'invalid', 'output')], { result: 'false' })),
-  ]);
+const levels = [['5'], ['1', '7'], ['-', '-', '4', '8']];
+const call = (index, label, extra = {}) => tree(
+  levels,
+  [mark(index, label, index === 5 ? 'warning' : 'focus', 'active-call')],
+  { input: 'tree=[5,1,7,null,null,4,8]', ...extra },
+);
 
-export default defineVisual('validate-binary-search-tree', draft, pendingReview(draft.objective));
+const draft = visual('Validate each node against the complete interval inherited from every ancestor.', [
+  frame(
+    'Call valid(5, -inf, inf)',
+    'The root 5 satisfies -inf < 5 < inf, so recursively validate its left subtree before its right subtree.',
+    call(0, 'check -inf < 5 < inf', { stack: 'valid(5,-inf,inf)' }),
+    'check-root',
+  ),
+  frame(
+    'Descend left with a tighter high bound',
+    'For node 1, the root value becomes the upper bound: -inf < 1 < 5 is true.',
+    call(1, 'check -inf < 1 < 5', { stack: 'valid(5,-inf,inf) -> valid(1,-inf,5)' }),
+    'check-left-child',
+  ),
+  frame(
+    'Return true for the left subtree',
+    'Both children of 1 are null, so both base cases return true and valid(1,-inf,5) returns true.',
+    call(1, 'left subtree valid', { returns: 'null=true, null=true, node 1=true' }),
+    'return-left-subtree',
+  ),
+  frame(
+    'Descend right with a tighter low bound',
+    'For node 7, the root value becomes the lower bound: 5 < 7 < inf is true.',
+    call(2, 'check 5 < 7 < inf', { stack: 'valid(5,-inf,inf) -> valid(7,5,inf)' }),
+    'check-right-child',
+  ),
+  frame(
+    'Carry both ancestor bounds to node 4',
+    'Node 4 is left of 7 but still right of 5, so its legal interval is (5,7). The check 5 < 4 < 7 fails.',
+    call(5, '5 < 4 < 7 is false', { stack: 'valid(5,-inf,inf) -> valid(7,5,inf) -> valid(4,5,7)' }),
+    'reject-descendant',
+  ),
+  frame(
+    'Propagate false to the root',
+    'valid(4,5,7) returns false, so the short-circuited conjunction rejects node 7 and then the entire tree.',
+    tree(levels, [mark(5, 'violates ancestor 5', 'output', 'active-call')], {
+      returns: 'node 4=false -> node 7=false -> node 5=false',
+      result: 'false',
+    }),
+    'return-invalid',
+  ),
+]);
+
+const review = {
+  pattern: 'Depth-first traversal with inherited exclusive lower and upper bounds.',
+  recognitionCue: 'BST validity applies against every ancestor, so a local parent-child comparison is insufficient and each recursive call must carry the legal value interval.',
+  invariant: 'At valid(node, low, high), every ancestor constraint is summarized by low < node.val < high; the left call tightens high and the right call tightens low.',
+  stateModel: 'Retain the current node, its exclusive low/high bounds, and the recursion stack; null returns true and any out-of-range node returns false immediately.',
+  visualRationale: 'A fixed tree with a moving active-call marker and visible inherited intervals shows the actual topology, recursion path, bound tightening, and false return chain.',
+  rejectedAlternatives: [
+    'An inorder value list can prove sortedness but hides how the supplied bound-carrying recursion works.',
+    'A parent-versus-child comparison diagram misses violations such as node 4 below ancestor 5.',
+    'A prose call table hides which ancestor edges created the interval (5,7).',
+  ],
+  transferLesson: 'When a recursive descendant must satisfy all ancestor decisions, summarize those decisions as constraints in the call state rather than rechecking only the parent.',
+  reviewStatus: 'reviewed',
+};
+
+export default defineVisual('validate-binary-search-tree', draft, review);

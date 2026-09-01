@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-lru-cache.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A map finds a node; a doubly linked list keeps least-recent to most-recent order.",
+  "learningObjective": "The map gives direct node access while the doubly linked order exposes the eviction candidate at its left edge.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a map finds a node; a doubly linked list keeps least-recent to most-recent order.",
-    "invariant": "A map finds a node; a doubly linked list keeps least-recent to most-recent order.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Hash map for direct lookup plus a sentinel-based doubly linked list for recency order.",
+    "recognitionCue": "The interface requires both O(1) key lookup and O(1) least-recent eviction, which no single ordinary array, map, or queue provides alone.",
+    "invariant": "Every map entry points to exactly one node between the sentinels, and list order is least-recent to most-recent; successful access moves that same key to the right edge.",
+    "stateModel": "Retain capacity, the key-to-node map, least/most sentinels, and each node’s previous/next links. Remove and append are constant-size pointer rewires.",
+    "visualRationale": "A sentinel-bounded linked chain gives every cache node a stable motion key as it moves, while adjacent visible map state shows direct key-to-node lookup through every mutation.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A map alone cannot identify the least-recent key in O(1) time.",
+      "A queue alone cannot find and move an arbitrary accessed key in O(1) time.",
+      "A final-state-only diagram hides the temporary over-capacity state and the separate list removal and map deletion."
     ],
-    "transferLesson": "Transfer the invariant: A map finds a node; a doubly linked list keeps least-recent to most-recent order.",
-    "reviewStatus": "pending"
+    "transferLesson": "Combine an index with an ordered linked structure whenever a system needs direct identity lookup plus constant-time promotion, removal, or boundary eviction.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

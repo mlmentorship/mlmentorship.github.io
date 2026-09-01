@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-lowest-common-ancestor-in-a-bst.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "BST ordering tells whether both targets lie left, right, or split at the current node.",
+  "learningObjective": "BST ordering discards one whole side until the targets split at their lowest shared ancestor.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to bst ordering tells whether both targets lie left, right, or split at the current node.",
-    "invariant": "BST ordering tells whether both targets lie left, right, or split at the current node.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "BST-guided single-path search for the first target split.",
+    "recognitionCue": "Both target nodes are in a BST, so comparing both values with the current root reveals whether their lowest common ancestor must be entirely left, entirely right, or current.",
+    "invariant": "At the start of every loop iteration, the current root’s subtree contains both targets; moving only when both values are on the same side preserves that fact.",
+    "stateModel": "Retain the current root and the two fixed target values. Move left if both are smaller, right if both are larger, otherwise return the current root.",
+    "visualRationale": "A fixed BST with independently keyed current-root and target markers shows the real search path, the discarded subtrees, and the exact split geometry.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Two root-to-target path lists find a common prefix but ignore the BST ordering shortcut.",
+      "A generic binary-tree DFS explores unnecessary branches and needs recursion state.",
+      "A three-row comparison table hides where targets and discarded subtrees lie in the tree."
     ],
-    "transferLesson": "Transfer the invariant: BST ordering tells whether both targets lie left, right, or split at the current node.",
-    "reviewStatus": "pending"
+    "transferLesson": "In an ordered search tree, track where multiple target values fall relative to the current separator; the first separator they do not share is their lowest common routing point.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
