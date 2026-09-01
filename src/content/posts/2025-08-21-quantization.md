@@ -53,30 +53,30 @@ Naive quantization: pick a scale `s` and zero-point `z`; quantize as `q = round(
 	<div class="visual-grid--two" role="group" aria-label="Shared-scale and per-channel symmetric INT4 quantization comparison">
 		<section class="visual-panel" aria-labelledby="shared-quantization-title">
 			<h4 id="shared-quantization-title">One shared scale</h4>
-			<p>The high-range channel sets Δ = 8/7 ≈ 1.14 for both rows.</p>
+			<p>The high-range channel sets &Delta; = 8/7 &asymp; 1.14 for both rows.</p>
 			<table class="cm-grid" aria-label="Symmetric INT4 quantization with one shared scale">
 				<thead><tr><th scope="col">Channel</th><th scope="col">Original</th><th scope="col">Codes → restored</th></tr></thead>
 				<tbody>
-					<tr><th scope="row">ordinary</th><td>−1, −0.5, 0.5, 1</td><td class="cm-selected">−1, 0, 0, 1<br>→ −1.14, 0, 0, 1.14</td></tr>
-					<tr><th scope="row">high range</th><td>−8, −4, 4, 8</td><td>−7, −4, 4, 7<br>→ −8, −4.57, 4.57, 8</td></tr>
+					<tr><th scope="row">ordinary</th><td>&minus;1, &minus;0.5, 0.5, 1</td><td class="cm-selected">&minus;1, 0, 0, 1<br>&rarr; &minus;1.14, 0, 0, 1.14</td></tr>
+					<tr><th scope="row">high range</th><td>&minus;8, &minus;4, 4, 8</td><td>&minus;7, &minus;4, 4, 7<br>&rarr; &minus;8, &minus;4.57, 4.57, 8</td></tr>
 				</tbody>
 			</table>
-			<p><strong>Lost detail:</strong> −0.5 and 0.5 both collapse to code 0.</p>
+			<p><strong>Lost detail:</strong> &minus;0.5 and 0.5 both collapse to code 0.</p>
 		</section>
 		<section class="visual-panel" aria-labelledby="channel-quantization-title">
 			<h4 id="channel-quantization-title">One scale per channel</h4>
-			<p>The ordinary row gets Δ = 1/7; the high-range row keeps Δ = 8/7.</p>
+			<p>The ordinary row gets &Delta; = 1/7; the high-range row keeps &Delta; = 8/7.</p>
 			<table class="cm-grid" aria-label="Symmetric INT4 quantization with a separate scale for each channel">
 				<thead><tr><th scope="col">Channel</th><th scope="col">Original</th><th scope="col">Codes → restored</th></tr></thead>
 				<tbody>
-					<tr><th scope="row">ordinary</th><td>−1, −0.5, 0.5, 1</td><td class="cm-selected">−7, −4, 4, 7<br>→ −1, −0.57, 0.57, 1</td></tr>
-					<tr><th scope="row">high range</th><td>−8, −4, 4, 8</td><td>−7, −4, 4, 7<br>→ −8, −4.57, 4.57, 8</td></tr>
+					<tr><th scope="row">ordinary</th><td>&minus;1, &minus;0.5, 0.5, 1</td><td class="cm-selected">&minus;7, &minus;4, 4, 7<br>&rarr; &minus;1, &minus;0.57, 0.57, 1</td></tr>
+					<tr><th scope="row">high range</th><td>&minus;8, &minus;4, 4, 8</td><td>&minus;7, &minus;4, 4, 7<br>&rarr; &minus;8, &minus;4.57, 4.57, 8</td></tr>
 				</tbody>
 			</table>
 			<p><strong>Recovered detail:</strong> each row uses the full signed code range.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the ordinary row across panels. With one shared scale, the ±8 values determine the step for every value, so −0.5 and 0.5 both round to zero. A separate scale lets the ordinary channel spend the same INT4 codes over its own smaller range and keeps the signs distinct. More scales reduce rounding error but add scale metadata and kernel complexity; calibration data and task-specific evaluation still determine whether the approximation is acceptable. This is an illustrative calculation, not a benchmark. Original example checked against <a href="https://arxiv.org/abs/1712.05877">Jacob et al.’s affine quantization formulation</a> and <a href="https://arxiv.org/abs/2211.10438">SmoothQuant’s analysis of channel-wise outliers</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the ordinary row across panels. With one shared scale, the &plusmn;8 values determine the step for every value, so &minus;0.5 and 0.5 both round to zero. A separate scale lets the ordinary channel spend the same INT4 codes over its own smaller range and keeps the signs distinct. More scales reduce rounding error but add scale metadata and kernel complexity; calibration data and task-specific evaluation still determine whether the approximation is acceptable. This is an illustrative calculation, not a benchmark. Original example checked against <a href="https://arxiv.org/abs/1712.05877">Jacob et al.’s affine quantization formulation</a> and <a href="https://arxiv.org/abs/2211.10438">SmoothQuant’s analysis of channel-wise outliers</a>.</figcaption>
 </figure>
 
 Modern techniques:
