@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "slug": "neural-network-training-recipe",
+  "article": "src/content/posts/2026-05-31-neural-network-training-recipe.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Use each training phase as an evidence gate, and return to the earliest failed assumption instead of tuning around an unverified pipeline.",
+  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that can show the recipe's ordered phases, the evidence required to advance, and the backward path when a gate fails. The task is procedural dependency rather than quantitative geometry, so labelled branches communicate the stop-and-repair discipline directly.",
+  "mediumComparison": {
+    "mermaid": "Selected: a top-to-bottom decision flow makes prerequisite gates and repair loops explicit while reusing the site's accessible, responsive process-diagram grammar.",
+    "svg": "Rejected: custom fixed geometry would duplicate Mermaid's existing flow and branch semantics without adding a quantitative shape or spatial relationship.",
+    "semanticHtml": "Rejected: a checklist or table can preserve order but cannot show that a failed gate routes backward and blocks all later tuning work as efficiently.",
+    "interaction": "Rejected: revealing stages or simulating choices would add controls and runtime behavior to a deterministic procedure whose complete logic fits in one compact flow.",
+    "paperReuse": "Rejected: the deck closely follows Karpathy's written recipe, but no source figure is necessary and permissive artwork-reuse rights were not established for the blog, course notes, or textbook. The diagram structure and wording are original.",
+    "noVisual": "Rejected: prose names six ordered steps, but readers can still treat them as an interchangeable checklist. A gate diagram exposes the central rule that later work is invalid until earlier evidence passes."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 55,
+        "insight": "The preceding slide concludes the gradient-estimator section with control variates and provides no project-level training sequence."
+      },
+      {
+        "page": 56,
+        "insight": "The section divider announces Practical steps to a neural net project and establishes the exact local deck sequence reviewed for this article."
+      },
+      {
+        "page": 57,
+        "insight": "The notes slide collects preprocessing, initialization, numerical, and regularization cautions, but presents them as independent facts rather than advancement gates."
+      },
+      {
+        "page": 58,
+        "insight": "Data Inspection is explicitly first and asks the practitioner to inspect imbalance, bias, label noise, outliers, and the structure that should shape later architecture choices."
+      },
+      {
+        "page": 59,
+        "insight": "Setup training skeleton says to gain trust through explicit experiments, including correct initial loss, input-independent baselines, exact pre-model tensors, prediction dynamics, and overfitting a single batch before proceeding."
+      },
+      {
+        "page": 60,
+        "insight": "Sanity checks repeats the chance-loss and tiny-subset tests and uses training-versus-validation behavior to separate overfitting from insufficient capacity."
+      },
+      {
+        "page": 61,
+        "insight": "Finding the right model (a) says to minimize bias first with enough capacity to overfit, a simple known architecture, fixed seeds, and one change at a time."
+      },
+      {
+        "page": 62,
+        "insight": "Finding the right model (b) moves to variance reduction only after fitting, prioritizing more data, augmentation, pretraining, weight decay, early stopping, and related regularizers."
+      },
+      {
+        "page": 63,
+        "insight": "Squeeze juice out and debug places hyperparameter search and ensembling after the earlier phases and specifically argues for random rather than grid search."
+      },
+      {
+        "page": 64,
+        "insight": "The following slide starts Basic Probabilistic ML algorithms, confirming that the practical training recipe ends on page 63."
+      }
+    ],
+    "notes": "All 214 pages of the local deck were text-indexed for training recipe, practical steps, overfit, single or tiny batch, regularization, random search, grid search, sanity checks, and hyperparameters. The complete relevant section spans pages 56-63, so both boundary neighbors, pages 55 and 64, were inspected as well. Pages 58-63 closely parallel the article's inspect, verify, fit, regularize, tune, and squeeze order. No deck artwork, layout, examples, or wording is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Recipe for Training Neural Networks",
+        "url": "https://karpathy.github.io/2019/04/25/recipe/",
+        "usage": "Used as the article's directly acknowledged practitioner source to verify the build-from-simple-to-complex process, explicit hypothesis checks, single-batch overfit gate, fit-before-regularize split, and late tuning stage.",
+        "license": "The author-hosted post is publicly readable, but no explicit permissive license for its prose or graphics was identified. No prose, artwork, layout, or examples are copied; the original diagram independently summarizes the procedure and links to the source."
+      },
+      {
+        "title": "Deep Learning, Chapter 11: Practical Methodology",
+        "url": "https://www.deeplearningbook.org/contents/guidelines.html",
+        "usage": "Used as an authoritative textbook source for the staged practical methodology of setting goals, establishing an end-to-end system, diagnosing bias and variance, and iterating under measured evidence.",
+        "license": "The online book is published by MIT Press and no permissive figure-reuse license was identified on the reviewed chapter. No text, figure, data, or chapter layout is reused."
+      },
+      {
+        "title": "Random Search for Hyper-Parameter Optimization",
+        "url": "https://jmlr.org/papers/v13/bergstra12a.html",
+        "usage": "Used as the primary research source for the article's late-stage recommendation that random search covers influential hyperparameters more efficiently than grid search under a fixed trial budget.",
+        "license": "JMLR papers are published under the journal's CC BY 4.0 license agreement. No paper figure, text, experiment, or layout is reused; the paper supports one terminal phase of the independently designed process diagram."
+      }
+    ],
+    "notes": "The hardest mental model is that the phases are evidence-gated prerequisites rather than six independent optimization ideas. The original diagram therefore asks four pass/fail questions: whether data and baselines are trustworthy, whether a tiny batch can be memorized, whether the full training set can be fit, and whether validation behavior is acceptable after regularization. A no branch repairs the earliest failed assumption; random search and squeezing appear only after every gate passes. This is a procedural synthesis, not an empirical performance claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected the entire practical-training section with both boundary neighbors, then checked the acknowledged practitioner recipe, an authoritative deep-learning textbook, and the primary random-search paper before selecting an original evidence-gate flowchart."
+  },
+  "implementation": {
+    "visualIds": [
+      "training-recipe-evidence-gates"
+    ],
+    "accessibility": "The Mermaid diagram includes a concise accessible title and a full description of every phase, pass condition, and repair loop. Node text, gate shapes, labelled yes/no branches, line weight, and order carry the lesson without color. The established tall-diagram primitive removes the mobile minimum width so the flow remains readable at 390 CSS pixels; shared Mermaid theme and print rules provide dark-mode contrast and a light printable palette."
+  }
+}
