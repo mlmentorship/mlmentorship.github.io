@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "slug": "scalable-oversight-and-ai-control",
+  "article": "src/content/posts/2026-07-11-scalable-oversight-and-ai-control.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Given a proposed safety technique, identify whether it improves judgment under a capability gap, limits harm under intentional subversion, or contributes evidence to both.",
+  "mediumRationale": "A shared-challenge panel followed by a two-column semantic comparison is the smallest medium that prevents readers from classifying techniques by name alone. Aligning threat assumption, intervention target, characteristic failure, and success test shows why a monitor or trusted model can participate in both fields while supporting different claims.",
+  "mediumComparison": {
+    "mermaid": "Rejected: the lesson is a controlled comparison of assumptions and evidence, not a single directed process. A flowchart would imply that oversight leads into control or that every method follows one fixed sequence.",
+    "svg": "Rejected: no quantitative geometry, scale, or fixed coordinate relationship carries the distinction. Fixed SVG text would wrap and magnify less effectively than semantic content at 390 CSS pixels.",
+    "semanticHtml": "Selected: aligned labelled sections keep the shared capability gap constant while contrasting four claim dimensions. The established panels stack in logical reading order on narrow screens and expose all content to assistive technology and print.",
+    "interaction": "Rejected: a scenario classifier could provide practice, but controls and hidden states are unnecessary for the one foundational distinction and would make the full comparison unavailable in static print.",
+    "paperReuse": "Rejected: the reviewed papers contain study-specific diagrams and results rather than this article's assumption-and-success-test comparison. Public access was not treated as adaptation permission; no source artwork, data, wording, or layout is reused.",
+    "noVisual": "Rejected: the prose lists overlapping techniques and cautions that a judge is not a protocol, but readers must still coordinate the threat assumption with the required evidence. The aligned comparison makes the claim boundary explicit."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 103,
+        "insight": "The preceding transformer survey provides architecture and capability context but contains no evaluator-capability gap, oversight protocol, or adversarial safety assumption."
+      },
+      {
+        "page": 104,
+        "insight": "The closest alignment slide discusses instruction tuning, RLHF, elicited behavior, and an alignment tax. It treats model behavior as a training outcome rather than asking how a weaker evaluator judges stronger work or how a protocol contains deliberate subversion."
+      },
+      {
+        "page": 105,
+        "insight": "The neighboring slide classifies base, instruction-trained, and RLHF models and introduces tool use, but has no scalable-oversight method, trusted monitor, threat model, or adaptive attacker."
+      },
+      {
+        "page": 167,
+        "insight": "The modeling slide recommends simple and human baselines, which is relevant background for evaluation, but it assumes ordinary model development and does not address superhuman task evaluation or intentional subversion."
+      },
+      {
+        "page": 168,
+        "insight": "The production slide asks about gating tests, monitoring, user feedback, low-confidence behavior, and inference constraints. These are possible protocol ingredients, but the slide provides no untrusted-model threat model, adaptive red team, safety-usefulness evaluation, or scalable-oversight claim."
+      },
+      {
+        "page": 169,
+        "insight": "The neighboring engineering-rules slide calls for independent infrastructure tests, monitoring, and quantified undesirable behavior. It motivates layered evidence but does not distinguish assisted judgment from containment against a strategic model."
+      },
+      {
+        "page": 170,
+        "insight": "The algorithms-and-data-structures divider ends the production neighborhood without further safety, oversight, or control content."
+      }
+    ],
+    "notes": "All 214 physical pages of Basic_ML_CS_concepts (1).pdf were text-indexed for scalable oversight, AI control, oversight, debate, process supervision, weak-to-strong supervision, red team, sandbox, monitor, and alignment. No slide directly covers scalable oversight or AI control. Pages 103-105 were read around the closest alignment discussion, and pages 167-170 were read around the closest production monitoring and gating discussion. The PDF declares no reuse license and contains attributed third-party material, so no deck screenshot, artwork, wording, data, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Measuring Progress on Scalable Oversight for Large Language Models",
+        "url": "https://arxiv.org/abs/2211.03540",
+        "usage": "Used as the primary source for scalable oversight as the problem of supervising models on tasks that humans cannot evaluate directly, and for evaluating proposed protocols through empirical capability-gap experiments.",
+        "license": "The official arXiv record provides access to the paper, but no permissive figure-adaptation right was relied upon. No figure, task example, result, wording, or layout is copied."
+      },
+      {
+        "title": "AI Control: Improving Safety Despite Intentional Subversion",
+        "url": "https://proceedings.mlr.press/v235/greenblatt24a.html",
+        "usage": "Used as the primary peer-reviewed source for AI control's intentional-subversion assumption and for evaluating safety protocols that combine an untrusted capable model, trusted weaker resources, usefulness measurement, and red-team attack strategies.",
+        "license": "The PMLR proceedings page is publicly accessible, but public access was not treated as permission to adapt its figures. No experiment diagram, result, code example, prose, or visual arrangement is reproduced."
+      },
+      {
+        "title": "AI safety via debate",
+        "url": "https://arxiv.org/abs/1805.00899",
+        "usage": "Used as a primary source to cross-check debate as an oversight proposal that aims to let a human judge identify the better answer by exposing arguments and counterarguments rather than solving the underlying task unaided.",
+        "license": "No permissive figure-reuse permission was established from the official record. The implementation copies no debate tree, example, text, data, or layout."
+      },
+      {
+        "title": "arXiv Reuse Requests",
+        "url": "https://info.arxiv.org/help/license/reuse.html",
+        "usage": "Used as official licensing guidance to verify that arXiv availability alone does not grant figure-reuse rights and that the assigned paper license must permit adaptation.",
+        "license": "The policy is cited only to document the licensing decision; no policy wording or artwork is reproduced in the visual."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that scalable oversight and AI control may reuse components while validating different contracts. Oversight asks whether assistance makes otherwise unjudgeable work reliably evaluable; control adopts the stronger threat model that the capable system may intentionally optimize against the protocol and therefore requires containment evidence under adaptive attacks plus a separate usefulness measure. The original visual is a qualitative synthesis and does not claim that all oversight assumes benign models, that monitoring alone provides control, or that a finite red team proves deployment risk is negligible."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-3 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 deck pages and inspected both closest slide neighborhoods, then reviewed primary scalable-oversight, debate, and peer-reviewed AI-control sources plus official reuse guidance before implementing an original assumption-and-success-test comparison."
+  },
+  "implementation": {
+    "visualIds": [
+      "oversight-control-assumption-test"
+    ],
+    "accessibility": "The figure has a question-style accessible title, a separately labelled shared-challenge section, two labelled comparison sections, and a group description that states both threat models. Repeated text headings align assumption, target, failure, and success evidence; no distinction depends on color, position alone, or symbols. The established two-column primitive stacks below 640 CSS pixels with no minimum width, including at 390 CSS pixels; theme variables provide dark-mode contrast and shared print rules preserve a high-contrast, break-resistant figure."
+  }
+}

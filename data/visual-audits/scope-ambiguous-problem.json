@@ -5,9 +5,9 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Turn an ambiguous stakeholder symptom into an explicit scope, then choose the smallest time-boxed experiment that resolves the biggest unknown before committing to v1.",
-  "mediumRationale": "A wide Mermaid decision flow is the smallest medium that turns the article's advice into a repeatable loop: reframe the symptom, bound the problem, permit a non-ML exit, isolate the dominant unknown, and route evidence to proceed, rescope, or stop.",
+  "mediumRationale": "A top-to-bottom Mermaid decision flow is the smallest medium that turns the article's advice into a repeatable loop: reframe the symptom, bound the problem, permit a non-ML exit, isolate the dominant unknown, and route evidence to proceed, rescope, or stop.",
   "mediumComparison": {
-    "mermaid": "Selected because the learning task is a qualitative decision process with two valid exit branches and an evidence-driven rescoping loop. Established wide flowchart primitives preserve relationship semantics and readable labels.",
+    "mermaid": "Selected because the learning task is a qualitative decision process with two valid exit branches and an evidence-driven rescoping loop. The established tall-flow treatment preserves relationship semantics and readable labels without compressing a long horizontal chain.",
     "svg": "Rejected because there is no quantitative geometry or fixed coordinate relationship to teach; hand-positioning the same decision graph would add maintenance without improving the mental model.",
     "semanticHtml": "Rejected because a checklist or one-pager table can inventory required fields but cannot show that the first experiment is selected from unresolved risk and can send the team backward or out of the project.",
     "interaction": "Rejected because simulated stakeholder answers would add many arbitrary states. The invariant decision structure, not practicing a scenario, is the article's smallest useful learning objective.",
@@ -81,6 +81,6 @@
     "visualIds": [
       "ambiguous-problem-scope-loop"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description. Every stage, decision, exit, and evidence branch is directly labelled; thick arrows emphasize the focal reasoning path while solid and dashed branches preserve meaning without color. The established wide flowchart scrolls horizontally at 390 CSS pixels so labels remain readable, shared Mermaid theme classes preserve dark-mode contrast, and print rules remove the minimum width and use a light high-contrast palette."
+    "accessibility": "The Mermaid source includes a complete accessible title and description. Every stage, decision, exit, and evidence branch is directly labelled; thick arrows emphasize the focal reasoning path while solid and dashed branches preserve meaning without color. The top-to-bottom graph uses the established tall-flow marker to avoid screen-height compression while fitting without a width floor at 390 CSS pixels; shared Mermaid theme classes preserve dark-mode contrast, and print rules use a light high-contrast palette."
   }
 }
