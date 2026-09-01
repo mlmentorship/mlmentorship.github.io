@@ -49,6 +49,41 @@ There is **always a tradeoff**: increasing one decreases the other along the pre
 
 The F1 score balances precision and recall via the harmonic mean. **Harmonic mean penalizes imbalance**: F1 is low if either P or R is low, even if the other is high.
 
+<!-- visual:precision-recall-f1-harmonic-penalty -->
+<figure class="learning-figure" aria-labelledby="f1-harmonic-penalty-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="f1-harmonic-penalty-title">See why F1 falls toward the smaller metric instead of rewarding the arithmetic average.</p>
+	<div class="visual-grid--two">
+		<section class="visual-panel" aria-labelledby="f1-balanced-title">
+			<h4 id="f1-balanced-title">Balanced pair</h4>
+			<p>Neither metric hides a weak side.</p>
+			<table class="cm-grid" aria-label="Balanced precision and recall both equal 0.50, producing arithmetic mean 0.50 and F1 0.50">
+				<tbody>
+					<tr><th scope="row">Precision</th><td><strong>0.50</strong></td></tr>
+					<tr><th scope="row">Recall</th><td><strong>0.50</strong></td></tr>
+					<tr><th scope="row">Arithmetic mean</th><td><strong>0.50</strong></td></tr>
+					<tr><th class="cm-selected" scope="row">F1</th><td class="cm-selected"><strong>0.50</strong></td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">2(0.50)(0.50) / (0.50 + 0.50) = 0.50</p>
+		</section>
+		<section class="visual-panel" aria-labelledby="f1-imbalanced-title">
+			<h4 id="f1-imbalanced-title">Imbalanced pair</h4>
+			<p>The same arithmetic mean masks one weak metric.</p>
+			<table class="cm-grid" aria-label="Imbalanced precision 0.90 and recall 0.10 produce arithmetic mean 0.50 but F1 only 0.18">
+				<tbody>
+					<tr><th scope="row">Precision</th><td><strong>0.90</strong></td></tr>
+					<tr><th scope="row">Recall</th><td><strong>0.10</strong></td></tr>
+					<tr><th scope="row">Arithmetic mean</th><td><strong>0.50</strong></td></tr>
+					<tr><th class="cm-selected" scope="row">F1</th><td class="cm-selected"><strong>0.18</strong></td></tr>
+				</tbody>
+			</table>
+			<p class="cm-equation">2(0.90)(0.10) / (0.90 + 0.10) = 0.18</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> both pairs average to 0.50 arithmetically, but F1 drops to 0.18 when recall is only 0.10. A high precision score cannot compensate for weak recall (and vice versa).</figcaption>
+</figure>
+
 The **F-beta** generalization weights recall $\beta^2$ times more than precision:
 
 $$
