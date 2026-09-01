@@ -12,6 +12,27 @@ category: "questions"
 
 The L4 candidate describes a draft model and verification. The L6 candidate explains *why* the verify pass costs roughly the same as a single decode step (memory bandwidth, not compute), and proves the output distribution is preserved.
 
+<!-- visual:speculative-decoding-weight-read-ledger -->
+<figure class="learning-figure" aria-labelledby="speculative-cost-title">
+<p class="visual-kicker">Learning objective</p>
+<h3 class="visual-title" id="speculative-cost-title">How can one target pass verify several drafted positions?</h3>
+<div class="visual-grid--two" role="group" aria-label="Cost comparison: ordinary low-batch decode reads the target model weights once to score one next position, while speculative verification reads the same target weights once to score K drafted positions in parallel; latency stays similar only while both operations are limited by weight bandwidth rather than compute">
+<section class="visual-panel">
+<h4>ORDINARY DECODE &#183; 1 POSITION</h4>
+<p><strong>Target-weight traffic</strong><br />Read the large model's weights from HBM once.</p>
+<p><strong>Useful target work</strong><br />Score one next-token position from the cached prefix.</p>
+<p><strong>Typical low-batch bottleneck</strong><br />Weight movement dominates; tensor-core capacity is underused.</p>
+</section>
+<section class="visual-panel">
+<h4>VERIFY &#183; <var>K</var> DRAFTED POSITIONS</h4>
+<p><strong>Target-weight traffic</strong><br />Read the same large-model weights from HBM once.</p>
+<p><strong>Useful target work</strong><br />Score the short drafted block in parallel, yielding distributions for several positions.</p>
+<p><strong>Conditional latency result</strong><br />More arithmetic, but near one decode step only while the pass remains memory-bound.</p>
+</section>
+</div>
+<figcaption><strong>Read it this way:</strong> speculative verification is not free computation. It amortizes one expensive target-weight read across several useful positions. The wall time can stay close to one target decode step while bandwidth remains the bottleneck; large <var>K</var>, batching, draft cost, and cache work can erase that advantage. Original cost ledger checked against <a href="https://arxiv.org/abs/2211.17192">Leviathan et al. (2023)</a> and <a href="https://arxiv.org/abs/2302.01318">Chen et al. (2023)</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "A small model proposes K tokens; the big model checks them in parallel. If they match, we accept; if not, we resample. This makes decoding faster."
