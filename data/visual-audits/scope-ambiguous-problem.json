@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "slug": "scope-ambiguous-problem",
+  "article": "src/content/posts/2026-04-23-scope-ambiguous-problem.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Turn an ambiguous stakeholder symptom into an explicit scope, then choose the smallest time-boxed experiment that resolves the biggest unknown before committing to v1.",
+  "mediumRationale": "A wide Mermaid decision flow is the smallest medium that turns the article's advice into a repeatable loop: reframe the symptom, bound the problem, permit a non-ML exit, isolate the dominant unknown, and route evidence to proceed, rescope, or stop.",
+  "mediumComparison": {
+    "mermaid": "Selected because the learning task is a qualitative decision process with two valid exit branches and an evidence-driven rescoping loop. Established wide flowchart primitives preserve relationship semantics and readable labels.",
+    "svg": "Rejected because there is no quantitative geometry or fixed coordinate relationship to teach; hand-positioning the same decision graph would add maintenance without improving the mental model.",
+    "semanticHtml": "Rejected because a checklist or one-pager table can inventory required fields but cannot show that the first experiment is selected from unresolved risk and can send the team backward or out of the project.",
+    "interaction": "Rejected because simulated stakeholder answers would add many arbitrary states. The invariant decision structure, not practicing a scenario, is the article's smallest useful learning objective.",
+    "paperReuse": "Rejected because the reviewed official guidance provides process principles rather than a source figure that matches this senior ML scoping loop. No external artwork, wording, coordinates, example, or layout is reused.",
+    "noVisual": "Rejected because the prose presents good questions and deliverables but leaves them as a long checklist. A flow makes the crucial ordering and exits visible: scope before solution, uncertainty test before v1, and stop as a successful outcome."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 159,
+        "insight": "The preceding RoboGoalie and HyQ slide describes completed robotics implementations without showing how their problems were framed, bounded, or selected."
+      },
+      {
+        "page": 160,
+        "insight": "The ML Design divider introduces a 35-minute interview sequence but contains no scoping guidance itself."
+      },
+      {
+        "page": 161,
+        "insight": "The ML design overview asks whether the product needs ML and covers end users, business value, objectives, metrics, data, model requirements, performance trade-offs, downstream impact, and project resources. It is the strongest deck match for turning ambiguity into requirements."
+      },
+      {
+        "page": 162,
+        "insight": "The production checklist adds customer problem, business action, ML and non-ML baselines, unique constraints, cost-benefit analysis, offline and online evaluation, success criteria, and a roadmap, but treats them as review questions rather than a convergence loop."
+      },
+      {
+        "page": 163,
+        "insight": "The content-feed example says interview prompts are deliberately vague and demonstrates clarifying scale, current metrics, intended optimization, inputs, latency, and learning cadence before high-level design and data deep-dive."
+      },
+      {
+        "page": 164,
+        "insight": "The adjacent continuation moves from algorithm selection to a testable hypothesis and offline and online experiments. It supports measurement before commitment but does not explicitly target the single riskiest assumption or allow rescope and stop outcomes."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for ambiguous, scope, stakeholder, success criteria, business problem and value, requirements, one-pager, unknown, baseline, prototype, and MVP, then directly read pages 159-164 around the only concentrated ML problem-framing sequence. Other matches concern statistical unknowns, model scope, or technical baselines. No slide supplies the article's symptom-to-outcome distinction, explicit in/out/deferred boundary, time-boxed one-pager, biggest-unknown selection, or proceed-rescope-stop loop. No deck image, wording, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "GOV.UK Service Manual: How the discovery phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works",
+        "usage": "Used as official service-design guidance to verify problem-before-solution discovery, explicit non-goals, users and constraints, success measurement, time-bounded discovery, alternatives to building, and stopping as a valid outcome.",
+        "license": "GOV.UK states that Crown copyright content is available under the Open Government Licence 3.0 unless otherwise indicated. No poster, diagram, example wording, or page layout is copied; the visual is an original synthesis with citation."
+      },
+      {
+        "title": "GOV.UK Service Manual: How the alpha phase works",
+        "url": "https://www.gov.uk/service-manual/agile-delivery/how-the-alpha-phase-works",
+        "usage": "Used as official guidance to verify testing the riskiest assumptions with prototypes only complex enough to learn, rather than building the entire service or production-quality code.",
+        "license": "GOV.UK Crown copyright content is available under the Open Government Licence 3.0 unless otherwise indicated. No source artwork or prose is adapted; only the independently stated process principle is cited."
+      },
+      {
+        "title": "Google for Developers: Understand the problem",
+        "url": "https://developers.google.com/machine-learning/problem-framing/problem",
+        "usage": "Used as official ML guidance to cross-check stating a non-ML goal first, deciding whether ML is appropriate, verifying data fitness, and comparing against a simpler heuristic or non-ML benchmark.",
+        "license": "Google Developers site content is licensed under Creative Commons Attribution 4.0 unless otherwise noted. No Google figure, table, wording, code, or visual structure is reused; the original flow cites the page as technical guidance."
+      },
+      {
+        "title": "Google for Developers: Planning an ML project",
+        "url": "https://developers.google.com/machine-learning/managing-ml-projects/planning",
+        "usage": "Used as official ML project guidance to verify time-boxing uncertain work, scoping down requirements, failing fast with low-cost experiments, updating plans as evidence arrives, and communicating uncertainty to stakeholders.",
+        "license": "Google Developers site content is licensed under Creative Commons Attribution 4.0 unless otherwise noted. The article reuses no Figure 3 data, artwork, prose, or layout; the visual is independently authored."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is that senior scoping is not a linear pre-build checklist. It is a convergence loop in which the stated symptom is reframed, a boundary is negotiated, ML can be rejected, and the dominant uncertainty determines the first experiment. The original diagram separates that learning experiment from v1 and gives evidence three honest outcomes: proceed, rescope, or stop."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, searched all 214 deck pages and inspected the exact ML design neighborhood, then checked official UK service-design and Google ML guidance before selecting an original decision loop."
+  },
+  "implementation": {
+    "visualIds": [
+      "ambiguous-problem-scope-loop"
+    ],
+    "accessibility": "The Mermaid source includes a complete accessible title and description. Every stage, decision, exit, and evidence branch is directly labelled; thick arrows emphasize the focal reasoning path while solid and dashed branches preserve meaning without color. The established wide flowchart scrolls horizontally at 390 CSS pixels so labels remain readable, shared Mermaid theme classes preserve dark-mode contrast, and print rules remove the minimum width and use a light high-contrast palette."
+  }
+}
