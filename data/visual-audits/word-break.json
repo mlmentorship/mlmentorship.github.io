@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-word-break.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A reachable string position can start any dictionary word that matches there.",
+  "learningObjective": "Only reachable boundaries may launch dictionary words; each full prefix match adds its ending boundary.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to a reachable string position can start any dictionary word that matches there.",
-    "invariant": "A reachable string position can start any dictionary word that matches there.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Forward reachability DP over string boundaries.",
+    "recognitionCue": "The string must be segmented into reusable dictionary words, so each valid prefix endpoint can seed another exact prefix match.",
+    "invariant": "Before scanning start s, reachable contains exactly the boundaries proven segmentable using dictionary words from earlier starts; only members may create new endpoints.",
+    "stateModel": "Retain the text, dictionary, set of reachable boundaries, current start, and current word check. No segmentation path is needed for a boolean answer.",
+    "visualRationale": "An indexed character strip with stable start and reachable-boundary keys shows prefix geometry, skipped starts, exact match spans, duplicate endpoints, and the missing final boundary.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A recursion tree repeats suffixes and obscures the memoized boundary state.",
+      "A boolean table without characters hides which substring starts and ends at each dependency.",
+      "Showing only \"cat\" + \"sand\" + failure skips alternative \"cats\" + \"and\" reachability and the actual loop branches."
     ],
-    "transferLesson": "Transfer the invariant: A reachable string position can start any dictionary word that matches there.",
-    "reviewStatus": "pending"
+    "transferLesson": "Treat partial solutions as reachable boundaries and propagate only from proven states; this transfers to sentence segmentation, path reachability, and parsing with reusable tokens.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

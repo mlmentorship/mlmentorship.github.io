@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-longest-increasing-subsequence.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "For each subsequence length, keep the smallest possible ending value.",
+  "learningObjective": "For every achievable length, retain the smallest ending value found so far.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to for each subsequence length, keep the smallest possible ending value.",
-    "invariant": "For each subsequence length, keep the smallest possible ending value.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Patience-sorting tails with binary search for the first tail not smaller than each value.",
+    "recognitionCue": "The problem asks only for the length of a strictly increasing subsequence in a long array, suggesting O(n log n) tail compression rather than quadratic pair DP.",
+    "invariant": "After each input prefix, smallest_end[k] is the minimum possible tail of any increasing subsequence of length k+1 in that prefix, and the tail array is increasing.",
+    "stateModel": "Retain only the sorted smallest_end array, current input value, and bisect_left slot. These tails need not form one actual subsequence, but their count equals the optimum length.",
+    "visualRationale": "Length-indexed tail slots with stable input and bisect markers show append versus replacement and why lowering a tail preserves length while increasing future options.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "Highlighting one final subsequence hides the alternative tails that justify replacements.",
+      "An O(n^2) predecessor graph depicts a different algorithm and overwhelms the invariant.",
+      "A binary-search tree obscures that bisect searches a compact sorted tail array."
     ],
-    "transferLesson": "Transfer the invariant: For each subsequence length, keep the smallest possible ending value.",
-    "reviewStatus": "pending"
+    "transferLesson": "Keep the most permissive representative for every achieved progress level; the same dominance idea prunes states in scheduling, envelopes, and frontier DP.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

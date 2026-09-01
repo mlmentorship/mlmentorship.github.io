@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-sum-of-two-integers.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "XOR supplies sum bits without carry; AND shifted left supplies the carry.",
+  "learningObjective": "XOR writes sum-without-carry bits while shifted AND carries shared 1 bits into the next pass.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to xor supplies sum bits without carry; and shifted left supplies the carry.",
-    "invariant": "XOR supplies sum bits without carry; AND shifted left supplies the carry.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Iterative binary addition: XOR for provisional sum and shifted AND for carry.",
+    "recognitionCue": "The prompt forbids arithmetic addition and subtraction but permits bitwise operators on fixed-width signed integers.",
+    "invariant": "At every loop boundary, first plus second modulo 2^32 equals the original sum; each pass moves unresolved carries left until second becomes zero.",
+    "stateModel": "Retain only two masked 32-bit words: first holds sum bits not yet combined with carry, and second holds the shifted carry. The example displays four low bits because 7+5 does not touch higher bits.",
+    "visualRationale": "Named bit-place columns with stable sum-bit and carry-bit keys make the carry move left across passes and keep all binary arithmetic readable without color.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A decimal number line uses addition geometry and hides XOR/AND behavior.",
+      "A truth table explains one bit but does not show carry propagation across repeated word-level passes.",
+      "Showing only 7 -> 12 skips the simultaneous tuple update and the termination condition."
     ],
-    "transferLesson": "Transfer the invariant: XOR supplies sum bits without carry; AND shifted left supplies the carry.",
-    "reviewStatus": "pending"
+    "transferLesson": "Separate a binary operation into local output and deferred carry state; the same decomposition underlies half/full adders, bit-mask arithmetic, and fixed-width overflow reasoning.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {

@@ -4,19 +4,20 @@
   "article": "src/content/posts/2026-09-01-coin-change.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The best way to make amount t is one coin plus the best way to make t-coin.",
+  "learningObjective": "For each amount, minimize one plus every already-solved predecessor amount.",
   "mechanismReview": {
-    "pattern": "Migrated problem-specific trace",
-    "recognitionCue": "Use this state model when the task asks you to the best way to make amount t is one coin plus the best way to make t-coin.",
-    "invariant": "The best way to make amount t is one coin plus the best way to make t-coin.",
-    "stateModel": "The visible authored frames preserve the algorithm state before and after each transition.",
-    "visualRationale": "The selected primitive exposes the values, topology, and state changes used by the algorithm.",
+    "pattern": "Bottom-up one-dimensional minimization DP over amounts.",
+    "recognitionCue": "The target can be composed repeatedly from reusable coin values and asks for a minimum count, so each total depends on smaller totals.",
+    "invariant": "When processing total t, every fewest[x] for x<t is final; after trying each valid coin, fewest[t] is the minimum candidate examined so far.",
+    "stateModel": "Retain an amount-indexed array with base fewest[0]=0, sentinel amount+1 for unreachable states, current total, current coin, and predecessor total-coin.",
+    "visualRationale": "An indexed DP row with moving current and predecessor keys directly exposes dependency direction and every improving, tying, or unreachable candidate.",
     "rejectedAlternatives": [
-      "Prose-only explanation",
-      "Generic decorative diagram"
+      "A coin combination tree repeats the same remaining amounts and hides memoized overlap.",
+      "A greedy largest-coin picture is incorrect for general denominations.",
+      "A final DP row alone omits the predecessor arithmetic that proves each cell."
     ],
-    "transferLesson": "Transfer the invariant: The best way to make amount t is one coin plus the best way to make t-coin.",
-    "reviewStatus": "pending"
+    "transferLesson": "Define the answer for one total from already-solved smaller totals and aggregate with min; this transfers to minimum steps, perfect squares, and shortest composition problems.",
+    "reviewStatus": "reviewed"
   },
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
