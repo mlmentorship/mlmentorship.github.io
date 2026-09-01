@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "slug": "robotics-policy-learning",
+  "article": "src/content/posts/2026-07-11-robotics-policy-learning.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Explain why behavior cloning's training distribution can stop matching the states its learned policy visits, and trace how DAgger uses expert labels on those visited states to reduce the mismatch.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align an expert trajectory with a policy-induced departure and then connect that departure to DAgger's collect-label-aggregate-retrain loop. Direct labels and distinct path styles make both the failure and correction visible in one scan.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic flowchart layout can show the DAgger loop but cannot reliably align the expert and learned trajectories at the exact departure state where covariate shift begins.",
+    "svg": "Selected because fixed geometry can juxtapose demonstrated states, an off-demonstration visited state, and the corrective data-aggregation loop while retaining deterministic rendering and complete text alternatives.",
+    "semanticHtml": "Rejected because cards or a table would restate the sequence but would not spatially show that one action error changes the next input distribution.",
+    "interaction": "Rejected because replaying errors over time would add controls and hidden states without improving the durable causal lesson over one fully visible static diagram.",
+    "paperReuse": "Rejected because the primary papers establish the compounding-error problem and DAgger algorithm, but no permissive figure-adaptation license was identified. No paper artwork, layout, wording, experiment, or values are reused.",
+    "noVisual": "Rejected because prose alone requires readers to mentally connect action error, policy-induced state shift, missing expert labels, and iterative recollection across different paragraphs."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 154,
+        "insight": "The reinforcement-learning divider begins the closest topical neighborhood but contains no policy-learning mechanism."
+      },
+      {
+        "page": 155,
+        "insight": "The ML-versus-RL slide notes that trajectories are not iid and that actions affect sequential samples. It is relevant context, but it does not explain expert-data covariate shift or interactive imitation learning."
+      },
+      {
+        "page": 156,
+        "insight": "The policy-optimization slide presents a CartPole REINFORCE example driven by rewards. It contains no demonstrations, expert queries, dataset aggregation, or behavior-cloning failure path."
+      },
+      {
+        "page": 157,
+        "insight": "The Past projects divider closes the general RL section."
+      },
+      {
+        "page": 158,
+        "insight": "The project slide describes a policy network trained against a localized reward, not imitation learning or a changing state distribution."
+      },
+      {
+        "page": 159,
+        "insight": "The robotics project slide describes RoboGoalie sensing and PID control plus HyQ motion planning. It supplies embodiment examples but no learned-policy trajectory, demonstrations, or DAgger mechanism."
+      },
+      {
+        "page": 160,
+        "insight": "The ML Design divider begins the next section and establishes the end of the robotics neighborhood."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol) text-indexed all 214 physical PDF pages for robot, robotics, policy, imitation, behavior cloning, DAgger, demonstration, sim-to-real, control, and reinforcement learning. Pages 154-160 are the only contiguous policy-learning and robotics neighborhood and were read in full with their boundary slides. The deck provides adjacent RL and robotics context but no visual or explanation of imitation-learning covariate shift, compounding errors, expert relabeling of learner-visited states, or dataset aggregation. No deck image, wording, code, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Efficient Reductions for Imitation Learning",
+        "url": "https://proceedings.mlr.press/v9/ross10a.html",
+        "usage": "Used as the primary source for the mismatch between iid supervised training and policy-induced test states, and for the result that errors can compound quadratically with task horizon under straightforward imitation learning.",
+        "license": "PMLR provides public access, but its proceedings page does not state a permissive license for adapting the paper's figures. No figure, prose, experiment, value, or layout is copied."
+      },
+      {
+        "title": "A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning",
+        "url": "https://proceedings.mlr.press/v15/ross11a.html",
+        "usage": "Used as the primary DAgger source: execute a mixture involving the current learner, query the expert on visited states, aggregate those labeled states, and retrain a stationary policy over iterations.",
+        "license": "PMLR public access was not treated as permission to adapt paper figures. The implementation is an original conceptual redraw and reuses no source artwork, geometry, wording, empirical result, or data."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is causal rather than taxonomic: a behavior-cloned policy chooses an action, that action determines its next observation, and a small mistake can therefore move the policy away from the expert-state distribution that supplied its labels. The original visual shows only this qualitative mechanism; it does not assign an error rate or claim every deviation is unrecoverable. Its DAgger loop preserves the paper's key ordering—visit states under the evolving policy, obtain expert actions for those states, aggregate them with prior data, and retrain—without reproducing a source figure."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-5 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, indexed the full 214-page deck and inspected its complete RL-to-robotics neighborhood, then checked the primary compounding-error and DAgger papers before selecting an original trajectory-and-correction schematic."
+  },
+  "implementation": {
+    "visualIds": [
+      "robotics-policy-dagger-recovery"
+    ],
+    "accessibility": "The SVG has a programmatic title and full description. Every state and transition is directly labeled; the expert path is solid, the learner departure is dashed, and the corrective loop uses numbered stages and arrowheads, so color is redundant. A 360-unit viewBox has no fixed or minimum width and scales within a 390 CSS-pixel viewport. Established theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  }
+}
