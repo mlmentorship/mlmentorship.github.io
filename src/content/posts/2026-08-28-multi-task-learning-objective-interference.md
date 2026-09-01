@@ -19,6 +19,8 @@ Multi-task learning trains one model on several related targets. Shared represen
 
 A sound design defines the primary outcome, masks missing labels, normalizes loss scales, checks gradient interaction, and evaluates every task separately. Architecture and loss weights should follow measured task relationships.
 
+**Learning objective:** distinguish task-gradient magnitude imbalance from directional conflict so the diagnosis, rather than equal raw loss weights, determines the intervention.
+
 ## Basic objective
 
 For tasks $t=1,\ldots,T$, a common objective is
@@ -73,6 +75,65 @@ the two gradients disagree locally. Improving one loss along its gradient can wo
 Gradient conflict is one diagnostic, not a complete explanation. Tasks may conflict only in some layers, examples, or training phases. Data imbalance, bad labels, and different convergence rates can produce similar symptoms.
 
 Track per-task validation metrics before and after adding each task.
+
+<!-- visual:multitask-gradient-diagnosis -->
+<figure class="learning-figure" aria-labelledby="multitask-gradient-title">
+	<p class="visual-kicker">Two diagnostics, two problems</p>
+	<p class="visual-title" id="multitask-gradient-title">Gradient size asks who dominates; the dot product asks whether the tasks disagree.</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of task-gradient magnitude imbalance and directional conflict">
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 330" role="img" aria-labelledby="gradient-scale-title gradient-scale-desc">
+				<title id="gradient-scale-title">Unequal but aligned task gradients</title>
+				<desc id="gradient-scale-desc">At the same shared-parameter point, task A has gradient vector four comma zero with norm four, while task B has vector one comma zero with norm one. Both point right, their dot product is positive four, and their unweighted sum is five comma zero. Task A supplies four fifths of the sum, so this is magnitude dominance without directional conflict.</desc>
+				<defs><marker id="gradient-scale-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+				<text class="viz-axis-label" x="10" y="17">CASE 1 - MAGNITUDE IMBALANCE</text>
+				<rect class="viz-plot-bg" x="8" y="28" width="284" height="205" rx="5"></rect>
+				<path d="M50 145H268M50 200V55" style="fill:none;stroke:var(--viz-edge);stroke-width:1"></path>
+				<text class="viz-edge-label" x="270" y="159">θ₁</text>
+				<text class="viz-edge-label" x="39" y="58">θ₂</text>
+				<circle cx="50" cy="145" r="4" style="fill:var(--c-text-soft)"></circle>
+				<path d="M50 145H250" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:3;marker-end:url(#gradient-scale-arrow)"></path>
+				<path d="M50 145H100" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:4;stroke-dasharray:5 3;marker-end:url(#gradient-scale-arrow)"></path>
+				<path d="M250 137V153M242 145H258" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<rect x="96" y="141" width="8" height="8" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></rect>
+				<text class="viz-callout" x="190" y="116" text-anchor="middle">g_A = (4, 0), ‖g_A‖ = 4</text>
+				<text class="viz-callout" x="103" y="178" text-anchor="middle">g_B = (1, 0), ‖g_B‖ = 1</text>
+				<text class="viz-axis-label" x="150" y="220" text-anchor="middle">SAME DIRECTION - DIFFERENT LENGTH</text>
+				<rect class="viz-node viz-node--output" x="18" y="247" width="264" height="67" rx="4"></rect>
+				<text class="viz-callout" x="150" y="268" text-anchor="middle">g_A · g_B = 4 &gt; 0 (aligned)</text>
+				<text class="viz-callout" x="150" y="288" text-anchor="middle">g_A + g_B = (5, 0); A supplies 80%</text>
+				<text class="viz-axis-label" x="150" y="306" text-anchor="middle">DIAGNOSIS: SCALE ISSUE, NOT CONFLICT</text>
+			</svg>
+		</section>
+		<section class="visual-panel plot-panel">
+			<svg viewBox="0 0 300 330" role="img" aria-labelledby="gradient-conflict-title gradient-conflict-desc">
+				<title id="gradient-conflict-title">Equal-sized but conflicting task gradients</title>
+				<desc id="gradient-conflict-desc">At the same shared-parameter point, task A has gradient three comma one and task B has gradient negative three comma one. Both norms equal square root of ten, but their dot product is negative eight. Their horizontal components cancel, producing a sum of zero comma two. Equalizing gradient norms cannot remove this directional conflict.</desc>
+				<defs><marker id="gradient-conflict-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
+				<text class="viz-axis-label" x="10" y="17">CASE 2 - DIRECTIONAL CONFLICT</text>
+				<rect class="viz-plot-bg" x="8" y="28" width="284" height="205" rx="5"></rect>
+				<path d="M28 175H272M150 213V48" style="fill:none;stroke:var(--viz-edge);stroke-width:1"></path>
+				<text class="viz-edge-label" x="274" y="189">θ₁</text>
+				<text class="viz-edge-label" x="139" y="51">θ₂</text>
+				<circle cx="150" cy="175" r="4" style="fill:var(--c-text-soft)"></circle>
+				<path d="M150 175L240 145" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:3;marker-end:url(#gradient-conflict-arrow)"></path>
+				<path d="M150 175L60 145" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-dasharray:6 3;marker-end:url(#gradient-conflict-arrow)"></path>
+				<path d="M150 175V115" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:4;marker-end:url(#gradient-conflict-arrow)"></path>
+				<path d="M240 137V153M232 145H248" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
+				<rect x="56" y="141" width="8" height="8" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:2"></rect>
+				<text class="viz-callout" x="224" y="128" text-anchor="middle">g_A = (3, 1)</text>
+				<text class="viz-callout" x="76" y="128" text-anchor="middle">g_B = (-3, 1)</text>
+				<text class="viz-callout" x="150" y="94" text-anchor="middle">sum = (0, 2)</text>
+				<text class="viz-axis-label" x="150" y="220" text-anchor="middle">EQUAL LENGTH - OPPOSING COMPONENTS</text>
+				<rect class="viz-node" x="18" y="247" width="264" height="67" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2"></rect>
+				<text class="viz-callout" x="150" y="268" text-anchor="middle">‖g_A‖ = ‖g_B‖ = √10</text>
+				<text class="viz-callout" x="150" y="288" text-anchor="middle">g_A · g_B = -8 &lt; 0 (conflict)</text>
+				<text class="viz-axis-label" x="150" y="306" text-anchor="middle">DIAGNOSIS: DIRECTION ISSUE, NOT SCALE</text>
+			</svg>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> compare lengths first, then angles. On the left, task A dominates the unweighted sum, but both gradients favor the same local direction; normalize or reweight only if that dominance is unintended. On the right, the norms are already equal, yet the negative dot product means a step down one task's gradient raises the other loss to first order. Norm balancing alone cannot remove that conflict: evaluate task outcomes, then consider less sharing or a conflict-aware method. The exact toy vectors and drawing are original, informed by <a href="https://proceedings.mlr.press/v80/chen18a.html">GradNorm</a> and <a href="https://arxiv.org/abs/2001.06782">PCGrad</a>.</figcaption>
+</figure>
 
 ## Loss balancing
 
