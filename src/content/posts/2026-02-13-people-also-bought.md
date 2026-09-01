@@ -21,6 +21,37 @@ Three distinct signals, often confused:
 
 The product question: which one should the shelf optimize for? On a product page, you usually want *complementary* recommendations (you've already decided on this printer; what else might you need?), not substitutes (which would distract from the purchase). So co-purchase, not co-view, not item similarity.
 
+<!-- visual:people-also-bought-three-relations -->
+<figure class="learning-figure" aria-labelledby="people-also-bought-relations-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="people-also-bought-relations-title">For one anchor product, which meaning of “related” serves a complementary shelf?</p>
+	<div class="visual-grid--two" role="group" aria-label="Comparison of an anchor printer and the candidates produced by co-purchase, co-view, and attribute-similarity evidence">
+		<section class="visual-panel">
+			<h4>ANCHOR · PRINTER</h4>
+			<p><strong>Product-page intent</strong><br />The shopper is close to choosing this item. Help complete the job rather than restart the comparison.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>1 · CO-PURCHASE → INK</h4>
+			<p><strong>Evidence</strong><br />The printer and ink appear in the same orders or purchase sessions.</p>
+			<p><strong>Relationship</strong><br />Complement: bought in addition to the anchor.</p>
+			<p><strong>Best use</strong><br />Primary signal for the “people also bought” shelf.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>2 · CO-VIEW → ANOTHER PRINTER</h4>
+			<p><strong>Evidence</strong><br />Shoppers inspect both products while comparing options.</p>
+			<p><strong>Relationship</strong><br />Often a substitute: chosen instead of the anchor.</p>
+			<p><strong>Best use</strong><br />Comparison or discovery surfaces.</p>
+		</section>
+		<section class="visual-panel">
+			<h4>3 · ATTRIBUTE SIMILARITY → SIMILAR PRINTER</h4>
+			<p><strong>Evidence</strong><br />Features or embeddings place the products near each other.</p>
+			<p><strong>Relationship</strong><br />Feature-level similarity, without requiring co-behavior.</p>
+			<p><strong>Best use</strong><br />Cold-item fallback, not proof of complementarity.</p>
+		</section>
+	</div>
+	<figcaption><strong>Read it this way:</strong> hold the anchor printer fixed, then read what changes in each card: evidence, candidate, and product purpose. Same-order behavior points toward the complementary ink, while co-view and attribute similarity tend to return alternative printers. Choose co-purchase for this shelf because its relation matches the post-decision cross-sell objective; keep similarity as a cold-item fallback. Original schematic checked against <a href="https://doi.org/10.1109/MIC.2003.1167344">Linden et al.'s item-to-item method</a> and <a href="https://doi.org/10.1145/2783258.2783381">McAuley et al.'s complement-versus-substitute distinction</a>.</figcaption>
+</figure>
+
 ## What an L5 answer sounds like
 
 > "I'd build it as a candidate-generation + ranking system optimized for co-purchase:
