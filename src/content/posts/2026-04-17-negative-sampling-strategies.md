@@ -18,6 +18,28 @@ In contrastive training (two-tower retrieval, embedding learning), the model see
 
 Random negatives are easy to push apart; the model trivially scores them low and learns little. Hard negatives, ones that look like positives but aren't, force the model to learn fine-grained distinctions.
 
+<!-- visual:negative-hardness-label-gate -->
+<figure class="learning-figure plot-panel" aria-labelledby="negative-gate-visual-title">
+	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-title" id="negative-gate-visual-title">Separate “hard for the model” from “safe to label negative.”</p>
+	<svg viewBox="0 0 360 460" role="img" aria-labelledby="negative-gate-svg-title negative-gate-svg-desc">
+		<title id="negative-gate-svg-title">Three negative candidates with different hardness and label validity</title>
+		<desc id="negative-gate-svg-desc">For the query capital of Australia, a random passage about photosynthesis has low model similarity and is a verified nonmatch, so pushing its score down is correct but gives a weak gradient. A mined passage saying Sydney is Australia's largest city has high similarity but does not answer the query, so pushing it down gives a useful strong gradient. A mined passage saying Canberra is Australia's capital has the highest similarity and is actually relevant despite lacking a label. Treating it as negative would push a valid answer down, so it must be excluded or reviewed. The diagram concludes that mining selects by model confusion while a separate relevance gate authorizes the negative label.</desc>
+		<text class="viz-axis-label" x="10" y="20">QUERY</text>
+		<rect class="viz-node viz-node--input" x="10" y="30" width="340" height="42" rx="4"></rect><text class="viz-callout" x="180" y="49" text-anchor="middle">“What is the capital of Australia?”</text><text class="viz-label" x="180" y="64" text-anchor="middle">known positive: Canberra</text>
+		<text class="viz-axis-label" x="10" y="98">CANDIDATE SOURCE + PASSAGE</text><text class="viz-axis-label" x="350" y="98" text-anchor="end">TRAINING DECISION</text>
+		<rect class="viz-node" x="10" y="110" width="340" height="82" rx="4"></rect>
+		<text class="viz-callout" x="22" y="130">RANDOM · LOW SIMILARITY</text><text class="viz-label" x="22" y="148">“Photosynthesis converts sunlight…”</text><text class="viz-node-value" x="104" y="170">VERIFIED NONMATCH ✓</text><text class="viz-callout" x="338" y="159" text-anchor="end">PUSH DOWN</text><text class="viz-label" x="338" y="177" text-anchor="end">correct · weak signal</text>
+		<rect class="viz-node viz-node--focus" x="10" y="204" width="340" height="92" rx="4"></rect>
+		<text class="viz-callout" x="22" y="224">BM25 / MODEL-MINED · HIGH SIMILARITY</text><text class="viz-label" x="22" y="242">“Australia's largest city is Sydney…”</text><text class="viz-node-value" x="104" y="266">VERIFIED NONMATCH ✓</text><text class="viz-callout" x="338" y="253" text-anchor="end">PUSH DOWN</text><text class="viz-label" x="338" y="271" text-anchor="end">correct · strong signal</text><text class="viz-label" x="180" y="288" text-anchor="middle">useful hard negative: plausible, but does not answer</text>
+		<rect x="10" y="308" width="340" height="100" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></rect>
+		<text class="viz-callout" x="22" y="328">MINED · HIGHEST SIMILARITY</text><text class="viz-label" x="22" y="346">“Canberra is Australia's capital…”</text><text class="viz-node-value" x="118" y="370">UNLABELED, ACTUALLY RELEVANT ✕</text><text class="viz-callout" x="338" y="357" text-anchor="end">DO NOT PUSH</text><text class="viz-label" x="338" y="375" text-anchor="end">exclude or review</text><text class="viz-label" x="180" y="398" text-anchor="middle">false negative: hardness came from being a valid answer</text>
+		<path d="M180 410V424" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path><path class="viz-arrow-forward" d="M180 432 l-5 -9 h10 Z"></path>
+		<rect class="viz-node" x="10" y="434" width="340" height="22" rx="4"></rect><text class="viz-node-value" x="180" y="449">MINE BY CONFUSION · LABEL BY RELEVANCE</text>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> compare the last two rows. Both rank near the query, so both are hard for the current model; only the Sydney passage is known not to answer it. Pushing that verified nonmatch down teaches a fine distinction. Pushing the unlabeled Canberra passage down teaches the opposite of the task. Mine by similarity, then use labels, answer checks, or a stronger teacher to filter before assigning the negative gradient. Original schematic checked against <a href="https://aclanthology.org/2020.emnlp-main.550/">Dense Passage Retrieval</a>, <a href="https://aclanthology.org/2021.naacl-main.466/">RocketQA</a>, and the <a href="https://www.sbert.net/examples/sentence_transformer/training/ms_marco/README.html">Sentence Transformers MS MARCO training guide</a>.</figcaption>
+</figure>
+
 ## What an L4 answer sounds like
 
 > "Sample random items from the corpus as negatives."

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "slug": "model-interpretability",
+  "article": "src/content/posts/2026-05-31-model-interpretability.md",
+  "status": "implemented",
+  "medium": "svg",
+  "learningObjective": "Trace one feature through every ordering in a three-feature model and recognize that its SHAP value averages context-dependent marginal contributions rather than using one leave-one-feature-out difference.",
+  "mediumRationale": "A compact deterministic SVG is the smallest medium that can align all six orderings, keep the focal feature fixed conceptually while its predecessor coalition changes spatially, and connect each ordering to the corresponding marginal difference. The static vector treatment makes the combinatorial averaging visible without controls or runtime behavior.",
+  "mediumComparison": {
+    "mermaid": "Rejected because automatic graph layout would obscure the deliberate row alignment between each permutation, predecessor set, and marginal expression; this is a finite combinatorial comparison rather than a flow graph.",
+    "svg": "Selected for deterministic alignment of all 3! orders, direct labels, responsive scaling, accessible text alternatives, theme-token colors, and print-safe vector output.",
+    "semanticHtml": "Rejected because a table could enumerate the permutations but would not as clearly expose how the focal feature moves through each ordering while the coalition before it changes.",
+    "interaction": "Rejected because choosing a focal feature or adding permutations dynamically would add controls to a complete six-row example without improving the single averaging lesson.",
+    "paperReuse": "Rejected because the primary paper and official tutorial contain source-specific figures whose reuse permission was not established. No source figure, data, wording, example, or layout is copied; the shipped three-feature permutation schematic is original.",
+    "noVisual": "Rejected because the equation states the weighted subset sum but leaves readers to mentally translate subset weights into fair averaging over feature orders, the exact distinction that separates SHAP from one with-versus-without comparison."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 152,
+        "insight": "The Model Interpretability section divider contains only the topic title and no mechanism or reusable explanatory figure."
+      },
+      {
+        "page": 153,
+        "insight": "The Explainability slide describes feature importance and SHAP, but its code replaces each feature with its background mean once and calls that single prediction difference a SHAP value. That is leave-one-feature-out attribution, not the Shapley average across predecessor coalitions, so neither the code nor its implied mental model is reused."
+      },
+      {
+        "page": 154,
+        "insight": "The neighboring slide starts the Reinforcement Learning section and confirms that the interpretability section ends after page 153."
+      }
+    ],
+    "notes": "All 214 pages of the local PDF were text-indexed page by page for interpretability, explainability, feature importance, SHAP, Shapley, LIME, saliency, and Grad-CAM terms. Pages 148-155 were inspected as the full neighboring sequence: pages 148-151 cover CNNs, Faster R-CNN, GANs, and stable diffusion; page 152 is the interpretability divider; page 153 is the only substantive explainability slide; and pages 154-155 begin reinforcement learning. The page 153 prose correctly motivates contributions across added or removed features, but its illustrative code does not average marginal contributions over coalitions. The article visual therefore corrects rather than reproduces the slide, and no deck artwork, wording, code, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "A Unified Approach to Interpreting Model Predictions",
+        "url": "https://arxiv.org/abs/1705.07874",
+        "usage": "Used as the primary SHAP source for additive feature attributions, the weighted marginal-contribution formula, local accuracy, missingness, consistency, and the relationship between SHAP and model-specific or model-agnostic approximations.",
+        "license": "The arXiv record provides access but does not establish a permissive license for third-party figure reuse. No paper figure, data, example, wording, or geometry is reproduced; the visual is an independently authored three-feature permutation construction."
+      },
+      {
+        "title": "An introduction to explainable AI with Shapley values",
+        "url": "https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html",
+        "usage": "Used as official SHAP project documentation to verify the feature-as-player interpretation, coalition-conditioned model evaluation, and additive identity from the expected model output to the prediction.",
+        "license": "No tutorial prose, code, dataset, plot, or image is copied. The documentation is used to verify semantics only, so its image-reuse terms are not relied upon."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access to an arXiv submission does not itself grant figure-reuse permission and that reuse rights depend on the license selected for the individual submission.",
+        "license": "The official licensing guidance is cited only to document the conservative reuse decision. No policy text or artwork is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why a SHAP attribution cannot be obtained from one feature-removal comparison. A feature's marginal contribution can change with the coalition already present, so the Shapley value averages its contribution over every possible ordering, equivalently weighting every predecessor subset by the number of orders that produce it. The original SVG enumerates the six orders for three abstract features, labels the coalition before B and its exact marginal expression in each row, then states both the averaging step and local-accuracy sum. It is qualitative and contains no empirical values or causal claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-08-31",
+    "summary": "Read the complete article, text-indexed all 214 source-deck pages and inspected pages 148-155 plus rendered pages 152-153, then checked the primary SHAP paper, official SHAP documentation, and arXiv licensing guidance before selecting an original all-orderings SVG."
+  },
+  "implementation": {
+    "visualIds": [
+      "shap-all-orderings-credit"
+    ],
+    "accessibility": "The SVG has a linked title and detailed description that enumerate the six-order logic, averaging step, and local-accuracy identity. Every ordering, predecessor coalition, and marginal expression is directly labelled; B is repeated as text and distinguished by an outlined focus node, so no meaning depends on color. The compact 360-pixel viewBox has no minimum width and scales within a 390 CSS-pixel viewport. Established visual classes and theme variables supply dark-mode contrast, while shared print rules provide a high-contrast light palette and prevent figure splitting."
+  }
+}
