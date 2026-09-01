@@ -40,7 +40,7 @@ with finite width $N$ such that $\sup_{x \in K} |g(x) - f(x)| < \varepsilon$, wh
 		<title id="uat-error-band-svg-title">A network approximation stays inside a uniform error band only on a compact domain</title>
 		<desc id="uat-error-band-svg-desc">On the compact interval K from a to b, a solid piecewise-linear target function is surrounded by a shaded tolerance band extending twelve drawing units above and below it. A dashed piecewise-linear network approximation stays inside the band. Its vertical error at every point is at most six units, so the maximum error is below epsilon. Below the plot, one box states what the theorem provides: some finite width and weights exist. A second box states what it does not provide: a small width, weights found by SGD, generalization from samples, or behavior outside K.</desc>
 		<rect class="viz-plot-bg" x="8" y="30" width="344" height="246" rx="5"></rect>
-		<text class="viz-axis-label" x="14" y="18">ON K, THE APPROXIMATION MUST STAY INSIDE THE ε BAND EVERYWHERE</text>
+		<text class="viz-axis-label" x="14" y="18">ON COMPACT K: UNIFORM ERROR &lt; ε</text>
 		<path d="M35 118L70 63L105 43L140 118L175 173L210 193L245 118L280 63L325 118L325 142L280 87L245 142L210 217L175 197L140 142L105 67L70 87L35 142Z" style="fill:var(--viz-focus-bg);stroke:none"></path>
 		<path d="M35 130L70 75L105 55L140 130L175 185L210 205L245 130L280 75L325 130" class="viz-roc-curve"></path>
 		<path d="M35 126L70 81L105 61L140 124L175 179L210 199L245 136L280 69L325 124" class="viz-pr-curve" stroke-dasharray="7 5"></path>
