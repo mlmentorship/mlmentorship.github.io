@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "slug": "walk-through-speculative-decoding",
+  "article": "src/content/posts/2026-05-04-walk-through-speculative-decoding.md",
+  "status": "implemented",
+  "medium": "semantic-html",
+  "learningObjective": "Explain why one target-model pass can verify several drafted positions at near the latency of one decode step when target inference is limited by reading weights rather than arithmetic.",
+  "mediumRationale": "A paired semantic cost ledger is the smallest medium that can hold the target weight traffic constant while contrasting one-token decode with K-position verification, without duplicating the existing first-rejection token trace.",
+  "mediumComparison": {
+    "mermaid": "Rejected because a process flow would repeat the draft-and-verify algorithm already visualized in the linked concept article and would not make constant weight traffic versus increasing arithmetic directly comparable.",
+    "svg": "Rejected because the lesson needs aligned qualitative cost accounting rather than proportional geometry; semantic text wraps more reliably at 390 CSS pixels and avoids implying universal timing ratios.",
+    "semanticHtml": "Selected because two responsive panels can compare identical target-weight reads, different useful token work, and the condition under which latency remains similar using direct labels and ordinary reading order.",
+    "interaction": "Rejected because a K or hardware sweep would require measured bandwidth, batch size, kernels, cache behavior, and draft cost not supplied by the article; invented timings would weaken the conditional claim.",
+    "paperReuse": "Rejected because the foundational papers contain algorithm and performance figures, but the learning objective needs an original qualitative cost ledger and public arXiv access is not treated as figure-adaptation permission.",
+    "noVisual": "Rejected because the phrase 'essentially free' is easy to misread as zero computation. Readers need to see that target weight traffic stays roughly fixed while useful arithmetic increases, and that the argument applies only while the pass remains memory-bound."
+  },
+  "deckReview": {
+    "pages": [
+      {
+        "page": 108,
+        "insight": "The compute-optimization setup defines memory-bound execution through arithmetic intensity and the gap between HBM bandwidth and tensor-core throughput, supplying the hardware premise."
+      },
+      {
+        "page": 112,
+        "insight": "The preceding slide covers sparse, low-rank, and dilated attention; it changes long-context attention math rather than decode-time weight amortization."
+      },
+      {
+        "page": 113,
+        "insight": "The speculative-decoding slide states that single-token target passes are memory-bound and that one parallel K-token target pass reuses the same weight loading, but presents the cost argument only in prose."
+      },
+      {
+        "page": 114,
+        "insight": "The following mixed-precision slide explains that fewer bytes can accelerate memory-bound operations, reinforcing bandwidth sensitivity but changing representation size rather than tokens per weight read."
+      },
+      {
+        "page": 115,
+        "insight": "The training-and-serving summary identifies speculative decoding as the remedy for autoregressive serial dependence and distinguishes it from quantization, paging, and continuous batching."
+      }
+    ],
+    "notes": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol) text-indexed all 214 PDF pages for speculative decoding, speculative sampling, draft model, verification, rejection sampling, memory-bound decoding, HBM, and candidate tokens. Pages 107-115 were extracted and read as the complete compute-optimization neighborhood. Pages 109-111 cover packing, FlashAttention, and sparse attention; page 112 closes those alternatives before the direct treatment on page 113. The deck contains no visual cost ledger comparing one-token decode with K-position verification. It provides no explicit artwork-reuse license, so no deck image, wording, value, or layout is reused."
+  },
+  "sourceReview": {
+    "sources": [
+      {
+        "title": "Fast Inference from Transformers via Speculative Decoding",
+        "url": "https://arxiv.org/abs/2211.17192",
+        "usage": "Used as a foundational paper for autoregressive drafting, parallel target evaluation, the exact modified rejection-sampling construction, the bonus target token, and the premise that parallel scoring can have latency comparable to one target step.",
+        "license": "The arXiv record is publicly accessible, but no permissive third-party figure-reuse grant was relied upon. No figure, prose, pseudocode, benchmark, or layout is copied."
+      },
+      {
+        "title": "Accelerating Large Language Model Decoding with Speculative Sampling",
+        "url": "https://arxiv.org/abs/2302.01318",
+        "usage": "Used as an independent foundational source to verify exact target-distribution sampling and the systems rationale that memory bandwidth and parameter reads dominate low-batch autoregressive decoding.",
+        "license": "Public arXiv access is not treated as permission to adapt paper figures. No artwork, wording, empirical value, algorithm formatting, or visual arrangement is reused."
+      },
+      {
+        "title": "Looking back at speculative decoding",
+        "url": "https://research.google/blog/looking-back-at-speculative-decoding/",
+        "usage": "Used as first-party retrospective context for the method's practical motivation and evolution, while keeping the implemented lesson limited to the conditional weight-bandwidth cost model.",
+        "license": "No Google Research image, animation, prose, measurement, or page layout is copied. The cost ledger is independently authored."
+      },
+      {
+        "title": "arXiv License Information",
+        "url": "https://info.arxiv.org/help/license/index.html",
+        "usage": "Used to verify that free access and download do not themselves grant permission to adapt figures from the foundational papers.",
+        "license": "The policy is cited only to document the conservative licensing decision. No policy wording, icon, or layout is reproduced."
+      }
+    ],
+    "notes": "The hardest prose-only mental model is why parallel verification is cheap without being computationally free. In low-batch decode, the target must stream its weights from HBM to produce one next-token distribution, while matrix-vector work may leave compute units underused. Scoring a short drafted block still reads the target weights once but performs useful work for multiple positions, raising arithmetic intensity. Latency can therefore remain near one target step only while the larger operation still fits the bandwidth-bound regime; draft generation, acceptance handling, cache management, and eventual compute saturation remain real costs. The original ledger makes no universal speed or hardware claim."
+  },
+  "agentReview": {
+    "reviewer": "GitHub Copilot CLI agent-2 (GPT-5.6 Sol)",
+    "reviewedAt": "2026-09-01",
+    "summary": "Read the complete interview article and existing concept treatment, text-indexed all 214 deck pages and inspected the full compute-optimization neighborhood, then checked both foundational papers, first-party retrospective context, and explicit licensing guidance before selecting an original conditional cost ledger."
+  },
+  "implementation": {
+    "visualIds": [
+      "speculative-decoding-weight-read-ledger"
+    ],
+    "accessibility": "The figure uses two semantic sections with direct headings and text for weight traffic, useful target work, bottleneck, and latency. Repeated 'one target-weight read' labels and explicit conditional language carry the comparison without color. Existing two-panel styles stack below 640 CSS pixels and permit normal wrapping at a 390-pixel viewport; established theme variables support dark mode, and shared print rules force a light high-contrast palette with page-break protection."
+  }
+}
