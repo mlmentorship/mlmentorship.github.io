@@ -97,8 +97,8 @@ const fullContentLabel: Record<Category, string> = {
   questions: 'Full interview answer',
   guides: 'Full guide',
 };
-const chapterReviewHref = libraryLocation
-  ? `/library/${libraryLocation.volume.id}/${libraryLocation.chapter.id}/review/#${slug}`
+const visualReviewHref = libraryLocation
+  ? `/review/#${slug}`
   : undefined;
 ---
 <BaseLayout
@@ -152,19 +152,24 @@ const chapterReviewHref = libraryLocation
       </header>
 
       {visualAudit && (
-        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-pagefind-ignore="all">
-          <VisualReviewCard
-            id="quick-review"
-            eyebrow={quickReviewLabel[category]}
-            summary={visualAudit.learningObjective || description}
-            loading
-          >
-            <span slot="status">Visual first · depth when needed</span>
-            <a slot="actions" href="#full-explanation">{fullContentLabel[category]} ↓</a>
-            {chapterReviewHref && <a slot="actions" href={chapterReviewHref}>Review this chapter →</a>}
-          </VisualReviewCard>
-          <noscript><style is:inline>[data-article-quick-review] { display: none !important; }</style></noscript>
-        </div>
+        <>
+          <nav class="reading-modes" aria-label="Reading mode" data-reading-modes data-pagefind-ignore="all">
+            <span>Reading mode</span>
+            {visualReviewHref && <a href={visualReviewHref}><strong>Visual review</strong><small>Continue through the library</small></a>}
+            <a href="#full-explanation" aria-current="page"><strong>Full lesson</strong><small>Visual plus complete explanation</small></a>
+          </nav>
+          <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-pagefind-ignore="all">
+            <VisualReviewCard
+              id="quick-review"
+              eyebrow={quickReviewLabel[category]}
+              summary={visualAudit.learningObjective || description}
+              loading
+            >
+              <span slot="status">Visual first · depth when needed</span>
+            </VisualReviewCard>
+            <noscript><style is:inline>[data-article-quick-review] { display: none !important; }</style></noscript>
+          </div>
+        </>
       )}
 
       {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
@@ -310,6 +315,26 @@ const chapterReviewHref = libraryLocation
   }
   .dot { margin: 0 .28rem; opacity: .55; }
 
+  .reading-modes {
+    display: grid;
+    grid-template-columns: auto repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    max-width: var(--measure);
+    margin: 1rem auto .7rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius);
+    background: var(--c-surface);
+    font-family: var(--font-ui);
+  }
+  .reading-modes > span { align-self: center; padding: .55rem .7rem; color: var(--c-muted); font-size: .62rem; text-transform: uppercase; }
+  .reading-modes a { display: grid; align-content: center; min-width: 0; padding: .5rem .7rem; border-left: 1px solid var(--c-rule); color: var(--c-text-soft); text-decoration: none; }
+  .reading-modes a:hover { background: var(--c-bg-tint); color: var(--c-accent); }
+  .reading-modes a[aria-current='page'] { background: var(--c-accent-soft); color: var(--c-text); }
+  .reading-modes strong,
+  .reading-modes small { display: block; }
+  .reading-modes strong { font-size: .72rem; }
+  .reading-modes small { margin-top: .08rem; overflow: hidden; color: var(--c-muted); font-size: .58rem; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+
   .docs-body {
     font-family: var(--font-reading);
     font-size: 1rem;
@@ -442,6 +467,12 @@ const chapterReviewHref = libraryLocation
     }
     .journey-links { grid-template-columns: 1fr; }
     .journey-link--next { text-align: left; }
+  }
+  @media (max-width: 520px) {
+    .reading-modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .reading-modes > span { grid-column: 1 / -1; padding: .35rem .55rem; border-bottom: 1px solid var(--c-rule); }
+    .reading-modes a:first-of-type { border-left: 0; }
+    .reading-modes small { white-space: normal; }
   }
   @media (min-width: 861px) {
     .breadcrumbs { display: none; }

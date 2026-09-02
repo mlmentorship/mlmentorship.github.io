@@ -203,6 +203,7 @@ const snapshotBody = `
 		activeFrame: Number(visual.dataset.activeFrame),
 		activeKey: activeFrame.dataset.frameKey,
 		frameCount: visual.querySelectorAll('[data-coding-frame]').length,
+		frameHeight: activeFrame.getBoundingClientRect().height,
 		controlsTop: visual.querySelector('[data-coding-controls]').getBoundingClientRect().top,
 		scrollY: window.scrollY,
 		enhanced: visual.dataset.codingEnhanced,
@@ -258,6 +259,7 @@ try {
 				${snapshotBody}
 			})()`, true);
 			assert.equal(transition.activeFrame, frameIndex, `${route.slug}: Next skipped to frame ${transition.activeFrame}`);
+			assert.ok(Math.abs(transition.frameHeight - initial.frameHeight) < 0.5, `${route.slug}: frame stage changed height`);
 			assert.ok(Math.abs(transition.controlsTop - initial.controlsTop) < 0.5, `${route.slug}: controls moved while advancing frames`);
 			assert.equal(transition.scrollY, initial.scrollY, `${route.slug}: page scrolled while advancing frames`);
 			const difference = trackedDifference(previous, transition);

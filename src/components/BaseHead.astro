@@ -27,6 +27,7 @@ const {
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(image, Astro.site).toString();
 const fullTitle = title === SITE.title ? title : `${title} · ${SITE.title}`;
+const copyrightNotice = `Copyright © ${new Date().getFullYear()} ${SITE.author}. All rights reserved.`;
 ---
 
 <meta charset="utf-8" />
@@ -36,6 +37,7 @@ const fullTitle = title === SITE.title ? title : `${title} · ${SITE.title}`;
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <meta name="author" content={SITE.author} />
+<meta name="copyright" content={copyrightNotice} />
 {noindex && <meta name="robots" content="noindex,follow" />}
 <link rel="canonical" href={canonicalURL} />
 

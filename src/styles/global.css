@@ -451,6 +451,7 @@ mark {
   min-width: 0;
 }
 .coding-trace {
+  position: relative;
   display: grid;
   gap: .7rem;
   min-width: 0;
@@ -459,6 +460,16 @@ mark {
 .coding-trace-controls[hidden],
 .coding-trace-timeline[hidden] { display: none; }
 .coding-trace-frame { min-width: 0; }
+.coding-visual.is-enhanced .coding-trace-frame { min-height: var(--coding-frame-height, auto); }
+.coding-trace-frame-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
 .coding-trace-frame-heading {
   display: grid;
   gap: .22rem;
@@ -1410,6 +1421,7 @@ mark {
 }
 
 @media print {
+  .coding-visual.is-enhanced .coding-trace-frame { min-height: 0; }
   .mermaid,
   .learning-figure {
     --c-text: #18181b;

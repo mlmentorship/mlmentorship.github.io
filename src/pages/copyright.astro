@@ -1,0 +1,47 @@
+---
+import DocsIndexLayout from '../layouts/DocsIndexLayout.astro';
+import { SITE } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<DocsIndexLayout
+  title="Copyright and use"
+  description={`Copyright terms for ${SITE.title} content, visualizations, and site-specific software.`}
+>
+  <header class="copyright-head">
+    <p>Copyright and use</p>
+    <h1>© {year} {SITE.author}. All rights reserved.</h1>
+    <p>The original writing, editorial structure, illustrations, visualizations, and site-specific software published by mlmentorship are proprietary.</p>
+  </header>
+
+  <section>
+    <h2>What you may do</h2>
+    <p>You may read the public website for personal use, link to its public pages, and use brief quotations where permitted by applicable law.</p>
+  </section>
+
+  <section>
+    <h2>What requires permission</h2>
+    <p>Copying, republishing, adapting, redistributing, selling, or creating derivative works from original mlmentorship material requires prior written permission from {SITE.author}.</p>
+  </section>
+
+  <section>
+    <h2>Third-party material</h2>
+    <p>Software dependencies, cited publications, trademarks, and other third-party material remain subject to their respective licenses and rights. The repository preserves applicable notices separately.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>For permissions or licensing questions, email <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+  </section>
+</DocsIndexLayout>
+
+<style>
+  .copyright-head { margin-bottom: 2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--c-rule); }
+  .copyright-head > p:first-child { margin: 0 0 .5rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; font-weight: 700; text-transform: uppercase; }
+  .copyright-head h1 { margin: 0 0 .6rem; font-size: clamp(1.8rem, 4vw, 2.35rem); }
+  .copyright-head > p:last-child { max-width: 40rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); line-height: 1.55; }
+  section { margin-top: 1.7rem; }
+  section h2 { margin: 0 0 .35rem; font-size: 1rem; }
+  section p { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); line-height: 1.65; }
+</style>

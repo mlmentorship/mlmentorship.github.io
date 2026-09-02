@@ -1,4 +1,5 @@
 const activeTimers = new Set<number>();
+const activeObservers = new Map<ResizeObserver, Element>();
 let lifecycleBound = false;
 
 function stopTimer(timer: number | undefined): void {
@@ -13,7 +14,37 @@ function bindLifecycle(): void {
   document.addEventListener('astro:before-preparation', () => {
     for (const timer of activeTimers) window.clearInterval(timer);
     activeTimers.clear();
+    for (const observer of activeObservers.keys()) observer.disconnect();
+    activeObservers.clear();
   });
+}
+
+function pruneDetachedObservers(): void {
+  for (const [observer, element] of activeObservers) {
+    if (element.isConnected) continue;
+    observer.disconnect();
+    activeObservers.delete(observer);
+  }
+}
+
+function reserveLargestFrame(trace: HTMLElement, frames: HTMLElement[]): void {
+  const width = trace.getBoundingClientRect().width;
+  if (width <= 0) return;
+  trace.style.removeProperty('--coding-frame-height');
+  const measure = document.createElement('div');
+  measure.className = 'coding-trace-frame-measure';
+  measure.setAttribute('aria-hidden', 'true');
+  trace.append(measure);
+  let largestHeight = 0;
+  for (const frame of frames) {
+    const clone = frame.cloneNode(true) as HTMLElement;
+    clone.hidden = false;
+    clone.removeAttribute('aria-current');
+    measure.replaceChildren(clone);
+    largestHeight = Math.max(largestHeight, clone.getBoundingClientRect().height);
+  }
+  measure.remove();
+  trace.style.setProperty('--coding-frame-height', `${Math.ceil(largestHeight)}px`);
 }
 
 function setFrame(
@@ -74,6 +105,7 @@ function setFrame(
 
 export function enhanceCodingVisuals(root: ParentNode = document): void {
   bindLifecycle();
+  pruneDetachedObservers();
   const candidates: HTMLElement[] = [];
   if (root instanceof HTMLElement && root.matches('[data-coding-visual]')) candidates.push(root);
   candidates.push(...root.querySelectorAll<HTMLElement>('[data-coding-visual]'));
@@ -88,9 +120,10 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
     const next = visual.querySelector<HTMLButtonElement>('[data-coding-next]');
     const status = visual.querySelector<HTMLElement>('[data-coding-status]');
     const timeline = visual.querySelector<HTMLElement>('[data-coding-timeline]');
+    const trace = visual.querySelector<HTMLElement>('[data-coding-trace]');
     const frames = [...visual.querySelectorAll<HTMLElement>('[data-coding-frame]')];
     const frameButtons = [...visual.querySelectorAll<HTMLButtonElement>('[data-coding-frame-button]')];
-    if (!controls || !progress || !previous || !play || !playLabel || !next || !timeline || frames.length < 2 || frameButtons.length !== frames.length) continue;
+    if (!controls || !progress || !previous || !play || !playLabel || !next || !timeline || !trace || frames.length < 2 || frameButtons.length !== frames.length) continue;
 
     let currentStep = 0;
     let timer: number | undefined;
@@ -177,6 +210,23 @@ export function enhanceCodingVisuals(root: ParentNode = document): void {
     visual.classList.add('is-enhanced');
     visual.dataset.codingEnhanced = 'true';
     visual.dataset.codingPlaying = 'false';
+    let measuredWidth = 0;
+    let observer: ResizeObserver | undefined;
+    const syncFrameHeight = () => {
+      if (!trace.isConnected) {
+        observer?.disconnect();
+        if (observer) activeObservers.delete(observer);
+        return;
+      }
+      const width = trace.getBoundingClientRect().width;
+      if (width <= 0 || Math.abs(width - measuredWidth) < 0.5) return;
+      measuredWidth = width;
+      reserveLargestFrame(trace, frames);
+    };
+    syncFrameHeight();
+    observer = new ResizeObserver(syncFrameHeight);
+    observer.observe(trace);
+    activeObservers.set(observer, trace);
     if (reducedMotion) {
       playLabel.textContent = 'Next step';
       play.setAttribute('aria-label', 'Next step');

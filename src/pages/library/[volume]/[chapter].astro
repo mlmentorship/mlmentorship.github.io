@@ -55,8 +55,8 @@ const typeLabel = { concepts: 'Concept', questions: 'Question', guides: 'Guide' 
       <div class="entry-heading">
         <div><h2 id="entries-heading">Chapter contents</h2><span>{entries.length} entries · read in order</span></div>
         {visualReviewEntries.length > 0 && (
-          <a class="visual-review-link" href={`/library/${volume.id}/${chapter.id}/review/`} data-visual-review-count={visualReviewEntries.length}>
-            Review visually <span>{visualReviewEntries.length} cards</span><span aria-hidden="true">→</span>
+          <a class="visual-review-link" href={`/review/#${visualReviewEntries[0].slug}`} data-visual-review-count={visualReviewEntries.length}>
+            Visual review <span>continue through the library</span><span aria-hidden="true">→</span>
           </a>
         )}
       </div>
