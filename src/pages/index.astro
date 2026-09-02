@@ -88,9 +88,23 @@ const depthSamples = [
 >
   <div class="landing-page">
     <header class="hero">
-      <p class="eyebrow">Free · visual-first · senior to principal</p>
-      <h1>Visual-first preparation for senior ML interviews.</h1>
-      <p class="hero-copy">Find one answer, practice an interview round, or study a complete sequence. The field guide spans ML foundations, training, evaluation, LLMs, systems, research, product, leadership, and coding.</p>
+      <div class="cover-edition"><span>mlmentorship field guide</span><span>2026 edition</span></div>
+      <div class="cover-title">
+        <p class="eyebrow">Visual-first · senior to principal</p>
+        <h1>The ML Interview Field Guide</h1>
+        <p class="hero-copy">A visual book for building the mechanisms, judgment, and answer depth expected across senior Applied Scientist, Research Scientist, Machine Learning Engineer, and Research Engineer interviews.</p>
+      </div>
+
+      <div class="cover-author">
+        <span>Written and illustrated by</span>
+        <strong>Hamidreza Saghir</strong>
+        <small>Principal Applied Scientist · ML engineer · researcher</small>
+      </div>
+
+      <div class="cover-actions" aria-label="Choose a reading mode">
+        <a class="cover-primary" href="/review/" data-home-event="homepage_start_clicked">Begin visual review <span aria-hidden="true">→</span></a>
+        <a class="cover-secondary" href="#curriculum" data-home-event="homepage_curriculum_clicked">Browse full lessons <span aria-hidden="true">↓</span></a>
+      </div>
 
       <button class="home-search" type="button" data-home-search aria-controls="search-dialog">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -107,6 +121,7 @@ const depthSamples = [
         <li><strong>{codingQuestionCount} coding traces</strong><span>state, move, and invariant</span></li>
         <li><strong>{LIBRARY_VOLUMES.length} ordered books</strong><span>foundations through execution</span></li>
       </ul>
+      <p class="cover-folio">Free to read · no account required · progress stays in this browser</p>
     </header>
 
     <section class="route-section" aria-labelledby="route-heading">
@@ -153,7 +168,7 @@ const depthSamples = [
                   <small>{volume.chapters.length} chapters · {volumeEntries.length} entries</small>
                 </div>
                 <div class="book-actions">
-                  {firstEntry && <a class="start-link" href={firstEntry.href} data-home-event="homepage_start_clicked">Start reading <span aria-hidden="true">→</span></a>}
+                  {firstEntry && <a class="start-link" href={`/review/#${firstEntry.slug}`} data-home-event="homepage_start_clicked">Start visually <span aria-hidden="true">→</span></a>}
                 </div>
               </li>
             ))}
@@ -225,12 +240,23 @@ const depthSamples = [
 </script>
 
 <style>
-  .landing-page { width: min(100%, 50rem); margin: 0 auto; padding: clamp(1.8rem, 4vw, 3rem) var(--gutter) 4.5rem; }
-  .hero { max-width: 46rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--c-text); }
+  .landing-page { width: min(100%, 54rem); margin: 0 auto; padding: clamp(1.8rem, 4vw, 3rem) var(--gutter) 4.5rem; }
+  .hero { position: relative; max-width: 50rem; min-height: 34rem; padding: 1.4rem 0 1.2rem 1.65rem; border-top: 1px solid var(--c-rule); border-bottom: 2px solid var(--c-text); border-left: 4px solid var(--c-accent); }
+  .cover-edition { display: flex; justify-content: space-between; gap: 1rem; color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; }
+  .cover-title { max-width: 43rem; margin-top: 3.2rem; }
   .eyebrow, .section-kicker { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
   .eyebrow { margin: 0 0 .55rem; }
-  .hero h1 { max-width: 44rem; margin: 0 0 .7rem; font-size: 3rem; line-height: 1.02; letter-spacing: 0; }
-  .hero-copy { max-width: 43rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.05rem; line-height: 1.55; }
+  .hero h1 { max-width: 44rem; margin: 0 0 .7rem; font-size: 3.35rem; line-height: 1.02; letter-spacing: 0; }
+  .hero-copy { max-width: 42rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.05rem; line-height: 1.55; }
+  .cover-author { display: grid; width: fit-content; margin-top: 1.45rem; padding-top: .65rem; border-top: 1px solid var(--c-rule); }
+  .cover-author span, .cover-author small { color: var(--c-muted); font-family: var(--font-ui); font-size: .62rem; }
+  .cover-author strong { margin: .08rem 0; font-family: var(--font-display); font-size: .85rem; }
+  .cover-actions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.3rem; }
+  .cover-actions a { display: inline-flex; min-height: 2.65rem; align-items: center; justify-content: center; gap: .65rem; padding: .62rem .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); font-size: .76rem; font-weight: 700; text-decoration: none; }
+  .cover-primary { border-color: var(--c-accent-fill) !important; background: var(--c-accent-fill); color: var(--c-on-accent); }
+  .cover-primary:hover { background: var(--c-link-hover); color: var(--c-on-accent); }
+  .cover-secondary { background: var(--c-surface); color: var(--c-text-soft); }
+  .cover-secondary:hover { border-color: var(--c-accent); color: var(--c-accent); }
   .home-search { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .75rem; align-items: center; width: 100%; margin-top: 1.15rem; padding: .75rem .85rem; border: 1px solid var(--c-accent); border-radius: var(--radius); background: var(--c-surface); color: var(--c-text); cursor: pointer; text-align: left; }
   .home-search:hover { background: var(--c-accent-soft); }
   .home-search > svg { color: var(--c-accent); }
@@ -243,6 +269,7 @@ const depthSamples = [
   .hero-proof strong, .hero-proof span { display: block; }
   .hero-proof strong { font-size: .78rem; }
   .hero-proof span { color: var(--c-muted); font-size: .65rem; }
+  .cover-folio { margin: .7rem 0 0; color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; text-align: right; }
   .workbook-line { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
   .workbook-line > span:first-child { color: var(--c-text-soft); font-weight: 600; }
   .workbook-line a { font-weight: 600; }
@@ -308,8 +335,13 @@ const depthSamples = [
   }
   @media (max-width: 600px) {
     .landing-page { padding-top: 1.4rem; }
-    .hero h1 { font-size: 2.2rem; }
+    .hero { min-height: 0; padding-left: 1rem; }
+    .cover-title { margin-top: 2rem; }
+    .hero h1 { font-size: 2.55rem; }
+    .cover-actions { display: grid; grid-template-columns: 1fr; }
+    .cover-actions a { width: 100%; }
     .hero-proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+    .cover-folio { text-align: left; }
     .route-list ol { grid-template-columns: 1fr; }
     .route-list li:nth-child(odd), .route-list li:nth-child(even) { padding-right: 0; padding-left: 0; border-right: 0; }
     .shelf > header { grid-template-columns: 1fr; gap: .1rem; }

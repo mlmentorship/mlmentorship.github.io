@@ -27,17 +27,18 @@ const articleLocation = articleSlug ? findLibraryLocation(articleSlug) : undefin
 const isLibraryRoute = pathParts[0] === 'library';
 const currentBookId = articleLocation?.volume.id ?? (isLibraryRoute ? pathParts[1] : undefined);
 const currentChapterId = articleLocation?.chapter.id ?? (isLibraryRoute ? pathParts[2] : undefined);
+const showLibrarySidebar = !immersive && (isArticleRoute || isLibraryRoute);
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-library-sidebar="collapsed">
   <head>
     <BaseHead {...headProps} />
   </head>
   <body class:list={[immersive && 'is-immersive']} data-pagefind-ignore={pagefindIgnore ? 'all' : undefined}>
     <a class="sr-only" href="#main">Skip to content</a>
     <Header />
-    <main id="main" class:list={['site-shell', immersive && 'site-shell--immersive']}>
-      {!immersive && <LibrarySidebar currentBookId={currentBookId} currentChapterId={currentChapterId} currentSlug={articleSlug} />}
+    <main id="main" class:list={['site-shell', showLibrarySidebar && 'site-shell--with-library', immersive && 'site-shell--immersive']}>
+      {showLibrarySidebar && <LibrarySidebar currentBookId={currentBookId} currentChapterId={currentChapterId} currentSlug={articleSlug} />}
       <div class="site-page">
         <slot />
       </div>
@@ -48,12 +49,17 @@ const currentChapterId = articleLocation?.chapter.id ?? (isLibraryRoute ? pathPa
 
 <style>
   .site-shell {
-    display: grid;
-    grid-template-columns: 12rem minmax(0, 1fr);
-    column-gap: 1.5rem;
     width: min(100%, var(--container));
     margin: 0 auto;
+  }
+  .site-shell--with-library {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    column-gap: 1.5rem;
     padding-left: var(--gutter);
+  }
+  :global(:root[data-library-sidebar='expanded']) .site-shell--with-library {
+    grid-template-columns: 12rem minmax(0, 1fr);
   }
   .site-page { min-width: 0; }
   .site-shell--immersive { display: block; width: 100%; padding: 0; }

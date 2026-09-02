@@ -22,8 +22,17 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
 
 <aside class="library-sidebar" aria-label="Library navigation" data-library-sidebar data-pagefind-ignore="all">
   <header class="sidebar-header">
-    <a href="/#curriculum">All books</a>
-    <span>{LIBRARY_VOLUMES.length} books</span>
+    <button class="sidebar-toggle" type="button" data-library-sidebar-toggle aria-expanded="false" aria-label="Open library contents" title="Open library contents">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M9 4v16" />
+        <path d="m14 9 3 3-3 3" data-sidebar-chevron />
+      </svg>
+    </button>
+    <div class="sidebar-heading">
+      <a href="/#curriculum">All books</a>
+      <span>{LIBRARY_VOLUMES.length} books</span>
+    </div>
   </header>
 
   <nav aria-label="Books">
@@ -87,14 +96,27 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
 </aside>
 
 <script>
-  document.querySelectorAll<HTMLElement>('[data-library-sidebar]').forEach((sidebar) => {
+  document.querySelectorAll<HTMLElement>('aside[data-library-sidebar]').forEach((sidebar) => {
+    const root = document.documentElement;
+    const toggle = sidebar.querySelector<HTMLButtonElement>('[data-library-sidebar-toggle]');
     const current = sidebar.querySelector<HTMLElement>('[data-current-nav]');
-    if (!current) return;
     const revealCurrent = () => requestAnimationFrame(() => {
+      if (!current || root.dataset.librarySidebar !== 'expanded') return;
       const target = current.offsetTop - sidebar.clientHeight * 0.25;
       sidebar.scrollTop = Math.max(0, Math.min(target, sidebar.scrollHeight - sidebar.clientHeight));
     });
-    revealCurrent();
+    const applyState = (expanded: boolean) => {
+      root.dataset.librarySidebar = expanded ? 'expanded' : 'collapsed';
+      sidebar.dataset.expanded = String(expanded);
+      toggle?.setAttribute('aria-expanded', String(expanded));
+      const label = expanded ? 'Close library contents' : 'Open library contents';
+      toggle?.setAttribute('aria-label', label);
+      toggle?.setAttribute('title', label);
+      try { localStorage.setItem('library-sidebar', expanded ? 'expanded' : 'collapsed'); } catch (_) { /* current page still updates */ }
+      if (expanded) revealCurrent();
+    };
+    applyState(root.dataset.librarySidebar === 'expanded');
+    toggle?.addEventListener('click', () => applyState(root.dataset.librarySidebar !== 'expanded'));
     if (document.readyState !== 'complete') window.addEventListener('load', revealCurrent, { once: true });
     document.fonts?.ready.then(revealCurrent);
   });
@@ -108,8 +130,8 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
     min-width: 0;
     max-height: calc(100vh - var(--header-height) - 2rem);
     margin-top: clamp(1.25rem, 3vw, 2.2rem);
-    padding: 0 .35rem 1rem 0;
-    overflow-y: auto;
+    padding: 0;
+    overflow: hidden;
     scrollbar-color: var(--c-rule) transparent;
     scrollbar-width: thin;
     font-family: var(--font-ui);
@@ -127,9 +149,25 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
     position: sticky;
     top: 0;
     z-index: 4;
-    min-height: 1.8rem;
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    min-height: 2.1rem;
     background: var(--c-bg);
   }
+  .sidebar-toggle {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius);
+    background: var(--c-surface);
+    color: var(--c-text-soft);
+    cursor: pointer;
+  }
+  .sidebar-toggle:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .sidebar-heading { display: flex; min-width: 0; align-items: baseline; justify-content: space-between; gap: .4rem; padding-left: .4rem; }
   .sidebar-header a {
     color: var(--c-text);
     font-size: .78rem;
@@ -138,6 +176,12 @@ const books = LIBRARY_VOLUMES.map((volume) => ({
   }
   .sidebar-header a:hover { color: var(--c-accent); text-decoration: underline; }
   .sidebar-header span { color: var(--c-muted); font-size: .62rem; }
+  :global(:root:not([data-library-sidebar='expanded'])) .sidebar-heading,
+  :global(:root:not([data-library-sidebar='expanded'])) .library-sidebar > nav,
+  :global(:root:not([data-library-sidebar='expanded'])) .library-sidebar > footer { display: none; }
+  :global(:root:not([data-library-sidebar='expanded'])) .sidebar-header { display: block; border-bottom: 0; }
+  :global(:root[data-library-sidebar='expanded']) .library-sidebar { padding: 0 .35rem 1rem 0; overflow-y: auto; }
+  :global(:root[data-library-sidebar='expanded']) [data-sidebar-chevron] { transform: rotate(180deg); transform-origin: center; }
   .book-disclosure { margin: 0; border-bottom: 1px solid var(--c-rule); }
   .book-disclosure > summary {
     display: grid;

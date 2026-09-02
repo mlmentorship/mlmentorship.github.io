@@ -1,5 +1,5 @@
 ---
-// ThemeToggle.astro, defaults to light and persists an explicit user override
+// ThemeToggle.astro, defaults to dark and persists an explicit user override
 ---
 <button
   id="theme-toggle"
@@ -49,7 +49,7 @@
   function currentTheme(): 'light' | 'dark' {
     const attr = document.documentElement.dataset.theme;
     if (attr === 'light' || attr === 'dark') return attr;
-    return 'light';
+    return 'dark';
   }
   function bind() {
     const btn = document.getElementById('theme-toggle');

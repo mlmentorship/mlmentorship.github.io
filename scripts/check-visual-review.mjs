@@ -43,7 +43,7 @@ for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.j
   }
   const html = readFileSync(output, 'utf8');
   if (!html.includes('data-article-quick-review')) failures.push(`${audit.slug}: quick-review lead is missing`);
-  if (!html.includes('data-reading-modes')) failures.push(`${audit.slug}: reading-mode selector is missing`);
+  if (!html.includes('data-reading-mode="visual"') || !html.includes('data-reading-mode="full"')) failures.push(`${audit.slug}: global reading-mode selector is missing`);
   if (!html.includes(`/review/#${audit.slug}`)) failures.push(`${audit.slug}: library-wide visual-review link is missing`);
   if (!html.includes('href="#full-explanation"')) failures.push(`${audit.slug}: full-content jump is missing`);
   if (!html.includes('data-full-explanation')) failures.push(`${audit.slug}: full-content boundary is missing`);

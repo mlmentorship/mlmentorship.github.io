@@ -13,6 +13,14 @@ const currentBookId = articleSlug
     ? pathParts[1]
     : undefined;
 const isCodingRoute = currentBookId === 'coding-interview';
+const isReviewRoute = pathname === '/review/' || pathname.startsWith('/review/');
+const visualModeHref = articleSlug ? `/review/#${articleSlug}` : '/review/';
+const fullModeHref = articleSlug ? '#full-explanation' : '/#curriculum';
+const visualModeActive = pathname === '/' || isReviewRoute;
+const readingModes = [
+  { label: 'Visual', description: 'Visual review mode', href: visualModeHref, active: visualModeActive, dataKey: 'visual' },
+  { label: 'Full', description: 'Full lesson mode', href: fullModeHref, active: !visualModeActive, dataKey: 'full' },
+];
 function isActive(href: string) {
   if (href === '/#curriculum') return pathname === '/'
     || (!isCodingRoute && (pathname.startsWith('/library/') || pathname.startsWith('/concepts/') || pathname.startsWith('/guides/')));
@@ -31,6 +39,18 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     <a class="brand" href="/" aria-label="mlmentorship contents">
       <span class="brand-name"><strong>ml</strong>mentorship</span>
     </a>
+
+    <nav class="reading-mode-switch reading-mode-switch--desktop" aria-label="Reading mode">
+      {readingModes.map((mode) => (
+        <a
+          href={mode.href}
+          class:list={[mode.active && 'active']}
+          aria-current={mode.active ? 'page' : undefined}
+          aria-label={mode.description}
+          data-reading-mode={mode.dataKey}
+        >{mode.label}</a>
+      ))}
+    </nav>
 
     <nav class="nav-desktop" aria-label="Primary">
       <ul>
@@ -56,6 +76,20 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
           <span></span><span></span><span></span>
         </summary>
         <nav class="nav-mobile" aria-label="Mobile">
+          <div class="mobile-reading-mode">
+            <span>Reading mode</span>
+            <div class="reading-mode-switch">
+              {readingModes.map((mode) => (
+                <a
+                  href={mode.href}
+                  class:list={[mode.active && 'active']}
+                  aria-current={mode.active ? 'page' : undefined}
+                  aria-label={mode.description}
+                  data-reading-mode={mode.dataKey}
+                >{mode.label}</a>
+              ))}
+            </div>
+          </div>
           <ul>
             {navItems.map((item) => (
               <li>
@@ -74,6 +108,23 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     </div>
   </div>
 </header>
+
+<script>
+  function syncReadingMode() {
+    const visualActive = window.location.pathname === '/review/'
+      || (window.location.pathname === '/' && window.location.hash !== '#curriculum');
+    document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode]').forEach((link) => {
+      const active = link.dataset.readingMode === (visualActive ? 'visual' : 'full');
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
+  syncReadingMode();
+  window.addEventListener('hashchange', syncReadingMode);
+  document.addEventListener('astro:page-load', syncReadingMode);
+</script>
 
 <style>
   .masthead {
@@ -105,6 +156,28 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     letter-spacing: -0.015em;
   }
   .brand-name strong { color: var(--c-accent); font-weight: 750; }
+
+  .reading-mode-switch {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius);
+    background: var(--c-bg-tint);
+    font-family: var(--font-ui);
+  }
+  .reading-mode-switch a {
+    min-width: 3.35rem;
+    padding: .3rem .5rem;
+    border-radius: 2px;
+    color: var(--c-muted);
+    font-size: .67rem;
+    font-weight: 650;
+    text-align: center;
+    text-decoration: none;
+  }
+  .reading-mode-switch a:hover { color: var(--c-text); }
+  .reading-mode-switch a.active { background: var(--c-surface); color: var(--c-accent); box-shadow: 0 0 0 1px var(--c-rule); }
 
   .nav-desktop { margin-left: auto; }
   .nav-desktop ul {
@@ -178,6 +251,8 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     background: var(--c-surface);
     box-shadow: var(--shadow-md);
   }
+  .mobile-reading-mode { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .35rem .35rem .65rem; border-bottom: 1px solid var(--c-rule); }
+  .mobile-reading-mode > span { color: var(--c-muted); font-family: var(--font-ui); font-size: .65rem; font-weight: 600; }
   .nav-mobile ul { list-style: none; margin: 0; padding: 0; }
   .nav-mobile li { margin: 0; }
   .nav-mobile a {
@@ -194,8 +269,9 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   .nav-mobile a:hover { background: var(--c-bg-tint); color: var(--c-text); }
   .nav-mobile a.active { background: var(--c-accent-soft); color: var(--c-accent); }
 
-  @media (max-width: 760px) {
+  @media (max-width: 940px) {
     .nav-desktop { display: none; }
+    .reading-mode-switch--desktop { display: none; }
     .bar-end { margin-left: auto; }
     .mobile-nav { display: block; }
   }

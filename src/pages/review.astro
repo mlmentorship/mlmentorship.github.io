@@ -164,7 +164,8 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
     let currentIndex = 0;
     let requestToken = 0;
     let touchStartX: number | undefined;
-    let explanationOpen = false;
+    const desktopExplanation = window.matchMedia('(min-width: 901px)');
+    let explanationOpen = desktopExplanation.matches;
 
     function fetchArticle(entry: ReviewEntry): Promise<Document> {
       const cached = cache.get(entry.href);
@@ -225,7 +226,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       explanationHost.replaceChildren(...body.childNodes);
     }
 
-    function setExplanation(open: boolean) {
+    function setExplanation(open: boolean, focus = true) {
       explanationOpen = open;
       if (explanation) explanation.hidden = !open;
       workspace?.classList.toggle('is-explanation-open', open);
@@ -233,8 +234,10 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       explanationToggle?.setAttribute('aria-pressed', String(open));
       if (modeLabel) modeLabel.textContent = open ? 'Visual only' : 'Full explanation';
       window.scrollTo({ top: 0, behavior: 'auto' });
-      if (open) explanationClose?.focus({ preventScroll: true });
-      else explanationToggle?.focus({ preventScroll: true });
+      if (focus) {
+        if (open) explanationClose?.focus({ preventScroll: true });
+        else explanationToggle?.focus({ preventScroll: true });
+      }
     }
 
     async function showEntry(index: number, options: { push?: boolean; focus?: boolean } = {}) {
@@ -255,6 +258,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       chapter.textContent = entry.chapterTitle;
       back.href = `/library/${entry.volumeId}/${entry.chapterId}/`;
       back.innerHTML = '<span aria-hidden="true">←</span> Chapter';
+      document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode="full"]').forEach((link) => { link.href = entry.href; });
       previous.disabled = boundedIndex === 0;
       next.disabled = boundedIndex === entries.length - 1;
       if (sourceHost) sourceHost.replaceChildren();
@@ -276,6 +280,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
           sourceDetails.hidden = false;
         }
         renderExplanation(article, entry);
+        setExplanation(explanationOpen, false);
         await renderMermaid(visualHost, entry.slug);
         if (token !== requestToken) return;
         stage.hidden = false;
@@ -317,6 +322,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
     next?.addEventListener('click', () => void showEntry(currentIndex + 1, { push: true, focus: true }), listenerOptions);
     explanationToggle?.addEventListener('click', () => setExplanation(!explanationOpen), listenerOptions);
     explanationClose?.addEventListener('click', () => setExplanation(false), listenerOptions);
+    desktopExplanation.addEventListener('change', (event) => setExplanation(event.matches, false), listenerOptions);
     window.addEventListener('popstate', () => void showEntry(indexFromHash()), listenerOptions);
     document.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
