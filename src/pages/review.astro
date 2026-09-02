@@ -32,6 +32,15 @@ if (reviewEntries.length === 0) throw new Error('Library-wide visual review need
 const firstEntry = reviewEntries[0];
 const reviewData = JSON.stringify(reviewEntries).replace(/</g, '\\u003c');
 const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Guide' } as const;
+const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
+  volume,
+  chapters: volume.chapters.map((chapter) => ({
+    chapter,
+    entries: entriesForChapter(allEntries, chapter)
+      .filter((entry) => getImplementedVisualAudit(entry.slug))
+      .map((entry) => ({ slug: entry.slug, title: entry.title })),
+  })).filter((item) => item.entries.length > 0),
+})).filter((item) => item.chapters.length > 0);
 ---
 
 <BaseLayout
@@ -51,8 +60,38 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       </div>
     </nav>
 
+    <aside class="review-contents" data-review-contents aria-label="Visual review contents">
+      <details class="review-contents-details" data-review-contents-details>
+        <summary>
+          <span>Contents</span>
+          <small data-review-contents-location>{firstEntry.volumeShortTitle} · {firstEntry.chapterTitle}</small>
+        </summary>
+        <div class="review-contents-panel">
+          {reviewContents.map(({ volume, chapters }) => (
+            <details class="review-contents-volume" data-review-contents-volume={volume.id} open={volume.id === firstEntry.volumeId}>
+              <summary><span>{volume.number} · {volume.shortTitle}</span><small>{chapters.length} chapters</small></summary>
+              <ol>
+                {chapters.map(({ chapter, entries }) => (
+                  <li>
+                    <details class="review-contents-chapter" data-review-contents-chapter={chapter.id} open={chapter.id === firstEntry.chapterId}>
+                      <summary><span>{chapter.title}</span><small>{entries.length}</small></summary>
+                      <ol>
+                        {entries.map((entry) => (
+                          <li><a href={`#${entry.slug}`} data-review-content-entry={entry.slug}>{entry.title}</a></li>
+                        ))}
+                      </ol>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+            </details>
+          ))}
+        </div>
+      </details>
+    </aside>
+
     <div class="review-workspace" data-review-workspace>
-      <section class="review-stage" data-review-stage hidden aria-busy="true">
+      <section class="review-stage" data-review-stage hidden aria-hidden="true" aria-busy="true">
         <VisualReviewCard
           eyebrow={`${categoryLabel[firstEntry.category]} · Visual review`}
           title={firstEntry.title}
@@ -65,7 +104,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
         </VisualReviewCard>
       </section>
 
-      <aside id="review-explanation" class="review-explanation" data-review-explanation hidden aria-label="Full explanation">
+      <aside id="review-explanation" class="review-explanation" data-review-explanation hidden aria-hidden="true" inert aria-label="Full explanation">
         <header>
           <div><span>Full explanation</span><strong tabindex="-1" data-review-explanation-title>{firstEntry.title}</strong></div>
           <div class="explanation-actions">
@@ -155,6 +194,10 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
     const modeLabel = root.querySelector<HTMLElement>('[data-review-mode-label]');
     const openArticle = root.querySelector<HTMLAnchorElement>('[data-review-open-article]');
     const announcer = root.querySelector<HTMLElement>('[data-review-announcer]');
+    const contentsLocation = root.querySelector<HTMLElement>('[data-review-contents-location]');
+    const contentsEntries = [...root.querySelectorAll<HTMLAnchorElement>('[data-review-content-entry]')];
+    const contentsVolumes = [...root.querySelectorAll<HTMLDetailsElement>('[data-review-contents-volume]')];
+    const contentsChapters = [...root.querySelectorAll<HTMLDetailsElement>('[data-review-contents-chapter]')];
     const cache = new Map<string, Promise<Document>>();
     const labels = {
       concepts: 'Concept · Visual quick review',
@@ -165,7 +208,25 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
     let requestToken = 0;
     let touchStartX: number | undefined;
     const desktopExplanation = window.matchMedia('(min-width: 901px)');
-    let explanationOpen = desktopExplanation.matches;
+    let explanationOpen = false;
+    let explanationTransitionTimer: number | undefined;
+
+    function syncContents(entry: ReviewEntry) {
+      if (!root) return;
+      if (contentsLocation) contentsLocation.textContent = `${entry.volumeShortTitle} · ${entry.chapterTitle}`;
+      contentsEntries.forEach((link) => {
+        if (link.dataset.reviewContentEntry === entry.slug) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      contentsVolumes.forEach((volume) => volume.removeAttribute('data-current'));
+      contentsChapters.forEach((chapter) => chapter.removeAttribute('data-current'));
+      const currentVolume = root.querySelector<HTMLDetailsElement>(`[data-review-contents-volume="${entry.volumeId}"]`);
+      const currentChapter = root.querySelector<HTMLDetailsElement>(`[data-review-contents-chapter="${entry.chapterId}"]`);
+      currentVolume?.setAttribute('data-current', 'true');
+      currentChapter?.setAttribute('data-current', 'true');
+      if (currentVolume) currentVolume.open = true;
+      if (currentChapter) currentChapter.open = true;
+    }
 
     function fetchArticle(entry: ReviewEntry): Promise<Document> {
       const cached = cache.get(entry.href);
@@ -221,23 +282,69 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       }
       const body = document.importNode(articleBody, true);
       body.removeAttribute('id');
-      body.querySelectorAll('.learning-figure, .diagram-source, script').forEach((element) => element.remove());
+      body.querySelectorAll('.learning-figure, .diagram-source, pre.mermaid, .mermaid, script').forEach((element) => element.remove());
       absolutizeVisualLinks(body, entry.href);
       explanationHost.replaceChildren(...body.childNodes);
     }
 
     function setExplanation(open: boolean, focus = true) {
       explanationOpen = open;
-      if (explanation) explanation.hidden = !open;
-      workspace?.classList.toggle('is-explanation-open', open);
+      if (explanationTransitionTimer !== undefined) {
+        window.clearTimeout(explanationTransitionTimer);
+        explanationTransitionTimer = undefined;
+      }
+      if (open) {
+        explanation?.removeAttribute('hidden');
+        explanation?.removeAttribute('inert');
+        explanation?.setAttribute('aria-hidden', 'false');
+        if (desktopExplanation.matches) {
+          stage?.style.removeProperty('max-height');
+          explanation?.style.removeProperty('max-height');
+        } else {
+          stage?.style.setProperty('max-height', '0px');
+          explanation?.style.setProperty('max-height', `${explanation?.scrollHeight ?? 0}px`);
+        }
+        window.requestAnimationFrame(() => {
+          if (!explanationOpen) return;
+          workspace?.classList.remove('is-explanation-closing');
+          workspace?.classList.add('is-explanation-open');
+          if (!desktopExplanation.matches && explanation) explanation.style.setProperty('max-height', `${explanation.scrollHeight}px`);
+          window.requestAnimationFrame(() => {
+            if (explanationOpen && !desktopExplanation.matches && explanation) explanation.style.setProperty('max-height', `${explanation.scrollHeight}px`);
+          });
+          if (focus) explanationClose?.focus({ preventScroll: true });
+        });
+      } else {
+        workspace?.classList.remove('is-explanation-open');
+        workspace?.classList.add('is-explanation-closing');
+        explanation?.setAttribute('aria-hidden', 'true');
+        explanation?.setAttribute('inert', '');
+        if (desktopExplanation.matches) {
+          stage?.style.removeProperty('max-height');
+          explanation?.style.removeProperty('max-height');
+        } else {
+          stage?.style.setProperty('max-height', `${stage?.scrollHeight ?? 0}px`);
+          explanation?.style.setProperty('max-height', '0px');
+        }
+        explanationTransitionTimer = window.setTimeout(() => {
+          if (explanationOpen) return;
+          if (explanation) explanation.hidden = true;
+          workspace?.classList.remove('is-explanation-closing');
+          explanationTransitionTimer = undefined;
+        }, 360);
+        if (focus) explanationToggle?.focus({ preventScroll: true });
+      }
+      if (desktopExplanation.matches || !open) {
+        stage?.removeAttribute('inert');
+        stage?.setAttribute('aria-hidden', 'false');
+      } else {
+        stage?.setAttribute('inert', '');
+        stage?.setAttribute('aria-hidden', 'true');
+      }
       explanationToggle?.setAttribute('aria-expanded', String(open));
       explanationToggle?.setAttribute('aria-pressed', String(open));
       if (modeLabel) modeLabel.textContent = open ? 'Visual only' : 'Full explanation';
-      window.scrollTo({ top: 0, behavior: 'auto' });
-      if (focus) {
-        if (open) explanationClose?.focus({ preventScroll: true });
-        else explanationToggle?.focus({ preventScroll: true });
-      }
+      window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
 
     async function showEntry(index: number, options: { push?: boolean; focus?: boolean } = {}) {
@@ -246,6 +353,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
       const entry = entries[boundedIndex];
       const token = ++requestToken;
       currentIndex = boundedIndex;
+      syncContents(entry);
       stage.setAttribute('aria-busy', 'true');
       visualHost.setAttribute('aria-busy', 'true');
       visualHost.innerHTML = '<p class="review-loading">Loading the visual…</p>';
@@ -279,11 +387,12 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
           sourceHost.append(note);
           sourceDetails.hidden = false;
         }
-        renderExplanation(article, entry);
-        setExplanation(explanationOpen, false);
         await renderMermaid(visualHost, entry.slug);
         if (token !== requestToken) return;
         stage.hidden = false;
+        stage.setAttribute('aria-hidden', 'false');
+        renderExplanation(article, entry);
+        setExplanation(explanationOpen, false);
         controls?.removeAttribute('hidden');
         if (fallback) fallback.hidden = true;
         stage.setAttribute('aria-busy', 'false');
@@ -312,6 +421,7 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
         errorPanel.append(errorDetail, articleLink);
         visualHost.replaceChildren(errorPanel);
         stage.hidden = false;
+        stage.setAttribute('aria-hidden', 'false');
         controls?.removeAttribute('hidden');
         stage.setAttribute('aria-busy', 'false');
         visualHost.setAttribute('aria-busy', 'false');
@@ -320,10 +430,20 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
 
     previous?.addEventListener('click', () => void showEntry(currentIndex - 1, { push: true, focus: true }), listenerOptions);
     next?.addEventListener('click', () => void showEntry(currentIndex + 1, { push: true, focus: true }), listenerOptions);
+    contentsEntries.forEach((link) => link.addEventListener('click', (event) => {
+      const index = entries.findIndex((entry) => entry.slug === link.dataset.reviewContentEntry);
+      if (index < 0) return;
+      event.preventDefault();
+      void showEntry(index, { push: true, focus: true });
+    }, listenerOptions));
     explanationToggle?.addEventListener('click', () => setExplanation(!explanationOpen), listenerOptions);
     explanationClose?.addEventListener('click', () => setExplanation(false), listenerOptions);
-    desktopExplanation.addEventListener('change', (event) => setExplanation(event.matches, false), listenerOptions);
+    desktopExplanation.addEventListener('change', () => setExplanation(explanationOpen, false), listenerOptions);
     window.addEventListener('popstate', () => void showEntry(indexFromHash()), listenerOptions);
+    window.addEventListener('hashchange', () => {
+      const nextIndex = indexFromHash();
+      if (nextIndex !== currentIndex) void showEntry(nextIndex);
+    }, listenerOptions);
     document.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
@@ -376,18 +496,107 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
   .review-progress-wrap { display: grid; justify-items: end; gap: .05rem; }
   .review-progress-wrap span { color: var(--c-text-soft); font-family: var(--font-mono); font-size: .66rem; }
   .review-progress-wrap small { color: var(--c-muted); font-size: .56rem; }
-  .review-workspace { width: min(100%, 96rem); margin: 0 auto; }
-  .review-workspace.is-explanation-open { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem); }
+  .review-contents {
+    position: fixed;
+    top: calc(var(--header-height) + 3.9rem);
+    right: max(var(--gutter), calc((100vw - 96rem) / 2));
+    z-index: 39;
+    width: min(20rem, calc(100vw - 2rem));
+    pointer-events: none;
+  }
+  .review-contents-details { pointer-events: auto; }
+  .review-contents-details > summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: .55rem;
+    align-items: center;
+    width: fit-content;
+    min-width: 8rem;
+    margin-left: auto;
+    padding: .5rem .65rem;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--c-bg) 96%, transparent);
+    box-shadow: 0 .35rem 1rem color-mix(in srgb, var(--c-text) 7%, transparent);
+    color: var(--c-text);
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: .68rem;
+    font-weight: 650;
+    list-style: none;
+    backdrop-filter: blur(12px);
+  }
+  .review-contents-details > summary::-webkit-details-marker,
+  .review-contents-volume > summary::-webkit-details-marker,
+  .review-contents-chapter > summary::-webkit-details-marker { display: none; }
+  .review-contents-details > summary::before { color: var(--c-accent); content: '≡'; font-family: var(--font-mono); font-size: .9rem; }
+  .review-contents-details > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); }
+  .review-contents-details[open] > summary { border-color: var(--c-accent); border-bottom-right-radius: 0; border-bottom-left-radius: 0; }
+  .review-contents-details[open] > summary::after { content: '−'; }
+  .review-contents-details > summary small { max-width: 11rem; overflow: hidden; color: var(--c-muted); font-size: .59rem; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+  .review-contents-panel {
+    max-height: min(70vh, 42rem);
+    overflow-y: auto;
+    padding: .45rem;
+    border: 1px solid var(--c-accent);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: color-mix(in srgb, var(--c-bg) 98%, transparent);
+    box-shadow: 0 .7rem 1.5rem color-mix(in srgb, var(--c-text) 10%, transparent);
+    scrollbar-width: thin;
+  }
+  .review-contents-volume,
+  .review-contents-chapter { margin: 0; }
+  .review-contents-volume + .review-contents-volume { border-top: 1px solid var(--c-rule); }
+  .review-contents-volume > summary,
+  .review-contents-chapter > summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .6rem;
+    padding: .48rem .45rem;
+    color: var(--c-text-soft);
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: .66rem;
+    font-weight: 650;
+    list-style: none;
+  }
+  .review-contents-volume > summary::after,
+  .review-contents-chapter > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); }
+  .review-contents-volume[open] > summary::after,
+  .review-contents-chapter[open] > summary::after { content: '−'; }
+  .review-contents-volume > summary small,
+  .review-contents-chapter > summary small { color: var(--c-muted); font-size: .56rem; font-weight: 400; }
+  .review-contents-volume[data-current='true'] > summary,
+  .review-contents-chapter[data-current='true'] > summary { color: var(--c-accent); }
+  .review-contents-volume > ol,
+  .review-contents-chapter > ol { margin: 0; padding: 0 0 .35rem; list-style: none; }
+  .review-contents-chapter { margin-left: .4rem; border-left: 1px solid var(--c-rule); }
+  .review-contents-chapter > summary { padding-left: .65rem; font-size: .62rem; font-weight: 550; }
+  .review-contents-chapter > ol { padding-left: .65rem; }
+  .review-contents-chapter li { margin: 0; }
+  .review-contents-chapter a { display: block; padding: .3rem .45rem; border-left: 2px solid transparent; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .68rem; line-height: 1.3; text-decoration: none; }
+  .review-contents-chapter a:hover { color: var(--c-accent); background: var(--c-bg-tint); }
+  .review-contents-chapter a[aria-current='page'] { border-left-color: var(--c-accent); background: var(--c-accent-soft); color: var(--c-text); font-weight: 650; }
+  .review-workspace { width: min(100%, 96rem); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 0px; transition: grid-template-columns 360ms cubic-bezier(.2,.8,.2,1); }
+  .review-workspace.is-explanation-open { grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem); }
   .review-stage { min-width: 0; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding: clamp(.8rem, 2vw, 1.5rem) var(--gutter); }
   .review-stage[hidden],
   .review-explanation[hidden],
   .review-bottom[hidden] { display: none; }
   .review-explanation {
     min-width: 0;
+    overflow: hidden;
     padding: 1rem 1.2rem 2.5rem;
     border-left: 1px solid var(--c-rule);
     background: var(--c-bg);
+    opacity: 0;
+    transform: translateX(1rem);
+    visibility: hidden;
+    transition: opacity 240ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), visibility 0s linear 360ms;
   }
+  .review-workspace.is-explanation-open .review-explanation { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; }
   .review-explanation > header {
     display: flex;
     align-items: flex-start;
@@ -459,9 +668,11 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
   :global(.review-error span) { color: var(--c-muted); font-size: .75rem; }
 
   @media (max-width: 900px) {
-    .review-workspace.is-explanation-open { display: block; }
-    .review-workspace.is-explanation-open .review-stage { display: none; }
-    .review-explanation { width: min(100%, 46rem); margin: 0 auto; border-left: 0; }
+    .review-workspace { display: block; transition: none; }
+    .review-stage { max-height: 10000px; overflow: hidden; opacity: 1; transform: none; transition: max-height 360ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), padding 360ms cubic-bezier(.2,.8,.2,1); }
+    .review-workspace.is-explanation-open .review-stage { max-height: 0; min-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; transform: translateX(-1rem); }
+    .review-explanation { width: min(100%, 46rem); max-height: 0; margin: 0 auto; padding: 0 var(--gutter); border-left: 0; opacity: 0; transform: translateX(1rem); transition: max-height 360ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), padding 360ms cubic-bezier(.2,.8,.2,1), visibility 0s linear 360ms; }
+    .review-workspace.is-explanation-open .review-explanation { max-height: 10000px; padding: .8rem var(--gutter) 2rem; opacity: 1; transform: none; transition-delay: 0s; }
   }
   @media (max-width: 640px) {
     .review-toolbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: .55rem; padding: .4rem var(--gutter); }
@@ -475,9 +686,13 @@ const categoryLabel = { concepts: 'Concept', questions: 'Question', guides: 'Gui
     .review-bottom button:last-child > span:first-child { display: none; }
     .review-explanation { padding: .8rem var(--gutter) 2rem; }
     .explanation-actions a { display: none; }
+    .review-contents { top: calc(var(--header-height) + 3.7rem); right: var(--gutter); width: min(21rem, calc(100vw - 2 * var(--gutter))); }
+    .review-contents-details > summary { min-width: 0; }
+    .review-contents-details > summary small { max-width: 8rem; }
   }
   @media print {
     .review-toolbar,
+    .review-contents,
     .review-bottom,
     .review-fallback,
     .review-explanation { display: none !important; }

@@ -75,7 +75,6 @@
     "visualIds": [
       "attention-keys-choose-values-contribute"
     ],
-    "accessibility": "Both SVG panels have linked titles and complete descriptions. Direct key, weight, value, contribution, and sum labels carry all meaning without color; bar length redundantly encodes weight magnitude. The established two-panel primitive stacks below 640 pixels, each SVG scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette. The authored trace adds stable weight, value, and contribution keys plus a three-state keyboard sequence.",
-    "mechanismTrace": { "visualId": "attention-keys-choose-values-contribute", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable attention-row keys, and print-visible authored states." }
+    "accessibility": "Both SVG panels have linked titles and complete descriptions. Direct key, weight, value, contribution, and sum labels carry all meaning without color; bar length redundantly encodes weight magnitude. The established two-panel primitive stacks below 640 pixels, each SVG scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
   }
 }

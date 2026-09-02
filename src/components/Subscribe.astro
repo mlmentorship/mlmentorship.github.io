@@ -32,7 +32,7 @@ const hasEmail =
   data-email-placement={placement}
   data-email-enabled={hasEmail ? 'true' : 'false'}
   data-email-account={SITE.newsletter.accountId}
-  hidden
+  hidden={placement === 'entry'}
   data-pagefind-ignore="all"
 >
   <div class="inner">
@@ -301,7 +301,7 @@ const hasEmail =
     border-bottom: 1px solid var(--c-rule);
   }
   .inner { max-width: 46rem; margin: 0 auto; }
-  .subscribe--home { margin-top: .8rem; }
+  .subscribe--home { margin-top: 1.15rem; padding: 1.25rem 1.1rem; border: 1px solid var(--c-accent); background: color-mix(in srgb, var(--c-accent-soft) 48%, var(--c-bg)); }
   .subscribe--home .inner { display: grid; grid-template-columns: minmax(0, .9fr) minmax(18rem, 1.1fr); gap: 1.4rem; align-items: center; }
   .eyebrow {
     margin: 0 0 .25rem;
@@ -319,6 +319,7 @@ const hasEmail =
     line-height: 1.25;
     letter-spacing: -.01em;
   }
+  .subscribe--home .title { font-size: 1.22rem; }
   .blurb {
     margin: 0;
     color: var(--c-text-soft);
@@ -326,6 +327,7 @@ const hasEmail =
     font-size: .76rem;
     line-height: 1.5;
   }
+  .subscribe--home .blurb { max-width: 25rem; font-size: .8rem; }
   .provider-frame { min-height: 2.45rem; }
   .form-status { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; }
   .terms, .alternatives {
@@ -411,6 +413,7 @@ const hasEmail =
   }
 
   @media (max-width: 680px) {
+    .subscribe--home { padding: 1rem .85rem; }
     .subscribe--home .inner { grid-template-columns: 1fr; gap: .75rem; }
   }
   @media (max-width: 420px) {

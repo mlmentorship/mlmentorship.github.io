@@ -53,7 +53,6 @@
   },
   "implementation": {
     "visualIds": ["calibration-reliability-gap"],
-    "accessibility": "The SVG includes a title and full description with all five illustrative coordinates. Distinct dashed and solid lines, point markers, direct region labels, a measured gap at 80 percent confidence, explicit axes, and the text caption preserve the interpretation without color. The authored trace adds stable bin and gap keys, preserves the missing-bin-count limitation, keyboard stepping, and print-visible states.",
-    "mechanismTrace": { "visualId": "calibration-reliability-gap", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable bin/gap keys, and print-visible authored states." }
+    "accessibility": "The SVG includes a title and full description with all five illustrative coordinates. Distinct dashed and solid lines, point markers, direct region labels, a measured gap at 80 percent confidence, explicit axes, and the text caption preserve the interpretation without color."
   }
 }

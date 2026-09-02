@@ -43,7 +43,6 @@
   },
   "implementation": {
     "visualIds": ["backprop-forward-reverse-trace"],
-    "accessibility": "The SVG includes a title and complete description. Solid and dashed paths distinguish direction, every result is labeled, and the caption states the VJP inference. The authored trace adds stable graph-node and edge keys, explicit forward and backward states, keyboard stepping, and print-visible gradients.",
-    "mechanismTrace": { "visualId": "backprop-forward-reverse-trace", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable graph keys, and print-visible authored states." }
+    "accessibility": "The SVG includes a title and complete description. Solid and dashed paths distinguish direction, every result is labeled, and the caption states the VJP inference."
   }
 }

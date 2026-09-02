@@ -32,14 +32,6 @@ function sourceAfter(element: Element | undefined): HTMLElement | undefined {
 }
 
 export function extractLearningVisual(root: ParentNode, visualId?: string): ExtractedLearningVisual | undefined {
-  const tracedFigure = visualId
-    ? [...root.querySelectorAll<HTMLElement>('[data-article-trace]')]
-      .find((element) => element.dataset.articleTrace === visualId)
-    : undefined;
-  if (tracedFigure) {
-    return { marker: visualMarker(root, visualId), figure: tracedFigure, source: sourceAfter(tracedFigure) };
-  }
-
   const marker = visualMarker(root, visualId);
   const markedElement = marker ? siblingElement(marker, 'next') : undefined;
   const existingFigure = markedElement?.classList.contains('learning-figure')

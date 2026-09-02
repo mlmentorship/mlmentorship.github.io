@@ -10,7 +10,7 @@
     "mermaid": "Rejected: a flowchart can enumerate draft, verify, and resample, but automatic layout obscures the positional boundary between the retained prefix and discarded suffix.",
     "svg": "Selected: deterministic token alignment, explicit outcome labels, distinct solid and dashed outlines, and a fixed first-rejection boundary communicate the prefix invariant without runtime code or color dependence.",
     "semanticHtml": "Rejected: a table can list each token's outcome, but it makes the causal boundary at the first rejection and the replacement token's position less immediate.",
-    "interaction": "Selected as progressive enhancement: the three authored states step through draft/verify, first rejection, and commit/restart while the static rejection-boundary figure remains the complete no-JavaScript fallback.",
+    "interaction": "Rejected: controls for probabilities or acceptance draws would add state and imply a simulation lesson when one concrete, correctly labelled cycle is sufficient.",
     "paperReuse": "Rejected: both primary papers contain algorithm figures, but their arXiv availability was not treated as permissive figure-reuse permission. No paper or deck artwork, geometry, wording, numeric example, or empirical result is copied; the shipped token trace is independently authored.",
     "noVisual": "Rejected: the prose states the sweep rule, but readers must mentally track three different outcomes after the first rejection: retain the accepted prefix, replace the rejected position, and invalidate the untouched suffix."
   },
@@ -67,7 +67,6 @@
     "visualIds": [
       "speculative-decoding-first-rejection-boundary"
     ],
-    "accessibility": "The SVG has a linked title and description that narrate all five draft positions and the committed output. Each position is numbered and directly labelled ACCEPT, REJECT, REPLACE, or DISCARD; solid accepted tokens, a heavy rejection mark, and dashed discarded tokens make color redundant. The established scrollable wide-figure primitive preserves legible text at 390 CSS pixels, theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette. The authored trace adds stable token and decision keys, explicit prefix ownership, and a three-state keyboard sequence.",
-    "mechanismTrace": { "visualId": "speculative-decoding-first-rejection-boundary", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable token and decision keys, and print-visible authored states." }
+    "accessibility": "The SVG has a linked title and description that narrate all five draft positions and the committed output. Each position is numbered and directly labelled ACCEPT, REJECT, REPLACE, or DISCARD; solid accepted tokens, a heavy rejection mark, and dashed discarded tokens make color redundant. The established scrollable wide-figure primitive preserves legible text at 390 CSS pixels, theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette."
   }
 }

@@ -33,7 +33,7 @@ assert.match(header, /pathname === '\/' \|\| isReviewRoute/);
 assert.match(sidebar, /aria-label="Open library contents"/);
 assert.match(sidebar, /aside\[data-library-sidebar\]/);
 assert.match(review, /const desktopExplanation = window\.matchMedia\('\(min-width: 901px\)'\)/);
-assert.match(review, /desktopExplanation\.addEventListener\('change', \(event\) => setExplanation\(event\.matches, false\)/);
+assert.match(review, /desktopExplanation\.addEventListener\('change', \(\) => setExplanation\(explanationOpen, false\)/);
 assert.match(review, /querySelectorAll<HTMLAnchorElement>\('\[data-reading-mode="full"\]'\)/);
 assert.match(home, /<h1>The ML Interview Field Guide<\/h1>/);
 assert.match(home, /class="cover-primary" href="\/review\/"/);
