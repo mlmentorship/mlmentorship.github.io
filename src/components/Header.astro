@@ -1,14 +1,23 @@
 ---
 import { SITE } from '../consts';
+import { findLibraryLocation } from '../data/library';
 import ThemeToggle from './ThemeToggle.astro';
 import Search from './Search.astro';
 
 const pathname = Astro.url.pathname;
+const pathParts = pathname.split('/').filter(Boolean);
+const articleSlug = pathParts.length === 2 && ['concepts', 'questions', 'guides'].includes(pathParts[0]) ? pathParts[1] : undefined;
+const currentBookId = articleSlug
+  ? findLibraryLocation(articleSlug)?.volume.id
+  : pathParts[0] === 'library'
+    ? pathParts[1]
+    : undefined;
+const isCodingRoute = currentBookId === 'coding-interview';
 function isActive(href: string) {
-  if (href === '/') return pathname === '/'
-    || pathname.startsWith('/library/')
-    || pathname.startsWith('/concepts/')
-    || pathname.startsWith('/guides/');
+  if (href === '/#curriculum') return pathname === '/'
+    || (!isCodingRoute && (pathname.startsWith('/library/') || pathname.startsWith('/concepts/') || pathname.startsWith('/guides/')));
+  if (href === '/library/coding-interview/') return isCodingRoute;
+  if (href === '/questions/') return !isCodingRoute && pathname.startsWith('/questions/');
   if (href === '/prep/') return pathname.startsWith('/prep/');
   return pathname === href || pathname.startsWith(href);
 }
@@ -187,6 +196,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 
   @media (max-width: 760px) {
     .nav-desktop { display: none; }
+    .bar-end { margin-left: auto; }
     .mobile-nav { display: block; }
   }
   @media (max-width: 420px) {

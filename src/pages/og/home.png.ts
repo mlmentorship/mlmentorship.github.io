@@ -67,11 +67,11 @@ export const GET: APIRoute = async () => {
                       fontWeight: 700,
                       fontSize: '64px',
                       lineHeight: 1.1,
-                      letterSpacing: '-0.025em',
+                      letterSpacing: '0',
                       color: '#0f172a',
                       maxWidth: '1060px',
                     },
-                    children: 'Senior ML interviews, calibrated.',
+                    children: 'Visual-first preparation for senior ML interviews.',
                   },
                 },
                 {
@@ -84,7 +84,7 @@ export const GET: APIRoute = async () => {
                       maxWidth: '1000px',
                     },
                     children:
-                      'Questions, guides, and concept notes for senior Applied Scientist, Research Scientist, MLE, and Research Engineer loops.',
+                      'Ordered ML lessons, interview questions, coding traces, and role-specific routes from foundations through principal scope.',
                   },
                 },
               ],

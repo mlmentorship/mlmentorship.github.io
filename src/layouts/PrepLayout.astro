@@ -27,7 +27,7 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
 <BaseLayout title={title} description={description}>
   <div class="prep-page">
     <nav class="workbook-trail" aria-label="Breadcrumb">
-      <a href="/">Contents</a><span aria-hidden="true">/</span>
+      <a href="/">Home</a><span aria-hidden="true">/</span>
       {pathname === '/prep/' ? <span aria-current="page">Workbook</span> : <a href="/prep/">Workbook</a>}
       {sectionLabel && <><span aria-hidden="true">/</span><span aria-current="page">{sectionLabel}</span></>}
     </nav>

@@ -868,7 +868,7 @@ mark {
 .coding-trace-bar-stack { display: flex; flex-wrap: wrap; align-items: center; gap: .3rem; }
 .coding-trace-bar-stack-entry { padding: .3rem .42rem; border: 1px solid var(--viz-state-stroke); background: var(--viz-state-bg); color: var(--c-text-soft); font-family: var(--font-mono); font-size: .61rem; font-weight: 650; }
 .coding-trace-bar-stack-entry:last-of-type { border-color: var(--viz-focus-stroke); background: var(--viz-focus-bg); color: var(--c-text); }
-.coding-trace-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .45rem; padding-top: .55rem; border-top: 1px solid var(--c-rule); }
+.coding-trace-controls { display: flex; flex-wrap: wrap; order: -1; align-items: center; justify-content: space-between; gap: .45rem; padding-bottom: .55rem; border-bottom: 1px solid var(--c-rule); }
 .coding-trace-control-buttons { display: flex; flex-wrap: wrap; gap: .35rem; }
 .coding-trace-controls button,
 .coding-trace-timeline button { min-height: 2.35rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-surface); color: var(--c-text-soft); cursor: pointer; font-family: var(--font-ui); font-size: .68rem; font-weight: 600; }

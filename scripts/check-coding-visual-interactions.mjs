@@ -20,6 +20,7 @@ assert.match(client, /data-motion-key/, 'stable motion-key interpolation is requ
 assert.equal(client.match(/visual\.addEventListener\('keydown'/g)?.length, 1, 'one keydown handler per visual is required');
 assert.match(styles, /@media print[\s\S]*coding-trace-frame/, 'print must reveal authored frames');
 assert.match(styles, /@media \(max-width: 640px\)/, 'exact-mobile behavior is required');
+assert.match(styles, /\.coding-trace-controls\s*\{[^}]*order:\s*-1;/, 'trace controls must stay above variable-height frames');
 assert.match(sample, /data-coding-frame="0"(?![^>]*hidden)/, 'no-JS first frame must be visible');
 assert.match(sample, /data-coding-controls hidden/, 'no-JS controls must stay hidden');
 
@@ -202,6 +203,8 @@ const snapshotBody = `
 		activeFrame: Number(visual.dataset.activeFrame),
 		activeKey: activeFrame.dataset.frameKey,
 		frameCount: visual.querySelectorAll('[data-coding-frame]').length,
+		controlsTop: visual.querySelector('[data-coding-controls]').getBoundingClientRect().top,
+		scrollY: window.scrollY,
 		enhanced: visual.dataset.codingEnhanced,
 		animationCount: typeof animationCount === 'undefined' ? 0 : animationCount,
 		keyed,
@@ -255,6 +258,8 @@ try {
 				${snapshotBody}
 			})()`, true);
 			assert.equal(transition.activeFrame, frameIndex, `${route.slug}: Next skipped to frame ${transition.activeFrame}`);
+			assert.ok(Math.abs(transition.controlsTop - initial.controlsTop) < 0.5, `${route.slug}: controls moved while advancing frames`);
+			assert.equal(transition.scrollY, initial.scrollY, `${route.slug}: page scrolled while advancing frames`);
 			const difference = trackedDifference(previous, transition);
 			trackedAppearance ||= difference.appearance;
 			trackedPosition ||= difference.position;

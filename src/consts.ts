@@ -4,7 +4,7 @@ export const LOOPLET_URL = 'https://github.com/hsaghir/looplet';
 
 export const SITE = {
   title: 'mlmentorship',
-  description: 'Build a private senior ML interview plan from your role, level, rounds, available time, and recent closed-book evidence. Free and browser-local.',
+  description: 'Visual-first senior ML interview prep with ordered lessons, practice questions, coding traces, role-specific routes, and a private browser-local workbook.',
   author: 'Hamidreza Saghir',
   authorBio: 'Notes on senior ML interviews, system design, and applied ML practice.',
   email: 'ml.mentorship@gmail.com',
@@ -48,11 +48,11 @@ export const SITE = {
     // the core Questions library.
     prepTools: import.meta.env.PUBLIC_PREP_TOOLS === undefined || import.meta.env.PUBLIC_PREP_TOOLS === 'true',
   },
-  // Keep the header short. The wordmark links to the table of contents.
-  // URLs unchanged to preserve search-engine indexing and any inbound links.
+  // Keep the header task-oriented. The wordmark remains the direct home link.
   nav: [
-    { label: 'Contents', href: '/' },
+    { label: 'Library', href: '/#curriculum' },
     { label: 'Questions', href: '/questions/' },
+    { label: 'Coding', href: '/library/coding-interview/' },
     { label: 'Workbook', href: '/prep/' },
     { label: 'About', href: '/about/' },
   ],

@@ -22,6 +22,8 @@ if (shelfVolumeIds.length !== LIBRARY_VOLUMES.length || new Set(shelfVolumeIds).
 }
 
 const questionCount = entries.filter((entry) => entry.category === 'questions').length;
+const codingQuestionCount = volumeStatsById.get('coding-interview')?.entries.filter((entry) => entry.category === 'questions').length ?? 0;
+if (codingQuestionCount === 0) throw new Error('Homepage coding route needs the coding interview volume.');
 const deepCaseSlugs = [
   'personalized-search-ranking',
   'design-multi-team-ml-platform',
@@ -37,9 +39,40 @@ const knownSlugs = new Set(entries.map((entry) => entry.slug));
 if (deepCaseSlugs.some((slug) => !knownSlugs.has(slug))) throw new Error('Homepage deep-case proof list is stale.');
 
 const valuePoints = [
-  { title: 'Follow the actual loop', copy: 'Prepare for the coding, math, system-design, research, product, project, and strategy rounds recruiting confirmed.' },
-  { title: 'See the expected depth', copy: 'Answers separate reliable execution, senior ownership, staff architecture, principal judgment, and company-dependent upper-IC scope.' },
-  { title: 'Practice before reading', copy: 'Questions include timers and observable rubrics. Deep cases connect models, evidence, systems, failure, and ownership.' },
+  { title: 'See the mechanism', copy: 'Every entry leads with a visual. Coding traces expose the state, move, and invariant instead of asking you to memorize a solution.' },
+  { title: 'Practice the round', copy: 'Questions cover coding, math, ML breadth, system design, research, product, project, behavioral, and strategy interviews.' },
+  { title: 'Calibrate the depth', copy: 'Answers separate reliable execution, senior ownership, staff architecture, principal judgment, and company-dependent upper-IC scope.' },
+];
+
+const quickRoutes = [
+  {
+    cue: 'I know the round',
+    title: 'Practice interview questions',
+    copy: `${questionCount} questions organized by round, with strong-answer depth and observable rubrics.`,
+    href: '/questions/',
+    event: 'homepage_practice_clicked',
+  },
+  {
+    cue: 'I want coding practice',
+    title: 'Learn algorithms visually',
+    copy: `${codingQuestionCount} step-by-step traces for patterns, data structures, and practical AI coding.`,
+    href: '/library/coding-interview/',
+    event: 'homepage_curriculum_clicked',
+  },
+  {
+    cue: 'I know my role',
+    title: 'Follow a role-specific route',
+    copy: 'Applied Scientist, Research Scientist, MLE, and Research Engineer expectations without a one-size-fits-all loop.',
+    href: SITE.features.prepTools ? '/prep/role-paths/' : '/guides/as-vs-mle-vs-re/',
+    event: 'homepage_plan_clicked',
+  },
+  {
+    cue: 'I want a sequence',
+    title: `Study the ${LIBRARY_VOLUMES.length} books in order`,
+    copy: 'Move from foundations through training, evaluation, frontier systems, specialist tracks, and interview execution.',
+    href: '#curriculum',
+    event: 'homepage_curriculum_clicked',
+  },
 ];
 
 const depthSamples = [
@@ -50,36 +83,60 @@ const depthSamples = [
 ---
 
 <BaseLayout
-  title="Senior ML interview prep for real interview loops"
-  description="An ordered field guide for senior ML interviews, with role-specific questions, deep system-design cases, timed practice, and upper-IC calibration."
+  title="Visual-first preparation for senior ML interviews"
+  description="A visual-first field guide with ordered ML lessons, interview questions, coding traces, role-specific routes, timed practice, and senior-to-principal calibration."
 >
   <div class="landing-page">
     <header class="hero">
-      <p class="eyebrow">Free senior ML interview field guide</p>
-      <h1>Prepare for the ML interview you actually have.</h1>
-      <p class="hero-copy">Learn what strong answers require for Applied Scientist, Research Scientist, Machine Learning Engineer, and Research Engineer loops. Study in order, practice under time, and go deep enough for senior through principal scope.</p>
+      <p class="eyebrow">Free · visual-first · senior to principal</p>
+      <h1>Visual-first preparation for senior ML interviews.</h1>
+      <p class="hero-copy">Find one answer, practice an interview round, or study a complete sequence. The field guide spans ML foundations, training, evaluation, LLMs, systems, research, product, leadership, and coding.</p>
+
+      <button class="home-search" type="button" data-home-search aria-controls="search-dialog">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <span><strong>Search a topic or interview question</strong><small>Try “KV cache”, “binary search”, or “system design”</small></span>
+        <kbd aria-hidden="true">/</kbd>
+      </button>
 
       <ul class="hero-proof" aria-label="Field guide scope">
-        <li><strong>{LIBRARY_VOLUMES.length} books</strong><span>{entries.length} ordered entries</span></li>
-        <li><strong>{questionCount} questions</strong><span>timed practice and rubrics</span></li>
-        <li><strong>{deepCaseSlugs.length} deep cases</strong><span>real operating decisions</span></li>
+        <li><strong>{entries.length} visual lessons</strong><span>mechanisms before summaries</span></li>
+        <li><strong>{questionCount} questions</strong><span>practice and answer calibration</span></li>
+        <li><strong>{codingQuestionCount} coding traces</strong><span>state, move, and invariant</span></li>
+        <li><strong>{LIBRARY_VOLUMES.length} ordered books</strong><span>foundations through execution</span></li>
       </ul>
-
-      <div class="hero-actions">
-        <a class="primary-action" href="#curriculum" data-home-event="homepage_curriculum_clicked"><span>Explore the curriculum</span><span aria-hidden="true">↓</span></a>
-        <a class="secondary-action" href={SITE.features.prepTools ? '/questions/how-to-choose-loss-function/?practice=1' : '/questions/how-to-choose-loss-function/'} data-home-event="homepage_practice_clicked">Try one interview question</a>
-      </div>
-
-      {SITE.features.prepTools && (
-        <p class="workbook-line"><span>Optional:</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
-      )}
     </header>
+
+    <section class="route-section" aria-labelledby="route-heading">
+      <header class="section-head">
+        <div><span class="section-kicker">Start here</span><h2 id="route-heading">Choose the shortest route from what you already know.</h2></div>
+        <p>You do not need to read the library front to back.</p>
+      </header>
+      <nav class="route-list" aria-label="Ways to start">
+        <ol>
+          {quickRoutes.map((route, index) => (
+            <li>
+              <a href={route.href} data-home-event={route.event}>
+                <span class="route-number">{String(index + 1).padStart(2, '0')}</span>
+                <span class="route-copy"><small>{route.cue}</small><strong>{route.title}</strong><span>{route.copy}</span></span>
+                <span class="route-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      {SITE.features.prepTools && (
+        <p class="workbook-line"><span>Active interview loop?</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
+      )}
+    </section>
 
     <Subscribe placement="home" />
 
     <section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading">
       <header class="section-head">
-        <div><span class="section-kicker">The curriculum</span><h2 id="curriculum-heading">Nine books, ordered from foundations to interview execution.</h2></div>
+        <div><span class="section-kicker">The curriculum</span><h2 id="curriculum-heading">{LIBRARY_VOLUMES.length} books, ordered from foundations to interview execution.</h2></div>
         <p>Open a book to inspect its chapters, or start reading its first entry now.</p>
       </header>
 
@@ -155,6 +212,10 @@ const depthSamples = [
 <script>
   import { trackPublicEvent, type PublicEventName } from '../utils/publicEvents';
 
+  document.querySelector<HTMLButtonElement>('[data-home-search]')?.addEventListener('click', () => {
+    document.getElementById('search-trigger')?.click();
+  });
+
   document.querySelectorAll<HTMLElement>('[data-home-event]').forEach((element) => {
     element.addEventListener('click', () => {
       const name = element.dataset.homeEvent as PublicEventName | undefined;
@@ -168,27 +229,40 @@ const depthSamples = [
   .hero { max-width: 46rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--c-text); }
   .eyebrow, .section-kicker { color: var(--c-accent); font-family: var(--font-mono); font-size: .68rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
   .eyebrow { margin: 0 0 .55rem; }
-  .hero h1 { max-width: 44rem; margin: 0 0 .7rem; font-size: clamp(2.3rem, 6vw, 3.55rem); line-height: 1.02; letter-spacing: -.045em; }
-  .hero-copy { max-width: 43rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: clamp(1rem, 2vw, 1.1rem); line-height: 1.55; }
-  .hero-proof { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; margin: 1rem 0 0; padding: .75rem 0 0; border-top: 1px solid var(--c-rule); list-style: none; }
+  .hero h1 { max-width: 44rem; margin: 0 0 .7rem; font-size: 3rem; line-height: 1.02; letter-spacing: 0; }
+  .hero-copy { max-width: 43rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.05rem; line-height: 1.55; }
+  .home-search { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: .75rem; align-items: center; width: 100%; margin-top: 1.15rem; padding: .75rem .85rem; border: 1px solid var(--c-accent); border-radius: var(--radius); background: var(--c-surface); color: var(--c-text); cursor: pointer; text-align: left; }
+  .home-search:hover { background: var(--c-accent-soft); }
+  .home-search > svg { color: var(--c-accent); }
+  .home-search > span, .home-search strong, .home-search small { display: block; }
+  .home-search strong { font-size: .82rem; }
+  .home-search small { margin-top: .1rem; color: var(--c-muted); font-size: .66rem; font-weight: 400; }
+  .home-search kbd { min-width: 1.65rem; padding: .22rem .35rem; border: 1px solid var(--c-rule); border-bottom-width: 2px; border-radius: 3px; background: var(--c-bg); color: var(--c-muted); font-family: var(--font-mono); font-size: .68rem; text-align: center; }
+  .hero-proof { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .7rem 1rem; margin: 1rem 0 0; padding: .75rem 0 0; border-top: 1px solid var(--c-rule); list-style: none; }
   .hero-proof li { margin: 0; }
   .hero-proof strong, .hero-proof span { display: block; }
   .hero-proof strong { font-size: .78rem; }
   .hero-proof span { color: var(--c-muted); font-size: .65rem; }
-  .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem .8rem; margin-top: 1rem; }
-  .primary-action, .secondary-action { display: inline-flex; align-items: center; justify-content: center; gap: .65rem; min-height: 2.6rem; padding: .64rem .82rem; border-radius: var(--radius); font-size: .8rem; font-weight: 700; text-decoration: none; }
-  .primary-action { border: 1px solid var(--c-accent-fill); background: var(--c-accent-fill); color: var(--c-on-accent); }
-  .primary-action:hover { border-color: var(--c-link-hover); background: var(--c-link-hover); color: var(--c-on-accent); }
-  .secondary-action { border: 1px solid var(--c-rule); background: var(--c-bg); color: var(--c-text); }
-  .secondary-action:hover { border-color: var(--c-text-soft); color: var(--c-accent); }
   .workbook-line { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
   .workbook-line > span:first-child { color: var(--c-text-soft); font-weight: 600; }
   .workbook-line a { font-weight: 600; }
-  .curriculum, .value-section, .depth-section { padding-top: 2.5rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
+  .route-section, .curriculum, .value-section, .depth-section { padding-top: 2.5rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
   .section-head { display: flex; align-items: end; justify-content: space-between; gap: 1.2rem; margin-bottom: .7rem; padding-bottom: .65rem; border-bottom: 1px solid var(--c-rule); }
   .section-head h2, .trust-section h2 { margin: .22rem 0 0; font-size: clamp(1.35rem, 3vw, 1.72rem); line-height: 1.18; }
   .section-head > p { max-width: 18rem; margin: 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; text-align: right; }
   .section-head > a { flex: 0 0 auto; color: var(--c-muted); font-size: .72rem; }
+  .route-list ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; border-top: 1px solid var(--c-rule); list-style: none; }
+  .route-list li { min-width: 0; margin: 0; border-bottom: 1px solid var(--c-rule); }
+  .route-list li:nth-child(odd) { padding-right: 1rem; border-right: 1px solid var(--c-rule); }
+  .route-list li:nth-child(even) { padding-left: 1rem; }
+  .route-list a { display: grid; grid-template-columns: 1.55rem minmax(0, 1fr) auto; gap: .55rem; align-items: start; height: 100%; padding: .8rem 0; color: inherit; text-decoration: none; }
+  .route-number { padding-top: .12rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; }
+  .route-copy, .route-copy small, .route-copy strong, .route-copy > span { display: block; min-width: 0; }
+  .route-copy small { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; text-transform: uppercase; }
+  .route-copy strong { margin-top: .08rem; font-size: .82rem; }
+  .route-copy > span { margin-top: .15rem; color: var(--c-muted); font-family: var(--font-reading); font-size: .7rem; line-height: 1.4; }
+  .route-arrow { align-self: center; color: var(--c-muted); font-size: .75rem; }
+  .route-list a:hover .route-copy strong { color: var(--c-accent); text-decoration: underline; }
   .shelf { margin-top: 1.45rem; }
   .shelf > header { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: .8rem; align-items: baseline; margin-bottom: .35rem; }
   .shelf > header h3 { margin: 0; font-size: .88rem; }
@@ -234,10 +308,10 @@ const depthSamples = [
   }
   @media (max-width: 600px) {
     .landing-page { padding-top: 1.4rem; }
-    .hero h1 { font-size: clamp(2.05rem, 12vw, 2.75rem); }
-    .hero-actions { align-items: stretch; flex-direction: column; }
-    .primary-action, .secondary-action { width: 100%; }
+    .hero h1 { font-size: 2.2rem; }
     .hero-proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; }
+    .route-list ol { grid-template-columns: 1fr; }
+    .route-list li:nth-child(odd), .route-list li:nth-child(even) { padding-right: 0; padding-left: 0; border-right: 0; }
     .shelf > header { grid-template-columns: 1fr; gap: .1rem; }
     .shelf > ol > li { grid-template-columns: 1.6rem minmax(0, 1fr); gap: .55rem; }
     .book-actions { grid-column: 2; align-items: flex-start; }
