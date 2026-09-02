@@ -10,7 +10,7 @@
     "mermaid": "Rejected: automatic graph layout can show micro-batch dependencies but cannot preserve a regular time grid whose active and idle slots can be counted.",
     "svg": "Selected: deterministic cells align three stages over six time slots, preserve the diagonal dependency wave, and expose the exact utilization arithmetic.",
     "semanticHtml": "Rejected: an HTML table could represent the schedule, but the established SVG timeline primitives provide clearer arrows, a continuous fill/drain boundary, and reliable print geometry.",
-    "interaction": "Rejected: changing stage or micro-batch counts would add controls and state when one worked example is enough to derive the invariant.",
+    "interaction": "Selected as progressive enhancement: the three authored states step through fill, full utilization, and drain/count while the static schedule remains the complete no-JavaScript fallback.",
     "paperReuse": "Rejected: the primary papers contain denser schedule figures and their public availability is not assumed to grant adaptation rights. No paper or deck figure, data, or layout is reused.",
     "noVisual": "Rejected: the ASCII timelines name a bubble but do not make the numerator and denominator in the bubble fraction spatially countable."
   },
@@ -76,6 +76,7 @@
     "visualIds": [
       "pipeline-fill-drain-bubble"
     ],
-    "accessibility": "The SVG has a linked title and detailed description. Every active cell names its micro-batch, every idle cell contains a dot, stage and time axes are explicit, and solid dependency arrows plus fill and drain labels preserve meaning without color. The established visual-wide scroll container keeps 11-pixel SVG labels at full size on a 390 CSS-pixel viewport, shared theme tokens support dark mode, and print rules remove the minimum width while forcing a light high-contrast palette."
+    "accessibility": "The SVG has a linked title and detailed description. Every active cell names its micro-batch, every idle cell contains a dot, stage and time axes are explicit, and solid dependency arrows plus fill and drain labels preserve meaning without color. The established visual-wide scroll container keeps 11-pixel SVG labels at full size on a 390 CSS-pixel viewport, shared theme tokens support dark mode, and print rules remove the minimum width while forcing a light high-contrast palette. The authored trace adds stable stage-time cell keys and a three-state keyboard sequence.",
+    "mechanismTrace": { "visualId": "pipeline-fill-drain-bubble", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable stage-time keys, and print-visible authored states." }
   }
 }

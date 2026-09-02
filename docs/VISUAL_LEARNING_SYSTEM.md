@@ -74,6 +74,12 @@ Every instructional figure needs:
 
 A figure should remain useful if its colors are removed. Shape, labels, arrows, line style, and position must carry meaning too.
 
+## Article mechanism traces
+
+When the lesson depends on a changing state, an article may add an `ArticleVisualTrace` before its reviewed static figure. The trace owns a worked example, at least three complete states, a transition note for each step, stable entity keys, and recognition, invariant, and transfer lessons. It uses the same progressive-enhancement contract as coding traces: the first state is visible without JavaScript, controls add keyboard and playback behavior, reduced motion advances one authored step, and print reveals every state.
+
+Use a trace for discrete transitions such as merges, assignments, backward sweeps, scheduler replacement, or accept/reject boundaries. Keep a deterministic SVG or semantic figure static when the lesson is a measured relationship, a comparison of axes, or a complete geometric construction whose meaning would be weakened by invented intermediate values. The trace and the static figure must share the audit visual ID so article pages and review mode continue to load one visual identity.
+
 ## Visual grammar
 
 - Neutral surface: ordinary processing or context.

@@ -10,7 +10,7 @@
     "mermaid": "Rejected: a flowchart can show queue, scheduler, and GPU components, but automatic layout does not expose slot occupancy across aligned decode iterations.",
     "svg": "Selected: deterministic timeline cells preserve iteration and slot correspondence, distinguish idle work with dashed shapes and text, and show the exact admission boundary without runtime code.",
     "semanticHtml": "Rejected: a table could encode the schedule, but the paired timeline and admission arrow would be less immediate, and a narrow table would require horizontal scrolling or abbreviated headers.",
-    "interaction": "Rejected: changing request lengths or arrivals would add controls and simulation state without improving the single replacement invariant this article needs to teach.",
+    "interaction": "Selected as progressive enhancement: the three authored states step through shared completion, static idling, and iteration-boundary replacement while the static two-schedule figure remains the complete no-JavaScript fallback.",
     "paperReuse": "Rejected: Orca contains scheduling figures and the vLLM and Sarathi papers contain system diagrams, but no permissive figure-reuse license was established for those papers. The shipped schedule, request lengths, geometry, and wording are independently authored.",
     "noVisual": "Rejected: prose explains that requests may enter after another finishes, but the reader must mentally synchronize completion, queue admission, and the continuing long request. The aligned schedules make the unused static slot and next-iteration replacement visible."
   },
@@ -67,6 +67,7 @@
     "visualIds": [
       "continuous-batching-reuses-finished-slot"
     ],
-    "accessibility": "Each SVG panel has a linked title and complete description. Every occupied cell contains its request letter, idle cells are dashed and explicitly say 'idle,' step numbers and slot labels establish both axes, and the admission boundary is directly labelled, so color is redundant. The established two-panel primitive stacks below 640 pixels, each panel scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens provide a light high-contrast palette."
+    "accessibility": "Each SVG panel has a linked title and complete description. Every occupied cell contains its request letter, idle cells are dashed and explicitly say 'idle,' step numbers and slot labels establish both axes, and the admission boundary is directly labelled, so color is redundant. The established two-panel primitive stacks below 640 pixels, each panel scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens provide a light high-contrast palette. The authored trace adds stable request-slot keys, an explicit slot header, and a three-state keyboard sequence.",
+    "mechanismTrace": { "visualId": "continuous-batching-reuses-finished-slot", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable request-slot keys, and print-visible authored states." }
   }
 }

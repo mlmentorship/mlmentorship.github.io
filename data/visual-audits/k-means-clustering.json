@@ -10,7 +10,7 @@
     "mermaid": "Rejected because automatic graph layout cannot preserve Euclidean distances, nearest-center geometry, or centroid movement in a shared coordinate system.",
     "svg": "Selected because fixed coordinates can show the same six observations, two initial centers, one representative distance comparison, and exact old-to-mean centroid moves across aligned panels.",
     "semanticHtml": "Rejected because a table can verify the coordinate arithmetic but cannot show how nearest-center assignment creates spatial regions or where each mean moves.",
-    "interaction": "Rejected because dragging initial centers could teach sensitivity but adds hidden states and controls before the reader understands the two deterministic substeps of one iteration.",
+    "interaction": "Selected as progressive enhancement: the three authored states step through fixed-center assignment, mean movement, and unchanged-membership stopping while the static coordinate figure remains available without JavaScript.",
     "paperReuse": "Rejected because the deck and reviewed sources contain related clustering explanations, but no permissive figure-reuse grant was established for a candidate that teaches this exact two-step objective. The plotted points, coordinates, labels, and composition are original.",
     "noVisual": "Rejected because the prose states two formulas sequentially while requiring the reader to imagine that each substep holds a different quantity fixed. The aligned panels make that alternation and its geometric consequence visible."
   },
@@ -76,6 +76,7 @@
     "visualIds": [
       "kmeans-assign-then-update"
     ],
-    "accessibility": "Each panel has a linked title and complete description. Cluster membership uses circles versus squares, centroids use large x marks, old-to-new movement uses labelled arrows, and every coordinate and mean calculation is written, so color is redundant. The two 340-unit SVGs stack at every viewport width to keep their smallest text above the rendering threshold on desktop as well as at 390 CSS pixels. Existing theme tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette."
+    "accessibility": "Each panel has a linked title and complete description. Cluster membership uses circles versus squares, centroids use large x marks, old-to-new movement uses labelled arrows, and every coordinate and mean calculation is written, so color is redundant. The two 340-unit SVGs stack at every viewport width to keep their smallest text above the rendering threshold on desktop as well as at 390 CSS pixels. Existing theme tokens preserve dark-mode contrast, and shared print rules force a light high-contrast palette. The authored trace adds stable point and centroid keys, explicit plot axes, and a keyboard-steppable state sequence.",
+    "mechanismTrace": { "visualId": "kmeans-assign-then-update", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable point and centroid keys, and print-visible authored states." }
   }
 }

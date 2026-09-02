@@ -63,6 +63,7 @@
   },
   "implementation": {
     "visualIds": ["activation-gradient-regions"],
-    "accessibility": "The SVGs include separate titles and complete descriptions. Numeric axes, direct curve labels, explicit saturation and dead-region annotations, solid versus dashed strokes, and the caption preserve the comparison without relying on color."
+    "accessibility": "The SVGs include separate titles and complete descriptions. Numeric axes, direct curve labels, explicit saturation and dead-region annotations, solid versus dashed strokes, and the caption preserve the comparison without relying on color. The authored trace adds exact output and slope tables at x=-2, x=0, and x=2, keyboard stepping, and print-visible states.",
+    "mechanismTrace": { "visualId": "activation-gradient-regions", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable function-row keys, and print-visible authored states." }
   }
 }

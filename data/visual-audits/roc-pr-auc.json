@@ -43,6 +43,7 @@
   },
   "implementation": {
     "visualIds": ["roc-pr-same-operating-point"],
-    "accessibility": "Each SVG has its own title and long description. Axis labels, dashed guides, point markers, explicit values, and a count-based caption preserve meaning without color."
+    "accessibility": "Each SVG has its own title and long description. Axis labels, dashed guides, point markers, explicit values, and a count-based caption preserve meaning without color. The authored trace adds stable confusion-count and metric keys, keyboard stepping, and print-visible states.",
+    "mechanismTrace": { "visualId": "roc-pr-same-operating-point", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable confusion-count keys, and print-visible authored states." }
   }
 }

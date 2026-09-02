@@ -10,7 +10,7 @@
     "mermaid": "Rejected: a flowchart can repeat count and merge stages, but automatic node layout would not preserve the exact token segmentation and arithmetic within each round as clearly as ordered text panels.",
     "svg": "Rejected: deterministic geometry could align token chips, but the lesson is a discrete sequence of corpus states rather than a geometric relationship. SVG would add markup and make text wrapping at phone width less robust.",
     "semanticHtml": "Selected: semantic headings, code fragments, explicit arithmetic, and logical source order make every merge inspectable, stack naturally at 390 CSS pixels, and remain useful without color or client-side code.",
-    "interaction": "Rejected: changing frequencies or stepping through merges would add controls and state when one carefully chosen three-round trace is enough to reveal the counting and rank-order invariants.",
+    "interaction": "Selected as progressive enhancement: the three authored states step through rank 1, rank 2, and rank 3/replay while the static corpus figure remains the complete no-JavaScript fallback.",
     "paperReuse": "Rejected: the 2016 ACL paper is available under CC BY 4.0 and could be adapted with attribution, while the Hugging Face course documentation is Apache 2.0 and tiktoken is MIT licensed. Their figures, examples, code, wording, data, and layouts were not reused. The shipped map/maps/cap corpus, counts, structure, and application examples are independently authored.",
     "noVisual": "Rejected: the prose lists the BPE loop but requires readers to mentally update a corpus after every merge, aggregate a pair across word frequencies, and connect learned merge rank to later segmentation. The trace makes those state transitions explicit."
   },
@@ -77,6 +77,7 @@
     "visualIds": [
       "bpe-corpus-merge-trace"
     ],
-    "accessibility": "The figure has a linked learning-question title and a role=list child with a complete accessible label. Every panel states its round, current segmentation, exact pair arithmetic, and resulting vocabulary token in text; learned order and output boundaries use headings, rank numbers, brackets, and code typography rather than color. The established one-column responsive grid has no minimum width and wraps at 390 CSS pixels. Shared theme variables supply dark-mode contrast, while established print rules force a light high-contrast palette and avoid splitting the figure."
+    "accessibility": "The figure has a linked learning-question title and a role=list child with a complete accessible label. Every panel states its round, current segmentation, exact pair arithmetic, and resulting vocabulary token in text; learned order and output boundaries use headings, rank numbers, brackets, and code typography rather than color. The established one-column responsive grid has no minimum width and wraps at 390 CSS pixels. Shared theme variables supply dark-mode contrast, while established print rules force a light high-contrast palette and avoid splitting the figure.",
+    "mechanismTrace": { "visualId": "bpe-corpus-merge-trace", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable entity keys, and print-visible authored states." }
   }
 }

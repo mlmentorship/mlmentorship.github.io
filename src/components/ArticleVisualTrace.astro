@@ -1,0 +1,83 @@
+---
+import ArticleTraceScene from './ArticleTraceScene.astro';
+import type { ArticleVisualTrace } from '../utils/articleVisualTraces';
+
+interface Props {
+  definition: ArticleVisualTrace;
+}
+
+const { definition } = Astro.props as Props;
+const titleId = `article-trace-${definition.slug}-title`;
+const firstFrame = definition.frames[0];
+const visualMarker = `<!-- visual:${definition.visualId} -->`;
+---
+
+<Fragment set:html={visualMarker} />
+<figure class="learning-figure article-trace-figure" data-article-trace={definition.visualId} aria-labelledby={titleId}>
+  <p class="visual-kicker">{definition.traceKind === 'evidence' ? 'Evidence trace' : 'Mechanism trace'}</p>
+  <p class="visual-title" id={titleId}>{definition.title}</p>
+  <div
+    class="coding-visual article-trace"
+    data-coding-visual
+    data-coding-mode="trace"
+    data-coding-slug={definition.slug}
+    role="group"
+    tabindex="0"
+    aria-label={`${definition.title}: ${definition.objective}`}
+  >
+    <div class="coding-visual-example">
+      <span>Worked example</span>
+      <strong>{definition.example}</strong>
+    </div>
+    <div class="coding-trace" data-coding-trace>
+      {definition.frames.map((frame, index) => (
+        <div
+          class="coding-trace-frame article-trace-frame"
+          data-coding-frame={index}
+          data-frame-key={frame.key}
+          hidden={index > 0}
+          role="group"
+          aria-label={frame.label}
+        >
+          <div class="coding-trace-frame-heading">
+            <span>{frame.label}</span>
+            <strong>{frame.note}</strong>
+          </div>
+          <ArticleTraceScene scene={frame.scene} slug={definition.slug} frameKey={frame.key} />
+        </div>
+      ))}
+      <div class="coding-trace-controls" data-coding-controls hidden>
+        <div class="coding-trace-control-buttons">
+          <button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button>
+          <button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button>
+          <button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button>
+        </div>
+        <output data-coding-progress>Step 1 of {definition.frames.length}</output>
+      </div>
+      <div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps">
+        {definition.frames.map((frame, index) => (
+          <button type="button" data-coding-frame-button={index} aria-current={index === 0 ? 'step' : undefined}>
+            <span>{index + 1}</span>
+            <strong>{frame.label}</strong>
+          </button>
+        ))}
+      </div>
+      <p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p>
+    </div>
+    <dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer">
+      <div class="coding-visual-lesson">
+        <dt>Recognize it</dt>
+        <dd>{definition.review.recognitionCue}</dd>
+      </div>
+      <div class="coding-visual-lesson">
+        <dt>Keep true</dt>
+        <dd>{definition.review.invariant}</dd>
+      </div>
+      <div class="coding-visual-lesson">
+        <dt>Reuse it</dt>
+        <dd>{definition.review.transferLesson}</dd>
+      </div>
+    </dl>
+  </div>
+  <figcaption><strong>Read it this way:</strong> {firstFrame?.note} Step through the authored states to follow the article's {definition.traceKind === 'evidence' ? 'reviewed evidence' : 'invariant'}.</figcaption>
+</figure>

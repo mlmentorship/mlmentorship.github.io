@@ -6,6 +6,7 @@ import PracticeMode from '../components/PracticeMode.astro';
 import CompletionToggle from '../components/CompletionToggle.astro';
 import BookReaderNav from '../components/BookReaderNav.astro';
 import VisualReviewCard from '../components/VisualReviewCard.astro';
+import ArticleVisualTrace from '../components/ArticleVisualTrace.astro';
 import Subscribe from '../components/Subscribe.astro';
 import { formatDate } from '../utils/date';
 import readingTime from 'reading-time';
@@ -15,6 +16,7 @@ import { getPracticeMode } from '../data/prepCurriculum';
 import { findLibraryLocation, getLibraryShelf } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { getImplementedVisualAudit } from '../utils/visualAudits';
+import { getArticleVisualTrace } from '../utils/articleVisualTraces';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -27,6 +29,7 @@ const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 const category = post.data.category as Category;
 const visualAudit = getImplementedVisualAudit(slug);
+const articleTrace = getArticleVisualTrace(slug);
 
 const CATEGORY_META: Record<Category, { singular: string; plural: string }> = {
   questions: { singular: 'Question', plural: 'Questions' },
@@ -186,6 +189,7 @@ const fullContentLabel: Record<Category, string> = {
       </nav>}
 
       <div id="answer" class="prose docs-body" itemprop="articleBody">
+        {articleTrace && <ArticleVisualTrace definition={articleTrace} />}
         <slot />
       </div>
 

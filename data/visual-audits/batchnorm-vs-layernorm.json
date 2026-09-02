@@ -45,6 +45,7 @@
   },
   "implementation": {
     "visualIds": ["normalization-shared-statistics"],
-    "accessibility": "Both tensor grids have descriptive image roles, visible axis keys, textual group labels, and a caption that explains the shared-statistics direction without relying on color."
+    "accessibility": "Both tensor grids have descriptive image roles, visible axis keys, textual group labels, and a caption that explains the shared-statistics direction without relying on color. The authored trace adds stable axis-group keys, explicit train/eval consequences, keyboard stepping, and print-visible states.",
+    "mechanismTrace": { "visualId": "normalization-shared-statistics", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable normalization-group keys, and print-visible authored states." }
   }
 }

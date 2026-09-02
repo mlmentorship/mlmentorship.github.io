@@ -15,9 +15,10 @@
     "check:links": "node scripts/check-links.mjs",
     "check:style": "node scripts/check-editorial-style.mjs",
     "check:site": "node scripts/check-site-contracts.mjs",
-    "check:visuals": "node scripts/check-visual-coverage.mjs && node scripts/check-coding-visual-architecture.mjs && node scripts/check-coding-visuals.mjs && node scripts/check-coding-visual-interactions.mjs",
+    "check:visuals": "node scripts/check-visual-coverage.mjs && node --experimental-strip-types scripts/check-article-visual-traces.mjs && node scripts/check-coding-visual-architecture.mjs && node scripts/check-coding-visuals.mjs && node scripts/check-coding-visual-interactions.mjs",
     "visuals:status": "node scripts/check-visual-coverage.mjs --next=20",
     "visuals:batch": "node scripts/create-visual-batch.mjs",
+    "content:visual-traces": "node scripts/generate-article-visual-traces.mjs",
     "content:coding-book": "node scripts/generate-coding-question-book.mjs --force"
   },
   "dependencies": {

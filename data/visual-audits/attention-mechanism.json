@@ -10,7 +10,7 @@
     "mermaid": "Rejected: a flowchart can show score, softmax, and sum, but it cannot align three weight magnitudes with three value contributions as precisely at phone width.",
     "svg": "Selected: deterministic bars, direct labels, and a worked scalar example expose both the normalized distribution and the weighted sum in one static trace.",
     "semanticHtml": "Rejected: a table could verify the arithmetic, but it would weaken the spatial handoff from query-key scoring to value aggregation.",
-    "interaction": "Rejected: changing scores or values would add controls and state without improving the single distinction the learner needs to retain.",
+    "interaction": "Selected as progressive enhancement: the three authored states step from query-key weights to paired value contributions to the weighted output while the static two-panel figure remains the complete no-JavaScript fallback.",
     "paperReuse": "Rejected: the source figures are architecture-level diagrams, their figure-reuse permission was not established, and none isolates the keys-versus-values mental model as narrowly as this article needs.",
     "noVisual": "Rejected: the prose lists the operations correctly but requires the reader to mentally preserve row correspondence while switching from keys in the scoring stage to values in the aggregation stage."
   },
@@ -75,6 +75,7 @@
     "visualIds": [
       "attention-keys-choose-values-contribute"
     ],
-    "accessibility": "Both SVG panels have linked titles and complete descriptions. Direct key, weight, value, contribution, and sum labels carry all meaning without color; bar length redundantly encodes weight magnitude. The established two-panel primitive stacks below 640 pixels, each SVG scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette."
+    "accessibility": "Both SVG panels have linked titles and complete descriptions. Direct key, weight, value, contribution, and sum labels carry all meaning without color; bar length redundantly encodes weight magnitude. The established two-panel primitive stacks below 640 pixels, each SVG scales from a 300-pixel viewBox without a minimum width for readability at 390 CSS pixels, theme variables preserve dark-mode contrast, and shared print tokens force a light high-contrast palette. The authored trace adds stable weight, value, and contribution keys plus a three-state keyboard sequence.",
+    "mechanismTrace": { "visualId": "attention-keys-choose-values-contribute", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable attention-row keys, and print-visible authored states." }
   }
 }

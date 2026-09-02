@@ -65,6 +65,7 @@
   },
   "implementation": {
     "visualIds": ["pca-rank-one-projection"],
-    "accessibility": "The figure uses a title and detailed description, direct labels, orthogonal line geometry, distinct circle and diamond markers, and dashed perpendicular residuals. Meaning does not depend on color, the SVG scales through its viewBox, and the existing learning-figure primitives provide dark-mode and print treatment."
+    "accessibility": "The figure uses a title and detailed description, direct labels, orthogonal line geometry, distinct circle and diamond markers, and dashed perpendicular residuals. Meaning does not depend on color, the SVG scales through its viewBox, and the existing learning-figure primitives provide dark-mode and print treatment. The authored trace adds stable projection and residual keys, keyboard stepping, and print-visible states.",
+    "mechanismTrace": { "visualId": "pca-rank-one-projection", "states": 3, "contract": "Static first state, keyboard and playback stepping, reduced-motion single-step behavior, stable projection/residual keys, and print-visible authored states." }
   }
 }

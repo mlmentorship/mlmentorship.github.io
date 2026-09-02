@@ -317,7 +317,7 @@ if (process.argv.includes('--dist')) {
     }
     const html = readFileSync(output, 'utf8');
     for (const id of audit.implementation.visualIds) {
-      const marker = html.indexOf(`<!-- visual:${id} -->`);
+      const marker = html.lastIndexOf(`<!-- visual:${id} -->`);
       if (audit.medium === 'mermaid') {
         const blockStart = html.indexOf('<pre class="mermaid">', marker);
         const blockEnd = html.indexOf('</pre>', blockStart);

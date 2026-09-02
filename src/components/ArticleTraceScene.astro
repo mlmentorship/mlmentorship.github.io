@@ -1,0 +1,246 @@
+---
+import type {
+  ArticleTraceCell,
+  ArticleTraceFlowNode,
+  ArticleTraceScene,
+} from '../utils/articleVisualTraces';
+
+interface Props {
+  scene: ArticleTraceScene;
+  slug: string;
+  frameKey: string;
+}
+
+const { scene, slug, frameKey } = Astro.props as Props;
+const sceneId = `article-trace-${slug}-${frameKey}`;
+const fallbackFlowNode: ArticleTraceFlowNode = {
+  key: 'missing',
+  x: 0,
+  y: 0,
+  label: '',
+  value: '',
+};
+const toneClass = (tone: ArticleTraceCell['tone'] = 'neutral') => `article-trace-tone-${tone}`;
+const pointX = (value: number) => 20 + value;
+const pointY = (value: number) => 205 - value;
+const flowNode = (key: string) => scene.type === 'flow'
+  ? scene.nodes.find((node) => node.key === key) ?? fallbackFlowNode
+  : fallbackFlowNode;
+const cellClass = (item: ArticleTraceCell) => ['article-trace-cell', toneClass(item.tone)];
+const formula = 'formula' in scene ? scene.formula : undefined;
+---
+
+{scene.type === 'lanes' && (
+  <div class="article-trace-lanes" role="list" aria-label={scene.ariaLabel}>
+    {scene.lanes.map((lane) => (
+      <div class="article-trace-lane" role="listitem">
+        <span class="article-trace-lane-label">{lane.label}</span>
+        <div class="article-trace-lane-cells">
+          {lane.cells.map((item) => (
+            <span class:list={cellClass(item)} data-motion-key={item.key}>
+              <strong>{item.value}</strong>
+              {item.detail && <small>{item.detail}</small>}
+            </span>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+{scene.type === 'table' && (
+  <div class="article-trace-table-wrap">
+    <table class="article-trace-table" aria-label={scene.ariaLabel}>
+      <thead>
+        <tr>{scene.columns.map((column) => <th scope="col">{column}</th>)}</tr>
+      </thead>
+      <tbody>
+        {scene.rows.map((row) => (
+          <tr>
+            {row.map((item) => (
+              <td class:list={cellClass(item)} data-motion-key={item.key}>
+                <strong>{item.value}</strong>
+                {item.detail && <small>{item.detail}</small>}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{scene.type === 'evidence' && (
+  <div class="article-trace-evidence" role="list" aria-label={scene.ariaLabel}>
+    {scene.stages.map((stage, index) => (
+      <div class:list={['article-trace-evidence-stage', toneClass(stage.tone)]} data-motion-key={stage.key} role="listitem">
+        <span>{index + 1}. {stage.label}</span>
+        <strong>{stage.value}</strong>
+      </div>
+    ))}
+  </div>
+)}
+
+{scene.type === 'plot' && (
+  <div class="article-trace-plot-wrap">
+    <svg class="article-trace-plot" viewBox="0 0 340 235" role="img" aria-labelledby={`${sceneId}-title ${sceneId}-desc`}>
+      <title id={`${sceneId}-title`}>{scene.ariaLabel}</title>
+      <desc id={`${sceneId}-desc`}>{scene.ariaLabel} {scene.annotations.join(' ')}</desc>
+      <defs>
+        <marker id={`${sceneId}-arrow`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path class="article-trace-forward-marker" d="M0 0L8 4L0 8Z" />
+        </marker>
+      </defs>
+      <path class="article-trace-axis" d="M20 205H320M20 205V25" />
+      <text class="article-trace-axis-label" x="316" y="220" text-anchor="end">x</text>
+      <text class="article-trace-axis-label" x="12" y="30">y</text>
+      {scene.centroids.map((centroid) => centroid.previous && (
+        <line
+          class="article-trace-centroid-move"
+          x1={pointX(centroid.previous.x)}
+          y1={pointY(centroid.previous.y)}
+          x2={pointX(centroid.x)}
+          y2={pointY(centroid.y)}
+          marker-end={`url(#${sceneId}-arrow)`}
+        />
+      ))}
+      {scene.points.map((point) => point.shape === 'circle' ? (
+        <circle
+          class:list={['article-trace-point', toneClass(point.tone), point.key === scene.activePoint ? 'is-active' : '']}
+          data-motion-key={point.key}
+          cx={pointX(point.x)}
+          cy={pointY(point.y)}
+          r="6"
+        />
+      ) : (
+        <rect
+          class:list={['article-trace-point', toneClass(point.tone), point.key === scene.activePoint ? 'is-active' : '']}
+          data-motion-key={point.key}
+          x={pointX(point.x) - 6}
+          y={pointY(point.y) - 6}
+          width="12"
+          height="12"
+        />
+      ))}
+      {scene.centroids.map((centroid) => (
+        <g class="article-trace-centroid" data-motion-key={centroid.key}>
+          <path d={`M${pointX(centroid.x) - 8} ${pointY(centroid.y) - 8}L${pointX(centroid.x) + 8} ${pointY(centroid.y) + 8}M${pointX(centroid.x) + 8} ${pointY(centroid.y) - 8}L${pointX(centroid.x) - 8} ${pointY(centroid.y) + 8}`} />
+          <text x={pointX(centroid.x)} y={pointY(centroid.y) - 12} text-anchor="middle">{centroid.label}</text>
+        </g>
+      ))}
+    </svg>
+  </div>
+)}
+
+{scene.type === 'flow' && (
+  <div class="article-trace-flow-wrap">
+    <svg class="article-trace-flow" viewBox="0 0 610 235" role="img" aria-labelledby={`${sceneId}-title ${sceneId}-desc`}>
+      <title id={`${sceneId}-title`}>{scene.ariaLabel}</title>
+      <desc id={`${sceneId}-desc`}>{scene.ariaLabel} {scene.annotations.join(' ')}</desc>
+      <defs>
+        <marker id={`${sceneId}-forward`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path class="article-trace-forward-marker" d="M0 0L8 4L0 8Z" />
+        </marker>
+        <marker id={`${sceneId}-backward`} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path class="article-trace-backward-marker" d="M0 0L8 4L0 8Z" />
+        </marker>
+      </defs>
+      {scene.edges.map((edge) => {
+        const from = flowNode(edge.from);
+        const to = flowNode(edge.to);
+        return (
+          <g class:list={['article-trace-flow-edge', `is-${edge.direction}`]} data-motion-key={edge.key}>
+            <line
+              x1={from.x + (to.x > from.x ? 32 : -32)}
+              y1={from.y}
+              x2={to.x - (to.x > from.x ? 32 : -32)}
+              y2={to.y}
+              marker-end={`url(#${sceneId}-${edge.direction})`}
+            />
+            <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 - 8} text-anchor="middle">{edge.label}</text>
+          </g>
+        );
+      })}
+      {scene.nodes.map((node) => (
+        <g class:list={['article-trace-flow-node', toneClass(node.tone)]} data-motion-key={node.key}>
+          <rect x={node.x - 30} y={node.y - 25} width="60" height="50" rx="4" />
+          <text class="article-trace-flow-node-label" x={node.x} y={node.y - 3} text-anchor="middle">{node.label}</text>
+          <text class="article-trace-flow-node-value" x={node.x} y={node.y + 14} text-anchor="middle">{node.value}</text>
+          {node.gradient && <text class="article-trace-flow-gradient" x={node.x} y={node.y - 34} text-anchor="middle">{node.gradient}</text>}
+        </g>
+      ))}
+    </svg>
+  </div>
+)}
+
+{(scene.type === 'grid' || scene.type === 'schedule') && (
+  <div class="article-trace-grid-wrap">
+    <div class="article-trace-grid" style={`--article-trace-columns: ${scene.columns.length}`} role="table" aria-label={scene.ariaLabel}>
+      <div class="article-trace-grid-row article-trace-grid-header" role="row">
+        <span role="columnheader">{scene.header ?? 'stage'}</span>
+        {scene.columns.map((column) => <span role="columnheader">{column}</span>)}
+      </div>
+      {scene.rows.map((row) => (
+        <div class="article-trace-grid-row" role="row">
+          <span class="article-trace-grid-row-label" role="rowheader">{row.label}</span>
+          {row.cells.map((item) => (
+            <span class:list={cellClass(item)} data-motion-key={item.key} role="cell">
+              <strong>{item.value}</strong>
+              {item.detail && <small>{item.detail}</small>}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
+    {scene.queue && scene.queue.length > 0 && (
+      <div class="article-trace-queue" role="group" aria-label="Queued requests">
+        <span class="article-trace-lane-label">queue</span>
+        {scene.queue.map((item) => (
+          <span class:list={cellClass(item)} data-motion-key={item.key}>
+            <strong>{item.value}</strong>
+            {item.detail && <small>{item.detail}</small>}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
+{scene.type === 'speculative' && (
+  <div class="article-trace-speculative" role="group" aria-label={scene.ariaLabel}>
+    <div class="article-trace-speculative-row" role="group" aria-label="Draft tokens">
+      <span class="article-trace-lane-label">draft</span>
+      {scene.draft.map((item) => (
+        <span class:list={cellClass(item)} data-motion-key={item.key}>
+          <strong>{item.value}</strong>
+          {item.detail && <small>{item.detail}</small>}
+        </span>
+      ))}
+    </div>
+    <div class="article-trace-speculative-row" role="group" aria-label="Target decisions">
+      <span class="article-trace-lane-label">target check</span>
+      {scene.decisions.map((item) => (
+        <span class:list={cellClass(item)} data-motion-key={item.key}>
+          <strong>{item.value}</strong>
+          {item.detail && <small>{item.detail}</small>}
+        </span>
+      ))}
+    </div>
+    {scene.committed.length > 0 && (
+      <div class="article-trace-speculative-row" role="group" aria-label="Committed output">
+        <span class="article-trace-lane-label">commit</span>
+        {scene.committed.map((item) => (
+          <span class:list={cellClass(item)} data-motion-key={item.key}>
+            <strong>{item.value}</strong>
+            {item.detail && <small>{item.detail}</small>}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
+<ul class="article-trace-annotations">
+  {scene.annotations.map((annotation) => <li>{annotation}</li>)}
+</ul>
+{formula && <p class="article-trace-formula"><span>Rule</span><code>{formula}</code></p>}
