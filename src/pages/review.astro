@@ -440,6 +440,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       if (contentsDetails) contentsDetails.open = false;
       void showEntry(index, { push: true, focus: true });
     }, listenerOptions));
+    window.addEventListener('scroll', () => {
+      if (contentsDetails?.open) contentsDetails.open = false;
+    }, { passive: true, signal: lifecycle.signal });
+    document.addEventListener('pointerdown', (event) => {
+      if (!contentsDetails?.open || !(event.target instanceof Node) || contentsDetails.contains(event.target)) return;
+      contentsDetails.open = false;
+    }, { signal: lifecycle.signal });
     explanationToggle?.addEventListener('click', () => setExplanation(!explanationOpen), listenerOptions);
     explanationClose?.addEventListener('click', () => setExplanation(false), listenerOptions);
     desktopExplanation.addEventListener('change', () => setExplanation(explanationOpen, false), listenerOptions);

@@ -37,6 +37,8 @@ assert.match(review, /desktopExplanation\.addEventListener\('change', \(\) => se
 assert.match(review, /class="review-contents-row"/);
 assert.match(review, /contentsDetails\.open = false/);
 assert.match(review, /max-height: min\(70dvh, 42rem/);
+assert.match(review, /window\.addEventListener\('scroll', \(\) =>/);
+assert.match(review, /document\.addEventListener\('pointerdown', \(event\) =>/);
 assert.match(review, /querySelectorAll<HTMLAnchorElement>\('\[data-reading-mode="full"\]'\)/);
 assert.match(home, /<h1>The ML Interview Field Guide<\/h1>/);
 assert.match(home, /class="cover-primary" href="\/review\/"/);
