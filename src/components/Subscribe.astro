@@ -1,5 +1,5 @@
 ---
-// A progressive MailerLite embed. The provider loads only when an eligible
+// A progressive Beehiiv embed. The provider loads only when an eligible
 // prompt approaches the viewport. The repeated entry prompt is shown once per
 // browser session, with longer local suppression after success or opt-out.
 import { SITE } from '../consts';
@@ -14,13 +14,12 @@ interface Props {
 const {
   placement = 'entry',
   heading = placement === 'home'
-    ? 'Get new field notes when they are worth sending.'
-    : 'Get the next useful field note.',
+    ? 'Get ML from Primitives notes when they are worth sending.'
+    : 'Get the next ML from Primitives note.',
 } = Astro.props;
 const headingId = `email-signup-${placement}-heading`;
 const hasEmail =
-  SITE.newsletter.provider === 'mailerlite' &&
-  SITE.newsletter.accountId.length > 0 &&
+  SITE.newsletter.provider === 'beehiiv' &&
   SITE.newsletter.formId.length > 0;
 ---
 
@@ -31,12 +30,12 @@ const hasEmail =
   data-email-signup
   data-email-placement={placement}
   data-email-enabled={hasEmail ? 'true' : 'false'}
-  data-email-account={SITE.newsletter.accountId}
+  data-email-form={SITE.newsletter.formId}
   data-pagefind-ignore="all"
 >
   <div class="inner">
     <div class="copy">
-      <p class="eyebrow">Field notes by email</p>
+      <p class="eyebrow">ML from Primitives</p>
       <h2 id={headingId} class="title">{heading}</h2>
       <p class="blurb">{SITE.newsletter.blurb}</p>
     </div>
@@ -44,12 +43,12 @@ const hasEmail =
     <div class="signup-panel">
       {hasEmail && (
         <div class="provider-frame">
-          <div class="ml-embedded" data-form={SITE.newsletter.formId}></div>
-          <p class="form-status" data-email-status aria-live="polite">Loading the email form…</p>
+          <div class="beehiiv-embedded" data-email-provider-host></div>
+          <p class="form-status" data-email-status aria-live="polite">Loading the email form...</p>
         </div>
       )}
 
-      {hasEmail && <p class="terms">Double opt-in through MailerLite. Unsubscribe any time. <a href="/privacy/">Privacy details</a>.</p>}
+      {hasEmail && <p class="terms">Subscribe through Beehiiv. Unsubscribe any time. <a href="/privacy/">Privacy details</a>.</p>}
       <div class="alternatives" data-email-actions>
         <span>{hasEmail ? 'Prefer a feed?' : 'Follow via'} <a href="/rss.xml">RSS</a> · <a href={`https://blogtrottr.com/?subscribe=${SITE.url}/rss.xml`} rel="noopener">RSS by email</a></span>
         {hasEmail && <button type="button" data-email-already>Already subscribed</button>}
@@ -63,10 +62,6 @@ const hasEmail =
   import { trackPublicEvent } from '../utils/publicEvents';
 
   type Placement = 'home' | 'entry';
-  type MailerLiteWindow = Window & {
-    ml?: ((command: string, value: string | boolean) => void) & { q?: unknown[][] };
-    ml_webform_after_success?: () => void;
-  };
 
   const SESSION_KEY = 'mlmentorship:email-signup:entry-seen:v2';
   const SUPPRESS_UNTIL_KEY = 'mlmentorship:email-signup:suppress-until';
@@ -95,72 +90,26 @@ const hasEmail =
     try { window[storageName].setItem(key, value); } catch (_) { /* The form still works. */ }
   }
 
-  function loadMailerLite(accountId: string, onError: () => void): void {
-    const mlWindow = window as MailerLiteWindow;
-    if (!mlWindow.ml) {
-      const queued = ((command: string, value: string | boolean) => {
-        (queued.q = queued.q || []).push([command, value]);
-      }) as NonNullable<MailerLiteWindow['ml']>;
-      mlWindow.ml = queued;
-    }
-    mlWindow.ml('enablePopups', false);
-    mlWindow.ml('account', accountId);
+  function loadBeehiiv(formId: string, host: HTMLElement | null, onError: () => void): void {
+    if (!host || host.dataset.beehiivLoaded === 'true') return;
+    host.dataset.beehiivLoaded = 'true';
 
-    if (document.querySelector('script[data-mlmentorship-mailerlite]')) return;
+    if (!document.querySelector('script[data-mlmentorship-beehiiv-attribution]')) {
+      const attribution = document.createElement('script');
+      attribution.async = true;
+      attribution.type = 'text/javascript';
+      attribution.src = 'https://subscribe-forms.beehiiv.com/attribution.js';
+      attribution.dataset.mlmentorshipBeehiivAttribution = '';
+      document.head.appendChild(attribution);
+    }
+
     const script = document.createElement('script');
     script.async = true;
-    script.src = 'https://assets.mailerlite.com/js/universal.js';
-    script.dataset.mlmentorshipMailerlite = '';
+    script.src = 'https://subscribe-forms.beehiiv.com/v3/loader.js';
+    script.dataset.beehiivForm = formId;
+    script.dataset.mlmentorshipBeehiiv = '';
     script.addEventListener('error', onError, { once: true });
-    document.head.appendChild(script);
-  }
-
-  function setImportant(element: HTMLElement | null, styles: Record<string, string>): void {
-    if (!element) return;
-    Object.entries(styles).forEach(([property, value]) => element.style.setProperty(property, value, 'important'));
-  }
-
-  function normalizeMailerLiteForm(embed: HTMLElement): void {
-    if (embed.dataset.emailNormalized === 'true') return;
-    const form = embed.querySelector<HTMLElement>('form.ml-block-form');
-    if (!form) return;
-    embed.dataset.emailNormalized = 'true';
-
-    document.querySelectorAll<HTMLStyleElement>('style').forEach((style) => {
-      if (style.textContent?.includes('assets.mlcdn.com/fonts.css')) {
-        style.textContent = style.textContent.replace(/@import\s+url\(["']?https:\/\/assets\.mlcdn\.com\/fonts\.css[^;]*;/g, '');
-      }
-    });
-
-    setImportant(form, { display: 'flex', gap: '.5rem', 'align-items': 'stretch', width: '100%' });
-    setImportant(form.querySelector('.ml-form-formContent'), { flex: '1 1 auto', width: 'auto', margin: '0' });
-    setImportant(form.querySelector('.ml-form-fieldRow'), { width: '100%', margin: '0' });
-    setImportant(form.querySelector('.ml-field-group'), { width: '100%', margin: '0' });
-    setImportant(form.querySelector('input[type="email"]'), {
-      width: '100%',
-      'min-width': '0',
-      'min-height': '2.45rem',
-      padding: '.55rem .68rem',
-      border: '1px solid var(--c-rule)',
-      'border-radius': 'var(--radius)',
-      background: 'var(--c-bg)',
-      color: 'var(--c-text)',
-      'font-family': 'var(--font-ui)',
-      'font-size': '.8rem',
-    });
-    setImportant(form.querySelector('.ml-form-embedSubmit'), { flex: '0 0 auto', width: 'auto', margin: '0', float: 'none', 'text-align': 'left' });
-    form.querySelectorAll<HTMLElement>('.ml-form-embedSubmit button').forEach((button) => setImportant(button, {
-      width: 'auto',
-      'min-height': '2.45rem',
-      padding: '.55rem .78rem',
-      border: '1px solid var(--c-accent-fill)',
-      'border-radius': 'var(--radius)',
-      background: 'var(--c-accent-fill)',
-      color: 'var(--c-on-accent)',
-      'font-family': 'var(--font-ui)',
-      'font-size': '.76rem',
-      'font-weight': '650',
-    }));
+    host.appendChild(script);
   }
 
   document.querySelectorAll<HTMLElement>('[data-email-signup]').forEach((signup) => {
@@ -174,9 +123,9 @@ const hasEmail =
     if (suppressUntil > Date.now() || seenThisSession) { signup.hidden = true; return; }
 
     const emailEnabled = signup.dataset.emailEnabled === 'true';
-    const accountId = signup.dataset.emailAccount ?? '';
+    const formId = signup.dataset.emailForm ?? '';
     const status = signup.querySelector<HTMLElement>('[data-email-status]');
-    const embed = signup.querySelector<HTMLElement>('.ml-embedded');
+    const embed = signup.querySelector<HTMLElement>('[data-email-provider-host]');
     const actions = signup.querySelector<HTMLElement>('[data-email-actions]');
     let loaded = false;
     let viewed = false;
@@ -200,13 +149,13 @@ const hasEmail =
       trackPublicEvent(events.confirmationSent);
     };
     const loadForm = () => {
-      if (loaded || !emailEnabled || !accountId) return;
+      if (loaded || !emailEnabled || !formId) return;
       loaded = true;
-      loadMailerLite(accountId, () => {
+      loadBeehiiv(formId, embed, () => {
         if (status) status.textContent = 'The email form is unavailable. RSS by email still works.';
       });
       window.setTimeout(() => {
-        if (status && !embed?.querySelector('.ml-block-form')) {
+        if (status && embed && !embed.querySelector('form, iframe')) {
           status.textContent = 'The email form is taking longer than expected. RSS by email still works.';
         }
       }, 8000);
@@ -219,24 +168,16 @@ const hasEmail =
     };
 
     const observer = embed && status ? new MutationObserver(() => {
-      if (embed.querySelector('.ml-block-form')) {
-        normalizeMailerLiteForm(embed);
+      if (embed.querySelector('form, iframe')) {
         status.hidden = true;
       }
-      const success = embed.querySelector<HTMLElement>('.row-success');
+      const success = embed.querySelector<HTMLElement>('[class*="success"], [data-success="true"]');
       if (success && getComputedStyle(success).display !== 'none') markCompleted();
     }) : undefined;
     observer?.observe(embed!, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
 
-    const mlWindow = window as MailerLiteWindow;
-    const previousSuccess = mlWindow.ml_webform_after_success;
-    mlWindow.ml_webform_after_success = () => {
-      previousSuccess?.();
-      markCompleted();
-    };
-
     signup.addEventListener('submit', (event) => {
-      if (event.target instanceof HTMLFormElement && event.target.matches('.ml-block-form') && signup.dataset.emailStarted !== 'true') {
+      if (event.target instanceof HTMLFormElement && signup.contains(event.target) && signup.dataset.emailStarted !== 'true') {
         signup.dataset.emailStarted = 'true';
         trackPublicEvent(events.attempted);
       }
@@ -350,24 +291,24 @@ const hasEmail =
   }
   .terms a:hover, .alternatives a:hover, .alternatives button:hover { color: var(--c-accent); }
 
-  /* MailerLite supplies behavior; these overrides keep its managed form native to the site. */
-  .subscribe :global(.ml-form-embedContent) { display: none !important; }
-  .subscribe :global(.ml-form-embedContainer),
-  .subscribe :global(.ml-form-align-center),
-  .subscribe :global(.ml-form-embedWrapper) {
+  /* Beehiiv supplies behavior; these overrides keep the managed form native to the site. */
+  .beehiiv-embedded { width: 100%; min-width: 0; }
+  .subscribe :global(iframe) {
     width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
+    border: 0 !important;
     background: transparent !important;
   }
-  .subscribe :global(.ml-form-embedBody),
-  .subscribe :global(.ml-form-successBody) { padding: 0 !important; }
-  .subscribe :global(.ml-form-formContent) { margin: 0 !important; }
-  .subscribe :global(.ml-block-form) { display: flex !important; gap: .5rem; align-items: stretch; }
-  .subscribe :global(.ml-form-fieldRow) { flex: 1 1 13rem; margin: 0 !important; }
-  .subscribe :global(.ml-field-group) { margin: 0 !important; }
-  .subscribe :global(input.form-control) {
+  .subscribe :global(form) {
+    display: flex !important;
+    gap: .5rem !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .subscribe :global(input[type="email"]) {
+    flex: 1 1 13rem !important;
     min-height: 2.45rem !important;
+    min-width: 0 !important;
     padding: .55rem .68rem !important;
     border: 1px solid var(--c-rule) !important;
     border-radius: var(--radius) !important;
@@ -376,13 +317,14 @@ const hasEmail =
     font-family: var(--font-ui) !important;
     font-size: .8rem !important;
   }
-  .subscribe :global(input.form-control:focus) {
+  .subscribe :global(input[type="email"]:focus) {
     border-color: var(--c-accent) !important;
     outline: 2px solid var(--c-accent) !important;
     outline-offset: 1px;
   }
-  .subscribe :global(.ml-form-embedSubmit) { flex: 0 0 auto; margin: 0 !important; }
-  .subscribe :global(.ml-form-embedSubmit button.primary) {
+  .subscribe :global(button),
+  .subscribe :global(input[type="submit"]) {
+    flex: 0 0 auto !important;
     width: auto !important;
     min-height: 2.45rem !important;
     padding: .55rem .78rem !important;
@@ -394,16 +336,18 @@ const hasEmail =
     font-size: .76rem !important;
     font-weight: 650 !important;
   }
-  .subscribe :global(.ml-form-embedSubmit button.primary:hover) { background: var(--c-link-hover) !important; }
-  .subscribe :global(.ml-form-successContent) { margin: 0 !important; }
-  .subscribe :global(.ml-form-successContent h4) {
+  .subscribe :global(button:hover),
+  .subscribe :global(input[type="submit"]:hover) { background: var(--c-link-hover) !important; }
+  .subscribe :global([class*="success"]) { margin: 0 !important; }
+  .subscribe :global([class*="success"] h4),
+  .subscribe :global([class*="success"] h3) {
     margin: 0 0 .2rem !important;
     color: var(--c-text) !important;
     font-family: var(--font-display) !important;
     font-size: 1rem !important;
     font-weight: 650 !important;
   }
-  .subscribe :global(.ml-form-successContent p) {
+  .subscribe :global([class*="success"] p) {
     margin: 0 !important;
     color: var(--c-text-soft) !important;
     font-family: var(--font-ui) !important;
@@ -416,8 +360,9 @@ const hasEmail =
     .subscribe--home .inner { grid-template-columns: 1fr; gap: .75rem; }
   }
   @media (max-width: 420px) {
-    .subscribe :global(.ml-block-form) { flex-direction: column; }
-    .subscribe :global(.ml-form-fieldRow) { flex-basis: auto; }
-    .subscribe :global(.ml-form-embedSubmit button.primary) { width: 100% !important; }
+    .subscribe :global(form) { flex-direction: column !important; }
+    .subscribe :global(input[type="email"]) { flex-basis: auto !important; }
+    .subscribe :global(button),
+    .subscribe :global(input[type="submit"]) { width: 100% !important; }
   }
 </style>

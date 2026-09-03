@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "slug": "chinchilla-moe-fused-triton",
+  "article": "src/content/posts/2026-09-02-chinchilla-moe-fused-triton.md",
+  "status": "implemented",
+  "medium": "mermaid",
+  "learningObjective": "Compare HBM memory bandwidth traffic between unfused grouped GEMMs and a fused SRAM Triton kernel for MoE feed-forward layers.",
+  "mediumRationale": "A Mermaid flowchart clearly juxtaposes the two-pass HBM round trip against the single-pass SRAM fusion path across the up-projection, activation, and down-projection stages.",
+  "mediumComparison": {
+    "mermaid": "Selected: directly contrasts the two-kernel HBM intermediate round-trip with the single-kernel SRAM streaming loop.",
+    "svg": "Rejected: flowchart nodes and dataflow arrows provide a clearer spatial comparison at standard viewports than a custom geometric SVG.",
+    "semanticHtml": "Rejected: cards cannot visually represent tensor memory round trips between GPU SRAM registers and external HBM.",
+    "interaction": "Rejected: static dataflow highlights the memory traffic elimination without requiring interactive state.",
+    "paperReuse": "Rejected: no external paper figure was adapted; the visual is an original architectural dataflow comparison.",
+    "noVisual": "Rejected: prose memory accounting is harder to visualize without a side-by-side memory boundary flow."
+  },
+  "deckReview": {
+    "pages": [],
+    "notes": "Searched deck for MoE, Triton, kernel fusion, and roofline memory bandwidth. Relevant GPU memory hierarchy context exists on page 47 (roofline model) and page 101 (dense transformer FFN). No external artwork was copied."
+  },
+  "sourceReview": {
+    "notes": "Derived from roofline bandwidth principles, Hoffmann et al. Chinchilla paper (2022), and Triton kernel fusion patterns.",
+    "sources": [
+      {
+        "title": "An Empirical Analysis of Compute-Optimal Large Language Model Training",
+        "url": "https://arxiv.org/abs/2203.15556",
+        "usage": "Used for Chinchilla scaling law formulations and loss laws.",
+        "license": "Public arXiv paper referenced for mathematical relationships."
+      },
+      {
+        "title": "Triton: An Intermediate Language and Compiler for Tile-Based Neural Network Programs",
+        "url": "https://triton-lang.org/",
+        "usage": "Used for Triton SRAM tiling model and program_id grid patterns.",
+        "license": "Open source documentation."
+      }
+    ]
+  },
+  "agentReview": {
+    "reviewer": "agent-1",
+    "reviewedAt": "2026-09-02",
+    "summary": "Verified that the Mermaid diagram correctly illustrates the elimination of intermediate HBM traffic when F exceeds D."
+  },
+  "implementation": {
+    "visualIds": [
+      "fused-moe-triton-sram-roofline"
+    ],
+    "accessibility": "Includes accTitle, accDescr, and a direct 'Read it this way' caption."
+  }
+}

@@ -4,9 +4,9 @@ export const LOOPLET_URL = 'https://github.com/hsaghir/looplet';
 
 export const SITE = {
   title: 'mlmentorship',
-  description: 'Visual-first senior ML interview prep with ordered lessons, practice questions, coding traces, role-specific routes, and a private browser-local workbook.',
+  description: 'A free visual field guide for senior ML, AI systems, and frontier-lab interviews, with ordered lessons, coding traces, and a private workbook.',
   author: 'Hamidreza Saghir',
-  authorBio: 'Notes on senior ML interviews, system design, and applied ML practice.',
+  authorBio: 'Notes on senior ML interviews, AI systems, and ML from primitives.',
   email: 'ml.mentorship@gmail.com',
   url: 'https://mlmentorship.com',
   locale: 'en',
@@ -19,12 +19,10 @@ export const SITE = {
     mastodon: '',
   },
   newsletter: {
-    // Dedicated form for the mlmentorship audience, under the shared MailerLite
-    // account. This keeps source attribution and audience segmentation explicit.
-    provider: 'mailerlite' as 'mailerlite' | 'none',
-    accountId: '2284644',
-    formId: 'rgOeEV',
-    blurb: 'Occasional senior-level answer patterns, interview-process changes, and new deep cases. No fixed schedule.',
+    // Dedicated Beehiiv form for the mlmentorship audience.
+    provider: 'beehiiv' as 'beehiiv' | 'none',
+    formId: 'ec384504-44fb-4f84-84ce-df038d14e1c1',
+    blurb: 'ML from Primitives: occasional notes on senior ML interviews, AI systems, kernels, scaling, and level calibration.',
   },
   analytics: {
     // Shared with hsaghir.com; BaseHead prefixes paths with the hostname so the

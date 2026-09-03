@@ -240,7 +240,7 @@ export const LIBRARY_VOLUMES: LibraryVolume[] = [
         id: 'hardware-performance', title: 'Hardware and performance', description: 'Count work and memory, understand accelerator limits, then read a trace.',
         difficulty: 'Advanced', priority: 'Role-specific', roles: ['RE', 'Systems MLE', 'Performance'], rounds: ['Systems', 'Performance'],
         prerequisites: [{ label: 'Neural network foundations', href: '/library/foundations/neural-networks/' }],
-        slugs: ['transformer-compute-memory-accounting', 'gpu-memory-hierarchy', 'accelerator-network-topology', 'profiling-distributed-ml-workloads', 'optimize-accelerator-workload'],
+        slugs: ['transformer-compute-memory-accounting', 'gpu-memory-hierarchy', 'accelerator-network-topology', 'profiling-distributed-ml-workloads', 'optimize-accelerator-workload', 'chinchilla-moe-fused-triton'],
       },
       {
         id: 'distributed-parallelism', title: 'Distributed training and parallelism', description: 'Build from collectives and sharded matrix operations to multi-axis parallel plans.',
