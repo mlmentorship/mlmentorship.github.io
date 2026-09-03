@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import VisualReviewCard from '../components/VisualReviewCard.astro';
+import Subscribe from '../components/Subscribe.astro';
 import { LIBRARY_VOLUMES } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { getImplementedVisualAudit } from '../utils/visualAudits';
@@ -55,42 +56,39 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       <a href={`/#curriculum`} data-review-back><span aria-hidden="true">←</span> Library</a>
       <p><span data-review-book>Book {firstEntry.volumeNumber} · Chapter {firstEntry.chapterIndex}</span><strong data-review-chapter>{firstEntry.chapterTitle}</strong></p>
       <div class="review-toolbar-actions">
+        <details class="review-contents-details" data-review-contents-details>
+          <summary>
+            <span>Contents</span>
+            <small data-review-contents-location>{firstEntry.volumeShortTitle} · {firstEntry.chapterTitle}</small>
+          </summary>
+          <div class="review-contents-panel">
+            {reviewContents.map(({ volume, chapters }) => (
+              <details class="review-contents-volume" data-review-contents-volume={volume.id} open={volume.id === firstEntry.volumeId}>
+                <summary><span>{volume.number} · {volume.shortTitle}</span><small>{chapters.length} chapters</small></summary>
+                <ol>
+                  {chapters.map(({ chapter, entries }) => (
+                    <li>
+                      <details class="review-contents-chapter" data-review-contents-chapter={chapter.id} open={chapter.id === firstEntry.chapterId}>
+                        <summary><span>{chapter.title}</span><small>{entries.length}</small></summary>
+                        <ol>
+                          {entries.map((entry) => (
+                            <li><a href={entry.href} data-review-content-entry={entry.slug}>{entry.title}</a></li>
+                          ))}
+                        </ol>
+                      </details>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            ))}
+          </div>
+        </details>
         <div class="review-progress-wrap">
           <span data-review-counter>1 / {reviewEntries.length}</span>
           <small>Entire library</small>
         </div>
       </div>
     </nav>
-
-    <div class="review-contents-row" data-review-contents aria-label="Visual review contents">
-      <details class="review-contents-details" data-review-contents-details>
-        <summary>
-          <span>Contents</span>
-          <small data-review-contents-location>{firstEntry.volumeShortTitle} · {firstEntry.chapterTitle}</small>
-        </summary>
-        <div class="review-contents-panel">
-          {reviewContents.map(({ volume, chapters }) => (
-            <details class="review-contents-volume" data-review-contents-volume={volume.id} open={volume.id === firstEntry.volumeId}>
-              <summary><span>{volume.number} · {volume.shortTitle}</span><small>{chapters.length} chapters</small></summary>
-              <ol>
-                {chapters.map(({ chapter, entries }) => (
-                  <li>
-                    <details class="review-contents-chapter" data-review-contents-chapter={chapter.id} open={chapter.id === firstEntry.chapterId}>
-                      <summary><span>{chapter.title}</span><small>{entries.length}</small></summary>
-                      <ol>
-                        {entries.map((entry) => (
-                          <li><a href={entry.href} data-review-content-entry={entry.slug}>{entry.title}</a></li>
-                        ))}
-                      </ol>
-                    </details>
-                  </li>
-                ))}
-              </ol>
-            </details>
-          ))}
-        </div>
-      </details>
-    </div>
 
     <div class="review-workspace" data-review-workspace>
       <section class="review-stage" data-review-stage hidden aria-hidden="true" aria-busy="true">
@@ -117,6 +115,8 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         <div class="prose review-explanation-body" data-review-explanation-host></div>
       </aside>
     </div>
+
+    <Subscribe placement="review" heading="Get ML from Primitives notes after your visual review." />
 
     <section class="review-fallback" data-review-fallback>
       <p class="fallback-kicker">Visual review</p>
@@ -520,23 +520,11 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-toolbar p strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .review-toolbar p span { color: var(--c-muted); font-size: .6rem; }
   .review-toolbar p strong { margin-top: .05rem; color: var(--c-text); font-size: .76rem; }
-  .review-toolbar-actions { display: flex; min-width: 0; align-items: center; justify-content: flex-end; gap: .65rem; }
+  .review-toolbar-actions { position: relative; display: flex; min-width: 0; align-items: center; justify-content: flex-end; gap: .65rem; }
   .review-progress-wrap { display: grid; justify-items: end; gap: .05rem; }
   .review-progress-wrap span { color: var(--c-text-soft); font-family: var(--font-mono); font-size: .66rem; }
   .review-progress-wrap small { color: var(--c-muted); font-size: .56rem; }
-  .review-contents-row {
-    position: sticky;
-    top: calc(var(--header-height) + 3.2rem);
-    z-index: 39;
-    width: min(100%, 96rem);
-    margin: 0 auto;
-    padding: .45rem var(--gutter) 0;
-    display: flex;
-    justify-content: flex-start;
-    pointer-events: none;
-  }
-  .review-contents-row > * { pointer-events: auto; }
-  .review-contents-details { width: min(24rem, 100%); position: relative; }
+  .review-contents-details { width: auto; }
   .review-contents-details > summary {
     display: grid;
     grid-template-columns: auto auto minmax(0, 1fr) auto;
@@ -563,20 +551,20 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-contents-chapter > summary::-webkit-details-marker { display: none; }
   .review-contents-details > summary::before { color: var(--c-accent); content: '≡'; font-family: var(--font-mono); font-size: .9rem; }
   .review-contents-details > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); }
-  .review-contents-details[open] > summary { border-color: var(--c-accent); border-bottom-right-radius: 0; border-bottom-left-radius: 0; }
+  .review-contents-details[open] > summary { border-color: var(--c-accent); }
   .review-contents-details[open] > summary::after { content: '−'; }
   .review-contents-details > summary small { max-width: 11rem; overflow: hidden; color: var(--c-muted); font-size: .59rem; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
   .review-contents-panel {
-    position: static;
-    margin-top: .45rem;
-    width: 100%;
-    max-width: 100%;
+    position: absolute;
+    top: calc(100% + .35rem);
+    right: 0;
+    z-index: 2;
+    width: min(24rem, calc(100vw - 2rem));
     max-height: min(70dvh, 42rem, calc(100dvh - var(--header-height) - 3.2rem - 3.7rem - 2rem));
     overflow-y: auto;
     padding: .45rem;
     border: 1px solid var(--c-accent);
-    border-top: 0;
-    border-radius: 0 0 var(--radius) var(--radius);
+    border-radius: var(--radius);
     background: color-mix(in srgb, var(--c-bg) 98%, transparent);
     box-shadow: 0 .7rem 1.5rem color-mix(in srgb, var(--c-text) 10%, transparent);
     scrollbar-width: thin;
@@ -722,15 +710,14 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     .review-bottom button:first-child > span:last-child,
     .review-bottom button:last-child > span:first-child { display: none; }
     .review-explanation { padding: .8rem var(--gutter) 2rem; }
-    .review-contents-row { top: calc(var(--header-height) + 2.9rem); justify-content: stretch; }
-    .review-contents-details { width: 100%; }
-    .review-contents-details > summary { width: 100%; min-width: 0; }
+    .review-toolbar-actions { gap: .35rem; }
+    .review-contents-details > summary { min-width: 4.5rem; }
+    .review-contents-panel { width: min(22rem, calc(100vw - 2rem)); }
     .review-contents-details > summary { grid-template-columns: auto auto auto; }
     .review-contents-details > summary small { display: none; }
   }
   @media print {
     .review-toolbar,
-    .review-contents-row,
     .review-bottom,
     .review-fallback,
     .review-explanation { display: none !important; }

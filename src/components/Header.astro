@@ -40,7 +40,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
       <span class="brand-name"><strong>ml</strong>mentorship</span>
     </a>
 
-    <nav class="reading-mode-switch reading-mode-switch--desktop" aria-label="Reading mode">
+    <nav class="reading-mode-switch reading-mode-switch--persistent" aria-label="Reading mode">
       {readingModes.map((mode) => (
         <a
           href={mode.href}
@@ -76,20 +76,6 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
           <span></span><span></span><span></span>
         </summary>
         <nav class="nav-mobile" aria-label="Mobile">
-          <div class="mobile-reading-mode">
-            <span>Reading mode</span>
-            <div class="reading-mode-switch">
-              {readingModes.map((mode) => (
-                <a
-                  href={mode.href}
-                  class:list={[mode.active && 'active']}
-                  aria-current={mode.active ? 'page' : undefined}
-                  aria-label={mode.description}
-                  data-reading-mode={mode.dataKey}
-                >{mode.label}</a>
-              ))}
-            </div>
-          </div>
           <ul>
             {navItems.map((item) => (
               <li>
@@ -166,6 +152,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     background: var(--c-bg-tint);
     font-family: var(--font-ui);
   }
+  .reading-mode-switch--persistent { flex: 0 0 auto; }
   .reading-mode-switch a {
     min-width: 3.35rem;
     padding: .3rem .5rem;
@@ -251,8 +238,6 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     background: var(--c-surface);
     box-shadow: var(--shadow-md);
   }
-  .mobile-reading-mode { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: .35rem .35rem .65rem; border-bottom: 1px solid var(--c-rule); }
-  .mobile-reading-mode > span { color: var(--c-muted); font-family: var(--font-ui); font-size: .65rem; font-weight: 600; }
   .nav-mobile ul { list-style: none; margin: 0; padding: 0; }
   .nav-mobile li { margin: 0; }
   .nav-mobile a {
@@ -271,12 +256,13 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 
   @media (max-width: 940px) {
     .nav-desktop { display: none; }
-    .reading-mode-switch--desktop { display: none; }
+    .reading-mode-switch--persistent a { min-width: 2.9rem; padding: .3rem .35rem; font-size: .62rem; }
     .bar-end { margin-left: auto; }
     .mobile-nav { display: block; }
   }
   @media (max-width: 420px) {
     .brand-name { font-size: .9rem; }
     .bar { gap: 0.5rem; }
+    .reading-mode-switch--persistent a { min-width: 2.5rem; padding: .28rem .25rem; font-size: .6rem; }
   }
 </style>

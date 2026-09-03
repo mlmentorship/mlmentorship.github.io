@@ -29,12 +29,15 @@ assert.match(baseLayout, /<html lang="en" data-theme="dark" data-library-sidebar
 assert.match(baseHead, /saved === 'light' \? 'light' : 'dark'/);
 assert.match(baseHead, /dataset\.librarySidebar = localStorage\.getItem\('library-sidebar'\) === 'expanded' \? 'expanded' : 'collapsed'/);
 assert.match(header, /data-reading-mode=\{mode\.dataKey\}/);
+assert.match(header, /reading-mode-switch--persistent/);
+assert.doesNotMatch(header, /mobile-reading-mode/);
 assert.match(header, /pathname === '\/' \|\| isReviewRoute/);
 assert.match(sidebar, /aria-label="Open library contents"/);
 assert.match(sidebar, /aside\[data-library-sidebar\]/);
 assert.match(review, /const desktopExplanation = window\.matchMedia\('\(min-width: 721px\)'\)/);
 assert.match(review, /desktopExplanation\.addEventListener\('change', \(\) => setExplanation\(explanationOpen, false\)/);
-assert.match(review, /class="review-contents-row"/);
+assert.match(review, /<nav class="review-toolbar"[\s\S]*data-review-contents-details/);
+assert.match(review, /<Subscribe placement="review"/);
 assert.match(review, /contentsDetails\.open = false/);
 assert.match(review, /max-height: min\(70dvh, 42rem/);
 assert.match(review, /window\.addEventListener\('scroll', \(\) =>/);

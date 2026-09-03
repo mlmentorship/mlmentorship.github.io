@@ -4,7 +4,7 @@
 // browser session, with longer local suppression after success or opt-out.
 import { SITE } from '../consts';
 
-type Placement = 'home' | 'entry';
+type Placement = 'home' | 'entry' | 'review';
 
 interface Props {
   placement?: Placement;
@@ -13,7 +13,7 @@ interface Props {
 
 const {
   placement = 'entry',
-  heading = placement === 'home'
+  heading = placement === 'home' || placement === 'review'
     ? 'Get ML from Primitives notes when they are worth sending.'
     : 'Get the next ML from Primitives note.',
 } = Astro.props;
@@ -61,7 +61,7 @@ const hasEmail =
 <script>
   import { trackPublicEvent } from '../utils/publicEvents';
 
-  type Placement = 'home' | 'entry';
+  type Placement = 'home' | 'entry' | 'review';
 
   const SESSION_KEY = 'mlmentorship:email-signup:beehiiv-entry-seen:v1';
   const SUPPRESS_UNTIL_KEY = 'mlmentorship:email-signup:beehiiv-suppress-until:v1';
@@ -77,6 +77,11 @@ const hasEmail =
       attempted: 'email_signup_attempted_entry',
       confirmationSent: 'email_signup_confirmation_sent_entry',
       dismissed: 'email_signup_dismissed_entry',
+    },
+    review: {
+      viewed: 'email_signup_viewed_review',
+      attempted: 'email_signup_attempted_review',
+      confirmationSent: 'email_signup_confirmation_sent_review',
     },
   } as const;
 
@@ -243,6 +248,8 @@ const hasEmail =
   .inner { max-width: 46rem; margin: 0 auto; }
   .subscribe--home { margin-top: 1.15rem; padding: 1.25rem 1.1rem; border: 1px solid var(--c-accent); background: color-mix(in srgb, var(--c-accent-soft) 48%, var(--c-bg)); }
   .subscribe--home .inner { display: grid; grid-template-columns: minmax(0, .9fr) minmax(18rem, 1.1fr); gap: 1.4rem; align-items: center; }
+  .subscribe--review { width: min(100%, 58rem); margin: 2rem auto 0; padding: 1.25rem var(--gutter); }
+  .subscribe--review .inner { display: grid; grid-template-columns: minmax(0, .9fr) minmax(18rem, 1.1fr); gap: 1.4rem; align-items: center; }
   .eyebrow {
     margin: 0 0 .25rem;
     color: var(--c-accent);
@@ -367,6 +374,8 @@ const hasEmail =
   @media (max-width: 680px) {
     .subscribe--home { padding: 1rem .85rem; }
     .subscribe--home .inner { grid-template-columns: 1fr; gap: .75rem; }
+    .subscribe--review { padding: 1rem var(--gutter); }
+    .subscribe--review .inner { grid-template-columns: 1fr; gap: .75rem; }
   }
   @media (max-width: 420px) {
     .subscribe :global(form) { flex-direction: column !important; }
