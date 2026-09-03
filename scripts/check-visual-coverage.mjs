@@ -130,12 +130,14 @@ function validateAudit(audit, file, entry) {
   if (audit.status === 'implemented' && !nonEmpty(audit.implementation?.accessibility)) {
     fail(`${label} needs an implementation.accessibility note`);
   }
-  if (audit.status === 'implemented' && audit.medium === 'mermaid') {
+  if (audit.status === 'implemented' && ['mermaid', 'mixed'].includes(audit.medium)) {
     for (const id of visualIds ?? []) {
       const marker = entry.source.indexOf(`<!-- visual:${id} -->`);
       const blockStart = entry.source.indexOf('```mermaid', marker);
       const blockEnd = entry.source.indexOf('```', blockStart + 10);
       const block = entry.source.slice(blockStart, blockEnd);
+      const figureStart = entry.source.indexOf('<figure', marker);
+      if (audit.medium === 'mixed' && (blockStart < 0 || (figureStart >= 0 && figureStart < blockStart))) continue;
       if (blockStart < 0 || !block.includes('accTitle:') || !block.includes('accDescr:')) {
         fail(`${label} Mermaid visual ${id} needs accTitle and accDescr`);
       }
@@ -145,9 +147,12 @@ function validateAudit(audit, file, entry) {
       }
     }
   }
-  if (audit.status === 'implemented' && audit.medium === 'svg') {
+  if (audit.status === 'implemented' && ['svg', 'mixed'].includes(audit.medium)) {
     for (const id of visualIds ?? []) {
       const marker = entry.source.indexOf(`<!-- visual:${id} -->`);
+      const figureStart = entry.source.indexOf('<figure', marker);
+      const mermaidStart = entry.source.indexOf('```mermaid', marker);
+      if (audit.medium === 'mixed' && (figureStart < 0 || mermaidStart >= 0)) continue;
       const figureEnd = entry.source.indexOf('</figure>', marker);
       const figure = entry.source.slice(marker, figureEnd + 9);
       if (/\n\s*\n/.test(figure)) {

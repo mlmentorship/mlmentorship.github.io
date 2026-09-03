@@ -70,7 +70,7 @@ export function savePracticeProgress(input: {
   const spacedSuccess = input.score === 'Confident'
     && input.weakDimensions.length === 0
     && existing?.lastSuccessfulOn !== today;
-  const successfulAttempts = input.score === 'Confident'
+  const successfulAttempts = input.score === 'Confident' && input.weakDimensions.length === 0
     ? (existing?.successfulAttempts ?? 0) + (spacedSuccess ? 1 : 0)
     : 0;
   const dueDays = input.score === 'Weak' ? 2 : 7;
@@ -83,8 +83,10 @@ export function savePracticeProgress(input: {
     dimensionMisses,
     attempts: (existing?.attempts ?? 0) + 1,
     successfulAttempts,
-    lastSuccessfulOn: spacedSuccess ? today : existing?.lastSuccessfulOn ?? null,
-    mixedVerifiedOn: input.score === 'Confident' ? existing?.mixedVerifiedOn ?? null : null,
+    lastSuccessfulOn: input.score === 'Confident' && input.weakDimensions.length === 0
+      ? spacedSuccess ? today : existing?.lastSuccessfulOn ?? null
+      : null,
+    mixedVerifiedOn: input.score === 'Confident' && input.weakDimensions.length === 0 ? existing?.mixedVerifiedOn ?? null : null,
     lastAttemptOn: today,
     dueOn: due ? toLocalDate(due) : null,
   };

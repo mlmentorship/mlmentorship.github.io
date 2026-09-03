@@ -148,6 +148,8 @@ const fullContentLabel: Record<Category, string> = {
         </div>
       </header>
 
+      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
+
       {visualAudit && (
         <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-pagefind-ignore="all">
           <VisualReviewCard
@@ -161,8 +163,6 @@ const fullContentLabel: Record<Category, string> = {
           <noscript><style is:inline>[data-article-quick-review] { display: none !important; }</style></noscript>
         </div>
       )}
-
-      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
 
       {visualAudit && (
         <div id="full-explanation" class="full-explanation-divider" data-full-explanation hidden data-pagefind-ignore="all">
@@ -196,7 +196,7 @@ const fullContentLabel: Record<Category, string> = {
       <nav class="journey-nav" aria-label={`Continue through ${libraryLocation ? libraryLocation.volume.title : categoryMeta.plural}`} data-pagefind-ignore="all">
         <div class="journey-context">
           <span>{chapterTitle}</span>
-          <a href={libraryLocation ? `/library/${libraryLocation.volume.id}/` : `/${category}/`}>{libraryLocation ? 'Book contents' : `All ${categoryMeta.plural.toLowerCase()}`}</a>
+          <a href={libraryLocation ? `/library/${libraryLocation.volume.id}/${libraryLocation.chapter.id}/` : `/${category}/`}>{libraryLocation ? 'Chapter contents' : `All ${categoryMeta.plural.toLowerCase()}`}</a>
         </div>
         <div class="journey-links">
           {previousPost ? (

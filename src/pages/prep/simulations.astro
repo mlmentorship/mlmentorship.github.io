@@ -156,11 +156,12 @@ const unfamiliarPrompts = [
   <dialog class="simulation-dialog" data-simulation-dialog aria-labelledby="simulation-round-title">
     <div class="simulation-dialog-inner">
       <header><div><p data-simulation-position></p><h2 id="simulation-round-title" data-simulation-title></h2></div><button type="button" data-close-simulation aria-label="Close simulation">×</button></header>
-      <p class="simulation-prompt" data-simulation-prompt></p>
-      <div class="simulation-timer"><strong data-simulation-timer>00:00</strong><button type="button" data-pause-simulation>Pause</button></div>
+      <p class="simulation-prompt"><a data-simulation-starter-link aria-label="Open related lesson after the simulation"></a><span data-simulation-prompt></span></p>
+      <div class="simulation-timer"><strong data-simulation-timer role="timer" aria-label="Simulation time remaining">00:00</strong><button type="button" data-pause-simulation>Pause</button></div>
+      <p class="sr-only" data-simulation-timer-status role="status" aria-live="polite"></p>
       <label>Private notes<textarea rows="7" data-simulation-notes placeholder="Outline evidence and follow-ups. Notes are cleared when this runner closes."></textarea></label>
       <p class="simulation-note">Do not open the linked answer during the round. Score after the timer or when you choose to stop.</p>
-      <div class="simulation-actions"><button type="button" data-next-simulation>Next round</button></div>
+      <div class="simulation-actions"><button type="button" class="secondary-button" data-previous-simulation>Previous round</button><button type="button" data-next-simulation>Next round</button></div>
     </div>
   </dialog>
 
@@ -220,49 +221,45 @@ const unfamiliarPrompts = [
     const role = ROLE_OVERLAYS[select.value as RoleId];
     return role.defaultRounds.map((roundId) => INTERVIEW_ROUNDS.find((round) => round.id === roundId)).filter((round): round is (typeof INTERVIEW_ROUNDS)[number] => Boolean(round));
   };
-  document.querySelector('[data-build-simulation]')?.addEventListener('click', () => {
-    if (!select || !output) return;
-    const rounds = buildRounds();
-    output.replaceChildren(...rounds.map((round) => {
-      const item = document.createElement('li');
-      const heading = document.createElement('strong');
-      heading.textContent = `${round.label} · ${round.minutes} min`;
-      const starter = round.starterLinks[Math.floor(Math.random() * round.starterLinks.length)];
-      const link = document.createElement('a');
-      link.href = starter.href;
-      link.textContent = starter.label;
-      const description = document.createElement('span');
-      description.textContent = round.description;
-      item.append(heading, link, description);
-      return item;
-    }));
-    output.hidden = false;
-  });
-
   const dialog = document.querySelector<HTMLDialogElement>('[data-simulation-dialog]');
   const position = document.querySelector<HTMLElement>('[data-simulation-position]');
   const title = document.querySelector<HTMLElement>('[data-simulation-title]');
   const prompt = document.querySelector<HTMLElement>('[data-simulation-prompt]');
+  const starterLink = document.querySelector<HTMLAnchorElement>('[data-simulation-starter-link]');
   const timer = document.querySelector<HTMLElement>('[data-simulation-timer]');
+  const timerStatus = document.querySelector<HTMLElement>('[data-simulation-timer-status]');
   const pause = document.querySelector<HTMLButtonElement>('[data-pause-simulation]');
+  const previous = document.querySelector<HTMLButtonElement>('[data-previous-simulation]');
   const next = document.querySelector<HTMLButtonElement>('[data-next-simulation]');
   const notes = document.querySelector<HTMLTextAreaElement>('[data-simulation-notes]');
   let activeRounds: ReturnType<typeof buildRounds> = [];
-  let activePrompts: string[] = [];
+  let builtRole: RoleId | undefined;
+  let builtStarters: Array<{ label: string; href: string }> = [];
+  let activeStarters: Array<{ label: string; href: string }> = [];
   let activeIndex = 0;
   let remaining = 0;
   let paused = false;
   let interval: number | undefined;
+  let deadline = 0;
+  const roundNotes: string[] = [];
 
   const stopTimer = () => { if (interval !== undefined) window.clearInterval(interval); interval = undefined; };
   const showTime = () => { if (timer) timer.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`; };
+  const refreshTimer = () => {
+    if (paused || deadline === 0) return;
+    remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    showTime();
+    if (remaining === 0) {
+      stopTimer();
+      if (timerStatus) timerStatus.textContent = 'Simulation time is up. Finish this round when ready.';
+    }
+  };
   const startTimer = () => {
     stopTimer();
-    interval = window.setInterval(() => {
-      if (!paused && remaining > 0) { remaining -= 1; showTime(); }
-      if (remaining === 0) stopTimer();
-    }, 1000);
+    deadline = Date.now() + remaining * 1000;
+    interval = window.setInterval(refreshTimer, 250);
   };
+  const saveCurrentNotes = () => { if (notes) roundNotes[activeIndex] = notes.value; };
   const showRound = () => {
     const round = activeRounds[activeIndex];
     if (!round) return;
@@ -270,21 +267,63 @@ const unfamiliarPrompts = [
     paused = false;
     if (position) position.textContent = `Round ${activeIndex + 1} of ${activeRounds.length}`;
     if (title) title.textContent = round.label;
-    if (prompt) prompt.textContent = `${activePrompts[activeIndex]}. ${round.description}`;
+    if (starterLink) {
+      starterLink.href = activeStarters[activeIndex]?.href ?? '#';
+      starterLink.textContent = activeStarters[activeIndex]?.label ?? round.label;
+    }
+    if (prompt) prompt.textContent = ` · ${round.description}`;
     if (pause) pause.textContent = 'Pause';
+    if (previous) previous.disabled = activeIndex === 0;
     if (next) next.textContent = activeIndex === activeRounds.length - 1 ? 'Finish simulation' : 'Next round';
-    if (notes) notes.value = '';
+    if (notes) notes.value = roundNotes[activeIndex] ?? '';
+    if (timerStatus) timerStatus.textContent = '';
     showTime(); startTimer();
   };
-  const closeRunner = () => { stopTimer(); if (notes) notes.value = ''; dialog?.close(); };
+  const closeRunner = () => { stopTimer(); if (notes) notes.value = ''; roundNotes.length = 0; dialog?.close(); };
+  const chooseStarters = (rounds: ReturnType<typeof buildRounds>) => rounds.map((round) => round.starterLinks[Math.floor(Math.random() * round.starterLinks.length)] ?? { label: round.label, href: '#' });
+  const renderBuiltPromptSet = (rounds: ReturnType<typeof buildRounds>) => {
+    if (!output) return;
+    output.replaceChildren(...rounds.map((round, index) => {
+      const item = document.createElement('li');
+      const heading = document.createElement('strong');
+      heading.textContent = `${round.label} · ${round.minutes} min`;
+      const link = document.createElement('a');
+      link.href = builtStarters[index]?.href ?? '#';
+      link.textContent = builtStarters[index]?.label ?? round.label;
+      const description = document.createElement('span');
+      description.textContent = round.description;
+      item.append(heading, link, description);
+      return item;
+    }));
+    output.hidden = false;
+  };
+  const buildPromptSet = () => {
+    if (!select) return [];
+    const rounds = buildRounds();
+    builtRole = select.value as RoleId;
+    builtStarters = chooseStarters(rounds);
+    renderBuiltPromptSet(rounds);
+    return rounds;
+  };
   document.querySelector('[data-start-simulation]')?.addEventListener('click', () => {
     activeRounds = buildRounds(); activeIndex = 0;
-    activePrompts = activeRounds.map((round) => round.starterLinks[Math.floor(Math.random() * round.starterLinks.length)]?.label ?? round.label);
+    const canReuseBuiltSet = builtRole === select?.value && builtStarters.length === activeRounds.length;
+    activeStarters = canReuseBuiltSet ? [...builtStarters] : chooseStarters(activeRounds);
+    roundNotes.length = 0;
     if (!dialog || activeRounds.length === 0) return;
     dialog.showModal(); showRound();
   });
-  pause?.addEventListener('click', () => { paused = !paused; pause.textContent = paused ? 'Resume' : 'Pause'; });
+  document.querySelector('[data-build-simulation]')?.addEventListener('click', () => { buildPromptSet(); });
+  pause?.addEventListener('click', () => { refreshTimer(); paused = !paused; pause.textContent = paused ? 'Resume' : 'Pause'; if (paused) stopTimer(); else startTimer(); });
+  previous?.addEventListener('click', () => {
+    if (activeIndex === 0) return;
+    saveCurrentNotes();
+    stopTimer();
+    activeIndex -= 1;
+    showRound();
+  });
   next?.addEventListener('click', () => {
+    saveCurrentNotes();
     stopTimer();
     if (activeIndex >= activeRounds.length - 1) {
       if (select) { try { setActivityComplete(`simulation:${select.value}`); } catch { /* simulation still completed */ } }
@@ -295,6 +334,7 @@ const unfamiliarPrompts = [
   });
   document.querySelector('[data-close-simulation]')?.addEventListener('click', closeRunner);
   dialog?.addEventListener('cancel', closeRunner);
+  document.addEventListener('visibilitychange', refreshTimer);
 </script>
 
 <style>

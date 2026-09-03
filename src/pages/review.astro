@@ -38,7 +38,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     chapter,
     entries: entriesForChapter(allEntries, chapter)
       .filter((entry) => getImplementedVisualAudit(entry.slug))
-      .map((entry) => ({ slug: entry.slug, title: entry.title })),
+      .map((entry) => ({ slug: entry.slug, title: entry.title, href: entry.href })),
   })).filter((item) => item.entries.length > 0),
 })).filter((item) => item.chapters.length > 0);
 ---
@@ -79,7 +79,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
                       <summary><span>{chapter.title}</span><small>{entries.length}</small></summary>
                       <ol>
                         {entries.map((entry) => (
-                          <li><a href={`#${entry.slug}`} data-review-content-entry={entry.slug}>{entry.title}</a></li>
+                          <li><a href={entry.href} data-review-content-entry={entry.slug}>{entry.title}</a></li>
                         ))}
                       </ol>
                     </details>
@@ -279,8 +279,11 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       const articleBody = article.querySelector<HTMLElement>('#answer');
       explanationTitle.textContent = entry.title;
       openArticle.href = entry.href;
+      explanationHost.replaceChildren();
       if (!articleBody) {
-        explanationHost.innerHTML = '<p>The full explanation is unavailable here. Open the article instead.</p>';
+        const message = document.createElement('p');
+        message.textContent = 'The full explanation is unavailable here. Open the article instead.';
+        explanationHost.append(message);
         return;
       }
       const body = document.importNode(articleBody, true);
@@ -369,6 +372,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       chapter.textContent = entry.chapterTitle;
       back.href = `/library/${entry.volumeId}/${entry.chapterId}/`;
       back.innerHTML = '<span aria-hidden="true">←</span> Chapter';
+      if (explanationTitle && openArticle && explanationHost) {
+        explanationTitle.textContent = entry.title;
+        openArticle.href = entry.href;
+        const loading = document.createElement('p');
+        loading.textContent = 'Loading the explanation…';
+        explanationHost.replaceChildren(loading);
+      }
       document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode="full"]').forEach((link) => { link.href = entry.href; });
       previous.disabled = boundedIndex === 0;
       next.disabled = boundedIndex === entries.length - 1;
@@ -423,6 +433,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         articleLink.textContent = 'Open the full article';
         errorPanel.append(errorDetail, articleLink);
         visualHost.replaceChildren(errorPanel);
+        if (explanationTitle && openArticle && explanationHost) {
+          explanationTitle.textContent = entry.title;
+          openArticle.href = entry.href;
+          const messagePanel = document.createElement('p');
+          messagePanel.textContent = 'The full explanation is unavailable here. Open the article instead.';
+          explanationHost.replaceChildren(messagePanel);
+        }
         stage.hidden = false;
         stage.setAttribute('aria-hidden', 'false');
         controls?.removeAttribute('hidden');
@@ -440,6 +457,10 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       if (contentsDetails) contentsDetails.open = false;
       void showEntry(index, { push: true, focus: true });
     }, listenerOptions));
+    contentsDetails?.addEventListener('toggle', () => {
+      if (!contentsDetails.open) return;
+      root.querySelector<HTMLAnchorElement>('[data-review-content-entry][aria-current="page"]')?.scrollIntoView({ block: 'nearest' });
+    }, listenerOptions);
     window.addEventListener('scroll', () => {
       if (contentsDetails?.open) contentsDetails.open = false;
     }, { passive: true, signal: lifecycle.signal });
@@ -694,7 +715,6 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     .review-bottom button:first-child > span:last-child,
     .review-bottom button:last-child > span:first-child { display: none; }
     .review-explanation { padding: .8rem var(--gutter) 2rem; }
-    .explanation-actions a { display: none; }
     .review-contents-details > summary { min-width: 0; }
     .review-contents-details > summary { grid-template-columns: auto auto auto; }
     .review-contents-details > summary small { display: none; }

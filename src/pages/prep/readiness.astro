@@ -135,8 +135,31 @@ const externalDependencies = [
   const form = document.querySelector<HTMLFormElement>('#readiness-form');
   const results = document.querySelector<HTMLElement>('#readiness-results');
   const roundError = document.querySelector<HTMLElement>('#round-error');
+  const READINESS_DRAFT_KEY = 'mlm:readiness-draft:v1';
   let started = false;
   form?.addEventListener('input', () => { if (!started) { started = true; trackPublicEvent('readiness_started'); } }, { once: true });
+
+  function saveDraft(): void {
+    if (!form) return;
+    const draft: Record<string, string | string[]> = {};
+    for (const [name, rawValue] of new FormData(form).entries()) {
+      const value = String(rawValue);
+      const existing = draft[name];
+      draft[name] = existing === undefined ? value : Array.isArray(existing) ? [...existing, value] : [existing, value];
+    }
+    try { localStorage.setItem(READINESS_DRAFT_KEY, JSON.stringify(draft)); } catch { /* The form remains usable for this visit. */ }
+  }
+
+  function restoreDraft(draft: Record<string, string | string[]>): void {
+    if (!form) return;
+    Object.entries(draft).forEach(([name, rawValue]) => {
+      const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+      form.querySelectorAll<HTMLInputElement | HTMLSelectElement>(`[name="${CSS.escape(name)}"]`).forEach((field) => {
+        if (field instanceof HTMLInputElement && (field.type === 'checkbox' || field.type === 'radio')) field.checked = values.includes(field.value);
+        else if (values[0] !== undefined) field.value = values[0];
+      });
+    });
+  }
 
   function activeEvidenceAreas(): Set<AreaId> {
     if (!form) return new Set();
@@ -169,8 +192,6 @@ const externalDependencies = [
     updateEvidenceFields();
   };
   document.querySelector('[data-typical-rounds]')?.addEventListener('click', applyTypicalRounds);
-  form?.querySelector('select[name="role"]')?.addEventListener('change', applyTypicalRounds);
-  form?.querySelector('select[name="level"]')?.addEventListener('change', applyTypicalRounds);
   form?.querySelectorAll('input[name="rounds"], select[name="domain"]').forEach((input) => input.addEventListener('change', updateEvidenceFields));
   const savedPlan = loadPrepPlan();
   if (form && savedPlan) {
@@ -193,6 +214,14 @@ const externalDependencies = [
     const externalDetails = form.querySelector<HTMLDetailsElement>('details.external-check');
     if (externalDetails && savedPlan.externalRounds.length > 0) externalDetails.open = true;
   }
+  if (form && !savedPlan) {
+    try {
+      const draft = JSON.parse(localStorage.getItem(READINESS_DRAFT_KEY) ?? 'null');
+      if (draft && typeof draft === 'object' && !Array.isArray(draft)) restoreDraft(draft as Record<string, string | string[]>);
+    } catch { /* Keep the default form when a draft cannot be read. */ }
+  }
+  form?.addEventListener('input', saveDraft);
+  form?.addEventListener('change', saveDraft);
   updateEvidenceFields();
 
   form?.addEventListener('submit', (event) => {
@@ -362,6 +391,7 @@ const externalDependencies = [
     }
     try {
       savePrepPlan(plan);
+      try { localStorage.removeItem(READINESS_DRAFT_KEY); } catch { /* The saved plan remains available. */ }
       if (planSaveStatus) planSaveStatus.textContent = 'Saved on this device. The Prep and Review pages will now show your next tasks.';
     } catch {
       if (planSaveStatus) planSaveStatus.textContent = 'The result is ready, but this browser blocked local plan storage.';
@@ -373,6 +403,7 @@ const externalDependencies = [
 
   document.querySelector('#reset-readiness')?.addEventListener('click', () => {
     if (results) results.hidden = true;
+    try { localStorage.removeItem(READINESS_DRAFT_KEY); } catch { /* The reset still applies in memory. */ }
     form?.querySelector<HTMLSelectElement>('select')?.focus({ preventScroll: true });
     form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });

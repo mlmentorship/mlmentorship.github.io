@@ -5,7 +5,7 @@
 // doesn't fail.
 ---
 
-<button id="search-trigger" class="search-trigger" aria-label="Search ⌘K" aria-keyshortcuts="Meta+K Control+K" type="button" data-pagefind-ignore="all">
+<button id="search-trigger" class="search-trigger" aria-label="Search, Control or Command K" aria-keyshortcuts="Meta+K Control+K" type="button" data-pagefind-ignore="all">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
     <circle cx="11" cy="11" r="7"/>
     <path d="m21 21-4.3-4.3"/>
@@ -16,6 +16,7 @@
 
 <dialog id="search-dialog" class="search-dialog" aria-label="Search the site" data-pagefind-ignore="all">
   <div class="search-inner">
+    <button class="search-close" type="button" data-search-close aria-label="Close search">×</button>
     <aside id="search-topic-hint" class="search-topic-hint" hidden>
       <strong data-topic-hint-title></strong>
       <p data-topic-hint-copy></p>
@@ -64,6 +65,8 @@
     backdrop-filter: blur(2px);
   }
   .search-inner { padding: 1rem; min-height: 4rem; }
+  .search-close { display: grid; width: 2rem; height: 2rem; margin: 0 0 .65rem auto; place-items: center; border: 1px solid var(--c-rule); border-radius: 50%; background: var(--c-bg); color: var(--c-text-soft); cursor: pointer; font-size: 1.15rem; line-height: 1; }
+  .search-close:hover { border-color: var(--c-accent); color: var(--c-accent); }
   .search-hint {
     color: var(--c-muted);
     font-size: 0.9rem;
@@ -224,6 +227,7 @@
     }
 
     if (trigger) trigger.addEventListener('click', openDialog);
+    document.querySelector('[data-search-close]')?.addEventListener('click', () => dialog?.close());
 
     document.addEventListener('keydown', (e) => {
       const tag = (document.activeElement && document.activeElement.tagName || '').toLowerCase();

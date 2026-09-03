@@ -284,6 +284,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     try {
       const backup = parsePrepBackup(JSON.parse(await file.text()));
       if (!backup) throw new Error('Invalid backup');
+      const hasCurrentState = Boolean(loadPrepPlan()) || loadPrepProgress().length > 0 || Object.keys(loadActivityProgress().completed).length > 0;
+      if (hasCurrentState && !window.confirm('Replace the current workbook plan, practice record, and completion marks with this backup?')) return;
       if (backup.plan) savePrepPlan(backup.plan); else clearPrepPlan();
       replacePrepProgress(backup.records);
       replaceActivityProgress(backup.activity);
@@ -303,6 +305,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   const anchoredDetails = window.location.hash ? document.querySelector<HTMLDetailsElement>(window.location.hash) : null;
   if (anchoredDetails?.tagName === 'DETAILS') anchoredDetails.open = true;
   render();
+  window.addEventListener('storage', render);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') render(); });
   trackPublicEvent('workbook_opened');
 </script>
 

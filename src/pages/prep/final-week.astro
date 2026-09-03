@@ -27,6 +27,8 @@ const groups = [
     <article><h3>Applied Scientist</h3><ul><li>One ML design answer connects product decision, metrics, and operational reality.</li><li>Project evidence shows both scientific depth and shipping judgment.</li><li>Experiment answers include guardrails and practical ship criteria.</li></ul></article>
     <article><h3>Machine Learning Engineer</h3><ul><li>At least one full ML implementation attempt runs correctly under time.</li><li>Design answers cover rollback, monitoring, ownership, and cost.</li><li>Debugging starts with measurements and a systematic isolation order.</li></ul></article>
     <article><h3>Research Engineer</h3><ul><li>Implementation and systems answers quantify bottlenecks.</li><li>Research critique distinguishes claims from evidence and alternatives.</li><li>Project deep-dive connects experiments to reliable infrastructure.</li></ul></article>
+    <article><h3>Research Scientist</h3><ul><li>Derivations and mechanism answers survive changed assumptions.</li><li>Research stories separate claim, evidence, alternative, and limitation.</li><li>Work samples show discriminating experiments rather than broad exploration.</li></ul></article>
+    <article><h3>Staff / Principal</h3><ul><li>Strategy connects problem selection to opportunity cost and reversal evidence.</li><li>Architecture names decision rights, interfaces, and recovery boundaries.</li><li>Stories show durable influence and other leaders carrying the work.</li></ul></article>
   </div>
 
   <section class="risk-gate">
@@ -42,14 +44,20 @@ const groups = [
 </PrepLayout>
 
 <script>
+  const STORAGE_KEY = 'mlm:final-week-checklist:v1';
   const checklist = document.querySelector<HTMLFormElement>('.final-checklist');
   const boxes = [...document.querySelectorAll<HTMLInputElement>('.final-checklist input[type="checkbox"]')];
   const complete = document.querySelector('[data-complete-count]');
   const progress = document.querySelector<HTMLElement>('[data-progress]');
-  const update = () => { const checked = boxes.filter((box) => box.checked).length; if (complete) complete.textContent = String(checked); if (progress) progress.style.width = `${boxes.length ? checked / boxes.length * 100 : 0}%`; };
+  const save = () => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(boxes.map((box) => box.checked))); } catch { /* The checklist still works for this visit. */ } };
+  const update = () => { const checked = boxes.filter((box) => box.checked).length; if (complete) complete.textContent = String(checked); if (progress) progress.style.width = `${boxes.length ? checked / boxes.length * 100 : 0}%`; save(); };
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+    if (Array.isArray(saved)) boxes.forEach((box, index) => { box.checked = saved[index] === true; });
+  } catch { /* Keep the checklist available when storage is blocked. */ }
   checklist?.addEventListener('change', update);
   document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
-  document.querySelector('[data-reset]')?.addEventListener('click', () => { checklist?.reset(); update(); });
+  document.querySelector('[data-reset]')?.addEventListener('click', () => { checklist?.reset(); try { localStorage.removeItem(STORAGE_KEY); } catch { /* The reset still applies in memory. */ } update(); });
   update();
 </script>
 

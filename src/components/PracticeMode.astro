@@ -31,7 +31,8 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
       </header>
 
       <section data-practice-phase>
-        <div class="timer-row"><p><strong data-practice-timer>{initialTimer}</strong><span>recommended time</span></p><button class="secondary-button" type="button" data-practice-pause>Pause</button></div>
+        <div class="timer-row"><p><strong data-practice-timer role="timer" aria-label="Practice time remaining">{initialTimer}</strong><span>recommended time</span></p><button class="secondary-button" type="button" data-practice-pause>Pause</button></div>
+        <p class="sr-only" data-practice-timer-status role="status" aria-live="polite"></p>
         <label class="scratchpad-label" for={`scratchpad-${slug}`}>Private scratchpad</label>
         <textarea id={`scratchpad-${slug}`} data-practice-notes rows="10" placeholder="Outline or work through the answer. This text stays in memory and is never saved or sent."></textarea>
         <p class="local-note">Closing or reloading clears the scratchpad. Only score, weak rubric dimensions, attempt count, and retry date can be stored locally.</p>
@@ -77,11 +78,15 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
     const notes = root.querySelector<HTMLTextAreaElement>('[data-practice-notes]');
     const last = root.querySelector<HTMLElement>('[data-practice-last]');
     const scoreStatus = root.querySelector<HTMLElement>('[data-score-status]');
+    const timerStatus = root.querySelector<HTMLElement>('[data-practice-timer-status]');
     const coachingPanel = root.querySelector<HTMLElement>('[data-coaching-panel]');
     const coachingList = root.querySelector<HTMLUListElement>('[data-coaching-list]');
+    const scoreButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-practice-score]')];
     let remaining = totalSeconds;
     let interval: number | undefined;
     let paused = false;
+    let deadline = 0;
+    let scoreSubmitted = false;
 
     const updateTimer = () => {
       if (!timer) return;
@@ -90,12 +95,19 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
       timer.textContent = `${minutes}:${seconds}`;
     };
     const stopTimer = () => { if (interval !== undefined) window.clearInterval(interval); interval = undefined; };
+    const refreshRemaining = () => {
+      if (paused || deadline === 0) return;
+      remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      updateTimer();
+      if (remaining === 0) {
+        stopTimer();
+        if (timerStatus) timerStatus.textContent = 'Practice time is up. Stop and score this attempt.';
+      }
+    };
     const startTimer = () => {
       stopTimer();
-      interval = window.setInterval(() => {
-        if (!paused && remaining > 0) { remaining -= 1; updateTimer(); }
-        if (remaining === 0) stopTimer();
-      }, 1000);
+      deadline = Date.now() + remaining * 1000;
+      interval = window.setInterval(refreshRemaining, 250);
     };
     const reset = () => {
       remaining = totalSeconds;
@@ -103,6 +115,9 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
       if (pause) pause.textContent = 'Pause';
       if (notes) notes.value = '';
       if (scoreStatus) scoreStatus.textContent = '';
+      if (timerStatus) timerStatus.textContent = '';
+      scoreSubmitted = false;
+      scoreButtons.forEach((button) => { button.disabled = false; button.removeAttribute('aria-pressed'); });
       if (practicePhase) practicePhase.hidden = false;
       if (rubricPhase) rubricPhase.hidden = true;
       if (coachingPanel) coachingPanel.hidden = true;
@@ -122,7 +137,13 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
       if (!dialog) return;
       reset(); dialog.showModal(); notes?.focus(); startTimer(); trackPublicEvent('practice_started');
     });
-    pause?.addEventListener('click', () => { paused = !paused; pause.textContent = paused ? 'Resume' : 'Pause'; });
+    pause?.addEventListener('click', () => {
+      refreshRemaining();
+      paused = !paused;
+      pause.textContent = paused ? 'Resume' : 'Pause';
+      if (paused) stopTimer();
+      else startTimer();
+    });
     root.querySelector('[data-practice-reveal]')?.addEventListener('click', () => {
       stopTimer();
       if (practicePhase) practicePhase.hidden = true;
@@ -132,13 +153,16 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
     });
     root.querySelectorAll<HTMLButtonElement>('[data-practice-score]').forEach((button) => {
       button.addEventListener('click', () => {
+        if (scoreSubmitted) return;
         const score = button.dataset.practiceScore as PracticeScore | undefined;
         if (!score) return;
         const checked = [...root.querySelectorAll<HTMLInputElement>('[data-dimension]:checked')];
         const weakDimensions = checked.map((input) => input.dataset.dimension).filter((value): value is string => Boolean(value));
         try {
           const record = savePracticeProgress({ slug, title, mode, score, weakDimensions });
-          if (score === 'Confident') setActivityComplete(`entry:${slug}`);
+          scoreSubmitted = true;
+          scoreButtons.forEach((scoreButton) => { scoreButton.disabled = true; scoreButton.setAttribute('aria-pressed', scoreButton === button ? 'true' : 'false'); });
+          if (score === 'Confident' && weakDimensions.length === 0) setActivityComplete(`entry:${slug}`);
           if (scoreStatus) scoreStatus.textContent = record.dueOn
             ? `Saved on this device. Retry due ${record.dueOn}. Evidence gate: ${record.successfulAttempts}/2 spaced successes.`
             : `Saved on this device. Evidence gate: ${record.successfulAttempts}/2 spaced successes; confirm in a mixed session.`;
@@ -161,6 +185,7 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
     root.querySelector('[data-practice-compare]')?.addEventListener('click', () => { close(); document.querySelector('#answer')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
     dialog?.addEventListener('cancel', () => { stopTimer(); reset(); });
     dialog?.addEventListener('click', (event) => { if (event.target === dialog) close(); });
+    document.addEventListener('visibilitychange', refreshRemaining);
     showLast(); updateTimer();
     if (new URLSearchParams(window.location.search).get('practice') === '1') {
       const startButton = root.querySelector<HTMLButtonElement>('[data-practice-start]');

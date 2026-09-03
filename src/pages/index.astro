@@ -2,10 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { LIBRARY_SHELVES, LIBRARY_VOLUMES } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
+import { getImplementedVisualAudit } from '../utils/visualAudits';
 import { SITE } from '../consts';
 import Subscribe from '../components/Subscribe.astro';
 
 const entries = await getLibraryEntries();
+const visualEntries = entries.filter((entry) => getImplementedVisualAudit(entry.slug));
 const volumeStats = LIBRARY_VOLUMES.map((volume) => {
   const volumeEntries = volume.chapters.flatMap((chapter) => entriesForChapter(entries, chapter));
   return { volume, entries: volumeEntries, firstEntry: volumeEntries[0] };
@@ -28,7 +30,7 @@ const quickRoutes = [
   {
     cue: 'Start with the mental model',
     title: 'Review the library visually',
-    copy: `${entries.length} lessons that lead with the mechanism before the summary.`,
+    copy: `${visualEntries.length} lessons that lead with the mechanism before the summary.`,
     href: '/review/',
     event: 'homepage_start_clicked',
   },
@@ -43,7 +45,7 @@ const quickRoutes = [
     cue: 'Build a plan around your loop',
     title: 'Follow a role-specific route',
     copy: 'Choose a role, rounds, available time, and evidence to create a private preparation path.',
-    href: SITE.features.prepTools ? '/prep/role-paths/' : '/guides/as-vs-mle-vs-re/',
+    href: SITE.features.prepTools ? '/prep/readiness/' : '/guides/as-vs-mle-vs-re/',
     event: 'homepage_plan_clicked',
   },
 ];
@@ -66,7 +68,7 @@ const quickRoutes = [
         <a class="cover-primary" href="/review/" data-home-event="homepage_start_clicked">Begin visual review <span aria-hidden="true">→</span></a>
         <a class="cover-secondary" href="#email-notes" data-home-event="homepage_signup_clicked">Get field notes <span aria-hidden="true">↓</span></a>
       </div>
-      <p class="hero-meta">{entries.length} visual lessons · {LIBRARY_VOLUMES.length} ordered books · free to read</p>
+      <p class="hero-meta">{visualEntries.length} visual lessons · {LIBRARY_VOLUMES.length} ordered books · free to read</p>
     </header>
 
     <Subscribe placement="home" heading="Get field notes for senior ML interviews." />

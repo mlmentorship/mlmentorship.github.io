@@ -3,9 +3,9 @@
   "slug": "flashattention",
   "article": "src/content/posts/2026-04-10-flashattention.md",
   "status": "implemented",
-  "medium": "mermaid",
-  "learningObjective": "Follow where the full attention score matrix is written and read in standard attention before contrasting that path with SRAM tiling.",
-  "mediumRationale": "The first lesson is a data-movement path through transformations and memory. Mermaid is appropriate for that topology; a later tiled-matrix SVG should explain the spatial FlashAttention algorithm itself.",
+  "medium": "mixed",
+  "learningObjective": "Follow one query block as key and value blocks stream through SRAM tiles, updating softmax state without materializing the full score matrix.",
+  "mediumRationale": "The Mermaid flow makes the standard HBM round trip legible, while the authored SVG makes the tiled matrix and SRAM residency spatially legible.",
   "deckReview": {
     "pages": [
       {
@@ -13,7 +13,7 @@
         "insight": "The source slide contrasts standard attention with tiled SRAM execution and highlights repeated HBM traffic as the bottleneck."
       }
     ],
-    "notes": "The deck's standard-versus-FlashAttention contrast establishes the right two-view teaching sequence. This first implementation improves the existing standard-attention path; a deterministic tiled-matrix companion remains in the visual roadmap."
+    "notes": "The deck's standard-versus-FlashAttention contrast establishes the right two-view teaching sequence. The web lesson now keeps both views: HBM traffic as a flow and SRAM residency as a deterministic tiled matrix."
   },
   "sourceReview": {
     "sources": [
@@ -24,15 +24,15 @@
         "license": "No paper figure copied; conceptual reference and citation only."
       }
     ],
-    "notes": "The primary paper supports the mechanism. The article should not reuse its dense algorithm figure directly because the web lesson isolates one path at a time."
+    "notes": "The primary paper supports the mechanism. The web lesson uses an original simplified matrix-and-memory redraw rather than reusing its dense algorithm figure."
   },
   "agentReview": {
     "reviewer": "Explore visual-learning subagent",
     "reviewedAt": "2026-08-30",
-    "summary": "Recommended retaining Mermaid for the standard dataflow, assigning stable roles to input, transformation, HBM state, and output, then adding a separate deterministic tile visual in a later pass."
+    "summary": "Recommended retaining Mermaid for the standard dataflow, assigning stable roles to input, transformation, HBM state, and output, and pairing it with a deterministic tile visual for the SRAM loop."
   },
   "implementation": {
-    "visualIds": ["flashattention-standard-hbm-path"],
-    "accessibility": "The Mermaid source includes an accessible title and detailed path description. Node roles use labels, shapes, and semantic colors, followed by a direct reading caption."
+    "visualIds": ["flashattention-sram-tile-stream", "flashattention-standard-hbm-path"],
+    "accessibility": "The Mermaid source includes an accessible title and detailed path description. The SVG includes a title, description, labels, arrows, matrix structure, and a direct reading caption; neither view relies on color alone."
   }
 }

@@ -5,8 +5,8 @@
   id="theme-toggle"
   type="button"
   class="theme-toggle"
-  aria-label="Toggle color theme"
-  title="Toggle light/dark theme"
+  aria-label="Switch to light theme"
+  title="Switch to light theme"
 >
   <svg class="sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <circle cx="12" cy="12" r="4"/>
@@ -42,18 +42,29 @@
 </style>
 
 <script>
-  function applyTheme(theme: 'light' | 'dark') {
-    document.documentElement.dataset.theme = theme;
-    try { localStorage.setItem('theme', theme); } catch (_) { /* current page still updates */ }
-  }
   function currentTheme(): 'light' | 'dark' {
     const attr = document.documentElement.dataset.theme;
     if (attr === 'light' || attr === 'dark') return attr;
     return 'dark';
   }
+  function updateLabel() {
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const nextTheme = currentTheme() === 'dark' ? 'light' : 'dark';
+    btn.setAttribute('aria-label', `Switch to ${nextTheme} theme`);
+    btn.setAttribute('title', `Switch to ${nextTheme} theme`);
+  }
+  function applyTheme(theme: 'light' | 'dark') {
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem('theme', theme); } catch (_) { /* current page still updates */ }
+    updateLabel();
+  }
   function bind() {
     const btn = document.getElementById('theme-toggle');
     if (!btn) return;
+    updateLabel();
+    if (btn.dataset.themeBound === 'true') return;
+    btn.dataset.themeBound = 'true';
     btn.addEventListener('click', () => {
       applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
     });

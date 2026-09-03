@@ -87,11 +87,15 @@ const stories = [
   let priorHeights: string[] = [];
 
   type StoryData = { id: string; fields: Record<string, string> };
-  function collect(): StoryData[] {
-    return cards().map((card) => ({
+  type ChecklistData = { delivery: boolean[]; coverage: boolean[] };
+  function checkedValues(selector: string): boolean[] {
+    return [...document.querySelectorAll<HTMLInputElement>(selector)].map((input) => input.checked);
+  }
+  function collect(): { stories: StoryData[]; checklists: ChecklistData } {
+    return { stories: cards().map((card) => ({
       id: card.dataset.story ?? '',
       fields: Object.fromEntries([...card.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[data-field]')].map((field) => [field.dataset.field ?? '', field.value])),
-    }));
+    })), checklists: { delivery: checkedValues('.checklist input'), coverage: checkedValues('.coverage-grid input') } };
   }
   function restore(stories: StoryData[]): void {
     stories.forEach((story) => {
@@ -107,19 +111,24 @@ const stories = [
     document.querySelector<HTMLFormElement>('.story-form')?.reset();
     document.querySelectorAll<HTMLInputElement>('.checklist input, .coverage-grid input').forEach((input) => { input.checked = false; });
   }
+  function restoreChecklists(checklists: ChecklistData | undefined): void {
+    if (!checklists) return;
+    document.querySelectorAll<HTMLInputElement>('.checklist input').forEach((input, index) => { input.checked = checklists.delivery?.[index] === true; });
+    document.querySelectorAll<HTMLInputElement>('.coverage-grid input').forEach((input, index) => { input.checked = checklists.coverage?.[index] === true; });
+  }
 
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
-    if (Array.isArray(saved?.stories)) { restore(saved.stories); if (status) status.textContent = 'Restored a locally saved story bank.'; }
+    if (Array.isArray(saved?.stories)) { restore(saved.stories); restoreChecklists(saved.checklists); if (status) status.textContent = 'Restored a locally saved story bank.'; }
   } catch { if (status) status.textContent = 'Saved story data could not be read.'; }
 
   document.querySelector('[data-save]')?.addEventListener('click', () => {
     if (!window.confirm('Save this potentially sensitive story text in local browser storage on this device?')) return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, stories: collect() })); if (status) status.textContent = 'Saved on this device only.'; }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, ...collect() })); if (status) status.textContent = 'Saved on this device only.'; }
     catch { if (status) status.textContent = 'Could not save locally. Export a private copy instead.'; }
   });
   document.querySelector('[data-export]')?.addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), stories: collect() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), ...collect() }, null, 2)], { type: 'application/json' });
     const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'mlmentorship-story-bank.json'; link.click(); URL.revokeObjectURL(link.href);
   });
   document.querySelector('[data-print]')?.addEventListener('click', () => window.print());

@@ -10,7 +10,7 @@ category: "concepts"
 
 ## Summary
 
-Attention is **memory-bound**: not compute-bound, on modern GPUs. The bottleneck for long sequences is moving the n×n attention matrix between HBM and SRAM, not the matmuls. The n×n matrix never goes to HBM; only n-sized output and statistics are stored.
+Attention is **memory-bound**: not compute-bound, on modern GPUs. The bottleneck for long sequences is moving the n×n attention matrix between HBM and SRAM, not the matmuls. The n×n matrix never goes to HBM; only the n×d output and two n-sized per-row statistics are stored.
 
 Result: same numerical output as standard attention, but **2-4&times; faster wall-clock and O(n) memory** instead of O(n²).
 
@@ -47,7 +47,7 @@ Standard attention does this:
 2. Read S, compute P = softmax(S, axis=-1) → write to HBM
 3. Read P, compute O = PV → write to HBM
 
-HBM traffic: **O(n² + nd)**. For n = 8192, d = 128, the n² term dominates by ~500&times;.
+HBM traffic: **O(n² + nd)**. For n = 8192 and d = 128, the simplified ratio of the quadratic matrix term to the output term is n/d = 64; the exact traffic ratio depends on the implementation and other tensors.
 
 FlashAttention restructures it:
 
@@ -67,7 +67,44 @@ ell_new = exp(m_i - m_new) * ell_i + sum(exp(S_ij - m_new))
 O_new   = (exp(m_i - m_new) * ell_i * O_i + exp(S_ij - m_new) @ V_j) / ell_new
 ```
 
-The final O&#7522; is **exact** (mathematically identical to the standard implementation; no approximation). The n&times;n matrix S is never materialized; only the n-sized (m, &#8467;) statistics are saved for the backward pass.
+<!-- visual:flashattention-sram-tile-stream -->
+<figure class="learning-figure" aria-labelledby="flashattention-tile-title" aria-describedby="flashattention-tile-description">
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title" id="flashattention-tile-title">Follow one query block as key and value blocks stream through SRAM.</p>
+<p id="flashattention-tile-description">The full score matrix is shown as a grid, but only the highlighted query-key tile enters SRAM at one time. The tile updates running softmax state and the output block before the next key and value block is loaded.</p>
+<div class="visual-scroll attention-tile-scroll">
+<svg class="attention-tile-visual" viewBox="0 0 1000 500" role="img" aria-labelledby="flashattention-tile-svg-title flashattention-tile-svg-description" width="1000" height="500">
+<title id="flashattention-tile-svg-title">FlashAttention streams one score tile through SRAM instead of materializing the full matrix</title>
+<desc id="flashattention-tile-svg-description">On the left, a query-by-key score matrix has one highlighted Bq by Bk tile. An arrow points to the right, where HBM supplies one query block and one key-value block to SRAM. The SRAM tile computes scores, updates m, ell, and O, then writes only an output block and per-row statistics.</desc>
+<defs><marker id="flashattention-tile-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--viz-focus-stroke)" /></marker></defs>
+<rect x="24" y="24" width="420" height="370" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+<text x="48" y="58" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="20" font-weight="700">Global score matrix S</text>
+<text x="48" y="82" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="13">n query rows x n key columns</text>
+<text x="148" y="108" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12">K blocks</text><text x="62" y="157" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" transform="rotate(-90 62 157)">Q blocks</text>
+<text x="137" y="125" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">K1</text><text x="195" y="125" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">K2</text><text x="253" y="125" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">K3</text><text x="311" y="125" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">K4</text>
+<text x="87" y="157" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">Q1</text><text x="87" y="215" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">Q2</text><text x="87" y="273" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">Q3</text><text x="87" y="331" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">Q4</text>
+<rect x="120" y="132" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="178" y="132" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="236" y="132" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="294" y="132" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" />
+<rect x="120" y="190" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="178" y="190" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="236" y="190" width="50" height="50" rx="4" fill="var(--viz-focus-bg)" stroke="var(--viz-focus-stroke)" stroke-width="3" /><rect x="294" y="190" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" />
+<rect x="120" y="248" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="178" y="248" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="236" y="248" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="294" y="248" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" />
+<rect x="120" y="306" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="178" y="306" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="236" y="306" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" /><rect x="294" y="306" width="50" height="50" rx="4" fill="var(--viz-neutral-bg)" stroke="var(--c-rule)" />
+<text x="261" y="220" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="12" font-weight="700">Sij</text><text x="48" y="374" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Only this tile is resident</text>
+<line x1="444" y1="214" x2="476" y2="214" stroke="var(--viz-focus-stroke)" stroke-width="3" marker-end="url(#flashattention-tile-arrow)" />
+<rect x="468" y="24" width="508" height="370" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+<text x="494" y="58" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="20" font-weight="700">One SRAM tile at a time</text><text x="494" y="82" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="13">stream blocks, update state, evict the tile</text>
+<rect x="494" y="110" width="116" height="112" rx="7" fill="var(--viz-neutral-bg)" stroke="var(--viz-state-stroke)" /><text x="552" y="136" text-anchor="middle" fill="var(--viz-state-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">HBM</text><text x="552" y="162" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="15">Qi</text><text x="552" y="184" text-anchor="middle" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">Kj, Vj</text><text x="552" y="207" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">load blocks</text>
+<line x1="610" y1="150" x2="646" y2="150" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#flashattention-tile-arrow)" /><line x1="610" y1="190" x2="646" y2="190" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#flashattention-tile-arrow)" />
+<rect x="650" y="100" width="284" height="142" rx="8" fill="var(--viz-focus-bg)" stroke="var(--viz-focus-stroke)" stroke-width="2" /><text x="792" y="126" text-anchor="middle" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="14" font-weight="700">GPU SRAM</text>
+<rect x="672" y="145" width="78" height="50" rx="4" fill="var(--viz-canvas)" stroke="var(--c-rule)" /><rect x="761" y="145" width="78" height="50" rx="4" fill="var(--viz-canvas)" stroke="var(--c-rule)" /><rect x="850" y="145" width="62" height="50" rx="4" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+<text x="711" y="174" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Qi</text><text x="800" y="174" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Kj, Vj</text><text x="881" y="174" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Sij</text>
+<text x="711" y="188" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="10">Bq x d</text><text x="800" y="188" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="10">Bk x d</text><text x="881" y="188" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="10">Bq x Bk</text>
+<line x1="792" y1="242" x2="792" y2="270" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#flashattention-tile-arrow)" /><rect x="650" y="274" width="284" height="68" rx="8" fill="var(--viz-neutral-bg)" stroke="var(--viz-output-stroke)" stroke-width="2" /><text x="792" y="299" text-anchor="middle" fill="var(--viz-output-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">streaming softmax update</text><text x="792" y="322" text-anchor="middle" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">mi, elli, Oi -&gt; next tile</text>
+<text x="494" y="374" fill="var(--viz-output-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Write Oi (Bq x d), mi and elli; never S</text>
+</svg>
+</div>
+<figcaption><strong>Read it this way:</strong> the left grid is the score matrix the naive implementation would materialize. FlashAttention keeps one highlighted query-key tile in SRAM, streams the next K/V block from HBM, updates the running softmax state, and moves on. The full n&times;n matrix never needs a trip to HBM.</figcaption>
+</figure>
+
+The final O&#7522; is **exact** (mathematically identical to the standard implementation; no approximation). The n&times;n matrix S is never materialized; only two n-sized per-row vectors, (m, &#8467;), are saved for the backward pass.
 
 ## Backward pass: trade memory for compute
 

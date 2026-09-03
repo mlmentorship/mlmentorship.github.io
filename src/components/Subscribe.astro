@@ -32,7 +32,6 @@ const hasEmail =
   data-email-placement={placement}
   data-email-enabled={hasEmail ? 'true' : 'false'}
   data-email-account={SITE.newsletter.accountId}
-  hidden={placement === 'entry'}
   data-pagefind-ignore="all"
 >
   <div class="inner">
@@ -172,7 +171,7 @@ const hasEmail =
     const events = eventNames[placement];
     const suppressUntil = Number(storageGet('localStorage', SUPPRESS_UNTIL_KEY) ?? '0');
     const seenThisSession = placement === 'entry' && storageGet('sessionStorage', SESSION_KEY) === '1';
-    if (suppressUntil > Date.now() || seenThisSession) return;
+    if (suppressUntil > Date.now() || seenThisSession) { signup.hidden = true; return; }
 
     const emailEnabled = signup.dataset.emailEnabled === 'true';
     const accountId = signup.dataset.emailAccount ?? '';
