@@ -12,9 +12,11 @@ const packageLock = JSON.parse(read('package-lock.json'));
 const baseHead = read('src/components/BaseHead.astro');
 const baseLayout = read('src/layouts/BaseLayout.astro');
 const header = read('src/components/Header.astro');
+const siteConsts = read('src/consts.ts');
 const sidebar = read('src/components/LibrarySidebar.astro');
 const review = read('src/pages/review.astro');
 const home = read('src/pages/index.astro');
+const map = read('src/pages/map.astro');
 
 assert.equal(existsSync(join(root, 'LICENSE.txt')), false, 'legacy LICENSE.txt must stay removed');
 assert.match(license, /PROPRIETARY LICENSE/);
@@ -45,5 +47,11 @@ assert.match(review, /document\.addEventListener\('pointerdown', \(event\) =>/);
 assert.match(review, /querySelectorAll<HTMLAnchorElement>\('\[data-reading-mode="full"\]'\)/);
 assert.match(home, /<h1>The ML Interview Field Guide<\/h1>/);
 assert.match(home, /class="cover-primary" href="\/review\/"/);
+assert.match(siteConsts, /\{ label: 'Map', href: '\/map\/' \}/);
+assert.match(map, /data-toc-map/);
+assert.match(map, /data-map-prerequisites/);
+assert.match(map, /data-map-search/);
+assert.match(map, /data-map-runtime hidden/);
+assert.match(map, /This map needs JavaScript/);
 
 console.log('Site contracts passed: dark visual-first defaults, collapsible contents, and proprietary ownership are enforced.');

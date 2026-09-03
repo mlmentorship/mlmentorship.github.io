@@ -1,0 +1,922 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { LIBRARY_SHELVES, LIBRARY_VOLUMES } from '../data/library';
+import { entriesForChapter, getLibraryEntries } from '../utils/library';
+
+const allEntries = await getLibraryEntries();
+const volumeById = new globalThis.Map<string, typeof LIBRARY_VOLUMES[number]>(LIBRARY_VOLUMES.map((volume) => [volume.id, volume]));
+const chapterByHref = new globalThis.Map<string, string>();
+const nodes: Array<Record<string, unknown>> = [
+  {
+    id: 'root',
+    parentId: null,
+    type: 'root',
+    level: 0,
+    title: 'ML Interview Field Guide',
+    meta: `${LIBRARY_VOLUMES.length} books · ${allEntries.length} lessons`,
+    description: 'The complete visual-first route from ML foundations to senior and principal interview judgment.',
+    href: '/',
+  },
+];
+const edges: Array<{ from: string; to: string; kind: 'hierarchy' | 'prerequisite' }> = [];
+
+function chapterHref(volumeId: string, chapterId: string): string {
+  return `/library/${volumeId}/${chapterId}/`;
+}
+
+function addNode(node: Record<string, unknown>): void {
+  nodes.push(node);
+}
+
+for (const volume of LIBRARY_VOLUMES) {
+  for (const chapter of volume.chapters) chapterByHref.set(chapterHref(volume.id, chapter.id), `chapter:${volume.id}:${chapter.id}`);
+}
+
+for (const shelf of LIBRARY_SHELVES) {
+  const shelfId = `shelf:${shelf.id}`;
+  addNode({
+    id: shelfId,
+    parentId: 'root',
+    type: 'shelf',
+    level: 1,
+    title: shelf.title,
+    meta: `${shelf.volumeIds.length} books`,
+    description: shelf.description,
+    href: `/#${shelf.id}`,
+  });
+  edges.push({ from: 'root', to: shelfId, kind: 'hierarchy' });
+
+  for (const volumeId of shelf.volumeIds) {
+    const volume = volumeById.get(volumeId);
+    if (!volume) continue;
+    const volumeIdKey = `volume:${volume.id}`;
+    const volumeEntries = volume.chapters.flatMap((chapter) => entriesForChapter(allEntries, chapter));
+    addNode({
+      id: volumeIdKey,
+      parentId: shelfId,
+      type: 'book',
+      level: 2,
+      title: volume.title,
+      meta: `${volume.chapters.length} chapters · ${volumeEntries.length} lessons`,
+      description: volume.description,
+      href: `/library/${volume.id}/`,
+      number: volume.number,
+    });
+    edges.push({ from: shelfId, to: volumeIdKey, kind: 'hierarchy' });
+
+    for (const chapter of volume.chapters) {
+      const chapterKey = `chapter:${volume.id}:${chapter.id}`;
+      const entries = entriesForChapter(allEntries, chapter);
+      const prerequisites = (chapter.prerequisites ?? [])
+        .map((item) => ({ id: chapterByHref.get(item.href.replace(/\/+$/, '/') || item.href), label: item.label }))
+        .filter((item): item is { id: string; label: string } => Boolean(item.id));
+      addNode({
+        id: chapterKey,
+        parentId: volumeIdKey,
+        type: 'chapter',
+        level: 3,
+        title: chapter.title,
+        meta: `${entries.length} lessons · ${chapter.difficulty}`,
+        description: chapter.description,
+        href: chapterHref(volume.id, chapter.id),
+        number: `${volume.number}.${volume.chapters.indexOf(chapter) + 1}`,
+        prerequisites,
+      });
+      edges.push({ from: volumeIdKey, to: chapterKey, kind: 'hierarchy' });
+      for (const prerequisite of prerequisites) edges.push({ from: prerequisite.id, to: chapterKey, kind: 'prerequisite' });
+
+      for (const entry of entries) {
+        const entryKey = `entry:${entry.slug}`;
+        addNode({
+          id: entryKey,
+          parentId: chapterKey,
+          type: 'entry',
+          level: 4,
+          title: entry.title,
+          meta: entry.category === 'questions' ? 'Question' : entry.category === 'guides' ? 'Guide' : 'Concept',
+          description: entry.description ?? entry.title,
+          href: entry.href,
+        });
+        edges.push({ from: chapterKey, to: entryKey, kind: 'hierarchy' });
+      }
+    }
+  }
+}
+
+const mapData = JSON.stringify({
+  nodes,
+  edges,
+  initialExpanded: ['root', ...LIBRARY_SHELVES.map((shelf) => `shelf:${shelf.id}`)],
+}).replace(/</g, '\\u003c');
+---
+
+<BaseLayout
+  title="Content map · mlmentorship"
+  description="Explore the ML interview field guide as a collapsible map of books, chapters, lessons, and prerequisite relationships."
+  immersive
+>
+  <div class="map-page" data-toc-map>
+    <div class="map-layout" data-map-runtime hidden>
+      <section class="map-tool" aria-label="Interactive content map">
+        <div class="map-floating-tools">
+          <div class="map-toolbar">
+            <div class="map-toolbar-heading"><strong>Content map</strong><span>{LIBRARY_VOLUMES.length} books · {allEntries.length} lessons</span></div>
+            <label class="map-search">
+              <span>Find a book, chapter, or lesson</span>
+              <input type="search" data-map-search placeholder="Try: attention, calibration, coding" autocomplete="off" />
+            </label>
+            <div class="map-actions">
+              <button type="button" data-map-expand>Show chapters</button>
+              <button type="button" data-map-collapse>Collapse to books</button>
+              <button type="button" data-map-reset aria-label="Reset map view" title="Reset map view">Reset</button>
+              <button type="button" data-map-details aria-expanded="false">Details</button>
+            </div>
+            <label class="map-check"><input type="checkbox" data-map-prerequisites checked /> <span>Prerequisite links</span></label>
+          </div>
+          <div class="map-search-results" data-map-search-results hidden>
+            <div class="map-search-result-head"><strong data-map-search-count>0 matches</strong><span>Choose a result to reveal its branch.</span></div>
+            <div class="map-search-result-list" data-map-search-result-list></div>
+          </div>
+        </div>
+        <div class="map-status-row">
+          <p data-map-status aria-live="polite"></p>
+          <p data-map-zoom-status aria-live="polite">100%</p>
+        </div>
+        <div class="map-viewport" data-map-viewport tabindex="0" aria-label="Interactive hierarchical content map. Drag to pan; use the mouse wheel, pinch gesture, or zoom controls to zoom.">
+          <div class="map-canvas" data-map-canvas>
+            <svg class="map-edges" data-map-edges aria-hidden="true"></svg>
+            <div class="map-nodes" data-map-nodes></div>
+          </div>
+        </div>
+        <div class="map-legend" aria-label="Map legend">
+          <span><i class="legend-line legend-line--solid"></i>Hierarchy</span>
+          <span><i class="legend-line legend-line--dashed"></i>Prerequisite</span>
+          <span><i class="legend-dot legend-dot--open"></i>Expandable</span>
+          <span><i class="legend-dot legend-dot--link"></i>Open lesson</span>
+        </div>
+        <div class="map-zoom-controls" aria-label="Map zoom controls">
+          <button type="button" data-map-zoom-out aria-label="Zoom out" title="Zoom out">−</button>
+          <button type="button" data-map-fit aria-label="Fit visible map" title="Fit visible map">Fit</button>
+          <button type="button" data-map-zoom-in aria-label="Zoom in" title="Zoom in">+</button>
+        </div>
+      </section>
+
+      <aside class="map-inspector" data-map-inspector aria-live="polite" hidden>
+        <header class="map-inspector-head"><p class="map-inspector-kicker" data-map-inspector-kind>Field guide</p><button type="button" data-map-inspector-close aria-label="Hide details" title="Hide details">×</button></header>
+        <h2 data-map-inspector-title>ML Interview Field Guide</h2>
+        <p data-map-inspector-description>The complete visual-first route from ML foundations to senior and principal interview judgment.</p>
+        <div class="map-inspector-actions">
+          <a class="map-open-link" data-map-inspector-open href="/">Open overview <span aria-hidden="true">↗</span></a>
+          <button type="button" data-map-inspector-expand>Expand branch</button>
+        </div>
+        <section class="map-inspector-section" data-map-inspector-relationships hidden>
+          <h3>Prerequisites</h3>
+          <p>Open both branches to see the dashed connection in the map.</p>
+          <ul data-map-inspector-prerequisites></ul>
+        </section>
+        <section class="map-inspector-section map-inspector-note">
+          <h3>Reading path</h3>
+          <p>Start broad at a shelf, open one book, then expand a chapter only when you are ready to see its lessons. Lesson labels are direct links to the full article.</p>
+        </section>
+      </aside>
+    </div>
+
+    <noscript>
+      <section class="map-noscript">
+        <h2>Browse the ordered library</h2>
+        <p>This map needs JavaScript for expansion. The complete book and chapter contents remain available in the <a href="/#curriculum">ordered library</a>.</p>
+      </section>
+    </noscript>
+    <script id="toc-map-data" type="application/json" is:inline set:html={mapData}></script>
+  </div>
+</BaseLayout>
+
+<script>
+  interface MapPrerequisite { id: string; label: string }
+  interface MapNode {
+    id: string;
+    parentId: string | null;
+    type: 'root' | 'shelf' | 'book' | 'chapter' | 'entry';
+    level: number;
+    title: string;
+    meta: string;
+    description: string;
+    href: string;
+    number?: string;
+    prerequisites?: MapPrerequisite[];
+  }
+  interface MapEdge { from: string; to: string; kind: 'hierarchy' | 'prerequisite' }
+  interface MapData { nodes: MapNode[]; edges: MapEdge[]; initialExpanded: string[] }
+  interface Position { x: number; y: number }
+
+  const root = document.querySelector<HTMLElement>('[data-toc-map]');
+  const dataNode = document.querySelector<HTMLScriptElement>('#toc-map-data');
+  let data: MapData | null = null;
+  try {
+    const parsed: unknown = JSON.parse(dataNode?.textContent ?? 'null');
+    if (parsed && typeof parsed === 'object') data = parsed as MapData;
+  } catch (error) {
+    console.error('Content map data could not be read.', error);
+  }
+
+  if (root && data && data.nodes.length > 0) {
+    const mapData = data;
+    root.querySelector<HTMLElement>('[data-map-runtime]')?.removeAttribute('hidden');
+    const nodeById = new Map(mapData.nodes.map((node) => [node.id, node]));
+    const childrenByParent = new Map<string, MapNode[]>();
+    for (const node of mapData.nodes) {
+      if (!node.parentId) continue;
+      const children = childrenByParent.get(node.parentId) ?? [];
+      children.push(node);
+      childrenByParent.set(node.parentId, children);
+    }
+    const expanded = new Set(mapData.initialExpanded);
+    const positions = new Map<string, Position>();
+    const visibleIds = new Set<string>();
+    const graphViewport = root.querySelector<HTMLElement>('[data-map-viewport]');
+    const canvas = root.querySelector<HTMLElement>('[data-map-canvas]');
+    const edgeLayer = root.querySelector<SVGElement>('[data-map-edges]');
+    const nodeLayer = root.querySelector<HTMLElement>('[data-map-nodes]');
+    const status = root.querySelector<HTMLElement>('[data-map-status]');
+    const search = root.querySelector<HTMLInputElement>('[data-map-search]');
+    const searchResults = root.querySelector<HTMLElement>('[data-map-search-results]');
+    const searchCount = root.querySelector<HTMLElement>('[data-map-search-count]');
+    const searchResultList = root.querySelector<HTMLElement>('[data-map-search-result-list]');
+    const prerequisitesToggle = root.querySelector<HTMLInputElement>('[data-map-prerequisites]');
+    const inspectorKind = root.querySelector<HTMLElement>('[data-map-inspector-kind]');
+    const inspector = root.querySelector<HTMLElement>('[data-map-inspector]');
+    const inspectorTitle = root.querySelector<HTMLElement>('[data-map-inspector-title]');
+    const inspectorDescription = root.querySelector<HTMLElement>('[data-map-inspector-description]');
+    const inspectorOpen = root.querySelector<HTMLAnchorElement>('[data-map-inspector-open]');
+    const inspectorExpand = root.querySelector<HTMLButtonElement>('[data-map-inspector-expand]');
+    const inspectorClose = root.querySelector<HTMLButtonElement>('[data-map-inspector-close]');
+    const inspectorToggle = root.querySelector<HTMLButtonElement>('[data-map-details]');
+    const relationshipSection = root.querySelector<HTMLElement>('[data-map-inspector-relationships]');
+    const prerequisiteList = root.querySelector<HTMLUListElement>('[data-map-inspector-prerequisites]');
+    const zoomStatus = root.querySelector<HTMLElement>('[data-map-zoom-status]');
+    const zoomIn = root.querySelector<HTMLButtonElement>('[data-map-zoom-in]');
+    const zoomOut = root.querySelector<HTMLButtonElement>('[data-map-zoom-out]');
+    const fit = root.querySelector<HTMLButtonElement>('[data-map-fit]');
+    const compactLayout = window.matchMedia('(max-width: 640px)').matches;
+    const nodeWidth = compactLayout ? 190 : 258;
+    const nodeHeight = compactLayout ? 74 : 78;
+    const columnGap = compactLayout ? 205 : 294;
+    const rowGap = compactLayout ? 88 : 96;
+    const canvasPadding = 28;
+    const selectedFromHash = decodeURIComponent(window.location.hash.slice(1));
+    let selectedId = nodeById.has(selectedFromHash) ? selectedFromHash : 'root';
+    let showPrerequisites = prerequisitesToggle?.checked ?? true;
+    let hasAutoPositioned = false;
+    let canvasDimensions = { width: 900, height: 520 };
+    let zoom = 1;
+    let panX = 0;
+    let panY = 0;
+    const minZoom = .35;
+    const maxZoom = 1.6;
+    const activePointers = new Map<number, { x: number; y: number }>();
+    let dragPointerId: number | undefined;
+    let lastDragPoint: { x: number; y: number } | undefined;
+    let pinchDistance = 0;
+    let pinchZoom = 1;
+    const scopeAttribute = [...root.attributes].find((attribute) => attribute.name.startsWith('data-astro-cid-'))?.name;
+
+    function scopeTree<T extends Element>(element: T): T {
+      if (!scopeAttribute) return element;
+      element.setAttribute(scopeAttribute, '');
+      element.querySelectorAll('*').forEach((child) => child.setAttribute(scopeAttribute!, ''));
+      return element;
+    }
+
+    function typeLabel(type: MapNode['type']): string {
+      return type === 'root' ? 'Field guide' : type === 'shelf' ? 'Track' : type === 'book' ? 'Book' : type === 'chapter' ? 'Chapter' : 'Lesson';
+    }
+
+    function childrenOf(id: string): MapNode[] {
+      return childrenByParent.get(id) ?? [];
+    }
+
+    function expandPath(id: string): void {
+      let current = nodeById.get(id);
+      while (current) {
+        expanded.add(current.id);
+        current = current.parentId ? nodeById.get(current.parentId) : undefined;
+      }
+    }
+
+    function clampPan(): void {
+      if (!graphViewport) return;
+      const scaledWidth = canvasDimensions.width * zoom;
+      const scaledHeight = canvasDimensions.height * zoom;
+      const horizontalBounds = scaledWidth > graphViewport.clientWidth
+        ? { min: graphViewport.clientWidth - scaledWidth - 32, max: 32 }
+        : { min: (graphViewport.clientWidth - scaledWidth) / 2, max: (graphViewport.clientWidth - scaledWidth) / 2 };
+      const verticalBounds = scaledHeight > graphViewport.clientHeight
+        ? { min: graphViewport.clientHeight - scaledHeight - 32, max: 32 }
+        : { min: (graphViewport.clientHeight - scaledHeight) / 2, max: (graphViewport.clientHeight - scaledHeight) / 2 };
+      panX = Math.min(horizontalBounds.max, Math.max(horizontalBounds.min, panX));
+      panY = Math.min(verticalBounds.max, Math.max(verticalBounds.min, panY));
+    }
+
+    function updateTransform(): void {
+      if (!canvas) return;
+      clampPan();
+      canvas.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoom})`;
+      if (zoomStatus) zoomStatus.textContent = `${Math.round(zoom * 100)}%`;
+    }
+
+    function zoomAt(nextZoom: number, clientX?: number, clientY?: number): void {
+      if (!graphViewport) return;
+      const boundedZoom = Math.min(maxZoom, Math.max(minZoom, nextZoom));
+      const viewportRect = graphViewport.getBoundingClientRect();
+      const focusX = clientX === undefined ? viewportRect.left + viewportRect.width / 2 : clientX;
+      const focusY = clientY === undefined ? viewportRect.top + viewportRect.height / 2 : clientY;
+      const localX = (focusX - viewportRect.left - panX) / zoom;
+      const localY = (focusY - viewportRect.top - panY) / zoom;
+      zoom = boundedZoom;
+      panX = focusX - viewportRect.left - localX * zoom;
+      panY = focusY - viewportRect.top - localY * zoom;
+      updateTransform();
+    }
+
+    function fitView(): void {
+      if (!graphViewport) return;
+      const widthRatio = (graphViewport.clientWidth - 64) / canvasDimensions.width;
+      const heightRatio = (graphViewport.clientHeight - 64) / canvasDimensions.height;
+      zoom = Math.min(1, Math.max(minZoom, Math.min(widthRatio, heightRatio)));
+      panX = (graphViewport.clientWidth - canvasDimensions.width * zoom) / 2;
+      panY = (graphViewport.clientHeight - canvasDimensions.height * zoom) / 2;
+      updateTransform();
+    }
+
+    function centerSelected(): void {
+      if (!graphViewport) return;
+      const position = positions.get(selectedId);
+      if (!position) return;
+      panX = graphViewport.clientWidth / 2 - (position.x + nodeWidth / 2) * zoom;
+      panY = graphViewport.clientHeight / 2 - (position.y + nodeHeight / 2) * zoom;
+      updateTransform();
+    }
+
+    expandPath(selectedId);
+
+    function visibleNodes(): MapNode[] {
+      visibleIds.clear();
+      const result: MapNode[] = [];
+      function visit(id: string): void {
+        const node = nodeById.get(id);
+        if (!node) return;
+        visibleIds.add(id);
+        result.push(node);
+        if (!expanded.has(id)) return;
+        for (const child of childrenOf(id)) visit(child.id);
+      }
+      visit('root');
+      return result;
+    }
+
+    function layout(nodes: MapNode[]): { width: number; height: number } {
+      positions.clear();
+      let leafIndex = 0;
+      function place(node: MapNode): number {
+        const visibleChildren = expanded.has(node.id) ? childrenOf(node.id).filter((child) => visibleIds.has(child.id)) : [];
+        const childCenters = visibleChildren.map(place);
+        const centerY = node.id === 'root'
+          ? canvasPadding + nodeHeight / 2
+          : childCenters.length > 0
+            ? childCenters.reduce((sum, childY) => sum + childY, 0) / childCenters.length
+            : canvasPadding + nodeHeight / 2 + leafIndex++ * rowGap;
+        positions.set(node.id, { x: canvasPadding + node.level * columnGap, y: centerY - nodeHeight / 2 });
+        return centerY;
+      }
+      const rootNode = nodeById.get('root');
+      if (rootNode) place(rootNode);
+      const maxLevel = Math.max(...nodes.map((node) => node.level));
+      return {
+        width: Math.max(graphViewport?.clientWidth ?? 900, canvasPadding * 2 + maxLevel * columnGap + nodeWidth),
+        height: Math.max(graphViewport?.clientHeight ?? 520, canvasPadding * 2 + nodeHeight + Math.max(0, leafIndex - 1) * rowGap),
+      };
+    }
+
+    function makeSvgElement(name: string, attributes: Record<string, string>): SVGElement {
+      const element = document.createElementNS('http://www.w3.org/2000/svg', name);
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+      return scopeTree(element);
+    }
+
+    function edgePath(from: Position, to: Position, kind: MapEdge['kind']): string {
+      const startX = kind === 'hierarchy' ? from.x + nodeWidth : from.x + nodeWidth / 2;
+      const endX = kind === 'hierarchy' ? to.x : to.x + nodeWidth / 2;
+      const startY = from.y + nodeHeight / 2;
+      const endY = to.y + nodeHeight / 2;
+      const direction = startX <= endX ? 1 : -1;
+      const bend = kind === 'hierarchy' ? Math.max(52, (endX - startX) * .42) : Math.max(76, Math.abs(endX - startX) * .35);
+      return `M ${startX} ${startY} C ${startX + direction * bend} ${startY}, ${endX - direction * bend} ${endY}, ${endX} ${endY}`;
+    }
+
+    function renderEdges(dimensions: { width: number; height: number }): void {
+      if (!edgeLayer) return;
+      const defs = makeSvgElement('defs', {});
+      const hierarchyMarker = makeSvgElement('marker', { id: 'map-hierarchy-arrow', viewBox: '0 0 10 10', refX: '8', refY: '5', markerWidth: '6', markerHeight: '6', orient: 'auto-start-reverse' });
+      hierarchyMarker.append(makeSvgElement('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: 'var(--map-edge)' }));
+      const prerequisiteMarker = makeSvgElement('marker', { id: 'map-prerequisite-arrow', viewBox: '0 0 10 10', refX: '8', refY: '5', markerWidth: '6', markerHeight: '6', orient: 'auto-start-reverse' });
+      prerequisiteMarker.append(makeSvgElement('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: 'var(--map-prerequisite)' }));
+      defs.append(hierarchyMarker, prerequisiteMarker);
+      edgeLayer.setAttribute('viewBox', `0 0 ${dimensions.width} ${dimensions.height}`);
+      edgeLayer.setAttribute('width', String(dimensions.width));
+      edgeLayer.setAttribute('height', String(dimensions.height));
+      const elements: SVGElement[] = [defs];
+      const visibleEdges = mapData.edges.filter((edge) => visibleIds.has(edge.from) && visibleIds.has(edge.to) && (edge.kind === 'hierarchy' || showPrerequisites));
+      for (const edge of visibleEdges.filter((item) => item.kind === 'prerequisite')) {
+        const from = positions.get(edge.from);
+        const to = positions.get(edge.to);
+        if (!from || !to) continue;
+        elements.push(makeSvgElement('path', { class: 'map-edge map-edge--prerequisite', d: edgePath(from, to, edge.kind), 'marker-end': 'url(#map-prerequisite-arrow)' }));
+      }
+      for (const edge of visibleEdges.filter((item) => item.kind === 'hierarchy')) {
+        const from = positions.get(edge.from);
+        const to = positions.get(edge.to);
+        if (!from || !to) continue;
+        elements.push(makeSvgElement('path', { class: 'map-edge map-edge--hierarchy', d: edgePath(from, to, edge.kind), 'marker-end': 'url(#map-hierarchy-arrow)' }));
+      }
+      edgeLayer.replaceChildren(...elements);
+    }
+
+    function renderNode(node: MapNode): HTMLElement | null {
+      const position = positions.get(node.id);
+      if (!position) return null;
+      const shell = document.createElement('div');
+      shell.className = 'map-node-shell';
+      shell.dataset.nodeId = node.id;
+      shell.dataset.nodeType = node.type;
+      shell.style.left = `${position.x}px`;
+      shell.style.top = `${position.y}px`;
+      shell.style.width = `${nodeWidth}px`;
+      shell.style.height = `${nodeHeight}px`;
+      const hasChildren = childrenOf(node.id).length > 0;
+      const isExpanded = expanded.has(node.id);
+      const isSelected = selectedId === node.id;
+      if (isSelected) shell.dataset.selected = 'true';
+
+      if (node.type === 'entry') {
+        const link = document.createElement('a');
+        link.className = 'map-node map-node--entry';
+        link.href = node.href;
+        link.dataset.mapNodeLink = node.id;
+        link.setAttribute('aria-label', `Open lesson: ${node.title}`);
+        link.innerHTML = `<span class="map-node-mark">L</span><span class="map-node-copy"><strong></strong><small></small></span><span class="map-node-arrow" aria-hidden="true">↗</span>`;
+        const strong = link.querySelector('strong');
+        const small = link.querySelector('small');
+        if (strong) strong.textContent = node.title;
+        if (small) small.textContent = node.meta;
+        shell.append(link);
+        return scopeTree(shell);
+      }
+
+      const card = document.createElement('div');
+      card.className = 'map-node';
+      card.classList.add(`map-node--${node.type}`);
+      const main = document.createElement('div');
+      main.className = 'map-node-main';
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'map-node-toggle';
+      toggle.dataset.mapToggle = node.id;
+      toggle.disabled = !hasChildren;
+      toggle.setAttribute('aria-expanded', String(isExpanded));
+      toggle.setAttribute('aria-label', hasChildren ? `${isExpanded ? 'Collapse' : 'Expand'} ${node.title}` : node.title);
+      toggle.innerHTML = `<span class="map-node-mark"></span><span class="map-node-copy"><strong></strong><small></small></span><span class="map-node-expander" aria-hidden="true"></span>`;
+      const mark = toggle.querySelector('.map-node-mark');
+      const strong = toggle.querySelector('strong');
+      const small = toggle.querySelector('small');
+      const expander = toggle.querySelector('.map-node-expander');
+      if (mark) mark.textContent = node.type === 'root' ? 'M' : node.type === 'shelf' ? 'T' : node.type === 'book' ? node.number ?? 'B' : node.number ?? 'C';
+      if (strong) strong.textContent = node.title;
+      if (small) small.textContent = node.meta;
+      if (expander) expander.textContent = hasChildren ? (isExpanded ? '−' : '+') : '';
+      const open = document.createElement('a');
+      open.className = 'map-node-open';
+      open.href = node.href;
+      open.textContent = '↗';
+      open.title = `Open ${typeLabel(node.type).toLowerCase()}`;
+      open.setAttribute('aria-label', `Open ${typeLabel(node.type).toLowerCase()}: ${node.title}`);
+      main.append(toggle, open);
+      card.append(main);
+      if (node.type === 'chapter' && node.prerequisites && node.prerequisites.length > 0) {
+        const relation = document.createElement('p');
+        relation.className = 'map-node-relation';
+        relation.textContent = `${node.prerequisites.length} prerequisite${node.prerequisites.length === 1 ? '' : 's'}`;
+        card.append(relation);
+      }
+      shell.append(card);
+      return scopeTree(shell);
+    }
+
+    function renderInspector(): void {
+      const node = nodeById.get(selectedId) ?? nodeById.get('root');
+      if (!node || !inspectorKind || !inspectorTitle || !inspectorDescription || !inspectorOpen || !inspectorExpand) return;
+      const children = childrenOf(node.id);
+      inspectorKind.textContent = typeLabel(node.type);
+      inspectorTitle.textContent = node.title;
+      inspectorDescription.textContent = node.description;
+      inspectorOpen.href = node.href;
+      inspectorOpen.innerHTML = `Open ${typeLabel(node.type).toLowerCase()} <span aria-hidden="true">↗</span>`;
+      inspectorExpand.hidden = children.length === 0;
+      inspectorExpand.textContent = expanded.has(node.id) ? 'Collapse branch' : 'Expand branch';
+      const prerequisites = node.prerequisites ?? [];
+      if (relationshipSection && prerequisiteList) {
+        relationshipSection.hidden = prerequisites.length === 0;
+        prerequisiteList.replaceChildren(...prerequisites.map((prerequisite) => {
+          const item = document.createElement('li');
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.mapReveal = prerequisite.id;
+          button.textContent = prerequisite.label;
+          item.append(button);
+          return scopeTree(item);
+        }));
+      }
+    }
+
+    function renderSearchResults(): void {
+      if (!search || !searchResults || !searchCount || !searchResultList) return;
+      const query = search.value.trim().toLowerCase();
+      if (!query) {
+        searchResults.hidden = true;
+        searchResultList.replaceChildren();
+        return;
+      }
+      const matches = mapData.nodes.filter((node) => node.type !== 'root' && `${node.title} ${node.description} ${node.meta}`.toLowerCase().includes(query));
+      searchResults.hidden = false;
+      searchCount.textContent = `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
+      searchResultList.replaceChildren(...matches.slice(0, 12).map((node) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.mapSearchResult = node.id;
+        button.innerHTML = `<strong></strong><small></small>`;
+        const strong = button.querySelector('strong');
+        const small = button.querySelector('small');
+        if (strong) strong.textContent = node.title;
+        if (small) small.textContent = `${typeLabel(node.type)} · ${node.meta}`;
+        return scopeTree(button);
+      }));
+      if (matches.length > 12) {
+        const more = document.createElement('p');
+        more.className = 'map-search-more';
+        more.textContent = `Showing the first 12 of ${matches.length} matches.`;
+        searchResultList.append(scopeTree(more));
+      }
+    }
+
+    function render(): void {
+      const nodes = visibleNodes();
+      const dimensions = layout(nodes);
+      if (canvas) {
+        canvas.style.width = `${dimensions.width}px`;
+        canvas.style.height = `${dimensions.height}px`;
+      }
+      canvasDimensions = dimensions;
+      renderEdges(dimensions);
+      if (nodeLayer) nodeLayer.replaceChildren(...nodes.map(renderNode).filter((node): node is HTMLElement => Boolean(node)));
+      const visibleLessons = nodes.filter((node) => node.type === 'entry').length;
+      if (status) status.textContent = `${nodes.length} visible nodes · ${visibleLessons} lesson${visibleLessons === 1 ? '' : 's'} shown`;
+      renderInspector();
+      renderSearchResults();
+      if (!hasAutoPositioned) {
+        hasAutoPositioned = true;
+        requestAnimationFrame(() => fitView());
+      }
+    }
+
+    root.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const toggle = target.closest<HTMLButtonElement>('[data-map-toggle]');
+      if (toggle) {
+        const id = toggle.dataset.mapToggle;
+        if (!id) return;
+        selectedId = id;
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+        history.replaceState(null, '', `#${encodeURIComponent(id)}`);
+        render();
+        root.querySelector<HTMLButtonElement>(`[data-map-toggle="${CSS.escape(id)}"]`)?.focus();
+        return;
+      }
+      const searchResult = target.closest<HTMLButtonElement>('[data-map-search-result]');
+      if (searchResult) {
+        const id = searchResult.dataset.mapSearchResult;
+        if (!id) return;
+        selectedId = id;
+        expanded.clear();
+        mapData.initialExpanded.forEach((expandedId) => expanded.add(expandedId));
+        expandPath(id);
+        history.replaceState(null, '', `#${encodeURIComponent(id)}`);
+        render();
+        if (inspector) { inspector.hidden = false; inspectorToggle?.setAttribute('aria-expanded', 'true'); }
+        requestAnimationFrame(() => centerSelected());
+        return;
+      }
+      const reveal = target.closest<HTMLButtonElement>('[data-map-reveal]');
+      if (reveal) {
+        const id = reveal.dataset.mapReveal;
+        if (!id) return;
+        selectedId = id;
+        expandPath(id);
+        history.replaceState(null, '', `#${encodeURIComponent(id)}`);
+        render();
+        if (inspector) { inspector.hidden = false; inspectorToggle?.setAttribute('aria-expanded', 'true'); }
+        requestAnimationFrame(() => centerSelected());
+      }
+    });
+
+    inspectorExpand?.addEventListener('click', () => {
+      const node = nodeById.get(selectedId);
+      if (!node) return;
+      if (expanded.has(node.id)) expanded.delete(node.id); else expanded.add(node.id);
+      render();
+    });
+    inspectorClose?.addEventListener('click', () => {
+      if (inspector) inspector.hidden = true;
+      inspectorToggle?.setAttribute('aria-expanded', 'false');
+      inspectorToggle?.focus({ preventScroll: true });
+    });
+    inspectorToggle?.addEventListener('click', () => {
+      if (!inspector) return;
+      inspector.hidden = !inspector.hidden;
+      inspectorToggle.setAttribute('aria-expanded', String(!inspector.hidden));
+      if (!inspector.hidden) inspector.querySelector<HTMLButtonElement>('[data-map-inspector-close]')?.focus({ preventScroll: true });
+    });
+    root.querySelector('[data-map-expand]')?.addEventListener('click', () => {
+      mapData.nodes.filter((node) => node.type === 'chapter').forEach((node) => expanded.delete(node.id));
+      mapData.nodes.filter((node) => node.type === 'book').forEach((node) => expanded.add(node.id));
+      render();
+      fitView();
+    });
+    root.querySelector('[data-map-collapse]')?.addEventListener('click', () => {
+      expanded.clear();
+      mapData.initialExpanded.forEach((id) => expanded.add(id));
+      selectedId = 'root';
+      history.replaceState(null, '', window.location.pathname);
+      render();
+      fitView();
+    });
+    root.querySelector('[data-map-reset]')?.addEventListener('click', () => {
+      expanded.clear();
+      mapData.initialExpanded.forEach((id) => expanded.add(id));
+      selectedId = 'root';
+      if (search) search.value = '';
+      history.replaceState(null, '', window.location.pathname);
+      if (inspector) { inspector.hidden = true; inspectorToggle?.setAttribute('aria-expanded', 'false'); }
+      render();
+      fitView();
+    });
+    prerequisitesToggle?.addEventListener('change', () => {
+      showPrerequisites = prerequisitesToggle.checked;
+      render();
+    });
+    zoomIn?.addEventListener('click', () => zoomAt(zoom * 1.2));
+    zoomOut?.addEventListener('click', () => zoomAt(zoom / 1.2));
+    fit?.addEventListener('click', () => fitView());
+    graphViewport?.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      zoomAt(zoom * Math.exp(-event.deltaY * .001), event.clientX, event.clientY);
+    }, { passive: false });
+    graphViewport?.addEventListener('pointerdown', (event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('button, a, input, label')) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      graphViewport.setPointerCapture(event.pointerId);
+      if (activePointers.size === 1) {
+        dragPointerId = event.pointerId;
+        lastDragPoint = { x: event.clientX, y: event.clientY };
+        graphViewport.classList.add('is-panning');
+      } else if (activePointers.size === 2) {
+        const points = [...activePointers.values()];
+        pinchDistance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        pinchZoom = zoom;
+        dragPointerId = undefined;
+      }
+      event.preventDefault();
+    });
+    graphViewport?.addEventListener('pointermove', (event) => {
+      if (!activePointers.has(event.pointerId)) return;
+      activePointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (activePointers.size === 2 && graphViewport) {
+        const points = [...activePointers.values()];
+        const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+        const centerX = (points[0].x + points[1].x) / 2;
+        const centerY = (points[0].y + points[1].y) / 2;
+        if (pinchDistance > 0) zoomAt(pinchZoom * distance / pinchDistance, centerX, centerY);
+        return;
+      }
+      if (event.pointerId !== dragPointerId || !lastDragPoint) return;
+      panX += event.clientX - lastDragPoint.x;
+      panY += event.clientY - lastDragPoint.y;
+      lastDragPoint = { x: event.clientX, y: event.clientY };
+      updateTransform();
+    });
+    const finishPointer = (event: PointerEvent) => {
+      activePointers.delete(event.pointerId);
+      if (activePointers.size === 0) {
+        dragPointerId = undefined;
+        lastDragPoint = undefined;
+        pinchDistance = 0;
+        graphViewport?.classList.remove('is-panning');
+      }
+    };
+    graphViewport?.addEventListener('pointerup', finishPointer);
+    graphViewport?.addEventListener('pointercancel', finishPointer);
+    graphViewport?.addEventListener('pointerleave', (event) => { if (dragPointerId === event.pointerId) finishPointer(event); });
+    window.addEventListener('resize', () => { clampPan(); updateTransform(); }, { passive: true });
+    search?.addEventListener('input', renderSearchResults);
+    render();
+  }
+</script>
+
+<style>
+  .map-page {
+    width: min(100%, 92rem);
+    margin: 0 auto;
+    padding: clamp(1.35rem, 3vw, 2.75rem) var(--gutter) 4.5rem;
+  }
+  .map-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.25rem 0 1.35rem;
+    border-top: 1px solid var(--c-rule);
+    border-bottom: 2px solid var(--c-text);
+  }
+  .map-kicker {
+    margin: 0 0 .45rem;
+    color: var(--c-accent);
+    font-family: var(--font-mono);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+  .map-header h1 { max-width: 36rem; margin: 0 0 .5rem; font-size: clamp(1.9rem, 4vw, 3.2rem); line-height: 1.03; letter-spacing: 0; }
+  .map-lede { max-width: 42rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .98rem; line-height: 1.55; }
+  .map-header-stat { display: grid; flex: 0 0 10rem; gap: .15rem; padding-left: 1rem; border-left: 1px solid var(--c-rule); }
+  .map-header-stat strong { color: var(--c-accent); font-family: var(--font-mono); font-size: 2rem; line-height: 1; }
+  .map-header-stat span { color: var(--c-muted); font-size: .7rem; line-height: 1.35; }
+  .map-layout { display: block; margin-top: 1rem; }
+  .map-tool { min-width: 0; }
+  .map-toolbar { display: grid; grid-template-columns: minmax(14rem, 1fr) auto; gap: .65rem; align-items: end; padding: .75rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); }
+  .map-search { display: grid; gap: .3rem; min-width: 0; }
+  .map-search > span { color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; }
+  .map-search input { width: 100%; min-height: 2.55rem; padding: .55rem .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .8rem; }
+  .map-search input:focus { border-color: var(--c-accent); outline: 2px solid var(--c-accent); outline-offset: 1px; }
+  .map-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .4rem; }
+  .map-actions button, .map-check, .map-inspector-actions button { min-height: 2.45rem; padding: .5rem .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text-soft); font: inherit; font-size: .72rem; font-weight: 650; cursor: pointer; }
+  .map-actions button:hover, .map-inspector-actions button:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .map-check { display: inline-flex; grid-column: 1 / -1; width: fit-content; min-height: auto; align-items: center; gap: .4rem; padding: .35rem .45rem; border: 0; color: var(--c-muted); font-size: .7rem; font-weight: 500; }
+  .map-check input { accent-color: var(--c-accent-fill); }
+  .map-search-results { margin-top: .55rem; padding: .65rem .75rem; border: 1px solid var(--c-accent); border-radius: var(--radius); background: color-mix(in srgb, var(--c-accent-soft) 32%, var(--c-bg)); }
+  .map-search-results[hidden] { display: none; }
+  .map-search-result-head { display: flex; flex-wrap: wrap; gap: .35rem .7rem; align-items: baseline; margin-bottom: .35rem; }
+  .map-search-result-head strong { color: var(--c-text); font-size: .74rem; }
+  .map-search-result-head span { color: var(--c-muted); font-size: .68rem; }
+  .map-search-result-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .3rem; }
+  .map-search-result-list button { display: grid; gap: .1rem; min-width: 0; padding: .45rem .5rem; border: 1px solid var(--c-rule); border-radius: 3px; background: var(--c-bg); color: var(--c-text); text-align: left; cursor: pointer; }
+  .map-search-result-list button:hover { border-color: var(--c-accent); }
+  .map-search-result-list strong { overflow: hidden; font-size: .7rem; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+  .map-search-result-list small { color: var(--c-muted); font-size: .6rem; }
+  .map-search-more { grid-column: 1 / -1; margin: .25rem 0 0; color: var(--c-muted); font-size: .65rem; }
+  .map-status-row { display: flex; justify-content: space-between; gap: 1rem; margin: .65rem .1rem .45rem; }
+  .map-status-row p { margin: 0; color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; }
+  .map-status-row p:first-child { color: var(--c-text-soft); }
+  .map-viewport { min-height: min(68vh, 44rem); max-height: calc(100vh - 17rem); overflow: auto; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background-color: var(--c-bg-tint); background-image: linear-gradient(var(--c-rule-soft) 1px, transparent 1px), linear-gradient(90deg, var(--c-rule-soft) 1px, transparent 1px); background-size: 24px 24px; scrollbar-color: var(--c-rule) transparent; }
+  .map-viewport:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+  .map-canvas { position: relative; min-width: 100%; min-height: 100%; }
+  .map-edges { position: absolute; top: 0; left: 0; overflow: visible; pointer-events: none; }
+  .map-edge { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .map-edge--hierarchy { stroke: var(--map-edge); stroke-width: 1.8; opacity: .65; }
+  .map-edge--prerequisite { stroke: var(--map-prerequisite); stroke-width: 1.6; stroke-dasharray: 5 5; opacity: .62; }
+  .map-nodes { position: absolute; inset: 0; }
+  .map-node-shell { position: absolute; width: 258px; height: 78px; }
+  .map-node { width: 100%; height: 100%; min-width: 0; overflow: hidden; border: 1px solid var(--c-rule); border-radius: 7px; background: color-mix(in srgb, var(--c-surface) 94%, transparent); box-shadow: 0 .3rem .8rem color-mix(in srgb, var(--c-text) 7%, transparent); }
+  .map-node-shell[data-selected='true'] .map-node { border-color: var(--c-accent); box-shadow: 0 0 0 2px var(--c-accent-soft), 0 .35rem .9rem color-mix(in srgb, var(--c-text) 9%, transparent); }
+  .map-node-main { display: flex; min-width: 0; height: 100%; align-items: stretch; }
+  .map-node-toggle { display: grid; flex: 1 1 auto; grid-template-columns: 1.75rem minmax(0, 1fr) 1rem; gap: .45rem; min-width: 0; align-items: center; padding: .55rem .45rem .45rem .65rem; border: 0; background: transparent; color: var(--c-text); font: inherit; text-align: left; cursor: pointer; }
+  .map-node-toggle:disabled { cursor: default; }
+  .map-node-open { display: grid; flex: 0 0 2.05rem; place-items: center; border-left: 1px solid var(--c-rule); color: var(--c-muted); font-size: .95rem; text-decoration: none; }
+  .map-node-open:hover { background: var(--c-accent-soft); color: var(--c-accent); }
+  .map-node-mark { display: grid; width: 1.55rem; height: 1.55rem; place-items: center; border: 1px solid var(--map-edge); border-radius: 50%; color: var(--map-edge); font-family: var(--font-mono); font-size: .58rem; font-weight: 700; }
+  .map-node-copy { display: grid; min-width: 0; gap: .18rem; }
+  .map-node-copy strong { display: -webkit-box; overflow: hidden; color: var(--c-text); font-size: .76rem; font-weight: 650; line-height: 1.25; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .map-node-copy small { overflow: hidden; color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; text-overflow: ellipsis; white-space: nowrap; }
+  .map-node-expander { color: var(--c-accent); font-family: var(--font-mono); font-size: 1rem; line-height: 1; }
+  .map-node-relation { position: absolute; right: .55rem; bottom: .35rem; margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .52rem; text-transform: uppercase; }
+  .map-node--root { border-width: 2px; border-color: var(--c-text); background: var(--c-bg); }
+  .map-node--root .map-node-mark { border-color: var(--c-text); color: var(--c-text); }
+  .map-node--shelf .map-node-mark { border-color: var(--viz-focus-stroke); color: var(--viz-focus-stroke); }
+  .map-node--book .map-node-mark { border-color: var(--viz-input-stroke); color: var(--viz-input-stroke); }
+  .map-node--chapter .map-node-mark { border-color: var(--viz-state-stroke); color: var(--viz-state-stroke); }
+  .map-node--entry { display: flex; align-items: center; gap: .45rem; padding: .55rem .55rem .55rem .65rem; color: inherit; text-decoration: none; }
+  .map-node--entry .map-node-copy { flex: 1 1 auto; }
+  .map-node--entry .map-node-mark { flex: 0 0 auto; border-color: var(--viz-output-stroke); color: var(--viz-output-stroke); }
+  .map-node--entry .map-node-arrow { flex: 0 0 auto; color: var(--c-muted); font-size: .9rem; }
+  .map-node--entry:hover { border-color: var(--viz-output-stroke); background: var(--c-bg); }
+  .map-node--entry:hover .map-node-arrow { color: var(--viz-output-stroke); }
+  .map-inspector { min-width: 0; margin-top: 1rem; padding: 1rem; border-top: 3px solid var(--c-accent); border-bottom: 1px solid var(--c-rule); background: var(--c-bg-tint); }
+  .map-inspector-kicker { margin: 0 0 .35rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .map-inspector h2 { margin: 0 0 .45rem; font-size: 1.1rem; line-height: 1.2; }
+  .map-inspector > p:not(.map-inspector-kicker) { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .82rem; line-height: 1.5; }
+  .map-inspector-actions { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .9rem; }
+  .map-open-link { display: inline-flex; min-height: 2.45rem; align-items: center; gap: .35rem; padding: .5rem .65rem; border: 1px solid var(--c-accent-fill); border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font-size: .72rem; font-weight: 700; text-decoration: none; }
+  .map-open-link:hover { background: var(--c-link-hover); color: var(--c-on-accent); }
+  .map-inspector-actions button { font-size: .68rem; }
+  .map-inspector-section { margin-top: 1.25rem; padding-top: .85rem; border-top: 1px solid var(--c-rule); }
+  .map-inspector-section[hidden] { display: none; }
+  .map-inspector-section h3 { margin: 0 0 .35rem; font-size: .75rem; }
+  .map-inspector-section p { margin: 0; color: var(--c-muted); font-size: .7rem; line-height: 1.45; }
+  .map-inspector-section ul { margin: .5rem 0 0; padding: 0; list-style: none; }
+  .map-inspector-section li + li { margin-top: .25rem; }
+  .map-inspector-section li button { padding: 0; border: 0; background: transparent; color: var(--c-accent); font: inherit; font-size: .7rem; text-align: left; text-decoration: underline; cursor: pointer; }
+  .map-inspector-note p { color: var(--c-text-soft); }
+  .map-legend { display: flex; flex-wrap: wrap; gap: .45rem .9rem; margin: .65rem .1rem 0; color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; }
+  .map-legend span { display: inline-flex; align-items: center; gap: .35rem; }
+  .legend-line { display: inline-block; width: 1.35rem; border-top: 2px solid var(--map-edge); }
+  .legend-line--dashed { border-top-style: dashed; border-color: var(--map-prerequisite); }
+  .legend-dot { display: inline-block; width: .55rem; height: .55rem; border: 1px solid var(--c-accent); border-radius: 50%; }
+  .legend-dot--link { border-color: var(--viz-output-stroke); }
+  .map-noscript { margin-top: 1rem; padding: 1rem; border-top: 1px solid var(--c-rule); color: var(--c-text-soft); }
+  .map-noscript h2 { margin: 0 0 .35rem; font-size: 1rem; }
+  .map-noscript p { margin: 0; font-size: .82rem; line-height: 1.5; }
+  :global(:root) { --map-edge: var(--c-text-soft); --map-prerequisite: var(--c-accent); }
+  @media (max-width: 980px) {
+    .map-viewport { max-height: 58vh; }
+  }
+  @media (max-width: 640px) {
+    .map-page { padding-top: 1rem; }
+    .map-header { align-items: flex-start; flex-direction: column; gap: 1rem; }
+    .map-header-stat { width: 100%; flex: 0 0 auto; grid-template-columns: auto 1fr; align-items: baseline; gap: .5rem; padding: .65rem 0 0; border-top: 1px solid var(--c-rule); border-left: 0; }
+    .map-header-stat strong { font-size: 1.4rem; }
+    .map-toolbar { grid-template-columns: 1fr; }
+    .map-actions { justify-content: flex-start; }
+    .map-check { grid-column: auto; }
+    .map-search-result-list { grid-template-columns: 1fr; }
+    .map-status-row { align-items: flex-start; flex-direction: column; gap: .25rem; }
+    .map-viewport { min-height: 52vh; max-height: 62vh; }
+  }
+
+  :global(html),
+  :global(body.is-immersive) { overflow: hidden; }
+  .map-page { width: 100%; height: calc(100dvh - var(--header-height)); max-width: none; margin: 0; padding: 0; overflow: hidden; }
+  .map-layout { position: relative; width: 100%; height: 100%; margin: 0; }
+  .map-tool { position: relative; width: 100%; height: 100%; }
+  .map-floating-tools { position: absolute; top: 1rem; left: 1rem; z-index: 20; width: min(32rem, calc(100% - 2rem)); }
+  .map-toolbar { grid-template-columns: minmax(0, 1fr) auto; padding: .65rem; border-color: color-mix(in srgb, var(--c-rule) 82%, transparent); background: color-mix(in srgb, var(--c-bg) 88%, transparent); box-shadow: 0 .45rem 1.2rem color-mix(in srgb, var(--c-text) 12%, transparent); backdrop-filter: blur(14px); }
+  .map-toolbar-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; grid-column: 1 / -1; }
+  .map-toolbar-heading strong { color: var(--c-text); font-family: var(--font-display); font-size: .92rem; }
+  .map-toolbar-heading span { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; }
+  .map-search > span { font-size: .56rem; }
+  .map-search input { min-height: 2.3rem; }
+  .map-actions { gap: .3rem; }
+  .map-actions button, .map-check, .map-inspector-actions button { min-height: 2.3rem; padding: .42rem .55rem; font-size: .66rem; }
+  .map-check { grid-column: 1 / -1; }
+  .map-search-results { max-height: min(48vh, 24rem); margin-top: .4rem; overflow-y: auto; box-shadow: 0 .45rem 1.2rem color-mix(in srgb, var(--c-text) 12%, transparent); backdrop-filter: blur(14px); }
+  .map-status-row { position: absolute; bottom: 1rem; left: 1rem; z-index: 15; display: flex; align-items: center; margin: 0; padding: .35rem .5rem; border: 1px solid color-mix(in srgb, var(--c-rule) 82%, transparent); border-radius: var(--radius); background: color-mix(in srgb, var(--c-bg) 88%, transparent); box-shadow: 0 .3rem .8rem color-mix(in srgb, var(--c-text) 9%, transparent); pointer-events: none; backdrop-filter: blur(12px); }
+  .map-status-row p { margin: 0; }
+  .map-status-row p + p { margin-left: .65rem; padding-left: .65rem; border-left: 1px solid var(--c-rule); }
+  .map-viewport { position: absolute; inset: 0; min-height: 0; max-height: none; overflow: hidden; border: 0; border-radius: 0; cursor: grab; touch-action: none; user-select: none; overscroll-behavior: none; }
+  .map-viewport.is-panning { cursor: grabbing; }
+  .map-canvas { position: absolute; top: 0; left: 0; min-width: 0; min-height: 0; transform-origin: 0 0; will-change: transform; }
+  .map-inspector { position: absolute; top: 1rem; right: 1rem; z-index: 25; width: min(20rem, calc(100% - 2rem)); max-height: calc(100% - 2rem); margin: 0; overflow-y: auto; border-color: color-mix(in srgb, var(--c-rule) 82%, transparent); box-shadow: 0 .45rem 1.2rem color-mix(in srgb, var(--c-text) 12%, transparent); backdrop-filter: blur(14px); }
+  .map-inspector[hidden] { display: none; }
+  .map-inspector-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+  .map-inspector-head .map-inspector-kicker { margin-bottom: 0; }
+  .map-inspector-head button { display: grid; width: 1.7rem; height: 1.7rem; place-items: center; padding: 0; border: 1px solid var(--c-rule); border-radius: 50%; background: var(--c-bg); color: var(--c-text-soft); font-size: 1rem; line-height: 1; cursor: pointer; }
+  .map-inspector-head button:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .map-zoom-controls { position: absolute; right: 1rem; bottom: 1rem; z-index: 15; display: flex; align-items: center; gap: .25rem; padding: .25rem; border: 1px solid color-mix(in srgb, var(--c-rule) 82%, transparent); border-radius: var(--radius); background: color-mix(in srgb, var(--c-bg) 88%, transparent); box-shadow: 0 .3rem .8rem color-mix(in srgb, var(--c-text) 9%, transparent); backdrop-filter: blur(12px); }
+  .map-zoom-controls button { display: grid; min-width: 2rem; height: 2rem; place-items: center; padding: 0 .45rem; border: 0; border-radius: 3px; background: transparent; color: var(--c-text-soft); font: inherit; font-size: .76rem; font-weight: 700; cursor: pointer; }
+  .map-zoom-controls button:hover { background: var(--c-accent-soft); color: var(--c-accent); }
+  .map-zoom-controls button:first-child, .map-zoom-controls button:last-child { font-size: 1.1rem; }
+  .map-legend { position: absolute; bottom: 1rem; left: 50%; z-index: 15; margin: 0; padding: .35rem .55rem; border: 1px solid color-mix(in srgb, var(--c-rule) 82%, transparent); border-radius: var(--radius); background: color-mix(in srgb, var(--c-bg) 88%, transparent); box-shadow: 0 .3rem .8rem color-mix(in srgb, var(--c-text) 9%, transparent); transform: translateX(-50%); backdrop-filter: blur(12px); }
+  .map-noscript { margin: 1rem; }
+
+  @media (max-width: 640px) {
+    .map-floating-tools { top: .5rem; left: .5rem; width: calc(100% - 1rem); }
+    .map-toolbar { grid-template-columns: 1fr; padding: .55rem; }
+    .map-toolbar-heading { grid-column: auto; }
+    .map-actions { justify-content: flex-start; }
+    .map-check { grid-column: auto; }
+    .map-inspector { top: .5rem; right: .5rem; left: .5rem; width: auto; max-height: calc(100% - 1rem); }
+    .map-status-row { bottom: 3.35rem; left: .5rem; max-width: calc(100% - 6rem); }
+    .map-status-row p + p { margin-left: .45rem; padding-left: .45rem; }
+    .map-legend { right: 4.7rem; bottom: .55rem; left: .5rem; justify-content: center; transform: none; }
+    .map-zoom-controls { right: .5rem; bottom: .5rem; }
+  }
+
+  @media print {
+    .map-toolbar, .map-search-results, .map-inspector, .map-legend, .map-hint, .map-zoom-controls { display: none !important; }
+    .map-viewport { max-height: none; overflow: visible; border: 0; background: #fff; }
+    .map-canvas { width: 100% !important; height: auto !important; }
+    .map-edges { display: none; }
+    .map-node-shell { position: relative; top: auto !important; left: auto !important; width: 100%; margin: .45rem 0; }
+    .map-nodes { position: static; }
+    .map-node-shell:not([data-node-type='root']):not([data-node-type='shelf']) { display: none; }
+  }
+</style>

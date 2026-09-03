@@ -49,6 +49,7 @@ export const SITE = {
   // Keep the header task-oriented. The wordmark remains the direct home link.
   nav: [
     { label: 'Library', href: '/#curriculum' },
+    { label: 'Map', href: '/map/' },
     { label: 'Questions', href: '/questions/' },
     { label: 'Coding', href: '/library/coding-interview/' },
     { label: 'Workbook', href: '/prep/' },

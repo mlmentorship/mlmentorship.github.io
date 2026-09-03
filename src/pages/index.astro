@@ -91,6 +91,7 @@ const quickRoutes = [
           ))}
         </ol>
       </nav>
+      <p class="map-line">Want to see how the library connects? <a href="/map/">Explore the content map</a>.</p>
       {SITE.features.prepTools && (
         <p class="workbook-line"><span>Active interview loop?</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
       )}
@@ -179,6 +180,8 @@ const quickRoutes = [
   .workbook-line { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
   .workbook-line > span:first-child { color: var(--c-text-soft); font-weight: 600; }
   .workbook-line a { font-weight: 600; }
+  .map-line { margin: .45rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
+  .map-line a { font-weight: 600; }
   .route-section, .curriculum { padding-top: 2.2rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
   .section-head { display: flex; align-items: end; justify-content: space-between; gap: 1.2rem; margin-bottom: .7rem; padding-bottom: .65rem; border-bottom: 1px solid var(--c-rule); }
   .section-head h2, .trust-section h2 { margin: .22rem 0 0; font-size: clamp(1.35rem, 3vw, 1.72rem); line-height: 1.18; }
