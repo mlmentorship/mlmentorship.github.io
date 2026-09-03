@@ -188,16 +188,25 @@ const {
   .visual-review-card--article {
     display: block;
   }
-  .visual-review-card--article:has(.attention-tile-visual) {
+  .visual-review-card--article:has(.attention-tile-visual),
+  .visual-review-card--article:has(.markov-stationary-visual),
+  .visual-review-card--article:has(.information-budget-visual),
+  .visual-review-card--article:has(.weight-decay-path-visual) {
     width: min(68rem, calc(100vw - 2 * var(--gutter)));
     margin-left: 50%;
     transform: translateX(-50%);
   }
-  .visual-review-card--article:has(.attention-tile-visual) .visual-review-visual {
+  .visual-review-card--article:has(.attention-tile-visual) .visual-review-visual,
+  .visual-review-card--article:has(.markov-stationary-visual) .visual-review-visual,
+  .visual-review-card--article:has(.information-budget-visual) .visual-review-visual,
+  .visual-review-card--article:has(.weight-decay-path-visual) .visual-review-visual {
     overflow-x: auto;
     overscroll-behavior-inline: contain;
   }
-  .visual-review-card--article:has(.attention-tile-visual) :global(.learning-figure) {
+  .visual-review-card--article:has(.attention-tile-visual) :global(.learning-figure),
+  .visual-review-card--article:has(.markov-stationary-visual) :global(.learning-figure),
+  .visual-review-card--article:has(.information-budget-visual) :global(.learning-figure),
+  .visual-review-card--article:has(.weight-decay-path-visual) :global(.learning-figure) {
     width: 100%;
     max-width: none !important;
   }
@@ -226,7 +235,10 @@ const {
 
   @media (max-width: 640px) {
     .visual-review-card--article { height: auto; display: block; }
-    .visual-review-card--article:has(.attention-tile-visual) { width: 100%; margin-left: 0; transform: none; }
+    .visual-review-card--article:has(.attention-tile-visual),
+    .visual-review-card--article:has(.markov-stationary-visual),
+    .visual-review-card--article:has(.information-budget-visual),
+    .visual-review-card--article:has(.weight-decay-path-visual) { width: 100%; margin-left: 0; transform: none; }
     .visual-review-card--article .visual-review-visual { overflow-y: visible; }
     .visual-review-card--deck { max-height: none; display: block; padding: .8rem; }
     .visual-review-card--deck .visual-review-visual { max-height: none; overflow-y: visible; }

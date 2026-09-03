@@ -3,13 +3,13 @@
   "slug": "weight-decay-vs-l2",
   "article": "src/content/posts/2026-02-27-weight-decay-vs-l2.md",
   "status": "implemented",
-  "medium": "semantic-html",
-  "learningObjective": "Trace where the regularization term enters each adaptive update and explain why L2 inherits Adam's coordinate-wise gradient history while AdamW applies one direct fractional shrinkage rate.",
-  "mediumRationale": "Two ordered semantic panels are the smallest spatial explanation that keeps the coupled and decoupled paths adjacent and makes the bypass around Adam's moments visible. The design complements the equations without introducing a second numerical example.",
+  "medium": "svg",
+  "learningObjective": "Trace the lambda-theta term and see why L2 shrinkage passes through Adam's coordinate-wise history while AdamW decay bypasses it.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can keep the same regularization term visible as it either joins the gradient and enters Adam moments or routes around them to the parameter. The side-by-side path geometry makes the coupled-versus-decoupled distinction visible without adding mutable state.",
   "mediumComparison": {
     "mermaid": "Rejected: automatic flowchart routing would add runtime and visual weight to two short, strictly ordered paths.",
-    "svg": "Rejected: the lesson is path placement rather than quantitative geometry, and fixed SVG text would be less adaptable at phone width.",
-    "semanticHtml": "Selected: labelled steps preserve source order for assistive technology, stack naturally at 390 CSS pixels, and reuse the established theme-aware and print-safe two-panel primitive.",
+    "svg": "Selected: the lesson is path placement through or around Adam's denominator, and fixed geometry keeps the bypass and coordinate-wise split visible together.",
+    "semanticHtml": "Rejected after review: labelled steps preserve source order but do not make the lambda-theta path physically visible enough to become a mental model.",
     "interaction": "Rejected: there is no parameter sweep or hidden state to reveal; interaction would obscure a static invariant.",
     "paperReuse": "Rejected: no external figure is needed, and public access to the reviewed papers does not by itself establish permission to adapt their figures.",
     "noVisual": "Rejected: the prose equations show different formulas but require readers to mentally track whether λθ passes through Adam's moments and coordinate-wise preconditioner."
@@ -106,12 +106,12 @@
   "agentReview": {
     "reviewer": "GitHub Copilot CLI agent-1 (GPT-5.6 Sol)",
     "reviewedAt": "2026-09-01",
-    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact loss, optimizer, and training neighborhoods, then checked the primary Adam and AdamW papers, current official PyTorch algorithms, and arXiv licensing guidance before selecting an original static path comparison."
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected the exact loss, optimizer, and training neighborhoods, then checked the primary Adam and AdamW papers, current official PyTorch algorithms, and arXiv licensing guidance before replacing the semantic path comparison with an original SVG path diagram."
   },
   "implementation": {
     "visualIds": [
       "weight-decay-adaptive-paths"
     ],
-    "accessibility": "The figure has a linked learning question and a labelled group whose source order presents each full path. Explicit method names, numbered steps, arrows, and written results carry all meaning without color. The established two-column primitive stacks below 640 pixels for readable text at 390 CSS pixels, uses theme tokens for dark mode, and has existing print overrides for a light high-contrast, page-break-safe rendering."
+    "accessibility": "The SVG includes a title, description, labelled update nodes, separate arrow paths for data and lambda-theta terms, coordinate-wise denominator labels, and a caption that states the coupled-versus-decoupled contrast without relying on color."
   }
 }

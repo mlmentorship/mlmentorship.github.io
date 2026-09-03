@@ -417,6 +417,17 @@ mark {
   left: 50%;
   transform: translateX(-50%);
 }
+.learning-figure:has(.markov-stationary-visual),
+.learning-figure:has(.information-budget-visual),
+.learning-figure:has(.weight-decay-path-visual) {
+  width: min(56rem, 95vw);
+  max-width: min(56rem, 95vw) !important;
+  position: relative;
+  left: 50%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  transform: translateX(-50%);
+}
 .visual-kicker {
   margin: 0 0 .25rem;
   color: var(--c-accent);
@@ -1328,7 +1339,11 @@ mark {
 .viz-callout { fill: var(--c-text); font-size: 11px; font-weight: 650; }
 
 .visual-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
-.attention-tile-visual { display: block; width: 100%; height: auto; }
+.attention-tile-visual,
+.markov-stationary-visual,
+.information-budget-visual,
+.weight-decay-path-visual { display: block; width: 100%; height: auto; }
+.weight-decay-path-mobile { display: none; width: 100%; height: auto; }
 .visual-wide svg { min-width: 42rem; }
 .backprop-visual svg { min-width: 42rem; overflow: hidden; }
 .viz-node { fill: var(--viz-neutral-bg); stroke: var(--viz-neutral-stroke); stroke-width: 1.5; }
@@ -1400,7 +1415,14 @@ mark {
   .visual-grid--two { grid-template-columns: 1fr; }
   .learning-figure { max-width: 100% !important; }
   .learning-figure:has(.attention-tile-visual) { width: 100%; max-width: 100% !important; left: auto; transform: none; }
+  .learning-figure:has(.markov-stationary-visual),
+  .learning-figure:has(.information-budget-visual),
+  .learning-figure:has(.weight-decay-path-visual) { width: 100%; max-width: 100% !important; left: auto; transform: none; }
   .attention-tile-visual { width: 1000px; max-width: none; }
+  .markov-stationary-visual,
+  .information-budget-visual { width: 900px; max-width: none; }
+  .weight-decay-path-visual { display: none; }
+  .weight-decay-path-mobile { display: block; }
   .coding-visual-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .coding-visual-step:not(:last-child)::after { display: none; }
   .coding-visual-controls output { width: 100%; margin-left: 0; }

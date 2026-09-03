@@ -3,13 +3,13 @@
   "slug": "markov-chains",
   "article": "src/content/posts/2025-11-27-markov-chains.md",
   "status": "implemented",
-  "medium": "semantic-html",
-  "learningObjective": "Distinguish a finite-time marginal from a stationary fixed point, and verify on one two-state chain that equal pairwise detailed-balance flow implies stationarity.",
-  "mediumRationale": "A compact numeric ledger is the smallest medium that aligns repeated row-vector updates, the limiting fixed point, and the pairwise flow calculation. Native table semantics make the distinction countable and readable without requiring graph animation.",
+  "medium": "svg",
+  "learningObjective": "See probability mass move toward a stationary split, then verify that equal counter-flow leaves that split unchanged.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can place finite-time marginals, their convergence direction, the stationary split, and equal detailed-balance flows in one spatial picture. The exact two-state numbers remain labelled, but the learner sees the mass moving instead of inferring motion from a table.",
   "mediumComparison": {
     "mermaid": "Rejected: a state graph shows one-step transition probabilities well but does not naturally align successive marginals or demonstrate that applying P to pi leaves the distribution unchanged.",
-    "svg": "Rejected: fixed node and bar geometry could animate or plot convergence, but the learning task depends on exact probability updates and equal-flow arithmetic rather than geometric shape.",
-    "semanticHtml": "Selected: scoped headers align time, Pr(A), and Pr(B), while native text gives an accessible exact calculation. The existing cm-grid primitive supports narrow wrapping, dark mode, and print with no client runtime.",
+    "svg": "Selected: fixed node and bar geometry can show convergence and detailed-balance flow while keeping every probability and transition value explicit.",
+    "semanticHtml": "Rejected after review: scoped headers align the arithmetic, but they force readers to infer the movement of probability mass rather than seeing the stationary fixed point spatially.",
     "interaction": "Rejected: stepping or changing transition probabilities would add controls and hidden states when three updates, one fixed point, and one detailed-balance equality fit in a static ledger.",
     "paperReuse": "Rejected: authoritative sources contain transition diagrams and convergence examples, but no external composition is needed. The author-hosted book remains copyrighted and the Berkeley text is CC BY-NC-ND 4.0, so no figure, prose, values, or layout is adapted.",
     "noVisual": "Rejected: equations alone leave readers to reconcile three different objects mentally: a transition row, the changing marginal mu_t, and the stationary vector pi. The worked ledger makes their roles and multiplication convention explicit."
@@ -93,12 +93,12 @@
   "agentReview": {
     "reviewer": "GitHub Copilot CLI agent-4 (GPT-5.6 Sol)",
     "reviewedAt": "2026-08-31",
-    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then checked an authoritative Markov-chain textbook, Berkeley's probability textbook, and the primary Hastings paper before selecting an original stationary-flow ledger."
+    "summary": "Read the complete article, indexed all 214 deck pages and inspected both relevant neighborhoods, then checked an authoritative Markov-chain textbook, Berkeley's probability textbook, and the primary Hastings paper before replacing the numeric ledger with an original stationary-flow geometry."
   },
   "implementation": {
     "visualIds": [
       "markov-chain-stationary-flow-ledger"
     ],
-    "accessibility": "The figure has a linked title and detailed description, a semantic table with scoped row and column headers, and explicit equations for P, pi P, and both directional flows. Every value and relationship is textual, so the lesson does not depend on color. The established three-column cm-grid has no minimum width and wraps at 390 CSS pixels; shared theme tokens preserve dark-mode contrast, and existing print rules force a light high-contrast canvas and avoid page breaks inside the figure."
+    "accessibility": "The SVG includes a title, description, labelled probability bars, labelled states, explicit equal-flow equations, and a caption that states the finite-time-versus-stationary distinction without relying on color."
   }
 }

@@ -3,13 +3,13 @@
   "slug": "entropy-mutual-information",
   "article": "src/content/posts/2026-08-29-entropy-mutual-information.md",
   "status": "implemented",
-  "medium": "semantic-html",
-  "learningObjective": "Read a binary noisy channel's joint distribution to distinguish marginal uncertainty, remaining conditional uncertainty, and the mutual information removed by observing the output.",
-  "mediumRationale": "Two semantic tables are the smallest medium that can align the binary channel's four joint outcomes with a before-after uncertainty budget. The shared 0.5 marginals remain visible while the diagonal concentration explains why observing Y still reduces uncertainty about X.",
+  "medium": "svg",
+  "learningObjective": "See mutual information as the part of X's uncertainty removed by observing Y, while the noisy-channel inset explains why both marginals can remain fair.",
+  "mediumRationale": "A deterministic SVG is the smallest medium that can put the entropy budget, shared-information overlap, and joint-probability concentration in one spatial picture. Exact probabilities and bit values remain labelled, but the learner sees mutual information as uncertainty removed rather than only subtracting table rows.",
   "mediumComparison": {
     "mermaid": "Rejected because a flowchart can show X passing through noise to Y but cannot make the joint probabilities, unchanged marginals, or entropy subtraction directly inspectable.",
-    "svg": "Rejected because custom geometry adds no precision beyond real table cells and would make the probability data less accessible and selectable.",
-    "semanticHtml": "Selected because a joint-probability table and a compact entropy ledger preserve row and column semantics, exact arithmetic, natural reading order, and responsive stacking.",
+    "svg": "Selected because custom geometry can show the one-bit uncertainty bar, the removed shared portion, the remaining conditional portion, and the fair-but-dependent joint table together.",
+    "semanticHtml": "Rejected after review because the joint-probability table and entropy ledger preserve exact arithmetic but leave the uncertainty-reduction geometry implicit.",
     "interaction": "Rejected because varying the crossover probability would add controls and mutable states when the article already provides changed-assumption practice; one deterministic 10% channel is enough to establish the decomposition.",
     "paperReuse": "Rejected because textbook information diagrams and channel figures are unnecessary, and public access does not establish permission to reuse them. No external figure, layout, prose, or dataset is copied.",
     "noVisual": "Rejected because the equations state H(X), H(X|Y), and I(X;Y), but prose alone makes it hard to see how both marginals can remain one full bit while their dependence still removes 0.531 bits of uncertainty."
@@ -79,6 +79,6 @@
     "visualIds": [
       "mutual-information-noisy-channel-budget"
     ],
-    "accessibility": "The figure uses real tables with scoped row and column headers, explicit joint probabilities, written marginal totals, a textual entropy identity, and a caption that states the conclusion without color. The established two-panel primitive stacks below 640 CSS pixels for a 390-pixel viewport, theme tokens preserve dark-mode contrast, and shared print rules enforce a light high-contrast palette."
+    "accessibility": "The SVG includes a title, description, explicit probability labels, bit-value labels, an uncertainty-bar decomposition, a shared-information overlap, and a caption that states the conclusion without relying on color."
   }
 }
