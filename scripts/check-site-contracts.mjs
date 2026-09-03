@@ -32,7 +32,7 @@ assert.match(header, /data-reading-mode=\{mode\.dataKey\}/);
 assert.match(header, /pathname === '\/' \|\| isReviewRoute/);
 assert.match(sidebar, /aria-label="Open library contents"/);
 assert.match(sidebar, /aside\[data-library-sidebar\]/);
-assert.match(review, /const desktopExplanation = window\.matchMedia\('\(min-width: 901px\)'\)/);
+assert.match(review, /const desktopExplanation = window\.matchMedia\('\(min-width: 721px\)'\)/);
 assert.match(review, /desktopExplanation\.addEventListener\('change', \(\) => setExplanation\(explanationOpen, false\)/);
 assert.match(review, /class="review-contents-row"/);
 assert.match(review, /contentsDetails\.open = false/);

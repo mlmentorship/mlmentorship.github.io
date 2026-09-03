@@ -210,7 +210,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     let currentIndex = 0;
     let requestToken = 0;
     let touchStartX: number | undefined;
-    const desktopExplanation = window.matchMedia('(min-width: 901px)');
+    const desktopExplanation = window.matchMedia('(min-width: 721px)');
     let explanationOpen = true;
     let explanationTransitionTimer: number | undefined;
 
@@ -307,7 +307,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
           stage?.style.removeProperty('max-height');
           explanation?.style.removeProperty('max-height');
         } else {
-          stage?.style.setProperty('max-height', '0px');
+          stage?.style.removeProperty('max-height');
           explanation?.style.setProperty('max-height', `${explanation?.scrollHeight ?? 0}px`);
         }
         window.requestAnimationFrame(() => {
@@ -340,16 +340,11 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         }, 360);
         if (focus) explanationToggle?.focus({ preventScroll: true });
       }
-      if (desktopExplanation.matches || !open) {
-        stage?.removeAttribute('inert');
-        stage?.setAttribute('aria-hidden', 'false');
-      } else {
-        stage?.setAttribute('inert', '');
-        stage?.setAttribute('aria-hidden', 'true');
-      }
+      stage?.removeAttribute('inert');
+      stage?.setAttribute('aria-hidden', 'false');
       explanationToggle?.setAttribute('aria-expanded', String(open));
       explanationToggle?.setAttribute('aria-pressed', String(open));
-      if (modeLabel) modeLabel.textContent = open ? 'Visual only' : 'Full explanation';
+      if (modeLabel) modeLabel.textContent = open ? 'Hide explanation' : 'Show explanation';
       window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
 
@@ -485,7 +480,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     }, listenerOptions);
     stage?.addEventListener('touchstart', (event) => { touchStartX = event.changedTouches[0]?.clientX; }, { passive: true, signal: lifecycle.signal });
     stage?.addEventListener('touchend', (event) => {
-      if (touchStartX === undefined || explanationOpen) return;
+      if (touchStartX === undefined) return;
       const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
       touchStartX = undefined;
       if (Math.abs(distance) < 60) return;
@@ -529,7 +524,18 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-progress-wrap { display: grid; justify-items: end; gap: .05rem; }
   .review-progress-wrap span { color: var(--c-text-soft); font-family: var(--font-mono); font-size: .66rem; }
   .review-progress-wrap small { color: var(--c-muted); font-size: .56rem; }
-  .review-contents-row { width: min(100%, 96rem); margin: 0 auto; padding: .45rem var(--gutter) 0; display: flex; justify-content: flex-end; }
+  .review-contents-row {
+    position: sticky;
+    top: calc(var(--header-height) + 3.2rem);
+    z-index: 39;
+    width: min(100%, 96rem);
+    margin: 0 auto;
+    padding: .45rem var(--gutter) 0;
+    display: flex;
+    justify-content: flex-start;
+    pointer-events: none;
+  }
+  .review-contents-row > * { pointer-events: auto; }
   .review-contents-details { width: min(24rem, 100%); position: relative; }
   .review-contents-details > summary {
     display: grid;
@@ -610,7 +616,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-contents-chapter a:hover { color: var(--c-accent); background: var(--c-bg-tint); }
   .review-contents-chapter a[aria-current='page'] { border-left-color: var(--c-accent); background: var(--c-accent-soft); color: var(--c-text); font-weight: 650; }
   .review-workspace { width: min(100%, 96rem); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 0px; transition: grid-template-columns 360ms cubic-bezier(.2,.8,.2,1); }
-  .review-workspace.is-explanation-open { grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem); }
+  .review-workspace.is-explanation-open { grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem); }
   .review-stage { min-width: 0; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding: clamp(.8rem, 2vw, 1.5rem) var(--gutter); }
   .review-stage[hidden],
   .review-explanation[hidden],
@@ -697,11 +703,11 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   :global(.review-error strong) { color: var(--c-text); }
   :global(.review-error span) { color: var(--c-muted); font-size: .75rem; }
 
-  @media (max-width: 900px) {
+  @media (max-width: 720px) {
     .review-workspace { display: block; transition: none; }
-    .review-stage { max-height: 10000px; overflow: hidden; opacity: 1; transform: none; transition: max-height 360ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), padding 360ms cubic-bezier(.2,.8,.2,1); }
-    .review-workspace.is-explanation-open .review-stage { max-height: 0; min-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; transform: translateX(-1rem); }
-    .review-explanation { width: min(100%, 46rem); max-height: 0; margin: 0 auto; padding: 0 var(--gutter); border-left: 0; opacity: 0; transform: translateX(1rem); transition: max-height 360ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), padding 360ms cubic-bezier(.2,.8,.2,1), visibility 0s linear 360ms; }
+    .review-stage { max-height: none; overflow: visible; opacity: 1; transform: none; }
+    .review-workspace.is-explanation-open .review-stage { max-height: none; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding-top: clamp(.8rem, 2vw, 1.5rem); padding-bottom: clamp(.8rem, 2vw, 1.5rem); opacity: 1; transform: none; }
+    .review-explanation { width: min(100%, 46rem); max-height: 0; margin: .2rem auto 0; padding: 0 var(--gutter); border-top: 1px solid var(--c-rule); border-left: 0; opacity: 0; transform: translateY(.4rem); transition: max-height 360ms cubic-bezier(.2,.8,.2,1), opacity 220ms ease, transform 360ms cubic-bezier(.2,.8,.2,1), padding 360ms cubic-bezier(.2,.8,.2,1), visibility 0s linear 360ms; }
     .review-workspace.is-explanation-open .review-explanation { max-height: 10000px; padding: .8rem var(--gutter) 2rem; opacity: 1; transform: none; transition-delay: 0s; }
   }
   @media (max-width: 640px) {
@@ -712,10 +718,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     .review-stage { padding: .65rem var(--gutter) 1rem; }
     .review-bottom { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .35rem; padding-right: var(--gutter); padding-left: var(--gutter); }
     .review-bottom button { min-width: 0; padding: .45rem .6rem; }
+    .review-bottom .explanation-toggle { min-width: 8.6rem; }
     .review-bottom button:first-child > span:last-child,
     .review-bottom button:last-child > span:first-child { display: none; }
     .review-explanation { padding: .8rem var(--gutter) 2rem; }
-    .review-contents-details > summary { min-width: 0; }
+    .review-contents-row { top: calc(var(--header-height) + 2.9rem); justify-content: stretch; }
+    .review-contents-details { width: 100%; }
+    .review-contents-details > summary { width: 100%; min-width: 0; }
     .review-contents-details > summary { grid-template-columns: auto auto auto; }
     .review-contents-details > summary small { display: none; }
   }

@@ -63,8 +63,8 @@ const hasEmail =
 
   type Placement = 'home' | 'entry';
 
-  const SESSION_KEY = 'mlmentorship:email-signup:entry-seen:v2';
-  const SUPPRESS_UNTIL_KEY = 'mlmentorship:email-signup:suppress-until';
+  const SESSION_KEY = 'mlmentorship:email-signup:beehiiv-entry-seen:v1';
+  const SUPPRESS_UNTIL_KEY = 'mlmentorship:email-signup:beehiiv-suppress-until:v1';
   const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
   const eventNames = {
     home: {
@@ -268,7 +268,11 @@ const hasEmail =
     line-height: 1.5;
   }
   .subscribe--home .blurb { max-width: 25rem; font-size: .8rem; }
-  .provider-frame { min-height: 2.45rem; }
+  .provider-frame {
+    min-height: 4.25rem;
+    display: grid;
+    align-items: center;
+  }
   .form-status { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; }
   .terms, .alternatives {
     color: var(--c-muted);
@@ -292,9 +296,14 @@ const hasEmail =
   .terms a:hover, .alternatives a:hover, .alternatives button:hover { color: var(--c-accent); }
 
   /* Beehiiv supplies behavior; these overrides keep the managed form native to the site. */
-  .beehiiv-embedded { width: 100%; min-width: 0; }
+  .beehiiv-embedded {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.45rem;
+  }
   .subscribe :global(iframe) {
     width: 100% !important;
+    min-height: 4.25rem !important;
     border: 0 !important;
     background: transparent !important;
   }
