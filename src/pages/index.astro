@@ -22,7 +22,6 @@ if (shelfVolumeIds.length !== LIBRARY_VOLUMES.length || new Set(shelfVolumeIds).
   throw new Error('Library shelves must assign every volume exactly once.');
 }
 
-const questionCount = entries.filter((entry) => entry.category === 'questions').length;
 const codingQuestionCount = volumeStatsById.get('coding-interview')?.entries.filter((entry) => entry.category === 'questions').length ?? 0;
 if (codingQuestionCount === 0) throw new Error('Homepage coding route needs the coding interview volume.');
 
@@ -33,13 +32,6 @@ const quickRoutes = [
     copy: `${visualEntries.length} lessons that lead with the mechanism before the summary.`,
     href: '/review/',
     event: 'homepage_start_clicked',
-  },
-  {
-    cue: 'Prepare for a specific round',
-    title: 'Practice interview questions',
-    copy: `${questionCount} questions organized by round, with strong-answer depth and observable rubrics.`,
-    href: '/questions/',
-    event: 'homepage_practice_clicked',
   },
   {
     cue: 'Build a plan around your loop',
@@ -64,14 +56,65 @@ const quickRoutes = [
         <p class="hero-copy">A free visual field guide for senior ML, AI systems, and frontier-lab interviews.</p>
       </div>
 
-      <div class="cover-actions" aria-label="Choose a reading mode">
+      <div class="cover-actions" aria-label="Choose where to begin">
         <a class="cover-primary" href="/review/" data-home-event="homepage_start_clicked">Begin visual review <span aria-hidden="true">→</span></a>
-        <a class="cover-secondary" href="#email-notes" data-home-event="homepage_signup_clicked">Get ML from Primitives <span aria-hidden="true">↓</span></a>
+        <a class="cover-secondary" href="/prep/readiness/" data-home-event="homepage_plan_clicked">Build my prep plan <span aria-hidden="true">→</span></a>
       </div>
       <p class="hero-meta">{visualEntries.length} visual lessons · {LIBRARY_VOLUMES.length} ordered books · free to read</p>
     </header>
 
-    <Subscribe placement="home" heading="Get ML from Primitives notes for senior AI systems interviews." />
+    <section class="visual-hook" aria-labelledby="visual-hook-title">
+      <div class="visual-hook-copy">
+        <p class="section-kicker">One idea, seen</p>
+        <h2 id="visual-hook-title">A matrix is a map, not a table of numbers.</h2>
+        <p>Map each basis vector to a column. Keep the input's weights. The geometry explains the rank, range, and the direction that disappears.</p>
+        <a href="/concepts/matrices-as-linear-maps/" data-home-event="homepage_visual_hook_clicked">See the full visual lesson <span aria-hidden="true">→</span></a>
+      </div>
+      <figure class="visual-hook-figure">
+        <svg class="visual-hook-svg visual-hook-svg--wide" viewBox="0 0 760 260" role="img" aria-labelledby="visual-hook-wide-title visual-hook-wide-description" width="760" height="260">
+          <title id="visual-hook-wide-title">A matrix maps basis vectors to its columns</title>
+          <desc id="visual-hook-wide-description">An input vector x equals two e1 minus e2 maps across a matrix to two times column a1 minus column a2. The output columns lie on one line, so the nonzero input direction collapses to zero.</desc>
+          <defs>
+            <marker id="home-hook-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--viz-focus-stroke)" /></marker>
+          </defs>
+          <rect x="10" y="10" width="218" height="220" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+          <text x="30" y="38" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">INPUT SPACE</text>
+          <line x1="118" y1="60" x2="118" y2="202" stroke="var(--c-rule)" stroke-width="1" /><line x1="46" y1="166" x2="190" y2="166" stroke="var(--c-rule)" stroke-width="1" />
+          <line x1="118" y1="166" x2="160" y2="104" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" /><line x1="118" y1="166" x2="88" y2="166" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" />
+          <text x="164" y="99" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">2e1</text><text x="62" y="184" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">−e2</text><text x="128" y="112" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">x = 2e1 − e2</text>
+          <line x1="228" y1="120" x2="290" y2="120" stroke="var(--viz-focus-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" /><text x="240" y="104" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">same weights</text>
+          <rect x="290" y="10" width="460" height="220" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+          <text x="312" y="38" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">OUTPUT SPACE</text>
+          <line x1="520" y1="60" x2="520" y2="202" stroke="var(--c-rule)" stroke-width="1" /><line x1="342" y1="166" x2="700" y2="166" stroke="var(--c-rule)" stroke-width="1" />
+          <line x1="520" y1="166" x2="594" y2="92" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" /><line x1="520" y1="166" x2="668" y2="18" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" />
+          <line x1="350" y1="248" x2="700" y2="-10" stroke="var(--viz-focus-stroke)" stroke-width="2" stroke-dasharray="6 5" />
+          <text x="572" y="88" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">a1 = (1, 1)</text><text x="600" y="36" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">a2 = (2, 2) = 2a1</text>
+          <text x="330" y="204" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Ax = 2a1 − a2 = 0</text><text x="562" y="204" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12">columns share one line</text>
+        </svg>
+        <svg class="visual-hook-svg visual-hook-svg--stacked" viewBox="0 0 360 430" role="img" aria-labelledby="visual-hook-stacked-title visual-hook-stacked-description" width="360" height="430">
+          <title id="visual-hook-stacked-title">A matrix maps basis vectors to its columns</title>
+          <desc id="visual-hook-stacked-description">The input vector x equals two e1 minus e2. Applying the same weights to the matrix columns gives Ax equals two a1 minus a2 equals zero because both output columns share one line.</desc>
+          <defs>
+            <marker id="home-hook-arrow-stacked" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--viz-focus-stroke)" /></marker>
+          </defs>
+          <rect x="12" y="12" width="336" height="160" rx="8" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+          <text x="26" y="36" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">1 · INPUT SPACE</text>
+          <text x="26" y="58" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">x = 2e1 − e2</text>
+          <line x1="118" y1="76" x2="118" y2="150" stroke="var(--c-rule)" stroke-width="1" /><line x1="56" y1="130" x2="190" y2="130" stroke="var(--c-rule)" stroke-width="1" />
+          <line x1="118" y1="130" x2="166" y2="84" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" /><line x1="118" y1="130" x2="78" y2="130" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" />
+          <text x="171" y="82" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">2e1</text><text x="58" y="150" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">−e2</text>
+          <line x1="180" y1="182" x2="180" y2="198" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#home-hook-arrow-stacked)" /><text x="194" y="192" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">same weights</text>
+          <rect x="12" y="208" width="336" height="210" rx="8" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
+          <text x="26" y="232" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">2 · OUTPUT SPACE</text>
+          <line x1="126" y1="252" x2="126" y2="392" stroke="var(--c-rule)" stroke-width="1" /><line x1="48" y1="362" x2="318" y2="362" stroke="var(--c-rule)" stroke-width="1" />
+          <line x1="126" y1="362" x2="184" y2="304" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" /><line x1="126" y1="362" x2="242" y2="246" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" />
+          <line x1="62" y1="426" x2="268" y2="220" stroke="var(--viz-focus-stroke)" stroke-width="2" stroke-dasharray="6 5" />
+          <text x="188" y="300" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">a1 = (1, 1)</text><text x="196" y="244" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">a2 = 2a1</text>
+          <text x="26" y="400" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Ax = 2a1 − a2 = 0</text><text x="214" y="400" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">one output line</text>
+        </svg>
+        <figcaption><strong>Read it this way:</strong> the matrix acts on the basis first. Once the columns are visible, the “rank-one” result is a shape, not a memorized phrase.</figcaption>
+      </figure>
+    </section>
 
     <section class="route-section" aria-labelledby="route-heading">
       <header class="section-head">
@@ -91,11 +134,12 @@ const quickRoutes = [
           ))}
         </ol>
       </nav>
-      <p class="map-line">Want to see how the library connects? <a href="/map/">Explore the content map</a>.</p>
       {SITE.features.prepTools && (
-        <p class="workbook-line"><span>Active interview loop?</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
+        <p class="workbook-line" hidden><span>Active interview loop?</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
       )}
     </section>
+
+    <Subscribe placement="home" heading="Get ML from Primitives notes for senior AI systems interviews." />
 
     <section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading">
       <header class="section-head">
@@ -138,6 +182,7 @@ const quickRoutes = [
 
     const workbookLink = document.querySelector<HTMLAnchorElement>('[data-workbook-link]');
     const workbookContext = document.querySelector<HTMLElement>('[data-workbook-context]');
+    const workbookLine = document.querySelector<HTMLElement>('.workbook-line');
     if (workbookLink && workbookContext) {
       const plan = loadPrepPlan();
       if (plan) {
@@ -145,6 +190,7 @@ const quickRoutes = [
         workbookLink.dataset.homeEvent = 'homepage_workbook_clicked';
         workbookLink.textContent = 'Continue my Workbook';
         workbookContext.textContent = ` · ${plan.roleLabel} · week ${currentPlanWeek(plan)} of ${plan.horizon}.`;
+        workbookLine?.removeAttribute('hidden');
       }
     }
   </script>
@@ -178,10 +224,18 @@ const quickRoutes = [
   .cover-secondary:hover { border-color: var(--c-accent); color: var(--c-accent); }
   .hero-meta { margin: 1rem 0 0; padding-top: .65rem; border-top: 1px solid var(--c-rule); color: var(--c-muted); font-family: var(--font-mono); font-size: .6rem; }
   .workbook-line { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
+  .workbook-line[hidden] { display: none; }
   .workbook-line > span:first-child { color: var(--c-text-soft); font-weight: 600; }
   .workbook-line a { font-weight: 600; }
-  .map-line { margin: .45rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
-  .map-line a { font-weight: 600; }
+  .visual-hook { display: grid; grid-template-columns: minmax(14rem, .8fr) minmax(0, 1.55fr); gap: 1.3rem; align-items: center; margin-top: 1.35rem; padding: 1rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .visual-hook-copy { max-width: 19rem; }
+  .visual-hook-copy h2 { margin: .25rem 0 .45rem; font-size: 1.25rem; line-height: 1.15; }
+  .visual-hook-copy p { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .78rem; line-height: 1.5; }
+  .visual-hook-copy a { display: inline-flex; gap: .45rem; margin-top: .75rem; font-size: .72rem; font-weight: 650; text-decoration: none; }
+  .visual-hook-figure { min-width: 0; margin: 0; }
+  .visual-hook-svg { display: block; width: 100%; height: auto; }
+  .visual-hook-svg--stacked { display: none; }
+  .visual-hook-figure figcaption { margin: .45rem 0 0; color: var(--c-muted); font-family: var(--font-ui); font-size: .62rem; line-height: 1.4; text-align: left; }
   .route-section, .curriculum { padding-top: 2.2rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
   .section-head { display: flex; align-items: end; justify-content: space-between; gap: 1.2rem; margin-bottom: .7rem; padding-bottom: .65rem; border-bottom: 1px solid var(--c-rule); }
   .section-head h2, .trust-section h2 { margin: .22rem 0 0; font-size: clamp(1.35rem, 3vw, 1.72rem); line-height: 1.18; }
@@ -229,6 +283,10 @@ const quickRoutes = [
     .section-head { align-items: flex-start; flex-direction: column; gap: .35rem; }
     .section-head > p { max-width: 38rem; text-align: left; }
     .trust-section { grid-template-columns: 1fr; gap: .8rem; }
+    .visual-hook { grid-template-columns: 1fr; gap: .8rem; }
+    .visual-hook-copy { max-width: none; }
+    .visual-hook-svg--wide { display: none; }
+    .visual-hook-svg--stacked { display: block; }
   }
   @media (max-width: 600px) {
     .landing-page { padding-top: 1.4rem; }

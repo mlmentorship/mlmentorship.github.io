@@ -14,6 +14,7 @@ const currentBookId = articleSlug
     : undefined;
 const isCodingRoute = currentBookId === 'coding-interview';
 const isReviewRoute = pathname === '/review/' || pathname.startsWith('/review/');
+const showReadingMode = Boolean(articleSlug) || isReviewRoute;
 const visualModeHref = articleSlug ? `/review/#${articleSlug}` : '/review/';
 const fullModeHref = articleSlug ? '#full-explanation' : '/#curriculum';
 const visualModeActive = pathname === '/' || isReviewRoute;
@@ -40,17 +41,19 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
       <span class="brand-name"><strong>ml</strong>mentorship</span>
     </a>
 
-    <nav class="reading-mode-switch reading-mode-switch--persistent" aria-label="Reading mode">
-      {readingModes.map((mode) => (
-        <a
-          href={mode.href}
-          class:list={[mode.active && 'active']}
-          aria-current={mode.active ? 'page' : undefined}
-          aria-label={mode.description}
-          data-reading-mode={mode.dataKey}
-        >{mode.label}</a>
-      ))}
-    </nav>
+    {showReadingMode && (
+      <nav class="reading-mode-switch reading-mode-switch--persistent" aria-label="Reading mode">
+        {readingModes.map((mode) => (
+          <a
+            href={mode.href}
+            class:list={[mode.active && 'active']}
+            aria-current={mode.active ? 'page' : undefined}
+            aria-label={mode.description}
+            data-reading-mode={mode.dataKey}
+          >{mode.label}</a>
+        ))}
+      </nav>
+    )}
 
     <nav class="nav-desktop" aria-label="Primary">
       <ul>
