@@ -63,7 +63,7 @@ const typeLabel = { concepts: 'Concept', questions: 'Question', guides: 'Guide' 
       <ol class="entry-list" data-pagefind-ignore="all">
         {entries.map((entry, index) => (
           <li data-entry-id={`entry:${entry.slug}`}>
-            <a href={entry.href}>
+            <a href={getImplementedVisualAudit(entry.slug) ? `/review/#${entry.slug}` : entry.href}>
               <span class="entry-number">{String(index + 1).padStart(2, '0')}</span>
               <div><strong>{entry.title}</strong></div>
               <small><span data-entry-complete hidden>✓ </span>{typeLabel[entry.category]}</small>

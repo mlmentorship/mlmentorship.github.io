@@ -1,46 +1,63 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { LIBRARY_SHELVES, LIBRARY_VOLUMES } from '../data/library';
+import { LIBRARY_VOLUMES } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { getImplementedVisualAudit } from '../utils/visualAudits';
-import { SITE } from '../consts';
 import Subscribe from '../components/Subscribe.astro';
 
 const entries = await getLibraryEntries();
 const visualEntries = entries.filter((entry) => getImplementedVisualAudit(entry.slug));
-const volumeStats = LIBRARY_VOLUMES.map((volume) => {
-  const volumeEntries = volume.chapters.flatMap((chapter) => entriesForChapter(entries, chapter));
-  return { volume, entries: volumeEntries, firstEntry: volumeEntries[0] };
-});
-const assignedHrefs = volumeStats.flatMap((item) => item.entries.map((entry) => entry.href));
+const entryBySlug = new Map(entries.map((entry) => [entry.slug, entry]));
+const volumeEntriesById = new Map(LIBRARY_VOLUMES.map((volume) => [
+  volume.id,
+  volume.chapters.flatMap((chapter) => entriesForChapter(entries, chapter)),
+]));
+const assignedHrefs = [...volumeEntriesById.values()].flatMap((entriesInVolume) => entriesInVolume.map((entry) => entry.href));
 if (assignedHrefs.length !== entries.length || new Set(assignedHrefs).size !== entries.length) {
   throw new Error(`Library taxonomy must assign each published entry exactly once. Assigned ${assignedHrefs.length} references across ${new Set(assignedHrefs).size} unique entries; expected ${entries.length}.`);
 }
-const volumeStatsById = new Map(volumeStats.map((item) => [item.volume.id, item]));
-const shelfVolumeIds = LIBRARY_SHELVES.flatMap((shelf) => shelf.volumeIds);
-if (shelfVolumeIds.length !== LIBRARY_VOLUMES.length || new Set(shelfVolumeIds).size !== LIBRARY_VOLUMES.length) {
-  throw new Error('Library shelves must assign every volume exactly once.');
+
+function landingVisual(slug: string, visualId?: string) {
+  const entry = entryBySlug.get(slug);
+  const audit = entry ? getImplementedVisualAudit(slug) : undefined;
+  const selectedVisualId = visualId ?? audit?.visualIds[0];
+  if (!entry || !audit || !selectedVisualId) throw new Error(`Landing page visual is not implemented: ${slug}`);
+  return {
+    slug,
+    title: entry.title,
+    href: entry.href,
+    visualId: selectedVisualId,
+    objective: audit.learningObjective || entry.description || entry.title,
+  };
 }
 
-const codingQuestionCount = volumeStatsById.get('coding-interview')?.entries.filter((entry) => entry.category === 'questions').length ?? 0;
-if (codingQuestionCount === 0) throw new Error('Homepage coding route needs the coding interview volume.');
-
-const quickRoutes = [
-  {
-    cue: 'Start with the mental model',
-    title: 'Review the library visually',
-    copy: `${visualEntries.length} lessons that lead with the mechanism before the summary.`,
-    href: '/review/',
-    event: 'homepage_start_clicked',
-  },
-  {
-    cue: 'Build a plan around your loop',
-    title: 'Follow a role-specific route',
-    copy: 'Choose a role, rounds, available time, and evidence to create a private preparation path.',
-    href: SITE.features.prepTools ? '/prep/readiness/' : '/guides/as-vs-mle-vs-re/',
-    event: 'homepage_plan_clicked',
-  },
+const featuredPosts = [
+  { ...landingVisual('matrices-as-linear-maps'), label: 'Foundations', note: 'Start with the shape behind the formula.' },
+  { ...landingVisual('flashattention', 'flashattention-sram-tile-stream'), label: 'Frontier systems', note: 'See the memory movement that makes a kernel fast.' },
+  { ...landingVisual('defend-values-under-ethical-pressure'), label: 'Interview judgment', note: 'Make the tradeoff explicit before you defend it.' },
 ];
+
+const bookVisuals: Record<string, { slug: string; visualId?: string }> = {
+  foundations: { slug: 'svd-and-pca' },
+  'training-research': { slug: 'cross-entropy-softmax' },
+  'evaluation-product': { slug: 'expected-calibration-error' },
+  'llms-agents': { slug: 'transformer-architecture' },
+  systems: { slug: 'sharded-matrix-multiplication' },
+  'retrieval-ranking': { slug: 'tf-idf-and-bm25' },
+  'reinforcement-learning': { slug: 'mdps-and-bellman-equations' },
+  'vision-language-speech': { slug: 'vision-transformers' },
+  'interview-practice': { slug: 'present-technical-ml-project' },
+  'coding-interview': { slug: 'stable-softmax' },
+};
+
+const bookCards = LIBRARY_VOLUMES.map((volume) => {
+  const visualSpec = bookVisuals[volume.id];
+  const entriesInVolume = volumeEntriesById.get(volume.id) ?? [];
+  if (!visualSpec || !entriesInVolume.some((entry) => entry.slug === visualSpec.slug)) {
+    throw new Error(`Book ${volume.id} needs an anchor visual assigned from its own entries.`);
+  }
+  return { volume, entries: entriesInVolume, visual: landingVisual(visualSpec.slug, visualSpec.visualId) };
+});
 ---
 
 <BaseLayout
@@ -63,141 +80,126 @@ const quickRoutes = [
       <p class="hero-meta">{visualEntries.length} visual lessons · {LIBRARY_VOLUMES.length} ordered books · free to read</p>
     </header>
 
-    <section class="visual-hook" aria-labelledby="visual-hook-title">
-      <div class="visual-hook-copy">
-        <p class="section-kicker">One idea, seen</p>
-        <h2 id="visual-hook-title">A matrix is a map, not a table of numbers.</h2>
-        <p>Map each basis vector to a column. Keep the input's weights. The geometry explains the rank, range, and the direction that disappears.</p>
-        <a href="/concepts/matrices-as-linear-maps/" data-home-event="homepage_visual_hook_clicked">See the full visual lesson <span aria-hidden="true">→</span></a>
+    <section class="featured-posts" aria-labelledby="featured-posts-heading">
+      <header class="section-head">
+        <div><span class="section-kicker" id="featured-posts-heading">A few ideas, seen</span></div>
+        <p>Three visual posts across foundations, systems, and interview judgment.</p>
+      </header>
+      <div class="featured-post-list">
+        {featuredPosts.map((post) => (
+          <article class="featured-post">
+            <div class="featured-post-copy">
+              <p class="featured-post-label">{post.label}</p>
+              <h3>{post.title}</h3>
+              <p>{post.note} {post.objective}</p>
+              <a href={post.href} data-home-event="homepage_start_clicked">Read the post <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="landing-visual featured-post-visual" data-landing-visual data-landing-visual-load="eager" data-landing-visual-href={post.href} data-landing-visual-id={post.visualId} aria-busy="true">
+              <p class="landing-visual-placeholder">Loading visual…</p>
+              <noscript><a href={post.href}>Read {post.title}</a></noscript>
+            </div>
+          </article>
+        ))}
       </div>
-      <figure class="visual-hook-figure">
-        <svg class="visual-hook-svg visual-hook-svg--wide" viewBox="0 0 760 260" role="img" aria-labelledby="visual-hook-wide-title visual-hook-wide-description" width="760" height="260">
-          <title id="visual-hook-wide-title">A matrix maps basis vectors to its columns</title>
-          <desc id="visual-hook-wide-description">An input vector x equals two e1 minus e2 maps across a matrix to two times column a1 minus column a2. The output columns lie on one line, so the nonzero input direction collapses to zero.</desc>
-          <defs>
-            <marker id="home-hook-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--viz-focus-stroke)" /></marker>
-          </defs>
-          <rect x="10" y="10" width="218" height="220" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
-          <text x="30" y="38" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">INPUT SPACE</text>
-          <line x1="118" y1="60" x2="118" y2="202" stroke="var(--c-rule)" stroke-width="1" /><line x1="46" y1="166" x2="190" y2="166" stroke="var(--c-rule)" stroke-width="1" />
-          <line x1="118" y1="166" x2="160" y2="104" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" /><line x1="118" y1="166" x2="88" y2="166" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" />
-          <text x="164" y="99" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">2e1</text><text x="62" y="184" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">−e2</text><text x="128" y="112" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">x = 2e1 − e2</text>
-          <line x1="228" y1="120" x2="290" y2="120" stroke="var(--viz-focus-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" /><text x="240" y="104" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">same weights</text>
-          <rect x="290" y="10" width="460" height="220" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
-          <text x="312" y="38" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">OUTPUT SPACE</text>
-          <line x1="520" y1="60" x2="520" y2="202" stroke="var(--c-rule)" stroke-width="1" /><line x1="342" y1="166" x2="700" y2="166" stroke="var(--c-rule)" stroke-width="1" />
-          <line x1="520" y1="166" x2="594" y2="92" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" /><line x1="520" y1="166" x2="668" y2="18" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow)" />
-          <line x1="350" y1="248" x2="700" y2="-10" stroke="var(--viz-focus-stroke)" stroke-width="2" stroke-dasharray="6 5" />
-          <text x="572" y="88" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">a1 = (1, 1)</text><text x="600" y="36" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="13" font-weight="700">a2 = (2, 2) = 2a1</text>
-          <text x="330" y="204" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Ax = 2a1 − a2 = 0</text><text x="562" y="204" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12">columns share one line</text>
-        </svg>
-        <svg class="visual-hook-svg visual-hook-svg--stacked" viewBox="0 0 360 430" role="img" aria-labelledby="visual-hook-stacked-title visual-hook-stacked-description" width="360" height="430">
-          <title id="visual-hook-stacked-title">A matrix maps basis vectors to its columns</title>
-          <desc id="visual-hook-stacked-description">The input vector x equals two e1 minus e2. Applying the same weights to the matrix columns gives Ax equals two a1 minus a2 equals zero because both output columns share one line.</desc>
-          <defs>
-            <marker id="home-hook-arrow-stacked" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--viz-focus-stroke)" /></marker>
-          </defs>
-          <rect x="12" y="12" width="336" height="160" rx="8" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
-          <text x="26" y="36" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">1 · INPUT SPACE</text>
-          <text x="26" y="58" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">x = 2e1 − e2</text>
-          <line x1="118" y1="76" x2="118" y2="150" stroke="var(--c-rule)" stroke-width="1" /><line x1="56" y1="130" x2="190" y2="130" stroke="var(--c-rule)" stroke-width="1" />
-          <line x1="118" y1="130" x2="166" y2="84" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" /><line x1="118" y1="130" x2="78" y2="130" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" />
-          <text x="171" y="82" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">2e1</text><text x="58" y="150" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">−e2</text>
-          <line x1="180" y1="182" x2="180" y2="198" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#home-hook-arrow-stacked)" /><text x="194" y="192" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">same weights</text>
-          <rect x="12" y="208" width="336" height="210" rx="8" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
-          <text x="26" y="232" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12" font-weight="700">2 · OUTPUT SPACE</text>
-          <line x1="126" y1="252" x2="126" y2="392" stroke="var(--c-rule)" stroke-width="1" /><line x1="48" y1="362" x2="318" y2="362" stroke="var(--c-rule)" stroke-width="1" />
-          <line x1="126" y1="362" x2="184" y2="304" stroke="var(--viz-input-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" /><line x1="126" y1="362" x2="242" y2="246" stroke="var(--viz-state-stroke)" stroke-width="3" marker-end="url(#home-hook-arrow-stacked)" />
-          <line x1="62" y1="426" x2="268" y2="220" stroke="var(--viz-focus-stroke)" stroke-width="2" stroke-dasharray="6 5" />
-          <text x="188" y="300" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">a1 = (1, 1)</text><text x="196" y="244" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12" font-weight="700">a2 = 2a1</text>
-          <text x="26" y="400" fill="var(--viz-focus-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Ax = 2a1 − a2 = 0</text><text x="214" y="400" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="11">one output line</text>
-        </svg>
-        <figcaption><strong>Read it this way:</strong> the matrix acts on the basis first. Once the columns are visible, the “rank-one” result is a shape, not a memorized phrase.</figcaption>
-      </figure>
     </section>
 
-    <section class="route-section" aria-labelledby="route-heading">
+    <Subscribe placement="home" heading="Keep the field guide close." />
+
+    <section id="curriculum" class="book-library" aria-labelledby="curriculum-heading">
       <header class="section-head">
-        <div><span class="section-kicker">Start here</span><h2 id="route-heading">Choose the shortest route from what you already know.</h2></div>
-        <p>You do not need to read the library front to back.</p>
+        <div><span class="section-kicker">The field guide</span><h2 id="curriculum-heading">Ten books, each with a visual sample.</h2></div>
+        <p>Each book carries a visual sample from its own lessons.</p>
       </header>
-      <nav class="route-list" aria-label="Ways to start">
-        <ol>
-          {quickRoutes.map((route, index) => (
-            <li>
-              <a href={route.href} data-home-event={route.event}>
-                <span class="route-number">{String(index + 1).padStart(2, '0')}</span>
-                <span class="route-copy"><small>{route.cue}</small><strong>{route.title}</strong><span>{route.copy}</span></span>
-                <span class="route-arrow" aria-hidden="true">→</span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
-      {SITE.features.prepTools && (
-        <p class="workbook-line" hidden><span>Active interview loop?</span> <a href="/prep/readiness/" data-workbook-link data-home-event="homepage_plan_clicked">Build a private plan</a><span data-workbook-context> from your role, rounds, available time, and recent evidence. It stays in this browser.</span></p>
-      )}
-    </section>
-
-    <Subscribe placement="home" heading="Get ML from Primitives notes for senior AI systems interviews." />
-
-    <section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading">
-      <header class="section-head">
-        <div><span class="section-kicker">The curriculum</span><h2 id="curriculum-heading">{LIBRARY_VOLUMES.length} books, ordered from foundations to interview execution.</h2></div>
-        <p>Open a shelf, then choose a book or start its first visual.</p>
-      </header>
-
-      {LIBRARY_SHELVES.map((shelf, shelfIndex) => (
-        <details class="shelf" id={shelf.id} open={shelfIndex === 0}>
-          <summary><span><strong>{shelf.title}</strong><small>{shelf.description}</small></span><b aria-hidden="true">+</b></summary>
-          <ol>
-            {shelf.volumeIds.map((volumeId) => volumeStatsById.get(volumeId)).filter((item) => item !== undefined).map(({ volume, entries: volumeEntries, firstEntry }) => (
-              <li>
-                <span class="volume-number">{volume.number}</span>
-                <div class="book-copy">
-                  <h4><a href={`/library/${volume.id}/`} data-home-event="homepage_curriculum_clicked">{volume.title}</a></h4>
-                  <p>{volume.description}</p>
-                  <small>{volume.chapters.length} chapters · {volumeEntries.length} entries</small>
-                </div>
-                <div class="book-actions">
-                  {firstEntry && <a class="start-link" href={`/review/#${firstEntry.slug}`} data-home-event="homepage_start_clicked">Start visually <span aria-hidden="true">→</span></a>}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </details>
-      ))}
-    </section>
-
-    <section class="trust-section">
-      <div><span class="section-kicker">Built from practice</span><h2>Specific, current, and honest about scope.</h2></div>
-      <p>Written by Hamidreza Saghir, Principal Applied Scientist at Microsoft, with earlier ML engineering, applied-science, and research roles at X, Amazon, and Borealis AI. The site uses public process evidence, never leaked prompts or job-outcome promises. <a href="/about/">About the author and project</a>.</p>
+      <div class="book-grid">
+        {bookCards.map(({ volume, visual }) => (
+          <a class="book-card" data-book-card href={`/library/${volume.id}/`} data-home-event="homepage_curriculum_clicked">
+            <header class="book-card-heading">
+              <span class="book-card-number">{volume.number}</span>
+              <h3>{volume.title}</h3>
+            </header>
+            <div class="landing-visual book-card-visual" data-landing-visual data-landing-visual-href={visual.href} data-landing-visual-id={visual.visualId} aria-label={`${volume.title} visual preview`} aria-busy="true">
+              <p class="landing-visual-placeholder">Loading visual…</p>
+            </div>
+            <p class="book-card-explanation">{volume.description}</p>
+          </a>
+        ))}
+      </div>
     </section>
   </div>
 </BaseLayout>
 
-{SITE.features.prepTools && (
-  <script>
-    import { currentPlanWeek, loadPrepPlan } from '../utils/prepPlan';
-
-    const workbookLink = document.querySelector<HTMLAnchorElement>('[data-workbook-link]');
-    const workbookContext = document.querySelector<HTMLElement>('[data-workbook-context]');
-    const workbookLine = document.querySelector<HTMLElement>('.workbook-line');
-    if (workbookLink && workbookContext) {
-      const plan = loadPrepPlan();
-      if (plan) {
-        workbookLink.href = '/prep/';
-        workbookLink.dataset.homeEvent = 'homepage_workbook_clicked';
-        workbookLink.textContent = 'Continue my Workbook';
-        workbookContext.textContent = ` · ${plan.roleLabel} · week ${currentPlanWeek(plan)} of ${plan.horizon}.`;
-        workbookLine?.removeAttribute('hidden');
-      }
-    }
-  </script>
-)}
-
 <script>
+  import { absolutizeVisualLinks, extractLearningVisual } from '../utils/visualReviewClient';
+  import { enhanceCodingVisuals } from '../utils/codingVisuals';
   import { trackPublicEvent, type PublicEventName } from '../utils/publicEvents';
+
+  const articleCache = new Map<string, Promise<Document>>();
+
+  function fetchArticle(href: string): Promise<Document> {
+    const cached = articleCache.get(href);
+    if (cached) return cached;
+    const request = fetch(href, { headers: { Accept: 'text/html' } })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Article returned ${response.status}`);
+        return response.text();
+      })
+      .then((html) => new DOMParser().parseFromString(html, 'text/html'))
+      .catch((error) => {
+        articleCache.delete(href);
+        throw error;
+      });
+    articleCache.set(href, request);
+    return request;
+  }
+
+  async function loadLandingVisual(target: HTMLElement): Promise<void> {
+    if (target.dataset.loaded === 'true') return;
+    const href = target.dataset.landingVisualHref;
+    const visualId = target.dataset.landingVisualId;
+    if (!href || !visualId) return;
+    target.setAttribute('aria-busy', 'true');
+    try {
+      const article = await fetchArticle(href);
+      const extracted = extractLearningVisual(article, visualId);
+      if (!extracted) throw new Error('No completed visual was found.');
+      const figure = document.importNode(extracted.figure, true);
+      absolutizeVisualLinks(figure, href);
+      target.replaceChildren(figure);
+      enhanceCodingVisuals(target);
+      target.dataset.loaded = 'true';
+      target.setAttribute('aria-busy', 'false');
+    } catch (error) {
+      target.setAttribute('aria-busy', 'false');
+      target.replaceChildren();
+      const message = document.createElement('p');
+      message.className = 'landing-visual-error';
+      message.textContent = 'Visual unavailable here.';
+      const link = document.createElement('a');
+      link.href = href;
+      link.textContent = 'Read the lesson';
+      target.append(message, link);
+      console.error('Landing visual could not be loaded.', error);
+    }
+  }
+
+  const landingVisualTargets = [...document.querySelectorAll<HTMLElement>('[data-landing-visual]')];
+  const eagerVisuals = landingVisualTargets.filter((target) => target.dataset.landingVisualLoad === 'eager');
+  eagerVisuals.forEach((target) => {
+    void loadLandingVisual(target);
+  });
+  const deferredVisuals = landingVisualTargets.filter((target) => target.dataset.landingVisualLoad !== 'eager');
+  if ('IntersectionObserver' in window) {
+    const visualObserver = new IntersectionObserver((observations) => {
+      observations.filter((observation) => observation.isIntersecting).forEach((observation) => {
+        const target = observation.target as HTMLElement;
+        visualObserver.unobserve(target);
+        void loadLandingVisual(target);
+      });
+    }, { rootMargin: '600px 0px' });
+    deferredVisuals.forEach((target) => visualObserver.observe(target));
+  } else {
+    deferredVisuals.forEach((target) => void loadLandingVisual(target));
+  }
 
   document.querySelectorAll<HTMLElement>('[data-home-event]').forEach((element) => {
     element.addEventListener('click', () => {
@@ -223,70 +225,13 @@ const quickRoutes = [
   .cover-secondary { background: var(--c-surface); color: var(--c-text-soft); }
   .cover-secondary:hover { border-color: var(--c-accent); color: var(--c-accent); }
   .hero-meta { margin: 1rem 0 0; padding-top: .65rem; border-top: 1px solid var(--c-rule); color: var(--c-muted); font-family: var(--font-mono); font-size: .6rem; }
-  .workbook-line { margin: .7rem 0 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; }
-  .workbook-line[hidden] { display: none; }
-  .workbook-line > span:first-child { color: var(--c-text-soft); font-weight: 600; }
-  .workbook-line a { font-weight: 600; }
-  .visual-hook { display: grid; grid-template-columns: minmax(14rem, .8fr) minmax(0, 1.55fr); gap: 1.3rem; align-items: center; margin-top: 1.35rem; padding: 1rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
-  .visual-hook-copy { max-width: 19rem; }
-  .visual-hook-copy h2 { margin: .25rem 0 .45rem; font-size: 1.25rem; line-height: 1.15; }
-  .visual-hook-copy p { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .78rem; line-height: 1.5; }
-  .visual-hook-copy a { display: inline-flex; gap: .45rem; margin-top: .75rem; font-size: .72rem; font-weight: 650; text-decoration: none; }
-  .visual-hook-figure { min-width: 0; margin: 0; }
-  .visual-hook-svg { display: block; width: 100%; height: auto; }
-  .visual-hook-svg--stacked { display: none; }
-  .visual-hook-figure figcaption { margin: .45rem 0 0; color: var(--c-muted); font-family: var(--font-ui); font-size: .62rem; line-height: 1.4; text-align: left; }
-  .route-section, .curriculum { padding-top: 2.2rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
   .section-head { display: flex; align-items: end; justify-content: space-between; gap: 1.2rem; margin-bottom: .7rem; padding-bottom: .65rem; border-bottom: 1px solid var(--c-rule); }
-  .section-head h2, .trust-section h2 { margin: .22rem 0 0; font-size: clamp(1.35rem, 3vw, 1.72rem); line-height: 1.18; }
+  .section-head h2 { margin: .22rem 0 0; font-size: clamp(1.35rem, 3vw, 1.72rem); line-height: 1.18; }
   .section-head > p { max-width: 18rem; margin: 0; color: var(--c-muted); font-size: .72rem; line-height: 1.45; text-align: right; }
-  .section-head > a { flex: 0 0 auto; color: var(--c-muted); font-size: .72rem; }
-  .route-list ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; border-top: 1px solid var(--c-rule); list-style: none; }
-  .route-list li { min-width: 0; margin: 0; border-bottom: 1px solid var(--c-rule); }
-  .route-list li:nth-child(odd) { padding-right: 1rem; border-right: 1px solid var(--c-rule); }
-  .route-list li:nth-child(even) { padding-left: 1rem; }
-  .route-list a { display: grid; grid-template-columns: 1.55rem minmax(0, 1fr) auto; gap: .55rem; align-items: start; height: 100%; padding: .8rem 0; color: inherit; text-decoration: none; }
-  .route-number { padding-top: .12rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; }
-  .route-copy, .route-copy small, .route-copy strong, .route-copy > span { display: block; min-width: 0; }
-  .route-copy small { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; text-transform: uppercase; }
-  .route-copy strong { margin-top: .08rem; font-size: .82rem; }
-  .route-copy > span { margin-top: .15rem; color: var(--c-muted); font-family: var(--font-reading); font-size: .7rem; line-height: 1.4; }
-  .route-arrow { align-self: center; color: var(--c-muted); font-size: .75rem; }
-  .route-list a:hover .route-copy strong { color: var(--c-accent); text-decoration: underline; }
-  .shelf { margin-top: 1rem; border-top: 1px solid var(--c-rule); }
-  .shelf > summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: center; padding: .8rem 0; color: var(--c-text); cursor: pointer; list-style: none; }
-  .shelf > summary::-webkit-details-marker { display: none; }
-  .shelf > summary > span { display: grid; gap: .15rem; min-width: 0; }
-  .shelf > summary strong { font-size: .88rem; }
-  .shelf > summary small { color: var(--c-muted); font-family: var(--font-reading); font-size: .75rem; line-height: 1.4; }
-  .shelf > summary > b { color: var(--c-muted); font-family: var(--font-mono); font-size: .9rem; font-weight: 400; }
-  .shelf[open] > summary > b { color: var(--c-accent); }
-  .shelf[open] > summary > b { font-size: 0; }
-  .shelf[open] > summary > b::after { font-size: .9rem; content: '−'; }
-  .shelf > ol { margin: 0; padding: 0; border-top: 1px solid var(--c-rule); list-style: none; }
-  .shelf > ol > li { display: grid; grid-template-columns: 2rem minmax(0, 1fr) 7rem; gap: .7rem; align-items: start; margin: 0; padding: .75rem 0; border-bottom: 1px solid var(--c-rule); }
-  .volume-number { padding-top: .12rem; color: var(--c-muted); font-size: .65rem; }
-  .book-copy h4, .book-copy p { margin: 0; }
-  .book-copy h4 { font-size: .9rem; }
-  .book-copy h4 a { color: var(--c-text); text-decoration: none; }
-  .book-copy h4 a:hover { color: var(--c-accent); text-decoration: underline; }
-  .book-copy p { margin-top: .12rem; color: var(--c-muted); font-family: var(--font-reading); font-size: .75rem; line-height: 1.4; }
-  .book-copy small { display: block; margin-top: .25rem; color: var(--c-muted); font-size: .62rem; }
-  .book-actions { display: flex; align-items: flex-end; flex-direction: column; gap: .28rem; padding-top: .08rem; }
-  .book-actions a { color: var(--c-muted); font-size: .66rem; text-align: right; }
-  .book-actions .start-link { color: var(--c-accent); font-weight: 650; text-decoration: none; }
-  .book-actions .start-link:hover { text-decoration: underline; }
-  .trust-section { display: grid; grid-template-columns: minmax(14rem, .75fr) minmax(0, 1.25fr); gap: 1.8rem; margin-top: 2.7rem; padding: 1.15rem 0; border-top: 2px solid var(--c-text); border-bottom: 1px solid var(--c-rule); }
-  .trust-section p { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .78rem; line-height: 1.55; }
 
   @media (max-width: 720px) {
     .section-head { align-items: flex-start; flex-direction: column; gap: .35rem; }
     .section-head > p { max-width: 38rem; text-align: left; }
-    .trust-section { grid-template-columns: 1fr; gap: .8rem; }
-    .visual-hook { grid-template-columns: 1fr; gap: .8rem; }
-    .visual-hook-copy { max-width: none; }
-    .visual-hook-svg--wide { display: none; }
-    .visual-hook-svg--stacked { display: block; }
   }
   @media (max-width: 600px) {
     .landing-page { padding-top: 1.4rem; }
@@ -295,10 +240,87 @@ const quickRoutes = [
     .hero h1 { font-size: 2.55rem; }
     .cover-actions { display: grid; grid-template-columns: 1fr; }
     .cover-actions a { width: 100%; }
-    .route-list ol { grid-template-columns: 1fr; }
-    .route-list li:nth-child(odd), .route-list li:nth-child(even) { padding-right: 0; padding-left: 0; border-right: 0; }
-    .shelf > ol > li { grid-template-columns: 1.6rem minmax(0, 1fr); gap: .55rem; }
-    .book-actions { grid-column: 2; align-items: flex-start; }
-    .book-actions a { text-align: left; }
+  }
+
+  .landing-page { width: min(100%, 70rem); }
+  .featured-posts,
+  .book-library { padding-top: 2.8rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
+  .featured-post-list { border-top: 1px solid var(--c-rule); }
+  .featured-post { display: grid; grid-template-columns: minmax(13rem, .7fr) minmax(0, 1.3fr); gap: clamp(1.2rem, 4vw, 3.5rem); height: 17rem; align-items: center; padding: 1rem 0; overflow: hidden; border-bottom: 1px solid var(--c-rule); }
+  .featured-post-copy { max-width: 21rem; }
+  .featured-post-label { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .featured-post-copy h3 { margin: .35rem 0 .5rem; font-size: clamp(1.15rem, 2vw, 1.5rem); line-height: 1.15; }
+  .featured-post-copy > p:not(.featured-post-label) { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .8rem; line-height: 1.5; }
+  .featured-post-copy > a { display: inline-flex; gap: .45rem; margin-top: .8rem; color: var(--c-text-soft); font-size: .72rem; font-weight: 650; text-decoration: none; }
+  .featured-post-copy > a:hover { color: var(--c-accent); }
+  .landing-visual { min-width: 0; }
+  .landing-visual[aria-busy='true'] { opacity: .78; }
+  .landing-visual :global(.learning-figure) { width: 100% !important; max-width: none !important; margin: 0 !important; }
+  .landing-visual :global(.learning-figure > p),
+  .landing-visual :global(.visual-kicker),
+  .landing-visual :global(.visual-title) { display: none !important; }
+  .landing-visual :global(.diagram-source) { display: none; }
+  .landing-visual :global(.visual-scroll) { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+  .landing-visual :global(.visual-wide svg),
+  .landing-visual :global(.backprop-visual svg) { min-width: 0; }
+  .landing-visual :global(svg) { max-width: 100%; height: auto; }
+  .landing-visual-placeholder { min-height: 10rem; display: grid; place-items: center; margin: 0; border: 1px solid var(--c-rule); border-radius: var(--radius); color: var(--c-muted); font-family: var(--font-ui); font-size: .72rem; }
+  .landing-visual-error { margin: 0; color: var(--c-muted); font-size: .72rem; }
+  .landing-visual-error + a { display: inline-block; margin-top: .35rem; color: var(--c-accent); font-size: .7rem; }
+  .featured-post-visual { height: 15rem; overflow: hidden; }
+  .featured-post-visual :global(.learning-figure) { height: 100%; overflow: hidden; }
+  .featured-post-visual :global(.learning-figure figcaption) { display: none; }
+  .featured-post-visual :global(.learning-figure > .visual-panel),
+  .featured-post-visual :global(.learning-figure > .visual-grid--two),
+  .featured-post-visual :global(.learning-figure > .visual-scroll) { max-height: 100%; overflow: hidden; }
+  .featured-post-visual :global(.learning-figure > .visual-panel),
+  .featured-post-visual :global(.learning-figure > .visual-grid--two),
+  .featured-post-visual :global(.learning-figure > .visual-scroll) { height: 100%; min-height: 0; }
+  .featured-post-visual :global(.learning-figure > .visual-panel) { display: grid; align-content: center; }
+  .featured-post-visual :global(.learning-figure > .visual-grid--two) { align-items: center; }
+  .featured-post-visual :global(.learning-figure > .visual-panel svg),
+  .featured-post-visual :global(.learning-figure > .visual-scroll svg),
+  .featured-post-visual :global(.learning-figure > .visual-grid--two svg),
+  .featured-post-visual :global(.learning-figure > svg) { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
+  .featured-post .landing-visual-placeholder { min-height: 15rem; }
+  .book-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .8rem; }
+  .book-card { min-width: 0; height: 22rem; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: .65rem; padding: .75rem; overflow: hidden; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-bg-tint); color: inherit; text-decoration: none; }
+  .book-card:hover { border-color: var(--c-accent); background: var(--c-bg); }
+  .book-card:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+  .book-card-number { color: var(--c-accent); font-family: var(--font-mono); font-size: .7rem; }
+  .book-card-heading { height: 2.9rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .7rem; align-items: start; min-width: 0; }
+  .book-card-heading h3 { display: -webkit-box; overflow: hidden; margin: 0; color: var(--c-text); font-size: .8rem; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+  .book-card-visual { width: 100%; height: 8.5rem; min-width: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .book-card-visual :global(.learning-figure) { width: 100% !important; height: 100%; max-width: 100% !important; overflow: hidden; }
+  .book-card-visual :global(.learning-figure figcaption) { display: none; }
+  .book-card-visual :global(.learning-figure > .visual-panel),
+  .book-card-visual :global(.learning-figure > .visual-grid--two),
+  .book-card-visual :global(.learning-figure > .visual-scroll),
+  .book-card-visual :global(.coding-visual) { max-width: 100%; max-height: 100%; overflow: hidden; }
+  .book-card-visual :global(.learning-figure > .visual-panel svg),
+  .book-card-visual :global(.learning-figure > .visual-scroll svg),
+  .book-card-visual :global(.learning-figure > .visual-grid--two svg),
+  .book-card-visual :global(.learning-figure > svg) { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
+  .book-card-explanation { display: -webkit-box; min-height: 3.9rem; overflow: hidden; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .68rem; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
+  .book-card-visual .landing-visual-placeholder { width: 100%; min-height: 7rem; }
+
+  @media (max-width: 720px) {
+    .featured-post { grid-template-columns: 1fr; height: 28rem; gap: 1rem; align-content: start; }
+    .featured-post-copy { max-width: none; }
+    .featured-post-visual { height: 14rem; }
+    .featured-post .landing-visual-placeholder { min-height: 14rem; }
+    .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 600px) {
+    .featured-posts,
+    .book-library { padding-top: 2.2rem; }
+    .book-card { height: 21rem; }
+    .book-card-visual { height: 7rem; }
+  }
+  @media (min-width: 721px) and (max-width: 1100px) {
+    .book-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 420px) {
+    .book-grid { grid-template-columns: 1fr; }
   }
 </style>
