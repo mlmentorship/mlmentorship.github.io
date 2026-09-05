@@ -15,6 +15,7 @@ const { title, description, heading, lede, eyebrow = 'Free prep resources' } = A
 const pathname = Astro.url.pathname;
 const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
   : pathname.startsWith('/prep/role-paths/') ? 'Role guide'
+  : pathname.startsWith('/prep/level-paths/') ? 'Level guide'
   : pathname.startsWith('/prep/simulations/') ? 'Simulation'
   : pathname.startsWith('/prep/labs/') ? 'Lab'
   : pathname.startsWith('/prep/frontier-labs/') ? 'Interview formats'
@@ -25,6 +26,22 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
   : pathname.startsWith('/prep/plans/') ? 'Planning appendix'
   : null;
 const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
+const journeyItems = [
+  { number: '01', label: 'Plan', href: '/prep/readiness/', active: pathname.startsWith('/prep/readiness/') || pathname.startsWith('/prep/plans/') },
+  { number: '02', label: 'Your map', href: '/prep/', active: pathname === '/prep/' },
+  { number: '03', label: 'Practice', href: '/questions/', active: false },
+  { number: '04', label: 'Simulate', href: '/prep/simulations/', active: pathname.startsWith('/prep/simulations/') },
+  { number: '05', label: 'Final week', href: '/prep/final-week/', active: pathname.startsWith('/prep/final-week/') },
+];
+const optionalLinks = [
+  { label: 'Role guide', href: '/prep/role-paths/', active: pathname.startsWith('/prep/role-paths/') || pathname.startsWith('/prep/level-paths/') },
+  { label: 'Stories', href: '/prep/story-bank/', active: pathname.startsWith('/prep/story-bank/') },
+  { label: 'Special formats', href: '/prep/frontier-labs/', active: pathname.startsWith('/prep/frontier-labs/') },
+  { label: 'Labs', href: '/prep/labs/', active: pathname.startsWith('/prep/labs/') },
+  { label: 'Presentation', href: '/prep/presentation/', active: pathname.startsWith('/prep/presentation/') },
+  { label: 'Values', href: '/prep/values/', active: pathname.startsWith('/prep/values/') },
+];
+const optionalActive = optionalLinks.some((link) => link.active);
 ---
 
 <BaseLayout title={title} description={description}>
@@ -33,6 +50,23 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
       <a href="/">Home</a><span aria-hidden="true">/</span>
       {pathname === '/prep/' ? <span aria-current="page">Workbook</span> : <a href="/prep/">Workbook</a>}
       {sectionLabel && <><span aria-hidden="true">/</span><span aria-current="page">{sectionLabel}</span></>}
+    </nav>
+
+    <nav class="prep-journey" aria-label="Workbook journey">
+      <p>Core journey</p>
+      <ol>
+        {journeyItems.map((item) => (
+          <li class:list={{ active: item.active }}>
+            <a href={item.href} aria-current={item.active ? 'page' : undefined}>
+              <span>{item.number}</span><strong>{item.label}</strong>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <details class="prep-more" open={optionalActive}>
+        <summary>More prep <span>Role, stories, and confirmed specialist formats</span></summary>
+        <div>{optionalLinks.map((link) => <a class={link.active ? 'active' : undefined} href={link.href} aria-current={link.active ? 'page' : undefined}>{link.label}</a>)}</div>
+      </details>
     </nav>
 
     {workbookEmailGateEnabled && (
@@ -106,6 +140,20 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
   .workbook-trail { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: 1.1rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .68rem; }
   .workbook-trail a { color: var(--c-text-soft); text-decoration: none; }
   .workbook-trail a:hover { color: var(--c-accent); text-decoration: underline; }
+  .prep-journey { margin: 0 0 1.35rem; padding: .65rem 0 .7rem; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .prep-journey > p { margin: 0 0 .45rem; color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; }
+  .prep-journey ol { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .3rem; margin: 0; padding: 0; list-style: none; }
+  .prep-journey li { min-width: 0; margin: 0; }
+  .prep-journey li a { display: flex; min-height: 3rem; flex-direction: column; justify-content: center; gap: .12rem; padding: .35rem .45rem; border-top: 2px solid var(--c-rule); color: var(--c-text-soft); text-decoration: none; }
+  .prep-journey li a:hover, .prep-journey li.active a { border-top-color: var(--c-accent); color: var(--c-accent); }
+  .prep-journey li a span { font-family: var(--font-mono); font-size: .58rem; }
+  .prep-journey li a strong { color: inherit; font-size: .76rem; }
+  .prep-more { margin-top: .55rem; padding-top: .55rem; border-top: 1px solid var(--c-rule-soft); }
+  .prep-more summary { display: flex; align-items: baseline; justify-content: space-between; gap: .8rem; cursor: pointer; color: var(--c-text-soft); font-size: .76rem; font-weight: 700; }
+  .prep-more summary span { color: var(--c-muted); font-size: .7rem; font-weight: 400; }
+  .prep-more > div { display: flex; flex-wrap: wrap; gap: .35rem .75rem; margin-top: .55rem; }
+  .prep-more a { color: var(--c-muted); font-size: .74rem; text-decoration: none; }
+  .prep-more a:hover, .prep-more a.active { color: var(--c-accent); text-decoration: underline; }
   .prep-hero { max-width: 42rem; margin-bottom: 1.4rem; padding-bottom: .9rem; border-bottom: 1px solid var(--c-rule); }
   .prep-eyebrow { margin: 0 0 .4rem !important; color: var(--c-muted) !important; font-size: .68rem !important; font-weight: 500; }
   .prep-hero h1 { margin: 0 0 .45rem; font-size: clamp(1.65rem, 4vw, 2.15rem); line-height: 1.14; letter-spacing: -.02em; }
@@ -135,8 +183,13 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
     .workbook-preview ul { grid-template-columns: 1fr; gap: .6rem; }
     .prep-content :global(.resource-grid) { grid-template-columns: 1fr; }
   }
+  @media (max-width: 620px) {
+    .prep-journey ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .prep-journey li:nth-child(4), .prep-journey li:nth-child(5) { margin-top: .2rem; }
+    .prep-more summary span { display: none; }
+  }
   @media print {
-    :global(.masthead), :global(footer), .workbook-trail, .prep-content :global(.print-button) { display: none !important; }
+    :global(.masthead), :global(footer), .workbook-trail, .prep-journey, .prep-content :global(.print-button) { display: none !important; }
     .prep-page { max-width: none; padding: 0; }
     .prep-hero { margin-bottom: 1rem; }
   }
