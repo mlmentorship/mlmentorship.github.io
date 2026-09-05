@@ -1,5 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Subscribe from '../components/Subscribe.astro';
+import { SITE } from '../consts';
 
 interface Props {
   title: string;
@@ -22,6 +24,7 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
   : pathname.startsWith('/prep/final-week/') ? 'Final week'
   : pathname.startsWith('/prep/plans/') ? 'Planning appendix'
   : null;
+const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -32,20 +35,59 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
       {sectionLabel && <><span aria-hidden="true">/</span><span aria-current="page">{sectionLabel}</span></>}
     </nav>
 
-    <header class="prep-hero">
-      <p class="prep-eyebrow">{eyebrow}</p>
-      <h1>{heading}</h1>
-      <p>{lede}</p>
-    </header>
+    {workbookEmailGateEnabled && (
+      <section class="workbook-gate" data-workbook-gate aria-labelledby="workbook-gate-heading">
+        <p class="prep-eyebrow">Private workbook</p>
+        <h1 id="workbook-gate-heading">Subscribe to unlock the workbook.</h1>
+        <p>The field guide remains free. A confirmed ML from Primitives subscription unlocks this browser-local preparation workspace on this device.</p>
+        <Subscribe placement="workbook" heading="Unlock the private prep workspace." />
+      </section>
+    )}
 
-    <article class="prep-content">
-      <slot />
-    </article>
+    <div class="workbook-content" data-workbook-content hidden={!workbookEmailGateEnabled}>
+      <header class="prep-hero">
+        <p class="prep-eyebrow">{eyebrow}</p>
+        <h1>{heading}</h1>
+        <p>{lede}</p>
+      </header>
+
+      <article class="prep-content">
+        <slot />
+      </article>
+    </div>
   </div>
 </BaseLayout>
 
+<script>
+  import { WORKBOOK_UNLOCK_KEY } from '../utils/newsletter';
+
+  const content = document.querySelector<HTMLElement>('[data-workbook-content]');
+  const gate = document.querySelector<HTMLElement>('[data-workbook-gate]');
+  const unlockKey = WORKBOOK_UNLOCK_KEY;
+
+  function isUnlocked(): boolean {
+    try { return window.localStorage.getItem(unlockKey) === '1'; } catch { return false; }
+  }
+
+  function syncWorkbookAccess(): void {
+    if (!content || !gate) return;
+    const unlocked = isUnlocked();
+    content.hidden = !unlocked;
+    gate.hidden = unlocked;
+  }
+
+  syncWorkbookAccess();
+  window.addEventListener('storage', syncWorkbookAccess);
+  window.addEventListener('workbook-email-unlocked', syncWorkbookAccess);
+  document.addEventListener('visibilitychange', syncWorkbookAccess);
+</script>
+
 <style>
   .prep-page { max-width: 46rem; margin: 0 auto; padding: clamp(1.3rem, 3vw, 2.2rem) var(--gutter) 4rem; }
+  .workbook-gate { padding: 1.2rem 0 1.5rem; border-bottom: 1px solid var(--c-rule); }
+  .workbook-gate h1 { margin: 0 0 .5rem; font-size: clamp(1.7rem, 4vw, 2.15rem); line-height: 1.14; letter-spacing: -.02em; }
+  .workbook-gate > p:not(.prep-eyebrow) { max-width: 38rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .94rem; line-height: 1.5; }
+  .workbook-gate :global(.subscribe) { width: 100%; margin-top: 1.25rem; }
   .workbook-trail { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: 1.1rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .68rem; }
   .workbook-trail a { color: var(--c-text-soft); text-decoration: none; }
   .workbook-trail a:hover { color: var(--c-accent); text-decoration: underline; }

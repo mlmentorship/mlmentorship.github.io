@@ -4,7 +4,7 @@
 // browser session, with longer local suppression after success or opt-out.
 import { SITE } from '../consts';
 
-type Placement = 'home' | 'entry' | 'review';
+type Placement = 'home' | 'entry' | 'review' | 'workbook';
 
 interface Props {
   placement?: Placement;
@@ -59,8 +59,9 @@ const hasEmail =
 
 <script>
   import { trackPublicEvent } from '../utils/publicEvents';
+  import { WORKBOOK_UNLOCK_KEY } from '../utils/newsletter';
 
-  type Placement = 'home' | 'entry' | 'review';
+  type Placement = 'home' | 'entry' | 'review' | 'workbook';
 
   const SESSION_KEY = 'mlmentorship:email-signup:beehiiv-entry-seen:v1';
   const SUPPRESS_UNTIL_KEY = 'mlmentorship:email-signup:beehiiv-suppress-until:v1';
@@ -81,6 +82,11 @@ const hasEmail =
       viewed: 'email_signup_viewed_review',
       attempted: 'email_signup_attempted_review',
       confirmationSent: 'email_signup_confirmation_sent_review',
+    },
+    workbook: {
+      viewed: 'email_signup_viewed_workbook',
+      attempted: 'email_signup_attempted_workbook',
+      confirmationSent: 'email_signup_confirmation_sent_workbook',
     },
   } as const;
 
@@ -149,8 +155,10 @@ const hasEmail =
       if (completed) return;
       completed = true;
       suppressForSixMonths();
+      storageSet('localStorage', WORKBOOK_UNLOCK_KEY, '1');
       actions?.setAttribute('hidden', '');
       trackPublicEvent(events.confirmationSent);
+      window.dispatchEvent(new Event('workbook-email-unlocked'));
     };
     const loadForm = () => {
       if (loaded || !emailEnabled || !formId) return;

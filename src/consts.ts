@@ -50,10 +50,7 @@ export const SITE = {
   nav: [
     { label: 'Library', href: '/#curriculum' },
     { label: 'Map', href: '/map/' },
-    { label: 'Questions', href: '/questions/' },
-    { label: 'Coding', href: '/library/coding-interview/' },
     { label: 'Workbook', href: '/prep/' },
-    { label: 'About', href: '/about/' },
   ],
   postsPerPage: 30,
 } as const;
