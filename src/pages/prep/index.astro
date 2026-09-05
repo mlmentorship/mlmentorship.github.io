@@ -24,10 +24,16 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   </section>
 
   <section class="plan-sheet" data-plan-context hidden>
-    <header>
-      <div><p class="section-kicker">Current plan</p><h2 data-plan-title></h2><p data-plan-summary></p></div>
+    <header class="plan-hero-header">
+      <div><p class="section-kicker">Personalized study plan</p><h2 data-plan-title></h2><p data-plan-summary></p></div>
       <a href="/prep/readiness/">Edit plan</a>
     </header>
+    <div class="plan-metrics" aria-label="Plan summary">
+      <div><span>Runway</span><strong data-plan-runway></strong><small data-plan-week></small></div>
+      <div><span>Weekly capacity</span><strong data-plan-capacity></strong><small>Protected for practice and review</small></div>
+      <div><span>Estimated work</span><strong data-plan-estimate></strong><small>For the full mapped preparation</small></div>
+    </div>
+    <p class="plan-focus" data-plan-focus></p>
     <section class="next-action" data-next-action hidden>
       <p>Do this next</p>
       <a data-next-link><strong data-next-title></strong><span data-next-detail></span></a>
@@ -98,23 +104,6 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     <a href="/questions/">Choose a question <span aria-hidden="true">→</span></a>
   </details>
 
-  <section class="next-stage">
-    <h2>When the basics are working</h2>
-    <ul>
-      <li><a href="/prep/simulations/">Run a role-specific simulation</a> after every expected round has a baseline.</li>
-      <li><a href="/prep/role-paths/">Open a role guide</a> when the next subject is unclear.</li>
-    </ul>
-    <details>
-      <summary>Specialist and final-stage appendices</summary>
-      <ul>
-        <li><a href="/prep/labs/">Executable labs</a></li>
-        <li><a href="/prep/frontier-labs/">Current interview formats</a></li>
-        <li><a href="/prep/story-bank/">Story bank</a></li>
-        <li><a href="/prep/final-week/">Final-week checklist</a></li>
-        <li><a href="/prep/readiness/">Rebuild the plan from your loop</a></li>
-      </ul>
-    </details>
-  </section>
 </PrepLayout>
 
 <script>
@@ -249,6 +238,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     const plan = loadPrepPlan();
     const context = document.querySelector<HTMLElement>('[data-plan-context]');
     const noPlan = document.querySelector<HTMLElement>('[data-no-plan]');
+    const hero = document.querySelector<HTMLElement>('.prep-hero');
+    if (hero) hero.hidden = Boolean(plan);
     if (context) context.hidden = !plan;
     if (noPlan) noPlan.hidden = Boolean(plan);
 
@@ -276,10 +267,21 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     }
 
     const week = currentPlanWeek(plan);
+    const routes = buildStudyRoutes(plan, records, today);
     const title = context.querySelector<HTMLElement>('[data-plan-title]');
     const summary = context.querySelector<HTMLElement>('[data-plan-summary]');
-    if (title) title.textContent = `${plan.roleLabel} · week ${week} of ${plan.availableWeeks} available`;
-    if (summary) summary.textContent = `${plan.level.toUpperCase()} · ${plan.weeklyHours} hours/week · estimated full workload ${plan.estimatedHours.low}–${plan.estimatedHours.high} hours · updated ${plan.updatedOn}`;
+    if (title) title.textContent = `${plan.availableWeeks}-week ${plan.roleLabel} study map`;
+    if (summary) summary.textContent = `${plan.level.toUpperCase()} · ${plan.domain.replaceAll('-', ' ')} · ${plan.selectedRounds.length} confirmed rounds · updated ${plan.updatedOn}`;
+    const runway = context.querySelector<HTMLElement>('[data-plan-runway]');
+    const weekLabel = context.querySelector<HTMLElement>('[data-plan-week]');
+    const capacity = context.querySelector<HTMLElement>('[data-plan-capacity]');
+    const estimate = context.querySelector<HTMLElement>('[data-plan-estimate]');
+    const focus = context.querySelector<HTMLElement>('[data-plan-focus]');
+    if (runway) runway.textContent = `${plan.availableWeeks} week${plan.availableWeeks === 1 ? '' : 's'}`;
+    if (weekLabel) weekLabel.textContent = `Week ${week} of ${plan.availableWeeks} · ${plan.availableWeeks >= plan.horizon ? `on track for ${plan.horizon} weeks` : `triage ${plan.horizon} weeks of work`}`;
+    if (capacity) capacity.textContent = `${plan.weeklyHours} hours`;
+    if (estimate) estimate.textContent = `${plan.estimatedHours.low}–${plan.estimatedHours.high} hours`;
+    if (focus) focus.textContent = routes[0] ? `Start with ${routes[0].label}. The map below stays inside your confirmed rounds and changes as you score each attempt.` : 'Open readiness to choose the rounds this map should cover.';
 
     const tasks = nextPrepTasks(plan, records, today);
     const nextAction = context.querySelector<HTMLElement>('[data-next-action]');
@@ -473,6 +475,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .storage-warning { margin: 0 0 1rem; padding: .75rem .85rem; border-left: 3px solid #b45309; background: var(--c-bg-tint); color: var(--c-text-soft); font-size: .82rem; }
   .section-kicker { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
   .start-sheet, .plan-sheet, .record-sheet { margin: 0 0 1.7rem; padding: .8rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .plan-sheet { padding: 1rem 0 1.15rem; border-top: 2px solid var(--c-text); }
   .study-map { margin: 0 0 1.7rem; padding: .9rem 0 1.1rem; border-top: 2px solid var(--c-text); border-bottom: 1px solid var(--c-rule); }
   .study-map[hidden] { display: none; }
   .study-map-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
@@ -509,7 +512,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     html, body, .prep-page, .workbook-content, .prep-content { background: #ffffff !important; color: #18181b !important; }
     body { transition: none !important; }
     html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .print-actions, .backup, .next-stage, .start-sheet, .later-tasks, .verify-button, .prep-download, .storage-warning, .prep-hero { display: none !important; }
+    .print-actions, .backup, .start-sheet, .later-tasks, .verify-button, .prep-download, .storage-warning, .prep-hero { display: none !important; }
     .round-route { break-before: page; }
     .route-steps > li { break-inside: avoid; }
     .study-map a[href^="/questions/"]::after, .study-map a[href^="/review/"]::after { content: ' (mlmentorship.com' attr(href) ')'; font-size: 8pt; font-weight: 400; overflow-wrap: anywhere; }
@@ -520,6 +523,15 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .primary-link { display: inline-block; padding: .58rem .78rem; border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font-weight: 700; text-decoration: none; }
   .plan-sheet[hidden], .start-sheet[hidden], [data-record-content][hidden], .empty-record[hidden], [data-next-action][hidden], [data-later-tasks][hidden], [data-plan-blockers][hidden] { display: none; }
   .plan-sheet > header, .record-sheet > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .plan-hero-header h2 { margin: .15rem 0 .35rem !important; font-size: 1.35rem !important; }
+  .plan-hero-header > a { flex: 0 0 auto; font-size: .78rem; }
+  .plan-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; margin: 1rem 0 .7rem; }
+  .plan-metrics div { min-width: 0; padding: .55rem .6rem; border: 1px solid var(--c-rule); background: var(--c-bg-tint); }
+  .plan-metrics span, .plan-metrics strong, .plan-metrics small { display: block; }
+  .plan-metrics span { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; }
+  .plan-metrics strong { margin-top: .2rem; font-size: .86rem; }
+  .plan-metrics small { margin-top: .15rem; color: var(--c-muted); font-size: .65rem; line-height: 1.3; }
+  .plan-focus { margin: 0; padding: .6rem .7rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); color: var(--c-text-soft); font-size: .8rem; }
   .plan-sheet > header > a { font-size: .78rem; }
   .plan-sheet [data-plan-summary], .record-sheet > header > p { margin: 0; color: var(--c-muted); font-size: .78rem; }
   .next-action { margin-top: 1rem; padding: .8rem 0 .8rem .9rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); }
@@ -530,7 +542,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .next-action span, .later-tasks span { margin-top: .12rem; color: var(--c-muted); font-size: .76rem; }
   .next-action a:hover strong, .later-tasks a:hover strong { color: var(--c-accent); text-decoration: underline; }
   .later-tasks { margin-top: .8rem; }
-  .later-tasks summary, .backup summary, .method-sheet summary, .next-stage details summary, .other-records summary { cursor: pointer; font-weight: 700; }
+  .later-tasks summary, .backup summary, .method-sheet summary, .other-records summary { cursor: pointer; font-weight: 700; }
   .later-tasks ol { margin: .5rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
   .later-tasks li { margin: 0; padding: .55rem 0; border-bottom: 1px solid var(--c-rule); }
   .external-blockers { margin-top: .8rem; padding: .65rem .75rem; border-left: 3px solid #b45309; background: var(--c-bg-tint); font-size: .78rem; }
@@ -569,19 +581,13 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .method-sheet ol { margin: 1rem 0; padding-left: 1.3rem; }
   .method-sheet li { margin: .55rem 0; }
   .method-sheet p, .method-sheet li { color: var(--c-text-soft); font-size: .88rem; }
-  .next-stage { margin-top: 2.2rem; }
-  .next-stage h2 { margin-bottom: .5rem !important; font-size: 1.15rem !important; }
-  .next-stage > ul { margin: 0; padding-left: 1.2rem; }
-  .next-stage > ul li { margin: .4rem 0; }
-  .next-stage details { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--c-rule); }
-  .next-stage details ul { columns: 2; }
   @media (max-width: 620px) {
     .study-map-header { align-items: flex-start; flex-direction: column; }
     .route-milestones { grid-template-columns: 1fr; gap: .25rem; }
     .round-route-grid { grid-template-columns: 1fr; }
     .plan-sheet > header, .record-sheet > header { flex-direction: column; }
+    .plan-metrics { grid-template-columns: 1fr; }
     .start-actions { align-items: stretch; flex-direction: column; }
     .start-actions a { text-align: center; }
-    .next-stage details ul { columns: 1; }
   }
 </style>
