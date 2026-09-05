@@ -39,6 +39,23 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     <div class="external-blockers" data-plan-blockers hidden><strong>Prepare separately</strong><ul></ul></div>
   </section>
 
+  <section class="study-map" data-study-map hidden aria-labelledby="study-map-heading">
+    <header class="study-map-header">
+      <div><p class="section-kicker">Your study map</p><h2 id="study-map-heading" data-route-title>Study the loop you actually have.</h2><p data-route-summary></p></div>
+      <span class="study-map-week" data-route-week></span>
+    </header>
+    <div class="route-milestones" data-route-milestones></div>
+    <section class="gap-route" aria-labelledby="gap-route-heading">
+      <header><h3 id="gap-route-heading">Start with these gaps</h3><span>From your evidence check</span></header>
+      <div class="gap-route-grid" data-gap-route-list></div>
+    </section>
+    <div class="round-route-grid" data-round-route-grid></div>
+    <details class="role-sequence" data-role-sequence>
+      <summary><strong data-role-sequence-title>Role sequence</strong><span>Study in order</span></summary>
+      <ol data-role-sequence-list></ol>
+    </details>
+  </section>
+
   <section id="queue" class="record-sheet">
     <header>
       <div><p class="section-kicker">Practice record</p><h2>Due and recent work</h2></div>
@@ -98,6 +115,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 <script>
   import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, replacePrepProgress, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
   import { clearPrepPlan, currentPlanWeek, loadPrepPlan, nextPrepTasks, parsePrepBackup, savePrepPlan } from '../../utils/prepPlan';
+  import { getRolePath } from '../../data/rolePaths';
+  import { INTERVIEW_ROUNDS } from '../../data/prepCurriculum';
   import { clearActivityProgress, loadActivityProgress, replaceActivityProgress } from '../../utils/activityProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
@@ -122,6 +141,123 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     link.append(strong, span);
     item.append(link);
     return item;
+  }
+
+  const roundMethods: Record<string, { how: string; repeat: string }> = {
+    'ml-breadth': { how: 'Read one visual lesson, close it, then explain the mechanism, assumptions, failure mode, and one alternative in eight minutes.', repeat: 'Retry in two days with a different topic and one “why?” follow-up.' },
+    coding: { how: 'Use Practice Mode: write the contract, examples, baseline, edge cases, and complexity before optimizing.', repeat: 'Retry in two to three days without looking at the reference implementation.' },
+    'agentic-codebase': { how: 'Map the repository, give an agent one bounded change, inspect every diff, and run focused tests before widening the task.', repeat: 'Repeat weekly with a new codebase or failure; keep one unaided implementation session.' },
+    'ml-system-design': { how: 'Scope the user and failure cost, then draw data, model, evaluation, serving, monitoring, and rollback before naming tools.', repeat: 'Retry in three days with a changed scale, latency, or reliability constraint.' },
+    'project-deep-dive': { how: 'Record a 90-second opening, then rehearse three decisions with ownership, alternatives, evidence, failure, and update.', repeat: 'Repeat weekly with a new skeptical follow-up or observer.' },
+    'technical-strategy': { how: 'Choose the problem, portfolio order, decision rights, stop conditions, migration cost, and what remains reversible.', repeat: 'Use the upper-IC path weekly; get an experienced person to challenge one premise.' },
+    'technical-presentation': { how: 'Practice the talk from claims and decisions, not a script. Reserve time for interruption and technical descent.', repeat: 'Record one full run, repair three moments, then run it again after two days.' },
+    behavioral: { how: 'Use a real story: situation, your decision, conflict or failure, measured result, and what you changed afterward.', repeat: 'Retell from prompts once a week; change the follow-up, not the facts.' },
+    'values-mission': { how: 'Name the tension, affected people, principle, decision, consequence, and where new evidence would change your view.', repeat: 'Practice with pushback after three days; avoid slogans and invented certainty.' },
+    'product-experimentation': { how: 'State the decision and causal question, choose the unit and metric, add guardrails, then define the ship rule.', repeat: 'Retry in three days with a different source of bias or product constraint.' },
+    'research-depth': { how: 'State the claim, strongest alternative explanation, ablation, uncertainty, and the result that would change your mind.', repeat: 'Critique a new paper or method weekly, under a fixed time limit.' },
+    'research-work-sample': { how: 'List competing hypotheses, choose the smallest discriminating probes, measure them, and give a short evidence readout.', repeat: 'Run a new case after three to seven days; do not reuse the same diagnosis.' },
+    'math-oral': { how: 'Derive without notes, check dimensions and assumptions, then answer one changed-condition follow-up aloud.', repeat: 'Repeat every three to four days until the derivation is reliable under time pressure.' },
+    'systems-infrastructure': { how: 'Estimate workload, memory, communication, latency, cost, failure recovery, and the bottleneck before choosing parallelism.', repeat: 'Retry in three days with a different scale or hardware constraint.' },
+  };
+
+  function textElement(tag: string, className: string, text: string): HTMLElement {
+    const element = document.createElement(tag);
+    element.className = className;
+    element.textContent = text;
+    return element;
+  }
+
+  function routeLink(label: string, href: string): HTMLAnchorElement {
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = label;
+    return link;
+  }
+
+  function renderStudyMap(plan: ReturnType<typeof loadPrepPlan>): void {
+    const map = document.querySelector<HTMLElement>('[data-study-map]');
+    if (!map) return;
+    if (!plan) {
+      map.hidden = true;
+      return;
+    }
+    map.hidden = false;
+    const week = currentPlanWeek(plan);
+    const title = map.querySelector<HTMLElement>('[data-route-title]');
+    const summary = map.querySelector<HTMLElement>('[data-route-summary]');
+    const weekLabel = map.querySelector<HTMLElement>('[data-route-week]');
+    if (title) title.textContent = `${plan.roleLabel} study map`;
+    if (summary) summary.textContent = `${plan.selectedRounds.length} confirmed rounds · ${plan.weeklyHours} hours/week · ${plan.horizon} weeks. Follow the round cards in order, then use the retry queue below.`;
+    if (weekLabel) weekLabel.textContent = `Week ${week} of ${plan.horizon}`;
+
+    const milestones = map.querySelector<HTMLElement>('[data-route-milestones]');
+    if (milestones) {
+      const phase = week === 1 ? 'Baseline' : week === plan.horizon ? 'Mixed practice' : 'Repair';
+      milestones.replaceChildren(
+        textElement('div', 'route-milestone route-milestone--active', `NOW · ${phase}`),
+        textElement('div', 'route-milestone', 'NEXT · Retry the weakest round'),
+        textElement('div', 'route-milestone', 'THEN · Run one mixed simulation'),
+      );
+    }
+
+    const grid = map.querySelector<HTMLElement>('[data-round-route-grid]');
+    if (grid) {
+      grid.replaceChildren();
+      plan.selectedRounds.forEach((roundId) => {
+        const round = INTERVIEW_ROUNDS.find((item) => item.id === roundId);
+        if (!round) return;
+        const method = roundMethods[round.id] ?? { how: 'Attempt one representative question closed-book, compare against the reference, and record the missing step.', repeat: 'Retry after two or three days with a changed assumption.' };
+        const card = document.createElement('article');
+        card.className = 'round-route-card';
+        card.append(textElement('p', 'round-route-label', round.label));
+        card.append(textElement('h3', '', round.description));
+        const study = document.createElement('p');
+        study.className = 'round-route-method';
+        study.append(textElement('strong', '', 'How: '), document.createTextNode(method.how));
+        card.append(study);
+        const repeat = document.createElement('p');
+        repeat.className = 'round-route-repeat';
+        repeat.append(textElement('strong', '', 'Repeat: '), document.createTextNode(method.repeat));
+        card.append(repeat);
+        const links = document.createElement('div');
+        links.className = 'round-route-links';
+        round.starterLinks.slice(0, 3).forEach((starter) => links.append(routeLink(starter.label, starter.href)));
+        card.append(links);
+        grid.append(card);
+      });
+    }
+
+    const gapList = map.querySelector<HTMLElement>('[data-gap-route-list]');
+    if (gapList) {
+      gapList.replaceChildren(...plan.topGaps.slice(0, 3).map((gap) => {
+        const card = document.createElement('article');
+        card.className = 'gap-route-card';
+        const heading = document.createElement('div');
+        heading.className = 'gap-route-heading';
+        heading.append(textElement('strong', '', gap.label), textElement('span', '', `${gap.rating}/5`));
+        card.append(heading, textElement('p', '', gap.description));
+        const links = document.createElement('div');
+        links.className = 'gap-route-links';
+        gap.starterLinks.slice(0, 2).forEach((starter) => links.append(routeLink(starter.label, starter.href)));
+        card.append(links);
+        return card;
+      }));
+    }
+
+    const rolePath = getRolePath(plan.role);
+    const sequenceTitle = map.querySelector<HTMLElement>('[data-role-sequence-title]');
+    const sequenceList = map.querySelector<HTMLOListElement>('[data-role-sequence-list]');
+    if (sequenceTitle) sequenceTitle.textContent = `${rolePath?.title ?? plan.roleLabel} sequence`;
+    if (sequenceList) {
+      sequenceList.replaceChildren(...(rolePath?.sequence ?? []).map((step, index) => {
+        const item = document.createElement('li');
+        const number = textElement('span', 'sequence-number', String(index + 1).padStart(2, '0'));
+        const body = document.createElement('div');
+        body.append(routeLink(step.title, step.href), textElement('p', '', step.detail));
+        item.append(number, body);
+        return item;
+      }));
+    }
   }
 
   function renderPlan(records: PracticeProgressRecord[]): void {
@@ -235,6 +371,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   function render(): void {
     const records = loadPrepProgress().sort((left, right) => (left.dueOn ?? '9999').localeCompare(right.dueOn ?? '9999'));
     renderPlan(records);
+    renderStudyMap(loadPrepPlan());
     const due = records.filter((record) => record.dueOn !== null && record.dueOn <= today);
     const other = records.filter((record) => !due.includes(record));
     const attempts = records.reduce((sum, record) => sum + record.attempts, 0);
@@ -314,6 +451,47 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .storage-warning { margin: 0 0 1rem; padding: .75rem .85rem; border-left: 3px solid #b45309; background: var(--c-bg-tint); color: var(--c-text-soft); font-size: .82rem; }
   .section-kicker { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
   .start-sheet, .plan-sheet, .record-sheet { margin: 0 0 1.7rem; padding: .8rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .study-map { margin: 0 0 1.7rem; padding: .9rem 0 1.1rem; border-top: 2px solid var(--c-text); border-bottom: 1px solid var(--c-rule); }
+  .study-map[hidden] { display: none; }
+  .study-map-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+  .study-map-header h2 { margin: .15rem 0 .35rem !important; font-size: 1.15rem !important; }
+  .study-map-header [data-route-summary] { max-width: 38rem; margin: 0; color: var(--c-muted); font-size: .76rem; line-height: 1.45; }
+  .study-map-week { flex: 0 0 auto; padding: .35rem .5rem; border: 1px solid var(--c-rule); color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; }
+  .route-milestones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; margin: 1rem 0; }
+  .route-milestone { padding: .45rem .5rem; border-top: 2px solid var(--c-rule); color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; }
+  .route-milestone--active { border-top-color: var(--c-accent); color: var(--c-accent); }
+  .gap-route { margin: .9rem 0; padding: .7rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .gap-route > header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+  .gap-route h3 { margin: 0 !important; font-size: .82rem !important; }
+  .gap-route > header span { color: var(--c-muted); font-size: .66rem; }
+  .gap-route-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin-top: .55rem; }
+  .gap-route-card { min-width: 0; padding: .55rem .6rem; background: var(--c-bg-tint); }
+  .gap-route-heading { display: flex; justify-content: space-between; gap: .4rem; }
+  .gap-route-heading strong { font-size: .72rem; line-height: 1.3; }
+  .gap-route-heading span { flex: 0 0 auto; color: var(--c-accent); font-family: var(--font-mono); font-size: .6rem; }
+  .gap-route-card p { margin: .3rem 0 0; color: var(--c-muted); font-size: .67rem; line-height: 1.4; }
+  .gap-route-links { display: flex; flex-wrap: wrap; gap: .3rem .55rem; margin-top: .5rem; }
+  .gap-route-links a { color: var(--c-accent); font-size: .64rem; font-weight: 650; text-decoration: none; }
+  .gap-route-links a:hover { text-decoration: underline; }
+  .round-route-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+  .round-route-card { min-width: 0; padding: .75rem; border: 1px solid var(--c-rule); background: var(--c-bg-tint); }
+  .round-route-label { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .round-route-card h3 { margin: .3rem 0 .5rem !important; font-size: .82rem !important; line-height: 1.3; }
+  .round-route-method, .round-route-repeat { margin: .4rem 0 0; color: var(--c-text-soft); font-size: .72rem; line-height: 1.45; }
+  .round-route-method strong, .round-route-repeat strong { color: var(--c-text); }
+  .round-route-repeat { color: var(--c-muted); }
+  .round-route-links { display: flex; flex-wrap: wrap; gap: .35rem .7rem; margin-top: .7rem; padding-top: .55rem; border-top: 1px solid var(--c-rule); }
+  .round-route-links a { color: var(--c-accent); font-size: .68rem; font-weight: 650; text-decoration: none; }
+  .round-route-links a:hover { text-decoration: underline; }
+  .role-sequence { margin-top: .75rem; }
+  .role-sequence summary { display: flex; justify-content: space-between; gap: .75rem; cursor: pointer; font-size: .78rem; }
+  .role-sequence summary span { color: var(--c-muted); font-size: .68rem; font-weight: 400; }
+  .role-sequence ol { margin: .7rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
+  .role-sequence li { display: grid; grid-template-columns: 1.7rem minmax(0, 1fr); gap: .55rem; margin: 0; padding: .55rem 0; border-bottom: 1px solid var(--c-rule); }
+  .sequence-number { color: var(--c-accent); font-family: var(--font-mono); font-size: .64rem; }
+  .role-sequence a { color: var(--c-text); font-size: .74rem; font-weight: 650; text-decoration: none; }
+  .role-sequence a:hover { color: var(--c-accent); text-decoration: underline; }
+  .role-sequence p { margin: .15rem 0 0; color: var(--c-muted); font-size: .7rem; line-height: 1.4; }
   .start-sheet h2, .plan-sheet h2, .record-sheet h2 { margin: .15rem 0 .35rem !important; font-size: 1.05rem !important; }
   .start-sheet > p:not(.section-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); }
   .start-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-top: .9rem; }
@@ -376,6 +554,10 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .next-stage details { margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--c-rule); }
   .next-stage details ul { columns: 2; }
   @media (max-width: 620px) {
+    .study-map-header { align-items: flex-start; flex-direction: column; }
+    .route-milestones { grid-template-columns: 1fr; gap: .25rem; }
+    .gap-route-grid { grid-template-columns: 1fr; }
+    .round-route-grid { grid-template-columns: 1fr; }
     .plan-sheet > header, .record-sheet > header { flex-direction: column; }
     .start-actions { align-items: stretch; flex-direction: column; }
     .start-actions a { text-align: center; }
