@@ -52,7 +52,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   pagefindIgnore
 >
   <div class="visual-review-mode" data-visual-review-mode data-pagefind-ignore="all">
-    <nav class="review-toolbar" aria-label="Visual review context">
+    <nav class="review-toolbar" data-review-toolbar aria-label="Visual review context" hidden>
       <a href={`/#curriculum`} data-review-back><span aria-hidden="true">←</span> Library</a>
       <p><span data-review-book>Book {firstEntry.volumeNumber} · Chapter {firstEntry.chapterIndex}</span><strong data-review-chapter>{firstEntry.chapterTitle}</strong></p>
       <div class="review-toolbar-actions">
@@ -90,6 +90,44 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       </div>
     </nav>
 
+    <section class="review-index" data-review-index aria-labelledby="review-index-title">
+      <header class="review-index-header">
+        <div>
+          <p class="fallback-kicker">Visual library</p>
+          <h1 id="review-index-title">Choose a visual lesson.</h1>
+          <p>Pick a chapter, then open any lesson in the visual review workspace. Each visual leads with the mechanism before the explanation.</p>
+        </div>
+        <a class="review-index-back" href="/#curriculum"><span aria-hidden="true">←</span> Browse the library</a>
+      </header>
+
+      <div class="review-index-list">
+        {reviewContents.map(({ volume, chapters }, volumeIndex) => (
+          <details class="review-index-volume" open={volumeIndex === 0}>
+            <summary>
+              <span><small>{volume.number} · {volume.shortTitle}</small><strong>{volume.title}</strong></span>
+              <span>{chapters.length} chapters · {chapters.reduce((total, item) => total + item.entries.length, 0)} visuals</span>
+            </summary>
+            <div class="review-index-chapters">
+              {chapters.map(({ chapter, entries }, chapterIndex) => (
+                <details class="review-index-chapter" open={volumeIndex === 0 && chapterIndex === 0}>
+                  <summary><strong>{chapter.title}</strong><span>{entries.length} visuals</span></summary>
+                  <ol>
+                    {entries.map((entry) => (
+                      <li>
+                        <a href={entry.href} data-review-index-entry={entry.slug} aria-label={`Open ${entry.title} in visual review`}>
+                          <span>{entry.title}</span><span aria-hidden="true">→</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              ))}
+            </div>
+          </details>
+        ))}
+      </div>
+    </section>
+
     <div class="review-workspace" data-review-workspace>
       <section class="review-stage" data-review-stage hidden aria-hidden="true" aria-busy="true">
         <VisualReviewCard
@@ -118,7 +156,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
 
     <Subscribe placement="review" heading="Get ML from Primitives notes after your visual review." />
 
-    <section class="review-fallback" data-review-fallback>
+    <section class="review-fallback" data-review-fallback hidden>
       <p class="fallback-kicker">Visual review</p>
       <h1>Review the complete library visually.</h1>
       <p>JavaScript adds one-visual navigation and the explanation panel. Every lesson remains available through the library.</p>
@@ -171,6 +209,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     const lifecycle = new AbortController();
     const listenerOptions = { signal: lifecycle.signal };
     const workspace = root.querySelector<HTMLElement>('[data-review-workspace]');
+    const reviewToolbar = root.querySelector<HTMLElement>('[data-review-toolbar]');
     const stage = root.querySelector<HTMLElement>('[data-review-stage]');
     const fallback = root.querySelector<HTMLElement>('[data-review-fallback]');
     const controls = root.querySelector<HTMLElement>('[data-review-controls]');
@@ -181,6 +220,8 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     const visualHost = root.querySelector<HTMLElement>('[data-review-visual-host]');
     const sourceHost = root.querySelector<HTMLElement>('[data-review-source-host]');
     const sourceDetails = root.querySelector<HTMLDetailsElement>('[data-review-source-details]');
+    const reviewIndex = root.querySelector<HTMLElement>('[data-review-index]');
+    const reviewIndexEntries = [...root.querySelectorAll<HTMLAnchorElement>('[data-review-index-entry]')];
     const position = root.querySelector<HTMLElement>('[data-review-position]');
     const counter = root.querySelector<HTMLElement>('[data-review-counter]');
     const book = root.querySelector<HTMLElement>('[data-review-book]');
@@ -274,6 +315,23 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       return index >= 0 ? index : 0;
     }
 
+    function showIndex() {
+      requestToken += 1;
+      reviewToolbar?.setAttribute('hidden', '');
+      reviewIndex?.removeAttribute('hidden');
+      reviewIndex?.setAttribute('aria-hidden', 'false');
+      stage?.setAttribute('hidden', '');
+      stage?.setAttribute('aria-hidden', 'true');
+      stage?.setAttribute('aria-busy', 'false');
+      explanation?.setAttribute('hidden', '');
+      explanation?.setAttribute('aria-hidden', 'true');
+      explanation?.setAttribute('inert', '');
+      controls?.setAttribute('hidden', '');
+      workspace?.classList.remove('is-explanation-open', 'is-explanation-closing');
+      contentsDetails?.removeAttribute('open');
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
     function renderExplanation(article: Document, entry: ReviewEntry) {
       if (!explanationHost || !explanationTitle || !openArticle) return;
       const articleBody = article.querySelector<HTMLElement>('#answer');
@@ -354,6 +412,9 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       const entry = entries[boundedIndex];
       const token = ++requestToken;
       currentIndex = boundedIndex;
+      reviewToolbar?.removeAttribute('hidden');
+      reviewIndex?.setAttribute('hidden', '');
+      reviewIndex?.setAttribute('aria-hidden', 'true');
       syncContents(entry);
       stage.setAttribute('aria-busy', 'true');
       visualHost.setAttribute('aria-busy', 'true');
@@ -405,7 +466,10 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
         if (fallback) fallback.hidden = true;
         stage.setAttribute('aria-busy', 'false');
         visualHost.setAttribute('aria-busy', 'false');
-        if (options.push) history.pushState({ slug: entry.slug }, '', `#${encodeURIComponent(entry.slug)}`);
+        if (options.push) {
+          history.pushState({ slug: entry.slug }, '', `#${encodeURIComponent(entry.slug)}`);
+          window.dispatchEvent(new Event('review-route-change'));
+        }
         else if (!window.location.hash) history.replaceState({ slug: entry.slug }, '', `#${encodeURIComponent(entry.slug)}`);
         if (announcer) announcer.textContent = `${entry.title}, visual ${boundedIndex + 1} of ${entries.length}`;
         if (options.focus) {
@@ -445,8 +509,9 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
 
     previous?.addEventListener('click', () => void showEntry(currentIndex - 1, { push: true, focus: true }), listenerOptions);
     next?.addEventListener('click', () => void showEntry(currentIndex + 1, { push: true, focus: true }), listenerOptions);
-    contentsEntries.forEach((link) => link.addEventListener('click', (event) => {
-      const index = entries.findIndex((entry) => entry.slug === link.dataset.reviewContentEntry);
+    [...contentsEntries, ...reviewIndexEntries].forEach((link) => link.addEventListener('click', (event) => {
+      const slug = link.dataset.reviewContentEntry ?? link.dataset.reviewIndexEntry;
+      const index = entries.findIndex((entry) => entry.slug === slug);
       if (index < 0) return;
       event.preventDefault();
       if (contentsDetails) contentsDetails.open = false;
@@ -466,11 +531,13 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     explanationToggle?.addEventListener('click', () => setExplanation(!explanationOpen), listenerOptions);
     explanationClose?.addEventListener('click', () => setExplanation(false), listenerOptions);
     desktopExplanation.addEventListener('change', () => setExplanation(explanationOpen, false), listenerOptions);
-    window.addEventListener('popstate', () => void showEntry(indexFromHash()), listenerOptions);
-    window.addEventListener('hashchange', () => {
-      const nextIndex = indexFromHash();
-      if (nextIndex !== currentIndex) void showEntry(nextIndex);
-    }, listenerOptions);
+    function syncRoute() {
+      if (window.location.hash) void showEntry(indexFromHash());
+      else showIndex();
+    }
+
+    window.addEventListener('popstate', syncRoute, listenerOptions);
+    window.addEventListener('hashchange', syncRoute, listenerOptions);
     document.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
@@ -489,7 +556,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     }, { passive: true, signal: lifecycle.signal });
     document.addEventListener('astro:before-preparation', () => lifecycle.abort(), { once: true, signal: lifecycle.signal });
 
-    void showEntry(indexFromHash());
+    syncRoute();
   }
 </script>
 
@@ -513,6 +580,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     background: color-mix(in srgb, var(--c-bg) 94%, transparent);
     backdrop-filter: blur(12px);
   }
+  .review-toolbar[hidden] { display: none; }
   .review-toolbar > a { color: var(--c-text-soft); font-size: .72rem; text-decoration: none; }
   .review-toolbar > a:hover { color: var(--c-accent); }
   .review-toolbar p { min-width: 0; margin: 0; text-align: center; }
@@ -603,6 +671,37 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   .review-contents-chapter a { display: block; padding: .3rem .45rem; border-left: 2px solid transparent; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .68rem; line-height: 1.3; text-decoration: none; }
   .review-contents-chapter a:hover { color: var(--c-accent); background: var(--c-bg-tint); }
   .review-contents-chapter a[aria-current='page'] { border-left-color: var(--c-accent); background: var(--c-accent-soft); color: var(--c-text); font-weight: 650; }
+  .review-index { width: min(100%, 76rem); margin: 0 auto; padding: clamp(1.5rem, 4vw, 3.5rem) var(--gutter) 4.5rem; }
+  .review-index[hidden] { display: none; }
+  .review-index-header { display: flex; align-items: end; justify-content: space-between; gap: 2rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--c-rule); }
+  .review-index-header h1 { margin: .35rem 0 .55rem; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1.05; }
+  .review-index-header p:not(.fallback-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .92rem; line-height: 1.55; }
+  .review-index-back { flex: 0 0 auto; color: var(--c-text-soft); font-size: .72rem; text-decoration: none; }
+  .review-index-back:hover { color: var(--c-accent); }
+  .review-index-list { margin-top: 1rem; }
+  .review-index-volume { border-bottom: 1px solid var(--c-rule); }
+  .review-index-volume > summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem .2rem; color: var(--c-text-soft); cursor: pointer; list-style: none; }
+  .review-index-volume > summary::-webkit-details-marker,
+  .review-index-chapter > summary::-webkit-details-marker { display: none; }
+  .review-index-volume > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); font-size: 1.1rem; }
+  .review-index-volume[open] > summary::after { content: '−'; }
+  .review-index-volume > summary > span:first-child { display: grid; gap: .18rem; }
+  .review-index-volume > summary small { color: var(--c-accent); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .review-index-volume > summary strong { color: var(--c-text); font-size: 1.05rem; }
+  .review-index-volume > summary > span:last-of-type { color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; }
+  .review-index-chapters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--c-rule); }
+  .review-index-chapter { min-width: 0; padding: 1rem 1rem 1.15rem 0; border-bottom: 1px solid var(--c-rule); }
+  .review-index-chapter:nth-child(even) { padding-right: 0; padding-left: 1rem; border-left: 1px solid var(--c-rule); }
+  .review-index-chapter > summary { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; color: var(--c-text-soft); cursor: pointer; list-style: none; }
+  .review-index-chapter > summary::after { color: var(--c-muted); content: '+'; font-family: var(--font-mono); }
+  .review-index-chapter[open] > summary::after { content: '−'; }
+  .review-index-chapter > summary strong { font-size: .78rem; }
+  .review-index-chapter > summary span { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; white-space: nowrap; }
+  .review-index-chapter ol { margin: .65rem 0 0; padding: 0; list-style: none; }
+  .review-index-chapter li { margin: 0; border-top: 1px solid color-mix(in srgb, var(--c-rule) 65%, transparent); }
+  .review-index-chapter a { display: flex; align-items: baseline; justify-content: space-between; gap: .65rem; padding: .45rem .35rem; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .76rem; line-height: 1.35; text-decoration: none; }
+  .review-index-chapter a span:last-child { flex: 0 0 auto; color: var(--c-muted); font-family: var(--font-ui); }
+  .review-index-chapter a:hover { background: var(--c-accent-soft); color: var(--c-accent); }
   .review-workspace { width: min(100%, 96rem); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 0px; transition: grid-template-columns 360ms cubic-bezier(.2,.8,.2,1); }
   .review-workspace.is-explanation-open { grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem); }
   .review-stage { min-width: 0; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding: clamp(.8rem, 2vw, 1.5rem) var(--gutter); }
@@ -692,6 +791,10 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
   :global(.review-error span) { color: var(--c-muted); font-size: .75rem; }
 
   @media (max-width: 720px) {
+    .review-index-header { align-items: flex-start; flex-direction: column; gap: 1rem; }
+    .review-index-chapters { display: block; }
+    .review-index-chapter,
+    .review-index-chapter:nth-child(even) { padding: .9rem 0 1rem; border-left: 0; }
     .review-workspace { display: block; transition: none; }
     .review-stage { max-height: none; overflow: visible; opacity: 1; transform: none; }
     .review-workspace.is-explanation-open .review-stage { max-height: none; min-height: calc(100dvh - var(--header-height) - 7.7rem); padding-top: clamp(.8rem, 2vw, 1.5rem); padding-bottom: clamp(.8rem, 2vw, 1.5rem); opacity: 1; transform: none; }

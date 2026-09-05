@@ -42,7 +42,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
     </a>
 
     {showReadingMode && (
-      <nav class="reading-mode-switch reading-mode-switch--persistent" aria-label="Reading mode">
+      <nav class="reading-mode-switch reading-mode-switch--persistent" aria-label="Reading mode" data-reading-mode-nav>
         {readingModes.map((mode) => (
           <a
             href={mode.href}
@@ -99,9 +99,13 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 </header>
 
 <script>
+  const readingModeNav = document.querySelector<HTMLElement>('[data-reading-mode-nav]');
+
   function syncReadingMode() {
     const visualActive = window.location.pathname === '/review/'
       || (window.location.pathname === '/' && window.location.hash !== '#curriculum');
+    const reviewIndex = window.location.pathname === '/review/' && !window.location.hash;
+    readingModeNav?.toggleAttribute('hidden', reviewIndex);
     document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode]').forEach((link) => {
       const active = link.dataset.readingMode === (visualActive ? 'visual' : 'full');
       link.classList.toggle('active', active);
@@ -112,6 +116,8 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 
   syncReadingMode();
   window.addEventListener('hashchange', syncReadingMode);
+  window.addEventListener('popstate', syncReadingMode);
+  window.addEventListener('review-route-change', syncReadingMode);
   document.addEventListener('astro:page-load', syncReadingMode);
 </script>
 
