@@ -49,6 +49,7 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
         <p class="prep-eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>
         <p>{lede}</p>
+        <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the printable workbook PDF</a><span>Blank companion pages for planning, evidence, repairs, and readiness gates.</span></p>
       </header>
 
       <article class="prep-content">
@@ -94,7 +95,11 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
   .prep-hero { max-width: 42rem; margin-bottom: 1.4rem; padding-bottom: .9rem; border-bottom: 1px solid var(--c-rule); }
   .prep-eyebrow { margin: 0 0 .4rem !important; color: var(--c-muted) !important; font-size: .68rem !important; font-weight: 500; }
   .prep-hero h1 { margin: 0 0 .45rem; font-size: clamp(1.65rem, 4vw, 2.15rem); line-height: 1.14; letter-spacing: -.02em; }
-  .prep-hero > p:last-child { max-width: 40rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .94rem; line-height: 1.5; }
+  .prep-hero > p:not(.prep-eyebrow):not(.prep-download) { max-width: 40rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .94rem; line-height: 1.5; }
+  .prep-download { display: flex; flex-wrap: wrap; gap: .25rem .7rem; align-items: baseline; margin-top: .7rem !important; font-family: var(--font-ui) !important; font-size: .72rem !important; }
+  .prep-download a { color: var(--c-accent); font-weight: 650; text-decoration: none; }
+  .prep-download a:hover { text-decoration: underline; }
+  .prep-download span { color: var(--c-muted); }
   .prep-content :global(h2) { margin: 2rem 0 .6rem; font-size: 1.2rem; scroll-margin-top: var(--sticky-offset); }
   .prep-content :global(h3) { margin: 1.35rem 0 .4rem; font-size: 1rem; }
   .prep-content :global(p), .prep-content :global(li) { overflow-wrap: anywhere; line-height: 1.55; }

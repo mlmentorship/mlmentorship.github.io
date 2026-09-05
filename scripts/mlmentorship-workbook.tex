@@ -1,0 +1,170 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=.7in,includeheadfoot]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{amssymb}
+
+\definecolor{ink}{HTML}{202124}
+\definecolor{muted}{HTML}{5F6368}
+\definecolor{accent}{HTML}{A85F32}
+\definecolor{rule}{HTML}{D9D4CE}
+\definecolor{wash}{HTML}{F5F1EC}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent,pdftitle={ML Interview Workbook},pdfauthor={mlmentorship}}
+\setlength{\headheight}{22pt}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textsf{mlmentorship}}
+\rhead{\textsf{ML interview workbook}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{rule}\leaders\hrule height \headrulewidth\hfill}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\emergencystretch=3em
+\sloppy
+\setlist{leftmargin=1.35em,itemsep=2pt,topsep=2pt}
+\newcommand{\linefield}[1]{\textbf{#1}\hspace{.25em}\rule{.72\linewidth}{.35pt}}
+\newcommand{\longline}{\rule{\hsize}{.35pt}\\[.55em]}
+\newcommand{\boxline}[1]{\fcolorbox{rule}{wash}{\parbox[t][#1][t]{.96\linewidth}{\vspace{.02in}}}}
+\newcommand{\sectionrule}{\vspace{.1in}\noindent{\color{rule}\rule{\linewidth}{.5pt}}\vspace{.1in}}
+
+\begin{document}
+
+{\color{accent}\sffamily\small ML FROM PRIMITIVES \hfill 2026 EDITION}
+\vspace{.25in}
+{\Huge\bfseries ML Interview Workbook\par}
+\vspace{.08in}
+{\large A compact, printable companion for evidence-based preparation.\par}
+\vspace{.18in}
+\fcolorbox{accent}{wash}{\parbox{.94\linewidth}{\textbf{Use this with the visual field guide.} Choose the work your loop actually requires, attempt it closed-book, record what happened, and schedule the smallest repair. This PDF is a blank companion; your private, browser-local plan lives in the Workbook.}}
+\vspace{.18in}
+\textbf{Candidate:} \rule{.25\linewidth}{.35pt}\hfill \textbf{Loop date:} \rule{.16\linewidth}{.35pt}
+
+\section*{How to use it}
+\begin{enumerate}
+  \item \textbf{Start from evidence.} Record confirmed rounds, time available, and recent closed-book performance.
+  \item \textbf{Choose three repairs.} Prefer high-relevance gaps over broad coverage.
+  \item \textbf{Attempt, compare, retry.} Keep the answer closed until the attempt ends; score observable behavior; schedule the next attempt.
+  \item \textbf{Graduate carefully.} Two spaced successful attempts plus an unfamiliar follow-up is stronger evidence than fluent repetition.
+\end{enumerate}
+
+\sectionrule
+\section*{1. Loop snapshot}
+\textbf{Target role:} \rule{.28\linewidth}{.35pt}\hfill \textbf{Level:} \rule{.16\linewidth}{.35pt}\\[.5em]
+\textbf{Primary domain:} \rule{.2\linewidth}{.35pt}\hfill \textbf{Weeks available:} \rule{.12\linewidth}{.35pt}\\[.5em]
+\textbf{Hours per week:} \rule{.16\linewidth}{.35pt}\hfill \textbf{Interview date:} \rule{.14\linewidth}{.35pt}\\[.5em]
+\vspace{.08in}
+\textbf{Confirmed round formats}\par
+\begin{tabularx}{\linewidth}{@{}X X@{}}
+$\square$ ML breadth / fundamentals & $\square$ ML system design \\
+$\square$ Modeling / experimentation & $\square$ Training / debugging \\
+$\square$ LLM systems / inference & $\square$ Project deep-dive \\
+$\square$ Behavioral / leadership & $\square$ Research / work sample \\
+$\square$ Coding / implementation & $\square$ Other: \rule{.35\linewidth}{.35pt}
+\end{tabularx}
+
+\newpage
+\section*{2. Evidence scorecard}
+Score only recent timed, closed-book evidence. \textbf{0} means not attempted; \textbf{3} means workable timed answer; \textbf{5} means two spaced successes plus an unfamiliar follow-up.
+\vspace{.08in}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\linewidth}{@{}p{.31\linewidth} c c c c c X@{}}
+\toprule
+Area & 0 & 1 & 2 & 3 & 4 & 5 / evidence note \\
+\midrule
+Fundamentals & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+Production / systems & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+LLM systems & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+Retrieval / search & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+System design & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+Experimentation & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+Behavioral / leadership & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+Math / research & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+Coding / implementation & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
+\bottomrule
+\end{tabularx}
+
+\newpage
+\section*{3. First three repairs}
+Choose repairs by relevance, evidence, and leverage. A repair should name an action, not a topic.
+\vspace{.08in}
+\begin{tabularx}{\linewidth}{@{}p{.07\linewidth} X@{}}
+\toprule
+\textbf{01} & \textbf{Gap / round:} \rule{.48\hsize}{.35pt}\\[-1pt]
+& \textbf{Closed-book action:} \rule{.45\hsize}{.35pt}\\[-1pt]
+& \textbf{Observable success:} \rule{.42\hsize}{.35pt}\\[-1pt]
+& \textbf{Retry date:} \rule{.6\hsize}{.35pt}\\[.5em]
+\midrule
+\textbf{02} & \textbf{Gap / round:} \rule{.48\hsize}{.35pt}\\[-1pt]
+& \textbf{Closed-book action:} \rule{.45\hsize}{.35pt}\\[-1pt]
+& \textbf{Observable success:} \rule{.42\hsize}{.35pt}\\[-1pt]
+& \textbf{Retry date:} \rule{.6\hsize}{.35pt}\\[.5em]
+\midrule
+\textbf{03} & \textbf{Gap / round:} \rule{.48\hsize}{.35pt}\\[-1pt]
+& \textbf{Closed-book action:} \rule{.45\hsize}{.35pt}\\[-1pt]
+& \textbf{Observable success:} \rule{.42\hsize}{.35pt}\\[-1pt]
+& \textbf{Retry date:} \rule{.6\hsize}{.35pt}\\
+\bottomrule
+\end{tabularx}
+
+\section*{4. Story bank prompts}
+For each story, keep the ownership and evidence explicit.
+\vspace{.08in}
+\textbf{Problem / stakes}\par
+\longline\longline
+\textbf{My decision}\par
+\longline
+\textbf{Alternatives rejected}\par
+\longline
+\textbf{Evidence / result}\par
+\longline
+\textbf{Failure or surprise}\par
+\longline
+\textbf{What I would change}\par
+\longline
+
+\newpage
+\section*{5. Weekly operating loop}
+\begin{tabularx}{\linewidth}{@{}p{.23\linewidth} X@{}}
+\toprule
+\textbf{Monday} & Pick the three highest-value repairs. Name the round and observable success.\\[.5em]
+\textbf{Tuesday--Thursday} & Attempt closed-book. Use a visual lesson only after the attempt. Record the missing mechanism or decision.\\[.5em]
+\textbf{Friday} & Retry one weak item and one unfamiliar transfer. Ask one changed-assumption follow-up.\\[.5em]
+\textbf{Weekend} & Review the evidence, update the plan, and remove work that is no longer relevant.\\
+\bottomrule
+\end{tabularx}
+\vspace{.2in}
+\textbf{This week's focus}\par
+\boxline{.7in}
+\vspace{.15in}
+\textbf{What changed after an attempt?}\par
+\boxline{1.0in}
+\vspace{.15in}
+\textbf{Next action}\par
+\boxline{.7in}
+
+\section*{6. Readiness gate}
+Do not graduate a critical gap on confidence alone.
+\begin{itemize}
+  \item Two successful closed-book attempts on different days.
+  \item No critical rubric dimension remains weak.
+  \item One unfamiliar follow-up or changed assumption succeeds.
+  \item One later mixed-session attempt remains workable.
+  \item A peer, mentor, or interviewer has challenged at least one claim when possible.
+\end{itemize}
+\vspace{.1in}
+\textbf{Evidence I still need before calling this ready:}\par
+\boxline{1.0in}
+
+\vfill
+\sectionrule
+\end{document}

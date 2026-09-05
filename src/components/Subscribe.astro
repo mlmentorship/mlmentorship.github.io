@@ -130,7 +130,11 @@ const hasEmail =
     const events = eventNames[placement];
     const suppressUntil = Number(storageGet('localStorage', SUPPRESS_UNTIL_KEY) ?? '0');
     const seenThisSession = placement === 'entry' && storageGet('sessionStorage', SESSION_KEY) === '1';
-    if (suppressUntil > Date.now() || seenThisSession) { signup.hidden = true; return; }
+    const workbookUnlocked = placement === 'workbook' && storageGet('localStorage', WORKBOOK_UNLOCK_KEY) === '1';
+    if (workbookUnlocked || (placement !== 'workbook' && (suppressUntil > Date.now() || seenThisSession))) {
+      signup.hidden = true;
+      return;
+    }
 
     const emailEnabled = signup.dataset.emailEnabled === 'true';
     const formId = signup.dataset.emailForm ?? '';
@@ -160,6 +164,14 @@ const hasEmail =
       trackPublicEvent(events.confirmationSent);
       window.dispatchEvent(new Event('workbook-email-unlocked'));
     };
+    const handleProviderMessage = (event: MessageEvent) => {
+      if (event.origin !== 'https://subscribe-forms.beehiiv.com') return;
+      const payload = typeof event.data === 'string' ? event.data : JSON.stringify(event.data ?? '');
+      if (!/\b(success|confirmed|subscribed|thank\s*you|double[- ]?opt[- ]?in)\b/i.test(payload)) return;
+      if (/\b(error|failed|invalid|declined)\b/i.test(payload)) return;
+      markCompleted();
+    };
+    window.addEventListener('message', handleProviderMessage);
     const loadForm = () => {
       if (loaded || !emailEnabled || !formId) return;
       loaded = true;
