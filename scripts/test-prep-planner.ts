@@ -88,6 +88,7 @@ test('all mapped questions exist and method matches content metadata', () => {
         assert.equal(step.practice.id, getPracticeMode(step.slug, category).id, file);
         const repairSlug = step.visualHref.split('#')[1];
         assert.ok(files.some(name => name.endsWith(`-${repairSlug}.md`)), repairSlug);
+        assert.notEqual(step.repairLabel, 'Worked visual for this prompt', step.slug);
       }
     }
   }

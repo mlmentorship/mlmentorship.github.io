@@ -55,7 +55,10 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     <p class="route-protocol">Attempt first, without notes. Spend up to 15 minutes reviewing the missed rubric items and the linked visual. Close the reference and redraw, derive, or implement the missing step. Keep the scored retry for its scheduled date.</p>
     <div class="round-route-grid" data-round-route-grid></div>
     <p class="route-protocol">Two prompts per round are a starting sample, not proof of full coverage. After they hold up, use an unfamiliar follow-up from the question and ask someone to challenge the weakest claim.</p>
-    <button type="button" class="print-map" data-print-map>Print my study map</button>
+    <div class="print-actions">
+      <button type="button" class="print-map" data-print-map>Save my study map as PDF</button>
+      <span class="print-note">In the print dialog, choose Save as PDF.</span>
+    </div>
   </section>
 
   <section id="queue" class="record-sheet">
@@ -431,15 +434,32 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   const anchoredDetails = document.getElementById(window.location.hash.slice(1));
   if (anchoredDetails instanceof HTMLDetailsElement) anchoredDetails.open = true;
   render();
-  document.querySelector('[data-print-map]')?.addEventListener('click', () => window.print());
+  let printTitle: string | null = null;
+  let printTheme: string | null = null;
   const printOpenStates = new Map<HTMLDetailsElement, boolean>();
   window.addEventListener('beforeprint', () => {
-    document.querySelectorAll<HTMLDetailsElement>('.study-map details').forEach(detail => { printOpenStates.set(detail, detail.open); detail.open = true; });
+    if (!printTitle) printTitle = document.title;
+    const plan = loadPrepPlan();
+    if (plan) document.title = `${plan.roleLabel} study map | ML interview workbook`;
+    if (printOpenStates.size === 0) {
+      printTheme = document.documentElement.dataset.theme ?? null;
+      document.documentElement.dataset.theme = 'light';
+      document.querySelectorAll<HTMLDetailsElement>('.study-map details, .method-sheet, [data-other-records]').forEach(detail => {
+        printOpenStates.set(detail, detail.open);
+        detail.open = true;
+      });
+    }
   });
   window.addEventListener('afterprint', () => {
     printOpenStates.forEach((open, detail) => { detail.open = open; });
     printOpenStates.clear();
+    if (printTheme) document.documentElement.dataset.theme = printTheme;
+    else delete document.documentElement.dataset.theme;
+    printTheme = null;
+    if (printTitle) document.title = printTitle;
+    printTitle = null;
   });
+  document.querySelector('[data-print-map]')?.addEventListener('click', () => window.print());
   window.addEventListener('hashchange', () => {
     const target = document.getElementById(window.location.hash.slice(1));
     if (target instanceof HTMLDetailsElement) target.open = true;
@@ -481,12 +501,18 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .route-rubric ul { padding-left: 1.2rem; }
   .route-rubric li { margin: .45rem 0; }
   .route-history { font-size: .78rem; color: var(--c-muted); }
+  .print-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .75rem; margin-top: 1.1rem; }
   .print-map { padding: .5rem .7rem; border: 1px solid var(--c-rule); border-radius: 4px; background: var(--c-bg); color: var(--c-text); font: inherit; cursor: pointer; }
+  .print-map:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .print-note { color: var(--c-muted); font-size: .74rem; }
   @media print {
-    .print-map, .backup, .next-stage, .start-sheet, .later-tasks, .verify-button { display: none !important; }
+    html, body, .prep-page, .workbook-content, .prep-content { background: #ffffff !important; color: #18181b !important; }
+    body { transition: none !important; }
+    html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .print-actions, .backup, .next-stage, .start-sheet, .later-tasks, .verify-button, .prep-download, .storage-warning, .prep-hero { display: none !important; }
     .round-route { break-before: page; }
     .route-steps > li { break-inside: avoid; }
-    .study-map a[href^="/questions/"]::after { content: ' (mlmentorship.com' attr(href) ')'; font-size: 8pt; font-weight: 400; overflow-wrap: anywhere; }
+    .study-map a[href^="/questions/"]::after, .study-map a[href^="/review/"]::after { content: ' (mlmentorship.com' attr(href) ')'; font-size: 8pt; font-weight: 400; overflow-wrap: anywhere; }
   }
   .start-sheet h2, .plan-sheet h2, .record-sheet h2 { margin: .15rem 0 .35rem !important; font-size: 1.05rem !important; }
   .start-sheet > p:not(.section-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); }

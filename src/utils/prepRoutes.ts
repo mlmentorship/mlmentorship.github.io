@@ -58,6 +58,22 @@ const repairConcepts: Record<string, { slug: string; label: string }> = {
   'derive-logistic-regression': { slug: 'maximum-likelihood-estimation', label: 'Maximum likelihood estimation' },
   'train-100b-model': { slug: 'fsdp-and-zero', label: 'FSDP and ZeRO memory layout' },
   'reduce-llm-inference-cost-10x': { slug: 'continuous-batching', label: 'Continuous batching' },
+  'advocated-quality-over-speed': { slug: 'advocated-quality-over-speed', label: 'Quality or safety under pressure' },
+  'agentic-ml-codebase-interview': { slug: 'agentic-ml-codebase-interview', label: 'Agentic codebase method' },
+  'debug-frontier-llm-training-run': { slug: 'debug-frontier-llm-training-run', label: 'Frontier training-run diagnosis' },
+  'decide-what-to-work-on': { slug: 'decide-what-to-work-on', label: 'Prioritization and decision evidence' },
+  'defend-values-under-ethical-pressure': { slug: 'defend-values-under-ethical-pressure', label: 'Values under pressure' },
+  'derive-ml-math-under-pressure': { slug: 'derive-ml-math-under-pressure', label: 'ML derivation under pressure' },
+  'design-ai-coding-product': { slug: 'design-ai-coding-product', label: 'AI coding product design' },
+  'design-enterprise-agent-platform': { slug: 'design-enterprise-agent-platform', label: 'Enterprise agent platform design' },
+  'design-llm-red-team-program': { slug: 'design-llm-red-team-program', label: 'LLM red-team program design' },
+  'design-multi-team-ml-platform': { slug: 'design-multi-team-ml-platform', label: 'Multi-team ML platform design' },
+  'design-post-training-data-and-rl-environment': { slug: 'design-post-training-data-and-rl-environment', label: 'Post-training data and RL environment' },
+  'disagreed-with-senior': { slug: 'disagreed-with-senior', label: 'Technical disagreement and updating' },
+  'investigate-black-box-model-behavior': { slug: 'investigate-black-box-model-behavior', label: 'Black-box investigation method' },
+  'most-ambitious-project': { slug: 'most-ambitious-project', label: 'Project ownership and evidence' },
+  'present-technical-ml-project': { slug: 'present-technical-ml-project', label: 'Technical project presentation' },
+  'scope-ambiguous-problem': { slug: 'scope-ambiguous-problem', label: 'Scoping an ambiguous problem' },
 };
 
 export function questionPair(plan: PrepPlanState, roundId: RoundId): { slugs: QuestionPair; reason: string } {
