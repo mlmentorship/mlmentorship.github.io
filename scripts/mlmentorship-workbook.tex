@@ -31,6 +31,7 @@
 \setlength{\parskip}{5pt}
 \emergencystretch=3em
 \sloppy
+\setlength{\tabcolsep}{3pt}
 \setlist{leftmargin=1.35em,itemsep=2pt,topsep=2pt}
 \newcommand{\linefield}[1]{\textbf{#1}\hspace{.25em}\rule{.72\linewidth}{.35pt}}
 \newcommand{\longline}{\rule{\hsize}{.35pt}\\[.55em]}
@@ -43,18 +44,18 @@
 \vspace{.25in}
 {\Huge\bfseries ML Interview Workbook\par}
 \vspace{.08in}
-{\large A compact, printable companion for evidence-based preparation.\par}
+{\large A compact, printable workbook for ML interview preparation.\par}
 \vspace{.18in}
-\fcolorbox{accent}{wash}{\parbox{.94\linewidth}{\textbf{Use this with the visual field guide.} Choose the work your loop actually requires, attempt it closed-book, record what happened, and schedule the smallest repair. This PDF is a blank companion; your private, browser-local plan lives in the Workbook.}}
+\fcolorbox{accent}{wash}{\parbox{.94\linewidth}{\textbf{Use this to prepare for the interview you actually have.} Write down the loop, choose the most important gap, attempt it closed-book, record what happened, and schedule the next attempt. The workbook covers planning, practice, simulations, stories, and the final week.}}
 \vspace{.18in}
 \textbf{Candidate:} \rule{.25\linewidth}{.35pt}\hfill \textbf{Loop date:} \rule{.16\linewidth}{.35pt}
 
 \section*{How to use it}
 \begin{enumerate}
-  \item \textbf{Start from evidence.} Record confirmed rounds, time available, and recent closed-book performance.
-  \item \textbf{Choose three repairs.} Prefer high-relevance gaps over broad coverage.
-  \item \textbf{Attempt, compare, retry.} Keep the answer closed until the attempt ends; score observable behavior; schedule the next attempt.
-  \item \textbf{Graduate carefully.} Two spaced successful attempts plus an unfamiliar follow-up is stronger evidence than fluent repetition.
+  \item \textbf{Start with recent practice.} Record confirmed rounds, time available, and what you can do without notes.
+  \item \textbf{Choose three gaps.} Work on the areas most likely to affect your actual loop.
+  \item \textbf{Attempt, compare, retry.} Keep notes closed until the attempt ends; compare your answer with the criteria; schedule the next attempt.
+  \item \textbf{Call a skill ready carefully.} Look for two successful attempts on different days and one unfamiliar follow-up.
 \end{enumerate}
 
 \sectionrule
@@ -74,12 +75,12 @@ $\square$ Coding / implementation & $\square$ Other: \rule{.35\linewidth}{.35pt}
 
 \newpage
 \section*{2. Evidence scorecard}
-Score only recent timed, closed-book evidence. \textbf{0} means not attempted; \textbf{3} means workable timed answer; \textbf{5} means two spaced successes plus an unfamiliar follow-up.
+Score only recent timed, closed-book practice. \textbf{0} means not attempted; \textbf{3} means you can give a workable timed answer; \textbf{5} means two successful attempts on different days plus an unfamiliar follow-up.
 \vspace{.08in}
 \renewcommand{\arraystretch}{1.35}
 \begin{tabularx}{\linewidth}{@{}p{.31\linewidth} c c c c c X@{}}
 \toprule
-Area & 0 & 1 & 2 & 3 & 4 & 5 / evidence note \\
+Area & 0 & 1 & 2 & 3 & 4 & 5 / note \\
 \midrule
 Fundamentals & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
 Production / systems & $\square$ & $\square$ & $\square$ & $\square$ & $\square$ & \rule{.8\hsize}{.35pt} \\
@@ -94,24 +95,24 @@ Coding / implementation & $\square$ & $\square$ & $\square$ & $\square$ & $\squa
 \end{tabularx}
 
 \newpage
-\section*{3. First three repairs}
-Choose repairs by relevance, evidence, and leverage. A repair should name an action, not a topic.
+\section*{3. First three practice priorities}
+Choose gaps by importance and evidence. Each plan item should name an action, not just a topic.
 \vspace{.08in}
 \begin{tabularx}{\linewidth}{@{}p{.07\linewidth} X@{}}
 \toprule
 \textbf{01} & \textbf{Gap / round:} \rule{.48\hsize}{.35pt}\\[-1pt]
 & \textbf{Closed-book action:} \rule{.45\hsize}{.35pt}\\[-1pt]
-& \textbf{Observable success:} \rule{.42\hsize}{.35pt}\\[-1pt]
+& \textbf{What success looks like:} \rule{.42\hsize}{.35pt}\\[-1pt]
 & \textbf{Retry date:} \rule{.6\hsize}{.35pt}\\[.5em]
 \midrule
 \textbf{02} & \textbf{Gap / round:} \rule{.48\hsize}{.35pt}\\[-1pt]
 & \textbf{Closed-book action:} \rule{.45\hsize}{.35pt}\\[-1pt]
-& \textbf{Observable success:} \rule{.42\hsize}{.35pt}\\[-1pt]
+& \textbf{What success looks like:} \rule{.42\hsize}{.35pt}\\[-1pt]
 & \textbf{Retry date:} \rule{.6\hsize}{.35pt}\\[.5em]
 \midrule
 \textbf{03} & \textbf{Gap / round:} \rule{.48\hsize}{.35pt}\\[-1pt]
 & \textbf{Closed-book action:} \rule{.45\hsize}{.35pt}\\[-1pt]
-& \textbf{Observable success:} \rule{.42\hsize}{.35pt}\\[-1pt]
+& \textbf{What success looks like:} \rule{.42\hsize}{.35pt}\\[-1pt]
 & \textbf{Retry date:} \rule{.6\hsize}{.35pt}\\
 \bottomrule
 \end{tabularx}
@@ -136,9 +137,9 @@ For each story, keep the ownership and evidence explicit.
 \section*{5. Weekly operating loop}
 \begin{tabularx}{\linewidth}{@{}p{.23\linewidth} X@{}}
 \toprule
-\textbf{Monday} & Pick the three highest-value repairs. Name the round and observable success.\\[.5em]
-\textbf{Tuesday--Thursday} & Attempt closed-book. Use a visual lesson only after the attempt. Record the missing mechanism or decision.\\[.5em]
-\textbf{Friday} & Retry one weak item and one unfamiliar transfer. Ask one changed-assumption follow-up.\\[.5em]
+	extbf{Monday} & Pick the three most important gaps. Name the round and what success looks like.\\[.5em]
+	extbf{Tuesday to Thursday} & Attempt closed-book. Use a visual lesson only after the attempt. Record what you could not explain, derive, design, or code.\\[.5em]
+	extbf{Friday} & Retry one weak item and one unfamiliar transfer. Ask one follow-up that changes an assumption.\\[.5em]
 \textbf{Weekend} & Review the evidence, update the plan, and remove work that is no longer relevant.\\
 \bottomrule
 \end{tabularx}
@@ -152,18 +153,150 @@ For each story, keep the ownership and evidence explicit.
 \textbf{Next action}\par
 \boxline{.7in}
 
-\section*{6. Readiness gate}
-Do not graduate a critical gap on confidence alone.
+\section*{6. Readiness check}
+Do not call a critical gap ready based on confidence alone.
 \begin{itemize}
   \item Two successful closed-book attempts on different days.
-  \item No critical rubric dimension remains weak.
-  \item One unfamiliar follow-up or changed assumption succeeds.
-  \item One later mixed-session attempt remains workable.
+  \item No critical scoring area remains weak.
+  \item One unfamiliar follow-up or changed assumption goes well.
+  \item One later mixed practice session remains workable.
   \item A peer, mentor, or interviewer has challenged at least one claim when possible.
 \end{itemize}
 \vspace{.1in}
-\textbf{Evidence I still need before calling this ready:}\par
+\textbf{What I still need to show:}\par
 \boxline{1.0in}
+
+\newpage
+\section*{7. Closed-book attempt and retry log}
+Use one row per meaningful attempt. Record what you could do without notes and what changed after feedback.
+\vspace{.12in}
+\renewcommand{\arraystretch}{1.55}
+\begin{tabularx}{\linewidth}{@{}p{.12\linewidth} p{.18\linewidth} X p{.14\linewidth} p{.14\linewidth} p{.14\linewidth}@{}}
+\toprule
+Date & Round & Prompt or task & Score & Gap & Retry \\
+\midrule
+\rule{0pt}{.45in} & & & & & \\
+\midrule
+\rule{0pt}{.45in} & & & & & \\
+\midrule
+\rule{0pt}{.45in} & & & & & \\
+\midrule
+\rule{0pt}{.45in} & & & & & \\
+\midrule
+\rule{0pt}{.45in} & & & & & \\
+\midrule
+\rule{0pt}{.45in} & & & & & \\
+\bottomrule
+\end{tabularx}
+
+\section*{Retry protocol}
+\begin{tabularx}{\linewidth}{@{}p{.27\linewidth} X@{}}
+\toprule
+Before the attempt & What must I do without notes? \rule{.45\hsize}{.35pt}\\[.45em]
+After the attempt & What could I not do yet? \rule{.35\hsize}{.35pt}\\[.45em]
+Next practice & What is the smallest task that addresses that gap? \rule{.32\hsize}{.35pt}\\[.45em]
+Evidence & What should improve next time? \rule{.32\hsize}{.35pt}\\
+\bottomrule
+\end{tabularx}
+
+\newpage
+\section*{8. Simulation review}
+Use this after a role-specific simulation or a full practice round. Separate a smooth answer from evidence that holds when an assumption changes.
+\vspace{.1in}
+\textbf{Simulation / role:} \rule{.45\linewidth}{.35pt}\hfill \textbf{Date:} \rule{.15\linewidth}{.35pt}\\[.55em]
+\textbf{Rounds included:} \rule{.72\linewidth}{.35pt}\\[.55em]
+\textbf{Time limit and conditions:} \rule{.58\linewidth}{.35pt}\\[.55em]
+
+\begin{tabularx}{\linewidth}{@{}p{.3\linewidth} X@{}}
+\toprule
+What held under pressure? & \longline \longline\\
+Where did I lose structure? & \longline \longline\\
+Which assumption changed the answer? & \longline \longline\\
+What evidence was missing? & \longline \longline\\
+What will I practice before the next simulation? & \longline \longline\\
+\bottomrule
+\end{tabularx}
+
+\section*{Observer / interviewer feedback}
+\textbf{Strongest signal}\par
+\longline
+\textbf{Most important improvement}\par
+\longline
+\textbf{Follow-up I should rehearse}\par
+\longline
+
+\newpage
+\section*{9. Project and story practice}
+Keep the story focused on decisions, ownership, evidence, failure, and what you changed. Do not memorize a script.
+\vspace{.1in}
+\begin{tabularx}{\linewidth}{@{}p{.28\linewidth} X@{}}
+\toprule
+90-second opening & Problem, ownership, outcome, and the three decisions I will explain.\\[.5em]
+Decision 1 & Constraint: \rule{.6\hsize}{.35pt}\\[-1pt] Choice and evidence: \rule{.5\hsize}{.35pt}\\[.4em]
+Decision 2 & Constraint: \rule{.6\hsize}{.35pt}\\[-1pt] Choice and evidence: \rule{.5\hsize}{.35pt}\\[.4em]
+Decision 3 & Constraint: \rule{.6\hsize}{.35pt}\\[-1pt] Choice and evidence: \rule{.5\hsize}{.35pt}\\[.4em]
+Ownership & What did I personally decide, build, unblock, or change?\\[.5em]
+Failure / surprise & What failed, and how did it update the plan?\\[.5em]
+Impact and guardrail & What changed for users or the business, and what could have regressed?\\
+\bottomrule
+\end{tabularx}
+
+\section*{Changed-assumption follow-ups}
+\textbf{01. If the data, latency, budget, or label changes:}\par
+\longline
+\textbf{02. If the first approach fails:}\par
+\longline
+\textbf{03. If a senior partner disagrees:}\par
+\longline
+
+\newpage
+\section*{10. Other interview rounds}
+Use this page for formats outside the guide. Those formats need their own practice plan.
+\vspace{.1in}
+\begin{tabularx}{\linewidth}{@{}p{.29\linewidth} X p{.18\linewidth}@{}}
+\toprule
+External format & Separate resource or drill & Baseline date \\
+\midrule
+General algorithms / DSA & \rule{.62\hsize}{.35pt} & \\
+Practical software / OOP / concurrency & \rule{.62\hsize}{.35pt} & \\
+SQL / data manipulation & \rule{.62\hsize}{.35pt} & \\
+General distributed systems & \rule{.62\hsize}{.35pt} & \\
+Other: & \rule{.62\hsize}{.35pt} & \\
+\bottomrule
+\end{tabularx}
+
+\section*{11. Final week}
+The final week is for steady practice on known gaps, not broad new coverage.
+\begin{itemize}
+  \item $\square$ Recheck each critical round with one closed-book baseline.
+  \item $\square$ Retry only the most important weak areas.
+  \item $\square$ Run one mixed simulation with an unfamiliar follow-up.
+  \item $\square$ Practice the 90-second project opening and three decisions.
+  \item $\square$ Confirm time zone, links, format, environment, and permitted tools.
+  \item $\square$ Prepare concise questions about scope, success, collaboration, and the first 90 days.
+  \item $\square$ Stop adding broad topics; protect sleep and response quality.
+\end{itemize}
+\textbf{Logistics / questions / risks}\par
+\boxline{1.35in}
+
+\newpage
+\section*{12. Review and backup}
+At the end of each week, update the plan from what you practiced, not from how you felt.
+\vspace{.1in}
+\begin{tabularx}{\linewidth}{@{}p{.3\linewidth} X@{}}
+\toprule
+What did I complete? & \longline \longline\\
+What remains critical? & \longline \longline\\
+What should I remove or defer? & \longline \longline\\
+What is next week's one priority? & \longline \longline\\
+\bottomrule
+\end{tabularx}
+\vspace{.15in}
+\textbf{Backup reminder}\par
+The browser workbook is local to the device. Export its JSON backup before changing devices or clearing browser data. This printable PDF contains no private plan data.
+
+\section*{A compact operating rule}
+\fcolorbox{accent}{wash}{\parbox{.94\linewidth}{\textbf{Practice without notes. Compare your answer with the criteria. Work on one gap. Retry after time has passed.} Study a topic only when it changes what you can do in the interview.}}
 
 \vfill
 \sectionrule

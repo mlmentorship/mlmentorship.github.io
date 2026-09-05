@@ -63,9 +63,6 @@ const hasEmail =
 
   type Placement = 'home' | 'entry' | 'review' | 'workbook';
 
-  const SESSION_KEY = 'mlmentorship:email-signup:beehiiv-entry-seen:v1';
-  const SUPPRESS_UNTIL_KEY = 'mlmentorship:email-signup:beehiiv-suppress-until:v1';
-  const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
   const eventNames = {
     home: {
       viewed: 'email_signup_viewed_home',
@@ -89,16 +86,6 @@ const hasEmail =
       confirmationSent: 'email_signup_confirmation_sent_workbook',
     },
   } as const;
-
-  type StorageName = 'localStorage' | 'sessionStorage';
-
-  function storageGet(storageName: StorageName, key: string): string | null {
-    try { return window[storageName].getItem(key); } catch (_) { return null; }
-  }
-
-  function storageSet(storageName: StorageName, key: string, value: string): void {
-    try { window[storageName].setItem(key, value); } catch (_) { /* The form still works. */ }
-  }
 
   function loadBeehiiv(formId: string, host: HTMLElement | null, onError: () => void): void {
     if (!host || host.dataset.beehiivLoaded === 'true') return;
@@ -128,13 +115,6 @@ const hasEmail =
 
     const placement = signup.dataset.emailPlacement as Placement;
     const events = eventNames[placement];
-    const suppressUntil = Number(storageGet('localStorage', SUPPRESS_UNTIL_KEY) ?? '0');
-    const seenThisSession = placement === 'entry' && storageGet('sessionStorage', SESSION_KEY) === '1';
-    const workbookUnlocked = placement === 'workbook' && storageGet('localStorage', WORKBOOK_UNLOCK_KEY) === '1';
-    if (workbookUnlocked || (placement !== 'workbook' && (suppressUntil > Date.now() || seenThisSession))) {
-      signup.hidden = true;
-      return;
-    }
 
     const emailEnabled = signup.dataset.emailEnabled === 'true';
     const formId = signup.dataset.emailForm ?? '';
@@ -152,14 +132,10 @@ const hasEmail =
       viewObserver?.disconnect();
       stopPositionChecks();
     };
-    const suppressForSixMonths = () => {
-      storageSet('localStorage', SUPPRESS_UNTIL_KEY, String(Date.now() + SIX_MONTHS_MS));
-    };
     const markCompleted = () => {
       if (completed) return;
       completed = true;
-      suppressForSixMonths();
-      storageSet('localStorage', WORKBOOK_UNLOCK_KEY, '1');
+      try { window.localStorage.setItem(WORKBOOK_UNLOCK_KEY, '1'); } catch { /* The form still works. */ }
       actions?.setAttribute('hidden', '');
       trackPublicEvent(events.confirmationSent);
       window.dispatchEvent(new Event('workbook-email-unlocked'));
@@ -187,7 +163,6 @@ const hasEmail =
     const markViewed = () => {
       if (viewed) return;
       viewed = true;
-      if (placement === 'entry') storageSet('sessionStorage', SESSION_KEY, '1');
       trackPublicEvent(events.viewed);
     };
 
@@ -208,7 +183,6 @@ const hasEmail =
     }, true);
 
     signup.querySelector<HTMLButtonElement>('[data-email-dismiss]')?.addEventListener('click', () => {
-      storageSet('sessionStorage', SESSION_KEY, '1');
       if (placement === 'entry') trackPublicEvent(eventNames.entry.dismissed);
       hide();
     });

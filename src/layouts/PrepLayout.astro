@@ -38,9 +38,17 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
     {workbookEmailGateEnabled && (
       <section class="workbook-gate" data-workbook-gate aria-labelledby="workbook-gate-heading">
         <p class="prep-eyebrow">Private workbook</p>
-        <h1 id="workbook-gate-heading">Subscribe to unlock the workbook.</h1>
-        <p>The field guide remains free. A confirmed ML from Primitives subscription unlocks this browser-local preparation workspace on this device.</p>
-        <Subscribe placement="workbook" heading="Unlock the private prep workspace." />
+        <h1 id="workbook-gate-heading">Subscribe to get the workbook by email.</h1>
+        <p>The field guide remains free. Subscribe to ML from Primitives to receive the printable workbook, then use this browser-local workspace to plan your loop and track practice.</p>
+        <div class="workbook-preview">
+          <p class="workbook-preview-label">Inside the workbook</p>
+          <ul>
+            <li><strong>Turn your actual loop into a plan.</strong><span>Role, rounds, runway, and weekly capacity become one next action.</span></li>
+            <li><strong>Practice from evidence.</strong><span>Track closed-book attempts, clear gaps, retries, and mixed practice checks.</span></li>
+            <li><strong>Prepare the human rounds.</strong><span>Shape project decisions, behavioral stories, pushback, simulations, and final-week logistics.</span></li>
+          </ul>
+        </div>
+        <Subscribe placement="workbook" heading="Get the printable workbook by email." />
       </section>
     )}
 
@@ -49,7 +57,7 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
         <p class="prep-eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>
         <p>{lede}</p>
-        <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the printable workbook PDF</a><span>Blank companion pages for planning, evidence, repairs, and readiness gates.</span></p>
+        <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the complete printable workbook PDF</a><span>Planning, practice, retries, simulations, stories, other interview rounds, and final-week practice.</span></p>
       </header>
 
       <article class="prep-content">
@@ -88,6 +96,12 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
   .workbook-gate { padding: 1.2rem 0 1.5rem; border-bottom: 1px solid var(--c-rule); }
   .workbook-gate h1 { margin: 0 0 .5rem; font-size: clamp(1.7rem, 4vw, 2.15rem); line-height: 1.14; letter-spacing: -.02em; }
   .workbook-gate > p:not(.prep-eyebrow) { max-width: 38rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .94rem; line-height: 1.5; }
+  .workbook-preview { margin: 1.1rem 0 0; padding: .85rem 1rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); }
+  .workbook-preview-label { margin: 0 0 .55rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .workbook-preview ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; margin: 0; padding: 0; list-style: none; }
+  .workbook-preview li { display: grid; gap: .2rem; margin: 0; }
+  .workbook-preview strong { color: var(--c-text); font-size: .74rem; line-height: 1.3; }
+  .workbook-preview span { color: var(--c-muted); font-family: var(--font-reading); font-size: .68rem; line-height: 1.4; }
   .workbook-gate :global(.subscribe) { width: 100%; margin-top: 1.25rem; }
   .workbook-trail { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: 1.1rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .68rem; }
   .workbook-trail a { color: var(--c-text-soft); text-decoration: none; }
@@ -118,6 +132,7 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
   .prep-content :global(.print-button) { padding: .65rem .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-weight: 600; cursor: pointer; }
   .prep-content :global(.print-button:hover) { border-color: var(--c-accent); color: var(--c-accent); }
   @media (max-width: 640px) {
+    .workbook-preview ul { grid-template-columns: 1fr; gap: .6rem; }
     .prep-content :global(.resource-grid) { grid-template-columns: 1fr; }
   }
   @media print {
