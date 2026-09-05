@@ -52,12 +52,12 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
       </section>
     )}
 
-    <div class="workbook-content" data-workbook-content hidden={!workbookEmailGateEnabled}>
+    <div class="workbook-content" data-workbook-content hidden={workbookEmailGateEnabled}>
       <header class="prep-hero">
         <p class="prep-eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>
         <p>{lede}</p>
-        <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the complete printable workbook PDF</a><span>Planning, practice, retries, simulations, stories, other interview rounds, and final-week practice.</span></p>
+        <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the printable route guide</a><span>Linked examples and blank tracking sheets. Print your saved map below for your own routes and dates.</span></p>
       </header>
 
       <article class="prep-content">

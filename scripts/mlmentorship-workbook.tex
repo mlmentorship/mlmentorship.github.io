@@ -34,17 +34,17 @@
 \setlength{\tabcolsep}{3pt}
 \setlist{leftmargin=1.35em,itemsep=2pt,topsep=2pt}
 \newcommand{\linefield}[1]{\textbf{#1}\hspace{.25em}\rule{.72\linewidth}{.35pt}}
-\newcommand{\longline}{\rule{\hsize}{.35pt}\\[.55em]}
-\newcommand{\boxline}[1]{\fcolorbox{rule}{wash}{\parbox[t][#1][t]{.96\linewidth}{\vspace{.02in}}}}
+\newcommand{\longline}{\par\noindent\rule{\linewidth}{.35pt}\par\vspace{.35em}}
+\newcommand{\boxline}[1]{\par\noindent\fcolorbox{rule}{wash}{\parbox[t][#1][t]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{\rule{\linewidth}{0pt}}}\par}
 \newcommand{\sectionrule}{\vspace{.1in}\noindent{\color{rule}\rule{\linewidth}{.5pt}}\vspace{.1in}}
 
 \begin{document}
 
-{\color{accent}\sffamily\small ML FROM PRIMITIVES \hfill 2026 EDITION}
+{\color{accent}\sffamily\small ML FROM PRIMITIVES \hfill 2026 EDITION\par}
 \vspace{.25in}
 {\Huge\bfseries ML Interview Workbook\par}
 \vspace{.08in}
-{\large A compact, printable workbook for ML interview preparation.\par}
+{\large A linked route guide and practice record for your interview loop.\par}
 \vspace{.18in}
 \fcolorbox{accent}{wash}{\parbox{.94\linewidth}{\textbf{Use this to prepare for the interview you actually have.} Write down the loop, choose the most important gap, attempt it closed-book, record what happened, and schedule the next attempt. The workbook covers planning, practice, simulations, stories, and the final week.}}
 \vspace{.18in}
@@ -75,38 +75,83 @@ $\square$ Coding / implementation & $\square$ Other: \rule{.35\linewidth}{.35pt}
 
 \newpage
 \section*{Your route through the field guide}
-Start with the rounds the recruiter actually named. Use the links below to choose a first lesson, then use the browser Workbook to save your role, round choices, evidence scores, and retry dates.
-\vspace{.08in}
-\textbf{Practice loop:} read one visual lesson, close it, attempt without notes, compare with the reference, record the gap, and retry after time has passed.
-\vspace{.1in}
-\renewcommand{\arraystretch}{1.35}
-\begin{tabularx}{\linewidth}{@{}p{.2\linewidth} X p{.27\linewidth}@{}}
+\textbf{This PDF is a route guide, not your saved plan.} Open
+\href{https://mlmentorship.com/prep/readiness/}{Build my plan}, enter your confirmed rounds, role, level, domain, available weeks, and hours. The \href{https://mlmentorship.com/prep/}{browser Workbook} selects diagnostic and transfer questions, links the repair material, and tracks retry dates. Use \textbf{Print my study map} for your own routes and progress.
+
+\section*{Choose the scope before the reading}
+\begin{enumerate}
+  \item Ask the recruiter for each round's task, duration, tools, and expected depth. A title alone does not specify the loop. Mark unconfirmed formats as questions to resolve.
+  \item Attempt one representative prompt per confirmed round. Start with the weakest evidence, not your favorite subject. A score from reading is not a baseline.
+  \item Reserve half your weekly time for retries, repairs, and feedback. A 40-minute design attempt plus 15-minute review uses 55 minutes, not an entire evening.
+  \item Add breadth only after the diagnostic identifies a missing mechanism. Two mapped prompts sample a round; they do not prove complete coverage.
+\end{enumerate}
+
+\section*{Use the same method on every route}
+\begin{enumerate}
+  \item \textbf{Attempt.} Open the diagnostic in Practice Mode and leave the answer closed. Use its timer and round-specific rubric.
+  \item \textbf{Score.} Weak: cannot complete the core task. Review: workable parts, but an important gap remains. Confident: a clean timed answer with no weak rubric item. Record the exact failed step.
+  \item \textbf{Repair, at most 15 minutes.} Read the relevant visual or reference section. Close it and reproduce only the missing derivation, diagram, test, or decision. If it still fails, split the repair into a smaller task.
+  \item \textbf{Repeat later.} Weak: two days. Review or first clean Confident: seven days. Keep the saved date even when the answer now feels familiar. These are practice defaults, not guaranteed optimal intervals.
+  \item \textbf{Transfer.} After a clean diagnostic, try the second linked prompt without notes. After two clean passes on different days, use a changed assumption in a later mixed session. Mark the pass only after doing it.
+\end{enumerate}
+
+\textbf{When time runs short:} reduce new topics, not the evidence standard. An unattempted or unrepaired round remains a risk. Ask a peer to probe that round before polishing already-strong answers.
+
+\newpage
+\section*{Worked routes: select, attempt, repair, transfer}
+These examples show how to choose from the library. Use only the rounds in your actual loop; the browser map makes these choices from your inputs.
+
+\subsection*{Applied Scientist: product ML, L5}
+Confirmed rounds: breadth, system design, project deep-dive. Eight hours per week; four weeks.
+\begin{itemize}
+  \item \textbf{Design diagnostic (40 min + 15 review):} \href{https://mlmentorship.com/questions/design-fraud-detection/?practice=1}{fraud detection}. State the decision, error costs, label delay, evaluation split, serving path, and rollback. If threshold choice is hand-waving, repair with \href{https://mlmentorship.com/review/\#decision-thresholds-asymmetric-costs-abstention}{decision thresholds and asymmetric costs}. Transfer: \href{https://mlmentorship.com/questions/design-ai-coding-product/?practice=1}{an AI coding product} with a different error cost and feedback loop.
+  \item \textbf{Breadth diagnostic:} \href{https://mlmentorship.com/questions/bias-variance-tradeoff/?practice=1}{bias and variance}. Explain a learning curve without reciting definitions. Repair the \href{https://mlmentorship.com/review/\#bias-variance-of-estimators}{estimator visual}; transfer to \href{https://mlmentorship.com/questions/how-to-choose-loss-function/?practice=1}{loss selection}.
+  \item \textbf{Project diagnostic:} \href{https://mlmentorship.com/questions/most-ambitious-project/?practice=1}{your ambitious project}. Use one real decision, rejected alternative, measured outcome, and failure. Transfer to \href{https://mlmentorship.com/questions/scope-ambiguous-problem/?practice=1}{an ambiguous scope}. Do not add coding unless it is confirmed.
+\end{itemize}
+
+\subsection*{ML Engineer: LLM serving, L5}
+Confirmed rounds: implementation and system design. Five hours per week; two weeks.
+\begin{itemize}
+  \item \textbf{Coding (40 + 15 min):} \href{https://mlmentorship.com/questions/implement-attention-from-scratch/?practice=1}{implement attention}. Test shapes, masking, numerical stability, and gradients. Repair the \href{https://mlmentorship.com/review/\#attention-mechanism}{attention visual}; transfer to \href{https://mlmentorship.com/questions/implement-kv-cache-decode/?practice=1}{KV-cache decoding}.
+  \item \textbf{Design (40 + 15 min):} \href{https://mlmentorship.com/questions/design-production-llm-inference-service/?practice=1}{production LLM inference}. Quantify prefill, decode, memory, queueing, and degradation. Repair \href{https://mlmentorship.com/review/\#prefill-vs-decode}{prefill versus decode}; transfer to \href{https://mlmentorship.com/questions/design-ai-coding-product/?practice=1}{an AI coding product}.
+  \item \textbf{Week budget:} 110 minutes for the two diagnostics; reserve 150 for retries and repairs; 40 remain. If Tuesday's coding attempt is Weak, retry Thursday. If Thursday is clean, repeat the following Thursday. Do not mark it ready on Friday from familiarity.
+\end{itemize}
+
+\subsection*{Research Scientist: paper defense and math}
+\href{https://mlmentorship.com/questions/critique-ml-paper/?practice=1}{Critique a paper} for 25 minutes: separate the claim from the evidence and strongest alternative explanation. Repair \href{https://mlmentorship.com/review/\#evaluation-validity-benchmark-contamination}{evaluation validity}; transfer to \href{https://mlmentorship.com/questions/design-ablation-study/?practice=1}{an ablation}. For a confirmed math oral, use \href{https://mlmentorship.com/questions/derive-ml-math-under-pressure/?practice=1}{a 15-minute derivation}; transfer to \href{https://mlmentorship.com/questions/derive-logistic-regression/?practice=1}{logistic regression}. Add the \href{https://mlmentorship.com/questions/present-technical-ml-project/?practice=1}{45-minute presentation} only when that format is confirmed.
+
+\newpage
+\section*{Other confirmed rounds: precise entry points}
+Use the linked question's timer and scorecard. The same two/seven-day retry rule applies; the task changes by round.
+\par
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{@{}p{.23\linewidth} X@{}}
 \toprule
-Round & Start here & Method and repeat \\
+Round & Diagnostic and observable output \\
 \midrule
-ML breadth & \href{https://mlmentorship.com/questions/bias-variance-tradeoff/}{Bias and variance}; \href{https://mlmentorship.com/questions/how-to-choose-loss-function/}{choose a loss} & Explain the mechanism, assumptions, failure, and one alternative in eight minutes. Retry in two days. \\
-ML system design & \href{https://mlmentorship.com/questions/design-multi-team-ml-platform/}{multi-team platform}; \href{https://mlmentorship.com/questions/design-ml-system-fixed-budget/}{fixed-budget system} & Scope first, then draw data, model, evaluation, serving, monitoring, and rollback. Retry with a changed constraint. \\
-Project deep-dive & \href{https://mlmentorship.com/questions/most-ambitious-project/}{ambitious project}; \href{https://mlmentorship.com/questions/present-technical-ml-project/}{technical project} & Practice the opening, three decisions, ownership, failure, and result. Repeat weekly with pushback. \\
-Coding / implementation & \href{https://mlmentorship.com/questions/debug-training-loop/}{debug a training loop}; \href{https://mlmentorship.com/questions/implement-attention-from-scratch/}{implement attention} & State the contract, write a baseline, test edge cases, then explain complexity. Retry in two to three days. \\
-Research depth & \href{https://mlmentorship.com/questions/critique-ml-paper/}{critique a paper}; \href{https://mlmentorship.com/questions/design-ablation-study/}{design an ablation} & State the claim, strongest alternative, test, and evidence that would change your mind. Repeat weekly. \\
-Behavioral / values & \href{https://mlmentorship.com/questions/most-ambitious-project/}{project story}; \href{https://mlmentorship.com/questions/defend-values-under-ethical-pressure/}{values pressure} & Use a real decision, conflict or failure, result, and update. Retell from prompts, not a script. \\
+Agentic codebase & \href{https://mlmentorship.com/questions/agentic-ml-codebase-interview/?practice=1}{Extend an evaluation codebase}: a bounded change, inspected diff, and passing tests. Use the \href{https://mlmentorship.com/prep/labs/}{executable labs} for the work environment. \\
+Technical strategy & \href{https://mlmentorship.com/questions/design-enterprise-agent-platform/?practice=1}{Enterprise agent platform}: ownership boundaries, investment order, migration, stop conditions. Compare with the \href{https://mlmentorship.com/guides/annotated-upper-ic-agent-platform-mock/}{annotated mock}. \\
+Presentation & \href{https://mlmentorship.com/questions/present-technical-ml-project/?practice=1}{Technical project}: claims, evidence, personal decisions, interruption, technical descent. \\
+Behavioral & \href{https://mlmentorship.com/questions/disagreed-with-senior/?practice=1}{Disagreement}: a real trade-off, your action, result, and update. Draft facts in the \href{https://mlmentorship.com/prep/story-bank/}{story bank}, not a memorized script. \\
+Values and mission & \href{https://mlmentorship.com/questions/defend-values-under-ethical-pressure/?practice=1}{Values under pressure}: competing obligations, cost of your decision, and evidence that changes your view. \\
+Experimentation & \href{https://mlmentorship.com/questions/design-ml-ab-test/?practice=1}{Design an A/B test}: unit, exposure, primary metric, guardrails, power, threats, ship rule. \\
+Research work sample & \href{https://mlmentorship.com/questions/investigate-black-box-model-behavior/?practice=1}{Black-box investigation}: competing hypotheses, discriminating probes, measured readout. \\
+Infrastructure & \href{https://mlmentorship.com/questions/train-100b-model/?practice=1}{Train a 100B model}: resource estimate, bottleneck, parallelism, checkpoint and recovery plan. \\
 \bottomrule
 \end{tabularx}
 
-\section*{Role paths}
-Choose the path that matches your target role, then follow its sequence in the browser Workbook:
-\begin{tabularx}{\linewidth}{@{}p{.25\linewidth} X@{}}
-\toprule
-Applied Scientist & \href{https://mlmentorship.com/prep/role-paths/applied-scientist/}{scope, breadth, design, experimentation, ownership, simulation} \\
-Machine Learning Engineer & \href{https://mlmentorship.com/prep/role-paths/ml-engineer/}{coding, debugging, production, system design, failure stories} \\
-Research Engineer & \href{https://mlmentorship.com/prep/role-paths/research-engineer/}{implementation, systems, research depth, ablations, critique} \\
-Research Scientist & \href{https://mlmentorship.com/prep/role-paths/research-scientist/}{paper defense, math, experiments, job talk, collaboration} \\
-\bottomrule
-\end{tabularx}
+\section*{Write your own route}
+\textbf{Confirmed round and duration:}\par\longline
+\textbf{Diagnostic link and date:}\par\longline
+\textbf{Failed rubric item and repair link:}\par\longline
+\textbf{Transfer prompt or changed assumption:}\par\longline
+\textbf{Score, next retry date, later mixed check:}\par\longline
+\textbf{Weekly review:} use \href{https://mlmentorship.com/prep/simulations/}{simulations} only after each confirmed round has a baseline. Pick the matching sections; skip unconfirmed formats. Use \href{https://mlmentorship.com/prep/final-week/}{final-week checks} for logistics, not a new syllabus.
 
 \newpage
 \section*{2. Evidence scorecard}
 Score only recent timed, closed-book practice. \textbf{0} means not attempted; \textbf{3} means you can give a workable timed answer; \textbf{5} means two successful attempts on different days plus an unfamiliar follow-up.
+\par
 \vspace{.08in}
 \renewcommand{\arraystretch}{1.35}
 \begin{tabularx}{\linewidth}{@{}p{.31\linewidth} c c c c c X@{}}
@@ -168,21 +213,21 @@ For each story, keep the ownership and evidence explicit.
 \section*{5. Weekly operating loop}
 \begin{tabularx}{\linewidth}{@{}p{.23\linewidth} X@{}}
 \toprule
-	extbf{Monday} & Pick the three most important gaps. Name the round and what success looks like.\\[.5em]
-	extbf{Tuesday to Thursday} & Attempt closed-book. Use a visual lesson only after the attempt. Record what you could not explain, derive, design, or code.\\[.5em]
-	extbf{Friday} & Retry one weak item and one unfamiliar transfer. Ask one follow-up that changes an assumption.\\[.5em]
+\textbf{Start of week} & Check due retries first. Reserve half the weekly budget for repair and feedback. Name one new diagnostic only if time remains.\\[.5em]
+\textbf{Practice days} & Attempt closed-book. Use a visual lesson only after the attempt. Record the failed step and saved retry date.\\[.5em]
+\textbf{On the due date} & Weak: two days later. Review or first clean Confident: seven days later. Do not force all retries onto Friday.\\[.5em]
 \textbf{Weekend} & Review the evidence, update the plan, and remove work that is no longer relevant.\\
 \bottomrule
 \end{tabularx}
 \vspace{.2in}
 \textbf{This week's focus}\par
-\boxline{.7in}
+\boxline{.5in}
 \vspace{.15in}
 \textbf{What changed after an attempt?}\par
-\boxline{1.0in}
+\boxline{.6in}
 \vspace{.15in}
 \textbf{Next action}\par
-\boxline{.7in}
+\boxline{.5in}
 
 \section*{6. Readiness check}
 Do not call a critical gap ready based on confidence alone.
@@ -195,11 +240,12 @@ Do not call a critical gap ready based on confidence alone.
 \end{itemize}
 \vspace{.1in}
 \textbf{What I still need to show:}\par
-\boxline{1.0in}
+\boxline{.5in}
 
 \newpage
 \section*{7. Closed-book attempt and retry log}
 Use one row per meaningful attempt. Record what you could do without notes and what changed after feedback.
+\par
 \vspace{.12in}
 \renewcommand{\arraystretch}{1.55}
 \begin{tabularx}{\linewidth}{@{}p{.12\linewidth} p{.18\linewidth} X p{.14\linewidth} p{.14\linewidth} p{.14\linewidth}@{}}

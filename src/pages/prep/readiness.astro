@@ -94,14 +94,14 @@ const externalDependencies = [
     <p id="readiness-delta" class="readiness-delta" hidden></p>
     <p id="result-summary" class="result-summary"></p>
     <div class="result-metrics"><div><span>Estimated work</span><strong id="result-hours"></strong></div><div><span>Your capacity</span><strong id="result-capacity"></strong></div><div><span>Runway signal</span><strong id="result-runway"></strong></div></div>
-    <h3>Your first three gaps</h3>
+    <h3>Your first diagnostic routes</h3>
     <ol id="focus-list" class="focus-list">
       {[0, 1, 2].map((index) => <li data-focus-item><span class="focus-rank">{String(index + 1).padStart(2, '0')}</span><div><h4><a data-focus-link></a></h4><p data-focus-description></p><p class="starter-links" data-focus-starters></p></div></li>)}
     </ol>
     <section class="role-result"><h3 id="role-heading"></h3><p id="role-summary"></p><ul id="role-allocation"></ul><p id="role-warning" class="warning"></p></section>
     <section class="level-result"><h3 id="level-heading"></h3><p id="level-bar"></p><ul id="level-evidence"></ul><p id="level-warning" class="warning"></p><p><a id="level-path" href="/prep/level-paths/staff-principal/" hidden>Open the staff through senior-principal level path →</a></p></section>
     <section id="external-result" class="external-result" hidden><h3>External rounds to prepare separately</h3><ul id="external-result-list"></ul></section>
-    <p class="domain-note">Domain selection changes gap priorities and examples. The Workbook will surface the role guide or simulation when it becomes the next useful task.</p>
+    <p class="domain-note">Open the Workbook for the full route, repair visuals, saved evidence, and retry dates. Its next action changes after each scored attempt.</p>
     <section class="gate-note"><h3>Do not graduate a critical gap on confidence alone</h3><p>Require two successful closed-book attempts separated in time, no critical rubric dimension still weak, and one unfamiliar follow-up. Use the <a href="/prep/#queue">Workbook</a> to track that evidence.</p></section>
     <button id="reset-readiness" class="text-button" type="button">Run the check again</button>
   </section>
@@ -110,6 +110,7 @@ const externalDependencies = [
 <script>
   import { INTERVIEW_ROUNDS, KNOWLEDGE_AREAS, LEVEL_OVERLAYS, ROLE_OVERLAYS, type AreaId, type LevelId, type RoleId, type RoundId } from '../../data/prepCurriculum';
   import { loadPrepPlan, savePrepPlan, type PrepPlanState } from '../../utils/prepPlan';
+  import { buildStudyRoutes, studyBudget } from '../../utils/prepRoutes';
   import { toLocalDate } from '../../utils/prepProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
@@ -274,7 +275,7 @@ const externalDependencies = [
     const roleMeta = ROLE_OVERLAYS[role];
     const resultTitle = document.querySelector<HTMLElement>('#result-title');
     const summary = document.querySelector<HTMLElement>('#result-summary');
-    if (resultTitle) resultTitle.textContent = `${horizon}-week ${roleMeta.label} starting plan`;
+    if (resultTitle) resultTitle.textContent = `${availableWeeks}-week ${roleMeta.label} study map`;
     if (summary) {
       const baseSummary = availableWeeks >= horizon
         ? `Your evidence and ${weeklyHours}-hour weekly capacity support the ${horizon}-week framework. Treat this as a starting estimate and recalibrate after the first mixed simulation.`
@@ -291,38 +292,13 @@ const externalDependencies = [
     if (runway) runway.textContent = runwayStatus;
 
     const focusItems = document.querySelectorAll<HTMLElement>('[data-focus-item]');
-    scored.slice(0, 3).forEach((item, index) => {
-      const link = focusItems[index]?.querySelector<HTMLAnchorElement>('[data-focus-link]');
-      const description = focusItems[index]?.querySelector<HTMLElement>('[data-focus-description]');
-      const starters = focusItems[index]?.querySelector<HTMLElement>('[data-focus-starters]');
-      if (link) { link.href = item.link; link.textContent = item.label; }
-      if (description) description.textContent = `${item.description} Current evidence: ${item.rating}/5.`;
-      if (starters) {
-        const children: Node[] = [document.createTextNode('Start: ')];
-        item.starterLinks.forEach((starter, starterIndex) => {
-          const starterLink = document.createElement('a');
-          starterLink.href = starter.href;
-          starterLink.textContent = starter.label;
-          children.push(starterLink);
-          if (starterIndex < item.starterLinks.length - 1) children.push(document.createTextNode(' · '));
-        });
-        starters.replaceChildren(...children);
-      }
-    });
     const roleHeading = document.querySelector('#role-heading');
     const roleSummary = document.querySelector('#role-summary');
     const roleWarning = document.querySelector('#role-warning');
     const allocation = document.querySelector('#role-allocation');
-    if (roleHeading) roleHeading.textContent = `${roleMeta.label} workload overlay`;
+    if (roleHeading) roleHeading.textContent = 'Time for your confirmed rounds';
     if (roleSummary) roleSummary.textContent = roleMeta.summary;
     if (roleWarning) roleWarning.textContent = roleMeta.warning;
-    if (allocation) {
-      allocation.replaceChildren(...roleMeta.allocation.map((item) => {
-        const li = document.createElement('li');
-        li.textContent = `${item.percent}% · ${item.label}`;
-        return li;
-      }));
-    }
     const levelMeta = LEVEL_OVERLAYS[level];
     const levelHeading = document.querySelector<HTMLElement>('#level-heading');
     const levelBar = document.querySelector<HTMLElement>('#level-bar');
@@ -380,6 +356,31 @@ const externalDependencies = [
       })),
     };
     const planSaveStatus = document.querySelector<HTMLElement>('#plan-save-status');
+    const routes = buildStudyRoutes(plan, [], today);
+    focusItems.forEach((item, index) => {
+      const route = routes[index];
+      item.hidden = !route;
+      if (!route) return;
+      const link = item.querySelector<HTMLAnchorElement>('[data-focus-link]');
+      const description = item.querySelector<HTMLElement>('[data-focus-description]');
+      const starters = item.querySelector<HTMLElement>('[data-focus-starters]');
+      if (link) { link.href = `/prep/#route-${route.id}`; link.textContent = route.label; }
+      if (description) description.textContent = route.reason;
+      if (starters) {
+        const starter = document.createElement('a');
+        starter.href = route.steps[0].href;
+        starter.textContent = `${route.steps[0].label} (${route.steps[0].practice.minutes} min + 15 min review)`;
+        starters.replaceChildren(starter);
+      }
+    });
+    if (allocation) {
+      const budget = studyBudget(plan, routes);
+      allocation.replaceChildren(...[
+        `${budget.repairMinutes} min/week reserved for retries, repair, and feedback.`,
+        `${budget.baselineMinutes} min for one diagnostic and review per confirmed round.`,
+        'Defer new topics when retries use the available time.',
+      ].map(text => Object.assign(document.createElement('li'), { textContent: text })));
+    }
     const readinessDelta = document.querySelector<HTMLElement>('#readiness-delta');
     if (readinessDelta) {
       readinessDelta.hidden = !existingPlan;

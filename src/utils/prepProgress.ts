@@ -2,6 +2,7 @@ export const PREP_PROGRESS_KEY = 'mlm:prep-progress:v1';
 const PREP_STORAGE_PROBE_KEY = 'mlm:storage-probe';
 
 export type PracticeScore = 'Weak' | 'Review' | 'Confident';
+export const RETRY_DAYS: Record<PracticeScore, number> = { Weak: 2, Review: 7, Confident: 7 };
 
 export interface PracticeProgressRecord {
   slug: string;
@@ -73,8 +74,8 @@ export function savePracticeProgress(input: {
   const successfulAttempts = input.score === 'Confident' && input.weakDimensions.length === 0
     ? (existing?.successfulAttempts ?? 0) + (spacedSuccess ? 1 : 0)
     : 0;
-  const dueDays = input.score === 'Weak' ? 2 : 7;
-  const due = input.score === 'Confident' && successfulAttempts >= 2
+  const dueDays = RETRY_DAYS[input.score];
+  const due = input.score === 'Confident' && successfulAttempts >= 2 && input.weakDimensions.length === 0
     ? null
     : new Date(now.getFullYear(), now.getMonth(), now.getDate() + dueDays);
   const record: PracticeProgressRecord = {
@@ -98,7 +99,7 @@ export function savePracticeProgress(input: {
 export function markMixedSessionVerified(slug: string): PracticeProgressRecord | null {
   const records = loadPrepProgress();
   const existing = records.find((record) => record.slug === slug);
-  if (!existing || existing.successfulAttempts < 2 || existing.weakDimensions.length > 0) return null;
+  if (!existing || existing.successfulAttempts < 2 || existing.weakDimensions.length > 0 || existing.score !== 'Confident' || existing.lastAttemptOn >= toLocalDate(new Date())) return null;
   const record = { ...existing, mixedVerifiedOn: toLocalDate(new Date()) };
   localStorage.setItem(PREP_PROGRESS_KEY, JSON.stringify([
     ...records.filter((item) => item.slug !== slug),

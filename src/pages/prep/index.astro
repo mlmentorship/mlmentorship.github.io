@@ -8,7 +8,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   title="Private ML interview workbook"
   description="One private, browser-local place for an ML interview plan, next practice task, due retries, and simulations."
   heading="Workbook"
-  lede="The books explain the material. This companion keeps one plan, one next action, and the practice evidence stored on this device."
+  lede="Prepare for your confirmed rounds. Start with a timed diagnostic, repair the missing step, then test it again after a delay."
   eyebrow="Companion to the field guide"
 >
   <p class="storage-warning" data-storage-warning aria-live="polite" hidden>Browser storage is unavailable. The books and question practice still work, but this device cannot save a plan or retry dates.</p>
@@ -36,6 +36,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
       <summary>Next after this</summary>
       <ol data-later-list></ol>
     </details>
+    <p data-plan-waiting hidden></p>
     <div class="external-blockers" data-plan-blockers hidden><strong>Prepare separately</strong><ul></ul></div>
   </section>
 
@@ -45,15 +46,16 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
       <span class="study-map-week" data-route-week></span>
     </header>
     <div class="route-milestones" data-route-milestones></div>
-    <section class="gap-route" aria-labelledby="gap-route-heading">
-      <header><h3 id="gap-route-heading">Start with these gaps</h3><span>From your evidence check</span></header>
-      <div class="gap-route-grid" data-gap-route-list></div>
+    <section class="week-budget" aria-labelledby="week-budget-heading">
+      <h3 id="week-budget-heading">This week's time budget</h3>
+      <p data-budget-summary></p>
+      <ul data-budget-sessions></ul>
+      <p data-budget-warning></p>
     </section>
+    <p class="route-protocol">Attempt first, without notes. Spend up to 15 minutes reviewing the missed rubric items and the linked visual. Close the reference and redraw, derive, or implement the missing step. Keep the scored retry for its scheduled date.</p>
     <div class="round-route-grid" data-round-route-grid></div>
-    <details class="role-sequence" data-role-sequence>
-      <summary><strong data-role-sequence-title>Role sequence</strong><span>Study in order</span></summary>
-      <ol data-role-sequence-list></ol>
-    </details>
+    <p class="route-protocol">Two prompts per round are a starting sample, not proof of full coverage. After they hold up, use an unfamiliar follow-up from the question and ask someone to challenge the weakest claim.</p>
+    <button type="button" class="print-map" data-print-map>Print my study map</button>
   </section>
 
   <section id="queue" class="record-sheet">
@@ -113,14 +115,13 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 </PrepLayout>
 
 <script>
-  import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, replacePrepProgress, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
+  import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, replacePrepProgress, RETRY_DAYS, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
   import { clearPrepPlan, currentPlanWeek, loadPrepPlan, nextPrepTasks, parsePrepBackup, savePrepPlan } from '../../utils/prepPlan';
-  import { getRolePath } from '../../data/rolePaths';
-  import { INTERVIEW_ROUNDS } from '../../data/prepCurriculum';
+  import { buildStudyRoutes, practiceStatus, studyBudget } from '../../utils/prepRoutes';
   import { clearActivityProgress, loadActivityProgress, replaceActivityProgress } from '../../utils/activityProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
-  const today = toLocalDate(new Date());
+  let today = toLocalDate(new Date());
   const storageWarning = document.querySelector<HTMLElement>('[data-storage-warning]');
   const backupControls = document.querySelector<HTMLElement>('[data-backup-controls]');
   if (storageWarning) storageWarning.hidden = isPrepStorageAvailable();
@@ -143,23 +144,6 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     return item;
   }
 
-  const roundMethods: Record<string, { how: string; repeat: string }> = {
-    'ml-breadth': { how: 'Read one visual lesson, close it, then explain the mechanism, assumptions, failure mode, and one alternative in eight minutes.', repeat: 'Retry in two days with a different topic and one “why?” follow-up.' },
-    coding: { how: 'Use Practice Mode: write the contract, examples, baseline, edge cases, and complexity before optimizing.', repeat: 'Retry in two to three days without looking at the reference implementation.' },
-    'agentic-codebase': { how: 'Map the repository, give an agent one bounded change, inspect every diff, and run focused tests before widening the task.', repeat: 'Repeat weekly with a new codebase or failure; keep one unaided implementation session.' },
-    'ml-system-design': { how: 'Scope the user and failure cost, then draw data, model, evaluation, serving, monitoring, and rollback before naming tools.', repeat: 'Retry in three days with a changed scale, latency, or reliability constraint.' },
-    'project-deep-dive': { how: 'Record a 90-second opening, then rehearse three decisions with ownership, alternatives, evidence, failure, and update.', repeat: 'Repeat weekly with a new skeptical follow-up or observer.' },
-    'technical-strategy': { how: 'Choose the problem, portfolio order, decision rights, stop conditions, migration cost, and what remains reversible.', repeat: 'Use the upper-IC path weekly; get an experienced person to challenge one premise.' },
-    'technical-presentation': { how: 'Practice the talk from claims and decisions, not a script. Reserve time for interruption and technical descent.', repeat: 'Record one full run, repair three moments, then run it again after two days.' },
-    behavioral: { how: 'Use a real story: situation, your decision, conflict or failure, measured result, and what you changed afterward.', repeat: 'Retell from prompts once a week; change the follow-up, not the facts.' },
-    'values-mission': { how: 'Name the tension, affected people, principle, decision, consequence, and where new evidence would change your view.', repeat: 'Practice with pushback after three days; avoid slogans and invented certainty.' },
-    'product-experimentation': { how: 'State the decision and causal question, choose the unit and metric, add guardrails, then define the ship rule.', repeat: 'Retry in three days with a different source of bias or product constraint.' },
-    'research-depth': { how: 'State the claim, strongest alternative explanation, ablation, uncertainty, and the result that would change your mind.', repeat: 'Critique a new paper or method weekly, under a fixed time limit.' },
-    'research-work-sample': { how: 'List competing hypotheses, choose the smallest discriminating probes, measure them, and give a short evidence readout.', repeat: 'Run a new case after three to seven days; do not reuse the same diagnosis.' },
-    'math-oral': { how: 'Derive without notes, check dimensions and assumptions, then answer one changed-condition follow-up aloud.', repeat: 'Repeat every three to four days until the derivation is reliable under time pressure.' },
-    'systems-infrastructure': { how: 'Estimate workload, memory, communication, latency, cost, failure recovery, and the bottleneck before choosing parallelism.', repeat: 'Retry in three days with a different scale or hardware constraint.' },
-  };
-
   function textElement(tag: string, className: string, text: string): HTMLElement {
     const element = document.createElement(tag);
     element.className = className;
@@ -174,7 +158,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     return link;
   }
 
-  function renderStudyMap(plan: ReturnType<typeof loadPrepPlan>): void {
+  function renderStudyMap(plan: ReturnType<typeof loadPrepPlan>, records: PracticeProgressRecord[]): void {
     const map = document.querySelector<HTMLElement>('[data-study-map]');
     if (!map) return;
     if (!plan) {
@@ -182,81 +166,79 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
       return;
     }
     map.hidden = false;
+    const routes = buildStudyRoutes(plan, records, today);
+    const budget = studyBudget(plan, routes);
     const week = currentPlanWeek(plan);
     const title = map.querySelector<HTMLElement>('[data-route-title]');
     const summary = map.querySelector<HTMLElement>('[data-route-summary]');
     const weekLabel = map.querySelector<HTMLElement>('[data-route-week]');
     if (title) title.textContent = `${plan.roleLabel} study map`;
-    if (summary) summary.textContent = `${plan.selectedRounds.length} confirmed rounds · ${plan.weeklyHours} hours/week · ${plan.horizon} weeks. Follow the round cards in order, then use the retry queue below.`;
-    if (weekLabel) weekLabel.textContent = `Week ${week} of ${plan.horizon}`;
+    if (summary) summary.textContent = `${routes.length} confirmed rounds · ${plan.level.toUpperCase()} · ${plan.domain.replaceAll('-', ' ')}. Weak attempts first, then your evidence gaps. No extra rounds added.`;
+    if (weekLabel) weekLabel.textContent = `Week ${week} of ${plan.availableWeeks} available`;
 
     const milestones = map.querySelector<HTMLElement>('[data-route-milestones]');
     if (milestones) {
-      const phase = week === 1 ? 'Baseline' : week === plan.horizon ? 'Mixed practice' : 'Repair';
+      const baselines = routes.filter(route => route.steps[0].record).length;
+      const clean = routes.filter(route => route.steps[0].record?.successfulAttempts).length;
+      const verified = routes.filter(route => route.steps.every(step => step.status === 'mastered')).length;
       milestones.replaceChildren(
-        textElement('div', 'route-milestone route-milestone--active', `NOW · ${phase}`),
-        textElement('div', 'route-milestone', 'NEXT · Retry the weakest round'),
-        textElement('div', 'route-milestone', 'THEN · Run one mixed simulation'),
+        textElement('div', 'route-milestone', `${baselines}/${routes.length} rounds attempted`),
+        textElement('div', 'route-milestone', `${clean}/${routes.length} clean diagnostics`),
+        textElement('div', 'route-milestone', `${verified}/${routes.length} routes verified`),
       );
     }
+    const budgetSummary = map.querySelector<HTMLElement>('[data-budget-summary]');
+    if (budgetSummary) budgetSummary.textContent = `${budget.weeklyMinutes} min available. Reserve ${budget.repairMinutes} min for due retries, repairs, and feedback. New sessions below include 15 min of review each.`;
+    const budgetList = map.querySelector<HTMLElement>('[data-budget-sessions]');
+    if (budgetList) budgetList.replaceChildren(...budget.sessions.map(session => {
+      const route = routes.find(item => item.id === session.roundId)!;
+      const item = document.createElement('li');
+      item.append(routeLink(`${route.label}: ${session.minutes} min`, `#route-${route.id}`));
+      return item;
+    }));
+    const budgetWarning = map.querySelector<HTMLElement>('[data-budget-warning]');
+    if (budgetWarning) budgetWarning.textContent = budget.baselineMinutes > budget.availableMinutes
+      ? `Your unattempted diagnostics need ${budget.baselineMinutes} min before any repeats; only ${budget.availableMinutes} min remain in your stated budget. Edit the scope or available time.`
+      : plan.estimatedHours.low > budget.availableMinutes / 60
+        ? `Full preparation is estimated at ${plan.estimatedHours.low}–${plan.estimatedHours.high} hours; your budget is ${budget.availableMinutes / 60}. Prioritize the weakest confirmed rounds. Finishing these diagnostics alone does not close that gap.`
+        : `${budget.unassignedMinutes} min unassigned. If retries fill the budget, defer new work. ${budget.baselineMinutes} min of unattempted diagnostics remain across the loop.`;
 
     const grid = map.querySelector<HTMLElement>('[data-round-route-grid]');
     if (grid) {
+      const openIds = new Set(Array.from(grid.querySelectorAll<HTMLDetailsElement>('details[open]')).map(item => item.id));
+      const firstRender = grid.children.length === 0;
       grid.replaceChildren();
-      plan.selectedRounds.forEach((roundId) => {
-        const round = INTERVIEW_ROUNDS.find((item) => item.id === roundId);
-        if (!round) return;
-        const method = roundMethods[round.id] ?? { how: 'Attempt one representative question closed-book, compare against the reference, and record the missing step.', repeat: 'Retry after two or three days with a changed assumption.' };
-        const card = document.createElement('article');
-        card.className = 'round-route-card';
-        card.append(textElement('p', 'round-route-label', round.label));
-        card.append(textElement('h3', '', round.description));
-        const study = document.createElement('p');
-        study.className = 'round-route-method';
-        study.append(textElement('strong', '', 'How: '), document.createTextNode(method.how));
-        card.append(study);
-        const repeat = document.createElement('p');
-        repeat.className = 'round-route-repeat';
-        repeat.append(textElement('strong', '', 'Repeat: '), document.createTextNode(method.repeat));
-        card.append(repeat);
-        const links = document.createElement('div');
-        links.className = 'round-route-links';
-        round.starterLinks.slice(0, 3).forEach((starter) => links.append(routeLink(starter.label, starter.href)));
-        card.append(links);
-        grid.append(card);
+      routes.forEach((route, index) => {
+        const section = document.createElement('details');
+        section.className = 'round-route';
+        section.id = `route-${route.id}`;
+        section.open = openIds.has(section.id) || window.location.hash === `#${section.id}` || (firstRender && index === 0);
+        const heading = document.createElement('summary');
+        const done = route.steps.filter(step => step.status === 'mastered').length;
+        heading.append(textElement('strong', '', `${index + 1}. ${route.label}`), textElement('span', '', `${done}/2 prompts verified`));
+        section.append(heading, textElement('p', 'route-reason', `${route.reason} Starting evidence: ${route.evidence.toFixed(1)}/5.`));
+        const steps = document.createElement('ol');
+        steps.className = 'route-steps';
+        route.steps.forEach(step => {
+          const item = document.createElement('li');
+          const blocked = step.stage === 'Transfer' && step.status === 'new' && !route.steps[0].record?.successfulAttempts;
+          const status = blocked ? 'After a clean diagnostic' : step.status === 'new' ? 'Not attempted' : step.status === 'scheduled' ? `Retry ${step.record?.dueOn}` : step.status === 'due' ? 'Retry due now' : step.status === 'mixed' ? 'Later mixed check needed' : `Verified ${step.record?.mixedVerifiedOn}`;
+          item.append(textElement('p', 'route-step-status', `${step.stage} · ${status}`), routeLink(step.label, step.href));
+          item.append(textElement('p', 'route-instruction', `${step.practice.minutes} min closed-book. ${step.practice.instruction}`));
+          const rubric = document.createElement('details');
+          rubric.className = 'route-rubric';
+          rubric.append(textElement('summary', '', 'Score and repair'));
+          const checks = document.createElement('ul');
+          step.practice.rubric.forEach(check => checks.append(textElement('li', '', check.question)));
+          rubric.append(checks, routeLink(`Repair: ${step.repairLabel}`, step.visualHref));
+          if (step.record?.weakDimensions.length) rubric.append(textElement('p', '', `Last gaps: ${step.record.weakDimensions.map(dimensionLabel).join(', ')}.`));
+          item.append(rubric);
+          if (step.record) item.append(textElement('p', 'route-history', `${step.record.attempts} attempts · ${step.record.successfulAttempts} clean passes on different days · last ${step.record.lastAttemptOn}`));
+          steps.append(item);
+        });
+        section.append(steps, textElement('p', 'route-repeat', `Repeat rule: Weak +${RETRY_DAYS.Weak} days; Review or first clean Confident +${RETRY_DAYS.Review} days. After two clean passes on different days, test an unfamiliar follow-up in a later mixed session. Record the pass in the practice record.`));
+        grid.append(section);
       });
-    }
-
-    const gapList = map.querySelector<HTMLElement>('[data-gap-route-list]');
-    if (gapList) {
-      gapList.replaceChildren(...plan.topGaps.slice(0, 3).map((gap) => {
-        const card = document.createElement('article');
-        card.className = 'gap-route-card';
-        const heading = document.createElement('div');
-        heading.className = 'gap-route-heading';
-        heading.append(textElement('strong', '', gap.label), textElement('span', '', `${gap.rating}/5`));
-        card.append(heading, textElement('p', '', gap.description));
-        const links = document.createElement('div');
-        links.className = 'gap-route-links';
-        gap.starterLinks.slice(0, 2).forEach((starter) => links.append(routeLink(starter.label, starter.href)));
-        card.append(links);
-        return card;
-      }));
-    }
-
-    const rolePath = getRolePath(plan.role);
-    const sequenceTitle = map.querySelector<HTMLElement>('[data-role-sequence-title]');
-    const sequenceList = map.querySelector<HTMLOListElement>('[data-role-sequence-list]');
-    if (sequenceTitle) sequenceTitle.textContent = `${rolePath?.title ?? plan.roleLabel} sequence`;
-    if (sequenceList) {
-      sequenceList.replaceChildren(...(rolePath?.sequence ?? []).map((step, index) => {
-        const item = document.createElement('li');
-        const number = textElement('span', 'sequence-number', String(index + 1).padStart(2, '0'));
-        const body = document.createElement('div');
-        body.append(routeLink(step.title, step.href), textElement('p', '', step.detail));
-        item.append(number, body);
-        return item;
-      }));
     }
   }
 
@@ -293,8 +275,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     const week = currentPlanWeek(plan);
     const title = context.querySelector<HTMLElement>('[data-plan-title]');
     const summary = context.querySelector<HTMLElement>('[data-plan-summary]');
-    if (title) title.textContent = `${plan.roleLabel} · week ${week} of ${plan.horizon}`;
-    if (summary) summary.textContent = `${plan.level.toUpperCase()} · ${plan.weeklyHours} hours/week · estimated ${plan.estimatedHours.low}–${plan.estimatedHours.high} hours · updated ${plan.updatedOn}`;
+    if (title) title.textContent = `${plan.roleLabel} · week ${week} of ${plan.availableWeeks} available`;
+    if (summary) summary.textContent = `${plan.level.toUpperCase()} · ${plan.weeklyHours} hours/week · estimated full workload ${plan.estimatedHours.low}–${plan.estimatedHours.high} hours · updated ${plan.updatedOn}`;
 
     const tasks = nextPrepTasks(plan, records, today);
     const nextAction = context.querySelector<HTMLElement>('[data-next-action]');
@@ -303,6 +285,12 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     const nextDetail = context.querySelector<HTMLElement>('[data-next-detail]');
     const first = tasks[0];
     if (nextAction) nextAction.hidden = !first;
+    const waiting = context.querySelector<HTMLElement>('[data-plan-waiting]');
+    if (waiting) {
+      waiting.hidden = Boolean(first);
+      const nextDate = buildStudyRoutes(plan, records, today).flatMap(route => route.steps).map(step => step.record?.dueOn).filter((date): date is string => Boolean(date && date > today)).sort()[0];
+      waiting.textContent = nextDate ? `No mapped retry is due today. Next retry: ${nextDate}. Review feedback or rest; keep the spacing.` : 'No new mapped task today. Save the mixed check for a later day and an unfamiliar follow-up.';
+    }
     if (first && nextLink && nextTitle && nextDetail) {
       nextLink.href = first.href;
       nextTitle.textContent = first.title;
@@ -347,8 +335,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
       card.append(gaps);
     }
 
-    const eligibleForMixed = record.successfulAttempts >= 2 && record.weakDimensions.length === 0;
-    if (eligibleForMixed && !record.mixedVerifiedOn) {
+    const eligibleForMixed = practiceStatus(record, today) === 'mixed' && record.lastAttemptOn < today;
+    if (eligibleForMixed) {
       const verify = document.createElement('button');
       verify.type = 'button';
       verify.className = 'verify-button';
@@ -359,7 +347,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
         catch { if (storageWarning) storageWarning.hidden = false; }
       });
       card.append(verify);
-    } else if (record.mixedVerifiedOn) {
+    } else if (practiceStatus(record, today) === 'mastered') {
       const graduated = document.createElement('p');
       graduated.className = 'graduated';
       graduated.textContent = `Graduated ${record.mixedVerifiedOn}`;
@@ -369,9 +357,10 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   }
 
   function render(): void {
+    today = toLocalDate(new Date());
     const records = loadPrepProgress().sort((left, right) => (left.dueOn ?? '9999').localeCompare(right.dueOn ?? '9999'));
     renderPlan(records);
-    renderStudyMap(loadPrepPlan());
+    renderStudyMap(loadPrepPlan(), records);
     const due = records.filter((record) => record.dueOn !== null && record.dueOn <= today);
     const other = records.filter((record) => !due.includes(record));
     const attempts = records.reduce((sum, record) => sum + record.attempts, 0);
@@ -439,15 +428,28 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   } catch {
     if (storageWarning) storageWarning.hidden = false;
   }
-  const anchoredDetails = window.location.hash ? document.querySelector<HTMLDetailsElement>(window.location.hash) : null;
-  if (anchoredDetails?.tagName === 'DETAILS') anchoredDetails.open = true;
+  const anchoredDetails = document.getElementById(window.location.hash.slice(1));
+  if (anchoredDetails instanceof HTMLDetailsElement) anchoredDetails.open = true;
   render();
+  document.querySelector('[data-print-map]')?.addEventListener('click', () => window.print());
+  const printOpenStates = new Map<HTMLDetailsElement, boolean>();
+  window.addEventListener('beforeprint', () => {
+    document.querySelectorAll<HTMLDetailsElement>('.study-map details').forEach(detail => { printOpenStates.set(detail, detail.open); detail.open = true; });
+  });
+  window.addEventListener('afterprint', () => {
+    printOpenStates.forEach((open, detail) => { detail.open = open; });
+    printOpenStates.clear();
+  });
+  window.addEventListener('hashchange', () => {
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (target instanceof HTMLDetailsElement) target.open = true;
+  });
   window.addEventListener('storage', render);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') render(); });
   trackPublicEvent('workbook_opened');
 </script>
 
-<style>
+<style is:global>
   .storage-warning { margin: 0 0 1rem; padding: .75rem .85rem; border-left: 3px solid #b45309; background: var(--c-bg-tint); color: var(--c-text-soft); font-size: .82rem; }
   .section-kicker { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
   .start-sheet, .plan-sheet, .record-sheet { margin: 0 0 1.7rem; padding: .8rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
@@ -460,38 +462,32 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .route-milestones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; margin: 1rem 0; }
   .route-milestone { padding: .45rem .5rem; border-top: 2px solid var(--c-rule); color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; }
   .route-milestone--active { border-top-color: var(--c-accent); color: var(--c-accent); }
-  .gap-route { margin: .9rem 0; padding: .7rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
-  .gap-route > header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
-  .gap-route h3 { margin: 0 !important; font-size: .82rem !important; }
-  .gap-route > header span { color: var(--c-muted); font-size: .66rem; }
-  .gap-route-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .5rem; margin-top: .55rem; }
-  .gap-route-card { min-width: 0; padding: .55rem .6rem; background: var(--c-bg-tint); }
-  .gap-route-heading { display: flex; justify-content: space-between; gap: .4rem; }
-  .gap-route-heading strong { font-size: .72rem; line-height: 1.3; }
-  .gap-route-heading span { flex: 0 0 auto; color: var(--c-accent); font-family: var(--font-mono); font-size: .6rem; }
-  .gap-route-card p { margin: .3rem 0 0; color: var(--c-muted); font-size: .67rem; line-height: 1.4; }
-  .gap-route-links { display: flex; flex-wrap: wrap; gap: .3rem .55rem; margin-top: .5rem; }
-  .gap-route-links a { color: var(--c-accent); font-size: .64rem; font-weight: 650; text-decoration: none; }
-  .gap-route-links a:hover { text-decoration: underline; }
-  .round-route-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
-  .round-route-card { min-width: 0; padding: .75rem; border: 1px solid var(--c-rule); background: var(--c-bg-tint); }
-  .round-route-label { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .round-route-card h3 { margin: .3rem 0 .5rem !important; font-size: .82rem !important; line-height: 1.3; }
-  .round-route-method, .round-route-repeat { margin: .4rem 0 0; color: var(--c-text-soft); font-size: .72rem; line-height: 1.45; }
-  .round-route-method strong, .round-route-repeat strong { color: var(--c-text); }
-  .round-route-repeat { color: var(--c-muted); }
-  .round-route-links { display: flex; flex-wrap: wrap; gap: .35rem .7rem; margin-top: .7rem; padding-top: .55rem; border-top: 1px solid var(--c-rule); }
-  .round-route-links a { color: var(--c-accent); font-size: .68rem; font-weight: 650; text-decoration: none; }
-  .round-route-links a:hover { text-decoration: underline; }
-  .role-sequence { margin-top: .75rem; }
-  .role-sequence summary { display: flex; justify-content: space-between; gap: .75rem; cursor: pointer; font-size: .78rem; }
-  .role-sequence summary span { color: var(--c-muted); font-size: .68rem; font-weight: 400; }
-  .role-sequence ol { margin: .7rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
-  .role-sequence li { display: grid; grid-template-columns: 1.7rem minmax(0, 1fr); gap: .55rem; margin: 0; padding: .55rem 0; border-bottom: 1px solid var(--c-rule); }
-  .sequence-number { color: var(--c-accent); font-family: var(--font-mono); font-size: .64rem; }
-  .role-sequence a { color: var(--c-text); font-size: .74rem; font-weight: 650; text-decoration: none; }
-  .role-sequence a:hover { color: var(--c-accent); text-decoration: underline; }
-  .role-sequence p { margin: .15rem 0 0; color: var(--c-muted); font-size: .7rem; line-height: 1.4; }
+  .week-budget { margin: 1rem 0; padding: .5rem 0 1rem; border-bottom: 1px solid var(--c-rule); }
+  .week-budget h3 { margin: 0 0 .4rem !important; }
+  .week-budget p, .week-budget li, .route-protocol { font-size: .85rem; color: var(--c-text-soft); }
+  .week-budget ul { padding-left: 1.2rem; }
+  .round-route-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .round-route { min-width: 0; padding: 1rem 0; border-top: 1px solid var(--c-rule); scroll-margin-top: var(--sticky-offset); }
+  .round-route > summary { cursor: pointer; font-size: .95rem; }
+  .round-route > summary span { display: block; margin: .3rem 0 0 1rem; color: var(--c-muted); font-size: .78rem; }
+  .route-reason, .route-repeat { color: var(--c-text-soft); font-size: .82rem; }
+  .route-steps { margin: 1rem 0; padding-left: 1.35rem; }
+  .route-steps > li { margin: 0; padding: .6rem 0 1rem .4rem; border-bottom: 1px solid var(--c-rule); }
+  .route-steps > li > a { font-size: .95rem; font-weight: 650; }
+  .route-step-status { margin: 0 0 .25rem; font-family: var(--font-mono); font-size: .75rem; color: var(--c-accent); }
+  .route-instruction { margin: .45rem 0; font-size: .87rem; color: var(--c-text-soft); }
+  .route-rubric { font-size: .84rem; }
+  .route-rubric summary { cursor: pointer; padding: .3rem 0; font-weight: 650; }
+  .route-rubric ul { padding-left: 1.2rem; }
+  .route-rubric li { margin: .45rem 0; }
+  .route-history { font-size: .78rem; color: var(--c-muted); }
+  .print-map { padding: .5rem .7rem; border: 1px solid var(--c-rule); border-radius: 4px; background: var(--c-bg); color: var(--c-text); font: inherit; cursor: pointer; }
+  @media print {
+    .print-map, .backup, .next-stage, .start-sheet, .later-tasks, .verify-button { display: none !important; }
+    .round-route { break-before: page; }
+    .route-steps > li { break-inside: avoid; }
+    .study-map a[href^="/questions/"]::after { content: ' (mlmentorship.com' attr(href) ')'; font-size: 8pt; font-weight: 400; overflow-wrap: anywhere; }
+  }
   .start-sheet h2, .plan-sheet h2, .record-sheet h2 { margin: .15rem 0 .35rem !important; font-size: 1.05rem !important; }
   .start-sheet > p:not(.section-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); }
   .start-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-top: .9rem; }
@@ -556,7 +552,6 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   @media (max-width: 620px) {
     .study-map-header { align-items: flex-start; flex-direction: column; }
     .route-milestones { grid-template-columns: 1fr; gap: .25rem; }
-    .gap-route-grid { grid-template-columns: 1fr; }
     .round-route-grid { grid-template-columns: 1fr; }
     .plan-sheet > header, .record-sheet > header { flex-direction: column; }
     .start-actions { align-items: stretch; flex-direction: column; }
