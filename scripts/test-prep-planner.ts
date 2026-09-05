@@ -33,6 +33,19 @@ test('role, domain, and level change representative questions', () => {
   assert.equal(questionPair({ ...plan, level: 'l7' }, 'ml-system-design').slugs[0], 'design-multi-team-ml-platform');
   assert.equal(questionPair({ ...plan, domain: 'recsys' }, 'ml-system-design').slugs[0], 'design-youtube-recommender');
   assert.equal(questionPair({ ...plan, role: 'research-engineer' }, 'coding').slugs[0], 'implement-attention-from-scratch');
+  assert.equal(questionPair({ ...plan, domain: 'llm' }, 'product-experimentation').slugs[0], 'how-would-you-evaluate-an-llm-application');
+  assert.equal(questionPair({ ...plan, domain: 'platform' }, 'systems-infrastructure').slugs[0], 'design-fault-tolerant-distributed-training');
+});
+
+test('priority puts the weakest round first without losing its route', () => {
+  const configured = { ...plan, selectedRounds: ['ml-breadth', 'ml-system-design'], areaRatings: { fundamentals: 4, 'system-design': 0 } };
+  const routes = buildStudyRoutes(configured, [record('design-fraud-detection', { score: 'Weak', weakDimensions: ['framing'], dueOn: null })], today);
+  assert.equal(routes[0].id, 'ml-system-design');
+  assert.equal(routes[0].steps[0].slug, 'design-fraud-detection');
+  const researchPlan = { ...plan, role: 'research-scientist', level: 'l7', domain: 'research', selectedRounds: ['ml-system-design', 'technical-strategy'], areaRatings: { 'system-design': 1, behavioral: 1 } };
+  const researchRoutes = buildStudyRoutes(researchPlan, [], today);
+  assert.deepEqual(researchRoutes.find(route => route.id === 'ml-system-design')?.steps.map(step => step.slug), ['design-reasoning-model-fixed-budget', 'design-ml-system-fixed-budget']);
+  assert.deepEqual(researchRoutes.find(route => route.id === 'technical-strategy')?.steps.map(step => step.slug), ['design-post-training-data-and-rl-environment', 'design-enterprise-agent-platform']);
 });
 
 test('future retries are withheld and become first priority when due', () => {
@@ -80,7 +93,12 @@ test('all mapped questions exist and method matches content metadata', () => {
   for (const domain of ['general', 'llm', 'recsys', 'platform', 'research', 'post-training', 'alignment', 'multimodal', 'product']) {
     for (const role of ['applied-scientist', 'ml-engineer', 'research-engineer', 'research-scientist']) {
       const routes = buildStudyRoutes({ ...plan, domain, role, selectedRounds: INTERVIEW_ROUNDS.map(round => round.id) }, [], today);
+      assert.equal(routes.length, INTERVIEW_ROUNDS.length, `${role}/${domain}: missing round route`);
+      const mappedSlugs: string[] = [];
       for (const route of routes) for (const step of route.steps) {
+        assert.equal(route.steps.length, 2, `${role}/${domain}/${route.id}: route needs diagnostic and transfer`);
+        assert.notEqual(route.steps[0].slug, route.steps[1].slug, `${role}/${domain}/${route.id}: duplicate pair`);
+        mappedSlugs.push(step.slug);
         const file = files.find(name => name.endsWith(`-${step.slug}.md`));
         assert.ok(file, step.slug);
         const category = getSubcategoryMap('questions')?.map[step.slug];
@@ -90,6 +108,7 @@ test('all mapped questions exist and method matches content metadata', () => {
         assert.ok(files.some(name => name.endsWith(`-${repairSlug}.md`)), repairSlug);
         assert.notEqual(step.repairLabel, 'Worked visual for this prompt', step.slug);
       }
+      assert.equal(new Set(mappedSlugs).size, mappedSlugs.length, `${role}/${domain}: duplicate prompt across rounds`);
     }
   }
 });

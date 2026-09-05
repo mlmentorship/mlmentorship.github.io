@@ -29,7 +29,7 @@ const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.
 const journeyItems = [
   { number: '01', label: 'Plan', href: '/prep/readiness/', active: pathname.startsWith('/prep/readiness/') || pathname.startsWith('/prep/plans/') },
   { number: '02', label: 'Your map', href: '/prep/', active: pathname === '/prep/' },
-  { number: '03', label: 'Practice', href: '/questions/', active: false },
+  { number: '03', label: 'Practice', href: '/prep/#queue', active: false },
   { number: '04', label: 'Simulate', href: '/prep/simulations/', active: pathname.startsWith('/prep/simulations/') },
   { number: '05', label: 'Final week', href: '/prep/final-week/', active: pathname.startsWith('/prep/final-week/') },
 ];
