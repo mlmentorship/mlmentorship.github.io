@@ -33,7 +33,12 @@ const externalDependencies = [
   <p class="privacy-note"><strong>No account, dates, identity, or answer text.</strong> Selections and calculations stay in this browser. Clearing browser data removes the saved plan; the Workbook can export a backup. Only coarse “started” and “completed” event names are counted.</p>
 
   <form id="readiness-form" class="readiness-form">
-    <section class="panel" aria-labelledby="target-heading">
+    <nav class="readiness-steps" data-readiness-steps aria-label="Readiness steps" hidden>
+      <button type="button" data-readiness-step="1"><span>01</span><strong>Loop</strong></button>
+      <button type="button" data-readiness-step="2"><span>02</span><strong>Rounds</strong></button>
+      <button type="button" data-readiness-step="3"><span>03</span><strong>Evidence</strong></button>
+    </nav>
+    <section class="panel" data-readiness-stage="1" aria-labelledby="target-heading">
       <h2 id="target-heading">1. Target and capacity</h2>
       <div class="field-grid">
         <label><span>Role</span><select name="role" required>{ROLE_ORDER.map((id) => <option value={id}>{ROLE_OVERLAYS[id].label}</option>)}</select></label>
@@ -43,8 +48,9 @@ const externalDependencies = [
         <label><span>Weeks until the loop</span><select name="runway" required><option value="2">2 weeks</option><option value="4" selected>4 weeks</option><option value="6">6 weeks</option><option value="8">8 weeks</option><option value="12">12+ weeks</option></select></label>
       </div>
     </section>
+    <div class="stage-actions" data-stage-actions="1" hidden><span>Step 1 of 3</span><button type="button" class="secondary-button" data-stage-next="2">Continue to rounds</button></div>
 
-    <fieldset class="panel rounds-panel">
+    <fieldset class="panel rounds-panel" data-readiness-stage="2">
       <legend>2. Actual interview rounds</legend>
       <div class="section-intro">
         <p>Select the formats the recruiter described, not every topic you might study. Domains such as LLMs and recommendations belong above, not here.</p>
@@ -58,7 +64,7 @@ const externalDependencies = [
       <p id="round-error" class="form-error" role="alert" hidden></p>
     </fieldset>
 
-    <details class="external-check">
+    <details class="external-check" data-readiness-stage="2">
       <summary>Rounds outside this site's curriculum</summary>
       <p>Select only formats confirmed for your loop. These affect readiness, but mlmentorship intentionally does not duplicate dedicated coding, SQL, or general systems resources.</p>
       <div class="external-grid">
@@ -74,8 +80,9 @@ const externalDependencies = [
         ))}
       </div>
     </details>
+    <div class="stage-actions" data-stage-actions="2" hidden><button type="button" class="text-button" data-stage-back="1">Back to loop</button><button type="button" class="secondary-button" data-stage-next="3">Continue to evidence</button></div>
 
-    <fieldset class="panel">
+    <fieldset class="panel" data-readiness-stage="3">
       <legend>3. Current evidence</legend>
       <p class="help">Every area starts at 0. Change it only when you have evidence from a recent timed, closed-book attempt. “I understand it when reading” is not a 3.</p>
       <div class="rating-grid">
@@ -85,7 +92,7 @@ const externalDependencies = [
       </div>
     </fieldset>
 
-    <div class="form-actions"><button class="primary-button" type="submit">Build my prep starting point</button></div>
+    <div class="form-actions" data-stage-actions="3"><button type="button" class="text-button" data-stage-back="2">Back to rounds</button><button class="primary-button" type="submit">Build my prep starting point</button></div>
   </form>
 
   <section id="readiness-results" class="results" aria-live="polite" tabindex="-1" hidden data-pagefind-ignore="all">
@@ -93,6 +100,7 @@ const externalDependencies = [
     <p id="plan-save-status" class="plan-save-status" aria-live="polite"></p>
     <p id="readiness-delta" class="readiness-delta" hidden></p>
     <p id="result-summary" class="result-summary"></p>
+    <a class="result-next" data-result-next href="/questions/">Start the first diagnostic <span aria-hidden="true">→</span></a>
     <div class="result-metrics"><div><span>Estimated work</span><strong id="result-hours"></strong></div><div><span>Your capacity</span><strong id="result-capacity"></strong></div><div><span>Runway signal</span><strong id="result-runway"></strong></div></div>
     <h3>Your first diagnostic routes</h3>
     <ol id="focus-list" class="focus-list">
@@ -136,9 +144,34 @@ const externalDependencies = [
   const form = document.querySelector<HTMLFormElement>('#readiness-form');
   const results = document.querySelector<HTMLElement>('#readiness-results');
   const roundError = document.querySelector<HTMLElement>('#round-error');
+  const readinessSteps = document.querySelector<HTMLElement>('[data-readiness-steps]');
   const READINESS_DRAFT_KEY = 'mlm:readiness-draft:v1';
   let started = false;
   form?.addEventListener('input', () => { if (!started) { started = true; trackPublicEvent('readiness_started'); } }, { once: true });
+
+  function setReadinessStage(stage: number, focus = true): void {
+    if (!form) return;
+    form.dataset.stepMode = 'true';
+    readinessSteps?.removeAttribute('hidden');
+    form.querySelectorAll<HTMLElement>('[data-readiness-stage]').forEach((element) => {
+      element.hidden = Number(element.dataset.readinessStage) !== stage;
+    });
+    form.querySelectorAll<HTMLElement>('[data-stage-actions]').forEach((element) => {
+      element.hidden = Number(element.dataset.stageActions) !== stage;
+    });
+    readinessSteps?.querySelectorAll<HTMLButtonElement>('[data-readiness-step]').forEach((button) => {
+      const active = Number(button.dataset.readinessStep) === stage;
+      button.classList.toggle('active', active);
+      if (active) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+    if (focus) form.querySelector<HTMLElement>(`[data-readiness-stage="${stage}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-stage-next], [data-stage-back], [data-readiness-step]').forEach((button) => {
+    button.addEventListener('click', () => setReadinessStage(Number(button.dataset.stageNext ?? button.dataset.stageBack ?? button.dataset.readinessStep)));
+  });
+  setReadinessStage(1, false);
 
   function saveDraft(): void {
     if (!form) return;
@@ -357,6 +390,11 @@ const externalDependencies = [
     };
     const planSaveStatus = document.querySelector<HTMLElement>('#plan-save-status');
     const routes = buildStudyRoutes(plan, [], today);
+    const resultNext = document.querySelector<HTMLAnchorElement>('[data-result-next]');
+    if (resultNext && routes[0]?.steps[0]) {
+      resultNext.href = routes[0].steps[0].href;
+      resultNext.textContent = `Start: ${routes[0].steps[0].label} (${routes[0].steps[0].practice.minutes} min)`;
+    }
     focusItems.forEach((item, index) => {
       const route = routes[index];
       item.hidden = !route;
@@ -413,6 +451,14 @@ const externalDependencies = [
 <style>
   .privacy-note { padding: .75rem .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg-tint); color: var(--c-muted); font-size: .88rem; }
   .readiness-form { display: grid; gap: 1rem; }
+  .readiness-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; margin-bottom: .15rem; }
+  .readiness-steps button { display: flex; min-height: 2.8rem; flex-direction: column; align-items: flex-start; justify-content: center; gap: .08rem; padding: .35rem .55rem; border: 0; border-top: 2px solid var(--c-rule); background: transparent; color: var(--c-muted); font: inherit; text-align: left; cursor: pointer; }
+  .readiness-steps button.active { border-top-color: var(--c-accent); color: var(--c-accent); }
+  .readiness-steps button span { margin: 0; font-family: var(--font-mono); font-size: .58rem; }
+  .readiness-steps button strong { color: inherit; font-size: .78rem; }
+  .stage-actions { display: flex; align-items: center; justify-content: flex-end; gap: .7rem; }
+  .stage-actions[hidden] { display: none; }
+  .stage-actions > span { margin-right: auto; color: var(--c-muted); font-size: .76rem; }
   .panel { margin: 0; padding: clamp(1.1rem, 3vw, 1.6rem); border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); }
   .panel h2, .panel legend { margin: 0 0 .7rem; font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; }
   .panel legend { padding: 0 .35rem; }
@@ -448,6 +494,8 @@ const externalDependencies = [
   .results-head h2 { margin: 0; }
   .eyebrow { margin: 0 0 .35rem; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); }
   .result-summary { color: var(--c-text-soft); }
+  .result-next { display: inline-flex; align-items: center; gap: .45rem; margin: .2rem 0 1rem; padding: .62rem .78rem; border: 1px solid var(--c-accent); border-radius: var(--radius); color: var(--c-accent); font-size: .82rem; font-weight: 700; text-decoration: none; }
+  .result-next:hover { background: var(--c-accent-soft); }
   .plan-save-status { margin: .65rem 0 0; color: var(--c-muted); font-size: .78rem; }
   .readiness-delta { margin: .35rem 0 0; color: var(--c-text-soft); font-size: .78rem; }
   .result-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin: 1.2rem 0; }
@@ -470,6 +518,8 @@ const externalDependencies = [
   .text-button { padding: .6rem 0; border: 0; background: none; color: var(--c-link); font: inherit; text-decoration: underline; cursor: pointer; }
   @media (max-width: 720px) {
     .field-grid, .rating-grid, .choice-grid, .result-metrics { grid-template-columns: 1fr; }
+    .readiness-steps { gap: .2rem; }
+    .readiness-steps button { padding-inline: .35rem; }
     .rating-field { grid-template-columns: 1fr; gap: .25rem; }
     .external-grid label { grid-template-columns: 1fr; gap: .25rem; }
     .section-intro, .results-head { align-items: stretch; flex-direction: column; }

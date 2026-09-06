@@ -254,7 +254,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
         if (kicker) kicker.textContent = 'Due now';
         if (title) title.textContent = `${due.length} ${due.length === 1 ? 'question needs' : 'questions need'} another attempt.`;
         if (copy) copy.textContent = 'Complete due work before opening another topic. Keep the answer closed until the attempt ends.';
-        if (primary) { primary.href = `/questions/${due[0].slug}/?practice=1`; primary.textContent = 'Practice the next due question'; }
+        if (primary) { primary.href = `/questions/${due[0].slug}/?practice=1&from=workbook`; primary.textContent = 'Practice the next due question'; }
         if (secondary) { secondary.href = '/prep/readiness/'; secondary.textContent = 'Build a plan'; }
       } else if (records.length > 0) {
         if (kicker) kicker.textContent = 'Continue';
@@ -320,7 +320,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     const header = document.createElement('header');
     const title = document.createElement('h4');
     const link = document.createElement('a');
-    link.href = `/questions/${record.slug}/?practice=1`;
+    link.href = `/questions/${record.slug}/?practice=1&from=workbook`;
     link.textContent = record.title;
     title.append(link);
     const badge = document.createElement('span');

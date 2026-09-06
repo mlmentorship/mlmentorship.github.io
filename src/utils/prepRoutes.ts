@@ -193,7 +193,7 @@ export function buildStudyRoutes(plan: PrepPlanState, records: PracticeProgressR
       const label = INTERVIEW_ROUNDS.flatMap(item => item.starterLinks).find(link => link.href === `/questions/${slug}/`)?.label
         ?? slug.replaceAll('-', ' ').replace(/^./, letter => letter.toUpperCase());
       const repair = repairConcepts[slug] ?? { slug, label: 'Worked visual for this prompt' };
-      return { slug, label, stage: index === 0 ? 'Diagnostic' : 'Transfer', href: `/questions/${slug}/?practice=1`, visualHref: `/review/#${repair.slug}`, repairLabel: repair.label, practice, record, status: practiceStatus(record, today) };
+      return { slug, label, stage: index === 0 ? 'Diagnostic' : 'Transfer', href: `/questions/${slug}/?practice=1&from=map`, visualHref: `/review/#${repair.slug}`, repairLabel: repair.label, practice, record, status: practiceStatus(record, today) };
     });
     return { id: round.id, label: round.label, reason: selected.reason, evidence, priority, steps, sessionMinutes: steps[0].practice.minutes + 15 };
   }).sort((left, right) => right.priority - left.priority);

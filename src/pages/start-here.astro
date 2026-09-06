@@ -17,6 +17,16 @@ import { SITE } from '../consts';
 
   {SITE.features.prepTools && <aside class="workbook-note"><strong>Preparing for an active interview loop?</strong> The <a href="/prep/">Workbook</a> combines role, rounds, current evidence, and due practice in one place.</aside>}
 
+  <section id="starter-route" class="starter-route" aria-labelledby="starter-route-heading">
+    <header><p class="kicker">Start here</p><h2 id="starter-route-heading">Three lessons, then choose your depth.</h2><p>Use this 30-minute route to see how the field guide teaches. Close each lesson and explain the mechanism before moving on.</p></header>
+    <ol>
+      <li><span>01</span><div><h3><a href="/concepts/matrices-as-linear-maps/">See a mechanism</a></h3><p>Build spatial intuition for a matrix before touching the formula.</p><small>Read the visual, close it, and explain what changes shape.</small></div></li>
+      <li><span>02</span><div><h3><a href="/concepts/flashattention/">See a systems trade-off</a></h3><p>Follow memory movement and tiling instead of memorizing a kernel name.</p><small>Explain the bottleneck and one condition that would change the design.</small></div></li>
+      <li><span>03</span><div><h3><a href="/questions/defend-values-under-ethical-pressure/">Practice interview judgment</a></h3><p>Work through a real trade-off, then defend the decision under pushback.</p><small>Answer closed-book before reading the leveled response.</small></div></li>
+    </ol>
+    <p class="starter-route-next">Ready for a real loop? <a href="/prep/readiness/">Build the personalized map →</a></p>
+  </section>
+
   <nav class="path-index" aria-label="Reading paths">
     <ol>
       <li><a href="#building-deep-technical-foundations"><span>01</span>Build technical foundations</a></li>
@@ -79,6 +89,22 @@ import { SITE } from '../consts';
   .lede { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.08rem; line-height: 1.6; }
 
   .workbook-note { margin: 0 0 2rem; padding: .8rem 0 .8rem .9rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); color: var(--c-text-soft); font-family: var(--font-reading); font-size: .9rem; }
+  .starter-route { margin: 0 0 3rem; padding: 1rem; border: 2px solid var(--c-text); background: var(--c-surface); scroll-margin-top: var(--sticky-offset); }
+  .starter-route header { max-width: 38rem; padding-bottom: .8rem; border-bottom: 1px solid var(--c-rule); }
+  .starter-route header .kicker { margin-bottom: .45rem; }
+  .starter-route header h2 { margin: 0 0 .35rem; font-size: 1.25rem; }
+  .starter-route header p:last-child { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); line-height: 1.5; }
+  .starter-route ol { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+  .starter-route li { display: grid; grid-template-columns: 1.4rem 1fr; gap: .55rem; margin: 0; padding: .7rem 0; border-top: 2px solid var(--c-rule); }
+  .starter-route li > span { color: var(--c-accent); font-family: var(--font-mono); font-size: .7rem; }
+  .starter-route h3 { margin: 0 0 .25rem; font-size: .92rem; }
+  .starter-route h3 a { color: var(--c-text); text-decoration: none; }
+  .starter-route h3 a:hover { color: var(--c-accent); text-decoration: underline; }
+  .starter-route li p, .starter-route li small { display: block; margin: 0; color: var(--c-text-soft); font-size: .78rem; line-height: 1.45; }
+  .starter-route li small { margin-top: .35rem; color: var(--c-muted); font-size: .7rem; }
+  .starter-route-next { margin: 1rem 0 0; padding-top: .7rem; border-top: 1px solid var(--c-rule); color: var(--c-text-soft); font-size: .82rem; }
+  .starter-route-next a { color: var(--c-accent); font-weight: 700; text-decoration: none; }
+  .starter-route-next a:hover { text-decoration: underline; }
 
   .path-index { margin-bottom: 3rem; }
   .path-index ol { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--c-rule); }
@@ -100,4 +126,5 @@ import { SITE } from '../consts';
     .path > header { grid-template-columns: 1.5rem 1fr; }
     .path ol { margin-left: 0.5rem; }
   }
+  @media (max-width: 700px) { .starter-route ol { grid-template-columns: 1fr; } }
 </style>

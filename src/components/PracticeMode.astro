@@ -21,7 +21,7 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
   <div class="practice-actions">
     <button class="practice-start" type="button" data-practice-start>Start {mode.label.toLowerCase()} practice</button>
     <div class="practice-links">
-      <a class="workbook-return" href="/prep/#queue">Back to my workbook</a>
+      <a class="workbook-return" data-workbook-return href="/prep/#queue">Back to my workbook</a>
       <a href="/prep/#how-practice-works">How practice works</a>
     </div>
   </div>
@@ -85,11 +85,13 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
     const coachingPanel = root.querySelector<HTMLElement>('[data-coaching-panel]');
     const coachingList = root.querySelector<HTMLUListElement>('[data-coaching-list]');
     const scoreButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-practice-score]')];
+    const workbookReturn = root.querySelector<HTMLAnchorElement>('[data-workbook-return]');
     let remaining = totalSeconds;
     let interval: number | undefined;
     let paused = false;
     let deadline = 0;
     let scoreSubmitted = false;
+    if (workbookReturn && new URLSearchParams(window.location.search).get('from') === 'map') workbookReturn.textContent = 'Back to my study map';
 
     const updateTimer = () => {
       if (!timer) return;

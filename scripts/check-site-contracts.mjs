@@ -48,8 +48,9 @@ assert.match(review, /querySelectorAll<HTMLAnchorElement>\('\[data-reading-mode=
 assert.match(home, /<h1>The ML Interview Field Guide<\/h1>/);
 assert.match(home, /class="cover-primary cover-intent" href="\/prep\/readiness\/"/);
 assert.match(home, /I have an interview loop/);
-assert.match(home, /class="cover-secondary cover-intent" href="\/review\/"/);
+assert.match(home, /class="cover-secondary cover-intent" href="\/start-here\/#starter-route"/);
 assert.match(home, /I’m building foundations/);
+assert.match(home, /Start a 3-lesson foundation route/);
 assert.match(siteConsts, /\{ label: 'Map', href: '\/map\/' \}/);
 assert.match(map, /data-toc-map/);
 assert.match(map, /data-map-prerequisites/);

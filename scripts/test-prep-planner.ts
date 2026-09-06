@@ -52,7 +52,7 @@ test('future retries are withheld and become first priority when due', () => {
   const pending = record('design-fraud-detection');
   assert.ok(nextPrepTasks(plan, [pending], today).every(task => !task.href.includes(pending.slug)));
   assert.equal(nextPrepTasks(plan, [pending], '2026-09-08')[0].kind, 'retry');
-  assert.equal(nextPrepTasks(plan, [pending], '2026-09-08')[0].href, '/questions/design-fraud-detection/?practice=1');
+  assert.equal(nextPrepTasks(plan, [pending], '2026-09-08')[0].href, '/questions/design-fraud-detection/?practice=1&from=map');
 });
 
 test('out-of-map practice is retained but does not displace selected work', () => {
@@ -64,7 +64,7 @@ test('transfer follows a clean diagnostic, not merely a failed attempt', () => {
   const oneRound = { ...plan, selectedRounds: ['ml-breadth'] };
   assert.equal(nextPrepTasks(oneRound, [record('bias-variance-tradeoff')], today).length, 0);
   const clean = record('bias-variance-tradeoff', { score: 'Confident', successfulAttempts: 1 });
-  assert.equal(nextPrepTasks(oneRound, [clean], today)[0].href, '/questions/how-to-choose-loss-function/?practice=1');
+  assert.equal(nextPrepTasks(oneRound, [clean], today)[0].href, '/questions/how-to-choose-loss-function/?practice=1&from=map');
 });
 
 test('mixed checks need clean spaced evidence and a later day', () => {
