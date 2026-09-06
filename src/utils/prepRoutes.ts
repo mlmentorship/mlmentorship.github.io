@@ -23,17 +23,6 @@ const roundQuestions: Record<RoundId, QuestionPair> = {
   'systems-infrastructure': ['train-100b-model', 'reduce-llm-inference-cost-10x'],
 };
 
-const designDomains: Record<string, QuestionPair> = {
-  llm: ['design-production-llm-inference-service', 'design-ai-coding-product'],
-  recsys: ['design-youtube-recommender', 'design-short-form-video-ecosystem'],
-  platform: ['design-multi-team-ml-platform', 'design-foundation-model-data-platform'],
-  research: ['design-reasoning-model-fixed-budget', 'design-ml-system-fixed-budget'],
-  'post-training': ['design-reasoning-model-fixed-budget', 'design-production-llm-inference-service'],
-  alignment: ['design-agent-safety-control-plane', 'design-llm-red-team-program'],
-  multimodal: ['design-real-time-multimodal-assistant', 'design-production-llm-inference-service'],
-  product: ['design-fraud-detection', 'design-ai-coding-product'],
-};
-
 const repairConcepts: Record<string, { slug: string; label: string }> = {
   'bias-variance-tradeoff': { slug: 'bias-variance-of-estimators', label: 'Bias and variance of estimators' },
   'how-to-choose-loss-function': { slug: 'cross-entropy-softmax', label: 'Cross-entropy and softmax' },

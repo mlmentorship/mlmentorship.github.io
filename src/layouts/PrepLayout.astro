@@ -25,13 +25,14 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
   : pathname.startsWith('/prep/final-week/') ? 'Final week'
   : pathname.startsWith('/prep/plans/') ? 'Planning appendix'
   : null;
-const workbookEmailGateEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
+const workbookHome = pathname === '/prep/';
+const workbookEmailGateEnabled = workbookHome && SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
 const journeyItems = [
-  { number: '01', label: 'Plan', href: '/prep/readiness/', active: pathname.startsWith('/prep/readiness/') || pathname.startsWith('/prep/plans/') },
-  { number: '02', label: 'Your map', href: '/prep/', active: pathname === '/prep/' },
-  { number: '03', label: 'Practice', href: '/prep/#queue', active: false },
-  { number: '04', label: 'Simulate', href: '/prep/simulations/', active: pathname.startsWith('/prep/simulations/') },
-  { number: '05', label: 'Final week', href: '/prep/final-week/', active: pathname.startsWith('/prep/final-week/') },
+  { id: 'plan', number: '01', label: 'Plan', href: '/prep/readiness/', active: pathname.startsWith('/prep/readiness/') || pathname.startsWith('/prep/plans/') },
+  { id: 'map', number: '02', label: 'Your map', href: '/prep/', active: pathname === '/prep/' },
+  { id: 'practice', number: '03', label: 'Practice', href: '/prep/#queue', active: false },
+  { id: 'simulate', number: '04', label: 'Simulate', href: '/prep/simulations/', active: pathname.startsWith('/prep/simulations/') },
+  { id: 'final-week', number: '05', label: 'Final week', href: '/prep/final-week/', active: pathname.startsWith('/prep/final-week/') },
 ];
 const optionalLinks = [
   { label: 'Role guide', href: '/prep/role-paths/', active: pathname.startsWith('/prep/role-paths/') || pathname.startsWith('/prep/level-paths/') },
@@ -57,7 +58,7 @@ const optionalActive = optionalLinks.some((link) => link.active);
       <ol>
         {journeyItems.map((item) => (
           <li class:list={{ active: item.active }}>
-            <a href={item.href} aria-current={item.active ? 'page' : undefined}>
+            <a data-journey-step={item.id} href={item.href} aria-current={item.active ? 'page' : undefined}>
               <span>{item.number}</span><strong>{item.label}</strong>
             </a>
           </li>
@@ -117,9 +118,32 @@ const optionalActive = optionalLinks.some((link) => link.active);
     const unlocked = isUnlocked();
     content.hidden = !unlocked;
     gate.hidden = unlocked;
+    if (unlocked && window.location.hash) {
+      requestAnimationFrame(() => document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ block: 'start' }));
+    }
   }
 
   syncWorkbookAccess();
+  const journeyLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-journey-step]')];
+  function syncJourneyState(): void {
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    const activeStep = path === '/prep/readiness/' || path.startsWith('/prep/plans/') ? 'plan'
+      : path.startsWith('/prep/simulations/') ? 'simulate'
+        : path.startsWith('/prep/final-week/') ? 'final-week'
+          : path === '/prep/' && hash === '#queue' ? 'practice'
+            : path === '/prep/' ? 'map'
+              : null;
+    journeyLinks.forEach((link) => {
+      const active = link.dataset.journeyStep === activeStep;
+      link.parentElement?.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  syncJourneyState();
+  window.addEventListener('hashchange', syncJourneyState);
+  window.addEventListener('popstate', syncJourneyState);
   window.addEventListener('storage', syncWorkbookAccess);
   window.addEventListener('workbook-email-unlocked', syncWorkbookAccess);
   document.addEventListener('visibilitychange', syncWorkbookAccess);

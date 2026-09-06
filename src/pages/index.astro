@@ -74,8 +74,16 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
       </div>
 
       <div class="cover-actions" aria-label="Choose where to begin">
-        <a class="cover-primary" href="/review/" data-home-event="homepage_start_clicked">Begin visual review <span aria-hidden="true">→</span></a>
-        <a class="cover-secondary" href="/prep/readiness/" data-home-event="homepage_plan_clicked">Build my prep plan <span aria-hidden="true">→</span></a>
+        <a class="cover-primary cover-intent" href="/prep/readiness/" data-home-event="homepage_plan_clicked">
+          <span class="cover-intent-context">I have an interview loop</span>
+          <strong>Build my prep map</strong>
+          <span class="cover-intent-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="cover-secondary cover-intent" href="/review/" data-home-event="homepage_start_clicked">
+          <span class="cover-intent-context">I’m building foundations</span>
+          <strong>Explore the visual field guide</strong>
+          <span class="cover-intent-arrow" aria-hidden="true">→</span>
+        </a>
       </div>
       <p class="hero-meta">{visualEntries.length} visual lessons · {LIBRARY_VOLUMES.length} ordered books · free to read</p>
     </header>
@@ -220,6 +228,10 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
   .hero-copy { max-width: 31rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: 1.08rem; line-height: 1.5; }
   .cover-actions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1.45rem; }
   .cover-actions a { display: inline-flex; min-height: 2.65rem; align-items: center; justify-content: center; gap: .65rem; padding: .62rem .8rem; border: 1px solid var(--c-rule); border-radius: var(--radius); font-size: .76rem; font-weight: 700; text-decoration: none; }
+  .cover-actions .cover-intent { position: relative; min-width: 15rem; align-items: flex-start; flex-direction: column; gap: .18rem; padding: .72rem 2.4rem .72rem .85rem; }
+  .cover-intent-context { color: var(--c-muted); font-family: var(--font-mono); font-size: .6rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .cover-intent strong { color: inherit; font-size: .82rem; }
+  .cover-intent-arrow { position: absolute; top: 50%; right: .85rem; transform: translateY(-50%); font-size: 1rem; }
   .cover-primary { border-color: var(--c-accent-fill) !important; background: var(--c-accent-fill); color: var(--c-on-accent); }
   .cover-primary:hover { background: var(--c-link-hover); color: var(--c-on-accent); }
   .cover-secondary { background: var(--c-surface); color: var(--c-text-soft); }
@@ -240,6 +252,7 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
     .hero h1 { font-size: 2.55rem; }
     .cover-actions { display: grid; grid-template-columns: 1fr; }
     .cover-actions a { width: 100%; }
+    .cover-actions .cover-intent { min-width: 0; }
   }
 
   .featured-posts,
