@@ -26,7 +26,9 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
   : pathname.startsWith('/prep/plans/') ? 'Planning appendix'
   : null;
 const workbookHome = pathname === '/prep/';
-const workbookEmailGateEnabled = workbookHome && SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
+const emailSignupEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
+const workbookEmailGateEnabled = workbookHome && emailSignupEnabled;
+const pdfEmailGateEnabled = emailSignupEnabled;
 const journeyItems = [
   { id: 'plan', number: '01', label: 'Plan', href: '/prep/readiness/', active: pathname.startsWith('/prep/readiness/') || pathname.startsWith('/prep/plans/') },
   { id: 'map', number: '02', label: 'Your map', href: '/prep/', active: pathname === '/prep/' },
@@ -92,8 +94,22 @@ const optionalActive = optionalLinks.some((link) => link.active);
         <p class="prep-eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>
         <p>{lede}</p>
-        <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the printable route guide</a><span>Linked examples and blank tracking sheets. Print your saved map below for your own routes and dates.</span></p>
+        {pdfEmailGateEnabled ? (
+          <p class="prep-download" data-pdf-download-area>
+            <a href="/downloads/mlmentorship-workbook.pdf" download data-pdf-download hidden>Download the printable route guide</a>
+            <span data-pdf-locked>Subscribe to get the printable workbook by email.</span>
+            <span>Linked examples and blank tracking sheets. Print your saved map below for your own routes and dates.</span>
+          </p>
+        ) : (
+          <p class="prep-download"><a href="/downloads/mlmentorship-workbook.pdf" download>Download the printable route guide</a><span>Linked examples and blank tracking sheets. Print your saved map below for your own routes and dates.</span></p>
+        )}
       </header>
+
+      {pdfEmailGateEnabled && !workbookHome && (
+        <div class="pdf-signup" data-pdf-signup>
+          <Subscribe placement="workbook" heading="Get the printable workbook by email." />
+        </div>
+      )}
 
       <article class="prep-content">
         <slot />
@@ -123,7 +139,18 @@ const optionalActive = optionalLinks.some((link) => link.active);
     }
   }
 
+  const pdfDownload = document.querySelector<HTMLAnchorElement>('[data-pdf-download]');
+  const pdfLocked = document.querySelector<HTMLElement>('[data-pdf-locked]');
+  const pdfSignup = document.querySelector<HTMLElement>('[data-pdf-signup]');
+  function syncPdfAccess(): void {
+    const unlocked = isUnlocked();
+    if (pdfDownload) pdfDownload.hidden = !unlocked;
+    if (pdfLocked) pdfLocked.hidden = unlocked;
+    if (pdfSignup) pdfSignup.hidden = unlocked;
+  }
+
   syncWorkbookAccess();
+  syncPdfAccess();
   const journeyLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-journey-step]')];
   function syncJourneyState(): void {
     const path = window.location.pathname;
@@ -146,6 +173,8 @@ const optionalActive = optionalLinks.some((link) => link.active);
   window.addEventListener('popstate', syncJourneyState);
   window.addEventListener('storage', syncWorkbookAccess);
   window.addEventListener('workbook-email-unlocked', syncWorkbookAccess);
+  window.addEventListener('storage', syncPdfAccess);
+  window.addEventListener('workbook-email-unlocked', syncPdfAccess);
   document.addEventListener('visibilitychange', syncWorkbookAccess);
 </script>
 
@@ -186,6 +215,9 @@ const optionalActive = optionalLinks.some((link) => link.active);
   .prep-download a { color: var(--c-accent); font-weight: 650; text-decoration: none; }
   .prep-download a:hover { text-decoration: underline; }
   .prep-download span { color: var(--c-muted); }
+  .prep-download [data-pdf-locked] { color: var(--c-accent); font-weight: 700; }
+  .pdf-signup { margin-top: 1rem; }
+  .pdf-signup :global(.subscribe) { margin-top: 0; }
   .prep-content :global(h2) { margin: 2rem 0 .6rem; font-size: 1.2rem; scroll-margin-top: var(--sticky-offset); }
   .prep-content :global(h3) { margin: 1.35rem 0 .4rem; font-size: 1rem; }
   .prep-content :global(p), .prep-content :global(li) { overflow-wrap: anywhere; line-height: 1.55; }

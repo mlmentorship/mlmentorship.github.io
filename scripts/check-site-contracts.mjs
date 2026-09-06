@@ -17,6 +17,7 @@ const sidebar = read('src/components/LibrarySidebar.astro');
 const review = read('src/pages/review.astro');
 const home = read('src/pages/index.astro');
 const map = read('src/pages/map.astro');
+const prepLayout = read('src/layouts/PrepLayout.astro');
 
 assert.equal(existsSync(join(root, 'LICENSE.txt')), false, 'legacy LICENSE.txt must stay removed');
 assert.match(license, /PROPRIETARY LICENSE/);
@@ -51,6 +52,9 @@ assert.match(home, /I have an interview loop/);
 assert.match(home, /class="cover-secondary cover-intent" href="\/start-here\/#starter-route"/);
 assert.match(home, /I’m building foundations/);
 assert.match(home, /Start a 3-lesson foundation route/);
+assert.match(prepLayout, /const pdfEmailGateEnabled = emailSignupEnabled/);
+assert.match(prepLayout, /data-pdf-download/);
+assert.match(prepLayout, /data-pdf-signup/);
 assert.match(siteConsts, /\{ label: 'Map', href: '\/map\/' \}/);
 assert.match(map, /data-toc-map/);
 assert.match(map, /data-map-prerequisites/);
