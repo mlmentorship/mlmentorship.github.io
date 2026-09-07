@@ -33,8 +33,24 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 
   <section class="scorecard"><h2>Score before coaching</h2><ul><li><strong>Thesis:</strong> the opening establishes stakes, claim, ownership, and result.</li><li><strong>Decision spine:</strong> alternatives and evidence organize the narrative.</li><li><strong>Technical depth:</strong> one implementation detail survives expert follow-up.</li><li><strong>Evidence:</strong> metrics, slices, uncertainty, and attribution are honest.</li><li><strong>Defense:</strong> direct answers come before context; the candidate updates when warranted.</li><li><strong>Level:</strong> scope and influence match the target without replacing hands-on credibility.</li></ul></section>
 
-  <section class="callout"><h2>Practice gate</h2><p>Run the presentation twice. The second observer must not have seen the deck, must interrupt, and must ask at least one counterfactual. Do not graduate if the story loses ownership, evidence, or technical credibility under questions.</p><p><a href="/questions/present-technical-ml-project/">Read the leveled answer and failure modes →</a></p></section>
+  <section class="callout"><h2>Practice gate</h2><p>Run the presentation twice. The second observer must not have seen the deck, must interrupt, and must ask at least one counterfactual. Do not graduate if the story loses ownership, evidence, or technical credibility under questions.</p><p><a href="/questions/present-technical-ml-project/">Read the leveled answer and failure modes →</a></p><p class="completion-control"><button type="button" data-mark-presentation>Mark presentation ready</button><span data-presentation-status aria-live="polite"></span></p></section>
 </PrepLayout>
+
+<script>
+  import { isActivityComplete, setActivityComplete } from '../../utils/activityProgress';
+  const presentationButton = document.querySelector<HTMLButtonElement>('[data-mark-presentation]');
+  const presentationStatus = document.querySelector<HTMLElement>('[data-presentation-status]');
+  const renderPresentationStatus = () => {
+    const complete = isActivityComplete('track:presentation');
+    if (presentationButton) { presentationButton.textContent = complete ? 'Presentation marked ready' : 'Mark presentation ready'; presentationButton.setAttribute('aria-pressed', String(complete)); }
+    if (presentationStatus) presentationStatus.textContent = complete ? 'Tracked in your Workbook.' : '';
+  };
+  presentationButton?.addEventListener('click', () => {
+    try { setActivityComplete('track:presentation', !isActivityComplete('track:presentation')); renderPresentationStatus(); }
+    catch { if (presentationStatus) presentationStatus.textContent = 'Storage unavailable'; }
+  });
+  renderPresentationStatus();
+</script>
 
 <style>
   .timeline { display: grid; grid-template-columns: 4.5rem 1fr; gap: .4rem .8rem; padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius); }
@@ -43,4 +59,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .scorecard { padding: 1rem; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-surface); }
   .scorecard h2 { margin-top: 0 !important; }
   .scorecard li { margin-bottom: .55rem; }
+  .completion-control { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem; }
+  .completion-control button { padding: .45rem .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .76rem; cursor: pointer; }
+  .completion-control button:hover, .completion-control button[aria-pressed='true'] { border-color: var(--c-accent); color: var(--c-accent); }
+  .completion-control span { color: var(--c-muted); font-size: .78rem; }
 </style>

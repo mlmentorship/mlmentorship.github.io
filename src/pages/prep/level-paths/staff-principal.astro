@@ -69,20 +69,27 @@ const transferCases = [
 
 <script>
   import { isActivityComplete, setActivityComplete } from '../../../utils/activityProgress';
-  document.querySelectorAll<HTMLButtonElement>('[data-level-step-id]').forEach((button) => {
-    const id = button.dataset.levelStepId;
-    if (!id) return;
-    const render = () => {
+  const levelButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-level-step-id]')];
+  const renderLevelPath = () => {
+    levelButtons.forEach((button) => {
+      const id = button.dataset.levelStepId;
+      if (!id) return;
       const complete = isActivityComplete(id);
       button.textContent = complete ? 'Done' : 'Mark done';
       button.setAttribute('aria-pressed', String(complete));
-    };
+    });
+    try { setActivityComplete('track:level-overlay', levelButtons.length > 0 && levelButtons.every((button) => button.getAttribute('aria-pressed') === 'true')); }
+    catch { /* The individual controls still work for this visit. */ }
+  };
+  levelButtons.forEach((button) => {
+    const id = button.dataset.levelStepId;
+    if (!id) return;
     button.addEventListener('click', () => {
-      try { setActivityComplete(id, !isActivityComplete(id)); render(); }
+      try { setActivityComplete(id, !isActivityComplete(id)); renderLevelPath(); }
       catch { button.textContent = 'Storage unavailable'; }
     });
-    render();
   });
+  renderLevelPath();
 </script>
 
 <style>

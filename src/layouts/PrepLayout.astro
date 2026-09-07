@@ -25,9 +25,7 @@ const sectionLabel = pathname.startsWith('/prep/readiness/') ? 'Build a plan'
   : pathname.startsWith('/prep/final-week/') ? 'Final week'
   : pathname.startsWith('/prep/plans/') ? 'Planning appendix'
   : null;
-const workbookHome = pathname === '/prep/';
 const emailSignupEnabled = SITE.newsletter.provider === 'beehiiv' && SITE.newsletter.formId.length > 0;
-const workbookEmailGateEnabled = workbookHome && emailSignupEnabled;
 const pdfEmailGateEnabled = emailSignupEnabled;
 const journeyItems = [
   { id: 'plan', number: '01', label: 'Plan', href: '/prep/readiness/', active: pathname.startsWith('/prep/readiness/') || pathname.startsWith('/prep/plans/') },
@@ -72,24 +70,7 @@ const optionalActive = optionalLinks.some((link) => link.active);
       </details>
     </nav>
 
-    {workbookEmailGateEnabled && (
-      <section class="workbook-gate" data-workbook-gate aria-labelledby="workbook-gate-heading">
-        <p class="prep-eyebrow">Private workbook</p>
-        <h1 id="workbook-gate-heading">Subscribe to get the workbook by email.</h1>
-        <p>The field guide remains free. Subscribe to ML from Primitives to receive the printable workbook, then use this browser-local workspace to plan your loop and track practice.</p>
-        <div class="workbook-preview">
-          <p class="workbook-preview-label">Inside the workbook</p>
-          <ul>
-            <li><strong>Turn your actual loop into a plan.</strong><span>Role, rounds, runway, and weekly capacity become one next action.</span></li>
-            <li><strong>Practice from evidence.</strong><span>Track closed-book attempts, clear gaps, retries, and mixed practice checks.</span></li>
-            <li><strong>Prepare the human rounds.</strong><span>Shape project decisions, behavioral stories, pushback, simulations, and final-week logistics.</span></li>
-          </ul>
-        </div>
-        <Subscribe placement="workbook" heading="Get the printable workbook by email." />
-      </section>
-    )}
-
-    <div class="workbook-content" data-workbook-content hidden={workbookEmailGateEnabled}>
+    <div class="workbook-content">
       <header class="prep-hero">
         <p class="prep-eyebrow">{eyebrow}</p>
         <h1>{heading}</h1>
@@ -97,7 +78,7 @@ const optionalActive = optionalLinks.some((link) => link.active);
         {pdfEmailGateEnabled ? (
           <p class="prep-download" data-pdf-download-area>
             <a href="/downloads/mlmentorship-workbook.pdf" download data-pdf-download hidden>Download the printable route guide</a>
-            <span data-pdf-locked>Subscribe to get the printable workbook by email.</span>
+            <a href="#pdf-signup" data-pdf-locked>Subscribe to get the printable workbook by email.</a>
             <span>Linked examples and blank tracking sheets. Print your saved map below for your own routes and dates.</span>
           </p>
         ) : (
@@ -105,15 +86,14 @@ const optionalActive = optionalLinks.some((link) => link.active);
         )}
       </header>
 
-      {pdfEmailGateEnabled && !workbookHome && (
-        <div class="pdf-signup" data-pdf-signup>
-          <Subscribe placement="workbook" heading="Get the printable workbook by email." />
-        </div>
-      )}
-
       <article class="prep-content">
         <slot />
       </article>
+      {pdfEmailGateEnabled && (
+        <div id="pdf-signup" class="pdf-signup" data-pdf-signup>
+          <Subscribe placement="workbook" heading="Get the printable workbook by email." />
+        </div>
+      )}
     </div>
   </div>
 </BaseLayout>
@@ -121,22 +101,10 @@ const optionalActive = optionalLinks.some((link) => link.active);
 <script>
   import { WORKBOOK_UNLOCK_KEY } from '../utils/newsletter';
 
-  const content = document.querySelector<HTMLElement>('[data-workbook-content]');
-  const gate = document.querySelector<HTMLElement>('[data-workbook-gate]');
   const unlockKey = WORKBOOK_UNLOCK_KEY;
 
   function isUnlocked(): boolean {
     try { return window.localStorage.getItem(unlockKey) === '1'; } catch { return false; }
-  }
-
-  function syncWorkbookAccess(): void {
-    if (!content || !gate) return;
-    const unlocked = isUnlocked();
-    content.hidden = !unlocked;
-    gate.hidden = unlocked;
-    if (unlocked && window.location.hash) {
-      requestAnimationFrame(() => document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ block: 'start' }));
-    }
   }
 
   const pdfDownload = document.querySelector<HTMLAnchorElement>('[data-pdf-download]');
@@ -149,7 +117,6 @@ const optionalActive = optionalLinks.some((link) => link.active);
     if (pdfSignup) pdfSignup.hidden = unlocked;
   }
 
-  syncWorkbookAccess();
   syncPdfAccess();
   const journeyLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-journey-step]')];
   function syncJourneyState(): void {
@@ -171,25 +138,12 @@ const optionalActive = optionalLinks.some((link) => link.active);
   syncJourneyState();
   window.addEventListener('hashchange', syncJourneyState);
   window.addEventListener('popstate', syncJourneyState);
-  window.addEventListener('storage', syncWorkbookAccess);
-  window.addEventListener('workbook-email-unlocked', syncWorkbookAccess);
   window.addEventListener('storage', syncPdfAccess);
   window.addEventListener('workbook-email-unlocked', syncPdfAccess);
-  document.addEventListener('visibilitychange', syncWorkbookAccess);
 </script>
 
 <style>
   .prep-page { max-width: 46rem; margin: 0 auto; padding: clamp(1.3rem, 3vw, 2.2rem) var(--gutter) 4rem; }
-  .workbook-gate { padding: 1.2rem 0 1.5rem; border-bottom: 1px solid var(--c-rule); }
-  .workbook-gate h1 { margin: 0 0 .5rem; font-size: clamp(1.7rem, 4vw, 2.15rem); line-height: 1.14; letter-spacing: -.02em; }
-  .workbook-gate > p:not(.prep-eyebrow) { max-width: 38rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .94rem; line-height: 1.5; }
-  .workbook-preview { margin: 1.1rem 0 0; padding: .85rem 1rem; border-left: 3px solid var(--c-accent); background: var(--c-bg-tint); }
-  .workbook-preview-label { margin: 0 0 .55rem; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-  .workbook-preview ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; margin: 0; padding: 0; list-style: none; }
-  .workbook-preview li { display: grid; gap: .2rem; margin: 0; }
-  .workbook-preview strong { color: var(--c-text); font-size: .74rem; line-height: 1.3; }
-  .workbook-preview span { color: var(--c-muted); font-family: var(--font-reading); font-size: .68rem; line-height: 1.4; }
-  .workbook-gate :global(.subscribe) { width: 100%; margin-top: 1.25rem; }
   .workbook-trail { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: 1.1rem; color: var(--c-muted); font-family: var(--font-ui); font-size: .68rem; }
   .workbook-trail a { color: var(--c-text-soft); text-decoration: none; }
   .workbook-trail a:hover { color: var(--c-accent); text-decoration: underline; }
@@ -236,7 +190,6 @@ const optionalActive = optionalLinks.some((link) => link.active);
   .prep-content :global(.print-button) { padding: .65rem .9rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-weight: 600; cursor: pointer; }
   .prep-content :global(.print-button:hover) { border-color: var(--c-accent); color: var(--c-accent); }
   @media (max-width: 640px) {
-    .workbook-preview ul { grid-template-columns: 1fr; gap: .6rem; }
     .prep-content :global(.resource-grid) { grid-template-columns: 1fr; }
   }
   @media (max-width: 620px) {

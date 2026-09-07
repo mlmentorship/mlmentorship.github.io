@@ -81,6 +81,7 @@ const stories = [
 </PrepLayout>
 
 <script>
+  import { setActivityComplete } from '../../utils/activityProgress';
   const STORAGE_KEY = 'mlm:story-bank:v1';
   const cards = () => Array.from(document.querySelectorAll<HTMLElement>('[data-story]'));
   const status = document.querySelector<HTMLElement>('[data-save-status]');
@@ -124,7 +125,7 @@ const stories = [
 
   document.querySelector('[data-save]')?.addEventListener('click', () => {
     if (!window.confirm('Save this potentially sensitive story text in local browser storage on this device?')) return;
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, ...collect() })); if (status) status.textContent = 'Saved on this device only.'; }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, ...collect() })); setActivityComplete('track:story-bank'); if (status) status.textContent = 'Saved on this device only.'; }
     catch { if (status) status.textContent = 'Could not save locally. Export a private copy instead.'; }
   });
   document.querySelector('[data-export]')?.addEventListener('click', () => {
@@ -134,7 +135,8 @@ const stories = [
   document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
   document.querySelector('[data-clear]')?.addEventListener('click', () => {
     if (!window.confirm('Clear the form and remove the locally saved story bank?')) return;
-    localStorage.removeItem(STORAGE_KEY); clearForm(); if (status) status.textContent = 'Story bank cleared.';
+    try { localStorage.removeItem(STORAGE_KEY); setActivityComplete('track:story-bank', false); clearForm(); if (status) status.textContent = 'Story bank cleared.'; }
+    catch { clearForm(); if (status) status.textContent = 'Story bank cleared for this visit; saved data could not be changed.'; }
   });
   window.addEventListener('beforeprint', () => { const textareas = [...document.querySelectorAll<HTMLTextAreaElement>('.story-form textarea')]; priorHeights = textareas.map((textarea) => textarea.style.height); textareas.forEach((textarea) => { textarea.style.height = `${textarea.scrollHeight}px`; }); });
   window.addEventListener('afterprint', () => { document.querySelectorAll<HTMLTextAreaElement>('.story-form textarea').forEach((textarea, index) => { textarea.style.height = priorHeights[index] ?? ''; }); });

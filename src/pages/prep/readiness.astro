@@ -118,7 +118,7 @@ const externalDependencies = [
 <script>
   import { INTERVIEW_ROUNDS, KNOWLEDGE_AREAS, LEVEL_OVERLAYS, ROLE_OVERLAYS, type AreaId, type LevelId, type RoleId, type RoundId } from '../../data/prepCurriculum';
   import { loadPrepPlan, savePrepPlan, type PrepPlanState } from '../../utils/prepPlan';
-  import { buildStudyRoutes, studyBudget } from '../../utils/prepRoutes';
+  import { buildStudyRoutes, prepTrackMinutes, studyBudget } from '../../utils/prepRoutes';
   import { toLocalDate } from '../../utils/prepProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
@@ -293,7 +293,13 @@ const externalDependencies = [
     const weightedDeficit = scored.reduce((sum, item) => sum + (5 - item.rating) * item.relevance, 0) / relevanceTotal;
     const criticalWeak = scored.filter((item) => item.rating <= 2 && item.relevance >= 1.5).length;
     const levelHours = level === 'l8' ? 9 : level === 'l7' ? 6 : level === 'l6' ? 3 : level === 'l5' ? 1.5 : 0;
-    const estimatedHours = 5 + selectedRounds.size * 1.25 + weightedDeficit * 5 + criticalWeak * 2 + levelHours;
+    const trackMinutes = prepTrackMinutes({
+      role,
+      level,
+      selectedRounds: [...selectedRounds],
+      externalRounds: selectedExternal.map((field) => ({ label: field.dataset.externalLabel ?? 'External round', status: field.value as 'missing' | 'workable' })),
+    });
+    const estimatedHours = 5 + selectedRounds.size * 1.25 + weightedDeficit * 5 + criticalWeak * 2 + levelHours + trackMinutes / 60;
     const rawWeeks = estimatedHours / weeklyHours;
     let horizon = rawWeeks <= 2.25 ? 2 : rawWeeks <= 4.5 ? 4 : 8;
     if (criticalWeak >= 3 && weeklyHours < 12) horizon = 8;

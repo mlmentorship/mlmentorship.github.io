@@ -6,6 +6,21 @@ import { getSubcategoryMap } from './subcategories';
 type QuestionPair = [string, string];
 type QuestionSelection = { slugs: string[]; reason: string };
 
+export type PrepTrackKind = 'story-bank' | 'presentation' | 'level-overlay' | 'simulation' | 'external';
+export type PrepTrackStatus = 'ready' | 'blocked' | 'complete';
+export interface PrepTrack {
+  id: string;
+  kind: PrepTrackKind;
+  title: string;
+  detail: string;
+  href: string;
+  activityId: string;
+  minutes: number;
+  status: PrepTrackStatus;
+}
+
+type PrepTrackPlan = Pick<PrepPlanState, 'role' | 'level' | 'selectedRounds' | 'externalRounds'>;
+
 const roundQuestions: Record<RoundId, QuestionPair> = {
   'ml-breadth': ['bias-variance-tradeoff', 'how-to-choose-loss-function'],
   coding: ['debug-training-loop', 'implement-batched-top-k'],
@@ -172,6 +187,66 @@ export function practiceStatus(record: PracticeProgressRecord | undefined, today
   return record.dueOn && record.dueOn > today ? 'scheduled' : 'due';
 }
 
+function trackSlug(label: string): string {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+export function buildPrepTracks(
+  plan: PrepTrackPlan,
+  routes: ReturnType<typeof buildStudyRoutes>,
+  completed: Record<string, string> = {},
+): PrepTrack[] {
+  const tracks: PrepTrack[] = [];
+  const add = (track: Omit<PrepTrack, 'status'>, blocked = false) => {
+    tracks.push({ ...track, status: completed[track.activityId] ? 'complete' : blocked ? 'blocked' : 'ready' });
+  };
+  const storyRounds = ['project-deep-dive', 'technical-strategy', 'technical-presentation', 'behavioral', 'values-mission'];
+  const upperIc = ['l6', 'l7', 'l8'].includes(plan.level);
+
+  if (upperIc || plan.selectedRounds.some(roundId => storyRounds.includes(roundId))) {
+    add({
+      id: 'story-bank', kind: 'story-bank', title: 'Build the evidence story bank',
+      detail: 'Draft bounded ownership, failure, impact, conflict, and leadership stories before rehearsing them.',
+      href: '/prep/story-bank/', activityId: 'track:story-bank', minutes: 60,
+    });
+  }
+  if (plan.selectedRounds.includes('technical-presentation')) {
+    add({
+      id: 'technical-presentation', kind: 'presentation', title: 'Prepare the technical presentation',
+      detail: 'Shape one project around decisions, evidence, a failed path, ownership, and interrupted follow-up.',
+      href: '/prep/presentation/', activityId: 'track:presentation', minutes: 45,
+    });
+  }
+  if (upperIc) {
+    add({
+      id: 'level-overlay', kind: 'level-overlay', title: 'Complete the upper-IC evidence path',
+      detail: 'Practice portfolio choice, delegated authority, reversibility, succession, and retained technical depth.',
+      href: '/prep/level-paths/staff-principal/', activityId: 'track:level-overlay', minutes: 90,
+    });
+  }
+  plan.externalRounds.filter(round => round.status === 'missing').forEach((round) => {
+    const slug = trackSlug(round.label);
+    add({
+      id: `external:${slug}`, kind: 'external', title: `Baseline: ${round.label}`,
+      detail: 'Use a dedicated resource for this round, complete one timed attempt, then mark the baseline here.',
+      href: '/prep/readiness/', activityId: `track:external:${slug}`, minutes: 60,
+    });
+  });
+  if (plan.selectedRounds.length >= 2) {
+    const hasBaselineForEveryRound = routes.length > 0 && routes.every(route => Boolean(route.steps[0]?.record));
+    add({
+      id: 'simulation', kind: 'simulation', title: 'Run one mixed interview simulation',
+      detail: hasBaselineForEveryRound ? 'Use unfamiliar prompts, real timing, and an observer who challenges your weakest claims.' : 'Complete one diagnostic for every confirmed round before running the simulation.',
+      href: `/prep/simulations/#${plan.role}`, activityId: `simulation:${plan.role}`, minutes: 180,
+    }, !hasBaselineForEveryRound);
+  }
+  return tracks;
+}
+
+export function prepTrackMinutes(plan: PrepTrackPlan): number {
+  return buildPrepTracks(plan, []).reduce((sum, track) => sum + track.minutes, 0);
+}
+
 export function buildStudyRoutes(plan: PrepPlanState, records: PracticeProgressRecord[], today: string) {
   const routeInputs = INTERVIEW_ROUNDS.filter(round => plan.selectedRounds.includes(round.id)).map(round => {
     const selected = questionSelection(plan, round.id);
@@ -199,15 +274,20 @@ export function buildStudyRoutes(plan: PrepPlanState, records: PracticeProgressR
   }).sort((left, right) => right.priority - left.priority);
 }
 
-export function studyBudget(plan: PrepPlanState, routes: ReturnType<typeof buildStudyRoutes>) {
+export function studyBudget(plan: PrepPlanState, routes: ReturnType<typeof buildStudyRoutes>, completed: Record<string, string> = {}) {
   const weeklyMinutes = Math.max(0, Math.floor(plan.weeklyHours * 60));
   const repairMinutes = Math.floor(weeklyMinutes / 2);
   let remaining = weeklyMinutes - repairMinutes;
+  const tracks = buildPrepTracks(plan, routes, completed).filter(track => track.status !== 'complete');
+  const trackMinutes = tracks.reduce((sum, track) => sum + track.minutes, 0);
+  const readyTrackMinutes = tracks.filter(track => track.status === 'ready').reduce((sum, track) => sum + track.minutes, 0);
+  const plannedTrackMinutes = Math.min(readyTrackMinutes, remaining);
+  remaining -= plannedTrackMinutes;
   const sessions = routes.filter(route => route.steps.some(step => step.status === 'new' && (step.stage === 'Diagnostic' || Boolean(route.steps[0].record?.successfulAttempts)))).flatMap(route => {
     if (route.sessionMinutes > remaining) return [];
     remaining -= route.sessionMinutes;
     return [{ roundId: route.id, minutes: route.sessionMinutes }];
   });
-  const baselineMinutes = routes.filter(route => !route.steps[0].record).reduce((sum, route) => sum + route.sessionMinutes, 0);
-  return { weeklyMinutes, repairMinutes, sessions, unassignedMinutes: remaining, baselineMinutes, availableMinutes: weeklyMinutes * plan.availableWeeks };
+  const baselineMinutes = routes.filter(route => !route.steps[0].record).reduce((sum, route) => sum + route.sessionMinutes, 0) + trackMinutes;
+  return { weeklyMinutes, repairMinutes, sessions, trackMinutes, plannedTrackMinutes, unassignedMinutes: remaining, baselineMinutes, availableMinutes: weeklyMinutes * plan.availableWeeks };
 }

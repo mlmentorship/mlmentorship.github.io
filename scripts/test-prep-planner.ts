@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { readdirSync } from 'node:fs';
 import { getPracticeMode, INTERVIEW_ROUNDS } from '../src/data/prepCurriculum';
 import { getSubcategoryMap } from '../src/utils/subcategories';
-import { buildStudyRoutes, practiceStatus, questionPair, studyBudget } from '../src/utils/prepRoutes';
+import { buildPrepTracks, buildStudyRoutes, practiceStatus, prepTrackMinutes, questionPair, studyBudget } from '../src/utils/prepRoutes';
 import { currentPlanWeek, nextPrepTasks, parsePrepBackup, type PrepPlanState } from '../src/utils/prepPlan';
 import { markMixedSessionVerified, PREP_PROGRESS_KEY, savePracticeProgress, type PracticeProgressRecord } from '../src/utils/prepProgress';
 
@@ -84,8 +84,26 @@ test('weekly recommendations leave half the budget for review and do not overspe
   for (const weeklyHours of [1, 5, 8, 12]) {
     const configured = { ...plan, weeklyHours, selectedRounds: INTERVIEW_ROUNDS.map(round => round.id) };
     const budget = studyBudget(configured, buildStudyRoutes(configured, [], today));
-    assert.equal(budget.sessions.reduce((sum, session) => sum + session.minutes, 0) + budget.repairMinutes + budget.unassignedMinutes, weeklyHours * 60);
+    assert.equal(budget.sessions.reduce((sum, session) => sum + session.minutes, 0) + budget.plannedTrackMinutes + budget.repairMinutes + budget.unassignedMinutes, weeklyHours * 60);
+    assert.equal(budget.baselineMinutes, buildStudyRoutes(configured, [], today).filter(route => !route.steps[0].record).reduce((sum, route) => sum + route.sessionMinutes, 0) + prepTrackMinutes(configured));
   }
+});
+
+test('preparation tracks cover human rounds, upper-IC evidence, simulations, and external baselines', () => {
+  const configured = {
+    ...plan,
+    level: 'l7',
+    selectedRounds: ['project-deep-dive', 'technical-presentation', 'ml-system-design'],
+    externalRounds: [{ label: 'General algorithms / DSA', status: 'missing' as const }],
+  };
+  const routes = buildStudyRoutes(configured, [], today);
+  const tracks = buildPrepTracks(configured, routes);
+  assert.deepEqual(tracks.map(track => track.id), ['story-bank', 'technical-presentation', 'level-overlay', 'external:general-algorithms-dsa', 'simulation']);
+  assert.equal(tracks.find(track => track.id === 'simulation')?.status, 'blocked');
+  assert.equal(studyBudget(configured, routes).trackMinutes, 435);
+  assert.equal(studyBudget(configured, routes).plannedTrackMinutes, 150);
+  assert.equal(buildPrepTracks(configured, routes, { 'track:story-bank': today }).find(track => track.id === 'story-bank')?.status, 'complete');
+  assert.equal(buildPrepTracks(configured, routes, { 'track:external:general-algorithms-dsa': today }).find(track => track.id === 'external:general-algorithms-dsa')?.status, 'complete');
 });
 
 test('all mapped questions exist and method matches content metadata', () => {

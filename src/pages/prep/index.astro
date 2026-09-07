@@ -46,6 +46,11 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     <div class="external-blockers" data-plan-blockers hidden><strong>Prepare separately</strong><ul></ul></div>
   </section>
 
+  <section id="prep-tracks" class="prep-tracks" data-prep-tracks hidden aria-labelledby="prep-tracks-heading">
+    <header><div><p class="section-kicker">Beyond question practice</p><h2 id="prep-tracks-heading">Complete the other evidence</h2></div><p data-prep-track-summary></p></header>
+    <ul data-prep-track-list></ul>
+  </section>
+
   <section class="study-map" data-study-map hidden aria-labelledby="study-map-heading">
     <header class="study-map-header">
       <div><p class="section-kicker">Your study map</p><h2 id="study-map-heading" data-route-title>Study the loop you actually have.</h2><p data-route-summary></p></div>
@@ -109,8 +114,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 <script>
   import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, replacePrepProgress, RETRY_DAYS, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
   import { clearPrepPlan, currentPlanWeek, loadPrepPlan, nextPrepTasks, parsePrepBackup, savePrepPlan } from '../../utils/prepPlan';
-  import { buildStudyRoutes, practiceStatus, studyBudget } from '../../utils/prepRoutes';
-  import { clearActivityProgress, loadActivityProgress, replaceActivityProgress } from '../../utils/activityProgress';
+  import { buildPrepTracks, buildStudyRoutes, practiceStatus, studyBudget } from '../../utils/prepRoutes';
+  import { clearActivityProgress, loadActivityProgress, replaceActivityProgress, setActivityComplete } from '../../utils/activityProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
   let today = toLocalDate(new Date());
@@ -150,6 +155,50 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     return link;
   }
 
+  function renderPrepTracks(plan: ReturnType<typeof loadPrepPlan>, records: PracticeProgressRecord[]): void {
+    const section = document.querySelector<HTMLElement>('[data-prep-tracks]');
+    const list = section?.querySelector<HTMLElement>('[data-prep-track-list]');
+    const summary = section?.querySelector<HTMLElement>('[data-prep-track-summary]');
+    if (!section || !list || !plan) {
+      if (section) section.hidden = true;
+      return;
+    }
+    const routes = buildStudyRoutes(plan, records, today);
+    const tracks = buildPrepTracks(plan, routes, loadActivityProgress().completed);
+    section.hidden = tracks.length === 0;
+    const remaining = tracks.filter(track => track.status !== 'complete');
+    if (summary) summary.textContent = remaining.length === 0
+      ? 'All mapped evidence tracks are complete.'
+      : `${remaining.length} track${remaining.length === 1 ? '' : 's'} remain. Keep these alongside your timed question attempts.`;
+    list.replaceChildren(...tracks.map((track) => {
+      const item = document.createElement('li');
+      item.className = `prep-track prep-track--${track.status}`;
+      const heading = document.createElement('div');
+      heading.className = 'prep-track-heading';
+      heading.append(
+        textElement('strong', '', track.title),
+        textElement('span', 'prep-track-status', track.status === 'complete' ? 'Complete' : track.status === 'blocked' ? 'Waiting for diagnostics' : `${track.minutes} min`),
+      );
+      item.append(heading, textElement('p', '', track.detail));
+      const actions = document.createElement('div');
+      actions.className = 'prep-track-actions';
+      actions.append(routeLink(track.status === 'complete' ? 'Review' : 'Open', track.href));
+      if (track.kind === 'external' && track.status !== 'complete') {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'track-complete';
+        button.textContent = 'Mark baseline complete';
+        button.addEventListener('click', () => {
+          try { setActivityComplete(track.activityId); render(); }
+          catch { button.textContent = 'Storage unavailable'; }
+        });
+        actions.append(button);
+      }
+      item.append(actions);
+      return item;
+    }));
+  }
+
   function renderStudyMap(plan: ReturnType<typeof loadPrepPlan>, records: PracticeProgressRecord[]): void {
     const map = document.querySelector<HTMLElement>('[data-study-map]');
     if (!map) return;
@@ -159,7 +208,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     }
     map.hidden = false;
     const routes = buildStudyRoutes(plan, records, today);
-    const budget = studyBudget(plan, routes);
+    const budget = studyBudget(plan, routes, loadActivityProgress().completed);
     const week = currentPlanWeek(plan);
     const title = map.querySelector<HTMLElement>('[data-route-title]');
     const summary = map.querySelector<HTMLElement>('[data-route-summary]');
@@ -180,17 +229,26 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
       );
     }
     const budgetSummary = map.querySelector<HTMLElement>('[data-budget-summary]');
-    if (budgetSummary) budgetSummary.textContent = `${budget.weeklyMinutes} min available. Reserve ${budget.repairMinutes} min for due retries, repairs, and feedback. New sessions below include 15 min of review each.`;
+    if (budgetSummary) budgetSummary.textContent = `${budget.weeklyMinutes} min available. Reserve ${budget.repairMinutes} min for due retries, repairs, and feedback. ${budget.plannedTrackMinutes > 0 ? `${budget.plannedTrackMinutes} min is reserved for other preparation tracks. ` : ''}New sessions below include 15 min of review each.`;
     const budgetList = map.querySelector<HTMLElement>('[data-budget-sessions]');
-    if (budgetList) budgetList.replaceChildren(...budget.sessions.map(session => {
-      const route = routes.find(item => item.id === session.roundId)!;
-      const item = document.createElement('li');
-      item.append(routeLink(`${route.label}: ${session.minutes} min`, `#route-${route.id}`));
-      return item;
-    }));
+    if (budgetList) {
+      const entries = budget.sessions.map(session => {
+        const route = routes.find(item => item.id === session.roundId)!;
+        const item = document.createElement('li');
+        item.append(routeLink(`${route.label}: ${session.minutes} min`, `#route-${route.id}`));
+        return item;
+      });
+      if (budget.plannedTrackMinutes > 0) {
+        const item = document.createElement('li');
+        item.append(routeLink(`Other preparation tracks: ${budget.plannedTrackMinutes} min`, '#prep-tracks'));
+        entries.push(item);
+      }
+      budgetList.replaceChildren(...entries);
+    }
     const budgetWarning = map.querySelector<HTMLElement>('[data-budget-warning]');
+    const diagnosticMinutes = routes.filter(route => !route.steps[0].record).reduce((sum, route) => sum + route.sessionMinutes, 0);
     if (budgetWarning) budgetWarning.textContent = budget.baselineMinutes > budget.availableMinutes
-      ? `Your unattempted diagnostics need ${budget.baselineMinutes} min before any repeats; only ${budget.availableMinutes} min remain in your stated budget. Edit the scope or available time.`
+      ? `Your mapped preparation needs ${budget.baselineMinutes} min before repeats; this includes ${diagnosticMinutes} min of round diagnostics and ${budget.trackMinutes} min of other tracks. Your stated budget is ${budget.availableMinutes} min. Edit the scope or available time.`
       : plan.estimatedHours.low > budget.availableMinutes / 60
         ? `Full preparation is estimated at ${plan.estimatedHours.low}–${plan.estimatedHours.high} hours; your budget is ${budget.availableMinutes / 60}. Prioritize the weakest confirmed rounds. Finishing these diagnostics alone does not close that gap.`
         : `${budget.unassignedMinutes} min unassigned. If retries fill the budget, defer new work. ${budget.baselineMinutes} min of unattempted diagnostics remain across the loop.`;
@@ -244,6 +302,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     if (noPlan) noPlan.hidden = Boolean(plan);
 
     if (!plan || !context) {
+      renderPrepTracks(null, records);
       const due = records.filter((record) => record.dueOn !== null && record.dueOn <= today);
       const kicker = document.querySelector<HTMLElement>('[data-start-kicker]');
       const title = document.querySelector<HTMLElement>('[data-start-title]');
@@ -268,6 +327,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 
     const week = currentPlanWeek(plan);
     const routes = buildStudyRoutes(plan, records, today);
+    renderPrepTracks(plan, records);
     const title = context.querySelector<HTMLElement>('[data-plan-title]');
     const summary = context.querySelector<HTMLElement>('[data-plan-summary]');
     if (title) title.textContent = `${plan.availableWeeks}-week ${plan.roleLabel} study map`;
@@ -476,6 +536,23 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .section-kicker { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
   .start-sheet, .plan-sheet, .record-sheet { margin: 0 0 1.7rem; padding: .8rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
   .plan-sheet { padding: 1rem 0 1.15rem; border-top: 2px solid var(--c-text); }
+  .prep-tracks { margin: 0 0 1.7rem; padding: .9rem 0 1rem; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); }
+  .prep-tracks[hidden] { display: none; }
+  .prep-tracks > header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+  .prep-tracks h2 { margin: .15rem 0 .35rem !important; font-size: 1.05rem !important; }
+  .prep-tracks > header > p { max-width: 25rem; margin: 0; color: var(--c-muted); font-size: .76rem; text-align: right; }
+  .prep-track-list { margin: .7rem 0 0; padding: 0; list-style: none; border-top: 1px solid var(--c-rule); }
+  .prep-track { padding: .65rem 0; border-bottom: 1px solid var(--c-rule); }
+  .prep-track-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .8rem; }
+  .prep-track-heading strong { font-size: .86rem; }
+  .prep-track-status { flex: 0 0 auto; color: var(--c-muted); font-family: var(--font-mono); font-size: .62rem; }
+  .prep-track--complete .prep-track-status { color: #166534; }
+  .prep-track--blocked .prep-track-status { color: #b45309; }
+  .prep-track p { max-width: 48rem; margin: .18rem 0 0; color: var(--c-text-soft); font-size: .78rem; }
+  .prep-track-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .8rem; margin-top: .35rem; font-size: .76rem; }
+  .prep-track-actions a { font-weight: 700; }
+  .track-complete { padding: .25rem .45rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-muted); font: inherit; font-size: .68rem; cursor: pointer; }
+  .track-complete:hover { border-color: var(--c-accent); color: var(--c-accent); }
   .study-map { margin: 0 0 1.7rem; padding: .9rem 0 1.1rem; border-top: 2px solid var(--c-text); border-bottom: 1px solid var(--c-rule); }
   .study-map[hidden] { display: none; }
   .study-map-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
@@ -521,7 +598,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .start-sheet > p:not(.section-kicker) { max-width: 42rem; margin: 0; color: var(--c-text-soft); }
   .start-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1rem; margin-top: .9rem; }
   .primary-link { display: inline-block; padding: .58rem .78rem; border-radius: var(--radius); background: var(--c-accent-fill); color: var(--c-on-accent); font-weight: 700; text-decoration: none; }
-  .plan-sheet[hidden], .start-sheet[hidden], [data-record-content][hidden], .empty-record[hidden], [data-next-action][hidden], [data-later-tasks][hidden], [data-plan-blockers][hidden] { display: none; }
+  .plan-sheet[hidden], .prep-tracks[hidden], .start-sheet[hidden], [data-record-content][hidden], .empty-record[hidden], [data-next-action][hidden], [data-later-tasks][hidden], [data-plan-blockers][hidden] { display: none; }
   .plan-sheet > header, .record-sheet > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
   .plan-hero-header h2 { margin: .15rem 0 .35rem !important; font-size: 1.35rem !important; }
   .plan-hero-header > a { flex: 0 0 auto; font-size: .78rem; }
@@ -585,7 +662,8 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     .study-map-header { align-items: flex-start; flex-direction: column; }
     .route-milestones { grid-template-columns: 1fr; gap: .25rem; }
     .round-route-grid { grid-template-columns: 1fr; }
-    .plan-sheet > header, .record-sheet > header { flex-direction: column; }
+    .plan-sheet > header, .prep-tracks > header, .record-sheet > header { flex-direction: column; }
+    .prep-tracks > header > p { max-width: none; text-align: left; }
     .plan-metrics { grid-template-columns: 1fr; }
     .start-actions { align-items: stretch; flex-direction: column; }
     .start-actions a { text-align: center; }
