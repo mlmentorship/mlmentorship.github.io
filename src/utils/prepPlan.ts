@@ -1,5 +1,5 @@
 import type { PracticeProgressRecord } from './prepProgress';
-import { buildStudyRoutes } from './prepRoutes';
+import { buildPrepTracks, buildStudyRoutes } from './prepRoutes';
 
 export const PREP_PLAN_KEY = 'mlm:prep-plan:v1';
 
@@ -86,7 +86,7 @@ export function currentPlanWeek(plan: PrepPlanState, now = new Date()): number {
   return Math.min(plan.availableWeeks, Math.floor(elapsedDays / 7) + 1);
 }
 
-export function nextPrepTasks(plan: PrepPlanState, records: PracticeProgressRecord[], today: string): PrepPlanTask[] {
+export function nextPrepTasks(plan: PrepPlanState, records: PracticeProgressRecord[], today: string, completed: Record<string, string> = {}): PrepPlanTask[] {
   const tasks: PrepPlanTask[] = [];
   const routes = buildStudyRoutes(plan, records, today);
   const seen = new Set<string>();
@@ -111,6 +111,19 @@ export function nextPrepTasks(plan: PrepPlanState, records: PracticeProgressReco
       dueOn: step.record?.dueOn ?? undefined,
     });
     seen.add(step.slug);
+  }
+  const urgentQuestionTasks = tasks.filter(task => task.kind === 'retry' || task.kind === 'mixed');
+  if (urgentQuestionTasks.length === 0) {
+    const evidenceTasks = buildPrepTracks(plan, routes, completed)
+      .filter(track => track.status === 'ready')
+      .map(track => ({
+        id: `track:${track.id}`,
+        kind: track.kind === 'simulation' ? 'simulation' as const : 'role-path' as const,
+        title: track.title,
+        detail: `${track.minutes} min. ${track.detail}`,
+        href: track.href,
+      }));
+    tasks.unshift(...evidenceTasks);
   }
   if (tasks.length === 0 && routes.length > 0 && routes.every(route => route.steps.every(step => step.status === 'mastered'))) {
     tasks.push({ id: 'final-week', kind: 'role-path', title: 'Review final-week logistics', detail: 'The mapped prompts have passed. Confirm your actual round formats and retain only remaining gaps.', href: '/prep/final-week/' });

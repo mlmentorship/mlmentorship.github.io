@@ -24,7 +24,15 @@ test('confirmed rounds are the only routes, with weakest evidence first', () => 
   const routes = buildStudyRoutes(plan, [], today);
   assert.deepEqual(routes.map(route => route.id), ['ml-system-design', 'ml-breadth']);
   assert.equal(nextPrepTasks(plan, [], today)[0].href, routes[0].steps[0].href);
-  assert.ok(nextPrepTasks({ ...plan, level: 'l7' }, [], today).every(task => !task.href.includes('level-paths')));
+  assert.ok(nextPrepTasks({ ...plan, level: 'l7' }, [], today).some(task => task.href.includes('level-paths')));
+});
+
+test('ready evidence tracks enter the queue, but due retries stay first', () => {
+  const upperIc = { ...plan, level: 'l7' };
+  assert.equal(nextPrepTasks(upperIc, [], today)[0].href, '/prep/story-bank/');
+  const due = record('design-multi-team-ml-platform', { dueOn: today });
+  assert.equal(nextPrepTasks(upperIc, [due], today)[0].href, '/questions/design-multi-team-ml-platform/?practice=1&from=map');
+  assert.equal(nextPrepTasks(upperIc, [], today, { 'track:story-bank': today })[0].href, '/prep/level-paths/staff-principal/');
 });
 
 test('role, domain, and level change representative questions', () => {

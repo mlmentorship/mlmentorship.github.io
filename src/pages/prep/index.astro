@@ -343,7 +343,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
     if (estimate) estimate.textContent = `${plan.estimatedHours.low}–${plan.estimatedHours.high} hours`;
     if (focus) focus.textContent = routes[0] ? `Start with ${routes[0].label}. The map below stays inside your confirmed rounds and changes as you score each attempt.` : 'Open readiness to choose the rounds this map should cover.';
 
-    const tasks = nextPrepTasks(plan, records, today);
+    const tasks = nextPrepTasks(plan, records, today, loadActivityProgress().completed);
     const nextAction = context.querySelector<HTMLElement>('[data-next-action]');
     const nextLink = context.querySelector<HTMLAnchorElement>('[data-next-link]');
     const nextTitle = context.querySelector<HTMLElement>('[data-next-title]');
