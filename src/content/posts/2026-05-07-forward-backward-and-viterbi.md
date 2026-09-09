@@ -73,8 +73,8 @@ There are $K^T$ possible paths. Both algorithms factor through a $T \times K$ DP
 				<text class="viz-axis-label" x="263" y="43" text-anchor="middle">t=4</text>
 				<path d="M50 68H101M125 68H176M200 68H251M50 108H101M125 108H176M200 108H251M50 148H101M125 148H176M200 148H251" style="fill:none;stroke:var(--viz-edge);stroke-width:0.8"></path>
 				<path d="M50 68L101 108M50 108L101 68M50 108L101 148M50 148L101 108M125 68L176 108M125 108L176 68M125 108L176 148M125 148L176 108M200 68L251 108M200 108L251 68M200 108L251 148M200 148L251 108" style="fill:none;stroke:var(--viz-edge);stroke-width:0.8;stroke-dasharray:3 3"></path>
-				<path d="M50 68L101 108H176L251 148" style="fill:none;stroke:var(--viz-focus);stroke-width:4"></path>
-				<path d="M94 102L101 108L92 110M169 103L176 108L169 113M242 141L251 148L240 149" style="fill:none;stroke:var(--viz-focus);stroke-width:2.5"></path>
+				<path d="M50 68L101 108H176L251 148" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:4"></path>
+				<path d="M94 102L101 108L92 110M169 103L176 108L169 113M242 141L251 148L240 149" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
 				<g class="viz-node"><circle cx="38" cy="108" r="12"></circle><circle cx="38" cy="148" r="12"></circle><circle cx="113" cy="68" r="12"></circle><circle cx="113" cy="148" r="12"></circle><circle cx="188" cy="68" r="12"></circle><circle cx="188" cy="148" r="12"></circle><circle cx="263" cy="68" r="12"></circle><circle cx="263" cy="108" r="12"></circle></g>
 				<g class="viz-node viz-node--focus"><circle cx="38" cy="68" r="14"></circle><circle cx="113" cy="108" r="14"></circle><circle cx="188" cy="108" r="14"></circle><circle cx="263" cy="148" r="14"></circle></g>
 				<g class="viz-node-label" text-anchor="middle"><text x="38" y="72">A</text><text x="38" y="112">B</text><text x="38" y="152">C</text><text x="113" y="72">A</text><text x="113" y="112">B</text><text x="113" y="152">C</text><text x="188" y="72">A</text><text x="188" y="112">B</text><text x="188" y="152">C</text><text x="263" y="72">A</text><text x="263" y="112">B</text><text x="263" y="152">C</text></g>

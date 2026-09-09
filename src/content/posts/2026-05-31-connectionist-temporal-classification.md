@@ -75,7 +75,7 @@ The **collapse function** $\mathcal{B}$ does two things, in order:
 				<text class="viz-axis-label" x="12" y="16">BLANK SEPARATOR · TWO Ls</text>
 				<text class="viz-axis-label" x="20" y="57">PATH</text>
 				<rect class="viz-node viz-node--input" x="104" y="38" width="30" height="28" rx="4"></rect>
-				<path d="M150 38L165 52L150 66L135 52Z" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:3 2"></path>
+				<path d="M150 38L165 52L150 66L135 52Z" style="fill:var(--viz-neutral-bg);stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:3 2"></path>
 				<rect class="viz-node viz-node--input" x="166" y="38" width="30" height="28" rx="4"></rect>
 				<text class="viz-node-label" x="119" y="57" text-anchor="middle">L</text>
 				<text class="viz-node-label" x="150" y="56" text-anchor="middle">∅</text>

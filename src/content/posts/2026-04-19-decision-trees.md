@@ -46,11 +46,11 @@ The greedy choice is locally optimal but not globally; finding the globally opti
 		<text class="viz-callout" x="179" y="45" text-anchor="end">root: x1 ≤ 4</text>
 		<path d="M185 122H328" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-dasharray:6 4"></path>
 		<text class="viz-callout" x="321" y="116" text-anchor="end">child: x2 ≤ 3</text>
-		<g style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:2">
+		<g style="fill:var(--viz-neutral-bg);stroke:var(--viz-edge);stroke-width:2">
 			<circle cx="76" cy="64" r="6"></circle><circle cx="113" cy="99" r="6"></circle><circle cx="145" cy="55" r="6"></circle><circle cx="288" cy="70" r="6"></circle>
 			<path d="M92 143L99 156H85Z"></path><path d="M224 152L231 165H217Z"></path><path d="M252 177L259 190H245Z"></path><path d="M278 174L285 187H271Z"></path>
 		</g>
-		<path d="M249 183L257 197H241Z" style="fill:var(--viz-focus-fill);stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
+		<path d="M249 183L257 197H241Z" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2.5"></path>
 		<text class="viz-callout" x="258" y="204">new point</text>
 		<text class="viz-axis-label" x="42" y="19">8 TRAINING POINTS: ○ CLASS 0, △ CLASS 1</text>
 		<text class="viz-axis-label" x="180" y="264" text-anchor="middle">THE SAME PARTITION, WRITTEN AS RULES</text>

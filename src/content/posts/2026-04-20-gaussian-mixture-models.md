@@ -46,7 +46,7 @@ The latent $z$ is what makes GMM a soft-clustering algorithm: posterior $p(z = k
 		<text class="viz-label" x="26" y="162">component 1 · solid</text>
 		<text class="viz-callout" x="280" y="145">μ₂</text>
 		<text class="viz-label" x="334" y="162" text-anchor="end">component 2 · dashed</text>
-		<path d="M180 82L187 89L180 96L173 89Z" style="fill:var(--c-text);stroke:var(--viz-plot-bg);stroke-width:1.5"></path>
+		<path d="M180 82L187 89L180 96L173 89Z" style="fill:var(--c-text);stroke:var(--viz-edge);stroke-width:1.5"></path>
 		<text class="viz-callout" x="180" y="70" text-anchor="middle">observation x</text>
 		<path d="M180 182V198" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#gmm-arrow)"></path>
 		<rect class="viz-node viz-node--input" x="8" y="204" width="164" height="66" rx="5"></rect>

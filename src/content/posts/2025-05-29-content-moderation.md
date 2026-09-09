@@ -61,20 +61,21 @@ This is L5. Layered architecture with human-in-the-loop and feedback.
 
 <!-- visual:content-moderation-governed-decision-loop -->
 ```mermaid
+%%{init: {"flowchart": {"diagramPadding": 24}}}%%
 flowchart TB
 	accTitle: Policy governs a multi-policy moderation decision and correction loop
 	accDescr: Policy owners publish versioned definitions and actions. Those definitions determine training labels for per-policy models and set policy-specific routing thresholds. User content enters the models, which produce separate scores for policies such as hate speech, violence, and spam. The decision layer combines each score with its policy threshold and routes the item to allow, trained human review, or an automatic action with a reason. Human decisions and appealed automatic actions create corrected decision records. Those records feed evaluation and retraining, but do not let the model redefine policy.
-	Policy["Policy owners<br/>versioned definitions + actions"]
+	Policy["Policy owners<br/>versioned definitions<br/>+ actions"]
 	Content["User content<br/>text · image · video"]
 	Models["Per-policy models<br/>hate · violence · spam · …"]
 	Decision{"Decision layer<br/>score × policy threshold"}
-	Allow["ALLOW<br/>log for random audit"]
+	Allow["ALLOW<br/>random audit"]
 	Review["HUMAN REVIEW<br/>borderline score"]
 	Auto["AUTO-ACTION + REASON<br/>high-confidence score"]
 	Appeal["USER APPEAL<br/>senior review"]
 	Record[("Corrected decision record<br/>policy version + reviewer outcome")]
 	Policy -->|"defines labels"| Models
-	Policy -->|"sets each action rule"| Decision
+	Policy -->|"sets each<br/>action rule"| Decision
 	Content --> Models
 	Models -->|"one score per policy"| Decision
 	Decision -->|"below low<br/>threshold"| Allow
