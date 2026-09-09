@@ -68,7 +68,7 @@ A path from bottom-left to top-right is one alignment. The training loss sums ov
 				<text class="viz-node-label" x="150" y="111">∅</text>
 				<text class="viz-node-label" x="195" y="86">B</text>
 				<text class="viz-node-label" x="220" y="36">∅</text>
-				<circle cx="45" cy="196" r="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:2"></circle>
+				<circle cx="45" cy="196" r="5" style="fill:var(--viz-neutral-bg);stroke:var(--viz-edge);stroke-width:2"></circle>
 				<circle cx="255" cy="46" r="5" style="fill:var(--viz-output-bg);stroke:var(--viz-edge);stroke-width:2"></circle>
 			</svg>
 		</section>
@@ -93,7 +93,7 @@ A path from bottom-left to top-right is one alignment. The training loss sums ov
 				<text class="viz-node-label" x="150" y="111">∅</text>
 				<text class="viz-node-label" x="195" y="86">B</text>
 				<text class="viz-node-label" x="220" y="36">∅</text>
-				<circle cx="45" cy="196" r="5" style="fill:var(--viz-surface);stroke:var(--viz-edge);stroke-width:2"></circle>
+				<circle cx="45" cy="196" r="5" style="fill:var(--viz-neutral-bg);stroke:var(--viz-edge);stroke-width:2"></circle>
 				<circle cx="255" cy="46" r="5" style="fill:var(--viz-output-bg);stroke:var(--viz-edge);stroke-width:2"></circle>
 			</svg>
 		</section>

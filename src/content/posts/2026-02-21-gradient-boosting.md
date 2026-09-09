@@ -44,7 +44,7 @@ For squared error, $r_{i,t} = y_i - F_{t-1}(x_i)$. Literal residuals. For other 
 		<path class="viz-gridline" d="M42 50H328M42 91H328M42 132H328"></path>
 		<path d="M53 91H317" style="fill:none;stroke:var(--viz-edge);stroke-width:2.5"></path>
 		<text class="viz-callout" x="313" y="84" text-anchor="end">F₀ = 5</text>
-		<g style="fill:var(--viz-surface);stroke:var(--viz-input-stroke);stroke-width:2.5">
+		<g style="fill:var(--viz-neutral-bg);stroke:var(--viz-input-stroke);stroke-width:2.5">
 			<circle cx="76" cy="132" r="6"></circle><circle cx="137" cy="132" r="6"></circle><circle cx="223" cy="50" r="6"></circle><circle cx="284" cy="50" r="6"></circle>
 		</g>
 		<g style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#gradient-boosting-arrow)">
@@ -74,7 +74,7 @@ For squared error, $r_{i,t} = y_i - F_{t-1}(x_i)$. Literal residuals. For other 
 		<path d="M53 442H180V400H317" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:3"></path>
 		<text class="viz-callout" x="58" y="437">F₁ = 3.5</text>
 		<text class="viz-callout" x="313" y="395" text-anchor="end">F₁ = 6.5</text>
-		<g style="fill:var(--viz-surface);stroke:var(--viz-input-stroke);stroke-width:2.5">
+		<g style="fill:var(--viz-neutral-bg);stroke:var(--viz-input-stroke);stroke-width:2.5">
 			<circle cx="76" cy="462" r="6"></circle><circle cx="137" cy="462" r="6"></circle><circle cx="223" cy="380" r="6"></circle><circle cx="284" cy="380" r="6"></circle>
 		</g>
 		<g style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2;marker-end:url(#gradient-boosting-arrow)">

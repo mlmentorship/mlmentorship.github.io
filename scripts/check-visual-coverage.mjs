@@ -8,6 +8,14 @@ import { unresolvedAccessibilityReferences } from './visual-accessibility.mjs';
 const root = resolve(import.meta.dirname, '..');
 const postsDir = join(root, 'src/content/posts');
 const auditsDir = join(root, 'data/visual-audits');
+const styleSources = [
+  join(root, 'src/styles/variables.css'),
+  join(root, 'src/styles/global.css'),
+];
+const declaredCustomProperties = new Set(
+  styleSources.flatMap((path) => [...readFileSync(path, 'utf8').matchAll(/(--[\w-]+)\s*:/g)]
+    .map((match) => match[1])),
+);
 const allowedStatuses = new Set(['planned', 'implemented', 'no-visual']);
 const allowedMedia = new Set(['mermaid', 'svg', 'semantic-html', 'interaction', 'paper-figure', 'mixed', 'none']);
 const urlPattern = /^https:\/\//;
@@ -87,6 +95,11 @@ function nonEmpty(value) {
 
 function validateAudit(audit, file, entry) {
   const label = `${file} (${entry.slug})`;
+  for (const match of entry.source.matchAll(/var\((--[\w-]+)\)/g)) {
+    if (!declaredCustomProperties.has(match[1])) {
+      fail(`${label} references undefined custom property ${match[1]}`);
+    }
+  }
   if (audit.schemaVersion !== 1) fail(`${label} must use schemaVersion 1`);
   if (audit.slug !== entry.slug) fail(`${label} slug does not match its filename and article`);
   if (audit.article !== entry.file) fail(`${label} article path must be ${entry.file}`);
