@@ -146,7 +146,7 @@ const currentChapterIndex = volume.chapters.findIndex((chapter) => chapter.id ==
     white-space: nowrap;
   }
   .book-mark:hover strong { color: var(--c-accent); text-decoration: underline; }
-  .reader-actions { display: flex; align-items: stretch; gap: .1rem; margin-left: auto; }
+  .reader-actions { display: flex; flex-wrap: wrap; align-items: stretch; gap: .1rem; margin-left: auto; }
   .reader-step,
   .book-contents > summary {
     display: flex;

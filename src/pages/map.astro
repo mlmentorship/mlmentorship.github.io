@@ -120,7 +120,7 @@ const mapData = JSON.stringify({
       <section class="map-tool" aria-label="Interactive content map">
         <div class="map-floating-tools">
           <div class="map-toolbar">
-            <div class="map-toolbar-heading"><strong>Content map</strong><span>{LIBRARY_VOLUMES.length} books · {allEntries.length} lessons</span></div>
+            <div class="map-toolbar-heading"><h1>Content map</h1><span>{LIBRARY_VOLUMES.length} books · {allEntries.length} lessons</span></div>
             <label class="map-search">
               <span>Find a book, chapter, or lesson</span>
               <input type="search" data-map-search placeholder="Try: attention, calibration, coding" autocomplete="off" />
@@ -138,15 +138,16 @@ const mapData = JSON.stringify({
             <div class="map-search-result-list" data-map-search-result-list></div>
           </div>
         </div>
-        <div class="map-status-row">
-          <p data-map-status aria-live="polite"></p>
-          <p data-map-zoom-status aria-live="polite">100%</p>
-        </div>
-        <div class="map-viewport" data-map-viewport tabindex="0" aria-label="Interactive hierarchical content map. Drag to pan; use the mouse wheel, pinch gesture, or zoom controls to zoom.">
+        <div class="map-viewport" data-map-viewport tabindex="0" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home" aria-label="Interactive hierarchical content map. Drag or use arrow keys to pan; use the mouse wheel, pinch gesture, or zoom controls to zoom.">
           <div class="map-canvas" data-map-canvas>
             <svg class="map-edges" data-map-edges aria-hidden="true"></svg>
             <div class="map-nodes" data-map-nodes></div>
           </div>
+        </div>
+        <div class="map-footer">
+        <div class="map-status-row">
+          <p data-map-status aria-live="polite"></p>
+          <p data-map-zoom-status aria-live="polite">100%</p>
         </div>
         <div class="map-legend" aria-label="Map legend">
           <span><i class="legend-line legend-line--solid"></i>Hierarchy</span>
@@ -158,6 +159,7 @@ const mapData = JSON.stringify({
           <button type="button" data-map-zoom-out aria-label="Zoom out" title="Zoom out">−</button>
           <button type="button" data-map-fit aria-label="Fit visible map" title="Fit visible map">Fit</button>
           <button type="button" data-map-zoom-in aria-label="Zoom in" title="Zoom in">+</button>
+        </div>
         </div>
       </section>
 
@@ -183,7 +185,7 @@ const mapData = JSON.stringify({
 
     <noscript>
       <section class="map-noscript">
-        <h2>Browse the ordered library</h2>
+        <h1>Browse the ordered library</h1>
         <p>This map needs JavaScript for expansion. The complete book and chapter contents remain available in the <a href="/#curriculum">ordered library</a>.</p>
       </section>
     </noscript>
@@ -676,6 +678,19 @@ const mapData = JSON.stringify({
     zoomIn?.addEventListener('click', () => zoomAt(zoom * 1.2));
     zoomOut?.addEventListener('click', () => zoomAt(zoom / 1.2));
     fit?.addEventListener('click', () => fitView());
+    graphViewport?.addEventListener('keydown', (event) => {
+      if (event.target !== graphViewport || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key === 'Home') { event.preventDefault(); fitView(); return; }
+      const offsets: Record<string, [number, number]> = { ArrowLeft: [1, 0], ArrowRight: [-1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] };
+      const offset = offsets[event.key];
+      if (!offset) return;
+      event.preventDefault();
+      const distance = event.shiftKey ? 160 : 48;
+      panX += offset[0] * distance;
+      panY += offset[1] * distance;
+      clampPan();
+      updateTransform();
+    });
     graphViewport?.addEventListener('wheel', (event) => {
       event.preventDefault();
       zoomAt(zoom * Math.exp(-event.deltaY * .001), event.clientX, event.clientY);
@@ -843,7 +858,7 @@ const mapData = JSON.stringify({
   .legend-dot { display: inline-block; width: .55rem; height: .55rem; border: 1px solid var(--c-accent); border-radius: 50%; }
   .legend-dot--link { border-color: var(--viz-output-stroke); }
   .map-noscript { margin-top: 1rem; padding: 1rem; border-top: 1px solid var(--c-rule); color: var(--c-text-soft); }
-  .map-noscript h2 { margin: 0 0 .35rem; font-size: 1rem; }
+  .map-noscript h1 { margin: 0 0 .35rem; font-size: 1rem; }
   .map-noscript p { margin: 0; font-size: .82rem; line-height: 1.5; }
   :global(:root) { --map-edge: var(--c-text-soft); --map-prerequisite: var(--c-accent); }
   @media (max-width: 980px) {
@@ -870,7 +885,7 @@ const mapData = JSON.stringify({
   .map-floating-tools { position: absolute; top: 1rem; left: 1rem; z-index: 20; width: min(32rem, calc(100% - 2rem)); }
   .map-toolbar { grid-template-columns: minmax(0, 1fr) auto; padding: .65rem; border-color: color-mix(in srgb, var(--c-rule) 82%, transparent); background: color-mix(in srgb, var(--c-bg) 88%, transparent); box-shadow: 0 .45rem 1.2rem color-mix(in srgb, var(--c-text) 12%, transparent); backdrop-filter: blur(14px); }
   .map-toolbar-heading { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; grid-column: 1 / -1; }
-  .map-toolbar-heading strong { color: var(--c-text); font-family: var(--font-display); font-size: .92rem; }
+  .map-toolbar-heading h1 { margin: 0; color: var(--c-text); font-family: var(--font-display); font-size: .92rem; }
   .map-toolbar-heading span { color: var(--c-muted); font-family: var(--font-mono); font-size: .58rem; }
   .map-search > span { font-size: .56rem; }
   .map-search input { min-height: 2.3rem; }
@@ -911,7 +926,7 @@ const mapData = JSON.stringify({
   }
 
   @media print {
-    .map-toolbar, .map-search-results, .map-inspector, .map-legend, .map-hint, .map-zoom-controls { display: none !important; }
+    .map-toolbar, .map-search-results, .map-inspector, .map-footer, .map-hint, .map-zoom-controls { display: none !important; }
     .map-viewport { max-height: none; overflow: visible; border: 0; background: #fff; }
     .map-canvas { width: 100% !important; height: auto !important; }
     .map-edges { display: none; }
@@ -919,4 +934,8 @@ const mapData = JSON.stringify({
     .map-nodes { position: static; }
     .map-node-shell:not([data-node-type='root']):not([data-node-type='shelf']) { display: none; }
   }
+  .map-footer { position: absolute; right: .5rem; bottom: .5rem; left: .5rem; z-index: 15; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .5rem; pointer-events: none; }
+  .map-footer > .map-status-row, .map-footer > .map-legend, .map-footer > .map-zoom-controls { position: static; max-width: 100%; margin: 0; transform: none; pointer-events: auto; }
+  .map-footer > .map-status-row { flex-direction: row; flex-wrap: wrap; gap: .25rem; }
+  .map-footer > .map-legend { justify-content: flex-start; }
 </style>

@@ -41,7 +41,7 @@ This is L5. You've named the unrolling, the memory and gradient problems, and th
 	<p class="visual-title" id="bptt-boundary-title">What does truncated BPTT detach: the recurrent state or the gradient path?</p>
 	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="group" aria-label="Full and truncated backpropagation through time compared">
 		<section class="visual-panel plot-panel">
-			<svg viewBox="0 0 340 200" role="img" aria-labelledby="bptt-full-title bptt-full-desc">
+			<svg viewBox="0 0 340 200" role="img" aria-labelledby="bptt-full-title bptt-full-desc" style="--viz-backward-marker:url(#bptt-full-backward-head)">
 				<title id="bptt-full-title">Full backpropagation reaches every unrolled recurrent state</title>
 				<desc id="bptt-full-desc">Four hidden states use the same recurrent weights. Solid state arrows run forward from h1 through h4 to loss L4. Dashed gradient arrows run backward from the loss through h4, h3, h2, and h1, so the final loss can assign credit across the whole unrolled chain.</desc>
 				<defs>
@@ -73,7 +73,7 @@ This is L5. You've named the unrolling, the memory and gradient problems, and th
 			</svg>
 		</section>
 		<section class="visual-panel plot-panel">
-			<svg viewBox="0 0 340 200" role="img" aria-labelledby="bptt-truncated-title bptt-truncated-desc">
+			<svg viewBox="0 0 340 200" role="img" aria-labelledby="bptt-truncated-title bptt-truncated-desc" style="--viz-backward-marker:url(#bptt-truncated-backward-head)">
 				<title id="bptt-truncated-title">Truncated backpropagation carries state forward but stops gradients at detach</title>
 				<desc id="bptt-truncated-desc">The same four hidden states and forward state arrows remain connected. A detach boundary sits between h2 and h3. For a two-state window containing h3 and h4, dashed gradients from loss L4 reach h4 and h3, then end at a stop bar before h2. The numeric state from h2 still initialized h3.</desc>
 				<defs>

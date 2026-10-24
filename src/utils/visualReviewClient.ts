@@ -1,3 +1,5 @@
+import { enhanceCodingVisuals } from './codingVisuals';
+
 export interface ExtractedLearningVisual {
   marker?: Comment;
   figure: HTMLElement;
@@ -33,16 +35,17 @@ function sourceAfter(element: Element | undefined): HTMLElement | undefined {
 
 export function extractLearningVisual(root: ParentNode, visualId?: string): ExtractedLearningVisual | undefined {
   const marker = visualMarker(root, visualId);
+  if (visualId && !marker) return undefined;
   const markedElement = marker ? siblingElement(marker, 'next') : undefined;
   const existingFigure = markedElement?.classList.contains('learning-figure')
     ? markedElement
-    : root.querySelector<HTMLElement>('.learning-figure');
+    : visualId ? undefined : root.querySelector<HTMLElement>('.learning-figure');
 
   if (existingFigure) return { marker, figure: existingFigure, source: sourceAfter(existingFigure) };
 
   const mermaid = markedElement?.matches('pre.mermaid, .mermaid')
     ? markedElement
-    : root.querySelector<HTMLElement>('pre.mermaid');
+    : visualId ? undefined : root.querySelector<HTMLElement>('pre.mermaid');
   if (!mermaid) return undefined;
 
   const caption = mermaid.nextElementSibling instanceof HTMLElement && mermaid.nextElementSibling.classList.contains('diagram-caption')
@@ -84,5 +87,71 @@ export function absolutizeVisualLinks(element: Element, articleHref: string) {
       if (!value || value.startsWith('#') || value.startsWith('data:')) continue;
       try { child.setAttribute(attribute, new URL(value, base).toString()); } catch { /* Preserve non-URL values. */ }
     }
+  });
+}
+
+const previewArticleCache = new Map<string, Promise<Document>>();
+const initializedPreviews = new WeakSet<HTMLElement>();
+
+async function loadVisualPreview(target: HTMLElement): Promise<void> {
+  const href = target.dataset.landingVisualHref;
+  const visualId = target.dataset.landingVisualId;
+  if (!href || !visualId || target.dataset.loaded === 'true') return;
+  target.setAttribute('aria-busy', 'true');
+  try {
+    let request = previewArticleCache.get(href);
+    if (!request) {
+      request = fetch(href, { headers: { Accept: 'text/html' } })
+        .then((response) => {
+          if (!response.ok) throw new Error(`Article returned ${response.status}`);
+          return response.text();
+        })
+        .then((html) => new DOMParser().parseFromString(html, 'text/html'))
+        .catch((error) => {
+          previewArticleCache.delete(href);
+          throw error;
+        });
+      previewArticleCache.set(href, request);
+    }
+    const extracted = extractLearningVisual(await request, visualId);
+    if (!extracted) throw new Error('No completed visual was found.');
+    const figure = document.importNode(extracted.figure, true);
+    absolutizeVisualLinks(figure, href);
+    target.replaceChildren(figure);
+    const diagrams = [...target.querySelectorAll<HTMLElement>('pre.mermaid')];
+    if (diagrams.length > 0) {
+      const { default: mermaid } = await import('mermaid');
+      mermaid.initialize({ startOnLoad: false, theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'default' });
+      await mermaid.run({ nodes: diagrams });
+    }
+    enhanceCodingVisuals(target);
+    target.dataset.loaded = 'true';
+  } catch (error) {
+    const message = document.createElement('p');
+    message.className = 'landing-visual-error';
+    message.textContent = 'Visual unavailable here.';
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = 'Read the lesson';
+    target.replaceChildren(message, link);
+    console.error('Visual preview could not be loaded.', error);
+  } finally {
+    target.setAttribute('aria-busy', 'false');
+  }
+}
+
+export function initializeVisualPreviews(root: ParentNode = document): void {
+  const targets = [...root.querySelectorAll<HTMLElement>('[data-landing-visual]')].filter((target) => !initializedPreviews.has(target));
+  if (targets.length === 0) return;
+  const observer = 'IntersectionObserver' in window ? new IntersectionObserver((observations) => {
+    observations.filter((observation) => observation.isIntersecting).forEach((observation) => {
+      observer?.unobserve(observation.target);
+      void loadVisualPreview(observation.target as HTMLElement);
+    });
+  }, { rootMargin: '600px 0px' }) : undefined;
+  targets.forEach((target) => {
+    initializedPreviews.add(target);
+    if (target.dataset.landingVisualLoad === 'eager' || !observer) void loadVisualPreview(target);
+    else observer.observe(target);
   });
 }

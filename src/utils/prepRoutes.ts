@@ -274,6 +274,18 @@ export function buildStudyRoutes(plan: PrepPlanState, records: PracticeProgressR
   }).sort((left, right) => right.priority - left.priority);
 }
 
+export function buildReadingTopics(plan: PrepPlanState) {
+  const seen = new Set<string>();
+  return buildStudyRoutes(plan, [], plan.updatedOn).map((route) => {
+    const slugs = route.steps.flatMap((step) => [repairConcepts[step.slug]?.slug ?? step.slug, step.slug]).filter((slug) => {
+      if (seen.has(slug)) return false;
+      seen.add(slug);
+      return true;
+    });
+    return { id: route.id, label: route.label, slugs };
+  }).filter((topic) => topic.slugs.length > 0);
+}
+
 export function studyBudget(plan: PrepPlanState, routes: ReturnType<typeof buildStudyRoutes>, completed: Record<string, string> = {}) {
   const weeklyMinutes = Math.max(0, Math.floor(plan.weeklyHours * 60));
   const repairMinutes = Math.floor(weeklyMinutes / 2);

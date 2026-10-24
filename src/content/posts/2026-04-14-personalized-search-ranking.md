@@ -161,6 +161,7 @@ flowchart TB
   accDescr: In the online request path, a query and request context enter query understanding, then lexical, semantic, query-conditioned personalized, and fresh or popular retrievers run in parallel. Their candidates are merged with source evidence, reduced by a first-pass ranker, scored by a final multi-task ranker, and checked by list constraints and policy before results are displayed. Displayed positions, the full candidate set, source evidence, scores, point-in-time features, and model and policy versions enter an exposure and interaction record. In the learning path, those records become point-in-time datasets for evaluation and training. Validated versioned rankers are used by the next request, closing a selective feedback loop. Logging makes the serving decision reconstructable but does not reveal outcomes for unsupported, unshown actions.
 
   subgraph Online["ONLINE REQUEST PATH"]
+	direction TB
     Q["1 · Query + request context"] --> U["2 · Query understanding"]
     U --> R["3 · Parallel retrieval<br/>lexical · semantic · personalized · fresh/popular"]
     R --> M["4 · Merge + deduplicate<br/>retain every source"]
@@ -171,6 +172,7 @@ flowchart TB
   end
 
   subgraph Learn["LEARNING PATH"]
+	direction TB
     E["9 · Exposure + interaction record<br/>candidates · positions · scores<br/>features · model + policy versions"]
     D["10 · Point-in-time datasets"]
     T["11 · Training + evaluation"]

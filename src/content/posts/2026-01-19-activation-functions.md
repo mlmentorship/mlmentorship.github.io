@@ -76,7 +76,7 @@ But ReLU has the **dying ReLU problem**: a neuron stuck at $z < 0$ has gradient 
 				<text class="viz-callout" x="49" y="155">ReLU: dead region, f′(x) = 0</text>
 				<text class="viz-callout" x="203" y="112">ReLU: solid</text>
 				<text class="viz-callout" x="180" y="137">GELU: dashed</text>
-				<text class="viz-label" x="75" y="143">smooth negative shoulder</text>
+				<text class="viz-label" x="75" y="125">smooth negative shoulder</text>
 				<circle class="viz-operating-point" cx="167" cy="168.4" r="4"></circle>
 				<text class="viz-label" x="172" y="181">both pass through (0, 0)</text>
 				<text class="viz-label" x="38" y="207">−3</text><text class="viz-label" x="163" y="207">0</text><text class="viz-label" x="288" y="207">3</text>

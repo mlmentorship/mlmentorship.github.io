@@ -16,11 +16,11 @@ const isCodingRoute = currentBookId === 'coding-interview';
 const isReviewRoute = pathname === '/review/' || pathname.startsWith('/review/');
 const showReadingMode = Boolean(articleSlug) || isReviewRoute;
 const visualModeHref = articleSlug ? `/review/#${articleSlug}` : '/review/';
-const fullModeHref = articleSlug ? '#full-explanation' : '/#curriculum';
-const visualModeActive = pathname === '/' || isReviewRoute;
+const fullModeHref = articleSlug ? '#full-explanation' : '/library/foundations/';
+const visualModeActive = isReviewRoute;
 const readingModes = [
-  { label: 'Visual', description: 'Visual review mode', href: visualModeHref, active: visualModeActive, dataKey: 'visual' },
   { label: 'Full', description: 'Full lesson mode', href: fullModeHref, active: !visualModeActive, dataKey: 'full' },
+  { label: 'Visual', description: 'Visual review mode', href: visualModeHref, active: visualModeActive, dataKey: 'visual' },
 ];
 function isActive(href: string) {
   if (href === '/#curriculum') return pathname === '/'
@@ -100,10 +100,13 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 
 <script>
   const readingModeNav = document.querySelector<HTMLElement>('[data-reading-mode-nav]');
+  const masthead = document.querySelector<HTMLElement>('.masthead');
+  if (masthead) {
+    new ResizeObserver(() => document.documentElement.style.setProperty('--header-height', `${Math.ceil(masthead.getBoundingClientRect().height)}px`)).observe(masthead);
+  }
 
   function syncReadingMode() {
-    const visualActive = window.location.pathname === '/review/'
-      || (window.location.pathname === '/' && window.location.hash !== '#curriculum');
+    const visualActive = window.location.pathname === '/review/';
     const reviewIndex = window.location.pathname === '/review/' && !window.location.hash;
     readingModeNav?.toggleAttribute('hidden', reviewIndex);
     document.querySelectorAll<HTMLAnchorElement>('[data-reading-mode]').forEach((link) => {
@@ -131,14 +134,16 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   }
   .bar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: .8rem;
-    min-height: var(--header-height);
+    min-height: 3.6rem;
     padding: .45rem var(--gutter);
     max-width: var(--container);
     margin: 0 auto;
   }
   .brand {
+    min-width: 0;
     color: var(--c-text);
     line-height: 1;
     text-decoration: none;
@@ -154,6 +159,8 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
 
   .reading-mode-switch {
     display: inline-flex;
+    flex-wrap: wrap;
+    max-width: 100%;
     align-items: center;
     padding: 2px;
     border: 1px solid var(--c-rule);
@@ -206,7 +213,7 @@ const navItems: Array<{ label: string; href: string; external?: boolean }> = [..
   }
   .ext { margin-left: 0.2rem; font-size: 0.75em; opacity: 0.6; }
 
-  .bar-end { display: inline-flex; align-items: center; gap: .2rem; }
+  .bar-end { display: inline-flex; flex-shrink: 0; align-items: center; gap: .2rem; }
   .mobile-nav { display: none; position: relative; }
   .menu-trigger {
     display: flex;

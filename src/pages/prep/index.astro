@@ -112,10 +112,10 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
 </PrepLayout>
 
 <script>
-  import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, replacePrepProgress, RETRY_DAYS, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
-  import { clearPrepPlan, currentPlanWeek, loadPrepPlan, nextPrepTasks, parsePrepBackup, savePrepPlan } from '../../utils/prepPlan';
+  import { clearPrepProgress, isPrepStorageAvailable, loadPrepProgress, markMixedSessionVerified, RETRY_DAYS, toLocalDate, type PracticeProgressRecord } from '../../utils/prepProgress';
+  import { clearPrepPlan, currentPlanWeek, loadPrepPlan, nextPrepTasks, parsePrepBackup, restorePrepBackup } from '../../utils/prepPlan';
   import { buildPrepTracks, buildStudyRoutes, practiceStatus, studyBudget } from '../../utils/prepRoutes';
-  import { clearActivityProgress, loadActivityProgress, replaceActivityProgress, setActivityComplete } from '../../utils/activityProgress';
+  import { clearActivityProgress, loadActivityProgress, setActivityComplete } from '../../utils/activityProgress';
   import { trackPublicEvent } from '../../utils/publicEvents';
 
   let today = toLocalDate(new Date());
@@ -472,17 +472,20 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   importFile?.addEventListener('change', async () => {
     const file = importFile.files?.[0];
     if (!file) return;
+    let validBackup = false;
     try {
       const backup = parsePrepBackup(JSON.parse(await file.text()));
       if (!backup) throw new Error('Invalid backup');
+      validBackup = true;
       const hasCurrentState = Boolean(loadPrepPlan()) || loadPrepProgress().length > 0 || Object.keys(loadActivityProgress().completed).length > 0;
       if (hasCurrentState && !window.confirm('Replace the current workbook plan, practice record, and completion marks with this backup?')) return;
-      if (backup.plan) savePrepPlan(backup.plan); else clearPrepPlan();
-      replacePrepProgress(backup.records);
-      replaceActivityProgress(backup.activity);
+      restorePrepBackup(backup);
       render();
     } catch {
-      if (storageWarning) { storageWarning.textContent = 'This file is not a valid mlmentorship workbook backup.'; storageWarning.hidden = false; }
+      if (storageWarning) {
+        storageWarning.textContent = validBackup ? 'Browser storage could not save this backup. Free storage space and try again.' : 'This file is not a valid mlmentorship workbook backup.';
+        storageWarning.hidden = false;
+      }
     } finally {
       importFile.value = '';
     }
@@ -648,7 +651,7 @@ if (!SITE.features.prepTools) return Astro.redirect('/questions/', 302);
   .backup > div { display: flex; flex-wrap: wrap; gap: .45rem; }
   .backup button { padding: .45rem .65rem; border: 1px solid var(--c-rule); border-radius: var(--radius); background: var(--c-bg); color: var(--c-text); font: inherit; font-size: .75rem; cursor: pointer; }
   .backup button:hover { border-color: var(--c-accent); color: var(--c-accent); }
-  .backup .danger { color: #b91c1c; }
+  .backup .danger { color: var(--c-danger); }
   .method-sheet { margin: 2.2rem 0; padding: .85rem 0; border-top: 1px solid var(--c-rule); border-bottom: 1px solid var(--c-rule); scroll-margin-top: var(--sticky-offset); }
   .method-sheet > summary { display: flex; justify-content: space-between; gap: 1rem; list-style: none; }
   .method-sheet > summary::-webkit-details-marker { display: none; }

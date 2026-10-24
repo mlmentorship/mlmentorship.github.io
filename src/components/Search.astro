@@ -23,6 +23,7 @@
       <a data-topic-hint-link></a>
     </aside>
     <div id="pagefind-host"></div>
+    <p id="search-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
     <p class="search-hint" id="search-hint" hidden>Search index not available in dev. Run <code>npm run build &amp;&amp; npm run preview</code> to use search locally.</p>
   </div>
 </dialog>
@@ -58,7 +59,9 @@
     background: var(--c-surface);
     color: var(--c-text);
     box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
   .search-dialog::backdrop {
     background: rgba(15, 23, 42, 0.45);
@@ -190,6 +193,13 @@
           excerptLength: 24,
           processTerm: (term) => aliases.get(term.trim().toLowerCase()) || term,
         });
+        const host = document.getElementById('pagefind-host');
+        const status = document.getElementById('search-status');
+        if (host && status) {
+          const announce = () => { status.textContent = host.querySelector('.pagefind-ui__message')?.textContent || ''; };
+          new MutationObserver(announce).observe(host, { childList: true, subtree: true, characterData: true });
+          announce();
+        }
         const input = document.querySelector('.pagefind-ui__search-input');
         if (input && topicHint) {
           input.addEventListener('input', () => {

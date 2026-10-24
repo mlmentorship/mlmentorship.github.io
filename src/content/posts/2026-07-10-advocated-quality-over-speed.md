@@ -27,7 +27,7 @@ In 90 to 120 seconds, cover six points:
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="quality-speed-path-title">How does evidence lead to a proportionate launch decision?</p>
 	<div class="visual-panel plot-panel">
-		<svg viewBox="0 0 360 500" role="img" aria-labelledby="quality-speed-svg-title quality-speed-svg-desc">
+		<svg viewBox="0 0 360 500" role="img" aria-labelledby="quality-speed-svg-title quality-speed-svg-desc" style="--viz-forward-marker:url(#quality-speed-arrow)">
 			<title id="quality-speed-svg-title">Evidence-to-mitigation decision path</title>
 			<desc id="quality-speed-svg-desc">A vertical path starts with evidence about concrete harm, affected users, likelihood and uncertainty, and reversibility. A targeted test reduces the key uncertainty. The path then asks whether a monitored, reversible release can keep harm within an explicit stop rule. A solid yes branch leads to a staged launch for a lower-risk segment with monitoring and rollback. A dashed no branch leads to reducing exposure through a scope cut, human review, or holding the affected path. Both outcomes require a decision owner, stop rule, and outcome metric.</desc>
 			<defs>

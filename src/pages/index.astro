@@ -4,6 +4,7 @@ import { LIBRARY_VOLUMES } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { getImplementedVisualAudit } from '../utils/visualAudits';
 import Subscribe from '../components/Subscribe.astro';
+import VisualPostList from '../components/VisualPostList.astro';
 
 const entries = await getLibraryEntries();
 const visualEntries = entries.filter((entry) => getImplementedVisualAudit(entry.slug));
@@ -79,9 +80,9 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
           <strong>Build my prep map</strong>
           <span class="cover-intent-arrow" aria-hidden="true">→</span>
         </a>
-        <a class="cover-secondary cover-intent" href="/start-here/#starter-route" data-home-event="homepage_start_clicked">
-          <span class="cover-intent-context">I’m building foundations</span>
-          <strong>Start a 3-lesson foundation route</strong>
+        <a class="cover-secondary cover-intent" href="/library/foundations/" data-home-event="homepage_start_clicked">
+          <span class="cover-intent-context">Explore every topic</span>
+          <strong>Browse the library</strong>
           <span class="cover-intent-arrow" aria-hidden="true">→</span>
         </a>
       </div>
@@ -93,22 +94,7 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
         <div><span class="section-kicker" id="featured-posts-heading">A few ideas, seen</span></div>
         <p>Three visual posts across foundations, systems, and interview judgment.</p>
       </header>
-      <div class="featured-post-list">
-        {featuredPosts.map((post) => (
-          <article class="featured-post">
-            <div class="featured-post-copy">
-              <p class="featured-post-label">{post.label}</p>
-              <h3>{post.title}</h3>
-              <p>{post.note} {post.objective}</p>
-              <a href={post.href} data-home-event="homepage_start_clicked">Read the post <span aria-hidden="true">→</span></a>
-            </div>
-            <div class="landing-visual featured-post-visual" data-landing-visual data-landing-visual-load="eager" data-landing-visual-href={post.href} data-landing-visual-id={post.visualId} aria-busy="true">
-              <p class="landing-visual-placeholder">Loading visual…</p>
-              <noscript><a href={post.href}>Read {post.title}</a></noscript>
-            </div>
-          </article>
-        ))}
-      </div>
+      <VisualPostList posts={featuredPosts} eager homeEvents />
     </section>
 
     <Subscribe placement="home" heading="Keep the field guide close." />
@@ -137,77 +123,7 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
 </BaseLayout>
 
 <script>
-  import { absolutizeVisualLinks, extractLearningVisual } from '../utils/visualReviewClient';
-  import { enhanceCodingVisuals } from '../utils/codingVisuals';
   import { trackPublicEvent, type PublicEventName } from '../utils/publicEvents';
-
-  const articleCache = new Map<string, Promise<Document>>();
-
-  function fetchArticle(href: string): Promise<Document> {
-    const cached = articleCache.get(href);
-    if (cached) return cached;
-    const request = fetch(href, { headers: { Accept: 'text/html' } })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Article returned ${response.status}`);
-        return response.text();
-      })
-      .then((html) => new DOMParser().parseFromString(html, 'text/html'))
-      .catch((error) => {
-        articleCache.delete(href);
-        throw error;
-      });
-    articleCache.set(href, request);
-    return request;
-  }
-
-  async function loadLandingVisual(target: HTMLElement): Promise<void> {
-    if (target.dataset.loaded === 'true') return;
-    const href = target.dataset.landingVisualHref;
-    const visualId = target.dataset.landingVisualId;
-    if (!href || !visualId) return;
-    target.setAttribute('aria-busy', 'true');
-    try {
-      const article = await fetchArticle(href);
-      const extracted = extractLearningVisual(article, visualId);
-      if (!extracted) throw new Error('No completed visual was found.');
-      const figure = document.importNode(extracted.figure, true);
-      absolutizeVisualLinks(figure, href);
-      target.replaceChildren(figure);
-      enhanceCodingVisuals(target);
-      target.dataset.loaded = 'true';
-      target.setAttribute('aria-busy', 'false');
-    } catch (error) {
-      target.setAttribute('aria-busy', 'false');
-      target.replaceChildren();
-      const message = document.createElement('p');
-      message.className = 'landing-visual-error';
-      message.textContent = 'Visual unavailable here.';
-      const link = document.createElement('a');
-      link.href = href;
-      link.textContent = 'Read the lesson';
-      target.append(message, link);
-      console.error('Landing visual could not be loaded.', error);
-    }
-  }
-
-  const landingVisualTargets = [...document.querySelectorAll<HTMLElement>('[data-landing-visual]')];
-  const eagerVisuals = landingVisualTargets.filter((target) => target.dataset.landingVisualLoad === 'eager');
-  eagerVisuals.forEach((target) => {
-    void loadLandingVisual(target);
-  });
-  const deferredVisuals = landingVisualTargets.filter((target) => target.dataset.landingVisualLoad !== 'eager');
-  if ('IntersectionObserver' in window) {
-    const visualObserver = new IntersectionObserver((observations) => {
-      observations.filter((observation) => observation.isIntersecting).forEach((observation) => {
-        const target = observation.target as HTMLElement;
-        visualObserver.unobserve(target);
-        void loadLandingVisual(target);
-      });
-    }, { rootMargin: '600px 0px' });
-    deferredVisuals.forEach((target) => visualObserver.observe(target));
-  } else {
-    deferredVisuals.forEach((target) => void loadLandingVisual(target));
-  }
 
   document.querySelectorAll<HTMLElement>('[data-home-event]').forEach((element) => {
     element.addEventListener('click', () => {
@@ -257,14 +173,6 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
 
   .featured-posts,
   .book-library { padding-top: 2.8rem; scroll-margin-top: calc(var(--header-height) + .75rem); }
-  .featured-post-list { border-top: 1px solid var(--c-rule); }
-  .featured-post { display: grid; grid-template-columns: minmax(13rem, .7fr) minmax(0, 1.3fr); gap: clamp(1.2rem, 4vw, 3.5rem); height: 17rem; align-items: center; padding: 1rem 0; overflow: hidden; border-bottom: 1px solid var(--c-rule); }
-  .featured-post-copy { max-width: 21rem; }
-  .featured-post-label { margin: 0; color: var(--c-accent); font-family: var(--font-mono); font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .featured-post-copy h3 { margin: .35rem 0 .5rem; font-size: clamp(1.15rem, 2vw, 1.5rem); line-height: 1.15; }
-  .featured-post-copy > p:not(.featured-post-label) { margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .8rem; line-height: 1.5; }
-  .featured-post-copy > a { display: inline-flex; gap: .45rem; margin-top: .8rem; color: var(--c-text-soft); font-size: .72rem; font-weight: 650; text-decoration: none; }
-  .featured-post-copy > a:hover { color: var(--c-accent); }
   .landing-visual { min-width: 0; }
   .landing-visual[aria-busy='true'] { opacity: .78; }
   .landing-visual :global(.learning-figure) { width: 100% !important; max-width: none !important; margin: 0 !important; }
@@ -279,22 +187,6 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
   .landing-visual-placeholder { min-height: 10rem; display: grid; place-items: center; margin: 0; border: 1px solid var(--c-rule); border-radius: var(--radius); color: var(--c-muted); font-family: var(--font-ui); font-size: .72rem; }
   .landing-visual-error { margin: 0; color: var(--c-muted); font-size: .72rem; }
   .landing-visual-error + a { display: inline-block; margin-top: .35rem; color: var(--c-accent); font-size: .7rem; }
-  .featured-post-visual { height: 15rem; overflow: hidden; }
-  .featured-post-visual :global(.learning-figure) { height: 100%; overflow: hidden; }
-  .featured-post-visual :global(.learning-figure figcaption) { display: none; }
-  .featured-post-visual :global(.learning-figure > .visual-panel),
-  .featured-post-visual :global(.learning-figure > .visual-grid--two),
-  .featured-post-visual :global(.learning-figure > .visual-scroll) { max-height: 100%; overflow: hidden; }
-  .featured-post-visual :global(.learning-figure > .visual-panel),
-  .featured-post-visual :global(.learning-figure > .visual-grid--two),
-  .featured-post-visual :global(.learning-figure > .visual-scroll) { height: 100%; min-height: 0; }
-  .featured-post-visual :global(.learning-figure > .visual-panel) { display: grid; align-content: center; }
-  .featured-post-visual :global(.learning-figure > .visual-grid--two) { align-items: center; }
-  .featured-post-visual :global(.learning-figure > .visual-panel svg),
-  .featured-post-visual :global(.learning-figure > .visual-scroll svg),
-  .featured-post-visual :global(.learning-figure > .visual-grid--two svg),
-  .featured-post-visual :global(.learning-figure > svg) { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
-  .featured-post .landing-visual-placeholder { min-height: 15rem; }
   .book-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .8rem; }
   .book-card { min-width: 0; height: 22rem; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: .65rem; padding: .75rem; overflow: hidden; border: 1px solid var(--c-rule); border-radius: var(--radius-lg); background: var(--c-bg-tint); color: inherit; text-decoration: none; }
   .book-card:hover { border-color: var(--c-accent); background: var(--c-bg); }
@@ -317,10 +209,6 @@ const bookCards = LIBRARY_VOLUMES.map((volume) => {
   .book-card-visual .landing-visual-placeholder { width: 100%; min-height: 7rem; }
 
   @media (max-width: 720px) {
-    .featured-post { grid-template-columns: 1fr; height: 28rem; gap: 1rem; align-content: start; }
-    .featured-post-copy { max-width: none; }
-    .featured-post-visual { height: 14rem; }
-    .featured-post .landing-visual-placeholder { min-height: 14rem; }
     .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 600px) {

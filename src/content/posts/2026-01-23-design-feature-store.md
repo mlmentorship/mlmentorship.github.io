@@ -51,12 +51,14 @@ flowchart TB
 	C --> O[("Online key-value store<br/>latest value per entity")]
 
 	subgraph TRAIN["TRAINING · reconstruct each example's past"]
+		direction TB
 		E["Examples<br/>entity + prediction time"] --> J{"Point-in-time join<br/>latest eligible value<br/>at or before example time"}
 		H --> J
 		J --> T["Training dataset<br/>historically correct features"]
 	end
 
 	subgraph SERVE["SERVING · answer with current materialized state"]
+		direction TB
 		R["Live request<br/>entity key"] --> L["Low-latency lookup"]
 		O --> L
 		L --> P["Current model prediction<br/>latest available features"]

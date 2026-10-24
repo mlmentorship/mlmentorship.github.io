@@ -50,15 +50,15 @@ This is L5. You've named the constraints and let them drive the architecture.
 flowchart TB
   accTitle: A healthcare LLM supplies traceable evidence to a clinician, not an autonomous clinical action
   accDescr: Intended use and regulatory classification set a bounded task. Minimum-necessary patient context and verified clinical sources feed an LLM that returns a structured draft with claim-level citations and uncertainty or refusal. A clinician independently reviews the source basis and patient fit. Unsupported or out-of-scope output is rejected or edited and triggers no clinical action; accepted output becomes the clinician's decision in the existing clinical workflow. Inputs, retrievals, outputs, model version, clinician edits or acceptance, and downstream outcomes enter an audit record used for workflow evaluation, fairness slices, incident response, rollback, and controlled updates.
-  Scope{"Intended use + regulatory class<br/>What may this system support?"}
-  Evidence["Minimum-necessary patient context<br/>+ verified clinical sources"]
-  Draft["Bounded LLM draft<br/>claims + citations + uncertainty / refusal"]
-  Review{"Clinician independently reviews<br/>source basis + patient fit"}
+  Scope{"Intended use<br/>+ regulatory class<br/>Allowed support?"}
+  Evidence["Minimum-necessary<br/>patient context<br/>+ verified clinical sources"]
+  Draft["Bounded LLM draft<br/>claims + citations<br/>uncertainty / refusal"]
+  Review{"Independent<br/>clinician review<br/>source basis + patient fit"}
   Stop["Reject, edit, or refuse<br/>no clinical action"]
   Decide["Clinician confirms<br/>the clinical decision"]
   Workflow["Existing clinical workflow<br/>document · communicate · act"]
-  Trace[("Versioned audit record<br/>input · retrieval · output · clinician decision · outcome")]
-  Operate["Workflow eval + fairness slices<br/>incident response · rollback · controlled update"]
+  Trace[("Versioned audit record<br/>input · retrieval · output<br/>clinician decision · outcome")]
+  Operate["Workflow evaluation<br/>fairness slices · incidents<br/>rollback · controlled update"]
   Scope --> Evidence
   Evidence --> Draft
   Draft ==>|"draft only"| Review
@@ -71,7 +71,7 @@ flowchart TB
   Decide -.->|"confirmation"| Trace
   Workflow -.->|"outcome"| Trace
   Trace --> Operate
-  Operate -.->|"gate update / rollback"| Scope
+  Operate -.->|"gate update<br/>or rollback"| Scope
   class Scope,Review viz-focus
   class Evidence viz-input
   class Trace viz-state

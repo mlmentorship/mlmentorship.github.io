@@ -40,6 +40,7 @@
   --c-code-bg:    #f5f5f4;
   --c-kbd-bg:     #f4f4f5;
   --c-highlight:  #fef9c3;
+  --c-danger:     #b91c1c;
 
   /* ---------- Instructional visual palette ---------- */
   --viz-canvas:         #fafaf9;
@@ -96,6 +97,7 @@
   --c-code-bg:    #18181b;
   --c-kbd-bg:     #202024;
   --c-highlight:  #3f3a14;
+  --c-danger:     #fca5a5;
   --viz-canvas:         #121214;
   --viz-neutral-bg:     #18181b;
   --viz-neutral-stroke: #52525b;

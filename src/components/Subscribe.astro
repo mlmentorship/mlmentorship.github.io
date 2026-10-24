@@ -59,9 +59,10 @@ const hasEmail =
 
 <script>
   import { trackPublicEvent } from '../utils/publicEvents';
-  import { WORKBOOK_UNLOCK_KEY } from '../utils/newsletter';
+  import { unlockWorkbookEmail } from '../utils/newsletter';
 
   type Placement = 'home' | 'entry' | 'review' | 'workbook';
+  const dismissKey = 'mlmentorship:email:entry-dismissed:v1';
 
   const eventNames = {
     home: {
@@ -115,6 +116,11 @@ const hasEmail =
 
     const placement = signup.dataset.emailPlacement as Placement;
     const events = eventNames[placement];
+    if (placement === 'entry') {
+      try {
+        if (window.sessionStorage.getItem(dismissKey) === '1') { signup.hidden = true; return; }
+      } catch {}
+    }
 
     const emailEnabled = signup.dataset.emailEnabled === 'true';
     const formId = signup.dataset.emailForm ?? '';
@@ -135,7 +141,7 @@ const hasEmail =
     const markCompleted = () => {
       if (completed) return;
       completed = true;
-      try { window.localStorage.setItem(WORKBOOK_UNLOCK_KEY, '1'); } catch { /* The form still works. */ }
+      unlockWorkbookEmail();
       actions?.setAttribute('hidden', '');
       trackPublicEvent(events.confirmationSent);
       window.dispatchEvent(new Event('workbook-email-unlocked'));
@@ -184,6 +190,7 @@ const hasEmail =
 
     signup.querySelector<HTMLButtonElement>('[data-email-dismiss]')?.addEventListener('click', () => {
       if (placement === 'entry') trackPublicEvent(eventNames.entry.dismissed);
+      try { window.sessionStorage.setItem(dismissKey, '1'); } catch {}
       hide();
     });
 
