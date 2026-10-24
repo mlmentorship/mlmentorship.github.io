@@ -1,6 +1,17 @@
 export type RoleId = 'applied-scientist' | 'ml-engineer' | 'research-scientist' | 'research-engineer';
 export const ROLE_ORDER: RoleId[] = ['applied-scientist', 'ml-engineer', 'research-scientist', 'research-engineer'];
 export type LevelId = 'l4' | 'l5' | 'l6' | 'l7' | 'l8';
+export const PREP_DOMAINS = [
+  { id: 'general', label: 'General / not sure' },
+  { id: 'llm', label: 'LLM and agent systems' },
+  { id: 'recsys', label: 'Recommendations, search, and ranking' },
+  { id: 'platform', label: 'ML platform, training, and serving' },
+  { id: 'research', label: 'Research and modeling' },
+  { id: 'post-training', label: 'Post-training, RL, and agent environments' },
+  { id: 'alignment', label: 'Alignment, safety, and model behavior' },
+  { id: 'multimodal', label: 'Multimodal, vision, speech, or robotics' },
+  { id: 'product', label: 'General product ML' },
+] as const;
 export type AreaId =
   | 'fundamentals'
   | 'production'
@@ -534,6 +545,7 @@ const MODE_BY_SUBCATEGORY: Record<string, PracticeModeId> = {
 };
 
 const QUESTION_MODE_OVERRIDES: Record<string, PracticeModeId> = {
+  'bptt-backprop-through-time': 'breadth',
   'most-ambitious-project': 'project',
   'scope-ambiguous-problem': 'project',
   'implement-attention-from-scratch': 'coding',

@@ -42,6 +42,7 @@ flowchart TB
 	Q["100M requests/day<br/>~1,160 average QPS<br/>~5,800 QPS at 5x peak"]
 	S[("Precomputed embeddings<br/>+ popular-item cache")]
 	subgraph E["ONE MEASURED REQUEST ENVELOPE<br/>p95 below 80 ms | serving at or below ~$0.08 / 1K requests"]
+		direction TB
 		C["Candidate generation<br/>large set | cheapest work per candidate"]
 		P["Light pre-ranker<br/>smaller set | moderate work per candidate"]
 		F["Final ranker<br/>smallest set | expensive model only here"]

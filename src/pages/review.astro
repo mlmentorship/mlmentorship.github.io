@@ -19,6 +19,7 @@ const reviewEntries = LIBRARY_VOLUMES.flatMap((volume) => volume.chapters.flatMa
       objective: audit.learningObjective || entry.description || entry.title,
       medium: audit.medium,
       visualId: audit.visualIds[0],
+      visualIds: audit.visualIds,
       volumeId: volume.id,
       volumeNumber: volume.number,
       volumeTitle: volume.title,
@@ -186,6 +187,7 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     objective: string;
     medium: string;
     visualId: string;
+    visualIds: string[];
     volumeId: string;
     volumeNumber: string;
     volumeTitle: string;
@@ -444,17 +446,25 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
       try {
         const article = await fetchArticle(entry);
         if (token !== requestToken) return;
-        const extracted = extractLearningVisual(article, entry.visualId);
-        if (!extracted) throw new Error('No completed learning visual was found');
-        const figure = document.importNode(extracted.figure, true);
-        absolutizeVisualLinks(figure, entry.href);
-        visualHost.replaceChildren(figure);
+        const visuals = entry.visualIds.map((visualId) => {
+          const extracted = extractLearningVisual(article, visualId);
+          if (!extracted) throw new Error(`No completed learning visual was found for ${visualId}`);
+          return extracted;
+        });
+        const figures = visuals.map((extracted) => {
+          const figure = document.importNode(extracted.figure, true);
+          absolutizeVisualLinks(figure, entry.href);
+          return figure;
+        });
+        visualHost.replaceChildren(...figures);
         enhanceCodingVisuals(visualHost);
-        if (extracted.source && sourceHost && sourceDetails) {
-          const note = document.importNode(extracted.source, true);
-          absolutizeVisualLinks(note, entry.href);
-          sourceHost.append(note);
-          sourceDetails.hidden = false;
+        for (const extracted of visuals) {
+          if (extracted.source && sourceHost && sourceDetails) {
+            const note = document.importNode(extracted.source, true);
+            absolutizeVisualLinks(note, entry.href);
+            sourceHost.append(note);
+            sourceDetails.hidden = false;
+          }
         }
         await renderMermaid(visualHost, entry.slug);
         if (token !== requestToken) return;
@@ -540,7 +550,15 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     window.addEventListener('hashchange', syncRoute, listenerOptions);
     document.addEventListener('keydown', (event) => {
       if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (document.querySelector('dialog[open]')) return;
       if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement) return;
+      if (event.target instanceof HTMLElement && event.target.isContentEditable) return;
+      if (event.key === 'Escape' && contentsDetails?.open) {
+        event.preventDefault();
+        contentsDetails.open = false;
+        contentsDetails.querySelector('summary')?.focus();
+        return;
+      }
       if (event.key === 'Escape' && explanationOpen) { event.preventDefault(); setExplanation(false); return; }
       if (event.key === 'ArrowLeft' && currentIndex > 0) { event.preventDefault(); void showEntry(currentIndex - 1, { push: true, focus: true }); }
       if (event.key === 'ArrowRight' && currentIndex < entries.length - 1) { event.preventDefault(); void showEntry(currentIndex + 1, { push: true, focus: true }); }
@@ -807,9 +825,9 @@ const reviewContents = LIBRARY_VOLUMES.map((volume) => ({
     .review-toolbar > a span { font-size: 1rem; }
     .review-progress-wrap small { display: none; }
     .review-stage { padding: .65rem var(--gutter) 1rem; }
-    .review-bottom { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .35rem; padding-right: var(--gutter); padding-left: var(--gutter); }
+    .review-bottom { grid-template-columns: auto minmax(0, 1fr) auto; gap: .35rem; padding-right: var(--gutter); padding-left: var(--gutter); }
     .review-bottom button { min-width: 0; padding: .45rem .6rem; }
-    .review-bottom .explanation-toggle { min-width: 8.6rem; }
+    .review-bottom .explanation-toggle { min-width: 0; overflow-wrap: anywhere; }
     .review-bottom button:first-child > span:last-child,
     .review-bottom button:last-child > span:first-child { display: none; }
     .review-explanation { padding: .8rem var(--gutter) 2rem; }

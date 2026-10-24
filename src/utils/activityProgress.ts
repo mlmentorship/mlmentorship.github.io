@@ -5,13 +5,17 @@ export interface ActivityProgressState {
   completed: Record<string, string>;
 }
 
+export function parseActivityProgress(value: unknown): ActivityProgressState {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return { version: 1, completed: {} };
+  const candidate = value as Partial<ActivityProgressState>;
+  const completed = candidate.completed && typeof candidate.completed === 'object' && !Array.isArray(candidate.completed) ? candidate.completed : {};
+  return { version: 1, completed: Object.fromEntries(Object.entries(completed).filter(([, date]) => typeof date === 'string')) };
+}
+
 export function loadActivityProgress(): ActivityProgressState {
   try {
     const value: unknown = JSON.parse(localStorage.getItem(ACTIVITY_PROGRESS_KEY) ?? 'null');
-    if (!value || typeof value !== 'object') return { version: 1, completed: {} };
-    const state = value as Partial<ActivityProgressState>;
-    if (state.version !== 1 || !state.completed || typeof state.completed !== 'object') return { version: 1, completed: {} };
-    return { version: 1, completed: state.completed };
+    return value && typeof value === 'object' && (value as Partial<ActivityProgressState>).version === 1 ? parseActivityProgress(value) : { version: 1, completed: {} };
   } catch {
     return { version: 1, completed: {} };
   }
@@ -38,13 +42,7 @@ export function clearActivityProgress(): void {
 }
 
 export function replaceActivityProgress(value: unknown): number {
-  if (!value || typeof value !== 'object') {
-    saveActivityProgress({ version: 1, completed: {} });
-    return 0;
-  }
-  const candidate = value as Partial<ActivityProgressState>;
-  const completed = candidate.completed && typeof candidate.completed === 'object' ? candidate.completed : {};
-  const safeCompleted = Object.fromEntries(Object.entries(completed).filter(([id, date]) => typeof id === 'string' && typeof date === 'string'));
-  saveActivityProgress({ version: 1, completed: safeCompleted });
-  return Object.keys(safeCompleted).length;
+  const state = parseActivityProgress(value);
+  saveActivityProgress(state);
+  return Object.keys(state.completed).length;
 }

@@ -82,7 +82,8 @@ For an orthogonal matrix $Q$: $|\det(Q)| = 1$ (rotation/reflection preserves vol
 			<text class="viz-callout" x="238" y="447">collapsed segment</text>
 			<text class="viz-node-value" x="290" y="468">det[b₁ b₂]</text>
 			<text class="viz-node-label" x="290" y="493">= 0</text>
-			<text class="viz-label" x="238" y="519">area = 0 · not invertible</text>
+			<text class="viz-label" x="238" y="519">area = 0</text>
+			<text class="viz-label" x="238" y="536">not invertible</text>
 		</svg>
 	</div>
 	<figcaption><strong>Read it this way:</strong> compare the first two panels before looking at the third. Swapping the ordered columns leaves the parallelogram and its area unchanged but reverses orientation, so only the sign flips. When one column becomes a multiple of the other, the shape loses a dimension; its area and determinant both become zero.</figcaption>

@@ -129,10 +129,12 @@ flowchart TB
 	accTitle: A hierarchical all-reduce crosses the slower network with one partial per local group
 	accDescr: In stage one, accelerators in fast local groups A and B each reduce their values to one group partial. In stage two, the two group partials enter a logical scale-out all-reduce over the slower inter-group network and produce the final reduced value. In stage three, that value is distributed over fast local links so every accelerator rank receives it.
 	subgraph A["FAST LOCAL GROUP A"]
+		direction TB
 		A1["accelerator values"] ==>|"1. fast local reduce"| AP["one A partial"]
 		AO["result on every A rank"]
 	end
 	subgraph B["FAST LOCAL GROUP B"]
+		direction TB
 		B1["accelerator values"] ==>|"1. fast local reduce"| BP["one B partial"]
 		BO["result on every B rank"]
 	end

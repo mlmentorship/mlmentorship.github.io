@@ -39,6 +39,7 @@ flowchart TB
   Encode --> Catalog[("STORED ITEM VECTORS + FEATURES")]
 
   subgraph Core["UNCHANGED HIGH-THROUGHPUT BACKBONE"]
+	direction TB
     Retrieve["FAST RETRIEVAL<br/>two-tower + ANN<br/>catalog → candidates"]
     Rank["LEARNED RANKER<br/>behavior + content + context<br/>candidates → top N"]
     Retrieve ==> Rank

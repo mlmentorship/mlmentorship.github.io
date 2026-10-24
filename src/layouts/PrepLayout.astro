@@ -99,19 +99,13 @@ const optionalActive = optionalLinks.some((link) => link.active);
 </BaseLayout>
 
 <script>
-  import { WORKBOOK_UNLOCK_KEY } from '../utils/newsletter';
-
-  const unlockKey = WORKBOOK_UNLOCK_KEY;
-
-  function isUnlocked(): boolean {
-    try { return window.localStorage.getItem(unlockKey) === '1'; } catch { return false; }
-  }
+  import { isWorkbookEmailUnlocked } from '../utils/newsletter';
 
   const pdfDownload = document.querySelector<HTMLAnchorElement>('[data-pdf-download]');
   const pdfLocked = document.querySelector<HTMLElement>('[data-pdf-locked]');
   const pdfSignup = document.querySelector<HTMLElement>('[data-pdf-signup]');
   function syncPdfAccess(): void {
-    const unlocked = isUnlocked();
+    const unlocked = isWorkbookEmailUnlocked();
     if (pdfDownload) pdfDownload.hidden = !unlocked;
     if (pdfLocked) pdfLocked.hidden = unlocked;
     if (pdfSignup) pdfSignup.hidden = unlocked;

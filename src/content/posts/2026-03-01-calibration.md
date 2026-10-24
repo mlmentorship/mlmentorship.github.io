@@ -45,7 +45,7 @@ Typical interpretation:
 			<path class="viz-gridline" d="M54 194.5H326 M54 139H326 M54 83.5H326 M122 28V250 M190 28V250 M258 28V250"></path>
 			<path class="viz-axis" d="M54 28V250H326"></path>
 			<path class="viz-baseline" d="M54 250L326 28"></path>
-			<text class="viz-axis-label" x="232" y="62" transform="rotate(-39 232 62)">perfect: observed = predicted</text>
+			<text class="viz-axis-label" x="110" y="173" transform="rotate(-39 110 173)">perfect calibration</text>
 			<text class="viz-label" x="77" y="64">UNDERCONFIDENT</text>
 			<text class="viz-label" x="246" y="220">OVERCONFIDENT</text>
 			<path class="viz-pr-curve" d="M108.4 223.4 L162.8 187.8 L217.2 154.5 L271.6 116.8 L298.8 90.2"></path>

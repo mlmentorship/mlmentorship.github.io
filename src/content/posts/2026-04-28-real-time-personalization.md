@@ -32,10 +32,12 @@ flowchart TB
 	accDescr: A batch clock updates stable user history, item embeddings, and long-window counts every hour or day. A streaming clock aggregates recent clicks, session activity, and short-window counts within seconds or minutes. Both paths materialize reusable values in online feature state before a request arrives. A request clock computes the current query, device, location, and time only when the request arrives. The serving path performs a bounded lookup of stored state, combines it with current context, runs model inference, and returns a personalized ranking within the request latency budget. The assembled vector also reports feature timestamps to freshness monitoring. Real-time therefore describes the response, not a requirement that every feature use the fastest update path.
 
 	subgraph BATCH["BATCH CLOCK · HOURS TO DAYS"]
+		direction TB
 		B["Stable history<br/>item embeddings · long-window counts"] --> BC["Scheduled computation<br/>refresh only as quality requires"]
 	end
 
 	subgraph STREAM["STREAM CLOCK · SECONDS TO MINUTES"]
+		direction TB
 		S["Recent events<br/>clicks · session activity"] --> SC["Windowed aggregation<br/>event-time state"]
 	end
 
@@ -43,6 +45,7 @@ flowchart TB
 	SC -->|"push fresh values"| O
 
 	subgraph REQUEST["REQUEST CLOCK · NOW"]
+		direction TB
 		R["Live request<br/>query · device · location · time"] --> RC["Compute current context"]
 	end
 

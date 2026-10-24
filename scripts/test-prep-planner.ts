@@ -3,8 +3,9 @@ import { test } from 'node:test';
 import { readdirSync } from 'node:fs';
 import { getPracticeMode, INTERVIEW_ROUNDS } from '../src/data/prepCurriculum';
 import { getSubcategoryMap } from '../src/utils/subcategories';
-import { buildPrepTracks, buildStudyRoutes, practiceStatus, prepTrackMinutes, questionPair, studyBudget } from '../src/utils/prepRoutes';
-import { currentPlanWeek, nextPrepTasks, parsePrepBackup, type PrepPlanState } from '../src/utils/prepPlan';
+import { buildPrepTracks, buildReadingTopics, buildStudyRoutes, practiceStatus, prepTrackMinutes, questionPair, studyBudget } from '../src/utils/prepRoutes';
+import { currentPlanWeek, nextPrepTasks, parsePrepBackup, PREP_PLAN_KEY, restorePrepBackup, type PrepPlanState } from '../src/utils/prepPlan';
+import { ACTIVITY_PROGRESS_KEY } from '../src/utils/activityProgress';
 import { markMixedSessionVerified, PREP_PROGRESS_KEY, savePracticeProgress, type PracticeProgressRecord } from '../src/utils/prepProgress';
 
 const today = '2026-09-05';
@@ -25,6 +26,25 @@ test('confirmed rounds are the only routes, with weakest evidence first', () => 
   assert.deepEqual(routes.map(route => route.id), ['ml-system-design', 'ml-breadth']);
   assert.equal(nextPrepTasks(plan, [], today)[0].href, routes[0].steps[0].href);
   assert.ok(nextPrepTasks({ ...plan, level: 'l7' }, [], today).some(task => task.href.includes('level-paths')));
+});
+
+test('reading topics lead with concepts and link directly to the selected posts', () => {
+  const topics = buildReadingTopics(plan);
+  assert.deepEqual(topics.map(topic => topic.id), ['ml-system-design', 'ml-breadth']);
+  assert.deepEqual(topics.find(topic => topic.id === 'ml-breadth')?.slugs, [
+    'bias-variance-of-estimators', 'bias-variance-tradeoff', 'cross-entropy-softmax', 'how-to-choose-loss-function',
+  ]);
+  const recsys = buildReadingTopics({ ...plan, domain: 'recsys' });
+  assert.ok(recsys[0].slugs.includes('two-tower-retrieval'));
+  assert.ok(recsys[0].slugs.includes('design-youtube-recommender'));
+});
+
+test('the reading curriculum does not repeat posts across topics', () => {
+  const topics = buildReadingTopics({ ...plan, selectedRounds: INTERVIEW_ROUNDS.map(round => round.id) });
+  const slugs = topics.flatMap(topic => topic.slugs);
+  assert.equal(topics.length, INTERVIEW_ROUNDS.length);
+  assert.equal(new Set(slugs).size, slugs.length);
+  assert.ok(slugs.every(slug => !slug.includes('/') && !slug.includes('?')));
 });
 
 test('ready evidence tracks enter the queue, but due retries stay first', () => {
@@ -114,6 +134,10 @@ test('preparation tracks cover human rounds, upper-IC evidence, simulations, and
   assert.equal(buildPrepTracks(configured, routes, { 'track:external:general-algorithms-dsa': today }).find(track => track.id === 'external:general-algorithms-dsa')?.status, 'complete');
 });
 
+test('BPTT uses the ML breadth rubric rather than its production subcategory default', () => {
+  assert.equal(getPracticeMode('bptt-backprop-through-time', getSubcategoryMap('questions')?.map['bptt-backprop-through-time']).id, 'breadth');
+});
+
 test('all mapped questions exist and method matches content metadata', () => {
   const files = readdirSync('src/content/posts');
   for (const domain of ['general', 'llm', 'recsys', 'platform', 'research', 'post-training', 'alignment', 'multimodal', 'product']) {
@@ -135,6 +159,9 @@ test('all mapped questions exist and method matches content metadata', () => {
         assert.notEqual(step.repairLabel, 'Worked visual for this prompt', step.slug);
       }
       assert.equal(new Set(mappedSlugs).size, mappedSlugs.length, `${role}/${domain}: duplicate prompt across rounds`);
+      const readingSlugs = buildReadingTopics({ ...plan, domain, role, selectedRounds: INTERVIEW_ROUNDS.map(round => round.id) }).flatMap(topic => topic.slugs);
+      assert.equal(new Set(readingSlugs).size, readingSlugs.length, `${role}/${domain}: duplicate reading post`);
+      for (const slug of readingSlugs) assert.ok(files.some(name => name.endsWith(`-${slug}.md`)), `Missing reading post: ${slug}`);
     }
   }
 });
@@ -142,6 +169,52 @@ test('all mapped questions exist and method matches content metadata', () => {
 test('existing version-one plans and backups remain compatible', () => {
   assert.deepEqual(parsePrepBackup({ version: 1, plan, records: [] })?.plan, plan);
   assert.equal(currentPlanWeek({ ...plan, availableWeeks: 2, horizon: 8 }, new Date('2026-09-26')), 2);
+});
+
+test('backups reject malformed nested plan and practice data before replacement', () => {
+  for (const changes of [
+    { externalRounds: [null] }, { externalRounds: [{ label: 'External', status: 'unknown' }] },
+    { topGaps: [null] }, { topGaps: [{ areaId: 'math', starterLinks: [null] }] },
+    { estimatedHours: null }, { estimatedHours: { low: 20, high: 10 } },
+    { selectedRounds: [null] }, { areaRatings: { fundamentals: null } },
+    { weeklyHours: Infinity }, { availableWeeks: -1 },
+    { domain: 'unknown' }, { role: 'unknown' }, { level: 'unknown' },
+  ]) assert.equal(parsePrepBackup({ version: 1, plan: { ...plan, ...changes }, records: [] }), null);
+  for (const changes of [
+    { weakDimensions: [null] }, { dimensionMisses: null },
+    { dimensionMisses: { mechanism: 'one' } }, { attempts: NaN },
+  ]) assert.equal(parsePrepBackup({ version: 1, plan, records: [{ ...record('bias-variance-tradeoff'), ...changes }] }), null);
+  assert.equal(parsePrepBackup({ version: 1, plan: 'invalid', records: [] }), null);
+  assert.deepEqual(parsePrepBackup({ version: 1, plan: { ...plan, areaRatings: undefined }, records: [] })?.plan?.areaRatings, {});
+});
+
+test('backup replacement restores every original key after any interrupted write', () => {
+  const original = new Map([
+    [PREP_PLAN_KEY, JSON.stringify(plan)],
+    [PREP_PROGRESS_KEY, JSON.stringify([record('bias-variance-tradeoff')])],
+    [ACTIVITY_PROGRESS_KEY, JSON.stringify({ version: 1, completed: { 'track:story-bank': today } })],
+  ]);
+  for (const failOn of [1, 2, 3]) {
+    const stored = new Map(original);
+    let writes = 0;
+    const storage = {
+      getItem: (key: string) => stored.get(key) ?? null,
+      removeItem: (key: string) => { stored.delete(key); },
+      setItem: (key: string, value: string) => {
+        if (++writes === failOn) throw new DOMException('Quota exceeded', 'QuotaExceededError');
+        stored.set(key, value);
+      },
+    };
+    assert.throws(() => restorePrepBackup({ version: 1, plan: { ...plan, roleLabel: 'Replacement' }, records: [] }, storage), /Quota exceeded/);
+    assert.deepEqual(stored, original);
+  }
+  const stored = new Map(original);
+  const storage = { getItem: (key: string) => stored.get(key) ?? null, setItem: (key: string, value: string) => { stored.set(key, value); }, removeItem: (key: string) => { stored.delete(key); } };
+  assert.throws(() => restorePrepBackup({ version: 1, plan: { ...plan, externalRounds: [null] }, records: [] }, storage), /Invalid workbook/);
+  assert.deepEqual(stored, original);
+  restorePrepBackup({ version: 1, plan: null, records: [], activity: { completed: { valid: today, invalid: null } } }, storage);
+  assert.equal(stored.has(PREP_PLAN_KEY), false);
+  assert.deepEqual(JSON.parse(stored.get(ACTIVITY_PROGRESS_KEY)!), { version: 1, completed: { valid: today } });
 });
 
 test('recorder uses two/seven day retries and rejects same-day mixed verification', context => {

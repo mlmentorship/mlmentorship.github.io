@@ -50,7 +50,7 @@ A single backward pass over the trajectory.
 <!-- visual:gae-residual-weight-trace -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="gae-residual-visual-title">
 	<p class="visual-kicker">Temporal credit assignment</p>
-	<p class="visual-title" id="gae-residual-visual-title">One advantage estimate gathers every later TD residual, one extra $\gamma\lambda$ factor per step.</p>
+	<p class="visual-title" id="gae-residual-visual-title">One advantage estimate gathers every later TD residual, one extra <var>&gamma;&lambda;</var> factor per step.</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 350" role="img" aria-labelledby="gae-residual-svg-title gae-residual-svg-desc">
 			<title id="gae-residual-svg-title">GAE as a weighted residual trace and reverse scan</title>
@@ -99,7 +99,7 @@ A single backward pass over the trajectory.
 			<text class="viz-gradient-label" x="545" y="339">dashed arrows: recursion direction</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start at the right edge of the rollout and scan left. Each step keeps its own TD residual at full strength, then adds $\gamma\lambda$ times the value already accumulated from later steps. Unrolling that recursion gives weights $1, \gamma\lambda, (\gamma\lambda)^2, \ldots$ for $\delta_t, \delta_{t+1}, \delta_{t+2}, \ldots$.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at the right edge of the rollout and scan left. Each step keeps its own TD residual at full strength, then adds <var>&gamma;&lambda;</var> times the value already accumulated from later steps. Unrolling that recursion gives weights 1, <var>&gamma;&lambda;</var>, (<var>&gamma;&lambda;</var>)<sup>2</sup>, ... for <var>&delta;</var><sub>t</sub>, <var>&delta;</var><sub>t+1</sub>, <var>&delta;</var><sub>t+2</sub>, ... .</figcaption>
 </figure>
 
 ## The two knobs

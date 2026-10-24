@@ -121,14 +121,17 @@ flowchart TB
 	accTitle: Fused Triton MoE kernel eliminates intermediate HBM activation round trip
 	accDescr: In the unfused pipeline, up-projection writes intermediate activation tensor h to HBM, which is then read back by down-projection. In the fused Triton kernel, up-projection, SiLU activation, and down-projection happen inside GPU SRAM tiles, writing only the final output to HBM.
 	subgraph U["UNFUSED MOE FFN (TWO KERNELS)"]
+        direction TB
 		X1["Input x [t, D]"] -->|"Read HBM"| K1["Up-GEMM: x @ Wup"]
 		K1 -->|"Write 2tF bytes"| HBM["HBM Activation h [t, F]"]
 		HBM -->|"Read 2tF bytes"| K2["Down-GEMM: SiLU(h) @ Wdown"]
 		K2 -->|"Write HBM"| Y1["Output y [t, D]"]
 	end
 	subgraph F["FUSED TRITON KERNEL (ONE PASS)"]
+        direction TB
 		X2["Input x [t, D]"] -->|"Read HBM once"| SRAM["GPU SRAM TILE (Registers)"]
 		subgraph S["IN-SRAM BLOCK STREAMING"]
+            direction TB
 			SRAM -->|"Tile dot"| H_SRAM["h_tile = x_tile @ Wup_tile"]
 			H_SRAM -->|"Elementwise"| ACT["h_tile = SiLU(h_tile)"]
 			ACT -->|"Accumulate"| ACC["acc += h_tile @ Wdown_tile"]

@@ -42,11 +42,13 @@ flowchart TB
 	accTitle: Choosing a training loss is separate from choosing a deployment action
 	accDescr: The training rail begins by asking what quantity the model must estimate. A probability distribution maps to log loss, a conditional mean to squared error, a conditional median to absolute error, a robust location to Huber loss, an ordering to a ranking loss, and embedding geometry to a contrastive loss. These produce predictions on held-out data. The deployment rail evaluates those predictions against the real metric, calibrates scores when probabilities are required, and combines predictions with error costs, constraints, and capacity to choose a threshold, ranking, abstention, or route. A dashed feedback arrow sends deployment evidence back to the prediction target and surrogate choice.
 	subgraph Train["TRAIN · estimate the right quantity"]
+		direction TB
 		Q{"What must the output mean?"}
 		Q --> L["class probability → log loss<br/>conditional mean → squared error<br/>conditional median → absolute error<br/>robust location → Huber loss<br/>relative order → ranking loss<br/>embedding geometry → contrastive loss"]
 		L --> O["Predictions on held-out data"]
 	end
 	subgraph Deploy["DEPLOY · choose the right action"]
+		direction TB
 		O --> V["Evaluate the real metric<br/>on representative data"]
 		V --> C["Calibrate if scores must<br/>represent probabilities"]
 		C --> K["Combine predictions with<br/>error costs · constraints · capacity"]

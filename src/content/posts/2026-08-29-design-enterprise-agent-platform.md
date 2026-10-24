@@ -185,11 +185,13 @@ flowchart TB
   accDescr: A user or service request enters an execution runtime only after the control plane checks identity and delegation. The runtime may call a model and scoped memory, but a structured tool proposal must return to the control plane for argument policy and approval. Only then does a tool executor receive narrow authority to affect an enterprise system. The entry decision, action decision, dispatch attempt, and authoritative outcome emit durable events to the evidence plane for audit, evaluation, and cost analysis.
   User["User or service<br/>identity"]
   subgraph Control["CONTROL PLANE · decides what may run"]
+	direction TB
     Registry[("Versions + registry")]
     Admission{"2 · Identity +<br/>delegation valid?"}
     Policy{"6 · Arguments +<br/>approval valid?"}
   end
   subgraph Execution["EXECUTION PLANE · performs bounded work"]
+	direction TB
     Entry["1 · Agent entry API"]
     Runtime["3–4 · Runtime adapter<br/>model + scoped memory"]
     Gateway["5 · Tool gateway"]
@@ -197,6 +199,7 @@ flowchart TB
     Systems["8 · Enterprise system<br/>authoritative outcome"]
   end
   subgraph Evidence["EVIDENCE PLANE · records what happened"]
+	direction TB
     Events[("Durable execution events")]
     Uses["Trace + audit<br/>evaluation + incidents<br/>budget + cost"]
     Events --> Uses

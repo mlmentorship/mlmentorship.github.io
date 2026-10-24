@@ -17,6 +17,7 @@ if (/visual-review-card--(?:article|deck)[\s\S]{0,500}overflow-y:\s*auto/.test(r
 
 const failures = [];
 const implemented = new Map();
+const implementedVisuals = new Map();
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -48,6 +49,7 @@ for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.j
   if (!html.includes('href="#full-explanation"')) failures.push(`${audit.slug}: full-content jump is missing`);
   if (!html.includes('data-full-explanation')) failures.push(`${audit.slug}: full-content boundary is missing`);
   implemented.set(audit.slug, 0);
+  implementedVisuals.set(audit.slug, audit.implementation?.visualIds ?? []);
 }
 
 const reviewOutput = join(dist, 'review', 'index.html');
@@ -76,6 +78,9 @@ else {
         slugs.add(entry.slug);
         if (!implemented.has(entry.slug)) failures.push(`library-wide review includes unresolved ${entry.slug}`);
         else implemented.set(entry.slug, implemented.get(entry.slug) + 1);
+        if (JSON.stringify(entry.visualIds) !== JSON.stringify(implementedVisuals.get(entry.slug))) {
+          failures.push(`library-wide review must include every declared visual for ${entry.slug}`);
+        }
       }
       if (entries.length !== implemented.size) failures.push(`library-wide review has ${entries.length} entries; expected ${implemented.size}`);
     }

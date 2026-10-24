@@ -160,6 +160,7 @@ flowchart TB
   Teams["PRODUCT TEAMS<br/>code · config · declared contracts"]
 
   subgraph SHARED["SHARED AUTHORITY · one organization-wide lifecycle"]
+	direction TB
     Identity["IMMUTABLE IDENTITY + LINEAGE"]
     Evidence["EVALUATION + RELEASE EVIDENCE"]
     State{"PROMOTION + DESIRED STATE"}

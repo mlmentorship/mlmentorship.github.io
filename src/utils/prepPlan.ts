@@ -1,5 +1,7 @@
-import type { PracticeProgressRecord } from './prepProgress';
+import { isPracticeProgressRecord, PREP_PROGRESS_KEY, type PracticeProgressRecord } from './prepProgress';
+import { ACTIVITY_PROGRESS_KEY, parseActivityProgress } from './activityProgress';
 import { buildPrepTracks, buildStudyRoutes } from './prepRoutes';
+import { INTERVIEW_ROUNDS, PREP_DOMAINS, ROLE_ORDER } from '../data/prepCurriculum';
 
 export const PREP_PLAN_KEY = 'mlm:prep-plan:v1';
 
@@ -40,23 +42,35 @@ export interface PrepPlanTask {
 }
 
 function isPlan(value: unknown): value is PrepPlanState {
-  if (!value || typeof value !== 'object') return false;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const plan = value as Partial<PrepPlanState>;
   return plan.version === 1
     && typeof plan.createdOn === 'string'
     && typeof plan.updatedOn === 'string'
-    && typeof plan.role === 'string'
+    && ROLE_ORDER.some(role => role === plan.role)
     && typeof plan.roleLabel === 'string'
-    && typeof plan.level === 'string'
-    && typeof plan.domain === 'string'
-    && typeof plan.weeklyHours === 'number'
-    && typeof plan.availableWeeks === 'number'
+    && ['l4', 'l5', 'l6', 'l7', 'l8'].includes(plan.level ?? '')
+    && PREP_DOMAINS.some(domain => domain.id === plan.domain)
+    && typeof plan.weeklyHours === 'number' && Number.isFinite(plan.weeklyHours) && plan.weeklyHours > 0
+    && typeof plan.availableWeeks === 'number' && Number.isSafeInteger(plan.availableWeeks) && plan.availableWeeks > 0
     && [2, 4, 8].includes(plan.horizon ?? 0)
+    && plan.estimatedHours !== null && typeof plan.estimatedHours === 'object'
+    && Number.isFinite(plan.estimatedHours.low) && Number.isFinite(plan.estimatedHours.high)
+    && plan.estimatedHours.low >= 0 && plan.estimatedHours.high >= plan.estimatedHours.low
     && Array.isArray(plan.selectedRounds)
+    && plan.selectedRounds.every(round => INTERVIEW_ROUNDS.some(known => known.id === round))
     && plan.areaRatings !== null
     && typeof plan.areaRatings === 'object'
+    && !Array.isArray(plan.areaRatings)
+    && Object.values(plan.areaRatings).every(rating => typeof rating === 'number' && Number.isFinite(rating))
     && Array.isArray(plan.topGaps)
-    && Array.isArray(plan.externalRounds);
+    && plan.topGaps.every(gap => gap !== null && typeof gap === 'object'
+      && ['areaId', 'label', 'description', 'link'].every(key => typeof gap[key as keyof PrepPlanGap] === 'string')
+      && Number.isFinite(gap.rating)
+      && Array.isArray(gap.starterLinks)
+      && gap.starterLinks.every(link => link !== null && typeof link === 'object' && typeof link.label === 'string' && typeof link.href === 'string'))
+    && Array.isArray(plan.externalRounds)
+    && plan.externalRounds.every(round => round !== null && typeof round === 'object' && typeof round.label === 'string' && ['missing', 'workable'].includes(round.status));
 }
 
 export function loadPrepPlan(): PrepPlanState | null {
@@ -142,16 +156,41 @@ export interface PrepBackup {
 export function parsePrepBackup(value: unknown): PrepBackup | null {
   if (!value || typeof value !== 'object') return null;
   const backup = value as Partial<PrepBackup>;
-  if (backup.version !== 1 || !Array.isArray(backup.records)) return null;
-  if (backup.plan && !(backup.plan as Partial<PrepPlanState>).areaRatings) {
-    (backup.plan as Partial<PrepPlanState>).areaRatings = {};
-  }
-  if (backup.plan !== null && backup.plan !== undefined && !isPlan(backup.plan)) return null;
+  if (backup.version !== 1 || !Array.isArray(backup.records) || !backup.records.every(isPracticeProgressRecord)) return null;
+  const plan = backup.plan && typeof backup.plan === 'object'
+    ? { ...backup.plan, areaRatings: backup.plan.areaRatings ?? {} }
+    : backup.plan;
+  if (plan !== null && plan !== undefined && !isPlan(plan)) return null;
   return {
     version: 1,
     exportedOn: typeof backup.exportedOn === 'string' ? backup.exportedOn : new Date().toISOString(),
-    plan: backup.plan ?? null,
+    plan: plan ?? null,
     records: backup.records,
     activity: backup.activity,
   };
+}
+
+export function restorePrepBackup(value: unknown, storage: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> = localStorage): void {
+  const backup = parsePrepBackup(value);
+  if (!backup) throw new TypeError('Invalid workbook backup');
+  const replacement: Array<[string, string | null]> = [
+    [PREP_PLAN_KEY, backup.plan ? JSON.stringify(backup.plan) : null],
+    [PREP_PROGRESS_KEY, JSON.stringify(backup.records)],
+    [ACTIVITY_PROGRESS_KEY, JSON.stringify(parseActivityProgress(backup.activity))],
+  ];
+  const previous = replacement.map(([key]) => [key, storage.getItem(key)] as const);
+  let changed = false;
+  try {
+    for (const [key, stored] of replacement) {
+      if (stored === null) storage.removeItem(key);
+      else storage.setItem(key, stored);
+      changed = true;
+    }
+  } catch (error) {
+    if (changed) {
+      for (const [key] of replacement) storage.removeItem(key);
+      for (const [key, stored] of previous) if (stored !== null) storage.setItem(key, stored);
+    }
+    throw error;
+  }
 }

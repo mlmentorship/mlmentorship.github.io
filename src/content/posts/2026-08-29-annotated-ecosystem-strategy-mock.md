@@ -58,8 +58,8 @@ flowchart TB
   Viewer["Viewer sessions<br/>watch · skip · return"]
   Creator["Creator opportunity<br/>audience tests · qualified reach"]
   Supply["Future creator supply<br/>retention · production · catalog"]
-  Policy -->|"seconds · recommendations"| Viewer
-  Viewer -->|"minutes to days · logged labels"| Policy
+  Policy -->|"seconds"| Viewer
+  Viewer -->|"minutes<br/>to days"| Policy
   Policy -.->|"hours to days · allocated exposure"| Creator
   Creator -.->|"weeks · retention and production"| Supply
   Supply -.->|"later cycles · candidates and training data"| Policy

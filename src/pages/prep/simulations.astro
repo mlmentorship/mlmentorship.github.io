@@ -242,8 +242,9 @@ const unfamiliarPrompts = [
   let interval: number | undefined;
   let deadline = 0;
   const roundNotes: string[] = [];
+  const roundTimes: Array<{ remaining: number; paused: boolean }> = [];
 
-  const stopTimer = () => { if (interval !== undefined) window.clearInterval(interval); interval = undefined; };
+  const stopTimer = () => { if (interval !== undefined) window.clearInterval(interval); interval = undefined; deadline = 0; };
   const showTime = () => { if (timer) timer.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`; };
   const refreshTimer = () => {
     if (paused || deadline === 0) return;
@@ -259,12 +260,16 @@ const unfamiliarPrompts = [
     deadline = Date.now() + remaining * 1000;
     interval = window.setInterval(refreshTimer, 250);
   };
-  const saveCurrentNotes = () => { if (notes) roundNotes[activeIndex] = notes.value; };
+  const saveCurrentRound = () => {
+    refreshTimer();
+    if (notes) roundNotes[activeIndex] = notes.value;
+    roundTimes[activeIndex] = { remaining, paused };
+  };
   const showRound = () => {
     const round = activeRounds[activeIndex];
     if (!round) return;
-    remaining = round.minutes * 60;
-    paused = false;
+    remaining = roundTimes[activeIndex]?.remaining ?? round.minutes * 60;
+    paused = roundTimes[activeIndex]?.paused ?? false;
     if (position) position.textContent = `Round ${activeIndex + 1} of ${activeRounds.length}`;
     if (title) title.textContent = round.label;
     if (starterLink) {
@@ -272,14 +277,15 @@ const unfamiliarPrompts = [
       starterLink.textContent = activeStarters[activeIndex]?.label ?? round.label;
     }
     if (prompt) prompt.textContent = ` · ${round.description}`;
-    if (pause) pause.textContent = 'Pause';
+    if (pause) pause.textContent = paused ? 'Resume' : 'Pause';
     if (previous) previous.disabled = activeIndex === 0;
     if (next) next.textContent = activeIndex === activeRounds.length - 1 ? 'Finish simulation' : 'Next round';
     if (notes) notes.value = roundNotes[activeIndex] ?? '';
-    if (timerStatus) timerStatus.textContent = '';
-    showTime(); startTimer();
+    if (timerStatus) timerStatus.textContent = remaining === 0 ? 'Simulation time is up. Finish this round when ready.' : '';
+    showTime();
+    if (!paused && remaining > 0) startTimer();
   };
-  const closeRunner = () => { stopTimer(); if (notes) notes.value = ''; roundNotes.length = 0; dialog?.close(); };
+  const closeRunner = () => { stopTimer(); if (notes) notes.value = ''; roundNotes.length = 0; roundTimes.length = 0; dialog?.close(); };
   const chooseStarters = (rounds: ReturnType<typeof buildRounds>) => rounds.map((round) => round.starterLinks[Math.floor(Math.random() * round.starterLinks.length)] ?? { label: round.label, href: '#' });
   const renderBuiltPromptSet = (rounds: ReturnType<typeof buildRounds>) => {
     if (!output) return;
@@ -310,6 +316,7 @@ const unfamiliarPrompts = [
     const canReuseBuiltSet = builtRole === select?.value && builtStarters.length === activeRounds.length;
     activeStarters = canReuseBuiltSet ? [...builtStarters] : chooseStarters(activeRounds);
     roundNotes.length = 0;
+    roundTimes.length = 0;
     if (!dialog || activeRounds.length === 0) return;
     dialog.showModal(); showRound();
   });
@@ -317,13 +324,13 @@ const unfamiliarPrompts = [
   pause?.addEventListener('click', () => { refreshTimer(); paused = !paused; pause.textContent = paused ? 'Resume' : 'Pause'; if (paused) stopTimer(); else startTimer(); });
   previous?.addEventListener('click', () => {
     if (activeIndex === 0) return;
-    saveCurrentNotes();
+    saveCurrentRound();
     stopTimer();
     activeIndex -= 1;
     showRound();
   });
   next?.addEventListener('click', () => {
-    saveCurrentNotes();
+    saveCurrentRound();
     stopTimer();
     if (activeIndex >= activeRounds.length - 1) {
       if (select) { try { setActivityComplete(`simulation:${select.value}`); } catch { /* simulation still completed */ } }

@@ -116,9 +116,11 @@ flowchart TB
 	accTitle: A governed agent action crosses control, execution, and evidence boundaries
 	accDescr: A product-owned runtime lets the model propose a typed tool action. The platform-owned gateway sends identity, purpose, scope, and arguments to policy. A denial produces no credential. A permit issues a narrow credential only to the executor, which dispatches one logical call to the tool. The gateway, policy decision, execution attempt, and authoritative final state all emit records to the durable evidence plane.
 	subgraph Runtime["RUNTIME ADAPTER · product team owns workflow outcome"]
+		direction TB
 		Proposal["1 · Model proposes<br/>tool + structured arguments"]
 	end
 	subgraph Control["CONTROL PLANE · platform owns enforcement"]
+		direction TB
 		Gateway["2 · Gateway receives<br/>identity + purpose + scope"]
 		Policy{"3 · Policy<br/>permits?"}
 		Credential["4 · Narrow credential<br/>for this call only"]
@@ -128,11 +130,13 @@ flowchart TB
 		Policy -. "deny" .-> Denied
 	end
 	subgraph Execution["EXECUTION · tool team owns action semantics"]
+		direction TB
 		Executor["5 · Executor dispatches<br/>one logical call ID"]
 		Tool["6 · Tool reports<br/>authoritative final state"]
 		Executor ==> Tool
 	end
 	subgraph Evidence["EVIDENCE PLANE · platform preserves portable records"]
+		direction TB
 		Record[("Authorized request<br/>policy · attempt · outcome")]
 	end
 	Proposal ==> Gateway

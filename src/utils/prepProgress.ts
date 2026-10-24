@@ -29,17 +29,21 @@ export function isPrepStorageAvailable(): boolean {
   }
 }
 
-function isRecord(value: unknown): value is PracticeProgressRecord {
-  if (!value || typeof value !== 'object') return false;
+export function isPracticeProgressRecord(value: unknown): value is PracticeProgressRecord {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const candidate = value as Partial<PracticeProgressRecord>;
   return typeof candidate.slug === 'string'
     && typeof candidate.title === 'string'
     && typeof candidate.mode === 'string'
     && ['Weak', 'Review', 'Confident'].includes(candidate.score ?? '')
     && Array.isArray(candidate.weakDimensions)
+    && candidate.weakDimensions.every(dimension => typeof dimension === 'string')
+    && candidate.dimensionMisses !== null
     && typeof candidate.dimensionMisses === 'object'
-    && typeof candidate.attempts === 'number'
-    && typeof candidate.successfulAttempts === 'number'
+    && !Array.isArray(candidate.dimensionMisses)
+    && Object.values(candidate.dimensionMisses).every(count => Number.isSafeInteger(count) && count >= 0)
+    && Number.isSafeInteger(candidate.attempts) && candidate.attempts! >= 0
+    && Number.isSafeInteger(candidate.successfulAttempts) && candidate.successfulAttempts! >= 0
     && (candidate.lastSuccessfulOn === null || typeof candidate.lastSuccessfulOn === 'string')
     && (candidate.mixedVerifiedOn === null || typeof candidate.mixedVerifiedOn === 'string')
     && typeof candidate.lastAttemptOn === 'string'
@@ -49,7 +53,7 @@ function isRecord(value: unknown): value is PracticeProgressRecord {
 export function loadPrepProgress(): PracticeProgressRecord[] {
   try {
     const value: unknown = JSON.parse(localStorage.getItem(PREP_PROGRESS_KEY) ?? '[]');
-    return Array.isArray(value) ? value.filter(isRecord) : [];
+    return Array.isArray(value) ? value.filter(isPracticeProgressRecord) : [];
   } catch {
     return [];
   }
@@ -113,7 +117,7 @@ export function clearPrepProgress(): void {
 }
 
 export function replacePrepProgress(values: unknown[]): number {
-  const records = values.filter(isRecord);
+  const records = values.filter(isPracticeProgressRecord);
   localStorage.setItem(PREP_PROGRESS_KEY, JSON.stringify(records));
   return records.length;
 }

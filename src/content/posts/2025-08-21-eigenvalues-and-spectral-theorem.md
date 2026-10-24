@@ -51,7 +51,7 @@ Geometric meaning: in the eigenbasis $\{q_i\}$, the action of $A$ is independent
 			<text class="viz-callout" x="24" y="34">1 · Change coordinates with Qᵀ</text>
 			<text class="viz-label" x="24" y="53">A = [[2, 1], [1, 2]] · v = (2, 1)</text>
 			<path class="viz-axis" d="M65 130H275 M170 150V62"></path>
-			<path class="viz-baseline" d="M106 148L234 66 M106 66L234 148"></path>
+			<path class="viz-baseline" d="M152 148L234 66 M106 66L188 148"></path>
 			<text class="viz-axis-label" x="238" y="66">q₁ = (1, 1)/√2</text>
 			<text class="viz-axis-label" x="24" y="76">q₂ = (−1, 1)/√2</text>
 			<path class="viz-roc-curve" d="M170 130L246 92" marker-end="url(#spectral-arrow-input)"></path>
@@ -59,24 +59,24 @@ Geometric meaning: in the eigenbasis $\{q_i\}$, the action of $A$ is independent
 			<text class="viz-label" x="24" y="153">z = Qᵀv = (3/√2, −1/√2)</text>
 			<rect class="viz-plot-bg" x="12" y="178" width="336" height="176" rx="4"></rect>
 			<text class="viz-callout" x="24" y="200">2 · Scale independently with Λ = diag(3, 1)</text>
-			<path class="viz-axis" d="M58 316H326 M74 334V220"></path>
+			<path class="viz-axis" d="M58 302H326 M74 334V220"></path>
 			<text class="viz-axis-label" x="306" y="332">q₁</text>
 			<text class="viz-axis-label" x="48" y="228">q₂</text>
-			<path class="viz-operating-guide" d="M74 316V330 M142 316V330 M278 316V330 M142 330H278"></path>
-			<path class="viz-roc-curve" d="M74 316L142 330" marker-end="url(#spectral-arrow-input)"></path>
-			<circle class="viz-node" cx="142" cy="330" r="4"></circle>
+			<path class="viz-operating-guide" d="M74 302V324 M140 302V324 M272 302V324 M140 324H272"></path>
+			<path class="viz-roc-curve" d="M74 302L140 324" marker-end="url(#spectral-arrow-input)"></path>
+			<circle class="viz-node" cx="140" cy="324" r="4"></circle>
 			<text class="viz-label" x="96" y="285">before: z</text>
-			<path class="viz-pr-curve" d="M74 316L278 330" marker-end="url(#spectral-arrow-focus)"></path>
-			<circle class="viz-operating-point" cx="278" cy="330" r="4"></circle>
+			<path class="viz-pr-curve" d="M74 302L272 324" marker-end="url(#spectral-arrow-focus)"></path>
+			<circle class="viz-operating-point" cx="272" cy="324" r="4"></circle>
 			<text class="viz-callout" x="207" y="277">after: Λz</text>
 			<text class="viz-label" x="24" y="349">q₁ coordinate ×3 · q₂ coordinate ×1</text>
 			<rect class="viz-plot-bg" x="12" y="368" width="336" height="160" rx="4"></rect>
 			<text class="viz-callout" x="24" y="390">3 · Return to the original axes with Q</text>
-			<path class="viz-axis" d="M56 498H318 M94 516V408"></path>
-			<path class="viz-baseline" d="M94 498L157 467"></path>
-			<text class="viz-label" x="160" y="473">v = (2, 1)</text>
-			<path class="viz-pr-curve" d="M94 498L264 418" marker-end="url(#spectral-arrow-focus)"></path>
-			<text class="viz-callout" x="216" y="410">Av = (5, 4)</text>
+			<path class="viz-axis" d="M56 498H318 M94 516V400"></path>
+			<path class="viz-baseline" d="M94 498L142 474"></path>
+			<text class="viz-label" x="147" y="477">v = (2, 1)</text>
+			<path class="viz-pr-curve" d="M94 498L214 402" marker-end="url(#spectral-arrow-focus)"></path>
+			<text class="viz-callout" x="222" y="414">Av = (5, 4)</text>
 			<text class="viz-label" x="24" y="521">Q(Λz) = QΛQᵀv = (5, 4)</text>
 		</svg>
 	</div>
@@ -93,7 +93,7 @@ For symmetric positive semi-definite $A$: SVD and eigendecomposition coincide ($
 | Object | What its eigenvalues tell you |
 |--------|------------------------------|
 | Covariance matrix | Variances along principal axes (PCA) |
-| Hessian of loss | Local curvature; condition number = $\lambda_\max / \lambda_\min$ |
+| Hessian of loss | Local curvature; condition number = $\lambda_{\max} / \lambda_{\min}$ |
 | Graph Laplacian | Connectivity, spectral clustering, GNN smoothness |
 | Markov transition matrix | Mixing rate (second-largest eigenvalue) |
 | Attention $Q K^\top$ | Effective rank; low-rank structure |
