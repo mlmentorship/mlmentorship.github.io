@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-minimum-window-substring.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Maintain the exact deficit count while the right boundary gains characters and the left boundary removes only proven surplus.",
+  "learningObjective": "Save valid covers before each left removal. Removing the first essential copy makes the window invalid again.",
   "mechanismReview": {
     "pattern": "Variable-size sliding window that grows to feasibility and shrinks to minimality.",
     "recognitionCue": "Use it when a contiguous result must cover a multiset of required values and validity can be updated by adding or removing one boundary value.",

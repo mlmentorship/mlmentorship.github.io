@@ -9,46 +9,22 @@ category: "concepts"
 
 ## Summary
 
-"Hybrid or end-to-end?" is a question about constraints, not fashion. The defensible answer is that the choice follows from your data, control needs, latency, and operations, and that modern production systems are often a blend rather than a pure camp. Declaring either one universally obsolete is the fastest way to fail the question.
+Locate the changing knowledge source before choosing acoustic retraining. Text, pronunciation, acoustics and endpointing need different update evidence.
 
-## Hybrid ASR
+## Problem
 
-Traditional hybrid systems combine an acoustic model, a pronunciation lexicon, HMM state structure, and a language model, usually decoded with a weighted finite-state transducer.
+Product names change weekly; the team has text and pronunciations, but little new audio.
+For two hypothetical transcript candidates, use fixed acoustic and external-LM log scores:
 
-Strengths:
+| Candidate | Acoustic score $A$ | LM score $L$ |
+| --- | ---: | ---: |
+| Rare name | -5 | -1 |
+| Common word | -2 | -4 |
 
-- Explicit pronunciation and language constraints
-- Strong control with limited labeled audio and abundant domain text
-- Components can be adapted or diagnosed separately
-- Mature streaming and decoding infrastructure
+Decode with $A+\lambda L$.
+Can text-side preferences change the winner without changing acoustic weights?
 
-Costs:
-
-- Complex multi-stage training and decoding
-- Expert-maintained lexicons and alignments
-- Components do not jointly optimize the final transcript
-
-## End-to-end ASR
-
-CTC, attention encoder-decoder, and RNN-T learn most of the audio-to-token mapping jointly.
-
-Strengths:
-
-- Simpler conceptual pipeline
-- Shared representations and joint optimization
-- Easier multilingual and subword modeling
-- Strong quality given enough diverse data
-
-Costs:
-
-- Data hungry
-- Harder to inject domain terms or diagnose component failures
-- Streaming constraints differ by architecture
-- Hallucination and calibration behavior can be less transparent
-
-## Choosing between them
-
-Choose from the available labeled audio, text-only domain data, latency target, and endpointing needs. Also consider vocabulary change, pronunciation control, language coverage, existing infrastructure, and error cost. Many production systems use an end-to-end acoustic core with external language rescoring, contextual biasing, or separate safety and confidence layers.
+## Picture: Find Where New Knowledge Enters
 
 <!-- visual:asr-adaptation-boundaries -->
 <figure class="learning-figure plot-panel" aria-labelledby="asr-boundaries-title">
@@ -56,7 +32,7 @@ Choose from the available labeled audio, text-only domain data, latency target, 
 	<p class="visual-title" id="asr-boundaries-title">See which ASR knowledge sources can change without retraining the acoustic core.</p>
 	<svg viewBox="0 0 360 468" role="img" aria-labelledby="asr-boundaries-svg-title asr-boundaries-svg-desc">
 		<title id="asr-boundaries-svg-title">Hybrid and end-to-end ASR adaptation boundaries</title>
-		<desc id="asr-boundaries-svg-desc">Two speech recognition paths receive audio and produce a transcript. The hybrid path passes acoustic scores into a decoder composed from HMM topology, a pronunciation lexicon, and a language model. Pronunciation and text updates enter separately and can be changed without retraining the acoustic model. The end-to-end path jointly trains an encoder and token model from paired audio and transcripts, then decodes tokens. Optional external language rescoring, contextual bias phrases, and endpointing still enter around this learned core. A final decision strip maps limited paired audio and explicit control toward hybrid systems, while abundant paired audio and simpler joint optimization favor end-to-end systems; production blends can combine both.</desc>
+		<desc id="asr-boundaries-svg-desc">A hybrid path passes acoustic scores into HMM, lexicon and language-model decoding. Compatible pronunciation/text updates can change those sources without retraining acoustic weights, while graph rebuilding and regression checks may still be required. A jointly trained audio-to-token core can also use external LM, contextual bias and endpoint controls. The bottom strip contrasts explicit updates with core adaptation and allows blends; neither data volume nor an architecture label determines quality.</desc>
 		<defs><marker id="asr-boundary-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
 		<rect class="viz-plot-bg" x="8" y="8" width="344" height="174" rx="5"></rect>
 		<text class="viz-axis-label" x="18" y="28">HYBRID · EXPLICIT MODULE BOUNDARIES</text>
@@ -75,11 +51,11 @@ Choose from the available labeled audio, text-only domain data, latency target, 
 		<rect class="viz-node viz-node--output" x="314" y="55" width="29" height="36" rx="3"></rect>
 		<text class="viz-callout" x="328.5" y="77" text-anchor="middle">text</text>
 		<rect class="viz-node viz-node--input" x="106" y="126" width="91" height="34" rx="3"></rect>
-		<text class="viz-callout" x="151.5" y="140" text-anchor="middle">pronunciations</text>
-		<text class="viz-label" x="151.5" y="153" text-anchor="middle">lexicon update</text>
+		<text class="viz-label" x="151.5" y="139" text-anchor="middle">pronunciations</text>
+		<text class="viz-label" x="151.5" y="155" text-anchor="middle">lexicon update</text>
 		<rect class="viz-node viz-node--input" x="213" y="126" width="75" height="34" rx="3"></rect>
-		<text class="viz-callout" x="250.5" y="140" text-anchor="middle">domain text</text>
-		<text class="viz-label" x="250.5" y="153" text-anchor="middle">LM update</text>
+		<text class="viz-label" x="250.5" y="139" text-anchor="middle">domain text</text>
+		<text class="viz-label" x="250.5" y="155" text-anchor="middle">LM update</text>
 		<path d="M197 143H205V109H221M250 126V109" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5;stroke-dasharray:4 3;marker-end:url(#asr-boundary-arrow)"></path>
 		<text class="viz-label" x="18" y="171">Swap explicit knowledge sources; keep the acoustic model fixed.</text>
 		<rect class="viz-plot-bg" x="8" y="192" width="344" height="174" rx="5"></rect>
@@ -98,38 +74,111 @@ Choose from the available labeled audio, text-only domain data, latency target, 
 		<rect class="viz-node viz-node--output" x="321" y="239" width="22" height="36" rx="3"></rect>
 		<text class="viz-callout" x="332" y="261" text-anchor="middle">text</text>
 		<rect class="viz-node viz-node--input" x="31" y="310" width="86" height="34" rx="3"></rect>
-		<text class="viz-callout" x="74" y="324" text-anchor="middle">paired audio + text</text>
-		<text class="viz-label" x="74" y="337" text-anchor="middle">retrain core</text>
+		<text class="viz-label" x="74" y="323" text-anchor="middle">audio + text</text>
+		<text class="viz-label" x="74" y="339" text-anchor="middle">retrain core</text>
 		<path d="M117 327H143V292" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5;marker-end:url(#asr-boundary-arrow)"></path>
 		<rect class="viz-node" x="160" y="310" width="173" height="34" rx="3" style="stroke-dasharray:4 3"></rect>
-		<text class="viz-callout" x="246.5" y="324" text-anchor="middle">LM rescoring · bias phrases · endpointing</text>
-		<text class="viz-label" x="246.5" y="337" text-anchor="middle">optional controls around the core</text>
+		<text class="viz-label" x="246.5" y="323" text-anchor="middle">LM / bias / endpointing</text>
+		<text class="viz-label" x="246.5" y="339" text-anchor="middle">optional core controls</text>
 		<path d="M277 310V280" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3;marker-end:url(#asr-boundary-arrow)"></path>
 		<text class="viz-label" x="18" y="355">End to end does not mean “no decoder” or “no external controls.”</text>
-		<text class="viz-axis-label" x="18" y="393">ARCHITECTURE FOLLOWS THE CONSTRAINT</text>
+		<text class="viz-axis-label" x="18" y="386">ARCHITECTURE FOLLOWS THE CONSTRAINT</text>
 		<path d="M36 419H324" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
 		<path d="M36 413V425M180 413V425M324 413V425" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
 		<text class="viz-callout" x="36" y="407">explicit control</text>
 		<text class="viz-callout" x="324" y="407" text-anchor="end">joint optimization</text>
-		<text class="viz-label" x="36" y="442">limited paired audio</text>
-		<text class="viz-label" x="180" y="459" text-anchor="middle">production blend</text>
-		<text class="viz-label" x="324" y="442" text-anchor="end">abundant paired audio</text>
+		<text class="viz-label" x="36" y="442">text/pronunciation update</text>
+		<text class="viz-label" x="180" y="459" text-anchor="middle">valid blend</text>
+		<text class="viz-label" x="324" y="442" text-anchor="end">core adaptation</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> trace where new knowledge enters. In a hybrid system, pronunciation and domain-text changes can update the lexicon or language model behind an explicit decode boundary without retraining the acoustic model. An end-to-end system learns more of the audio-to-token mapping jointly from paired data, but production decoding can still add text-only rescoring, contextual biasing, and endpointing. Choose the boundary that matches your data and control needs; a blended system is a valid design, not a contradiction. Original schematic checked against <a href="https://kaldi-asr.org/doc/graph.html">Kaldi's HCLG documentation</a>, <a href="https://arxiv.org/abs/1508.01211">Listen, Attend and Spell</a>, and <a href="https://arxiv.org/abs/1211.3711">RNN-T</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> trace text and pronunciation into decoding, not acoustic weights. A jointly trained core can also retain external controls; compatible updates still require validation.</figcaption>
 </figure>
+
+## Calculate the Changed Preference
+
+| Fusion weight | Rare name | Common word | Selected candidate |
+| --- | --- | --- | --- |
+| $\lambda=0.5$ | $-5-0.5=-5.5$ | $-2-2=-4$ | Common |
+| $\lambda=1.5$ | $-5-1.5=-6.5$ | $-2-6=-8$ | Rare |
+
+The acoustic evidence and parameters stayed fixed.
+Only the scoring preference changed; this is not measured accuracy improvement or proof the rare name was spoken.
+If that candidate never enters a fixed n-best list, rescoring cannot select it.
+
+<span id="choosing-between-them"></span>
+
+## Decision: Version the Whole Update
+
+Specify acoustic/token units, compatible phone/token inventory, lexicon, LM score convention, fusion weight, search and artifact versions.
+Graph rebuilding, publication, regression tests and compatible rollback can remain necessary when acoustic weights do not change.
+Compare rare-term recall, false insertions, WER slices, delay, maintenance and update time under matched data and workloads.
+
+## Change 1: Only Text and Pronunciations Are Available
+
+**New task.** Add domain terms without paired-audio retraining data.
+
+**Picture and change.** Test compatible lexicon, LM or contextual-bias updates with candidate-support and negative checks.
+
+**Check.** New-term recall must not hide unrelated false insertions.
+
+**Use when.** Vocabulary changes faster than labeled audio.
+
+## Change 2: The Microphone Changed
+
+**New task.** Errors follow channel conditions, not new vocabulary.
+
+**Picture and change.** Inspect front-end/acoustic coverage and collect representative adaptation and evaluation audio.
+
+**Check.** A stronger term bias cannot restore missing acoustic information.
+
+**Use when.** Failure tracks noise, channel or device.
+
+## Failure: Fixed Acoustic Weights Are Called a Free Update
+
+An incompatible graph, missing candidate or untested bias can break delivery despite unchanged acoustic weights.
+
+## Transfer Check
+
+Is an end-to-end acoustic core with external LM rescoring a contradiction?
+
+### Reasoned Answer
+
+No. Joint core training and modular inference controls describe different boundaries.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Hybrid ASR
+
+Acoustic scores combine with HMM topology, pronunciation lexicon and LM, often through WFST decoding.
+Explicit modules enable local diagnosis/control but cost alignment, graph and component maintenance.
+Separate objectives do not automatically optimize final transcript quality jointly.
+
+## End-to-end ASR
+
+CTC, RNN-T and attention objectives learn audio-to-token mappings with different alignment/history assumptions.
+Joint representations can reduce some boundaries; external fusion, biasing, endpointing, confidence and safety controls can remain.
+Data needs, multilingual quality, hallucination and diagnosis depend on the actual system, not its label.
 
 ## In an interview
 
-1. Describe both decompositions accurately.
-2. Do not declare either one universally obsolete.
-3. Tie the architecture to data and operational constraints.
-4. Cover streaming, rare words, domain adaptation, and debugging.
-5. Propose evaluation beyond aggregate WER.
+1. Name whether acoustics, pronunciation, frequency or endpoint policy changes.
+2. Locate the update in both decompositions.
+3. Check labeled audio, domain text, control, languages and existing infrastructure.
+4. Validate streaming, rare terms, false biasing and update rollback.
+5. Compare matched beyond-WER outcomes and operating cost.
 
 ## Common confusions
 
-- **"End-to-end means one neural network and no decoder."** Beam search, language integration, endpointing, and context biasing are still system components.
-- **"Hybrid always needs less data."** It gives stronger priors, but real performance depends on the domain and component quality.
-- **"WER decides the architecture."** Latency, rare terms, operations, and adaptation speed often dominate.
+Neither "hybrid always needs less data" nor "end-to-end has no decoder" is a reliable selection rule.
+Accuracy and adaptation speed require workload-specific evidence.
+
+## Sources
+
+- [Kaldi HCLG construction](https://kaldi-asr.org/doc/graph.html).
+- [Listen, Attend and Spell](https://arxiv.org/abs/1508.01211).
+- [RNN-T](https://arxiv.org/abs/1211.3711).
 
 *Related: [CTC](/concepts/connectionist-temporal-classification/), [RNN-T](/concepts/rnn-transducer/), [encoder-decoder architectures](/concepts/encoder-decoder-architectures/), and [streaming ASR](/concepts/streaming-asr/).*
+
+</div>

@@ -13,34 +13,177 @@ priority: "Role-specific"
 prerequisites: ["streaming-asr", "multimodal-foundation-models", "automatic-speech-recognition", "long-context-llms", "design-production-llm-inference-service"]
 ---
 
-> *Asked in: multimodal ML system design, real-time LLM systems, product architecture, and upper-IC technical-strategy rounds.*
+Use capture time for evidence and a direct device control path for interruption.
+Model output does not establish freshness or authority.
 
-A basic answer streams microphone, camera, screen, and text into a multimodal model. A senior answer defines separate product modes, one event-time media timeline, bounded latency, interruption semantics, degraded operation, privacy, and measurable grounding.
+<span id="the-prompt"></span>
+## Problem
 
-A staff answer makes those contracts reusable across clients and teams. A principal answer chooses which capabilities become shared services. A senior-principal answer sets durable consent, evidence, authority, and ownership rules while models, devices, and product surfaces change.
+Design a laptop/phone assistant with voice, camera, selected-window sharing, text and confirmed reversible tools.
+Use these fictional first-release assumptions:
 
-The proposed system keeps fast media handling near the user, performs heavier reasoning in regional cloud services, and treats every modality as optional. It can continue safely when one stream becomes late, unavailable, untrusted, or disallowed.
+- 200,000 daily users across two regions; 20,000 peak concurrent sessions.
+- Eight-minute median sessions; two-hour p99 sessions; variable mobile networks.
+- Enterprise media remains in its approved region; some tenants prohibit cloud video storage.
+- Full duplex speech; explicit camera/window sharing; enterprise sessions excluded from training by default.
 
-## The prompt
+Resolve two synthetic failures:
 
-Design a real-time assistant for laptops and phones. A user can speak, type, share a camera, or share one application window. The assistant answers by voice and text. With confirmation, it can operate approved tools.
+| Event | Shared session clock |
+| --- | ---: |
+| Old screen captured | 10.00 s |
+| Old screen arrives after reconnect | 14.20 s |
+| User asks what to press now | 14.30 s |
+| Requested keyframe captured | 14.40 s |
+| Keyframe arrives | 14.45 s |
 
-The product supports four experiences:
+The current-screen freshness limit is 0.50 seconds, with 18 milliseconds of mapped-clock uncertainty.
+Which frame can support the answer?
 
-1. a voice conversation while the camera shows an object;
-2. guidance over a shared application window;
-3. a meeting companion that answers questions about the current discussion;
-4. an accessibility mode that describes visible content and accepts speech commands.
+Separately, speech starts at 1,000 ms and server cancellation finishes at 1,050 ms.
+Queued assistant audio remains audible until 1,900 ms; an alternative client flush stops playback at 1,150 ms.
+Which interval measures interruption?
 
-The first release serves 200,000 daily users in two regions. Peak concurrency is 20,000 sessions. Median sessions last eight minutes, while the p99 lasts two hours. Mobile networks are variable. Some enterprise tenants prohibit cloud video storage.
+## Picture: Arrival Is Not Current State
 
-A recent prototype produced two failures. First, the assistant answered a question about an old screen frame after network recovery. Second, synthesized speech continued for 900 milliseconds after a user interrupted it. The user believed the assistant had ignored the interruption.
+<!-- visual:multimodal-stale-frame-gate -->
+```mermaid
+flowchart TB
+  accTitle: Capture time gates current-screen evidence
+  accDescr: The old frame is captured at 10 seconds and arrives at 14.2. At the 14.3-second question it is 4.3 seconds old, not 0.1 seconds old. Arrival ordering accepts obsolete UI; event-time ordering preserves it as history. A requested frame captured at 14.4 and received at 14.45 has conservative age 68 milliseconds, including 18 milliseconds of clock uncertainty. It passes the 500-millisecond freshness rule only with current source epoch and permission. Otherwise the assistant waits within its deadline or reports stale screen evidence.
+  Old["OLD SCREEN<br/>capture 10.00 s"] --> Stall["UPLINK STALL<br/>frame waits in transport"]
+  Question["CURRENT-SCREEN QUESTION<br/>14.30 s"] --> Clock
+  Stall --> Recovery["RECOVERY<br/>old frame arrives 14.20 s"]
+  Recovery --> Clock{"WHICH CLOCK<br/>selects evidence?"}
+  Clock -->|"arrival time"| Arrival["APPARENT AGE<br/>0.10 s"]
+  Arrival ==> Unsafe["WRONG STATE<br/>obsolete screen accepted"]
+  Clock -->|"mapped capture time + epoch"| Event["ACTUAL AGE<br/>4.30 s; keep as history"]
+  Event --> Watermark["SOURCE PROGRESS<br/>does not prove freshness"]
+  Watermark --> Gate{"FRESH, PERMITTED<br/>ACTIVE-EPOCH EVIDENCE?"}
+  Gate -->|"new capture 14.40; arrives 14.45"| Answer["AGE BOUND 0.068 s<br/>new snapshot; revalidate actions"]
+  Gate -.->|"deadline expires"| Abstain["VISIBLE FALLBACK<br/>screen view is stale"]
+  class Old,Question viz-input
+  class Recovery,Clock,Gate viz-focus
+  class Stall,Watermark viz-state
+  class Event,Answer viz-output
+  class Arrival,Unsafe,Abstain viz-warning
+```
 
-Design the product, architecture, synchronization contract, model path, latency budget, failure behavior, evaluation, rollout, and operating model.
+<p class="diagram-caption"><strong>Read it this way:</strong> late arrival can repair history without advancing live state. Source progress is not proof that a screen remains current. Apply the request's freshness, epoch and permission rules before answering.</p>
+
+## Work the Two Traces
+
+At the question, the old frame's capture age is $14.30-10.00=4.30$ seconds.
+Its arrival age, $14.30-14.20=0.10$ seconds, measures the wrong thing.
+
+At 14.45 seconds, the new frame's conservative age is:
+
+$$
+(14.45-14.40)+0.018=0.068\text{ seconds}<0.50.
+$$
+
+This assumes a valid clock mapping and the same permitted, active source epoch.
+If clock uncertainty crosses the limit, wait for better evidence or abstain.
+A changed screen or permission invalidates any affected action proposal.
+
+The interruption intervals are:
+
+| Measurement | Calculation | Meaning |
+| --- | --- | --- |
+| Server cancellation | 1,050 − 1,000 = 50 ms | Server stopped work |
+| Audible stop | 1,900 − 1,000 = 900 ms | User still heard queued speech |
+| Alternative local flush | 1,150 − 1,000 = 150 ms | This trace stops playback sooner |
+
+These are individual synthetic traces, not percentile results.
+Measure detection delay separately when the production metric starts at true speech onset rather than detected onset.
+
+## Keep Four Mode Contracts
+
+| Mode | Required evidence | Authority and fallback |
+| --- | --- | --- |
+| Live conversation | Speech/text; camera only when needed | Advice; disclose missing visual input |
+| Screen guidance | Current window/UI evidence for current-state claims | Read-only unless confirmed; wait or abstain when stale |
+| Meeting companion | Scoped speakers, consent and aligned history | Drafts; identify gaps or uncertain speakers |
+| Accessibility control | Permitted semantic targets and resulting state | Narrow reversible actions; explicit local/offline limits |
+
+Shared transport does not justify identical freshness, retention, authority or latency rules.
+A greeting can ignore video; a current-screen click cannot.
+
+## Preserve Twelve Invariants
+
+1. Carry event time, source, sequence and clock uncertainty.
+2. Record each output's evidence horizon and snapshot.
+3. Keep late or prior-epoch media historical, not live.
+4. Track each modality's permission, health and request-specific necessity.
+5. Give stop controls a direct playback path, independent of semantic endpointing.
+6. Verify external effects through authoritative application/tool evidence.
+7. Bound raw retention; propagate purpose, scope and deletion to derivatives.
+8. Enforce consent changes during capture, routing, processing, output and retrieval.
+9. Declare stage anchors and queue limits; measure the joint end-to-end trace.
+10. Show degraded operation instead of inventing missing evidence.
+11. Isolate tenant/session context, credentials, budgets and traces.
+12. Link affected outputs to versions and evidence intervals during incidents.
+
+## Change 1: Reconnect or Restart the Source
+
+**New task.** Six-second-old packets arrive, or the source restarts.
+
+**Picture and change.** Keep old-epoch packets historical; authenticate a new epoch, map its clock and establish a fresh baseline.
+
+**Check.** Epoch identifiers are opaque. A larger numeric sequence cannot make an inactive epoch current.
+
+**Use when.** Recovery changes event ordering or clock continuity.
+
+## Change 2: One Device Keeps Speaking
+
+**New task.** Server cancellation is fast, but queued audio continues on one phone family.
+
+**Picture and change.** Flush/duck local playback, prioritize cancel events, stop further generation and record the last audible sample.
+
+**Check.** Test echo, noise, backchannels and explicit stop. Gate the affected device slice, not just the fleet average.
+
+**Use when.** Server telemetry disagrees with user-visible control.
+
+## Change 3: Consent or Screen State Changes in Flight
+
+**New task.** Sharing is revoked, a participant joins or the action target changes before confirmation.
+
+**Picture and change.** Stop capture at the first controlled boundary; restrict/cancel processing and output under policy; invalidate affected proposals.
+
+**Check.** Cached summaries and fallback providers cannot restore revoked authority. Apply deletion rules to derivatives.
+
+**Use when.** Evidence or delegated scope changes.
+
+## Change 4: Placement or Consequences Change
+
+**New task.** Enterprise media must remain local, cloud service fails or the assistant starts controlling physical equipment.
+
+**Picture and change.** Move approved capabilities locally or degrade explicitly. Physical control requires a new safety envelope and independent controller authority.
+
+**Check.** Reversible UI-action assumptions do not establish physical safety or hard real-time guarantees.
+
+**Use when.** Deployment or consequences invalidate the initial contract.
+
+## Failure: A Completed Request Is Treated as Truth
+
+Arrival does not prove freshness; server cancellation does not prove silence; model intent does not prove an external effect.
+An unknown action outcome requires reconciliation, not a blind retry.
+
+## Transfer Check
+
+A new model accepts an hour of video. Which synchronization, memory or authority components can be removed on that fact alone?
+
+### Reasoned Answer
+
+None. Context capacity does not establish event freshness, consent, retention, grounding, cancellation or valid action state.
+Replace a component only after preserving its contracts and measured evidence.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
 
 ## Choose product modes before components
 
-The four experiences should share transport, identity, event schemas, model routing, and observability. They should not share one unrestricted context policy or latency target.
+Share transport, identity, schemas, routing and traces, while preserving mode-specific context, timing and authority.
 
 | Mode | Primary input | Expected output | Interaction target | Default authority |
 | --- | --- | --- | --- | --- |
@@ -51,204 +194,157 @@ The four experiences should share transport, identity, event schemas, model rout
 
 ### Live conversation
 
-Speech controls the rhythm. The system should emit a useful audio response quickly, stop output when the user speaks, and avoid finalizing a turn during a natural pause. Camera evidence can enrich an answer, but late video should not block a simple spoken reply.
+Prioritize turn exchange and interruption. Do not end a turn during a natural pause or block ordinary speech on optional video.
 
 ### Screen guidance
 
-Freshness and grounding dominate. A correct answer about a stale window is still a product failure. Every claim about the screen should cite a frame sequence, structured UI snapshot, or optical character recognition result with a capture time.
+Cite captured frame/UI/OCR identities and times. Correct descriptions of obsolete windows still fail current-state requests.
 
 ### Meeting companion
 
-Speaker attribution, consent, and temporal retrieval dominate. The assistant must distinguish live speech, prior transcript, chat, and shared slides. It should expose uncertainty when diarization or consent state is unclear.
+Distinguish current speech, older transcript, chat and slides. Expose uncertain speaker attribution or consent.
 
 ### Accessibility control
 
-Latency, predictable focus, and action confirmation dominate. The assistant should prefer accessibility-tree data over pixels when available. It must never infer that a visible button was activated unless the operating system reports the resulting state.
-
-A candidate who merges these modes too early will hide incompatible requirements. Shared infrastructure is useful only when each mode can apply a stricter policy and a different degradation path.
+Prefer permitted semantic UI state; verify focus and resulting application state instead of inferring activation from visible buttons.
 
 ## Clarify the user contract
 
-Ask questions that remove architecture or change authority.
+Clarify the requirements that change architecture or authority.
 
 ### Interaction
 
-- Does the assistant need full duplex audio, or can output pause during user speech?
-- May camera and screen inputs arrive together?
-- Can the user switch modes during a session?
-- Which response requires the latest visual state?
-- How long may partial transcripts revise prior words?
-- Does a visual pointer need pixel accuracy or semantic element accuracy?
+- Full duplex, simultaneous camera/screen and mid-session mode changes?
+- Which claims require current visual state?
+- What transcript-revision window and pointer/semantic-element accuracy are required?
 
 ### Action
 
-- Is the assistant explaining, drafting, navigating, or committing an external change?
-- Which actions are reversible?
-- Which actions require confirmation on the same device?
-- Can a meeting participant grant tool authority for another participant?
-- What happens when the visible screen changes between proposal and confirmation?
+- Explanation, draft, navigation or external commitment?
+- Reversibility and same-device confirmation requirements?
+- Who can delegate whose authority? What expires after screen changes?
 
 ### Privacy and consent
 
-- Who can start camera, screen, or meeting capture?
-- How do other participants learn that capture is active?
-- Which media may leave the device or region?
-- How long may raw media, derived features, transcripts, and summaries remain?
-- Can the product learn from enterprise sessions?
-- How are bystanders, children, and sensitive applications handled?
+- Who starts capture, and how are participants notified?
+- Which data may leave each device/region, with what retention and training permission?
+- How are bystanders, children and sensitive applications handled?
 
 ### Scale and reliability
 
-- What are the target devices, codecs, languages, and network conditions?
-- Which functions must work offline?
-- What is the concurrent-session distribution by region?
-- Which mode needs the strongest availability?
-- What useful fallback exists when speech, video, or the model fails?
-
-Assume full duplex audio is required. Screen sharing is limited to one chosen window. Camera sharing is explicit. Tool actions are reversible in the first release. Enterprise media stays in its selected region and is excluded from training by default.
+- Devices, codecs, languages, networks and offline functions?
+- Regional concurrency, mode-specific availability and useful speech/video/model fallbacks?
 
 ## Define success by mode
 
-One blended satisfaction score can hide severe regressions. Measure interaction, grounding, safety, reliability, and cost separately.
+Report separate mode-specific outcomes and severe-event counts, not one blended satisfaction score.
 
 ### Interaction quality
 
-- time from user speech onset to stable partial transcript;
-- time from detected turn end to first audible response;
-- barge-in stop latency from user speech to inaudible output;
-- false endpoint and missed endpoint rates;
-- response abandonment and repeated-request rates;
-- transcript revision distance after display;
-- conversation overlap caused by late output.
+- Onset-to-stable-text, declared end-to-first-audio and onset-to-last-audible timings.
+- False/missed endpoints, abandonment, repeated requests, displayed revision distance and unwanted overlap.
 
 ### Multimodal grounding
 
-- claims supported by the cited media interval;
-- answer accuracy on current versus stale frames;
-- temporal-order accuracy across audio and visual events;
-- correct screen element, region, speaker, and application attribution;
-- abstention when evidence is missing or too old;
-- performance under conflicting text, speech, and visual evidence.
+- Cited-interval support, current/stale-frame accuracy and temporal ordering.
+- Element/region/speaker/application attribution, justified abstention and conflicting-evidence behavior.
 
 ### Product outcomes
 
-- task completion by mode;
-- time to complete a guided workflow;
-- user correction or manual takeover;
-- accessibility command success and undo rate;
-- meeting-answer usefulness after participant review;
-- return usage without rising privacy complaints.
+- Completion/time, correction/takeover, accessibility command success/undo and participant-reviewed meeting usefulness.
+- Return usage alongside privacy complaints, not as evidence of consent.
 
 ### Safety and privacy
 
-- capture started without valid consent evidence;
-- restricted media sent to a disallowed processor;
-- sensitive application exposure outside the selected window;
-- tool actions executed against stale visual state;
-- harmful or unsupported advice from ambiguous media;
-- deletion requests completed across raw and derived stores.
+- Unauthorized capture/processor routing/window exposure, stale-state actions and unsupported harmful advice.
+- Deletion completion across raw and derived stores.
 
 ### Reliability and efficiency
 
-- session setup success;
-- reconnect success without timeline corruption;
-- partial-modality availability by mode;
-- p50, p95, and p99 latency for each response stage;
-- compute and network cost per useful minute;
-- thermal and battery cost on mobile devices.
-
-Safety events should remain visible as counts and rates. Do not average an unauthorized capture event into general task success.
+- Setup/reconnect correctness, per-mode modality availability and latency distributions.
+- Compute/network cost per useful minute, device thermal load and battery use.
 
 ## Establish system invariants
 
-The design follows from contracts that stay stable across model versions.
-
-1. **Every media item has event time.** Capture time, sequence, source, and clock quality travel with the payload.
-2. **Output cites an evidence horizon.** A response records the newest audio, video, screen, and text event it used.
-3. **Late is different from current.** Recovered media cannot silently replace newer state.
-4. **Every modality is optional.** The session declares which inputs are present, permitted, healthy, and required for the current request.
-5. **Barge-in cancels output immediately.** Cancellation does not wait for semantic turn completion.
-6. **A model proposal does not prove external state.** Tool execution and operating-system feedback provide action evidence.
-7. **Raw media has bounded retention.** Derived memory inherits purpose, consent, tenant, region, and deletion scope.
-8. **Consent changes apply during a session.** New media stops at capture or the first controlled boundary.
-9. **Each stage has a latency budget.** Queueing cannot consume time reserved for endpointing or playback.
-10. **Degraded operation is explicit.** The user can tell which modality is unavailable or stale.
-11. **Shared services isolate sessions and tenants.** Context, credentials, budgets, and traces never cross by default.
-12. **Incidents can identify affected outputs.** Versions and evidence intervals are queryable from every response.
-
-These invariants define correctness more clearly than a list of model and storage products.
+Use the twelve core invariants as test obligations across releases, not as model capabilities.
 
 ## Separate the media, reasoning, and action paths
 
 ```mermaid
-flowchart LR
-  subgraph Device[User device]
-    Mic[Microphone capture]
-    Cam[Camera capture]
-    Scr[Window and UI capture]
+flowchart TB
+  accTitle: Separate live media, reasoning and action paths
+  accDescr: Device microphone, camera, selected window and typed input enter a local controller and regional edge. Timeline processing feeds speech and visual encoders plus context assembly. Fast and deeper model routes return through output and device playback. A separate tool path checks policy and confirmation before execution, then returns authoritative evidence. Versioned registries constrain routing, context and policy; joined event logs support observation and evaluation.
+  subgraph Device[Device capture]
+    Mic[Microphone]
+    Cam[Camera]
+    Scr[Window + UI]
     Txt[Typed events]
-    Local[Local media controller]
-    Play[Audio and visual renderer]
+    Local[Local media<br/>controller]
     Mic --> Local
     Cam --> Local
     Scr --> Local
     Txt --> Local
   end
 
-  Local --> Edge[Regional session edge]
-  Edge --> Time[Timeline and synchronization]
-  Time --> ASR[Streaming speech encoder]
-  Time --> Vision[Streaming visual encoders]
-  Time --> Context[Context assembler]
+  Local --> Edge[Regional<br/>session edge]
+  Edge --> Time[Timeline +<br/>synchronization]
+  Time --> ASR[Streaming<br/>speech encoder]
+  Time --> Vision[Streaming<br/>visual encoders]
+  Time --> Context[Context<br/>assembler]
   ASR --> Context
   Vision --> Context
   Context --> Router[Model router]
-  Router --> Fast[Fast response model]
-  Router --> Deep[Deeper multimodal model]
-  Fast --> Output[Streaming output coordinator]
+  Router --> Fast[Fast response<br/>model]
+  Router --> Deep[Deeper multimodal<br/>model]
+  Fast --> Output[Streaming output<br/>coordinator]
   Deep --> Output
   Output --> Edge
-  Edge --> Play
+  Edge --> Play[Device audio +<br/>visual renderer]
 
-  Router --> Tools[Tool proposal gateway]
-  Tools --> Policy[Policy and confirmation]
-  Policy --> Exec[Controlled tool executor]
-  Exec --> Evidence[Authoritative action evidence]
+  Router --> Tools[Tool proposal<br/>gateway]
+  Tools --> Policy[Policy +<br/>confirmation]
+  Policy --> Exec[Controlled<br/>tool executor]
+  Exec --> Evidence[Authoritative<br/>action evidence]
   Evidence --> Context
 
-  Time --> Events[Session event log]
+  Time --> Events[Session<br/>event log]
   Router --> Events
   Output --> Events
   Tools --> Events
-  Events --> Obs[Observability and evaluation]
-  Registry[Model, policy, prompt, and encoder registry] --> Router
+  Events --> Obs[Observability +<br/>evaluation]
+  Registry[Versioned model, policy,<br/>prompt + encoder registry] --> Router
   Registry --> Context
   Registry --> Policy
+  class Mic,Cam,Scr,Txt,Registry viz-input
+  class Local,Time,Context,Router,Policy viz-focus
+  class Edge,ASR,Vision,Fast,Deep,Tools,Events viz-state
+  class Output,Play,Exec,Evidence,Obs viz-output
+  class Registry viz-extra-wide
 ```
 
 ### Device media controller
 
-The device owns capture permissions, selected sources, echo cancellation, local voice activity detection, encryption, and immediate playback cancellation. It can reduce frame rate before transmission and expose a clear capture indicator.
+Own permissions, selected sources, encryption, echo cancellation, local VAD, frame reduction and immediate playback control.
 
 ### Regional session edge
 
-The edge terminates the real-time transport, authenticates the session, applies tenant and region routing, and maintains short reconnect state. It should avoid semantic decisions that require the full context.
+Authenticate transport and tenant/region routing; keep bounded reconnect state, not full-context semantic decisions.
 
 ### Timeline service
 
-The timeline service validates sequence numbers and timestamps, reorders within bounded windows, tracks watermarks, and marks gaps. It emits a common event stream for downstream encoders and the context assembler.
+Validate sequences/timestamps, bound reordering, mark gaps and expose per-source progress to encoders/context selection.
 
 ### Model path
 
-Streaming encoders produce partial speech and visual features. The context assembler selects temporally aligned evidence. A router chooses a fast text or speech path, a deeper multimodal path, or a safe fallback.
+Assemble aligned incremental evidence; route to fast, deeper or degraded paths under deadline and policy.
 
 ### Action path
 
-Tool proposals leave the generative path before execution. Policy checks identity, permission, arguments, evidence freshness, and required confirmation. The executor returns authoritative state, which can then enter the conversation.
+Separate proposals from execution. Check identity, scope, arguments, freshness and confirmation; return authoritative action evidence.
 
 ## Give every event a common temporal envelope
 
-Audio, video, screen, and text arrive at different rates. Arrival order is not event order. The shared envelope must preserve both.
+Preserve event and arrival time in the common envelope.
 
 ```text
 MediaEvent
@@ -271,105 +367,57 @@ MediaEvent
 
 ### Use a monotonic device clock
 
-Wall clocks can jump after synchronization or manual changes. Order media with a monotonic device clock. Carry wall time for audit and cross-device correlation.
-
-A new `device_clock_epoch` starts after restart or clock reset. Events from different epochs cannot be ordered by the monotonic value alone. The edge maps each epoch into session time and records uncertainty.
-
-Epoch identifiers are opaque, not numeric ordering keys. After the edge authenticates and activates a new epoch for one source, late events from the prior epoch can repair history but cannot advance current state. A fresh keyframe or audio boundary establishes the new live baseline, and the trace records any unmapped gap.
+Wall clocks can jump. Order within a source epoch using monotonic time; map epochs into session time with uncertainty.
+Epoch identifiers are opaque, not numeric ordering keys.
+Authenticate activation after restart/reset. Prior-epoch events can repair history but cannot advance current state.
+Establish a fresh keyframe/audio baseline and record unmapped gaps.
 
 ### Estimate clock offset and drift
 
-The device and edge exchange periodic timing probes. The service estimates network delay, device-to-edge offset, and clock drift. A robust filter should reject probes delayed by queue spikes.
-
-The estimate produces an interval rather than a perfect timestamp. For example, a camera frame may map to session time 12.420 seconds with plus or minus 18 milliseconds. Context selection can then account for uncertainty.
+Timing probes estimate delay, offset and drift; reject queue-spike outliers under the chosen estimator.
+Keep uncertainty intervals, not perfect timestamps. Validate assumptions against the selected device/transport APIs.
 
 ### Preserve event time and arrival time
 
-Event time describes when the user spoke or the screen changed. Arrival time describes when the service received it. Both are needed.
-
-A video packet may arrive late because the mobile uplink stalled. Replaying that packet as current evidence recreates the prototype incident. The timeline marks it late and places it at its original event time.
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace why the last frame to arrive is not necessarily the current frame, then apply a freshness gate to the user's question.</p>
-
-<!-- visual:multimodal-stale-frame-gate -->
-```mermaid
-flowchart TB
-  accTitle: Event time prevents a recovered stale screen frame from becoming current evidence
-  accDescr: An old screen frame is captured before a network stall. During the stall, the user asks what to press now. On recovery, the old frame arrives after the question. Selecting evidence by arrival order treats that frame as current and can produce an unsafe answer. Selecting by capture event time places the frame in history and leaves the screen watermark delayed. Because this question requires a current screen, a freshness gate either accepts a requested fresh keyframe and answers from it or reaches its latency bound and tells the user that the screen is stale.
-  Old["OLD SCREEN FRAME<br/>captured before the stall"] --> Stall["UPLINK STALL<br/>frame waits in transport"]
-  Question["USER ASKS<br/>'What should I press now?'"] --> Recovery["NETWORK RECOVERS<br/>old frame arrives after question"]
-  Stall --> Recovery
-  Recovery --> Clock{"WHICH CLOCK<br/>selects evidence?"}
-  Clock -->|"arrival time"| Arrival["LAST ARRIVAL = CURRENT<br/>old frame advances state"]
-  Arrival ==> Unsafe["UNSAFE ANSWER<br/>describes obsolete UI"]
-  Clock -->|"capture event time + sequence"| Event["PLACE FRAME IN HISTORY<br/>do not advance live state"]
-  Event --> Watermark["SCREEN WATERMARK<br/>still delayed"]
-  Watermark --> Gate{"CURRENT SCREEN<br/>required for this request"}
-  Gate -->|"fresh keyframe arrives"| Answer["ANSWER FROM<br/>new screen state"]
-  Gate -.->|"latency bound expires"| Abstain["VISIBLE DEGRADATION<br/>'Screen view is stale'"]
-  class Old,Question viz-input
-  class Recovery,Clock,Gate viz-focus
-  class Stall,Watermark viz-state
-  class Event,Answer viz-output
-  class Arrival,Unsafe,Abstain viz-warning
-  class Old viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the recovered frame to the clock decision. Arrival order makes the old frame look newest; event time makes it a historical repair and leaves the live screen delayed. Because “now” requires current evidence, answer only after a fresh keyframe or state plainly that the screen is stale. Original synthesis checked against <a href="https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/">Apache Flink's event-time and watermark guidance</a>, <a href="https://www.rfc-editor.org/rfc/rfc3550.html">RTP timestamp and sequence contracts</a>, and <a href="https://www.rfc-editor.org/rfc/rfc8834.html">WebRTC media transport guidance</a>.</p>
+Capture describes the observed event; arrival describes transport. Place delayed packets in their original interval, not current state.
 
 ### Define watermarks
 
-A watermark states that the service expects no more events before a session time, within the configured lateness bound. Maintain it per source and modality. A request then applies its own freshness policy to those watermarks.
+A watermark describes bounded-lateness processing progress, not proof that the latest frame depicts the present.
+Maintain it per source/modality; apply separate request-specific freshness and clock-uncertainty rules.
 
-Audio can use a short lateness window because conversational delay is costly. Screen keyframes can tolerate a larger transfer delay, but an answer about the current screen may need to wait or abstain.
-
-Use request-specific evidence rules:
-
-- a spoken greeting can ignore late video;
-- “What error is on my screen?” requires a fresh screen snapshot;
-- “What did Alex say before the chart changed?” needs aligned transcript, speaker, and visual events;
-- a confirmed click requires the exact UI state used when the action was proposed.
+Choose lateness windows by modality and mode. Current-screen claims may require waiting or abstention despite processing progress.
+Historical questions need aligned speaker/transcript/visual intervals; confirmed clicks require the proposal's exact relevant UI state.
 
 ### Handle revisions explicitly
 
-Partial automatic speech recognition can revise words. Optical character recognition can improve after a higher-quality frame arrives. A screen parser can replace a pixel-only guess with a structured element.
-
-Emit revision events that reference prior hypotheses. Never overwrite history without an identity. Downstream responses record which hypothesis version they used.
-
-If a revision invalidates a low-risk answer, the assistant may correct itself. If it affects a proposed action, the action must be revalidated before confirmation.
+ASR, OCR and UI hypotheses can change. Emit identified revisions; record the hypothesis versions used by each response.
+Correct affected low-risk answers explicitly. Revalidate affected proposals before confirmation or execution.
 
 ## Use adaptive jitter buffers
 
-A jitter buffer trades completeness against delay. One fixed buffer cannot handle stable broadband and a variable mobile uplink well.
+Buffers trade completeness against delay; measure the policy by network, mode and device.
 
 ### Audio buffer
 
-Packetized audio usually arrives in small frames. The edge estimates recent delay variation and chooses a target playout or processing delay. A common range might be 40 to 120 milliseconds, subject to measured network conditions.
-
-When packets miss the deadline, the decoder can use packet-loss concealment. Waiting too long for a missing frame delays every later word. The system should expose loss and concealment to the speech encoder.
+Bound processing/playout delay; expose missed packets and concealment to ASR. Avoid blocking all later speech on a missing frame.
 
 ### Video buffer
 
-Video can tolerate more reordering, but old frames have less product value. Prefer dropping dependent frames until the next decodable keyframe rather than building an ever-growing queue.
-
-The session can request a fresh keyframe after a gap. Screen sharing can send semantic change regions or UI-tree deltas instead of full high-frame-rate video.
+Bound queues; discard unusable dependent frames, request keyframes and consider semantic screen/UI deltas.
 
 ### Adaptive policy
 
-The policy uses recent jitter, packet loss, bandwidth, mode, and device health. It should change slowly enough to avoid oscillation. It should shrink after recovery rather than preserving a large delay for the whole session.
-
-Track the chosen buffer size as an event. Otherwise a latency regression may look like model slowdown even when the transport added the delay.
+Use jitter/loss/bandwidth, mode and device health; control oscillation and shrink delay after recovery. Log policy changes.
 
 ### Overload behavior
 
-When the edge is overloaded, preserve audio and control events before redundant video. Drop intermediate camera frames while retaining keyframes and scene changes. Keep text and confirmation messages reliable.
-
-Do not delay cancellation behind media processing. Barge-in and consent revocation use a high-priority control channel.
+Prioritize audio, reliable text/confirmation and keyframes over redundant video.
+Cancel/revoke controls bypass media queues through reserved processing paths.
 
 ## Design voice activity, endpointing, and barge-in together
 
-Voice activity detection (VAD) estimates whether speech is present. Endpointing decides whether the user's turn is complete. Barge-in stops assistant output when the user begins speaking. These functions share signals but have different costs.
+VAD detects speech; endpointing commits a turn boundary; barge-in stops output. Their errors have different costs.
 
 ```mermaid
 stateDiagram-v2
@@ -384,19 +432,16 @@ stateDiagram-v2
   Cancelling --> UserSpeaking: output stopped and input active
   AssistantSpeaking --> Listening: output completes
   AssistantPlanning --> UserSpeaking: user resumes before output
+  class Listening viz-wide
 ```
 
 ### Run fast VAD on the device
 
-The device can detect probable speech onset with very low delay. It should immediately lower or stop assistant playback and send a cancellation event. Cloud confirmation can follow.
-
-Local VAD needs noise suppression, echo cancellation, and awareness of the assistant's own output. Otherwise the speaker output can trigger false barge-in.
+Stop/duck locally before cloud confirmation. Test noise, echo and self-output to avoid false barge-in.
 
 ### Combine acoustic and semantic endpointing
 
-Silence alone is a weak end-of-turn signal. “Can you compare the first...” may contain a pause before the object name. A semantic endpoint model can estimate whether the partial transcript appears complete.
-
-Use a layered policy:
+Allow incomplete phrases to continue under a bounded layered policy:
 
 1. a minimum silence prevents endpointing between phonemes;
 2. acoustic evidence proposes an endpoint;
@@ -404,43 +449,33 @@ Use a layered policy:
 4. a maximum wait bounds delay;
 5. an explicit tap or command ends the turn immediately.
 
-The policy can wait longer after conjunctions or incomplete questions. It can commit sooner after a direct command and a strong punctuation hypothesis.
 
 ### Keep endpoint decisions reversible for a short period
 
-The system may start planning from a tentative endpoint. It should avoid committing audible output until confidence rises or a short hold expires. If the user resumes, cancel speculative work.
-
-This approach hides some reasoning latency without forcing an early conversational interruption.
+Speculate from tentative endpoints under a bounded hold; cancel work if speech resumes before output commitment.
 
 ### Set a barge-in objective
 
-Measure from detected user speech onset to the last audible assistant sample. A practical target may be below 200 milliseconds at p95 on supported devices. Measure device playback buffers, network cancellation, server cancellation, and already-buffered synthesized speech.
-
-Stop sending new audio first. Flush or duck queued device audio next. Cancel text-to-speech and model generation after that. Preserve the partial assistant response in the transcript only if the product labels it interrupted.
+Measure the declared onset-to-last-audible interval, including detection delay when the onset anchor requires it.
+Stop local playback and new audio, then cancel synthesis/model work; acknowledge playback and label interrupted transcript output.
+Set device-slice percentile targets from measured requirements, not the core's individual trace.
 
 ### Resolve simultaneous speech
 
-Some users say short acknowledgments while the assistant continues. The product may treat “yes” or “right” differently from a new question. Start with a simple rule that always yields to sustained user speech.
-
-Later, add an overlap classifier with conservative thresholds. Users should have an explicit stop control that bypasses classification.
+Evaluate backchannels separately from sustained interruptions. Explicit stop bypasses any overlap classifier.
 
 ## Stream modality encoders with bounded state
 
-A live session can last hours. Reprocessing all prior media after each packet is impossible. Each encoder needs bounded incremental state and a declared reset contract.
+Bound incremental encoder state and define reset/replay behavior for long sessions.
 
 ### Streaming speech path
 
-The audio path performs echo cancellation, denoising, feature extraction, streaming encoding, decoding, punctuation, and optional speaker attribution.
-
-A chunked encoder can cache prior attention or recurrent state. Limited lookahead improves recognition but adds visible delay. The decoder emits partial hypotheses with stability scores and token time ranges.
-
-Keep final transcript words, timing, confidence, speaker hypothesis, and revision lineage. Do not retain raw audio longer than the consent and debugging policy allows.
+Control echo/noise; extract features, encode/decode incrementally, punctuate and optionally attribute speakers.
+Measure lookahead versus recognition/delay. Preserve token times, stability, confidence, speaker hypotheses and revisions under retention policy.
 
 ### Camera path
 
-Camera video contains heavy temporal redundancy. Use a cheap scene-change and quality model before the expensive visual encoder.
-
-Possible outputs include:
+Sample by scene change, quality and question detail. Possible outputs:
 
 - sampled frame embeddings;
 - detected objects and tracks;
@@ -450,7 +485,7 @@ Possible outputs include:
 - safety-sensitive content labels;
 - uncertainty and frame quality.
 
-Use different sampling policies for a static document and a moving object. A user asking about a connector may need a sharp crop. A room-description request may need a wider scene sample.
+Static documents, moving objects, sharp connector crops and room views need different sampling policies.
 
 ### Screen path
 
@@ -462,17 +497,16 @@ Prefer structured sources when the platform exposes them:
 4. screen pixels and optical character recognition;
 5. pointer, keyboard, and scroll events.
 
-The accessibility tree gives semantic roles and state. Pixels cover custom canvases and remote desktops. Combining them needs spatial and temporal registration.
-
-Every screen snapshot carries application identity, window identity, bounds, scale, and capture time. A crop without this metadata can point to the wrong element after resize or scroll.
+Register semantic and pixel evidence spatially and temporally.
+Carry application/window identities, bounds, scale and capture time through crops, scroll and resize.
 
 ### Typed text path
 
-Typed text is reliable and low bandwidth, but its timing still matters. A correction sent after a spoken question should supersede the relevant phrase. Chat from another meeting participant needs speaker and consent metadata.
+Identify typed corrections and their targets. Attribute meeting chat to its speaker and consent scope.
 
 ### Fusion path
 
-The context assembler can represent evidence as temporally anchored segments:
+Represent aligned evidence with explicit provenance and scope:
 
 ```text
 EvidenceSegment
@@ -487,88 +521,83 @@ EvidenceSegment
   permission_scope
 ```
 
-A multimodal model can attend to selected raw features while the language model receives compact semantic records. This hybrid avoids turning every video frame into a long token sequence.
+Select raw features or semantic records by required detail; do not assume summaries preserve all needed evidence.
 
 ### Reset and recovery
 
-Encoder caches are performance state, not authoritative history. After failover, the service can rebuild from a bounded replay window and the latest stable summaries.
-
-If cache reconstruction is too slow, mark that modality warming. Continue with other inputs and tell the user when the requested answer needs the missing context.
+Caches are rebuildable performance state, not authoritative history. Use bounded permitted replay and stable summaries; mark unavailable context as warming.
 
 ## Assemble context around the active question
 
-The assistant should not place the entire session into every model call. Context selection uses the current turn, product mode, temporal references, evidence freshness, and memory policy.
+Select context by active question, mode, temporal reference, freshness and memory policy.
 
 ### Use a layered context
 
-1. **Control context:** policy, mode, allowed tools, consent, and response constraints.
-2. **Current turn:** stable and partial transcript, typed corrections, and interaction state.
-3. **Aligned media:** fresh frames, UI structure, visual features, and audio events near the turn.
-4. **Session summary:** compact facts and unresolved references from the current session.
-5. **Retrieved history:** older episodes selected for the present request.
-6. **Tool evidence:** authoritative results with timestamps and source identities.
+1. **Control:** policy, mode, tools, consent, response limits.
+2. **Turn:** transcript, corrections, interaction state.
+3. **Media:** aligned frames, UI, visual/audio features.
+4. **Summary:** session facts and unresolved references.
+5. **History:** relevant older episodes.
+6. **Tools:** authoritative timestamped results and sources.
 
-Untrusted visual text, transcripts, web content, and tool output remain evidence. They cannot alter tool authority or consent policy.
+Observed text, transcripts, web and tool output are evidence, not authority to change policy.
 
 ### Resolve temporal language
 
-Words such as “this,” “that,” “before,” and “when I clicked” require event references. The system should bind them to candidate intervals and preserve uncertainty.
-
-For “What changed after I clicked Save?”, retrieve the UI state before the click, the operating-system input event, the state after it, and any tool result. Do not answer from the newest frame alone.
+Bind “this,” “before” and “after Save” to candidate intervals with uncertainty.
+Retrieve pre-click UI, the input event, post-click UI and tool results, not just the newest frame.
 
 ### Budget visual detail
 
-Start with semantic summaries and a small set of high-value frames. Add crops or raw features when the question requires fine detail. A second model pass can request more evidence through a read-only retrieval operation.
-
-The request should state what evidence was absent. Silent omission makes a hallucinated visual answer look grounded.
+Start compactly; request permitted crops/raw features through read-only retrieval when needed. Record absent evidence explicitly.
 
 ### Prevent context races
 
-The screen can change while context is assembled. Assign a `context_snapshot_id` with per-modality watermarks. The generated response cites that snapshot.
-
-For ordinary advice, a newer event can wait for the next turn. For a tool proposal, any relevant newer screen or permission event invalidates the proposal and forces revalidation.
+Assign `context_snapshot_id` with per-modality evidence horizons/progress. Cite it from responses.
+Revalidate actions after relevant newer screen, permission, argument or hypothesis events.
 
 ## Separate session state from durable memory
 
-Memory should match the user's expectation and the product purpose.
+Separate memory by purpose, scope and retention.
 
 ### Ephemeral media state
 
-Jitter buffers, encoder caches, partial transcripts, and temporary frame features expire quickly. They exist to complete the current interaction.
+Expire buffers, caches, partial hypotheses and temporary features under a short declared policy.
 
 ### Session record
 
-The session record contains stable transcript segments, evidence references, model responses, interruption state, tool proposals, and action outcomes. Retention differs by product and tenant.
+Retain permitted stable transcripts, evidence, responses, interruptions, proposals and outcomes under tenant/product policy.
 
 ### User-approved preferences
 
-Language, voice speed, accessibility preferences, and explicit personal facts can persist when the user opts in. Each item has source, creation time, purpose, confidence, expiration, and deletion identity.
+Opt-in items need source, creation time, purpose, confidence, expiry and deletion identity.
 
 ### Meeting memory
 
-Meeting summaries need participant and tenant scope. A later participant should not gain access because one attendee used the assistant. Retrieval checks current membership and the meeting's sharing policy.
+Apply participant/tenant scope and current sharing/membership checks; attendance alone does not grant historical access.
 
 ### Learned product patterns
 
-Aggregate quality improvements should use consented, minimized data. Enterprise sessions remain excluded unless the contract says otherwise. Raw media is a poor default training artifact because it carries bystander and background information.
+Use minimized consented data; retain enterprise exclusions. Raw media can expose bystanders and backgrounds.
 
 ### Memory writes
 
-The model proposes a memory item. A memory policy decides whether the category is allowed, whether confirmation is required, and how long it lives. Sensitive inferred traits should not become durable memory.
+Policy approves category, confirmation and lifetime; model proposals do not authorize sensitive inferred-trait storage.
 
 ### Deletion
 
-A deletion request removes the authoritative item and invalidates transcript indexes, frame indexes, summaries, embeddings, and cached context that derive from it. The system records completion without retaining the deleted content.
-
-Backups follow a bounded expiry policy. Evaluation sets and incident artifacts need separate legal and user-consent rules. A deletion verifier should test that authorized retrieval no longer returns the subject.
+Delete authoritative items; invalidate derived transcript/frame indexes, summaries, embeddings and context caches.
+Record completion without content. Bound backup expiry and separately govern evaluation/incident artifacts.
+Verify that authorized retrieval no longer returns the deleted subject.
 
 ## Allocate an end-to-end latency budget
 
 Users experience delay from capture through playback. Model runtime is one part.
 
-Assume the user completes a spoken question on a healthy regional connection. A p95 target for first audible response might be about 850 milliseconds after the committed endpoint.
+Use speech end to first audible response as the planning path's explicit anchor.
+The following stage allocations total 830 ms; they are not measured stage p95s or an end-to-end percentile.
 
-| Stage | Example p95 budget | Notes |
+| Stage | Planning allocation | Notes |
 | --- | ---: | --- |
 | Final audio transport and jitter | 80 ms | Adaptive by network condition |
 | Endpoint decision after silence | 180 ms | Semantic policy can shorten or extend |
@@ -578,9 +607,11 @@ Assume the user completes a spoken question on a healthy regional connection. A 
 | Model time to first response token | 220 ms | Fast path for common conversational turns |
 | Initial text-to-speech audio | 90 ms | Time to the first playable streamed chunk |
 | Return transport and device playback | 70 ms | Includes device audio buffer |
-| **Total** | **830 ms** | Budgets overlap through speculation |
+| **Arithmetic sum** | **830 ms** | Not a percentile or deterministic upper bound |
 
-The arithmetic total is a diagnostic bound. Some work overlaps. The system can retrieve visual context while endpoint confidence rises. Text-to-speech can start after a stable opening clause.
+Define each stage's start/end events and concurrency in the trace; speculation can overlap work.
+Measure the actual speech-end-to-first-audio distribution by mode, network and device.
+An endpoint-commit metric excludes the preceding endpoint wait and needs its own allocation.
 
 ### Track several latency clocks
 
@@ -595,47 +626,39 @@ The arithmetic total is a diagnostic bound. Some work overlaps. The system can r
 
 ### Protect interactive queues
 
-Meeting summarization and background indexing should not delay live turns. Use workload classes, admission control, per-tenant quotas, and reserved interactive capacity.
-
-A long context request can route to a slower path after acknowledging the user. A fast response can say that it is checking the shared screen, then provide the grounded result when ready.
+Isolate background summaries/indexing with admission, quotas and interactive reserves. Acknowledge slower checks without inventing their result.
 
 ### Define mode-specific targets
 
-Screen guidance may accept a slower answer if it guarantees a fresh frame. Accessibility navigation may require lower action feedback latency. Meeting questions may tolerate more delay for speaker and temporal accuracy.
-
-One service-level objective for every mode will pressure teams to hide either quality or delay.
+Measure each mode's freshness/accuracy/delay trade-off; avoid one SLO that hides different requirements.
 
 ## Split work across device, edge, and cloud
 
-Placement follows privacy, latency, compute, battery, and update frequency.
+Choose placement by privacy, delay, compute, battery and update constraints.
 
 ### Device
 
-Good device candidates include capture, permission enforcement, source selection, echo cancellation, fast VAD, playback cancellation, low-cost scene change, redaction, and a small offline speech path.
-
-Device processing reduces media transfer and preserves basic function during outages. It also consumes battery, memory, and thermal budget. Older phones may need lighter policies.
+Keep capture/control, echo/VAD, approved redaction/sampling and defined offline functions local; measure memory, battery and thermal costs.
 
 ### Regional edge
 
-The edge handles transport, session authentication, clock mapping, adaptive jitter, reconnect state, traffic shaping, and nearby routing. It can host compact encoders when the latency and cost justify regional deployment.
+Host authenticated transport, clocks, jitter, reconnect, shaping/routing and justified compact encoders.
 
 ### Regional cloud
 
-The cloud hosts large multimodal models, durable event processing, retrieval, tool policy, shared memory, evaluation, and fleet management. Sensitive tenants can use dedicated regional deployments or approved private endpoints.
+Host approved heavier models, durable events, retrieval, action policy, memory and fleet services in permitted deployments.
 
 ### Placement decision
 
-Do not claim that all media should stay local or that all reasoning belongs in the cloud. Choose per stage.
-
-For example, keep raw screen pixels on device for an enterprise tenant. Send a redacted accessibility-tree representation and selected encrypted crops only when the user asks about a visual detail.
+Choose per stage. Local-only pixels do not automatically permit transmitting derived trees/crops; check their separate policy.
 
 ### Model update trade-off
 
-Cloud models update quickly and share accelerators efficiently. On-device models offer privacy and resilience but have slower fleet adoption. The contract should tolerate mixed encoder and model versions during staged rollout.
+Support explicitly compatible mixed client/encoder/model versions during staged rollout; measure placement-specific update and resilience costs.
 
 ## Degrade by modality instead of failing the whole session
 
-The session health record tracks each source independently.
+Track each source independently:
 
 | Failure | Continue with | User-visible behavior | Unsafe behavior to avoid |
 | --- | --- | --- | --- |
@@ -658,13 +681,12 @@ Every modality has a freshness state: current, delayed, stale, warming, absent, 
 
 ### Recovery
 
-On reconnect, the device sends the current clock epoch, source states, highest acknowledged sequence, and a fresh keyframe. The edge rejects duplicates and does not replay stale media as current.
-
-The assistant can summarize that some context was missed. It should not invent a continuous account of the gap.
+Reconnect sends epoch, source state, acknowledged sequence and fresh keyframe; authenticate activation, reject duplicates and preserve gaps.
+Do not invent continuity through missed context.
 
 ## Put tool use behind fresh evidence and explicit authority
 
-The assistant may propose a click, form edit, calendar draft, or device setting change. The action path must be stricter than the answer path.
+Actions require stricter evidence and authority than advice.
 
 ### Bind proposals to observed state
 
@@ -684,93 +706,81 @@ ActionProposal
   confirmation_policy
 ```
 
-If the window, focused element, arguments, permission, or relevant media changes, the proposal expires. A new proposal can explain the updated state.
+Expire affected proposals after window, focus, argument, permission or evidence changes.
 
 ### Prefer semantic targets
 
-Use stable element identity, application identity, and expected state instead of raw coordinates. Coordinates can change after scroll, zoom, resize, or remote rendering.
-
-When only pixels are available, highlight the proposed target and require confirmation. After execution, read the operating-system or application result before reporting success.
+Prefer stable element/application identity and expected state over coordinates.
+Pixel-only targeting needs explicit policy, highlighting and confirmation; verify resulting application state before reporting success.
 
 ### Keep tools narrow
 
-A screen-guidance assistant does not need general shell or filesystem access. Each product mode receives a small action catalog with argument limits and rate limits.
-
-The accessibility mode may receive bounded navigation operations. A meeting mode may create a draft action item without sending messages automatically.
+Use mode-specific catalogs with argument/rate limits, not general shell/filesystem access. Navigation or drafts do not grant message-sending authority.
 
 ### Handle unknown outcomes
 
-A timeout after dispatch does not prove failure. Query tool state by action identity or pause for reconciliation. Never repeat a consequential action only because the response was lost.
+A timeout does not prove failure. Query by action identity or reconcile before retrying a consequential effect.
 
 ## Make privacy and consent part of runtime state
 
-Consent is not a setup screen that disappears after onboarding. It changes what the live pipeline may capture, send, store, retrieve, and learn from.
+Apply live consent to capture, routing, storage, retrieval, processing, output and learning.
 
 ### Capture indicators
 
-Show persistent, modality-specific indicators for microphone, camera, window, meeting recording, and tool action. A global “assistant active” light is too vague.
-
-The device must stop capture when the user disables a source. Server policy should also reject packets created under an expired permission version.
+Show modality/action-specific indicators. Stop disabled capture; reject expired permission versions at controlled server boundaries.
 
 ### Window isolation
 
-Use operating-system window capture when available. Avoid full-display capture followed by cloud cropping. The latter exposes notifications and other applications before filtering.
-
-When a dialog opens outside the selected window, pause visual claims until the capture contract explains whether it is included.
+Use selected-window capture, not cloud cropping of a full display. Treat outside-window dialogs under an explicit capture contract.
 
 ### Meeting consent
 
-The product needs a participant policy, jurisdiction policy, and visible notification. Joining late, changing rooms, or adding an external participant can change consent state.
-
-If valid consent disappears, stop new capture and mark the timeline boundary. Existing retained data follows the declared retention contract.
+Joining, room changes and external participants can change consent. Apply reviewed participant/jurisdiction policy, notify and mark stop boundaries.
+Retained prior data remains subject to its declared policy; this guide provides no legal certification.
 
 ### Bystanders and background data
 
-Camera media can reveal faces, documents, homes, and health information. Use on-device redaction when possible. Avoid durable face identity unless the feature explicitly requires and authorizes it.
+Evaluate local redaction and sensitive background exposure. Durable face identity requires an explicit authorized purpose.
 
 ### Provider policy
 
-The model gateway checks tenant, region, media class, and provider agreement before routing. A provider outage cannot justify sending restricted media to an unapproved fallback.
+Check tenant, region, media class and agreement before routing, including fallbacks.
 
 ### Data minimization
 
-Store semantic events or selected evidence instead of continuous raw media when the product can still work. Debug sampling needs explicit rates, access, expiration, and redaction.
+Prefer sufficient minimized records. Debug sampling needs approved rates, access, redaction, expiry and deletion.
 
 ## Add safety controls around perception and response
 
-A multimodal assistant can make confident claims from weak or manipulated evidence. Safety depends on source quality, grounding, policy, and response behavior.
+Weak or manipulated perception requires independent grounding and authority checks.
 
 ### Ground claims
 
-Responses should carry internal evidence links. User interfaces can expose a frame thumbnail, transcript interval, or “screen last updated 4 seconds ago” when helpful.
-
-The model should abstain from exact identity, medical interpretation, or hazardous physical guidance when evidence and policy are insufficient.
+Link claims to evidence; expose relevant age/intervals. Abstain from unsupported identity, medical or hazardous physical claims.
 
 ### Detect conflicting evidence
 
-A screen message can instruct the assistant to ignore policy. Spoken instructions can conflict with typed corrections. A poster can contain text that resembles a command.
-
-Source type and authority resolve the conflict. User-authenticated control events have a different role from text observed in an image.
+Resolve typed/spoken/visual conflicts by authenticated source authority and correction lineage. Observed prompt-like text cannot grant privileges.
 
 ### Protect high-risk domains
 
-Medical, financial, legal, child-safety, and physical-control scenarios need narrower product behavior. The first release can restrict responses to information, emergency guidance, or approved workflows.
+Define reviewed medical, financial, legal, child-safety and physical-control limits before granting related capabilities.
 
 ### Resist media attacks
 
-Test adversarial audio, hidden text, rapid frame changes, replayed speech, synthetic participants, and manipulated timestamps. Transport authentication and sequence checks reduce replay risk. Policy must still limit any accepted instruction.
+Test manipulated audio/text/frames, replay, synthetic participants and timestamps. Authenticated transport does not itself authorize accepted instructions.
 
 ### Keep uncertainty visible
 
-The product can say that audio was unclear, the screen changed, or the camera view is too dark. A short clarification is better than a fluent unsupported answer.
+Disclose unclear audio, changed screens or dark views; ask a brief clarification instead of inventing detail.
 
 ## Observe the full interaction timeline
 
-The trace should explain delay, evidence, model behavior, interruption, and external effects without retaining unnecessary raw media.
+Trace delay, evidence, output and effects without unnecessary payload retention.
 
 ### Correlation identities
 
-Use session, turn, source, event, context snapshot, model request, output stream, tool action, and incident identifiers. Preserve parent-child relationships.
+Join session, turn, source, event, snapshot, model request, output, action and incident IDs with parent-child relationships.
 
 ### Stage telemetry
 
@@ -788,25 +798,24 @@ Record:
 
 ### Derived operational views
 
-Build views for slow turns, late-frame answers, false endpoints, incomplete cancellation, privacy denials, modality outages, and action reconciliation. Slice by device, network, language, tenant, region, mode, and model version.
+Track slow turns, stale answers, endpoint/cancel failures, denials, outages and reconciliation.
+Slice by device, network, language, tenant, region, mode and version.
 
 ### Privacy-aware traces
 
-Keep metadata broadly queryable and payload access narrow. Store hashes or redacted references when operators only need timing and version information. Access to raw sampled media should require an incident or evaluation purpose.
+Minimize trace metadata and restrict payload access by incident/evaluation purpose; use redacted references when timing/version data suffices.
 
 ### Alert on user-visible failure
 
-CPU and request-error alerts are insufficient. Alert when stale evidence supports current claims, barge-in misses its objective, endpoint errors spike, or a region sends media to an invalid processor.
+Alert on stale claims, audible-stop/endpoint failures and invalid processor routing, not only CPU/errors.
 
 ## Evaluate the system at several layers
 
-A single answer-quality judge cannot measure synchronization, cancellation, privacy, or external state.
+Use eight complementary layers; an answer judge cannot establish all system contracts.
 
 ### Component evaluation
 
-Measure streaming speech error, partial stability, speaker attribution, scene detection, object tracking, optical character recognition, UI parsing, synthesis quality, and VAD accuracy.
-
-Component scores help diagnosis. They do not prove that the complete assistant answers the right question at the right time.
+Measure ASR/stability/speakers, scene/tracking/OCR/UI, synthesis and VAD. Component scores diagnose, not prove complete task success.
 
 ### Temporal grounding evaluation
 
@@ -819,53 +828,48 @@ Build cases with controlled event order:
 - an old camera packet arrives after a new keyframe;
 - the user asks about an event before a click.
 
-Score event selection, ordering, freshness, and supported claims. Include timestamp uncertainty and missing packets.
+Score selection, order, freshness and supported claims under clock uncertainty and gaps.
 
 ### Interaction evaluation
 
-Use recorded and synthetic turn patterns with pauses, overlap, noise, backchannels, interruptions, and device echo. Measure endpoint decisions and audible cancellation directly.
-
-Human raters can judge natural rhythm, but instrumentation should supply onset and playback times. Memory of conversational delay is imprecise.
+Test pauses, overlap, noise, backchannels, interruption and echo. Instrument onset/playback timing; use human review for conversational quality.
 
 ### Task evaluation
 
-Create mode-specific tasks. Screen guidance can use reproducible application states and expected elements. Accessibility tasks can verify focus and final application state. Meeting questions can use known speaker and event timelines.
+Use reproducible application states, focus/outcome checks and known meeting speakers/timelines.
 
 ### Safety and privacy evaluation
 
-Test revoked consent, disallowed regions, hidden windows, background notifications, prompt-like visual text, synthetic voices, stale action proposals, and cross-tenant memory attempts.
-
-A severe privacy failure should fail the release gate even if aggregate task success improves.
+Test revocation, region/window/tenant boundaries, notifications, prompt-like media, synthetic voices and stale proposals. Severe failures remain independent vetoes.
 
 ### Partial-modality evaluation
 
-Remove, delay, corrupt, or forbid one modality. Verify that the system continues only when the request remains answerable. Check the user message and the absence of silent text-prior substitution.
+Remove/delay/corrupt/forbid inputs; check honest answerability and visible fallback, not silent substitution from model priors.
 
 ### Long-session evaluation
 
-Run sessions for hours. Test encoder-state growth, summary drift, speaker changes, clock epochs, device handoff, reconnect, memory deletion, and context retrieval after compaction.
+Test bounded state, summary drift, speakers, epochs, handoff/reconnect, deletion and retrieval after compaction across hours.
 
 ### Stochastic evaluation
 
-Repeat model-dependent cases. Report success probability, severe-tail count, latency distribution, and cost. Pin every component version and retain the evidence identities needed for replay.
+Repeat model-dependent cases; report success, severe-tail counts, latency and cost with pinned versions and replay evidence.
 
 ## Connect offline evaluation to online evidence
 
-Offline suites provide controlled coverage. Production supplies network diversity, real conversational rhythm, and new failure families.
+Use controlled coverage alongside monitored live diversity, not as interchangeable evidence.
 
 ### Online metrics
 
-Track useful completion, correction, interruption, modality disablement, repeated questions, action undo, support reports, and privacy settings changes. Interpret them by mode and exposure.
-
-A low camera-disable rate does not prove comfort. Users who dislike capture may never start the feature. Compare eligible, exposed, started, completed, and retained populations.
+Track completion, corrections, interruptions, disablement, repeats, undo, support and privacy changes by mode.
+Distinguish eligible, exposed, started, completed and retained populations; low disablement does not prove comfort.
 
 ### Sample review
 
-Review consented samples from failure buckets rather than random traffic alone. Useful buckets include high latency, stale evidence, repeated barge-in, user correction, action undo, and cross-modal disagreement.
+Review consented failure buckets plus representative samples: delay, stale evidence, interruption, correction, undo and modality conflict.
 
 ### Counterfactual tests
 
-Run shadow alternatives on recorded or consented sessions without changing user output. Compare endpoint policy, context selection, route, and safety decisions against the shipped path.
+Shadow permitted endpoint/context/routing/policy alternatives without changing output. Shadow comparisons alone do not identify causal product effects.
 
 ### Release gates
 
@@ -880,69 +884,67 @@ Require all of the following:
 
 ## Plan capacity and cost around live sessions
 
-Peak concurrency drives state and accelerator demand. Average daily users do not size the interactive fleet.
+Use concurrency and measured per-session demand, not DAU or median duration alone.
 
 ### Session state
 
-Keep small reconnect and routing state at the edge. Store durable events asynchronously with bounded buffering. Encoder caches live near the assigned worker and expire after the session.
+At 2 MiB/session, 20,000 sessions require 39.0625 GiB before caches, replication and headroom.
+Bound reconnect/cache state and replay. Durable acknowledgment requires committed evidence or an approved bounded spool, not an unprotected asynchronous queue.
 
 ### Model scheduling
 
-Batch across active sessions for encoder and decoder efficiency, but cap waiting time. Continuous batching should respect interactive deadlines and cancellation.
-
-Use a fast path for common turns and a deeper path for fine visual reasoning. The router can consider required modality, evidence detail, language, risk, device, queue, and tenant policy.
+Batch under deadline/cancellation limits. Route by required detail/modality, language, risk, device, queue and tenant policy.
 
 ### Visual compute
 
-Do not encode unchanged screens at camera frame rates. Change detection, structured UI deltas, region crops, and question-driven sampling reduce cost.
+Measure change detection, UI deltas, crops and question-driven sampling against grounding gates.
 
 ### Admission control
 
-When capacity is scarce, preserve active turns and accessibility sessions before background meeting summaries. Reject or delay new expensive visual operations with a clear fallback.
+Protect active/accessibility work over background summaries. Reject/degrade expensive requests explicitly when capacity or evidence durability is unavailable.
 
 ### Unit economics
 
-Track cost per useful session minute and per completed task. Break cost into transport, edge state, speech, vision, language model, synthesis, storage, and human review.
-
-Optimization should preserve interaction and grounding gates. A cheaper route that answers from stale frames has poor unit economics despite lower compute cost.
+Ledger transport, state, speech, vision, reasoning, synthesis, storage and review per useful minute/completed task.
+Do not count unsupported output as useful completion.
 
 ## Roll out from observation to bounded action
 
 ### Phase 0: instrument the prototype
 
-Add common event identities, playback acknowledgments, evidence horizons, and stage latency. Reproduce the stale-frame and late-barge-in incidents before changing the architecture.
+Instrument identities, playback, evidence horizons and latency; reproduce both incidents.
 
 ### Phase 1: voice and text pilot
 
-Launch full duplex speech with text fallback to employees and invited users. Keep camera, screen, and tools disabled. Validate endpointing, cancellation, regional routing, and long-session stability.
+Pilot duplex speech/text without visuals/tools. Validate endpointing, cancellation, regions and long-session stability.
 
 ### Phase 2: read-only visual pilot
 
-Add explicit camera and selected-window sharing. Answers expose freshness and can abstain. No visual state can trigger an external action.
+Pilot explicit camera/window sharing with freshness/abstention, never external actions.
 
 ### Phase 3: screen guidance
 
-Add UI structure, temporal references, and reproducible application tasks. Pilot with a few applications whose semantics and capture behavior are understood.
+Pilot known applications with UI structure, temporal references and reproducible tasks.
 
 ### Phase 4: reversible tools
 
-Allow narrow actions bound to context snapshots and explicit confirmation. Keep undo available and verify final state.
+Pilot confirmed snapshot-bound actions; preserve undo and verify final state.
 
 ### Phase 5: enterprise and meeting expansion
 
-Add regional policy, tenant retention, meeting consent, administrative controls, and audited support. Expand only after deletion and isolation tests pass.
+Gate enterprise/meeting expansion on region, retention, consent, administrative controls, audited support, deletion and isolation.
 
 ### Rollback units
 
-Roll back encoder, endpoint policy, model route, context selector, synthesis, tool policy, or client release independently. A global product rollback should be rare.
+Independently roll back encoders, endpointing, routing, context, synthesis, tool policy or clients under tested compatibility rules.
 
 ### Stop conditions
 
-Stop expansion after any unauthorized capture, cross-tenant context, repeated stale-state action, unexplained tool effect, or material accessibility regression. Repair the relevant capability before increasing authority.
+Stop for unauthorized capture, tenant leaks, stale actions, unexplained effects or material accessibility regression; repair before expanding authority.
 
 ## Walk through the stale-screen incident
 
-The prototype answered “Click Retry” after the application had already recovered and replaced the dialog.
+The old Retry dialog disappears before the prototype recommends clicking it.
 
 1. A mobile uplink stalls for four seconds.
 2. Audio continues through a lower-bandwidth path.
@@ -963,7 +965,7 @@ The production design changes the outcome:
 7. Otherwise the assistant says the screen view is stale and asks the user to refresh sharing.
 8. Any prior action proposal bound to the old snapshot expires.
 
-The incident review queries all responses produced with the affected timeline version, transport condition, and freshness decision. It does not require searching raw video manually.
+Query affected responses by timeline version, transport condition and freshness decision, without searching raw video.
 
 ### Corrective actions
 
@@ -977,11 +979,9 @@ The incident review queries all responses produced with the affected timeline ve
 
 ## Walk through the barge-in incident
 
-The user starts speaking while 900 milliseconds of synthesized audio remains queued on the device.
+The synthetic 900 ms incident isolates queued client playback despite prompt server cancellation.
 
-The server canceled generation quickly, but the client playback buffer continued. Server-only latency made the system look healthy.
-
-The corrected flow is:
+Correct the complete path:
 
 1. local VAD detects sustained user speech;
 2. the client immediately ducks and flushes assistant playback;
@@ -997,250 +997,178 @@ The service-level objective uses the last audible sample, not the server cancell
 
 ### Client media team owns
 
-- capture permissions and indicators;
-- selected-source isolation;
-- device preprocessing and echo cancellation;
-- local VAD and playback cancellation;
-- battery, thermal, and client compatibility;
-- playback acknowledgments and offline fallback.
+Capture/indicators/isolation, preprocessing/echo/VAD, playback/cancel acknowledgments, device resources/compatibility and defined offline behavior.
 
 ### Real-time platform owns
 
-- transport and reconnect;
-- clock mapping and jitter policy;
-- timeline ordering and watermarks;
-- interactive scheduling and session state;
-- common event schemas and reliability objectives.
+Transport/reconnect, clocks/jitter/timeline, bounded state, scheduling and shared reliability/schema contracts.
 
 ### Multimodal ML team owns
 
-- speech, vision, fusion, routing, and synthesis models;
-- context selection and evidence quality;
-- model evaluations and slice performance;
-- model release and fallback behavior.
+Speech/vision/fusion/routing/synthesis, context evidence, slice evaluation, model releases and fallback behavior.
 
 ### Product teams own
 
-- mode semantics and task outcomes;
-- user controls and explanations;
-- action catalogs and confirmation experience;
-- domain evaluation cases;
-- support and feedback loops.
+Mode semantics/outcomes, controls/explanations, action catalogs/confirmation, domain tests and support/feedback.
 
 ### Privacy, security, and safety owners own
 
-- consent and retention policy;
-- provider and regional constraints;
-- threat models and severe release gates;
-- incident review requirements;
-- audit and deletion assurance.
+Consent/retention, provider/region restrictions, threat models, severe gates, incident review and deletion assurance.
 
-Shared ownership cannot mean unclear incident authority. Each failure class needs one primary responder and tested escalation.
-
-The real-time platform owns the end-to-end interaction SLO and assigns sub-budgets to client, model, synthesis, and transport owners. A miss is diagnosed across the full timeline rather than transferred between teams at component boundaries.
+Assign one primary responder and tested escalation per failure class.
+The real-time platform owns the end-to-end interaction SLO; client/model/synthesis/transport owners accept named sub-budgets.
+Diagnose the full timeline rather than transferring misses between teams.
 
 ## Decide what to build, buy, and keep replaceable
 
 ### Likely external capabilities
 
-- commodity real-time transport;
-- speech or synthesis models for early releases;
-- large multimodal model inference;
-- device codec support;
-- managed regional compute and object storage.
+Transport, codecs, speech/synthesis, large-model inference and regional compute/storage are capability-specific buy candidates.
 
 ### Likely company-specific capabilities
 
-- product-mode contracts;
-- event-time synchronization and evidence horizons;
-- context and freshness policy;
-- consent integration;
-- tool authority tied to observed state;
-- evaluation suites and incident linkage;
-- cross-device interaction experience.
+Retain product modes, timeline/evidence/freshness, consent, observed-state authority, evaluations/incident linkage and cross-device interaction contracts.
 
 ### Stable interfaces
 
-Keep media envelopes, context snapshots, evidence references, model requests, action proposals, and evaluation records versioned independently from a provider.
-
-Provider portability does not require identical behavior. It requires measurable behavior, exportable state, and a bounded migration path.
+Version media, snapshots, evidence, requests, proposals and evaluation records independently of providers.
+Portability requires exportable state, measured behavior and bounded migration, not identical outputs.
 
 ### Build-buy review
 
-Review quality, regional availability, latency, cost, data terms, failure behavior, observability, and exit effort per capability. Avoid one suite decision for transport, speech, vision, reasoning, and synthesis.
+Compare quality, regions, delay, cost, data terms, failure behavior, observability and exit effort separately per capability.
 
 ## Make staff-level decisions explicit
 
-A staff candidate should make the reusable technical contracts precise.
-
-1. Define one event-time envelope across modalities.
-2. Set mode-specific freshness and latency policies.
-3. Design adaptive jitter, endpointing, and barge-in as one interaction system.
-4. Keep streaming encoder state bounded and recoverable.
-5. Make partial-modality behavior explicit.
-6. Bind tool proposals to current evidence.
-7. Join transport, model, playback, and action traces.
-8. Roll out through representative product slices.
-9. Align service ownership with failure classes.
-
-The candidate should defend one mechanism under pressure. Strong choices include clock epochs, watermarks, endpoint policy, context snapshots, playback cancellation, or stale action invalidation.
+Specify reusable timeline, mode, interaction, bounded-state, degradation, action, trace, rollout and ownership contracts.
+Defend one mechanism precisely: epoch activation, watermark semantics, endpointing, snapshots, playback cancellation or proposal invalidation.
 
 ## Add principal-level decisions
 
-A principal candidate chooses the shared boundary across products and organizations.
-
-1. Standardize timeline, consent, evidence, and action contracts before standardizing every model.
-2. Keep product-specific interaction and outcome semantics with product teams.
-3. Decide which encoders and gateways need regional shared operation.
-4. Balance live experience, privacy, accessibility, reliability, and model capability investments.
-5. Preserve a useful text or local fallback when cloud multimodal reasoning fails.
-6. Define evidence that expands or narrows each product mode.
-7. Fund client, platform, ML, evaluation, and retirement work together.
-8. Develop technical owners for synchronization, interaction, grounding, and privacy.
-
-Principal scope appears in shared-boundary, portfolio, and authority decisions. Adding more modalities to one diagram does not demonstrate it.
+Standardize contracts before models; retain product outcomes locally and justify shared regional encoders/gateways.
+Fund client/platform/ML/evaluation/retirement together. Balance model capability against interaction, privacy, accessibility, reliability and useful local/text fallback.
+Develop technical owners and evidence-based expansion/retirement rules.
 
 ## Add senior-principal decisions
 
-Titles vary across companies. This section describes organization-wide technical scope rather than a universal title mapping.
+Titles vary; this section describes decision scope, not a universal level mapping.
 
 ### Set durable interaction doctrine
 
-The organization can adopt rules that survive specific models:
-
-- user control has a direct path to capture and playback;
-- event time governs live evidence;
-- missing modalities cause visible degradation;
-- consequential actions require fresh, authoritative state;
-- consent and purpose follow derived data;
-- product outcomes stay with product owners.
+Preserve direct capture/playback control, event-time evidence, visible degradation, fresh-state authority, derivative consent/purpose and product-owned outcomes.
 
 ### Federate technical authority
 
-Principal engineers can own real-time transport, multimodal models, interaction policy, privacy, and product adoption. Define interface authority, release rights, incident command, and appeal paths.
-
-The senior-principal role keeps those directions coherent without reviewing every model or product change.
+Delegate transport, models, interaction, privacy and adoption directions with interface/release rights, incident command and appeals.
+Keep coherence without central approval of every change.
 
 ### Balance a multi-year portfolio
 
-Investments compete across on-device models, regional capacity, foundational models, accessibility, privacy infrastructure, evaluation, and new product modes. A model upgrade may be less valuable than fixing interruption or consent failures.
-
-Use quarterly evidence to expand, narrow, or retire bets. Preserve budget for reliability and old-client retirement.
+Compare device/regional/model/accessibility/privacy/evaluation/mode investments quarterly; expand, narrow or retire from outcome evidence.
+Reserve reliability and old-client retirement budgets. Better models may matter less than fixing interruption or consent.
 
 ### Plan for external change
 
-Device platforms can restrict capture APIs. Regulators can change consent rules. Providers can remove models or regions. Networks and accelerators can change cost.
-
-Stable event, evidence, consent, and action contracts let implementation move without redefining every product.
+Capture APIs, consent rules, providers/regions and compute/network costs can change. Preserve stable contracts while revising placement and suppliers.
 
 ### Design succession and reversal
 
-Document decision rights, compatibility policy, incident lessons, quality thresholds, and retirement criteria. Another leader should be able to challenge and change the direction from recorded evidence.
-
-State what would reverse centralization. For example, regulated tenants may require isolated execution while retaining the common timeline and evaluation formats.
+Record decision rights, compatibility, incidents, thresholds and retirement/reversal evidence for a successor.
+Regulated tenants may justify isolated execution while preserving common timeline/evaluation formats.
 
 ### Retain technical depth
 
-A senior-principal candidate should still reason precisely about one mechanism. They might derive a watermark policy, bound barge-in latency, explain context invalidation, or trace a cross-region consent change.
-
-Broad organizational language without mechanism is weak evidence.
+Derive one actual watermark, cancellation, invalidation or consent mechanism; organizational scope does not replace technical depth.
 
 ## Compare rejected architectures
 
 ### Send every stream directly to one model
 
-This simplifies a demo but hides event time, cost, degraded modes, and source authority. Preprocess and align media before assembling question-specific context.
+Question-specific alignment, source authority and degradation remain necessary even behind a unified model API.
 
 ### Order media by arrival
 
-This works on stable networks and fails after jitter or reconnect. Preserve capture time, clock epoch, sequence, and bounded lateness.
+Arrival order fails after jitter/reconnect; preserve event time, epochs, sequence and bounded lateness.
 
 ### Wait for every modality
 
-This improves completeness while making conversation depend on the slowest stream. Declare request-specific required modalities and freshness.
+Optional video must not delay unrelated speech. Declare required modalities per request.
 
 ### Use silence as the only endpoint
 
-This clips pauses or adds excessive delay. Combine acoustic, semantic, dialogue, and explicit controls.
+Combine acoustic, semantic, dialogue and explicit controls; measure pause clipping against delay.
 
 ### Cancel only on the server
 
-Queued device audio can keep playing. Stop playback locally and measure the last audible sample.
+Queued client audio remains audible; local playback evidence defines success.
 
 ### Keep continuous raw media for debugging
 
-This simplifies retrospective review while creating privacy, security, and cost exposure. Retain selected consented evidence with strict access and expiry.
+Retain only approved sufficient evidence with controlled access and expiry.
 
 ### Execute screen actions from pixel coordinates
 
-Coordinates become stale after layout change. Prefer semantic element identity and verify final application state.
+Layout changes invalidate coordinates. Prefer semantic targets and authoritative resulting state.
 
 ### Make one team own every modality
 
-Central ownership can disconnect product semantics from infrastructure. Use common contracts with clear domain and product ownership.
+Keep common contracts without removing product-specific outcome ownership.
 
 ## Structure a 60-minute interview
 
 ### Minutes 0 to 7: define modes and user contract
 
-Name the four product modes. Clarify full duplex, authority, consent, regions, devices, scale, and current incidents. State that media shares an event-time timeline while modes keep separate freshness and latency policies.
+Clarify modes, duplex, authority, consent, regions, devices and scale. Use the two incidents to establish distinct freshness/control contracts.
 
 ### Minutes 7 to 15: define success and invariants
 
-Choose interaction, grounding, privacy, reliability, and cost metrics. Define event time, evidence horizons, optional modalities, cancellation, retention, and explicit degradation.
+Choose mode-specific metrics and the twelve invariants; name evidence and enforcement boundaries.
 
 ### Minutes 15 to 25: draw the architecture
 
-Connect device capture, edge session handling, synchronization, streaming encoders, context assembly, model routing, output, action policy, event logs, and evaluation.
+Draw capture through playback, plus independent action, consent and evidence paths.
 
 ### Minutes 25 to 37: take one technical deep dive
 
-Choose one:
-
-- clock synchronization, jitter, and watermarks;
-- VAD, endpointing, and barge-in;
-- streaming encoders and context selection;
-- screen freshness and action invalidation;
-- long-session state and memory;
-- partial-modality recovery.
+Choose clocks/buffers, interaction, encoders/context, action freshness, long-session memory or modality recovery; trace concrete states and limits.
 
 ### Minutes 37 to 45: cover evaluation and safety
 
-Explain temporal grounding cases, interaction instrumentation, privacy tests, severe release gates, partial-modality evaluation, and online evidence.
+Cover temporal/interaction/privacy tests, severe gates, missing inputs and online selection limits.
 
 ### Minutes 45 to 52: cover operation and rollout
 
-Define stage budgets, degraded modes, incident linkage, rollout phases, rollback units, and ownership.
+Declare latency anchors, degraded modes, incident linkage, phased authority, rollback and primary responders.
 
 ### Minutes 52 to 57: make principal decisions
 
-Choose shared versus product-specific capabilities. Discuss build-buy, regional placement, portfolio evidence, and technical ownership.
+Defend shared boundaries, per-capability buy/build, regional placement, investment evidence and technical ownership.
 
 ### Minutes 57 to 60: add senior-principal scope
 
-State durable doctrine, federated authority, external change, succession, and evidence that would reverse a major platform choice.
+State durable rules, delegated authority, external risks, succession and reversal evidence.
 
 ## Distinguish answer levels
 
 ### Senior
 
-Designs one reliable live assistant experience. It covers streaming media, a latency target, endpointing, grounding, fallback, and product evaluation.
+Defend one complete live experience, including measured interaction, grounding, fallback and outcomes.
 
 ### Staff
 
-Defines reusable synchronization, context, degradation, action, and observability contracts across several modes. It remains precise during a transport, model, or interaction follow-up.
+Defend reusable contracts across modes and changed transport/model/interaction conditions.
 
 ### Principal
 
-Chooses shared capabilities across products, balances infrastructure and model investments, assigns technical ownership, and keeps regional or product variation behind stable contracts.
+Defend cross-product boundaries, investments, technical ownership and regional/product variation.
 
 ### Senior principal
 
-Defines durable interaction, consent, evidence, and authority doctrine across principal-owned directions. It handles external change, succession, portfolio reversal, and retained technical depth.
+Defend durable rules across delegated directions, including external change, succession, reversal and technical depth.
 
 ## Observer scorecard
 
-Score each dimension from 0 to 2.
+Score each practice dimension from 0 to 2; these are not validated hiring predictions.
 
 | Dimension | 0 | 1 | 2 |
 | --- | --- | --- | --- |
@@ -1257,40 +1185,17 @@ Score each dimension from 0 to 2.
 | Senior-principal scope | Says company-wide | Adds doctrine | Federates leaders and plans for external change, succession, and reversal |
 | Communication | Lists components | Uses a structure | Preserves the decision while changing technical depth under challenge |
 
-A staff target should score 2 on synchronization, interaction, reliability, and ownership. A principal target should also score 2 on shared boundaries and portfolio. A senior-principal target should add doctrine, delegated leadership, succession, and reversal.
+Use missing mechanisms to select another practice trace. Company titles and decision rights vary.
 
 ## Strong signals
 
-- Separates product modes before selecting a model.
-- Uses event time and capture identity instead of arrival order.
-- Explains clock epochs, bounded lateness, and request-specific freshness.
-- Treats VAD, endpointing, playback, and barge-in as one measured loop.
-- Uses streaming encoder state and question-driven visual sampling.
-- Makes every modality optional and defines visible degraded behavior.
-- Binds screen actions to a context snapshot and authoritative final state.
-- Includes capture consent, window isolation, provider policy, retention, and deletion.
-- Measures temporal grounding and audible cancellation directly.
-- Allocates latency across transport, endpointing, models, synthesis, and playback.
-- Connects incidents to versions and evidence intervals.
-- Assigns client, platform, ML, product, and policy ownership.
-- Chooses shared contracts before a universal implementation.
-- Distinguishes staff execution, principal portfolio, and senior-principal doctrine.
+Trace a decision through evidence, control, external state, failure and ownership.
+Change one assumption and explain the resulting contract, test and rollback.
 
 ## Weak signals
 
-- Says “use a multimodal model” without defining product modes.
-- Sends every frame and audio chunk into one growing prompt.
-- Orders recovered packets by arrival time.
-- Waits for all modalities before every response.
-- Uses silence alone for turn completion.
-- Measures cancellation at the server while device audio continues.
-- Treats old visual evidence as harmless context.
-- Claims a click succeeded because the model requested it.
-- Stores continuous raw media by default.
-- Uses one average quality score across severe privacy and ordinary task outcomes.
-- Discusses latency without capture, endpoint, synthesis, and playback.
-- Adds regions and teams without changing ownership or policy.
-- Cannot explain one synchronization or interaction mechanism precisely.
+Component names, global averages and asserted authority cannot replace those traces.
+Revisit unsupported freshness, effect, retention or percentile claims before adding scale.
 
 ## Changed-condition follow-ups
 
@@ -1319,6 +1224,16 @@ A staff target should score 2 on synchronization, interaction, reliability, and 
 
 For each follow-up, name the changed invariant, affected mode, required evidence, safe fallback, owner, and rollback unit.
 
+## Sources
+
+- [Flink event time and watermarks](https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/).
+- [RTP timestamp and sequence contracts, RFC 3550](https://www.rfc-editor.org/rfc/rfc3550.html).
+- [WebRTC media transport, RFC 8834](https://www.rfc-editor.org/rfc/rfc8834.html).
+
+Verify chosen versions and platform APIs before implementation; these references do not qualify this proposed product.
+
 ---
 
 *Related: [streaming automatic speech recognition](/concepts/streaming-asr/), [multimodal foundation models](/concepts/multimodal-foundation-models/), [automatic speech recognition](/concepts/automatic-speech-recognition/), [long-context LLMs](/concepts/long-context-llms/), and [production LLM inference design](/questions/design-production-llm-inference-service/).*
+
+</div>

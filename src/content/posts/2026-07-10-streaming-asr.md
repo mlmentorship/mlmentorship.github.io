@@ -9,9 +9,26 @@ category: "concepts"
 
 ## Summary
 
-Streaming ASR is the difference between a voice assistant that feels responsive and one that feels broken: it has to emit transcript while the user is still speaking, with bounded latency. The catch is that the model cannot attend to unlimited future context, so it trades recognition quality against emission latency, compute, and transcript stability. Offline ASR has none of those constraints, which is why a system that scores well offline can still feel terrible live.
+Show tentative words before speech ends, but define when they may change and when the transcript becomes final.
 
-**Learning objective:** trace why a token can appear before speech ends while remaining revisable, and distinguish first-token latency from finalization latency.
+## Problem
+
+One synthetic trace uses a shared clock, not measured service guarantees:
+
+| Event | Time |
+| --- | ---: |
+| Speech starts | 0 ms |
+| First word ends | 300 ms |
+| First displayed partial includes that word | 460 ms |
+| Speech ends | 1,200 ms |
+| Final text appears | 1,550 ms |
+
+The first partial is "play the"; later audio changes it to "play their song".
+Compute first-text, word-emission and finalization delays without changing their anchors.
+Separately, a ten-second clip needs two seconds of processing.
+Does that compute ratio certify the live experience?
+
+## Picture: Useful Early Text Can Still Change
 
 <!-- visual:streaming-asr-provisional-to-final -->
 <figure class="learning-figure plot-panel" aria-labelledby="streaming-asr-timeline-title">
@@ -30,11 +47,11 @@ Streaming ASR is the difference between a voice assistant that feels responsive 
 		<text class="viz-node-value" x="56" y="55">/play/</text>
 		<text class="viz-node-value" x="125" y="55">/their/</text>
 		<text class="viz-node-value" x="194" y="55">/song/</text>
-		<text class="viz-node-value" x="279" y="55">pause · endpoint wait</text>
+		<text class="viz-node-value" x="279" y="55">pause / wait</text>
 		<path d="M156 68V326" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.5;stroke-dasharray:4 4"></path>
 		<path d="M225 68V326" style="fill:none;stroke:var(--viz-edge);stroke-width:1.2;stroke-dasharray:4 4"></path>
 		<path d="M326 68V326" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.5;stroke-dasharray:4 4"></path>
-		<text class="viz-axis-label" x="12" y="102">CHECKPOINT 1 · EARLY PARTIAL</text>
+		<text class="viz-axis-label" x="12" y="102">CHECKPOINT 1 · EARLY PARTIAL · 460 ms</text>
 		<text class="viz-label" x="12" y="119">chunk + bounded right context are available</text>
 		<rect class="viz-node viz-node--input" x="44" y="132" width="72" height="32" rx="4"></rect>
 		<rect class="viz-node viz-node--focus" x="124" y="132" width="72" height="32" rx="4" style="stroke-dasharray:4 3"></rect>
@@ -54,50 +71,131 @@ Streaming ASR is the difference between a voice assistant that feels responsive 
 		<text class="viz-axis-label" x="284" y="254">REVISED</text>
 		<path d="M240 264V284M236 276L240 284L244 276" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.8"></path>
 		<text class="viz-label" x="12" y="278">speech stops; endpoint must fire</text>
-		<text class="viz-axis-label" x="12" y="301">FINAL RESULT</text>
+		<text class="viz-axis-label" x="12" y="301">FINAL RESULT · 1550 ms</text>
 		<rect class="viz-node viz-node--output" x="44" y="309" width="232" height="32" rx="4"></rect>
 		<rect x="48" y="313" width="224" height="24" rx="2" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1"></rect>
 		<text class="viz-node-label" x="160" y="330">play their song</text>
 		<text class="viz-callout" x="286" y="330">FINAL</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the first partial result appears once a chunk and its bounded right context are available, so <strong>time to first token</strong> can end while speech is still arriving. That text remains provisional: later audio changes <code>the</code> to <code>their</code>. <strong>Finalization latency</strong> ends only after the pause triggers endpointing and remaining processing completes. Measure both milestones and the revision between them. Original schematic informed by <a href="https://arxiv.org/abs/1811.06621">He et al. (2019)</a>, <a href="https://www.isca-archive.org/interspeech_2020/shangguan20_interspeech.html">Shangguan et al. (2020)</a>, and <a href="https://research.google/pubs/towards-fast-and-accurate-streaming-end-to-end-asr/">Li et al. (2020)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare partial, revised and final text, not geometric distances on this schematic clock. First text precedes speech end; finalization includes endpointing and remaining delivery.</figcaption>
 </figure>
 
-## Architecture choices
+## Calculate Distinct Delays
 
-- **Chunked encoder:** processes bounded windows with cached state or limited lookahead.
-- **RNN-T / transducer:** learns a monotonic alignment and emits tokens incrementally.
-- **CTC:** a simple monotonic objective, often paired with streaming beam search and a language model.
-- **Streaming attention:** constrains or chunks encoder-decoder attention so it does not need the whole utterance.
+| Measurement | Calculation | Result |
+| --- | --- | ---: |
+| First text from speech start | 460 - 0 | 460 ms |
+| This word's emission from word end | 460 - 300 | 160 ms |
+| Finalization from speech end | 1,550 - 1,200 | 350 ms |
+| Separate clip's real-time factor | 2 / 10 | 0.2 |
 
-## Latency components
-
-End-to-end latency is more than model runtime: audio chunk size, feature extraction, model compute, lookahead, decoding, endpointing, network, and client rendering all add up. Reporting model runtime alone hides the delay the user actually feels.
+Real-time factor is processing duration divided by audio duration.
+It does not bound queueing, network delivery, revision frequency or finalization tails.
+Measure stable-prefix time separately; an early partial is not necessarily stable.
 
 ## Endpointing and partial stability
 
-The system has to decide when speech has ended. Aggressive endpointing lowers latency but clips pauses; conservative endpointing feels sluggish. Partial hypotheses may also revise earlier words, so measure flicker or edit overhead alongside final word error rate.
+For word-token indices, keep "play" stable and replace range $[1,2)$ of the first partial with ["their", "song"].
+Advance the version; later mark the unchanged full transcript final.
+Declare replacement ranges, stable-prefix length, endpoint state and reconnect/reset behavior.
+Reject stale updates or changes to committed prefixes.
+
+Aggressive endpointing can clip pauses; conservative endpointing delays finalization.
+Keep tentative state reversible and measure false endpoints alongside delay.
+Provisional words do not authorize consequential actions.
+Even final text can require separate semantic, permission and confirmation checks.
+
+## Change 1: More Future Context
+
+**New task.** Additional lookahead helps recognition but threatens the deadline.
+
+**Picture and change.** Measure actual critical-path delay, quality and cache cost under live load.
+
+**Check.** Overlap changes incremental delay; model runtime alone is insufficient.
+
+**Use when.** Context and responsiveness conflict.
+
+## Change 2: Pauses Cause Premature Finalization
+
+**New task.** The endpoint closes an unfinished request.
+
+**Picture and change.** Adjust endpoint/stability policy and test pauses, rushed speech, noise and interruption.
+
+**Check.** Lower mean delay can hide worse false-endpoint and task-completion rates.
+
+**Use when.** Commitment errors dominate.
 
 ## Evaluation
 
-- Final and streaming word error rate
-- Time to first token and finalization latency
-- Partial stability / revision rate
-- Real-time factor and peak compute
-- Slice quality by accent, noise, device, language, and speech rate
+| Group | Required observation |
+| --- | --- |
+| Recognition | Final/streaming WER with fixed normalization |
+| Delay | Named first-text, word, stable-prefix and final anchors, including tails |
+| Stability | Revisions/edit overhead and false endpoints |
+| Resources | Real-time factor, peak compute, queue/cache behavior |
+| Slices | Accent, noise, device, language and speech rate |
+
+## Failure: Good Final WER Arrives Too Late
+
+Accurate final text can miss a live task's deadline.
+Acting on a subsequently revised provisional word creates a different failure.
+
+## Transfer Check
+
+Does streaming require batch size one?
+
+### Reasoned Answer
+
+No. Independent live streams may be batched while preserving bounded future context, state and output deadlines.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Architecture choices
+
+| Route | Runtime contract |
+| --- | --- |
+| Chunked encoder | Bounded windows/lookahead, persistent caches |
+| RNN-T | Time/token decoding with streaming-compatible encoder/state |
+| CTC | Frame objective with compatible front end, encoder and search |
+| Streaming attention | Explicitly constrained/chunked context, not full-utterance dependence |
+
+## Latency components
+
+Trace chunk buffering, feature extraction, lookahead, compute, decoding, endpointing, queueing, network and client rendering.
+Overlap matters; measure end-to-end distributions from joint traces, not sums of stage percentiles.
+Offline processing still has resource and deadline constraints even without live-context restrictions.
+
+```text
+PartialUpdate
+	utterance_id, stream_epoch, version, token_replace_range
+	tokens, stable_prefix_length, final, endpoint_state
+	audio_event_time, display_time, model_policy_version
+```
+
+Bind replacements to the utterance/epoch and increasing version.
+On reconnect, explicitly resume acknowledged state or reset; do not mix caches across utterances.
+Specify stale/missing updates, bounded queues and safe timeout/fallback behavior.
+Later offline rescoring needs a distinct result identity and cannot silently rewrite an already consumed final result.
 
 ## In an interview
 
-1. Clarify the latency and quality targets.
-2. Choose a monotonic or chunked architecture.
-3. Account for every latency component, not just the model.
-4. Discuss endpointing and partial-transcript stability.
-5. Design fallback, offline rescoring, and slice monitoring.
+1. Fix latency anchors and quality/stability targets.
+2. Declare context, chunk, cache and decoding policy.
+3. Trace buffering through client display.
+4. Define tentative, stable, endpoint and final states.
+5. Test fallback, rescoring, interruptions and slice monitoring.
 
 ## Common confusions
 
-- **"Streaming means batch size one."** It means bounded future context and incremental output; you can still batch across streams.
-- **"WER captures latency."** It says nothing about when words appear or how often they change.
-- **"More lookahead is free quality."** Every frame of lookahead is user-visible latency.
+Low WER is not a delay bound; extra context changes the actual critical path, not necessarily every frame additively.
+
+## Sources
+
+- [He et al., 2019](https://arxiv.org/abs/1811.06621).
+- [Shangguan et al., 2020](https://www.isca-archive.org/interspeech_2020/shangguan20_interspeech.html).
+- [Li et al., 2020](https://research.google/pubs/towards-fast-and-accurate-streaming-end-to-end-asr/).
 
 *Related: [automatic speech recognition](/concepts/automatic-speech-recognition/), [RNN-T](/concepts/rnn-transducer/), and [CTC](/concepts/connectionist-temporal-classification/).*
+
+</div>

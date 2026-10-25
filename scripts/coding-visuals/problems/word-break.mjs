@@ -4,11 +4,35 @@ const positions = ['0|', 'c', 'a', 't', 's', 'a', 'n', 'd', 'o', 'g'];
 const example = 'text = "catsandog", words = ["cats", "dog", "sand", "and", "cat"]';
 const scan = (index, label) => mark(index, label, 'focus', 'start-cursor');
 const reached = (index, label = 'reachable') => mark(index, label, 'state', `reachable-${index}`);
-const state = (start, reachable, extra = {}) => array(
-  positions,
-  [scan(start, `start=${start}`), ...reachable.map((index) => reached(index))],
-  { example, positionMeaning: 'boundary after index characters; cell 0 is empty prefix', reachable: `{${reachable.join(',')}}`, ...extra },
-);
+let boundaryGraphId = 0;
+const state = (start, reachable, extra = {}) => {
+  const edges = [];
+  if (reachable.includes(4)) edges.push('0->4');
+  if (reachable.includes(3)) edges.push('0->3');
+  if (reachable.includes(7)) edges.push('3->7');
+  if (start >= 4 && reachable.includes(7)) edges.push('4->7');
+  return array(
+    positions,
+    [scan(start, `start=${start}`), ...reachable.map((index) => reached(index))],
+    {
+      graphCompanion: {
+        nodes: ['0', '3', '4', '7', '9'],
+        edges,
+        edgeLabels: { '0->4': 'cats', '0->3': 'cat', '3->7': 'sand', '4->7': 'and' },
+        positions: { '0': { x: 38, y: 112 }, '3': { x: 135, y: 55 }, '4': { x: 135, y: 172 }, '7': { x: 232, y: 112 }, '9': { x: 325, y: 112 } },
+        width: 360,
+        start: String(start),
+        visited: reachable.map(String),
+        markerId: `word-break-edge-${boundaryGraphId++}`,
+        ariaLabel: 'Proven word transitions between text boundaries; no path reaches boundary 9',
+      },
+      example,
+      positionMeaning: 'boundary after index characters; cell 0 is empty prefix',
+      reachable: `{${reachable.join(',')}}`,
+      ...extra,
+    },
+  );
+};
 
 const draft = visual('Only reachable boundaries may launch dictionary words; each full prefix match adds its ending boundary.', [
   frame('Initialize boundary 0', 'The empty prefix is reachable, so reachable={0} before scanning any start.', state(0, [0], { operation: 'initialize' }), 'initialize-reachable'),

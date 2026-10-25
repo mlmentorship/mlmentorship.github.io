@@ -1,6 +1,6 @@
 ---
 title: "Debug this training loop"
-description: "A live coding question with a paste of buggy training code. The senior signal is the order in which you find bugs and what your debugging procedure looks like."
+description: "Trace gradient buffers and module mode, separate demonstrated defects from missing contracts, then execute a corrected CPU training fixture."
 date: "2025-12-01"
 draft: false
 tags: ["questions"]
@@ -8,11 +8,16 @@ category: "questions"
 ---
 
 
-> *Asked in: coding rounds at LLM-team and senior MLE interviews.*
+A training loop carries parameter gradients and module mode between batches.
+Trace those states before changing the loss or guessing which task the model performs.
 
-The interviewer pastes a training loop with several bugs (typically 2 to 5). You read it, find the bugs, and explain the impact of each. The signal is your *procedure*, not your speed.
+## Problem
 
-## Example: a bug-laden PyTorch loop
+Inspect the supplied loop. Assume ordinary PyTorch module and optimizer behavior.
+Identify persistent-state defects, then separate them from questions requiring missing model, data or device information.
+The following is deliberately broken exercise code, not a runnable reference.
+
+<span id="example-a-bug-laden-pytorch-loop"></span>
 
 ```python
 import torch
@@ -41,19 +46,11 @@ for epoch in range(10):
             print(f"epoch {epoch} val loss: {val_loss}")
 ```
 
-What's wrong (in order of severity):
+## Picture
 
-1. **Missing `optimizer.zero_grad()`**. Gradients accumulate across batches; effective learning rate is N times larger than intended. Will likely diverge or produce wrong dynamics.
-
-2. **MSE loss on what looks like a classification task** (the variable is `criterion = nn.MSELoss()` but `MyModel` may produce class logits). If classification: vanishing gradients on confident-wrong predictions; should be `nn.CrossEntropyLoss()`.
-
-3. **`model.eval()` not followed by `model.train()`**. After the eval block, the model stays in eval mode (dropout off, batch norm using running stats). Training resumes with broken behavior.
-
-4. **No `torch.no_grad()` around eval**. Validation forward pass builds a computation graph and stores activations, wasting memory. Should be wrapped in `with torch.no_grad():`.
-
-5. **Validation on the same batch as training** (`x` is from training loader; the eval block uses `x_val` only for the eval forward). If `x_val` is a fixed pre-loaded batch, validation isn't representative; if not defined, the code crashes.
-
-6. **No data movement to device**. If model is on GPU, `x` and `y` need to be moved (`x = x.to(device)`). Will crash or silently work on CPU.
+`optimizer.step()` does not clear `.grad` buffers.
+`model.eval()` persists until the mode is changed again.
+Gradient recording is a third, separate setting: `no_grad()` does not restore training mode.
 
 <!-- visual:training-loop-persistent-state -->
 ```mermaid
@@ -78,64 +75,165 @@ flowchart TB
 	class G0 viz-compact
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> follow each lane into the next batch. <code>optimizer.step()</code> changes parameters but does not clear their <code>.grad</code> buffers, and <code>model.eval()</code> changes module behavior until <code>model.train()</code> changes it back. These are separate state leaks; <code>torch.no_grad()</code> only disables gradient recording inside its own context.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> follow each lane into the next batch. A parameter update leaves gradient buffers intact. An evaluation-mode switch persists. A local no-grad context changes neither of those reset requirements.</p>
 
-## Senior debugging procedure (the actual signal)
+## Calculate the stale-gradient effect
 
-> "I'd read the loop top to bottom and find issues in this order, by impact:
->
-> 1. **Optimizer / gradient flow first.** Missing `zero_grad`, missing `optimizer.step`, detached tensors, `.item()` calls that drop gradient. These break training entirely.
->
-> 2. **Loss function vs task.** MSE on classification, CrossEntropy on probabilities (instead of logits), wrong reduction.
->
-> 3. **Train/eval mode.** Forgetting to switch back, forgetting `no_grad` in eval. These work silently incorrectly.
->
-> 4. **Device placement.** GPU/CPU mismatches, missing `.to(device)`, parameters on wrong device.
->
-> 5. **Data shape and type issues.** Batch dimension mismatches, label encoding wrong, target dtype wrong.
->
-> 6. **Numerical stability.** No grad clipping for transformers, no LR warmup for Adam, no fp32 for stability ops.
->
-> The order isn't arbitrary; it's roughly by likelihood-of-being-wrong and severity."
+Use a scalar SGD calculation, not Adam: $w_0=0$, rate $0.1$, loss $(w-t)^2/2$.
+The first target $t=1$ gives gradient $-1$ and $w_1=0.1$.
+For target $t=2$, the new gradient is $-1.9$.
 
-## What an L4 candidate misses
+| Buffer before the second update | Used gradient | Next weight |
+| --- | --- | --- |
+| Cleared before backward | $-1.9$ | $0.29$ |
+| Old $-1$ retained | $-2.9$ | $0.39$ |
 
-- Doesn't mention `zero_grad` (the most common bug).
-- Spots the eval-mode issue but not the `no_grad` issue.
-- Doesn't have an order; finds bugs randomly.
+Stale accumulation changes the update. It is not generally an N-times learning-rate multiplier, especially with Adam's moments.
+Intentional accumulation needs its own reduction and reset boundary.
 
-## What an L5 candidate finds
+## Code with an explicit task
 
-- All the gradient-flow bugs.
-- The loss / task mismatch.
-- The eval-mode bug.
+This complete CPU fixture uses two-class logits and integer class targets.
+Its tiny split tests execution, not convergence or evaluation validity.
 
-## What an L6 candidate adds
+```python
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, TensorDataset
 
-- A *procedure* explained out loud as they read.
-- Severity ranking ("this is the most impactful, but this other one would silently corrupt eval metrics").
-- A note on what they would *test* to verify each bug.
+torch.manual_seed(0)
+device = torch.device("cpu")
+train_data = TensorDataset(
+	torch.tensor([[0., 0.], [1., 0.], [0., 1.], [1., 1.]]),
+	torch.tensor([0, 1, 1, 0]),
+)
+val_data = TensorDataset(
+	torch.tensor([[0.2, 0.1], [0.8, 0.1]]),
+	torch.tensor([0, 1]),
+)
+dataloader = DataLoader(train_data, batch_size=2, shuffle=False)
+val_loader = DataLoader(val_data, batch_size=2, shuffle=False)
+model = nn.Sequential(
+	nn.Linear(2, 4), nn.ReLU(), nn.Dropout(0.2), nn.Linear(4, 2)
+).to(device)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+criterion = nn.CrossEntropyLoss()
+for epoch in range(2):
+	model.train()
+	for batch_inputs, batch_targets in dataloader:
+		batch_inputs = batch_inputs.to(device)
+		batch_targets = batch_targets.to(device)
+		optimizer.zero_grad(set_to_none=True)
+		loss = criterion(model(batch_inputs), batch_targets)
+		loss.backward()
+		optimizer.step()
+	model.eval()
+	val_sum, val_count = 0.0, 0
+	with torch.no_grad():
+		for batch_inputs, batch_targets in val_loader:
+			batch_inputs = batch_inputs.to(device)
+			batch_targets = batch_targets.to(device)
+			val_sum += criterion(model(batch_inputs), batch_targets).item() * batch_targets.numel()
+			val_count += batch_targets.numel()
+	print(epoch, val_sum / val_count)
+	model.train()
+```
 
-## Tells that get you a strong-hire vote
+## Change the loop requirement
 
-- You explain your **scanning order** out loud.
-- You catch **`zero_grad`** immediately.
-- You distinguish **bugs that crash** from **bugs that silently mislead**.
-- You suggest **adding asserts or tests** to prevent recurrence.
+### 1. Validate between training updates
 
-## Tells that get you down-leveled
+**New task:** run one diagnostic validation batch immediately after an update.
 
-- Reading line by line in random order.
-- Missing `zero_grad`.
-- Spotting bugs but not characterizing their impact.
-- Suggesting "use a framework" as the fix.
+**Picture and change:** replace the epoch validation block with this excerpt after `optimizer.step()`.
+It uses the fixture's existing model, device, loss and validation loader.
+
+```python
+validation_inputs, validation_targets = next(iter(val_loader))
+validation_inputs = validation_inputs.to(device)
+validation_targets = validation_targets.to(device)
+previous_mode = model.training
+model.eval()
+try:
+	with torch.no_grad():
+		val_loss = criterion(model(validation_inputs), validation_targets)
+finally:
+	model.train(previous_mode)
+```
+
+**Check:** entered from training mode, it exits in training mode and `val_loss.requires_grad` is false.
+
+**Use when:** more training forwards follow the diagnostic in the same epoch.
+
+### 2. Bound measured gradient growth
+
+**New task:** require a maximum gradient norm of one after observing finite gradient growth.
+
+**Picture and change:** insert this between backward and the optimizer step, retaining gradient clearing.
+
+```python
+torch.nn.utils.clip_grad_norm_(
+	model.parameters(), max_norm=1.0, error_if_nonfinite=True
+)
+```
+
+**Check:** gradient $[3,4]$ has norm five and becomes approximately $[0.6,0.8]$.
+Nonfinite norms raise an error.
+
+**Use when:** evidence motivates clipping. Its absence alone is not a demonstrated defect.
+
+## Do not invent the task from the loss name
+
+MSE can be correct for regression with matching floating targets and outputs.
+The original excerpt does not establish classification, validation overlap or a GPU requirement.
+Check those contracts before changing them.
+
+## Try separating recording from mode
+
+Validation uses `no_grad()`, but the next training batch behaves differently. Which state must be inspected?
+
+<details>
+<summary>Check your answer</summary>
+
+Inspect `model.training` and mode-sensitive layers such as dropout and BatchNorm.
+`no_grad()` controls recording, not persistent module mode.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+<span id="senior-debugging-procedure-the-actual-signal"></span>
+<span id="what-an-l4-candidate-misses"></span>
+<span id="what-an-l5-candidate-finds"></span>
+<span id="what-an-l6-candidate-adds"></span>
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Choose the next discriminating check
+
+| Suspected defect | Cheap check | Possible consequence |
+| --- | --- | --- |
+| Broken gradient flow | Inspect `requires_grad`, parameter gradients and parameter changes | No learning or an incorrect update |
+| Wrong loss contract | Check output shape, target dtype, reduction and API inputs | Crash or silently wrong objective |
+| Mode or recording leak | Inspect module mode and validation graph state | Changed dropout/BatchNorm or unnecessary graph memory |
+| Device mismatch | Compare parameter, input and target devices | Runtime error or an unintended CPU run |
+| Unstable numerics | Locate the first nonfinite value and inspect gradient scale | Corrupted update; clipping may not repair the cause |
+
+Missing validation variables can crash; a fixed batch may instead mislead evaluation.
+Neither consequence follows without checking what those variables contain.
+Repeated validation inside every batch also changes cost and selection exposure.
 
 ## Common follow-up
 
 "You've fixed all the bugs. The model still isn't training. What now?"
 
-The L6 answer is the same as the [debug a model that's not learning](/questions/debug-model-not-learning/) procedure: overfit a single batch, check gradient norms, LR sweep, look at predictions, etc.
+If the repaired loop still fails, try overfitting one batch and inspect predictions and gradients.
+Then test a controlled rate change; see [model debugging](/questions/debug-model-not-learning/).
 
----
+API references: [zero_grad](https://docs.pytorch.org/docs/stable/generated/torch.optim.Optimizer.zero_grad.html), [module modes](https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html), [no_grad](https://docs.pytorch.org/docs/stable/generated/torch.no_grad.html), and [gradient clipping](https://docs.pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html).
 
-*Related: [How would you debug a model that's not learning?](/questions/debug-model-not-learning/), [Implement attention from scratch](/questions/implement-attention-from-scratch/), [How do you choose a learning rate?](/questions/how-to-choose-learning-rate/).*
+Related: [attention implementation](/questions/implement-attention-from-scratch/) and [learning-rate selection](/questions/how-to-choose-learning-rate/).
+
+</div>

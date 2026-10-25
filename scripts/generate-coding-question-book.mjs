@@ -1,6 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { codingQuestionVisuals } from './coding-question-visuals.mjs';
+import assert from 'node:assert/strict';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { parseFragment } from 'parse5';
+import yaml from 'js-yaml';
 
 const root = process.cwd();
 const argumentsList = process.argv.slice(2);
@@ -8,6 +11,13 @@ const slugsArgumentIndex = argumentsList.findIndex((argument) => argument === '-
 const slugsArgument = argumentsList.find((argument) => argument.startsWith('--slugs='))
   ?.slice('--slugs='.length) ?? (slugsArgumentIndex >= 0 ? argumentsList[slugsArgumentIndex + 1] : '');
 const requestedSlugs = new Set(slugsArgument.split(',').map((slug) => slug.trim()).filter(Boolean));
+const visualsOnly = argumentsList.includes('--visuals-only');
+const selfTest = argumentsList.includes('--self-test');
+const codingQuestionVisuals = selfTest
+  ? {}
+  : visualsOnly
+    ? await loadRequestedVisuals(requestedSlugs)
+    : (await import('./coding-question-visuals.mjs')).codingQuestionVisuals;
 const sourceArgument = argumentsList.find((argument, index) =>
   !argument.startsWith('--') && index !== slugsArgumentIndex + 1);
 const sourcePath = sourceArgument || path.resolve(root, '../ml_interview_book/docs/dsa/Coding_Questions_Phone_Guide.md');
@@ -29,6 +39,16 @@ const chapterDefinitions = [
 ];
 
 const allowedTones = new Set(['focus', 'state', 'output', 'warning', 'neutral']);
+
+async function loadRequestedVisuals(slugs, load = (slug) => import(new URL(`./coding-visuals/problems/${slug}.mjs`, import.meta.url))) {
+  const entries = await Promise.all([...slugs].map(async (slug) => {
+    assert.match(slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, `Invalid requested slug: ${slug}`);
+    const definition = (await load(slug)).default;
+    assert.equal(definition?.slug, slug, `Missing or mismatched visual definition: ${slug}`);
+    return [slug, definition];
+  }));
+  return Object.fromEntries(entries);
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -123,11 +143,15 @@ function renderArrayScene(scene) {
     const cellMarks = marks.get(index) ?? [];
     const labels = cellMarks.map((item) => item.label).join(' · ');
     const classes = cellMarks.map((item) => toneClass(item.tone)).join('');
+    const saved = scene.savedRange && index >= scene.savedRange.start && index < scene.savedRange.end;
     const display = item === '' ? '""' : item;
     const pointers = cellMarks.map((mark) => `<span class="coding-trace-array-pointer"${motionKey(mark.key ?? `marker-${mark.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`)}>${escapeHtml(mark.label)}</span>`).join('');
-    return `<span class="coding-trace-array-item${classes}" role="listitem"${motionKey(`value-${index}`)}>${pointers || `<span class="coding-trace-array-mark">${escapeHtml(labels)}</span>`}<span class="coding-trace-array-cell">${escapeHtml(display)}</span><small class="coding-trace-array-index">${index}</small></span>`;
+    return `<span class="coding-trace-array-item${classes}${saved ? ' is-saved-range' : ''}" role="listitem"${motionKey(`value-${index}`)}${saved ? ' data-saved-range' : ''}>${pointers || `<span class="coding-trace-array-mark">${escapeHtml(labels)}</span>`}<span class="coding-trace-array-cell">${escapeHtml(display)}</span><small class="coding-trace-array-index">${escapeHtml(scene.indexLabels?.[index] ?? index)}</small></span>`;
   }).join('');
-  return `<div class="coding-trace-array" role="list" aria-label="Array state">${cells}</div>${renderMeta(scene, ['type', 'items', 'marks'])}`;
+  const graph = scene.graphCompanion ? renderGraphScene(scene.graphCompanion, false) : '';
+  const strip = `<div class="coding-trace-array${scene.fitArray ? ' is-fitted' : ''}"${scene.fitArray ? ` style="--trace-items:${scene.arrayColumns ?? scene.items.length}"` : ''} role="list" aria-label="Array state">${cells}</div>`;
+  const inventory = scene.graphCompanion && scene.arraySummary ? `<details><summary>${escapeHtml(scene.arraySummary)}</summary>${strip}</details>` : strip;
+  return `${graph}${inventory}${renderMeta(scene, ['type', 'items', 'marks', 'graphCompanion', 'arraySummary', 'savedRange', 'fitArray', 'indexLabels', 'arrayColumns'])}`;
 }
 
 function renderArrayMapScene(scene) {
@@ -147,12 +171,23 @@ function renderGridCells(scene) {
   return scene.rows.map((row, rowIndex) => row.map((value, colIndex) => {
     const mark = marks.get(`${rowIndex}:${colIndex}`);
     const key = mark?.key ?? (mark?.label ? `marker-${mark.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : `grid-${rowIndex}-${colIndex}`);
-    return `<span class="coding-trace-grid-cell${toneClass(mark?.tone)}"${motionKey(key)}><span>${escapeHtml(value)}</span>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>`;
+    const position = Array.isArray(scene.pathRoute) ? ` style="grid-row:${rowIndex + 1};grid-column:${colIndex + 1}"` : '';
+    return `<span class="coding-trace-grid-cell${toneClass(mark?.tone)}"${motionKey(key)}${position}><span>${escapeHtml(value)}</span>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>`;
   }).join('')).join('');
 }
 
 function renderGridScene(scene) {
-  return `<div class="coding-trace-grid" style="--trace-cols:${Math.max(1, scene.rows[0]?.length ?? 1)}" role="group" aria-label="Grid state">${renderGridCells(scene)}</div>${renderMeta(scene, ['type', 'rows', 'marks'])}`;
+  const route = scene.pathRoute ?? [];
+  const links = route.slice(1).map(([row, col], index) => {
+    const [fromRow, fromCol] = route[index];
+    const direction = col > fromCol ? 'right' : col < fromCol ? 'left' : row > fromRow ? 'down' : 'up';
+    return `<span class="coding-trace-path-link is-${direction}" style="grid-row:${fromRow + 1};grid-column:${fromCol + 1}" data-path-from="${fromRow}:${fromCol}" data-path-to="${row}:${col}"><svg viewBox="0 0 24 24" role="img" aria-label="Path (${fromRow},${fromCol}) to (${row},${col})"><path d="M3 12h17m-5-5 5 5-5 5" /></svg></span>`;
+  }).join('');
+  const grid = `<div class="coding-trace-grid${Array.isArray(scene.pathRoute) ? ' has-path' : ''}" style="--trace-cols:${Math.max(1, scene.rows[0]?.length ?? 1)}" role="group" aria-label="Grid state">${renderGridCells(scene)}${links}</div>`;
+  const picture = scene.graphCompanion
+    ? `${renderGraphScene(scene.graphCompanion, false)}${scene.gridVisible ? grid : `<details><summary>${escapeHtml(scene.gridSummary ?? 'Input adjacency matrix')}</summary>${grid}</details>`}`
+    : grid;
+  return `${picture}${renderMeta(scene, ['type', 'rows', 'marks', 'graphCompanion', 'gridSummary', 'gridVisible', 'pathRoute'])}`;
 }
 
 function renderQueueGridScene(scene) {
@@ -162,7 +197,12 @@ function renderQueueGridScene(scene) {
     return `<div class="coding-trace-queue-grid-row${state}"${motionKey(`adjacency-row-${rowIndex}`)}><span class="coding-trace-label">${rowIndex}</span>${row.map((value, columnIndex) => `<span class="coding-trace-grid-cell"${motionKey(`adjacency-${rowIndex}-${columnIndex}`)}>${escapeHtml(value)}</span>`).join('')}</div>`;
   }).join('');
   const queue = (scene.queue ?? []).map((item) => `<span class="coding-trace-queue-item"${motionKey(`frontier-${item}`)}>${escapeHtml(item)}</span>`).join('');
-  return `<div class="coding-trace-queue-grid">${rows}</div><div class="coding-trace-queue"><span class="coding-trace-label">queue</span>${queue || '<span class="coding-trace-empty">empty</span>'}</div>`;
+  const inventory = `<div class="coding-trace-queue-grid">${rows}</div>`;
+  const picture = scene.graphCompanion
+    ? `${renderGraphScene(scene.graphCompanion, false)}<details><summary>${escapeHtml(scene.gridSummary ?? 'Input adjacency lists')}</summary>${inventory}</details>`
+    : inventory;
+  const metadata = scene.graphCompanion ? renderMeta(scene, ['type', 'rows', 'queue', 'start', 'visited', 'graphCompanion', 'gridSummary', 'frontierLabel']) : '';
+  return `${picture}<div class="coding-trace-queue"><span class="coding-trace-label">${escapeHtml(scene.frontierLabel ?? 'queue')}</span>${queue || '<span class="coding-trace-empty">empty</span>'}</div>${metadata}`;
 }
 
 function renderStackScene(scene) {
@@ -171,17 +211,25 @@ function renderStackScene(scene) {
 }
 
 let graphTopologyId = 0;
+const graphMarkerIds = new Set();
 
-function renderGraphScene(scene) {
-  const width = 480;
-  const height = 230;
+function renderGraphScene(scene, retainMotion = true) {
+  const width = scene.width ?? 480;
+  const height = scene.height ?? 230;
   const positions = scene.nodes.map((node, index) => ({
     node,
     x: scene.positions?.[node]?.x ?? width / 2 + Math.cos(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * Math.min(170, 45 * scene.nodes.length),
     y: scene.positions?.[node]?.y ?? height / 2 + Math.sin(-Math.PI / 2 + index * Math.PI * 2 / scene.nodes.length) * 78,
   }));
-  const markerId = `coding-graph-arrow-${graphTopologyId++}`;
+  const requestedMarkerId = scene.markerId ?? `coding-graph-arrow-${graphTopologyId++}`;
+  let markerId = requestedMarkerId;
+  for (let instance = 1; graphMarkerIds.has(markerId); instance += 1) markerId = `${requestedMarkerId}-${instance}`;
+  graphMarkerIds.add(markerId);
   const endpoint = (edge, first) => {
+    const parts = String(edge).split(/<->|->|-/);
+    const exactToken = parts[first ? 0 : parts.length - 1]?.trim();
+    const exact = positions.find((item) => String(item.node) === exactToken);
+    if (exact) return exact.node;
     const tokens = String(edge).match(/[A-Za-z]*\s*\d+|[A-Za-z]+/g) ?? [];
     const token = tokens[first ? 0 : tokens.length - 1]?.trim();
     return positions.find((item) => item.node === token || String(item.node).split(' ').at(-1) === token)?.node;
@@ -193,40 +241,50 @@ function renderGraphScene(scene) {
     const deltaY = to.y - from.y;
     const length = Math.hypot(deltaX, deltaY) || 1;
     const directed = String(edge).includes('->') && !String(edge).includes('<->');
-    const label = scene.edgeLabels === false ? '' : scene.edgeLabelMode === 'weight' ? String(edge).match(/-(\d+)->/)?.[1] ?? edge : edge;
-    return `<g${motionKey(`edge-${edge}-${index}`)}><line class="coding-trace-edge-line" x1="${from.x + deltaX / length * 26}" y1="${from.y + deltaY / length * 26}" x2="${to.x - deltaX / length * 29}" y2="${to.y - deltaY / length * 29}"${directed ? ` marker-end="url(#${markerId})"` : ''} />${label ? `<text class="coding-trace-graph-edge-label" x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2 - 7}">${escapeHtml(label)}</text>` : ''}</g>`;
+    const rejected = scene.rejectedEdges?.includes(edge);
+    const label = scene.edgeLabels === false ? '' : scene.edgeLabels?.[edge] ?? (scene.edgeLabelMode === 'weight' ? String(edge).match(/-(\d+)->/)?.[1] ?? edge : edge);
+    return `<g${retainMotion ? motionKey(`edge-${edge}-${index}`) : ''}${rejected ? ' data-invalid-transition' : ''}><line class="coding-trace-edge-line${rejected ? ' is-rejected' : ''}" x1="${from.x + deltaX / length * 26}" y1="${from.y + deltaY / length * 26}" x2="${to.x - deltaX / length * 29}" y2="${to.y - deltaY / length * 29}"${directed ? ` marker-end="url(#${markerId})"` : ''} />${label ? `<text class="coding-trace-graph-edge-label" x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2 - 7}">${escapeHtml(label)}</text>` : ''}</g>`;
   }).join('');
-  const nodes = positions.map(({ node, x, y }, index) => {
-    const state = scene.start === node ? ' is-focus' : scene.visited?.some((item) => String(item).startsWith(`${node}:`) || item === node) ? ' is-state' : '';
-    return `<g class="coding-trace-graph-node${state}"${motionKey(`node-${node}`)}><circle cx="${x}" cy="${y}" r="23" /><text x="${x}" y="${y + 4}">${escapeHtml(node)}</text></g>`;
+  const nodes = positions.map(({ node, x, y }) => {
+    const state = scene.start === node ? ' is-focus' : scene.stateNodes?.includes(node) || scene.visited?.some((item) => String(item).startsWith(`${node}:`) || item === node) ? ' is-state' : '';
+    return `<g class="coding-trace-graph-node${state}"${retainMotion ? motionKey(`node-${node}`) : ''}><circle cx="${x}" cy="${y}" r="23" /><text x="${x}" y="${y + 4}">${escapeHtml(scene.nodeLabels?.[node] ?? node)}</text></g>`;
   }).join('');
   const regions = (scene.regions ?? []).map((region) => `<text class="coding-trace-graph-region" x="${region.x}" y="${region.y}">${escapeHtml(region.label)}</text>`).join('');
   const keys = ['visited', 'frontier', 'ready', 'order', 'roots', 'components', 'indegree'];
   const lists = keys.flatMap((key) => scene[key] ? [`<span><b>${key}</b>${escapeHtml(Array.isArray(scene[key]) ? scene[key].join(', ') : scene[key])}</span>`] : []).join('');
-  return `<div class="coding-trace-graph"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Connected graph topology"><defs><marker id="${markerId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="coding-trace-graph-marker" d="M 0 0 L 8 4 L 0 8 z" /></marker></defs>${regions}${edges}${nodes}</svg>${lists ? `<div class="coding-trace-meta">${lists}</div>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'edges', 'positions', 'regions', 'edgeLabels', 'edgeLabelMode', 'start', ...keys, 'motion'])}`;
+  return `<div class="coding-trace-graph${scene.treeLayout ? ' is-tree-layout' : ''}"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(scene.ariaLabel ?? 'Connected graph topology')}"><defs><marker id="${markerId}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="coding-trace-graph-marker" d="M 0 0 L 8 4 L 0 8 z" /></marker></defs>${regions}${edges}${nodes}</svg>${lists ? `<div class="coding-trace-meta">${lists}</div>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'edges', 'nodeLabels', 'stateNodes', 'positions', 'regions', 'edgeLabels', 'edgeLabelMode', 'rejectedEdges', 'ariaLabel', 'start', 'width', 'height', 'markerId', 'treeLayout', ...keys, 'motion'])}`;
 }
 
 function renderTreeScene(scene) {
-  const offsets = [];
-  let offset = 0;
-  for (const level of scene.levels) {
-    offsets.push(offset);
-    offset += level.length;
-  }
-  const occurrences = new Map();
-  const renderNode = (levelIndex, index) => {
-    const value = scene.levels[levelIndex]?.[index] ?? '-';
-    if (value === '-') return '<li class="is-placeholder" aria-hidden="true"><span></span></li>';
-    const flatIndex = offsets[levelIndex] + index;
-    const mark = scene.marks?.find((candidate) => candidate.index === flatIndex);
-    const occurrence = occurrences.get(value) ?? 0;
-    occurrences.set(value, occurrence + 1);
-    const nextLevel = scene.levels[levelIndex + 1];
-    const hasChildren = nextLevel && (nextLevel[index * 2] !== '-' || nextLevel[index * 2 + 1] !== '-');
-    const children = hasChildren ? `<ul>${renderNode(levelIndex + 1, index * 2)}${renderNode(levelIndex + 1, index * 2 + 1)}</ul>` : '';
-    return `<li><span class="coding-trace-tree-node${toneClass(mark?.tone)}"${motionKey(`tree-node-${value}-${occurrence}`)}><b>${escapeHtml(value)}</b>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>${children}</li>`;
+  const renderTree = (levels, label, retainMotion) => {
+    const offsets = [];
+    let offset = 0;
+    for (const level of levels) {
+      offsets.push(offset);
+      offset += level.length;
+    }
+    const occurrences = new Map();
+    const renderNode = (levelIndex, index) => {
+      const value = levels[levelIndex]?.[index] ?? '-';
+      if (value === '-') return '<li class="is-placeholder" aria-hidden="true"><span></span></li>';
+      const flatIndex = offsets[levelIndex] + index;
+      const mark = scene.marks?.find((candidate) => candidate.index === flatIndex);
+      const originalValue = scene.levels[levelIndex]?.[index];
+      const occurrence = occurrences.get(originalValue) ?? 0;
+      occurrences.set(originalValue, occurrence + 1);
+      const nodeMotion = retainMotion && originalValue !== undefined && originalValue !== '-' ? motionKey(`tree-node-${originalValue}-${occurrence}`) : '';
+      const nextLevel = levels[levelIndex + 1];
+      const isMissing = Boolean(scene.pairedTrees) && value === 'None';
+      const hasChildren = !isMissing && nextLevel && (nextLevel[index * 2] !== '-' || nextLevel[index * 2 + 1] !== '-');
+      const children = hasChildren ? `<ul>${renderNode(levelIndex + 1, index * 2)}${renderNode(levelIndex + 1, index * 2 + 1)}</ul>` : '';
+      return `<li><span class="coding-trace-tree-node${toneClass(mark?.tone)}${isMissing ? ' is-missing' : ''}"${nodeMotion}><b>${escapeHtml(value)}</b>${mark?.label ? `<small>${escapeHtml(mark.label)}</small>` : ''}</span>${children}</li>`;
+    };
+    return `<div class="coding-trace-tree" role="img" aria-label="${escapeHtml(label)}"><ul class="coding-trace-tree-semantic">${renderNode(0, 0)}</ul></div>`;
   };
-  return `<div class="coding-trace-tree" role="img" aria-label="Binary tree with parent-child edges and call state"><ul class="coding-trace-tree-semantic">${renderNode(0, 0)}</ul></div>${renderMeta(scene, ['type', 'levels', 'marks', 'motion'])}`;
+  const trees = scene.pairedTrees
+    ? `<div class="coding-trace-tree-pair">${scene.pairedTrees.map((item, index) => `<div class="coding-trace-tree-panel"><p class="coding-trace-tree-label">${escapeHtml(item.label)}</p>${renderTree(item.levels, `${item.label}: nodes, edges and explicit missing positions`, index === 0)}</div>`).join('')}</div>`
+    : renderTree(scene.levels, 'Binary tree with parent-child edges and call state', true);
+  return `${trees}${renderMeta(scene, ['type', 'levels', 'marks', 'motion', 'pairedTrees'])}`;
 }
 
 function renderIntervalsScene(scene) {
@@ -240,8 +298,8 @@ function renderIntervalsScene(scene) {
   return `<div class="coding-trace-intervals">${rows}</div>${renderMeta(scene, ['type', 'items', 'max'])}`;
 }
 
-function renderLinkedRow(nodes, label = '') {
-  const rendered = nodes.map((node, index) => `${index > 0 ? `<span class="coding-trace-link-arrow"${motionKey(`link-${nodes[index - 1].value}-${node.value}`)}>&rarr;</span>` : ''}<span class="coding-trace-linked-node${toneClass(node.tone)}"${motionKey(node.key ?? `node-${node.value}`)}><span>${escapeHtml(node.value)}</span>${node.pointer ? `<small${motionKey(`pointer-${node.pointer}`)}>${escapeHtml(node.pointer)}</small>` : ''}</span>`).join('');
+function renderLinkedRow(nodes, label = '', bidirectional = false) {
+  const rendered = nodes.map((node, index) => `${index > 0 ? `<span class="coding-trace-link-arrow"${motionKey(`link-${nodes[index - 1].value}-${node.value}`)}>${bidirectional ? '&harr;' : '&rarr;'}</span>` : ''}<span class="coding-trace-linked-node${toneClass(node.tone)}"${motionKey(node.key ?? `node-${node.value}`)}><span>${escapeHtml(node.value)}</span>${node.pointer ? `<small${motionKey(`pointer-${node.pointer}`)}>${escapeHtml(node.pointer)}</small>` : ''}</span>`).join('');
   return `<div class="coding-trace-linked-row">${label ? `<span class="coding-trace-label">${escapeHtml(label)}</span>` : ''}${rendered}</div>`;
 }
 
@@ -273,7 +331,7 @@ function renderLinkedTopology(scene) {
 
 function renderLinkedScene(scene) {
   if (scene.edges) return renderLinkedTopology(scene);
-  return `<div class="coding-trace-linked">${renderLinkedRow(scene.nodes)}${scene.second ? renderLinkedRow(scene.second.map((value) => ({ value })), 'second') : ''}${scene.arrows ? `<p class="coding-trace-inline-note">${escapeHtml(scene.arrows.join(' · '))}</p>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'second', 'arrows'])}`;
+  return `<div class="coding-trace-linked">${renderLinkedRow(scene.nodes, '', scene.bidirectional)}${scene.second ? renderLinkedRow(scene.second.map((value) => ({ value })), scene.secondLabel ?? 'second', scene.bidirectional) : ''}${scene.arrows ? `<p class="coding-trace-inline-note">${escapeHtml(scene.arrows.join(' · '))}</p>` : ''}</div>${renderMeta(scene, ['type', 'nodes', 'second', 'secondLabel', 'bidirectional', 'arrows'])}`;
 }
 
 function renderTrieTopology(scene) {
@@ -283,12 +341,12 @@ function renderTrieTopology(scene) {
   const edges = scene.edges.map((edge) => {
     const from = nodes.get(edge.from);
     const to = nodes.get(edge.to);
-    return `<g${motionKey(edge.key)}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y + 16}" x2="${to.x}" y2="${to.y - 16}" /><text class="coding-trace-trie-edge-label" x="${(from.x + to.x) / 2 + 14}" y="${(from.y + to.y) / 2 + 4}">${escapeHtml(edge.label)}</text></g>`;
+    return `<g${motionKey(edge.key)}${edge.hidden ? ' visibility="hidden" aria-hidden="true"' : ''}><line class="coding-trace-edge-line" x1="${from.x}" y1="${from.y + 16}" x2="${to.x}" y2="${to.y - 16}" /><text class="coding-trace-trie-edge-label" x="${(from.x + to.x) / 2 + 14}" y="${(from.y + to.y) / 2 + 4}">${escapeHtml(edge.label)}</text></g>`;
   }).join('');
   const renderedNodes = scene.nodes.map((node) => {
     const cursor = active.has(node.key) ? `<text class="coding-trace-trie-cursor" x="${node.x}" y="${node.y - 23}"${motionKey('trie-cursor')}>current</text>` : '';
     const classes = `${active.has(node.key) ? ' is-focus' : ''}${queued.has(node.key) ? ' is-state' : ''}${node.terminal ? ' is-terminal' : ''}`;
-    return `<g class="coding-trace-trie-node${classes}"${motionKey(node.key)}>${cursor}<rect x="${node.x - 33}" y="${node.y - 16}" width="66" height="32" rx="3" /><text x="${node.x}" y="${node.y + 5}">${escapeHtml(node.label)}</text></g>`;
+    return `<g class="coding-trace-trie-node${classes}"${motionKey(node.key)}${node.hidden ? ' visibility="hidden" aria-hidden="true"' : ''}>${cursor}<rect x="${node.x - 33}" y="${node.y - 16}" width="66" height="32" rx="3" /><text x="${node.x}" y="${node.y + 5}">${escapeHtml(node.label)}</text></g>`;
   }).join('');
   return `<div class="coding-trace-trie-topology"><svg viewBox="0 0 ${scene.width ?? 480} ${scene.height ?? 260}" role="img" aria-label="Shared-prefix trie topology"><title>Shared-prefix trie</title><desc>One node per shared prefix; double borders mark complete words.</desc>${edges}${renderedNodes}</svg><p class="coding-trace-trie-key"><span>double border</span> complete word${queued.size ? '<span>muted fill</span> queued wildcard branch' : ''}</p></div>${renderMeta(scene, ['type', 'paths', 'nodes', 'edges', 'active', 'queued', 'width', 'height', 'motion'])}`;
 }
@@ -437,6 +495,28 @@ function renderVisual(problem) {
   };
 }
 
+function replaceVisual(article, visual) {
+  const ranges = [];
+  function htmlWalk(node, offset) {
+    const attributes = Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
+    if (node.nodeName === 'figure' && attributes['aria-labelledby'] === `${visual.visualId}-title`) {
+      const location = node.sourceCodeLocation;
+      assert(location?.endTag, 'Visual must have a complete closing tag');
+      ranges.push([offset + location.startOffset, offset + location.endOffset]);
+    }
+    for (const child of node.childNodes ?? []) htmlWalk(child, offset);
+  }
+  function walk(node) {
+    if (node.type === 'html') htmlWalk(parseFragment(node.value, { sourceCodeLocationInfo: true }), node.position.start.offset);
+    for (const child of node.children ?? []) walk(child);
+  }
+  walk(fromMarkdown(article));
+  assert.equal(ranges.length, 1, `Expected one existing visual: ${visual.visualId}`);
+  const [start, end] = ranges[0];
+  const figure = visual.source.slice(visual.source.indexOf('\n') + 1);
+  return article.slice(0, start) + figure + article.slice(end);
+}
+
 function parseProblems(source) {
   const headings = [...source.matchAll(/^## ((?:\d+|AI\d+|H\d+)\. .+)$/gm)];
   return headings.map((match, index) => {
@@ -457,12 +537,55 @@ function parseProblems(source) {
   });
 }
 
+function readVisualProblem(slug) {
+  assert(codingQuestionVisuals[slug], `Unknown requested slug: ${slug}`);
+  const article = fs.readFileSync(path.join(postsDir, `${publicationDate}-${slug}.md`), 'utf8');
+  const frontmatter = article.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+  assert(frontmatter, `Missing frontmatter: ${slug}`);
+  const metadata = yaml.load(frontmatter[1]);
+  const tasks = [];
+  function text(node) {
+    return node.nodeName === '#text' ? node.value : (node.childNodes ?? []).map(text).join('');
+  }
+  function htmlWalk(node) {
+    const attributes = Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
+    if ((attributes.class ?? '').split(/\s+/).includes('coding-visual-example')) {
+      const goal = node.childNodes.find((child) => child.nodeName === 'strong');
+      if (goal) tasks.push(text(goal));
+    }
+    for (const child of node.childNodes ?? []) htmlWalk(child);
+  }
+  function walk(node) {
+    if (node.type === 'html') htmlWalk(parseFragment(node.value));
+    for (const child of node.children ?? []) walk(child);
+  }
+  walk(fromMarkdown(article.slice(frontmatter[0].length)));
+  assert.equal(tasks.length, 1, `Expected one existing task: ${slug}`);
+  return { slug, title: metadata.title, task: tasks[0] };
+}
+
 function chapterFor(problem) {
   return chapterDefinitions.find((chapter) => chapter.numbers.includes(problem.identifier));
 }
 
+function linkedMarkerOffset(ids) {
+  const offsets = ids.map((id) => id.match(/^coding-linked-arrow-(\d+)$/)?.[1]).filter(Boolean).map(Number);
+  return offsets.length ? Math.min(...offsets) : undefined;
+}
+
 function writeProblem(problem) {
+  const articlePath = path.join(postsDir, `${publicationDate}-${problem.slug}.md`);
+  const baselinePath = path.join(root, 'data/pattern-first-baseline.json');
+  if (visualsOnly && fs.existsSync(baselinePath)) {
+    const captured = JSON.parse(fs.readFileSync(baselinePath, 'utf8')).pieces.find((piece) => piece.slug === problem.slug);
+    linkedTopologyId = linkedMarkerOffset(captured?.identities.explicit_ids ?? []) ?? linkedTopologyId;
+  }
   const visual = renderVisual(problem);
+  if (visualsOnly) {
+    const article = fs.readFileSync(articlePath, 'utf8');
+    fs.writeFileSync(articlePath, replaceVisual(article, visual));
+    return problem;
+  }
   const platformNote = problem.section.includes('TreeNode') && !problem.section.includes('class TreeNode')
     ? '\n\nThe platform supplies `TreeNode` with `val`, `left`, and `right`; this snippet assumes that definition.'
     : problem.section.includes('ListNode') && !problem.section.includes('class ListNode')
@@ -492,14 +615,104 @@ function writeProblem(problem) {
   return problem;
 }
 
-const source = fs.readFileSync(sourcePath, 'utf8');
-const allProblems = parseProblems(source);
+if (selfTest) {
+  const loaded = [];
+  const selected = await loadRequestedVisuals(['example'], async (slug) => {
+    loaded.push(slug);
+    return { default: { slug } };
+  });
+  assert.deepEqual(loaded, ['example']);
+  assert.deepEqual(Object.keys(selected), ['example']);
+  await assert.rejects(() => loadRequestedVisuals(['../example']), /Invalid requested slug/);
+  await assert.rejects(() => loadRequestedVisuals(['example'], async () => ({})), /Missing or mismatched visual definition/);
+  await assert.rejects(() => loadRequestedVisuals(['example'], async () => ({ default: { slug: 'other' } })), /Missing or mismatched visual definition/);
+  const visual = { visualId: 'fixture', source: '<!-- visual:fixture -->\n<figure aria-labelledby="fixture-title"><p>New.</p></figure>' };
+  const before = '---\ntitle: "Keep"\n---\n\n## Problem\n\nKeep this prose.\n\n<!-- visual:fixture -->\n<figure aria-labelledby="fixture-title"><p>Old.</p></figure>\n\n```python\nprint("keep")\n```\n';
+  assert.equal(replaceVisual(before, visual), before.replace('<p>Old.</p>', '<p>New.</p>'));
+  assert.throws(() => replaceVisual('No visual.', visual), /Expected one existing visual/);
+  assert.throws(() => replaceVisual(`${before}\n<figure aria-labelledby="fixture-title"></figure>`, visual), /Expected one existing visual/);
+  assert.throws(() => replaceVisual('```html\n<figure aria-labelledby="fixture-title"></figure>\n```', visual), /Expected one existing visual/);
+  assert.equal(linkedMarkerOffset(['coding-linked-arrow-7-warning', 'coding-linked-arrow-8', 'coding-linked-arrow-7']), 7);
+  assert.equal(linkedMarkerOffset(['coding-linked-arrow-0', 'coding-linked-arrow-1']), 0);
+  assert.equal(linkedMarkerOffset(['unrelated', 'coding-linked-arrow-7-warning']), undefined);
+  const pairedGraph = {
+    nodes: ['main1', 'sub1'],
+    nodeLabels: { main1: '1', sub1: '1' },
+    edges: [],
+    start: 'main1',
+    stateNodes: ['sub1'],
+    treeLayout: true,
+    markerId: 'paired-graph-fixture',
+  };
+  const renderedGraph = renderGraphScene(pairedGraph);
+  assert.match(renderedGraph, /coding-trace-graph is-tree-layout/);
+  assert.match(renderedGraph, /coding-trace-graph-node is-focus/);
+  assert.match(renderedGraph, /coding-trace-graph-node is-state/);
+  assert.match(renderedGraph, /data-motion-key="node-main1"/);
+  assert.match(renderedGraph, /data-motion-key="node-sub1"/);
+  assert.equal((renderedGraph.match(/<text[^>]*>1<\/text>/g) ?? []).length, 2);
+  assert.doesNotMatch(renderedGraph, /<b>visited<\/b>|stateNodes|nodeLabels|treeLayout/);
+  assert.doesNotMatch(renderGraphScene(pairedGraph, false), /data-motion-key/);
+  const ordinaryGraph = renderGraphScene({ nodes: ['1', '2'], edges: ['1->2'], visited: ['2'], markerId: 'ordinary-graph-fixture' });
+  assert.match(ordinaryGraph, /class="coding-trace-graph"/);
+  assert.match(ordinaryGraph, /data-motion-key="node-1"/);
+  assert.match(ordinaryGraph, /coding-trace-graph-node is-state/);
+  assert.match(ordinaryGraph, /<b>visited<\/b>2/);
+  const coordinateGraph = renderGraphScene({
+    nodes: ['r0c0', 'r1c0', 'r0c1'],
+    edges: ['r1c0->r0c0', 'r0c0->r0c1'],
+    positions: { r0c0: { x: 40, y: 40 }, r1c0: { x: 40, y: 140 }, r0c1: { x: 140, y: 40 } },
+    edgeLabels: false,
+    markerId: 'coordinate-graph-fixture',
+  });
+  assert.match(coordinateGraph, /x1="40" y1="114" x2="40" y2="69" marker-end/);
+  assert.match(coordinateGraph, /x1="66" y1="40" x2="111" y2="40" marker-end/);
+  const weightedGraph = renderGraphScene({
+    nodes: ['S', 'T'], edges: ['S-7->T'], positions: { S: { x: 40, y: 40 }, T: { x: 140, y: 40 } }, edgeLabelMode: 'weight', markerId: 'weighted-graph-fixture',
+  });
+  assert.match(weightedGraph, /x1="66" y1="40" x2="111" y2="40" marker-end/);
+  assert.match(weightedGraph, /class="coding-trace-graph-edge-label"[^>]*>7<\/text>/);
+  const repeatedGraph = { nodes: ['first', 'second'], edges: ['first->second'], markerId: 'repeated-graph-fixture' };
+  const repeatedGraphs = renderGraphScene(repeatedGraph)
+    + renderGraphScene({ ...repeatedGraph, markerId: 'repeated-graph-fixture-1' })
+    + renderGraphScene(repeatedGraph);
+  const repeatedMarkers = [...repeatedGraphs.matchAll(/<marker id="([^"]+)"/g)].map(match => match[1]);
+  assert.deepEqual(repeatedMarkers, ['repeated-graph-fixture', 'repeated-graph-fixture-1', 'repeated-graph-fixture-2']);
+  assert.deepEqual([...repeatedGraphs.matchAll(/marker-end="url\(#([^)]+)\)"/g)].map(match => match[1]), repeatedMarkers);
+  const adjacencyScene = { rows: [['1'], ['0']], queue: ['1'] };
+  const originalAdjacency = renderQueueGridScene(adjacencyScene);
+  assert.match(originalAdjacency, /<span class="coding-trace-label">queue<\/span>/);
+  assert.doesNotMatch(originalAdjacency, /<details>|coding-trace-graph/);
+  const graphAdjacency = renderQueueGridScene({ ...adjacencyScene, graphCompanion: pairedGraph, frontierLabel: 'stack: top at right', stackState: '[1]' });
+  assert.match(graphAdjacency, /<span class="coding-trace-label">stack: top at right<\/span>/);
+  assert.match(graphAdjacency, /<details><summary>Input adjacency lists<\/summary>/);
+  assert.match(graphAdjacency, /<b>stackState<\/b>\[1\]/);
+  assert.deepEqual([...graphAdjacency.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]), [...originalAdjacency.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]));
+  const gridScene = { rows: [['0', '1'], ['1', '?']], marks: [{ row: 0, col: 0, label: 'base', key: 'base-cell' }] };
+  const originalGrid = renderGridScene(gridScene);
+  const graphGrid = renderGridScene({ ...gridScene, graphCompanion: pairedGraph });
+  const visibleGrid = renderGridScene({ ...gridScene, graphCompanion: pairedGraph, gridVisible: true });
+  assert.match(graphGrid, /<details><summary>Input adjacency matrix<\/summary>/);
+  assert.doesNotMatch(visibleGrid, /<details>/);
+  assert.match(visibleGrid, /coding-trace-graph/);
+  assert.match(visibleGrid, /coding-trace-grid/);
+  for (const rendered of [graphGrid, visibleGrid]) {
+    assert.deepEqual([...rendered.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]), [...originalGrid.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]));
+  }
+  console.log('Coding generator selftest passed: selective imports, exact replacement, preserved bytes, exact coordinate/legacy-weighted endpoints, graph display/state isolation, unique marker references, grid/adjacency companions with original motion identity, opt-in visible grids and invalid definition/visual rejection.');
+  process.exit(0);
+}
+if (visualsOnly) assert(requestedSlugs.size > 0, '--visuals-only requires explicit --slugs');
+
+const allProblems = visualsOnly
+  ? [...requestedSlugs].map(readVisualProblem)
+  : parseProblems(fs.readFileSync(sourcePath, 'utf8'));
 const problems = requestedSlugs.size > 0
   ? allProblems.filter((problem) => requestedSlugs.has(problem.slug))
   : allProblems;
 const force = process.argv.includes('--force');
-if (allProblems.length !== 106) throw new Error(`Expected 106 problems, found ${allProblems.length}`);
-if (Object.keys(codingQuestionVisuals).length !== allProblems.length) throw new Error(`Visual registry count does not match problem count`);
+if (!visualsOnly && allProblems.length !== 106) throw new Error(`Expected 106 problems, found ${allProblems.length}`);
+if (!visualsOnly && Object.keys(codingQuestionVisuals).length !== allProblems.length) throw new Error(`Visual registry count does not match problem count`);
 if (requestedSlugs.size > 0 && problems.length !== requestedSlugs.size) {
   const found = new Set(problems.map((problem) => problem.slug));
   throw new Error(`Unknown requested slug(s): ${[...requestedSlugs].filter((slug) => !found.has(slug)).join(', ')}`);
@@ -507,8 +720,12 @@ if (requestedSlugs.size > 0 && problems.length !== requestedSlugs.size) {
 const existingSlugs = new Set(fs.readdirSync(postsDir).map((name) => name.replace(/\.mdx?$/, '').replace(/^\d{4}-\d{2}-\d{2}-/, '')));
 for (const problem of problems) {
   if (existingSlugs.has(problem.slug) && !force && requestedSlugs.size === 0) throw new Error(`Slug already exists: ${problem.slug}`);
-  if (!problem.task || !problem.pattern) throw new Error(`Missing metadata for ${problem.identifier}`);
-  if (!chapterFor(problem)) throw new Error(`No chapter for ${problem.identifier}`);
+  const articlePath = path.join(postsDir, `${publicationDate}-${problem.slug}.md`);
+  if (!visualsOnly && !force && fs.existsSync(articlePath) && fs.readFileSync(articlePath, 'utf8').includes('<!-- learning:core-end -->')) {
+    throw new Error(`Refusing to overwrite authored lesson: ${problem.slug}; use --visuals-only for its generated figure`);
+  }
+  if (!visualsOnly && (!problem.task || !problem.pattern)) throw new Error(`Missing metadata for ${problem.identifier}`);
+  if (!visualsOnly && !chapterFor(problem)) throw new Error(`No chapter for ${problem.identifier}`);
   if (!codingQuestionVisuals[problem.slug]) throw new Error(`No visual definition for ${problem.slug}`);
 }
 fs.mkdirSync(postsDir, { recursive: true });
@@ -517,6 +734,6 @@ const generated = problems.map(writeProblem);
 const registry = chapterDefinitions.map((chapter) => ({ ...chapter, slugs: allProblems.filter((problem) => chapter.numbers.includes(problem.identifier)).map((problem) => problem.slug) }));
 const registryPath = process.env.CODING_BOOK_REGISTRY || '/tmp/coding-interview-book-registry.json';
 if (requestedSlugs.size === 0) fs.writeFileSync(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
-console.log(`Generated ${generated.length} coding question pages and audits.`);
+console.log(visualsOnly ? `Refreshed ${generated.length} coding visuals without rewriting lesson bodies or audits.` : `Generated ${generated.length} coding question pages and audits.`);
 if (requestedSlugs.size === 0) console.log(`Registry written to ${registryPath}.`);
 console.log(`Visual scenes: ${[...new Set(Object.values(codingQuestionVisuals).flatMap((definition) => definition.frames.map((item) => item.scene.type)))].sort().join(', ')}.`);

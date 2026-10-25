@@ -7,7 +7,7 @@ const selectedMotion = (firstX, secondX, firstLabel, secondLabel) => [
 ];
 
 const draft = visual('Use partial partition only to select top-k membership, then sort those candidate indices by their scores for the required descending order.', [
-  frame('Validate k against score count', 'For scores [0.1,0.9,0.4,0.8] and k=2, the guard 1<=2<=4 passes.', array(scores, [
+  frame('Validate k against score count', 'For four scores, k=2 passes validation.', array(scores, [
     mark(0, 'input start', 'focus', 'selection-cursor'),
   ], {
     guard: '1 <= k=2 <= len(scores)=4',

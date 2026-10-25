@@ -1,130 +1,171 @@
 ---
 title: "Present a technical ML project and defend it under questions"
-description: "A senior project presentation should expose three decisions, one failure, honest attribution, and enough depth to survive interruption."
+description: "Present owned decisions with credible alternatives, prior evidence, technical depth and honest outcome limits, even when questions change the order."
 date: "2026-07-11"
 draft: false
 tags: ["questions"]
 category: "questions"
 ---
 
-> Prepare a 30-minute presentation about a consequential technical project. Expect 15 minutes of questions on decisions, failures, ownership, and impact.
+Present decisions through evidence, ownership and a concrete mechanism, not just an architecture tour.
+Keep each decision understandable when questions interrupt.
 
-Build the presentation around decisions, not chronology. The audience is not hiring the project. It is deciding whether your judgment, scope, and technical depth transfer to its problems.
+## Problem
 
-## Choose the project with the best evidence
+In this fictional rehearsal, the complete request has a 100 ms p99 objective.
+One critical-path trace starts at 0 ms:
 
-A strong project has five properties:
+| Parallel dependency | Completion |
+| --- | ---: |
+| Model inference | 45 ms |
+| Feature join | 120 ms |
 
-- You owned at least one consequential technical decision.
-- There were credible alternatives.
-- Something failed or contradicted the first plan.
-- The outcome was measured.
-- You can descend from architecture to implementation detail.
+The response needs both results; other stages are omitted from this simplified trace.
+Which component should you investigate first? What does this trace not establish?
 
-Prestige is not on the list. A famous system where you changed one component produces a weaker presentation than a bounded system whose difficult calls were yours.
-
-## Open with the answer
-
-The first two minutes should establish:
-
-1. the user or research problem;
-2. why it mattered;
-3. what you personally owned;
-4. the measured result;
-5. the three decisions the presentation will defend.
-
-Do not begin with your resume, company history, or a 12-box architecture. Those delay the claim and invite the audience to guess why the work mattered.
-
-## The decision spine
-
-For each major decision, use the same compact structure:
-
-- **Constraint:** what made the obvious approach insufficient?
-- **Alternatives:** what credible options existed?
-- **Evidence then:** what did you know before the outcome?
-- **Choice:** what did you decide and own?
-- **Result:** what happened, including a failure or surprise?
-- **Update:** what would you do differently now?
-
-One decision should support a technical descent. Show a bottleneck calculation, loss or metric choice, failure trace, data-contract issue, ablation, or serving invariant. The detail proves that the architecture slide reflects work you understand.
+## Picture: A Question Opens One Decision Record
 
 <!-- visual:technical-project-decision-spine -->
 <figure class="learning-figure" aria-labelledby="technical-project-decision-spine-title">
-	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-kicker">Decision records</p>
 	<p class="visual-title" id="technical-project-decision-spine-title">How does a decision spine keep a project presentation coherent under questions?</p>
 	<div class="visual-grid--two" role="group" aria-label="Chronological project tour compared with three self-contained decision records">
 		<section class="visual-panel">
-			<h4>FRAGILE: ONE CHRONOLOGICAL ROUTE</h4>
-			<p><strong>Setup &rarr; data &rarr; model &rarr; launch</strong><br />Ownership and alternatives are scattered across stages. A question about why the model changed forces the story to backtrack.</p>
+			<h4>Chronology alone</h4>
+			<p><strong>Setup &rarr; data &rarr; model &rarr; launch</strong><br />This order can hide ownership and alternatives. A question may require reconstructing an earlier decision.</p>
 		</section>
 		<section class="visual-panel">
-			<h4>DEFENSIBLE: THREE DECISION RECORDS</h4>
-			<p><strong>Decision 1 &middot; Decision 2 &middot; Decision 3</strong><br />Each carries its own constraint, alternatives, evidence then, choice, result, and update. Questions can enter any record without losing the claim.</p>
+			<h4>Independent records</h4>
+			<p><strong>Decision 1 &middot; Decision 2 &middot; Decision 3</strong><br />Each carries constraint, alternatives, prior evidence, choice/owner, result and update. Open the requested record directly.</p>
 		</section>
 	</div>
-	<section class="visual-panel" role="note" aria-label="Question paths that test each decision record">
-		<h4>CHANGE DEPTH, NOT STRUCTURE</h4>
-		<p><strong>Why this choice?</strong> Compare alternatives and prior evidence. <strong>What failed?</strong> Trace the result and update. <strong>Was it yours?</strong> Name your choice and collaborators. <strong>Can you prove it?</strong> Descend into one calculation, trace, ablation, or invariant.</p>
+	<section class="visual-panel" role="group" aria-label="One simplified request trace, not a latency distribution">
+		<h4>One request, two parallel dependencies</h4>
+		<svg viewBox="0 0 330 180" role="img" aria-labelledby="project-trace-title project-trace-desc">
+			<title id="project-trace-title">The join, not the model, blocks this request</title>
+			<desc id="project-trace-desc">Both dependencies start at zero. The model completes at 45 milliseconds and the feature join at 120. The response waits for both, so its completion cannot precede 120 milliseconds. A line at 100 marks the objective value, not a measured percentile. Other work is omitted. Horizontal coordinates use x equals 70 plus two times milliseconds.</desc>
+			<rect class="viz-plot-bg" x="4" y="4" width="322" height="172" rx="4"></rect>
+			<path d="M270 24V124" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:5 4"></path>
+			<text class="viz-label" x="70" y="35">model · 45 ms</text>
+			<rect class="viz-node viz-node--input" x="70" y="44" width="90" height="20" rx="2"></rect>
+			<text class="viz-label" x="70" y="85">feature join · 120 ms</text>
+			<rect class="viz-node viz-node--warning" x="70" y="94" width="240" height="20" rx="2"></rect>
+			<path class="viz-axis" d="M70 124H320"></path>
+			<text class="viz-label" x="70" y="140" text-anchor="middle">0</text>
+			<text class="viz-label" x="270" y="140" text-anchor="middle">100</text>
+			<text class="viz-label" x="310" y="140" text-anchor="middle">120 ms</text>
+			<text class="viz-label" x="270" y="161" text-anchor="middle">100 ms objective</text>
+		</svg>
 	</section>
-	<figcaption><strong>Read it this way:</strong> the left-hand deck works only in delivery order. The right-hand deck has three independent evidence units, so an interruption changes which decision you open or how deeply you inspect it, not the logic of the presentation. This original comparison was checked against <a href="https://pure.psu.edu/en/publications/how-the-design-of-presentation-slides-affects-audience-comprehens/">Garner and Alley's assertion-evidence presentation study</a> and the <a href="https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/guide.pdf">U.S. Office of Personnel Management's structured-interview guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> open the relevant decision, then its supporting trace. The join blocks this request; neither bar estimates the complete request's p99.</figcaption>
 </figure>
 
-## What an L4 answer sounds like
+## Investigate the Blocker Without Overclaiming
 
-> "We built a recommendation model. I will explain the data pipeline, architecture, training, and launch. Engagement increased 8%."
+Completion cannot precede $\max(45,120)=120$ ms in this trace.
+Making inference instantaneous would still leave the join at 120 ms.
 
-The project may be good, but the presentation hides the candidate. "We" owns every choice, the architecture becomes a tour, and the outcome has no attribution or guardrail. Questions quickly expose that the candidate memorized the final system rather than drove it.
+Investigate a versioned join change under matched load and inspect complete request latency and quality.
+A single trace does not estimate p99; stage percentiles must not be added into an end-to-end claim.
+State your actual ownership and other teams' changes.
 
-## What an L5 answer adds
+## The Decision Spine
 
-An L5 presentation has a clear personal thread. It explains why a baseline failed, compares alternatives, shows one implementation detail, and connects offline evidence to an online decision. The candidate can answer who owned each component, where they disagreed, and what metric blocked launch.
+Use this editable record for each real consequential choice:
 
-The failure is specific:
+| Field | Record |
+| --- | --- |
+| Constraint | What blocked the obvious approach? |
+| Alternatives | Which credible options existed? |
+| Evidence then | What was known before the outcome? |
+| Choice/owner | What did you decide, and with whose authority? |
+| Result | What happened, including limits or actual surprises? |
+| Update | What changed, or would change under new evidence? |
 
-> "Our first sequence model improved NDCG but increased p99 latency by 70 ms. I owned the decision to keep the candidate model and replace the online feature join. A shadow test showed that the join, not inference, caused most of the tail. That preserved the gain without spending the latency budget."
+Connect one record to a sanitized calculation, trace, ablation, data contract or invariant.
+Do not invent failure, metrics, ownership or a causal interpretation to fill fields.
 
-This is a decision with evidence, not a list of tasks.
+## Change 1: Ten Minutes Remain
 
-## What an L6 answer adds
+**New task.** Time shrinks or questions interrupt early.
 
-An L6 candidate shows how one project changed a broader system or decision process while remaining technically credible. They explain cross-team incentives, the adoption path, and the second-order effect of the launch. They do not inflate attribution.
+**Picture and change.** Keep the opening claim and one complete record; place other evidence in appendices.
 
-Under questions, they answer directly before adding context. They can say:
+**Check.** Remove repetition, not the reason for the choice. Answer directly before returning to the deck.
 
-- "No. That result does not prove causality; the holdback does."
-- "I did not own the training platform. I owned the model and the launch decision."
-- "That assumption was wrong. The slice analysis changed my position."
-- "With half the compute, I would keep the data intervention and drop the architecture search."
+**Use when.** Delivery time or question order changes.
 
-They use counterfactuals to demonstrate a model of the system, not attachment to the historical solution.
+## Change 2: Resources or Criticism Change
 
-## Tells that get you a strong-hire vote
+**New task.** Compute is halved or a credible critic disputes the reported effect.
 
-- The opening gives problem, ownership, outcome, and roadmap in two minutes.
-- Three decisions organize the deck.
-- Alternatives are credible, not straw men.
-- One failed approach changes the narrative.
-- Architecture descends into a concrete mechanism or bottleneck.
-- Impact is separated into observed outcome and personal contribution.
-- You answer the question asked before returning to the deck.
-- You update when a challenge exposes a weak assumption.
+**Picture and change.** Re-evaluate constraints and evidence; identify which intervention to retain and which claim changes.
 
-## Tells that get you down-leveled
+**Check.** Do not defend historical architecture after its assumptions fail.
 
-- A chronological diary of meetings and implementation steps.
-- Dense architecture slides with no decision.
-- "We" throughout, followed by vague ownership under questioning.
-- Only successful experiments.
-- Offline metrics presented as product impact.
-- A polished monologue that breaks when interrupted.
-- Strategic claims with no hands-on technical descent.
+**Use when.** A changed condition tests your model of the system.
+
+## Failure: Impressive Metrics Without an Owned Choice
+
+An architecture tour cannot substitute for a credible alternative, owner, supporting mechanism and evidence limit.
+
+## Transfer Check
+
+Why does a holdback alone not prove your impact claim?
+
+### Reasoned Answer
+
+Causal interpretation depends on assignment, exposure, measurement, interference, attrition and analysis assumptions.
+Name the actual design and limits.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Choose the project with the best evidence
+
+Check five properties: owned consequential judgment, credible alternatives, actual uncertainty/surprises, outcome evidence or explicit limits, and implementation depth.
+Prestige, duration and a compulsory failure story are not substitutes. Respect confidentiality and approved disclosure boundaries.
+
+## Open with the answer
+
+State problem, importance, personal responsibility, observed result/limits and the decision roadmap.
+A two-minute opening, three records and 30-minute talk plus 15-minute questions are configurable rehearsal settings, not universal interview facts.
+
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-adds"></span>
+<span id="what-an-l6-answer-adds"></span>
+## Evidence Ledger
+
+| Claim | Source/version | Personal action | Collaborator | Observed outcome | Causal design/limit | Changed condition |
+| --- | --- | --- | --- | --- | --- | --- |
+| Fill with approved real evidence | Exact artifact/trace | Your contribution | Other owners | Measured or unavailable | Identification assumptions | Reopening evidence |
+
+Use the same names at overview, architecture and implementation depth.
+Explain adoption, incentives and second-order effects only when supported; distinguish your contribution from the project's total result.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+## Check the Account
+
+Can a question enter through evidence, ownership, mechanism or changed constraints without losing the claim?
+If evidence is unavailable or confidential, state the limit rather than inventing a number.
+
+<span id="tells-that-get-you-down-leveled"></span>
+## Missing Evidence
+
+Replace vague team attribution, offline-as-product claims and unsupported strategic language with the actual decision record.
 
 ## Common follow-up
 
-"What would your strongest critic say you got wrong?"
-
-A strong answer names a real criticism, not a disguised compliment. State the critic's evidence, where you agree, and the decision you would revisit. If no reasonable critic exists in the story, the presentation probably removed the hard part.
+What would your strongest critic say was wrong? State the actual criticism, supporting evidence, agreement/disagreement and decision to revisit.
+Do not manufacture a critic or substitute a disguised compliment.
 
 Use the [presentation protocol](/prep/presentation/) and attempt it before reading this page again.
 
+## Sources
+
+- [Garner and Alley, assertion-evidence presentation study](https://pure.psu.edu/en/publications/how-the-design-of-presentation-slides-affects-audience-comprehens/).
+- [OPM structured-interview guide](https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews/guide.pdf).
+
 *Related: [your most ambitious project](/questions/most-ambitious-project/), [scope an ambiguous problem](/questions/scope-ambiguous-problem/), and [technical presentation practice](/prep/presentation/).*
+
+</div>

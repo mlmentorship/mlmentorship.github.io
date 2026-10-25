@@ -1,6 +1,6 @@
 ---
 title: "Continuous batching for LLM serving"
-description: "Let new requests join an in-flight batch at every decode step instead of waiting for the slowest one. The other half of why vLLM is fast."
+description: "Reuse finished request positions between iterations while preserving per-request state and respecting token and KV budgets."
 date: "2026-04-22"
 draft: false
 tags: ["concepts"]
@@ -9,18 +9,18 @@ category: "concepts"
 
 ## Summary
 
-Continuous batching (a.k.a. iteration-level scheduling) processes a batch one decode step at a time and lets new requests enter the batch as soon as another request finishes, instead of waiting for the entire static batch to complete.
+Continuous batching rebuilds the active request set between model iterations, allowing queued work to replace a completed request.
 
-Small-batch LLM decoding is usually memory-bound because each step reads model weights for little arithmetic. Adding requests can amortize those weight reads and improve throughput. Iteration time eventually grows as matrix compute, KV-cache traffic, or scheduler overhead becomes limiting.
+Consider two decode positions: A needs five more iterations, B two, and queued C three.
+C's prefill is complete; all required KV reservations fit.
+Each occupied cell below represents one scheduled decode iteration, not prompt processing.
 
-With **static batching**, you wait for the longest request in the batch before reusing GPU. If one request generates 1000 tokens and another generates 50, the second request's GPU slot sits idle for 950 steps.
-
-Continuous batching keeps more useful work on the GPU. Combined with paged KV allocation, it is a common design in modern LLM servers. The gain over static batching depends on arrival rate, length distribution, memory capacity, scheduler policy, and latency target.
+When can C use B's position without disturbing A's ordered state?
 
 <!-- visual:continuous-batching-reuses-finished-slot -->
 <figure class="learning-figure" aria-labelledby="continuous-batching-slot-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="continuous-batching-slot-title">What changes when the scheduler can rebuild the batch after every decode step?</p>
+	<p class="visual-kicker">B ends after iteration 2; C is ready</p>
+	<p class="visual-title" id="continuous-batching-slot-title">Rebuilding membership fills three otherwise idle decode positions.</p>
 	<div class="visual-grid--two" role="group" aria-label="Static and continuous schedules for the same five decode steps">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 210" role="img" aria-labelledby="static-batch-title static-batch-desc">
@@ -98,38 +98,89 @@ Continuous batching keeps more useful work on the GPU. Combined with paged KV al
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> B finishes after step 2 in both schedules. Static batching strands that slot until A finishes; continuous batching rebuilds the active set and admits queued C for step 3 while A keeps decoding.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both schedules finish B after iteration 2. Continuous membership admits ready C at iteration 3; static membership waits for A to finish.</figcaption>
 </figure>
+
+Static membership uses $5+2=7$ of ten positions: 70% occupancy.
+Continuous membership uses $5+2+3=10$: 100% occupancy, with C finished after iteration 5.
+This is not a measured $10/7$ throughput gain: iteration durations can differ.
 
 ## The mechanism
 
-Each "step" of the server runs one forward pass for the current batch:
+Maintain a queue and request-state ledger keyed by request ID, not batch row.
 
-1. Maintain a queue of pending requests and a set of active (in-flight) requests.
-2. Each step, build a batch of (a) one decode token from each active request whose KV cache exists and (b) prefill tokens for newly admitted requests.
-3. Run one forward pass. Update each active request's KV cache.
-4. For requests that hit EOS or `max_tokens`, mark complete and free their KV blocks.
-5. Admit new requests from the queue if there is enough free KV-cache capacity.
+| Request | Phase | Remaining iterations | Owned state |
+| --- | --- | --- | --- |
+| A | Decode | $5$ | Valid KV length, positions, stop count, RNG |
+| B | Decode | $2$ | Same fields, separately owned |
+| C | Ready/queued | $3$ | Completed prefill and reserved capacity |
 
-This requires the attention kernel to handle variable per-request lengths in the same batch (cu_seqlens-style cumulative offsets) and a non-contiguous KV cache (PagedAttention).
+1. Select decode tokens and eligible prefill chunks within token, memory and fairness limits.
+2. Run the supported batch; update each request's valid KV, position and sampling state.
+3. On EOS, `max_tokens` or cancellation, release that request's owned references safely.
+4. Rebuild membership for the next iteration; preserve each continuing request's identity and order.
+
+Packed offsets such as `cu_seqlens` can isolate variable-length sequences.
+Paging is one cache-management choice, not a requirement of continuous scheduling.
+
+## Change the prefill or capacity constraint
+
+### 1. C's eight-token prompt is unfinished
+
+**Picture and change:** permit prefill alongside two continuing decoders under a four-token iteration budget.
+Reserve two decode tokens, leaving at most two prompt tokens per iteration.
+
+**Check:** four two-token chunks finish the prompt, assuming both decoders remain active.
+Track the prompt cursor and existing KV together.
+C cannot use first-token logits before its final prefill chunk completes.
+
+**Use when:** long prefills threaten existing requests' inter-token latency.
+
+### 2. A free row lacks KV capacity
+
+**Picture and change:** C needs three additional KV blocks, but only two are free.
+Defer admission or use an explicitly supported preemption policy.
+
+**Check:** an empty row does not authorize allocation; cancellation must release only C's references.
+
+**Use when:** context lengths make row counts a poor memory proxy.
+
+## Failure and transfer
+
+Moving A to another row while retaining row-indexed KV or sampler state can mix requests.
+A global RNG can also change A's sampled string after C joins.
+
+B finishes, but C's prompt is unprocessed. Can C immediately decode?
+
+<details>
+<summary>Check your answer</summary>
+
+No. Schedule prefill within both budgets; completed prefill supplies initial KV and the first-token distribution.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Prefill vs. decode
 
-Two phases with very different cost profiles:
-
-- **Prefill**: process the full prompt in one parallel matmul. Compute-bound; high arithmetic intensity.
-- **Decode**: one new token per step per request. Memory-bound; benefits hugely from batching.
-
-Most servers either alternate prefill and decode steps or interleave (chunked prefill, [Patel et al., 2023](https://arxiv.org/abs/2308.16369)) so neither phase starves the other.
+Prefill processes prompt positions; cached decode appends to per-request state.
+Small-batch decode can amortize weight traffic across requests, but bottlenecks depend on workload and hardware.
+See [prefill versus decode](/concepts/prefill-vs-decode/) and [GPU memory bounds](/concepts/gpu-memory-hierarchy/).
 
 ## Tradeoffs
 
-- **Throughput vs. latency**: larger batches mean higher tokens/sec across the server but slightly higher per-request latency. SLO-aware servers cap batch size or fragment large prefills.
-- **Memory pressure**: continuous batching is throughput-limited by KV-cache memory, not by compute. PagedAttention removes most fragmentation; GQA / MQA shrink per-request cache.
-- **Fairness**: a long-context request consumes more KV per step. Without admission control, it can starve short requests.
+Batch size affects latency, compute and KV traffic; it does not guarantee throughput improvements.
+Admission, queue age and preemption policies determine fairness under memory pressure.
+GQA/MQA change architecture and cache size; paging addresses allocation, not all possible bottlenecks.
 
 ## Common pitfalls
 
-- **Profiling decode without batching.** Single-request decode benchmarks dramatically understate server throughput.
-- **Confusing batch size with sequence length.** Batch size grows the number of concurrent *requests*; longer sequences grow per-request KV.
-- **Assuming static batching is fine for production.** It almost never is. The GPU sits idle whenever any request finishes.
+Measure arrival/length distributions, scheduler overhead, latency targets and memory capacity.
+A single-request profile does not establish serving throughput.
+Distinguish concurrency from context length; idle positions do not mean the whole GPU is idle.
+
+References: [Orca](https://www.usenix.org/conference/osdi22/presentation/yu), [SARATHI](https://arxiv.org/abs/2308.16369), [PagedAttention](https://arxiv.org/abs/2309.06180).
+
+</div>

@@ -1,14 +1,29 @@
 import { array, defineVisual, frame, visual } from '../primitives.mjs';
 
 const nodes = ['w', 'e', 'r', 't', 'f'];
-const scene = (edges, extra = {}) => array(nodes, [], {
-  words: '[wrt, wrf, er, ett, rftt]',
-  rules: edges.length ? edges.join(', ') : 'none yet',
-  ...extra,
-});
+let constraintGraphId = 0;
+const scene = (edges, extra = {}) => {
+  const { emittedNodes = [], ...metadata } = extra;
+  return array(nodes, [], {
+    graphCompanion: {
+      nodes,
+      edges,
+      positions: { w: { x: 35, y: 50 }, e: { x: 180, y: 50 }, r: { x: 325, y: 50 }, t: { x: 245, y: 180 }, f: { x: 90, y: 180 } },
+      width: 360,
+      edgeLabels: false,
+      ...(emittedNodes.length ? { visited: emittedNodes } : {}),
+      markerId: `alien-dictionary-edge-${constraintGraphId++}`,
+      ariaLabel: 'Remaining character-precedence graph; highlighted vertices have been emitted',
+    },
+    arraySummary: 'Observed character inventory',
+    words: '[wrt, wrf, er, ett, rftt]',
+    rules: edges.length ? edges.join(', ') : 'none yet',
+    ...metadata,
+  });
+};
 
 const draft = visual('Use the first difference of each adjacent word pair as a directed edge, then emit zero-indegree letters with Kahn topological sorting.', [
-  frame('Initialize every character', 'Create graph and indegree entries for w,e,r,t,f before adding edges, so isolated letters would also appear in the answer.', scene([], {
+  frame('Initialize every character', 'Create one vertex per observed character, including isolated letters, before recording any precedence rules.', scene([], {
     indegree: 'w:0 e:0 r:0 t:0 f:0',
   }), 'initialize'),
   frame('Compare wrt with wrf', 'The shared prefix wr ends at the first difference t versus f, adding t->f and indegree(f)=1.', scene(['t -> f'], {
@@ -31,26 +46,31 @@ const draft = visual('Use the first difference of each adjacent word pair as a d
   frame('Seed and pop w', 'Only w has indegree 0. Pop w, append it, remove w->e, and enqueue e when its indegree becomes 0.', scene(['t -> f', 'r -> t', 'e -> r'], {
     ready: '[e]',
     emitted: '[w]',
+    emittedNodes: ['w'],
     update: 'indegree(e): 1 -> 0',
   }), 'pop-w'),
   frame('Pop e, then make r ready', 'Pop e, append it, remove e->r, and enqueue r at indegree 0.', scene(['t -> f', 'r -> t'], {
     ready: '[r]',
     emitted: '[w,e]',
+    emittedNodes: ['w', 'e'],
     update: 'indegree(r): 1 -> 0',
   }), 'pop-e'),
   frame('Pop r, then make t ready', 'Pop r, append it, remove r->t, and enqueue t.', scene(['t -> f'], {
     ready: '[t]',
     emitted: '[w,e,r]',
+    emittedNodes: ['w', 'e', 'r'],
     update: 'indegree(t): 1 -> 0',
   }), 'pop-r'),
   frame('Pop t, then make f ready', 'Pop t, append it, remove t->f, and enqueue f.', scene([], {
     ready: '[f]',
     emitted: '[w,e,r,t]',
+    emittedNodes: ['w', 'e', 'r', 't'],
     update: 'indegree(f): 1 -> 0',
   }), 'pop-t'),
   frame('Pop f and validate the order', 'All five characters were emitted, so len(order)=len(indegree)=5 and the valid alien alphabet is wertf.', scene([], {
     ready: '[]',
     emitted: '[w,e,r,t,f]',
+    emittedNodes: ['w', 'e', 'r', 't', 'f'],
     check: '5 == 5',
     result: 'wertf',
   }), 'finish'),

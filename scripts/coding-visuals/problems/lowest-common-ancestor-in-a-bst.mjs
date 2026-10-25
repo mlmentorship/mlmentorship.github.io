@@ -10,6 +10,17 @@ const topology = [
   ['', '3', '', '5', '', '', ''],
 ];
 const positions = { '6': [0, 3], '2': [2, 1], '4': [4, 2] };
+const nodePositions = {
+  '6': { x: 230, y: 45 },
+  '2': { x: 100, y: 145 },
+  '8': { x: 350, y: 145 },
+  '0': { x: 40, y: 245 },
+  '4': { x: 175, y: 245 },
+  '7': { x: 290, y: 245 },
+  '9': { x: 410, y: 245 },
+  '3': { x: 135, y: 345 },
+  '5': { x: 225, y: 345 },
+};
 const at = (node, label, extra = {}) => grid(topology, [
   {
     row: positions[node][0],
@@ -24,6 +35,25 @@ const at = (node, label, extra = {}) => grid(topology, [
   input: 'first=3, second=5',
   currentRoot: label,
   targets: 'first=3, second=5',
+  graphCompanion: {
+    nodes: ['6','2','8','0','4','7','9','3','5'],
+    edges: ['6->2','6->8','2->0','2->4','8->7','8->9','4->3','4->5'],
+    positions: nodePositions,
+    width: 460,
+    height: 420,
+    treeLayout: true,
+    start: node,
+    visited: ['3','5'],
+    markerId: `bst-lca-${node}-${label.replace(/[^a-z0-9]+/gi, '-')}`,
+    edgeLabels: false,
+    ariaLabel: 'BST rooted at 6: route 6 to 2 to 4 reaches the split between targets 3 and 5',
+    regions: [
+      { x: nodePositions[node].x, y: nodePositions[node].y + 40, label },
+      { x: 135, y: 385, label: 'first=3' },
+      { x: 225, y: 385, label: 'second=5' },
+    ],
+  },
+  gridSummary: 'Original coordinate inventory',
   ...extra,
 });
 
@@ -59,7 +89,7 @@ const review = {
   recognitionCue: 'Both target nodes are in a BST, so comparing both values with the current root reveals whether their lowest common ancestor must be entirely left, entirely right, or current.',
   invariant: 'At the start of every loop iteration, the current root’s subtree contains both targets; moving only when both values are on the same side preserves that fact.',
   stateModel: 'Retain the current root and the two fixed target values. Move left if both are smaller, right if both are larger, otherwise return the current root.',
-  visualRationale: 'A compact coordinate grid keeps all BST nodes and ASCII parent-child edges visible while stable current-root and target keys show the search path, discarded sides, and split.',
+  visualRationale: 'An actual node-and-edge BST keeps both target labels fixed while the current root moves. The original coordinate inventory retains its cursor and target motion keys in a disclosure.',
   rejectedAlternatives: [
     'Two root-to-target path lists find a common prefix but ignore the BST ordering shortcut.',
     'A generic binary-tree DFS explores unnecessary branches and needs recursion state.',

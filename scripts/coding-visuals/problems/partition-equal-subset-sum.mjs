@@ -15,7 +15,7 @@ function subsetState(index, possible, additions, ignored, result) {
 const draft = visual('Each number extends a snapshot of previously reachable sums; reaching half the total proves an equal partition.', [
   frame(
     'Check the total and seed zero',
-    'For nums = [1, 5, 11, 5], total = 22 is even, so target = 11. The empty subset makes only sum 0 reachable.',
+    'The total is 22, so target is 11. Seed {0} using the empty subset.',
     arrayMap(nums, possibleMap([0]), [mark(0, 'next=1', 'focus', 'current-number')], {
       mapLabel: 'possible sums at or below target 11',
       arithmetic: 'total=1+5+11+5=22; target=22/2=11',

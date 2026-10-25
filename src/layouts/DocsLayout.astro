@@ -15,6 +15,7 @@ import { getPracticeMode } from '../data/prepCurriculum';
 import { findLibraryLocation, getLibraryShelf } from '../data/library';
 import { entriesForChapter, getLibraryEntries } from '../utils/library';
 import { getImplementedVisualAudit } from '../utils/visualAudits';
+import { getColdPrompt, getLearningContext } from '../utils/learningMechanisms';
 
 interface Props {
   post: CollectionEntry<'posts'>;
@@ -27,6 +28,10 @@ const stats = readingTime(rawContent);
 const slug = post.slug.replace(/^\d{4}-\d{2}-\d{2}-/, '');
 const category = post.data.category as Category;
 const visualAudit = getImplementedVisualAudit(slug);
+const learning = getLearningContext(slug);
+const hasExtension = rawContent.includes('data-learning-extension');
+const patternFirst = rawContent.includes('<!-- learning:core-end -->');
+const coldPrompt = category === 'questions' ? getColdPrompt(rawContent) : undefined;
 
 const CATEGORY_META: Record<Category, { singular: string; plural: string }> = {
   questions: { singular: 'Question', plural: 'Questions' },
@@ -117,7 +122,7 @@ const fullContentLabel: Record<Category, string> = {
   />}
   <div class="docs-shell">
     <div class="docs-layout">
-      <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting">
+      <article class="docs-article" itemscope itemtype="https://schema.org/BlogPosting" data-reading-depth="full">
       <header class="docs-head">
         <nav class="breadcrumbs" aria-label="Chapter context" data-pagefind-ignore="all">
           {libraryLocation ? (
@@ -148,10 +153,10 @@ const fullContentLabel: Record<Category, string> = {
         </div>
       </header>
 
-      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} />}
+      {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} prompt={coldPrompt} />}
 
       {visualAudit && (
-        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-pagefind-ignore="all">
+        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-inline-visual={patternFirst ? 'true' : undefined} hidden={patternFirst} data-pagefind-ignore="all">
           <VisualReviewCard
             id="quick-review"
             eyebrow={quickReviewLabel[category]}
@@ -175,7 +180,7 @@ const fullContentLabel: Record<Category, string> = {
         <details class="reader-tool">
           <summary>
             <span>On this page</span>
-            <small>{pageHeadings.length} sections</small>
+            <small data-reading-section-count>{pageHeadings.length} sections</small>
           </summary>
           <div class="reader-menu">
             <ol>{pageHeadings.map((heading) => (
@@ -185,9 +190,23 @@ const fullContentLabel: Record<Category, string> = {
         </details>
       </nav>}
 
+      {hasExtension && <fieldset class="reading-depth" data-reading-depth-controls>
+        <legend class="sr-only">Reading depth</legend>
+        <label><input type="radio" name="reading-depth" value="full" checked /><span>Full</span></label>
+        <label><input type="radio" name="reading-depth" value="core" /><span>Core</span></label>
+      </fieldset>}
+
       <div id="answer" class="prose docs-body" itemprop="articleBody">
         <slot />
       </div>
+
+      {learning && <nav class="mechanism-reading" aria-label="Mechanism reading links" data-pagefind-ignore="all">
+        <p class="mechanism-name"><a href={`/mechanisms/#${learning.family.id}`}>{learning.family.title}</a></p>
+        {learning.owner.slug !== slug && <p><strong>Shared lesson</strong> <a href={learning.owner.href}>{learning.owner.title}</a></p>}
+        {learning.required.length > 0 && <div><strong>Prerequisites</strong><ul>{learning.required.map((entry) => <li><a href={entry.href}>{entry.title}</a></li>)}</ul></div>}
+        {learning.applications.length > 0 && <div><strong>Applications</strong><ul>{learning.applications.map((entry) => <li><a href={entry.href}>{entry.title}</a></li>)}</ul></div>}
+        {learning.related.length > 0 && <details><summary>Compare mechanisms</summary><ul>{learning.related.map((entry) => <li><a href={entry.href}>{entry.title}</a></li>)}</ul></details>}
+      </nav>}
 
       {category !== 'questions' && <CompletionToggle itemId={`entry:${slug}`} />}
 
@@ -224,6 +243,43 @@ const fullContentLabel: Record<Category, string> = {
   import { extractLearningVisual } from '../utils/visualReviewClient';
   import { enhanceCodingVisuals } from '../utils/codingVisuals';
 
+  function fragmentTarget(hash: string) {
+    try { return document.getElementById(decodeURIComponent(hash.replace(/^#/, ''))); }
+    catch { return null; }
+  }
+
+  function initializeReadingDepth() {
+    const article = document.querySelector<HTMLElement>('[data-reading-depth]');
+    const controls = article?.querySelector<HTMLElement>('[data-reading-depth-controls]');
+    if (!article || !controls || controls.dataset.ready) return;
+    controls.dataset.ready = 'true';
+    const inputs = [...controls.querySelectorAll<HTMLInputElement>('input')];
+    const extension = article.querySelector<HTMLElement>('[data-learning-extension]');
+    const links = [...article.querySelectorAll<HTMLAnchorElement>('.reader-tool a')];
+    const apply = (depth: string, updateUrl = false) => {
+      article.dataset.readingDepth = depth;
+      inputs.forEach((input) => { input.checked = input.value === depth; });
+      for (const link of links) {
+        const hidden = depth === 'core' && extension?.contains(fragmentTarget(link.hash));
+        const row = link.closest('li');
+        if (row) row.hidden = Boolean(hidden);
+      }
+      const count = links.filter((link) => !link.closest('li')?.hidden).length;
+      const status = article.querySelector<HTMLElement>('[data-reading-section-count]');
+      if (status) status.textContent = `${count} ${count === 1 ? 'section' : 'sections'}`;
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (depth === 'core') url.searchParams.set('depth', 'core');
+        else url.searchParams.delete('depth');
+        window.history.replaceState(window.history.state, '', url);
+      }
+    };
+    const target = fragmentTarget(window.location.hash);
+    const requested = new URLSearchParams(window.location.search).get('depth');
+    apply(requested === 'core' && !(target && extension?.contains(target)) ? 'core' : 'full');
+    inputs.forEach((input) => input.addEventListener('change', () => { if (input.checked) apply(input.value, true); }));
+  }
+
   function promoteArticleVisual() {
     const wrapper = document.querySelector<HTMLElement>('[data-article-quick-review]');
     const articleBody = document.querySelector<HTMLElement>('#answer');
@@ -237,6 +293,7 @@ const fullContentLabel: Record<Category, string> = {
       return;
     }
 
+    if (wrapper.dataset.inlineVisual === 'true') extracted.figure.before(wrapper);
     const visualNodes: Node[] = extracted.marker
       ? [extracted.marker, extracted.figure]
       : [extracted.figure];
@@ -249,6 +306,7 @@ const fullContentLabel: Record<Category, string> = {
       if (sourceDetails) sourceDetails.hidden = false;
     }
 
+    wrapper.hidden = false;
     card.hidden = false;
     const divider = document.querySelector<HTMLElement>('[data-full-explanation]');
     if (divider) divider.hidden = false;
@@ -257,8 +315,18 @@ const fullContentLabel: Record<Category, string> = {
 
   promoteArticleVisual();
   enhanceCodingVisuals();
+  initializeReadingDepth();
   document.addEventListener('astro:page-load', promoteArticleVisual);
   document.addEventListener('astro:page-load', () => enhanceCodingVisuals());
+  document.addEventListener('astro:page-load', initializeReadingDepth);
+  window.addEventListener('hashchange', () => {
+    const target = fragmentTarget(window.location.hash);
+    if (!target?.closest('[data-learning-extension]')) return;
+    const article = document.querySelector<HTMLElement>('[data-reading-depth="core"]');
+    if (!article) return;
+    article.querySelector<HTMLInputElement>('[data-reading-depth-controls] input[value="full"]')?.click();
+    target.scrollIntoView();
+  });
 </script>
 
 <style>
@@ -315,6 +383,25 @@ const fullContentLabel: Record<Category, string> = {
   .docs-body :global(h2) { margin-top: 1.9rem; }
   .docs-body :global(h3) { margin-top: 1.4rem; }
   .docs-body :global(h2), .docs-body :global(h3) { scroll-margin-top: var(--sticky-offset); }
+
+  .reading-depth { display: flex; border: 0; padding: 0; margin: 1rem 0; font-family: var(--font-ui); }
+  .reading-depth label { position: relative; min-width: 4rem; text-align: center; cursor: pointer; }
+  .reading-depth input { position: absolute; opacity: 0; width: 100%; height: 100%; inset: 0; margin: 0; cursor: pointer; }
+  .reading-depth span { display: block; padding: .4rem .65rem; border: 1px solid var(--c-rule); border-bottom: 2px solid var(--c-rule); font-size: .78rem; }
+  .reading-depth input:checked + span { color: var(--c-text); border-bottom-color: var(--c-accent); font-weight: 650; }
+  .reading-depth input:focus-visible + span { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+  [data-reading-depth='core'] :global([data-learning-extension]) { display: none; }
+  @media print { .reading-depth { display: none; } }
+
+  .mechanism-reading { border-top: 1px solid var(--c-rule); margin-top: 2rem; padding-top: 1rem; font-family: var(--font-ui); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .mechanism-reading p { margin: 0 0 .6rem; }
+  .mechanism-name { font-family: var(--font-display); font-size: 1rem; }
+  .mechanism-reading a { color: var(--c-text-soft); text-underline-offset: .15em; }
+  .mechanism-reading a:hover { color: var(--c-accent); }
+  .mechanism-reading strong { display: block; font-size: .75rem; color: var(--c-muted); font-weight: 550; }
+  .mechanism-reading ul { margin: .3rem 0 .8rem; padding-left: 1.1rem; }
+  .mechanism-reading li { margin: .25rem 0; }
+  .mechanism-reading summary { cursor: pointer; color: var(--c-text-soft); }
 
   .reader-tools { max-width: var(--measure); margin: .9rem auto 1.5rem; }
   .reader-tool {

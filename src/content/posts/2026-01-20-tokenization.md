@@ -1,6 +1,6 @@
 ---
 title: "Tokenization: BPE, WordPiece, and the LLM era"
-description: "The critical input layer between text and model. Tokenization mismatch is a frequent source of production LLM bugs."
+description: "Trace ranked BPE merges, byte coverage and the versioned text-to-ID contract shared by training and serving."
 date: "2026-01-20"
 draft: false
 tags: ["concepts"]
@@ -10,29 +10,23 @@ category: "concepts"
 
 ## Summary
 
-Tokenization splits text into discrete units (tokens). Modern LLMs use subword schemes (BPE, WordPiece, SentencePiece) that decompose rare words into subword pieces while preserving common words as single tokens.
+A tokenizer converts text to model IDs; preprocessing, vocabulary, merge rules and special-token handling belong to the model contract.
 
-- Tokenization defines the model's input and output space, it's irreversibly baked into a trained model.
-- Token count drives both cost and latency at inference. Different tokenizers give different counts for the same text (sometimes by 30%+).
-- Tokenization mismatches between training and serving cause silent quality regressions that are hard to debug.
-- Production LLM bugs in multilingual quality, code performance, and unusual-character handling often involve tokenization.
+Consider a hypothetical corpus containing `map` five times, `maps` three times and `cap` twice.
+Use UTF-8 byte base pieces, forbid merges across word boundaries, and resolve ties by a declared fixed ordering.
+Which pairs merge, and how should the learned tokenizer encode `maps`, `cap` and unseen `traps`?
 
 ## The main families
 
 ### BPE (Byte-Pair Encoding)
 
-Original from text compression (1994), adapted for NLP. Algorithm:
-1. Start with a vocabulary of single characters.
-2. Find the most frequent adjacent pair in the corpus.
-3. Merge that pair into a new vocabulary item.
-4. Repeat until target vocabulary size.
-
-**Learning objective:** trace how corpus-wide pair counts create ranked, reusable BPE tokens that compress common words while leaving rarer words as multiple pieces.
+Count adjacent pairs across the weighted corpus, merge the most frequent eligible pair, apply it, then recount.
+Training changes the segmentation; encoding later replays the learned priority without retraining on each input.
 
 <!-- visual:bpe-corpus-merge-trace -->
 <figure class="learning-figure" aria-labelledby="bpe-merge-trace-title">
-	<p class="visual-kicker">Learning objective · toy byte-level corpus</p>
-	<p class="visual-title" id="bpe-merge-trace-title">How does one frequent byte pair grow into reusable subword and whole-word tokens?</p>
+	<p class="visual-kicker">Weighted training counts; ranked encoding</p>
+	<p class="visual-title" id="bpe-merge-trace-title">The three winning pair counts are 10, then 8, then 3.</p>
 	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="list" aria-label="Three ranked BPE merge rounds followed by tokenization of three words">
 		<section class="visual-panel" role="listitem">
 			<h4>START · COUNT ADJACENT PAIRS ACROSS ALL OCCURRENCES</h4>
@@ -54,75 +48,127 @@ Original from text compression (1994), adapted for NLP. Algorithm:
 			<p><code>maps</code> → <strong><code>[maps]</code></strong> · common whole word<br /><code>cap</code> → <strong><code>[c] [ap]</code></strong> · shared learned ending<br /><code>traps</code> → <strong><code>[t] [r] [ap] [s]</code></strong> · rarer word, more pieces</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> read downward. At each round, count pairs in the current segmentation, merge the largest count everywhere, then recount. The learned order matters at encoding time: <code>ap</code> forms before <code>map</code>, and <code>map</code> before <code>maps</code>. Frequent patterns therefore become larger tokens; an unfamiliar word still falls back to available byte pieces. Original worked example informed by <a href="https://aclanthology.org/P16-1162/">Sennrich et al. (2016)</a> and the <a href="https://github.com/openai/tiktoken">tiktoken documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> recount after each training merge. At encoding time, replay the fixed learned ranks; do not choose pairs using the new word's frequencies.</figcaption>
 </figure>
 
-Result: common words become single tokens; rare words decompose into subwords; arbitrary text is always representable (down to characters).
+Initially, `a+p` occurs $5+3+2=10$ times.
+After merging it, `m+ap` occurs eight times; after that merge, `map+s` occurs three times.
+All three winners are unique, so the tie rule does not affect this example.
 
-Used in: GPT-2/3/4, LLaMA family, most modern LLMs.
+The frozen sequence yields `maps → [maps]`, `cap → [c, ap]` and `traps → [t, r, ap, s]`.
+The last word needs available byte pieces `t` and `r`, even though the tiny training corpus never used them.
 
 ### Byte-level BPE
 
-BPE applied at the *byte* level, not the character level. Vocabulary starts with 256 byte values; merges happen on byte sequences. The advantage: any UTF-8 text is representable without unknown tokens, and the base vocabulary is fixed.
+Starting with all 256 byte values makes supported UTF-8 text representable before optional merges.
+An individual token's bytes need not form a complete Unicode character; decode the whole sequence with the declared policy.
+Character-only vocabularies without fallback do not inherit this coverage guarantee.
 
-Used in: GPT-2 onward, RoBERTa, most modern LLMs. This is what "BPE" almost always means in 2026.
+## Change base units or the deployed vocabulary
+
+### 1. Encode previously unseen Unicode
+
+**New task:** preserve supported text without an unknown-token fallback or silent normalization.
+
+**Picture and change:** U+00E9 has UTF-8 bytes `[195, 169]` before merges.
+Its decomposed form, U+0065 followed by U+0301, has different bytes.
+Whether to normalize is a task requirement, not a universal cleanup step.
+
+**Code:** use the existing tokenizer implementation, pinned here to `tiktoken==0.12.0` and `cl100k_base`.
+This real encoding is separate from the toy corpus above.
+
+```python
+import tiktoken
+
+encoding = tiktoken.get_encoding("cl100k_base")
+composed = "\u00e9"
+decomposed = "e\u0301"
+composed_ids = encoding.encode(composed, disallowed_special="all")
+decomposed_ids = encoding.encode(decomposed, disallowed_special="all")
+assert list(composed.encode("utf-8")) == [195, 169]
+assert encoding.decode_bytes(composed_ids) == composed.encode("utf-8")
+assert encoding.decode_bytes(decomposed_ids) == decomposed.encode("utf-8")
+assert composed_ids != decomposed_ids
+print(composed_ids, decomposed_ids)
+```
+
+**Check:** both forms round-trip to their original bytes, but their token IDs differ.
+Special-token-looking strings need a separate explicit policy; do not grant control-token status to arbitrary user text.
+
+**Use when:** exact code, identifiers or source text must survive preprocessing.
+
+### 2. Add domain-specific pieces
+
+**New task:** reduce fragmentation for domain text without silently changing a deployed model's symbols.
+
+**Picture and change:** version the vocabulary, IDs, embedding/output rows, templates and corresponding continued training together.
+Preserving old IDs can avoid one incompatibility, but does not train new rows.
+
+**Check:** reusing ID 17 for another piece without updating coupled weights changes the model's input interpretation.
+Revalidate quality and context counts on the paired model/tokenizer artifact.
+
+**Use when:** measured domain fragmentation justifies model adaptation and its costs.
+
+## Failure and transfer
+
+Serving with different BOS/EOS IDs or a different role template can break compatibility despite ordinary text looking correct.
+Compare the final serialized IDs, not screenshots of prompts.
+
+Does fewer tokens per document establish a better model?
+
+<details>
+<summary>Check your answer</summary>
+
+No. Compression, coverage, quality and embedding/output parameter cost are different quantities; evaluate the complete paired artifact.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ### WordPiece
 
-Similar to BPE but uses a likelihood-based merging criterion (maximize the probability of the corpus given the vocabulary) instead of frequency. Tokens not at word start are prefixed with `##`.
-
-Used in: BERT, distilBERT.
+BERT-style inference commonly uses greedy longest-match pieces within pretokenized words, with `##` marking continuation.
+Training details depend on the implementation; a family name does not pin a unique likelihood-based merge algorithm.
+Unknown-token behavior differs from complete byte coverage.
 
 ### SentencePiece (Unigram)
 
-A different paradigm: starts with a large vocabulary, removes pieces that contribute least to corpus likelihood. Trains on raw text with no pre-tokenization (handles whitespace and punctuation as part of the algorithm). Implementation by Google, often paired with their models.
-
-Used in: T5, mT5, ALBERT, multilingual models.
+SentencePiece is a toolkit supporting Unigram and BPE, not a synonym for Unigram.
+Unigram uses a probabilistic piece vocabulary and segmentation; training can prune candidates according to its objective.
+Normalization and whitespace treatment are configurable parts of the artifact.
 
 ### Tiktoken / cl100k / o200k
 
-Tiktoken is OpenAI's BPE implementation. Their tokenizers (cl100k_base, o200k_base) are byte-level BPE optimized for code and multilingual text. Available open-source.
+Tiktoken implements byte-level BPE encodings, including `cl100k_base` and `o200k_base`.
+Encoding name, package version, merge assets and special-token policy matter more than a model-family nickname.
 
 ## What an interviewer expects you to say
 
-If asked about tokenization:
-
-1. Define subword tokenization and why it solves the OOV (out-of-vocabulary) problem.
-2. Explain BPE algorithm (frequency-based merging).
-3. Distinguish character-level vs byte-level BPE.
-4. Mention vocab size trade-offs (small vocab → more tokens per word; large vocab → more parameters in embedding/output layer).
-5. Mention that **tokenization choice is fixed at training time**: you can't change it post-training without retraining.
-
-Bonus depth: mention the multilingual tokenization issue (English-trained tokenizers have very different per-character costs for non-Latin scripts, sometimes 5-10x more tokens for the same content).
+Explain base units, corpus weighting, boundaries, normalization, merge ordering, ties, IDs, special tokens and round-trip policy.
+Distinguish training from encoding and model adaptation from silent tokenizer replacement.
 
 ## Common confusions
 
-- **"Tokens are words."** No. Tokens are arbitrary pieces. "tokenization" itself might be one or two tokens depending on the tokenizer.
-- **"Switching tokenizer = small change."** It's a categorical change. The model has to be retrained.
-- **"All tokenizers are roughly equivalent in cost."** No. cl100k vs LLaMA tokenizer can give 10-30% different token counts on the same text. For multilingual and code-heavy content, the gap is much larger.
-- **"BPE is the same as WordPiece."** Similar idea, different merge criterion (frequency vs likelihood). The differences in practice are small.
+Tokens are not necessarily words, characters or complete UTF-8 sequences.
+Smaller vocabularies can increase sequence length; larger ones increase embedding/output rows and can reduce sharing.
+Neither tradeoff alone predicts final quality.
 
 ## The LLM-era tokenization gotchas
 
-A few tokenization issues that bite in production:
-
-1. **Tokenizer drift between training and serving.** Different versions of the same tokenizer family can subtly differ. Always pin the exact tokenizer version with the model.
-2. **Inconsistent BOS/EOS tokens.** Different chat-tuned models expect different special tokens for system prompts, user turns, assistant turns. Send the wrong format → quality regression. Use the model's chat template, not your own.
-3. **Multilingual cost asymmetry.** English text is ~4 chars/token; Japanese can be ~1 char/token; some scripts are even worse. A 1000-character Japanese document can cost 10x more than a 1000-character English document.
-4. **Code tokenization.** Code-aware tokenizers handle indentation, common keywords, and operators efficiently. Non-code tokenizers (older BERT, etc.) treat code very inefficiently.
-5. **Unicode normalization.** Different unicode normalizations of the "same" string (composed vs decomposed) can produce different token sequences. NFC normalization is standard but worth verifying for your domain.
-6. **Number tokenization.** Some tokenizers split numbers digit-by-digit (great for arithmetic), others treat numbers as multi-digit tokens (worse for arithmetic). LLaMA and modern models tend to split digits.
+Pin the training/serving contract, including template and BOS/EOS handling.
+Measure actual multilingual corpora, indentation/code and number formatting with the exact encoding.
+There is no universal characters-per-token ratio or guaranteed arithmetic benefit from digit splitting.
+Test normalization against exact-byte requirements rather than silently applying NFC everywhere.
 
 ## Why interviewers ask
 
-Tokenization questions test:
-1. Whether you know the algorithm vs just the vocabulary file.
-2. Whether you've debugged a real tokenization bug in production.
-3. Whether you know modern LLM tokenization choices (byte-level BPE, digit splitting, code-aware vocab).
-4. Whether you're aware of multilingual fairness/cost issues.
+For inefficient domain tokenization, compare fragmentation, quality, memory and retraining costs before choosing vocabulary adaptation.
+Use only truthful production examples; neither vocabulary terminology nor a token-count improvement proves operational experience.
 
-A common follow-up asks how to handle an inefficient tokenizer for medical, legal, or code text. Extend the tokenizer and continue pretraining, or train a new tokenizer on domain text and retrain the model.
-
----
+References: [Sennrich et al.](https://aclanthology.org/P16-1162/), [tiktoken](https://github.com/openai/tiktoken), [SentencePiece](https://aclanthology.org/D18-2012/).
 
 *Related: [Transformer architecture](/concepts/transformer-architecture/), [LLM Evals essay](/guides/llm-evals-the-hardest-part/).*
+
+</div>

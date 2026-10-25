@@ -14,192 +14,230 @@ priority: "Role-specific"
 prerequisites: ["design-youtube-recommender", "choose-ml-product-metrics", "multi-task-learning-objective-interference", "position-bias-counterfactual-learning-to-rank", "contextual-bandits"]
 ---
 
-> *Asked in: staff, principal, and senior-principal recommendation system design, product ML, experimentation, and technical-strategy rounds.*
+A feed allocates attention today and changes tomorrow's supply; separate hard policy, participant health, product outcomes and model diagnostics.
 
-Design the feed as a coupled viewer and creator system. Optimize durable viewer value under explicit creator, quality, advertiser, and platform constraints. Do not collapse these policy choices into one permanent weighted score.
+<span id="the-prompt"></span>
 
-A basic answer covers retrieval, ranking, list composition, features, labels, serving, and online tests. A senior answer adds calibration, exposure bias, creator cold start, safe exploration, concentration loops, moderation, incidents, and long-horizon measurement. Principal scope adds portfolio choices, decision rights, and evidence that can reverse a policy.
+## Problem
 
-This page gives a reference design for a 60-minute answer. In an interview, state the objective hierarchy, draw the request path, and take two difficult mechanisms deep.
+Design a fictional short-form feed for 800 million monthly viewers and 25 million active creators.
+Its scenario peak is 500,000 requests/second, ten returned items/request and 20 million daily uploads.
+The server p99 target is below 120 milliseconds; media startup is separate.
+These counts and the reported effects below are invented teaching assumptions, not company observations.
 
-## The prompt
+A release reports 4.8% higher watch time, followed by weaker new-creator retention and concentrated exposure eight weeks later.
+Viewers, creators, advertisers and the platform need separate outcome contracts.
+Define a two-year direction with safe launches, qualified creator opportunity, durable evidence and reversible policies.
 
-A global short-form video product has 800 million monthly viewers and 25 million active creators. Viewers open a full-screen feed and swipe through videos lasting from several seconds to three minutes.
+For a smaller diagnostic, compare two policy cohorts with complete tested-creator outcomes but missing untested-creator outcomes.
+Return means another policy-eligible upload on days 15-30 after the first eligible upload.
 
-The current ranker predicts watch time, completion, likes, shares, and follows. A recent release raised daily watch time by 4.8 percent. Eight weeks later, creator research found a different pattern. New-creator retention fell, exposure concentrated among established accounts, and several high-quality categories produced less content.
+| Cohort record | Policy A | Policy B |
+| --- | ---: | ---: |
+| All eligible new creators | 1,000 | 1,000 |
+| Creators receiving a qualified test | 400 | 200 |
+| Returning creators among those tested | 200 | 120 |
+| Untested creators with outcomes not retrieved | 600 | 800 |
 
-The company also operates an advertising business. Advertisers need brand-safe reach and credible measurement. Trust and safety teams enforce content policy across regions and age groups. Serving must remain below 120 milliseconds at the 99th percentile.
+Did creator retention improve, and what must a release decision recover?
 
-Design recommendation for the next two years. Improve viewer value while maintaining a healthy supply of creators. Cover models, data, experiments, serving, policy, operations, ownership, and the choices expected at staff, principal, and senior-principal scope.
+## Picture: Keep the Whole Cohort in View
 
-## State the answer before drawing the system
+The tested-only return rate rises, but access to the tested group shrinks.
 
-Use a multi-stage recommender with several candidate sources, calibrated task heads, and a constrained list composer. Train models to estimate viewer responses and longer-term outcomes. Apply eligibility, safety, diversity, exposure, freshness, and advertising rules outside the predictive heads.
+| Quantity | Policy A | Policy B |
+| --- | --- | --- |
+| Return among tested | 200/400 = 50% | 120/200 = 60% |
+| Qualified-test receipt | 400/1,000 = 40% | 200/1,000 = 20% |
+| Returning tested creators per eligible cohort | 200/1,000 = 20% | 120/1,000 = 12% |
+| Possible all-eligible return rate | 20%-80% | 12%-92% |
 
-The objective hierarchy has four levels:
+The last bounds allow every untested creator either to return or not return.
+Their outcomes are unknown, not zero.
+Both total improvement and total decline remain compatible with this ledger.
+Recover mature outcomes for the entire eligible cohort before evaluating its primary retention rate.
+Test receipt and exposure-conditioned views remain pathway diagnostics, not replacement denominators.
 
-1. **Legal and safety constraints:** prohibited content, age rules, privacy, regional policy, and severe integrity risks block exposure.
-2. **Durable participant health:** viewer satisfaction, creator opportunity, advertiser trust, and platform reliability set launch guardrails.
-3. **Product outcomes:** satisfied viewing, useful discovery, creator production, and sustainable revenue guide tradeoffs within those constraints.
-4. **Model diagnostics:** ranking loss, calibration, retrieval recall, latency, and cost explain behavior but do not define product success.
+Even complete outcomes do not automatically identify causality.
+The cohort contrast above is not declared randomized; concurrent incentives, eligibility and acquisition can differ.
+Separately, even viewer-randomized cells can share treatment-altered creator supply.
 
-A single weighted sum cannot settle a dispute between viewer retention, creator opportunity, child safety, and advertiser suitability. Their units, time horizons, evidence quality, and acceptable failure rates differ. Some constraints are hard. Some use budgets or floors. Others require a policy decision with a named owner.
+<p class="visual-kicker">Why viewer randomization may not isolate long-run supply effects</p>
+<p class="visual-title">Treatment and control can consume the same inventory after creators respond to both policies.</p>
 
-The design therefore separates prediction from policy. Models estimate outcomes under stated exposure conditions. A versioned policy layer chooses allowable tradeoffs, records the decision, and supports rollback.
+<!-- visual:ecosystem-experiment-interference -->
+```mermaid
+flowchart TB
+  accTitle: Shared creator supply creates interference between viewer-randomized treatment and control cells
+  accDescr: Current creator inventory supplies viewer-randomized treatment and control cells. The cells compare immediate viewer outcomes while their ranking policies allocate different exposure to the same creators. Exposure from both cells changes creator learning, retention, and production over weeks. That response creates next-period shared inventory, which enters both future treatment and future control cells. An immediate comparison has a narrower estimand under its assumptions. Future control consumes an ecosystem partly changed by treatment and is not an untouched long-horizon counterfactual.
+  Inventory["CURRENT SHARED INVENTORY<br/>same creators supply both cells"]
+  Cells["VIEWER-RANDOMIZED CELLS<br/>treatment: new policy / control: current"]
+  Immediate["IMMEDIATE VIEWER COMPARISON<br/>watch / skip / satisfaction"]
+  Opportunity["SHARED CREATOR OPPORTUNITY<br/>both policies allocate reach"]
+  Response["CREATOR RESPONSE OVER WEEKS<br/>learning / retention / production"]
+  Next["NEXT-PERIOD SHARED INVENTORY<br/>supply responds to both cells"]
+  Future["FUTURE TREATMENT + CONTROL<br/>not an untouched ecosystem"]
+  Inventory ==> Cells
+  Cells -->|"before supply responds"| Immediate
+  Cells ==>|"different policies, same creators"| Opportunity
+  Opportunity ==> Response ==> Next
+  Next -.->|"shared supply returns to both cells"| Future
+  class Inventory viz-state
+  class Cells,Opportunity,Response viz-focus
+  class Immediate,Next viz-output
+  class Future viz-warning
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow reach into creator production, then back into both cells' inventory. A longer viewer test does not automatically restore an untreated ecosystem.</p>
+
+<span id="state-the-answer-before-drawing-the-system"></span>
+
+## Decision Contract: Prediction Is Not Policy Authority
+
+| Level | Decision behavior |
+| --- | --- |
+| Legal/safety constraints | Block prohibited, age-inappropriate, privacy-invalid or severe-integrity exposure |
+| Participant-health guardrails | Protect viewer value, creator opportunity, advertiser trust and reliability with approved stops |
+| Product outcomes | Compare satisfied viewing, useful discovery, sustainable production and revenue within those bounds |
+| Model diagnostics | Use loss, calibration, recall, latency and cost to explain mechanisms, not declare ecosystem success |
+
+Version the source portfolio, task heads, calibrators, constrained composer and exposure policy.
+Training loss weights control optimization; policy owners govern attention allocation, budgets, floors and exceptions.
+At this workload, returned capacity is five million positions/second, not five million examined or qualified impressions.
+Prefetch is not actual exposure.
+
+## Change 1: A Proposed 20% New-Account Allocation
+
+**New task.** Leadership wants a global new-account impression target.
+
+**Picture and change.** Require eligible audience fit, qualified-test floors, approved budgets and randomized response curves.
+Protect viewer and creator outcomes rather than guarantee equal raw reach.
+
+**Check.** More exploration can harm viewers without improving learning when candidate quality or matching fails.
+
+**Use when.** Opportunity is confused with guaranteed distribution.
+
+## Change 2: Creators Supply Both Experiment Cells
+
+**New task.** Treatment alters inventory later consumed by control.
+
+**Picture and change.** Specify immediate versus long-run effects and spillover paths.
+Choose justified creator clusters, markets, switchbacks, saturation or holdouts, with remaining contamination and power reported.
+
+**Check.** No experiment unit universally removes network or supply interference.
+
+**Use when.** Policy changes shared production or competition.
+
+## Change 3: Mature Creator Damage Breaches a Guardrail
+
+**New task.** Viewer gains remain valuable, but the approved creator bound fails.
+
+**Picture and change.** Validate cohorts/instrumentation, then trace source, score, calibration, composition, eligibility and advertisement displacement.
+Restore or narrow a known compatible manifest; test recovery separately.
+
+**Check.** Containment can be justified before exact causal attribution.
+An untested creator boost can obscure the original failure.
+
+**Use when.** Delayed externalities require a reversible decision now.
+
+## Change 4: Generated Uploads or Subscription Funding
+
+**New task.** Generated uploads dominate, or subscriptions replace advertising.
+
+**Picture and change.** Reopen provenance, integrity, incentives and creator-outcome policy with domain owners.
+State the investment displaced; preserve shared exposure identity and auditable decision authority.
+
+**Check.** Neither a blanket generated-content penalty nor raw-view incentives follow automatically.
+
+**Use when.** Supply economics or business assumptions change.
+
+## Failure: Selected Survivors Become the Primary Outcome
+
+A short viewer test does not settle ecosystem health.
+Replacing all-eligible retention with tested-only return hides lost opportunity and missing outcomes.
+Keep mature cohort denominators, interference limits, domain owners and reversal conditions explicit.
+
+## Transfer Check
+
+Does rising concentration alone establish unhealthy allocation?
+
+### Reasoned Answer
+
+No. A major event can create legitimate concentrated demand.
+Inspect qualified opportunity, participant outcomes, category supply, causal/mechanical evidence and approved policy before intervening.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
 
 ## Clarify the product and authority
 
-Ask questions that can change the architecture or objective.
+<span id="surface-and-viewer-intent"></span>
+<span id="creator-supply"></span>
+<span id="policy-and-integrity"></span>
+<span id="advertising-and-business"></span>
+<span id="scale-and-operations"></span>
 
-### Surface and viewer intent
-
-- Is this the main swipe feed, a following feed, search, or notifications?
-- Does the surface promise entertainment, learning, social connection, or rapid discovery?
-- Are sessions usually two minutes or forty minutes?
-- How do age, language, region, device, and network quality change the experience?
-- Can viewers choose stronger topic, creator, or time controls?
-
-### Creator supply
-
-- What fraction of uploads comes from new, occasional, professional, and institutional creators?
-- Which creator outcome is scarce: first qualified exposure, repeat production, income, audience formation, or trust?
-- How long does a creator need to judge whether publishing is worthwhile?
-- Are creators paid directly, through advertising, through commerce, or outside the platform?
-- Which categories need longer production cycles than daily entertainment?
-
-### Policy and integrity
-
-- Which content is ineligible, restricted, reduced, labeled, or allowed?
-- When does a moderation appeal restore distribution?
-- Which decisions need human review?
-- Can a ranking team alter exposure policy without trust and safety approval?
-- What evidence is required before a creator receives a penalty?
-
-### Advertising and business
-
-- Are advertisements inserted after organic ranking or jointly allocated?
-- Which brand-safety classes apply by advertiser and region?
-- Does ad load depend on session depth, user tolerance, or inventory?
-- Which revenue changes are temporary auction effects?
-- Can commercial incentives influence organic creator distribution?
-
-### Scale and operations
-
-- How many feed requests and uploads arrive each second?
-- How quickly must a new upload become retrievable?
-- What are the candidate count, ranking budget, and tail-latency target?
-- Which features require real-time updates?
-- What fallback can operate during feature, model, or policy outages?
-
-Assume the main personalized feed receives 500,000 requests per second at peak. Each request returns ten items and prefetches the next page. About 20 million videos arrive daily. Most viewer sessions begin with little explicit intent.
+| Boundary | Questions that change scope |
+| --- | --- |
+| Viewer | Swipe/follow/search/notification, promised value, session length, age/locale/device/network and topic/time controls? |
+| Creator | New/professional supply, scarce opportunity/income/trust, production horizon and funding model? |
+| Authority | Eligibility/restriction/reduction, appeals, human review, policy-change rights and penalty evidence? |
+| Business | Organic/ad allocation, suitability, fatigue/pacing, auction transients and commercial influence? |
+| Operations | Rates, publication delay, candidate/compute/tail budgets, real-time features and validated fallbacks? |
 
 ## Model the product as a coupled system
 
 The recommender allocates scarce attention. That allocation changes creator behavior, future inventory, advertiser demand, and the next training set.
 
 ```mermaid
-flowchart LR
-  C[Creators choose what to make] --> U[Upload and moderation]
-  U --> E[Eligible video inventory]
-  E --> R[Retrieval and ranking]
-  R --> X[Viewer exposure]
-  X --> V[Viewer response and satisfaction]
-  X --> O[Creator reach and feedback]
+flowchart TB
+  accTitle: Attention allocation changes creator supply, demand, revenue and later training
+  accDescr: Creators upload into moderated inventory. Retrieval and ranking allocate viewer exposure. Viewer responses affect future demand; creator reach and funding affect future production. Advertising and training logs also depend on this allocation. These coupled delayed paths can create interference rather than independent item outcomes.
+  C["Creator choices<br/>next uploads"] --> U["Upload<br/>moderation"]
+  U --> E["Eligible<br/>inventory"]
+  E --> R["Retrieval<br/>ranking"]
+  R --> X["Viewer<br/>exposure"]
+  X --> V["Viewer response<br/>satisfaction"]
+  X --> O["Creator reach<br/>feedback"]
   O --> C
-  V --> D[Future viewer demand]
+  V --> D["Future viewer<br/>demand"]
   D --> R
-  X --> A[Advertiser delivery and brand safety]
-  A --> B[Revenue and creator funding]
+  X --> A["Ad delivery<br/>brand safety"]
+  A --> B["Revenue<br/>creator funding"]
   B --> C
-  X --> L[Training and experiment logs]
+  X --> L["Training<br/>experiment logs"]
   L --> R
+  class C,E viz-state
+  class R,X viz-focus
+  class V,O,A,L viz-output
 ```
 
-The arrows have different delays. A skip arrives in seconds. A viewer return label may need weeks. Creator retention may need one or three months. Supply quality can change over several production cycles.
-
-This structure creates interference. Showing one video removes an impression from another. Giving a creator more reach can change that creator's next upload. A viewer-level experiment can affect creators who supply both treatment and control viewers.
-
-The system also has several scarce resources:
-
-- viewer attention;
-- first-page positions;
-- creator exposure;
-- moderation capacity;
-- exploration traffic;
-- advertisement opportunities;
-- serving compute;
-- product attention for policy changes.
-
-A senior answer says which resource each control allocates. A broad word like engagement does not identify the allocation.
+Skips arrive quickly; viewer return, creator retention and supply response need longer, different windows.
+Attention, positions, creator tests, moderation, exploration, ads, compute and policy-review capacity are scarce.
+Name which resource each control allocates and which participants share its consequences.
 
 ## Build an objective hierarchy
 
-Start with separate objectives and constraints. Combine only quantities whose relationship has been reviewed and measured.
-
 ### Viewer objective
 
-Use a durable viewer outcome as the primary product objective. One example is incremental satisfied active days over 28 days among eligible viewers.
-
-No single observed label measures satisfaction. Use a measurement system containing:
-
-- session starts and qualified watches;
-- rapid skips and abandonment;
-- explicit likes, saves, shares, and follows;
-- hides, reports, blocks, and topic controls;
-- sampled satisfaction surveys;
-- next-day and next-week return;
-- repeated viewing that suggests either value or compulsion;
-- time spent followed by regret or time-limit actions.
-
-Watch time remains useful. It measures consumed attention and gives a dense training signal. It should remain a diagnostic or bounded product metric when extra minutes may reflect low-quality continuation.
+Define a durable outcome, such as incremental satisfied active days over a declared horizon.
+Triangulate qualified viewing, skips, abandonment, explicit reactions/controls, sampled surveys, voluntary return and regret/time-limit behavior.
+Repeated viewing and extra minutes are not automatically satisfaction.
 
 ### Creator objective
 
-The creator objective is sustainable production of content that viewers value under platform policy. It is not equal exposure for every upload and it is not creator retention at any cost.
-
-Measure creator health through cohorts and opportunity transitions:
-
-- fraction receiving a first qualified test audience;
-- time from upload to enough evidence for a decision;
-- probability of reaching 100, 1,000, or 10,000 qualified viewers;
-- repeat upload rate after quality-adjusted exposure;
-- 30-day and 90-day active creator retention;
-- audience formation across several uploads;
-- creator earnings, where applicable;
-- appeal rate and successful appeal restoration;
-- concentration of impressions and earnings;
-- production by category, language, region, and creator tenure.
-
-Qualified exposure excludes accidental autoplay, invalid traffic, and viewers outside the intended audience. A creator who reaches 10,000 uninterested viewers did not receive useful opportunity.
+Seek sustainable useful production, not equal impressions or retention at any cost.
+Track qualified tests, decision delay, reach-band transitions, repeat uploads, mature retention, audience formation, earnings, appeals and concentration by cohort.
+Exclude invalid traffic and mismatched/accidental exposure from qualified opportunity.
 
 ### Advertiser objective
 
-Advertisers need effective and trusted delivery. Track:
-
-- incremental conversions or brand lift;
-- reach and frequency;
-- viewability and completion under valid traffic;
-- brand-safety violations;
-- adjacency to unsuitable content;
-- campaign pacing;
-- auction health and advertiser concentration;
-- complaint, refund, and make-good rates.
-
-Revenue is a platform outcome, but short-term revenue can rise through excessive ad load. Viewer abandonment and advertiser trust should constrain that choice.
+Track incremental conversion/lift, reach/frequency, valid viewability, suitability/adjacency, pacing, auction health and complaint/refund/make-good costs.
+Extra ad revenue can hide abandonment or trust damage.
 
 ### Platform objective
 
-The platform needs reliable, affordable, and governable operation. Track:
-
-- feed availability and latency percentiles;
-- cost per satisfied session;
-- model and policy rollback time;
-- moderation backlog and appeal delay;
-- privacy and data-use violations;
-- measurement coverage and label maturity;
-- incident frequency and blast radius;
-- engineering support cost per experiment;
-- ability to reproduce exposure decisions.
+Track availability/tails, cost per satisfied session, rollback, moderation/appeal delay, privacy, measurement/maturity, incident blast radius and support cost.
+Require reconstructable exposure decisions.
 
 ### Hard constraints, guardrails, and diagnostics
 
@@ -244,35 +282,18 @@ Decision use:
   launch guardrail for broad ranking changes
 ```
 
-This definition keeps creators denied exposure in the primary denominator. Conditioning the primary retention metric on treatment-driven exposure would create post-treatment selection. Exposure-conditioned views remain useful pathway diagnostics, but they cannot be the only launch guardrail.
-
-The maturity rule also prevents a fresh cohort from appearing to have zero retention.
-
-Metric contracts should include revision history. Changing qualified impression logic can create a false trend even when product behavior is stable.
+Keep denied-exposure creators in the primary denominator; treatment-driven exposure strata are diagnostic unless a justified mediation estimand is defined.
+Unmatured cohorts are not zero-return cohorts.
+Version qualified-impression and metric logic so definition changes do not masquerade as product trends.
 
 ### Leading and lagging indicators
 
-Long-horizon outcomes arrive too late for daily operation. Use leading indicators that have demonstrated a relationship with mature outcomes.
+| Participant | Candidate leading indicators |
+| --- | --- |
+| Creator | Test-entry delay, early qualified reach, distinct tests across uploads, feedback delay, concentration and demand-matched category coverage |
+| Viewer | Skips, repetitive-session abandonment, hides/reports, sampled surveys, topic/creator diversity and voluntary return |
 
-Creator leading indicators can include:
-
-- fraction of eligible uploads entering a test bucket within six hours;
-- median qualified impressions in the first day;
-- share of new creators whose first three uploads receive distinct audience tests;
-- creator-facing feedback latency;
-- concentration among eligible impressions;
-- coverage of content categories with healthy viewer demand.
-
-Viewer leading indicators can include:
-
-- rapid-skip rate;
-- session abandonment after repeated similar items;
-- hide and report rates;
-- survey response on sampled sessions;
-- topic and creator diversity over a week;
-- voluntary return after a natural break.
-
-A leading indicator needs periodic validation. If first-day exposure stops predicting 30-day creator retention, it loses authority as a launch signal.
+Validate these against mature outcomes periodically; a broken relationship removes their launch authority.
 
 ### Cohort maturity board
 
@@ -289,55 +310,37 @@ The board prevents an early watch-time win from becoming a final ecosystem verdi
 
 ## Design candidate generation as a portfolio
 
-At this scale, no ranker scores every eligible video. Candidate generation should preserve several ways for an item to enter the feed.
-
 ### Candidate sources
 
-1. **Personalized embedding retrieval:** a user or session tower retrieves nearby video embeddings from an approximate nearest-neighbor index.
-2. **Sequence continuation:** a session model finds items compatible with recent watches, skips, topic shifts, and completion patterns.
-3. **Follow and relationship graph:** recent eligible uploads from followed creators or close social connections.
-4. **Content-based retrieval:** text, audio, visual, language, topic, and style features match current viewer interests.
-5. **Fresh inventory:** recent uploads receive a controlled route before collaborative signals become reliable.
-6. **New-creator pool:** policy-eligible videos from creators lacking exposure history enter bounded quality-aware tests.
-7. **Regional and cultural trends:** time-local patterns enter with velocity and integrity controls.
-8. **Editorial or public-interest sources:** reviewed collections support events, civic information, and underserved content needs.
-9. **Exploration source:** uncertain items with plausible viewer fit enter under a logged propensity policy.
-10. **Recovery and diversity source:** candidates repair missing topics, creators, languages, or viewpoints when the current set is too narrow.
+1. **Personalized embeddings:** viewer/session-to-video ANN retrieval.
+2. **Sequence continuation:** recent watches, skips and intent changes.
+3. **Follow graph:** eligible followed/social uploads.
+4. **Content:** multimodal, language, topic and style matching.
+5. **Fresh:** recent inventory before interaction evidence.
+6. **New creators:** bounded quality-aware audience tests.
+7. **Regional trends:** time-local velocity with integrity checks.
+8. **Editorial/public interest:** reviewed events and underserved needs.
+9. **Exploration:** uncertain plausible matches with logged propensities.
+10. **Recovery/diversity:** repair missing topics, creators, languages or viewpoints.
 
 Each source should have an owner, recall target, eligibility contract, quota range, and degradation behavior.
 
 ### Merge and deduplicate
 
-Candidate IDs carry source membership, retrieval score, index version, eligibility version, and retrieval propensity when known. The merge stage deduplicates without erasing source evidence.
-
-An item retrieved by both follow graph and embedding search may deserve different interpretation from an item found only through exploration. Preserve every source bit for analysis.
-
-Use source floors or ranges rather than fixed permanent quotas. A new viewer may need more trend and exploration supply. A mature viewer may need more follow and sequence candidates. Policy can raise a source floor during a creator cold-start repair.
+Retain every source, score, index/eligibility version and known propensity under canonical IDs.
+Use reviewed source ranges/floors responsive to viewer support and opportunity needs, not permanent universal quotas.
 
 ### Retrieval models
 
-Personalized embedding retrieval can use a two-tower model trained with sampled softmax or in-batch negatives. The viewer tower encodes longer-term interests and bounded recent context. The video tower combines content embeddings, language, topic, freshness, and exposure-aware history.
-
-Observed watches are policy-selected positives. Sample negatives from items that were eligible and plausibly exposed, then evaluate how the sampling policy changes calibration and coverage. Random unseen catalog items are often too easy and teach little about near-neighbor ranking.
-
-Precompute stable video embeddings and update fresh-video embeddings through a streaming path. Use approximate nearest-neighbor indexes with coarse region, language, and policy partitions. Recheck current eligibility after retrieval because index state can lag moderation.
-
-A sequence retriever can model short session intent separately from long-term taste. Keep its source identity visible. Otherwise, a temporary session pattern can silently dominate every candidate path.
+Two towers can combine bounded viewer context with content, language, topic, freshness and exposure-aware video history.
+Sampled-softmax/in-batch objectives need false-negative and sampling/calibration checks; observed watches are policy-selected positives.
+Precompute stable embeddings, stream fresh ones, partition where useful and recheck current eligibility after potentially stale index retrieval.
+Keep sequence intent distinct from long-term taste and retain its source identity.
 
 ### Retrieval evaluation
 
-Measure retrieval before ranking:
-
-- recall of later high-value items within the candidate set;
-- eligible catalog coverage;
-- new-video and new-creator coverage;
-- source overlap and marginal contribution;
-- category, language, and region coverage;
-- retrieval latency and index freshness;
-- exposure propensity support;
-- frequency of empty or low-quality source returns.
-
-An excellent ranker cannot choose an item that retrieval omitted. Many ecosystem failures begin as candidate starvation rather than ranking error.
+Measure supported useful-item recall, eligible/cold coverage, unique contribution, locale/category, freshness/tails, propensity support and empty/poor sources.
+Missing candidates cannot be repaired by final ranking.
 
 ## Build a multi-task ranker with calibrated outputs
 
@@ -345,29 +348,17 @@ The ranker estimates several viewer responses for each candidate. A shared trunk
 
 ### Ranking architecture
 
-Use a long-term viewer encoder, a bounded session sequence encoder, precomputed multimodal video features, exposure-aware creator context, and explicit interaction features. Keep slow content computation outside the request path. Update only small real-time counters and session state during serving.
+Combine long-term/session encoders, precomputed multimodal content, opportunity-aware creator history and bounded real-time crosses.
+Compare shared heads, task branches or experts through per-task ablations, gradient conflict and serving cost.
+Contrast content-rich versus history-rich paths for low-exposure inventory; normalization alone does not establish causal quality.
 
-A shared trunk with task heads is a clear baseline. Multi-gate mixture of experts or task-specific branches can help when sparse satisfaction labels conflict with dense watch labels. Architecture changes should follow per-task ablations, gradient diagnostics, and serving cost.
-
-Limit historical creator features or normalize them for prior opportunity. Raw follower and impression counts can let earlier allocation dominate content evidence. Compare a content-rich path against the full history model for low-exposure inventory.
-
-Possible heads include:
-
-- probability of watch beyond two seconds;
-- expected watch duration conditional on a qualified start;
-- probability of completion, normalized by video duration;
-- rapid skip;
-- like, save, share, follow, hide, block, and report;
-- sampled satisfaction response;
-- next-session return;
-- creator profile visit;
-- voluntary session continuation after the item.
-
-Do not train every outcome on every row. Use explicit masks for delayed, sampled, or ineligible labels. Preserve label maturity and observation probability.
-
-Do not copy a session-level return label onto every shown item without an attribution rule. Use a sequence objective, a documented proxy, or randomized evidence for longer-term contribution. An item-level return head otherwise learns position, session length, and prior policy as if each item caused the outcome.
-
-Estimate advertisement opportunity with a separate session model. This keeps bids and campaign state out of organic item predictions while allowing the final composer to account for ad fatigue.
+| Head family | Label/population contract |
+| --- | --- |
+| Watch | Qualified-start probability, conditional seconds, completion definition and video-duration meaning |
+| Reactions | Skip, like/save/share/follow/hide/block/report with observation windows |
+| Satisfaction | Survey sampling/response, mature return, profile visits or voluntary continuation |
+| Attribution | Masks for sampled/delayed/ineligible labels; no session outcome copied to every item without justification |
+| Ads | Separate session opportunity model; bids/campaign state do not silently alter organic predictions |
 
 ### Separate training balance from product policy
 
@@ -379,68 +370,34 @@ $$
 
 The weights $w_t$ control optimization. They do not state how the product values an extra share against a report or a creator opportunity.
 
-Normalize loss scale, inspect gradient magnitude, and measure task conflict by layer. Compare hard sharing, task-specific branches, multi-gate mixture of experts, or progressive layered extraction when negative transfer appears.
-
-An auxiliary watch head may improve representation while remaining absent from the final decision policy. Conversely, a policy constraint can affect ranking without becoming a training head.
+Inspect loss/gradient scale and layerwise conflicts; compare hard sharing, experts or progressive extraction when warranted.
+Auxiliary training heads need not enter utility, and policy constraints need not become heads.
 
 ### Calibrate every decision-facing head
 
-Calibration means a predicted probability of 0.2 corresponds to about a 20 percent event rate on the relevant deployment population.
-
-Calibrate item predictions under a declared reference exposure regime. If a post-ranking response model includes assigned position, calibrate that model separately. Do not feed an unknown future position into a pre-composition item calibrator.
-
-Useful calibration slices include:
-
-- task;
-- country and language where needed;
-- video duration bucket;
-- position or exposure regime;
-- new versus established content;
-- traffic source;
-- policy version;
-- label maturity cohort.
-
-Use held-out deployment-like data. Platt scaling, isotonic regression, beta calibration, or learned calibrators are possible choices. Monitor expected calibration error, reliability plots, and decision-weighted calibration error.
-
-A sparse report head and a dense watch head can have very different base rates. Combining their raw logits gives arbitrary behavior. Even calibrated predictions do not decide the policy tradeoff. They only put estimates into interpretable units.
+Calibration compares predicted probabilities with event frequencies on a declared population and reference exposure regime.
+Never insert unknown future position into a pre-composition item calibrator; calibrate position-conditioned response separately.
+Use deployment-like held-out task, locale, duration, exposure, cold-content, source, policy and maturity slices.
+Compare Platt, isotonic, beta or learned calibration with reliability and decision-weighted diagnostics.
+Raw logits have incompatible meanings; calibrated heads still do not choose policy trade-offs.
 
 ### Represent uncertainty
 
-New videos and rare viewer contexts have uncertain predictions. Carry uncertainty or support features into composition and exploration.
-
-Useful signals include:
-
-- posterior variance or ensemble disagreement;
-- effective sample size for creator and video history;
-- distance from training support;
-- calibration confidence by slice;
-- age of the content and feature snapshot;
-- uncertainty in moderation or topic labels.
-
-Uncertainty should not excuse unsafe distribution. It controls whether an eligible item receives a bounded test, a conservative score, or human review.
+Carry posterior/ensemble uncertainty, history support, training distance, calibration confidence, snapshot age and label uncertainty where validated.
+These guide bounded eligible tests or review, not unsafe exposure.
 
 ## Correct exposure and position bias
 
 Training data records outcomes for shown items. The current policy chose those items and positions. Raw watch and click labels therefore reward prior exposure.
 
-Log the full observation process:
-
-- request and viewer identifiers;
-- eligible candidate set or a sampled representation;
-- retrieval sources and scores;
-- pre-composition predictions;
-- policy and model versions;
-- final slate and positions;
-- assignment and actual exposure;
-- randomization propensity;
-- viewport, autoplay, and network state;
-- mature outcomes and corrections.
+Retain request/viewer, candidate support, sources/scores, pre-composition estimates, versions, slate/positions, assignment, actual exposure, propensities and mature corrections.
+Viewport, autoplay, continuation and network state affect examination.
 
 ### Examination and position
 
-A full-screen feed still has position effects. Early items receive more viewers. Later items are seen only by people who continue the session. Network delay and prefetch failure can also change actual exposure.
-
-Estimate examination or continuation probabilities through controlled position randomization where risk permits. Continuation logs show whether a position was reached. They do not identify an item's causal effect at that position without randomization or a justified structural model.
+Later positions require continued viewing; network/prefetch can prevent exposure.
+Continuation logs record reached positions, not causal item effects.
+Use justified controlled randomization or explicit structural assumptions when estimating position effects.
 
 ### Inverse propensity methods
 
@@ -470,21 +427,8 @@ Use care when interpreting them as intrinsic quality. Compare models with exposu
 
 ## Compose a list under explicit constraints
 
-Ranking items independently can produce a repetitive or unsafe page. A list composer considers interactions among the selected items and the current session.
-
-Possible constraints include:
-
-- policy eligibility for the viewer's age and region;
-- maximum repeated creator count within a window;
-- topic and format diversity;
-- minimum freshness when qualified inventory exists;
-- bounded new-creator tests;
-- language compatibility;
-- no near-duplicate videos;
-- fatigue limits for sounds, trends, or advertisements;
-- brand-safety rules around ad slots;
-- exploration budget;
-- serving and prefetch feasibility.
+Compose interactions under age/region eligibility, creator/topic/format repetition, qualified freshness/opportunity, language, deduplication, fatigue, suitability and exploration constraints.
+Include serving/prefetch feasibility.
 
 Use a fast greedy re-ranker, constrained beam search, submodular objective, or integer optimization on a small top set. The choice depends on latency and interaction complexity.
 
@@ -494,30 +438,20 @@ $$
 \max_{S} U_{viewer}(S)
 $$
 
-subject to eligibility, risk, repetition, exploration, ad-load, and opportunity constraints. $U_{viewer}$ can combine reviewed viewer predictions, but it does not absorb creator, advertiser, or safety authority. Those objectives retain separate guardrails, experiments, and decision owners. Some constraints may be soft within approved ranges. Severe safety constraints remain hard.
+Select only sets satisfying eligibility, risk, repetition, exploration, ad-load and opportunity requirements.
+The viewer utility can combine reviewed predictions, not absorb creator, advertiser or safety authority.
+Keep separate owners/guardrails and approved soft ranges; severe safety constraints remain hard.
 
 The composer should emit reason codes. Examples are `selected_personal_fit`, `fresh_inventory_test`, `creator_repeat_cap`, `policy_ineligible`, and `topic_repair`. Reason codes support debugging, creator explanations, and incident analysis.
 
 ### Session-aware composition
 
-The next item depends on what the viewer already saw. Maintain a lightweight session state containing:
-
-- recent topics and creators;
-- skips and qualified watches;
-- repeated sounds or formats;
-- session depth and elapsed time;
-- recent negative feedback;
-- ad exposure and fatigue;
-- exploration already consumed;
-- quality or wellbeing prompts already shown.
-
-The session state must have bounded size and a clear fallback. If it is unavailable, use conservative repetition and ad-load rules.
+Bound session topics/creators, skips/watches, repeated formats, depth/time, negatives, ad fatigue, exploration spent and wellbeing prompts.
+Specify conservative repetition/ad-load fallback when state is unavailable.
 
 ## Give new creators a qualified learning opportunity, not guaranteed reach
 
-Creator cold start has two related problems. The model knows little about a new creator, and the platform has little behavioral evidence for each new video.
-
-A sound policy provides qualified learning opportunities among eligible content. It does not promise equal impressions or suppress clear viewer preferences.
+Separate uncertain creator history from uncertain video response; provide qualified learning opportunities, not guaranteed equal reach.
 
 ### Cold-start path
 
@@ -529,9 +463,8 @@ A sound policy provides qualified learning opportunities among eligible content.
 6. Expand, hold, narrow, or stop based on calibrated evidence.
 7. Let later uploads benefit from transferable creator evidence without making history permanent.
 
-The first audience should be relevant enough to produce information. Random global exposure creates bad viewer experiences and noisy creator feedback.
-
-Keep a randomized allocation within eligible matched audiences when risk permits. This separates early allocation effects from content-match selection and estimates how creator and viewer outcomes respond to test size.
+Test matched eligible audiences, not random global impressions.
+Permitted randomization can estimate allocation response under its design; retain safety, support and interference limits.
 
 ### Evidence ladder
 
@@ -549,24 +482,14 @@ Each stage has minimum evidence, maximum exposure, and stop conditions. The thre
 
 ### Creator-facing feedback
 
-Creators need understandable signals. Give ranges and reason classes rather than false precision.
-
-Useful feedback includes:
-
-- whether the video passed policy eligibility;
-- whether a technical issue limited delivery;
-- audience match and early response ranges;
-- appeal status;
-- repeated policy or quality concerns;
-- whether evidence is still immature.
-
-Do not reveal features that invite direct abuse. Keep internal anti-spam thresholds and sensitive moderation signals protected.
+Explain eligibility, delivery faults, audience/response ranges, appeals, repeated concerns and immature evidence.
+Protect anti-abuse thresholds and sensitive signals; avoid false precision.
 
 ### Measure opportunity conditionally
 
-Compare creator outcomes after accounting for content eligibility, category demand, upload cadence, region, and acquisition channel. Also report unadjusted outcomes because adjustment can hide product effects.
-
-Track survival curves for creator cohorts. A drop concentrated after repeated low-exposure uploads suggests a different mechanism from a drop after policy removals.
+For causal comparisons, use justified pre-treatment covariates and all-eligible outcomes.
+Treatment-driven exposure/eligibility adjustments are pathway diagnostics unless a mediation estimand is identified.
+Report raw outcomes and survival patterns; low reach and policy removals suggest different investigations.
 
 ## Explore safely and measure the exploration policy
 
@@ -574,36 +497,18 @@ Exploration gathers information and broadens opportunity. It consumes viewer att
 
 ### Exploration units
 
-Explore among:
-
-- uncertain videos with strong content-based fit;
-- new creators who passed quality and policy checks;
-- topics where the viewer model has weak support;
-- source allocations rather than arbitrary items;
-- policy variants within approved ranges.
-
-Do not explore prohibited or high-risk content for learning value.
+Choose eligible uncertain matched videos, qualified new creators, weak-support topics, source allocations or approved policy ranges.
+Never bypass prohibitions for learning value.
 
 ### Algorithms
 
-Contextual bandits can choose among eligible candidates or source allocations. Thompson sampling uses posterior uncertainty. Upper confidence bound methods add an uncertainty bonus. Epsilon-greedy is simple but spends traffic without directing it toward informative choices.
-
-For large slates, use a layered approach. Retrieval sources propose eligible items. A small exploration controller chooses a source or candidate subset. The main composer still enforces safety, repetition, and session constraints.
+Compare contextual Thompson sampling, UCB or epsilon-greedy under their reward/support/nonstationarity assumptions.
+A source/subset controller can limit slate complexity while the composer retains all constraints.
 
 ### Logging
 
-Every exploratory choice needs:
-
-- the eligible action set;
-- chosen action;
-- action probability;
-- context snapshot;
-- policy version;
-- exposure and position;
-- reward horizon;
-- safety and quality state.
-
-Without propensities, the data cannot support reliable counterfactual evaluation.
+Log eligible actions, choice/probability, context, version, actual exposure/position, reward horizon and safety/quality state.
+Missing propensities prevent identifying the intended IPS comparison from those records alone.
 
 ### Exploration budgets
 
@@ -617,46 +522,23 @@ Short-form feeds can amplify early noise. A small watch advantage creates more i
 
 ### Common loops
 
-**Popularity loop:** prior impressions create social proof and richer features. The model interprets those consequences as future merit.
-
-**Velocity loop:** rapid early engagement raises trend exposure. Larger exposure increases measured velocity.
-
-**Creator capital loop:** established creators have followers, production resources, and known audience embeddings. New creators receive less precise matching.
-
-**Topic loop:** a short-lived topic gain changes the training distribution. The next model overpredicts future demand for that topic.
-
-**Moderation loop:** heavily exposed content receives more reports and review. Low-exposure content has less observed policy evidence, which can look safer by accident.
+| Loop | Amplification path |
+| --- | --- |
+| Popularity | Prior impressions create proof/features interpreted as merit |
+| Velocity | Early engagement expands exposure, increasing measured velocity |
+| Creator capital | Followers/resources/matching favor established accounts |
+| Topic | Transient demand shifts training and future predictions |
+| Moderation | Exposure selects reports/review; unlabeled low-reach content appears falsely clean |
 
 ### Concentration metrics
 
-Track several views because one number can hide movement:
-
-- top 0.1, 1, and 10 percent share of qualified impressions;
-- Herfindahl-Hirschman index across creators and categories;
-- Gini coefficient of impressions and earnings;
-- effective number of creators receiving meaningful reach;
-- transition rates across exposure bands;
-- concentration within language, region, and category;
-- viewer-level creator diversity over seven and 28 days;
-- repeated exposure to the same creator or topic.
-
-Do not target a flat distribution. Viewer demand and creator quality differ. Look for unexplained concentration growth, closed opportunity transitions, and reduced supply in valuable categories.
+Measure top-share bands, HHI, Gini, effective meaningful-reach creators, opportunity transitions, locale/category and viewer-level repetition/diversity.
+Inspect demand and supply, not an automatic flat-distribution target.
 
 ### Damp unstable amplification
 
-Possible controls include:
-
-- use exposure-normalized response estimates;
-- cap the contribution of recent raw impression counts;
-- require mature evidence before broad expansion;
-- apply velocity decay and anomaly checks;
-- reserve source capacity for fresh eligible inventory;
-- limit repeated creator exposure within a session;
-- detect coordinated engagement before trend expansion;
-- compare content-only and history-rich rankers for new inventory;
-- keep a stable exploration cohort.
-
-Each control changes who receives attention. Version it as policy and evaluate both viewer and creator outcomes.
+Test exposure-aware estimates, bounded history, mature expansion, velocity/integrity checks, fresh capacity, repetition limits and content/history contrasts.
+Keep a stable exploration cohort; version each allocation control and evaluate both participant outcomes.
 
 ## Integrate quality, moderation, and integrity
 
@@ -695,80 +577,31 @@ Eligibility labels decide whether content may enter ranking. Quality estimates d
 
 ### Adversarial adaptation
 
-Creators and coordinated networks adapt to ranking. Monitor:
-
-- copied formats and near duplicates;
-- engagement rings;
-- purchased traffic;
-- rapid account creation;
-- policy evasion through text, audio, or visual changes;
-- bait-and-switch edits;
-- cross-account content laundering.
-
-Integrity defenses should feed eligibility and trend controls. Avoid exposing sensitive detector thresholds through creator analytics.
+Detect duplicates, engagement rings, bought traffic, account churn, multimodal evasion, bait-and-switch and laundering.
+Feed eligibility/trend controls without exposing sensitive detector thresholds.
 
 ## Protect each participant with guardrails
 
-### Viewer guardrails
+<span id="viewer-guardrails"></span>
+<span id="creator-guardrails"></span>
+<span id="advertiser-guardrails"></span>
+<span id="platform-guardrails"></span>
 
-- severe content exposure;
-- reports, blocks, and hides;
-- rapid-skip and abandonment tails;
-- age-inappropriate exposure;
-- repeated-topic and repeated-creator fatigue;
-- survey dissatisfaction;
-- seven-day and 28-day retention;
-- time-control use and regret indicators;
-- latency, errors, and data consumption.
-
-### Creator guardrails
-
-- first qualified exposure coverage;
-- new-creator opportunity transitions;
-- 30-day and 90-day creator retention;
-- concentration by creator cohort;
-- appeal delay and restoration success;
-- false policy or quality penalties;
-- category and regional supply decline;
-- earnings concentration where monetization exists;
-- unexplained reach volatility.
-
-### Advertiser guardrails
-
-- brand-safety incident rate;
-- invalid traffic;
-- reach and frequency distortion;
-- conversion or lift quality;
-- campaign pacing failures;
-- adjacency policy violations;
-- auction concentration;
-- advertiser retention and make-good cost.
-
-### Platform guardrails
-
-- feed availability and tail latency;
-- serving cost per satisfied session;
-- index and feature freshness;
-- privacy violations;
-- policy propagation delay;
-- rollback time;
-- unexplained exposure changes;
-- experiment sample-ratio mismatch;
-- observability coverage.
+| Participant | Guardrail families |
+| --- | --- |
+| Viewer | Severe/age exposure, negative feedback, fatigue, mature retention, regret/controls and delivery cost/quality |
+| Creator | Qualified tests/transitions, mature retention, concentration, appeals/false penalties, supply/earnings and reach volatility |
+| Advertiser | Suitability/adjacency, invalid traffic, reach/frequency, lift, pacing, concentration, retention and make-goods |
+| Platform | Availability/tails/cost, freshness/privacy, propagation/rollback, exposure shifts, assignment validity and observability |
 
 Guardrails need thresholds, uncertainty treatment, and an owner. A dashboard without a stop rule cannot govern a launch.
 
 ## Keep advertisements and organic recommendation accountable
 
-Advertisements share viewer attention with organic videos, but their allocation has extra constraints.
-
-Use a slot or opportunity allocator that considers session depth, ad fatigue, campaign pacing, viewer tolerance, and brand safety. The ad auction can rank eligible advertisements within an approved opportunity.
-
-Do not let advertiser bids silently change organic creator predictions. Keep organic ranking, ad eligibility, auction, and final composition evidence separately inspectable.
-
-Measure incremental revenue against viewer and creator effects. An extra ad can shorten the session, change which creators receive later impressions, and alter future viewer return. Revenue per request misses those effects.
-
-For creator revenue sharing, audit whether ranking and monetization incentives create unstable content choices. A policy that rewards raw watch time may push creators toward longer or repetitive formats even when viewers report lower satisfaction.
+An opportunity allocator governs depth, fatigue, pacing, tolerance and suitability before the eligible ad auction.
+Keep organic predictions, ad eligibility, auction and composition inspectable; bids cannot silently redefine creator quality.
+Measure displaced creator/viewer outcomes and mature revenue effects.
+Audit monetization incentives for length/repetition gaming rather than trusting revenue per request.
 
 ## Design the data and training architecture
 
@@ -776,31 +609,36 @@ The architecture needs event-time correctness, versioned policy, and mature outc
 
 ```mermaid
 flowchart TB
-  Apps[Viewer and creator clients] --> Events[Exposure, action, upload, and feedback events]
-  Upload[Upload pipeline] --> Understand[Content understanding]
-  Understand --> Moderate[Eligibility and risk state]
-  Moderate --> Catalog[Versioned video catalog]
+  accTitle: Versioned exposure, catalog, training and deployment evidence connect the feed lifecycle
+  accDescr: Client and upload events enter streaming validation and an immutable event lake. Current eligibility and catalog state feed online features and fresh indexes. Point-in-time snapshots train and evaluate versioned models, calibrators and policy. Serving consumes compatible published state, while cohort and experiment evidence informs release governance.
+  Apps["Viewer/creator<br/>clients"] --> Events["Exposure/action<br/>upload/feedback"]
+  Upload["Upload<br/>pipeline"] --> Understand["Content<br/>understanding"]
+  Understand --> Moderate["Eligibility<br/>risk state"]
+  Moderate --> Catalog["Versioned<br/>video catalog"]
 
-  Events --> Stream[Streaming validation and features]
-  Events --> Lake[Immutable event lake]
+  Events --> Stream["Streaming<br/>validation/features"]
+  Events --> Lake["Immutable<br/>event lake"]
   Catalog --> Stream
   Catalog --> Lake
 
-  Stream --> Online[Online feature store]
-  Stream --> Index[Fresh candidate indexes]
-  Lake --> Snapshots[Point-in-time training snapshots]
-  Snapshots --> Train[Retrieval, ranking, calibration, and policy evaluation]
-  Train --> Registry[Model and policy registry]
+  Stream --> Online["Online<br/>feature store"]
+  Stream --> Index["Fresh candidate<br/>indexes"]
+  Lake --> Snapshots["Point-in-time<br/>training snapshots"]
+  Snapshots --> Train["Retrieval/ranking<br/>calibration/policy"]
+  Train --> Registry["Model/policy<br/>registry"]
 
-  Registry --> Serve[Feed serving stack]
+  Registry --> Serve["Feed serving<br/>stack"]
   Online --> Serve
   Index --> Serve
   Catalog --> Serve
   Serve --> Events
 
-  Lake --> Metrics[Cohort, experiment, integrity, and ecosystem metrics]
-  Metrics --> Release[Release and governance decisions]
+  Lake --> Metrics["Cohort/experiment<br/>integrity/ecosystem"]
+  Metrics --> Release["Release<br/>governance"]
   Registry --> Release
+  class Catalog,Lake,Registry viz-state
+  class Stream,Train,Serve viz-focus
+  class Online,Index,Metrics,Release viz-output
 ```
 
 ### Event schema
@@ -838,21 +676,18 @@ Store label maturity explicitly. A 28-day return head trains only on examples wh
 
 ### Dataset and model manifests
 
-A training manifest records:
+```text
+TrainingManifest
+  event_ranges, feature_versions, eligibility_policy
+  negative_sampling, propensity_treatment, label_windows, maturity
+  creator_viewer_cohorts, code_digest, environment_digest
+  architecture, loss_weights, calibration_data, privacy, retention
+DeploymentManifest
+  retrieval_indexes, ranker, calibrators, composer_policy
+  moderation_version, feature_schema, assignment, compatibility
+```
 
-- source event ranges;
-- feature definitions and versions;
-- eligibility policy;
-- negative sampling;
-- propensity treatment;
-- label windows and maturity;
-- creator and viewer cohort filters;
-- code and environment digest;
-- model architecture and loss weights;
-- calibration data;
-- privacy and retention class.
-
-A deployment manifest binds retrieval, ranker, calibrators, composer policy, moderation version, feature schema, and experiment assignment. Rolling back only the ranker can fail if the composer or calibrator also changed.
+Rollback restores the compatible deployment manifest, not only ranker weights.
 
 ## Build the online serving path
 
@@ -871,7 +706,7 @@ A feed request can follow this path:
 
 ### Example latency budget
 
-| Stage | p99 budget |
+| Stage | Planning allocation |
 | --- | ---: |
 | Context and feature reads | 20 ms |
 | Parallel candidate retrieval | 30 ms |
@@ -880,7 +715,16 @@ A feed request can follow this path:
 | Composition and ads | 15 ms |
 | Evidence write and response | 10 ms |
 
-The numbers are illustrative. Media startup has a separate budget and often dominates perceived quality.
+The allocations total 120 milliseconds but are not measured quantiles or an end-to-end percentile guarantee.
+Measure whole-request tails and media startup separately with headroom.
+
+### Evidence durability
+
+For this design, durably acknowledge the decision envelope before returning a page.
+The client later appends actual-render/exposure events using stable event IDs for deduplication.
+If neither the log nor an approved durable spool acknowledges, do not silently serve an unrecorded experimental policy.
+Use a reviewed degraded mode only if its evidence contract remains satisfied; otherwise return a clear failure.
+Report missing client exposure separately from server delivery.
 
 ### Freshness
 
@@ -901,7 +745,7 @@ Do not cache a final slate beyond the period where moderation, session state, or
 - If the ranker fails, use a conservative cached or lightweight model.
 - If the composer policy fails, use a reviewed static policy with strict safety filters.
 - If eligibility state is unavailable, block uncertain content rather than assume eligibility.
-- If evidence writes fail, stop broad experiments and high-risk policy changes.
+- If evidence writes fail, stop experiments/high-risk changes; use only evidence-valid degraded operation or return a clear failure.
 
 Every degradation path needs offline and production tests. A fallback used only during incidents can drift for months.
 
@@ -915,17 +759,7 @@ Report recall, coverage, source contribution, cold-start coverage, freshness, an
 
 ### Ranking evaluation
 
-Report:
-
-- log loss or task-specific loss;
-- calibration and reliability plots;
-- ranking metrics such as normalized discounted cumulative gain;
-- expected watch and satisfaction diagnostics;
-- severe negative-event recall;
-- performance by viewer, creator, content, and exposure cohort;
-- counterfactual estimates with support diagnostics;
-- robustness to missing or stale features;
-- latency and cost.
+Report task/ranking loss, calibration, watch/satisfaction diagnostics, severe-negative recall, participant/exposure slices, supported counterfactuals, feature robustness and cost/tails.
 
 ### List evaluation
 
@@ -952,36 +786,6 @@ Check sample-ratio mismatch, instrumentation, pre-period balance, and policy com
 ### Interference
 
 Creators supply content to treatment and control viewers. Treatment exposure can change creator production, which later changes inventory for both groups. Viral trends also cross experiment cells.
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace how viewer-randomized cells stop being independent when both change and reuse the same creator supply.</p>
-
-<!-- visual:ecosystem-experiment-interference -->
-```mermaid
-flowchart TB
-  accTitle: Shared creator supply creates interference between viewer-randomized treatment and control cells
-  accDescr: Current creator inventory supplies viewer-randomized treatment and control cells. The cells compare immediate viewer outcomes while their ranking policies allocate different exposure to the same creators. Exposure from both cells changes creator learning, retention, and production over weeks. That response creates next-period shared inventory, which enters both future treatment and future control cells. The immediate comparison may estimate a feed effect before supply responds, but the future control cell is exposed to an ecosystem partly changed by treatment and is not an untouched long-horizon counterfactual.
-  Inventory["CURRENT SHARED INVENTORY<br/>same creators supply both cells"]
-  Cells["VIEWER-RANDOMIZED CELLS<br/>treatment: new policy · control: current policy"]
-  Immediate["IMMEDIATE VIEWER COMPARISON<br/>watch · skip · satisfaction"]
-  Opportunity["SHARED CREATOR OPPORTUNITY<br/>both policies allocate reach"]
-  Response["CREATOR RESPONSE OVER WEEKS<br/>learning · retention · production"]
-  Next["NEXT-PERIOD SHARED INVENTORY<br/>supply has responded to both cells"]
-  Future["FUTURE TREATMENT + CONTROL<br/>control is not an untouched ecosystem"]
-  Inventory ==> Cells
-  Cells -->|"before supply responds"| Immediate
-  Cells ==>|"different policies, same creators"| Opportunity
-  Opportunity ==> Response
-  Response ==> Next
-  Next -.->|"shared supply returns to both cells"| Future
-  class Inventory viz-state
-  class Cells,Opportunity,Response viz-focus
-  class Immediate,Next viz-output
-  class Future viz-warning
-  class Inventory viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> the viewer cells can estimate an immediate feed effect before supply responds, but both policies allocate reach to the same creators. The resulting production changes next-period inventory for both cells, so future control is not an untouched long-horizon counterfactual. Use creator-side, clustered, switchback, or saturation designs according to the spillover and estimand. Original synthesis informed by <a href="https://arxiv.org/abs/2106.00762">Nandy et al. on two-sided recommender experiments</a>, <a href="https://arxiv.org/abs/2002.05670">Johari et al. on two-sided platform experiment bias</a>, and <a href="https://arxiv.org/abs/2004.12162">test-control interference in online marketplaces</a>.</p>
 
 Possible designs include:
 
@@ -1037,16 +841,7 @@ Do not assume concentration caused retention damage. Build a causal and mechanic
 
 ### Trace the mechanism
 
-Partition the feed decision into:
-
-- retrieval source share;
-- ranker score movement;
-- calibration movement;
-- composer constraints;
-- trend expansion;
-- exploration allocation;
-- moderation eligibility;
-- ad displacement.
+Partition source, score, calibration, composer, trend, exploration, eligibility and advertisement effects.
 
 Inspect transition rates. Did fewer new creators enter the test pool? Did they enter but lose during ranking? Did tests reach mismatched viewers? Did broad expansion thresholds become harder after calibration changed?
 
@@ -1058,9 +853,9 @@ Use creator-level or cluster-level experimental evidence where available. Histor
 
 ### Choose containment
 
-If the release is still controlled, stop expansion and restore the prior manifest for affected traffic. If viewer gains are valuable and damage is localized, narrow the rollback to the source allocation, calibrator, or composer policy causing the loss.
-
-Do not create an untested creator boost during the incident. Restore known behavior first. Test repairs under explicit budgets after containment.
+Stop expansion and restore known compatible behavior for affected traffic.
+When justified, narrow containment to the implicated source, calibrator or composer; do not invent an untested boost.
+Test budgeted repairs after containment.
 
 ## Operate incidents and rollback
 
@@ -1132,17 +927,13 @@ The cross-domain owner does not replace domain accountability. They decide appro
 
 ### Policy change record
 
-Every material exposure policy change should record:
-
-- problem and affected participants;
-- metrics and current baselines;
-- alternatives considered;
-- hard constraints and approved ranges;
-- causal evidence and limits;
-- expected short and long effects;
-- rollout and maturity schedule;
-- stop, repair, and reversal conditions;
-- owners and review date.
+```text
+PolicyChange
+  problem, participants, metrics, baselines, alternatives
+  hard_constraints, approved_ranges, evidence, causal_limits
+  expected_short_long_effects, rollout, maturity
+  stop_repair_reversal, owners, review_date
+```
 
 This record separates durable policy from model implementation. A new model may improve estimates without reopening every business rule.
 
@@ -1160,181 +951,74 @@ Do not renegotiate every policy weight during a daily launch meeting. Escalate o
 
 ## Choose an incremental roadmap
 
-### Quarter 1: establish evidence and control
+<span id="quarter-1-establish-evidence-and-control"></span>
+<span id="quarter-2-improve-prediction-and-composition"></span>
+<span id="quarters-3-and-4-learn-causal-response"></span>
+<span id="year-2-adjust-the-portfolio"></span>
 
-- define viewer, creator, advertiser, and platform metric contracts;
-- version exposure policy and deployment manifests;
-- repair impression, candidate, propensity, and maturity logging;
-- add source-level and creator-cohort dashboards;
-- establish rollback by manifest;
-- run a new-creator exposure audit;
-- keep the existing ranker unless an active incident requires change.
-
-### Quarter 2: improve prediction and composition
-
-- build calibrated multi-task heads;
-- add explicit negative feedback and survey labels;
-- deploy session-aware repetition and diversity constraints;
-- separate fresh and new-creator sources;
-- validate content-only cold-start retrieval;
-- introduce a small safe exploration bucket.
-
-### Quarters 3 and 4: learn causal response
-
-- run creator-cluster or saturation experiments;
-- estimate exploration and opportunity response curves;
-- improve trend integrity and velocity decay;
-- add advertiser and creator long-horizon holdouts where feasible;
-- compare centralized and source-specific composition policies;
-- retire features that encode exposure without incremental value.
-
-### Year 2: adjust the portfolio
-
-- invest in creator audience matching where cold-start evidence supports it;
-- expand causal measurement for supply response;
-- improve category-specific maturity models;
-- federate policy implementation across regions under shared contracts;
-- retire redundant rankers or policy layers;
-- keep research bets with explicit evidence checkpoints.
-
-The roadmap begins with measurement because the reported failure concerns a delayed ecosystem outcome. Replacing the ranker before fixing attribution can repeat the damage with less visibility.
+| Phase | Evidence-led investment |
+| --- | --- |
+| Q1 | Participant contracts, versioned policy/manifests, repaired logs, cohort/source dashboards, rollback and exposure audit before replacing ranker |
+| Q2 | Calibrated heads, negative/survey labels, session composition, separate fresh/creator sources, content-only validation and safe exploration |
+| Q3-4 | Creator/saturation designs, response curves, trend integrity, long holdouts, composer alternatives and retirement of unhelpful exposure features |
+| Year 2 | Supported audience matching, supply causality, category maturity, regional policy under shared contracts, redundancy retirement and research checkpoints |
 
 ## Make level-specific portfolio choices
 
-### Staff-level choices
+<span id="staff-level-choices"></span>
+<span id="principal-level-choices"></span>
+<span id="senior-principal-choices"></span>
 
-A staff candidate should make one feed path reliable across several teams.
+| Scope pattern | Required decisions |
+| --- | --- |
+| Cross-team feed | Event/feature contracts, calibrated source/rank/list behavior, reason codes, mature data, cold/exploration, rollback and aligned operators |
+| Domain portfolio | Shared exposure/experiment contracts versus owned objectives; model/label/exploration opportunity cost, intervention stops, delegated owners and regional variation |
+| Organization portfolio | Observable allocation, hard safety, causal participant evidence, qualified opportunity and reversal doctrine; cross-product standards, real decision rights, research alternatives, external adaptation, retirement and succession |
 
-Expected decisions include:
-
-- define event and feature contracts;
-- build source-aware retrieval and calibrated ranking;
-- enforce list constraints with reason codes;
-- establish point-in-time datasets and mature labels;
-- implement cold-start tests and exploration logging;
-- create manifest rollback and degraded modes;
-- align ranking, data, moderation, and serving owners.
-
-Staff depth appears in mechanisms. The candidate should explain calibration, propensity logging, list composition, or a rollback trace precisely.
-
-### Principal-level choices
-
-A principal candidate decides the boundary among ranking, creator policy, trust, ads, and infrastructure.
-
-Expected decisions include:
-
-- choose which objectives remain domain-owned;
-- define shared exposure and experiment contracts;
-- order investment among prediction, cold start, integrity, measurement, and serving;
-- price the opportunity cost of a large model against better exploration or labels;
-- set evidence that expands or stops creator interventions;
-- develop staff owners for ranking, experimentation, and ecosystem measurement;
-- preserve regional variation without forking the event contract.
-
-Principal scope appears when the candidate rejects a technically attractive project because another constraint has greater product value.
-
-### Senior-principal choices
-
-Titles differ across employers. Treat this as an organization-wide scope pattern.
-
-A senior-principal candidate coordinates several principal-owned directions over multiple years. The candidate should define a small doctrine:
-
-- attention allocation is observable and versioned;
-- severe policy constraints remain outside engagement optimization;
-- participant health uses mature causal evidence;
-- new supply receives qualified learning opportunities;
-- domains retain accountable owners;
-- major policy choices have reversal conditions.
-
-Expected portfolio choices include:
-
-- balance feed capability, creator supply, trust, ads, and measurement;
-- decide which exposure standards should span products;
-- assign principal owners with real decision rights;
-- preserve independent research paths when evidence is weak;
-- respond to regulation, market entry, and business-model change;
-- retire policies whose original assumptions no longer hold;
-- ensure another leader can run the review system.
-
-Senior-principal breadth does not excuse shallow ranking knowledge. The candidate should still defend one estimator, training interaction, serving failure, or experiment design.
+Titles vary; scope is not a hiring prediction.
+Defend one estimator, calibration, training, serving or experiment mechanism at every scope.
 
 ## Compare rejected approaches
 
-### Optimize raw watch time
+<span id="optimize-raw-watch-time"></span>
+<span id="put-creator-retention-in-the-item-score"></span>
+<span id="give-every-new-creator-equal-impressions"></span>
+<span id="add-one-diversity-penalty"></span>
+<span id="trust-offline-replay"></span>
+<span id="launch-on-a-short-ab-test"></span>
+<span id="centralize-every-decision-in-ranking"></span>
 
-Watch time is dense and easy to measure. Used alone, it can favor repetitive, sensational, or long content and hide viewer regret. It also ignores how exposure shapes future supply.
-
-### Put creator retention in the item score
-
-Creator retention is delayed, creator-level, and affected by many platform actions. Adding a predicted retention value to every item can produce poor attribution and gaming.
-
-Use creator outcomes to govern policy, candidate access, and experiments. Add a decision-facing model only after defining its causal interpretation and calibration.
-
-### Give every new creator equal impressions
-
-Equal raw exposure ignores audience fit, content quality, safety, and category demand. It can harm viewers and give creators noisy feedback.
-
-Provide a qualified test opportunity under known propensities and reviewed budgets.
-
-### Add one diversity penalty
-
-Diversity has viewer, session, creator, category, language, and time dimensions. One pairwise penalty cannot represent all of them.
-
-Use several interpretable constraints and evaluate their marginal effect.
-
-### Trust offline replay
-
-Replay is useful for model and policy diagnostics. Historical candidates and outcomes came from an earlier policy. Replay cannot identify future creator production or new viral loops.
-
-### Launch on a short A/B test
-
-Short tests catch system and immediate viewer effects. They do not mature creator retention, advertiser trust, or supply response. Use staged authority and later confirmation.
-
-### Centralize every decision in ranking
-
-Ranking engineers cannot own legal policy, creator economics, ad contracts, and product goals alone. Centralize shared evidence and enforcement contracts while retaining domain accountability.
+| Rejected shortcut | Reason and replacement |
+| --- | --- |
+| Raw watch objective | Can hide regret and supply effects; use participant contracts |
+| Creator retention in each item score | Delayed/shared attribution and gaming; govern policy with identified models/experiments |
+| Equal impressions | Ignores match/quality/safety; use qualified bounded tests |
+| One diversity penalty | Different participant/time dimensions need explicit constraints |
+| Replay proves future economy | Historical candidates cannot identify new supply/viral response |
+| Short viewer test settles launch | Mature creator/advertiser/supply evidence needs staged confirmation |
+| Ranking owns every choice | Share evidence/enforcement, retain legal/product/creator/ads authority |
 
 ## Structure a 60-minute interview
 
-### Minutes 0 to 6: define the coupled product
+<span id="minutes-0-to-6-define-the-coupled-product"></span>
+<span id="minutes-6-to-12-set-the-objective-hierarchy"></span>
+<span id="minutes-12-to-22-draw-retrieval-ranking-and-composition"></span>
+<span id="minutes-22-to-32-go-deep-on-one-learning-problem"></span>
+<span id="minutes-32-to-41-data-and-serving"></span>
+<span id="minutes-41-to-49-experiments-and-long-horizons"></span>
+<span id="minutes-49-to-55-incident-and-governance"></span>
+<span id="minutes-55-to-60-portfolio-and-changed-conditions"></span>
 
-Clarify the surface, participants, business model, policy, scale, and reported failure. State that the feed allocates attention and changes future supply.
-
-### Minutes 6 to 12: set the objective hierarchy
-
-Name hard constraints, durable participant guardrails, the primary viewer outcome, creator health metrics, and platform diagnostics. Reject a permanent scalar for policy conflict.
-
-### Minutes 12 to 22: draw retrieval, ranking, and composition
-
-Cover candidate-source portfolio, multi-task calibrated heads, and session-aware list constraints. Explain how fresh and new-creator content enters.
-
-### Minutes 22 to 32: go deep on one learning problem
-
-Choose one:
-
-- exposure and position bias;
-- creator cold start and exploration;
-- multi-task interference and calibration;
-- virality and concentration;
-- moderation selection bias.
-
-Write an estimator, state assumptions, and name logging requirements.
-
-### Minutes 32 to 41: data and serving
-
-Describe point-in-time events, maturity, features, indexes, latency, caching, deployment manifests, and degraded modes.
-
-### Minutes 41 to 49: experiments and long horizons
-
-Discuss assignment, exposure, interference, creator spillovers, cluster or saturation designs, mature cohorts, and retained holdouts.
-
-### Minutes 49 to 55: incident and governance
-
-Walk through the watch-time win and creator damage. Contain, roll back, trace the mechanism, assign owners, and define repair evidence.
-
-### Minutes 55 to 60: portfolio and changed conditions
-
-State staff, principal, or senior-principal choices. Give one investment deferred, one assumption under review, and one condition that reverses the direction.
+| Minutes | Practice focus |
+| --- | --- |
+| 0-6 | Coupled participants, promise, policy, scale and failure |
+| 6-12 | Hierarchy, mature outcomes, opportunity and diagnostics |
+| 12-22 | Sources, calibrated heads, session constraints and new supply |
+| 22-32 | One estimator/assumption/logging trace for exposure, cold start, task conflict, concentration or moderation |
+| 32-41 | Temporal data, maturity, indexes, serving, cache and manifest recovery |
+| 41-49 | Assignment, spillovers, design, mature cohorts and holdouts |
+| 49-55 | Damage containment, mechanism, owners and repair |
+| 55-60 | Deferred investment, reviewed assumption, delegated authority and reversal |
 
 ## Observer rubric
 
@@ -1353,42 +1037,15 @@ Score each dimension from 0 to 2.
 | Operations | Monitors latency | Adds rollback | Versions full manifests, degradation, incident authority, and repair |
 | Scope | Adds teams and years | Gives a roadmap | Makes portfolio, ownership, succession, and reversal choices |
 
-A strong staff answer usually scores 2 on retrieval, ranking, data, and operations. A principal answer should also score 2 on objective hierarchy, ecosystem, experimentation, and ownership. A senior-principal answer should add portfolio coherence, delegated leaders, external adaptation, and succession.
+Use this unvalidated rubric to locate practice gaps, not predict hiring or company level.
 
 ## Strong signals
 
-- Frames recommendation as attention allocation with delayed supply effects.
-- Gives viewers, creators, advertisers, and platform teams separate guardrails.
-- Keeps hard safety rules outside engagement optimization.
-- Uses several candidate sources with explicit cold-start paths.
-- Separates multi-task loss weights from product policy.
-- Calibrates task heads on deployment-like cohorts.
-- Logs candidate sets, propensities, actual exposure, and policy versions.
-- Treats list composition as constrained session-aware selection.
-- Explains how new creators receive informative audience tests.
-- Measures concentration without assuming a flat exposure target.
-- Names interference and long-horizon limits of viewer A/B tests.
-- Uses leading indicators only after validating them against mature cohorts.
-- Rolls back a compatible manifest and traces source, score, and policy effects.
-- Assigns metric and policy owners rather than delegating tradeoffs to the model.
-- Defers or retires a project when another portfolio constraint dominates.
+Defensible design connects qualified opportunity, mature participant outcomes, calibrated supported predictions and constrained allocation to accountable reversible decisions.
 
 ## Weak signals
 
-- Starts with a transformer and approximate nearest-neighbor index before defining the product.
-- Calls watch time the north star without a satisfaction or regret model.
-- Puts every concern into one weighted score.
-- Treats likes and watches as unbiased relevance labels.
-- Adds new-creator boosts without eligibility, audience fit, or propensity logging.
-- Promises equal exposure for all creators.
-- Uses one diversity metric for every ecosystem concern.
-- Ignores advertiser effects on organic exposure.
-- Assumes a two-week user experiment identifies creator retention effects.
-- Reports fresh cohorts before labels mature.
-- Has no policy propagation or moderation rollback path.
-- Makes the ranking team accountable for every business and safety decision.
-- Uses organization-wide language without an investment choice or delegated owner.
-- Cannot explain one estimator, calibration failure, or serving trace.
+Selected survivors, unsupported counterfactuals, automatic exposure boosts, premature cohort verdicts and unowned policy weights break those contracts.
 
 ## Changed-condition questions
 
@@ -1417,4 +1074,12 @@ For each question, state the affected participant, decision owner, causal limit,
 
 ---
 
+## Sources
+
+- [Nandy et al.: two-sided recommender experiments](https://arxiv.org/abs/2106.00762).
+- [Johari et al.: two-sided platform experiment bias](https://arxiv.org/abs/2002.05670).
+- [Test-control interference in online marketplaces](https://arxiv.org/abs/2004.12162).
+
 *Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [choose metrics for an ML product](/questions/choose-ml-product-metrics/), [multi-task learning and objective interference](/concepts/multi-task-learning-objective-interference/), [position bias and counterfactual ranking](/concepts/position-bias-counterfactual-learning-to-rank/), and the [annotated ecosystem strategy mock](/guides/annotated-ecosystem-strategy-mock/).*
+
+</div>

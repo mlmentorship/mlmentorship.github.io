@@ -1,93 +1,136 @@
 ---
 title: "Choose metrics for an ML product"
-description: "Select a primary outcome, guardrails, diagnostics, and decision horizon without turning the dashboard into a metric zoo."
+description: "Define metric populations, horizons and decision roles, then apply a joint release rule without overriding its guardrails."
 date: "2026-07-10"
 draft: false
 tags: ["questions"]
 category: "questions"
 ---
 
-> You are launching an ML-powered assistant. Choose the metrics the team should use to decide whether it is successful.
+Give each metric a decision role: primary outcomes support release, guardrails can veto, and diagnostics explain behavior.
 
-Pick one primary metric that tracks user value, wrap it in a few guardrails, and keep model metrics as diagnostics. The failure mode is a dashboard of twenty co-primary metrics that can't decide anything, or an "engagement" number that climbs while the product is failing users.
+## Problem
 
-## Start with the product decision
+An invented randomized, independent-user experiment has 10,000 eligible users per arm, each contributing one binary task outcome.
+Arm A completes 6,000 tasks for $10,000; B completes 6,600 for $13,000.
 
-Clarify:
+Predeclared rules require improvement's lower confidence bound above two percentage points and cost/success below $2.
+The p95 latency limit is two seconds.
+B's observed p95 is 2.1 seconds.
+Should the full release proceed?
 
-- Who is the user, and what job are they trying to finish?
-- Is the product optimizing speed, quality, discovery, revenue, safety, or cost?
-- What failure is unacceptable?
-- Over what horizon should value appear?
-- Which behavior can the model influence directly?
+## Picture
 
-## A metric hierarchy
-
-**One primary outcome.** The closest measurable outcome to user value that can move within the decision horizon: successful task completion, retained weekly use, qualified resolution, or incremental conversion. Raw model accuracy is not the default.
-
-**Guardrails.** Protect against predictable harm: user reports and unsafe outputs, latency and availability, cost per successful task, diversity or ecosystem concentration, and retention or downstream quality.
-
-**Diagnostics.** Explain the primary outcome without declaring victory: acceptance, edit, retry, abandonment, and escalation rate; retrieval coverage and citation support; calibration and slice quality; tool-call and fallback behavior.
-
-**Offline model metrics.** They support iteration and regression testing but do not replace the product outcome. State the mechanism you expect to link an offline change to online value.
+The release rule is an AND gate, not a vote among favorable measurements.
 
 <!-- visual:product-metric-decision-authority -->
 <figure class="learning-figure" aria-labelledby="metric-authority-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="metric-authority-title">Which metrics decide whether to ship, and which only help you understand the result?</p>
+	<p class="visual-kicker">Quality passes; latency vetoes</p>
+	<p class="visual-title" id="metric-authority-title">A favorable completion interval cannot override a failed latency gate.</p>
 	<div class="visual-grid--two" role="group" aria-label="Product metrics grouped by their authority in a launch decision">
 		<section class="visual-panel">
 			<h4>DECISION GATE · CAN AUTHORIZE OR VETO</h4>
-			<p><strong>1 · Primary outcome: authorize</strong><br />Did successful task completion improve by the pre-set amount within the decision horizon?</p>
-			<p><strong>2 · Guardrails: veto</strong><br />Did unsafe-output rate, p95 latency, and cost per successful task all remain within their limits?</p>
-			<p><strong>Ship rule</strong><br />Eligible only when the primary outcome clears its bar <em>and</em> every guardrail holds.</p>
+			<p><strong>Completion: pass</strong><br />Improvement 6 points; approximate lower bound 4.66 points exceeds the two-point floor.</p>
+			<p><strong>Cost/success: pass</strong><br />B costs about $1.97 per completed task, below $2.</p>
+			<p><strong>Latency: fail</strong><br />B's 2.1 seconds exceeds two seconds. Do not authorize full release.</p>
 		</section>
 		<section class="visual-panel">
 			<h4>SUPPORTING EVIDENCE · CANNOT DECLARE VICTORY</h4>
-			<p><strong>Diagnostics: explain</strong><br />Retry, edit, abandonment, and escalation rates show where the experience changed and which slices need investigation.</p>
-			<p><strong>Offline model metrics: qualify</strong><br />Task-eval and slice scores catch regressions and justify an online test; they do not prove user value.</p>
-			<p><strong>Use rule</strong><br />Use these signals to debug, iterate, or reject a candidate; do not use them to outvote a missed primary outcome.</p>
+			<p><strong>Diagnostics: explain</strong><br />Retries, edits, abandonment and escalation help locate the change.</p>
+			<p><strong>Offline metrics: qualify</strong><br />Model and slice checks support iteration, not proof of user value.</p>
+			<p><strong>No override</strong><br />Supporting signals cannot cancel a failed release gate.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> read the left panel as an AND gate: the primary outcome must improve and no guardrail may fail. Read the right panel as evidence about why, not as extra votes that can turn a failed launch decision into a win.</figcaption>
+	<figcaption><strong>Read it this way:</strong> completion and cost pass their declared rules, but latency fails. Diagnose latency or justify a different eligible treatment before testing again.</figcaption>
 </figure>
 
-## What an L4 answer sounds like
+## Calculate the decision
 
-> "Accuracy, latency, user engagement, and cost."
+Completion changes from $0.60$ to $0.66$, a six-percentage-point increase.
+At a fixed readout, an approximate independent-binomial 95% interval is:
 
-A reasonable list, but it names no decision, no hierarchy, and no trade-offs.
+$$
+SE=\sqrt{\frac{0.60(0.40)+0.66(0.34)}{10000}}\approx0.006815,
+\qquad 0.06\pm1.96SE\approx[0.04664,0.07336].
+$$
 
-## What an L5 answer adds
+Costs per success are $10000/6000\approx1.67$ and $13000/6600\approx1.97$ dollars.
+These hypothetical policy margins are not statistical estimates or universal product rules.
 
-An L5 answer picks one primary metric, explains why it represents user value, adds a small set of guardrails, defines the slices that matter, and states what result would block launch.
+## Change the horizon or harm distribution
 
-## What an L6 answer adds
+### 1. Confirm resolution after seven days
 
-An L6 answer anticipates gaming and second-order effects: more assistant use can mean value or repeated failure; acceptance can rise because users stop checking; faster completion can erode learning or trust; average quality can hide catastrophic failures in one segment. It also names an owner, a review cadence, thresholds, and when the organization should revisit the objective.
+**Picture and change:** exclude immature cohorts from final resolution rates, or model censoring explicitly.
+Keep immediate acceptance diagnostic.
 
-## Tells that get you a strong-hire vote
+**Check:** yesterday's acceptance cannot establish seven-day resolution.
 
-- One primary metric, not a dashboard vote.
-- Clean separation of outcome, guardrail, diagnostic, and offline metrics.
-- Cost per successful outcome, not cost per request alone.
-- A slice strategy tied to plausible harms.
-- A practical ship/iterate/stop rule.
+**Use when:** value becomes observable after the interaction.
 
-## Tells that get you down-leveled
+### 2. A critical slice degrades
 
-- "Engagement" with no definition of valuable engagement.
-- Twenty co-primary metrics.
-- Trusting thumbs-up rate without accounting for response or selection bias.
-- Ignoring delayed effects and user adaptation.
-- Treating benchmark accuracy as the product goal.
+**Picture and change:** predeclare a consequential-slice safety gate and qualified review process.
+
+**Check:** an overall gain cannot override that failed gate.
+
+**Use when:** rare severe harms differ from ordinary dissatisfaction, including medical-use evaluation.
+
+## Failure and transfer
+
+Longer sessions caused by repeated failures are not evidence of greater user value.
+
+Completion rises but seven-day retention falls. Which wins?
+
+<details>
+<summary>Check your answer</summary>
+
+Apply predeclared roles, horizon, uncertainty and veto margins; do not choose a favorable hierarchy afterward.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Start with the product decision
+
+Identify the user, job, controllable behavior, unacceptable failures and time to value.
+Define numerator, denominator, eligibility, unit, window, direction, uncertainty, role, threshold, owner and review date.
+Repeated tasks per user require a compatible uncertainty method, not the independent-user calculation above.
+
+## A metric hierarchy
+
+Choose a primary outcome close to measurable value: completion, qualified resolution, retention or incremental conversion.
+Protect safety, latency, availability, cost/success and relevant ecosystem effects.
+Keep acceptance, edits, retries, tool calls, fallbacks, retrieval and calibration diagnostic.
+
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-adds"></span>
+<span id="what-an-l6-answer-adds"></span>
+
+## Explain scope, not a level label
+
+A metric list is incomplete without populations, decisions and tradeoffs.
+Explain delayed effects and user adaptation; faster completion can undermine learning or trust.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Review gaming and measurement bias
+
+Acceptance can rise when users stop checking.
+Thumbs-up data can have response and selection bias.
+No metric list guarantees a hiring outcome.
 
 ## Common follow-ups
 
-- What if task completion rises but retention falls?
-- How would you measure quality when labels arrive weeks later?
-- Which metric would a team accidentally game?
-- Which slices should be mandatory before launch?
-- How would the metrics differ for a healthcare assistant?
+State the planned retention rule when completion rises.
+Use mature cohorts for delayed labels.
+Test whether engagement rewards retries.
+Choose mandatory slices from plausible harms.
+Healthcare applications need qualified review and distinct severity gates, not an averaged satisfaction score.
 
 *Related: [expected calibration error](/concepts/expected-calibration-error/), [A/B testing for ML](/concepts/ab-testing-for-ml/), and [evaluate an LLM application](/questions/how-would-you-evaluate-an-llm-application/).*
+
+</div>

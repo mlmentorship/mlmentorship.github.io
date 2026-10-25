@@ -1,6 +1,6 @@
 ---
 title: "How would you do cold-start for a new user?"
-description: "Cold-start is solved by combining minimal explicit signal, demographic and contextual fallbacks, and aggressive exploration in the first few sessions."
+description: "Use permitted context, item content, optional preferences and bounded exploration while measuring feedback uncertainty and whole-cohort outcomes."
 date: "2025-11-30"
 draft: false
 tags: ["questions"]
@@ -8,89 +8,147 @@ category: "questions"
 ---
 
 
-> *Asked in: recsys interviews. The classic open-ended sub-question.*
+A new user has no interaction history; use permitted evidence and bounded feedback rather than an arbitrary personalization switch.
 
-The L4 candidate proposes "use popularity." The L6 candidate stages a transition from generic to personalized signal across the user's first several sessions.
+## Problem
 
-## What an L4 answer sounds like
+A new user can receive eligible recommendations from strategies A and B.
+Use optional preferences, permitted request context and item content before behavior exists.
+Decide how early feedback should change the mix without claiming certainty or bypassing safety.
 
-> "Show them popular items until they have some history, then switch to personalized."
+For a teaching model, strategy A has independent Bernoulli rewards with stable save probability $p$.
+A success means a save within 24 hours after confirmed exposure; a matured no-save is failure for this reward.
+That failure does not establish dislike.
+Start with $p\sim\operatorname{Beta}(1,1)$ and observe success, success, failure.
+What changes, and what remains unknown?
 
-The right idea, no nuance. Misses how to make the transition smooth, what intermediate signals to use, and how to bootstrap quickly.
+## Picture: Update Belief, Not a Session Counter
 
-## What an L5 answer sounds like
+The Beta prior contributes one unit to each parameter, not two observed interactions.
+Add the two successes to the first parameter and the failure to the second.
 
-> "Cold-start has three sources of signal, used in sequence:
->
-> 1. **Onboarding signal**: ask the user explicitly. Pick 5 favorite artists / genres / categories. Cheap to collect, surprisingly good signal. Many products skip this; they shouldn't.
->
-> 2. **Contextual fallbacks**: time, location, device, referral source, demographic if available. A user signing up at 9am on weekday mobile has different intent than 11pm Friday on TV.
->
-> 3. **Exploration in early sessions**: explicitly diversify recommendations to gather signal across categories quickly. A bandit-style approach (epsilon-greedy or Thompson sampling on the candidate distribution) bootstraps faster than pure exploitation.
->
-> Transition: at session 1, almost all signal is from (1) and (2). After ~5-10 interactions, the personalization model starts to dominate. Hard threshold, gradual blend, or a learned mixing weight depending on signal volume."
+$$
+p\mid S,S,F\sim\operatorname{Beta}(3,2),\qquad
+\mathbb{E}[p\mid S,S,F]=\frac{3}{3+2}=0.60.
+$$
 
-This is L5. Three signals, sequenced over user-lifetime.
+The mean rises from 0.50 to 0.60, but probability mass remains spread across possible values.
+Untried B keeps its own uncertainty; A's three observations do not establish B's value.
 
 <!-- visual:cold-start-signal-handoff -->
 <figure class="learning-figure" aria-labelledby="cold-start-handoff-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="cold-start-handoff-title">How does a recommender hand control from fallback signals to learned user behavior?</p>
-	<div class="visual-grid--two" role="group" aria-label="Two stages of the cold-start signal handoff from fallback evidence to observed user behavior">
-		<section class="visual-panel">
-			<h4>1 · BEFORE BEHAVIOR EXISTS</h4>
-			<p><strong>Start with available evidence</strong><br />Onboarding choices + request context + item content + safe population priors.</p>
-			<p><strong>Compose the first slate</strong><br />Anchor it with likely-relevant items, then reserve some positions for diverse exploration.</p>
-			<p><strong>What is missing</strong><br />There are no clicks, skips, saves, or watch-time observations for this user yet.</p>
-		</section>
-		<section class="visual-panel">
-			<h4>2 · EACH RESPONSE UPDATES THE MIX</h4>
-			<p><strong>Observe</strong><br />Exploratory impressions produce clicks, skips, saves, and dwell-time evidence.</p>
-			<p><strong>Shift influence gradually</strong><br />Observed behavior gains influence; onboarding, context, and population fallbacks recede as confidence grows.</p>
-			<p><strong>Keep learning</strong><br />Do not turn exploration off: preferences, intent, and the item catalog can still change.</p>
-		</section>
+	<p class="visual-kicker">Three mature observations, still uncertain</p>
+	<p class="visual-title" id="cold-start-handoff-title">A's mean moves from 0.50 to 0.60, not to certainty.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 270" role="img" aria-labelledby="cold-start-beta-title cold-start-beta-desc" style="width:400px;min-width:400px">
+			<title id="cold-start-beta-title">Uniform Beta prior and the posterior after two successes and one failure</title>
+			<desc id="cold-start-beta-desc">The dashed Beta(1,1) prior has constant density one. The solid Beta(3,2) posterior has density twelve times p squared times one minus p. Both integrate to one. The posterior mean is 0.60 and its peak is at two thirds, with substantial uncertainty remaining.</desc>
+			<g fill="none" stroke="currentColor">
+				<path d="M40 30 H70" stroke-dasharray="5 4" stroke-width="1.5" />
+				<path d="M40 55 H70" stroke-width="3" />
+				<path d="M60 75 V210 H310" />
+				<path d="M60 150 H300" stroke-dasharray="5 4" stroke-width="1.5" />
+				<path data-beta-posterior d="M60 210 C140 210 220 -30 300 210" stroke-width="3" />
+				<path d="M204 80 V210" stroke-dasharray="2 4" />
+			</g>
+			<g fill="currentColor" font-size="14">
+				<text x="80" y="35">Prior: Beta(1,1)</text>
+				<text x="80" y="60">After S, S, F: Beta(3,2)</text>
+				<text x="10" y="72">Density</text>
+				<text x="48" y="214" text-anchor="end">0</text>
+				<text x="48" y="154" text-anchor="end">1</text>
+				<text x="48" y="94" text-anchor="end">2</text>
+				<text x="60" y="232" text-anchor="middle">0</text>
+				<text x="180" y="232" text-anchor="middle">0.5</text>
+				<text x="300" y="232" text-anchor="middle">1</text>
+				<text x="215" y="90">Mean 0.60</text>
+				<text x="180" y="260" text-anchor="middle">Strategy A's save probability p</text>
+			</g>
+		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> begin on the left with signals that exist at sign-up. The slate intentionally gathers feedback; carry that feedback to the right, where personalized behavior gains influence rather than switching on at one fixed interaction count. Exploration stays in the mix so the system can keep learning. Original schematic informed by <a href="https://doi.org/10.1145/564376.564421">Schein et al. on cold-start recommendation</a> and <a href="https://arxiv.org/abs/1003.0146">Li et al. on contextual-bandit feedback</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the solid curve shifts belief toward larger save probabilities without collapsing to one value. These are illustrative distributions under the stated reward assumptions, not a production user classifier.</figcaption>
 </figure>
 
-## What an L6 answer adds
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
 
-> "...practical things:
->
-> **The first session matters disproportionately.** Users decide whether to come back based on early experience. Cold-start that surfaces obvious popular hits is safe but boring; that loses long-term retention. The right balance: anchor on hits, sprinkle exploration.
->
-> **Side information beats interaction signal at cold-start.** Item content (genre, description, audio embedding for music, visual embedding for video) lets you recommend before any user interaction with that item. Two-tower models that use both content and collaborative signal handle this naturally.
->
-> **Synthetic warm-up via similar users.** A new user signing up with profile X can be matched to existing users with similar profiles; recommendations bootstrapped from those users' aggregated history. Useful when explicit onboarding signal is weak.
->
-> **Multi-armed bandits for shelf composition** in early sessions. Try several recommendation strategies (popular, trending, content-based, demographic match) and use bandit logic to converge on what works for this user fast.
->
-> **Cold-start as a metric, not just a feature.** Track 'time to good recommendations' (sessions until a personalized model performs well for a new user) as a release-gating metric. New cold-start improvements should reduce this number.
->
-> **The dual problem (cold items)** is just as important. New items have no engagement signal; they need a content-based candidate source and an explicit boost in the first hours / days to gather signal."
+## Decision Contract
 
-## Tells that get you a strong-hire vote
+First filter eligible items/actions using safety, availability, consent and privacy rules.
+Then blend available preference, context, content and behavior evidence using calibrated confidence, not a universal interaction count.
+Bound exploration against an acceptable fallback.
+Keep exposure, strategy/policy, selection probability, context, feedback window and missingness with each update.
+Pending or unexamined impressions are not observed dislikes.
 
-- You name **three signals** (onboarding, context, exploration) and sequence them.
-- You bring up **content-based features** for early personalization.
-- You mention **bandits** for shelf-level exploration.
-- You name **cold-start as a metric** to track over releases.
-- You connect to the **dual cold-item problem**.
+## Change 1: Onboarding Causes Abandonment
 
-## Tells that get you down-leveled
+**New task.** Preference questions produce richer profiles among completers but increase abandonment.
 
-- "Just show popular items."
-- No onboarding-signal collection.
-- No mention of exploration.
-- Only solving the user side; ignoring cold-items.
+**Picture and change.** Compare optional/minimal questions against context/content fallback, assigning users before onboarding.
+Retain abandoners in whole-cohort retention and successful-recommendation outcomes.
 
-## Common follow-up
+**Check.** Better recommendations among completers can coexist with worse results for all assigned users.
 
-"How would you measure how well your cold-start works?"
+**Use when.** Collecting signal has product cost.
 
-The L6 answer:
+## Change 2: The Item Is New
 
-> "Three metrics: (1) Day-N retention for new users (do they come back), (2) time to first 'good' recommendation (sessions until a personalized model meets quality threshold for that user), (3) per-cohort engagement on first session vs same cohort at session 10. A/B cold-start changes against the previous cold-start strategy on new users only; the population is small so power matters and tests need to run longer than usual."
+**New task.** A new item has content but no engagement history.
+
+**Picture and change.** Retrieve it through eligible content features and consider bounded exploration with quality and item/creator coverage checks.
+
+**Check.** A boost cannot bypass eligibility or guarantee value.
+
+**Use when.** The cold side is the catalog, not the user.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Failure: Unshown Means Disliked
+
+If popular items receive every impression, unseen categories have no feedback.
+Treating their missing clicks as negative preferences reinforces the same selection without learning about alternatives.
+
+## Transfer Check
+
+Does higher engagement in session ten prove that learning improved cold-start?
+
+### Reasoned Answer
+
+No. Returners differ from users who left, and intent may change.
+Compare identified cohorts with explicit follow-up maturity and censoring.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-an-l6-answer-adds"></span>
+
+## Signal Sources and Exploration Limits
+
+Content features and two-tower models can connect eligible items with stated or observed interests before item-specific interaction exists.
+Similar-user aggregates can supply priors only when their use is permitted and relevant.
+Available demographics do not imply permission or useful prediction.
+
+An epsilon-greedy or Thompson-sampling strategy needs eligible actions, defined rewards, sufficient exposure support and a nonstationarity policy.
+The Beta example assumes stable, independent rewards; actual slates, repeated exposures and changing intent can violate that assumption.
+No algorithm guarantees faster learning or retention.
+Continue only justified exploration after early sessions; reset or adapt when evidence becomes stale.
+
+<span id="common-follow-up"></span>
+
+## Evaluate New-User Outcomes
+
+Define success and time to useful recommendations before testing; report users who never reach the threshold.
+Compare new-user strategies with cohort assignment, uncertainty, sample/power planning and privacy/safety/quality guardrails.
+Measure first-session outcomes, mature day-N retention and time-to-event outcomes with explicit censoring.
+Use the full assigned cohort, not only onboarding completers or returning users.
+
+## Sources
+
+- [Schein et al.: cold-start recommendation](https://doi.org/10.1145/564376.564421).
+- [Li et al.: contextual-bandit feedback](https://arxiv.org/abs/1003.0146).
+
+</div>
 
 ---
 

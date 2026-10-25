@@ -7,7 +7,7 @@ const cursor = (index, label) => mark(index, label, 'focus', 'scan-cursor');
 const draft = visual('Check each complement before saving the current value.', [
   frame(
     'Initialize the lookup',
-    'Before index 0, seen is empty; the only retained state will map each scanned value to its index.',
+    'Before index 0, seen is empty. Each retained value maps to one earlier index.',
     arrayMap(nums, [], [cursor(0, 'current i=0')], { example, target: '6', mapLabel: 'seen: value -> index' }),
     'initialize-seen',
   ),

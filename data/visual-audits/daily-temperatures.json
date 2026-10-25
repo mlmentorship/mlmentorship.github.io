@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-daily-temperatures.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "A decreasing stack keeps unresolved day indices until the first warmer temperature can pop them.",
+  "learningObjective": "Unresolved temperatures are nonincreasing; a strictly warmer day pops waiting indices and writes their first qualifying distances.",
   "mechanismReview": {
     "pattern": "Monotonic decreasing stack of unresolved indices.",
     "recognitionCue": "Look for the first later greater value or the waiting distance to it; those words suggest keeping unresolved indices until a new value is large enough to answer them.",

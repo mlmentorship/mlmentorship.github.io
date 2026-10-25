@@ -15,128 +15,177 @@ priority: "Role-specific"
 prerequisites: ["two-tower-retrieval", "learning-to-rank-losses", "position-bias-counterfactual-learning-to-rank"]
 ---
 
-Personalized search should retrieve relevant items first, rank them for the current user and request, and control the feedback loop created by its own results. A strong design connects stage-specific objectives, exposure-aware data, online decisions, latency, fallback, and long-term product health.
+Personal history must not replace exact query intent; trace a missing result through retrieval and merging before changing the ranker.
 
-This case uses one concrete workload, but the decisions transfer to product, media, marketplace, job, and enterprise search. It is a reference map rather than a script. In an interview, state the product decision, draw the request path, and take one or two areas deep.
+<span id="the-prompt"></span>
 
-## The prompt
+## Problem
 
-Design the main search experience for a global media product.
+Design search for a fictional global media product.
+The scenario has 100 million monthly users, ten million items, 10,000 peak queries/second and twenty result positions.
+The server target is below 200 milliseconds at p99, not an established benchmark.
+Use query, locale, device, session and consented history; region, rights and safety eligibility remain mandatory.
 
-Assume:
+The current lexical/popularity path handles exact titles but struggles with broad queries, fresh inventory and several locales.
+Improve broad-query success without violating exact-lookup, latency, discovery or market guardrails.
 
-- 100 million monthly active users;
-- 10 million searchable items;
-- 10,000 peak queries per second;
-- a top-20 result page;
-- a p99 server latency target below 200 milliseconds;
-- text, locale, device, current session, and consented history as inputs;
-- new users, new items, and tail queries as important slices;
-- long-term successful consumption as the product goal.
+For one exact-title query, eligible item A is lexical rank 1 and absent from semantic retrieval.
+B is lexical rank 2 and semantic rank 1.
+Fuse ranks with reciprocal-rank fusion at offset 60, then keep one candidate.
+Can a better final ranker restore A?
 
-The current system uses lexical retrieval plus popularity. Exact-title search works, but broad queries are generic. New items receive little exposure. Repeated recommendations narrow over time. Search reformulation is rising in several locales.
+## Picture: The Correct Item Disappears Before Ranking
 
-The first release must improve broad-query success without regressing exact lookup, latency, new-item discovery, or critical market slices.
+RRF adds $1/(60+\text{rank})$ for each source that retrieved the item.
+An absent source contributes nothing; its absence remains explicit in the record.
 
-## State the design thesis first
+| Item | Lexical contribution | Semantic contribution | Fused score |
+| --- | --- | --- | ---: |
+| A | 1/61 | Absent | 0.016393443 |
+| B | 1/62 | 1/61 | 0.032522475 |
 
-Use a multi-stage retrieve, rank, and constrain architecture.
+B wins the unprotected one-candidate merge, so A never reaches either ranker.
+The final ranker cannot recover an item outside its candidate set.
+A high-confidence exact-intent quota or a sufficiently large supported merge can retain eligible A.
+That protects candidate access, not final placement or relevance for every rewritten query.
 
-1. Retrieve candidates from lexical, semantic, personalized, and freshness-aware sources.
-2. Preserve recall with a cheap first-pass ranker.
-3. Predict several user outcomes with a richer final ranker.
-4. Apply list-level constraints for availability, safety, diversity, and product policy.
-5. Log exposure and decision context so evaluation does not confuse the old policy with user preference.
-6. Launch by query segment and traffic stage, with a lexical fallback and rollback-ready artifacts.
+<p class="visual-kicker">Candidate loss before the final model</p>
+<p class="visual-title">RRF favors B here; an exact-intent protection rule must act before A is discarded.</p>
 
-Personalization should be conditional on the query. User history can resolve intent and order relevant candidates, but it should not replace query relevance. A user who often watches football should still receive the correct film when they search its exact title.
+<!-- visual:personalized-search-request-learning-loop -->
+```mermaid
+flowchart TB
+  accTitle: Exact-title candidate A is lost during an unprotected rank-fusion cutoff
+  accDescr: The original exact-title request has eligible A at lexical rank one and B at lexical rank two. Semantic retrieval contains B at rank one but no A. Reciprocal-rank fusion with offset sixty gives A 0.016393443 and B 0.032522475. An unprotected one-candidate merge keeps B and removes A, which no final ranker can restore. A separate protected path can retain eligible A through a confident exact-intent quota or a larger merge, followed by final quality and policy checks. Both paths must retain candidates, source evidence, versions and actual exposure for supported learning; logging does not reveal unshown outcomes.
+  Query["Original exact-title query<br/>preserve rewrite uncertainty"]
+  Lexical["LEXICAL<br/>A rank 1 / B rank 2"]
+  Semantic["SEMANTIC<br/>B rank 1 / A absent"]
+  Fusion["RRF, offset 60<br/>A: 0.016393443<br/>B: 0.032522475"]
+  Cutoff["UNPROTECTED CAP 1<br/>B survives / A removed"]
+  Final["FIRST + FINAL RANKERS<br/>cannot restore absent A"]
+  Protection["PROTECTED EXACT INTENT<br/>eligible A retained by quota<br/>or larger supported merge"]
+  Validate["Rank and constrain<br/>validate final exact-query quality"]
+  Exposure["Log candidate/source evidence<br/>versions, policy and actual exposure"]
+  Learn["Point-in-time supported evaluation<br/>validated next artifacts only"]
+  Query --> Lexical --> Fusion
+  Query --> Semantic --> Fusion
+  Fusion --> Cutoff --> Final --> Exposure
+  Fusion --> Protection --> Validate --> Exposure
+  Exposure --> Learn
+  Learn -.->|"changes next request policy"| Query
+  class Query,Lexical,Semantic viz-input
+  class Fusion,Protection,Validate viz-focus
+  class Cutoff,Final viz-warning
+  class Exposure,Learn viz-state
+```
+<p class="diagram-caption"><strong>Read it this way:</strong> follow A's membership, not only its score. The protection path retains a candidate; later ranking and current eligibility still need validation. Logging reconstructs the decision, not unshown outcomes.</p>
+
+<span id="state-the-design-thesis-first"></span>
+
+## Decision Contract
+
+| Boundary | Retain and evaluate |
+| --- | --- |
+| Query | Original/transformed text, intent uncertainty and reversible correction |
+| Retrieval/merge | Canonical IDs, every source rank/score, missing-source state, eligible coverage and quotas |
+| First/final rankers | Cutoff recall/regret, conditional head populations/units, model/calibrator and feature versions |
+| List policy | Hard eligibility, soft diversity/freshness, pre/post ranks and policy owner |
+| Learning | Point-in-time availability, actual exposure, assignment/propensity, maturity, retention and replay manifest |
+| Release | Exact-intent non-inferiority, broad-query benefit, mature outcomes, slices, cost/latency and compatible rollback |
+
+At 10,000 queries/second and twenty positions, output capacity is 200,000 result positions/second.
+This is not 200,000 examined items or complete outcome labels.
+Keep retrieval recall, cutoff loss, final/list utility and causal product effect separate.
+
+## Change 1: Half the Users Disable History
+
+**New task.** Personal history becomes impermissible or unavailable.
+
+**Picture and change.** Use a validated query/context-only mode with compatible features, cache scope and current policy.
+Maintain exact intent and compare consent-cohort quality without treating missing history as service failure.
+
+**Check.** Defaults and old cache entries cannot invent consent or silently restore personal state.
+
+**Use when.** Personalization lacks legitimate support.
+
+## Change 2: A Billion Items and Subminute Publication
+
+**New task.** The catalog grows while new entries must become searchable within one minute.
+
+**Picture and change.** Reprice sharding, replicas, ANN recall and streaming publication/deletion.
+Keep a lexical freshness path and tested compatible model/index/embedding/tokenizer versions.
+
+**Check.** Incremental speed does not replace count, schema, recall, current eligibility or rollback validation.
+
+**Use when.** Inventory scale and freshness change.
+
+## Change 3: A Source Adds 40 Milliseconds to p99
+
+**New task.** Semantic retrieval raises measured end-to-end p99 despite parallel execution.
+
+**Picture and change.** Measure unique relevant contribution by intent, deadlines, cancellation and missing-source behavior.
+Narrow or remove the source where marginal quality cannot justify the tail cost.
+
+**Check.** Parallel work is not free on the critical path.
+Per-stage quantiles cannot generally be added into an end-to-end percentile guarantee.
+
+**Use when.** Local quality and whole-request performance disagree.
+
+## Failure: A Locale Outage Hides in Aggregate NDCG
+
+A rewriter translates rare proper names; semantic candidates consume the merge quota and remove the exact item.
+Positive aggregate NDCG does not excuse that slice failure.
+Reconstruct query, source membership, cutoff, constraints and versions before choosing a fix.
+
+## Transfer Check
+
+Does complete exposure logging reveal user outcomes for unshown items?
+
+### Reasoned Answer
+
+No. It reconstructs the policy-created observation process.
+Counterfactual claims still require support, assignment/examination assumptions and valid outcomes.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
 
 ## Clarify the product decision
 
-Ask questions that change the objective or architecture.
+<span id="user-intent"></span>
+<span id="inventory"></span>
+<span id="personalization-and-policy"></span>
+<span id="operations"></span>
 
-### User intent
+| Boundary | Questions that change scope |
+| --- | --- |
+| Intent | Lookup/discovery/navigation/factual task, success, ambiguous intents, wrong/empty-result cost and explanations/citations? |
+| Inventory | Changes/expiry, regional/subscription/rights/age policy, immediate searchable fields and available modalities? |
+| Personalization | Consent/purpose/retention, history-free modes, prohibited attributes and supplier quality/exposure commitments? |
+| Operations | Request/index/feature targets, partial-failure fallback, stage owners and shadow capability? |
 
-- Is the dominant task exact lookup, broad discovery, navigation, or factual retrieval?
-- Does success mean a click, completed consumption, purchase, application, or resolved task?
-- Can one query express several valid intents?
-- How costly is an empty or confidently wrong result?
-- Are explanations or source citations part of the result?
-
-### Inventory
-
-- How often do items appear, change, expire, or become unavailable?
-- Does availability depend on region, subscription, rights, age, or policy?
-- Which item fields are searchable immediately after publication?
-- Are text, audio, image, graph, or behavioral representations available?
-
-### Personalization and policy
-
-- Which user signals have consent and a valid retention purpose?
-- Must some sessions operate without history?
-- Which attributes must not influence ranking?
-- Does the product owe exposure or quality guarantees to creators, sellers, or employers?
-- What safety filters must apply before any learned score?
-
-### Operations
-
-- What are the request, index-freshness, and feature-freshness targets?
-- What fallback is acceptable when one retriever or feature service fails?
-- Which teams own query understanding, retrieval, ranking, policy, and serving?
-- Can the current system shadow the new stages?
-
-For this case, exact lookup has high value, broad discovery needs improvement, and the catalog changes continuously. Personalization uses recent consented interactions and coarse long-term preferences. Region and rights filters are hard requirements.
+For this case, protect exact lookup while improving broad discovery; catalog and eligibility can change continuously.
 
 ## Define success at three levels
 
-A ranking system can improve one metric while making the product worse. Define the decision before selecting a loss.
+<span id="request-success"></span>
+<span id="product-outcome"></span>
+<span id="guardrails"></span>
 
-### Request success
+| Level | Definition and limit |
+| --- | --- |
+| Request | Useful consumption, reformulation, abandonment, dissatisfaction, zero/low results; clicks alone are not satisfaction |
+| Product | Successful search session with mature return/consumption evidence; avoid assigning every delayed outcome to one request |
+| Guardrails | Exact lookup, latency, cost, errors/timeouts, new/tail exposure, diversity, policy, locale/device and repetition |
 
-Measure whether the user reached a useful result for the current task.
-
-Candidate metrics include:
-
-- successful result consumption;
-- query reformulation within a short window;
-- immediate abandonment;
-- long click or completed session;
-- explicit dissatisfaction;
-- zero-result and low-result rates.
-
-A click alone is weak. Position, presentation, and curiosity can create clicks without satisfaction.
-
-### Product outcome
-
-Choose a primary outcome connected to the surface. For a media product, use a successful search session and confirm longer-term effects through return or retained consumption.
-
-Long-term return is too delayed and diffuse to optimize alone. Use it to validate short-term objectives and detect harm rather than assigning every request direct credit.
-
-### Guardrails
-
-Track:
-
-- exact-title success;
-- p95 and p99 latency;
-- cost per query;
-- crash and timeout rates;
-- new-item and tail-item exposure;
-- result diversity;
-- policy violations;
-- critical locale and device slices;
-- repeated-query and reformulation rates.
-
-Predefine the launch rule. For example, broad-query success must improve, exact lookup must remain within a narrow non-inferiority margin, and no critical guardrail may cross its stop threshold.
+Predefine broad-query benefit, exact-title non-inferiority and critical stop thresholds before selecting a loss.
 
 ## Build a workload and latency budget
 
-Order-of-magnitude estimates constrain the design.
+The core gives output rate, not examined-item count.
+Candidate reduction and batching bound the expensive model's workload.
+This table partitions a 200-millisecond planning envelope, not measured stage quantiles.
 
-At 10,000 peak queries per second and 20 visible results, the product emits 200,000 visible result positions per second. The system may score thousands of candidates per request, so final model complexity depends on aggressive early reduction and batching.
-
-A 200-millisecond p99 server target could allocate:
-
-| Stage | p99 budget |
+| Stage | Planning allocation |
 | --- | ---: |
 | Request parsing, policy, and query understanding | 15 ms |
 | Parallel candidate retrieval | 35 ms |
@@ -145,84 +194,29 @@ A 200-millisecond p99 server target could allocate:
 | List constraints and response assembly | 20 ms |
 | Network variance and safety margin | 40 ms |
 
-These are budgets, not promises. Measure each stage and preserve headroom. If a stage consumes its full budget under ordinary load, small index or dependency changes will break the request target.
-
-Assume each retriever returns hundreds or low thousands of candidates. The merge produces about 5,000 unique candidates, the first ranker keeps 500, and the final ranker scores 100 to 500 depending on model cost.
+Measure end-to-end tails under realistic load and retain headroom; allocated deadlines do not guarantee p99.
+For the full workload, merge about 5,000 candidates, keep 500, then score 100-500 with the final model.
+These scenario counts differ from the core's deliberately tiny failure example.
 
 ## Draw the request and learning loops
 
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace one request into an exposure record, then explain why that record links serving, evaluation, and retraining.</p>
-
-<!-- visual:personalized-search-request-learning-loop -->
-```mermaid
-flowchart TB
-  accTitle: Personalized search serving and learning meet at the exposure record
-  accDescr: In the online request path, a query and request context enter query understanding, then lexical, semantic, query-conditioned personalized, and fresh or popular retrievers run in parallel. Their candidates are merged with source evidence, reduced by a first-pass ranker, scored by a final multi-task ranker, and checked by list constraints and policy before results are displayed. Displayed positions, the full candidate set, source evidence, scores, point-in-time features, and model and policy versions enter an exposure and interaction record. In the learning path, those records become point-in-time datasets for evaluation and training. Validated versioned rankers are used by the next request, closing a selective feedback loop. Logging makes the serving decision reconstructable but does not reveal outcomes for unsupported, unshown actions.
-
-  subgraph Online["ONLINE REQUEST PATH"]
-	direction TB
-    Q["1 · Query + request context"] --> U["2 · Query understanding"]
-    U --> R["3 · Parallel retrieval<br/>lexical · semantic · personalized · fresh/popular"]
-    R --> M["4 · Merge + deduplicate<br/>retain every source"]
-    M --> R1["5 · First-pass ranker"]
-    R1 --> R2["6 · Final multi-task ranker"]
-    R2 --> C["7 · List constraints + policy"]
-    C --> O["8 · Displayed results"]
-  end
-
-  subgraph Learn["LEARNING PATH"]
-	direction TB
-    E["9 · Exposure + interaction record<br/>candidates · positions · scores<br/>features · model + policy versions"]
-    D["10 · Point-in-time datasets"]
-    T["11 · Training + evaluation"]
-    V["12 · Next request uses<br/>versioned R1 + R2"]
-    E -->|reconstruct what was eligible and shown| D
-    D -->|supported evidence| T
-    T -.->|publish only validated artifacts| V
-  end
-
-  O -->|display creates observable outcomes| E
-
-  class Q,R viz-input
-  class U,M,R1,R2,C viz-focus
-  class O viz-output
-  class E,D,T,V viz-state
-  class Q viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path through displayed results, then cross the exposure-record boundary. The learner does not observe free-standing preference: it observes outcomes under the candidates, positions, features, model, and policy that produced the page. Logging that context makes the decision reconstructable; it does not invent outcomes or support for items the policy never exposed. The dashed path shows the consequence: validated artifacts change the rankers used by the next request. Original synthesis checked against <a href="https://arxiv.org/abs/1608.04468">Joachims et al. on unbiased learning-to-rank</a>, <a href="https://proceedings.mlr.press/v37/swaminathan15.html">counterfactual risk minimization</a>, and Google's <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Rules of Machine Learning</a>.</p>
-
-The online path ends at results. The learning path begins with the exact candidates, positions, scores, model versions, and features used to create those results.
-
-If the exposure log is incomplete, later training cannot distinguish “the user disliked this item” from “the system never made it visible.”
+Online serving ends with constrained results; learning starts from versioned decision, exposure and outcome records.
+Missing exposure cannot establish dislike.
 
 ## Stage 0: understand the query without delaying it
 
-Query understanding can provide:
-
-- normalization and tokenization;
-- language and locale detection;
-- spell correction;
-- entity or title detection;
-- intent probabilities;
-- safety classification;
-- query embeddings;
-- structured constraints such as date, category, or language.
-
-Keep reversible transformations. A correction should not erase the original query. Retrieve from both when confidence is uncertain.
+Normalize/tokenize, detect locale/entities/intent/safety, embed queries and extract structured date/category/language constraints where justified.
+Preserve the original alongside reversible corrections.
 
 ### Exact versus broad intent
 
-An entity or exact-title detector can protect lookup tasks. Exact lexical matches receive a strong feature or dedicated candidate quota. Broad queries rely more on semantic, personalized, and exploratory sources.
-
-Do not use one fixed source mixture for every query. A learned or rule-based query router can select budgets by intent, but the first version can use a few transparent classes.
+Use validated exact-intent features/quotas; broad intent can justify different semantic, personal and exploratory budgets.
+Start with transparent query classes rather than one universal source mixture.
 
 ### Query rewriting
 
-Rewriting can improve recall, especially across languages and vocabulary mismatch. It can also change intent.
-
-Log the original and rewritten query, assign a confidence, and run retrieval on the original when uncertainty is material. Evaluate rewrites on exact entities, sensitive topics, negation, and tail languages.
+Log rewrite confidence and retain original-query retrieval when uncertainty matters.
+Check exact entities, sensitive topics, negation and tail languages; better lexical coverage does not justify changed intent.
 
 ## Stage 1: retrieve with complementary sources
 
@@ -230,160 +224,80 @@ No one retriever handles every query. Run several sources in parallel and preser
 
 ### Lexical retrieval
 
-An inverted index with a term-based score handles:
-
-- exact titles and names;
-- rare terms;
-- identifiers;
-- spelling variants captured by the analyzer;
-- fresh items with little behavioral data.
-
-Use field weights and phrase features. Title matches should differ from body or transcript matches. Region and hard availability filters should run before expensive ranking when possible.
+An inverted index supports titles, names, identifiers, rare terms, analyzer variants and fresh items.
+Keep field/phrase distinctions and apply hard eligibility before expensive ranking where possible.
 
 ### Semantic retrieval
 
-A two-tower model embeds the query context and items into a shared space. Item vectors are computed offline or on publication. Query vectors are computed online.
-
-Training pairs can use successful query-item interactions, explicit judgments, and teacher scores. Negative construction matters:
-
-- random negatives teach broad separation;
-- in-batch negatives improve efficiency but may contain false negatives;
-- impression negatives reflect confusing exposed items;
-- hard lexical or semantic negatives teach fine distinctions;
-- cross-encoder distillation transfers a richer relevance signal.
-
-Approximate nearest-neighbor search trades recall for memory and latency. Evaluate index recall against exact search on a representative query distribution. Report head, tail, locale, and freshness slices.
+Two towers encode request context online and items offline/on publication.
+Training can combine outcomes, judgments and teachers.
+Random, in-batch, impression and hard negatives imply different tasks and false-negative risks; cross-encoder distillation transfers teacher limitations too.
+Benchmark ANN against exact neighbors by head/tail, locale and freshness; measure memory, latency and task recall separately.
 
 ### Query-conditioned personalization
 
-Personalized retrieval should combine query and user state. Options include:
-
-- a query embedding adjusted by recent session intent;
-- separate query and user retrieval whose candidates are intersected or fused;
-- a model that attends from the query to selected history events;
-- category or creator preferences applied after a relevance floor.
-
-Limit the history window and remove events without a valid use policy. A current-session signal often predicts intent better than a long-term profile.
-
-When history is unavailable, the same endpoint should fall back to query, locale, and context features. Absence of history is a normal mode, not an error.
+Condition history on the query through session-adjusted vectors, query/user fusion, selected-history attention or preferences above a relevance floor.
+Bound consented history; validate session versus long-term value.
+History-free query/context operation is a normal supported mode.
 
 ### Freshness and popularity sources
 
-A small fresh-item source prevents new inventory from waiting for interaction labels. Popularity can recover obvious results during cold start and partial failures.
-
-Compute popularity by relevant context such as region, language, time window, and category. Global popularity can erase local or tail intent.
+A fresh source offers eligible new items without interaction history.
+Use region/language/time/category-aware popularity when justified; global counts can erase local intent.
 
 ### Source budgets
 
-Each source receives a candidate budget based on query class and measured marginal recall. Adding another thousand semantic candidates has low value if lexical retrieval already covers the relevant set.
-
-Track contribution and unique contribution. A source that appears in many final results may still add no candidates beyond another source.
+Budget by query class and unique relevant contribution, not source appearance frequency alone.
 
 ## Merge candidates without losing source evidence
 
 Candidate lists use incomparable scores. A lexical score, vector distance, and popularity count do not share a natural scale.
 
-The merge layer should:
-
-- deduplicate by canonical item identity;
-- retain every source and source rank;
-- record raw and calibrated source scores;
-- enforce hard availability and policy filters;
-- reserve quotas when one source would otherwise dominate;
-- cap total candidates under overload;
-- expose missing-source indicators.
-
-Reciprocal-rank fusion is a strong baseline because it combines ranks without assuming calibrated scores. A small learned merger can later use query class, source ranks, and source scores.
-
-Do not hide source failure. If semantic retrieval times out, the ranker needs a missing-source feature and the system needs a metric. Treating absent scores as ordinary zeros can shift behavior silently.
+Deduplicate canonical IDs while retaining every source/rank/raw score, any calibrated score and explicit missing-source state.
+Apply eligibility, justified quotas and overload caps.
+RRF avoids common-score-unit assumptions but can still lose exact candidates, as the core demonstrates.
+A learned merger also needs source-failure validation; absence is not an ordinary score of zero.
 
 ## Stage 2: optimize recall with a cheap ranker
 
-The first-pass ranker reduces about 5,000 candidates to 500. Its main failure is removing the item that the final ranker would have selected.
-
-Useful models include gradient-boosted trees, linear models over crossed features, or small neural networks. Features can include:
-
-- source identity, score, and rank;
-- lexical match and phrase features;
-- embedding similarity;
-- item availability and freshness;
-- coarse query intent;
-- lightweight user-item interactions;
-- popularity within context;
-- historical quality and policy flags.
-
-Use features that can be computed or fetched cheaply in a batch. Avoid remote per-candidate calls.
+Reduce about 5,000 candidates to 500 using inexpensive batched features, not remote per-candidate calls.
+Trees, crossed linear models or small networks can use source/lexical/embedding, freshness, intent, lightweight interaction and quality/policy evidence.
 
 ### Stage metric
 
-Measure recall of judged or successfully consumed items at the cutoff. Also measure final-system regret: how often did the first pass drop an item that a slower teacher or later successful interaction considered useful?
-
-A first-pass NDCG improvement is irrelevant if recall at 500 declines and the final model loses its best candidates.
+Measure cutoff recall and losses against a justified teacher or mature useful outcome.
+Improved local ordering does not compensate for dropping the final model's useful candidates.
 
 ### Distillation
 
-Train the first ranker from labels plus scores from the richer final model. Distillation can preserve candidates that have subtle value.
-
-Validate against real outcomes because the teacher can transfer its own bias. Keep explicit relevance and policy features so the first ranker does not become an opaque copy.
+Combine labels/teacher scores where useful, then validate against real outcomes and policy; teacher bias can transfer.
 
 ## Stage 3: rank several outcomes
 
-The final ranker scores a few hundred candidates with richer cross features and sequence context.
-
-Possible architecture choices include:
-
-- gradient-boosted trees for fast iteration and tabular features;
-- deep cross networks for sparse and dense interactions;
-- attention over recent user history;
-- a cross-encoder for query-item text interaction;
-- a mixture or cascade that reserves expensive scoring for ambiguous candidates.
-
-Choose from latency, training data, interpretability, feature shape, and measured quality. A fashionable architecture is not a design requirement.
+Score hundreds with richer crosses/sequence context.
+Compare trees, deep crosses, history attention, cross-encoders or selective cascades using data, feature shape, interpretability and quality/cost/latency.
 
 ### Multi-task outputs
 
-Predict outcomes that have distinct semantics:
-
-- probability of useful engagement;
-- expected consumption conditional on engagement;
-- task completion;
-- reformulation or abandonment;
-- explicit negative feedback;
-- longer-term satisfaction proxy;
-- policy or quality risk.
-
-Calibrate heads before combining them. Different base rates and loss scales can make one head dominate even when its product weight is small.
-
-A score might combine expected benefits and costs:
+Define each engagement, conditional consumption, completion, reformulation, negative, satisfaction or risk head's population, units and maturity.
+Calibrate probability heads where used as probabilities; a combined utility is not automatically a probability.
+One possible product-owned utility is:
 
 $$
 S(x) = \sum_k w_k \hat{u}_k(x) - \sum_j \lambda_j \hat{c}_j(x)
 $$
 
-The weights represent a product decision. They should not be hidden inside model training without an owner or evaluation plan.
+Assign an owner and evaluation plan to the weights.
 
 ### Constrained decisions
 
-Some requirements should be constraints rather than negative score terms. Region, rights, safety exclusions, and severe quality rules belong outside the learned utility score when violations are unacceptable.
-
-Other goals, such as diversity and freshness, can be soft constraints or list-level objectives. Record which layer owns each rule.
+Unacceptable region, rights, safety or severe-quality violations are hard constraints, not cheap score penalties.
+Record ownership for soft diversity/freshness trade-offs.
 
 ## Stage 4: optimize the result list
 
-Items that score well independently can form a poor page. The list may contain duplicates, one creator, one viewpoint, or several near-identical titles.
-
-The list layer can apply:
-
-- canonical deduplication;
-- hard policy and availability rules;
-- maximum marginal relevance;
-- category or creator caps;
-- freshness floors;
-- source or format diversity;
-- page-level business constraints;
-- exploration assignments.
-
-List rules can reduce immediate score while improving user choice or ecosystem health. Evaluate the complete page, not only item-level predictions.
+Evaluate complete pages for duplicates, redundancy and supplier/intent coverage.
+Options include maximum marginal relevance, category/creator caps, freshness floors, source/format diversity, business rules and bounded exploration.
 
 ### Constraint ordering
 
@@ -393,66 +307,40 @@ Log both pre-constraint and post-constraint ranks. Otherwise teams may blame the
 
 ## Build labels from decisions, exposure, and outcomes
 
-Training records should include:
-
-- request and stable session identifiers;
-- original and transformed query;
-- candidate set and source evidence;
-- exposed items and positions;
-- model and policy versions;
-- relevant point-in-time features;
-- randomization probability when used;
-- immediate interactions;
-- delayed outcomes and maturity state;
-- policy interventions;
-- privacy and retention class.
+```text
+DecisionRecord
+  request_id, session_id, original_query, transformed_query
+  candidates, all_source_evidence, pre_post_constraint_ranks
+  exposed_items, positions, examination_evidence
+  model, calibrator, index, tokenizer, policy_versions
+  point_in_time_features, availability_times, assignment_probability
+  interactions, delayed_outcomes, maturity, interventions
+  privacy_class, purpose, consent, retention, replay_manifest
+```
 
 ### Do not call every non-click a negative
 
-An unclicked item may have been below the fold, ignored after an earlier result succeeded, or unseen because the user left. Treating every impression as an equal negative teaches position and stopping behavior.
-
-Use stronger negatives such as:
-
-- examined items skipped before a later click;
-- items shown in the same visible region;
-- reformulated-query failures;
-- explicit negative feedback;
-- hard candidates judged irrelevant;
-- sampled catalog negatives for retrieval geometry.
-
-Keep negative type as a feature or training weight. Each type answers a different question.
+Unclicked can mean unexamined, earlier success or departure.
+Examined skips, visible comparisons, reformulations, explicit negatives, judged candidates and sampled catalog negatives have different semantics.
+Retain negative type and its weighting assumptions; examination evidence is not perfect relevance truth.
 
 ### Delayed outcomes
 
-A click arrives quickly. Completion, product re-engagement, refund, complaint, or successful application may take days.
-
-Build labels with maturity windows. Evaluation should state how much of the outcome window is complete. Retraining on partially mature labels can create apparent gains that disappear when late negatives arrive.
+Declare windows and completeness for consumption, return, refund, complaint or other delayed outcomes.
+Pending labels are not mature negatives; apparent gains can reverse after late outcomes.
 
 ### Selective labels
 
-The system observes detailed outcomes mainly for items it exposed. In marketplaces or risk systems, downstream decisions can hide even more labels.
-
-Preserve randomized or audit samples where policy permits. Without support beyond the current policy, offline data cannot reliably evaluate large ranking changes.
+Exposure and downstream actions select which labels exist.
+Preserve permitted audit/randomized samples; unsupported policy changes cannot be evaluated merely by adding ordinary logs.
 
 ## Correct exposure bias without claiming impossible counterfactuals
 
-Clicks mix relevance with examination, position, presentation, and the old policy. Counterfactual learning uses known or estimated propensities to reweight observed outcomes.
-
-Use randomized position swaps or exploration traffic to estimate exposure probabilities. Then consider:
-
-- inverse propensity scoring for unbiased estimates under correct propensities and support;
-- self-normalized estimators for lower variance with some bias;
-- clipped weights to control extreme variance;
-- doubly robust estimators that combine outcome models with propensity weighting.
-
-State the assumptions:
-
-- the logging probability is known or estimated well;
-- the new policy has support under logged actions;
-- the exposure model captures the relevant assignment process;
-- interference and delayed outcomes are handled appropriately.
-
-Do not claim to know what a user would have done for every unshown item. Use controlled exploration, explicit judgments, and sensitivity analysis to reduce uncertainty.
+Clicks mix relevance, examination, presentation and policy.
+Randomized swaps/exploration can help identify exposure under their design.
+IPS requires valid propensities and support; self-normalization, clipping and doubly robust models have distinct bias/variance/identification conditions.
+State assignment, confounding, interference and outcome-maturity assumptions, then perform appropriate sensitivity checks.
+None reveals arbitrary unshown outcomes.
 
 ## Choose losses by stage and evidence
 
@@ -480,118 +368,55 @@ The [learning-to-rank loss guide](/concepts/learning-to-rank-losses/) covers the
 
 Historical examples must reconstruct what the system could know at request time.
 
-Version:
-
-- query processing;
-- user-history windows;
-- item metadata;
-- availability and rights;
-- popularity aggregates;
-- source indices;
-- feature transformations;
-- label definitions;
-- model and policy code.
-
-Use event time and availability time for late-arriving data. A corrected catalog record or delayed interaction should not appear in training as if it existed earlier.
+Version query processing, history, item/rights metadata, popularity, indices, transformations, labels, models and policy.
+Use event and availability time; later corrections must not leak into earlier requests.
 
 ### Splits
 
-Use time-based evaluation for deployment realism. Add group constraints where repeated users, items, or queries would leak across splits.
-
-Evaluate several transfer slices:
-
-- new users;
-- new items;
-- tail queries;
-- new query-item combinations;
-- changed locales or catalog segments.
-
-Random row splits often overstate performance because the same users, items, and near-duplicate sessions appear on both sides.
+Use deployment-realistic temporal splits and justified user/item/query grouping.
+Check new users/items, tail queries, unseen combinations and changed locales/catalogs; random rows can leak near-duplicate sessions.
 
 ## Handle cold start as several problems
 
-### New user
+<span id="new-user"></span>
+<span id="new-item"></span>
+<span id="new-query"></span>
+<span id="new-market"></span>
 
-Use query, session, locale, device, and contextual popularity. Ask for lightweight preference only when the product can justify the friction.
-
-Move gradually from contextual to historical personalization. Do not switch after an arbitrary interaction count without confidence or quality evidence.
-
-### New item
-
-Use text, image, audio, metadata, and publisher features. Include the item in a freshness-aware retriever and allocate bounded exploration.
-
-Measure whether exploration gathers useful evidence or merely shifts exposure. Correct for the exploration assignment in later evaluation.
-
-### New query
-
-Use lexical and semantic generalization, spelling support, and query-intent features. Monitor zero results, reformulation, and nearest known-query distance.
-
-### New market
-
-Language, inventory, policy, and behavior can all change. Start from a strong non-personalized baseline and validate local labels. A translated query model does not prove calibrated ranking in the new market.
+| Cold case | Supported path and check |
+| --- | --- |
+| User | Permitted query/session/context/popularity; optional preference friction; confidence-based handoff |
+| Item | Content/metadata/publisher features, fresh source, bounded exploration and logged assignment; exposure is not proven value |
+| Query | Lexical/semantic/spelling/intent; zero results, reformulation and known-query distance |
+| Market | Local language/inventory/policy/behavior and labels; strong baseline, not assumed translation transfer |
 
 ## Evaluate each stage and the complete system
 
-### Retrieval
+<span id="retrieval"></span>
+<span id="first-pass-ranking"></span>
+<span id="final-ranking"></span>
+<span id="list-quality"></span>
+<span id="end-to-end-replay"></span>
 
-Measure:
-
-- recall at candidate budget;
-- unique relevant contribution by source;
-- approximate-index recall against exact neighbors;
-- latency and memory;
-- fresh-item inclusion;
-- head, tail, locale, and cold-start slices.
-
-### First-pass ranking
-
-Measure recall at its cutoff, teacher regret, latency, and robustness when one retrieval source is missing.
-
-### Final ranking
-
-Use NDCG, MRR, or task-specific utility on judged and interaction data. Report calibration where scores drive utility or thresholds.
-
-### List quality
-
-Measure deduplication, diversity, coverage, constraint satisfaction, and page-level judgments.
-
-### End-to-end replay
-
-Replay complete versioned requests through candidate generation, ranking, and constraints. A model-only evaluation cannot detect index, feature, or policy changes.
+| Stage | Evidence |
+| --- | --- |
+| Retrieval | Budgeted/unique task recall, ANN exact-neighbor recall, latency/memory and fresh/head/tail/locale/cold slices |
+| First pass | Cutoff recall/regret, latency and missing-source robustness |
+| Final | NDCG/MRR/defined utility plus probability calibration where required |
+| List | Deduplication, diversity, coverage, hard constraints and page judgments |
+| Replay | Full query/index/feature/model/policy path; model-only tests cannot reconstruct changes elsewhere |
 
 ## Use human judgments for coverage and diagnosis
 
-Human labels can evaluate candidates the old policy rarely exposed. Create a stratified set across intent, locale, popularity, tail queries, and known failure modes.
-
-A useful rubric separates:
-
-- topical relevance;
-- exact-intent satisfaction;
-- quality or authority;
-- freshness when needed;
-- harmful or disallowed content;
-- list redundancy;
-- confidence in the judgment.
-
-Measure agreement and adjudicate ambiguous cases. Do not reduce every disagreement to labeler error. Ambiguity can reveal underspecified product intent.
-
-Refresh part of the set and keep a stable regression subset. A static benchmark becomes less representative as the catalog, policy, and model change.
+Sample intent, locale, popularity, tail and failure cases beyond the old top results.
+Separate topical/exact relevance, authority, freshness, harm, redundancy and confidence.
+Adjudicate ambiguity, including underspecified intent; agreement is not validity.
+Version refreshes and protect a stable regression subset.
 
 ## Design the online experiment around the decision
 
-Randomize at the user level when treatment can affect later sessions. Query-level randomization gives more power but can contaminate learning and user experience when the same person sees both policies.
-
-Define:
-
-- eligibility and exposure;
-- primary metric and maturity window;
-- exact-title non-inferiority guardrail;
-- latency, cost, safety, and ecosystem guardrails;
-- minimum worthwhile effect;
-- sample size and duration;
-- novelty and carryover risks;
-- stop rules;
-- segment analysis planned before launch.
+Choose randomization to handle cross-session effects; query assignment is not universally more powerful or uncontaminated.
+Predefine eligibility, actual exposure, mature target, exact-title non-inferiority, other guardrails, worthwhile effect, power/duration, carryover, stops and slices.
 
 ### Ramp sequence
 
@@ -606,65 +431,30 @@ Shadowing validates features, latency, and score behavior. It does not measure u
 
 ### Interpret disagreement
 
-If offline metrics improve and online outcomes decline, investigate:
-
-- objective mismatch;
-- exposure or selection bias;
-- temporal leakage;
-- feature skew;
-- index differences;
-- list constraints;
-- latency and timeout changes;
-- novelty effects;
-- slice regressions;
-- logging errors.
-
-Do not automatically trust either side. Online data can also be invalid through assignment, exposure, or instrumentation failures.
+Check objective, selection, leakage, feature/index/policy differences, latency, novelty, slices and logging.
+Validate online assignment/exposure/instrumentation rather than automatically trusting either side.
 
 ## Control feedback loops and exploration
 
-The current ranker determines future exposure, labels, and model confidence. Without intervention, popular items can accumulate evidence while tail items remain uncertain.
-
-Use several controls:
-
-- a small randomized exploration bucket;
-- freshness-aware candidate quotas;
-- uncertainty-aware exploration where risk permits;
-- diversity constraints;
-- counterfactual evaluation with logged propensities;
-- stable holdouts;
-- periodic human judgment outside the current top results;
-- monitoring of exposure concentration and query coverage.
+Consider bounded exploration/fresh quotas, diversity, supported counterfactual checks, stable holdouts and judgments beyond current results.
+Monitor concentration, query coverage and resulting confidence, not only engagement.
 
 ### Exploration policy
 
-Separate product exploration from experiment randomization. Define eligibility, maximum user cost, safety exclusions, and the probability of each action.
-
-High-risk queries may allow no exploration. Broad discovery queries can tolerate more than exact title or urgent tasks.
-
-Exploration budget limits what offline estimators can support. Small randomization reduces user cost but may not cover a large policy change. Increase support gradually, use targeted judgments, and require an online test when logged overlap remains weak.
+Separate experiment assignment from product exploration; declare eligibility, user-cost limits, exclusions and action probabilities.
+Exact/high-risk tasks may forbid exploration.
+Small buckets need not support large policy changes; use targeted judgments and appropriate new experiments.
 
 ### Ecosystem effects
 
-Search can change creator, seller, employer, or publisher behavior. Monitor exposure concentration, new-item discovery, low-quality optimization, and strategic manipulation.
-
-A short-term click gain can shift the inventory toward content that exploits the objective. Product health needs longer-horizon and supplier-side evidence.
+Monitor supplier response, concentration, discovery and strategic low-quality optimization over suitable horizons.
 
 ## Design the serving path for partial failure
 
-The online service should use parallel retrieval with deadlines. Slow sources return partial results rather than block the whole request.
-
-A practical request path includes:
-
-- authenticated request and consent context;
-- query processing;
-- parallel retrieval with per-source timeout;
-- merge and hard filters;
-- batched feature fetch;
-- first and final rankers;
-- list constraints;
-- response cache where valid;
-- exposure logging through a durable asynchronous path.
+Authenticate the request and consent context, process the query, then retrieve with deadlines.
+Merge and filter, fetch features in batches, rank and constrain results.
+Cache only valid responses and durably log actual exposure.
+Allow explicit partial results only when the reduced mode remains valid.
 
 ### Fallback ladder
 
@@ -686,34 +476,22 @@ Cancel or ignore late work. Record timeout, candidate contribution, and quality 
 
 Group online features by freshness and failure behavior.
 
-### Request features
+<span id="request-features"></span>
+<span id="user-features"></span>
+<span id="item-features"></span>
+<span id="cross-features"></span>
 
-Query, locale, device, session state, and current product context arrive with the request.
-
-### User features
-
-Long-term preferences can update in batch. Recent interactions may update through a stream. Both need timestamps, defaults, and consent state.
-
-### Item features
-
-Metadata and embeddings update on publication or content change. Popularity and quality aggregates update on a declared cadence.
-
-### Cross features
-
-Rich query-item and user-item features are expensive. Compute lightweight values in batch, derive bounded online interactions, or use model architectures that combine embeddings efficiently.
+| Family | Update/contract |
+| --- | --- |
+| Request | Query, locale, device, session and current context |
+| User | Batch preferences/stream interactions with timestamps, defaults and current consent |
+| Item | Publication/content metadata/embeddings and declared popularity/quality cadence |
+| Cross | Batched or bounded query-item/user-item computation; no unbounded per-candidate remote work |
 
 ### Feature failure
 
-Every feature family needs one of:
-
-- a safe default;
-- a cached value with maximum age;
-- a reduced model that excludes it;
-- a request failure when the feature is legally or operationally required.
-
-Do not remove an input from a model that was trained to require it. Use a separately trained reduced model, a model with validated missingness handling, or a cascade to a simpler architecture.
-
-Record the feature versions and missingness used for each prediction. This supports incident analysis and model evaluation under degraded modes.
+Declare safe defaults, maximum-age cache, validated reduced/missingness-aware model or failure when legally/operationally required.
+Do not simply omit a required model input; record versions and actual missingness.
 
 ## Update indices without corrupting availability
 
@@ -734,27 +512,21 @@ A model version should declare compatible index and embedding versions. Rolling 
 
 ## Monitor quality, system health, and learning health
 
-### Request path
+<span id="request-path"></span>
+<span id="retrieval-and-ranking"></span>
+<span id="user-outcomes"></span>
+<span id="slices"></span>
+<span id="learning-loop"></span>
 
-Track latency, errors, saturation, timeouts, cache behavior, candidate counts, and degraded mode by stage.
+| Layer | Signals |
+| --- | --- |
+| Request | Stage latency/errors/saturation/timeouts, cache, counts and degraded mode |
+| Models/index | Contributions, scores/rank movement, missing features, freshness and constraint effects |
+| Outcomes | Success, reformulation, abandonment, consumption, complaints and maturity |
+| Slices | Intent, frequency, locale/device, cold user/item and policy-sensitive groups |
+| Learning | Concentration/support, delay, data age, drift and offline/online relationship |
 
-### Retrieval and ranking
-
-Track source contribution, score distributions, rank movement, missing features, index freshness, and constraint effects.
-
-### User outcomes
-
-Track successful sessions, reformulations, abandonment, long consumption, complaints, and delayed outcome maturity.
-
-### Slices
-
-Monitor exact, broad, head, tail, locale, device, new-user, new-item, and policy-sensitive groups.
-
-### Learning loop
-
-Track exposure concentration, propensity support, label delay, training-data age, evaluation drift, and offline-online relationship.
-
-Every alert needs severity, owner, and response. Drift without demonstrated harm often belongs in a diagnostic dashboard. A policy violation or exact-query outage may require an immediate stop.
+Alerts need severity, owner and response; drift is diagnostic evidence, while policy or exact-query failures may require stopping.
 
 ## Protect privacy, safety, and user control
 
@@ -774,16 +546,7 @@ User-facing explanations should describe defensible factors such as query match,
 
 ## Model cost and capacity explicitly
 
-Estimate cost by stage:
-
-- index memory and replication;
-- query and item embedding computation;
-- feature reads;
-- candidates scored per ranker;
-- model operations and batch efficiency;
-- logging volume;
-- training and evaluation cadence;
-- human judgment.
+Price index memory/replicas, embeddings, feature reads, scored candidates, operations/batching, logs, training/evaluation and human judgment.
 
 ### Quality-cost frontier
 
@@ -808,31 +571,23 @@ Log the active mode so product metrics are not compared as if the same policy se
 
 Avoid replacing the complete system in one release.
 
-### Phase 1: logging and replay
+<span id="phase-1-logging-and-replay"></span>
+<span id="phase-2-hybrid-retrieval"></span>
+<span id="phase-3-first-pass-learning"></span>
+<span id="phase-4-richer-final-ranking"></span>
+<span id="phase-5-personalization"></span>
+<span id="phase-6-controlled-exploration"></span>
 
-Verify exposure, candidate, feature, model, and outcome joins. Build stage-level evaluation before training a complex model.
+| Phase | Standalone evidence before expansion |
+| --- | --- |
+| 1 | Correct decision/exposure/feature/model/outcome joins and replay |
+| 2 | Shadowed hybrid retrieval, unique broad-query recall and protected exact lookup |
+| 3 | Cheap ranker cutoff recall and missing-source robustness |
+| 4 | Properly calibrated heads, independent list policy and fallback |
+| 5 | Session/broad-intent value before expanded consented history |
+| 6 | Bounded exploration with probabilities, support and cold-start evidence |
 
-### Phase 2: hybrid retrieval
-
-Add semantic retrieval in shadow mode. Launch first on broad queries where it adds unique judged recall. Preserve lexical protection for exact intent.
-
-### Phase 3: first-pass learning
-
-Introduce a cheap ranker over source evidence. Measure recall at the final-rank cutoff and behavior when sources fail.
-
-### Phase 4: richer final ranking
-
-Add calibrated multi-task predictions. Keep the list policy and fallback independent from the model artifact.
-
-### Phase 5: personalization
-
-Start with session signals and broad intent. Expand history only after slice, privacy, and feedback-loop evidence supports it.
-
-### Phase 6: controlled exploration
-
-Introduce bounded exploration with logged probabilities. Use the data to improve counterfactual evaluation and cold-start learning.
-
-Each phase has a rollback target and a result that can stand alone. The organization should gain value before every planned stage exists.
+Each phase has a compatible rollback target and useful standalone result.
 
 ## Walk through an incident
 
@@ -863,129 +618,67 @@ This incident shows why model-only metrics were insufficient. The model never sa
 
 ## Make staff-level decisions visible
 
-A staff answer should connect product, model, and operating boundaries across teams.
+<span id="own-the-interfaces"></span>
+<span id="protect-stage-metrics"></span>
+<span id="migrate-without-dual-confusion"></span>
+<span id="measure-adoption-through-outcomes"></span>
+<span id="preserve-exceptions"></span>
 
-### Own the interfaces
-
-Define ownership among query understanding, retrieval, ranking, policy, experimentation, and serving. Teams can iterate independently only when candidate, feature, logging, and release contracts are stable.
-
-### Protect stage metrics
-
-A shared end metric does not replace stage accountability. Retrieval owns recall and latency. Ranking owns ordering and calibration. The list layer owns constraint effects. The product owner owns the ship decision.
-
-### Migrate without dual confusion
-
-Move one authority at a time. If both old and new rankers can control production without a clear assignment record, incident analysis becomes ambiguous.
-
-### Measure adoption through outcomes
-
-A shared ranking service creates leverage only when teams ship faster, reduce repeated failures, or gain evidence they could not produce alone. Client count is incomplete evidence.
-
-### Preserve exceptions
-
-A specialized market or safety surface may need a different retriever, objective, or release rule. Require explicit ownership and compatible logging rather than forcing one lowest-common-denominator model.
+| Boundary | Accountability |
+| --- | --- |
+| Teams | Stable query/candidate/feature/log/release interfaces with named stage operators |
+| Metrics | Retrieval recall/latency, ranking order/calibration, list constraints and product ship decision |
+| Migration | One authority/assignment record at a time, not dual uncontrolled production writers |
+| Adoption | Faster delivery, fewer repeated failures or new useful evidence, not client counts |
+| Exceptions | Named market/safety owners and compatible logging for justified specialized paths |
 
 ## Add the principal portfolio view
 
-A principal answer decides where shared investment creates durable leverage.
-
 ### Shared capabilities
 
-Good candidates for shared ownership include:
-
-- item identity and availability contracts;
-- exposure logging;
-- experiment assignment;
-- index publication safety;
-- model and policy version identity;
-- stage telemetry;
-- common evaluation infrastructure.
+Share identities/availability, exposure, assignment, safe index publication, telemetry and common evaluation where semantics agree.
 
 ### Specialized capabilities
 
-Keep domain-specific ownership for:
-
-- query-intent taxonomies;
-- market policy;
-- labels and utility weights;
-- specialized encoders;
-- supplier or creator constraints;
-- high-risk fallback decisions.
+Keep intent, market policy, labels/utility, specialized encoders, supplier constraints and high-risk fallback with accountable domain owners.
 
 ### Portfolio choices
 
-Balance:
-
-- broad-query quality;
-- exact-intent reliability;
-- cold-start and tail coverage;
-- platform reliability;
-- privacy and safety work;
-- market expansion;
-- retirement of old indices and models.
-
-A new final ranker may have less value than repairing logging support or index freshness. State the opportunity cost.
+Balance broad quality, exact reliability, cold/tail coverage, operations, privacy/safety, expansion and retirement.
+Compare the next model against repairing logging or freshness; state opportunity cost.
 
 ### Decision checkpoints
 
-Review the direction each quarter using:
-
-- unique recall contribution;
-- online success and guardrails;
-- feedback-loop health;
-- cost and latency headroom;
-- market transfer;
-- team delivery time;
-- incident and support load;
-- retirement of replaced systems.
-
-Expand, narrow, or stop components based on evidence. Preserve portable item, query, exposure, model, and policy identities so the architecture can change.
+Quarterly, expand/narrow/stop using unique recall, product/feedback health, headroom, market transfer, delivery, support/incidents and actual retirement.
+Keep portable query/item/exposure/model/policy identities and evidence for exit.
 
 ## Structure a 45-minute answer
 
-### Minutes 0 to 5: product and decision
+<span id="minutes-0-to-5-product-and-decision"></span>
+<span id="minutes-5-to-12-workload-and-request-path"></span>
+<span id="minutes-12-to-22-data-and-models"></span>
+<span id="minutes-22-to-32-evaluation-and-launch"></span>
+<span id="minutes-32-to-39-serving-and-failure"></span>
+<span id="minutes-39-to-45-staff-or-principal-depth"></span>
 
-Clarify intent, success, inventory, personalization policy, scale, and failure cost. State the multi-stage thesis and protect exact lookup.
-
-### Minutes 5 to 12: workload and request path
-
-Estimate candidates and latency. Draw query understanding, parallel retrieval, merge, first ranker, final ranker, constraints, and exposure logging.
-
-### Minutes 12 to 22: data and models
-
-Explain source complementarity, label semantics, negative sampling, multi-task outputs, and point-in-time data.
-
-### Minutes 22 to 32: evaluation and launch
-
-Define stage metrics, human judgments, counterfactual assumptions, experiment design, guardrails, and rollout.
-
-### Minutes 32 to 39: serving and failure
-
-Cover deadlines, fallback, index versions, features, monitoring, rollback, and one incident.
-
-### Minutes 39 to 45: staff or principal depth
-
-Choose ownership, migration, feedback control, shared boundaries, portfolio trade-offs, or decision checkpoints based on target level.
-
-Do not explain every model family. Spend detail where the interviewer challenges an assumption.
+| Minutes | Practice focus |
+| --- | --- |
+| 0-5 | Intent, decision, inventory, consent, scale and failure cost |
+| 5-12 | Workload, complete request path and exposure |
+| 12-22 | Sources, labels/negatives, heads and temporal reconstruction |
+| 22-32 | Stage/human/counterfactual/online evidence and launch |
+| 32-39 | Deadlines, fallback, compatibility, monitoring and incident |
+| 39-45 | Ownership, migration, shared boundary, portfolio and checkpoints |
 
 ## Answer-level signals
 
-### Mid-level
+<span id="mid-level"></span>
+<span id="senior"></span>
+<span id="staff"></span>
+<span id="principal"></span>
 
-Explains lexical and vector retrieval, names a ranker, and chooses ranking metrics. The request path may work, but labels, bias, failure, and launch remain thin.
-
-### Senior
-
-Connects candidate recall, ranking objectives, point-in-time data, online evaluation, serving, monitoring, and rollback for the search product.
-
-### Staff
-
-Defines cross-team stage contracts, ownership, migration, feedback control, and measured operating leverage. The answer remains technically precise under a retrieval, data, model, or serving follow-up.
-
-### Principal
-
-Chooses shared versus market-specific capabilities, balances several investments, preserves exit paths, and sets evidence-based checkpoints across a multi-year search direction.
+Distinguish correct components, a complete product lifecycle, cross-team contracts/migration and a reversible investment portfolio.
+Company titles vary; these scope descriptions do not predict hiring outcomes.
 
 ## Observer scorecard
 
@@ -1005,29 +698,11 @@ Score each dimension from 0 to 2.
 
 ## Strong signals
 
-- Protects exact intent while improving broad discovery.
-- Uses complementary retrieval and stage-specific metrics.
-- Preserves source evidence through candidate merge.
-- Separates exposure, interaction, and delayed outcomes.
-- States counterfactual support and propensity assumptions.
-- Treats utility weights and hard constraints as product decisions.
-- Reconstructs point-in-time requests across index, feature, model, and policy versions.
-- Designs fallback and index rollback before launch.
-- Monitors feedback-loop and ecosystem effects.
-- Makes staff and principal decisions concrete through ownership and portfolio evidence.
+Traceable stage value, explicit temporal/exposure assumptions, compatible recovery, accountable owners and measured portfolio choices support the design.
 
 ## Weak signals
 
-- Jumps directly to an embedding model.
-- Uses clicks as unbiased relevance labels.
-- Reports only final NDCG and ignores candidate recall.
-- Personalizes exact queries without a relevance floor.
-- Calls every non-click a negative.
-- Claims counterfactual outcomes for unsupported items.
-- Treats shadow traffic as proof of product impact.
-- Rolls back model weights without compatible features, index, and policy.
-- Adds diversity as a slogan without a product metric or constraint.
-- Describes staff scope as more components and principal scope as more years.
+Unbiased-click claims, missing-candidate blindness, invalid rollback, unsupported counterfactuals and unmeasured diversity violate those contracts.
 
 ## Changed-condition follow-ups
 
@@ -1048,4 +723,12 @@ For each follow-up, state which assumption changed, which stage absorbs the chan
 
 ---
 
+## Sources
+
+- [Joachims et al.: unbiased learning-to-rank](https://arxiv.org/abs/1608.04468).
+- [Swaminathan and Joachims: counterfactual risk minimization](https://proceedings.mlr.press/v37/swaminathan15.html).
+- [Rules of Machine Learning](https://developers.google.com/machine-learning/guides/rules-of-ml).
+
 *Related: [learning-to-rank losses](/concepts/learning-to-rank-losses/), [position bias and counterfactual ranking](/concepts/position-bias-counterfactual-learning-to-rank/), [negative sampling](/questions/negative-sampling-strategies/), [multi-task interference](/concepts/multi-task-learning-objective-interference/), [evaluate a search ranker](/questions/evaluate-search-ranker/), and [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/).*
+
+</div>

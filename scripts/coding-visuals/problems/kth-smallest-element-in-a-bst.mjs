@@ -10,6 +10,16 @@ const topology = [
   ['1', '', '', '', '', '', ''],
 ];
 const positions = { '5': [0, 3], '3': [2, 1], '7': [2, 5], '2': [4, 0], '4': [4, 2], '1': [6, 0] };
+const nodePositions = {
+  '5': { x: 230, y: 45 },
+  '3': { x: 100, y: 145 },
+  '7': { x: 350, y: 145 },
+  '2': { x: 45, y: 245 },
+  '4': { x: 165, y: 245 },
+  '6': { x: 290, y: 245 },
+  '8': { x: 410, y: 245 },
+  '1': { x: 45, y: 345 },
+};
 const state = (node, label, extra) => grid(topology, [{
   row: positions[node][0],
   col: positions[node][1],
@@ -19,6 +29,23 @@ const state = (node, label, extra) => grid(topology, [{
 }], {
   input: 'tree=[5,3,7,2,4,6,8,1], k=4',
   cursor: label,
+  graphCompanion: {
+    nodes: ['5','3','7','2','4','6','8','1'],
+    edges: ['5->3','5->7','3->2','3->4','7->6','7->8','2->1'],
+    positions: nodePositions,
+    width: 460,
+    height: 445,
+    treeLayout: true,
+    start: node,
+    markerId: `bst-rank-${node}-${label.replace(/[^a-z0-9]+/gi, '-')}`,
+    edgeLabels: false,
+    ariaLabel: 'BST with root 5, children 3 and 7, and leftmost leaf 1 below 2',
+    regions: [
+      { x: nodePositions[node].x, y: nodePositions[node].y + 40, label: label.replace(/root=null after \d+/, 'root=null') },
+      { x: 230, y: 425, label: `pending stack ${extra.stack}` },
+    ],
+  },
+  gridSummary: 'Original coordinate inventory',
   ...extra,
 });
 
@@ -40,7 +67,7 @@ const review = {
   recognitionCue: 'The input is a BST and the question asks for an order statistic, so inorder traversal produces the required sorted rank without sorting all values.',
   invariant: 'Before each pop, the stack top is the smallest unvisited node reachable from the processed search frontier; completed pops are in strictly ascending BST order.',
   stateModel: 'Keep only the current root pointer, the stack of deferred ancestors, and the remaining rank k; push a full left spine, pop once, decrement k, then explore the popped node’s right child.',
-  visualRationale: 'A compact coordinate grid keeps every BST node and ASCII parent-child edge fixed while a stable inorder cursor moves; stack and k arithmetic change at every push and pop.',
+  visualRationale: 'Actual tree edges retain the ancestor route while a pending-stack row distinguishes descent from emitted rank. The disclosed coordinate inventory preserves every original motion identity.',
   rejectedAlternatives: [
     'Flattening and sorting every value hides the BST ordering and costs extra O(n log n) time.',
     'A sorted output row omits the deferred-ancestor stack that makes iterative inorder work.',

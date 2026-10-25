@@ -15,21 +15,19 @@ prerequisites: ["expectation-variance-covariance-correlation"]
 
 ## Summary
 
-Choose a probability distribution from the values that can occur and the process that generates them. The support rules out impossible values. The parameters describe location, spread, rate, or class probabilities. The likelihood then gives a training objective.
+A probability distribution assigns probabilities to values one observation can record.
+Choose the observation unit and generating process before the family name.
 
-Binary outcomes suggest Bernoulli models. Counts often suggest binomial or Poisson models. Real-valued residuals may support Gaussian or Laplace assumptions. Probabilities and class mixtures often use Beta or Dirichlet distributions.
+Five hypothetical independent visits share conversion probability $p=0.2$.
+Their outcomes are $1,0,1,0,0$.
+What changes when one record contains one visit rather than the total from five visits?
 
 ## A practical selection rule
 
-Ask five questions:
-
-1. Is the value binary, categorical, a count, positive, bounded, or real-valued?
-2. Is one observation a single trial, a total over trials, or a waiting time?
-3. Are events independent at the chosen unit?
-4. Does variance grow with the mean?
-5. Do the tails and zero frequency match the proposed model?
-
-A familiar distribution with wrong support is already wrong. A Gaussian model can assign negative probability to a quantity that must be positive. A Poisson model cannot represent count data whose variance is far above its mean without an extension.
+First specify the **support**: the possible recorded values.
+Then ask whether the record is a trial, trial total, count during an exposure or waiting time.
+Check dependence, changing rates, tail behavior and the frequency of zeros.
+Correct support alone does not establish the model's assumptions.
 
 <!-- visual:distribution-observation-unit -->
 <figure class="learning-figure" aria-labelledby="distribution-unit-title">
@@ -91,31 +89,100 @@ A familiar distribution with wrong support is already wrong. A Gaussian model ca
 			<text class="viz-node-value" x="266" y="541">continuous duration</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> choose the process first, then draw a box around exactly what one training row records. For repeated visits with the same independent success probability, one outcome is Bernoulli while a fixed-size total is binomial. For independent constant-rate events, a fixed-time count is Poisson while the wait to the next event is exponential. The distribution follows the observation unit and assumptions, not the noun “conversion” or “arrival.”</figcaption>
+	<figcaption><strong>Read it this way:</strong> decide what one row records. One visit is Bernoulli; independent visits with the same probability give a binomial total. For independent constant-rate events, fixed-window counts are Poisson and next-event waits are exponential.</figcaption>
 </figure>
 <p class="diagram-source">Original process-and-observation construction checked against the open <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-3-binomial-distribution">OpenStax binomial</a>, <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-6-poisson-distribution">Poisson</a>, and <a href="https://openstax.org/books/introductory-statistics-2e/pages/5-3-the-exponential-distribution">exponential</a> textbook sections and the <a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda366j.htm">NIST Poisson reference</a>.</p>
 
 ## Bernoulli and binomial
 
-A Bernoulli variable $X \in \{0,1\}$ has
+A single-visit outcome $X\in\{0,1\}$ has a Bernoulli distribution:
 
 $$
 P(X=1)=p, \qquad P(X=0)=1-p.
 $$
 
-Its mean is $p$ and variance is $p(1-p)$. Binary cross-entropy is the negative Bernoulli log-likelihood.
+Its mean is $p=0.2$ and variance is $p(1-p)=0.16$.
+Binary cross-entropy is its negative log-likelihood.
 
-A binomial variable counts successes in $n$ independent Bernoulli trials with the same probability $p$:
+A total $S$ over $n$ independent visits with the same probability has a binomial distribution:
 
 $$
-X \sim \operatorname{Binomial}(n,p).
+S \sim \operatorname{Binomial}(n,p),\qquad
+P(S=s)=\binom ns p^s(1-p)^{n-s}.
 $$
 
-Use Bernoulli for one conversion and binomial for the number of conversions among a fixed number of comparable opportunities. Dependence, changing probabilities, or varying exposure can break the binomial assumptions.
+Here $n=5$, so the support is $0,1,\ldots,5$.
+Its mean is $np=1$ and variance is $np(1-p)=0.8$.
+The observed count of two need not equal the expected count of one.
+
+## Count the possible orders
+
+The particular ordered sequence has probability $0.2^2\times0.8^3=0.02048$.
+But ten different orders contain two successes:
+
+$$
+P(S=2)=\binom52(0.2)^2(0.8)^3=10\times0.02048=0.2048.
+$$
+
+The binomial coefficient counts those orders. Summing the six probabilities for $s=0$ through $5$ gives one.
+The likelihood must match what the observation records.
+
+## Change what a record measures
+
+### 1. Double the exposure window
+
+**New task:** count independent constant-rate events for twenty minutes instead of ten.
+
+**Picture and change:** keep rate $\lambda=0.3$ events per minute.
+For exposure $t$ minutes, $K_t\sim\operatorname{Poisson}(\lambda t)$.
+The count mean changes from $3$ to $6$. The next-event wait remains $\operatorname{Exponential}(0.3)$.
+
+**Check:** the twenty-minute count has mean and variance $6$.
+Its zero-event probability is $e^{-6}\approx0.002479$.
+The mean next-event wait remains $1/0.3$ minutes.
+
+**Use when:** exposure changes without changing the process rate.
+
+### 2. Allow different underlying count rates
+
+**New task:** describe a hypothetical count population with mean $\mu=3$ and variance $9$.
+
+**Picture and change:** Poisson's equal mean and variance cannot match both moments.
+Use a negative-binomial parameterization with variance $\mu+\mu^2/r$, where dispersion parameter $r>0$.
+
+**Check:** $r=3^2/(9-3)=1.5$, giving variance $3+9/1.5=9$.
+Matching two moments does not establish the whole distribution's fit.
+
+**Use when:** overdispersion remains after accounting for exposure and relevant groups.
+
+## Dependence can invalidate the count model
+
+Suppose all five visits repeat one shared Bernoulli outcome instead of being independent.
+Then $S$ is either zero or five, with mean one and variance $25\times0.16=4$.
+Now $P(S=2)=0$.
+The support bound and mean stayed compatible with binomial assumptions; independence did not.
+
+## Try a different record
+
+One record contains class counts $(2,1,2)$ from five exclusive three-class trials.
+Is that record categorical, multinomial or multi-label?
+
+<details>
+<summary>Check your answer</summary>
+
+It is multinomial: the counts sum to five.
+One trial would be categorical. Multi-label outcomes allow several labels within one trial and need a different model.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Categorical and multinomial
 
-A categorical variable selects one of $K$ classes with probabilities $p_1,\ldots,p_K$. Softmax cross-entropy is the negative categorical log-likelihood.
+A categorical variable selects one of $K$ classes with nonnegative probabilities $p_1,\ldots,p_K$ summing to one.
+Softmax cross-entropy is the negative categorical log-likelihood.
 
 A multinomial variable counts how often each class appears across $n$ categorical trials. The counts sum to $n$.
 
@@ -123,15 +190,18 @@ Use categorical models for one label and multinomial models for a vector of clas
 
 ## Gaussian and Laplace
 
-A Gaussian variable has support over the real line:
+A Gaussian variable has real-valued support, location $\mu$ and variance $\sigma^2>0$:
 
 $$
 X \sim \mathcal{N}(\mu,\sigma^2).
 $$
 
-It is a common model for accumulated noise and averages. Maximizing a Gaussian likelihood with fixed variance gives mean squared error.
+Gaussian residuals with fixed variance give squared-error loss, up to positive scaling and an additive constant.
+The mean-variance parameters need not describe bounded or strongly skewed residuals well.
 
-A Laplace distribution has sharper center mass and heavier tails than a Gaussian. Maximizing a Laplace likelihood with fixed scale gives mean absolute error.
+A Laplace residual has location $\mu$, scale $b>0$ and variance $2b^2$.
+Its tails decay more slowly than Gaussian tails. Fixed-scale Laplace negative log-likelihood gives absolute-error loss.
+If scale is learned, retain its likelihood terms, including the log-scale term.
 
 This connection turns loss selection into a noise-model choice:
 
@@ -144,13 +214,13 @@ Inspect residuals instead of assuming either model from habit.
 
 ## Poisson and negative binomial
 
-A Poisson variable models a count in a fixed exposure interval:
+A Poisson count with dimensionless expected count $\mu=\lambda t$ has
 
 $$
-P(X=k)=\frac{\lambda^k e^{-\lambda}}{k!}, \qquad k=0,1,2,\ldots
+P(K=k)=\frac{\mu^k e^{-\mu}}{k!}, \qquad k=0,1,2,\ldots
 $$
 
-Its mean and variance both equal $\lambda$. A log link is common in regression because it keeps the predicted rate positive.
+Its mean and variance both equal $\mu$. A log link keeps a predicted rate positive.
 
 Real counts often have variance above the mean. This is overdispersion. A negative-binomial model adds dispersion and is often a better fit for clicks, incidents, or purchases with heterogeneous rates.
 
@@ -158,7 +228,8 @@ Always include exposure. Ten failures in one hour and ten failures in one month 
 
 ## Exponential and Gamma
 
-The exponential distribution models a positive waiting time under a constant event rate. It is memoryless:
+An exponential wait has nonnegative real support and rate $\lambda>0$ in events per unit time.
+Its mean is $1/\lambda$ and variance is $1/\lambda^2$. It is memoryless:
 
 $$
 P(T>s+t \mid T>s)=P(T>t).
@@ -166,7 +237,10 @@ $$
 
 Use it when a constant hazard is defensible. It fails when risk changes with elapsed time.
 
-The Gamma distribution models positive values and includes the exponential as a special case. It can represent waiting time until several events or positive right-skewed quantities.
+A Gamma variable with shape $a>0$ and rate $\lambda>0$ has mean $a/\lambda$ and variance $a/\lambda^2$.
+Scale is the reciprocal of rate. Shape one gives an exponential distribution.
+Integer shape $a$ gives the wait until event $a$ in a constant-rate Poisson process.
+General shapes also model positive right-skewed values. Censoring needs its own likelihood contribution.
 
 ## Beta and Dirichlet
 
@@ -184,11 +258,13 @@ $$
 
 The Dirichlet distribution generalizes this idea to a vector of class probabilities. It is conjugate to the categorical and multinomial likelihoods.
 
-Conjugacy means the posterior stays in the same distribution family. It gives simple updates, but it is a computational convenience rather than proof that the prior fits the problem.
+Conjugacy keeps the posterior in the prior's family. It simplifies updating; it does not validate the prior or observation model.
+Beta and Dirichlet distributions describe unknown probability parameters, not individual observed class labels.
 
 ## Worked example
 
-A product records 20 conversions among 500 independent visits. A binomial likelihood fits the fixed-trial count. With a $\operatorname{Beta}(1,1)$ prior, the posterior conversion probability is
+A product records 20 conversions among 500 independent visits sharing probability $p$.
+With a $\operatorname{Beta}(1,1)$ prior, the posterior is
 
 $$
 p \mid D \sim \operatorname{Beta}(21,481).
@@ -207,7 +283,7 @@ For any proposed distribution, state:
 5. The assumption most likely to fail.
 6. A diagnostic or alternative model.
 
-A strong answer chooses a distribution after defining the data unit. It does not list distribution names without a generative story.
+State the model's generating assumptions after defining its observation unit.
 
 ## Common mistakes
 
@@ -221,3 +297,5 @@ A strong answer chooses a distribution after defining the data unit. It does not
 ## Practice next
 
 Connect distribution choice to [maximum likelihood estimation](/concepts/maximum-likelihood-estimation/), [the exponential family](/concepts/exponential-family/), and [loss-function selection](/questions/how-to-choose-loss-function/).
+
+</div>

@@ -8,7 +8,7 @@ const scene = (rows, row, col, extra = {}) => grid(rows, [
 });
 
 const draft = visual('Allocate one batch-width rectangle filled with pad values, then copy each sequence and mark the identical half-open slice as valid.', [
-  frame('Find the rectangular width', 'The sequence lengths are 2, 0, and 1, so width=max(2,0,1)=2 and the output shape is (3,2).', scene([
+  frame('Find the rectangular width', 'Lengths 2, 0 and 1 give width 2. Both output arrays therefore have shape (3,2).', scene([
     ['row 0: 3', 'row 0: 4'],
     ['row 1: empty', 'row 1: empty'],
     ['row 2: 9', 'row 2: empty'],

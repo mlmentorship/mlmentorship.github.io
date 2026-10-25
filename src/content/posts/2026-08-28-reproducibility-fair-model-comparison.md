@@ -9,46 +9,20 @@ category: "concepts"
 
 ## Summary
 
-A reproducible ML result can be rebuilt from recorded code, data, configuration, and environment. A fair comparison gives each method a matched and clearly reported chance to succeed.
+A model comparison needs complete runs and a declared resource budget.
+A reproducible record lets another person rebuild those runs from code, data, configuration and environment.
 
-## Why AI labs care
+## Problem
 
-A model result can change because of:
+A candidate has a better best accuracy than the baseline. Should you recommend it?
+Compare three hypothetical paired runs with equal tokens, tuning opportunity and evaluation settings.
+The pair mapping was specified before scores were observed. None of these planned runs failed.
 
-- random initialization;
-- data order and sampling;
-- hyperparameter search;
-- training duration;
-- data cleaning;
-- hardware and numerical precision;
-- evaluation prompts and decoding settings;
-- code or dependency changes.
+## Picture
 
-If these factors are not controlled or recorded, a small gain may not come from the proposed method.
-
-## Three useful terms
-
-- **Repeatability:** the same team runs the same setup again and gets a compatible result.
-- **Reproducibility:** another person can rebuild the result from the provided records and artifacts.
-- **Replicability:** an independent implementation or dataset supports the same claim.
-
-Interviewers often use these words loosely. Define what you mean and focus on the evidence.
-
-## Match the comparison
-
-A fair baseline should receive a reasonable version of the same resources:
-
-| Resource | Question to ask |
-| --- | --- |
-| Data | Did both methods train on the same examples and tokens? |
-| Parameters | Is the gain only due to a larger model? |
-| Compute | Did one method train longer or use more hardware? |
-| Tuning | Did both methods get a similar search budget? |
-| Code quality | Is one baseline poorly implemented? |
-| Evaluation | Were prompts, decoding, and scoring identical? |
-| Selection | Were both results chosen using the same rule? |
-
-Exact matching is not always possible. Report the difference and explain why it is needed.
+Give every planned run a row before training begins.
+Put the baseline and candidate side by side. Compare within each row, then summarize all rows.
+Keep a failed run in its row with its status.
 
 <!-- visual:fair-comparison-evidence-ledger -->
 <figure class="learning-figure" aria-labelledby="fair-comparison-ledger-title">
@@ -87,84 +61,136 @@ Exact matching is not always possible. Report the difference and explain why it 
 			<p class="cm-equation">conclusion allowed: effect size + uncertainty + disclosed cost</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> read down the left panel before comparing scores: unequal data, compute, and search make the winning method ambiguous, and selecting only each best run hides stability. On the right, fairness starts before training with one declared opportunity contract and continues after training by retaining every planned run, including failures. Summarize that complete set with effect size, uncertainty, and cost, not the luckiest cell. Original synthesis informed by the <a href="https://arxiv.org/abs/2103.03098">benchmark-variance study</a>, <a href="https://aclanthology.org/D19-1224/">experimental-reporting study</a>, and <a href="https://jmlr.org/papers/v22/20-303.html">NeurIPS reproducibility report</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the resource rows before the scores. Unequal data, compute or search can explain a win. The right panel declares the comparison before training and retains every planned run, including failures. Report the complete set's effect size, uncertainty and cost.</figcaption>
 </figure>
+<p class="diagram-source">Original synthesis informed by the <a href="https://arxiv.org/abs/2103.03098">benchmark-variance study</a>, <a href="https://aclanthology.org/D19-1224/">experimental-reporting study</a>, and <a href="https://jmlr.org/papers/v22/20-303.html">NeurIPS reproducibility report</a>.</p>
 
 ## Repeat the sources of variation
 
-A single seed hides training variance. Several seeds help estimate it.
-
-The number of runs depends on cost and observed variance. Use cheap pilot runs to learn which factors matter. For an expensive frontier run, teams may not repeat the full run many times. They can still repeat smaller-scale tests, replay critical data ranges, compare checkpoints, and state uncertainty honestly.
-
-Do not treat deterministic execution as the only goal. A fully deterministic run can prove that code is repeatable. It may hide the normal variation seen in production training. Use deterministic tests for debugging and representative repeated runs for scientific claims.
-
-## Keep an experiment record
-
-Each run should record:
-
-- code commit;
-- data and mixture version;
-- model configuration;
-- optimizer and schedule;
-- random seeds;
-- hardware and precision;
-- dependency and kernel versions;
-- checkpoint source;
-- evaluation version;
-- decoding settings;
-- run status and failure reason;
-- links to logs and artifacts.
-
-Failed runs are part of the evidence. Removing them can make an unstable method look reliable.
+Repeat the variation relevant to the claim: initialization, data order, training stochasticity or evaluation sampling.
+Pairing means a declared correspondence between runs. Equal seed numbers alone do not guarantee useful pairing across different programs.
+For this example, each row is one paired training repeat evaluated on the same held-out set.
+Evaluation-sample uncertainty is a separate quantity.
 
 ## Small example
 
-A new attention change improves validation loss in one run.
+| Planned pair | Baseline accuracy | Candidate accuracy | Candidate minus baseline |
+| --- | --- | --- | --- |
+| 1 | 0.80 | 0.83 | 0.03 |
+| 2 | 0.82 | 0.81 | -0.01 |
+| 3 | 0.78 | 0.79 | 0.01 |
 
-Before making a mechanism claim:
+The baseline mean is $0.80$ and the candidate mean is $0.81$.
+The mean paired difference is $0.01$: one percentage point.
+One pair regresses. The best candidate's three-point paired gain is not the average gain.
 
-1. Run both models with several matched seeds at a smaller scale.
-2. Match tokens, parameters, and tuning budget.
-3. Check whether the gain is larger than run-to-run variation.
-4. Measure the internal effect predicted by the claim.
-5. Repeat on a second task or scale only if the claim requires it.
-6. Save every run, including failures.
+Let $d_j$ be the difference in row $j$, and let $\bar d$ be their mean.
+The centered differences are $[0.02,-0.02,0]$.
+Their sample standard deviation is
 
-If the gain appears only for the best new-model seed, the evidence is weak.
+$$
+s_d=\sqrt{\frac{(0.02)^2+(-0.02)^2+0^2}{3-1}}=0.02.
+$$
+
+Report the complete ledger, mean difference, declared uncertainty method and costs.
+Three rows describe this fixture; they are insufficient evidence for a general reliability claim.
+If a fourth planned run fails, retain it and define how failures enter the comparison's outcome.
+
+## Change the comparison
+
+### 1. The candidate uses twice the compute
+
+**New task:** isolate the method's gain at equal compute.
+
+**Picture and change:** add a compute-matched baseline. Keep the larger-system comparison separately labeled.
+Match tuning opportunity too.
+
+**Check:** one versus two GPU-hours on the same hardware is unequal compute, even with identical seed labels.
+
+**Use when:** architecture or training duration changes resource use.
+
+### 2. Replay a failed training step
+
+**New task:** reproduce a NaN in one distributed transition.
+
+**Picture and change:** save the pre-failure checkpoint, next batch, optimizer, schedule, data position and random-number state.
+Record rank mapping, world size, software, kernels and precision.
+
+**Check:** loading the weights with a different batch does not replay the same transition.
+
+**Use when:** the target is a failure mechanism. Keep this replay separate from representative performance repeats.
+
+## Selection can survive repetition
+
+Suppose the baseline receives two tuning trials and the candidate receives fifty.
+Rerunning their selected winners leaves that unequal selection opportunity unchanged.
+Define the tuning and selection rules before comparing the methods.
+
+## Try a different claim
+
+Does an exactly repeated result prove a useful performance gain?
+
+<details>
+<summary>Check your answer</summary>
+
+It demonstrates repeatability of that setup.
+A useful comparative gain needs matched opportunities, relevant variation and an outcome worth its cost.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+<a id="why-ai-labs-care"></a>
+
+## Sources of variation
+
+Initialization, data sampling, cleaning, tuning, training duration, hardware, precision, evaluation and code changes can explain a score change.
+Control or record each factor relevant to the claim.
+
+## Three useful terms
+
+- **Repeatability:** rerun the same setup and obtain a compatible result.
+- **Reproducibility:** rebuild the result from supplied records and artifacts.
+- **Replicability:** test the claim with an independent implementation or dataset.
+
+Terminology conventions differ. State the evidence your chosen term requires.
+
+## Match the comparison
+
+| Resource | Recorded comparison |
+| --- | --- |
+| Data | Examples, tokens and cleaning |
+| Capacity | Model size and parameter use |
+| Compute | Work, hardware, time and precision |
+| Tuning | Search budget and selection rule |
+| Implementation | Baseline correctness and optimization |
+| Evaluation | Prompts, decoding, scorer and held-out set |
+
+If exact matching is impossible, report the difference and narrow the claim.
+
+## Keep an experiment record
+
+Use immutable run IDs. Retain code, data/mixture, model configuration, optimizer, schedule, seeds, hardware, precision and dependency/kernel versions.
+Include checkpoint lineage, evaluator, decoding, status, failure reason, logs and artifact locations.
 
 ## Reproducing a training failure
 
-For a failure, preserve the first bad transition:
-
-- exact input batch or task;
-- checkpoint and optimizer state;
-- random-number state;
-- world size and rank mapping;
-- software and kernel versions;
-- logs before and after the event.
-
-Restoring only model weights may not reproduce a failed training step.
+Keep logs on both sides of the first bad transition.
+For expensive runs, repeat affordable scale tests or replay critical ranges.
+Report which full-run variation remains unmeasured.
+Deterministic replay helps debugging; representative repeats measure variability.
 
 ## In an interview
 
-A strong answer includes:
-
-1. The claim and the main source of variation.
-2. Matched data, compute, capacity, and tuning.
-3. Repeated runs or a clear reason they are not feasible.
-4. Effect size and uncertainty, not only the best score.
-5. Complete run lineage and failed runs.
-6. A test that measures the claimed mechanism.
-7. A result that would reject the claim.
+State the claim, its alternative explanation, the matched comparison and a result that would reject your explanation.
 
 ## Common mistakes
 
-- Comparing a tuned new method with an untuned baseline.
-- Reporting the best seed.
-- Changing data and model code at the same time.
-- Reusing the test set to choose a checkpoint.
-- Recording model weights without optimizer, data, and environment state.
-- Claiming reproducibility because a notebook ran once.
-- Treating a tiny average gain as useful when its cost is much higher.
+Do not tune on the final test set or omit failed attempts.
+Changing data and model together needs additional controls to isolate their effects.
 
 *Related: [ML data lineage and versioning](/concepts/ml-data-lineage-versioning/), [design an ablation study](/questions/design-ablation-study/), [debug a frontier LLM training run](/questions/debug-frontier-llm-training-run/), and [loss spikes at scale](/concepts/loss-spikes-at-scale/).*
+
+</div>

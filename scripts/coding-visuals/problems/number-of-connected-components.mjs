@@ -7,6 +7,22 @@ const scene = (extra = {}) => {
   return queueGrid(adjacency, frontier, {
     edgeTopology: `${edges.join(', ')}; node 5 isolated`,
     rowMeaning: 'row index = node; cells = adjacent nodes',
+    frontierLabel: 'stack: top at right',
+    graphCompanion: {
+      nodes: ['0', '1', '2', '3', '4', '5'],
+      edges,
+      positions: { '0': { x: 70, y: 40 }, '1': { x: 30, y: 140 }, '2': { x: 120, y: 140 }, '3': { x: 220, y: 40 }, '4': { x: 220, y: 140 }, '5': { x: 325, y: 90 } },
+      width: 360,
+      height: 185,
+      treeLayout: true,
+      start: metadata.start,
+      stateNodes: metadata.visited ?? [],
+      seen: metadata.visited ? `{${metadata.visited.join(',')}}` : '{}',
+      markerId: `components-${metadata.components}-${metadata.start ?? 'outer'}-${frontier.join('-') || 'empty'}`,
+      edgeLabels: false,
+      ariaLabel: 'Undirected components 0-1-2 and 3-4, plus isolated vertex 5',
+    },
+    gridSummary: 'Original undirected adjacency lists',
     ...metadata,
     motion: [
       { key: 'graph-topology', kind: 'state', x: 0, y: 0, label: edges.join(', ') },
@@ -18,19 +34,19 @@ const scene = (extra = {}) => {
 const draft = visual('Each unseen outer-loop vertex starts exactly one DFS and marks exactly one previously uncounted connected component.', [
   frame(
     'Build the graph and initialize',
-    'For 6 nodes and edges [[0,1],[0,2],[3,4]], build both directions. Start with seen = {}, components = 0.',
+    'Build both directions for edges 0-1, 0-2 and 3-4. Node five has no neighbors. Start with seen={}, components=0.',
     scene({ adjacency: '0:[1,2]; 1:[0]; 2:[0]; 3:[4]; 4:[3]; 5:[]', seenState: '{}', components: '0' }),
     'initialize-components',
   ),
   frame(
     'Start component 1 at node 0',
-    'Outer-loop start 0 is unseen. Increment components 0->1, add 0 to seen, and seed stack [0].',
+    'Start 0 is unseen. Increase components from 0 to 1. Add 0 to seen and seed stack [0].',
     scene({ start: '0', visited: ['0'], frontier: ['0'], components: '1', stackState: '[0]' }),
     'start-component-1',
   ),
   frame(
     'Expand node 0',
-    'Pop 0; neighbors 1 and 2 are unseen, so add and push both. seen = {0,1,2}; stack = [1,2].',
+    'Pop 0. Neighbors 1 and 2 are unseen, so add and push both. Now seen={0,1,2}, stack=[1,2].',
     scene({ start: '0', visited: ['0', '1', '2'], frontier: ['1', '2'], components: '1', stackState: '[1,2]' }),
     'expand-component-1-root',
   ),
@@ -54,7 +70,7 @@ const draft = visual('Each unseen outer-loop vertex starts exactly one DFS and m
   ),
   frame(
     'Start component 2 at node 3',
-    'Start 3 is unseen. Increment components 1->2, add 3, and seed stack [3].',
+    'Start 3 is unseen. Increase components from 1 to 2. Add 3 to seen and seed stack [3].',
     scene({ start: '3', visited: ['0', '1', '2', '3'], frontier: ['3'], components: '2', stackState: '[3]' }),
     'start-component-2',
   ),
@@ -66,7 +82,7 @@ const draft = visual('Each unseen outer-loop vertex starts exactly one DFS and m
   ),
   frame(
     'Finish component 2',
-    'Pop 4; neighbor 3 is already seen, so the stack empties.',
+    'Pop 4. Neighbor 3 is already seen, so the stack empties.',
     scene({ start: '4', visited: ['0', '1', '2', '3', '4'], components: '2', stackState: '[]', transition: '4->3 skipped: seen' }),
     'finish-component-2',
   ),
@@ -78,7 +94,7 @@ const draft = visual('Each unseen outer-loop vertex starts exactly one DFS and m
   ),
   frame(
     'Start isolated component 3',
-    'Start 5 is unseen, so increment components 2->3, add 5 to seen, and seed stack [5].',
+    'Start 5 is unseen. Increase components from 2 to 3. Add 5 to seen and seed stack [5].',
     scene({ start: '5', visited: ['0', '1', '2', '3', '4', '5'], frontier: ['5'], components: '3', stackState: '[5]' }),
     'start-isolated-component',
   ),
@@ -101,7 +117,7 @@ const review = {
   recognitionCue: 'Use it when an undirected graph may contain multiple disconnected groups, including isolated vertices, and the task asks how many maximal reachable groups exist.',
   invariant: 'After processing outer-loop starts below the current index, every vertex in their components is seen and components equals the number of DFS launches. A seen vertex can never launch another count.',
   stateModel: 'The minimal state is the adjacency list, global seen set, component counter, and per-flood stack. The trace includes every launch, discovery, pop, continue branch, and the isolated vertex.',
-  visualRationale: 'Fixed adjacency rows keep both connected groups and the isolated node visible while the adjacent frontier, seen, current, and count labels explain the nested loops. A stable topology key preserves identity and stays legible at 390px.',
+  visualRationale: 'Three actual undirected components retain isolated vertex five in every frame. Persistent seen marks, the explicit LIFO stack and the launch count expose coverage without relying on color. Original adjacency rows remain in a disclosure with exact motion identities.',
   rejectedAlternatives: [
     'Union-find was rejected because it does not match the supplied DFS implementation.',
     'Three colored blobs were rejected because color alone cannot explain DFS launches or isolated-node handling.',

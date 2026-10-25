@@ -13,17 +13,30 @@ aliases: []
 prerequisites: []
 ---
 
-> Find a target in a sorted array.
+Find a target in a sorted array, or return -1.
+One middle comparison rules out a whole side because the values are ordered.
 
-Start with the concrete trace below. It shows the state the algorithm must carry as it runs.
+## Problem
+
+Search `[-9, -3, 0, 4, 7, 11, 18, 25]` for 11; return index 5.
+Require nondecreasing integer values and random access. Empty arrays or absent targets return -1.
+Duplicates may return **any matching index**, not necessarily the first.
+
+## Picture: Preserve the Inclusive Candidate Interval
 
 <!-- visual:binary-search-state -->
-<figure class="learning-figure coding-visual-figure" aria-labelledby="binary-search-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="binary-search-state-title">Binary Search: Preserve the inclusive sorted interval that can still contain target 11.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="binary-search" role="group" tabindex="0" aria-label="Binary Search: Preserve the inclusive sorted interval that can still contain target 11."><div class="coding-visual-example"><span>Input and goal</span><strong>Find a target in a sorted array.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize-interval" role="group" aria-label="Initialize the candidate interval"><div class="coding-trace-frame-heading"><span>Initialize the candidate interval</span><strong>For target 11, left=0 and right=7 keep every index; middle=floor((0+7)/2)=3, whose value is 4.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-pointer" data-motion-key="pointer-left">left</span><span class="coding-trace-array-cell">-9</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">0</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-pointer" data-motion-key="pointer-middle">middle</span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">7</span><small class="coding-trace-array-index">4</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-5"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">11</span><small class="coding-trace-array-index">5</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-6"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">18</span><small class="coding-trace-array-index">6</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-7"><span class="coding-trace-array-pointer" data-motion-key="pointer-right">right</span><span class="coding-trace-array-cell">25</span><small class="coding-trace-array-index">7</small></span></div><div class="coding-trace-meta"><span><b>target</b>11</span><span><b>interval</b>[0, 7]</span><span><b>comparison</b>4 &lt; 11</span></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="discard-lower-half" hidden role="group" aria-label="Discard indices 0 through 3"><div class="coding-trace-frame-heading"><span>Discard indices 0 through 3</span><strong>Because the array is sorted and nums[3]=4 &lt; 11, none of indices 0..3 can match. Set left=middle+1=4; the new middle is floor((4+7)/2)=5.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-9</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">0</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-pointer" data-motion-key="pointer-left">left</span><span class="coding-trace-array-cell">7</span><small class="coding-trace-array-index">4</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-5"><span class="coding-trace-array-pointer" data-motion-key="pointer-middle">middle</span><span class="coding-trace-array-cell">11</span><small class="coding-trace-array-index">5</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-6"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">18</span><small class="coding-trace-array-index">6</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-7"><span class="coding-trace-array-pointer" data-motion-key="pointer-right">right</span><span class="coding-trace-array-cell">25</span><small class="coding-trace-array-index">7</small></span></div><div class="coding-trace-meta"><span><b>target</b>11</span><span><b>interval</b>[4, 7]</span><span><b>comparison</b>11 = 11</span><span><b>discarded</b>indices 0..3</span></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="return-index" hidden role="group" aria-label="Return the matching index"><div class="coding-trace-frame-heading"><span>Return the matching index</span><strong>nums[5]=11 equals the target, so the loop returns index 5 without probing any discarded index.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-9</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">0</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-pointer" data-motion-key="pointer-left">left</span><span class="coding-trace-array-cell">7</span><small class="coding-trace-array-index">4</small></span><span class="coding-trace-array-item trace-tone-output" role="listitem" data-motion-key="value-5"><span class="coding-trace-array-pointer" data-motion-key="pointer-middle">middle = target</span><span class="coding-trace-array-cell">11</span><small class="coding-trace-array-index">5</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-6"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">18</span><small class="coding-trace-array-index">6</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-7"><span class="coding-trace-array-pointer" data-motion-key="pointer-right">right</span><span class="coding-trace-array-cell">25</span><small class="coding-trace-array-index">7</small></span></div><div class="coding-trace-meta"><span><b>target</b>11</span><span><b>result</b>index 5</span></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 3</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize the candidate interval</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Discard indices 0 through 3</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Return the matching index</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">The input is sorted and the task asks for an exact target position, so comparing one middle value can order the target relative to an entire half.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">Before every probe, if target 11 exists, its index is inside the inclusive interval [left, right]; every removed index is provably too small or too large.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">For lower-bound, upper-bound, and insertion-position variants, first define what the interval promises, then choose whether middle is excluded or retained after each comparison.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> For target 11, left=0 and right=7 keep every index; middle=floor((0+7)/2)=3, whose value is 4. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
+<figure class="learning-figure coding-visual-figure" aria-labelledby="binary-search-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="binary-search-state-title">Binary Search: Preserve the inclusive sorted interval that can still contain target 11.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="binary-search" role="group" tabindex="0" aria-label="Binary Search: Preserve the inclusive sorted interval that can still contain target 11."><div class="coding-visual-example"><span>Input and goal</span><strong>Find a target in a sorted array.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize-interval" role="group" aria-label="Initialize the candidate interval"><div class="coding-trace-frame-heading"><span>Initialize the candidate interval</span><strong>Start with left=0, right=7 and target 11. The midpoint is index 3, value 4.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-pointer" data-motion-key="pointer-left">left</span><span class="coding-trace-array-cell">-9</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">0</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-pointer" data-motion-key="pointer-middle">middle</span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">7</span><small class="coding-trace-array-index">4</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-5"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">11</span><small class="coding-trace-array-index">5</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-6"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">18</span><small class="coding-trace-array-index">6</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-7"><span class="coding-trace-array-pointer" data-motion-key="pointer-right">right</span><span class="coding-trace-array-cell">25</span><small class="coding-trace-array-index">7</small></span></div><div class="coding-trace-meta"><span><b>target</b>11</span><span><b>interval</b>[0, 7]</span><span><b>comparison</b>4 &lt; 11</span></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="discard-lower-half" hidden role="group" aria-label="Discard indices 0 through 3"><div class="coding-trace-frame-heading"><span>Discard indices 0 through 3</span><strong>Because the array is sorted and nums[3]=4 &lt; 11, none of indices 0..3 can match. Set left=middle+1=4; the new middle is floor((4+7)/2)=5.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-9</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">0</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-pointer" data-motion-key="pointer-left">left</span><span class="coding-trace-array-cell">7</span><small class="coding-trace-array-index">4</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-5"><span class="coding-trace-array-pointer" data-motion-key="pointer-middle">middle</span><span class="coding-trace-array-cell">11</span><small class="coding-trace-array-index">5</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-6"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">18</span><small class="coding-trace-array-index">6</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-7"><span class="coding-trace-array-pointer" data-motion-key="pointer-right">right</span><span class="coding-trace-array-cell">25</span><small class="coding-trace-array-index">7</small></span></div><div class="coding-trace-meta"><span><b>target</b>11</span><span><b>interval</b>[4, 7]</span><span><b>comparison</b>11 = 11</span><span><b>discarded</b>indices 0..3</span></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="return-index" hidden role="group" aria-label="Return the matching index"><div class="coding-trace-frame-heading"><span>Return the matching index</span><strong>nums[5]=11 equals the target, so the loop returns index 5 without probing any discarded index.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-9</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">0</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-pointer" data-motion-key="pointer-left">left</span><span class="coding-trace-array-cell">7</span><small class="coding-trace-array-index">4</small></span><span class="coding-trace-array-item trace-tone-output" role="listitem" data-motion-key="value-5"><span class="coding-trace-array-pointer" data-motion-key="pointer-middle">middle = target</span><span class="coding-trace-array-cell">11</span><small class="coding-trace-array-index">5</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-6"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">18</span><small class="coding-trace-array-index">6</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-7"><span class="coding-trace-array-pointer" data-motion-key="pointer-right">right</span><span class="coding-trace-array-cell">25</span><small class="coding-trace-array-index">7</small></span></div><div class="coding-trace-meta"><span><b>target</b>11</span><span><b>result</b>index 5</span></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 3</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize the candidate interval</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Discard indices 0 through 3</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Return the matching index</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">The input is sorted and the task asks for an exact target position, so comparing one middle value can order the target relative to an entire half.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">Before every probe, if target 11 exists, its index is inside the inclusive interval [left, right]; every removed index is provably too small or too large.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">For lower-bound, upper-bound, and insertion-position variants, first define what the interval promises, then choose whether middle is excluded or retained after each comparison.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> Start with left=0, right=7 and target 11. The midpoint is index 3, value 4. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
 
-**Pattern:** Binary search on indices.
+| left | right | middle/value | Decision |
+| ---: | ---: | --- | --- |
+| 0 | 7 | `3 / 4` | All indices through 3 are too small; set `left = 4` |
+| 4 | 7 | `5 / 11` | Return 5 |
 
-**Simple idea:** Compare the middle value with the target. Keep only the half that may still
-contain the target.
+Invariant: if a target exists, a matching index remains in `[left, right]`.
+If `nums[middle] < target`, every earlier value is too small; the opposite comparison removes `middle` and larger indices.
+Every miss removes `middle`, strictly shrinking the interval. `left > right` means no candidates remain.
+
+## Code
 
 ```python
 def binary_search(nums: list[int], target: int) -> int:
@@ -41,4 +54,90 @@ def binary_search(nums: list[int], target: int) -> int:
    return -1
 ```
 
-**Cost:** $O(\log n)$ time and $O(1)$ space.
+With ordinary comparison/random-access costs, time is $O(\log(n+1))$ and auxiliary space is $O(1)$.
+
+`[]` returns -1 immediately. `[2, 2, 2]`, target 2, returns 1: correct for any-match, not first-match.
+
+## Change 1: First Value at Least the Target
+
+**New task.** Return an insertion boundary, including when no equality exists.
+
+**Picture and change.** Use unknown elements `[left, right)`. Values before `left` are too small; values from `right` qualify.
+The possible boundary includes `right`, so equality keeps `middle` as a boundary candidate.
+
+**Code.**
+
+```python
+def lower_bound(nums, target):
+   left, right = 0, len(nums)
+   while left < right:
+      middle = (left + right) // 2
+      if nums[middle] < target:
+         left = middle + 1
+      else:
+         right = middle
+   return left
+```
+
+**Check.** `[1, 2, 2, 4]`, target 2, returns 1; target 5 returns 4; empty input returns 0.
+
+**Use when.** The answer is the first `>= target` position. `len(nums)` is a valid sentinel, not an index to read.
+
+## Change 2: First Value Strictly Greater
+
+**New task.** Insert after every equal value.
+
+**Picture and change.** Values before `left` are now `<= target`; values from `right` are greater. Equality moves `left`.
+
+**Code.**
+
+```python
+def upper_bound(nums, target):
+   left, right = 0, len(nums)
+   while left < right:
+      middle = (left + right) // 2
+      if nums[middle] <= target:
+         left = middle + 1
+      else:
+         right = middle
+   return left
+```
+
+**Check.** `[1, 2, 2, 4]`, target 2, returns 3; upper minus lower is duplicate count 2.
+
+**Use when.** Equality belongs on the discarded left side.
+
+## Failure: Mixing Interval Conventions
+
+Keeping `while left <= right` but changing to `right = middle` can repeat the singleton state forever.
+
+## Transfer Check
+
+Why does lower bound retain an equal `middle` as a possible answer?
+
+### Reasoned Answer
+
+It may be the first qualifying position; earlier equal values might remain. Equality alone does not settle this boundary contract.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Draw the Two Boundaries
+
+For `[1, 2, 2, 4]` and target 2:
+
+| Position | 0 | 1 | 2 | 3 | 4 |
+| --- | --- | --- | --- | --- | --- |
+| Value | 1 | 2 | 2 | 4 | Sentinel |
+| Boundary | | Lower | | Upper | |
+
+Boundary search classifies a prefix and suffix, not an inclusive interval of unread array elements.
+When its half-open unknown interval empties, `left == right` is the answer boundary.
+Each update strictly reduces `right - left`.
+
+For the incompatible exact-search change, `(left, right) = (0, 0)` and `right = middle = 0` makes no progress.
+Re-prove both preservation and termination whenever endpoint meaning changes.
+
+Unsorted input invalidates the half-deletion argument. Duplicate handling must follow the required output, not a remembered template.
+
+</div>

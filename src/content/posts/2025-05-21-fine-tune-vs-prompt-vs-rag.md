@@ -1,6 +1,6 @@
 ---
 title: "When would you fine-tune vs prompt vs RAG?"
-description: "The most-asked LLM design question of 2026. The answer is a decision tree, not a preference."
+description: "Locate a failed requirement, test the suspected cause and compare prompts, retrieval, training or a simpler implementation."
 date: "2025-05-21"
 draft: false
 tags: ["questions"]
@@ -8,92 +8,172 @@ category: "questions"
 ---
 
 
-> *Asked in: LLM-team loops. Tests whether you understand a real product decision, not just techniques.*
+Prompting changes request context, retrieval selects evidence, and fine-tuning updates model parameters; diagnose the failed requirement before choosing an intervention.
 
-There is no universally correct answer. The interviewer is checking whether you can articulate the *decision criteria*, not whether you have a favorite technique. The strongest answers reframe the question: prompting, RAG, and fine-tuning solve different problems.
+## Problem
 
-## What an L4 answer sounds like
+A fictional support service must apply yesterday's authorized policy revision B and return two JSON fields.
+Policy A allowed refunds within seven days; B allows thirty days.
+The request concerns day fourteen.
+The baseline applies A and returns malformed JSON.
 
-> "Fine-tuning gives the best quality but is expensive. RAG is good when you have lots of documents. Prompting is the simplest. I'd usually start with prompting, then add RAG, then fine-tune if that's not enough."
+Choose tests that separate missing policy evidence from output-format failure.
+Then decide what to change, what to measure and how to revert.
 
-This is roughly correct. It's also exactly what the interviewer can read on any blog. It signals you've consumed the public discourse but haven't *worked* the decision.
+## Picture: Two Failed Checks, Not Three Ranked Techniques
 
-## What an L5 answer sounds like
+The current-policy check expects eligibility under B.
+The format check expects a boolean `eligible` and a `policy_version` string, with no other fields.
+Passing either check does not imply passing the other.
 
-> "These solve different problems, so 'vs' is misleading. I'd ask which problem we have:
->
-> - **Prompting** changes *behavior*, how the model responds, formatting, persona, reasoning style. Use it when the model already knows what it needs to know and you're shaping the output.
-> - **RAG** changes *knowledge*, what facts, documents, or context the model can reference. Use it when the model needs information it wasn't trained on or that changes frequently.
-> - **Fine-tuning** changes *capability*, what tasks the model can perform reliably. Use it when prompting can't get the model to do the task at the quality bar, or when you need consistent behavior at low latency.
->
-> In practice I'd build in this order: prompting first (cheapest, fastest iteration), add RAG when I see knowledge gaps, fine-tune only when I see persistent quality or latency issues that the first two can't fix."
+Use this stipulated diagnostic ledger; these are example outputs, not measured model runs.
+
+| Intervention | Example output | Policy check | JSON/schema check |
+| --- | --- | --- | --- |
+| Baseline | `eligible = false` | Fail | Fail |
+| Supply authorized B directly | `Eligible under policy B.` | Pass | Fail |
+| Supply B and an output contract | `{"eligible":true,"policy_version":"B"}` | Pass | Pass |
+
+Supplying known-correct context bypasses retrieval to test whether the model can use the needed evidence.
+It does not prove a retrieval system will find B.
+If the model still misreads B, better retrieval alone cannot resolve that failure.
+
+<span id="what-an-l5-answer-sounds-like"></span>
 
 <!-- visual:llm-adaptation-layers -->
 <figure class="learning-figure" aria-labelledby="llm-adaptation-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="llm-adaptation-title">Which layer owns the failure, and how can the layers work together?</p>
-	<div class="visual-grid--two" role="group" aria-label="An evaluation-driven diagnosis panel followed by a production composition panel for prompting, retrieval, and fine-tuning">
+	<p class="visual-kicker">Independent release requirements</p>
+	<p class="visual-title" id="llm-adaptation-title">Current evidence and valid output need separate checks.</p>
+	<div class="visual-grid--two" role="group" aria-label="Policy evidence and output validation for the same refund request">
 		<section class="visual-panel">
-			<h4>1 · DIAGNOSE THE FAILED EVAL</h4>
-			<p><strong>Instructions or examples are unclear?</strong><br />Change the <strong>prompt</strong>: shape this request without updating model weights.</p>
-			<p><strong>A needed fact is missing, private, or stale?</strong><br />Add <strong>RAG</strong>: retrieve evidence into this request without storing it in model weights.</p>
-			<p><strong>The task stays unreliable, or repeated prompt tokens miss cost or latency targets?</strong><br />Consider <strong>fine-tuning</strong>: train representative examples into new model parameters.</p>
+			<h4>1. Supply the applicable policy</h4>
+			<p>Day fourteen exceeds A's seven days but fits B's thirty days.</p>
+			<p>Supply authorized B directly, then test whether retrieval returns that same applicable revision.</p>
+			<p>Version, freshness, access and correct interpretation all matter.</p>
 		</section>
 		<section class="visual-panel">
-			<h4>2 · COMPOSE THE PRODUCTION SYSTEM</h4>
-			<p><strong>At request time</strong><br />Prompt instructions + retrieved evidence</p>
-			<p><strong>Then generate with</strong><br />A base model or a fine-tuned model</p>
-			<p><strong>Finally</strong><br />Response &rarr; the same eval and operational gates</p>
-			<p><strong>These are layers, not rungs.</strong><br />A tuned model can still use RAG, and both still need a prompt.</p>
+			<h4>2. Validate the output</h4>
+			<p><code>{"eligible":true,"policy_version":"B"}</code></p>
+			<p>Check field names, types and allowed values separately from policy correctness.</p>
+			<p>A tuned model still needs current evidence, a request contract and release checks.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start with the failed eval, not a favorite technique. Change request instructions with prompting, supply missing evidence with RAG, and change persistent learned behavior or efficiency with fine-tuning. If failures span layers, combine the interventions and evaluate the whole system.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the left panel tests applicable evidence; the right tests output structure. Neither check establishes the other.</figcaption>
 </figure>
 
-This is hireable at L5. You've reframed the question to be about *what's broken*, not *which technique*.
+## Make the Decision Inspectable
 
-## What an L6 answer sounds like
+| Failed requirement | Candidate cause | Intervention | Matched check | Operating cost | Rollback |
+| --- | --- | --- | --- | --- | --- |
+| Current policy | Missing or stale B | Authorized retrieval | Same policy/version cases | Index freshness, retrieval latency | Restore prior index/configuration |
+| JSON contract | Unclear output rules | Prompt/examples, supported constrained generation, validator | Syntax/types plus separate semantic checks | Context tokens, validation/retry | Restore prompt/schema version |
+| Persistent task error | Learned behavior misses target | Representative fine-tuning experiment | Held-out tasks, same release limits | Training, serving, refresh, validation | Restore base/checkpoint |
 
-The L6 answer adds the operational reality:
+These interventions compose; they are not mandatory steps in a ladder.
+Training can learn facts, and retrieved text can change behavior.
+The categories identify where the system changes, not exclusive effects.
+Keep the complete release contract fixed when comparing candidates.
 
-> "...and I'd add a few practical considerations.
->
-> **Prompting has hidden costs.** Every prompt token is paid for at every request. A 5K-token system prompt at scale gets expensive fast. At some point, fine-tuning a smaller model with the prompt baked in is *cheaper* than prompting a larger model, even ignoring quality.
->
-> **RAG fails most often at retrieval, not generation.** When teams say 'RAG didn't work for us,' it usually means their retrieval was bad, chunking strategy, embedding model, lack of reranking. If the right document was retrieved, generation usually works. So before adding RAG, ask: do we have a retrieval problem we know how to solve?
->
-> **Fine-tuning has a hidden coupling cost.** Once you fine-tune on a model, you're tied to that model. Provider deprecates it, you re-tune. New model family launches, you re-tune to test. This is a real ongoing cost, not a one-time investment. I'd only fine-tune when the quality or cost gap is large enough to justify the lock-in.
->
-> **The decision is never one-or-the-other.** Production systems use all three: a fine-tuned base model, with RAG for knowledge, with prompting for per-request shaping. The interesting question is the ratio.
->
-> **Eval gates the decision, not the other way around.** I wouldn't make this call before having a good eval. Otherwise we'd ship a 'better' system whose 'betterness' we can't measure. The eval comes first; the technique comes second."
+## Change 1: Request Volume Changes the Economics
 
-This is L6. You've moved from "which to pick" to "what's the system you're operating in."
+**New task.** A prompt adds 0.002 currency units per request.
+Tuning costs 2,000 initially and reduces that increment to 0.001.
+Assume equal quality and exclude costs common to both systems.
 
-## The tells that get you a strong-hire vote
+**Picture and change.** Accumulate each variable cost, then add fixed training and separate refresh costs.
 
-- You **reframe the question** to be about the underlying problem (behavior/knowledge/capability).
-- You mention **eval first**: "I wouldn't make this call without an eval."
-- You name **specific failure modes**: "RAG fails at retrieval," "fine-tuning has lock-in cost."
-- You acknowledge that **production systems combine all three**: not pick one.
-- You bring up **economics**: cost per request, prompt-token bloat, fine-tune amortization.
+```python
+from decimal import Decimal
 
-## The tells that get you down-leveled
 
-- "Fine-tuning is always better when you can afford it." (No: it's lock-in and often unnecessary.)
-- "RAG just means retrieval + generation." (Surface-level; doesn't show you've debugged a RAG system.)
-- "We should always start with prompting." (True but cliched; the interviewer is testing if you go past this.)
-- Treating the three as a hierarchy ("prompting < RAG < fine-tuning"). They solve different problems; the hierarchy framing is wrong.
-- No mention of evals, latency, cost, or operational coupling.
+def adaptation_costs(requests, refresh_cost=Decimal("0")):
+    if requests < 0 or refresh_cost < 0:
+        raise ValueError("cost inputs must be nonnegative")
+    prompt_cost = Decimal("0.002") * requests
+    tuned_cost = Decimal("2000") + refresh_cost + Decimal("0.001") * requests
+    return prompt_cost, tuned_cost
 
-## A common follow-up: "When does it make sense to *not* use an LLM at all?"
 
-This is the trap question hidden inside the LLM-team interview, and the L6 answer here is genuinely impressive:
+assert adaptation_costs(2_000_000) == (Decimal("4000"), Decimal("4000"))
+```
 
-> "When the task is structured enough that a smaller, cheaper, more predictable system would do better. Classification with 50 labels and abundant training data, just train a classifier. Information extraction with a fixed schema, a fine-tuned BERT or even a regex/parser may beat an LLM on cost, latency, and reliability. Recommendation ranking, LLMs are still rarely the right tool. The 'use LLM for everything' impulse is the most common architecture mistake I see in 2026."
+**Check.** The simple break-even is two million requests, not two million tokens.
+A 500-unit refresh moves it to 2.5 million requests.
 
-A candidate who pushes back on the implicit premise of the question (that you should be using an LLM) signals genuine senior judgment.
+**Use when.** Measured recurring savings can repay adaptation before the model or task changes.
 
----
+<span id="a-common-follow-up-when-does-it-make-sense-to-not-use-an-llm-at-all"></span>
 
-*Related: ["How would you evaluate an LLM application you've built?"](/questions/how-would-you-evaluate-an-llm-application/), because this decision is downstream of having an eval.*
+## Change 2: The Task Is an Exact Grammar
+
+**New task.** Accept a whole identifier `ACCT-` followed by six ASCII digits.
+Preserve leading zeros and reject surrounding text.
+
+**Picture and change.** Match the declared grammar instead of sampling a generated answer.
+
+```python
+import re
+
+
+def parse_account_id(text):
+    matched = re.fullmatch(r"ACCT-([0-9]{6})", text)
+    return matched.group(1) if matched else None
+
+
+assert parse_account_id("ACCT-000123") == "000123"
+assert parse_account_id("ACCT-000123\n") is None
+```
+
+**Check.** Syntax validity does not establish that an account exists or that the caller may access it.
+
+**Use when.** A parser, classifier or task-specific model meets the actual requirement more predictably.
+
+## Failure: Training Becomes a Freshness Strategy
+
+A weekly-changing policy needs source/version maintenance even if the model once learned it.
+Likewise, finding B does not ensure correct interpretation or safe handling of untrusted content.
+
+## Transfer Check
+
+Could one system use fine-tuning, retrieval and prompting together?
+
+### Reasoned Answer
+
+Yes. A tuned model can receive current authorized evidence and request-specific instructions.
+Evaluate the combined system; neither parameter updates nor citations remove schema, access or semantic checks.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="the-tells-that-get-you-down-leveled"></span>
+
+## Localize Failures Before Expanding the System
+
+Audit retrieval coverage, document access, applicable versions, chunk selection and reranking separately from answer faithfulness.
+Use direct correct context as a diagnostic, not as a production retrieval result.
+Inspect real prompt contents before concluding that a fact is absent from the model.
+Training a generator cannot authorize an inaccessible source or repair an index automatically.
+
+<span id="what-an-l6-answer-sounds-like"></span>
+<span id="the-tells-that-get-you-a-strong-hire-vote"></span>
+
+## Compare Lifecycle Costs
+
+Prompt costs depend on token counts, caching, provider pricing, latency and retries, not length alone.
+Fine-tuning adds data preparation, privacy review, training, validation, checkpoint serving and refresh work.
+A provider deprecation or model-family change can require new adaptation and qualification.
+Retrieval adds ingestion, access filtering, versioning, evaluation, storage and serving costs.
+
+Report cost per successful task, tail latency, invalid answers and severe failures under the same task distribution.
+Shorter prompts or smaller models are potential savings, not guaranteed savings.
+Include a named owner, versioned artifacts and a tested rollback for each changed component.
+
+## Test a Simpler Baseline
+
+A label classifier, parser or conventional ranking model may satisfy a narrow task without generative output.
+Choose using representative quality, latency, cost and maintenance evidence, not the label “LLM application.”
+
+*Related: [Evaluate an LLM application](/questions/how-would-you-evaluate-an-llm-application/).*
+
+</div>

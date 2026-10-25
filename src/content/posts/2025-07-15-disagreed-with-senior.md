@@ -8,99 +8,143 @@ category: "questions"
 ---
 
 
-> *Asked in: behavioral round at every senior level.*
+Make both positions legible, identify the deciding evidence and name the decision owner.
+An honest outcome can retain A or B.
 
-The L4 candidate's story ends with "and they realized I was right." The L6 candidate's story ends with a synthesis neither party had at the start, or with the candidate updating their position based on new information.
+## Problem
 
-## What the question actually tests
+Use this fictional rehearsal, not a personal project claim:
 
-Three specific things:
-1. Did you have the technical conviction to disagree at all? (Some candidates won't, on principle, with anyone senior. That's a signal.)
-2. Did you raise the disagreement productively? (Email tantrum, calm 1:1, or formal escalation each say something different.)
-3. Did you remain open to being wrong? (The most senior signal is updating your view when warranted.)
+| Option | Latency | Cost | Approved processing region? |
+| --- | ---: | ---: | --- |
+| A | 80 ms | $100,000 | Yes |
+| B | 60 ms | $70,000 | No |
 
-## What an L4 answer sounds like
+The requirements are latency below 100 ms and an approved processing location.
+Someone favors B's speed and cost; you favor A's compliance with the current boundary.
+What evidence resolves the choice? What could reopen it?
 
-> "My manager wanted to use approach A. I wanted to use approach B because I thought it was better. I argued for B and we eventually used B. It worked out."
-
-This describes a victory, not a disagreement. you don't actually engage with the senior person's reasoning, you just push.
-
-## What an L5 answer sounds like
-
-A good answer follows a STAR(L) structure with specific technical content:
-
-- **Situation**: brief context, what the team was deciding.
-- **Task**: what you were responsible for in the decision.
-- **Action**: specifically what you did to surface the disagreement (1:1, written doc, larger forum), what evidence you brought, how you engaged with the other person's argument.
-- **Result**: what was decided, what shipped, how it worked.
-- **Learning**: what you took away about disagreement, the technical area, or the people involved.
-
-The story should:
-- Have specific technical content the interviewer can probe.
-- Show that you understood the senior person's reasoning, not dismissed it.
-- Include some evidence-gathering or experimentation to inform the decision.
-- End with an outcome (and ideally a learning), not just "I won."
-
-## What an L6 answer adds
-
-The L6 version often has these properties:
-
-- **The disagreement was about strategy, not just technique.** "We disagreed on whether to invest 6 months in a custom solution or use an off-the-shelf tool" is an L6 disagreement; "we disagreed on whether to use Adam or SGD" is an L5 disagreement.
-- **You facilitated the resolution.** Brought the right people into the room, framed the trade-offs, ran a small experiment to inform the decision, wrote the proposal that the team eventually agreed to.
-- **You changed your view at some point.** Maybe started with strong conviction for B, learned something through the process, updated to a third option C that was better than either A or B.
-- **The story includes someone you respect being on the other side.** L6 candidates have learned to disagree well with smart people, not just to dismiss them.
+## Picture: Evidence Before Commitment
 
 <!-- visual:disagreement-evidence-commit-loop -->
 ```mermaid
 flowchart TB
 	accTitle: From two defensible positions to one owned decision
-	accDescr: Two defensible positions are first steelmanned against a shared goal, constraints, and evidence. The team names the uncertainty that could change the choice. If it is answerable, they run the smallest decisive test or gather missing evidence; if it is not testable yet, they name assumptions and risks and use agreed criteria. They then honestly retain A, retain B, or synthesize C. A decision owner records the rationale and a revisit rule, after which everyone commits publicly and executes. New evidence reopens the uncertainty only when it crosses the agreed revisit rule.
+	accDescr: Represent both positions fairly, then identify evidence or explicit criteria that can change the choice. Retain A, retain B or synthesize C honestly. A separate hard-boundary gate precedes commitment: prohibited action goes to required review or escalation, not execution. An authorized owner records the allowed decision, rationale and revisit rule; new evidence can reopen that rule. In the fictional ledger both latency values pass, but B lacks an approved region.
 	A["Position A + position B<br/>both defensible"] --> B["Steelman both sides<br/>shared goal · constraints · evidence"]
 	B --> C{"What uncertainty<br/>could change the choice?"}
 	C -->|"answerable"| D["Run the smallest decisive test<br/>or gather missing evidence"]
 	C -->|"not testable yet"| E["Name assumptions + risks<br/>use agreed criteria"]
 	D --> F["Update honestly<br/>retain A · retain B · synthesize C"]
 	E --> F
-	F ==> G["Decision owner chooses<br/>record rationale + revisit rule"]
+	F --> Allowed{"Within required safety,<br/>privacy + integrity boundaries?"}
+	Allowed -->|"no"| Escalate["Required review / escalation<br/>do not execute prohibited work"]
+	Allowed ==>|"yes"| G["Decision owner chooses<br/>record rationale + revisit rule"]
 	G ==> H["Commit publicly<br/>execute the chosen direction"]
 	H -. "new evidence crosses the revisit rule" .-> C
 	class A,B viz-input
-	class C,F viz-focus
+	class C,F,Allowed viz-focus
 	class D,E viz-state
 	class G,H viz-output
+	class Escalate viz-warning
 ```
-<p class="diagram-caption"><strong>Read it this way:</strong> disagreement is not repeated advocacy until one side yields. First make both positions legible, then identify what could change the choice and update honestly from evidence or explicit criteria. Once an owner decides, commit to execution; reopen the decision only when new evidence crosses the rule agreed in advance. Original synthesis checked against <a href="https://www.amazon.jobs/content/en/our-workplace/leadership-principles">Amazon's disagree-and-commit principle</a>, <a href="https://doi.org/10.2307/2666999">Edmondson on psychological safety and team learning</a>, and <a href="https://ntrs.nasa.gov/citations/20170001761">NASA decision-analysis guidance</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> test the deciding uncertainty, not the other person's status. Commit to allowed work; a decision owner cannot remove every external obligation.</p>
 
-## Tells that get you a strong-hire vote
+## Apply the Constraints Independently
 
-- The story is **specific and technical**, not abstract.
-- You **understood the other side's reasoning** before disagreeing.
-- You used **evidence or experimentation** to inform the decision.
-- You **updated your view** at some point in the process.
-- The outcome is a **synthesis**, not a clean win.
+Both 80 and 60 ms are below 100 ms.
+B's lower cost cannot compensate for its failed region requirement.
+The owner can select A or investigate an approved B configuration.
+Record regional approval as a possible reopening condition; do not assume it will occur.
 
-## Tells that get you down-leveled
+## Change 1: The Other Approach Is Selected
 
-- The story is generic ("I disagreed with my manager about a model").
-- The other person is presented as wrong and you as right, with no grey area.
-- No evidence of evidence-gathering.
-- "I won" framing.
-- You can't describe the other person's argument convincingly.
+**New task.** The owner chooses another defensible, permitted approach.
+
+**Picture and change.** Execute it responsibly; observe the distinguishing metrics and agreed revisit condition.
+
+**Check.** Commitment does not require pretending your earlier uncertainty vanished or waiting to say you were right.
+
+**Use when.** Your recommendation is not selected.
+
+## Change 2: The Decision Crosses a Hard Boundary
+
+**New task.** The chosen action violates a non-negotiable safety, privacy or integrity rule.
+
+**Picture and change.** Use required review/escalation and keep appropriate records; do not treat ordinary commitment as authorization.
+
+**Check.** An owner cannot waive every external duty.
+
+**Use when.** The issue is a prohibited action, not an ordinary preference.
+
+## Failure: A Scripted Victory or Conversion
+
+A story fails to explain the decision when it omits credible opposition or invents a change of mind.
+
+## Transfer Check
+
+Must a disagreement end with a third option C?
+
+### Reasoned Answer
+
+No. Evidence can support retaining A or B. Synthesis is a possible result, not a required narrative.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## What the question actually tests
+
+Describe technical conviction, productive challenge and willingness to update when warranted.
+Do not fabricate disagreement or opposing competence to fit a story.
+
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
+<span id="what-an-l6-answer-adds"></span>
+## Evidence Worksheet
+
+Use STAR(L) as optional prompts, not memorized filler:
+
+| Prompt | Record |
+| --- | --- |
+| Situation/task | Shared goal, constraints, responsibility and decision rights |
+| Positions | Strongest actual argument for each option |
+| Action | Your discussion, document, test, collaboration or escalation |
+| Evidence | Measured facts, assumptions and remaining uncertainty |
+| Decision/result | Owner, selected option, what shipped and observed outcome |
+| Learning | What changed or remained; revisit condition |
+
+Separate personal/team contributions and observed/counterfactual impact.
+When a decisive test is unavailable, state criteria and risks instead of inventing certainty.
+Technical versus strategic topic labels do not determine scope or company level.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+## Check the Account
+
+Can another person probe the technical decision and reconstruct your actual contribution?
+Neither changing your view nor creating C is mandatory.
+
+<span id="tells-that-get-you-down-leveled"></span>
+## Missing Evidence
+
+Replace generic advocacy with the missing rationale, action, outcome limit or reopening rule.
 
 ## A trap to avoid
 
-Some candidates pick a disagreement where the senior person's view was clearly wrong (a manager who didn't understand ML pushing for naive approaches). These stories make you sound right but make the senior person sound dumb, which signals you don't have actual senior peers to disagree with.
-
-Better: a disagreement with a respected senior person whose argument was *also* defensible. Demonstrates you can engage with smart opposition.
+Respectful representation does not require pretending an unsafe proposal is acceptable.
+Avoid caricaturing the other person; explain the disputed reasoning and constraint.
 
 ## Common follow-up
 
-"What if you'd lost that argument?"
+What if your recommendation lost? Explain allowed execution, distinguishing observations and agreed review, not a grudge.
 
-The L6 answer:
+## Sources
 
-> "Two layers. First, I'd own the chosen direction publicly; once a team decides, you commit. Second, I'd track the metrics that distinguish the two approaches and revisit the decision when there's evidence to revisit on. If the chosen direction is failing on the metrics, that's information; if it's succeeding, that's also information, including about my own judgment. The worst pattern is to hold a 'I would have told you so' grudge in case the decision goes wrong; that poisons the team and makes you less able to disagree well next time."
+- [Amazon leadership principles](https://www.amazon.jobs/content/en/our-workplace/leadership-principles).
+- [Psychological safety and team learning](https://doi.org/10.2307/2666999).
+- [NASA decision analysis](https://ntrs.nasa.gov/citations/20170001761).
 
 ---
 
 *Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/).*
+
+</div>

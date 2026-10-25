@@ -7,27 +7,33 @@ tags: ["questions"]
 category: "questions"
 ---
 
-> You have ten minutes to read a paper's abstract, method figure, and main result table. Critique the work and propose the next experiment.
+A paper critique connects a specific claim to evidence and a test that could change the conclusion.
 
-State the paper's strongest claim in the authors' own terms, then go after the single threat most likely to explain the headline result. Ten generic faults ("small gain, few datasets, more baselines") get you down-leveled; the signal is fair, prioritized, falsifiable judgment under incomplete information.
+## Problem
 
-## A reading order
+You have ten minutes to inspect an abstract, method figure and main result table.
+An explicitly hypothetical paper claims: “Our routing mechanism improves accuracy efficiently.”
 
-1. **Claim:** what does the paper say is new and true?
-2. **Evidence:** which result supports each part of the claim?
-3. **Comparison:** are the baselines strong, current, and fairly resourced?
-4. **Validity:** could leakage, selection, tuning, or variance explain the result?
-5. **Mechanism:** do the ablations isolate why it works?
-6. **Scope:** where should the conclusion generalize, and where should it break?
-7. **Value:** is the gain meaningful relative to compute and complexity?
-8. **Next experiment:** what single result would most change your belief?
+| Main-table recipe | Accuracy | Total tuning/training cost |
+| --- | --- | --- |
+| Baseline | $80\%$ | $10$ GPU-hours |
+| Routing | $84\%$ | $20$ GPU-hours |
+
+Choose the most important unresolved explanation and propose one feasible next experiment.
+Do not assume anything else about the unpublished method or evaluation.
+
+## Picture
+
+The reported four-percentage-point gain is a real strength within this hypothetical table.
+But routing and resource advantage changed together.
+Matched resources could distinguish a resource-only explanation from a gain that survives the comparison.
 
 <!-- visual:paper-critique-prioritization-funnel -->
 ```mermaid
 flowchart TB
-	accTitle: A strong paper critique narrows many plausible threats to one belief-changing experiment
-	accDescr: Begin by stating the paper's strongest claim fairly, then map the headline evidence that supports it. Generate plausible alternative explanations including leakage or selection, unfair compute or tuning, variance or a weak baseline, and limited scope. Rank those threats by which could most overturn the central claim, choose one, and propose an experiment where the claim and that alternative predict different outcomes. The result should strengthen, narrow, or reject the claim.
-	C["1 · State the strongest claim<br/>in the authors' terms"] --> E["2 · Map the headline evidence<br/>to that exact claim"]
+	accTitle: Test whether the hypothetical four-point gain survives matched compute
+	accDescr: The claim is that routing improves accuracy efficiently. The table reports 84 versus 80 percent, but 20 versus 10 GPU-hours. Compute, leakage, variance and scope are candidate explanations. The immediate experiment matches hardware, data and total tuning/training budget. Three paired runs per recipe each receive ten GPU-hours, totaling sixty. A justified interval below a two-point useful threshold would narrow the efficiency claim; a supported retained gain would weaken the resource-only explanation without proving the routing mechanism.
+	C["CLAIM<br/>Routing improves accuracy efficiently"] --> E["TABLE<br/>84% vs 80%; 20 vs 10 GPU-hours"]
 	E --> H["3 · Generate plausible<br/>alternative explanations"]
 	H -.-> L["Leakage /<br/>selection"]
 	H -.-> F["Unfair compute<br/>or tuning"]
@@ -37,8 +43,8 @@ flowchart TB
 	F --> P
 	V --> P
 	S --> P
-	P ==>|"claim and threat predict differently"| X["5 · Run one discriminating,<br/>falsifiable experiment"]
-	X --> U["6 · Update belief:<br/>strengthen, narrow, or reject"]
+	P ==>|"selected threat: resource advantage"| X["MATCHED TEST<br/>3 paired runs × 2 recipes × 10 hours"]
+	X --> U["DECIDE<br/>Does a useful gain survive?<br/>Mechanism remains unresolved"]
 	class C viz-input
 	class E,H viz-state
 	class L,F,V,S viz-warning
@@ -46,46 +52,128 @@ flowchart TB
 	class U viz-output
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid spine from claim to evidence, then inspect the dashed candidate threats. Do not turn all four into generic requests for more work. Reconverge on the threat most capable of overturning the claim, and choose one experiment where that threat and the authors' explanation predict different outcomes.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> both method and resources changed in the table. Select resource advantage for the next test, rather than requesting every possible experiment.</p>
+
+## Write the decision record
+
+| Field | This hypothetical decision |
+| --- | --- |
+| Claim and evidence | Exact abstract quote; main-table rows; versioned paper copy |
+| Selected alternative | More resources, rather than routing, explain the useful gain |
+| Comparison | Same hardware, data, evaluation and total budget |
+| Resource plan | Three paired runs per recipe; each gets two tuning hours and eight final-training hours |
+| Primary effect | Paired accuracy difference in percentage points |
+| Useful threshold | At least two points, declared before confirmation |
+| Opposing predictions | Gain disappears under matching, or a useful gain remains |
+| Uncertainty | Declare seed pairing, evaluation sampling unit and analysis method |
+| Stop rule | Fixed budget; retain failed attempts and all outcomes |
+
+The six training/tuning allocations total $3\times2\times(2+8)=60$ GPU-hours.
+Declare tuning opportunities and account for failed attempts within each allocation.
+Budget evaluation overhead separately.
+Equal FLOPs, wall time, GPU-hours and tuning opportunities are different contracts; choose one matching the claim.
+
+Suppose a justified analysis reports $+0.2$ points with interval $[-0.6,+1.0]$.
+This is an interpretation fixture, not an interval calculated from three seeds.
+Its upper endpoint remains below the declared useful threshold.
+That outcome would not justify a larger reproduction based on this efficiency claim.
+
+A supported retained three-point gain would weaken the resource-only explanation.
+It would not prove the proposed routing mechanism or generalization beyond the evaluated setting.
+Training-seed variation and uncertainty over evaluation items need separate treatment.
+
+## Change the threat or decision
+
+### 1. Suspect shared source documents
+
+**New task:** budgets already match, but evaluation items may share training-document ancestry.
+
+**Picture and change:** freeze the original result and build a source-disjoint confirmation set from provenance.
+Keep tuning away from it.
+
+**Check:** compare matched clean and overlapping strata.
+A clean-set decline alone cannot prove leakage; difficulty or domain may also change.
+
+**Use when:** source overlap directly threatens out-of-source generalization.
+
+### 2. Judge operating value
+
+**New task:** slower batches reduce failure recovery work.
+
+**Picture and change:** measure end-to-end cost, reliability and intervention time, not kernel speed alone.
+
+**Check:** compare the same workload and service objective over the same observation window.
+Operational value can justify adoption without establishing a novel learning mechanism.
+
+**Use when:** the decision is deployment rather than scientific novelty.
+
+## Failure and transfer
+
+Requesting five datasets is not discriminating if every experiment retains the same confound.
+Which competing predictions would the added observations separate?
+
+Does a fair reproduction retaining the gain prove the mechanism?
+
+<details>
+<summary>Check your answer</summary>
+
+No. It supports the observed comparison and weakens the selected resource explanation.
+Mechanism evidence still needs an intervention with competing predictions.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## A reading order
+
+1. State the claim precisely.
+2. Locate its supporting evidence.
+3. Check baseline and resource fairness.
+4. Identify leakage, selection and variance threats.
+5. Ask what isolates the mechanism.
+6. Bound generalization and failure settings.
+7. Compare value with compute and complexity.
+8. Choose one belief-changing experiment.
 
 ## Be fair before you criticize
 
-Open by stating the strongest contribution in the authors' own terms, then separate:
+Distinguish an overstated correct result, useful engineering without novel science, an unsupported mechanism, and an invalid evaluation.
+Absence of evidence is not evidence of failure.
 
-- A correct result with an overstated claim
-- A useful engineering improvement without novel science
-- A plausible mechanism with insufficient evidence
-- A flawed evaluation that invalidates the headline
+<span id="what-an-l4-answer-sounds-like"></span>
 
-## What an L4 answer sounds like
+## Unfocused critique
 
-> "The gain is small, there are not enough datasets, and they should compare to more baselines."
+“Small gain” needs uncertainty and practical-cost context.
+“More baselines” needs a comparison that tests the claim.
 
-These may be true, but they are generic and never identify the highest-impact threat.
+<span id="what-an-l5-answer-adds"></span>
 
-## What an L5 answer adds
+## Claim-specific critique
 
-An L5 answer ties each criticism to the claim. For efficiency, compare matched wall time and hardware use. For robustness, define the shift and uncertainty. For a mechanism, require a discriminating ablation. Compare small gains with seed variance and tuning budget, then propose one feasible experiment.
+Match the measurement to efficiency, robustness or mechanism, then explain the result that would alter the conclusion.
 
-## What an L6 answer adds
+<span id="what-an-l6-answer-adds"></span>
 
-An L6 answer also judges strategic value. It checks whether the benchmark matches real use, whether the method improves cost or reliability, and which result may survive scale. It identifies the capability needed to reproduce the work and classifies the contribution as a primitive, recipe, or local optimization.
+## Strategic value
 
-## Tells that get you a strong-hire vote
+Ask what survives scale, what reproduction requires, and whether the contribution is a primitive, recipe or local optimization.
 
-- Criticism is prioritized by impact on the central claim.
-- Baseline and compute fairness are explicit.
-- You separate absence of evidence from evidence of failure.
-- You propose a falsifiable next experiment.
-- You name a real strength before the limitations.
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
 
-## Tells that get you down-leveled
+## Useful evidence
 
-- Judging the venue or the authors rather than the evidence.
-- Demanding more datasets without saying what they would test.
-- Calling a small gain meaningless with no uncertainty or cost context.
-- Missing leakage or matched-compute issues.
-- Ten criticisms and no decision.
+Prioritize impact, acknowledge a genuine strength and make the next test falsifiable.
+No response format guarantees a hiring outcome.
+
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Avoid unsupported judgments
+
+Judge evidence, not authors or venue.
+Avoid long criticism lists without a decision.
 
 ## Common follow-ups
 
@@ -95,4 +183,14 @@ An L6 answer also judges strategic value. It checks whether the benchmark matche
 - How would you test whether the result survives scale?
 - What if the method is slower but easier to operate?
 
+## Sources
+
+Checklist items cover claims, uncertainty and compute; they are not a mechanical accept/reject rubric.
+
+- [NeurIPS 2025 reviewer guidance](https://neurips.cc/Conferences/2025/ReviewerGuidelines).
+- [NeurIPS paper checklist](https://neurips.cc/public/guides/PaperChecklist).
+- [Pineau et al., JMLR reproducibility-program report](https://jmlr.org/papers/v22/20-303.html).
+
 *Related: [design an ablation study](/questions/design-ablation-study/), [bias-variance of estimators](/concepts/bias-variance-of-estimators/), and [lessons from Marin 8B](/guides/lessons-from-marin-8b/).*
+
+</div>

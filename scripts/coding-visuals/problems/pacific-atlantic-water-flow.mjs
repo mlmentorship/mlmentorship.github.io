@@ -44,7 +44,7 @@ const atlanticAll = [
 const draft = visual('Reverse both flow searches from their ocean borders, move uphill, then intersect the reached cells.', [
   frame(
     'Seed the Pacific reverse search',
-    'Pacific starts are every top- or left-border cell: (0,0),(0,1),(0,2),(1,0),(2,0). These five cells initialize seen and the stack.',
+    'Seed the Pacific search from every top and left border cell. These five seeds initialize both seen and the stack.',
     scene(pacificSeeds, { search: 'Pacific', stack: '5 border seeds', reached: '5 cells' }),
     'seed-pacific',
   ),

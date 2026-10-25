@@ -6,7 +6,7 @@ const current = (index, label = `i=${index}`) => [mark(index, label, 'focus', 's
 const draft = visual('Count earlier prefix sums equal to current prefix minus target.', [
   frame(
     'Seed the empty prefix',
-    'For nums = [1, -1, 1, -1, 1] and target 0, record prefix 0 once before scanning so subarrays starting at index 0 can match.',
+    'Use nums = [1, -1, 1, -1, 1] and target 0. Record the empty boundary once so ranges starting at index 0 can match.',
     arrayMap(nums, [['0', 'count 1']], current(0, 'next i=0'), {
       mapLabel: 'earlier prefix counts',
       prefix: '0',

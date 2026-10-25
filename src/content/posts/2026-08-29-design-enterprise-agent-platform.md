@@ -13,137 +13,194 @@ priority: "Role-specific"
 prerequisites: ["evaluate-an-agent", "llm-security-threat-models", "rl-environments-and-graders", "design-multi-team-ml-platform"]
 ---
 
-> *Asked in: principal and senior-principal agent architecture, ML system design, safety, and technical-strategy rounds.*
+Agents propose, policy authorizes, and tools create effects; a timeout does not prove an effect failed.
 
-A workable platform executes bounded agent workflows and records what happened. A principal design also creates shared authority, safety, evaluation, and operating contracts across organizations. A senior-principal design decides which contracts should govern several agent products while preserving local innovation, regulatory variation, and a credible exit path.
+<span id="the-prompt"></span>
 
-The platform should centralize control over identity, delegated authority, tool contracts, execution evidence, and release policy. Product teams should retain task semantics, user experience, domain tools, and outcome ownership. One universal agent runtime is not the starting goal.
+## Problem
 
-This page is a reference map. In an interview, state the authority model, draw the execution path, and take one or two technical boundaries deep.
+A fictional company has 40 agent teams, several model providers and about 300 tools.
+Independent systems disagree on schemas, permissions, memory, traces and retries.
+Peak starts are 2,000 workflows/second; most finish within one minute and five calls, but some run for hours.
+Ten tools move value or alter access; 50 read restricted data.
 
-## The prompt
+A support agent sends a 50-unit account credit, loses the response, then retries and creates another credit.
+Separately, an uploaded report induces a research agent to propose a broader internal-data export than the user authorized.
 
-A global company has 40 teams building agents for customer support, software engineering, sales operations, finance, research, and internal productivity. The agents use several model providers and about 300 tools.
+Design a two-year platform direction with a first release in one quarter, incremental migration and regional processing restrictions.
+What prevents the duplicate effect and unauthorized export without requiring every team to use one planning runtime?
 
-Current systems evolved independently. They have incompatible tool schemas, permissions embedded in prompts, ad hoc memory, incomplete traces, and different retry behavior. Teams cannot compare evaluations or identify every product affected by a compromised tool.
+## Picture: one logical action, several observations
 
-A recent support agent retried an account-credit operation after a timeout. The first call had succeeded, but the response was lost. The retry issued a second credit. In a separate incident, an uploaded document persuaded a research agent to call an internal export tool with broader scope than the user expected.
+Logical call `credit-123` uses downstream key `k-456` and exact approved arguments.
+Separate its durable record from each network attempt and from the account system's authoritative state.
 
-Design a platform for the next two years. The first production release must arrive in one quarter. Existing agents cannot all migrate at once. Some regions require local data processing and different approval rules.
+| Event | Durable call state | Account system | Permitted next action |
+| --- | --- | --- | --- |
+| Authorize exact credit | `authorized` | No dispatch yet | Persist authorization, then dispatch |
+| Send `k-456` | `dispatched` | May process request | Wait or query status |
+| Commit; response lost | `outcome_unknown` | One 50-unit credit exists | Reconcile, not a new logical credit |
+| Replacement worker resumes | `outcome_unknown` | Same committed credit | Lookup `k-456` with current authority |
+| Lookup returns commit ID | `reconciled_success` | Still one credit | Record receipt and finish original call |
+
+The downstream contract must bind key, arguments, committed effect and recoverable result consistently.
+A client-created UUID does not supply that guarantee.
+Revocation after dispatch cannot erase the committed credit.
+
+## Separate control, execution, and evidence planes
+
+Control decides authority and versions; execution performs bounded work; evidence records decisions and observed effects.
+
+<!-- visual:enterprise-agent-three-plane-boundary -->
+```mermaid
+flowchart TB
+  accTitle: Control authorizes, execution performs, and evidence records an enterprise action
+  accDescr: An authenticated request enters a bounded runtime under explicit delegation. The runtime proposes structured tool arguments but receives no general action credential. Policy checks current authority, arguments and approval. Consequential dispatch waits for durable authorized state. A narrow executor invokes the enterprise system, whose commit or status lookup provides authoritative completion evidence. A lost response remains unknown until reconciliation. Evidence records decisions and effects but cannot itself authorize an action.
+  User["User or service<br/>verified identity"]
+  subgraph Control["CONTROL · authority and versions"]
+    Registry[("Versions + registry")]
+    Admission{"Identity + delegation valid?"}
+    Policy{"Current authority + arguments<br/>approval + destination valid?"}
+  end
+  subgraph Execution["EXECUTION · bounded work"]
+    Entry["Agent entry API"]
+    Runtime["Runtime adapter<br/>model + scoped context"]
+    Gateway["Structured tool proposal"]
+    Durable{"Authorized state<br/>durably written?"}
+    Executor["Narrow executor<br/>logical call + downstream key"]
+    Systems["Enterprise system<br/>commit / authoritative status"]
+  end
+  subgraph Evidence["EVIDENCE · observable decisions and effects"]
+    Events[("Durable execution events")]
+    Uses["Audit · evaluation · incidents<br/>budgets · cost"]
+    Events --> Uses
+  end
+  User ==> Entry ==> Admission
+  Admission ==>|"allow workflow"| Runtime
+  Runtime ==> Gateway ==> Policy
+  Policy ==>|"allow exact action"| Durable
+  Durable ==>|"yes"| Executor ==> Systems
+  Registry -. "approved versions" .-> Admission
+  Registry -. "contract + policy" .-> Policy
+  Admission -. "decision" .-> Events
+  Policy -. "decision" .-> Events
+  Durable -. "pre-dispatch record" .-> Events
+  Systems -. "commit or status receipt" .-> Events
+  class User,Entry viz-input
+  class Admission,Policy,Gateway,Durable viz-focus
+  class Registry,Events viz-state
+  class Runtime,Executor viz-neutral
+  class Systems,Uses viz-output
+```
+
+<p class="diagram-caption"><strong>Read it this way:</strong> a model proposes; policy authorizes; durable state precedes consequential dispatch. Completion comes from authoritative effect evidence, not a successful-looking model explanation.</p>
+<p class="diagram-source">References: <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>, <a href="https://www.rfc-editor.org/rfc/rfc8693.html">RFC 8693</a>, <a href="https://docs.temporal.io/workflow-execution">durable execution</a>, and <a href="https://github.com/open-telemetry/semantic-conventions-genai">OpenTelemetry GenAI conventions</a>.</p>
+
+## Apply ten invariants
+
+1. Authority comes from verified identity and explicit delegation, never prompt text.
+2. Every tool call uses a versioned action contract with an owner and retry semantics.
+3. Consequential calls have durable authorization before dispatch.
+4. Unknown effects remain unknown until authoritative reconciliation.
+5. Retrieved content, tool output and memory do not become trusted control instructions.
+6. Time, tokens, calls, concurrency and cost have enforced limits and terminal reasons.
+7. High-risk completion needs independent policy and final-state evidence.
+8. Tenant and regional data, credentials and authority remain isolated.
+9. Tool, model, workflow and policy versions can be revoked independently.
+10. Contracts and evidence remain portable across runtime replacement.
+
+## Change retry support, authority or residency
+
+### 1. The tool lacks deduplication and status lookup
+
+**Picture and change:** prohibit automatic retry after possible dispatch.
+Add a genuinely reconcilable downstream wrapper or approved manual resolution; client bookkeeping alone is insufficient.
+
+**Check:** timeout plus unknown external state remains unresolved, not failed-safe.
+
+**Use when:** transport results cannot establish effect absence.
+
+### 2. Access is revoked while approval waits
+
+**Picture and change:** invalidate or narrow delegation and reauthorize immediately before dispatch.
+Bind approval to exact arguments, policy and expiration; old approval cannot restore revoked authority.
+
+**Check:** no new consequential call starts from the expired grant.
+
+**Use when:** work outlives its initiating authorization.
+
+### 3. A region prohibits external payload processing
+
+**Picture and change:** keep model, memory, tool and trace payloads in approved regional planes.
+Share only permitted identity, version, policy and aggregate metadata.
+
+**Check:** a provider outage cannot silently reroute restricted text through a forbidden region.
+
+**Use when:** residency governs ordinary operation and failover alike.
+
+## Test the second incident and transfer
+
+The uploaded report remains untrusted evidence even if its proposed export passes JSON validation.
+Evaluate purpose, source-data class, destination and authority across the entire tool chain before issuing credentials.
+Individually permitted read/send tools do not automatically authorize their composition.
+
+Why is compensation not rollback?
+
+<details>
+<summary>Check your answer</summary>
+
+Compensation is a new action that can fail; it cannot erase observations or irreversible consequences of the original effect.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## State the boundary before choosing a framework
 
 Build a shared agent control plane and tool gateway around several execution runtimes.
 
-The first release should provide:
-
-1. workload and user identity;
-2. explicit delegated authority;
-3. versioned tool contracts;
-4. durable execution and tool-call state;
-5. policy enforcement before side effects;
-6. complete outcome and audit evidence;
-7. budgets and termination controls;
-8. evaluation and staged release gates.
-
-Keep model planning and domain workflow implementations behind adapters at first. Teams can use different runtimes if they emit the shared events and call tools through the enforced gateway.
-
-This choice addresses the two incidents directly. A retry cannot repeat an unknown side effect without reconciliation. Untrusted document text cannot grant authority because permissions come from identity and policy, not model-generated instructions.
+First-release contracts cover identity, delegation, tools, durable state, policy, evidence, budgets and staged releases.
+Keep planning and domain workflows behind adapters; shared enforcement must not be optional.
 
 ## Clarify product, authority, and risk
 
-Ask questions that change the platform contract.
+<span id="users-and-products"></span>
+<span id="tools-and-effects"></span>
+<span id="identity-and-authorization"></span>
+<span id="data-and-memory"></span>
+<span id="scale-and-reliability"></span>
 
-### Users and products
+| Boundary | Questions that change the contract |
+| --- | --- |
+| Product | Advice, draft or action? Interactive or asynchronous? Customer, employee or software consumer? Cross-product workflow? Useful fallback? |
+| Tool | Read/write, reversibility, idempotency, status lookup, region, data classes, cost and approval support? |
+| Authority | User/workload identity, joint delegation, tenant, purpose, resource, amount, expiration and revocation target? |
+| Data | Permitted session/team/region/provider flows, retention, correction, deletion and provenance? |
+| Reliability | Arrival distribution, duration tails, calls, recovery/audit targets and task/tenant budgets? |
 
-- Are agents assisting a user, acting asynchronously, or operating without immediate review?
-- Which products face customers, employees, or other software agents?
-- Does the user expect advice, a draft, a reversible action, or an irreversible action?
-- Which workflows cross product or organization boundaries?
-- What fallback remains useful when action execution is unavailable?
-
-### Tools and effects
-
-- Which tools only read data?
-- Which tools create reversible state?
-- Which tools move money, publish content, delete data, change access, or execute code?
-- Do existing tools support idempotency keys and status lookup?
-- Can a tool describe its data classes, region, cost, and approval requirements?
-
-### Identity and authorization
-
-- Does the agent act as the user, as a service, or through delegated joint authority?
-- Which permissions depend on tenant, purpose, time, amount, region, or resource?
-- What authority can a team grant without a central review?
-- Which actions require confirmation or a second approver?
-- How quickly must a compromised tool or model version lose access?
-
-### Data and memory
-
-- Which context may cross sessions, teams, regions, or products?
-- What retention and deletion rules apply to prompts, tool results, traces, and memory?
-- Can untrusted retrieved content reach a tool argument?
-- Which data may be sent to each model provider?
-- What provenance must remain visible to users and auditors?
-
-### Scale and reliability
-
-- How many workflows start per second?
-- How long can they run, and how many tool calls can they make?
-- Which workflows need interactive latency versus durable asynchronous execution?
-- What completion, recovery, and audit targets apply by risk class?
-- What is the allowed cost per task and per tenant?
-
-Assume 2,000 workflow starts per second at peak. Most finish within one minute and five tool calls. The long tail can last hours. Ten tools move money or alter access. Fifty tools read restricted internal data. The rest are lower-risk reads or reversible updates.
+Peak starts and a typical duration do not establish mean concurrency; size queues and recovery from actual distributions.
 
 ## Define success around safe useful work
 
-The platform exists to help teams ship useful agent workflows with bounded authority and comparable evidence. Counted tool registrations or migrated agents are weak outcomes.
+<span id="product-outcomes"></span>
+<span id="safety-and-control"></span>
+<span id="platform-delivery"></span>
+<span id="efficiency"></span>
 
-### Product outcomes
+| Role | Evidence |
+| --- | --- |
+| Product | Defined completion, corrections/escalations, time-to-value, abandonment/retries, reversibility and delayed errors |
+| Safety | Unauthorized dispatch, approval validity, duplicate/unknown effects, bypass, tenant/region exposure and revocation time |
+| Delivery | Safe onboarding, observe-mode time, trace completeness, compliant release time, support burden and diagnosis time |
+| Efficiency | Cost/tokens/calls per success, p50/p95/p99 duration, queue delay, post-terminal waste, gateway and storage costs |
 
-- task success under the product's real completion definition;
-- user correction and escalation rate;
-- time to useful completion;
-- abandonment and repeated-attempt rate;
-- reversible versus irreversible action outcomes;
-- downstream errors discovered after the session.
-
-### Safety and control
-
-- unauthorized action attempts blocked before dispatch;
-- high-risk actions with valid confirmation and approval evidence;
-- duplicate or ambiguous side effects;
-- policy bypass through direct tool access;
-- cross-tenant or cross-region data exposure;
-- time to revoke a tool, model, or credential;
-- unresolved executions with unknown external state.
-
-### Platform delivery
-
-- time to register and safely expose a tool;
-- time to move an existing agent into observe-only mode;
-- fraction of workflows producing complete execution evidence;
-- release time for a policy-compliant agent change;
-- support tickets and manual approvals per workflow team;
-- time to diagnose a failed or unsafe trajectory.
-
-### Efficiency
-
-- cost per successful task;
-- model tokens and tool calls per successful task;
-- p50, p95, and p99 workflow duration;
-- queue delay by tenant and priority;
-- wasted calls after a terminal outcome;
-- shared gateway and trace-storage cost.
-
-Do not combine safety and task success into one average. A workflow that completes through an unauthorized action fails even when the user receives the desired result.
+Do not average unauthorized effects into task success or count registrations as user value.
 
 ## Classify actions by consequence
 
-Risk belongs to the tool action, arguments, identity, and context. A tool name alone is too coarse.
-
-Use a small action taxonomy.
+Classify action, arguments, identity and context, not tool name alone.
 
 | Class | Example | Default control | Completion evidence |
 | --- | --- | --- | --- |
@@ -153,99 +210,22 @@ Use a small action taxonomy.
 | Irreversible or regulated | Send funds, delete records, grant access | Strong authentication, explicit approval, and narrow policy | Authoritative commit ID, approval record, and immutable audit event |
 | Code or infrastructure | Run code, deploy, change production state | Sandbox or controlled executor with reviewed scope | Executor result plus observed target state and health |
 
-Arguments can raise risk. Reading one user's account differs from exporting every account. A transfer below a threshold differs from a large transfer. Policy should inspect structured arguments and resource scope before dispatch.
-
-Each action contract should state whether it is reversible, compensatable, or neither. Compensation is a new action with its own failure modes. It does not erase the original event.
+Reading one account differs from exporting all accounts.
+Declare reversibility, compensation and neither explicitly; compensation requires its own authorization and evidence.
 
 ## Establish platform invariants
 
-The architecture follows from invariants that remain true across models and runtimes.
+The core's [ten invariants](#apply-ten-invariants) define the common boundary, not a prescribed planning algorithm.
 
-1. **Authority comes from verified identity and explicit delegation.** Prompt text cannot add permission.
-2. **Every tool call uses a versioned contract.** The contract describes schema, side effects, retry behavior, ownership, and policy metadata.
-3. **Every consequential call has durable state before dispatch.** The platform can distinguish requested, authorized, dispatched, succeeded, failed, and unknown outcomes.
-4. **Unknown is different from failed.** A lost response after dispatch must be reconciled before another side effect.
-5. **Untrusted content remains untrusted.** Retrieved text, tool output, memory, and user uploads cannot silently become control instructions.
-6. **Every execution has bounded resources and termination rules.** Loops cannot consume unlimited time, tokens, calls, or money.
-7. **High-risk decisions produce independent evidence.** Model explanations do not replace policy checks or final-state verification.
-8. **Tenants and regions have isolated data and authority.** A shared runtime does not imply shared memory or credentials.
-9. **A release can be stopped without replacing every agent.** Policy, model, tool, and runtime versions can be revoked independently.
-10. **The common contract can outlive the current framework.** Execution evidence and tool identities remain portable.
+<span id="control-plane"></span>
+<span id="execution-plane"></span>
+<span id="evidence-plane"></span>
 
-These invariants give teams freedom inside a bounded system. They also define what the platform team must operate reliably.
-
-## Separate control, execution, and evidence planes
-
-**Learning objective:** Distinguish the control plane's authorization and version decisions from execution work and from the evidence plane's durable record of decisions and effects.
-
-<!-- visual:enterprise-agent-three-plane-boundary -->
-```mermaid
-flowchart TB
-  accTitle: Control, execution, and evidence planes for an enterprise agent action
-  accDescr: A user or service request enters an execution runtime only after the control plane checks identity and delegation. The runtime may call a model and scoped memory, but a structured tool proposal must return to the control plane for argument policy and approval. Only then does a tool executor receive narrow authority to affect an enterprise system. The entry decision, action decision, dispatch attempt, and authoritative outcome emit durable events to the evidence plane for audit, evaluation, and cost analysis.
-  User["User or service<br/>identity"]
-  subgraph Control["CONTROL PLANE · decides what may run"]
-	direction TB
-    Registry[("Versions + registry")]
-    Admission{"2 · Identity +<br/>delegation valid?"}
-    Policy{"6 · Arguments +<br/>approval valid?"}
-  end
-  subgraph Execution["EXECUTION PLANE · performs bounded work"]
-	direction TB
-    Entry["1 · Agent entry API"]
-    Runtime["3–4 · Runtime adapter<br/>model + scoped memory"]
-    Gateway["5 · Tool gateway"]
-    Executor["7 · Tool executor<br/>with narrow authority"]
-    Systems["8 · Enterprise system<br/>authoritative outcome"]
-  end
-  subgraph Evidence["EVIDENCE PLANE · records what happened"]
-	direction TB
-    Events[("Durable execution events")]
-    Uses["Trace + audit<br/>evaluation + incidents<br/>budget + cost"]
-    Events --> Uses
-  end
-  User ==> Entry
-  Entry ==> Admission
-  Admission ==>|"allow workflow"| Runtime
-  Runtime ==>|"structured proposal"| Gateway
-  Gateway ==> Policy
-  Policy ==>|"allow + scoped capability"| Executor
-  Executor ==> Systems
-  Registry -. "approved versions" .-> Admission
-  Registry -. "contracts + policy" .-> Policy
-  Admission -. "decision" .-> Events
-  Gateway -. "request" .-> Events
-  Policy -. "decision" .-> Events
-  Executor -. "attempt" .-> Events
-  Systems -. "final state" .-> Events
-  class User,Entry viz-input
-  class Admission,Policy,Gateway viz-focus
-  class Registry,Events viz-state
-  class Runtime,Executor viz-neutral
-  class Systems,Uses viz-output
-  class User viz-wide
-  class User viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the numbered solid path. Control checks identity before the runtime starts and checks structured arguments again before a side effect; the model never receives action authority. Then follow the dashed edges: decisions, attempts, and the enterprise system's final state become evidence, but the evidence store does not authorize the call. Original synthesis checked against <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>, <a href="https://www.rfc-editor.org/rfc/rfc8693.html">RFC 8693</a>, <a href="https://docs.temporal.io/workflow-execution">Temporal's durable-execution documentation</a>, and the <a href="https://github.com/open-telemetry/semantic-conventions-genai">OpenTelemetry GenAI semantic conventions</a>.</p>
-
-### Control plane
-
-The control plane owns identities, versions, policy, desired state, release status, and revocation. It answers what may run and which contracts apply.
-
-### Execution plane
-
-Runtime adapters conduct model calls, context assembly, planning, and workflow transitions. Tool executors perform side effects within isolated credentials and environments.
-
-### Evidence plane
-
-An append-only event stream records execution state. Derived stores support product metrics, debugging, evaluation, cost, and audit.
-
-Do not put high-volume prompts and tool payloads inside the transactional control database. Store references, hashes, redacted summaries, and required metadata there. Sensitive payloads belong in access-controlled stores with separate retention.
+Keep control metadata transactional; keep sensitive payloads in separately governed stores referenced by identity, hash and redacted summary.
 
 ## Model identity and delegated authority
 
-An agent acts with authority borrowed from a user, service, team, or approved automation policy. Represent that delegation explicitly.
+Represent user/service and agent workload authority separately; permission for a human read does not imply permission for external-model export.
 
 ```text
 Delegation
@@ -265,43 +245,25 @@ Delegation
   policy_version
 ```
 
-The user identity and agent workload identity are both required. A user may access a record directly while the agent workload is prohibited from exporting it to an external model.
-
 ### Short-lived capability
 
-Issue short-lived credentials or capability tokens after policy evaluation. Bind them to the exact tool action, resource scope, tenant, purpose, and expiration.
-
-Do not give a general database credential to the model or agent process. The tool executor receives narrow authority after the gateway approves structured arguments.
-
-Refreshing a capability requires another policy decision. Refresh may preserve or narrow scope; expanding scope requires a new delegation and any required confirmation. Revocation blocks new dispatches within the declared propagation target. A consequential action reauthorizes immediately before dispatch. Revocation after dispatch cannot erase an external effect, so the executor records the timestamp and reconciles the authoritative state.
+Bind narrow executor credentials to action, arguments, resource, tenant, purpose and expiration after policy approval.
+Refresh requires another decision; expansion requires new delegation and applicable confirmation.
+Reauthorize consequential dispatch, record revocation timing and reconcile effects already sent.
 
 ### Authorization versus instruction
 
-The model chooses a proposed action. The policy service decides whether the action is authorized. The tool implementation performs it.
-
-Keep these responsibilities separate. A system prompt can guide behavior, but it is not a security boundary.
-
-Central security policy should define the minimum floor. Product, tool, and regional owners can add stricter rules within delegated authority. An exception needs an authorized owner, bounded scope, evidence, and expiration rather than an unrestricted override.
+Prompts guide behavior, not permission.
+Central policy sets a floor; product, tool and regional owners may tighten it.
+Exceptions need an authorized owner, bounded scope, evidence and expiration.
 
 ### Revocation
 
-The control plane should revoke by:
-
-- user or service identity;
-- agent workload;
-- model version;
-- workflow version;
-- tool or tool version;
-- tenant;
-- region;
-- policy rule;
-- credential issuer.
-
-Propagate high-risk revocations quickly. Existing long workflows must reauthorize consequential actions instead of relying on authority captured hours earlier.
+Support revocation by principal, workload, model/workflow/tool version, tenant, region, rule and credential issuer, with a declared propagation target.
 
 ## Define a complete tool contract
 
-A tool contract should be machine-readable and human-reviewable.
+Keep contracts machine-readable and reviewable, with exact versions on calls.
 
 ```text
 ToolAction
@@ -332,7 +294,7 @@ Use a common result envelope while keeping the result body tool-specific.
 ```text
 ToolResult
   logical_call_id
-  outcome  # succeeded | failed | partial | unknown
+  outcome
   result
   error_code
   external_operation_id
@@ -340,140 +302,87 @@ ToolResult
   retry_after
 ```
 
-`unknown` means dispatch may have created an effect, so transport retry is unsafe until reconciliation. A `partial` result must identify completed effects and the available compensation path. The action contract defines which result fields prove authoritative completion.
+`outcome` distinguishes succeeded, failed, partial and unknown.
+Partial results identify completed effects and approved compensation; each contract specifies authoritative completion fields.
 
 ### Schema
 
-Use strict structured arguments. Reject unknown fields where safe. Validate types, bounds, enumerations, resource identifiers, and cross-field constraints.
-
-A valid schema does not prove a safe request. A transfer amount can be syntactically valid and unauthorized. Policy evaluates semantics after schema validation.
+Validate types, bounds, enumerations, resources, cross-field constraints and unexpected fields.
+Then evaluate authorization: syntactically valid amounts can still be prohibited.
 
 ### Side effects
 
-Declare whether the action is:
+| Retry mode | Required downstream contract |
+| --- | --- |
+| `safe_retry` | Repeating the logical action converges without a key |
+| `key_deduplicated` | Downstream binds key, arguments, effect and recoverable result |
+| `reconcile_before_retry` | Authoritative lookup establishes effect absence before another dispatch |
+| `no_automatic_retry` | Unknown effects need review or a separately approved action |
 
-- pure read;
-- idempotent write;
-- idempotent only with a supplied key;
-- non-idempotent with status lookup;
-- compensatable;
-- irreversible.
-
-The platform should not infer retry safety from an HTTP method or tool description.
-
-Use an explicit retry mode:
-
-- `safe_retry`: repeating the logical request converges without a key;
-- `key_deduplicated`: the downstream system stores the key and prior result;
-- `reconcile_before_retry`: status lookup must prove that no effect occurred;
-- `no_automatic_retry`: an unknown outcome requires review or a separate approved action.
+Also declare read/write, compensation and irreversibility; HTTP method alone proves none of these properties.
 
 ### Ownership and service level
 
-The contract identifies an operating owner, escalation path, availability target, timeout meaning, and change policy. Product teams need to know whether a timeout means no work started or the result is unknown.
+Name owner, escalation, service target and timeout meaning: “never started” differs from “effect unknown.”
 
 ### Versioning
 
-Compatible additions can remain within a version range. Breaking changes require a new version and a migration period.
-
-Record the exact contract version on every call. A trace that says only `send_refund` cannot explain behavior after the tool changes.
+Declare compatibility ranges; breaking contracts need new versions and migration periods.
 
 ## Enforce policy at the tool boundary
 
-Place a policy enforcement point where every governed call passes before credentials are issued.
-
-The decision uses:
-
-- user and workload identity;
-- tenant and region;
-- workflow and model version;
-- tool action and arguments;
-- data classification;
-- current delegation;
-- prior execution state;
-- budget and rate state;
-- confirmation and approval evidence;
-- policy version.
-
-Return a structured decision:
+All governed calls pass enforcement before credentials issue.
+Evaluate identities, tenant/region, workflow/model/action versions, arguments, data classes, delegation, prior state, budgets and approval evidence.
 
 ```text
 allow | deny | require_confirmation | require_approval | reduce_scope
 ```
 
-Include a reason code and policy version. Do not expose sensitive policy details that help an attacker probe hidden boundaries.
+Record reason class and policy version without exposing sensitive decision details.
 
 ### Fail behavior
 
-High-risk actions should fail closed when policy cannot be evaluated. Low-risk read paths may use a narrow cached grant if the risk owner approves that degradation.
-
-A global policy outage should not necessarily remove every assistant response. The runtime can switch to advice-only or draft-only mode while action execution is unavailable.
+Fail high-risk actions closed; only explicitly approved low-risk reads may use narrow cached grants.
+Advice/drafts can remain available without action authority.
 
 ### Policy conflicts
 
-Region, tenant, product, and central rules can conflict. Define precedence mechanically. A safe default is that the most restrictive applicable rule wins unless an explicit, authorized exception exists.
-
-Exceptions need owner, scope, reason, evidence, and expiration. Permanent undocumented exceptions become another policy system.
+Define regional/tenant/product/central precedence mechanically; stricter applicable rules win unless an authorized bounded exception says otherwise.
 
 ## Treat untrusted content as data
 
-Prompt injection is an authority and data-flow problem. It cannot be solved by asking the model to ignore malicious instructions.
-
-Untrusted inputs include:
-
-- user text;
-- uploaded files;
-- retrieved web pages;
-- emails and tickets;
-- tool results;
-- shared memory;
-- generated code;
-- messages from another agent.
-
-Tag provenance and trust class when content enters the system. Preserve those labels through retrieval and memory.
+Preserve provenance/trust for user uploads, retrieval, emails, tool results, memory, generated code and other agents' messages.
 
 ### Separate control context
 
-Build context in typed sections:
-
-- platform policy;
-- product instructions;
-- user request;
-- retrieved evidence;
-- tool results;
-- working state.
-
-The model still receives text, so separation is imperfect. It improves evaluation, filtering, and trace analysis. Security remains at tool authorization and data egress boundaries.
+Separate platform policy, product instructions, user request, evidence, tool results and working state.
+Typed sections aid inspection but do not replace enforced authorization and egress policy.
 
 ### Data-flow policy
 
-Before a tool call or model call, evaluate whether each data class may flow to that destination. An internal document may be available for local summarization but prohibited from an external model provider or public messaging tool.
+Check source-data class against model/tool destination before each flow; internal readability does not imply permission to publish or export.
 
 ### Argument construction
 
-Prefer typed selection from validated identifiers over free-form strings. Resolve a customer, repository, account, or file through an authorized lookup rather than letting untrusted text provide a raw resource path.
+Resolve typed account, repository and file identifiers through authorized lookups; do not trust raw paths from retrieved text.
 
 ### Generated code
 
-Run generated code in a sandbox with bounded filesystem, network, process, secret, time, and compute access. Treat test success as evidence of behavior within the sandbox, not proof of broad safety.
+Bound filesystem, network, process, secret, time and compute access; passing sandbox tests does not prove broad safety.
 
 ## Use a durable execution state machine
 
-An LLM is nondeterministic. The workflow around it can still have explicit durable state.
+| Prior state | Event/guard | Next state |
+| --- | --- | --- |
+| `created` | Admission succeeds | `running` |
+| `running` | User/approval/tool needed | Corresponding `waiting_for_*` |
+| Waiting | Authorized response/receipt arrives | `running` |
+| Nonterminal | Verified task completion | `completed` |
+| Nonterminal | Unrecoverable failure | `failed` |
+| Nonterminal | Cancellation resolved under policy | `cancelled` |
+| Nonterminal | Hard resource limit | `exhausted` |
 
-```text
-created
-  -> running
-  -> waiting_for_user
-  -> waiting_for_approval
-  -> waiting_for_tool
-  -> completed
-  -> failed
-  -> cancelled
-  -> exhausted
-```
-
-Each transition writes an event with expected prior state. Use optimistic concurrency or a compare-and-swap operation so two workers cannot advance the same workflow independently.
+Use expected-version CAS or equivalent concurrency control for every transition; terminal states are not sequential stages.
 
 ### Execution identity
 
@@ -492,23 +401,20 @@ Execution
   terminal_reason
 ```
 
-A model response is one event, not the source of truth for workflow state. The runtime validates proposed actions and applies allowed transitions.
+Model output is an event, not authoritative workflow state.
 
 ### Leases and workers
 
-A worker obtains a time-bounded lease for an execution. If the worker dies, another can resume from durable events after the lease expires.
-
-The resumed worker must not assume that the last external call failed. It reads the tool-call state and reconciles unknown outcomes.
+Use expiring worker leases and fencing/concurrency checks.
+Replacement workers reconcile dispatched calls before resuming effects; lease expiry does not prove downstream failure.
 
 ### Cancellation
 
-Cancellation should stop new calls and release leases. It cannot undo a dispatched side effect. The workflow may need compensation or human review before reaching a terminal state.
+Cancellation stops new calls, not existing effects; reconcile or approve compensation before declaring a resolved terminal outcome.
 
 ### Branching and replay
 
-A debug replay can branch from a recorded checkpoint with a different model or policy. It should not repeat real side effects.
-
-Use simulated tools, recorded outputs, or read-only environments. Mark replay events so they cannot contaminate production outcome metrics.
+Replay with simulated tools, recorded outputs or read-only environments; label events and exclude them from production outcomes.
 
 ## Design tool-call state for ambiguous outcomes
 
@@ -532,883 +438,520 @@ compensation_requested
   -> compensation_failed
 ```
 
-Write the authorized request durably before dispatch. Include a unique call identifier and idempotency key when the tool supports one.
-
-A partial or irreversible effect moves to manual review. A failed compensation is a new incident, not a successful rollback.
+Persist logical identity, exact arguments, authorization and supported downstream key before dispatch.
+Partial/irreversible unresolved effects need review; failed compensation is a new incident.
 
 ### Idempotency key
 
-Scope the key to the logical action, not the network attempt. Retries of the same logical action reuse it. A later intentional action receives a new key.
-
-The downstream tool must store or derive the result for that key. A client-side key alone does not make a non-idempotent tool safe.
+Reuse the logical key across transport attempts; later intentional actions receive new keys.
+Downstream enforcement, not client UUID generation, prevents duplicate effects.
 
 ### Unknown outcome
 
-If dispatch may have reached the tool and no result returns, mark the outcome unknown. Then:
-
-1. query tool status by call or idempotency key;
-2. inspect authoritative downstream state;
-3. retry only when the tool confirms no side effect;
-4. escalate if state cannot be determined;
-5. compensate only through an approved action.
-
-Never convert unknown to failed merely because a timeout elapsed.
+Query authoritative status, preserve unknown if unresolved, and retry only under the declared safe-retry contract.
+Elapsed time alone never proves effect absence.
 
 ### Tools without safe retry support
 
-Wrap the tool with an executor that maintains a request ledger and reconciliation, or prohibit automatic retry. For irreversible high-risk actions, require stronger confirmation and human handling when the outcome is unknown.
+A wrapper must genuinely reconcile downstream effects; otherwise prohibit automatic retry and use approved manual resolution.
 
 ### Exactly-once language
 
-Distributed execution can duplicate messages and workers. Promise one unambiguous logical outcome where contracts support it, not exactly-once physical execution.
-
-Tools with idempotency keys and status lookup can support one logical outcome across repeated network attempts. Tools without those contracts need a reconciliation wrapper or no automatic retry after an unknown result. The runtime should know the declared class before it proposes recovery.
+Deduplication/status contracts can support one logical outcome despite repeated attempts; do not promise exactly-once physical execution.
 
 ## Add human approval without creating theater
 
-Human review is useful when a person receives enough information, authority, and time to change the decision.
+Review requires a person with information, authority and time to change the decision.
 
-An approval request should contain:
-
-- requested action and target;
-- user or service principal;
-- agent and workflow version;
-- relevant evidence and uncertainty;
-- expected effect and reversibility;
-- policy reason;
-- expiration;
-- alternative safe action.
+```text
+Approval
+  approval_id, principal, reviewer_role, delegation_id
+  action, target, exact_arguments_or_bounds, arguments_hash
+  agent_version, workflow_version, policy_version
+  evidence_refs, uncertainty, expected_effect, reversibility
+  reason, expires_at, safe_alternative
+```
 
 ### Confirmation versus approval
 
-**Confirmation** asks the initiating user to verify intent. **Approval** asks an authorized reviewer to accept risk. They are different controls.
-
-Do not ask users to confirm routine low-risk actions repeatedly. Alert fatigue can turn confirmation into an automatic click.
+Confirmation verifies initiating intent; approval accepts risk under a reviewer's authority.
+Match frequency to consequence to avoid routine click-through.
 
 ### Approval binding
 
-Bind approval to exact arguments or a narrow range. If the agent changes the recipient, amount, repository, or scope, require a new decision.
+Changed recipient, amount, repository or scope needs a new decision outside the approved bounds.
 
 ### Delegated approval
 
-At scale, central reviewers cannot approve every action. Policy owners define which roles can approve which classes. Product and regional owners can add stricter rules.
-
-Record delegated authority and review it periodically. The platform team operates enforcement but does not own every domain decision.
+Delegate reviewer roles by action class, retain stricter regional rules and review authority periodically.
 
 ## Partition working state and durable memory
 
-“Agent memory” combines several stores with different semantics.
+<span id="execution-state"></span>
+<span id="conversation-context"></span>
+<span id="user-preferences"></span>
+<span id="domain-knowledge"></span>
+<span id="learned-workflow-knowledge"></span>
+<span id="audit-evidence"></span>
 
-### Execution state
-
-Current plan, completed steps, pending calls, budgets, and approvals belong to the durable workflow state. They expire with the execution unless policy requires longer retention.
-
-### Conversation context
-
-Recent user and agent messages support continuity. Keep an authoritative transcript separately from compacted context sent to the model.
-
-### User preferences
-
-Stable preferences require user visibility, correction, purpose, and retention controls. A model inference should not silently become a durable preference.
-
-### Domain knowledge
-
-Approved documents and structured records belong in governed retrieval systems. Memory should reference their identity and version rather than copy unrestricted content into a general vector store.
-
-### Learned workflow knowledge
-
-Teams may store successful plans, examples, or summaries. Validate provenance and prevent one tenant's material from entering another tenant's context.
-
-### Audit evidence
-
-Security and compliance traces have restricted access and independent retention. They should not become normal agent context.
+| Store | Contract |
+| --- | --- |
+| Execution | Structured plan/state, calls, budgets and approvals; explicit lifecycle |
+| Conversation | Authoritative transcript distinct from compacted model context |
+| Preferences | User-visible purpose, correction and retention; inferred text is not automatically durable fact |
+| Domain knowledge | Governed source identities/versions, not unrestricted vector-store copies |
+| Learned workflows | Reviewed provenance and tenant isolation for reusable examples/plans |
+| Audit | Restricted access/retention, excluded from ordinary agent context |
 
 ## Make memory writes explicit
 
-A memory write is a tool action with policy.
+Treat writes and deletions as separately authorized tools, with product-selected policy rather than model-chosen retention.
 
-The contract should include:
-
-- memory class;
-- subject and tenant;
-- source execution;
-- provenance;
-- confidence;
-- visibility;
-- retention;
-- correction path;
-- deletion behavior;
-- permitted readers.
-
-Do not let the model decide retention from prose alone. Product code selects a memory policy and the gateway enforces it.
+```text
+MemoryWrite
+  class, subject, tenant, source_execution, provenance
+  confidence, visibility, permitted_readers
+  retention, correction_path, deletion_policy
+MemoryDeletion
+  memory_id, authorized_requester, tombstone_version
+  required_stores, acknowledgements, deadline, status
+```
 
 ### Poisoning
 
-Untrusted content can poison memory and influence future sessions. Restrict which sources can create durable entries. Use review, confidence, provenance, and expiration for inferred knowledge.
-
-Evaluate delayed attacks where a malicious document creates memory used days later.
-
-For example, a document might create a false preference that suppresses future warnings. Inject the entry, start a later session, and verify that current delegation and required confirmation still win. A release fails if prior memory can weaken either control.
-
-Deletion authority is separate from write authority. A user may request removal of a preference while a data owner controls governed knowledge. Record that deletion occurred without retaining the prohibited payload, then remove or invalidate derived memory according to policy.
+Restrict durable sources, review inferred entries and test delayed-session poisoning.
+A stored preference must not suppress current delegation or required confirmation.
+Deletion records retain structure, not prohibited payloads.
 
 ### Deletion guarantees
 
-A deletion first creates a tombstone that blocks the authoritative read path. Derived indexes, summaries, caches, and regional replicas invalidate the memory identity within a declared service level. Each store reports completion independently. Until every required store confirms, retrieval treats the entry as unavailable and the deletion remains pending.
-
-A partial failure pages the memory owner and keeps the tombstone active. Verification queries test that the subject is no longer retrievable across tenants and regions. Removing memory and indexes does not remove influence from a trained model. Any model trained on the payload follows a separate lineage, retraining, approved unlearning, or retirement policy.
+Tombstone the authoritative read path first; invalidate indexes, summaries, caches and replicas by identity.
+Keep retrieval blocked and deletion pending until all required stores acknowledge; failures page the owner.
+Verify across tenants/regions.
+Trained-model influence needs separate lineage, retraining, approved unlearning or retirement, not a vector-store deletion claim.
 
 ### Context compaction
 
-Summaries reduce cost but can omit constraints or convert uncertainty into fact. Keep source links and important structured state outside the summary.
-
-Test compaction across long tasks. Compare decisions before and after compaction, especially permissions, user intent, unresolved tool outcomes, and negative constraints.
+Keep permissions, intent, unresolved calls, negative constraints and source references outside lossy summaries; compare decisions across compaction.
 
 ## Route model calls through a gateway
 
-A model gateway gives one place for provider policy, routing, budgets, telemetry, and revocation.
-
-Record:
-
-- provider and model version;
-- request policy and region;
-- context classes and token counts;
-- tool schema version;
-- latency, errors, and retries;
-- usage and cost;
-- safety settings;
-- output identity;
-- cache behavior.
+Record provider, model, policy, region, context classification, tokens, schemas and safety settings.
+Also record output identity, cache behavior, latency, errors, retries, usage and cost.
 
 ### Routing
 
-Choose models by task, risk, latency, cost, and data policy. A small model may route requests or extract structured fields. A stronger model may plan ambiguous work. Some high-risk decisions should use deterministic policy or human review rather than a larger model.
+Route by task, risk, latency, cost and data policy; larger models do not replace deterministic authorization or qualified review.
 
 ### Provider failure
 
-Fallback to another model only when policy, tool-calling behavior, context size, and evaluation support it. A provider swap can change action distribution even when final text quality looks similar.
-
-Evaluate each fallback pair. Reasoning-focused and instruction-focused models may propose different tool sequences, timing, and costs under the same workflow.
+Evaluate each fallback pair for policy, context, action sequence, timing and cost, not final-text similarity alone.
 
 ### Caching
 
-Cache only when identity, context, tool state, and freshness make reuse valid. Never reuse a prior authorization decision after delegation, policy, or resource state changes.
+Cache against actual identity/context/tool/freshness dependencies; reauthorize when delegation, policy or resources change.
 
 ### Model retries
 
-A repeated model call can propose a different action. Treat it as a new attempt with its own output identity. Do not confuse model-call retry with safe tool-call retry.
+Repeated model calls get new output identities and can propose different actions; model retry is not tool-retry safety.
 
 ## Isolate tool execution
 
-The tool gateway should separate authorization from execution credentials.
+<span id="credential-broker"></span>
+<span id="network-and-data-boundaries"></span>
+<span id="code-execution"></span>
+<span id="browser-and-user-interface-tools"></span>
+<span id="tool-composition"></span>
 
-### Credential broker
-
-Issue narrow short-lived credentials to executors. Avoid placing reusable secrets in prompts, model context, traces, or general runtime environment variables.
-
-### Network and data boundaries
-
-Restrict egress and destinations by tool action. A database-read tool should not also reach arbitrary internet hosts.
-
-### Code execution
-
-Use ephemeral sandboxes with resource limits, clean base images, restricted mounts, controlled package sources, and captured artifacts. Separate build, test, and production deployment authority.
-
-### Browser and user-interface tools
-
-Bind browser sessions to the initiating user and origin. Protect against cross-site actions, hidden instructions, file uploads, and stale authentication.
-
-### Tool composition
-
-Two individually allowed tools can create an unsafe chain. Reading private data and sending a message may produce exfiltration.
-
-Evaluate information flow across the trajectory. Policy can restrict destinations based on data classes observed earlier in the execution.
+| Boundary | Enforcement |
+| --- | --- |
+| Credentials | Narrow, short-lived executor grants; no reusable secrets in prompts, traces or general runtime environments |
+| Network | Action-specific destinations/egress; private reads do not imply arbitrary internet access |
+| Code | Ephemeral bounded sandboxes, clean images, controlled packages/mounts, captured artifacts; separate build/test/deploy authority |
+| Browser | User/origin-bound sessions; protect uploads, cross-site actions and stale authentication |
+| Composition | Enforce source-to-destination information flow across the whole trajectory |
 
 ## Bound loops, concurrency, and budgets
 
-Each execution needs limits on:
-
-- wall-clock time;
-- model calls;
-- tool calls;
-- tokens;
-- monetary cost;
-- concurrent branches;
-- retries;
-- data read or written;
-- approval wait time.
-
-A limit can stop a loop without declaring success. Use terminal reasons such as completed, user-cancelled, policy-denied, budget-exhausted, deadline-exceeded, or unresolved-side-effect.
+Enforce time, calls, tokens, money, branches, retries, data volume and approval-wait limits.
+Distinguish completed, cancelled, denied, exhausted, expired and unresolved-side-effect outcomes.
 
 ### Loop progress
 
-Detect repeated plans, identical failing calls, no state change, and oscillation between actions. A learned judge can help, but deterministic counters and state comparisons should enforce hard limits.
+Detect repeated plans, identical failures, unchanged state and oscillation; deterministic limits remain authoritative over model judgment.
 
 ### Concurrency
 
-Parallel reads can reduce latency. Parallel writes can violate order or invariants.
-
-Declare dependencies and conflict keys. Serialize actions that modify the same account, document, repository, or resource unless the downstream contract supports safe concurrency.
+Declare dependencies/conflict keys; serialize same-resource writes unless downstream concurrency is safe.
 
 ### Tenant fairness
 
-Use tenant quotas, weighted queues, burst limits, and priority classes. One team running long research agents should not starve customer support.
-
-Reserve emergency capacity for incident and safety workflows. Review whether priority labels reflect real business needs instead of permanent privilege.
+Use tenant quotas, weighted queues, bursts and reviewed priorities; reserve incident capacity without creating permanent privilege.
 
 ## Make multi-agent coordination explicit
 
-Use multiple agents only when decomposition, specialization, or independent checking provides measured value.
-
-Each agent needs:
-
-- workload identity;
-- role and allowed actions;
-- input and output contract;
-- budget;
-- shared-state access;
-- termination rule;
-- parent execution;
-- evidence requirements.
+Use multiple agents only for measured value.
+Each needs identity, role, input/output, authority, budget, state access, parent, termination rules and evidence requirements.
 
 ### Shared state
 
-Use a structured task graph or event store. Do not rely on agents reading a shared chat transcript and inferring ownership.
+Use structured task ownership and events, not inferred ownership from shared chat.
 
 ### Delegation
 
-A parent cannot grant authority it does not possess. Child agents receive a subset of the parent's capability and budget.
+Child capabilities and budgets are subsets of the parent's; recursion cannot manufacture authority.
 
 ### Independent checking
 
-A reviewer agent should use different evidence or constraints when possible. Two agents using the same prompt, model, and data can reproduce the same error.
+Shared model/prompt/data can reproduce errors; checking needs genuinely distinct evidence or constraints.
 
 ### Deadlock and duplication
 
-Tasks need explicit ownership, lease, and completion state. Detect two agents attempting the same side effect. Bound recursive delegation depth.
-
-For example, an agent claims a “create ticket” task in the shared task graph with a lease and logical action ID. Another agent sees the claim and waits. After lease expiry, a replacement reconciles the tool-call state before reclaiming, so worker loss cannot create a second ticket.
-
-Use the term **runtime delegation** for user, service, parent-agent, and child-agent capability transfer. Use **delegated technical authority** for decision rights held by principal engineers and domain owners. The two mechanisms solve different problems.
+Lease task claims with logical action IDs, detect duplicate claims and reconcile before replacement side effects.
+Bound delegation depth and deadlocks.
+Runtime delegation transfers capabilities; delegated technical authority assigns engineering decision rights.
 
 ## Build observability for decisions and effects
 
-Separate several views.
+<span id="execution-health"></span>
+<span id="model-behavior"></span>
+<span id="tool-health"></span>
+<span id="policy-health"></span>
+<span id="product-outcomes-1"></span>
+<span id="cost"></span>
 
-### Execution health
-
-Track queue delay, workflow duration, step count, retries, lease loss, terminal reason, and unresolved state.
-
-### Model behavior
-
-Track model routing, token use, tool proposal rates, denied actions, repeated plans, and confidence or uncertainty signals where meaningful.
-
-### Tool health
-
-Track dispatch latency, outcome class, unknown results, reconciliation time, error codes, rate limits, and downstream saturation.
-
-### Policy health
-
-Track allow, deny, confirmation, approval, and exception rates by action and tenant. Sudden changes can indicate a model update, attack, or policy error.
-
-### Product outcomes
-
-Track task success, user corrections, escalations, downstream incidents, and delayed results.
-
-### Cost
-
-Track cost by execution, task class, tenant, model, tool, and outcome. Average cost hides runaway tails.
+| View | Signals |
+| --- | --- |
+| Execution | Queues, duration, steps, retries, leases, terminal/unknown state |
+| Model | Routing, tokens, proposals, denials, repetition and meaningful uncertainty |
+| Tool | Dispatch, outcome, reconciliation, errors, limits and saturation |
+| Policy | Allow/deny/confirmation/approval/exception by tenant and action |
+| Product | Completion, corrections, escalation, incidents and delayed results |
+| Cost | Execution/task/tenant/model/tool/outcome breakdown and tails |
 
 ## Preserve useful traces without over-collecting
 
-A trace may contain private prompts, credentials, tool output, customer records, source code, and model reasoning. More logging can increase risk.
-
-Use tiers:
-
-- event metadata for every execution;
-- redacted structured arguments for governed calls;
-- sampled payloads for approved debugging;
-- restricted full evidence for incidents and high-risk audit;
-- no storage for prohibited data classes.
-
-Encrypt stores, separate access, and record trace reads. Use field-level redaction before general analytics.
+Use event metadata, redacted arguments, approved samples, restricted incident evidence and prohibited-storage classes as separate tiers.
+Encrypt, restrict access, audit trace reads and redact before analytics.
 
 ### Reasoning traces
 
-Do not require private model reasoning as the security record. Record proposed actions, observable outputs, policy decisions, tool effects, and user-visible rationale.
+Record observable proposals, decisions, effects and user-facing rationale, not private model reasoning as a required security record.
 
 ### Deletion
 
-Deletion should remove or redact governed payloads while preserving enough structural evidence to explain that an event occurred. Record the deletion action without retaining prohibited content.
+Remove governed payloads while retaining permitted structural evidence of the event and deletion.
 
 ## Evaluate agents at several layers
 
-A release gate should combine deterministic invariants, task outcomes, trajectory diagnostics, and adversarial tests.
+<span id="final-state"></span>
+<span id="permission-and-side-effects"></span>
+<span id="trajectory"></span>
+<span id="product-outcome"></span>
+<span id="cost-and-latency"></span>
 
-### Final state
-
-Did the workflow produce the correct external state? For support, inspect account status. For coding, inspect repository state and tests. For research, inspect artifacts and claims.
-
-### Permission and side effects
-
-Did every action stay within delegated authority? Were required confirmation and approval present? Did the agent create forbidden or unnecessary effects?
-
-### Trajectory
-
-Measure tool selection, argument correctness, recovery, repeated calls, step efficiency, and termination.
-
-Do not enforce one ideal trajectory when several valid approaches exist. Use hard checks for invariants and softer analysis for efficiency or style.
-
-### Product outcome
-
-Measure whether users achieved the intended result, including delayed failures and corrections.
-
-### Cost and latency
-
-Report success at fixed cost, cost per success, and tail behavior. A higher success rate can be unacceptable if rare loops consume unbounded resources.
+| Layer | Required evidence |
+| --- | --- |
+| Final state | Authoritative accounts, repository/tests or research artifacts/claims |
+| Authority | Delegation, confirmation/approval, prohibited and unnecessary effects |
+| Trajectory | Tool/argument correctness, recovery, repetitions, efficiency and termination; allow multiple valid paths |
+| Product | Real completion, corrections and delayed failures |
+| Economics | Fixed-cost success, cost/success and latency/resource tails |
 
 ## Construct representative evaluation suites
 
-Build scenario families across:
-
-- task type and difficulty;
-- tool availability and failure;
-- user ambiguity;
-- permission boundaries;
-- data sensitivity;
-- prompt injection channels;
-- long context and memory;
-- multi-turn correction;
-- model and provider variation;
-- tenant and region;
-- consequential actions;
-- unknown side effects.
-
-Keep held-out families, not only held-out strings. A model can memorize one attack template or tool sequence.
+Cover tasks/difficulty, outages, ambiguity, permissions, sensitive data, injection channels, memory, corrections, providers, regions and unknown effects.
+Hold out scenario families, not just strings.
 
 ### Deterministic checks
 
-Use deterministic graders for:
-
-- final database or repository state;
-- authorization;
-- schema and argument bounds;
-- required approvals;
-- forbidden data flow;
-- duplicate effects;
-- budget and termination;
-- artifact integrity.
+Check final state, authority, schemas, approvals, data flow, duplicates, budgets, termination and artifact integrity directly.
 
 ### Semantic graders
 
-Use human or calibrated model judgment for usefulness, explanation quality, and ambiguous completion. Blind comparisons where possible. Measure agreement and inspect disagreements.
+Use qualified humans or calibrated judges for ambiguous usefulness; blind comparisons and inspect disagreements.
 
 ### Safety-utility frontier
 
-Measure false allows and false blocks by action consequence. High-risk irreversible actions favor missed-harm reduction, while low-risk assistance may tolerate more permissive thresholds. Report blocked valid work separately so a safer policy does not hide unusable products.
+Report false allows and false blocks by consequence; severe-harm protection must not hide blocked valid work.
 
 ### Stochasticity
 
-Run repeated samples on a representative subset. Report uncertainty and failure probability, especially for rare severe outcomes.
-
-A model that succeeds nine times and causes one severe unauthorized action is not summarized adequately by 90% success.
+Repeat representative cases with justified uncertainty; nine successes do not compensate for one prohibited severe action.
 
 ## Test the whole system adversarially
 
-Threats can enter through users, retrieved content, tools, memory, another agent, generated code, or compromised infrastructure.
+Test controlled adversarial scenarios across every input and infrastructure boundary, without exposing real assets.
 
-Test:
+| Family | Boundary to verify |
+| --- | --- |
+| Injection/forgery | User, retrieval, arguments, tool results, code and agent messages cannot grant authority |
+| Isolation/exfiltration | Confused deputy, escalation, cross-tenant retrieval and composed-tool data flow |
+| Durability | Duplicate effects, delayed results, unknown outcomes and stale grants |
+| Persistence | Memory poisoning, delayed triggers and compaction |
+| Operations | Approval fatigue, sandbox boundaries, resource exhaustion and fallback downgrade |
 
-- direct and indirect prompt injection;
-- tool argument injection;
-- confused-deputy behavior;
-- permission escalation;
-- cross-tenant retrieval;
-- data exfiltration through allowed tools;
-- unsafe retry and duplicate effects;
-- forged tool output;
-- memory poisoning;
-- delayed triggers;
-- approval fatigue;
-- sandbox escape;
-- cost and denial-of-service attacks;
-- policy downgrade during fallback.
-
-Adaptive red teams should know the architecture and pursue actual assets. A static jailbreak list measures only one input channel.
-
-Turn confirmed failures into regression tests without publishing sensitive exploit details. Track owner, severity, fix, retest, and residual risk.
+Adaptive testing supplements static lists; record owner, severity, fix, retest and residual risk without publishing sensitive exploit details.
 
 ## Use production evidence carefully
 
-Production traces reveal real tasks and failures, but the deployed policy selected what occurred.
-
-Sample:
-
-- successes and failures;
-- escalations;
-- long and expensive tails;
-- denied actions;
-- unknown outcomes;
-- low-volume high-risk tools;
-- new tenants and regions;
-- sessions with user correction.
-
-Protect privacy and avoid training directly on sensitive traces without a valid purpose and review.
-
-Offline replay cannot estimate every new policy. It can test deterministic policy, parser, and tool compatibility. It cannot reveal user reactions to actions never taken.
+Sample success/failure, corrections, escalation, costly tails, denials, unknowns, rare high-risk tools and new tenants/regions.
+Respect purpose and privacy before training on traces.
+Replay checks compatibility, not reactions to unobserved policies; deployed-policy selection remains a bias.
 
 ## Stage releases by risk and authority
 
-A release sequence can be:
-
-1. offline scenario and adversarial tests;
-2. replay against recorded events with simulated side effects;
-3. shadow planning without tool dispatch;
-4. read-only tools on internal users;
-5. reversible writes with confirmation;
-6. narrow canary for consequential actions;
-7. controlled product experiment where suitable;
-8. progressive tenant and region rollout;
-9. long-term monitoring and retained holdouts.
-
-Do not jump from benchmark success to broad write authority.
+Progress through offline tests, simulated replay, shadow planning, internal reads, confirmed reversible writes and narrow consequential canaries.
+Then use suitable controlled experiments, regional/tenant rollout, retained holdouts and monitoring; benchmark success does not grant write authority.
 
 ### Release unit
 
-Version model, workflow, tools, policy, memory behavior, and runtime together through a deployment manifest. Individual components can roll independently only within declared compatibility ranges.
+```text
+DeploymentManifest
+  workflow, model, provider, runtime, tool_contract_versions
+  policy_version, memory_policy, region, owner
+  compatibility_ranges, evaluation_receipts, rollback_units
+ExecutionEvent
+  execution_id, event_id, expected_state_version, timestamp
+  logical_call_id, attempt_id, actor, decision, policy_version
+  evidence_refs, result_identity, outcome, budget_delta
+```
+
+Roll components independently only within declared compatibility ranges.
 
 ### Stop conditions
 
-Stop or reduce authority on:
-
-- unauthorized effect;
-- unexplained duplicate action;
-- cross-tenant exposure;
-- severe policy regression;
-- unresolved high-risk outcome beyond its service level;
-- cost or latency breach that removes safe review;
-- critical evaluation evidence becoming invalid.
+Stop or narrow authority for unauthorized/duplicate effects, cross-tenant exposure, severe policy changes, overdue unknowns, unsafe budgets or invalid evidence.
 
 ### Rollback
 
-Rollback may restore a prior workflow or model, revoke one tool, tighten a policy, disable memory writes, or switch to advice-only mode. The safest response is often narrower than a full service rollback.
+Rollback units include workflow/model versions, individual tools, policy, memory writes and advice-only mode; narrow containment can beat global shutdown.
 
 ## Design for degraded operation
 
-### Model provider outage
+<span id="model-provider-outage"></span>
+<span id="policy-service-outage"></span>
+<span id="tool-outage"></span>
+<span id="event-store-delay"></span>
+<span id="memory-unavailable"></span>
+<span id="budget-service-unavailable"></span>
 
-Queue durable asynchronous work, route only evaluated compatible tasks, or switch to a lower-capability advice mode. Do not expose a new provider to restricted data without policy.
-
-### Policy service outage
-
-Block high-risk tools. Use narrow cached grants only for approved low-risk actions. Continue text or read-only assistance if safe.
-
-### Tool outage
-
-Explain the unavailable action, preserve workflow state, and offer retry later or a manual path. Do not loop on the failing tool.
-
-### Event store delay
-
-Do not dispatch consequential calls when durable pre-dispatch evidence cannot be written. Low-risk stateless responses may continue if policy allows.
-
-### Memory unavailable
-
-Continue with explicit session context or ask the user to restate required information. Do not invent prior preferences.
-
-### Budget service unavailable
-
-Use conservative local limits. High-cost asynchronous work may queue until budget state is reliable.
+| Failure | Degraded behavior |
+| --- | --- |
+| Provider | Queue durable work or use evaluated policy-compatible fallback/advice; no unauthorized new destination |
+| Policy | Block high risk; only approved narrow low-risk grants or advice |
+| Tool | Preserve state, explain unavailable action, offer manual/later path; no retry loop |
+| Event store | No consequential dispatch without durable pre-write |
+| Memory | Use explicit context or ask again; invent no preferences |
+| Budget | Conservative local limits; queue expensive work until reliable accounting |
 
 ## Isolate tenants, regions, and environments
 
-### Tenant isolation
+<span id="tenant-isolation"></span>
+<span id="regional-processing"></span>
+<span id="environment-isolation"></span>
 
-Partition execution state, memory, credentials, retrieval, traces, and quotas by tenant. Include tenant identity in every key and authorization decision.
-
-Test missing-tenant and confused-tenant failures. A global cache must include every security-relevant dimension in its key.
-
-### Regional processing
-
-Route model, memory, tools, and traces according to data residency and product policy. A global control plane can distribute policy metadata while regional data planes retain payloads.
-
-Avoid sending raw payloads through the global plane. Replicate only approved identities, versions, and aggregate health.
-
-### Environment isolation
-
-Separate development, evaluation, staging, and production credentials. Replays and tests cannot call production side effects.
-
-A production tool contract may have a simulated evaluator implementation with the same schema but different authority.
+| Partition | Required separation |
+| --- | --- |
+| Tenant | State, memory, credentials, retrieval, traces, quotas and security-relevant cache keys; test missing/confused identity |
+| Region | Model/memory/tool/trace payloads local where required; share only approved control metadata |
+| Environment | Distinct dev/eval/staging/production credentials; simulated tools share schema, never production authority |
 
 ## Attribute and control cost
 
-Agent cost includes:
-
-- repeated model context;
-- planning and reflection calls;
-- tool latency and usage charges;
-- retrieval and memory;
-- sandbox compute;
-- approvals and support;
-- trace storage;
-- failed and abandoned work.
-
-Track cost per successful task and tail percentiles. Set budgets by task class, tenant, and risk.
+Include context, planning, tools, retrieval/memory, sandboxes, approvals/support, traces and abandoned work in cost/success and tail accounting.
 
 ### Cost controls
 
-- route simple steps to smaller evaluated models;
-- compact context with provenance;
-- cache stable read results within policy;
-- stop repeated plans;
-- cap branches and retries;
-- batch compatible background work;
-- reserve expensive review for uncertain or high-impact cases;
-- require estimates for long asynchronous workflows.
-
-A cheaper model can increase total cost if it needs more steps or causes more corrections. Compare complete workflow economics.
+Evaluate smaller-model routing, provenance-preserving compaction, valid read caches, progress stops, branch/retry caps, background batching and risk-targeted review.
+Estimate long jobs; cheap calls can produce expensive workflows through extra steps and corrections.
 
 ### Budget response
 
-At a soft limit, ask the runtime to summarize progress and choose a bounded next step. At a hard limit, stop new calls and return a partial result or escalation.
-
-Do not let the model raise its own hard budget.
+Soft limits request bounded replanning; hard limits stop calls with a partial/escalated outcome.
+The model cannot increase its own hard budget.
 
 ## Decide what to build, buy, and standardize
 
-Evaluate components separately.
+<span id="common-candidates-to-buy-or-adopt"></span>
+<span id="common-candidates-for-company-specific-integration"></span>
 
-### Common candidates to buy or adopt
-
-- base model APIs and gateways;
-- generic workflow execution;
-- queueing and durable scheduling;
-- secrets management;
-- telemetry storage;
-- policy language or engine;
-- sandbox infrastructure.
-
-### Common candidates for company-specific integration
-
-- enterprise identity and delegation;
-- tool contracts and ownership;
-- data-flow policy;
-- approval semantics;
-- evaluation scenarios;
-- release evidence;
-- incident and revocation workflows;
-- cost attribution.
-
-The differentiating work is often the connection between enterprise authority and product outcomes. Building a new orchestration framework may provide little value if reliable open systems already exist.
+| Adopt where suitable | Integrate with company semantics |
+| --- | --- |
+| Models, generic workflows, queues, secrets, telemetry, policy engines and sandboxes | Identity/delegation, tools, data flow, approvals, evaluation, releases, incidents/revocation and cost attribution |
 
 ### Portability
 
-Keep tool contracts, execution events, evaluation cases, policy inputs, and deployment manifests independent from one runtime when practical.
-
-Do not flatten every vendor capability into a weak common denominator. Use adapters at clear boundaries and allow a product to depend on a provider-specific feature explicitly.
+Keep tools, events, cases, policy inputs and manifests portable; declare provider-specific dependencies instead of flattening every capability.
 
 ### Exit test
 
-Ask what must move if the model provider, orchestration runtime, policy engine, or memory store changes. Price the migration before adoption.
+Price provider/runtime/policy/memory replacement before adoption.
 
 ## Migrate existing agents incrementally
 
-### Phase 0: inventory and baseline
+<span id="phase-0-inventory-and-baseline"></span>
+<span id="phase-1-observe-only-evidence"></span>
+<span id="phase-2-enforced-low-risk-gateway"></span>
+<span id="phase-3-consequential-actions"></span>
+<span id="phase-4-shared-evaluation-and-release"></span>
+<span id="phase-5-retire-bypass-paths"></span>
 
-Inventory agents, tools, direct credentials, risk classes, incidents, cost, and owners. Identify unsupported side effects and unknown retry semantics.
+| Phase | Acceptance evidence |
+| --- | --- |
+| 0: Inventory | Owners, tools, credentials, risk, incidents/cost and unknown retry semantics; choose read-heavy and reversible-write pilots |
+| 1: Observe | Adapter events match current behavior; identify bypass and missing identity/schema/outcome |
+| 2: Low risk | Enforce schemas, delegation, budgets and traces; tested bounded incident exception |
+| 3: Consequential | Deduplication/status, approval and reconciliation pass simulation/canary |
+| 4: Shared release | Manifest, comparable evaluation, model/policy revocation |
+| 5: Retire bypass | Gateway reliability and product degradation proven before removing direct credentials |
 
-Select two pilots:
-
-- one internal read-heavy assistant;
-- one customer workflow with reversible actions and clear outcomes.
-
-### Phase 1: observe-only evidence
-
-Wrap tool calls or add adapters that emit common events. Do not enforce new policy yet. Compare the platform trace against current behavior.
-
-Find direct calls that bypass the gateway. Measure missing identities, schemas, and outcome states.
-
-### Phase 2: enforced low-risk gateway
-
-Move read-only and reversible pilot tools behind schema validation, delegation, budget, and trace contracts.
-
-Keep a tested escape path for incidents, with explicit owner and expiration.
-
-### Phase 3: consequential actions
-
-Add idempotency, status lookup, confirmation, approval, and reconciliation. Run simulated and canary traffic before broad authority.
-
-### Phase 4: shared evaluation and release
-
-Require deployment manifests and comparable evidence for migrated workflows. Introduce model and policy revocation.
-
-### Phase 5: retire bypass paths
-
-Remove direct production credentials only after the gateway meets reliability targets and each product has a degradation path.
-
-One authority should control each action at a time. Dual enforcement can produce contradictory decisions and ambiguous incidents.
+One authority controls each action during migration; dual enforcement creates conflicting decisions.
 
 ## Define ownership around semantics
 
-### Central platform owns
+<span id="central-platform-owns"></span>
+<span id="product-teams-own"></span>
+<span id="tool-owners-own"></span>
+<span id="security-and-policy-owners-own"></span>
 
-- identity integration and enforcement mechanics;
-- tool registry and gateway reliability;
-- execution event contract;
-- policy evaluation infrastructure;
-- common budgets and telemetry;
-- release and revocation mechanics;
-- migration tooling;
-- platform incident response.
-
-### Product teams own
-
-- task definition and user experience;
-- agent workflow and prompts;
-- domain outcome metrics;
-- tool selection;
-- product fallback;
-- user confirmation design;
-- product incidents and residual risk.
-
-### Tool owners own
-
-- action semantics;
-- schema and compatibility;
-- side-effect and retry contract;
-- service level;
-- downstream data policy;
-- status lookup and compensation;
-- tool incidents.
-
-### Security and policy owners own
-
-- risk classification;
-- authorization requirements;
-- approval rules;
-- exception decisions;
-- threat models;
-- audit interpretation.
-
-The platform team should not become the owner of every agent decision. It provides enforceable contracts and evidence.
+| Owner | Decision/operating responsibility |
+| --- | --- |
+| Platform | Identity/enforcement, registry/gateway, events, policy infrastructure, budgets/telemetry, release/revocation, migration and platform incidents |
+| Product | Task/UX, workflow/prompts, outcomes, tools, fallback, confirmation, incidents/residual risk |
+| Tool | Action semantics, schema/compatibility, side effects/retries, service levels, data policy, status/compensation and incidents |
+| Security/policy | Classification, authorization, approvals, bounded exceptions, threats and audit interpretation |
 
 ## Make adoption reveal product quality
 
-Offer a paved path:
-
-- register a workflow and owner;
-- select model and data policy;
-- discover approved tools;
-- generate typed clients;
-- run local simulated tools;
-- execute standard evaluation suites;
-- deploy to shadow and canary;
-- inspect cost and traces;
-- request a bounded exception.
-
-Measure time to first safe workflow, ticket-free releases, debugging time, and repeated bypass attempts.
-
-Mandatory gateway use may be justified for consequential production actions. Do not mandate one planning framework when shared risk does not require it.
-
-Exceptions are data. Repeated exceptions can reveal a missing capability, an overly broad policy, or a boundary that should remain product-owned.
+Provide registration, approved tools, typed clients, local simulation, standard evaluations, shadow/canary, traces/cost and bounded exceptions.
+Measure safe onboarding, ticket-free releases, diagnosis and bypass attempts; repeated exceptions reveal missing capabilities or misplaced ownership.
 
 ## Walk through the duplicate-credit incident
 
-A support agent proposes a $50 account credit.
-
-1. The user and workload identities establish a valid delegation.
-2. The tool gateway validates account, amount, reason, tenant, and region.
-3. Policy requires user confirmation because the action moves value.
-4. The confirmed request receives logical call ID `credit-123` and idempotency key `k-456`.
-5. The platform writes authorized state before dispatch.
-6. The executor sends the request with `k-456`.
-7. The account system commits the credit and stores the result under `k-456`.
-8. The network drops the response.
-9. The executor marks outcome unknown instead of failed.
-10. Reconciliation queries the account system by `k-456`.
-11. The system returns the committed credit identifier.
-12. The platform marks the original call succeeded and does not issue another credit.
-13. The final response cites the completed action and audit identifier.
-
-If the downstream system cannot query status or honor idempotency, automatic credits should remain disabled until a safe wrapper or manual process exists.
+The [core ledger](#picture-one-logical-action-several-observations) retains `credit-123` through the lost response and authoritative lookup.
+Before dispatch, validate account, amount, reason, tenant, region and required confirmation.
+After reconciliation, cite the commit/audit IDs; unsupported downstream semantics require manual handling, not another key.
 
 ## Walk through the malicious-document incident
 
-A research agent reads an uploaded report containing instructions to export internal data.
-
-1. The ingestion service labels the report as user-provided untrusted content.
-2. Retrieval preserves source and trust metadata.
-3. The runtime places the passage in the evidence section, not the platform-policy section.
-4. The model proposes an export call.
-5. The gateway sees restricted source data in execution context and an external destination.
-6. Data-flow policy denies the call before issuing credentials.
-7. The denial event records policy version and reason class.
-8. The runtime can explain that the requested export is not permitted and offer an approved internal summary.
-9. The event enters injection and data-flow evaluation sampling.
-
-The model may still follow the malicious instruction in its reasoning. The security outcome depends on enforced authority and data flow, not obedience to a prompt.
+Preserve the report's trust label through retrieval/context, deny prohibited export before credentials issue, and log policy version/reason class.
+Offer an approved internal summary and retain a controlled regression case; model obedience is not the security boundary.
 
 ## Staff-level decisions
 
-A staff answer should make the execution and migration contracts precise.
-
-1. Put identity, delegation, tools, state, and evidence behind stable interfaces.
-2. Treat unknown tool outcomes separately from failure.
-3. Preserve trust and provenance through context and memory.
-4. Add bounded budgets and tested degraded modes.
-5. Pilot across two different workflows.
-6. Align platform, product, tool, and security ownership.
-7. Measure adoption through safe delivery and incident outcomes.
-
-The candidate should descend into one mechanism such as policy evaluation, idempotency, state transitions, memory isolation, or evaluation.
+Reusable cross-team contracts need migration, tested degradation and aligned owners; defend one mechanism rather than listing interfaces.
 
 ## Principal-level decisions
 
-A principal answer chooses the shared boundary across organizations.
-
-1. Centralize delegated authority and consequential tool access.
-2. Standardize execution evidence and release policy before planning runtimes.
-3. Keep domain tools and product outcomes with their owners.
-4. Define which low-risk capabilities can remain local.
-5. Balance platform reliability, migration, product delivery, and retirement.
-6. Preserve runtime and provider exit paths.
-7. Establish evidence that expands, narrows, or stops each shared capability.
-8. Develop technical owners who can carry policy, tool, runtime, and evaluation domains.
-
-Principal scope appears in portfolio and authority choices, not the number of boxes in the diagram.
+Choose shared versus local boundaries, portfolio, migration/retirement and exit evidence while developing independent technical owners.
 
 ## Senior-principal decisions
 
-“Senior principal,” “distinguished,” and equivalent titles vary sharply across employers. Treat this section as a scope archetype, not a universal level mapping.
-
-A senior-principal answer shapes several durable technical directions and the system that lets principal engineers own them.
+Titles below describe scope archetypes, not employer grading rules or hiring guarantees.
 
 ### Define a doctrine, not one implementation
 
-The doctrine could be:
-
-- authority is explicit and time-bounded;
-- side effects are typed and reconcilable;
-- untrusted content never grants authority;
-- every governed action produces portable evidence;
-- products retain outcome ownership;
-- regional policy can become stricter without forking identity.
-
-Specific runtimes, models, and stores can change under those constraints.
+Keep authority, typed effects, trust, portable evidence, product ownership and stricter regional policy stable across implementation changes.
 
 ### Federate technical authority
 
-Central architecture should not make one senior person the approval bottleneck. Delegate ownership to principal-level leaders for tool contracts, evaluation, runtime, policy, and regional implementation.
-
-Define decision rights, interface review, incident authority, and escalation. The senior-principal contribution is the technical system that keeps those decisions coherent.
+Delegate domain decision rights, interface review, incident authority and escalation instead of creating a single-person approval bottleneck.
 
 ### Balance several portfolios
 
-The company must invest in platform control, model capability, product workflows, security, migration, and retirement. Funding every central capability can starve product evidence. Funding only products preserves duplicated risk.
-
-Set review points around measurable constraints. Reallocate when incident, adoption, cost, or model change invalidates the current balance.
+Balance control, models, products, security, migration and retirement; revisit funding using incidents, adoption, costs and changed capabilities.
 
 ### Coordinate external constraints
 
-Model providers, regulators, enterprise customers, open standards, and tool vendors can change the design. Preserve regional and provider variation behind stable identities and evidence.
-
-Decide when a company-specific contract should become an open interface and when external standardization would freeze an immature design.
+Preserve provider/regional variation and decide when external standards improve portability versus freezing an immature boundary.
 
 ### Design succession and reversal
 
-The direction should survive executive or architecture leadership changes. Decision records, owners, compatibility policy, incident practice, and portable evidence reduce dependence on oral history.
-
-State which assumptions would reverse centralization. For example, a regulated product may need a separate execution plane while retaining common tool and audit contracts.
+Retain decision records, owners, compatibility, incident practice and portable evidence through leadership changes.
+A regulated product may separate execution while retaining tool/audit contracts; state evidence that would reverse centralization.
 
 ### Retain technical depth
 
-The senior-principal candidate should still defend one hard boundary. Examples include unknown side effects, capability-token scope, event consistency, cross-tool data flow, evaluator support, or regional failover.
-
-Broad scope without a defensible mechanism sounds ceremonial.
+Defend unknown effects, capabilities, event consistency, data flow, evaluator support or regional failover under a concrete changed condition.
 
 ## Compare rejected architectures
 
 ### One universal agent runtime
 
-It simplifies onboarding but couples every product to one planning model and release cadence. Start with contracts around authority and evidence. Consolidate runtime only when operating evidence supports it.
+Standardize authority/evidence first; consolidate planning only when operating evidence supports the coupling.
 
 ### Permissions in prompts
 
-This is easy to implement and impossible to enforce. Prompts guide model behavior. Identity and policy enforce authority.
+Prompt instructions do not enforce authorization.
 
 ### Direct tool credentials in each agent
 
-This preserves team speed but prevents central revocation, consistent audit, and safe cross-tool data flow. Move consequential calls through the gateway.
+Broad direct credentials defeat governed revocation, audit and data flow.
 
 ### Retry every timeout
 
-This improves apparent completion while creating duplicate side effects. Unknown outcomes need status lookup or reconciliation.
+Unknown effects need reconciliation, not automatic new dispatch.
 
 ### Store every trace forever
 
-This helps debugging while increasing privacy, security, and cost risk. Use classified retention and restricted evidence tiers.
+Classify retention instead of accumulating privacy and cost risk.
 
 ### Human approval for every write
 
-This appears safe but produces delay and approval fatigue. Match confirmation and approval to consequence, reversibility, and uncertainty.
+Match review to consequence, reversibility and uncertainty; universal review creates fatigue.
 
 ### Central team owns all tools
 
-This creates a queue and disconnects contracts from domain semantics. Tool owners retain semantics and operation under shared requirements.
+Tool owners retain semantics and operation under shared contracts.
 
 ## Structure a 60-minute interview
 
 ### Minutes 0 to 7: scope authority and incidents
 
-Clarify users, action classes, identity, regions, scale, and current failures. State the control-plane and gateway thesis.
+Scope users, consequences, identity, regions, scale and incidents.
 
 ### Minutes 7 to 15: invariants and architecture
 
-Define delegated authority, versioned tools, durable state, evidence, budgets, and tenant isolation. Draw control, execution, and evidence planes.
+Draw authority, tools, state, evidence, budgets and isolation.
 
 ### Minutes 15 to 27: deep technical boundary
 
-Choose one:
-
-- policy and capability scope;
-- tool-call idempotency and reconciliation;
-- event-sourced workflow state;
-- memory provenance and data flow;
-- multi-agent coordination;
-- regional and tenant isolation.
+Defend one boundary: capability, retries, state, memory/data flow, coordination or isolation.
 
 ### Minutes 27 to 38: evaluation and rollout
 
-Cover final-state checks, permissions, trajectories, adversarial suites, stochasticity, shadow mode, staged authority, stop conditions, and rollback.
+Cover final state, permissions, trajectories, repeated/adversarial evaluation, staged authority, stops and rollback.
 
 ### Minutes 38 to 48: migration and operation
 
-Define pilots, observe-only integration, one authority per action, degraded modes, ownership, cost, and adoption evidence.
+Show pilots, single-authority migration, degradation, ownership, cost and adoption evidence.
 
 ### Minutes 48 to 55: principal portfolio
 
-Choose shared versus local capabilities, build versus buy, provider portability, retirement, and quarterly decisions.
+Choose shared/local boundaries, sourcing, portability, retirement and review points.
 
 ### Minutes 55 to 60: senior-principal scope
 
-Explain doctrine, delegated technical authority, external constraints, succession, and evidence that would reverse the direction.
+Explain doctrine, delegated technical authority, external constraints, succession and reversal evidence.
 
 ## Distinguish answer levels
 
 ### Senior
 
-Designs a reliable agent workflow for one product. It covers tools, state, evaluation, monitoring, and safe user confirmation.
+One reliable product workflow, tools, state, evaluation and confirmation.
 
 ### Staff
 
-Defines reusable contracts, safe retries, migration, and ownership across several teams. It remains precise under a technical follow-up.
+Reusable cross-team contracts, retries, migration and ownership.
 
 ### Principal
 
-Chooses the platform boundary across organizations, balances migration and product delivery, preserves provider options, and delegates ownership to technical leaders.
+Cross-organization boundaries, delivery balance, provider options and delegated owners.
 
 ### Senior principal
 
-Defines durable doctrine across several principal-owned directions. It coordinates region, provider, security, and product constraints while preserving local ownership, succession, and a path to reverse major choices.
+Several independently owned directions with coherent doctrine, external constraints, succession and reversible decisions.
 
 ## Observer scorecard
 
@@ -1427,33 +970,15 @@ Score each dimension from 0 to 2.
 | Senior-principal scope | Says company-wide | Adds multi-year scale | Defines doctrine, federated authority, succession, and reversal |
 | Communication | Lists components | Uses a structure | Preserves the decision while changing depth under challenge |
 
-A principal target should score 2 on authority, state, migration, and principal scope. A senior-principal target should also score 2 on delegated authority, external constraints, succession, and reversal.
+Use this as a practice diagnostic, not a validated hiring rubric; explain evidence behind each score.
 
 ## Strong signals
 
-- Starts with authority and consequence before model choice.
-- Treats permissions in prompts as guidance rather than enforcement.
-- Defines logical action identity and unknown outcomes correctly.
-- Preserves provenance through retrieval, memory, and tool arguments.
-- Evaluates final state, permission, trajectory, severe failures, and cost.
-- Stages increasing authority instead of launching broad write access.
-- Keeps product and tool semantics with domain owners.
-- Measures platform value through safe delivery and operating outcomes.
-- Preserves provider and runtime exit paths.
-- Distinguishes principal portfolio ownership from senior-principal technical doctrine.
+Inspectable authority, effect state, provenance, outcome evidence, staged rollout, ownership and exit paths support the design.
 
 ## Weak signals
 
-- Starts with an agent framework and model provider.
-- Gives the model direct broad credentials.
-- Retries side effects after every timeout.
-- Treats a transcript as durable workflow state.
-- Stores untrusted memory without provenance or expiration.
-- Uses another model as the only security or evaluation layer.
-- Requires human approval for every write without considering fatigue.
-- Forces one runtime before proving shared contracts.
-- Calls company-wide scope senior-principal without delegated leaders or reversal criteria.
-- Cannot descend from doctrine into one technical invariant.
+Broad credentials, transcript-only state, blind retries, ungoverned memory and model-only security violate those boundaries.
 
 ## Changed-condition follow-ups
 
@@ -1479,3 +1004,5 @@ For each follow-up, state which invariant changes, which authority decides, whic
 ---
 
 *Related: [agent safety control-plane design](/questions/design-agent-safety-control-plane/), [evaluate an agent](/questions/evaluate-an-agent/), [LLM security threat models](/concepts/llm-security-threat-models/), [design a multi-team ML platform](/questions/design-multi-team-ml-platform/), and [the annotated upper-IC agent-platform mock](/guides/annotated-upper-ic-agent-platform-mock/).*
+
+</div>

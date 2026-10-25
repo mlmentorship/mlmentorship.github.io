@@ -9,7 +9,7 @@ const left = (row, col) => ({ row, col, label: 'left', tone: 'state', key: 'left
 const up = (row, col) => ({ row, col, label: 'up', tone: 'state', key: 'up-dependency' });
 
 const draft = visual('Fill prefix states left to right: a match takes diagonal + 1; a mismatch takes max(left, up).', [
-  frame('Initialize empty-prefix answers', 'For first = "abc" and second = "ac", an empty prefix has LCS length 0 with every other prefix.', grid([
+  frame('Initialize empty-prefix answers', 'For abc and ac, initialize every empty-prefix answer to zero.', grid([
     ['0', '0', '0'],
     ['0', '?', '?'],
     ['0', '?', '?'],

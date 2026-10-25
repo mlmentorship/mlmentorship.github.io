@@ -21,7 +21,7 @@ const draft = visual('A set keeps one entry per distinct value, so any duplicate
     setSize: '2',
     action: 'insert 1',
   }), 'insert-one'),
-  frame('Collapse the repeated 4', 'Reading index 2 finds that 4 already has a set entry; the set remains {4,1} with size 2.', scan(2, ['4', '1'], {
+  frame('Collapse the repeated 4', 'Index 2 supplies another 4. The set remains {4,1} with size 2.', scan(2, ['4', '1'], {
     setSize: '2',
     action: '4 already present; size unchanged',
   }), 'repeat-four'),
@@ -29,7 +29,7 @@ const draft = visual('A set keeps one entry per distinct value, so any duplicate
     setSize: '3',
     action: 'insert 2',
   }), 'insert-two'),
-  frame('Compare the two lengths', 'len(nums)=4 and len(set(nums))=3; because 4 != 3, the function returns true.', scan(3, ['4', '1', '2'], {
+  frame('Compare the two lengths', 'len(nums)=4 and len(set(nums))=3. The function returns true because 4 != 3.', scan(3, ['4', '1', '2'], {
     comparison: '4 != 3',
     result: 'true',
   }), 'compare-lengths'),

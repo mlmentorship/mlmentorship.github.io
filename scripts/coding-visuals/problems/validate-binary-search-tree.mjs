@@ -8,6 +8,30 @@ const topology = [
   ['', '', '', '', '4', '', '8'],
 ];
 const positions = { '5': [0, 3], '1': [2, 1], '7': [2, 5], '4': [4, 4] };
+const nodePositions = {
+  '5': { x: 210, y: 50 },
+  '1': { x: 75, y: 160 },
+  '7': { x: 315, y: 160 },
+  '4': { x: 255, y: 270 },
+  '8': { x: 390, y: 270 },
+};
+const companion = (node, label) => ({
+  nodes: ['5','1','7','4','8'],
+  edges: ['5->1','5->7','7->4','7->8'],
+  positions: nodePositions,
+  width: 440,
+  height: 340,
+  treeLayout: true,
+  start: node,
+  markerId: `bst-bound-${node}-${label.replace(/[^a-z0-9]+/gi, '-')}`,
+  edgeLabels: false,
+  ariaLabel: 'Binary tree: 5 has children 1 and 7; 7 has children 4 and 8',
+  regions: [{
+    x: nodePositions[node].x,
+    y: nodePositions[node].y + 43,
+    label: label.replace(/^check /, '').replace('left subtree valid', 'valid subtree'),
+  }],
+});
 const call = (node, label, extra = {}) => grid(topology, [{
   row: positions[node][0],
   col: positions[node][1],
@@ -17,13 +41,15 @@ const call = (node, label, extra = {}) => grid(topology, [{
 }], {
   input: 'tree=[5,1,7,null,null,4,8]',
   activeCheck: label,
+  graphCompanion: companion(node, label),
+  gridSummary: 'Original coordinate inventory',
   ...extra,
 });
 
 const draft = visual('Validate each node against the complete interval inherited from every ancestor.', [
   frame(
     'Call valid(5, -inf, inf)',
-    'The root 5 satisfies -inf < 5 < inf, so recursively validate its left subtree before its right subtree.',
+    'Root 5 passes its open interval (-inf, inf). Validate left before right.',
     call('5', 'check -inf < 5 < inf', { stack: 'valid(5,-inf,inf)' }),
     'check-root',
   ),
@@ -62,6 +88,8 @@ const draft = visual('Validate each node against the complete interval inherited
       key: 'active-call',
     }], {
       activeCheck: '4 violates ancestor bound 5',
+      graphCompanion: companion('4', 'reject: 4 is not above 5'),
+      gridSummary: 'Original coordinate inventory',
       returns: 'node 4=false -> node 7=false -> node 5=false',
       result: 'false',
     }),
@@ -74,7 +102,7 @@ const review = {
   recognitionCue: 'BST validity applies against every ancestor, so a local parent-child comparison is insufficient and each recursive call must carry the legal value interval.',
   invariant: 'At valid(node, low, high), every ancestor constraint is summarized by low < node.val < high; the left call tightens high and the right call tightens low.',
   stateModel: 'Retain the current node, its exclusive low/high bounds, and the recursion stack; null returns true and any out-of-range node returns false immediately.',
-  visualRationale: 'A compact coordinate grid draws every node and parent-child edge with ASCII geometry; a stable active-call key moves through readable inherited bounds and the false return chain.',
+  visualRationale: 'Actual node-and-edge topology shows the ancestor route to 4 and its inherited interval. A disclosed coordinate inventory retains every original motion key without making ASCII geometry the primary picture.',
   rejectedAlternatives: [
     'An inorder value list can prove sortedness but hides how the supplied bound-carrying recursion works.',
     'A parent-versus-child comparison diagram misses violations such as node 4 below ancestor 5.',

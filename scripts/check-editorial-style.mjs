@@ -1,5 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import assert from 'node:assert/strict';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import { parseFragment } from 'parse5';
 
 const root = process.cwd();
 const scanRoots = ['.github', 'docs', 'public', 'scripts', 'src'];
@@ -32,6 +38,10 @@ const contentRules = [
   ['related-reference inconsistency', /^\*Related reference:/i],
 ];
 const violations = [];
+const parser = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
+const sentenceSegmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
+const qualified = [];
+const learningPieces = new Map(JSON.parse(fs.readFileSync(path.join(root, 'src/data/learningMechanisms.json'), 'utf8')).pieces.map((piece) => [piece.slug, piece]));
 
 function wordCount(value) {
   return (value.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) ?? []).length;
@@ -39,6 +49,58 @@ function wordCount(value) {
 
 function preserveNewlines(value) {
   return '\n'.repeat((value.match(/\n/g) ?? []).length);
+}
+
+export function qualifyProse(body) {
+  const result = { core: 0, extension: 0, sentences: [] };
+  let layer = 'core';
+  function markdownText(node) {
+    if (node.type === 'text') return node.value;
+    if (node.type === 'inlineCode') return 'identifier';
+    if (node.type === 'inlineMath') return 'formula';
+    if (node.type === 'break') return ' ';
+    return (node.children ?? []).map(markdownText).join('');
+  }
+  function record(text, line, quoted = false) {
+    const readable = text.replace(/\s+/g, ' ').trim();
+    result[layer] += wordCount(readable);
+    if (quoted) return;
+    const ordinary = readable.replace(/"[^"\n]*"|“[^”\n]*”/g, 'quotation');
+    for (const { segment } of sentenceSegmenter.segment(ordinary)) {
+      const words = wordCount(segment);
+      if (words > 20) result.sentences.push({ line, words, text: segment.trim() });
+    }
+  }
+  function htmlText(node) {
+    if (['code', 'pre', 'svg', 'style', 'script'].includes(node.nodeName)) return '';
+    return node.nodeName === '#text' ? node.value : (node.childNodes ?? []).map(htmlText).join('');
+  }
+  function htmlWalk(node, startLine) {
+    const attributes = Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
+    const classes = new Set((attributes.class ?? '').split(/\s+/));
+    if (['svg', 'pre', 'style', 'script'].includes(node.nodeName) || ['diagram-source', 'visual-title', 'visual-kicker'].some((name) => classes.has(name))) return;
+    if (node.nodeName === 'p' || node.nodeName === 'figcaption') {
+      record(htmlText(node), startLine + (node.sourceCodeLocation?.startLine ?? 1) - 1);
+      return;
+    }
+    for (const child of node.childNodes ?? []) htmlWalk(child, startLine);
+  }
+  function walk(node, quoted = false) {
+    if (node.type === 'html') {
+      if (node.value.includes('<!-- learning:core-end -->')) layer = 'extension';
+      htmlWalk(parseFragment(node.value, { sourceCodeLocationInfo: true }), node.position.start.line);
+      return;
+    }
+    if (['heading', 'code', 'math', 'table', 'definition'].includes(node.type)) return;
+    if (node.type === 'paragraph') {
+      const text = markdownText(node);
+      if (!/^Related:/.test(text)) record(text, node.position.start.line, quoted);
+      return;
+    }
+    for (const child of node.children ?? []) walk(child, quoted || node.type === 'blockquote');
+  }
+  walk(parser.parse(body));
+  return result;
 }
 
 function scanContentFile(file, text) {
@@ -84,6 +146,19 @@ function scanContentFile(file, text) {
   }
 
   const bodyLineOffset = frontmatter.split('\n').length - 1;
+  if (body.includes('<!-- learning:core-end -->')) {
+    const slug = path.basename(file).replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+    const piece = learningPieces.get(slug);
+    const prose = qualifyProse(body);
+    for (const sentence of prose.sentences) {
+      violations.push(`${relative}:${bodyLineOffset + sentence.line}: sentence exceeds 20 words (${sentence.words}): ${sentence.text}`);
+    }
+    for (const layer of ['core', 'extension']) {
+      if (piece && prose[layer] > piece.budget[layer]) violations.push(`${relative}: ${layer} prose exceeds ${piece.budget[layer]} words (${prose[layer]})`);
+    }
+    qualified.push({ slug, core: prose.core, extension: prose.extension });
+    return;
+  }
   const prose = body
     .replace(/```[\s\S]*?```/g, preserveNewlines)
     .replace(/\$\$[\s\S]*?\$\$/g, preserveNewlines);
@@ -122,6 +197,20 @@ function walk(directory) {
   }
 }
 
+if (process.argv.includes('--self-test')) {
+  const long = Array.from({ length: 21 }, (_, index) => `word${index}`).join(' ');
+  assert.equal(qualifyProse(`${long}.`).sentences.length, 1);
+  assert.equal(qualifyProse(`${long.replace('word10 ', 'word10\n')}.`).sentences.length, 1);
+  for (const source of [`\`\`\`python\n${long}\n\`\`\``, `$$\n${long}\n$$`, `> ${long}.`, `"${long}."`, `| Header |\n| --- |\n| ${long} |`]) {
+    assert.equal(qualifyProse(source).sentences.length, 0);
+  }
+  assert.equal(qualifyProse(`<figure><figcaption>${long}.</figcaption></figure>`).sentences.length, 1);
+  const layers = qualifyProse('One.\n\n<!-- learning:core-end -->\n\n<div data-learning-extension>\n\nTwo.\n\n</div>');
+  assert.deepEqual([layers.core, layers.extension], [1, 1]);
+  console.log('Editorial selftest passed: multiline sentences, literal exceptions, captions and reading layers.');
+  process.exit(0);
+}
+
 scanRoots.forEach((directory) => walk(path.join(root, directory)));
 rootFiles.forEach((file) => scanFile(path.join(root, file)));
 
@@ -132,3 +221,5 @@ if (violations.length > 0) {
 }
 
 console.log('Editorial style check passed: pyramid openings, concise prose, and banned-language rules satisfied.');
+console.log(`Pattern-first prose qualified: ${qualified.length}/${learningPieces.size} articles; 20-word sentences and approved prose budgets.`);
+if (process.argv.includes('--report')) console.log(JSON.stringify(qualified, null, 2));

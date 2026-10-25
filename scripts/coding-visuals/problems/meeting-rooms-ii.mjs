@@ -9,7 +9,20 @@ const state = (values, extra = {}) => {
   ], [{ row: 0, col: 0, label: 'minimum', tone: 'focus', key: 'heap-root' }], {
     example,
     heapArray: `[${values.join(',')}]`,
-    heapMeaning: 'root above its children; active meeting end times',
+    heapMeaning: 'retained end times; cleanup removes expired meetings',
+    gridSummary: 'Original heap grid',
+    graphCompanion: {
+      nodes: values.length ? values : ['empty'],
+      edges: values.slice(1).map((value, index) => `${values[Math.floor(index / 2)]}->${value}`),
+      positions: Object.fromEntries((values.length ? values : ['empty']).map((value, index) => [value, {
+        x: index === 0 ? 240 : index === 1 ? 140 : 340,
+        y: index === 0 ? 75 : 170,
+      }])),
+      edgeLabels: false,
+      ariaLabel: 'Retained end times with a minimum root and parent-to-child heap edges',
+      start: values[0],
+      regions: [{ x: 240, y: 27, label: values.length ? 'minimum end' : 'empty heap' }],
+    },
     motion: [
       { key: 'heap-root', kind: 'pointer', x: 0, y: 0, label: root },
       ...values.map((value, index) => ({
@@ -27,7 +40,7 @@ const state = (values, extra = {}) => {
 const draft = visual('Before each start, pop every ended meeting; then push the new end and record the largest heap size.', [
   frame(
     'Initialize the active heap',
-    'Meetings are sorted by start as [0,30], [5,10], [5,15], [20,25]. end_times is empty and most_rooms=0.',
+    'Sort meetings by start. Begin with an empty heap and zero peak.',
     state([], { nextMeeting: '[0,30]', mostRooms: '0' }),
     'initialize-active-heap',
   ),

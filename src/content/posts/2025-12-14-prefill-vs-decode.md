@@ -9,17 +9,20 @@ category: "concepts"
 
 ## Summary
 
-LLM inference splits into **prefill** (one parallel pass over the prompt) and **decode** (one new token per autoregressive step). Large, well-batched prefills are often compute-bound. Small decode batches are often memory-bound. Almost every serving optimization makes sense only when you know which phase and shape it targets.
+Prefill processes available prompt positions together; decode processes a newly sampled input after its predecessor becomes available.
+Compare available rows per weight read before naming the bottleneck.
 
-Prefill can process many tokens at once with high arithmetic intensity. A single-request decode step processes one token but may read the model weights from HBM for very little arithmetic. Their per-token costs and latency limits can differ greatly.
+Consider a $1024\times1024$ BF16 weight matrix W: $2{,}097{,}152$ bytes, or 2 MiB.
+Assume each invocation streams W once, with no inter-call residency.
+Ignore input/output bytes, KV traffic and kernel overhead for this accounting exercise.
 
-Picking the wrong cost model leads to wrong decisions: batching helps decode but barely affects prefill latency; quantization helps decode bandwidth but not prefill compute; speculative decoding only accelerates the decode phase.
+How do four simultaneous rows differ from four serial one-row invocations?
 
 <!-- visual:prefill-decode-weight-reuse -->
 <figure class="learning-figure" aria-labelledby="prefill-decode-visual-title" aria-describedby="prefill-decode-visual-description">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="prefill-decode-visual-title">Trace why the same model weights create two different hardware regimes.</p>
-	<p id="prefill-decode-visual-description">Compare reuse of one representative weight tile during a four-token prefill with repeated streaming of that tile across four serial, batch-one decode steps.</p>
+	<p class="visual-kicker">Same arithmetic; different ideal weight traffic</p>
+	<p class="visual-title" id="prefill-decode-visual-title">Four parallel rows share 2 MiB; four serial invocations stream 8 MiB.</p>
+	<p id="prefill-decode-visual-description">W has shape 1024 by 1024. The serial calls represent four subsequent decode steps, not four total output tokens.</p>
 	<div class="visual-grid--two" role="group" aria-label="Prefill and decode weight-reuse comparison">
 		<section class="visual-panel" aria-labelledby="prefill-weight-reuse-title">
 			<h4 id="prefill-weight-reuse-title">Prefill · one parallel pass</h4>
@@ -28,13 +31,13 @@ Picking the wrong cost model leads to wrong decisions: batching helps decode but
 				<thead><tr><th scope="col">HBM supplies</th><th scope="col">Matrix work</th></tr></thead>
 				<tbody><tr><td><strong>weight tile W</strong><br>load for this tile</td><td class="cm-selected"><strong>rows 1 · 2 · 3 · 4</strong><br>reuse W across prompt rows</td></tr></tbody>
 			</table>
-			<p><strong>High reuse:</strong> more arithmetic per byte can make compute the limit.</p>
+			<p><strong>Weight-only accounting:</strong> 8,388,608 FLOPs / 2,097,152 bytes = 4 FLOPs/byte.</p>
 		</section>
 		<section class="visual-panel" aria-labelledby="decode-weight-stream-title">
 			<h4 id="decode-weight-stream-title">Decode · four serial passes</h4>
 			<p>At batch 1, only one new-token row exists per step.</p>
 			<table class="cm-grid" aria-label="The same decode weight tile streamed again for each serial output step">
-				<thead><tr><th scope="col">Output step</th><th scope="col">HBM and matrix work</th></tr></thead>
+				<thead><tr><th scope="col">Decode invocation</th><th scope="col">HBM and matrix work</th></tr></thead>
 				<tbody>
 					<tr><th scope="row">1</th><td>load W → row 1</td></tr>
 					<tr><th scope="row">2</th><td>load W again → row 2</td></tr>
@@ -42,65 +45,102 @@ Picking the wrong cost model leads to wrong decisions: batching helps decode but
 					<tr><th scope="row">4</th><td>load W again → row 4</td></tr>
 				</tbody>
 			</table>
-			<p><strong>Low reuse:</strong> repeated weight traffic can make bandwidth the limit.</p>
+			<p><strong>Weight-only accounting:</strong> 8,388,608 FLOPs / 8,388,608 bytes = 1 FLOP/byte.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow one representative weight tile. Prefill exposes many prompt-token rows to one matrix operation, so a loaded tile can serve all of them before eviction. Batch-one decode exposes only the newest-token row, then the next token waits for another model pass that streams the weights again. The model is unchanged; available parallel rows, and therefore arithmetic per byte, change. These are common large-prefill and small-batch-decode regimes, not guarantees for every shape or device. Original comparison checked against <a href="https://arxiv.org/abs/2211.05102">Pope et al.’s transformer-inference analysis</a> and the <a href="https://www.usenix.org/conference/osdi22/presentation/yu">Orca serving paper</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> four parallel rows reuse each loaded weight. Serial one-row calls repeat the stream under the stated residency assumption; actual traffic requires measurement.</figcaption>
 </figure>
+
+One row costs $2(1024)^2=2{,}097{,}152$ FLOPs, counting a multiply-add as two operations.
+Both schedules perform $8{,}388{,}608$ FLOPs; their ideal weight traffic differs fourfold.
+Neither ratio alone establishes a hardware bottleneck.
 
 ## Prefill
 
-For a prompt of length $P$:
+For prompt length $P$, compute K/V and hidden outputs for available positions with the required causal mask.
+The final prompt position supplies the first output-token distribution.
 
-- Single forward pass: compute K, V, and output for all $P$ tokens in parallel.
-- FLOPs: $\approx 2 \cdot P \cdot N_\text{params}$ for the FFN and Q/K/V/O matmuls, plus $O(P^2 \cdot d \cdot \text{layers})$ for attention.
-- Arithmetic intensity is high because Q has $P$ rows; matmuls are square-shaped and saturate tensor cores.
-- Time to first token grows with prompt length. Matrix efficiency, attention's $O(P^2)$ work, batching, and scheduler load determine the exact curve.
+Using $N$ participating dense weights, the dense work is approximately $2PN$ FLOPs.
+Add attention work $O(LP^2d)$ for $L$ layers and hidden width $d$.
+More rows can improve reuse; they need not produce square matrices or saturate the device.
 
-Likely bottleneck: compute for large efficient matrix shapes. Short prompts, small batches, or poor kernels can be memory-bound or launch-bound.
+Large efficient shapes can be compute-bound; short prompts can be memory-bound or launch-bound.
 
 ## Decode
 
-For each subsequent generated token:
+Each subsequent invocation processes the sampled token, appends its K/V, and predicts the next token.
+For batch size $B$, dense work is approximately $2BN$, plus context-dependent attention and KV traffic.
 
-- One forward pass with sequence length 1 (just the new token).
-- Q is a single vector; K and V come from the [KV cache](/concepts/kv-cache/).
-- FLOPs: $\approx 2 \cdot N_\text{params}$. One multiply-add per parameter for the matmul.
-- Bytes moved from HBM: at least $N_\text{params} \cdot \text{dtype\_bytes}$ (must read all weights).
-- Arithmetic intensity from BF16 weight reads: about 1 FLOP/byte at batch 1 because one multiply-add uses a two-byte weight. Other reads and writes lower the effective value.
-
-Likely bottleneck: HBM bandwidth at small batch sizes. Batching increases arithmetic intensity until compute or KV-cache traffic becomes limiting.
-
-## What follows from the asymmetry
-
-| Optimization | Helps prefill? | Helps decode? | Why |
-|--------------|---------------|---------------|-----|
-| Larger batch | workload-dependent | large until another limit | amortizes weight reads across requests |
-| FlashAttention | yes (long prompts) | yes (long context) | reduces HBM traffic in attention |
-| Weight quantization (int8/4) | small | huge | cuts decode bandwidth proportionally |
-| KV-cache quantization | no | yes (long context) | cuts decode-time KV reads |
-| Speculative decoding | no | huge | parallelizes decode steps |
-| GQA / MQA | small | yes (long context) | shrinks KV cache |
-| Continuous batching | small | huge | keeps batch full during decode |
+Small-batch weight streaming can dominate, but long-context KV reads, compute and launches can become limiting.
+See the [KV state ledger](/concepts/kv-cache/) and [resource lower bounds](/concepts/gpu-memory-hierarchy/).
 
 ## Latency metrics
 
-Production serving SLOs typically use both:
+TTFT measures arrival-to-first-token latency, including queueing, scheduling, prompt processing, sampling and transport as applicable.
+Inter-token intervals describe later outputs; TPOT is often their average, not a constant service time.
 
-- **TTFT** (Time To First Token): prefill time. Bottleneck for chat UI responsiveness.
-- **TPOT** (Time Per Output Token, or inter-token latency): decode time per token. Bottleneck for sustained generation.
-- **End-to-end latency** = TTFT + (output_length − 1) × TPOT.
+For $T\ge1$ outputs, end-to-end latency is TTFT plus the $T-1$ subsequent intervals.
+A separate hypothetical request with TTFT 100 ms and three 20-ms intervals finishes four outputs in $100+3(20)=160$ ms.
 
-For a 1000-token output, TPOT dominates. For a search query that gets a 50-token answer, TTFT dominates.
+## Change the rows or arrival clock
+
+### 1. Sixteen requests are ready
+
+**Picture and change:** batch sixteen independent decode rows while retaining separate positions, masks, KV and sampler states.
+
+**Check:** weight-only intensity becomes 16 FLOPs/byte, not a guaranteed sixteenfold speedup.
+
+**Use when:** measurements identify weight traffic as a limiting term.
+
+### 2. Add 20 ms of queueing
+
+**Picture and change:** measure from arrival, not GPU launch.
+If prefills block decoding, bound chunks and track the prompt cursor with KV.
+
+**Check:** TTFT becomes 120 ms and four-output latency 180 ms, with other timings unchanged.
+
+**Use when:** load or long prompts violate first-token or inter-token targets.
+
+## Failure and transfer
+
+Calling every prefill compute-bound misses launch-bound short prompts; calling every decode weight-bound misses other traffic and compute.
+
+How many subsequent decode invocations normally produce four outputs after prefill supplies the first?
+
+<details>
+<summary>Check your answer</summary>
+
+Three. The first sampled output enters KV only when processed by a subsequent invocation, not when sampled.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## What follows from the asymmetry
+
+| Optimization | Conditional effect, not a universal phase ranking |
+| --- | --- |
+| Larger batches | Reuse weights across rows; queueing, compute and KV can limit benefits |
+| FlashAttention | Reduce attention traffic; actual gain depends on shape and implementation |
+| Weight quantization | Reduce weight bytes; kernel support, conversion and errors matter |
+| KV quantization | Change cache capacity/traffic, including writes; metadata and accuracy remain costs |
+| Speculation | Spend draft/verification work to reduce sequential target calls when accepted |
+| GQA/MQA | Change architecture and KV size, requiring compatible trained weights |
+| Continuous batching | Reuse completed request positions under token, memory and fairness constraints |
 
 ## Common pitfalls
 
-- **Quoting one cost number for "inference."** Prefill and decode are different problems with different solutions.
-- **Optimizing decode without measuring TTFT.** Speculative decoding can hurt latency on short outputs (overhead dominates).
-- **Ignoring chunked prefill.** Long prefills block decode steps for other requests in the same batch; chunked prefill [(Patel et al., 2023)](https://arxiv.org/abs/2308.16369) interleaves them.
+Measure full workloads, not a single inference-cost number.
+Neither output length alone nor phase name determines the dominant latency term.
+Speculation can lose on short outputs when overhead exceeds saved work.
+
+References: [Pope et al.](https://arxiv.org/abs/2211.05102), [Orca](https://www.usenix.org/conference/osdi22/presentation/yu), [SARATHI](https://arxiv.org/abs/2308.16369).
 
 ## Related
 
-- [GPU memory hierarchy](/concepts/gpu-memory-hierarchy/). Why decode is bandwidth-bound.
-- [Continuous batching](/concepts/continuous-batching/). How servers exploit decode batching.
-- [Speculative decoding](/concepts/speculative-decoding/). The main lever for decode speedup.
+[Continuous batching](/concepts/continuous-batching/) covers admission and per-request state.
+[Speculative decoding](/concepts/speculative-decoding/) covers draft verification.
+
+</div>

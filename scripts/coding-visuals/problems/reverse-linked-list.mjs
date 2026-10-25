@@ -3,7 +3,7 @@ import { defineVisual, frame, linked, visual } from '../primitives.mjs';
 const draft = visual('Preserve the unreversed suffix before redirecting each current.next, then advance the previous/current boundary one node.', [
   frame(
     'Initialize the two list regions',
-    'For 1->2->3->4->null, previous = null and head/current = 1. The whole list is still the unreversed suffix.',
+    'Start with an empty reversed prefix. The current reference points to the untouched four-node chain.',
     linked([{ value: '1', pointer: 'current' }, { value: '2' }, { value: '3' }, { value: '4' }], {
       previous: 'null',
       actualLinks: '1->2, 2->3, 3->4, 4->null',
@@ -15,6 +15,7 @@ const draft = visual('Preserve the unreversed suffix before redirecting each cur
     'Save next_node = 2, write 1.next = null, then set previous = 1 and head = 2. The saved pointer prevents losing nodes 2->3->4.',
     linked([{ value: '2', pointer: 'current' }, { value: '3' }, { value: '4' }], {
       second: ['1'],
+      secondLabel: 'previous',
       reversedPrefix: '1->null',
       unreversedSuffix: '2->3->4->null',
       savedNext: '2',
@@ -26,6 +27,7 @@ const draft = visual('Preserve the unreversed suffix before redirecting each cur
     'Save next_node = 3, write 2.next = 1, then advance previous = 2 and head = 3.',
     linked([{ value: '3', pointer: 'current' }, { value: '4' }], {
       second: ['2', '1'],
+      secondLabel: 'previous',
       reversedPrefix: '2->1->null',
       unreversedSuffix: '3->4->null',
       savedNext: '3',
@@ -37,6 +39,7 @@ const draft = visual('Preserve the unreversed suffix before redirecting each cur
     'Save next_node = 4, write 3.next = 2, then advance previous = 3 and head = 4.',
     linked([{ value: '4', pointer: 'current' }], {
       second: ['3', '2', '1'],
+      secondLabel: 'previous',
       reversedPrefix: '3->2->1->null',
       unreversedSuffix: '4->null',
       savedNext: '4',

@@ -1,12 +1,12 @@
 import { defineVisual, frame, trie, visual } from '../primitives.mjs';
 
 const nodes = [
-	{ key: 'root', label: 'root', x: 180, y: 30 },
-	{ key: 'a', label: 'a', x: 180, y: 84 },
-	{ key: 'ap', label: 'ap', x: 180, y: 138 },
-	{ key: 'app', label: 'app', x: 180, y: 192, terminal: true },
-	{ key: 'appl', label: 'appl', x: 180, y: 246 },
-	{ key: 'apple', label: 'apple', x: 180, y: 300, terminal: true },
+	{ key: 'root', label: 'root', x: 180, y: 42 },
+	{ key: 'a', label: 'a', x: 180, y: 96 },
+	{ key: 'ap', label: 'ap', x: 180, y: 150 },
+	{ key: 'app', label: 'app', x: 180, y: 204, terminal: true },
+	{ key: 'appl', label: 'appl', x: 180, y: 258 },
+	{ key: 'apple', label: 'apple', x: 180, y: 312, terminal: true },
 ];
 const edges = nodes.slice(1).map((node, index) => ({
 	key: `edge-${nodes[index].key}-${node.key}`,
@@ -17,22 +17,27 @@ const edges = nodes.slice(1).map((node, index) => ({
 const paths = [{ word: 'app', prefix: 'terminal' }, { word: 'apple', prefix: 'terminal' }];
 const state = (active, extra = {}) => {
 	const current = nodes.find((node) => node.key === active);
+	const { createdLength = 5, ...metadata } = extra;
 	return trie(paths, {
-		nodes,
-		edges,
+		nodes: nodes.map((node) => ({
+			...node,
+			hidden: node.key !== 'root' && node.key.length > createdLength,
+			terminal: Boolean(node.terminal && node.key.length <= createdLength),
+		})),
+		edges: edges.map((edge) => ({ ...edge, hidden: edge.to.length > createdLength })),
 		active: [active],
 		width: 360,
-		height: 330,
+		height: 342,
 		motion: [{ key: 'trie-cursor', kind: 'pointer', x: current.x, y: current.y, label: `current ${active}` }],
-		...extra,
+		...metadata,
 	});
 };
 
 const draft = visual('Each root-to-node path is one shared prefix; terminal state distinguishes a complete word from a mere prefix.', [
-	frame('Start with an empty root', 'The root has no child before insert("app").', state('root', { operation: 'insert("app")', existing: 'root only' }), 'initialize-root'),
-	frame('Create prefix a', 'setdefault creates the root child keyed by a.', state('a', { path: 'root -a-> a' }), 'insert-a'),
-	frame('Create prefix ap', 'From a, setdefault creates child p for prefix ap.', state('ap', { path: 'root -a-> a -p-> ap' }), 'insert-ap'),
-	frame('Create and mark app', 'Create the second p child, then store None at app.', state('app', { path: 'root -a-> a -p-> ap -p-> app', terminal: 'app=yes' }), 'mark-app-terminal'),
+	frame('Start with an empty root', 'The root has no child before insert("app").', state('root', { operation: 'insert("app")', existing: 'root only', createdLength: 0 }), 'initialize-root'),
+	frame('Create prefix a', 'setdefault creates the root child keyed by a.', state('a', { path: 'root -a-> a', createdLength: 1 }), 'insert-a'),
+	frame('Create prefix ap', 'From a, setdefault creates child p for prefix ap.', state('ap', { path: 'root -a-> a -p-> ap', createdLength: 2 }), 'insert-ap'),
+	frame('Create and mark app', 'Create the second p child, then store None at app.', state('app', { path: 'root -a-> a -p-> ap -p-> app', terminal: 'app=yes', createdLength: 3 }), 'mark-app-terminal'),
 	frame('Reuse app while inserting apple', 'Follow existing a, ap, app; create l->appl then e->apple and mark apple terminal.', state('apple', { operation: 'insert("apple")', created: 'appl, apple' }), 'insert-apple'),
 	frame('Reject ap as a full word', 'search("ap") reaches ap but terminal=no, so return false.', state('ap', { query: 'search("ap")', outcome: 'false' }), 'search-ap-false'),
 	frame('Accept ap as a prefix', 'starts_with("ap") only requires the node to exist, so return true.', state('ap', { query: 'starts_with("ap")', outcome: 'true' }), 'prefix-ap-true'),

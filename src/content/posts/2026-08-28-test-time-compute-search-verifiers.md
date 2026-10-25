@@ -9,59 +9,28 @@ category: "concepts"
 
 ## Summary
 
-Test-time compute is extra work performed when answering a request rather than during model training. The system may sample several answers, search over steps, use tools, revise an answer, or run verifiers.
+Test-time compute adds sampling, search, tools or revision while answering a request; selection must retain any correct candidate found.
 
-## Why AI labs care
+For nonnegative integer $n$, a task asks for $1+\cdots+n$.
+Four hypothetical programs produce these outputs on three checks:
 
-A fixed model can often solve more tasks when it receives more inference compute. This creates a new control:
+| Candidate | Rule | $n=0$ | $n=3$ | $n=10$ |
+| --- | --- | --- | --- | --- |
+| A | $n(n-1)/2$ | $0$ | $3$ | $45$ |
+| B | $n(n+1)/2$ | $0$ | $6$ | $55$ |
+| C | Only handles $3$ | Missing | $6$ | Missing |
+| D | Always returns $6$ | $6$ | $6$ | $6$ |
 
-- small budget for easy requests;
-- larger budget for hard or high-value requests;
-- strict limits for latency-sensitive requests;
-- verification before an answer is returned.
+Expected outputs are `[0, 6, 55]`.
+A plausibility scorer assigns A/B/C/D scores `[0.60, 0.80, 0.40, 0.95]`.
+Which program does each selector return?
 
-The system needs evidence that the extra compute improves the target result enough to justify its cost.
-
-## Main methods
-
-### Best-of-n sampling
-
-Generate $n$ independent candidates and choose the highest verifier score.
-
-This works when:
-
-- the policy sometimes produces a correct answer;
-- samples are diverse enough;
-- the verifier ranks them well.
-
-More samples give smaller gains when outputs are highly correlated.
-
-### Self-consistency
-
-Generate several reasoning paths and choose the answer that appears most often. This is useful when different valid paths reach the same answer.
-
-Agreement can still be confidently wrong. It is not an external correctness check.
-
-### Iterative revision
-
-Generate an answer, critique it, and revise it. Revision helps when errors can be found from the available evidence. Repeated revision can also add confident errors or unnecessary length.
-
-### Search
-
-Treat partial solutions as states. Expand promising states, score them, and keep a limited set.
-
-Examples include beam-like search, tree search, and planning with tools. Search quality depends on the proposal policy, state representation, score, and stopping rule.
-
-### Tool use
-
-Use a calculator, code runner, search index, theorem checker, or external environment. Tool results can provide stronger evidence than internal confidence.
-
-**Learning objective:** separate proposal coverage from selection quality by explaining how extra compute can generate a correct candidate yet still return a wrong answer when the verifier ranks a proxy instead of correctness.
+Hold proposal coverage fixed: B exists in both panels.
 
 <!-- visual:test-time-compute-verifier-bottleneck -->
 <figure class="learning-figure" aria-labelledby="test-time-verifier-heading">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="test-time-verifier-heading">More candidates help only if the verifier selects the right one.</p>
+	<p class="visual-kicker">Same candidates; different selection evidence</p>
+	<p class="visual-title" id="test-time-verifier-heading">B passes all three checks; the plausibility proxy selects constant-answer D.</p>
 	<svg viewBox="0 0 360 410" role="img" aria-labelledby="test-time-verifier-title test-time-verifier-desc">
 		<title id="test-time-verifier-title">The same candidate set succeeds with a direct checker and fails with a weak proxy verifier</title>
 		<desc id="test-time-verifier-desc">Two panels contain the same four sampled candidates: A has wrong arithmetic, B is correct, C is incomplete, and D is a polished shortcut with a wrong answer. In the upper panel, protected tests directly check the task and select candidate B, so the returned answer is correct. In the lower panel, a weak model judge rewards plausibility and selects candidate D, so the returned answer is wrong even though candidate B was available. Candidate letters, truth labels, verifier labels, selection text, and solid versus dashed arrows communicate the result without color.</desc>
@@ -85,7 +54,7 @@ Use a calculator, code runner, search index, theorem checker, or external enviro
 		<text class="viz-label" x="281" y="92" text-anchor="middle">check task outcome</text>
 		<path d="M281 103V119" fill="none" stroke="var(--viz-output-stroke)" stroke-width="3" marker-end="url(#test-time-arrow)"></path>
 		<rect class="viz-node viz-node--output" x="222" y="127" width="118" height="47" rx="4"></rect>
-		<text class="viz-callout" x="281" y="146" text-anchor="middle">SELECT B · PASS</text>
+		<text class="viz-callout" x="281" y="146" text-anchor="middle">SELECT B · 3/3</text>
 		<text class="viz-label" x="281" y="163" text-anchor="middle">return correct answer</text>
 		<text class="viz-label" x="18" y="187">Sampling found B; direct evidence preserved it.</text>
 		<rect class="viz-plot-bg" x="8" y="229" width="344" height="174" rx="5"></rect>
@@ -109,112 +78,150 @@ Use a calculator, code runner, search index, theorem checker, or external enviro
 		<text class="viz-label" x="281" y="365" text-anchor="middle">return wrong answer</text>
 		<text class="viz-label" x="18" y="389">Sampling still found B; the proxy discarded it.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> candidate B exists in both panels, so generation coverage is identical. Protected tests select B by checking the outcome; a plausibility judge selects polished-but-wrong D. More samples cannot rescue a selection rule that rewards the wrong thing.</figcaption>
+	<figcaption><strong>Read it this way:</strong> sampling already found B. The three checks retain B; the proxy discards it for D, which passes only one check.</figcaption>
 </figure>
 
 ## The verifier is the bottleneck
 
-A strong policy with a weak verifier may generate a correct answer and then reject it. A weak policy with an exploitable verifier may learn to produce high-scoring failures.
+The following executable fixture checks the actual functions, not their written explanations.
+These illustrative tests are finite evidence, not a proof for every input.
 
-A verifier may be:
+```python
+proposals = {
+	"A": lambda count: count * (count - 1) // 2,
+	"B": lambda count: count * (count + 1) // 2,
+	"C": lambda count: 6 if count == 3 else None,
+	"D": lambda count: 6,
+}
+checks = [(0, 0), (3, 6), (10, 55)]
+proxy_scores = {"A": 0.60, "B": 0.80, "C": 0.40, "D": 0.95}
 
-- an exact program;
-- protected unit tests;
-- a symbolic solver;
-- an environment state check;
-- a model judge;
-- a human reviewer.
+def choose_checked(candidates, cases):
+	passing = [
+		name for name, function in candidates.items()
+		if all(function(count) == expected for count, expected in cases)
+	]
+	return passing[0] if passing else None
 
-Use direct checks before model judgment. Test the verifier on hard negatives and unusual valid solutions.
+assert choose_checked(proposals, checks) == "B"
+assert max(proxy_scores, key=proxy_scores.get) == "D"
+without_correct = {name: function for name, function in proposals.items() if name != "B"}
+assert choose_checked(without_correct, checks) is None
+```
 
-## Allocate compute by request
+For a selector returning one candidate:
 
-Uniformly spending a large budget is wasteful. A deployment system should estimate:
+$$
+P(\text{return correct})=
+P(\text{any correct})\,
+P(\text{select correct}\mid\text{any correct}).
+$$
 
-- task difficulty;
-- value of a correct answer;
-- cost of a wrong answer;
-- expected gain from more samples or search;
-- remaining latency and token budget;
-- verifier confidence.
+The proxy fails selection, so more proposals alone do not repair this demonstrated fault.
+Use reliable direct checks where possible; validate model judges and test false accepts, false rejects and unusual valid solutions.
 
-Stop when the expected value of more work is below its cost, or when a hard budget is reached.
+## Change the sample budget or verification result
 
-A simple policy can use a small initial sample. Escalate only when candidates disagree, verification fails, or the task belongs to a high-risk class.
+### 1. Increase from four candidates to eight
+
+**Picture and change:** under hypothetical independent success probability $p=0.25$, coverage is $1-(1-p)^m$ for $m$ samples.
+Retain a reliable selector and account for its cost too.
+
+**Check:** coverage rises from $0.68359375$ to $0.899887085$.
+Perfectly correlated samples remain at $0.25$ coverage.
+
+A separate model-verifier accounting fixture charges 100 generation tokens and 50 verification tokens per candidate.
+Four candidates cost 600 tokens; eight cost 1,200, versus 150 for one.
+These are invented charges, not measured usage; Python execution itself does not imply model tokens.
+
+**Use when:** coverage, not selection, limits quality; compare equal-cost alternatives, including a stronger base model.
+
+### 2. B is absent and the budget is exhausted
+
+**Picture and change:** return an explicit unverified/escalation result instead of silently selecting the highest proxy score.
+
+**Check:** `choose_checked(without_correct, checks)` returns `None`; A/C/D each pass only one check.
+
+**Use when:** unsupported answers cost more than abstention or qualified escalation.
+
+## Failure and transfer
+
+Protect evaluation from candidate modification; repeated feedback can overfit even hidden selection tests.
+Keep separate confirmation data.
+
+Does eight-way majority agreement establish correctness when every candidate repeats the same wrong formula?
+
+<details>
+<summary>Check your answer</summary>
+
+No. Test a discriminating boundary or obtain independent evidence; repeated agreement is not independent correctness evidence.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Main methods
+
+### Best-of-n sampling
+
+Generate candidates and apply a selector; independence is an assumption for the coverage formula, not a sampling guarantee.
+
+### Self-consistency
+
+Aggregate answers; agreement can preserve correlated errors.
+
+### Iterative revision
+
+Revise against available evidence; unsupported critique can introduce errors.
+
+### Search
+
+Define states, expansion, score, pruning and stopping.
+An early weak score can prune the only correct path.
+
+### Tool use
+
+Programs, symbolic solvers, environment checks and human review provide evidence only within their own assumptions.
+Sandbox untrusted code and bound tool resources.
 
 ## Small example: coding assistant
 
-A coding assistant receives a repository task.
+Run focused tests, revise from failures, then run regressions and static checks.
+Consider another plan for high risk; stop within scope or escalate missing requirements/checks.
 
-1. Produce one patch and run focused tests.
-2. If tests fail, use the failure output to revise.
-3. If tests pass, run protected regressions and static checks.
-4. For a high-risk change, generate a second plan or patch for comparison.
-5. Stop when checks pass and the patch stays within scope.
-6. Escalate when tests are missing or requirements remain unclear.
+## Allocate compute by request
 
-Generating ten patches before running any test wastes compute and weakens feedback.
+Use task risk, difficulty, expected gain and remaining budget.
+Disagreement or failed checks can trigger bounded escalation, not endless revision.
 
 ## Measure the compute-quality curve
 
-For each budget, report:
-
-- task success;
-- verifier false accepts and false rejects;
-- tokens and tool calls;
-- latency percentiles;
-- monetary or hardware cost;
-- failure rate by task difficulty;
-- gains relative to a stronger base model.
-
-Compare systems at equal total cost as well as equal sample count.
+Report success, verifier errors, tokens, tool calls, latency tails, cost and difficulty slices at completed budgets.
+Compare equal total cost as well as sample count.
 
 ## Main failure modes
 
-### Correlated candidates
+<span id="correlated-candidates"></span>
+<span id="verifier-exploitation"></span>
+<span id="search-error"></span>
+<span id="unbounded-loops"></span>
+<span id="latency-tails"></span>
+<span id="hidden-quality-loss"></span>
 
-Many samples repeat one approach. Increase diversity through prompts, temperatures, policies, or search state rather than only increasing $n$.
+Bound loops, inspect latency tails and overload behavior, and retain consequential held-out slices.
 
-### Verifier exploitation
+<span id="in-an-interview"></span>
+<span id="common-mistakes"></span>
+<span id="why-ai-labs-care"></span>
 
-The search finds outputs that score well without solving the task.
+## Scope the answer
 
-### Search error
+Define task, risk, method, verifier, allocation, stopping and measurement; do not infer correctness from additional compute.
 
-A weak early score prunes the path that would have led to the best answer.
-
-### Unbounded loops
-
-Revision or tool use continues without enough progress. Set step, token, time, and cost limits.
-
-### Latency tails
-
-Average latency looks acceptable while difficult requests exceed the service target. Report percentiles and overload behavior.
-
-### Hidden quality loss
-
-Shortcuts reduce cost or latency while harming an important slice. Keep held-out evaluations and production guardrails.
-
-## In an interview
-
-Use this order:
-
-1. Define the task, risk, and budget.
-2. Choose sampling, revision, search, or tools.
-3. Define the verifier and test its errors.
-4. Explain how compute is allocated and stopped.
-5. Measure a quality-cost-latency curve.
-6. Cover correlated samples, verifier exploits, and tail latency.
-7. Compare against training or serving a stronger base model.
-
-## Common mistakes
-
-- Saying "sample more" without a selection method.
-- Treating majority agreement as correctness.
-- Using a model judge without calibration.
-- Ignoring candidate correlation.
-- Reporting accuracy without tokens, latency, and cost.
-- Allowing open-ended agent loops.
-- Comparing systems at different total compute without saying so.
+References: [verifier training](https://arxiv.org/abs/2110.14168), [self-consistency](https://arxiv.org/abs/2203.11171), [process supervision](https://arxiv.org/abs/2305.20050), [allocation](https://arxiv.org/abs/2408.03314).
 
 *Related: [train and serve a reasoning model under a fixed budget](/questions/design-reasoning-model-fixed-budget/), [annotated reasoning-strategy mock](/guides/annotated-reasoning-strategy-mock/), [evaluate an agent](/questions/evaluate-an-agent/), and [RL with verifiable rewards and GRPO](/concepts/rl-verifiable-rewards-grpo/).*
+
+</div>

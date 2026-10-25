@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-longest-palindromic-substring.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Every odd or even palindrome is discovered by expanding its unique center; update the saved range only when an expansion is strictly longer.",
+  "learningObjective": "Expand every character center and every gap center. Save only a strictly longer accepted range.",
   "mechanismReview": {
     "pattern": "Expand around every character center and every gap center.",
     "recognitionCue": "The answer is a contiguous palindrome, whose symmetry guarantees one unique odd character center or even gap center.",

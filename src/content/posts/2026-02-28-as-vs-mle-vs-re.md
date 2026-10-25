@@ -8,40 +8,36 @@ category: "guides"
 ---
 
 
-**Pick the team, not the title.** Companies use Research Scientist, Applied Scientist, Research Engineer, and ML Engineer to mean different things. The actual day-to-day work is what matters for prep, fit, and trajectory.
+Two teams can use the same title for different work.
+Compare responsibilities, artifacts, decision rights and success criteria before choosing a role or preparation path.
 
-## The basic decomposition
+## Problem
 
-ML work decomposes into roughly four activities:
+Consider these fictional teams. The candidate prefers systems debugging:
 
-1. **Research**: framing novel problems, reading literature, designing experiments, writing papers
-2. **Modeling**: data preparation, training models, hyperparameter tuning, evaluation
-3. **Engineering**: serving infrastructure, training infrastructure, ops, scaling
-4. **Product**: talking to users, defining what to build, owning end-to-end outcomes
+| Team/title | Actual responsibility | Artifact |
+| --- | --- | --- |
+| A / Research Engineer | Data, experiments and model evaluation | Experiment report |
+| B / Applied Scientist | Distributed-training reliability and on-call | Incident diagnosis and reliability changes |
 
-Different roles weight these differently:
+Which team deserves closer investigation? Can the title identify its interview format?
 
-| Role | Research | Modeling | Engineering | Product |
-|---|---|---|---|---|
-| **Research Scientist (RS)** | 60% | 30% | 5% | 5% |
-| **Applied Scientist (AS)** | 20% | 40% | 20% | 20% |
-| **Research Engineer (RE)** | 25% | 30% | 40% | 5% |
-| **ML Engineer (MLE)** | 5% | 30% | 50% | 15% |
-| **Software Engineer (ML adjacent)** | 0% | 10% | 80% | 10% |
+## Picture: Compare Work on Common Axes
 
-These percentages are rough averages.
+The bars are **invented allocations**, not industry averages or measurements of teams A and B.
+For this illustration, each activity gets one primary time category; real activities can overlap.
 
 <!-- visual:ml-role-activity-profiles -->
 <figure class="learning-figure" aria-labelledby="ml-role-profiles-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ml-role-profiles-title">See AS, RE, and MLE as different activity profiles, not as a ranking.</p>
-	<div class="visual-grid--two" role="group" aria-label="Three identically scaled role profiles comparing research, modeling, engineering, and product work">
+	<p class="visual-kicker">Fictional activity allocations</p>
+	<p class="visual-title" id="ml-role-profiles-title">Compare invented profiles on the same scale, not as a ranking.</p>
+	<div class="visual-grid--two" role="group" aria-label="Three hypothetical profiles comparing research, modeling, engineering and product allocations">
 		<section class="visual-panel plot-panel">
-			<h4>Applied Scientist</h4>
-			<p>Modeling-led, with meaningful work on every axis.</p>
+			<h4>Applied Scientist example</h4>
+			<p>This invented allocation gives modeling the largest share.</p>
 			<svg viewBox="0 0 300 138" role="img" aria-labelledby="as-profile-title as-profile-desc">
 				<title id="as-profile-title">Applied Scientist activity profile</title>
-				<desc id="as-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 20 percent, modeling 40 percent, engineering 20 percent, and product 20 percent.</desc>
+				<desc id="as-profile-desc">An invented allocation, not an industry average. Common zero-to-one-hundred-percent scale: research 20, modeling 40, engineering 20 and product 20 percent.</desc>
 				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="36" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">20%</text>
 				<text class="viz-label" x="0" y="50">Modeling</text><rect class="viz-plot-bg" x="82" y="39" width="180" height="14" rx="2"></rect><rect x="82" y="39" width="72" height="14" rx="2" style="fill:var(--viz-focus-stroke)"></rect><text class="viz-axis-label" x="292" y="50" text-anchor="end">40%</text>
 				<text class="viz-label" x="0" y="80">Engineering</text><rect class="viz-plot-bg" x="82" y="69" width="180" height="14" rx="2"></rect><rect x="82" y="69" width="36" height="14" rx="2" style="fill:var(--viz-input-stroke)"></rect><text class="viz-axis-label" x="292" y="80" text-anchor="end">20%</text>
@@ -50,11 +46,11 @@ These percentages are rough averages.
 			</svg>
 		</section>
 		<section class="visual-panel plot-panel">
-			<h4>Research Engineer</h4>
-			<p>Engineering-led, but still close to experiments and research.</p>
+			<h4>Research Engineer example</h4>
+			<p>This invented allocation gives engineering the largest share.</p>
 			<svg viewBox="0 0 300 138" role="img" aria-labelledby="re-profile-title re-profile-desc">
 				<title id="re-profile-title">Research Engineer activity profile</title>
-				<desc id="re-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 25 percent, modeling 30 percent, engineering 40 percent, and product 5 percent.</desc>
+				<desc id="re-profile-desc">An invented allocation, not an industry average. Common zero-to-one-hundred-percent scale: research 25, modeling 30, engineering 40 and product 5 percent.</desc>
 				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="45" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">25%</text>
 				<text class="viz-label" x="0" y="50">Modeling</text><rect class="viz-plot-bg" x="82" y="39" width="180" height="14" rx="2"></rect><rect x="82" y="39" width="54" height="14" rx="2" style="fill:var(--viz-focus-stroke)"></rect><text class="viz-axis-label" x="292" y="50" text-anchor="end">30%</text>
 				<text class="viz-label" x="0" y="80">Engineering</text><rect class="viz-plot-bg" x="82" y="69" width="180" height="14" rx="2"></rect><rect x="82" y="69" width="72" height="14" rx="2" style="fill:var(--viz-input-stroke)"></rect><text class="viz-axis-label" x="292" y="80" text-anchor="end">40%</text>
@@ -63,11 +59,11 @@ These percentages are rough averages.
 			</svg>
 		</section>
 		<section class="visual-panel plot-panel">
-			<h4>ML Engineer</h4>
-			<p>Engineering-dominant, with modeling and product context.</p>
+			<h4>ML Engineer example</h4>
+			<p>This invented allocation gives engineering half the time.</p>
 			<svg viewBox="0 0 300 138" role="img" aria-labelledby="mle-profile-title mle-profile-desc">
 				<title id="mle-profile-title">ML Engineer activity profile</title>
-				<desc id="mle-profile-desc">Four bars on a common zero-to-one-hundred-percent scale: research 5 percent, modeling 30 percent, engineering 50 percent, and product 15 percent.</desc>
+				<desc id="mle-profile-desc">An invented allocation, not an industry average. Common zero-to-one-hundred-percent scale: research 5, modeling 30, engineering 50 and product 15 percent.</desc>
 				<text class="viz-label" x="0" y="20">Research</text><rect class="viz-plot-bg" x="82" y="9" width="180" height="14" rx="2"></rect><rect x="82" y="9" width="9" height="14" rx="2" style="fill:var(--viz-state-stroke)"></rect><text class="viz-axis-label" x="292" y="20" text-anchor="end">5%</text>
 				<text class="viz-label" x="0" y="50">Modeling</text><rect class="viz-plot-bg" x="82" y="39" width="180" height="14" rx="2"></rect><rect x="82" y="39" width="54" height="14" rx="2" style="fill:var(--viz-focus-stroke)"></rect><text class="viz-axis-label" x="292" y="50" text-anchor="end">30%</text>
 				<text class="viz-label" x="0" y="80">Engineering</text><rect class="viz-plot-bg" x="82" y="69" width="180" height="14" rx="2"></rect><rect x="82" y="69" width="90" height="14" rx="2" style="fill:var(--viz-input-stroke)"></rect><text class="viz-axis-label" x="292" y="80" text-anchor="end">50%</text>
@@ -76,126 +72,131 @@ These percentages are rough averages.
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> Start with the longest bar, then inspect what remains. AS is broad and modeling-led; RE keeps more research while shifting toward engineering; MLE puts half its profile in engineering. These are illustrative averages, not standardized job definitions.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the same activity across panels on the 0–100% scale. A longer bar means more allocated time only in this fictional schedule. Current team evidence, not these invented profiles, determines fit.</figcaption>
 </figure>
 
-## Role-by-role, in plain language
+## Work the Team Comparison
 
-### Research Scientist
+Team B better matches the stated systems interest **for further investigation**.
+Ask about reliability ownership, on-call load, research expectations and learning support before deciding.
+If B's current work instead becomes model evaluation, update the fit assessment.
+Neither title establishes salary, degree requirements or interview format. Confirm the round constraints separately.
 
-Think: a tenure-track position with better pay, no teaching, and no grant writing.
+## The basic decomposition
 
-You're judged primarily by the *quality* of your scientific output: papers at top venues, citation impact, novel ideas that the field absorbs. You typically don't ship product directly; instead you publish, your ideas get incorporated into other teams' systems, and you're rewarded for influence.
+- **Research:** hypotheses, experiments and scientific reports; success depends on supported findings.
+- **Modeling:** data, training and evaluation; inspect quality against the task's requirements.
+- **Engineering:** training/serving systems and operations; inspect reliability and resource constraints.
+- **Product:** user needs and outcomes; inspect measurement, guardrails and adoption.
 
-Where it exists: foundation labs (OpenAI, Anthropic, DeepMind, Google Brain remnants, FAIR), research-heavy industry labs (MSR, IBM Research, NVIDIA Research), some startups.
-
-Who it suits: People who genuinely love research, are willing to work on long-time-horizon problems, and don't mind not seeing their work in product. New PhDs from top labs sometimes start here; mid-career folks usually transition in from AS or RE roles after building a track record.
-
-How competitive: Extremely. RS roles at top labs are *more* competitive than tenure-track CS faculty positions in many subfields.
-
-### Applied Scientist
-
-Think: a hybrid scientist + engineer + product partner. The "T-shaped" role.
-
-You take open-ended problems from the business or product, scope them into ML problems, design and train models, work with engineers to deploy them, and own the outcome. You publish if the work is novel, but publishing is bonus, not the metric.
-
-Where it exists: Amazon (the canonical AS role), Microsoft, Apple, Meta, Google, every big-tech ML org, well-funded LLM startups.
-
-Who it suits: People who like ML *and* like seeing their work in production. PhDs who want their science to ship. Engineers who want to do science. The role is unusually broad, you're expected to do *some* research, *some* engineering, *some* product thinking. None of those at world-class level individually, but all at competent level together.
-
-How competitive: Competitive but more abundant than RS. The bar is "can you scope, build, and ship." Strong PhDs with even modest production experience can land senior AS roles.
-
-The most common target for PhDs transitioning to industry.
-
-### Research Engineer
-
-Think: an engineer who understands the science deeply enough to be useful in research-adjacent work.
-
-REs are the people who scale up training runs, build the infrastructure that lets RS folks run experiments, implement papers in production-ready code, and bridge the gap between "the paper says it works" and "it works on our infrastructure."
-
-Where it exists: Foundation labs (where the role is sometimes the *most valuable* on the team, you can't run a frontier model without REs), DeepMind, OpenAI, Anthropic. Less common at FAANG-style product orgs, where the work tends to be split between AS and MLE.
-
-Who it suits: Strong engineers who like ML and the systems side. Often very strong CS undergrads or master's, sometimes PhDs in ML systems areas. Very compensated very well at frontier labs.
-
-How competitive: Very. The combination of strong systems skills and ML literacy is rare.
-
-### ML Engineer
-
-Think: a software engineer specialized in ML systems.
-
-You build the platforms and infrastructure that ML runs on: training pipelines, feature stores, model serving, monitoring, experimentation infrastructure, deployment tooling. You sometimes train models, but it's not your primary value. Your job is to make ML *reliable and scalable*.
-
-Where it exists: Everywhere. Every company doing serious ML has MLEs.
-
-Who it suits: Software engineers who want to specialize in ML systems. People who care more about reliability and scale than about novelty.
-
-**Hiring bar:** Most teams ask whether you are a strong software engineer with enough ML knowledge for the role. The ML depth varies by team. Some want senior researchers; others want engineers who could also work in a non-ML role.
-
-### Software Engineer (ML adjacent)
-
-Think: a SWE who happens to work on a team that ships ML.
-
-You may not train models at all; you build the application code, the APIs, the data pipelines, the user-facing features. You need to understand enough about ML to integrate it sensibly, but you're judged as a software engineer first.
-
-This is increasingly the largest category at most companies: most of the code around an ML model is regular software.
+These activities overlap. Ask how the team assigns ownership and measures success, not just time percentages.
 
 ## The decision tree
 
-If you're trying to pick a role to target:
+Build an editable team profile:
 
-- **Do you have a PhD or equivalent research experience, and want to stay close to the science?** → Applied Scientist (with Research Scientist as a stretch goal at top labs).
-- **Are you a strong engineer with deep ML interest, especially infra/systems?** → Research Engineer at a frontier lab if you can land it; otherwise senior MLE at a big company.
-- **Are you an engineer who wants to work near ML but doesn't want to live in modeling?** → ML Engineer.
-- **Are you trying to break into ML from a software background and don't have research experience?** → Start as a software engineer on an ML team, or as MLE if your team is willing to train you on the modeling side.
+| Field | Record |
+| --- | --- |
+| Task | Current recurring work |
+| Artifact | Expected deliverable |
+| Success criterion | Observable standard |
+| Decision rights | What you own or must escalate |
+| Collaborators | Who shares the work |
+| Operating duties | Deployment, on-call or research obligations |
+| Learning needs | Current gap and available support |
+| Evidence | Source, scope, date and unknowns |
+
+## Change 1: Responsibilities Contradict the Archetype
+
+**New task.** Current manager/team evidence conflicts with the title's implied mix.
+
+**Picture and change.** Replace the profile with current tasks, artifacts and operating duties.
+
+**Check.** The title is not ground truth.
+
+**Use when.** Role labels are ambiguous.
+
+## Change 2: A Private-Lab Offer Looks Higher
+
+**New task.** Compensation affects the choice.
+
+**Picture and change.** Compare dated base, bonus, equity valuation/liquidity, location, level, risk and work fit; state unknowns.
+
+**Check.** A posted base range does not establish a total-compensation multiple.
+
+**Use when.** Offers differ in pay structure.
+
+## Failure: A Prestige Ladder Instead of Team Evidence
+
+Degree labels, invented averages and title equivalences do not establish the actual job.
+
+## Transfer Check
+
+What should overturn a title-based preparation plan?
+
+### Reasoned Answer
+
+Current tasks, artifacts, success criteria and ownership, confirmed with relevant people and dated sources. Then verify assessment constraints.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Role-by-role, in plain language
+
+These are possible technical cores, not universal job descriptions or a prestige ranking.
+Researchers can ship products; engineers can lead scientific experiments.
+
+### Research Scientist
+
+Possible core: question selection, research methods and supported findings. Ask about publication, deployment and collaboration obligations.
+
+### Applied Scientist
+
+Possible core: product-to-ML framing, modeling and evaluation. Ask who owns serving, launch and product outcomes.
+
+### Research Engineer
+
+Possible core: research implementations, experiments and training systems. Ask about scientific decisions versus infrastructure ownership.
+
+### ML Engineer
+
+Possible core: data/training pipelines, serving, testing and monitoring. Ask about modeling depth and operating duties.
+
+### Software Engineer (ML adjacent)
+
+Possible core: APIs, applications, integration and data systems. Ask which ML-specific behavior and failure modes require ownership.
+
+## Fictional Allocation Reference
+
+These invented schedules are not measured industry averages. Each row assigns 100% to disjoint primary activity bins.
+
+| Example label | Research | Modeling | Engineering | Product |
+| --- | ---: | ---: | ---: | ---: |
+| RS | 60% | 30% | 5% | 5% |
+| AS | 20% | 40% | 20% | 20% |
+| RE | 25% | 30% | 40% | 5% |
+| MLE | 5% | 30% | 50% | 15% |
+| ML-adjacent SWE | 0% | 10% | 80% | 10% |
 
 ## Compensation patterns (US, mid-2026)
 
-Roughly, at the same level (e.g., L5 / Senior at a FAANG):
-
-- RS: highest base, often equity-heavy at frontier labs (can be 2&times;-5&times; FAANG total comp at OpenAI/Anthropic/xAI for senior roles)
-- AS: high base, decent equity, comparable total to senior MLE at FAANG
-- RE: at frontier labs, can rival or exceed RS comp; at FAANG, typically slightly above MLE
-- MLE: standard senior SWE comp, sometimes with modest premium for the ML specialty
-- SWE on ML team: standard senior SWE comp
-
-The frontier labs (OpenAI, Anthropic, xAI, Google DeepMind) pay roughly 2&times; FAANG comp for equivalent roles in 2026. This is the largest comp delta in the industry. If you can get into one of these, the comp alone often justifies the move.
+No verified pay comparison is established here. Use sourced offer terms; do not infer liquid equity value from a headline valuation.
 
 ## What changes between levels
 
-Across all roles, the senior trajectory looks similar:
-
-- **Junior** (L4): execute well within a defined scope.
-- **Mid** (L5): own a project area; make autonomous technical decisions.
-- **Senior** (L6 / Staff): own a problem space; influence multiple teams; set technical direction; mentor.
-- **Principal** (L7): cross-org technical leadership; long-time-horizon strategic decisions.
-- **Senior principal / distinguished** (company-dependent): create coherence across principal-owned technical portfolios; preserve delegated authority, external adaptability, succession, and reversal.
-
-The difference between roles diminishes at higher levels, but the technical core remains. Upper ICs share responsibility for direction, portfolio choices, and influence. They differ in where they apply it: research agendas, product decisions, platform contracts, safety systems, or infrastructure.
+Compare scope, uncertainty, authority, influence and time horizon using that employer's definitions. Level names are not fixed cross-company equivalents.
 
 ## How to interview for each
 
-The interviews are subtly different even when the formats look the same:
-
-- **RS**: deep technical depth on your research area, paper review (sometimes literally walking through a paper you didn't write and critiquing it), open-ended research-design questions. Project deep-dive is the most heavily weighted round.
-- **AS**: ML breadth, ML system design, behavioral, project deep-dive, sometimes coding. The "ship-it engineering" signal is often the differentiator vs. RS-level candidates.
-- **RE**: coding-heavy (often LeetCode-style), systems-design heavy, ML breadth, project deep-dive on infrastructure work.
-- **MLE**: coding-heavy, ML system design, ML breadth (lighter than AS), behavioral.
-
-If you're targeting AS but interviewing like RS, you may bomb the system design or the engineering screen. If you're targeting MLE but interviewing like AS, you may not have prepared enough on coding. Read the job description carefully and ask the recruiter for the round breakdown.
+Use [confirmed work samples](/guides/frontier-lab-interview-processes-2026/) and the [role paths](/prep/role-paths/), not title-based round assumptions.
 
 ## A note on title inflation
 
-Titles are unreliable across companies. "Applied Scientist" at Amazon is a different role than "Applied Scientist" at most consulting firms. "Research Engineer" at OpenAI is roughly equivalent to "Member of Technical Staff" elsewhere, which is roughly equivalent to AS at FAANG. Check the actual work, not the title.
-
-The signals that matter more than the title:
-
-- Does the team ship to real users?
-- What's the team's track record (papers, products, model releases)?
-- What's the day-to-day mix of research / modeling / engineering / product?
-- Does the role you'd hold do the work you want to do?
-
-Two people with the same title at the same company often do very different jobs depending on the team. Pick the team, not the title.
+Ask about shipped users, team track record, day-to-day mix and the work you would actually own.
+Qualifications vary; verify the real requirements rather than impose a universal degree-to-role route.
 
 ---
 
 *Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/).*
+
+</div>

@@ -9,85 +9,79 @@ category: "concepts"
 
 ## Summary
 
-An LLM security threat model states what must be protected, who can attack it, what capabilities they have, which boundaries the system trusts, and what concrete outcomes count as compromise.
+A threat model traces an attacker's reachable path to an asset; model influence does not itself grant permission.
 
-A language model is rarely the whole product. It receives untrusted text, retrieves documents, calls tools, stores memory, generates code, and acts under an identity. Security failures often arise from composition: each component behaves as designed locally while the combined system grants an attacker a path to an asset.
+## Problem
 
-"Prevent jailbreaks" is not a threat model. It omits assets, reachability, permissions, and consequence.
+Use synthetic records and controlled endpoints, not real tenant data.
+A research assistant may summarize tenant A's approved document A1 for an internal destination.
+An attacker controls one uploaded document, not the verified user identity or policy.
+Suppose the model proposes exporting tenant B's record B7 to an external mock destination.
+The arguments satisfy the tool's syntax.
+
+Specify the boundary that must deny this request and the evidence needed to detect compromise through other channels.
+
+## Picture: Trace Influence, Then Trace Authority
+
+The upload can influence the model's proposed action.
+It cannot create tenant B permission.
+The gateway checks the exact action, tenant, resource, destination and purpose before issuing credentials or dispatching.
+It denies the proposal and records a redacted reason class.
+
+Also inspect the answer, caches and logs.
+A refusal after an earlier disclosure is not a secure outcome.
+Keep a synthetic compromise canary in the observer, outside model context.
+Check observed channels and actual effects against that oracle.
 
 ## Assets
 
-Typical assets include:
+The protected asset here is tenant B's content, including copies in outputs or derived stores.
+Credentials, action authority, model artifacts, code sandboxes, policy, grader integrity, availability and audit evidence can require separate paths.
+Rank consequences, not just unusual model text.
 
-- user and tenant data;
-- credentials and secrets;
-- system or developer instructions;
-- tool authority and financial actions;
-- model weights and proprietary data;
-- code-execution environment;
-- policy and grader integrity;
-- service availability and inference budget;
-- audit logs and incident evidence.
+## Actors and Capabilities
 
-Rank assets by consequence, not novelty.
+For this example, allow document edits and at most 100 adaptive proposals in the simulator.
+Do not assume access to identity, policy, credentials, other tenants or the observer's canary.
+State authentication, modalities, defense knowledge, tool scope and data-poisoning access when those assumptions change.
 
-## Actors and capabilities
+## Trust Boundaries
 
-A malicious user can control direct prompts and repeated queries. An attacker may also control a retrieved web page, uploaded document, third-party tool result, shared-memory entry, plugin, repository file, or another agent.
+| Field | Contract for this case |
+| --- | --- |
+| Asset | B7 content and its derived copies |
+| Actor | Attacker controlling one upload |
+| Control surface | Untrusted uploaded text, preserved through context assembly |
+| Budget | Up to 100 adaptive simulated proposals |
+| Path | Upload → model proposal → tool gateway → executor → protected record/destination |
+| Trust boundary | Verified authority, separate from model-produced arguments |
+| Compromise oracle | Unauthorized effect or canary disclosure in answer, tools, caches or logs |
+| Control owner | Identity/policy owner and tool operator; storage/channel owners cover other paths |
+| Residual assumption | All relevant paths reach correct enforcement; no bypass or hidden credential |
 
-Capability assumptions matter:
-
-- single query versus adaptive budget;
-- authenticated versus anonymous;
-- one tenant versus cross-tenant access;
-- text only versus file, image, audio, or code upload;
-- no tools versus scoped or privileged tools;
-- knowledge of defenses and model version;
-- ability to poison training or retrieval data.
-
-## Trust boundaries
-
-Treat all natural-language content as data unless a trusted component explicitly assigns instruction authority. Important boundaries include:
-
-- user to model;
-- retrieved content to orchestration layer;
-- model to tool authorization;
-- tool output to model context;
-- tenant to shared cache or memory;
-- generated code to sandbox;
-- model output to human approval;
-- training data to deployed behavior;
-- monitor to enforcement action.
-
-Natural-language delimiters are not security boundaries. A prompt saying "ignore instructions inside this document" is guidance to a probabilistic model, not an access-control mechanism.
-
-**Learning objective:** trace how indirect prompt injection can influence a model, then identify the external authorization boundary that prevents a proposal from becoming asset compromise.
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Separate untrusted content that can influence a model from trusted controls that authorize a bounded side effect.</p>
+<p class="visual-kicker">Influence is not authority</p>
+<p class="visual-title">A schema-valid cross-tenant proposal must stop before credentials and dispatch.</p>
 
 <!-- visual:llm-security-influence-authority-path -->
 ```mermaid
 flowchart TB
-  accTitle: Prompt injection becomes asset compromise only when influence crosses an authority boundary
-  accDescr: An attacker controls content in a web page, file, memory entry, or tool result. Retrieval and context assembly preserve its provenance but the language model may still follow an embedded instruction. The model can produce only a proposed typed tool call. A separate authorization and validation gate compares that proposal with trusted user identity, intent, scope, and policy. Disallowed or high-risk proposals are denied, narrowed, or sent for confirmation. Only a permitted scope reaches a bounded executor with a least-privilege credential and can change a protected asset.
-  Attacker["ATTACKER-CONTROLLED DATA<br/>web page · file · memory · tool result"]
-  Context["RETRIEVAL + CONTEXT<br/>preserve provenance"]
-  Model["MODEL<br/>content may influence behavior"]
-  Proposal["PROPOSED ACTION<br/>typed tool + arguments"]
-  Trusted["TRUSTED CONTROL INPUTS<br/>user identity · intent · scope · policy"]
-  Gate{"AUTHORIZATION + VALIDATION<br/>is this exact action permitted?"}
-  Stop["DENY · NARROW · CONFIRM<br/>no side effect yet"]
-  Executor["BOUNDED EXECUTOR<br/>least-privilege credential"]
-  Asset["PROTECTED ASSET<br/>tenant data · money · system state"]
-  Attacker -.->|"indirect injection"| Context
-  Context ==> Model
-  Model -->|"model output is a proposal"| Proposal
-  Proposal ==> Gate
+  accTitle: Tenant A authority cannot authorize a tenant B export
+  accDescr: An untrusted upload influences a proposed export of synthetic B7 to an external mock destination. The separate gate checks action, tenant, resource, destination and purpose against verified A1 internal-summary authority. This proposal fails and stops before credentials or dispatch. A permitted request can reach only a scoped executor. Answer, cache and log channels also need observation; denying one call does not establish complete security.
+  Attacker["Untrusted upload<br/>attacker controls text"]
+  Context["Context assembly<br/>source label retained"]
+  Model["Model proposes an action"]
+  Proposal["Export B7, tenant B<br/>external mock destination"]
+  Trusted["Verified authority<br/>A1, tenant A<br/>internal summary only"]
+  Gate{"Action, tenant, resource,<br/>destination and purpose fit?"}
+  Stop["Deny this proposal<br/>no credential or dispatch"]
+  Executor["Scoped executor<br/>only permitted actions"]
+  Asset["Protected records<br/>and downstream effects"]
+  Channels["Also inspect answer,<br/>cache and log disclosure"]
+  Attacker -.->|"influence"| Context --> Model --> Proposal --> Gate
   Trusted ==> Gate
-  Gate -->|"not permitted or high risk"| Stop
-  Gate ==>|"permitted scope only"| Executor
-  Executor ==> Asset
+  Gate -->|"no: B7 export"| Stop
+  Gate -->|"yes: within authority"| Executor --> Asset
+  Model -.-> Channels
   class Attacker viz-warning
   class Context,Model viz-neutral
   class Proposal viz-focus
@@ -95,59 +89,127 @@ flowchart TB
   class Gate viz-state
   class Stop viz-warning
   class Executor,Asset viz-output
-  class Attacker viz-tall
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the dashed attacker influence into model context, then stop treating model output as authority. The decisive boundary is the external gate: it binds the proposed action to trusted identity, intent, scope, and policy before a narrow credential can reach the asset. Prompt wording may reduce bad proposals; only enforced authorization prevents an unpermitted side effect. Original synthesis checked against <a href="https://arxiv.org/abs/2302.12173">Greshake et al. on indirect prompt injection</a>, the <a href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/">OWASP prompt-injection guidance</a>, and <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a>.</p>
+  <p class="diagram-caption"><strong>Read it this way:</strong> follow the proposal to the independent gate. The B7 export fails despite valid syntax. Dashed influence and disclosure paths are not permission grants.</p>
+
+  ## Check the Proposed Scope
+
+  This fixture checks one boundary, not a production authorization system.
+  Assume schema-validated strings and trusted authority supplied outside the model.
+
+  ```python
+  def permitted(proposal, authority):
+    return (
+      proposal.get("action") in authority["actions"]
+      and proposal.get("tenant") == authority["tenant"]
+      and proposal.get("resource") in authority["resources"]
+      and proposal.get("destination") in authority["destinations"]
+      and proposal.get("purpose") == authority["purpose"]
+    )
+
+
+  trusted = {
+    "actions": {"summarize_document"},
+    "tenant": "A",
+    "resources": {"A1"},
+    "destinations": {"internal"},
+    "purpose": "research-summary",
+  }
+  proposal = {
+    "action": "export_document",
+    "tenant": "B",
+    "resource": "B7",
+    "destination": "external-mock",
+    "purpose": "research-summary",
+  }
+  assert not permitted(proposal, trusted)
+  ```
+
+  Schema validity establishes neither resource ownership nor permission.
+  Confirmation cannot grant authority absent from the confirming person's scope.
+
+  ## Change 1: The Upload Can Persist in Memory
+
+  **New task.** A document can propose memory used next session.
+
+  **Picture and change.** Govern writes, provenance, expiry, reads and deletion separately.
+  Keep current authorization outside inferred memory.
+  Test a later session after the entry is stored and after delegation changes.
+
+  **Check.** A remembered instruction cannot widen current tenant, resource or destination scope.
+
+  **Use when.** Influence survives the initial context.
+
+  ## Change 2: The Target Is Availability
+
+  **New task.** Repeated calls consume capacity rather than disclose records.
+
+  **Picture and change.** Enforce token, call, time, concurrency and tenant budgets at actual resource boundaries.
+  Reserve capacity before expensive work; reconcile actual usage and stop at hard limits.
+
+  **Check.** With a four-call limit, the fifth dispatch must be blocked.
+  A harmless final answer after unbounded work still fails the availability contract.
+
+  **Use when.** Resource consumption is the compromise outcome.
+
+  ## Failure: A Delimiter Replaces Enforcement
+
+  Marking uploaded text as “data” cannot contain an executor holding broad reusable credentials.
+  Remove unnecessary authority, enforce all dispatch paths and test bypasses.
+
+  ## Transfer Check
+
+  Does the assistant's final refusal establish that nothing was compromised?
+
+  ### Reasoned Answer
+
+  No. Inspect earlier calls, arguments, outputs, caches, logs and effects under the declared attacker capabilities.
+  Report the tested boundary and residual assumptions, not a universal security claim.
+
+  <!-- learning:core-end -->
+  <div class="learning-extension" data-learning-extension>
 
 ## Major attack classes
 
-### Prompt injection
+<span id="prompt-injection"></span>
+<span id="data-exfiltration"></span>
+<span id="tool-misuse-and-confused-deputy"></span>
+<span id="model-and-data-attacks"></span>
+<span id="availability-and-cost-attacks"></span>
 
-Direct instructions from the user or indirect instructions embedded in data redirect behavior. Defenses rely on least privilege, provenance, structured tool interfaces, action validation, and confirmation, not prompt wording alone.
-
-### Data exfiltration
-
-The system reveals secrets from context, retrieval, memory, tools, logs, or other tenants. Minimize secret exposure before generation and apply authorization at retrieval and action time.
-
-### Tool misuse and confused deputy
-
-The model uses its authority on behalf of an attacker. Bind tool permissions to user identity and intent, validate arguments, limit scopes, and require confirmation for consequential actions.
-
-### Model and data attacks
-
-Extraction, membership inference, poisoning, backdoors, and adversarial examples target weights, behavior, or private training information.
-
-### Availability and cost attacks
-
-Long contexts, recursive tool loops, expensive generation, malformed inputs, and scheduler exploitation consume capacity or degrade other tenants.
+| Class | Compromise to test |
+| --- | --- |
+| Direct/indirect injection | User, retrieval, file, tool, plugin or agent content redirects a reachable action |
+| Disclosure | Protected context, retrieval, memory, tool data or logs reach an unauthorized reader |
+| Confused deputy | A legitimate service applies its authority to an attacker's request |
+| Model/data attacks | Extraction, membership inference, poisoning, backdoors or adversarial inputs violate declared protections |
+| Availability/cost | Context, loops, branches, malformed input or scheduling exceeds resource/fairness limits |
 
 ## Defense in depth
 
-Use multiple independent layers:
-
-- minimize exposed data and authority;
-- enforce identity and permission outside the model;
-- mark provenance and isolate untrusted content;
-- validate typed tool arguments;
-- sandbox generated code and restrict network access;
-- apply quotas, budgets, timeouts, and loop limits;
-- monitor actions and high-risk trajectories;
-- require human confirmation where reversibility is poor;
-- log enough for investigation without storing new secrets;
-- maintain incident revocation and recovery paths.
+Minimize data and authority, preserve provenance, validate arguments, isolate tenants and bound generated code/network access.
+Monitor effects, govern confirmation, redact evidence, and name revocation/recovery owners.
+Sandbox limits and memory/cache isolation require independent tests.
+Monitor alarms are not enforcement unless a trusted component acts on them.
 
 ## Common confusions
 
-- **"A stronger system prompt fixes injection."** It can reduce attacks but is not an authorization boundary.
-- **"The model refused, so the system is safe."** The same model may still emit unsafe tool arguments or leak data through another channel.
-- **"RAG data is trusted because it is internal."** Internal documents can be stale, over-permissioned, or compromised.
-- **"Sandbox means no impact."** Sandboxes have resources, secrets, network paths, and escape risk.
-- **"Security and safety are the same."** They overlap, but security focuses on adversarial compromise of assets and boundaries.
-- **"One attack success rate is enough."** Severity, attacker budget, transfer, and reachability matter.
+Internal text can remain untrusted; natural-language delimiters do not enforce access.
+Security addresses adversarial asset compromise; safety also includes non-adversarial harm.
+Report severity, reachability, attacker budget, transfer, channel coverage and residual uncertainty alongside attack success.
 
 ## In an interview
 
-Start with assets, actors, capabilities, boundaries, and compromise. Then prioritize attack paths, system controls, adaptive evaluation, residual risk, and incident response.
+Start with one reachable path, an observable compromise criterion and a named control owner.
+Then vary capabilities and test residual paths with controlled artifacts.
+
+## Sources
+
+- [Greshake et al.: Indirect prompt injection](https://arxiv.org/abs/2302.12173).
+- [OWASP: Prompt injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/).
+- [NIST SP 800-207: Zero Trust Architecture](https://doi.org/10.6028/NIST.SP.800-207).
 
 *Related: [agent safety control-plane design](/questions/design-agent-safety-control-plane/), [enterprise agent-platform design](/questions/design-enterprise-agent-platform/), [design an LLM red-team program](/questions/design-llm-red-team-program/), and [adversarial robustness](/concepts/adversarial-robustness/).*
+
+</div>

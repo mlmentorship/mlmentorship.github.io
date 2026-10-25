@@ -12,6 +12,16 @@ const topology = [
   ['sub2', '2', '-> null', '-> null'],
 ];
 const rowByNode = new Map(topology.map((row, index) => [row[0], index]));
+const nodePositions = {
+  main3: { x: 145, y: 55 },
+  main4: { x: 80, y: 155 },
+  main5: { x: 210, y: 155 },
+  main1: { x: 35, y: 255 },
+  main2: { x: 125, y: 255 },
+  sub4: { x: 355, y: 155 },
+  sub1: { x: 305, y: 255 },
+  sub2: { x: 405, y: 255 },
+};
 const trees = (activeNodes, extra = {}) => grid(topology, activeNodes.map((node, index) => ({
   row: rowByNode.get(node),
   col: 1,
@@ -21,6 +31,31 @@ const trees = (activeNodes, extra = {}) => grid(topology, activeNodes.map((node,
 })), {
   mainTree: 'main3(main4(main1,main2),main5)',
   subTree: 'sub4(sub1,sub2)',
+  graphCompanion: {
+    nodes: Object.keys(nodePositions),
+    nodeLabels: { main3: '3', main4: '4', main5: '5', main1: '1', main2: '2', sub4: '4', sub1: '1', sub2: '2' },
+    edges: ['main3->main4','main3->main5','main4->main1','main4->main2','sub4->sub1','sub4->sub2'],
+    positions: nodePositions,
+    width: 460,
+    height: 365,
+    treeLayout: true,
+    start: activeNodes[0],
+    stateNodes: activeNodes.slice(1),
+    markerId: `subtree-pair-${activeNodes.join('-')}${extra.result ? '-result' : ''}`,
+    edgeLabels: false,
+    ariaLabel: 'Separate trees: main 3 has children 4 and 5; main 4 and pattern 4 each have children 1 and 2',
+    regions: [
+      { x: 145, y: 20, label: 'Main tree' },
+      { x: 355, y: 120, label: 'Pattern' },
+      ...activeNodes.map((node, index) => ({
+        x: index === 0 ? 145 : 355,
+        y: 315,
+        label: `${index === 0 ? 'first' : 'second'}=${node}`,
+      })),
+      { x: 230, y: 345, label: 'Exact match includes all missing children' },
+    ],
+  },
+  gridSummary: 'Original child-slot inventory',
   motion: [
     ...topology.flatMap((row, rowIndex) => row.map((value, colIndex) => ({
       key: `topology-${rowIndex}-${colIndex}`,
@@ -76,7 +111,7 @@ const review = {
   recognitionCue: 'Use this composition when one complete rooted tree must appear inside another: candidate roots may occur anywhere, but a candidate succeeds only if every value and missing-child position matches.',
   invariant: 'is_subtree searches every reachable candidate root until one same call succeeds; same(first, second) returns true exactly when the two rooted trees have equal values and recursively identical left and right topology.',
   stateModel: 'The recursion stack holds either a candidate-search node paired with the fixed subroot or a same-tree node pair; no visited set is needed because trees have unique parent paths.',
-  visualRationale: 'A compact child-slot topology keeps every real edge and null position visible while paired cursors move through candidate roots and corresponding children.',
+  visualRationale: 'Two disconnected node-and-edge trees distinguish the moving main-tree candidate from the fixed pattern. Exact null semantics remain explicit in the caption and preserved child-slot inventory.',
   rejectedAlternatives: [
     'Array serialization can support another algorithm, but it hides the recursive parent-child checks used by this implementation.',
     'A value-only node list cannot distinguish equal values with different missing-child topology.',

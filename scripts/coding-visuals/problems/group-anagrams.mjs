@@ -4,7 +4,13 @@ const characters = ['e', 'a', 't', '|', 't', 'e', 'a', '|', 't', 'a', 'n'];
 const example = 'words = ["eat", "tea", "tan"]';
 const cursor = (index, label) => mark(index, label, 'focus', 'signature-cursor');
 const groups = (entries, index, label, extra = {}) =>
-  arrayMap(characters, entries, [cursor(index, label)], { example, mapLabel: '26-count tuple -> bucket', ...extra });
+  arrayMap(characters, entries, [cursor(index, label)], {
+    example,
+    mapLabel: '26-count tuple -> bucket',
+    fitArray: true,
+    arrayColumns: 4,
+    ...extra,
+  });
 
 const draft = visual('Use each word\'s 26-letter frequency tuple as its bucket address.', [
   frame(
@@ -16,58 +22,58 @@ const draft = visual('Use each word\'s 26-letter frequency tuple as its bucket a
   frame(
     'Count e in eat',
     'The character e increments slot ord("e")-ord("a") from 0 to 1.',
-    groups([], 0, 'e: 0 -> 1', { counts: 'a0 e1 t0; others 0' }),
+    groups([], 0, 'e +1', { counts: 'a0 e1 t0; others 0' }),
     'eat-count-e',
   ),
   frame(
     'Count a in eat',
     'The character a increments its slot, preserving e:1.',
-    groups([], 1, 'a: 0 -> 1', { counts: 'a1 e1 t0; others 0' }),
+    groups([], 1, 'a +1', { counts: 'a1 e1 t0; others 0' }),
     'eat-count-a',
   ),
   frame(
     'Count t and append eat',
-    'The completed tuple has a:1, e:1, t:1 and zeros elsewhere; append "eat" at that exact key.',
-    groups([['(a1,e1,t1; others 0)', '[eat]']], 2, 't: 0 -> 1; append', { signature: '(a1,e1,t1; others 0)' }),
+    'The complete tuple has a:1, e:1, t:1 and zeros elsewhere. Append "eat" at that key.',
+    groups([['(a1,e1,t1; others 0)', '[eat]']], 2, 't +1', { signature: '(a1,e1,t1; others 0)' }),
     'eat-append-bucket',
   ),
   frame(
     'Reset and count t in tea',
-    'A fresh all-zero count array is created for "tea"; its first character sets t:1.',
-    groups([['(a1,e1,t1; others 0)', '[eat]']], 4, 'new counts; t: 0 -> 1', { counts: 'a0 e0 t1; others 0' }),
+    'Create fresh zero counts for "tea". Its first character sets t:1.',
+    groups([['(a1,e1,t1; others 0)', '[eat]']], 4, 'new t', { counts: 'a0 e0 t1; others 0' }),
     'tea-count-t',
   ),
   frame(
     'Count e in tea',
     'The second character sets e:1 while t remains 1.',
-    groups([['(a1,e1,t1; others 0)', '[eat]']], 5, 'e: 0 -> 1', { counts: 'a0 e1 t1; others 0' }),
+    groups([['(a1,e1,t1; others 0)', '[eat]']], 5, 'e +1', { counts: 'a0 e1 t1; others 0' }),
     'tea-count-e',
   ),
   frame(
     'Count a and reuse the bucket',
-    'After a becomes 1, tea has the same complete 26-count tuple as eat, so append to the existing bucket.',
-    groups([['(a1,e1,t1; others 0)', '[eat, tea]']], 6, 'a: 0 -> 1; append', { signature: '(a1,e1,t1; others 0)' }),
+    'Setting a:1 completes the same 26-count tuple as eat. Append tea to that existing bucket.',
+    groups([['(a1,e1,t1; others 0)', '[eat, tea]']], 6, 'a +1', { signature: '(a1,e1,t1; others 0)' }),
     'tea-append-existing-bucket',
   ),
   frame(
     'Reset and count t in tan',
-    'A third fresh count array starts at zero; t becomes 1.',
-    groups([['(a1,e1,t1; others 0)', '[eat, tea]']], 8, 'new counts; t: 0 -> 1', { counts: 'a0 n0 t1; others 0' }),
+    'A third fresh count array starts at zero. Set t:1.',
+    groups([['(a1,e1,t1; others 0)', '[eat, tea]']], 8, 'new t', { counts: 'a0 n0 t1; others 0' }),
     'tan-count-t',
   ),
   frame(
     'Count a in tan',
     'The second character sets a:1 while t remains 1.',
-    groups([['(a1,e1,t1; others 0)', '[eat, tea]']], 9, 'a: 0 -> 1', { counts: 'a1 n0 t1; others 0' }),
+    groups([['(a1,e1,t1; others 0)', '[eat, tea]']], 9, 'a +1', { counts: 'a1 n0 t1; others 0' }),
     'tan-count-a',
   ),
   frame(
     'Count n and create a bucket',
-    'The completed tan tuple has a:1, n:1, t:1. It differs from the eat/tea key at e and n, so defaultdict creates a new bucket.',
+    'The tan tuple has a:1, n:1, t:1. Its different e/n counts require a new bucket.',
     groups([
       ['(a1,e1,t1; others 0)', '[eat, tea]'],
       ['(a1,n1,t1; others 0)', '[tan]'],
-    ], 10, 'n: 0 -> 1; append', { signature: '(a1,n1,t1; others 0)', branch: 'new key' }),
+    ], 10, 'n +1', { signature: '(a1,n1,t1; others 0)', branch: 'new key' }),
     'tan-create-new-bucket',
   ),
   frame(
@@ -76,7 +82,7 @@ const draft = visual('Use each word\'s 26-letter frequency tuple as its bucket a
     groups([
       ['(a1,e1,t1; others 0)', '[eat, tea]'],
       ['(a1,n1,t1; others 0)', '[tan]'],
-    ], 10, 'scan complete', { buckets: '2', result: '[["eat", "tea"], ["tan"]]' }),
+    ], 10, 'done', { buckets: '2', result: '[["eat", "tea"], ["tan"]]' }),
     'return-groups',
   ),
 ]);

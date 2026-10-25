@@ -9,27 +9,25 @@ category: "concepts"
 
 ## Summary
 
-Single-agent RL assumes a stationary environment. The moment other learning agents share it, that assumption breaks: markets, game-playing, traffic, negotiation, ad auctions, and self-play training are all multi-agent. Multi-agent RL studies environments where several agents act at once, and each agent's reward and transitions depend on the other agents' policies, which are themselves changing.
+Joint evidence can help train local actors; it cannot supply facts unavailable when those actors execute.
 
-## Why it is harder than single-agent RL
+## Problem
 
-- **Non-stationarity:** from one agent's view, the environment shifts as the others learn.
-- **Credit assignment:** a shared team reward does not say whose action helped.
-- **Partial observability:** agents usually see only local information.
-- **Coordination equilibria:** several stable conventions can coexist.
-- **Opponent modeling:** competitive agents adapt strategically to you.
-- **Evaluation:** doing well against one set of opponents need not generalize.
+Two cooperative agents choose A or B from separate observations.
+For one fixed state, their local action values are $q_1=[2,1]$ and $q_2=[0,3]$.
+Compare additive and positive-weight team values, then test whether perfect self-play predicts success with an unfamiliar partner.
 
 ## Centralized training, decentralized execution
 
-The common pattern trains critics or value functions with global state and all agents' actions, while each deployed policy acts on its local observation only. MADDPG and value-decomposition methods apply this idea differently.
+Training may use global state and joint actions; deployed actors use only permitted local observations, history or declared messages.
+The drawing uses the simple observation-only case.
 
 <!-- visual:multi-agent-ctde-information-boundary -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="ctde-visual-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="ctde-visual-title">Separate information used to learn coordinated policies from information each policy can use when acting.</p>
 	<div class="visual-scroll">
-		<svg viewBox="0 0 760 360" role="img" aria-labelledby="ctde-svg-title ctde-svg-desc">
+		<svg viewBox="0 0 760 360" style="min-width: 760px;" role="img" aria-labelledby="ctde-svg-title ctde-svg-desc">
 			<title id="ctde-svg-title">Centralized training and decentralized execution information paths</title>
 			<desc id="ctde-svg-desc">During training, agent one and agent two each map a local observation to an action. A centralized critic additionally receives global state and both actions, then sends dashed learning signals back to both policies. During execution, the critic and global state are absent. Each trained policy independently maps only its own local observation to its own action.</desc>
 			<defs>
@@ -70,27 +68,120 @@ The common pattern trains critics or value functions with global state and all a
 			<path class="viz-forward" d="M495 312 H530"></path><path class="viz-forward" d="M635 312 H670"></path>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> read the solid paths first: each actor always chooses from its own observation. During training only, the critic may inspect global state and the joint action, then send dashed learning signals into both policies. Below the divider, that privileged path is gone; execution remains decentralized. Original schematic checked against <a href="https://arxiv.org/abs/1706.02275">MADDPG</a> and <a href="https://proceedings.mlr.press/v80/rashid18a.html">QMIX</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow each local observation into its action. Dashed training signals can use joint evidence; below the divider, no critic/global-state input reaches either actor.</figcaption>
 </figure>
+
+## Calculate Local Choices and Team Values
+
+Agent 1 greedily chooses A, while agent 2 chooses B.
+
+| Joint choice | VDN: $q_1+q_2$ | Positive mixer: $2q_1+q_2$ |
+| --- | ---: | ---: |
+| A, A | 2 | 4 |
+| A, B | 5 | 7 |
+| B, A | 1 | 2 |
+| B, B | 4 | 5 |
+
+Both team functions are maximized by the independent choices here.
+Hold the state fixed and assume independent feasible action sets.
+Nonnegative mixer derivatives let local greedy choices attain a joint maximum:
+
+$$
+\frac{\partial Q_{\mathrm{tot}}}{\partial q_i}\geq 0.
+$$
+
+QMIX uses this monotonicity constraint; it restricts representable team values.
+It does not identify each agent's causal contribution or guarantee equilibrium.
+
+## Check a Convention Outside Self-Play
+
+In a separate game, both agents receive one only when their symbols match.
+A learned actor always chooses A.
+
+| Partner | Expected payoff |
+| --- | ---: |
+| Self-play partner always A | 1 |
+| Held-out partner equally A or B | 0.5 |
+
+Perfect self-play did not establish partner generalization.
+This is an exact toy expectation, not an agent-training experiment.
+
+## Change 1: Unfamiliar or Adapting Agents
+
+**New task.** Deployment partners or opponents differ from training.
+
+**Picture and change.** Broaden populations and cross-play, including held-out conventions and exploiting policies.
+
+**Check.** Stable self-play averages can conceal cycles or narrow conventions.
+
+**Use when.** Training policies do not represent deployment.
+
+## Change 2: Communication Disappears
+
+**New task.** A shared channel disappears or messages arrive late.
+
+**Picture and change.** Restrict actor inputs, retrain permitted memory/communication and test missing/delayed messages.
+
+**Check.** A privileged training critic cannot supply missing runtime information by itself.
+
+**Use when.** The information boundary changes.
+
+## Failure: Training Privilege Leaks into Execution
+
+An actor requiring unavailable global state violates decentralized execution.
+A team reward also does not automatically solve credit assignment or coordination.
+
+## Transfer Check
+
+Must the joint transition law change merely because two agents exist?
+
+### Reasoned Answer
+
+No. A stationary joint game can induce changing individual dynamics when other agents' policies change.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Why it is harder than single-agent RL
+
+Let $s$ be joint state, $o_i$ agent $i$'s observation, and $\mathbf a$ the joint action.
+Specify transition law $P(s'\mid s,\mathbf a)$, rewards $r_i(s,\mathbf a)$, communication and policy versions.
+State which agents learn and whether incentives are cooperative, competitive or mixed.
+
+| Challenge | Distinct question |
+| --- | --- |
+| Non-stationarity | Which other policies change the agent's induced observations/transitions? |
+| Credit | Which action contributed to shared return? |
+| Partial observation | What local information/history is missing? |
+| Coordination | Which conventions coexist? |
+| Opponents | How can others strategically respond? |
+| Evaluation | Which partners, seeds and exploiters are genuinely held out? |
 
 ## Cooperative and competitive methods
 
-**Cooperative.** Value decomposition builds a team value from per-agent values: VDN sums them; QMIX uses a monotonic mixing network so decentralized greedy actions stay consistent with the joint value.
-
-**Competitive and mixed.** Self-play, population-based training, opponent sampling, and league systems reduce overfitting to a single opponent. Nash equilibrium is a useful reference point but hard to compute in large stochastic games.
+VDN adds local values; QMIX conditions a monotonic mixer on training evidence.
+Neither represents every team payoff nor repairs missing local facts.
+MADDPG uses centralized action critics with decentralized actors.
+Self-play, leagues and population sampling broaden experience, not guarantee robustness or Nash equilibrium.
 
 ## In an interview
 
-1. Name the source of non-stationarity.
-2. Clarify cooperative, competitive, or mixed incentives.
-3. Explain centralized training with decentralized execution.
-4. Address credit assignment and communication.
-5. Evaluate against diverse policies, unseen partners, and exploiters.
+1. Name changing policies and incentives.
+2. Declare joint/local information and message permissions.
+3. Trace training versus deployment inputs.
+4. Check credit, coordination and communication failures.
+5. Report cross-play, seeds, adaptation and exploiting policies.
 
 ## Common confusions
 
-- **"Just treat other agents as part of the environment."** Their policies change and respond strategically.
-- **"Self-play guarantees robustness."** It can cycle or overfit to its own population.
-- **"A team reward creates teamwork."** It can also create free-riding and muddy credit assignment.
+Multiple fixed policies do not automatically imply a changing joint transition law.
+Privileged critics, monotonic mixing and population generalization solve different problems.
+
+## Sources
+
+- [MADDPG, 2017](https://arxiv.org/abs/1706.02275).
+- [QMIX, 2018](https://proceedings.mlr.press/v80/rashid18a.html).
 
 *Related: [actor-critic methods](/concepts/actor-critic-methods/), [exploration versus exploitation](/concepts/exploration-vs-exploitation/), and [PPO](/concepts/ppo/).*
+
+</div>

@@ -1,6 +1,6 @@
 ---
 title: "How would you evaluate a search ranker?"
-description: "Search ranking eval is offline metrics for development, A/B for shipping, and human raters for absolute calibration. The senior answer uses all three and respects what each measures."
+description: "Evaluate a search ranker with judged queries, explicit averaging weights, exposure controls, slice guardrails and a recorded release decision."
 date: "2025-04-09"
 draft: false
 tags: ["questions"]
@@ -8,106 +8,150 @@ category: "questions"
 ---
 
 
-> *Asked in: search and information-retrieval interviews.*
+A ranker can improve average NDCG while regressing on important queries; keep judgment, offline screening and product impact separate.
 
-The L4 candidate names NDCG. The L6 candidate combines offline metrics, online behavioral signals, and human relevance judgments, and knows what each is good for.
+## Problem
 
-## What an L4 answer sounds like
+Compare A and B on two equally sized sets of judged queries: head and tail.
+Suppose traffic is 90% head and 10% tail.
+These are fictional slice means and traffic weights, not measured production results.
 
-> "Use NDCG@10 on a held-out set of queries with relevance labels."
+| Ranker | Head NDCG@10 | Tail NDCG@10 |
+| --- | ---: | ---: |
+| A | 0.80 | 0.80 |
+| B | 0.90 | 0.70 |
 
-Right tool, only one of three. You've heard the metric, not the eval system.
+The proposed offline gate requires tail NDCG@10 of at least 0.78.
+Does B improve the headline metric, pass the gate or establish better user outcomes?
 
-## What an L5 answer sounds like
+## Picture: The Weights Change the Headline
 
-> "Three layers, each measuring something different:
->
-> 1. **Offline ranking metrics on a labeled set.** NDCG@K (graded relevance), MRR (first relevant), Recall@K (did we get the right docs at all). Used to compare model variants quickly during development. Cheap to compute, but only as good as the labels.
->
-> 2. **Online behavioral metrics.** CTR at position, clicks-per-session, abandoned queries (no clicks), regret signals (immediate query reformulation). Cheap, but biased by position (top results get clicked more regardless of relevance) and by what the user already saw.
->
-> 3. **Human relevance judgments.** Trained raters score (query, document) pairs against a rubric. Slow and expensive but the most calibrated signal. Used for absolute quality measurement and to train the offline labeled set.
->
-> Pipeline: develop with offline metrics, ship with online A/B tests, calibrate with periodic human evaluations."
+Imagine one equal-sized stack of judged queries for each slice.
+Equal-slice averaging gives both rankers 0.80.
+Traffic averaging gives the head stack nine times the tail stack's weight.
 
-This is L5. Three layers, what each is good for.
+$$
+\begin{aligned}
+A_{\text{traffic}}&=0.9(0.80)+0.1(0.80)=0.80\\
+B_{\text{traffic}}&=0.9(0.90)+0.1(0.70)=0.88.
+\end{aligned}
+$$
 
-**Learning objective:** Route a ranker candidate through human calibration, offline screening, and randomized online validation without asking one evidence layer to answer another layer's question.
+B gains 0.08 in traffic-weighted NDCG but loses 0.10 on tail queries.
+It fails the declared 0.78 tail gate.
+Neither weighted average establishes causal user benefit.
 
 <!-- visual:search-ranker-evidence-flywheel -->
 ```mermaid
 flowchart TB
-	accTitle: Three evidence layers form a search-ranker evaluation flywheel
-	accDescr: Human reviewers apply a relevance rubric to sampled query-document pairs, creating a labeled test set. Offline metrics use that set to screen ranker candidates quickly and by slice. Promising candidates enter a randomized online A/B test or interleaving comparison with production traffic. Only candidates with an online lift and healthy guardrails ship gradually; other candidates return for revision. Production failures and drift are sampled by slice for the next human review cycle and labeled-set refresh. Raw clicks never bypass randomized exposure to become relevance labels.
-	Ranker["Ranker candidate"]
-	Human["1 · Human judgments<br/>rubric-defined relevance<br/><b>Are these results useful?</b>"]
-	Labels["Labeled query-document set<br/>head · torso · tail · verticals"]
-	Offline["2 · Offline metrics<br/>NDCG · MRR · Recall@K<br/><b>Does it beat baseline on fixed labels?</b>"]
-	Traffic["Production traffic<br/>randomized exposure"]
-	Online["3 · Online comparison<br/>A/B: product impact<br/>interleaving: relative preference"]
-	Ship["Ship gradually<br/>monitor + rollback"]
-	Revise["Revise ranker<br/>or diagnose labels"]
-	Failures["Production failures + drift<br/>sample by slice"]
-	NextReview["Next review cycle<br/>re-judge hard cases + refresh labels"]
-
-	Human -->|applies rubric| Labels
-	Labels -->|fixed evaluation set| Offline
-	Ranker --> Offline
-	Offline -->|promising on key slices| Online
-	Offline -->|weak or regressed| Revise
-	Traffic --> Online
-	Online -->|no causal lift| Revise
-	Online -->|lift + healthy guardrails| Ship
-	Ship --> Failures
-	Failures -.-> NextReview
-
-	class Ranker,Traffic viz-input
-	class Human,Labels,Failures,NextReview viz-state
-	class Offline,Online viz-focus
-	class Ship viz-output
-	class Revise viz-warning
-	class Human viz-tall
-	class Ranker viz-wide
+  accTitle: A weighted NDCG improvement does not override the tail guardrail
+  accDescr: Human judgments define a versioned relevance dataset. Fixed head and tail slices give A scores 0.80 and 0.80, and B scores 0.90 and 0.70. With 90 percent head traffic, traffic-weighted NDCG is 0.80 for A and 0.88 for B. B nevertheless fails the required tail score of at least 0.78 and returns for diagnosis. Candidates that pass declared screening can enter an appropriately randomized product experiment. Its estimand, uncertainty and guardrails determine a staged release decision. Production failures inform a separately versioned judging refresh rather than silently changing a running comparison.
+  Human["Human rubric + sampled candidates<br/>versioned relevance judgments"]
+  Slices["Fixed head / tail slices<br/>A: 0.80 / 0.80<br/>B: 0.90 / 0.70"]
+  Weights["Traffic weights: 0.90 / 0.10<br/>weighted A: 0.80<br/>weighted B: 0.88"]
+  Gate{"Tail at least 0.78?<br/>B: 0.70 fails"}
+  Hold["Hold B; diagnose tail failure<br/>average gain is not permission"]
+  Online["Passing candidate only:<br/>randomized product experiment<br/>estimand + uncertainty + guardrails"]
+  Release{"Release evidence sufficient?"}
+  Ship["Staged release<br/>monitor + compatible rollback"]
+  Refresh["Failure sampling + new judgments<br/>new dataset version"]
+  Human --> Slices --> Weights --> Gate
+  Gate -->|"B fails"| Hold
+  Gate -->|"candidate passes"| Online --> Release
+  Release -->|"yes"| Ship --> Refresh
+  Release -->|"no or uncertain"| Hold
+  Refresh -.-> Human
+  class Human,Slices,Refresh viz-state
+  class Weights,Gate,Online,Release viz-focus
+  class Hold viz-warning
+  class Ship viz-output
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> start with a candidate, not a favorite metric. Human judgments define rubric-based relevance; offline metrics cheaply screen variants against those labels; randomized online evidence decides whether behavior and guardrails improve. Then send production failures back through human review so drift and weak slices refresh the next offline set. Raw clicks do not skip the exposure-control step.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> calculate the weighted average, then apply the tail constraint. Passing offline screening permits further evaluation; it does not prove product lift.</p>
 
-## What an L6 answer adds
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
 
-> "...practical points:
->
-> **Position bias dominates online click metrics.** Position 1 gets ~5x the CTR of position 5 regardless of relevance. Mitigations: position-aware models (predict CTR conditional on position, then estimate relevance), randomized swaps for unbiased estimation (interleaving experiments), or click-model-based corrections (cascade model, dynamic Bayesian network).
->
-> **Interleaving experiments are more powerful than A/B for ranker comparisons.** Show a user a mix of results from ranker A and ranker B; observe which they click. Per-query signal, much higher statistical power than user-level A/B.
->
-> **Counterfactual eval on logged data.** With proper inverse propensity weighting, you can estimate how a new ranker would have performed on past traffic. Cheap pre-screening before launching a real A/B.
->
-> **Slice-based evaluation is mandatory.** Aggregate metrics hide failures on important slices: rare queries (the long tail), specific verticals (jobs, news), specific user segments. A 1% NDCG lift overall while regressing 5% on the most valuable query class is a bad ship.
->
-> **Human eval calibration drift.** Human raters disagree (inter-rater reliability ~0.6-0.7 for nuanced judgments). Re-train the rater pool periodically; track inter-rater agreement; treat absolute scores cautiously, deltas more reliably."
+## Decision Contract: Three Different Questions
 
-## Tells that get you a strong-hire vote
+| Layer | Measures | Important limit |
+| --- | --- | --- |
+| Human judgments | Relevance under a documented rubric | Rater agreement is not truth or user satisfaction |
+| Offline metrics | Fixed-label ranking comparison, including slices | NDCG: graded ordering; MRR: first relevant result; Recall@K: relevant-result coverage |
+| Online experiment | Defined behavioral/product effect under randomized exposure | Clicks depend on position and prior exposure; no-click can also mean success |
 
-- You name **three layers** (offline / online / human).
-- You bring up **position bias** as the dominant confound in online metrics.
-- You mention **interleaving** for ranker comparison.
-- You insist on **slice-based eval**.
-- You acknowledge **human eval drift** and inter-rater reliability.
+Freeze an evaluation manifest: query/candidate/judgment/exposure versions, cutoff, gains, weights, slices and uncertainty.
+Also declare randomization unit, target effect, outcome maturity, guardrails, decision owner and rollback conditions.
+Define zero-ideal-gain queries and relevance thresholds before computing metrics.
 
-## Tells that get you down-leveled
+## Change 1: New Documents Have No Judgments
 
-- NDCG only.
-- No mention of online metrics.
-- No awareness of position bias.
-- No slicing.
+**New task.** A new retriever finds documents absent from the old judging pool.
 
-## Common follow-up
+**Picture and change.** Mark them unknown, pool candidates from multiple systems and obtain rubric-based judgments.
+Version the resulting comparison and report judged coverage by slice.
 
-"How would you build a labeled ranking dataset?"
+**Check.** The old ranker must not win merely because its documents already have labels.
 
-The L6 answer:
+**Use when.** Candidate support changes.
 
-> "Sample queries from production traffic stratified by query frequency (head, torso, tail). For each query, collect candidate documents from production retrieval. Have trained raters score each (query, document) pair on a graded relevance scale (e.g., 0-4) using a documented rubric. Track inter-rater agreement and re-rate ambiguous cases. Refresh the dataset quarterly; production query distribution drifts faster than people expect. The rubric design is the most important step: vague rubrics produce noisy labels that look like measurement uncertainty but are spec uncertainty."
+## Change 2: The Goal Is Long-Term Satisfaction
+
+**New task.** Relative click preference is insufficient for the release decision.
+
+**Picture and change.** Choose a product experiment with suitable randomization, duration, mature outcomes and safety/cost/latency guardrails.
+Interleaving can still compare rankers through attributed clicks under its protocol.
+
+**Check.** Interleaving preference is not automatically long-term causal value or universally more powerful than A/B testing.
+
+**Use when.** The target effect changes.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Failure: Production Clicks Become Relevance Truth
+
+Sampling only the current ranker's top results excludes unseen candidates.
+Treating their raw clicks as relevance labels also confounds exposure, position and usefulness.
+More data from that same selection process does not resolve missing support.
+
+## Transfer Check
+
+Does refreshing labels every quarter keep the evaluation valid?
+
+### Reasoned Answer
+
+No fixed calendar guarantees validity.
+Monitor intents, candidates, policy, data and raters; refresh versioned rubrics while protecting ongoing comparisons.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-an-l6-answer-adds"></span>
+
+## Position and Counterfactual Evidence
+
+Position-aware prediction alone does not identify relevance independently of exposure.
+Randomized swaps and explicit click models need their own design and assumptions; they are not synonyms for interleaving.
+Cascade and dynamic Bayesian click models impose behavioral assumptions, not guaranteed bias removal.
+
+Logged-policy evaluation requires valid exposure propensities, support for evaluated actions, an identified outcome and controlled confounding/interference assumptions.
+Inverse propensity weighting can have high variance.
+It cannot recover unsupported actions by assigning them invented probabilities.
+Record clipping and sensitivity analyses when used; correction changes uncertainty and sometimes the target.
+
+<span id="common-follow-up"></span>
+
+## Build and Maintain the Judged Set
+
+Sample production queries across head, torso, tail, verticals and relevant user segments.
+Record sampling weights and privacy constraints; pool candidate documents beyond the current ranker's results.
+Document graded relevance criteria, rater training, adjudication and disagreement.
+Measure agreement by slice and investigate shared rubric errors; agreement alone cannot establish validity.
+Rejudge ambiguous/new candidates and retain a protected comparison set with versioned updates.
+There is no universal agreement target or refresh interval.
+
+</div>
 
 ---
 

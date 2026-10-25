@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-house-robber.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "For each prefix of houses, keep the better of skipping the current house or taking it after the best prefix ending two houses earlier.",
+  "learningObjective": "For each prefix, compare skipping the current house with taking it after the last compatible prefix.",
   "mechanismReview": {
     "pattern": "One-dimensional take-or-skip dynamic programming with two rolling prefix answers.",
     "recognitionCue": "Items lie in a line, adjacent choices conflict, and the objective asks for a maximum total rather than the exact chosen sequence.",

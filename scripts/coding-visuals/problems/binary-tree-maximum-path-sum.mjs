@@ -11,6 +11,15 @@ const nodeNames = {
 const nodes = Object.values(nodeNames);
 const nodeIndexes = Object.fromEntries(Object.keys(nodeNames).map((value, index) => [value, index]));
 const edges = ['root -> 9', 'root -> 20', '9 -> leaf', '20 -> 15', '20 -> 7'];
+const graphIds = { '-10': 'n0', '9': 'n1', '20': 'n2', '-4': 'n3', '15': 'n4', '7': 'n5' };
+const nodePositions = {
+  n0: { x: 220, y: 50 },
+  n1: { x: 100, y: 160 },
+  n2: { x: 340, y: 160 },
+  n3: { x: 50, y: 270 },
+  n4: { x: 285, y: 270 },
+  n5: { x: 400, y: 270 },
+};
 const treeScene = (active, label, extra = {}, output = []) => array(nodes, [
   mark(nodeIndexes[active], label, output.includes(active) ? 'output' : 'focus', 'active-node'),
   ...output.filter((value) => value !== active).map((value) => mark(nodeIndexes[value], 'path', 'output', `path-${value}`)),
@@ -18,6 +27,29 @@ const treeScene = (active, label, extra = {}, output = []) => array(nodes, [
   ...extra,
   activeState: label,
   topology: edges.join(', '),
+  graphCompanion: {
+    nodes: Object.keys(nodePositions),
+    nodeLabels: Object.fromEntries(Object.entries(graphIds).map(([value, node]) => [node, value])),
+    edges: ['n0->n1','n0->n2','n1->n3','n2->n4','n2->n5'],
+    positions: nodePositions,
+    width: 460,
+    height: 380,
+    treeLayout: true,
+    start: graphIds[active],
+    stateNodes: output.filter((value) => value !== active).map((value) => graphIds[value]),
+    markerId: `maximum-path-${graphIds[active]}-${label.replace(/[^a-z0-9]+/gi, '-')}`,
+    edgeLabels: false,
+    ariaLabel: 'Tree rooted at negative 10: left 9 has child negative 4; right 20 has children 15 and 7',
+    regions: [
+      {
+        x: nodePositions[graphIds[active]].x + (['-10', '9', '20'].includes(active) ? 70 : 0),
+        y: nodePositions[graphIds[active]].y + (['-10', '9', '20'].includes(active) ? 0 : 40),
+        label,
+      },
+      { x: 230, y: 365, label: output.length ? 'completed: 15 -> 20 -> 7' : 'return one branch; score two' },
+    ],
+  },
+  arraySummary: 'Original node inventory',
 });
 
 const draft = visual('Postorder returns one extendable branch to a parent while scoring a complete path through each node with both nonnegative child gains.', [
@@ -63,7 +95,7 @@ const draft = visual('Postorder returns one extendable branch to a parent while 
     returnedGain: '-10 + max(9, 35) = 25; return 25',
     best: '42',
   }), 'visit-negative-10'),
-  frame('Return the global maximum', 'The completed path 15 -> 20 -> 7 has sum 42. It can use both branches because it ends locally rather than extending to a parent.', treeScene('20', 'maximum 42', {
+  frame('Return the global maximum', 'The completed path 15 -> 20 -> 7 has sum 42. It can use both branches because it ends locally rather than extending to a parent.', treeScene('20', 'best 42', {
     path: '15 -> 20 -> 7',
     arithmetic: '15 + 20 + 7 = 42',
     result: '42',
@@ -75,7 +107,7 @@ const review = {
   recognitionCue: 'Use it when a connected tree path may bend once at a highest node, while any value returned to a parent must remain a single non-branching chain.',
   invariant: 'After a node finishes, its return is the maximum sum of one downward branch starting there; global best is the maximum complete path in every finished subtree, and negative child returns contribute zero.',
   stateModel: 'The minimal recursive state is each node’s left and right clamped gains plus one global best. The trace retains real parent-child edges, active call position, postorder return, local two-branch score, and best update.',
-  visualRationale: 'A stable node strip paired with the explicit parent-child edge list preserves the complete tree topology at narrow widths; active-node marks, formulas, and call-stack labels expose returned branches versus locally completed paths without color.',
+  visualRationale: 'Actual parent-child edges show the harmful negative leaf and the two-branch completed path. Distinct display values and internal node IDs preserve negative values safely; the original strip remains in an inventory disclosure.',
   rejectedAlternatives: [
     'A values-only postorder table was rejected because it hides which child gains feed each parent.',
     'A recursion tree of function calls was rejected because it duplicates the actual binary-tree topology.',

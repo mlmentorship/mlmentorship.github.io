@@ -15,142 +15,172 @@ prerequisites: []
 
 ## Summary
 
-Expectation describes the average value of a random variable under its probability distribution. Variance describes spread around that average. Covariance describes how two variables move together, and correlation rescales covariance to a unit-free value between -1 and 1.
+Expectation averages values under a probability law.
+Variance averages squared deviations from a mean. Covariance averages products of two variables' deviations.
 
-These quantities support loss analysis, uncertainty estimates, feature analysis, Monte Carlo methods, and multivariate models. They describe association under a distribution. They do not prove that changing one variable causes another to change.
-
-## Expectation
-
-For a discrete random variable $X$ with probability mass function $p(x)$,
-
-$$
-\mathbb{E}[X] = \sum_x x p(x).
-$$
-
-For a continuous variable with density $p(x)$,
-
-$$
-\mathbb{E}[X] = \int x p(x)\,dx.
-$$
-
-Expectation is linear. For constants $a$ and $b$,
-
-$$
-\mathbb{E}[aX+bY] = a\mathbb{E}[X] + b\mathbb{E}[Y].
-$$
-
-This property does not require $X$ and $Y$ to be independent.
-
-A useful warning: an expected value need not be a likely outcome. The expected value of one fair die roll is 3.5, although 3.5 can never appear.
-
-## Variance
-
-Variance is the expected squared distance from the mean:
-
-$$
-\operatorname{Var}(X) = \mathbb{E}[(X-\mathbb{E}[X])^2].
-$$
-
-The computational form is
-
-$$
-\operatorname{Var}(X) = \mathbb{E}[X^2] - \mathbb{E}[X]^2.
-$$
-
-For constants $a$ and $b$,
-
-$$
-\operatorname{Var}(aX+b) = a^2\operatorname{Var}(X).
-$$
-
-Adding a constant changes the mean but not the variance. Scaling by $a$ scales standard deviation by $|a|$ and variance by $a^2$.
+Suppose a hypothetical population gives probability $1/4$ to each pair $(-1,-1)$, $(-1,1)$, $(1,1)$ and $(1,3)$.
+How does their co-movement affect the spread of $X+Y$?
+These are population probabilities, not four observations used to estimate an unknown population.
 
 ## Covariance
 
-Covariance measures linear co-movement:
-
-$$
-\operatorname{Cov}(X,Y) = \mathbb{E}[(X-\mathbb{E}[X])(Y-\mathbb{E}[Y])].
-$$
-
-It also has a computational form:
-
-$$
-\operatorname{Cov}(X,Y) = \mathbb{E}[XY] - \mathbb{E}[X]\mathbb{E}[Y].
-$$
+Center both coordinates: the mean of $X$ is zero and the mean of $Y$ is one.
+Multiply each point's horizontal and vertical deviations, then average those products.
 
 <!-- visual:covariance-centered-product-signs -->
 <figure class="learning-figure plot-panel" aria-labelledby="covariance-signs-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="covariance-signs-title">Determine each observation's covariance sign from its position relative to both means.</p>
+	<p class="visual-title" id="covariance-signs-title">Multiply deviations from both means, then average the four products.</p>
 	<svg viewBox="0 0 480 330" role="img" aria-labelledby="covariance-signs-svg-title covariance-signs-svg-desc">
 		<title id="covariance-signs-svg-title">Signs of centered-product contributions to covariance</title>
-		<desc id="covariance-signs-svg-desc">A scatter plot is divided by the mean of X and the mean of Y. Circular points in the upper-right and lower-left regions have same-sign deviations and positive centered products. Diamond points in the upper-left and lower-right regions have opposite-sign deviations and negative centered products. Covariance averages all of these signed products.</desc>
+		<desc id="covariance-signs-svg-desc">Four equally likely outcomes have X mean zero and Y mean one. Points (-1, -1) and (1, 3) each contribute a centered product of two. Points (-1, 1) and (1, 1) lie on the Y-mean line and contribute zero. Their average product is one. Empty quadrants show where opposite-sign deviations would contribute negatively.</desc>
 		<rect x="55" y="30" width="370" height="240" rx="8" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.5"></rect>
 		<path class="viz-axis" d="M55 150H425M240 30V270"></path>
 		<path d="M235 38L240 30L245 38M417 145L425 150L417 155" style="fill:none;stroke:var(--c-text);stroke-width:1.8"></path>
 		<text class="viz-axis-label" x="438" y="155" style="font-size:15px">X</text>
 		<text class="viz-axis-label" x="246" y="20" style="font-size:15px">Y</text>
-		<text class="viz-axis-label" x="240" y="291" text-anchor="middle" style="font-size:15px">mean of X</text>
-		<text class="viz-axis-label" x="62" y="143" style="font-size:15px">E[Y]</text>
+		<text class="viz-axis-label" x="240" y="291" text-anchor="middle" style="font-size:15px">mean of X = 0</text>
+		<text class="viz-axis-label" x="62" y="143" style="font-size:15px">mean of Y = 1</text>
 		<text class="viz-callout" x="332" y="54" text-anchor="middle" style="font-size:15px">same signs: (+)(+) = +</text>
 		<text class="viz-callout" x="148" y="54" text-anchor="middle" style="font-size:15px">opposite signs: (-)(+) = -</text>
 		<text class="viz-callout" x="148" y="254" text-anchor="middle" style="font-size:15px">same signs: (-)(-) = +</text>
 		<text class="viz-callout" x="332" y="254" text-anchor="middle" style="font-size:15px">opposite signs: (+)(-) = -</text>
-		<circle cx="315" cy="90" r="12" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
-		<text class="viz-axis-label" x="315" y="95" text-anchor="middle" style="font-size:15px">+</text>
-		<circle cx="365" cy="118" r="12" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
-		<text class="viz-axis-label" x="365" y="123" text-anchor="middle" style="font-size:15px">+</text>
-		<circle cx="120" cy="205" r="12" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
-		<text class="viz-axis-label" x="120" y="210" text-anchor="middle" style="font-size:15px">+</text>
-		<circle cx="185" cy="230" r="12" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
-		<text class="viz-axis-label" x="185" y="235" text-anchor="middle" style="font-size:15px">+</text>
-		<path d="M135 83L147 95L135 107L123 95Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></path>
-		<text class="viz-axis-label" x="135" y="100" text-anchor="middle" style="font-size:15px">-</text>
-		<path d="M190 105L202 117L190 129L178 117Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></path>
-		<text class="viz-axis-label" x="190" y="122" text-anchor="middle" style="font-size:15px">-</text>
-		<path d="M305 190L317 202L305 214L293 202Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></path>
-		<text class="viz-axis-label" x="305" y="207" text-anchor="middle" style="font-size:15px">-</text>
-		<path d="M375 207L387 219L375 231L363 219Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></path>
-		<text class="viz-axis-label" x="375" y="224" text-anchor="middle" style="font-size:15px">-</text>
+		<circle cx="305" cy="80" r="12" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
+		<text class="viz-axis-label" x="305" y="85" text-anchor="middle" style="font-size:15px">2</text>
+		<text class="viz-axis-label" x="323" y="85" style="font-size:15px">(1, 3)</text>
+		<circle cx="175" cy="220" r="12" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></circle>
+		<text class="viz-axis-label" x="175" y="225" text-anchor="middle" style="font-size:15px">2</text>
+		<text class="viz-axis-label" x="91" y="225" style="font-size:15px">(-1, -1)</text>
+		<path d="M175 138L187 150L175 162L163 150Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></path>
+		<text class="viz-axis-label" x="175" y="155" text-anchor="middle" style="font-size:15px">0</text>
+		<text class="viz-axis-label" x="130" y="181" style="font-size:15px">(-1, 1)</text>
+		<path d="M305 138L317 150L305 162L293 150Z" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:2"></path>
+		<text class="viz-axis-label" x="305" y="155" text-anchor="middle" style="font-size:15px">0</text>
+		<text class="viz-axis-label" x="283" y="181" style="font-size:15px">(1, 1)</text>
 		<text class="viz-callout" x="240" y="317" text-anchor="middle" style="font-size:15px">Cov(X, Y) averages every signed centered product.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> Center both variables at their means. A point on the same side of both means multiplies two deviations with the same sign and contributes positively; a point on opposite sides contributes negatively. Covariance is the average of these signed products, so the contributions can cancel.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each point has probability one quarter. Two centered products equal two; two equal zero. Their average is one. Opposite-sign deviations would contribute negatively.</figcaption>
 </figure>
 
-Positive covariance means large values of one variable tend to occur with large values of the other. Negative covariance means they tend to move in opposite directions. Zero covariance means there is no linear association.
+## Expectation
 
-Independence implies zero covariance when the expectations exist. Zero covariance does not imply independence. For example, let $X$ be symmetric around zero and let $Y=X^2$. Their covariance is zero, but $Y$ is fully determined by $X$.
+For probability mass $p(x)$, $\mathbb E[X]=\sum_x xp(x)$.
+For a density $p(x)$, replace the sum by $\int xp(x)\,dx$.
+Assume finite expectations. For constants $a,b$, linearity gives
+
+$$
+\mathbb E[aX+bY]=a\mathbb E[X]+b\mathbb E[Y].
+$$
+
+No independence is needed. An expectation need not be a possible outcome: a fair die has expectation $3.5$.
+
+## Variance
+
+Let $\mu_X=\mathbb E[X]$ and $\mu_Y=\mathbb E[Y]$. Assume finite second moments.
+Variance squares one deviation; covariance multiplies two:
+
+$$
+\operatorname{Var}(X)=\mathbb E[(X-\mu_X)^2],\qquad
+\operatorname{Cov}(X,Y)=\mathbb E[(X-\mu_X)(Y-\mu_Y)].
+$$
+
+Expanding these expressions gives $\operatorname{Var}(X)=\mathbb E[X^2]-\mu_X^2$ and $\operatorname{Cov}(X,Y)=\mathbb E[XY]-\mu_X\mu_Y$.
+
+## Worked example
+
+| Outcome | Probability | $X-0$ | $Y-1$ | Centered product |
+| --- | --- | --- | --- | --- |
+| $(-1,-1)$ | $1/4$ | $-1$ | $-2$ | $2$ |
+| $(-1,1)$ | $1/4$ | $-1$ | $0$ | $0$ |
+| $(1,1)$ | $1/4$ | $1$ | $0$ | $0$ |
+| $(1,3)$ | $1/4$ | $1$ | $2$ | $2$ |
+
+The means are $0$ and $1$. The second moments are $1$ and $3$.
+Thus $\operatorname{Var}(X)=1$, $\operatorname{Var}(Y)=3-1^2=2$ and $\operatorname{Cov}(X,Y)=1$.
 
 ## Variance of a sum
 
-For two random variables,
+Square $(X-\mu_X)+(Y-\mu_Y)$, then average. The two cross-products produce the covariance term:
 
 $$
 \operatorname{Var}(X+Y) = \operatorname{Var}(X) + \operatorname{Var}(Y) + 2\operatorname{Cov}(X,Y).
 $$
 
-For independent variables, the covariance term is zero. This is why averaging independent measurements reduces variance.
-
-If $X_1,\ldots,X_n$ are independent with variance $\sigma^2$, then the sample mean has variance
-
-$$
-\operatorname{Var}(\bar{X}) = \frac{\sigma^2}{n}.
-$$
-
-The standard error therefore falls as $1/\sqrt{n}$, not $1/n$.
+Here the variance is $1+2+2(1)=5$.
+Direct check: $X+Y$ takes $-2,0,2,4$, with mean $1$.
+Its squared deviations are $9,1,1,9$, averaging $5$.
+Removing dependence while retaining the marginals would instead give sum variance $3$.
 
 ## Correlation
 
-Pearson correlation standardizes covariance:
+Pearson correlation divides covariance by positive standard deviations $\sigma_X$ and $\sigma_Y$:
 
 $$
 \rho_{X,Y} = \frac{\operatorname{Cov}(X,Y)}{\sigma_X\sigma_Y}.
 $$
 
-Correlation is unit-free and invariant to positive rescaling. It measures linear association. A value near zero can hide a strong nonlinear relationship, and an extreme outlier can change the estimate sharply.
+Here $\rho=1/\sqrt2\approx0.707107$. It is undefined if either variance is zero.
+Correlation lies between $-1$ and $1$ and does not establish an intervention effect.
 
-Use a scatter plot with the coefficient. For monotonic but nonlinear association, Spearman rank correlation may be more informative.
+## Change the measurement
+
+### 1. Convert the units of Y
+
+**New task:** replace $Y$ by $100Y$ without changing the joint observations.
+
+**Picture and change:** each vertical deviation grows by $100$.
+Covariance scales once; $Y$ variance scales twice.
+
+**Check:** covariance becomes $100$ and variance becomes $20{,}000$.
+Correlation stays $1/\sqrt2$. A negative rescaling would reverse its sign.
+
+**Use when:** units change but the underlying association does not.
+
+### 2. Average correlated measurements
+
+**New task:** average four variables, each with variance $4$ and pairwise correlation $0.5$.
+
+**Picture and change:** retain all six pairwise covariances, each equal to $2$.
+Divide the full sum variance by $4^2$.
+
+**Check:** average variance is $(16+2\times12)/16=2.5$, not the independent value $1$.
+
+**Use when:** measurements share a user, environment or disturbance.
+
+## Zero covariance can hide dependence
+
+Let $X$ be equally likely to be $-1,0,1$, and let $Y=X^2$.
+Both $\mathbb E[X]$ and $\mathbb E[XY]$ are zero, so covariance is zero.
+Yet $Y$ is determined by $X$. Independence implies zero covariance under these moment conditions; the reverse implication fails.
+
+## Try averaging two independent quantities
+
+Independent variables have variances $9$ and $16$. Find the variance and standard deviation of their average.
+
+<details>
+<summary>Check your answer</summary>
+
+The covariance term is zero. Variance is $(9+16)/4=6.25$, and standard deviation is $2.5$.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Scaling and repeated measurements
+
+For constants $a,b$, $\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X)$.
+Translation changes the mean but not spread. Standard deviation scales by $|a|$.
+More generally,
+
+$$
+\operatorname{Var}(aX+bY)=a^2\operatorname{Var}(X)+b^2\operatorname{Var}(Y)+2ab\operatorname{Cov}(X,Y).
+$$
+
+For independent measurements with common variance $\sigma^2$, their mean has variance $\sigma^2/n$.
+Its standard error falls as $1/\sqrt n$, not $1/n$.
+As another check, variances $4,4$ and covariance $3$ give sum variance $4+4+2(3)=14$.
 
 ## Covariance matrices
 
@@ -168,30 +198,14 @@ $$
 v^\top\Sigma v = \operatorname{Var}(v^\top x) \ge 0.
 $$
 
-This links covariance to principal component analysis, Gaussian models, whitening, and uncertainty ellipsoids.
-
-## Worked example
-
-Suppose $X$ and $Y$ both have variance 4 and covariance 3.
-
-$$
-\operatorname{Var}(X+Y)=4+4+2(3)=14.
-$$
-
-If they were independent, the variance would be 8. Positive covariance makes their sum less stable because both variables tend to move in the same direction.
+This supports PCA, Gaussian models, whitening and uncertainty ellipsoids.
+Use a scatter plot alongside Pearson correlation: outliers can change it sharply.
+Spearman correlation instead measures association between ranks; it answers a different question about monotonic relationships.
 
 ## In an interview
 
-Use this order:
-
-1. Define expectation, variance, and covariance.
-2. State linearity of expectation.
-3. Derive the variance of a sum.
-4. Explain independence versus zero covariance.
-5. Describe correlation as standardized linear association.
-6. Connect the covariance matrix to variance along a direction.
-
-A common follow-up asks why the standard error falls as $1/\sqrt{n}$. Start from the variance of an average of independent variables.
+Reconstruct the sum-variance formula by centering and squaring.
+State the observation law, moment conditions and independence assumptions before simplifying it.
 
 ## Common mistakes
 
@@ -205,3 +219,5 @@ A common follow-up asks why the standard error falls as $1/\sqrt{n}$. Start from
 ## Practice next
 
 Use these quantities in [bias and variance of estimators](/concepts/bias-variance-of-estimators/), [SVD and PCA](/concepts/svd-and-pca/), and the [ML math oral](/prep/labs/math-oral/).
+
+</div>

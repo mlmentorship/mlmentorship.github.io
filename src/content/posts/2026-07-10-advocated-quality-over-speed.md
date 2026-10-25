@@ -7,20 +7,21 @@ tags: ["questions"]
 category: "questions"
 ---
 
-> *Asked in: behavioral rounds wherever ML failures can harm users, trust, or regulatory standing.*
+Use a real launch decision. Explain the evidence that changed your recommendation and what you personally did.
+Separate your action from the team's decision.
 
-The L4 story ends with "I blocked a reckless launch and I was right." The L6 story ends with a proportionate mitigation that shipped close to the original date, plus a decision system that makes the next call easier. The signal is judgment: when to push, how hard, on what evidence, and how you protected delivery while you did it.
+## Problem
+
+> Tell me about a time you advocated for quality or safety when a team faced delivery pressure.
 
 ## What a strong answer covers
 
-In 90 to 120 seconds, cover six points:
-
-1. The delivery pressure and why it was legitimate.
-2. The specific risk, stated as concrete user harm.
-3. What you measured or proposed.
-4. The proportional mitigation or staged path.
-5. The decision and measurable outcome.
-6. What you learned about escalating under uncertainty.
+1. Pressure: what made the deadline costly to miss?
+2. Harm: who could be affected, and how?
+3. Measurement: what uncertainty did you test?
+4. Mitigation: what allowed release remained possible?
+5. Decision and result: who decided, and what happened?
+6. Learning: what would you change next time?
 
 <!-- visual:quality-speed-proportionate-path -->
 <figure class="learning-figure" aria-labelledby="quality-speed-path-title">
@@ -68,38 +69,97 @@ In 90 to 120 seconds, cover six points:
 			<text class="viz-node-value" x="180" y="480">Both: owner · stop rule · outcome metric</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> do not argue from “quality” in the abstract. Name the harm, reduce the key uncertainty, then choose the least restrictive path that keeps exposure within a pre-agreed stop rule. A block is proportionate only when staging, scope cuts, review, or rollback cannot bound the harm.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the evidence through a targeted test to a permitted release decision. A stop rule needs an owner who can act. Monitoring and rollback cannot undo every harm or replace a required permission check.</figcaption>
 </figure>
 
-## What an L4 answer sounds like
+## Work through a practice case
 
-> "I noticed accuracy was low and told my manager we should test more before launch. We delayed and fixed it."
+This case is hypothetical, not a first-person achievement.
+Two of 20 deliberately selected critical tests violate a required permission rule.
+Those counterexamples fail the gate for that path.
+The selected cases do not estimate a 10% production incident rate.
+A narrower release needs separate evidence and an authorized decision owner.
 
-Responsible, but it never shows how you judged severity, moved the decision, or weighed the cost of delay.
+## Change the decision
 
-## What an L5 answer adds
+### New evidence reduces the concern
 
-An L5 answer names a concrete failure mode and quantifies the exposure. It proposes the smallest action that resolves the uncertainty: a launch-blocking slice, targeted red-team or shadow evaluation, lower-risk first segment, human review, or scope cut. It also explains how product, legal, and leadership reached the decision.
+**New task:** reconsider a recommendation after a test reduces the suspected risk.
 
-## What an L6 answer adds
+**Picture and change:** update the decision using the resolved uncertainty.
 
-An L6 answer changes the decision system rather than one launch: a recurring risk review tied to severity and reversibility, quality gates that fix the incentive rewarding speed without consequences, and influence across teams without centralizing every call. The strongest version admits where an earlier safety concern was too conservative and updates the framework accordingly.
+**Check:** does the permitted release now meet the original requirement?
 
-## Tells that get you a strong-hire vote
+**Use when:** your concern was too conservative. Supporting the launch can be the result.
 
-- You respect the stakeholder's delivery constraint.
-- The risk is specific, testable, and proportional to the mitigation.
-- You bring evidence before you escalate rhetoric.
-- You propose a reversible path, not an indefinite veto.
-- You can say what would have changed your own position.
+### Leadership still wants the affected path
 
-## Tells that get you down-leveled
+**New task:** respond when delivery pressure persists after review.
 
-- Everyone else is careless and you are the lone adult.
-- "Safety" is invoked with no concrete user harm behind it.
-- You escalate before you try to collaborate.
-- You never acknowledge the cost of delay.
-- The story ends with "leadership agreed I was right."
+**Picture and change:** name decision rights, required escalation and hard boundaries. Continue allowed work.
+
+**Check:** stakeholder agreement does not override a required permission rule.
+
+**Use when:** the affected path remains disputed.
+
+## Failure case
+
+"I blocked it and was right" leaves the harm, evidence, authority and outcome unexplained.
+Zero observed failures in a small later sample does not prove zero risk or quantify avoided harm.
+
+## Try a changed outcome
+
+What evidence could have made your original recommendation too restrictive?
+
+<details>
+<summary>Check your answer</summary>
+
+Name the actual uncertainty, threshold and permitted alternative.
+Use a condition that could have changed your view at the time.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+<a id="what-an-l4-answer-sounds-like"></a>
+
+## Make your judgment visible
+
+"Accuracy was low, so we delayed" does not show severity, exposure or the cost of waiting.
+Describe the affected users, tested failure and choice you could influence.
+Use observed quantities when you have them. Identify modeled estimates separately.
+
+<a id="what-an-l5-answer-adds"></a>
+
+## Choose a targeted mitigation
+
+Possible actions include a critical-slice evaluation, shadow run, lower-risk segment, human review or scope cut.
+Explain why your choice addressed the tested failure.
+Record how product, legal or leadership participated when their approval was required.
+
+<a id="what-an-l6-answer-adds"></a>
+
+## Improve the next decision
+
+Describe a process change only if it happened: an owned gate, severity review or revised escalation path.
+Explain its observed effect and any extra delivery cost.
+Include an instance where evidence changed an overly conservative recommendation.
+
+<a id="tells-that-get-you-a-strong-hire-vote"></a>
+
+## Evidence to include
+
+Show the legitimate deadline, proportionate test, permitted alternatives and outcome.
+No story structure guarantees an interview rating or level.
+
+<a id="tells-that-get-you-down-leveled"></a>
+
+## Claims to question
+
+Check claims that everyone else was careless or that agreement proved your recommendation correct.
+A delay is an action. Reduced harm needs supporting evidence.
 
 ## Common follow-ups
 
@@ -110,3 +170,5 @@ An L6 answer changes the decision system rather than one launch: a recurring ris
 - Tell me about a time you were too conservative.
 
 *Related: [when you disagreed with someone senior](/questions/disagreed-with-senior/), [LLM deployment in healthcare](/questions/llm-deployment-healthcare/), and the [story-bank worksheet](/prep/story-bank/).*
+
+</div>

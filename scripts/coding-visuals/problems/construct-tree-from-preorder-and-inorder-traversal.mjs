@@ -8,6 +8,32 @@ const topology = [
   ['', '', '', '', '15', '', '7'],
 ];
 const positions = { '3': [0, 3], '9': [2, 1], '20': [2, 5], '15': [4, 4], '7': [4, 6] };
+const nodePositions = {
+  '3': { x: 210, y: 50 },
+  '9': { x: 75, y: 160 },
+  '20': { x: 315, y: 160 },
+  '15': { x: 255, y: 270 },
+  '7': { x: 390, y: 270 },
+};
+const construction = (active, extra) => {
+  const created = ['3','9','20','15','7'].slice(0, Number(extra.preorderIndex ?? 5));
+  return {
+    nodes: created,
+    edges: ['3->9','3->20','20->15','20->7'].filter((edge) => edge.split('->').every((node) => created.includes(node))),
+    positions: nodePositions,
+    width: 440,
+    height: 380,
+    treeLayout: true,
+    start: active,
+    markerId: `build-tree-${active}-${extra.preorderIndex ?? 'complete'}`,
+    edgeLabels: false,
+    ariaLabel: `Constructed tree after consuming ${created.length} preorder values`,
+    regions: [
+      ...(created.length ? [{ x: nodePositions[active].x, y: nodePositions[active].y + 40, label: `root ${active}` }] : []),
+      { x: 220, y: 365, label: created.length ? extra.split ?? 'all five nodes returned' : 'no nodes created; preorder index 0' },
+    ],
+  };
+};
 const scene = (active, extra = {}) => grid(topology, [{
   row: positions[active][0],
   col: positions[active][1],
@@ -19,6 +45,8 @@ const scene = (active, extra = {}) => grid(topology, [{
   preorder: '[3, 9, 20, 15, 7]',
   inorder: '[9, 3, 15, 20, 7]',
   positions: '9:0, 3:1, 15:2, 20:3, 7:4',
+  graphCompanion: construction(active, extra),
+  gridSummary: 'Original completed-tree inventory',
   ...extra,
 });
 
@@ -29,7 +57,7 @@ const draft = visual('The next preorder value becomes a root, and its inorder po
   frame('Create right child 20', 'After 9 returns, build(2,4) reads preorder[2]=20 and advances to 3. middle=3 splits [2,2] and [4,4].', scene('20', { callStack: '3 build(0,4) -> 20 build(2,4)', split: '[2,2] | 20 | [4,4]', preorderIndex: '3' }), 'node-20'),
   frame('Create 20 left child 15', 'build(2,2) reads preorder[3]=15 and advances to 4. Its ranges build(2,1) and build(3,2) are empty and return None.', scene('15', { callStack: '3 -> 20 -> 15 build(2,2)', split: 'empty | 15 | empty', baseCases: 'build(2,1)=None; build(3,2)=None', preorderIndex: '4' }), 'node-15'),
   frame('Create 20 right child 7', 'After 15 returns, build(4,4) reads preorder[4]=7 and advances to 5. Both child ranges are empty.', scene('7', { callStack: '3 -> 20 -> 7 build(4,4)', split: 'empty | 7 | empty', baseCases: 'build(4,3)=None; build(5,4)=None', preorderIndex: '5' }), 'node-7'),
-  frame('Return the reconstructed tree', 'Return 7, then 20, then 3. Preorder_index=5 has consumed every value, and the real parent-child edges match both traversals.', scene('3', { callStack: 'empty after returns 7 -> 20 -> 3', verification: 'preorder 3,9,20,15,7; inorder 9,3,15,20,7', result: '3(9, 20(15, 7))' }), 'return-tree'),
+  frame('Return the new tree', 'Return 7, then 20, then 3. Preorder_index=5 has consumed every value, and the real parent-child edges match both traversals.', scene('3', { callStack: 'empty after returns 7 -> 20 -> 3', verification: 'preorder 3,9,20,15,7; inorder 9,3,15,20,7', result: '3(9, 20(15, 7))' }), 'return-tree'),
 ]);
 
 export default defineVisual('construct-tree-from-preorder-and-inorder-traversal', draft, {
@@ -37,7 +65,7 @@ export default defineVisual('construct-tree-from-preorder-and-inorder-traversal'
   recognitionCue: 'Unique node values are given in preorder and inorder, so root order and left/right membership complement each other to determine one binary tree.',
   invariant: 'build(left,right) consumes exactly the next preorder values belonging to inorder[left:right+1] and returns precisely that subtree. Empty ranges consume nothing and return None.',
   stateModel: 'Keep the inorder value-to-index map, one shared preorder_index, recursive left/right bounds, and constructed nodes. The call stack preserves unfinished parent assignments.',
-  visualRationale: 'A compact coordinate grid draws every binary-tree node and parent-child edge with ASCII geometry, while a stable active-root key moves through inorder ranges, splits, base cases, and returns at readable mobile size.',
+  visualRationale: 'Actual nodes and edges appear only as preorder values are consumed. Inorder splits remain explicit, while a completed-tree inventory retains every original cursor and grid motion identity.',
   rejectedAlternatives: [
     'A table of traversal lists does not depict parent-child topology or recursive returns.',
     'Repeated list slicing hides the shared preorder cursor and adds avoidable allocation.',

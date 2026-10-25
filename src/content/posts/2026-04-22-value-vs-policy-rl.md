@@ -1,6 +1,6 @@
 ---
 title: "Value-based vs. policy-based RL"
-description: "Two paradigms in reinforcement learning. Value-based learns Q(s, a) and acts greedily; policy-based directly parametrizes the policy. When to use which."
+description: "Trace values, action selectors, actors and critics; choose data reuse and learned dynamics independently of the action interface."
 date: "2026-04-22"
 draft: false
 tags: ["concepts"]
@@ -9,122 +9,138 @@ category: "concepts"
 
 ## Summary
 
-**Value-based** RL learns a value function (typically $Q(s, a)$) and acts greedily with respect to it: $\pi(s) = \arg\max_a Q(s, a)$. **Policy-based** RL directly parametrizes a stochastic policy $\pi_\theta(a \mid s)$ and optimizes $\theta$ via the policy gradient. **Actor-critic** combines both.
+A value function scores actions; an actor produces actions or distributions. Choose data reuse and dynamics models separately.
 
-Choosing the right paradigm is a central decision in RL system design. Mismatch leads to poor sample efficiency, instability, or simply not working. For instance, value-based methods are awkward in continuous action spaces, and pure policy-based methods are sample-inefficient in tabular settings.
+## Problem
 
-**Learning objective:** trace how a state becomes an action in value-based and policy-based control, then locate the critic in an actor-critic without mistaking it for the action selector.
+For one state, actions are left, stay and right.
+Their return estimates are $Q=[1.2,0.4,2.1]$.
+An explicit actor instead gives probabilities $[0.15,0.10,0.75]$.
+Trace each action path, then add epsilon-greedy behavior with $\epsilon=0.2$ and uniform exploration across all three actions.
+
+## Picture: Scores Need a Selection Rule
 
 <!-- visual:value-policy-action-interface -->
 <figure class="learning-figure" aria-labelledby="value-policy-interface-title">
-	<p class="visual-kicker">Learning objective · one state, two action interfaces</p>
+	<p class="visual-kicker">One state, two action interfaces</p>
 	<p class="visual-title" id="value-policy-interface-title">What learned object sits directly upstream of the action?</p>
 	<div class="visual-grid--two" role="group" aria-label="Value-based control derives an action through a selector over learned action values; policy-based control obtains an action directly from a learned policy; actor-critic uses an actor for action choice and a critic for a training signal">
 		<section class="visual-panel" aria-labelledby="value-interface-title">
-			<h4 id="value-interface-title">VALUE-BASED · LEARN SCORES, THEN SELECT</h4>
-			<p><strong>1 · Estimate</strong><br />For state <var>s</var>, learn one return estimate per candidate: <var>Q</var>(<var>s</var>, left) = 1.2, <var>Q</var>(<var>s</var>, stay) = 0.4, <var>Q</var>(<var>s</var>, right) = 2.1.</p>
-			<p><strong>2 · Derive a policy</strong><br />An action selector reads those scores: greedy <code>argmax</code> chooses right; an exploration rule such as ε-greedy can sometimes choose another action.</p>
-			<p><strong>Decision path</strong><br /><code>state → Q scores → selector → action</code></p>
-			<p><strong>Canonical training signal</strong><br />A Bellman target moves the selected state-action value toward reward plus a bootstrapped future value.</p>
+			<h4 id="value-interface-title">Value: scores then a rule</h4>
+			<p>Left: 1.2. Stay: 0.4. Right: 2.1.</p>
+			<p>Greedy selection chooses right. Epsilon-greedy instead chooses right with probability 13/15.</p>
+			<p><code>state &rarr; Q scores &rarr; rule &rarr; action</code></p>
+			<p>Bellman targets can train the values; the behavior rule need not be deterministic.</p>
 		</section>
 		<section class="visual-panel" aria-labelledby="policy-interface-title">
-			<h4 id="policy-interface-title">POLICY-BASED · LEARN THE SELECTOR ITSELF</h4>
-			<p><strong>1 · Parameterize</strong><br />For the same state <var>s</var>, an explicit policy might output π(left | <var>s</var>) = 0.15, π(stay | <var>s</var>) = 0.10, π(right | <var>s</var>) = 0.75.</p>
-			<p><strong>2 · Act directly</strong><br />Sample from that distribution, or use its mode at evaluation. For continuous control, the policy can instead output distribution parameters such as μ and σ.</p>
-			<p><strong>Decision path</strong><br /><code>state → policy → action</code></p>
-			<p><strong>Canonical training signal</strong><br />A return or advantage weights the gradient of the sampled action's log probability.</p>
+			<h4 id="policy-interface-title">Policy: learn the selector</h4>
+			<p>Left: 0.15. Stay: 0.10. Right: 0.75.</p>
+			<p>Sampling chooses right 75% of the time; using the mode always chooses right here.</p>
+			<p><code>state &rarr; actor &rarr; action</code></p>
+			<p>An actor can also be deterministic; a stochastic actor can use a return-weighted log-probability gradient.</p>
 		</section>
 		<section class="visual-panel" style="grid-column: 1 / -1;" aria-labelledby="actor-critic-interface-title">
-			<h4 id="actor-critic-interface-title">ACTOR-CRITIC · POLICY ACTION PATH, VALUE TRAINING PATH</h4>
-			<p><strong>Decision:</strong> <code>state → actor πθ → action</code>. The actor remains the explicit policy that chooses the action.</p>
-			<p><strong>Training:</strong> <code>transition → critic Vφ or Qφ → advantage / target → actor update</code>. The critic evaluates states or actions to reduce variance or construct an optimization target; it need not sit in the deployed action path.</p>
-			<p><strong>Taxonomy check:</strong> actor-critic is a hybrid architecture, not a promise of on-policy learning. PPO is commonly on-policy; SAC is off-policy and reuses replay data.</p>
+			<h4 id="actor-critic-interface-title">Actor-critic: separate training path</h4>
+			<p><code>transition &rarr; critic &rarr; baseline/target/actor derivative</code></p>
+			<p>A state/action critic supports learning; it need not choose deployed actions.</p>
+			<p>SAC combines a stochastic actor with off-policy Q learning, not an actor-equals-on-policy rule.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow only the decision paths first. Value-based control must turn learned action scores into a policy through a selector; policy-based control learns that policy directly. Then read the actor-critic training path: the critic helps improve the actor, but the actor still supplies the action. These are distinctions about what is parameterized, not universal guarantees about stochasticity or data reuse. Original comparison informed by <a href="https://proceedings.neurips.cc/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html">Sutton et al. (1999)</a> and <a href="https://spinningup.openai.com/en/latest/algorithms/sac.html">OpenAI Spinning Up's SAC documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the action paths before the training path. Values plus a rule and a learned actor are different interfaces, not opposite definitions of randomness.</figcaption>
 </figure>
+
+## Check the Behavior Probabilities
+
+For epsilon-greedy here, right receives the greedy branch plus its share of exploration:
+
+$$
+P(\text{right}\mid s)=0.8+0.2/3=13/15.
+$$
+
+Left and stay each receive $1/15$.
+The actor's right probability remains $0.75$, despite both interfaces having the same mode.
+State behavior/target distributions and corrections explicitly when reusing data.
+
+## Change 1: Discrete Choices Become Continuous Torque
+
+**New task.** Choose real-valued motor commands.
+
+**Picture and change.** Price continuous Q maximization or use a bounded actor with controller/safety constraints.
+
+**Check.** A small finite output head cannot enumerate every torque.
+
+**Use when.** Argmax is no longer a cheap scan.
+
+## Change 2: Interaction Becomes Expensive
+
+**New task.** Real-world samples are costly and the simulator is imperfect.
+
+**Picture and change.** Compare reuse and learned-model planning with support, model-error, transfer and safe-fallback checks.
+
+**Check.** Dynamics errors can compound; sample efficiency is not guaranteed.
+
+**Use when.** Data cost changes the feasible methods.
+
+## Failure: An Algorithm Name Replaces Its Assumptions
+
+A task-name table can hide unsupported offline actions, unsafe controls or missing observation memory.
+No universal variance or sample-efficiency ranking resolves those constraints.
+
+## Transfer Check
+
+Is model-based learning mutually exclusive with actor-critic?
+
+### Reasoned Answer
+
+No. Learned dynamics can support planning or training data alongside an actor and critic.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
 
 ## Value-based methods
 
-Examples: Q-learning, DQN, Rainbow, distributional Q-learning.
-
-**Strengths:**
-
-- **Off-policy data reuse**: replay buffers enable training on old data, large effective sample size.
-- **Lower variance** than vanilla policy gradient.
-- **Good for discrete action spaces** with moderate cardinality.
-
-**Weaknesses:**
-
-- **Continuous actions** require $\arg\max_a Q(s, a)$. A separate optimization at each step. DDPG / TD3 learn a deterministic actor for this.
-- **No stochastic policies**: greedy w.r.t. $Q$ is deterministic. For exploration, must add $\varepsilon$-greedy externally.
-- **Maximization bias**: $\max_a Q$ overestimates true $Q$ when $Q$ is noisy.
-- **Many tricks needed** for stable deep variants: target networks, prioritized replay, double DQN.
-
-**Use when:**
-
-- Discrete actions, environment can be simulated cheaply (Atari, board games).
-- Need to reuse offline data.
-- Value function approximation is structurally easy (e.g., low-d state).
+Q-learning/DQN-family methods learn action values with chosen behavior and target rules.
+Replay, target networks and double estimators address specific data/stability risks, not unsupported offline actions automatically.
 
 ## Policy-based methods
 
-Examples: REINFORCE, A2C, A3C, TRPO, PPO.
-
-**Strengths:**
-
-- **Continuous actions** are natural: parametrize $\pi$ as Gaussian or similar.
-- **Stochastic policies** built-in: useful for exploration, mixed-strategy equilibria, partial observability.
-- **Direct objective**: maximize expected return.
-- **Simpler theoretical framing**: no Bellman equations, just expectation gradients.
-
-**Weaknesses:**
-
-- **Sample inefficient**: standard policy gradient is on-policy. Discard data after each gradient step.
-- **High variance**: Monte Carlo gradient estimator is noisy without baselines.
-- **Local optima**: policy gradient can get stuck in deterministic suboptimal policies.
-
-**Use when:**
-
-- Continuous control (robotics, physical simulation).
-- Stochastic policy needed (exploration, multi-agent).
-- Policy is naturally differentiable but value function is not (e.g., LLMs as policies in RLHF).
+Actors may be stochastic or deterministic.
+PPO commonly reuses recent rollouts for several updates; SAC uses replay under its algorithm.
+Monte Carlo gradients can have high variance; baselines and critics introduce their own estimation considerations.
 
 ## Actor-critic: combining the two
 
-An **actor-critic** algorithm trains both:
-
-- **Actor** $\pi_\theta(a \mid s)$: the policy.
-- **Critic** $V_\phi(s)$ or $Q_\phi(s, a)$: the value function, used as a baseline / target for the actor's gradient.
-
-The critic reduces the variance of the policy gradient; the actor handles continuous actions cleanly. Almost all modern RL algorithms (PPO, SAC, DDPG, TD3, IMPALA) are actor-critic.
+A critic can provide a state baseline, bootstrapped target or action derivative.
+SAC is stochastic/off-policy; TD3 uses a deterministic actor with Q critics.
 
 ## Decision matrix
 
-| Problem | First choice |
-|---------|------------|
-| Discrete actions, abundant simulation | DQN / Rainbow |
-| Continuous control, sample-efficient | SAC |
-| Continuous control, simple and robust | PPO |
-| LLM alignment | PPO or DPO |
-| Multi-agent | MAPPO, IMPALA |
-| Real-world robotics with limited samples | SAC or model-based RL |
-| Board games / planning | AlphaZero-style (MCTS + learned policy/value) |
-| Partially observable, RNN policy | PPO with LSTM/transformer policy |
+| Assumption | Candidate direction | Discriminating check |
+| --- | --- | --- |
+| Modest finite actions | Enumerated Q values or actor | Selection/coverage cost |
+| Continuous control | Actor or continuous optimizer | Bounds, stability, latency |
+| Offline/costly data | Supported reuse or models | Coverage, shift, safe interaction |
+| Partial observation | Memory/belief with either interface | Missing information and history |
+| Preference fitting | Specified preference objective | DPO is not generic sequential online RL |
 
 ## What about model-based RL?
 
-A third paradigm: learn a dynamics model $p(s' \mid s, a)$ and plan with it. Examples: Dreamer, MuZero, World Models. **Strengths**: extreme sample efficiency. **Weaknesses**: dynamics model errors compound; engineering complexity. Used when real-world samples are expensive (robotics, healthcare).
+Dynamics learning/planning is another axis, not an exclusive third interface.
+Dreamer/MuZero-style designs still need model-error and decision checks.
 
 ## Common pitfalls
 
-- **Choosing value-based for continuous control.** Awkward; SAC or DDPG-family if you must use Q-learning.
-- **Choosing pure policy gradient for sample-rich discrete problems.** DQN-family is much more sample-efficient.
-- **Treating actor-critic as fundamentally different.** It's just policy gradient with a learned baseline; understand both pieces.
-- **Ignoring variance in policy gradient.** Without baselines + advantage normalization, you'll see noisy curves and slow learning.
+Do not equate actors with fresh-only data, values with determinism, or critics with guaranteed improvement.
 
 ## Related
 
 - [Q-learning](/concepts/q-learning/). Canonical value-based.
 - [Policy gradient](/concepts/policy-gradient/). Canonical policy-based.
 - [PPO](/concepts/ppo/). Modern actor-critic.
+
+## Sources
+
+- [Sutton et al., 1999](https://proceedings.neurips.cc/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html).
+- [SAC documentation](https://spinningup.openai.com/en/latest/algorithms/sac.html).
+
+</div>

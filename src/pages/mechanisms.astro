@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getMechanismFamilies } from '../utils/learningMechanisms';
+import { findLibraryLocation } from '../data/library';
+
+const families = getMechanismFamilies();
+const groups = new Map<string, { title: string; families: typeof families }>();
+for (const family of families) {
+  const location = findLibraryLocation(family.owner.slug);
+  const id = location?.volume.id ?? 'other';
+  const group = groups.get(id) ?? { title: location?.volume.title ?? 'Further mechanisms', families: [] };
+  group.families.push(family);
+  groups.set(id, group);
+}
+---
+<BaseLayout title="Mechanisms" description="Shared computations, proofs and decision rules across the ML interview library.">
+  <div class="mechanism-index">
+    <header>
+      <nav aria-label="Library"><a href="/library/foundations/">Library</a><a href="/questions/">Questions</a></nav>
+      <h1>Mechanisms</h1>
+      <p class="index-count">{families.length} mechanisms · 391 lessons</p>
+      <label for="mechanism-search">Find a mechanism</label>
+      <input id="mechanism-search" type="search" autocomplete="off" />
+      <p class="filter-status" data-mechanism-status role="status" aria-live="polite"></p>
+    </header>
+    {[...groups.entries()].map(([id, group]) => <section data-mechanism-group aria-labelledby={`group-${id}`}>
+      <h2 id={`group-${id}`}>{group.title}</h2>
+      <ul>{group.families.map((family) => <li id={family.id} data-mechanism-entry data-search={`${family.title} ${family.owner.title} ${family.members.join(' ')}`.toLowerCase()}>
+        <a href={family.owner.href}>{family.title}</a>
+        {family.members.length > 1 && <small>{family.members.length - 1} {family.members.length === 2 ? 'application' : 'applications'}</small>}
+      </li>)}</ul>
+    </section>)}
+  </div>
+</BaseLayout>
+
+<script>
+  function initializeMechanismSearch() {
+    const input = document.querySelector<HTMLInputElement>('#mechanism-search');
+    if (!input || input.dataset.ready) return;
+    input.dataset.ready = 'true';
+    const entries = [...document.querySelectorAll<HTMLElement>('[data-mechanism-entry]')];
+    const groups = [...document.querySelectorAll<HTMLElement>('[data-mechanism-group]')];
+    const status = document.querySelector<HTMLElement>('[data-mechanism-status]');
+    input.addEventListener('input', () => {
+      const terms = input.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      for (const entry of entries) entry.hidden = !terms.every((term) => entry.dataset.search?.includes(term));
+      for (const group of groups) group.hidden = !group.querySelector('[data-mechanism-entry]:not([hidden])');
+      const count = entries.filter((entry) => !entry.hidden).length;
+      if (status) status.textContent = terms.length ? `${count} matching ${count === 1 ? 'mechanism' : 'mechanisms'}` : '';
+    });
+  }
+  initializeMechanismSearch();
+  document.addEventListener('astro:page-load', initializeMechanismSearch);
+</script>
+
+<style>
+  .mechanism-index { width: min(100%, 64rem); margin: 0 auto; padding: 2rem var(--gutter) 4rem; }
+  header { max-width: 38rem; }
+  header nav { display: flex; gap: 1rem; font: .8rem var(--font-ui); }
+  a { color: var(--c-text-soft); text-underline-offset: .2em; }
+  a:hover { color: var(--c-accent); }
+  h1 { font-family: var(--font-display); font-size: 2rem; letter-spacing: 0; margin: 1rem 0 .3rem; }
+  .index-count { color: var(--c-muted); font: .85rem var(--font-ui); margin-bottom: 1.5rem; }
+  label { display: block; font: .8rem var(--font-ui); margin-bottom: .4rem; }
+  input { box-sizing: border-box; width: 100%; min-height: 2.7rem; border: 1px solid var(--c-rule); border-radius: 4px; background: var(--c-bg); color: var(--c-text); padding: .5rem .7rem; font: 1rem var(--font-ui); }
+  input:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+  .filter-status { min-height: 1.5rem; font: .8rem var(--font-ui); color: var(--c-muted); }
+  section { margin-top: 2rem; }
+  h2 { font: 600 1.2rem var(--font-display); letter-spacing: 0; border-bottom: 1px solid var(--c-rule); padding-bottom: .6rem; }
+  ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
+  li { min-width: 0; padding: .8rem 0; border-bottom: 1px solid var(--c-rule); scroll-margin-top: 6rem; }
+  li[hidden], section[hidden] { display: none; }
+  li a { display: block; font: .95rem/1.5 var(--font-reading); overflow-wrap: anywhere; }
+  small { display: block; color: var(--c-muted); font: .7rem var(--font-ui); margin-top: .25rem; }
+  @media (max-width: 650px) { ul { grid-template-columns: minmax(0, 1fr); } }
+</style>

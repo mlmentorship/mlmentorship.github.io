@@ -7,39 +7,46 @@ tags: ["questions"]
 category: "questions"
 ---
 
-> You can query an undocumented model through an API. Investigate one surprising behavior and present your conclusion, evidence, uncertainty, and next experiment.
+Investigate observable behavior with controlled queries, competing predictions and a fixed budget, without inferring hidden architecture from outputs alone.
 
-The senior signal is experimental compression: how much uncertainty did each query remove? A hundred prompt variations are weaker than six probes chosen because competing hypotheses predict different outcomes.
+## Problem
+
+You have an undocumented model API, 90 minutes and a ceiling of 32 queries.
+The user requests the exact token `BLUE`; conflicting data requests `RED`.
+Investigate whether following the conflict depends on its source rather than wording, simulated risk cues or order.
+Execute no external actions, even in a condition labeled high risk.
 
 ## Begin with a behavioral claim
 
-A useful claim is observable and bounded:
-
-> "When tool output contains an instruction that conflicts with the user request, the model follows the tool instruction more often if the requested action is low risk."
-
-This is better than "the model trusts tools" because it identifies the input condition, behavior, comparison, and likely interaction. It can be falsified.
-
-Do not begin with a hidden-architecture story. Many mechanisms can generate the same output. First establish behavior.
+Bound the claim to model version, tested request family, tool schema and decoding settings.
+Do not turn “this source contrast changes responses” into “we found an internal priority module.”
+Repeated samples of one request are not independent tasks or a production prevalence estimate.
 
 ## Build competing hypotheses
 
-For the claim above:
+Use deliberately simplified accounts:
 
-- **H1, source priority:** tool text is treated as higher priority than user context.
-- **H2, lexical trigger:** a small set of override phrases causes the behavior regardless of source.
-- **H3, risk gate:** the model follows conflicting text only when a separate risk classifier allows the action.
-- **H4, recency:** the last instruction wins, and source labels are incidental.
+- **H1, source:** conflict in tool text predicts `RED`, unlike the tested context placement.
+- **H2, wording:** the exact trigger predicts `RED`, but its tested paraphrase does not.
+- **H3, risk cue:** the low-risk label predicts `RED`, unlike the simulated high-risk label.
+- **H4, recency:** conflict last predicts `RED`, unlike user instruction last.
 
-Now choose probes where predictions diverge. Move the same phrase between context and tool output. Change order without changing content. Vary risk while holding the conflict constant. Paraphrase the trigger. Include a control with no conflict.
+These accounts can coexist; real hypotheses need not have these cleanly separated predictions.
+Write predictions before inspecting outputs.
+
+## Picture
+
+The original setup combines tool source, exact wording, low-risk cue and late placement.
+All four idealized accounts predict `RED`, so another identical success does little to separate them.
 
 <!-- visual:black-box-discriminating-probes -->
 <figure class="learning-figure" aria-labelledby="black-box-probes-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="black-box-probes-title">Choose the next query by asking where the hypotheses disagree.</p>
+	<p class="visual-kicker">Predictions before observations</p>
+	<p class="visual-title" id="black-box-probes-title">One RED response fits four accounts; choose a matched contrast.</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of an ambiguous observation and four matched discriminating probes">
 		<section class="visual-panel" aria-labelledby="black-box-ambiguous-title">
 			<h4 id="black-box-ambiguous-title">One observation fits every story</h4>
-			<p>Setup: an exact override phrase appears last in tool output and requests a low-risk action. The model follows it.</p>
+			<p>The exact conflict appears last in tool output with a simulated low-risk cue. The model returns RED.</p>
 			<table class="cm-grid" aria-label="Four hypotheses that all predict the observed behavior">
 				<thead><tr><th scope="col">hypothesis</th><th scope="col">prediction</th></tr></thead>
 				<tbody>
@@ -53,21 +60,99 @@ Now choose probes where predictions diverge. Move the same phrase between contex
 		</section>
 		<section class="visual-panel" aria-labelledby="black-box-discriminate-title">
 			<h4 id="black-box-discriminate-title">Change one factor; predict before querying</h4>
-			<p>Hold the other factors fixed. A switch back to the user request singles out one explanation.</p>
-			<table class="cm-grid" aria-label="Four one-factor probes and the hypothesis uniquely supported if behavior switches">
-				<thead><tr><th scope="col">one change</th><th scope="col">switch supports</th><th scope="col">rivals predict</th></tr></thead>
+			<p>Hold other factors fixed where the API permits. A switch matches one simplified prediction, not a unique internal mechanism.</p>
+			<table class="cm-grid" aria-label="One-factor probes and idealized predictions when the response switches to BLUE">
+				<thead><tr><th scope="col">one change</th><th scope="col">switch matches</th><th scope="col">idealized rivals</th></tr></thead>
 				<tbody>
 					<tr><th scope="row">tool to context, still last</th><td class="cm-selected"><strong>H1</strong>stop</td><td>follow</td></tr>
 					<tr><th scope="row">paraphrase trigger</th><td class="cm-selected"><strong>H2</strong>stop</td><td>follow</td></tr>
-					<tr><th scope="row">low to high risk</th><td class="cm-selected"><strong>H3</strong>stop</td><td>follow</td></tr>
+					<tr><th scope="row">low to high risk cue</th><td class="cm-selected"><strong>H3</strong>stop</td><td>follow</td></tr>
 					<tr><th scope="row">conflict first, user last</th><td class="cm-selected"><strong>H4</strong>stop</td><td>follow</td></tr>
 				</tbody>
 			</table>
-			<p class="cm-equation">best next probe = largest useful prediction split</p>
+			<p class="cm-equation">Select a useful split within the query budget.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the first query confirms the behavior but cannot choose among H1-H4 because all four predict the same outcome. Spend the next query on a matched contrast: change only source, phrase, risk, or order and write the predictions first. If behavior switches only under one contrast, that result removes more uncertainty than another unstructured prompt variation. These predictions illustrate the stated hypotheses, not hidden model internals. Original synthesis informed by <a href="https://doi.org/10.1126/science.146.3642.347">Platt's strong-inference method</a> and <a href="https://aclanthology.org/2020.acl-main.442/">CheckList behavioral testing</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> change source, wording, risk cue or order while recording unavoidable serialization changes. A matched contrast tests a prediction; four samples do not establish a hidden mechanism.</figcaption>
 </figure>
+
+<p class="diagram-source">Method references: <a href="https://doi.org/10.1126/science.146.3642.347">Platt, Strong Inference</a> and <a href="https://aclanthology.org/2020.acl-main.442/">CheckList behavioral testing</a>.</p>
+
+## Read an invented result ledger
+
+Score exact `RED`, exact `BLUE` and other output separately.
+The following counts are invented for teaching; they are not results from a queried model.
+Each cell receives four samples; assume all non-RED responses in this fixture are `BLUE`.
+
+| Condition | Intended change | RED / samples |
+| --- | --- | --- |
+| Baseline | Tool, exact phrase, low-risk cue, conflict last | $4/4$ |
+| No conflict | Remove conflicting request | $0/4$ |
+| Source swap | Context placement, still last | $0/4$ |
+| Paraphrase | Change phrase, retain source and order | $4/4$ |
+| Risk cue | Change only simulated risk label | $4/4$ |
+| Order reversal | Conflict first, user last | $4/4$ |
+
+This pattern favors H1's tested behavioral prediction, with substantial uncertainty.
+It does not establish source priority inside the model or risk of deployed actions.
+Inspect serialized messages: API role restrictions may prevent a clean source or order intervention.
+
+## Keep the query budget explicit
+
+Initial allocation uses $6\times4=24$ calls.
+Reserve eight calls for a four-cell source-by-order pilot, two samples per cell.
+Stop at 32 total; replacing that pilot with residual tests must not add uncounted calls.
+Log actual request/output tokens and priced cost.
+At caps of 512 input and eight output tokens per call, the ceilings are 16384 input and 256 output tokens.
+Count the complete serialized request against the input cap.
+
+Freeze model, prompts, tools, rubric and decoding; declare seed policy.
+Same-seed repeats need not provide independent draws.
+Retain refusals, errors and negative outcomes rather than selecting only successful conflicts.
+
+## Change the tested factor or allocation
+
+### 1. Cross source with order
+
+**New task:** source and recency both explain the baseline.
+
+**Picture and change:** cross tool/context placement with early/late conflict using the reserved four cells.
+Keep semantics and scoring fixed; document serialization differences.
+
+**Check:** a source effect at both orders supports H1's behavioral prediction.
+An effect only when last requires an interaction account.
+
+**Use when:** competing accounts still predict the same observed result.
+
+### 2. Investigate residuals
+
+**New task:** the leading account leaves 10% unexplained in a larger investigation.
+
+**Picture and change:** allocate reserved calls to exact residual reruns and matched residual-feature contrasts.
+Inspect severity and production reachability, not only frequency.
+
+**Check:** residuals appearing only after a model-version change require separate version analysis.
+Do not dismiss the tail as noise or spend the same reserve twice.
+
+**Use when:** reproducible residuals could change the decision.
+
+## Failure and transfer
+
+A hundred successful paraphrases from one family establish neither production prevalence nor an internal risk classifier.
+
+What if paraphrasing stops the conflict but source swapping does not?
+
+<details>
+<summary>Check your answer</summary>
+
+H2's wording account gains support.
+Test new paraphrases and source-by-phrase interactions before claiming a mechanism.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Keep an experiment ledger
 
@@ -82,70 +167,51 @@ For each probe, record:
 | Update | Which beliefs moved, and how? |
 | Next probe | Highest-information follow-up |
 
-If the model is stochastic, repeated samples and fixed decoding settings matter. If the API hides probability, use a categorical rubric and report uncertainty honestly.
+Separate exact scoring from model-graded judgments; an unavailable probability is not a license to invent confidence.
 
-## What an L4 answer sounds like
+<span id="what-an-l4-answer-sounds-like"></span>
 
-> "I tried many jailbreak prompts. Some worked, so the model is vulnerable to prompt injection. I would add more safety training."
+## An unsupported generalization
 
-The conclusion is broader than the evidence. There is no control, no denominator, no competing explanation, and no boundary condition. "More safety training" is not connected to a measured failure mechanism.
+A prompt dump without a denominator, control or boundary cannot support a broad prevalence claim.
 
-## What an L5 answer adds
+<span id="what-an-l5-answer-adds"></span>
 
-An L5 candidate states a bounded claim, creates competing hypotheses, varies one factor at a time, and then tests an interaction. They preserve negative results and distinguish deterministic checks from model-graded judgments.
+## A five-minute readout
 
-Their readout fits five minutes:
+Present claim, experiment matrix, decision-changing result, uncertainty and next test.
+Show the evidence needed for the conclusion rather than every prompt.
 
-1. claim;
-2. experiment matrix;
-3. result that most changed belief;
-4. boundary or uncertainty;
-5. next experiment.
+<span id="what-an-l6-answer-adds"></span>
 
-They do not show every prompt. They show the evidence needed for the conclusion.
+## Decision and evaluation limits
 
-## What an L6 answer adds
+Connect findings to a product surface, threat model or evaluation gap without treating the toy fixture as launch evidence.
+A model grader can share the target's blind spot.
+Safety changes can regress usefulness; static prompts can be overfit.
+Nondeterminism can mimic interactions, and version changes can invalidate comparisons.
 
-An L6 candidate connects the investigation to a decision. They ask whether the observed behavior is prevalent, severe, reachable in production, and mitigated elsewhere in the system. A black-box curiosity becomes actionable only when tied to a threat model, product surface, training intervention, or evaluation gap.
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
 
-They also anticipate evaluation traps:
+## Inspectable evidence
 
-- Prompt families are correlated, so 100 paraphrases are not 100 independent failures.
-- A model grader may share the target model's blind spot.
-- Safety behavior can improve while useful behavior regresses.
-- A static prompt set can be overfit by post-training.
-- API nondeterminism can look like an interaction effect.
-- Model-version changes can invalidate the conclusion.
+Bound claims, preserve negative results and choose controls before interactions.
+No presentation format guarantees a hiring outcome.
 
-They version prompts, model, decoding, tools, and grader. They define the result that would block launch or change training.
+<span id="tells-that-get-you-down-leveled"></span>
 
-## Tells that get you a strong-hire vote
+## Avoid overclaiming
 
-- The first claim is falsifiable and bounded.
-- At least three hypotheses predict different probe outcomes.
-- Controls precede interactions.
-- Negative results remain in the evidence table.
-- You report uncertainty and stochasticity.
-- The readout prioritizes one decision-changing result.
-- You propose the next experiment by information value.
-- You avoid claiming hidden mechanisms from outputs alone.
-
-## Tells that get you down-leveled
-
-- A large prompt dump with no experiment design.
-- Counting paraphrases as independent evidence.
-- Selecting only successful attacks.
-- Changing multiple factors in every probe.
-- Treating a model judge as ground truth.
-- Inferring internals from one behavior.
-- Ending with "collect more data" rather than a specific next test.
+Do not select only successes, conflate correlated prompts with independent tasks, or treat a model judge as ground truth.
 
 ## Common follow-up
 
 "Your leading hypothesis explains 90% of observations. What do you do with the other 10%?"
 
-First determine whether the residual is noise, a mislabeled outcome, or a missing condition. Cluster residuals by input features and rerun exact cases under controlled decoding. A theory that predicts only the majority may still be useful, but the tail can reveal the safety-critical interaction. Do not average it away before inspecting severity and reachability.
+Check noise, labels and missing conditions before averaging away the residual.
 
 Use the [black-box behavior lab](/prep/labs/black-box/) for an executable attempt.
 
 *Related: [design an ablation study](/questions/design-ablation-study/), [critique an ML paper](/questions/critique-ml-paper/), and [chain-of-thought monitorability](/concepts/chain-of-thought-monitorability/).*
+
+</div>

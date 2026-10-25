@@ -13,7 +13,7 @@ function robState(index, twoBack, oneBack, skip, take, current, decision, result
   });
 }
 
-const draft = visual('For each prefix of houses, keep the better of skipping the current house or taking it after the best prefix ending two houses earlier.', [
+const draft = visual('For each prefix, compare skipping the current house with taking it after the last compatible prefix.', [
   frame(
     'Initialize before house 0',
     'For money [2, 7, 9, 3, 1], both saved prefix answers start at zero.',
