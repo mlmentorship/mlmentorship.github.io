@@ -14,11 +14,21 @@ priority: "Role-specific"
 prerequisites: ["design-youtube-recommender", "choose-ml-product-metrics", "multi-task-learning-objective-interference", "position-bias-counterfactual-learning-to-rank", "contextual-bandits"]
 ---
 
-A feed allocates attention today and changes tomorrow's supply; separate hard policy, participant health, product outcomes and model diagnostics.
+Design a short-form video ecosystem that accounts for viewer outcomes, creator opportunity, and long-term supply under explicit serving constraints.
 
 <span id="the-prompt"></span>
 
 ## Problem
+
+**Context.** The fictional platform serves 800 million monthly viewers and 25 million active creators.
+Detailed traffic and latency givens appear below.
+A watch-time increase accompanies later creator-health concerns, and the smaller diagnostic has incomplete untested-creator outcomes.
+
+**Task.** Define a two-year direction, participant-specific outcomes, candidate and exposure policies, reliable evidence, and reversible launch controls.
+Analyze what the creator cohorts establish and which missing denominator or outcome records a release decision must recover.
+
+**Constraints.** Treat all supplied counts and effects as teaching assumptions, not company observations.
+Preserve hard policy boundaries and distinguish tested-creator return rates from all-eligible-creator retention or causal policy effects.
 
 Design a fictional short-form feed for 800 million monthly viewers and 25 million active creators.
 Its scenario peak is 500,000 requests/second, ten returned items/request and 20 million daily uploads.
@@ -188,6 +198,8 @@ Inspect qualified opportunity, participant outcomes, category supply, causal/mec
 
 The recommender allocates scarce attention. That allocation changes creator behavior, future inventory, advertiser demand, and the next training set.
 
+<p class="visual-title" data-supplemental-visual="video-ecosystem-delayed-effects">Today's exposure can change tomorrow's inventory</p>
+
 ```mermaid
 flowchart TB
   accTitle: Attention allocation changes creator supply, demand, revenue and later training
@@ -210,6 +222,7 @@ flowchart TB
   class R,X viz-focus
   class V,O,A,L viz-output
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> trace exposure through creator reach and revenue back to future uploads. Immediate viewer response alone cannot settle that delayed effect.</p>
 
 Skips arrive quickly; viewer return, creator retention and supply response need longer, different windows.
 Attention, positions, creator tests, moderation, exploration, ads, compute and policy-review capacity are scarce.
@@ -607,6 +620,8 @@ Audit monetization incentives for length/repetition gaming rather than trusting 
 
 The architecture needs event-time correctness, versioned policy, and mature outcomes.
 
+<p class="visual-title" data-supplemental-visual="video-publication-evidence">Training snapshots and live serving need compatible versions</p>
+
 ```mermaid
 flowchart TB
   accTitle: Versioned exposure, catalog, training and deployment evidence connect the feed lifecycle
@@ -640,6 +655,7 @@ flowchart TB
   class Stream,Train,Serve viz-focus
   class Online,Index,Metrics,Release viz-output
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> distinguish point-in-time training snapshots from live catalog and feature state. Published models still need compatible serving inputs and release evidence.</p>
 
 ### Event schema
 

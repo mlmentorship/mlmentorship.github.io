@@ -8,9 +8,17 @@ category: "questions"
 ---
 
 
-An inline completion belongs to one editor state; typing can make a valid-looking response stale before it arrives.
+Design an inline coding assistant that displays suggestions for the correct editor state despite overlapping requests.
 
 ## Problem
+
+**Context.** An editor requests model-generated code while the developer continues typing, so requests may complete out of order.
+
+**Task.** Decide which result may be displayed or accepted in the race below.
+Define request identity, stale-result handling, acceptance checks, and the surrounding latency-sensitive serving path.
+
+**Constraints.** A syntactically valid suggestion can target an obsolete document or cursor.
+Preserve developer acceptance authority; cancellation alone does not prove an old response cannot arrive.
 
 A hypothetical request R1 targets document version 41 at cursor 80.
 The user types, producing version 42 and cursor 81 before R1 returns.
@@ -21,6 +29,8 @@ R1's suggested code parses correctly. Which result may the editor display or acc
 
 Treat each response as a proposal for its captured document, cursor, context and policy, not as free-floating code.
 Cancellation can save work, but a late response still needs a validity check.
+
+<p class="visual-title">Late suggestions must still match the editor revision</p>
 
 <!-- visual:coding-assistant-two-latency-paths -->
 ```mermaid

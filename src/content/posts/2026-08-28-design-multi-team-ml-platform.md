@@ -13,11 +13,20 @@ priority: "Role-specific"
 prerequisites: ["ml-data-lineage-versioning", "design-feature-store", "design-ml-monitoring"]
 ---
 
-Eight teams can share release identity and promotion authority without sharing every executor; test that boundary with two representative pilots.
+Design a shared ML platform that improves reproducibility and release control without forcing eight teams into one execution runtime.
 
 <span id="the-prompt"></span>
 
 ## Problem
+
+**Context.** Eight ML teams with about 50 practitioners and 30 models operate fragmented pipelines.
+The detailed scenario below includes retries and regional failure.
+
+**Task.** Define a two-year platform direction, a useful first-quarter release, incremental adoption, and authoritative publication, promotion, and recovery.
+Resolve how attempts A and B publish results for one logical run while existing executors remain.
+
+**Constraints.** No wholesale rewrite or forced migration is allowed.
+Separate execution attempts from committed release identity, preserve deletion and access obligations, and state ownership and degraded-operation rules.
 
 An organization has eight ML teams, about 50 scientists/engineers and roughly 30 models.
 Separate pipelines produce irreproducible data, training-serving skew, incomparable experiments, ambiguous releases, idle compute and poorly traced deletions.

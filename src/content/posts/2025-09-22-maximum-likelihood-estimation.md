@@ -1,6 +1,6 @@
 ---
 title: "Maximum likelihood estimation"
-description: "The dominant statistical principle: pick parameters that make the observed data most probable. Reduces to minimizing cross-entropy for classification and MSE for Gaussian regression."
+description: "Compare parameter values using fixed observed data, derive a Bernoulli estimate, and distinguish likelihood, priors, and asymptotic guarantees."
 date: "2025-09-22"
 draft: false
 tags: ["concepts"]
@@ -9,19 +9,28 @@ category: "concepts"
 
 ## Summary
 
-For a parametric family $p(x \mid \theta)$ and observed data $\{x_1, \dots, x_n\}$, the **maximum likelihood estimate (MLE)** is
+Maximum likelihood chooses a parameter that maximizes the probability or density assigned to the observed data.
+The data stay fixed while candidate parameters vary.
+For independent observations with a common model $p(x\mid\theta)$,
 
 $$
 \hat\theta_\text{MLE} = \arg\max_\theta \prod_{i=1}^{n} p(x_i \mid \theta) = \arg\max_\theta \sum_{i=1}^{n} \log p(x_i \mid \theta).
 $$
 
-MLE underlies almost every modern ML loss function:
+The logarithm preserves the maximizer while turning products into sums.
+For continuous observations, the factors are densities, not probabilities of exact values.
+Dependent data require their joint or conditional likelihood rather than an unjustified independent product.
 
-- Cross-entropy for classification = MLE under a categorical model.
-- Mean-squared error = MLE under a Gaussian noise model.
-- Negative log-likelihood for language models = MLE.
+For seven successes and three failures under an independent Bernoulli model,
 
-When you read "minimize the negative log-likelihood," you're reading MLE.
+$$
+L(p)=p^7(1-p)^3,\qquad
+\ell'(p)=\frac7p-\frac3{1-p}.
+$$
+
+Setting the derivative to zero gives $7(1-p)=3p$, hence $\widehat p=0.7$.
+The second derivative is negative for $0<p<1$, so this is the unique maximum for these mixed outcomes.
+The diagram rescales likelihood by its peak only to make the shape readable.
 
 <!-- visual:mle-bernoulli-parameter-sweep -->
 <figure class="learning-figure plot-panel" aria-labelledby="mle-sweep-title">
@@ -61,16 +70,20 @@ When you read "minimize the negative log-likelihood," you're reading MLE.
 		<text class="viz-axis-label" x="45" y="154">relative likelihood</text>
 		<text class="viz-axis-label" x="192.5" y="316" text-anchor="middle">candidate success probability p</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> keep the ten observations fixed and move along the horizontal axis to try different values of <code>p</code>. Seven ones contribute <code>p⁷</code>; three zeros contribute <code>(1 − p)³</code>. Their product is largest at <code>p = 0.7</code>, so that candidate is the MLE. The curve compares parameter values; it is not a probability distribution over <code>p</code>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> keep the observations fixed while varying <code>p</code>. Seven successes contribute <code>p⁷</code>; three failures contribute <code>(1 − p)³</code>. Their product peaks at <code>0.7</code>. Relative likelihood is a parameter score, not a normalized parameter distribution.</figcaption>
 </figure>
 
 ## Properties
 
-Under regularity conditions (smooth log-likelihood, identifiable model, true parameter in interior), MLE is:
+Under appropriate identification, sampling, regularity, and existence conditions, MLE can be consistent and asymptotically normal:
 
-- **Consistent**: $\hat\theta \to \theta^*$ as $n \to \infty$.
-- **Asymptotically normal**: $\sqrt{n}(\hat\theta - \theta^*) \to \mathcal{N}(0, I(\theta^*)^{-1})$ where $I(\theta)$ is the **Fisher information**.
-- **Asymptotically efficient**: achieves the Cramér–Rao lower bound. No consistent estimator has lower asymptotic variance.
+$$
+\sqrt n(\widehat\theta-\theta^*)\Rightarrow\mathcal N(0,I(\theta^*)^{-1}).
+$$
+
+Here $I$ is Fisher information per observation and must be nonsingular for this expression.
+Efficiency statements compare regular estimators under their stated asymptotic framework; they do not rule out every pointwise superefficient estimator.
+Small samples, boundary parameters, growing dimension, or misspecification require separate analysis.
 
 ## Common cases
 
@@ -80,8 +93,8 @@ Under regularity conditions (smooth log-likelihood, identifiable model, true par
 | Gaussian variance | $\hat\sigma^2 = \frac{1}{n} \sum (x_i - \bar x)^2$ (biased; sample-variance uses $n-1$) |
 | Bernoulli ($p$) | $\hat p = \text{fraction of successes}$ |
 | Categorical | empirical class frequencies |
-| Linear regression with Gaussian noise | OLS: $\hat\beta = (X^\top X)^{-1} X^\top y$ |
-| Logistic regression | no closed form; iterative (Newton, gradient methods) |
+| Linear regression with independent equal-variance Gaussian noise | Least squares; the displayed inverse formula needs full column rank |
+| Logistic regression | Iterative optimization; complete separation can prevent a finite optimum |
 
 ## Connection to cross-entropy and KL
 
@@ -91,18 +104,55 @@ $$
 -\tfrac{1}{n} \sum_i \log p_\theta(x_i) = H(\hat p_\text{data}, p_\theta) = H(\hat p_\text{data}) + \mathrm{KL}(\hat p_\text{data} \| p_\theta).
 $$
 
-Maximizing likelihood = minimizing cross-entropy = minimizing KL from the empirical distribution to the model.
+The empirical entropy is constant as model parameters vary, so both objectives select the same optimum.
+Gaussian regression produces squared-error minimization when its noise-variance and independence assumptions are appropriate.
 
 ## MLE vs MAP
 
-MAP (maximum a posteriori) adds a prior: $\hat\theta_\text{MAP} = \arg\max_\theta \log p(\theta) + \sum \log p(x_i \mid \theta)$. MAP equals MLE when the prior is uniform (improper). Common choices:
+### Add Prior Evidence
 
-- Gaussian prior $\Rightarrow$ L2 regularization on $\theta$.
-- Laplace prior $\Rightarrow$ L1 regularization.
+**New task:** Incorporate a declared prior rather than reporting only the likelihood maximizer.
+
+**Picture and change:** A $\operatorname{Beta}(2,2)$ prior multiplies the Bernoulli likelihood by a factor proportional to $p(1-p)$.
+The posterior is $\operatorname{Beta}(9,5)$.
+
+**Check:** Its interior mode is $8/12=2/3$, not the MLE $0.7$; its mean is $9/14$.
+
+**Use when:** Prior assumptions belong in the model.
+MAP maximizes posterior density in the chosen parameterization; it is not generally invariant under reparameterization.
+Gaussian and Laplace parameter priors produce quadratic and absolute-value penalties under their specified scales.
+
+### Change the Observation Unit
+
+**New task:** Fit a binomial count of seven successes rather than one particular ordered sequence.
+
+**Picture and change:** Multiply by $\binom{10}{7}$ to account for compatible sequences.
+
+**Check:** The factor equals $120$ and does not depend on $p$, so the maximizer remains $0.7$.
+
+**Use when:** Aggregation changes the recorded observation but preserves the model's sufficient counts.
+If dependence changes instead, multiplying independent factors need not be valid.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common pitfalls
 
-- **Treating sample variance as MLE.** MLE for Gaussian variance divides by $n$ (biased); the sample variance divides by $n-1$ (unbiased). Different estimators.
-- **Stopping at MLE without checking identifiability.** If two parameter values yield identical likelihoods, MLE is non-unique.
-- **Trusting MLE on small samples.** Asymptotic guarantees can be misleading when $n$ is small relative to dimension; use cross-validation or Bayesian methods.
-- **Forgetting that MLE on a misspecified model is still well-defined.** It converges to the parameter that minimizes KL to the (mismatched) true distribution within the model family.
+- **Wrong variance denominator.** With an unknown Gaussian mean, the variance MLE divides residual squares by $n$.
+	The unbiased sample-variance estimator uses $n-1$ under its assumptions.
+- **Missing identification.** Parameters producing the same observation distribution need not have unique estimates.
+- **Missing existence.** All-success Bernoulli data maximize at $p=1$ if the boundary is allowed.
+	Restricting the parameter to $(0,1)$ leaves only a supremum.
+- **Unqualified misspecification claims.** Suitable convergence conditions may select a KL-best approximation, not the true data-generating mechanism.
+
+## Reconstruct
+
+<details>
+<summary>Is the plotted likelihood a posterior over the parameter?</summary>
+
+No. It scores fixed data across parameter values and has not included a prior or normalized over parameters.
+A constant rescaling preserves the likelihood maximizer; a nonconstant prior can change the posterior mode.
+
+</details>
+
+</div>

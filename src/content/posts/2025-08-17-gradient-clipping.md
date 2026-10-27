@@ -1,6 +1,6 @@
 ---
 title: "Gradient clipping"
-description: "Cap the norm of the gradient before each optimizer step. The simplest and most reliable defense against training instability."
+description: "Project a finite global gradient onto a norm ball, then distinguish that bound from the optimizer's final parameter displacement."
 date: "2025-08-17"
 draft: false
 tags: ["concepts"]
@@ -9,7 +9,13 @@ category: "concepts"
 
 ## Summary
 
-Gradient clipping rescales the gradient vector before the optimizer step so that its global norm does not exceed a fixed threshold $c$. If $\|g\| > c$, replace $g$ with $g \cdot c / \|g\|$; otherwise leave it unchanged.
+Global-norm clipping shortens a finite gradient by one common factor, preserving its direction when the factor is positive.
+For threshold $c\ge0$, use $g'=g\min(1,c/\|g\|_2)$, leaving a zero vector unchanged.
+This caps the gradient norm, not every optimizer's eventual update.
+
+The fixture has $g=(6,8)$, norm ten, and threshold five.
+Scaling by one-half produces $(3,4)$ with norm five.
+Ordinary SGD with learning rate $0.1$ moves by $(-0.3,-0.4)$, norm $0.5$.
 
 <!-- visual:global-norm-clipping-radial-projection -->
 <figure class="learning-figure" aria-labelledby="gradient-clipping-title">
@@ -41,47 +47,91 @@ Gradient clipping rescales the gradient vector before the optimizer step so that
 			<text class="viz-label" x="214" y="228">‖g′‖₂ = 5 · same ray</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> begin with the dashed gradient <var>g</var>, whose norm 10 lies outside the radius-5 limit. Multiplying every component by the same factor, 5/10, moves its endpoint radially to the circle at (3, 4). The solid clipped vector is shorter but stays on the same ray, so global-norm clipping preserves direction; clipping components independently need not. The dashed line, square and triangle endpoints, positions, and direct labels carry the explanation without color. Original schematic based on <a href="https://proceedings.mlr.press/v28/pascanu13.html">Pascanu, Mikolov, and Bengio (2013)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html">PyTorch global-norm definition</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the dashed gradient (6, 8) has norm ten. A common factor one-half places (3, 4) on the radius-five circle. The solid vector retains its direction. The optimizer still transforms it before changing parameters. Original schematic follows <a href="https://proceedings.mlr.press/v28/pascanu13.html">Pascanu, Mikolov, and Bengio (2013)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html">PyTorch global-norm definition</a>.</figcaption>
 </figure>
 
-Training instabilities. Loss spikes, NaN gradients, exploding updates. Are usually caused by a single batch with anomalous gradients. Without clipping, that one bad step can drive parameters into a region from which training never recovers. Clipping bounds the worst-case update and turns a divergence into a recoverable hiccup.
-
-Standard in: transformer pretraining (always), most RL training (always), RNN training (originally proposed for RNNs by [Pascanu et al., 2013](https://arxiv.org/abs/1211.5063), where exploding gradients are intrinsic).
+Among vectors inside the radius-$c$ Euclidean ball, radial projection minimizes distance to $g$.
+Cauchy-Schwarz makes the nearest nonzero candidate parallel to $g$; its permitted length is $\min(\|g\|,c)$.
+This geometric guarantee neither diagnoses a loss spike nor makes a nonfinite gradient usable.
+Check finiteness before stepping; infinity multiplied by zero does not produce a repaired direction.
 
 ## Two flavors
 
 ### Global-norm clipping (the standard)
 
-Compute the L2 norm of the concatenated gradient vector across **all** parameters:
+Compute the norm over the declared optimizer parameter set after its intended accumulation and synchronization:
 
 $$
 \|g\|_2 = \sqrt{\sum_p \|g_p\|_2^2}
 $$
 
-If $\|g\|_2 > c$, scale every parameter's gradient by $c / \|g\|_2$. This preserves the *direction* of the gradient (just shrinks magnitude). $c = 1.0$ is the dominant default for transformer training.
+Use that same factor for every included tensor.
+For sharded gradients, aggregate squared norms over unique shards; replicated data-parallel copies are not additional parameter coordinates.
 
 ### Per-parameter clipping
 
-Clip each parameter's gradient norm independently. Simpler but distorts the gradient direction; rarely used.
+Separate tensor caps change relative scaling and generally rotate the concatenated gradient.
 
 ### Value clipping
 
-Clip individual elements of $g$ to a range $[-c, +c]$. Distorts direction even more; mostly historical.
+Coordinate clipping to $[-5,5]$ turns $(6,8)$ into $(5,5)$, with norm $\sqrt{50}$ and a different direction.
+That is a coordinate bound, not the radius-five constraint.
 
 ## How to pick the threshold
 
-- **Transformers**: $c = 1.0$ is the universal default. Llama, Mistral, Qwen, GPT all use 1.0.
-- **RNNs / LSTMs**: $c$ between 0.25 and 5; needs tuning.
-- **RL**: depends on reward scale and policy parametrization; often $c = 0.5$.
-- **Diagnostic**: log $\|g\|_2$ over training. If it almost never exceeds $c$, the clip is inactive (try lower); if it always does, the clip is destroying signal (try higher).
+Log the preclip norm, nonfinite frequency, clipping frequency, and actual optimizer update norm.
+Threshold units depend on loss reduction, parameterization, and batch accumulation.
+Rare clipping may be an intentional safety limit; frequent clipping warrants checking the intended learning-rate and loss-scale interaction.
+Validate a threshold against the training objective rather than treating an architecture-wide number as universal.
 
 ## Combined with mixed precision
 
-In FP16/BF16 mixed precision, the loss is scaled before the backward pass to keep small gradients representable. Clipping must be applied **on the unscaled gradients** (after the scaler unscales them). PyTorch's `GradScaler` and similar tooling enforce this ordering.
+If loss scaling is used, finish accumulation and unscale once before clipping.
+Otherwise the threshold applies to scaled units; dividing afterward changes the effective cap.
+BF16 frequently runs without a loss scaler; format choice alone does not imply one.
+
+## Change the Requirement
+
+### Bound Parameter Movement
+
+**New task:** Cap the final optimizer displacement rather than its input gradient.
+
+**Picture and change:** Inspect momentum, preconditioning, learning rate, and decay before choosing an update-level constraint.
+
+**Check:** With velocity $v=(100,0)$ and rule $v'=0.9v+g'$, the fixture gives $(93,4)$, not a norm-five update.
+
+**Use when:** The requirement concerns actual parameter movement.
+The bound $\|\Delta\theta\|\le\eta c$ applies to ordinary SGD without those additional transformations.
+
+### Accumulate Before Clipping
+
+**New task:** Combine several microbatches into one optimizer step under a declared summed-loss convention.
+
+**Picture and change:** Sum contributions first, then clip the combined gradient.
+
+**Check:** Scalar contributions $10$ and $-9$ sum to $1$; clipping each to five before adding instead gives zero.
+
+**Use when:** Multiple backward calls represent one update.
+For mean loss, apply the correct sample-count normalization; averaging unequal batch means defines a different gradient.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common pitfalls
 
-- **Clipping per parameter group instead of globally.** Gives a different effective clip for each parameter; rarely intended.
-- **Forgetting to unscale before clipping under AMP.** The clip threshold is meaningless if applied to scaled gradients.
-- **Setting clipping too aggressive.** $c = 0.01$ for a transformer cripples training; you'll see flat loss curves with the clip always active.
-- **Treating clipping as a fix for a buggy data pipeline.** A consistent stream of large gradients usually indicates a data or initialization problem, not a clipping problem.
+- **Wrong constrained object.** Tensor, coordinate, example, gradient, and update clipping solve different problems.
+- **Wrong units.** Unscale before measuring the threshold when using AMP scaling.
+- **Invalid directions.** Skip or diagnose nonfinite gradients; do not expect a norm projection to repair them.
+- **Missing diagnosis.** Repeated large gradients can reflect data, initialization, objective, or numerical issues; clipping alone identifies none.
+
+## Reconstruct
+
+<details>
+<summary>Does threshold one bound every AdamW step by its learning rate?</summary>
+
+No. Saved moments, coordinate scaling, and decoupled decay also contribute to parameter movement.
+The ordinary-SGD bound cannot be transferred without inspecting the actual update rule.
+
+</details>
+
+</div>

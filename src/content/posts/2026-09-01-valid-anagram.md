@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Forget positions, but retain how often each character occurs.
-Two strings are anagrams exactly when every character count matches.
+Determine whether one string can be rearranged into the other using exactly the same character occurrences.
 
 ## Problem
 
-`"aab"` and `"aba"` return `True`; `"aab"` and `"abb"` return `False`.
-The reference compares exact Python string code points, including case and whitespace. Two empty strings match.
+**Input.** Two Python strings, `first` and `second`.
+
+**Output.** Return `True` if both strings contain each character the same number of times; otherwise return `False`.
+
+**Rules.** Order does not matter, but multiplicity does.
+Compare exact code points, including case and whitespace, without normalization or filtering.
+Do not change either string. Two empty strings match; unequal lengths cannot match.
+
+**Example.** `"aab"` and `"aba"` return `True` because both contain two a characters and one b.
+For `"aab"` and `"abb"`, return `False`.
 
 ## Picture: Count Repetitions, Not Just Membership
 

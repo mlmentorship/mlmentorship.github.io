@@ -8,9 +8,16 @@ category: "questions"
 ---
 
 
-A healthy endpoint can serve stale features; monitor the earliest violated contract without confusing changed behavior with proven harm.
+Design monitoring and an incident response when a model service looks healthy but its inputs and scores have changed.
 
 ## Problem
+
+**Context.** An online model uses timestamped session features, while its outcome labels require a seven-day observation window.
+
+**Task.** Specify signals, immediate actions, and later comparisons for the incident below, including owners and evidence for recovery.
+
+**Constraints.** Distinguish service availability, feature freshness, distribution changes, and measured outcome quality.
+Account for missing label joins and important slices; unavailable mature labels cannot establish current quality.
 
 At 12:00, an ML endpoint meets its latency and error objectives.
 Its session-feature snapshot has `as_of=11:40`, despite a two-minute maximum-age contract.
@@ -33,6 +40,8 @@ Use the declared fallback for affected requests while the data owner investigate
 It might use approved rules or a model that does not require the stale feature.
 Do not replace missing values with zero unless that behavior was validated.
 Record affected versions, cohorts, actions and exposure so later outcomes remain interpretable.
+
+<p class="visual-title">Stale features fail now; quality labels arrive later</p>
 
 <!-- visual:ml-monitoring-observability-layers -->
 ```mermaid

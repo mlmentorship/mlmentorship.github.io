@@ -9,34 +9,44 @@ category: "concepts"
 
 ## Summary
 
-**Mixup** [(Zhang et al., 2018)](https://arxiv.org/abs/1710.09412) trains the model on convex combinations of pairs of training examples: $\tilde x = \lambda x_i + (1 - \lambda) x_j$ and $\tilde y = \lambda y_i + (1 - \lambda) y_j$ with $\lambda \sim \text{Beta}(\alpha, \alpha)$. **CutMix** [(Yun et al., 2019)](https://arxiv.org/abs/1905.04899) instead pastes a rectangular patch from $x_j$ onto $x_i$ and mixes labels by the area ratio.
-
-Both techniques regularize by training on examples between the original training points. Empirically:
-
-- Improve top-1 accuracy on ImageNet by ~1–2% over baseline.
-- Improve calibration (predicted probabilities track accuracy better).
-- Improve robustness to label noise and adversarial perturbations.
-- Standard in modern image classification recipes (timm, ConvNeXt, ViT-style training).
-
-Less common in NLP (token mixing is non-trivial) and in pretraining (large data already covers the input space well). Sometimes used in audio (mix waveforms or spectrograms) and tabular (interpolate features).
+Mixup blends paired inputs and class targets with the same coefficient; CutMix replaces a region and uses realized-area target weights.
+The constructions impose training conventions on synthetic inputs, not a guarantee that semantic evidence is proportional to those coefficients.
+Quality, calibration, and robustness effects require evaluation under the actual task and recipe.
 
 ## Mechanism
 
 ### Mixup
 
-For each batch, sample $\lambda \sim \text{Beta}(\alpha, \alpha)$ once (or per sample) with $\alpha$ small (typical 0.2–0.4). For paired examples $(x_i, y_i)$ and $(x_j, y_j)$:
+For paired same-shaped numeric inputs and class-probability targets, choose $0\le\lambda\le1$:
 
 $$
 \tilde x = \lambda x_i + (1 - \lambda) x_j, \quad \tilde y = \lambda y_i + (1 - \lambda) y_j.
 $$
 
-Train normally on $(\tilde x, \tilde y)$ with cross-entropy. The label is a soft target.
+With $x_A=(0,4)$, $x_B=(4,0)$, labels A/B, and $\lambda=0.75$, the input becomes $(1,3)$.
+The target is $q=(0.75,0.25)$, a nonnegative distribution summing to one.
+At illustrative mixed-input prediction $(0.6,0.4)$, soft-target cross-entropy is:
+
+$$
+-0.75\log(0.6)-0.25\log(0.4)\approx0.612191901.
+$$
+
+The weighted class losses must use this same mixed-input prediction, not predictions on the two original inputs.
+For a batch, preserve the example permutation and align every input/target coefficient; declare per-batch or per-example sampling.
 
 ### CutMix
 
-Sample $\lambda \sim \text{Beta}(\alpha, \alpha)$. Pick a random rectangle in $x_i$ of area $1 - \lambda$ (e.g., width and height $\sqrt{1 - \lambda}$ times the image). Paste the corresponding region from $x_j$ into $x_i$. Mix labels by the area ratio $\lambda$.
+Let binary M equal one on retained A pixels and zero on the pasted B region:
 
-The resulting image has a clear local boundary (no blending). Models trained on CutMix often produce more localized class activations.
+$$
+{}\tilde x=Mx_A+(1-M)x_B,\qquad
+\lambda_{real}=\frac{\sum M}{HW},\qquad
+q=\lambda_{real}y_A+(1-\lambda_{real})y_B.
+$$
+
+Broadcast the spatial mask across image channels.
+The pictured four-cell patch in a $4\times4$ grid gives $\lambda_{real}=12/16=0.75$ and the same target as above.
+The actual synthetic input differs: pasted regions are not pixelwise blends.
 
 <!-- visual:mixup-cutmix-input-target-coupling -->
 <figure class="learning-figure plot-panel" aria-labelledby="mixup-cutmix-visual-title">
@@ -62,34 +72,57 @@ The resulting image has a clear local boundary (no blending). Models trained on 
 		<rect class="viz-node viz-node--output" x="186" y="336" width="154" height="130" rx="4"></rect><text class="viz-node-value" x="263" y="358">AREA-MATCHED TARGET</text><rect x="198" y="370" width="96" height="24" rx="2" style="fill:url(#mix-source-a);stroke:var(--viz-input-stroke);stroke-width:1.5"></rect><rect x="294" y="370" width="32" height="24" rx="2" style="fill:url(#mix-source-b);stroke:var(--viz-focus-stroke);stroke-width:1.5"></rect><text class="viz-edge-label" x="246" y="387">12/16 A</text><text class="viz-edge-label" x="310" y="387">4/16 B</text><text class="viz-node-value" x="263" y="416">λ = retained A area</text><text class="viz-node-value" x="263" y="436">0.75 y<tspan baseline-shift="sub" font-size="8">A</tspan> + 0.25 y<tspan baseline-shift="sub" font-size="8">B</tspan></text><text class="viz-edge-label" x="263" y="454">hard boundary · soft label</text>
 		<rect class="viz-node viz-node--focus" x="20" y="510" width="320" height="28" rx="4"></rect><text class="viz-callout" x="180" y="529" text-anchor="middle">input contribution = target contribution</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> keep the paired sources and target weights fixed. Mixup applies the 75/25 coefficient at every input coordinate. CutMix does no pixel blending: the dotted source B occupies 4 of 16 cells, so source A retains 12/16 of the area and receives 75% of the target. In real code, use the patch area that remains after image-boundary clipping. Original schematic checked against the <a href="https://arxiv.org/abs/1710.09412">Mixup paper</a>, the <a href="https://arxiv.org/abs/1905.04899">CutMix paper</a>, and the <a href="https://docs.pytorch.org/vision/stable/auto_examples/transforms/plot_cutmix_mixup.html">Torchvision guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> Mixup blends every coordinate using 75/25 coefficients. CutMix pastes four of sixteen cells, leaving twelve A cells. Both targets are 75/25 here, although the inputs differ. Original schematic follows the <a href="https://arxiv.org/abs/1710.09412">Mixup paper</a>, <a href="https://arxiv.org/abs/1905.04899">CutMix paper</a>, and <a href="https://docs.pytorch.org/vision/stable/auto_examples/transforms/plot_cutmix_mixup.html">Torchvision guide</a>.</figcaption>
 </figure>
+
+### Change the Interpolation Coefficient
+
+**New task:** Set lambda to one-half for the same paired vectors.
+
+**Picture and change:** Change both input and target: $\tilde x=(2,2)$ and $q=(0.5,0.5)$.
+
+**Check:** Holding the illustrative prediction at $(0.6,0.4)$ gives loss $0.713558178$.
+The actual model's new prediction can differ; retaining the old target would mismatch the specified construction.
+
+**Use when:** The sampled coefficient changes; alpha controls its distribution, not a deterministic mixing result.
+
+### Clip a Boundary-Crossing Rectangle
+
+**New task:** A requested $2\times2$ patch leaves only $1\times2$ inside the $4\times4$ image.
+
+**Picture and change:** Use half-open coordinates, clip ordered rectangle bounds to the image, and count actual replaced pixels.
+For $x\in[-1,1)$ and $y\in[1,3)$, clipped width is one and height two.
+
+**Check:** Two inserted cells give $\lambda_{real}=14/16=0.875$ and target $(0.875,0.125)$, not $(0.75,0.25)$.
+
+**Use when:** Boundaries or integer rounding change realized area.
+An area-weighted target is still a convention: that small patch could remove the only visible A object.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Choosing $\alpha$
 
-| Setting | Mixup $\alpha$ | CutMix $\alpha$ |
-|---------|---------------|----------------|
-| ImageNet from scratch | 0.2 | 1.0 |
-| Small datasets | 0.2 (more aggressive Mixup hurts) | 1.0 |
-| ViT training | 0.2 + CutMix 1.0 (used together) |. |
-
-$\alpha \to 0$ gives near-original samples (almost no mixing); $\alpha \to \infty$ gives $\lambda \approx 0.5$ (always equally mixed). $\alpha$ between 0.2 and 1 is the empirical sweet spot.
+For $\lambda\sim Beta(\alpha,\alpha)$ with positive alpha, the mean is one-half and variance is $1/[4(2\alpha+1)]$.
+Small alpha favors endpoints; large alpha concentrates near one-half.
+The original [Mixup](https://arxiv.org/abs/1710.09412) and [CutMix](https://arxiv.org/abs/1905.04899) papers report recipe-specific experiments, not universal improvement magnitudes.
 
 ## Why it works (intuition)
 
-- **Vicinal risk minimization** [(Chapelle et al., 2001)](https://papers.nips.cc/paper/2000/hash/ba9a56ce0a9bfa26e8ed9e10b2cc8f46-Abstract.html): training on a vicinity around each point regularizes the decision boundary.
-- **Empirically**: smoother decision functions, better calibration, less overconfidence on out-of-distribution inputs.
-- **Equivalent to** an implicit form of weight regularization in the linear case.
+[Vicinal risk minimization](https://papers.nips.cc/paper/2000/hash/ba9a56ce0a9bfa26e8ed9e10b2cc8f46-Abstract.html) motivates training on chosen neighborhoods around examples.
+Those neighborhoods encode assumptions; synthetic points need not belong to the deployment distribution or preserve its correct labels.
 
 ## Common pitfalls
 
-- **Mixing labels but not inputs.** Some implementations mix targets without mixing inputs; this is just label noise, not Mixup.
-- **Combining with strong cropping.** Mixup + RandomResizedCrop + label smoothing + AutoAugment is the modern recipe but can over-regularize small datasets.
-- **Using on detection / segmentation directly.** Class labels mix easily; bounding boxes do not. Variants like Mosaic (YOLOv4) handle this.
-- **Forgetting to disable for evaluation.** Eval should use clean images.
+- **Label-only mixing:** it is not the stated paired-input augmentation, whatever separate objective it implements.
+- **Wrong target unit:** image classification, segmentation, boxes, and sequences require task-specific target handling.
+- **Evaluation contamination:** disable random training mixing for ordinary clean-example evaluation.
+- **Recipe interactions:** augmentation and target smoothing can jointly overregularize; evaluate matched ablations.
 
 ## Related
 
 - [Label smoothing](/concepts/label-smoothing/). Another way to soften targets.
 - [Dropout](/concepts/dropout/). Stochastic activation regularization.
 - [Regularization](/concepts/regularization/). Overview.
+
+</div>

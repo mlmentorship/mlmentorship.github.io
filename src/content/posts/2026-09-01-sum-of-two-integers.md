@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-XOR keeps sum bits without carry. Shifted AND records the carry that still needs to be combined.
+Add two fixed-width integer words without using arithmetic addition or subtraction in the implementation.
 
 ## Problem
 
-> Add two integers without `+` or `-`.
+**Input.** Two 32-bit signed operands, `first` and `second`, or their corresponding unsigned 32-bit word patterns.
 
-Use 32-bit signed operands or their unsigned word patterns. The result is signed 32-bit, with overflow wrapping.
+**Output.** Return their sum interpreted as a signed 32-bit integer, wrapping on overflow.
+
+**Rules.** Do not use arithmetic `+` or `-` to implement the addition.
+The result follows 32-bit two's-complement behavior, not Python's unbounded-integer sum.
+Only the low 32 bits belong to the word; the highest bit determines its signed interpretation.
+
+**Example.** Inputs `1` and `2` return `3`; inputs `-2` and `3` return `1`.
+Inputs `2147483647` and `1` return `-2147483648` because signed overflow wraps.
 
 ## Picture
 

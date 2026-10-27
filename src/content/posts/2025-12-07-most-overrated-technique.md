@@ -8,10 +8,17 @@ category: "questions"
 ---
 
 
-Critique a specific use, not an entire technique.
-State its mechanism, useful boundary, evidence and the comparison that could reverse your recommendation.
+Evaluate a claimed improvement from an ML technique by comparing its evidence, costs, and appropriate scope of use.
 
 ## Problem
+
+**Context.** An interviewer asks which technique is overrated; the invented ledger below offers one specific use to examine.
+
+**Task.** Explain the technique's mechanism, assess whether the observed improvement justifies its cost, and propose a deciding follow-up comparison.
+Describe a useful boundary and evidence that could reverse your recommendation.
+
+**Constraints.** Critique the claimed use rather than dismissing every use of the technique.
+Aggregate correct counts alone do not establish paired statistical significance, causal product benefit, or a universal ranking.
 
 This fictional ledger uses 1,000 matched held-out tasks:
 

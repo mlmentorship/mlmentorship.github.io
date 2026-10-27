@@ -13,14 +13,19 @@ aliases: []
 prerequisites: []
 ---
 
-Keep the largest `k` occurrences in a min-heap; its smallest retained value is the requested rank.
+Return the value at a requested descending rank, counting repeated array entries separately.
 
 ## Problem
 
-For `[3,2,1,5,6,4]` and `k = 2`, return **5**.
-Rank integer occurrences, not distinct values: `[5,5,4]` has second-largest occurrence `5`.
-Require an integer `k` with `1 <= k <= len(nums)`.
-The reference raises `ValueError` outside that range, including on empty input.
+**Input.** An integer list `nums` and a one-based integer rank `k` satisfying `1 <= k <= len(nums)`.
+
+**Output.** Return the value in position `k` when all occurrences are ordered from largest to smallest.
+
+**Rules.** Equal values occupy separate ranks. Return a value, not its original index or the `k` largest values.
+Preserve the input. The reference raises `ValueError` for invalid ranks, including empty input.
+
+**Example.** For `[3, 2, 1, 5, 6, 4]` and `k = 2`, return `5`.
+For `[5, 5, 4]` and `k = 2`, return `5`, not the second distinct value 4.
 
 ## Picture
 

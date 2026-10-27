@@ -13,16 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Save a course when its prerequisites have all been emitted. The resulting prefix is useful only if it eventually contains every course.
+Produce a complete course order in which every prerequisite appears before the course that requires it.
 
 ## Problem
 
-> Return one valid order for completing every course.
+**Input.** A nonnegative `course_count` and prerequisite pairs `[course, prerequisite]` with valid IDs from `0` through `course_count - 1`.
 
-Courses are integer IDs `0..course_count-1`. Each pair `[course, prerequisite]` creates directed edge `prerequisite -> course`.
-Pairs may repeat; every stored occurrence must be decremented once.
+**Output.** Return every course exactly once in a valid completion order, or `[]` if no complete order exists.
 
-Return every course exactly once, or `[]` if no complete order exists. For zero courses, `[]` is also valid success.
+**Rules.** In each pair, the prerequisite must occur earlier than the course.
+Include courses absent from the pairs. Repeated pairs do not create additional courses.
+Any valid complete order is acceptable. Preserve the inputs; zero courses returns `[]` as valid success.
+
+**Example.** Four courses with pairs `[[1, 0], [2, 0], [3, 1], [3, 2]]` permit `[0, 1, 2, 3]`.
+The order `[0, 2, 1, 3]` is also valid; pairs `[[0, 1], [1, 0]]` instead require `[]`.
 
 ## Picture
 

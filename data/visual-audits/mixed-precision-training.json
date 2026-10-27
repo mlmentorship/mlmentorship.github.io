@@ -77,5 +77,12 @@
       "fp16-loss-scaling-ledger"
     ],
     "accessibility": "The figure uses labelled semantic sections and native tables with scoped column and row headers. Every dtype, operation, power-of-two value, underflow result, and update decision is written explicitly; path labels, row order, symbols, and words carry the lesson without color. The established two-panel grid stacks below 640 CSS pixels with ordinary wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme variables preserve dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+  },
+  "comprehensionRevision": {
+    "date": "2026-10-26",
+    "problem": "The ledger conflated preserving a tiny gradient with guaranteeing a visible parameter update without declaring the starting weight or optimizer.",
+    "change": "Declare plain SGD with learning rate one, no momentum or decay, and FP32 master weight 2^-10. Contrast its representable 2^-30 subtraction with weight one, where that subtraction rounds away.",
+    "readerCheck": "Why can the same recovered gradient change the small FP32 weight but leave weight one unchanged?",
+    "evidenceLimit": "IEEE FP32 arithmetic checks and expert illustration revision, not measured learner comprehension or GPU AMP qualification."
   }
 }

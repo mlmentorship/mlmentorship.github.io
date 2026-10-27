@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-XOR the expected domain with the observed values. Equal pairs cancel, leaving the one missing value only when the promised multiplicities hold.
+Find the sole missing integer when every other member of a consecutive domain appears exactly once.
 
 ## Problem
 
-> Values come from 0 through `n`, with one missing. Return the missing value.
+**Input.** An integer list `nums` of length `n`, containing distinct values from the inclusive domain `0..n`.
 
-There are `n = len(nums)` distinct integer observations from the inclusive domain `0..n`. Exactly one domain member is absent.
+**Output.** Return the one domain value absent from the list.
+
+**Rules.** Exactly one member is missing, and all other members appear once.
+Input order is arbitrary. Duplicates, out-of-range values, and multiple omissions violate the contract.
+Do not modify the list. Empty input has domain `{0}` and returns zero.
+
+**Example.** `[3, 0, 1]` has length 3, so its domain is `0..3`; return `2`.
+For `[0, 1]`, return `2`, the missing upper endpoint.
 
 ## Picture
 

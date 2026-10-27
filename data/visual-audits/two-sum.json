@@ -10,7 +10,7 @@
     "recognitionCue": "The prompt asks for two positions whose values satisfy a target sum, so each current value determines one exact complement that can be looked up.",
     "invariant": "Before processing index i, seen contains exactly the useful values from indices below i; therefore a hit is an earlier, distinct element.",
     "stateModel": "Keep the input array, target, moving index i, computed needed value, and seen[value] = earlier index. No pair list or nested search is needed.",
-    "visualRationale": "An indexed array beside the evolving value-to-index map makes the check-before-save order and the moving current index directly visible.",
+    "visualRationale": "A fitted indexed array leads to the complement equation and a value-to-original-index table. Hit connectors join the queried key to its saved index; dashed new rows appear only after a miss.",
     "rejectedAlternatives": [
       "A pair-sum matrix shows quadratic combinations and obscures why one lookup replaces the inner loop.",
       "A sorted two-pointer line loses the original indices and depicts a different algorithm.",
@@ -22,8 +22,8 @@
   "mediumRationale": "An original, problem-specific trace shows the actual input, changing state, safe transition, and result. The static first frame works without JavaScript; controls add step-by-step playback without replacing the proof with decoration.",
   "mediumComparison": {
     "mermaid": "Rejected: automatic graph layout would hide the exact data values and state changes that this problem needs.",
-    "svg": "Rejected: the trace is a changing data state, so semantic HTML keeps values selectable, readable, and responsive.",
-    "semanticHtml": "Selected: each problem owns concrete frames rendered as arrays, maps, grids, trees, stacks, queues, intervals, pointers, bits, or tensor shapes.",
+    "svg": "Selected inside each semantic trace frame to connect the current cell, complement equation, matching map row, and returned original index without fragmented pointer labels.",
+    "semanticHtml": "Selected for the existing frame order, selectable notes, review text, and progressively enhanced controls; the six opt-in lookup drawings preserve all motion keys.",
     "interaction": "Selected as progressive enhancement: Play, Previous, Next, and step buttons reveal the same authored frames while static HTML remains complete.",
     "paperReuse": "Rejected: the visual is an original synthesis of the supplied implementation and does not reuse source artwork.",
     "noVisual": "Rejected: prose alone would make the learner simulate the changing data structure in working memory."
@@ -45,6 +45,13 @@
     "visualIds": [
       "two-sum-state"
     ],
-    "accessibility": "The figure has a labelled title, a complete group description, visible values and state labels, a direct Read it this way caption, keyboard controls, and a static first-frame fallback."
+    "accessibility": "The existing figure title, six named frames, keyboard controls, and static first-frame fallback remain. Every lookup drawing adds its own linked title and description, directly labeled original indices, text-labeled miss/save/hit phases, and color-independent dashed insertion rows. Current mode, print, and frame checks are recorded separately."
+  },
+  "comprehensionRevision": {
+    "date": "2026-10-26",
+    "problem": "The actual complement lookup was buried in metadata and long labels, and saved value-to-index entries did not read as a table.",
+    "change": "Draw current cell to needed value, needed key to matching table row, and saved original index to the returned pair; explicitly distinguish lookup-before-save from the resulting map state.",
+    "readerCheck": "Can a reader trace 6 - 4 = 2 to saved index 1 and explain why the first 3 cannot pair with itself?",
+    "evidenceLimit": "Expert illustration revision and state/geometry checks, not measured learner comprehension."
   }
 }

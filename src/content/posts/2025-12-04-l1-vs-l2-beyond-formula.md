@@ -1,6 +1,6 @@
 ---
-title: "L1 vs L2 regularization, beyond the formula"
-description: "The math is identical to most candidates: penalty terms in the loss. The senior signal is the Bayesian interpretation, the optimization geometry, and when each is the right choice."
+title: "L1 versus L2: derive the zero coefficient"
+description: "Solve a common quadratic under absolute and squared penalties, test the zero subgradient condition, and separate objective sparsity from solver behavior."
 date: "2025-12-04"
 draft: false
 tags: ["questions"]
@@ -8,30 +8,44 @@ category: "questions"
 ---
 
 
-> *Asked in: ML breadth at every level.*
+Compare the exact fitted coefficients produced by absolute and squared penalties under one explicitly defined quadratic objective.
 
-The L4 answer states the formulas. The L6 answer explains *why* L1 induces sparsity geometrically, names the Bayesian priors each corresponds to, and gives a clear practitioner rule for when to pick which.
+## Problem
 
-## What an L4 answer sounds like
+**Context.** Fit $a=(2,0.3)$ using data loss $L_{data}(w)=\frac12\lVert w-a\rVert_2^2$ and coefficient $\lambda=0.5$.
+Compare L1 penalty $\lambda\sum_i|w_i|$ with half-scaled L2 penalty $\frac\lambda2\sum_iw_i^2$.
 
-> "L1 adds the absolute value of weights to the loss, L2 adds the squared values. L1 leads to sparse solutions, L2 leads to small weights."
+**Task.** Derive the minimizing coefficients for each penalized objective and identify which coefficients become exactly zero.
+Explain how changing the penalty convention or feature scaling changes the comparison.
 
-Correct, no depth. You've heard the rule, not the reason.
+**Constraints.** Coordinates are independent, feature units are comparable, and no intercept appears in this fixture.
+Use subgradients at the absolute-value corner; distinguish objective sparsity from a solver merely returning a small number.
 
-## What an L5 answer sounds like
+<span id="what-an-l4-answer-sounds-like"></span>
+## Fix the objective
 
-> "Both add a penalty term to the loss to constrain the weights:
->
-> - L1: `lambda * sum(|w_i|)`
-> - L2: `lambda * sum(w_i^2)`
->
-> The Bayesian view: L1 corresponds to a Laplace prior on the weights centered at zero; L2 corresponds to a Gaussian prior. Both pull weights toward zero, but with different shapes.
->
-> Why L1 induces sparsity (the geometric view): the L1 ball has corners at the axes. The optimum of the loss + L1 penalty often lands at one of those corners, which means many weights are exactly zero. The L2 ball is round, so the optimum lands somewhere off the axes, with all weights small but rarely zero.
->
-> Practical use: L2 (weight decay) is the default for deep networks; pick L1 when you want feature selection (sparse models, interpretability, downstream sparse computation)."
+Use L1 penalty $\lambda\sum_i|w_i|$ and L2 penalty $\frac\lambda2\sum_iw_i^2$.
+An unhalved L2 convention, $\lambda\sum_iw_i^2$, doubles its penalty derivative for the same numerical coefficient.
+Changing summed loss to mean loss also changes relative penalty strength unless rescaled.
+State intercept treatment and feature scaling in a real fit.
 
-This is L5. You've named the prior interpretation, given the geometric intuition, and made a practitioner recommendation.
+<span id="what-an-l5-answer-sounds-like"></span>
+## Solve the corner and the smooth condition
+
+For one L1 coordinate, minimize $\frac12(w-a)^2+\lambda|w|$.
+
+- If $w>0$, stationarity gives $w-a+\lambda=0$, valid for $a>\lambda$.
+- If $w<0$, it gives $w-a-\lambda=0$, valid for $a<-\lambda$.
+- At zero, $0\in-a+\lambda[-1,1]$ holds exactly when $|a|\le\lambda$.
+
+Together these give $w=\operatorname{sign}(a)\max(|a|-\lambda,0)$.
+For L2, $w-a+\lambda w=0$ gives $w=a/(1+\lambda)$.
+
+| Objective | First coordinate | Second coordinate |
+| --- | --- | --- |
+| Unpenalized | $2$ | $0.3$ |
+| L1 | $2-0.5=1.5$ | $0$, since $0.3\le0.5$ |
+| Half-scaled L2 | $2/1.5=4/3$ | $0.3/1.5=0.2$ |
 
 <!-- visual:l1-l2-first-contact-geometry -->
 <figure class="learning-figure" aria-labelledby="regularization-contact-title">
@@ -81,43 +95,69 @@ This is L5. You've named the prior interpretation, given the geometric intuition
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> imagine a loss contour expanding from the star until it first reaches the allowed coefficient region. With the L1 diamond, an axis-aligned corner can be the first contact, making one coefficient exactly zero. With the smooth L2 circle, contact is usually between the axes, so both coefficients shrink but remain nonzero. The geometry explains a tendency, not a guarantee that every L1 solution is sparse. This is an original schematic checked against <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://hastie.su.domains/ElemStatLearn/"><cite>The Elements of Statistical Learning</cite></a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> expand a loss contour from the star until it touches the allowed region. A diamond corner can zero a coefficient; a smooth-circle contact can retain both. This schematic illustrates a tendency, not the numerical coordinates of our separate analytic fixture. Equivalent constrained budgets depend on the fitted optimum; equal numeric budgets across norms are not equivalent penalties. Sources: <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://hastie.su.domains/ElemStatLearn/"><cite>The Elements of Statistical Learning</cite></a>.</figcaption>
 </figure>
 
-## What an L6 answer sounds like
+<span id="what-an-l6-answer-sounds-like"></span>
+## Change the requirements
 
-> "...a few more things worth saying:
->
-> **L1 is non-differentiable at zero**, which means standard gradient descent doesn't drive weights exactly to zero; you need proximal methods (ISTA, FISTA) or specialized solvers. In practice, frameworks use a sub-gradient (typically zero at zero) and rely on small numerical noise for actual sparsity.
->
-> **AdamW vs Adam with weight decay**: 'L2 regularization' as a `+ lambda * w^2` term in the loss interacts badly with adaptive optimizers (the regularization gets scaled by the adaptive learning rate). AdamW decouples weight decay by applying it directly to the weights, not the gradient. This is what most modern transformers use.
->
-> **Elastic Net** combines both. Useful when you want some sparsity but L1 alone is unstable in the presence of correlated features.
->
-> **Implicit regularization** matters more than people think. SGD's noise, early stopping, and architecture (e.g., dropout, batch norm) often dominate explicit penalty regularization in deep learning. For very large models, weight decay is more about training stability than overfitting prevention."
+**New task:** reduce L1 strength to $0.2$ while keeping the fitting surface fixed.
+Move the threshold inward.
+**Check:** $(2-0.2,0.3-0.2)=(1.8,0.1)$; the removed coefficient returns.
+**Use when:** validation or a feature-count requirement favors less sparsity.
 
-## Tells that get you a strong-hire vote
+**New task:** combine L1 strength $\lambda_1=0.5$ with L2 strength $\lambda_2=1$.
+Threshold, then shrink: $w=\operatorname{soft}(a,\lambda_1)/(1+\lambda_2)$, giving $(0.75,0)$.
+**Use when:** sparse selection and correlated-feature stability both matter.
+**Boundary:** this reference has independent coordinates; correlated designs require solving the coupled objective.
 
-- You name the **Bayesian priors** (Laplace for L1, Gaussian for L2).
-- You give the **geometric** sparsity argument, not just the empirical claim.
-- You distinguish **AdamW vs Adam with weight decay**.
-- You acknowledge **implicit regularization** matters more for deep nets.
+**Failure:** for $\frac12w^2+|w|$, step size one sends $w=0.25$ to $-1$, then alternates between $1$ and $-1$.
+The optimum is zero; fixed-step subgradient updates need not reach it.
+Numerical jitter is not an exact-sparsity method.
 
-## Tells that get you down-leveled
+**Reconstruct:** multiply a feature by $100$ while preserving its prediction contribution. Is its coefficient penalty unchanged?
 
-- "L1 is sparse, L2 is small" with no further explanation.
-- Confusion about the AdamW vs Adam weight-decay distinction.
-- Suggesting L1 for deep networks as a default (rare; usually L2 or weight decay).
-- No awareness that L1 needs special optimizers for true sparsity.
+<details><summary>Answer</summary>
+
+No. Its coefficient becomes one hundredth as large.
+The same contribution receives one hundredth the L1 penalty and one ten-thousandth the L2 penalty.
+Standardize features or justify scale-specific penalties.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+## Priors and solver choices
+
+Independent Laplace and Gaussian priors yield L1 and L2 MAP penalties under matching likelihood units and scale.
+MAP is a point estimate, not the whole posterior.
+Intercept exclusions and rescaled features alter that interpretation.
+
+Proximal gradient methods apply soft thresholding after the smooth-loss step; their threshold includes step size.
+ISTA, FISTA, coordinate descent, and specialized solvers handle nonsmoothness explicitly.
+The separable closed form does not extend unchanged to an arbitrary correlated design.
+See <a href="https://web.stanford.edu/~boyd/papers/prox_algs.html">Parikh and Boyd's Proximal Algorithms</a>.
+
+<span id="tells-that-get-you-down-leveled"></span>
+## Keep optimizer effects separate
+
+For frozen coordinate preconditioners, a coupled L2 gradient is preconditioned; AdamW's shrinkage is separate.
+[The decay trace](/concepts/weight-decay-vs-l2/) computes that difference.
+Neither procedure is universally preferable for every statistical objective.
+
+Optimizer noise, architecture, and early stopping can bias fitted solutions without an explicit penalty.
+Their generalization effects and relative importance depend on workload and training protocol.
 
 ## Common follow-up
 
-"You said weight decay is the default. When would you turn it off?"
-
-The L6 answer:
-
-> "Frontier-scale LLM pretraining uses very small weight decay (e.g., 0.01 or 0.1 in AdamW) because the model is underfitting at trillion-token scale, not overfitting. Some teams report no quality loss with weight decay = 0; others find a small WD helps with training stability. For typical supervised models on small data, default weight decay (1e-4 to 1e-2) is meaningful regularization."
+When should decay be disabled?
+Compare matched validation outcomes, parameter groups, schedules, and deployment constraints, including a zero-decay control.
+Model size alone does not prescribe a universal coefficient.
 
 ---
 
 *Related: [regularization](/concepts/regularization/) and [Adam and AdamW](/concepts/adam-and-adamw/).*
+
+</div>

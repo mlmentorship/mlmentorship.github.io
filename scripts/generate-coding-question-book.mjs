@@ -154,7 +154,57 @@ function renderArrayScene(scene) {
   return `${graph}${inventory}${renderMeta(scene, ['type', 'items', 'marks', 'graphCompanion', 'arraySummary', 'savedRange', 'fitArray', 'indexLabels', 'arrayColumns'])}`;
 }
 
+function renderComplementLookupScene(scene) {
+  const current = scene.marks.find((item) => item.key === 'scan-cursor')?.index;
+  assert(Number.isInteger(current), 'Complement lookup needs one stable scan cursor');
+  const value = Number(scene.items[current]);
+  const needed = Number(scene.lookupTarget) - value;
+  const entries = scene.map.map(([key, index]) => {
+    assert.match(index, /^index \d+$/, 'Complement lookup map must retain original indices');
+    return { key: Number(key), index: Number(index.slice(6)) };
+  });
+  const earlier = entries.find((entry) => entry.key === needed && entry.index < current);
+  const hit = scene.lookupPhase === 'hit' || scene.lookupPhase === 'return';
+  assert.equal(Boolean(earlier), hit, 'Complement lookup phase must agree with the prior map');
+  const titleId = `coding-complement-${scene.lookupPhase}-${current}-title`;
+  const descriptionId = `coding-complement-${scene.lookupPhase}-${current}-desc`;
+  const markers = (index) => scene.marks.filter((item) => item.index === index).map((item) => {
+    const center = 88 + item.index * 128;
+    return `<g${motionKey(item.key)}><text x="${center}" y="60" text-anchor="middle" font-size="22">${item.index === current ? `i = ${current}` : 'earlier'}</text><path d="M${center} 68V86M${center - 5} 80L${center} 86L${center + 5} 80" fill="none" stroke="var(--viz-${item.tone}-stroke)" stroke-width="2"/></g>`;
+  }).join('');
+  const cells = scene.items.map((item, index) => {
+    const tone = scene.marks.find((mark) => mark.index === index)?.tone ?? 'neutral';
+    return `<g${motionKey(`value-${index}`)}><rect x="${32 + index * 128}" y="92" width="112" height="80" rx="3" fill="var(--viz-${tone}-bg)" stroke="var(--viz-${tone}-stroke)"/><text x="${88 + index * 128}" y="126" text-anchor="middle" font-size="28">${escapeHtml(item)}</text><text x="${88 + index * 128}" y="158" text-anchor="middle" font-size="20">index ${index}</text>${markers(index)}</g>`;
+  }).join('');
+  const rows = entries.map((entry, index) => {
+    const matched = hit && entry === earlier;
+    const inserted = scene.lookupPhase === 'saved' && entry.index === current;
+    return `<g data-lookup-key="${entry.key}" data-saved-index="${entry.index}"${matched ? ' data-lookup-match="true"' : ''}><rect x="32" y="${370 + index * 44}" width="282" height="44" fill="var(--viz-${matched ? 'output' : 'neutral'}-bg)" stroke="var(--viz-${matched ? 'output' : 'neutral'}-stroke)"${inserted ? ' stroke-dasharray="5 3"' : ''}/><text x="100" y="${400 + index * 44}" text-anchor="middle">${entry.key}</text><text x="246" y="${400 + index * 44}" text-anchor="middle">${entry.index}</text></g>`;
+  }).join('');
+  const phaseLabels = {
+    next: ['NEXT LOOKUP', 'only prior', 'indices count'],
+    miss: ['MISS', `No saved ${needed}`, `before i = ${current}`],
+    saved: ['AFTER MISS', `save ${value} -> ${current}`, 'then advance'],
+    hit: ['HIT', `key ${needed} gives`, `index ${earlier?.index}`],
+    return: ['RETURN', 'two distinct', 'indices'],
+  }[scene.lookupPhase];
+  assert(phaseLabels, 'Unknown complement lookup phase');
+  const status = phaseLabels.map((label, index) => `<text x="342" y="${350 + index * 36}" font-size="22"${index === 0 ? ' font-weight="700"' : ''}>${escapeHtml(label)}</text>`).join('');
+  const matchedCenter = 392 + entries.indexOf(earlier) * 44;
+  const lookup = hit ? `<path d="M32 250H16V${matchedCenter}H32M24 ${matchedCenter - 6}L32 ${matchedCenter}L24 ${matchedCenter + 6}" fill="none" stroke="var(--viz-focus-stroke)" stroke-width="2"/><path d="M314 ${matchedCenter}H328V474H280V488M274 480L280 488L286 480" fill="none" stroke="var(--viz-output-stroke)" stroke-width="2"/>` : '';
+  const result = hit
+    ? `seen[${needed}] = ${earlier.index}; ${scene.lookupPhase === 'return' ? `return [${earlier.index}, ${current}]` : `earlier index ${earlier.index}`}`
+    : scene.lookupPhase === 'saved'
+      ? `Saved only after the miss: ${value} -> ${current}`
+      : scene.lookupPhase === 'miss'
+        ? `${needed} absent: do not reuse index ${current}.`
+        : 'No earlier entries are saved yet.';
+  const proof = hit ? `<text x="280" y="580" text-anchor="middle" font-size="22">nums[${earlier.index}] + nums[${current}] = ${needed} + ${value} = ${scene.lookupTarget}</text>` : '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 600" role="img" aria-labelledby="${titleId} ${descriptionId}" data-complement-lookup="${scene.lookupPhase}" style="width:100%; min-width:0; height:auto; font-family:var(--font-ui); font-size:24px; fill:var(--c-text)"><title id="${titleId}">Complement lookup at index ${current}: ${escapeHtml(phaseLabels[0])}</title><desc id="${descriptionId}">The indexed input is ${escapeHtml(scene.items.join(', '))}, target ${scene.lookupTarget}. Needed equals ${scene.lookupTarget} minus ${value}, or ${needed}. ${escapeHtml(result)}. Dashed new map rows are inserted only after a failed lookup.</desc><text x="32" y="30">nums; target = ${scene.lookupTarget}</text>${cells}<path d="M${88 + current * 128} 172V222M${82 + current * 128} 214L${88 + current * 128} 222L${94 + current * 128} 214" fill="none" stroke="var(--viz-focus-stroke)" stroke-width="2"/><rect x="32" y="222" width="496" height="58" rx="3" fill="var(--viz-focus-bg)" stroke="var(--viz-focus-stroke)"/><text x="280" y="258" text-anchor="middle">${scene.lookupTarget} - ${value} = ${needed}${scene.lookupPhase === 'saved' ? ' : MISS before save' : ''}</text><text x="32" y="314" font-size="22">seen${scene.lookupPhase === 'saved' ? ': after saving' : ': before saving current'}</text><rect x="32" y="332" width="282" height="126" fill="var(--viz-neutral-bg)" stroke="var(--viz-neutral-stroke)"/><path d="M32 370H314M172 332V458" fill="none" stroke="var(--viz-neutral-stroke)"/><text x="100" y="358" text-anchor="middle" font-size="22">value</text><text x="246" y="358" text-anchor="middle" font-size="20">saved index</text>${rows || '<text x="172" y="414" text-anchor="middle">empty</text>'}${status}${lookup}<rect x="32" y="488" width="496" height="62" rx="3" fill="var(--viz-${hit ? 'output' : 'neutral'}-bg)" stroke="var(--viz-${hit ? 'output' : 'neutral'}-stroke)"/><text x="280" y="526" text-anchor="middle" font-size="22">${escapeHtml(result)}</text>${proof}</svg>`;
+}
+
 function renderArrayMapScene(scene) {
+  if (scene.lookupTarget !== undefined) return renderComplementLookupScene(scene);
   const map = (scene.map ?? []).map(([key, value]) => `<span class="coding-trace-map-entry"><b>${escapeHtml(key)}</b><span>${escapeHtml(value)}</span></span>`).join('');
   return `<div class="coding-trace-array-map">${renderArrayScene(scene)}<div class="coding-trace-map"><span class="coding-trace-label">${escapeHtml(scene.mapLabel ?? 'saved state')}</span>${map || '<span class="coding-trace-empty">empty</span>'}</div></div>`;
 }
@@ -632,6 +682,19 @@ if (selfTest) {
   assert.throws(() => replaceVisual('No visual.', visual), /Expected one existing visual/);
   assert.throws(() => replaceVisual(`${before}\n<figure aria-labelledby="fixture-title"></figure>`, visual), /Expected one existing visual/);
   assert.throws(() => replaceVisual('```html\n<figure aria-labelledby="fixture-title"></figure>\n```', visual), /Expected one existing visual/);
+  const lookupFixture = { items: ['3', '2', '4', '7'], map: [['3', 'index 0'], ['2', 'index 1']], marks: [{ index: 1, tone: 'state', key: 'saved-complement' }, { index: 2, tone: 'focus', key: 'scan-cursor' }], lookupTarget: 6, lookupPhase: 'hit' };
+  const renderedLookup = renderArrayMapScene(lookupFixture);
+  assert.match(renderedLookup, /6 - 4 = 2/);
+  assert.match(renderedLookup, /data-lookup-key="2" data-saved-index="1" data-lookup-match="true"/);
+  assert.match(renderedLookup, /M32 250H16V436H32/);
+  assert.match(renderedLookup, /seen\[2\] = 1; earlier index 1/);
+  assert.deepEqual([...renderedLookup.matchAll(/data-motion-key="([^"]+)"/g)].map((match) => match[1]), ['value-0', 'value-1', 'saved-complement', 'value-2', 'scan-cursor', 'value-3']);
+  assert.throws(() => renderArrayMapScene({ ...lookupFixture, lookupPhase: 'miss' }), /phase must agree/);
+  const savedLookup = renderArrayMapScene({ items: ['3', '2', '4', '7'], map: [['3', 'index 0']], marks: [{ index: 0, tone: 'focus', key: 'scan-cursor' }], lookupTarget: 6, lookupPhase: 'saved' });
+  assert.match(savedLookup, /MISS before save/);
+  assert.match(savedLookup, /stroke-dasharray="5 3"/);
+  assert.doesNotMatch(savedLookup, /data-lookup-match="true"/);
+  assert.doesNotMatch(renderArrayMapScene({ items: ['3'], map: [], marks: [] }), /data-complement-lookup|<svg/);
   assert.equal(linkedMarkerOffset(['coding-linked-arrow-7-warning', 'coding-linked-arrow-8', 'coding-linked-arrow-7']), 7);
   assert.equal(linkedMarkerOffset(['coding-linked-arrow-0', 'coding-linked-arrow-1']), 0);
   assert.equal(linkedMarkerOffset(['unrelated', 'coding-linked-arrow-7-warning']), undefined);

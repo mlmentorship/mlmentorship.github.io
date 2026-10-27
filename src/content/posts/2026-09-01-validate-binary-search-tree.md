@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-A descendant must satisfy every ancestor decision, not just its immediate parent's ordering rule.
+Determine whether a binary tree satisfies strict binary-search ordering across every complete subtree.
 
 ## Problem
 
-> Check whether every node follows all BST ordering rules.
+**Input.** The root of a finite integer-valued binary tree without cycles or shared children.
 
-Use a finite binary tree of integers, without cycles or shared children. Values must be strictly smaller on the left and larger on the right. Duplicates are forbidden.
+**Output.** Return `True` exactly when the tree is a valid strict binary search tree.
+
+**Rules.** Every value in a node's left subtree must be smaller than that node's value.
+Every value in its right subtree must be larger, and both rules apply recursively.
+Duplicates are forbidden. Preserve the tree; an empty tree returns `True`.
+
+**Example.** Root 2 with children 1 and 3 returns `True`.
+Root 5 with right child 7 and `7.left = 4` returns `False`: 4 violates the ancestor's right-subtree requirement.
 
 ## Picture
 

@@ -13,15 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Group words by complete character counts when letter order does not matter. A character set would lose repeated letters.
+Group input words together when each group contains exactly the same letters with the same multiplicities.
 
 ## Problem
 
-> Put words with the same letters into the same group.
+**Input.** A list `words` containing only lowercase ASCII letters `a` through `z` in each string.
 
-Every character must be lowercase ASCII `a` through `z`. Empty words and repeated words are allowed.
+**Output.** Return groups of anagrams: words with identical character counts, regardless of character order.
 
-Preserve every input occurrence without changing the input. The source orders groups by first appearance and words by input order.
+**Rules.** Preserve every occurrence, including repeated words and empty strings.
+The reference orders groups by first appearance and words within each group by input order.
+Leave the input unchanged. An empty list returns `[]`; other alphabets require the variant below.
+
+**Example.** `["eat", "tea", "tan", "ate", "nat", "bat"]` returns `[["eat", "tea", "ate"], ["tan", "nat"], ["bat"]]`.
+Each first-group word has one `a`, one `e`, and one `t`.
 
 ## Picture
 

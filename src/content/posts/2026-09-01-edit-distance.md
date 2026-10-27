@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Transform one prefix into another by choosing a final edit and its already-solved predecessor. Save only the rows needed by the next cell.
+Find the minimum number of single-character edits needed to transform one complete string into another.
 
 ## Problem
 
-> Find the fewest insert, delete, or replace steps needed to change one string into another.
+**Input.** Two Python strings, `first` and `second`.
 
-Transform `first` into `second`. Each insertion, deletion or replacement costs one; keeping an equal character costs zero.
-This is unit-cost Levenshtein distance, not an edit script, transposition distance or semantic similarity score.
-Characters are Python code points, without automatic normalization.
+**Output.** Return the smallest edit count that changes `first` into exactly `second`.
+
+**Rules.** Inserting, deleting, or replacing one character costs one; keeping an equal character costs zero.
+Swapping adjacent characters is not a separate allowed edit.
+Characters are Python code points without automatic normalization. Preserve both strings.
+Return a distance, not an edit script or semantic similarity score.
+
+**Example.** `"horse"` to `"ros"` returns `3`: replace `h`, delete the extra `r`, then delete `e`.
+Changing `""` into `"cat"` costs `3` insertions.
 
 ## Picture
 

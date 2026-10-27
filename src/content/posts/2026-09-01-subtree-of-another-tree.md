@@ -13,15 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Search chooses where to compare. Equality proves the entire rooted structure, including which children are missing.
+Determine whether one complete binary tree occurs as a rooted subtree inside another tree.
 
 ## Problem
 
-> Check whether one full tree appears inside another tree.
+**Input.** A main binary tree and a pattern binary tree, both finite and without cycles or shared children.
 
-Both inputs are finite binary trees without cycles or shared children. Equal values alone do not establish a match.
+**Output.** Return `True` if some main-tree node roots a subtree exactly equal to the pattern; otherwise return `False`.
 
-An empty pattern matches anywhere, including an empty main tree. A nonempty pattern cannot match an empty main tree.
+**Rules.** Matching requires equal values and identical left/right structure, including all missing children.
+You cannot ignore extra descendants below a chosen root. Preserve both trees.
+An empty pattern matches anywhere, including an empty main tree; a nonempty pattern cannot match an empty main tree.
+
+**Example.** A node 4 with leaf children 1 and 2 matches a pattern with exactly that structure.
+If the pattern's node 2 is a leaf but the main node 2 has an extra child, that candidate fails.
 
 ## Picture
 

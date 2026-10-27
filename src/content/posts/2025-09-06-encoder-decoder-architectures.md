@@ -9,19 +9,30 @@ category: "concepts"
 
 ## Summary
 
-An **encoder-decoder** model has two networks: an **encoder** that reads the input sequence and produces hidden representations, and a **decoder** that generates the output sequence one token at a time, attending to both the encoder's representations and the partial output so far.
-
-Encoder-decoder is the canonical architecture for **sequence-to-sequence** tasks where the input and output may differ in length, structure, or modality:
-
-- Machine translation (original transformer, 2017).
-- Summarization (BART, T5).
-- Text-to-speech.
-- Image captioning, image-to-text.
-- Modern diffusion models (text encoder + denoising decoder).
-
-Modern decoder-only LLMs (GPT, Llama, Mistral) are the dominant chat architecture, but encoder-decoder remains better for tasks with a *clear input-output split* and constrained output length (translation, summarization).
+An attention-based autoregressive encoder-decoder routes source representations and a growing target prefix through different attention paths.
+Its source memory can remain fixed during generation while target state grows; this requires fixed source input and parameters.
+Other encoder-decoder systems, including nonautoregressive decoders, need not share this factorization.
 
 ## The structure
+
+For one decoder layer, let $H=Encoder(source)$ and use:
+
+$$
+Q=target\_states\,W_Q,\qquad K=HW_K,\qquad V=HW_V.
+$$
+
+Source K/V projections belong to that layer; different layers need not share them.
+Target self-attention reads the causal target prefix, whereas cross-attention reads the permitted source memory.
+Padding and source-availability masks remain separate from the target causal mask.
+
+Consider three source positions producing $H\in\mathbb R^{3\times2}$, then output token y1 followed by EOS.
+One encoder pass produces H and the layer's source K/V.
+BOS supplies the first incremental target query: three source score pairs precede y1.
+The next query, after appending y1, contributes three more pairs before EOS.
+Total: one encoder pass, two incremental decoder steps, and six cross-score pairs per head and layer.
+
+<p class="visual-kicker">Source and target state</p>
+<p class="visual-title">Reuse fixed source memory while causal target state grows.</p>
 
 <!-- visual:encoder-once-decoder-loop -->
 ```mermaid
@@ -42,12 +53,40 @@ flowchart TB
 	class MEM,CROSS viz-focus
 	class NEXT,OUT viz-output
 ```
-<p class="diagram-caption"><strong>Read it this way:</strong> at inference, encode the complete input once. The decoder's causal self-attention reads only the output prefix generated so far; its cross-attention then uses the decoder state as Q and the unchanged encoder memory as K,V. Append one predicted token and repeat the decoder path, not the encoder path. Original synthesis checked against the <a href="https://arxiv.org/abs/1706.03762">Transformer paper</a>, the original <a href="https://arxiv.org/abs/1409.3215">sequence-to-sequence formulation</a>, and <a href="https://huggingface.co/docs/transformers/en/model_doc/encoder-decoder">Hugging Face's implementation documentation</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> encode a fixed source once, then append target tokens through the decoder path. Target queries read each layer's reusable source K/V. The target cache grows; the source length does not. Original synthesis follows the <a href="https://arxiv.org/abs/1706.03762">Transformer paper</a>, <a href="https://arxiv.org/abs/1409.3215">sequence-to-sequence formulation</a>, and <a href="https://huggingface.co/docs/transformers/en/model_doc/encoder-decoder">implementation documentation</a>.</p>
 
-Each decoder block has two attention sub-blocks:
+### Switch to Teacher-Forced Scoring
 
-- **Self-attention** over previous decoder outputs (causal masking).
-- **Cross-attention** with $Q$ from decoder state, $K, V$ from encoder hidden states.
+**New task:** Score observed labels y1, EOS rather than sampling them.
+
+**Picture and change:** Decoder inputs are BOS, y1; labels are y1, EOS.
+Suitable causal-transformer implementations evaluate both target positions in parallel, with source access retained except padding.
+
+**Check:** The first prediction cannot read the second input position containing y1.
+Two target positions still make six source score pairs.
+Unshifted inputs y1, EOS would leak each answer through its own position despite a causal mask.
+
+**Use when:** Computing training loss or conditional sequence likelihood.
+
+### Change the Source
+
+**New task:** A fourth token arrives for a bidirectional encoder.
+
+**Picture and change:** Recompute or explicitly invalidate affected source encodings and derived caches; older source states can change too.
+
+**Check:** New H has shape $4\times2$ and four cross keys, not three old keys plus an independently encoded token.
+Previously decoded target states may also be incompatible with the changed source.
+
+**Use when:** The input changes; streaming needs a separately specified information-flow and cache policy.
+
+## Cross-attention complexity
+
+For source length $n$ and evaluated target length $m$, dense cross-attention makes $mn$ score pairs per head and layer.
+Score and value arithmetic also depend on their dimensions; projection, encoder, and target-self-attention costs are additional.
+The incremental trace evaluates only new target queries; repeatedly recomputing the full prefix performs different work.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Encoder-only vs. decoder-only vs. encoder-decoder
 
@@ -59,14 +98,8 @@ Each decoder block has two attention sub-blocks:
 
 ## Why decoder-only models took over chat
 
-Several reasons:
-
-1. **In-context learning** emerged in decoder-only LLMs at scale; the encoder-decoder split is unnecessary if the task is conveyed in the prompt.
-2. **Simpler training**: one stack of identical blocks, one objective (next-token prediction).
-3. **Easier to scale**: weight-sharing between encoder and decoder is awkward; decoder-only just adds layers.
-4. **Single inference path**: no separate encoder pass.
-
-For tasks where the input is fixed and the output is a transformation of it (translation, summarization, code completion from a spec), encoder-decoder still has efficiency advantages.
+The retained historical heading is not an architectural superiority theorem.
+Compare training recipe, source/target lengths, reuse, quality, and deployment costs rather than asserting that a clear split guarantees victory.
 
 ## Variants and their distinctions
 
@@ -77,21 +110,15 @@ For tasks where the input is fixed and the output is a transformation of it (tra
 - **BART**: encoder-decoder, denoising autoencoder.
 - **FLAN-T5**: T5 + instruction fine-tuning.
 
-## Cross-attention complexity
-
-Cross-attention from decoder to encoder is $O(n_\text{out} \cdot n_\text{in})$. For long inputs (long-document summarization), this dominates. Variants:
-
-- **Sparse cross-attention**: BigBird-style for long inputs.
-- **Encoder caching**: encoder runs once per input; cached for all decoder steps.
-
 ## Common pitfalls
 
-- **Confusing T5 (encoder-decoder) and BERT (encoder-only)**. Different training objectives, different uses.
-- **Using decoder-only for translation when encoder-decoder is better.** Decoder-only translation works but encoder-decoder usually trains faster and gives slightly better quality at smaller scale.
-- **Sharing position encodings between encoder and decoder naively.** Often they need different schemes (relative for encoder, RoPE for decoder).
-- **Treating encoder hidden states as static during decoding.** They are; the encoder runs once per input. Don't recompute.
+- **Unshifted targets:** causality alone does not hide the current input token.
+- **Wrong cache lifetime:** source memory is reusable only under its fixed-input/parameter contract.
+- **Universal dominance:** neither a separate encoder nor a single stack guarantees better cost or quality.
 
 ## Related
 
 - [Transformer architecture](/concepts/transformer-architecture/). Block-level structure.
 - [Attention mechanism](/concepts/attention-mechanism/). Both self- and cross-attention.
+
+</div>

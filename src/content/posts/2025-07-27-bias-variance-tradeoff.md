@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth at every level. The classic warm-up question.*
 
-The interviewer is checking whether you understand the concept or can *use* it. The L4 answer states the formula. The L6 answer connects it to a debugging procedure and to scaling.
+Explain bias and variance, then use the distinction to reason about a model's generalization behavior.
+
+## Problem
+
+**Context.** A predictor is fitted on sampled training data and evaluated on new examples from a specified population.
+Its predictions can be systematically wrong and can change when the training sample changes.
+
+**Task.** Define bias, variance, and irreducible noise under squared loss, then relate them to model capacity and diagnostic experiments.
+Explain what additional evidence would justify changing data volume, regularization, or architecture.
+
+**Constraints.** State assumptions behind the classical decomposition and distinguish repeated-sample expectations from one train-validation split.
+A generalization gap alone does not directly measure every term or establish a universal capacity trade-off.
 
 ## What an L4 answer sounds like
 

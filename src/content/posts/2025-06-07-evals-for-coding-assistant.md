@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team interviews at companies building coding products.*
 
-The L4 candidate names HumanEval. The L6 candidate distinguishes the metrics that matter for a *product* from the leaderboard scores, and addresses what verification can and can't catch.
+Evaluate a coding assistant's usefulness and risks using representative tasks rather than a single code-generation benchmark score.
+
+## Problem
+
+**Context.** A hypothetical coding product proposes completions, explains code, or edits repositories, and its model is changing.
+You must decide whether a candidate version is better for developers.
+
+**Task.** Design offline tasks, verification checks, product measurements, slice analysis, and a staged release decision.
+Explain which failures unit tests, acceptance rates, and standard coding benchmarks cannot independently establish.
+
+**Constraints.** Separate product modes, prevent evaluation leakage, and preserve private repository boundaries.
+Measure correctness, latency, security, and downstream developer work; accepting a suggestion does not prove that it is correct.
 
 ## What an L4 answer sounds like
 

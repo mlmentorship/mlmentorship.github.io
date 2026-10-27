@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Softmax depends on logit differences, so a shared offset cancels.
+Convert finite class scores into probabilities while avoiding overflow from large but valid score values.
 
 ## Problem
 
-Normalize the floating-point row $[1000,1001,999]$ into probabilities without directly exponentiating $1001$.
-Support an explicit normalization axis.
-Assume finite floating inputs and a nonempty selected axis.
+**Input.** A floating-point NumPy array `logits` and a valid normalization `axis`, defaulting to the last axis.
+
+**Output.** Return softmax probabilities with the same shape, summing to one along each selected-axis slice.
+
+**Rules.** Probabilities are proportional to exponentiated scores within each slice.
+Require finite inputs, a nonempty selected axis, and representable score differences.
+Preserve the input. Large common score offsets must not cause exponential overflow.
+
+**Example.** Scores `[1000, 1001, 999]` return approximately `[0.244728, 0.665241, 0.090031]`.
+Scores `[0, 0]` return `[0.5, 0.5]`, not raw exponentials `[1, 1]`.
 
 ## Picture
 

@@ -68,6 +68,8 @@ Two timestamps may matter:
 
 A transaction may occur on Monday but arrive on Wednesday. A Tuesday prediction cannot use it. Joining only on event time still leaks information.
 
+<p class="visual-title">An event is usable only after its arrival</p>
+
 <!-- visual:point-in-time-availability-boundary -->
 ```mermaid
 flowchart TB

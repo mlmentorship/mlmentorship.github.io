@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Complete decodings split into disjoint groups by final token width; add only groups whose final token is valid.
+Count how many letter sequences a digit string can represent under the mapping from 1 through 26.
 
 ## Problem
 
-Count decodings of ASCII digit string `2101`, where tokens `1` through `26` map to `A` through `Z`.
-No token may start with zero.
-The source returns zero for empty input as an external API convention.
-It assumes ASCII digits rather than validating arbitrary input.
+**Input.** A string `text` containing only ASCII digits.
+
+**Output.** Return the number of complete decodings when tokens `1` through `26` represent letters `A` through `Z`.
+
+**Rules.** Every digit must belong to exactly one valid token, in its original order.
+A token cannot start with zero; `10` and `20` are valid, but `0` and `06` are not.
+Return zero for empty input by this API's convention. The reference assumes, rather than validates, ASCII digits.
+
+**Example.** `"12"` returns `2`, representing `"AB"` and `"L"`.
+For `"2101"`, return `1` for `"BJA"`; `"06"` returns `0`.
 
 ## Picture
 

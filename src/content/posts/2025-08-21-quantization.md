@@ -1,6 +1,6 @@
 ---
 title: "Quantization: INT8, INT4, FP8, and the inference cost picture"
-description: "Reduce model precision to shrink memory and speed up inference. The trade-offs are real but increasingly small with modern techniques."
+description: "Trace low-bit codes, rounding error, clipping, and scale overhead before measuring task quality or kernel-dependent speed."
 date: "2025-08-21"
 draft: false
 tags: ["concepts"]
@@ -10,40 +10,27 @@ category: "concepts"
 
 ## Summary
 
-Quantization reduces model weights (and sometimes activations) to lower precision than the trained representation, trading accuracy for memory and speed at inference.
-
-LLM serving is dominated by weight-loading bandwidth. Reducing weight precision from 16 bits to 4 bits cuts that bandwidth by 4&times;, often the single largest serving cost reduction available. For GPU memory, it lets you fit much larger models on a given device.
-
-INT8 quantization is standard in most inference stacks by 2026; many support INT4 or FP8. Quality cost is typically <1% on benchmarks for 4-bit when done well.
-
-## The flavors
-
-### Weight-only quantization (most common)
-
-Compress only the weights; keep activations and computation in higher precision.
-
-- **INT8 weights** with FP16/BF16 compute: 2&times; smaller weights, modest speedup, near-zero quality loss.
-- **INT4 weights** (GPTQ, AWQ, GGML): 4&times; smaller weights, significant speedup for memory-bound decoding, &lt;1% quality loss in most cases.
-- Standard for LLM inference. Used in vLLM, TGI, llama.cpp, all major serving systems.
-
-### Activation quantization (less common, harder)
-
-Quantize both weights and activations.
-
-- **INT8 weights + INT8 activations** (W8A8): full INT8 inference. Tensor cores can run INT8 matmuls 2&times; faster than BF16. Quality cost is larger; needs more careful calibration.
-- **FP8 (W8A8)**: H100 / B100 era. Uses FP8 tensor cores; fewer accuracy issues than INT8 W8A8 because FP8 has dynamic range.
-
-### KV cache quantization
-
-Quantize the KV cache to INT8 or INT4. Saves serving memory; lets you fit longer contexts or higher batch sizes. Quality cost is small if done with care (per-token or per-channel scaling).
-
-### Quantization-aware training (QAT)
-
-Quantize during training (with simulated quantization noise) so the model learns to be quantization-friendly. More accurate than post-training quantization but requires retraining. Used for INT4 / very low precision; less needed for INT8.
+Quantization stores or computes selected tensors with a reduced code set and an explicit reconstruction policy.
+Rounding, clipping, scale granularity, metadata, and supported kernels determine numerical and systems effects separately.
+Smaller weights do not guarantee faster execution or a universal bound on task-quality change.
 
 ## The mechanism
 
-Naive affine quantization: pick a scale `s` and integer zero-point `z`; quantize as `q = round(x / s) + z` (then clamp to the integer range), and dequantize as `x' = s * (q - z)`. Per-tensor scaling fails for LLMs because activation magnitudes vary wildly across channels.
+For positive scale $s$ and integer zero-point $z$, affine quantization uses:
+
+$$
+q=\operatorname{clip}(\operatorname{round}(x/s)+z,q_{min},q_{max}),\qquad
+\hat x=s(q-z).
+$$
+
+The pictured symmetric INT4 fixture uses $z=0$, codes $-7$ through $7$, and half ties rounded away from zero.
+It deliberately excludes code $-8$; other four-bit schemes need not use this convention.
+With shared $s=8/7$, ordinary values $[-1,-0.5,0.5,1]$ become codes $[-1,0,0,1]$.
+Reconstruction is $[-8/7,0,0,8/7]$, with squared error $2/49+1/2=53/98$.
+
+Giving that channel $s=1/7$ yields codes $[-7,-4,4,7]$ and reconstruction $[-1,-4/7,4/7,1]$.
+Its squared error becomes $1/98$.
+The high-range row keeps $s=8/7$ under either policy, restoring $[-8,-32/7,32/7,8]$.
 
 <!-- visual:quantization-scale-granularity -->
 <figure class="learning-figure" aria-labelledby="quantization-scale-title" aria-describedby="quantization-scale-description">
@@ -76,69 +63,76 @@ Naive affine quantization: pick a scale `s` and integer zero-point `z`; quantize
 			<p><strong>Recovered detail:</strong> each row uses the full signed code range.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the ordinary row across panels. With one shared scale, the &plusmn;8 values determine the step for every value, so &minus;0.5 and 0.5 both round to zero. A separate scale lets the ordinary channel spend the same INT4 codes over its own smaller range and keeps the signs distinct. More scales reduce rounding error but add scale metadata and kernel complexity; calibration data and task-specific evaluation still determine whether the approximation is acceptable. This is an illustrative calculation, not a benchmark. Original example checked against <a href="https://arxiv.org/abs/1712.05877">Jacob et al.’s affine quantization formulation</a> and <a href="https://arxiv.org/abs/2211.10438">SmoothQuant’s analysis of channel-wise outliers</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the ordinary row across panels. Its shared-scale middle values collapse to zero; its separate scale preserves both signs. More scales add metadata and kernel requirements. This calculation is not a quality benchmark. Original example follows <a href="https://arxiv.org/abs/1712.05877">Jacob et al.</a> and <a href="https://arxiv.org/abs/2211.10438">SmoothQuant</a>.</figcaption>
 </figure>
 
-Modern techniques:
+### Calibrate for a Larger Outlier
 
-- **Per-channel quantization**: separate scale per output channel. Standard for INT8.
-- **Per-group quantization**: group columns/rows into small groups, scale per group. Used in GPTQ, AWQ for INT4.
-- **GPTQ**: post-training quantization that uses second-order information (approximate Hessian) to choose quantized weights that minimize output error. Standard for INT4 LLMs.
-- **AWQ (Activation-aware Weight Quantization)**: identifies "important" weight channels (those with large activation magnitudes) and protects them with higher precision or careful scaling. Often slightly better than GPTQ for INT4.
-- **SmoothQuant**: handles activation outliers by mathematically shifting the scale from activations to weights.
-- **GGUF / GGML quantization**: family of quantization methods used in llama.cpp; supports very flexible bit-widths (2-bit through 8-bit, often per-block).
+**New task:** Deployment introduces value sixteen in the high-range channel.
+
+**Picture and change:** Retain the old scale and clip, or recalibrate to $16/7$ and recompute all affected codes.
+
+**Check:** The stale scale clips sixteen to code seven and restores eight, absolute error eight.
+With a shared recalibrated scale, the entire ordinary row rounds to zero and its squared error becomes $2.5$.
+
+**Use when:** Deployment ranges exceed calibration coverage; retaining separate scales can isolate this particular cross-channel effect.
+
+### Budget Group-Scale Overhead
+
+**New task:** Store 128 four-bit weights with one BF16 scale.
+
+**Picture and change:** Pack sixty-four payload bytes and retain two scale bytes; the kernel must use the same grouping.
+
+**Check:** Sixty-six bytes versus 256 BF16 bytes is $256/66\approx3.8788$ times smaller, excluding headers, alignment, and zero-point metadata.
+
+**Use when:** Granularity improves reconstruction while memory remains constrained; benchmark actual dequantization and task quality separately.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+## The flavors
+
+### Weight-only quantization (most common)
+
+Compress weights while declaring activation, compute, and accumulation dtypes separately.
+The retained heading does not establish a deployment-frequency ranking.
+
+### Activation quantization (less common, harder)
+
+Declare W8A8's formats, scales, and accumulators.
+FP8 E4M3 and E5M2 trade precision against range differently and are not affine integer codes.
+
+### KV cache quantization
+
+Compress cached K/V with a supported layout and evaluate long-context behavior, not only short prompts.
+
+### Quantization-aware training (QAT)
+
+Model quantization effects during training; compare its extra training cost and quality against suitable post-training baselines.
 
 ## What an interviewer expects you to say
 
-If asked about quantization:
-
-1. Distinguish weight-only vs activation quantization.
-2. Mention INT8 (easy, near-zero quality loss) vs INT4 (more accuracy concern, but workable with GPTQ/AWQ) vs FP8 (H100-era).
-3. Mention per-channel / per-group scaling as the standard improvement over naive quantization.
-4. Discuss when quantization helps most (memory-bound decoding) vs when it doesn't (compute-bound prefill).
-5. Acknowledge quality measurement: quantized models should be A/B tested against the baseline on your own eval set, not just benchmarks.
+Name the compressed tensor, rounding/scaling contract, target kernel, and quality evaluation before choosing a method.
 
 ## Where the wins come from
 
-For LLM decoding (memory-bound):
-- INT8 weights: ~1.5-2&times; speedup from less memory bandwidth.
-- INT4 weights: ~3-4&times; speedup.
-- FP8: similar to INT8, with better accuracy floor.
-
-For LLM prefill (compute-bound on long inputs):
-- Less benefit from weight quantization alone.
-- W8A8 INT8 or FP8 helps: tensor core throughput is higher.
-
-For GPU memory:
-- INT8 cuts weight memory in half.
-- INT4 quarters it.
-- KV cache quantization is often the bigger memory win at long contexts.
+Profile weight bandwidth, arithmetic, cache capacity, and dequantization; the bottleneck changes with batching, context, hardware, and kernels.
 
 ## Common confusions
 
-- **"Quantization always loses quality."** True but at INT8 the loss is usually negligible. At INT4 with GPTQ/AWQ, often still &lt;1% on standard benchmarks. Worth measuring on *your* eval, not just published benchmarks.
-- **"Quantization is the same as distillation."** No. Distillation is training a smaller model to mimic a larger one. Quantization is reducing precision of the same model. They compose.
-- **"Quantize everything."** No. LayerNorm parameters, the embedding lookup, and small layers often stay in higher precision because they cost little memory and are sensitive.
-- **"FP8 is just smaller FP16."** Different exponent/mantissa split (E4M3 vs E5M2) and per-tensor scale management.
+GPTQ uses calibrated second-order reconstruction approximations; AWQ uses activation-aware scaling, not mandatory higher-precision protection.
+SmoothQuant redistributes scale across activations and weights; GGUF is a storage format supporting multiple schemes, not one quantization algorithm.
 
 ## Picking a quantization method (decision tree)
 
-1. **Need to fit on smaller GPU?** Start with INT8 weight-only.
-2. **Need maximum throughput?** INT4 weight-only or FP8 (H100+).
-3. **Quality regression on eval?** Try AWQ instead of GPTQ; tune group size; consider mixed precision (sensitive layers in higher precision).
-4. **Long context?** Add KV cache quantization on top.
-5. **Have time for retraining?** Consider QAT for the most aggressive bit widths.
+Measure supported candidates and sensitive slices; keep higher-precision tensors where justified rather than treating one method as universally best.
 
 ## Why interviewers ask
 
-Quantization questions test:
-1. Whether you know several quantization methods and their tradeoffs.
-2. Whether you understand *why* it works (memory-bandwidth bottleneck).
-3. Whether you've measured quality loss in production (vs trusting published numbers).
-4. Whether you can prioritize: which quantization technique for which problem.
-
-In senior LLM-team interviews, quantization comes up most often inside the cost-reduction question. See [How would you reduce LLM inference cost by 10x?](/questions/reduce-llm-inference-cost-10x/).
+Connect byte arithmetic to a measured bottleneck and a task-quality acceptance criterion.
 
 ---
 
 *Related: [Mixed precision training](/concepts/mixed-precision-training/), [KV cache](/concepts/kv-cache/), [How to think about LLM inference cost](/guides/llm-inference-cost/).*
+
+</div>

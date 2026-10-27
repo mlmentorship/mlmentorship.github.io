@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Use each occurrence count as a bucket coordinate, then scan from the highest count downward.
+Return the distinct input values that occur most frequently, rather than the largest numeric values.
 
 ## Problem
 
-For `[1,1,1,2,2,3]` and `k = 2`, return **[1,2]**.
-Candidates are distinct integer values; priority is frequency, not numeric size.
-Use integer `k` with `0 <= k <= u`, where `u` is the distinct count.
-Any cutoff-tied selection is valid unless a separate tie rule is specified.
+**Input.** An integer list `nums` and integer `k` with `0 <= k <= u`, where `u` is its distinct-value count.
+
+**Output.** Return `k` distinct values with the highest occurrence counts.
+
+**Rules.** Rank by frequency, not by numeric value. Equal occurrences contribute to their value's count.
+Any selection among cutoff-tied values is valid, and no output ordering is required.
+Leave the input unchanged. Rank zero returns `[]`; an empty list therefore permits only zero.
+
+**Example.** `[1, 1, 1, 2, 2, 3]` with `k = 2` returns `[1, 2]` in either order.
+For `[5, 5, 9]` and `k = 1`, return `[5]`, not `[9]`.
 
 ## Picture
 

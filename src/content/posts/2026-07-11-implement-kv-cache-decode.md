@@ -9,7 +9,19 @@ category: "questions"
 
 > Implement KV-cache append and one-token attention for autoregressive decoding. Show equivalence to full attention at every prefix.
 
-The core invariant is exactness: for the same model state and prefix, the newest-token output from cached decoding should match the newest-token output from a full causal forward pass, up to numerical tolerance.
+Implement one-token cached attention and demonstrate that its output agrees with recomputing attention over the same full prefix.
+
+## Problem
+
+**Context.** The basic case uses equal query and KV head counts.
+Projected caches have shape `(batch, heads, time, head_dim)`; the newest query, key, and value each contain one time position.
+
+**Task.** Append the new key and value, return one attention output shaped `(batch, heads, 1, head_dim)`, and retain the grown cache.
+Test agreement with the newest row of full causal attention at every prefix.
+
+**Constraints.** Match batch, head, feature, dtype, device, position, and model state; use a declared floating-point tolerance.
+The cache contains only the current sequence's prefix and new token, with no future positions or unrelated requests.
+Grouped heads, padding, cache capacity, and lifecycle policies require explicit extensions beyond the basic sketch.
 
 ## Contract first
 

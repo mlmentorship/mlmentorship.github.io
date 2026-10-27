@@ -19,61 +19,38 @@ Speculative decoding turns this serial work into batched work. The large model r
 Speculative decoding is a standard optimization for LLM serving in 2026. Major serving systems (vLLM, TGI, SGLang, TensorRT-LLM) support it.
 
 <!-- visual:speculative-decoding-first-rejection-boundary -->
-<figure class="learning-figure plot-panel visual-wide" aria-labelledby="speculative-rejection-visual-title">
+<figure class="learning-figure" aria-labelledby="speculative-rejection-visual-title">
 	<p class="visual-kicker">Learning objective · one cycle with K = 5</p>
-	<p class="visual-title" id="speculative-rejection-visual-title">Trace what survives when the target rejects the third draft token.</p>
-	<div class="visual-scroll">
-		<svg viewBox="0 0 760 330" role="img" aria-labelledby="speculative-rejection-svg-title speculative-rejection-svg-desc">
-			<title id="speculative-rejection-svg-title">First-rejection boundary in one speculative-decoding cycle</title>
-			<desc id="speculative-rejection-svg-desc">The draft model proposes five ordered tokens. One parallel target-model pass scores all five positions. Drafts one and two are accepted and committed. Draft three is rejected and replaced by a sample from the corrected residual distribution q. Drafts four and five are discarded because they follow the rejected draft prefix. The cycle commits the two accepted drafts and the replacement, then restarts after that replacement.</desc>
-			<rect class="viz-plot-bg" x="12" y="12" width="736" height="306" rx="5"></rect>
-			<text class="viz-axis-label" x="24" y="38">DRAFT MODEL PROPOSES SERIALLY</text>
-			<text class="viz-label" x="24" y="92">draft</text>
-			<text class="viz-axis-label" x="138" y="67" text-anchor="middle">position 1</text>
-			<text class="viz-axis-label" x="258" y="67" text-anchor="middle">position 2</text>
-			<text class="viz-axis-label" x="378" y="67" text-anchor="middle">position 3</text>
-			<text class="viz-axis-label" x="498" y="67" text-anchor="middle">position 4</text>
-			<text class="viz-axis-label" x="618" y="67" text-anchor="middle">position 5</text>
-			<rect class="viz-node viz-node--input" x="93" y="76" width="90" height="42" rx="4"></rect>
-			<rect class="viz-node viz-node--input" x="213" y="76" width="90" height="42" rx="4"></rect>
-			<rect class="viz-node viz-node--input" x="333" y="76" width="90" height="42" rx="4"></rect>
-			<rect class="viz-node" x="453" y="76" width="90" height="42" rx="4" style="stroke-dasharray:5 3"></rect>
-			<rect class="viz-node" x="573" y="76" width="90" height="42" rx="4" style="stroke-dasharray:5 3"></rect>
-			<text class="viz-node-label" x="138" y="102">draft 1</text>
-			<text class="viz-node-label" x="258" y="102">draft 2</text>
-			<text class="viz-node-label" x="378" y="102">draft 3</text>
-			<text class="viz-node-label" x="498" y="102">draft 4</text>
-			<text class="viz-node-label" x="618" y="102">draft 5</text>
-			<path d="M81 132H675" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
-			<text class="viz-axis-label" x="378" y="148" text-anchor="middle">ONE TARGET PASS SCORES ALL FIVE POSITIONS IN PARALLEL</text>
-			<path d="M138 119V165" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
-			<path d="M258 119V165" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
-			<path d="M378 119V165" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:3"></path>
-			<path d="M498 119V165" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></path>
-			<path d="M618 119V165" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></path>
-			<text class="viz-callout" x="138" y="181" text-anchor="middle">ACCEPT</text>
-			<text class="viz-callout" x="258" y="181" text-anchor="middle">ACCEPT</text>
-			<text class="viz-callout" x="378" y="181" text-anchor="middle">REJECT</text>
-			<text class="viz-label" x="498" y="181" text-anchor="middle">DISCARD</text>
-			<text class="viz-label" x="618" y="181" text-anchor="middle">DISCARD</text>
-			<path d="M318 55V294" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.5;stroke-dasharray:5 4"></path>
-			<text class="viz-gradient-label" x="326" y="213">FIRST REJECTION</text>
-			<text class="viz-label" x="24" y="252">commit</text>
-			<rect class="viz-node viz-node--output" x="93" y="226" width="90" height="42" rx="4"></rect>
-			<rect class="viz-node viz-node--output" x="213" y="226" width="90" height="42" rx="4"></rect>
-			<rect class="viz-node viz-node--focus" x="333" y="226" width="90" height="42" rx="4"></rect>
-			<text class="viz-node-label" x="138" y="252">draft 1</text>
-			<text class="viz-node-label" x="258" y="252">draft 2</text>
-			<text class="viz-node-label" x="378" y="245">replacement</text>
-			<text class="viz-node-value" x="378" y="260">sample from q</text>
-			<text class="viz-axis-label" x="498" y="240" text-anchor="middle">cycle stops here;</text>
-			<text class="viz-axis-label" x="498" y="256" text-anchor="middle">restart after replacement</text>
-			<path d="M108 286H408" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
-			<path d="M408 281L422 286L408 291Z" style="fill:var(--viz-output-stroke)"></path>
-			<text class="viz-axis-label" x="258" y="307" text-anchor="middle">COMMITTED OUTPUT STILL FOLLOWS TARGET M</text>
-		</svg>
-	</div>
-	<figcaption><strong>Read it this way:</strong> scan left to right. The accepted prefix stays. At the first rejection, replace that draft from the corrected distribution q; discard every later draft because each was conditioned on a prefix that no longer exists.</figcaption>
+	<p class="visual-title" id="speculative-rejection-visual-title">Keep the accepted prefix; correct the first rejection</p>
+	<svg viewBox="0 0 600 680" role="img" aria-labelledby="speculative-rejection-svg-title speculative-rejection-svg-desc" style="width: 100%; min-width: 0; height: auto;">
+		<title id="speculative-rejection-svg-title">First rejection and its exact residual sampling correction</title>
+		<desc id="speculative-rejection-svg-desc">One target pass scores five serial draft positions. The first two drafts are accepted; draft token A at position three is rejected, invalidating drafts four and five. At that position, conditional on the accepted prefix, the illustrative target distribution P over A,B,C is 0.2,0.3,0.5 and draft distribution D is 0.5,0.3,0.2. Accept proposed x with probability min(1,P(x)/D(x)). The positive part of P minus D is 0,0,0.3. Its normalized residual q is 0,0,1, so replacement is C, not an ordinary new draw from P. Commit the first two drafts and C, then restart from that changed prefix. Exactness assumes the stated sampling rule and compatible conditional distributions; no speedup is inferred.</desc>
+		<g fill="var(--c-text)" font-family="var(--font-ui)" font-size="24">
+			<text x="40" y="30" font-weight="650">One target pass; first rejection at 3</text>
+			<g fill="var(--viz-input-bg)" stroke="var(--viz-input-stroke)"><rect x="40" y="68" width="88" height="44"/><rect x="144" y="68" width="88" height="44"/><rect x="248" y="68" width="88" height="44"/></g>
+			<g fill="var(--viz-neutral-bg)" stroke="var(--viz-edge)" stroke-dasharray="4 3"><rect x="352" y="68" width="88" height="44"/><rect x="456" y="68" width="88" height="44"/></g>
+			<g text-anchor="middle"><text x="84" y="98">draft 1</text><text x="188" y="98">draft 2</text><text x="292" y="98">A</text><text x="396" y="98">draft 4</text><text x="500" y="98">draft 5</text></g>
+			<g font-size="20" text-anchor="middle"><text x="84" y="145">ACCEPT</text><text x="188" y="145">ACCEPT</text><text x="292" y="145">REJECT</text><text x="396" y="145">DISCARD</text><text x="500" y="145">DISCARD</text></g>
+			<path d="M360 76L432 104 M464 76L536 104" stroke="var(--viz-warning-stroke)" stroke-width="2"/>
+			<path d="M84 153V184 M188 153V184 M292 153V184" stroke="var(--viz-edge)" stroke-width="2"/>
+			<g fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)"><rect x="40" y="190" width="88" height="44"/><rect x="144" y="190" width="88" height="44"/></g>
+			<rect x="248" y="190" width="88" height="44" fill="var(--viz-focus-bg)" stroke="var(--viz-focus-stroke)"/>
+			<g text-anchor="middle"><text x="84" y="220">draft 1</text><text x="188" y="220">draft 2</text><text x="292" y="220">C</text></g>
+			<text x="354" y="209" font-size="22">Sample q;</text><text x="354" y="237" font-size="22">restart after C</text>
+			<path d="M40 248V258H336V248" fill="none" stroke="var(--viz-output-stroke)" stroke-width="2"/><text x="188" y="286" text-anchor="middle" font-size="22">Committed prefix</text>
+			<path d="M40 310H560" stroke="var(--c-rule)"/>
+			<text x="40" y="346" font-size="22">At position 3, after the accepted prefix:</text>
+			<text x="40" y="380" font-size="21">Accept x with min(1, P(x) / D(x)).</text>
+			<g font-size="22"><text x="300" y="418">A</text><text x="400" y="418">B</text><text x="500" y="418">C</text></g>
+			<g data-speculative-row="draft"><text x="40" y="454">Draft D</text><text x="300" y="454">0.5</text><text x="400" y="454">0.3</text><text x="500" y="454">0.2</text></g>
+			<g data-speculative-row="target"><text x="40" y="490">Target P</text><text x="300" y="490">0.2</text><text x="400" y="490">0.3</text><text x="500" y="490">0.5</text></g>
+			<g data-speculative-row="positive-part"><text x="40" y="526">Positive P - D</text><text x="300" y="526">0</text><text x="400" y="526">0</text><text x="500" y="526">0.3</text></g>
+			<g data-speculative-row="correction"><text x="40" y="562">Normalize: q</text><text x="300" y="562">0</text><text x="400" y="562">0</text><text x="500" y="562">1</text></g>
+			<text x="40" y="610" font-weight="650">q returns C with probability 1.</text>
+			<text x="40" y="650" font-size="22">A fresh P draw is not this correction.</text>
+		</g>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> the rejected A is replaced by C under the illustrated residual distribution q. Later drafts followed A, so they cannot survive that change. Accepted mass plus the rejection correction recovers the target law; the picture does not predict speedup.</figcaption>
 </figure>
 
 ## The mechanism

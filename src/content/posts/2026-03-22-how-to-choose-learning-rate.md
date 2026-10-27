@@ -8,10 +8,17 @@ category: "questions"
 ---
 
 
-A learning rate controls the scale of an optimizer update.
-A short sweep can propose a candidate, but it does not establish a complete training recipe.
+Choose a learning-rate policy by comparing update behavior and validating a complete training schedule rather than a single sweep result.
 
 ## Problem
+
+**Context.** The exact one-dimensional SGD fixture below isolates learning-rate behavior before considering noisy, scheduled training.
+
+**Task.** Compare the three constant rates, explain convergence or divergence, and propose a controlled learning-rate selection procedure.
+Describe how warmup, decay, optimizer choice, and intended run length affect the final comparison.
+
+**Constraints.** Use the stated loss, gradient, and starting point for the fixture; do not add momentum or stochastic noise.
+A short range test proposes candidates rather than proving the best full-run schedule.
 
 Use plain SGD on $L(w)=5w^2$, starting at $w_0=1$ with exact gradient $10w$.
 Compare constant rates $0.1$, $0.2$ and $0.25$.

@@ -15,11 +15,19 @@ prerequisites: ["design-enterprise-agent-platform", "llm-security-threat-models"
 
 > *Asked in: agent safety architecture, ML system design, control, reliability, and principal technical-strategy rounds.*
 
-A basic answer validates tool arguments and adds a block rule. A senior answer combines pre-action checks, observed-outcome checks, rate limits, monitors, evidence, and recovery. A staff answer operates those controls across several products without making one team approve every action.
+Design an independent runtime safety layer for already-authorized high-impact agent actions without replacing the underlying agent platform.
 
-A principal answer chooses the shared safety boundary, calibrates the false-allow and false-block frontier, separates product and control authority, and funds incident readiness. A senior-principal answer defines safety doctrine across business units while preserving local action semantics, independent evidence, succession, and credible authority reduction.
+## Problem
 
-Assume identity, delegated permissions, versioned tool contracts, and durable agent execution already exist. Add an independent safety control plane around high-impact actions. It can narrow, pause, challenge, or revoke granted authority. It cannot expand authority, replace product evaluation, or make a risky action safe through a monitor score alone.
+**Context.** A governed enterprise agent platform already supplies identity, delegation, typed tool contracts, idempotency keys, and audit events.
+The scenario below includes harmful authorized action patterns and correlated agent-monitor failures.
+
+**Task.** Design pre-action, observed-outcome, and aggregate controls with escalation, circuit breakers, independent evidence, degraded operation, and incident ownership.
+Specify interfaces, evaluation, staged adoption, and conditions for reducing or restoring authority.
+
+**Constraints.** Controls may preserve or narrow granted authority, never expand it.
+Do not rebuild the general agent runtime or treat monitor agreement as independent proof of safety.
+Respect product-specific action consequences and define enforceable behavior when a control dependency is unavailable.
 
 ## The prompt
 

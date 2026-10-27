@@ -13,11 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Reverse every allowed flow edge, search from each ocean's borders, then intersect the two reached sets.
+Find all height-grid cells from which water can reach both of two opposite ocean borders.
 
 ## Problem
 
-Find cells with an allowed route to each ocean in this rectangular height grid:
+**Input.** A rectangular integer height grid `heights`.
+
+**Output.** Return zero-based `[row, col]` coordinates of every cell with a route to each ocean.
+
+**Rules.** The Pacific touches the top and left borders; the Atlantic touches the bottom and right borders.
+Water moves to equal or lower orthogonal neighbors, never diagonally or uphill.
+The two routes may differ. Border cells already touch their corresponding ocean.
+Preserve the grid. Empty input returns `[]`; the reference orders coordinates by row, then column.
+
+**Example.** For this grid:
 
 ```text
 1 2 2
@@ -25,10 +34,7 @@ Find cells with an allowed route to each ocean in this rectangular height grid:
 2 4 1
 ```
 
-Pacific borders are top/left; Atlantic borders are bottom/right.
-Forward moves go to equal or lower orthogonal neighbors.
-Return the seven coordinates other than `(0,0)` and `(2,2)`.
-Routes to the two oceans may differ.
+Return `[[0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1]]`.
 This asks reachability, not water volume or travel time.
 
 ## Picture

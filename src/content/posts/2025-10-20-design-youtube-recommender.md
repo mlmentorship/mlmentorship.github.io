@@ -8,9 +8,18 @@ category: "questions"
 ---
 
 
-Retrieval limits what ranking can show, and the displayed slate limits ordinary feedback; choose surface and objective first.
+Design a large-catalog video home feed and define how candidate selection, ranking, and feedback support its objective.
 
 ## Problem
+
+**Context.** The surface is a YouTube-like home feed with eligible videos and uncertain estimates of viewing behavior.
+The component estimates below illustrate a choice of ranking objective.
+
+**Task.** Specify requirements, compare the two videos under both objectives, and design retrieval, ranking, slate composition, and evaluation.
+Explain what exposure records are needed to interpret later feedback.
+
+**Constraints.** This is hypothetical, not a description of YouTube internals.
+State scale, latency, cost, permitted signals, and safety assumptions; an offline expected-value calculation does not establish causal user benefit.
 
 Design a YouTube-like home feed, not search or watch-next.
 This is a hypothetical design, not a claim about YouTube's current internal system.

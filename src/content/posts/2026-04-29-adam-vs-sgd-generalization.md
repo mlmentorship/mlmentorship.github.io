@@ -8,10 +8,17 @@ category: "questions"
 ---
 
 
-An optimizer can win one controlled comparison without winning every workload.
-Measure the gap first, then test its proposed explanation.
+Compare Adam and SGD through controlled optimization and generalization experiments rather than assuming one optimizer universally wins.
 
 ## Problem
+
+**Context.** A workload appears to generalize differently under two optimizers; the coordinate-change fixture below probes one proposed sharpness explanation.
+
+**Task.** Design a fair comparison, separate observed performance from its explanation, and analyze whether reparameterization changes the predictor's outputs.
+Identify evidence that would support or reject a proposed mechanism.
+
+**Constraints.** Make data splits, initialization, tuning budgets, schedules, and regularization conventions explicit.
+Parameter-space curvature depends on coordinates; do not treat it alone as proof of different function-space behavior or generalization.
 
 A toy predictor outputs $w$, with loss $L(w)=(w-1)^2/2$.
 Reparameterize it as $w=10\phi$.

@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth at LLM-team and infra interviews.*
 
-The interviewer wants more than "use AMP." The L6 answer explains the recipe: master weights in FP32, compute in BF16/FP16, certain ops kept in FP32 for stability, loss scaling for FP16.
+Explain how mixed-precision training assigns numerical formats while preserving useful gradients and stable optimization.
+
+## Problem
+
+**Context.** A model-training workload seeks the speed or memory benefits of FP16 or BF16 without silently corrupting training.
+Activations, reductions, gradients, parameters, and optimizer state can have different numerical requirements.
+
+**Task.** Specify a precision policy, explain range and rounding failure modes, and describe how to validate it against a higher-precision baseline.
+Compare the role of loss scaling for FP16 and BF16, including the order of unscaling, clipping, and stepping.
+
+**Constraints.** Distinguish storage dtype, compute dtype, and accumulation dtype; automatic casting does not choose every policy for you.
+Account for nonfinite gradients and skipped steps, and do not assume every operation or parameter needs identical precision.
 
 ## What an L4 answer sounds like
 

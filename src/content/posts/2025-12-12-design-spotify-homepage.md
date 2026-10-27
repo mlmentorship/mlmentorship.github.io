@@ -8,9 +8,17 @@ category: "questions"
 ---
 
 
-Two strong shelves can repeat the same songs and intent; compose the page, not just independent lists.
+Design a music homepage whose selected shelves work together rather than merely ranking each shelf independently.
 
 ## Problem
+
+**Context.** A Spotify-like homepage combines shelves for different listening intents; the invented candidates below can overlap.
+
+**Task.** Choose two shelves under the stated page-utility model, then explain selection, ordering, feedback, and evaluation in a full design.
+Distinguish choosing a pair from choosing its display order.
+
+**Constraints.** Use the stipulated common utility units and pair penalties only for this toy calculation.
+Respect eligibility and policy boundaries; do not present the example as Spotify's internal implementation or a causal user-benefit estimate.
 
 Design a Spotify-like homepage with coherent shelves for familiar favorites, discovery, new releases and editorial selections.
 These names illustrate the surface, not Spotify's current internal implementation.

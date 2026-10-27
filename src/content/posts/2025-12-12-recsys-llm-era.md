@@ -8,9 +8,17 @@ category: "questions"
 ---
 
 
-Choose one changed task, then budget the LLM stage and validate every catalog item before display.
+Decide where a language model could improve a recommender while respecting catalog validity, serving load, and request deadlines.
 
 ## Problem
+
+**Context.** A fictional recommender optionally sends a fraction of requests to an LLM reranker, with the workload specified below.
+
+**Task.** Estimate arrival rate, mean in-flight work, and billed input-token load, then assess the proposed deadline.
+Choose a useful LLM task and define quality checks, catalog validation, fallback, and rollout evidence.
+
+**Constraints.** Apply the stated stable-flow boundary and do not infer tail latency from a mean service time.
+Account for permitted evidence, item eligibility, and failure behavior; generated item names are not proof of valid catalog IDs.
 
 A fictional recommender handles 1,000 requests/second.
 An optional reranker receives 10% of requests.
@@ -20,39 +28,49 @@ Estimate its load, and assess a proposed 50-millisecond hard request deadline.
 
 ## Picture: Optional Work Still Consumes Capacity
 
-<p class="visual-kicker">Choose placement, not a universal replacement</p>
-<p class="visual-title">Intent, stored content and bounded reranking solve different tasks; every displayed item must remain valid.</p>
-
 <!-- visual:recsys-llm-bounded-augmentation -->
-```mermaid
-flowchart TB
-  accTitle: Optional LLM paths require budgets and live catalog validation
-  accDescr: Requests can use fast retrieval directly or an optional intent helper. Item content can be encoded offline by a chosen simpler or language model. Retrieval and ranking use stored representations and permitted behavioral evidence. A bounded optional reranker has a deadline and fast fallback. An alternative semantic-ID generator must resolve IDs into catalog candidates before ranking. All outputs pass current catalog, permission and composition checks. This is an illustrative design, not a prevalence claim.
-  Request["REQUEST<br/>query/session"] ==> Retrieve["FAST RETRIEVAL<br/>candidate set"]
-  Request -.->|"optional"| Intent["INTENT HELPER<br/>clarify/rewrite"]
-  Intent --> Retrieve
-  Content["ITEM CONTENT"] -.->|"offline"| Encode["CONTENT ENCODER<br/>compare simpler/LLM"]
-  Encode --> Catalog[("STORED FEATURES")]
-  Catalog ==> Retrieve
-  Retrieve ==> Rank["RANKER<br/>bounded top N"]
-  Catalog --> Rank
-  Behavior["PERMITTED HISTORY"] ==> Retrieve
-  Behavior ==> Rank
-  Rank -.->|"approved route"| Rerank["OPTIONAL RERANK<br/>deadline + token cap"]
-  Rerank --> Validate["CURRENT CATALOG<br/>permission + composition"]
-  Rank ==>|"fast fallback"| Validate
-  Validate ==> Slate["VALID SLATE<br/>evidence-backed reasons"]
-  Intent -.->|"alternative retrieval"| Generate["SEMANTIC ID<br/>sequence generation"]
-  Generate --> Resolve["RESOLVE ID<br/>versioned catalog"]
-  Resolve --> Rank
-  class Request,Behavior,Content viz-input
-  class Intent,Encode,Rerank viz-focus
-  class Catalog,Resolve viz-state
-  class Validate viz-warning
-  class Slate viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the fast path, then inspect each optional branch's cost and validation boundary. Semantic-ID generation changes retrieval, not permission to display an unresolved item.</p>
+<figure class="learning-figure" data-visual-id="recsys-llm-bounded-augmentation" aria-labelledby="recsys-budget-heading">
+<p class="visual-kicker">Choose placement, not a universal replacement</p>
+<p class="visual-title" id="recsys-budget-heading">Optional inference cannot make a late or invalid result eligible for display.</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 850" role="img" aria-labelledby="recsys-budget-title recsys-budget-desc" style="width:100%; min-width:0; height:auto; font-family:var(--font-ui); font-size:24px; fill:var(--c-text)">
+<title id="recsys-budget-title">A deadline fallback and a catalog check bound optional LLM work</title>
+<desc id="recsys-budget-desc">One declared counterexample has fast candidates A and B ready at five milliseconds and an optional LLM call taking one hundred milliseconds. A shared time ruler places the hard fifty-millisecond deadline halfway through that call. Serve a valid fast fallback by the deadline; the late LLM result cannot replace the completed reply. This is a declared call, not a tail-latency estimate from a mean. Every displayed item must pass current catalog and permission checks. The stated workload implies one hundred routed calls per second, ten mean calls in flight, and two hundred thousand billed input tokens per second. Offline content features are computed before requests. A separately generated ID Z missing from the catalog is rejected rather than displayed.</desc>
+<text x="40" y="30" font-size="22">One declared request, not a latency percentile</text>
+<rect x="40" y="50" width="520" height="114" rx="4" fill="var(--viz-input-bg)" stroke="var(--viz-input-stroke)"/>
+<text x="60" y="82" font-weight="700">FAST RETRIEVE + RANK</text>
+<text x="60" y="118">Ready at 5 ms: candidates [A, B]</text>
+<text x="60" y="148" font-size="22">Keep these IDs for the deadline fallback.</text>
+<text x="40" y="200">Optional call for this request: 100 ms</text>
+<g data-recsys-timeline="100" data-deadline-ms="50">
+<rect x="60" y="222" width="480" height="26" fill="var(--viz-focus-bg)" stroke="var(--viz-focus-stroke)"/>
+<path d="M60 252V262M300 210V262M540 252V262" fill="none" stroke="var(--viz-edge)" stroke-width="2"/>
+<text x="60" y="288" font-size="22">0 ms</text>
+<text x="300" y="288" text-anchor="middle" font-size="22" font-weight="700">50 ms deadline</text>
+<text x="540" y="288" text-anchor="end" font-size="22">100 ms</text>
+</g>
+<text x="40" y="326" font-size="22" data-recsys-decision="fallback">50 ms: fallback served; LLM still busy.</text>
+<text x="40" y="360" font-size="22">100 ms: late result cannot replace this reply.</text>
+<rect x="40" y="388" width="520" height="102" rx="4" fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)"/>
+<text x="60" y="424" font-weight="700">Before display: live catalog + policy</text>
+<text x="60" y="462" font-size="22">Fast and reranked IDs pass the same gate.</text>
+<text x="40" y="534" font-size="22">Route load: 100/s; mean in flight = 10.</text>
+<text x="40" y="566" font-size="22">Input billing: 200,000 tokens/s.</text>
+<path d="M40 588H560" fill="none" stroke="var(--c-rule)"/>
+<text x="40" y="626">Offline content -> stored features</text>
+<text x="40" y="658" font-size="22">Compute before requests; refresh by version.</text>
+<text x="40" y="704" font-size="22">Generated IDs need the same live check.</text>
+<rect x="40" y="726" width="180" height="94" rx="4" fill="var(--viz-state-bg)" stroke="var(--viz-state-stroke)"/>
+<text x="130" y="762" text-anchor="middle" font-size="22">Generated ID</text>
+<text x="130" y="800" text-anchor="middle" font-weight="700">Z</text>
+<path d="M220 774H270M260 766L270 774L260 782" fill="none" stroke="var(--viz-edge)" stroke-width="2"/>
+<g data-generated-id="Z" data-catalog-resolution="missing" data-catalog-decision="reject">
+<rect x="270" y="726" width="290" height="94" rx="4" fill="var(--viz-warning-bg)" stroke="var(--viz-warning-stroke)"/>
+<text x="415" y="762" text-anchor="middle" font-size="22">Catalog: Z is missing</text>
+<text x="415" y="800" text-anchor="middle" font-weight="700">HOLD / REJECT</text>
+</g>
+</svg>
+<figcaption><strong>Read it this way:</strong> the declared 100 ms call cannot finish before the 50 ms request deadline. Serve a catalog-valid fallback within the total request budget; timeout does not make work free. This example does not infer a percentile from mean service time. Offline features avoid per-request encoding, while a generated ID still needs current catalog resolution and permission.</figcaption>
+</figure>
 
 ## Calculate the Routed Load
 

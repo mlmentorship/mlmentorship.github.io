@@ -7,13 +7,24 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
+Fault-tolerant training must restore a coherent optimizer transition, not merely complete a retried collective.
+
 ## Summary
 
-A fault-tolerant collective detects missing, delayed, divergent, or corrupted participants and either completes with a stated guarantee or aborts into a consistent recovery path. Ordinary all-reduce assumes the group is healthy; fault tolerance begins when that assumption fails.
+Do all ranks agree on the operation, input state and whether its optimizer update already happened?
+Consider two synthetic ranks starting with weight $w=1$.
+The intended SGD update subtracts $0.1\cdot2=0.2$ using a fixed gradient.
 
-Synchronous training advances at the pace of the slowest required rank. One fail-stop worker can abort the communication group, one straggler can stall every peer, and one rank with divergent state can produce a numerically valid but scientifically invalid update.
+| Boundary | Rank zero | Rank one |
+| --- | --- | --- |
+| Committed start | 1 | 1 |
+| Partial application, then failure | 0.8 | 1 |
+| Blindly apply again | 0.6 | 0.8 |
+| Coordinated restore | 1 | 1 |
+| Replay from restored inputs | 0.8 | 0.8 |
 
-"Retry the collective" is not a general solution. A retry is safe only when every participant agrees on the operation, input state, and whether the previous attempt committed.
+Replaying communication cannot undo an update already applied on one rank.
+Even equal weights are insufficient for Adam if moments or step counters disagree.
 
 ## Failure model first
 
@@ -26,49 +37,15 @@ Synchronous training advances at the pace of the slowest required rank. One fail
 | Network partition | subgroups remain alive | split progress or indefinite wait |
 | Byzantine participant | arbitrary or adversarial value | aggregate integrity fails |
 
-Fail-stop tolerance does not imply Byzantine tolerance. Most ML communication stacks detect transport and process failures but do not defend against an arbitrary malicious gradient.
-
-## Recovery choices
-
-### Abort and restart
-
-The common robust path is to abort the process group and restart a consistent job state from checkpoint. This costs rollback but avoids ambiguous partial completion.
-
-### Elastic membership
-
-A runtime may rebuild the group with fewer or replacement workers. The algorithm must tolerate changed world size, batch partition, optimizer semantics, and parallel-group shape. Tensor and pipeline parallelism often constrain membership more tightly than data parallelism.
-
-### Redundancy
-
-Duplicate computation, parity-like coding, redundant parameter shards, or multiple gradient estimates can reconstruct some failures. Redundancy consumes compute or bandwidth and relies on an independence assumption.
-
-### Approximate aggregation
-
-Asynchronous or partial aggregation can continue with missing workers, but it changes the optimization algorithm. Staleness, bias, effective batch, and convergence become part of the contract. Availability is not free correctness.
-
-## Detection
-
-Useful signals include:
-
-- collective sequence numbers and deadlines;
-- rank-local start and finish timestamps;
-- tensor shape, dtype, finite checks, norms, and checksums;
-- hardware and link errors;
-- heartbeat and process liveness;
-- parameter or optimizer checksums at selected boundaries;
-- checkpoint-manifest completeness.
-
-A timeout detects absence, not cause. Preserve rank-local evidence before the group tears down.
-
-## Silent corruption
-
-Checksums can detect transmission or storage corruption, but a deterministic checksum does not prove the computation itself was correct. Range checks and redundant calculation catch different failures. Robust aggregation methods such as coordinate-wise median or trimmed means address outliers under specific assumptions, but can distort ordinary stochastic gradients and scale poorly.
-
-State the adversary and statistical assumptions before calling an aggregate robust.
+Fail-stop detection does not provide Byzantine tolerance against arbitrary participant values.
+A timeout establishes missing timely completion, not the failure's cause.
 
 ## Recovery and exactly-once language
 
-Distributed training rarely needs transaction-style exactly-once execution of a collective. It needs a consistent optimizer transition. If some ranks applied step $t$ and others did not, replaying communication alone is insufficient. Restore all required state or use a commit protocol that prevents partial publication of the step.
+Abort the old group and restore all participants from one verified, committed checkpoint manifest.
+Restore parameters, optimizer, scheduler, scaler, random-generator state, input position and step identity before rebuilding supported membership.
+Record checkpoint lineage and replayed inputs.
+The diagram's once-only result means one coherent intended transition under that protocol, not universal exactly-once execution.
 
 <!-- visual:collective-failure-commit-boundary -->
 <figure class="learning-figure plot-panel" aria-labelledby="collective-commit-title">
@@ -128,19 +105,100 @@ Distributed training rarely needs transaction-style exactly-once execution of a 
 		<path d="M170 464L178 470L170 476Z" style="fill:var(--viz-focus-stroke)"></path>
 		<text class="viz-label" x="22" y="463">cannot safely join</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> a collective result is not the commit boundary; the optimizer transition is. Once ranks disagree about whether step <code>t</code> was applied, replaying only communication can apply the update a different number of times. Abort the failed group, restore every required state component from one committed boundary, rebuild membership, and replay the whole step exactly once.</figcaption>
+	<figcaption><strong>Read it this way:</strong> four ranks disagree about whether update <code>t</code> happened. The left path repeats work from mixed states; the right path restores one complete boundary first. Replay is coherent only under the stated state-restoration and membership protocol.</figcaption>
 </figure>
+
+## Change the recovery contract
+
+### Continue with fewer ranks
+
+**New task:** resume after losing one data-parallel worker.
+
+**Picture and change:** equal-sized local gradients $2,4,12$ previously averaged to six.
+The surviving gradients two and four average to three, not six.
+
+**Check:** dividing their sum by the old world size gives two, which is not even the surviving-batch mean.
+Recompute normalization and effective batch; restore compatible state and record the changed experiment.
+A missing required tensor shard needs reconstruction, not fewer-gradient averaging.
+
+**Use when:** the runtime supports membership rebuild and the model's decomposition remains feasible.
+
+### Admit an arbitrary participant
+
+**New task:** a live rank can submit a finite but wrong gradient.
+
+**Picture and change:** gradients two and one hundred average to fifty-one.
+Both can pass shape, finiteness and byte-integrity checks.
+
+**Check:** adding another honest value two makes the median two, but changes the aggregation rule.
+That rule needs an explicit honest-participant and statistical model; heterogeneous legitimate gradients can also be suppressed.
+
+**Use when:** the threat exceeds fail-stop transport detection.
+Separate integrity checks, redundant computation and statistically robust aggregation.
+
+## Reconstruct the boundary
+
+Can matching checksums establish that the restored gradient is correct?
+
+<details>
+<summary>Reasoned answer</summary>
+
+No. Matching bytes can encode the same wrong computation.
+Check agreement and checkpoint completeness separately from numerical correctness and experiment equivalence.
+Equal weights with unequal optimizer moments can still produce different next updates.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Recovery choices
+
+### Abort and restart
+
+Restore a committed consistency domain, not each rank's newest independently written file.
+An incomplete or corrupted checkpoint can preserve the original failure.
+
+### Elastic membership
+
+Check data partition, loss denominator, optimizer state redistribution and tensor/pipeline group constraints.
+Availability does not imply the original trajectory is preserved.
+
+### Redundancy
+
+Replicas, coded computation and redundant shards consume resources and require a specified reconstruction rule.
+Common-mode faults can defeat supposedly independent copies.
+
+### Approximate aggregation
+
+Partial or asynchronous progress changes which gradients enter an update and their staleness.
+Treat convergence and bias as new obligations, not free availability.
+
+## Detection
+
+Capture process-group identity, operation sequence, shape/dtype, rank starts/ends, deadlines, hardware errors and liveness.
+Retain parameter/optimizer/step checks and checkpoint-manifest completeness.
+Preserve evidence before teardown.
+Transport retries cannot restore application state.
+
+## Silent corruption
+
+Checksums detect specified byte changes; redundant calculation tests different faults.
+Neither guarantees arbitrary computational correctness.
+Trimmed means and coordinate medians need stated assumptions and can distort legitimate stochastic gradients.
 
 ## Common confusions
 
-- **"NCCL retries failed collectives."** A failed process group commonly requires teardown and reconstruction; transport retry does not restore rank state.
-- **"Elastic means fault tolerant."** Elastic membership solves one recovery mechanism, not state consistency or algorithm equivalence.
-- **"Averaging removes bad gradients."** Averaging reduces independent zero-mean noise. Correlated or adversarial errors do not vanish as $1/n$.
-- **"Checkpointing solves corruption."** A corrupted or incomplete checkpoint can preserve the failure unless integrity and completeness are verified.
-- **"Asynchronous training is always more available."** It trades synchronization for staleness and different convergence behavior.
+Independent zero-mean noise may average down; correlated or adversarial errors need not.
+Do not confuse transport completion with global optimizer publication.
+Framework/version-specific group reconstruction is not a portable blanket retry promise.
 
 ## In an interview
 
-Start with failure classes, collective semantics, and consistent state. Then discuss timeouts, evidence, checkpoint commit, recovery scope, and whether the recovered job is still the same experiment.
+State the failure model, committed boundary and recovery consistency domain.
+Then specify detection, validation, supported membership and lineage before claiming the experiment survived unchanged.
 
 *Related: [all-reduce and collectives](/concepts/all-reduce-and-collectives/), [FSDP and ZeRO](/concepts/fsdp-and-zero/), and [design fault-tolerant distributed training](/questions/design-fault-tolerant-distributed-training/).*
+
+</div>

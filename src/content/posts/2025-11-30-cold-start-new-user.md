@@ -8,9 +8,18 @@ category: "questions"
 ---
 
 
-A new user has no interaction history; use permitted evidence and bounded feedback rather than an arbitrary personalization switch.
+Design recommendations for a user with no interaction history and explain how limited early feedback should update decisions.
 
 ## Problem
+
+**Context.** A new user can receive recommendations from eligible strategies A and B before any personal behavior is available.
+The teaching fixture below models saves after confirmed exposure.
+
+**Task.** Propose initial recommendations, update the stated probability model after the observations, and identify what remains uncertain.
+Explain how feedback could change the mix without assuming a fixed interaction count establishes reliable personalization.
+
+**Constraints.** Use only permitted context and optional preferences; preserve eligibility and safety boundaries.
+Respect the reward's observation window, and distinguish a matured no-save from dislike or unobserved exposure.
 
 A new user can receive eligible recommendations from strategies A and B.
 Use optional preferences, permitted request context and item content before behavior exists.

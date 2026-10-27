@@ -13,13 +13,19 @@ aliases: []
 prerequisites: []
 ---
 
-Clear the lowest remaining one at each step. The number of deletions is the original integer's set-bit count.
+Count how many one bits occur in the binary representation of a nonnegative integer.
 
 ## Problem
 
-> Count the set bits in an integer.
+**Input.** A nonnegative integer `value`.
 
-The reference requires a nonnegative integer. Zero has no set bits.
+**Output.** Return the number of binary digits equal to one, also called the set-bit count or Hamming weight.
+
+**Rules.** Count bits, not the integer's decimal digits or its total binary width.
+Leading zeros contribute nothing. Zero returns zero; negative integers require a separate finite-width contract below.
+
+**Example.** Integer `11`, binary `1011`, returns `3`.
+Integer `8`, binary `1000`, returns `1`.
 
 ## Picture
 

@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth at every level.*
 
-The interviewer is checking whether you treat cross-validation as a reflex or as a choice. The L4 candidate uses it everywhere. The L6 candidate names specific cases where it's the wrong tool.
+Decide when ordinary cross-validation would answer the wrong deployment question and propose a more appropriate evaluation.
+
+## Problem
+
+**Context.** A model may face future observations, repeated observations from the same entity, distribution shift, or expensive repeated training.
+You need an estimate relevant to deployment, not merely a score from conveniently available rows.
+
+**Task.** Explain when ordinary random folds are unsuitable and select a replacement for each failure mode.
+Address evaluation population, temporal or group boundaries, training cost, and model-selection bias.
+
+**Constraints.** Keep preprocessing and tuning inside the appropriate training boundary.
+State what the chosen split estimates; neither more folds nor a structure-aware split automatically repairs deployment distribution shift.
 
 <!-- visual:cross-validation-fit-the-question -->
 <figure class="learning-figure" aria-labelledby="cross-validation-question-title">

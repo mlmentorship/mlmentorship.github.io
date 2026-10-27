@@ -10,7 +10,17 @@ category: "questions"
 
 > *Asked in: ML breadth, every level.*
 
-Three valid explanations exist (regularization, implicit ensembling, Bayesian approximation) and which ones you reach for tells the level. Modern large models often use no dropout, which is also a tell.
+Explain why randomly suppressing activations during training can improve a neural network's behavior on unseen data.
+
+## Problem
+
+**Context.** A network fits its training data but generalizes poorly. Training may randomly zero some activations using dropout.
+
+**Task.** Explain the proposed benefit, how training and prediction differ, and when dropout may be unnecessary or counterproductive.
+Distinguish regularization, model-averaging intuition, and uncertainty estimation rather than treating them as interchangeable claims.
+
+**Constraints.** Different masks share the same learned weights; they are not independently trained models.
+State the keep-probability and scaling convention. Approximate ensemble or Bayesian interpretations do not guarantee calibrated uncertainty.
 
 **Learning objective:** trace how changing only the dropout mask creates many weight-sharing subnetworks, then distinguish deterministic approximate model averaging from repeated stochastic passes for uncertainty.
 

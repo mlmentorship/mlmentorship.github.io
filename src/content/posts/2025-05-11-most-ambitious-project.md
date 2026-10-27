@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: behavioral round, especially at L6+ loops.*
 
-The L4 candidate names a school project. The L6 candidate describes a multi-quarter, cross-functional effort with specific decisions, specific failures, and specific learnings.
+Describe a genuinely ambitious project through its stakes, your decisions, the obstacles, and the evidence of its outcome.
+
+## Problem
+
+**Context.** An interviewer asks about the most ambitious project you have personally worked on.
+Ambition may come from technical uncertainty, organizational scope, resource limits, or the importance of the result.
+
+**Task.** Explain the goal, why it was difficult, your ownership, major decisions, setbacks, and the eventual outcome.
+Be ready to examine one concrete trade-off and what you would change now.
+
+**Constraints.** Use a real experience rather than adopting the examples below as personal history.
+Separate your work from the team's work, protect confidential information, and label estimates or uncertain attribution honestly.
 
 ## What "ambitious" means in interview context
 

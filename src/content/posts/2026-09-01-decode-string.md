@@ -13,14 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-An opening bracket suspends the outer text and repeat count. A closing bracket restores that context and attaches the completed inner expansion.
+Expand a valid encoded string whose bracketed pieces may be repeated and nested.
 
 ## Problem
 
-Decode `3[a2[c]]` into `accaccacc`.
-Counts use ASCII digits and immediately precede balanced brackets; repeat counts are positive.
-Literal text contains no digits or bracket syntax. Empty input decodes to `""`.
-This reference assumes valid input; it does not validate an untrusted grammar.
+**Input.** A valid encoded string `text` containing literal text and expressions of the form `count[contents]`.
+
+**Output.** Return the fully expanded string after applying every repetition, including nested repetitions.
+
+**Rules.** Repeat counts are positive ASCII integers immediately followed by balanced brackets.
+Literal text contains no digits or bracket syntax. Adjacent pieces are concatenated in their original order.
+Empty input returns `""`. Assume valid input; parsing malformed or untrusted text is a different task.
+
+**Example.** `"3[a2[c]]"` returns `"accaccacc"`.
+The inner expression becomes `"acc"`, which is then repeated three times.
+For `"2[a]bc"`, return `"aabc"`.
 
 ## Picture: Save the Entire Suspended Context
 

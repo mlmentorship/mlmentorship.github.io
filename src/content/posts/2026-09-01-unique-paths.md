@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-At each cell, add counts from above and left. A left-to-right sweep preserves both in one row.
+Count the routes across an obstacle-free rectangular grid when movement is restricted to right or down.
 
 ## Problem
 
-> Count paths from the top-left to bottom-right when moves can only go right or down.
+**Input.** Positive integers `rows` and `cols` specifying the grid dimensions.
 
-The reference requires positive integer `rows` and `cols`.
+**Output.** Return the number of distinct move sequences from the top-left cell to the bottom-right cell.
+
+**Rules.** Each move advances exactly one cell right or one cell down, remaining inside the grid.
+There are no obstacles, diagonal moves, or backward moves.
+Different move orders count separately. A one-cell grid has one route: take no moves.
+
+**Example.** A grid with 3 rows and 2 columns returns `3`.
+Its routes are right-down-down, down-right-down, and down-down-right. A 3-by-7 grid returns `28`.
 
 ## Picture
 

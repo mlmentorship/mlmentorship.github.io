@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep both the largest and smallest products ending at the cursor. A negative next value can turn the smallest product into the largest.
+Find the largest product obtainable from one nonempty contiguous range of an integer list.
 
 ## Problem
 
-> Find the largest product of a nonempty continuous subarray.
+**Input.** A nonempty integer list `nums`, possibly containing negative numbers and zeros.
 
-The reference accepts a nonempty integer list. Selected values must be contiguous.
+**Output.** Return the largest product of all values in any nonempty contiguous subarray.
+
+**Rules.** Select at least one value and do not skip positions inside the selected range.
+Return the product, not the range or a selection of unrelated values.
+Leave the list unchanged. Empty input is outside the reference contract.
+
+**Example.** `[2, 3, -2, 4]` returns `6` from `[2, 3]`.
+For `[-2, 0, -1]`, return `0`, not 2, because the two negative values are separated by zero.
 
 ## Picture
 

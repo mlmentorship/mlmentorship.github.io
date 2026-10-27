@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Every sequence has one final value. Remove it to get a smaller solved total, then add the sizes of these disjoint final-value groups.
+Count the ordered sequences of available positive values that add to an exact target.
 
 ## Problem
 
-> Count ordered sequences of values that add to the target.
+**Input.** A list `nums` of distinct positive integers and a nonnegative integer `target`.
 
-The source requires **distinct positive integer** values and a nonnegative integer target. Values may repeat within a sequence; their order matters.
-It does not validate these requirements or deduplicate input.
+**Output.** Return the number of ordered value sequences whose sum equals `target`.
+
+**Rules.** A value may be reused any number of times; different orders count separately.
+Target zero has one sequence: the empty sequence. An unreachable positive target has zero sequences.
+Leave the input unchanged. The reference neither validates positivity nor removes duplicate input values.
+
+**Example.** For `nums = [1, 2]` and `target = 3`, return `3`.
+The sequences are `[1, 1, 1]`, `[1, 2]`, and `[2, 1]`.
 
 ## Picture
 

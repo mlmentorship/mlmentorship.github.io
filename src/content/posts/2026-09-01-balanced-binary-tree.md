@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-A child returns either a certified height or failure. A parent must not treat failure as a height.
+Determine whether every node in a binary tree has subtrees of nearly equal height.
 
 ## Problem
 
-> Check whether the child heights at every node differ by at most one.
+**Input.** The root of a finite binary tree, with `left` and `right` child references or `None`.
 
-Assume a finite binary tree without cycles or shared children. Height counts nodes; an empty subtree has height zero.
+**Output.** Return `True` exactly when every node's left and right subtree heights differ by at most one.
+
+**Rules.** Height counts nodes: an empty subtree has height zero and a leaf has height one.
+The condition must hold throughout the tree, not only at the root.
+Assume no cycles or shared children. Do not change any nodes; an empty tree is balanced.
+
+**Example.** A root with two leaf children returns `True`.
+A three-node chain containing only left children returns `False`; its root's subtree heights are two and zero.
 
 ## Picture
 

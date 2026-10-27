@@ -9,14 +9,19 @@ category: "questions"
 
 > Implement a pre-norm Transformer decoder block from projections and tensor operations. Do not call a built-in attention module.
 
-Get the contract right before writing code:
+Implement a causal pre-normalized Transformer decoder block whose tensor shapes and gradient paths remain correct.
 
-- input and output: `[batch, time, d_model]`;
-- `d_model` divisible by `num_heads`;
-- each position may attend only to itself and earlier positions;
-- softmax runs stably;
-- residual paths preserve shape;
-- gradients reach input and parameters.
+## Problem
+
+**Context.** Inputs have shape `(batch, time, d_model)`, with `d_model` divisible by a positive `num_heads`.
+The block combines pre-normalization, causal multi-head self-attention, a position-wise feed-forward network, and residual paths.
+
+**Task.** Return the same shape and demonstrate causal isolation, stable attention, and gradients to inputs and trainable parameters.
+State feed-forward width, activation, positional-encoding, and dropout choices before testing.
+
+**Constraints.** Use projections and tensor operations rather than a built-in attention module.
+No position may depend on future tokens. Preserve residual shapes and control stochastic behavior for numerical equivalence tests.
+The reference sketches components; a complete block must connect them under the stated contract.
 
 ## The minimal structure
 

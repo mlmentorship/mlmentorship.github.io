@@ -8,10 +8,17 @@ category: "questions"
 ---
 
 
-Make both positions legible, identify the deciding evidence and name the decision owner.
-An honest outcome can retain A or B.
+Explain a technical disagreement with a senior colleague through both positions, the deciding evidence, and your role in the resolution.
 
 ## Problem
+
+**Context.** An interviewer asks about a real disagreement; the fictional choice below provides a rehearsal of the decision mechanics.
+
+**Task.** Explain the competing goals, gather deciding evidence, identify the decision owner, and describe the outcome and follow-through.
+For the rehearsal, decide which option currently satisfies the requirements and what new evidence could reopen the choice.
+
+**Constraints.** Mandatory processing-region rules cannot be traded away for speed or cost without authorized requirement changes.
+Use your own experience in an interview, distinguish facts from assumptions, and represent the other position fairly.
 
 Use this fictional rehearsal, not a personal project claim:
 
@@ -25,6 +32,8 @@ Someone favors B's speed and cost; you favor A's compliance with the current bou
 What evidence resolves the choice? What could reopen it?
 
 ## Picture: Evidence Before Commitment
+
+<p class="visual-title">A declared boundary can reject the faster option</p>
 
 <!-- visual:disagreement-evidence-commit-loop -->
 ```mermaid

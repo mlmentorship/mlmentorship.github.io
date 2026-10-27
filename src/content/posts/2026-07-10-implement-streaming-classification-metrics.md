@@ -9,7 +9,20 @@ category: "questions"
 
 > Implement a streaming binary-classification metric accumulator. It receives batches of labels and predictions, uses bounded memory, supports merging across workers, and reports precision, recall, F1, accuracy, and the confusion matrix.
 
-This is distributed model evaluation in miniature: score a stream too large to hold in memory, then merge per-worker accumulators into one global result. The design hinges on storing sufficient statistics (the four confusion-matrix counts) rather than every prediction, because those counts are exactly what makes the metric mergeable across shards.
+Compute binary-classification metrics over a stream and merge worker results without retaining every prediction.
+
+## Problem
+
+**Context.** Each update receives equally long sequences of binary labels and finite prediction scores at a fixed threshold.
+The reference predicts positive when `score >= threshold`, defaulting to 0.5.
+
+**Task.** Implement update, merge, and compute operations reporting confusion counts, precision, recall, F1, and accuracy.
+Labels `[1, 0, 1]` and scores `[0.9, 0.8, 0.1]` yield TP 1, FP 1, FN 1, and TN 0.
+Precision, recall, and F1 are 0.5; accuracy is one third.
+
+**Constraints.** Use bounded retained state and merge only compatible thresholds; do not average worker-level metric ratios.
+The reference uses `None` for zero-denominator ratios and for F1 when either rate is undefined or both sum to zero.
+Empty batches are allowed. Sample weights, concurrency, and transactional rollback of invalid updates require additional policies.
 
 ## Contract
 

@@ -1,19 +1,21 @@
 ---
-title: "Weight initialization (Kaiming, Xavier)"
-description: "Set the initial variance of each layer's weights so that activations and gradients neither explode nor vanish through depth. The single most impactful one-line decision in deep nets."
+title: "Weight initialization: trace signal scale through a layer"
+description: "Derive ReLU second-moment scaling, compare fan-in and fan-out, and recompute the rule when the activation or path structure changes."
 date: "2026-05-05"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
+Weight initialization sets a layer's starting scale before data or optimization can correct it.
+Which weight variance prevents repeated shrinking or growth through a simple ReLU chain?
+
 ## Summary
 
-Initialize each layer's weights from a distribution whose variance is set so the variance of activations (forward pass) and gradients (backward pass) stays approximately constant from layer to layer. Two standard schemes: **Xavier/Glorot** for tanh/sigmoid layers, **Kaiming/He** for ReLU-family layers.
-
-If weights are too small, activations shrink toward zero through depth and gradients vanish. If too large, activations explode and gradients blow up. With either failure, training stalls or diverges in the first few hundred steps.
-
-A correct init lets a 24-layer transformer train to convergence with vanilla SGD or Adam; an incorrect init makes the same architecture untrainable without ad-hoc fixes (warmup hacks, smaller LR, etc.).
+Track the activation second moment $q=\mathbb E[x_j^2]$, not just centered variance.
+For a layer with four inputs and zero bias, compare weight variances $0.25$, $0.5$, and $0.75$.
+Under the assumptions below, their per-layer second-moment multipliers are $0.5$, $1$, and $1.5$.
+Four layers therefore yield $1/16$, $1$, and $81/16$ from $q_0=1$.
 
 <!-- visual:relu-second-moment-through-depth -->
 <figure class="learning-figure" aria-labelledby="relu-init-title">
@@ -24,69 +26,136 @@ A correct init lets a 24-layer transformer train to convergence with vanilla SGD
 			<title id="relu-init-svg-title">Activation second moment through four ReLU layers at three initialization scales</title>
 			<desc id="relu-init-svg-desc">Under independent zero-mean symmetric preactivations, each ReLU layer multiplies activation second moment by fan-in times weight variance divided by 2. All three paths start at q zero equal to 1. Weight variance 1 over fan-in multiplies by one half per layer and ends at 1 over 16. Kaiming variance 2 over fan-in multiplies by 1 and remains at 1. Variance 3 over fan-in multiplies by three halves and ends at 81 over 16, about 5.06. Circle, square, and triangle markers plus dotted, dashed, and solid paths distinguish the cases without color.</desc>
 			<path class="viz-gridline" d="M48 28V226M48 226H305M112 28V226M176 28V226M240 28V226M304 28V226"></path>
-			<path class="viz-pr-curve" d="M48 112L112 92L176 72L240 52L304 32"></path>
+			<path class="viz-pr-curve" d="M48 112L112 95.621L176 79.242L240 62.863L304 46.484"></path>
 			<path class="viz-operating-guide" d="M48 112H304"></path>
 			<path class="viz-baseline" d="M48 112L112 140L176 168L240 196L304 224" style="stroke-dasharray:2 4"></path>
-			<g style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.5"><path d="M48 107L53 117H43Z"></path><path d="M112 87L117 97H107Z"></path><path d="M176 67L181 77H171Z"></path><path d="M240 47L245 57H235Z"></path><path d="M304 27L309 37H299Z"></path></g>
+			<g style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.5"><path d="M48 107L53 117H43Z"></path><path d="M112 90.621L117 100.621H107Z"></path><path d="M176 74.242L181 84.242H171Z"></path><path d="M240 57.863L245 67.863H235Z"></path><path d="M304 41.484L309 51.484H299Z"></path></g>
 			<g style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.5"><rect x="44" y="108" width="8" height="8"></rect><rect x="108" y="108" width="8" height="8"></rect><rect x="172" y="108" width="8" height="8"></rect><rect x="236" y="108" width="8" height="8"></rect><rect x="300" y="108" width="8" height="8"></rect></g>
 			<g style="fill:var(--viz-neutral-bg);stroke:var(--viz-edge);stroke-width:1.5"><circle cx="48" cy="112" r="4"></circle><circle cx="112" cy="140" r="4"></circle><circle cx="176" cy="168" r="4"></circle><circle cx="240" cy="196" r="4"></circle><circle cx="304" cy="224" r="4"></circle></g>
 			<text class="viz-axis-label" x="48" y="16">activation second moment q_l / q_0 · log scale</text>
 			<text class="viz-callout" x="58" y="54">3 / fan-in: gain 1.5 / layer</text>
-			<text class="viz-callout" x="116" y="104">2 / fan-in: gain 1 (Kaiming)</text>
+			<text class="viz-callout" x="116" y="129">2 / fan-in: gain 1 (Kaiming)</text>
 			<text class="viz-callout" x="58" y="218">1 / fan-in: gain 0.5 / layer</text>
-			<text class="viz-axis-label" x="314" y="35">5.06</text><text class="viz-axis-label" x="314" y="116">1</text><text class="viz-axis-label" x="314" y="228">0.0625</text>
+			<text class="viz-axis-label" x="314" y="50">5.06</text><text class="viz-axis-label" x="314" y="116">1</text><text class="viz-axis-label" x="314" y="228">0.0625</text>
 			<text class="viz-label" x="48" y="244" text-anchor="middle">0</text><text class="viz-label" x="112" y="244" text-anchor="middle">1</text><text class="viz-label" x="176" y="244" text-anchor="middle">2</text><text class="viz-label" x="240" y="244" text-anchor="middle">3</text><text class="viz-label" x="304" y="244" text-anchor="middle">4</text>
 			<text class="viz-axis-label" x="176" y="264" text-anchor="middle">ReLU layers traversed</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow each path from the shared second moment <var>q</var><sub>0</sub> = 1. A linear map with <var>fan-in</var> · Var(<var>W</var>) = <var>c</var> multiplies the second moment by <var>c</var>; under the usual symmetric-preactivation assumptions, ReLU keeps half, so each layer multiplies by <var>c</var>/2. The dotted circle path shrinks to 1/16, the dashed square Kaiming path stays at 1, and the solid triangle path grows to 81/16. Position, labels, marker shapes, and line styles carry the result without color. Original schematic based on <a href="https://proceedings.mlr.press/v9/glorot10a.html">Glorot and Bengio (2010)</a> and <a href="https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">He et al. (2015)</a>.</figcaption>
+	<p>Forward scaling counts four inputs; backward scaling counts eight outputs in the unequal-width example below.</p>
+	<figcaption><strong>Read it this way:</strong> start each path at second moment one. Independent symmetric weights give a ReLU multiplier of fan-in times weight variance divided by two. Circles end at 1/16, squares at one, and triangles at 81/16. The vertical axis uses shared logarithmic spacing. Marker shapes also distinguish paths. Sources are <a href="https://proceedings.mlr.press/v9/glorot10a.html">Glorot and Bengio (2010)</a> and <a href="https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">He et al. (2015)</a>.</figcaption>
 </figure>
 
 ## The variance argument
 
-For a linear layer $y = W x$ with $W \in \mathbb{R}^{d_\text{out} \times d_\text{in}}$, $x$ zero-mean with variance $\sigma_x^2$, and $W$ drawn iid with mean 0 and variance $\sigma_W^2$:
+Let $z=Wx$ with $W\in\mathbb R^{d_{\rm out}\times d_{\rm in}}$ and zero bias.
+At initialization, weights are mutually independent, zero-mean, symmetric, and independent of the inputs.
+Each input coordinate has finite second moment $q$.
+Write $v=\operatorname{Var}(W_{ij})$.
+Cross terms vanish because distinct weights have zero expected product:
 
 $$
-\text{Var}(y_i) = d_\text{in} \cdot \sigma_W^2 \cdot \sigma_x^2.
+\mathbb E[z_i^2]=\sum_j\mathbb E[W_{ij}^2]\mathbb E[x_j^2]
+=d_{\rm in}vq.
 $$
 
-To preserve variance ($\sigma_y^2 = \sigma_x^2$), pick $\sigma_W^2 = 1 / d_\text{in}$.
+This expectation averages the initialized weights as well as the input law.
+It is not an exact guarantee for every sampled matrix.
+For zero-mean inputs, $q$ equals input variance.
 
-The same argument on the backward pass gives $\sigma_W^2 = 1 / d_\text{out}$. Compromise:
-
-$$
-\sigma_W^2 = \frac{2}{d_\text{in} + d_\text{out}} \quad \text{(Xavier/[Glorot, 2010](https://proceedings.mlr.press/v9/glorot10a.html))}
-$$
-
-For ReLU activations, it is more precise to track the second moment $q = \mathbb{E}[x^2]$: ReLU outputs are not zero-mean, so their variance is not their second moment. Under the usual independent, symmetric-preactivation assumptions, ReLU zeros half the values and retains half the second moment. Compensate with a factor of 2:
+Symmetry of $z_i$ makes each half-line contribute half its second moment.
+Therefore
 
 $$
-\sigma_W^2 = \frac{2}{d_\text{in}} \quad \text{([Kaiming/He, 2015](https://arxiv.org/abs/1502.01852), "fan-in" mode)}
+q_{\ell+1}=\mathbb E[\operatorname{ReLU}(z_i)^2]
+=\frac{d_{\rm in}v}{2}q_\ell.
 $$
+
+Setting $v=2/d_{\rm in}$ preserves this expected second moment: the He/Kaiming fan-in rule.
+For $d_{\rm in}=4$, variance $v=0.5$ gives multiplier one.
+Variances $0.25$ and $0.75$ give multipliers $0.5$ and $1.5$.
+
+ReLU outputs need not be centered.
+If $z$ is equally likely to be $-1$ or $1$, its ReLU second moment is $1/2$.
+Its mean is $1/2$ and its centered variance is only $1/4$.
+
+### Change the activation
+
+Leaky ReLU passes negative inputs with slope $a$.
+Under symmetry, it retains $(1+a^2)/2$ of the preactivation second moment.
+The preserving rule becomes
+
+$$
+v=\frac{2}{(1+a^2)d_{\rm in}}.
+$$
+
+At $a=1$, the activation is linear and this becomes $1/d_{\rm in}$.
+At $a=0.1$ and fan-in four, it gives $v=50/101\approx0.49505$.
+Recompute the activation factor rather than treating GELU or sigmoid as exact ReLU cases.
+
+### Change the path structure
+
+Adding a centered branch $F$ to stream $x$ requires covariance accounting:
+
+$$
+\operatorname{Var}(x+\alpha F)
+=\operatorname{Var}(x)+\alpha^2\operatorname{Var}(F)
++2\alpha\operatorname{Cov}(x,F).
+$$
+
+Independent unit-variance stream and branch give variance two when $\alpha=1$.
+If $F=x$, the same addition gives variance four, not two.
+For $L$ mutually uncorrelated unit-variance branches, scaling each by $1/\sqrt L$ makes their total added variance one.
+Correlated residual branches require their covariance terms; a serial-chain rule alone cannot justify that scaling.
+
+### Change the direction
+
+The linear backward map uses $W^\top$, so its analogous independent-gradient calculation counts $d_{\rm out}$ terms.
+With unequal widths, one variance cannot preserve both linear directions exactly.
+Glorot's compromise is $v=2/(d_{\rm in}+d_{\rm out})$.
+For fan-in four and fan-out eight, $v=1/6$ gives forward factor $2/3$ and backward factor $4/3$.
+Real backpropagated gradients can depend on weights; this scale argument is an initialization approximation.
+
+**Reconstruct:** can a rectangular orthogonal map preserve all forward and backward vector norms?
+
+<details><summary>Answer</summary>
+
+No, not in both unequal-dimensional spaces.
+Orthonormal columns give $W^\top W=I$, preserving every forward input norm.
+Orthonormal rows give $WW^\top=I$, preserving the reverse direction instead.
+The other direction generally preserves only the corresponding subspace.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Practical defaults
 
-| Layer type | Init |
-|------------|------|
-| Linear, ReLU/GELU activation | Kaiming-normal, fan-in |
-| Linear, tanh/sigmoid | Xavier-uniform |
-| Conv, ReLU | Kaiming-normal, fan-in |
-| Embeddings | $\mathcal{N}(0, 0.02^2)$ for transformers; $\mathcal{N}(0, 1)$ when followed by LayerNorm |
-| LayerNorm $\gamma$ | 1 |
-| LayerNorm $\beta$ | 0 |
-| Bias | 0 |
+| Component | Starting point | Limit to check |
+| --- | --- | --- |
+| ReLU linear or convolution | He scale in the intended fan direction | Correct connectivity and weight layout |
+| Near-linear centered activation | Glorot scale | Sigmoid offsets and tanh saturation change propagation |
+| GELU | Architecture-tested scale | Its second-moment factor depends on its input law |
+| Embedding | Architecture-specific distribution | Vocabulary, width, scaling, and downstream normalization |
+| Normalization affine parameters | Often scale one, shift zero | Residual designs sometimes choose another scale |
+| Bias | Often zero | Recurrent gates and architectural offsets can justify nonzero values |
 
-Most modern frameworks default to Kaiming-uniform for `nn.Linear` (PyTorch). For transformers, GPT-style models often add a per-residual scaling $1/\sqrt{2 \cdot N_\text{layers}}$ on the output projections to keep residual-stream variance bounded with depth.
+Do not infer a framework default from an initializer's name.
+Check its version, arguments, fan convention, and resulting bounds.
 
 ## Special cases
 
-- **Residual connections**: with N layers, the residual stream's variance grows linearly with depth unless the contributions from each block are downscaled. GPT-2 / GPT-3 scale output projections by $1/\sqrt{N}$.
-- **Identity init for recurrent** [(Le et al., 2015)](https://arxiv.org/abs/1504.00941): initialize the recurrent weight matrix to the identity to make RNNs behave like feed-forward at $t=0$.
-- **Orthogonal init**: weight matrices initialized to orthogonal matrices preserve norms exactly. Used in some RL policy networks.
+Residual output scaling is architecture-specific; it depends on branch count and covariance, not only network depth.
+Embedding scales such as $0.02$ are model conventions, not universal variance laws.
+[Identity initialization for ReLU recurrent networks](https://arxiv.org/abs/1504.00941) changes recurrent products but does not remove temporal state.
+Orthogonal recurrent weights preserve a linear multiplication's norm; nonlinear derivatives can still shrink gradients.
+Rectangular matrices need the row/column distinction above.
 
 ## Common pitfalls
 
-- **Using PyTorch's default `nn.Linear` for a transformer without checking it.** The default is Kaiming-uniform with the wrong fan; many transformer codebases override it with $\mathcal{N}(0, 0.02^2)$.
-- **Initializing bias to nonzero.** Almost never helps; can break symmetry breaking arguments.
-- **Forgetting to scale residual outputs.** Without it, deep transformers produce huge residual-stream values at init.
-- **Trusting "it trains" as proof of correct init.** It might converge slower than a properly initialized run.
+- Balanced expected moments do not prove convergence or control every finite-width realization.
+- Nonzero bias changes preactivation symmetry; random weights, not zero bias alone, break neuron symmetry.
+- Normalization, optimizer state, residual correlations, and activation saturation lie outside the simple serial-chain calculation.
+- A training run succeeding does not establish the assumed propagation law or an optimal scale.
+
+</div>

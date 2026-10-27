@@ -13,27 +13,39 @@ aliases: []
 prerequisites: []
 ---
 
-Release a course only when every prerequisite is processed; decrement each outgoing requirement once and enqueue newly zero counts.
+Determine whether every course can be completed while respecting all listed prerequisite requirements.
 
 ## Problem
 
-Can four courses finish with pairs `[[1,0],[2,0],[3,1],[3,2]]`?
-Each pair is `[course,prerequisite]`, so it creates an edge from prerequisite to course.
-The answer is `True`.
-Course IDs must be integers from zero through `course_count-1`.
+**Input.** A nonnegative `course_count` and pairs `[course, prerequisite]` using IDs from `0` through `course_count - 1`.
+
+**Output.** Return `True` if some order completes every course; otherwise return `False`.
+
+**Rules.** Each listed prerequisite must finish before its course can start.
+All courses count, including isolated ones. Repeated pairs are allowed, and inputs remain unchanged.
+Zero courses is feasible. A course requiring itself is not feasible.
+
+**Example.** Four courses with pairs `[[1, 0], [2, 0], [3, 1], [3, 2]]` return `True`.
+One possible order is `[0, 1, 2, 3]`.
+For two courses with pairs `[[1, 0], [0, 1]]`, return `False`.
 
 ## Picture
 
 The label counts unmet incoming requirements.
 Initially, only course `0` is ready:
 
+<p class="visual-title" data-supplemental-visual="course-prerequisite-fanout">Processing 0 makes 1 and 2 ready, not 3</p>
+
 ```mermaid
 flowchart LR
+   accTitle: Ready courses have no unprocessed prerequisites
+   accDescr: Course zero initially has indegree zero. Courses one and two each depend on zero; course three depends on both one and two. Removing zero makes one and two ready, but three retains two incoming prerequisites until both are processed.
    Zero["0: indegree 0<br/>ready"] --> One["1: indegree 1"]
    Zero --> Two["2: indegree 1"]
    One --> Three["3: indegree 2"]
    Two --> Three
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> count incoming prerequisite edges. Readiness is indegree zero, not simply having a path from an already-ready course.</p>
 
 Completing `0` releases `1` and `2`.
 Completing `1` lowers course `3` from two requirements to one; it must still wait.

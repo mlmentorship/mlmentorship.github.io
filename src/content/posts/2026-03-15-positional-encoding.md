@@ -1,6 +1,6 @@
 ---
-title: "RoPE, ALiBi, and modern positional encodings"
-description: "Modern LLMs usually replace sinusoidal positional encoding with RoPE, ALiBi, or related methods. Compare how they represent relative position and extrapolate."
+title: "Positional encoding: where does position enter attention?"
+description: "Compare embeddings, rotary geometry, and score biases; compute ALiBi probabilities and test slope, visibility, and common-shift changes."
 date: "2026-03-15"
 draft: false
 tags: ["concepts"]
@@ -10,70 +10,62 @@ category: "concepts"
 
 ## Summary
 
-Positional encoding gives a transformer information about token *order*, since attention itself is permutation-invariant. Modern LLMs use **rotary position embeddings (RoPE)** or **ALiBi** instead of the original sinusoidal scheme, primarily for better long-context behavior.
+Position can change embeddings, query/key geometry, or scores before softmax.
+Those are different computations, not interchangeable ways to relabel a checkpoint.
+Unmasked position-free self-attention is permutation-equivariant: permuting input rows permutes output rows.
+A fixed causal mask already restricts positions asymmetrically.
 
-The choice of positional encoding determines long-context performance, extrapolation beyond training length, and relative position representation. It's a small choice with outsized impact on production inference.
+**Task:** query position $i=6$ may read keys $j=[2,4,6]$.
+Hold scaled content scores at zero and use causal ALiBi slope $s_h=0.25$.
+Compute the attention probabilities, then change the slope and permitted directions.
 
 ## The lineup
 
+The pipeline is embeddings, Q/K projections, dot product, bias/mask, then softmax.
+Locate each method at its actual stage.
+
 ### Sinusoidal (original Transformer, 2017)
 
-Add a fixed sinusoidal pattern to the input embeddings:
+Add fixed absolute-position vectors before the projections:
 ```
 PE(pos, 2i)   = sin(pos / 10000^(2i/d))
 PE(pos, 2i+1) = cos(pos / 10000^(2i/d))
 ```
 
-- Encodes absolute position.
-- Allows some implicit relative-position learning through linear combinations of sinusoids.
-- Limited extrapolation: at positions much beyond training length, behavior degrades.
+Defined values at unseen positions do not guarantee useful extrapolation.
 
 ### Learned absolute positional embeddings
 
-A learnable embedding per position. Used in BERT, GPT-2.
-
-- Each position gets its own embedding learned during training.
-- Cannot extrapolate at all to lengths beyond training.
-- Larger memory cost (one embedding per position).
+Add a learned table row for each supported position, as in BERT or GPT-2.
+Unseen indices need an explicit adaptation, not an undefined table lookup.
 
 ### Relative positional encoding
 
-Replace absolute positions with relative offsets. T5 introduced a simple bucketed bias added to attention scores.
+T5-style relative bucket biases enter scores; bucket definitions are part of the model.
+Shaw and Transformer-XL use other relative constructions, not the same lookup formula.
 
-- Better generalization than absolute.
-- Several variants (T5, Transformer-XL, Shaw et al.).
+<span id="rope-rotary-position-embeddings-the-modern-default"></span>
+### RoPE (Rotary Position Embeddings)
 
-### RoPE (Rotary Position Embeddings), the modern default
+Rotate query/key coordinate pairs before their dot product, rather than adding an embedding vector.
 
-Don't add positional info to embeddings. Instead, *rotate* Q and K by position-dependent angles before the attention dot product.
-
-For position `m`, the rotation matrix `R_m` is block-diagonal with 2x2 rotations of angles `m * theta_i` for each pair of dimensions. Then:
+For positions `m` and `n`, use their specified block-diagonal rotations:
 ```
 Q' = R_m * Q   (Q rotated by query position)
 K' = R_n * K   (K rotated by key position)
 ```
 
-The dot product `Q'^T * K' = Q^T * R_{n-m} * K` depends only on the *relative* position `n - m`, not on absolute positions. So RoPE is implicitly relative.
-
-- Encodes relative position naturally.
-- Plays well with FlashAttention (rotation is an element-wise op).
-- Has no learned position-table cutoff, but unscaled use far beyond the training length can still degrade.
-- Used in: LLaMA family, Mistral, Qwen, Gemma, most modern open LLMs.
-
-Variants exist for context extension: **NTK-aware RoPE**: **YaRN**: **PI (Position Interpolation)**: rescale the rotation frequencies to handle longer-than-trained contexts.
+The [rotation derivation](/concepts/rotary-position-embeddings/) proves the common-shift relationship for fixed content vectors.
+The figure retains positions $(1,3)$ and $(4,6)$; their relative offsets agree.
 
 ### ALiBi (Attention with Linear Biases)
 
-Add a position-dependent *bias* directly to attention scores:
+Add a distance bias after the scaled content score:
 ```
 score_h(i, j) = Q_i K_j^T / sqrt(d) - s_h * (i - j)
 ```
-where `s_h > 0` is a fixed per-head slope and `i - j >= 0` is the distance from a causal query to an unmasked key. For bidirectional attention, use absolute distance.
-
-- No additional parameters; no embedding modification.
-- Implicitly relative.
-- Excellent extrapolation to longer sequences than seen at training time.
-- Used in: MPT, BLOOM, some BERT variants.
+Here $d$ is head width, $s_h>0$ is a fixed head-specific slope, and allowed causal keys satisfy $j\le i$.
+Forbidden scores still require a separate mask.
 
 <!-- visual:positional-relative-mechanisms -->
 <figure class="learning-figure plot-panel" aria-labelledby="positional-relative-title">
@@ -111,52 +103,73 @@ where `s_h > 0` is a fixed per-head slope and `i - j >= 0` is the distance from 
 		<text class="viz-axis-label" x="180" y="436" text-anchor="middle">content score − sₕ(i − j) → softmax</text>
 		<text class="viz-label" x="180" y="449" text-anchor="middle">each head h has its own fixed positive slope sₕ</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> in the top panel, shift both positions by three: both vectors rotate together, so their angle gap remains <code>2θ</code> and the positional part of their dot product is unchanged. In the bottom panel, ALiBi never rotates the vectors; after the content dot product, it subtracts a larger score penalty from more distant keys. Both mechanisms depend on relative offset, but at different stages. This original schematic is checked against the <a href="https://arxiv.org/abs/2104.09864">RoFormer paper</a> and the <a href="https://arxiv.org/abs/2108.12409">ALiBi paper</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> shifting both upper positions by three preserves their angle gap for fixed content vectors. ALiBi instead subtracts distance penalties from content scores before softmax. At slope 0.25, the lower symbolic biases become −1, −0.5, and 0. These are different operations, despite their common relative-offset dependence. Sources: <a href="https://arxiv.org/abs/2104.09864">RoFormer</a> and <a href="https://arxiv.org/abs/2108.12409">ALiBi</a>.</figcaption>
 </figure>
+
+### Compute and change the row
+
+| Slope | Distances | Score biases | Softmax probabilities |
+| --- | --- | --- | --- |
+| $0.25$ | $[4,2,0]$ | $[-1,-0.5,0]$ | $[0.186324,0.307196,0.506480]$ |
+| $0.5$ | $[4,2,0]$ | $[-2,-1,0]$ | $[0.090031,0.244728,0.665241]$ |
+
+For the first row, exponentials are $[0.367879,0.606531,1]$, summing to $1.974410$.
+The newest key is $e^1$ times as likely as the oldest because their content scores match.
+Shifting query to $9$ and keys to $[5,7,9]$ preserves distances and probabilities for unchanged content.
+
+**New task:** strengthen recency preference.
+Double the slope and recompute softmax, as the second row shows.
+**Use when:** deliberately adapting head distance preferences; changing deployed slopes changes the model.
+
+**New task:** allow an encoder query at $6$ to read key $8$.
+Use a bidirectional mask and the specified absolute-distance bias.
+**Check:** slope $0.25$ gives $-0.25|6-8|=-0.5$, not $+0.5$ from misusing signed causal distance.
+**Use when:** available source positions lie on both sides.
 
 ### Position-free / implicit position
 
-Some recent architectures (some MoE variants, certain SSM-based models) avoid explicit positional encoding by relying on the recurrence or state dynamics to inject position. Less common in transformers proper.
+A causal mask or recurrence can impose order without adding a positional vector.
+Mixture-of-experts routing alone does not supply sequence position.
 
 ## What an interviewer expects you to say
 
-If asked about positional encoding:
+Separate position representation, visibility, and context capacity.
+**Failure:** a fixed slope is not a causal mask; unmasked future keys can receive an unintended positive signed-distance bias.
 
-1. Explain *why* attention needs positional info (permutation-invariance).
-2. Mention the original sinusoidal scheme as a starting point.
-3. State that modern LLMs use **RoPE or ALiBi**: not sinusoidal.
-4. Explain RoPE's mechanism (rotation in 2D blocks; gives relative position implicitly).
-5. Discuss the long-context extrapolation issue and the techniques (NTK-aware, YaRN, PI) for extending RoPE-trained models to longer contexts.
+**Reconstruct:** can RoPE replace ALiBi unchanged because both use relative positions?
 
-If you describe positional encoding in 2026 using only sinusoidal, you signal your knowledge stops in 2020.
+<details><summary>Answer</summary>
+
+No. Rotation changes content dot products; ALiBi adds score biases.
+The same trained weights need not preserve scores, probabilities, or useful behavior after substitution.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common confusions
 
-- **"Sinusoidal is the standard."** It was the standard in 2017-2019 and is now obsolete in production. RoPE is the standard since ~2021.
-- **"Absolute vs relative positional encoding."** A meaningful distinction. RoPE and ALiBi are both relative.
-- **"Positional encoding extends the context window."** No, the model architecture and training data extend the context window. PE choices affect *how gracefully* the model handles long contexts and whether it can extrapolate.
-- **"YaRN is a different positional encoding."** YaRN is a specific *adaptation* of RoPE that extends context, not a separate scheme.
+Relative scores do not guarantee long-context generalization.
+Context capacity also depends on memory, compute, implementation limits, and training.
+An unbounded position formula is not an empirical quality result.
 
 ## Long-context extension techniques
 
-A practical concern: most LLMs are pretrained at modest context (e.g., 8K) but production wants much longer (32K, 128K, 1M). Three families of fix:
+- [Position interpolation](https://arxiv.org/abs/2306.15595) rescales positions toward the trained range, with its specified continued training.
+- NTK-aware variants change the frequency schedule; inspect the actual formula rather than assuming one universal implementation.
+- [YaRN](https://arxiv.org/abs/2309.00071) changes interpolation and attention scaling under its chosen recipe.
+- Continued long-context training changes the learning exposure and compute budget, not merely a position index limit.
 
-1. **Position interpolation (PI)**: scale position indices down so that positions in the longer context map into the trained range, then fine-tune at the longer length.
-2. **NTK-aware scaling**: scale RoPE frequencies non-uniformly so high-frequency dimensions are preserved (which matter for short-distance precision) and low-frequency dimensions are stretched. Better than naive PI.
-3. **YaRN**: interpolate frequencies selectively by wavelength and adjust attention scale. It can improve zero-shot extension, while short continued training produces stronger results.
-4. **Continued pretraining at long context**: the most reliable but expensive option. Used by Anthropic, OpenAI, etc.
-
-Long-context extension is now standard interview territory because it's a commercial differentiator in 2026.
+Evaluate short-context retention, retrieval, reasoning, location sensitivity, latency, and memory separately.
+One successful retrieval needle does not qualify every long-document task.
 
 ## Why interviewers ask
 
-Positional encoding tests:
-1. Whether you've kept up with transformer evolution since 2020.
-2. Whether you understand attention's permutation-invariance and why position info is needed.
-3. Whether you've handled long-context concerns in production.
-
-A senior follow-up: "How would you extend a RoPE-trained model from 8K to 128K context?" Answer: NTK-aware scaling or YaRN, possibly followed by continued pretraining on long-context data; evaluate retrieval quality (needle-in-haystack) at the new length to verify. This is a standard 2026 problem and the answer signals production fluency.
+The useful test is whether you can locate the operation, reproduce the score change, and specify evidence for adaptation.
 
 ---
 
 *Related: [Transformer architecture](/concepts/transformer-architecture/), [FlashAttention](/concepts/flashattention/), [KV cache](/concepts/kv-cache/).*
+
+</div>

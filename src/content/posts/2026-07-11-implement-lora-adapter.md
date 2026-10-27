@@ -10,7 +10,20 @@ aliases: ["LoRA", "low-rank adaptation", "parameter efficient fine tuning", "PEF
 
 > Wrap a frozen linear layer with a trainable rank-$r$ update. At initialization, output must exactly match the base layer.
 
-For base weight $W \in \mathbb{R}^{d_{out} \times d_{in}}$, LoRA learns:
+Wrap a frozen linear layer with a trainable low-rank update while preserving the base layer's initial output.
+
+## Problem
+
+**Context.** A base linear weight has shape `(d_out, d_in)`, and inputs end in feature dimension `d_in`.
+Trainable factors have shapes `(r, d_in)` and `(d_out, r)`, with positive rank `r` and scale `alpha / r`.
+
+**Task.** Implement the adapter forward path and initialization, returning the same output shape as the base layer.
+Show that initialization matches the base output and that adapter parameters can receive gradients while the base remains frozen.
+
+**Constraints.** Preserve the base weight and any base bias; match dtype, device, and arbitrary leading input dimensions.
+The initial effective update must be zero. Explain factor initialization and distinguish forward equivalence from every factor receiving a nonzero first-step gradient.
+
+For base weight $W \in \mathbb{R}^{d_{out} \times d_{in}}$, the adapted weight is:
 
 $$
 W' = W + \frac{\alpha}{r} B A,

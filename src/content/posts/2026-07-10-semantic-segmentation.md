@@ -9,18 +9,25 @@ category: "concepts"
 
 ## Summary
 
-Semantic segmentation is the dense version of classification: a class label for every pixel, which is what scene parsing, medical imaging, and autonomous perception actually need. Two things make it hard. A network downsamples to build semantic context, so the central challenge is recovering spatial precision at the boundaries it blurred. And the obvious metric lies: pixel accuracy can look excellent while the model quietly predicts background everywhere. It differs from object detection, which predicts boxes, and instance segmentation, which separates individual objects of the same class.
+Semantic segmentation predicts a semantic class at each evaluated pixel, rather than a box or a separate object identity.
+An encoder can recognize an object while discarding its precise boundary.
+Ask which spatial evidence survives and which denominator reveals a small-class failure.
+
+Output logits have shape $B\times C\times H\times W$: batch, classes, height, and width.
+Align predictions with the target coordinates and exclude declared ignore labels.
+Resize categorical targets by nearest-neighbor unless a separate soft-label policy applies.
 
 ## Architectures
 
 - **FCN:** replaces dense heads with convolutional prediction.
-- **U-Net:** encoder-decoder with skip connections that restore spatial detail.
-- **DeepLab:** dilated convolution for multi-scale context without losing resolution.
+- **U-Net:** combines coarse semantics with retained higher-resolution encoder features.
+- **DeepLab:** uses dilation and multiscale context with a declared output stride.
 - **Transformer decoders:** combine global context with learned masks or pixel queries.
 
-The recurring trade-off is semantic context versus precise boundaries.
-
-**Learning objective:** trace why upsampling restores output size but cannot by itself recover an erased object boundary, then identify what a same-scale encoder skip contributes.
+If two boundaries produce the same coarse representation, its decoder alone cannot identify which boundary occurred.
+For example, averaging $(1,0)$ and $(0,1)$ yields the same value $1/2$.
+Interpolation restores size, not that erased distinction.
+A learned prior may infer plausible detail; a skip supplies additional evidence without guaranteeing exact recovery.
 
 <!-- visual:semantic-segmentation-boundary-fusion -->
 <figure class="learning-figure" aria-labelledby="segmentation-boundary-heading">
@@ -87,12 +94,14 @@ The recurring trade-off is semantic context versus precise boundaries.
 		<rect class="viz-node" x="288" y="411" width="38" height="20"></rect>
 		<path d="M 212 408 L 212 434" fill="none" stroke="var(--c-text)" stroke-width="3"></path>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> start at the fine encoder grid: it retains where the object ends. Downsampling builds stronger context but compresses that edge into a coarse cell. Upsampling can produce an eight-cell mask again, yet the dashed two-cell region shows that a larger canvas does not recreate the discarded location. The dashed skip carries same-scale fine evidence around the bottleneck; fusing it with coarse semantics lets the decoder place the solid boundary. Skips help localization, but they do not guarantee perfect reconstruction. Original synthesis informed by <a href="https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html">Long et al. (2015)</a> and <a href="https://arxiv.org/abs/1505.04597">Ronneberger et al. (2015)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the fine grid retains the edge, while the coarse grid leaves an uncertain cell. Enlarging that cell does not restore distinctions already erased. The dashed skip supplies fine evidence that can distinguish candidate boundaries; success still depends on those features and the decoder. The illustrated sharp edge is an outcome, not a reconstruction guarantee. Original synthesis informed by <a href="https://openaccess.thecvf.com/content_cvpr_2015/html/Long_Fully_Convolutional_Networks_2015_CVPR_paper.html">Long et al. (2015)</a> and <a href="https://arxiv.org/abs/1505.04597">Ronneberger et al. (2015)</a>.</figcaption>
 </figure>
 
 ## Losses
 
-Pixelwise cross-entropy is the baseline. Class-weighted or focal losses handle imbalance. Dice loss rewards overlap directly and is common when the positive region is small. Boundary losses emphasize shape but are sensitive to annotation noise.
+Mean pixel cross-entropy averages only evaluated pixels; an empty valid set needs an explicit skip/error policy.
+Weighted or focal losses change contributions; Dice emphasizes overlap; boundary terms emphasize localization.
+None removes annotation uncertainty or automatically supplies calibrated probabilities.
 
 ## Metrics
 
@@ -100,20 +109,71 @@ Intersection over Union for class $c$ is
 
 $$\text{IoU}_c = \frac{TP_c}{TP_c + FP_c + FN_c}.$$
 
-Mean IoU averages across classes. Report per-class IoU and boundary quality when rare or safety-critical classes matter, because pixel accuracy can look excellent by predicting background.
+For 95 background and five object pixels, predicting background everywhere gives:
+
+| Class | TP | FP | FN | IoU |
+| --- | --- | --- | --- | --- |
+| Object | 0 | 0 | 5 | 0 |
+| Background | 95 | 5 | 0 | 0.95 |
+
+Accuracy is $0.95$, while two-class macro mIoU is $(0+0.95)/2=0.475$.
+The metric correctly measures pixel agreement, not rare-class success.
+Zero IoU denominators require a stated absent-class policy; ignored pixels are not background.
+
+### Make rare positives more important
+
+**New task:** prioritize the small foreground class.
+
+**Picture and change:** weight positive cross-entropy terms by $19$, background terms by $1$.
+
+**Check:** weighted class masses become $19(5)=95$ and $1(95)=95$.
+A constant-score model's optimum changes from foreground probability $0.05$ to weighted score $0.5$.
+Report class-specific results and validate calibration rather than interpreting the weighted score as the original probability.
+
+**Use when:** missed foreground carries different task costs; the all-background object's IoU remains zero.
+
+### Fit inference into smaller tiles
+
+**New task:** full-resolution activations exceed memory.
+
+**Picture and change:** a $512^2$ tile uses 262,144 pixels versus 921,600 for a $960^2$ image.
+Along each axis, origins $0$ and $448$ produce a 64-pixel overlap.
+
+**Check:** global coordinate $500$ is local coordinate $52$ in the second tile.
+Align and blend overlapping logits before class selection; do not average discrete class IDs.
+Context, padding, and tile boundaries may still differ from full-image inference.
+
+**Use when:** activation memory requires tiling, with measured overlap, latency, and boundary checks.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## In an interview
 
-1. Separate semantic from instance segmentation.
-2. Choose an encoder-decoder and explain how resolution is recovered.
-3. Discuss imbalance, annotation quality, and augmentation.
-4. Use mIoU plus critical-class and boundary metrics.
-5. Cover tiling, latency, memory, and confidence handling at deployment.
+Define the spatial transform, ignore mask, label set, and evaluation unit before choosing an architecture.
+Report per-class IoU, the declared class average, boundary quality, and relevant object/task outcomes.
+Memory savings require accounting for feature channels, temporary workspaces, tiling overlap, and batch size, not pixels alone.
 
 ## Common confusions
 
-- **"Accuracy is enough."** Background dominance hides the failures that matter.
-- **"Upsampling recovers lost detail."** Skip connections or high-resolution features carry the information; interpolation alone cannot.
-- **"More precise masks are always better."** Annotation boundaries are often uncertain, and task value may depend on object-level outcomes.
+Hard binary Dice is $2TP/(2TP+FP+FN)$.
+One soft convention uses $(2\sum_u p_uy_u+\epsilon)/(\sum_u p_u+\sum_u y_u+\epsilon)$.
+Declare $\epsilon$, valid pixels, per-image versus pooled reduction, and the empty-mask policy.
+Other denominator conventions define different objectives.
+
+Boundary penalties can emphasize uncertain or inconsistent annotations.
+Confidence thresholds and abstention need validation on the deployment population; higher mask precision is not automatically higher task value.
+
+Can semantic labels distinguish two touching objects of the same class?
+
+<details><summary>Answer</summary>
+
+Not necessarily: both objects can share the same semantic label throughout their union.
+Instance segmentation supplies separate identities; detection supplies boxes rather than full pixel assignments.
+
+</details>
+
+</div>
 
 *Related: [CNN architecture](/concepts/cnn-architecture/), [ResNet](/concepts/resnet/), and [object detection](/concepts/object-detection-overview/).*

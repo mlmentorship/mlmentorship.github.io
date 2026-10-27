@@ -1545,6 +1545,7 @@ mark {
   .mermaid svg.flowchart:has(.viz-wide) { min-width: 0; }
   .visual-scroll { overflow: visible; }
   .visual-wide svg,
+  .plot-panel svg,
   .backprop-visual svg { min-width: 0; }
   .coding-visual-controls,
   .coding-visual-status { display: none !important; }

@@ -15,11 +15,18 @@ prerequisites: ["foundation-model-data-curation", "ml-data-lineage-versioning", 
 
 > *Asked in: foundation-model systems, research engineering, data platform, safety, and principal technical-strategy rounds.*
 
-A basic answer moves documents through collection, cleaning, deduplication, and sharding. A senior answer makes every retained sample reproducible and every stage restartable. A staff answer adds policy, evaluation protection, ownership, deletion workflows, and adoption across research teams.
+Design foundation-model data infrastructure that makes large-scale processing, permitted use, reproducibility, and release evidence work together.
 
-A principal answer treats data mixtures as versioned model decisions with explicit evidence and exit conditions. A senior-principal answer defines durable source, provenance, and release rules across several model programs while preserving independent research and regional constraints.
+## Problem
 
-Build a governed data control plane around high-throughput processing planes. Keep raw evidence, policy decisions, transformation lineage, dataset manifests, and release state separate from the workers that scan bytes. Do not reduce data quality to one score or infer causality from correlations between mixture shares and model results.
+**Context.** A laboratory plans 10 trillion retained text-equivalent tokens over two years across text and multimodal model programs.
+Fragmented workflows lack consistent provenance, source permissions, versioning, benchmark protection, and deletion tracing, as detailed below.
+
+**Task.** Design ingestion, transformation lineage, curation, mixture experiments, manifests, release gates, recovery, and policy and incident ownership.
+Deliver a useful first-quarter scope while supporting petabyte-scale processing and several research organizations.
+
+**Constraints.** Enforce approved source uses, privacy, regional rules, held-out evaluation boundaries, and deletion obligations.
+Preserve reproducible data identities without requiring one processing engine. Quality scores and mixture correlations alone do not establish model capability or causality.
 
 ## The prompt
 
@@ -164,44 +171,23 @@ These rules constrain publication rather than exploration. A researcher can test
 
 ## Separate control, processing, and evidence planes
 
+<p class="visual-title" data-supplemental-visual="foundation-data-build-planes">Processed shards are not yet an authorized dataset release</p>
+
 ```mermaid
-flowchart LR
+flowchart TB
   accTitle: Control, processing, and evidence planes govern a foundation-model dataset build
-  accDescr: Sources enter quarantined intake and immutable storage. A source and policy registry constrains a build planner, while versioned workers parse, filter, deduplicate, select, tokenize, and publish immutable shards and manifests. A protected evaluation registry feeds contamination checks. Every processing and publication stage emits append-only lineage and observability events so a released training run can be traced back to its source, policy, and transformation evidence.
-  Sources[Licensed, public, partner, internal, human, synthetic] --> Intake[Quarantined intake]
-  Intake --> Registry[Source and policy registry]
-  Intake --> Raw[Immutable raw object store]
-
-  Registry --> Planner[Build planner]
-  Raw --> Parse[Parse and normalize workers]
-  Parse --> Privacy[PII, secret, and policy filters]
-  Privacy --> Dedup[Exact, fuzzy, and semantic dedup]
-  Dedup --> Quality[Quality and coverage selection]
-  Quality --> Tokenize[Tokenizer and sequence builder]
-  Tokenize --> Shards[Immutable training shards]
-
-  Bench[Protected evaluation registry] --> Contam[Contamination service]
-  Parse --> Contam
-  Dedup --> Contam
-  Contam --> Planner
-
-  Registry --> Policy[Policy decisions and exclusions]
-  Policy --> Planner
-  Planner --> Manifest[Dataset and mixture manifests]
-  Shards --> Manifest
-  Manifest --> Train[Training and post-training jobs]
-
-  Intake --> Events[Append-only lineage events]
-  Parse --> Events
-  Privacy --> Events
-  Dedup --> Events
-  Quality --> Events
-  Tokenize --> Events
-  Manifest --> Events
-  Train --> Events
-  Events --> Lineage[Lineage graph and audit store]
-  Events --> Observe[Data observability]
+  accDescr: Quarantined immutable sources feed versioned filtering, deduplication, and tokenization. Processing produces immutable shards and append-only build evidence, including protected-evaluation contamination checks. A separate control path supplies approved use policy and exclusions. Shards, policy, and evidence must meet at one release gate. Missing evidence or denied policy holds the build; approval creates an immutable manifest that binds exact shard and transformation versions for training.
+  Intake["Quarantined intake<br/>immutable sources"] --> Process["Versioned workers<br/>filter, dedup, tokenize"]
+  Intake --> Policy["Approved use policy<br/>exclusions + build plan"]
+  Process --> Shards["Shards + evidence<br/>lineage + eval checks"]
+  Shards --> Gate{"Policy permits use<br/>+ checks pass?"}
+  Policy --> Gate
+  Gate -->|no| Hold["HOLD build<br/>no publication"]
+  Gate -->|yes| Manifest["Immutable manifest<br/>exact shards + versions"]
+  Manifest --> Train["Training job<br/>binds this manifest"]
+  class Intake,Process,Policy,Shards,Gate,Hold,Manifest,Train viz-fit
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> a shard is not a release. Join build artifacts with approved policy; publish a manifest only after every required check.</p>
 
 ### Control plane
 
@@ -796,6 +782,8 @@ Test these queries through scheduled drills. A lineage graph that exists only on
 ## Define deletion, exclusion, and retraining honestly
 
 A request can mean several different technical actions. State which one the system completed.
+
+<p class="visual-title">Removing a source does not erase its downstream models</p>
 
 <!-- visual:foundation-data-deletion-blast-radius -->
 ```mermaid

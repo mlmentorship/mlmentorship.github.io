@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Count one range for every accepted radius around a character or gap center. Equal text at different positions remains separate occurrences.
+Count every nonempty contiguous substring that reads the same forward and backward, including repeated occurrences.
 
 ## Problem
 
-> Count every continuous palindrome in a string.
+**Input.** A Python string `text`.
 
-Count nonempty contiguous **occurrences**, identified by their boundaries. Empty input returns zero.
-Equality is exact Python code-point equality, without normalization or grapheme grouping.
+**Output.** Return the number of nonempty palindromic substring occurrences.
+
+**Rules.** Different start/end ranges count separately, even when they contain identical text.
+Ranges must be contiguous. Use exact code-point equality without normalization or grapheme grouping.
+Leave the string unchanged. Empty input returns zero.
+
+**Example.** `"aaa"` returns `6`: three one-character ranges, two `"aa"` ranges, and one `"aaa"` range.
+For `"abc"`, return `3`, one occurrence for each character.
 
 ## Picture
 

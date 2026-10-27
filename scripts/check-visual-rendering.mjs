@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { parseFragment } from 'parse5';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -36,6 +38,7 @@ if (slugs.length === 0 || new Set(slugs).size !== slugs.length) {
 const baseUrl = option('base-url', 'http://127.0.0.1:8123').replace(/\/$/, '');
 const outputDir = resolve(root, option('output', 'scratch/visual-render-review'));
 const allFrames = process.argv.includes('--all-frames');
+const supplemental = process.argv.includes('--supplemental');
 const auditsDir = join(root, 'data', 'visual-audits');
 const auditedEntries = slugs.map((slug) => {
   const auditPath = join(auditsDir, `${slug}.json`);
@@ -49,13 +52,30 @@ const auditedEntries = slugs.map((slug) => {
   const article = readFileSync(articlePath, 'utf8');
   const category = article.match(/^---\n[\s\S]*?^category:\s*["']?([^"'\n]+)["']?\s*$[\s\S]*?^---$/m)?.[1]?.trim();
   if (!category) throw new Error(`Could not read category from ${audit.article}`);
+  const supplementalIds = [];
+  if (supplemental) {
+    const visitHtml = (node) => {
+      const id = node.attrs?.find((attribute) => attribute.name === 'data-supplemental-visual')?.value;
+      if (id) supplementalIds.push(id);
+      for (const child of node.childNodes ?? []) visitHtml(child);
+    };
+    const visitMarkdown = (node) => {
+      if (node.type === 'html') visitHtml(parseFragment(node.value));
+      for (const child of node.children ?? []) visitMarkdown(child);
+    };
+    visitMarkdown(fromMarkdown(article));
+    if (supplementalIds.length === 0 || new Set(supplementalIds).size !== supplementalIds.length) {
+      throw new Error(`${slug} needs a non-empty, unique supplemental visual list`);
+    }
+  }
   return {
     slug,
     status: audit.status,
     category,
-    medium: audit.medium,
-    visualIds: audit.implementation.visualIds,
+    medium: supplemental ? 'mermaid' : audit.medium,
+    visualIds: supplemental ? supplementalIds : audit.implementation.visualIds,
     article: basename(audit.article),
+    supplemental,
   };
 });
 const entries = auditedEntries.filter((entry) => entry.status === 'implemented');
@@ -74,13 +94,18 @@ if (process.platform !== 'win32' && /^[A-Za-z]:|^\/mnt\/[a-z]\//.test(executable
   throw new Error('Run this script with Windows Node when using a Windows browser so its CDP port is reachable');
 }
 
-const modes = [
+const allModes = [
   { name: 'desktop-light', width: 1280, height: 900, theme: 'light', media: 'screen' },
   { name: 'desktop-dark', width: 1280, height: 900, theme: 'dark', media: 'screen' },
   { name: 'mobile-light', width: 390, height: 900, theme: 'light', media: 'screen', mobile: true },
   { name: 'mobile-dark', width: 390, height: 900, theme: 'dark', media: 'screen', mobile: true },
   { name: 'print', width: 1280, height: 900, theme: 'light', media: 'print' },
 ];
+const requestedModes = option('modes').split(',').map((name) => name.trim()).filter(Boolean);
+if (new Set(requestedModes).size !== requestedModes.length || requestedModes.some((name) => !allModes.some((mode) => mode.name === name))) {
+  throw new Error('--modes must contain unique names from desktop-light, desktop-dark, mobile-light, mobile-dark, print');
+}
+const modes = allModes.filter((mode) => requestedModes.length === 0 || requestedModes.includes(mode.name));
 
 class Cdp {
   constructor(url) {
@@ -139,6 +164,9 @@ async function waitForVisualLayout(cdp, visualId, theme, label) {
       document.documentElement.dataset.theme = ${JSON.stringify(theme)};
       await document.fonts.ready;
       const locateVisual = () => {
+        if (${JSON.stringify(supplemental)}) {
+          return document.querySelector(${JSON.stringify(`[data-supplemental-visual="${visualId}"]`)})?.nextElementSibling;
+        }
         const comments = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT);
         let marker;
         while (comments.nextNode()) {
@@ -152,6 +180,7 @@ async function waitForVisualLayout(cdp, visualId, theme, label) {
         return visual;
       };
       let previous = '';
+      let previousSvg = null;
       let stableSince = performance.now();
       for (let attempt = 0; attempt < 40; attempt += 1) {
         await new Promise((resolve) => setTimeout(resolve, 50));
@@ -159,6 +188,13 @@ async function waitForVisualLayout(cdp, visualId, theme, label) {
         window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
         const visual = locateVisual();
         if (!visual) throw new Error(${JSON.stringify(`${label}: visual not found`)});
+        const svg = visual.querySelector('svg');
+        if (visual.matches('.mermaid') && (!svg || !svg.querySelector('text, foreignObject'))) {
+          previous = '';
+          previousSvg = null;
+          stableSince = performance.now();
+          continue;
+        }
         const rect = visual.getBoundingClientRect();
         const signature = [
           rect.left + scrollX,
@@ -169,10 +205,11 @@ async function waitForVisualLayout(cdp, visualId, theme, label) {
           document.documentElement.scrollHeight,
         ].map((value) => Math.round(value * 100) / 100).join('|');
         const now = performance.now();
-        if (signature !== previous) {
+        if (signature !== previous || svg !== previousSvg) {
           previous = signature;
+          previousSvg = svg;
           stableSince = now;
-        } else if (now - stableSince >= 250) {
+        } else if (now - stableSince >= 500) {
           return true;
         }
       }
@@ -286,7 +323,6 @@ try {
         const label = `${entry.slug}/${visualId}/${mode.name}`;
         await waitForVisualLayout(cdp, visualId, mode.theme, label);
         const expression = `(() => new Promise((resolve) => {
-          document.documentElement.dataset.theme = ${JSON.stringify(mode.theme)};
           requestAnimationFrame(() => requestAnimationFrame(() => {
             window.scrollTo({ left: 0, top: 0, behavior: 'instant' });
             const comments = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT);
@@ -297,7 +333,10 @@ try {
                 break;
               }
             }
-            let visual = marker?.nextElementSibling;
+            const supplementalTitle = ${JSON.stringify(supplemental)}
+              ? document.querySelector(${JSON.stringify(`[data-supplemental-visual="${visualId}"]`)})
+              : null;
+            let visual = supplementalTitle?.nextElementSibling ?? marker?.nextElementSibling;
             while (visual && !visual.matches('figure.learning-figure, .mermaid')) visual = visual.nextElementSibling;
             if (!visual) throw new Error(${JSON.stringify(`${label}: visual not found`)});
             const visualHost = visual.closest('.visual-review-visual');
@@ -312,7 +351,7 @@ try {
             const captionText = caption?.textContent.trim() ?? '';
             const visualTitle = visual.matches('figure')
               ? visual.querySelector('.visual-title')
-              : marker?.previousElementSibling?.matches('.visual-title') ? marker.previousElementSibling : null;
+              : supplementalTitle ?? (marker?.previousElementSibling?.matches('.visual-title') ? marker.previousElementSibling : null);
             const visualKicker = visual.matches('.mermaid') && visualTitle?.previousElementSibling?.matches('.visual-kicker')
               ? visualTitle.previousElementSibling
               : null;
@@ -459,6 +498,7 @@ try {
                   : null,
               } : null,
               svgCount: svgElements.length,
+              mermaid: visual.matches('.mermaid'),
               titleCount: visual.querySelectorAll('svg > title').length,
               descCount: visual.querySelectorAll('svg > desc').length,
               minRenderedText: renderedTextSizes.length ? Math.min(...renderedTextSizes) : null,
@@ -500,6 +540,10 @@ try {
           throw new Error(`${label} lost its rendered learning title`);
         }
         if (details.rawCaptionMath) throw new Error(`${label} retains raw math delimiters in its caption`);
+        if (details.mermaid && (details.svgCount === 0 || details.minRenderedText === null ||
+          details.svgCount !== details.titleCount || details.svgCount !== details.descCount)) {
+          throw new Error(`${label} lost its rendered Mermaid graph or accessibility markup`);
+        }
         if (mode.media !== 'print' && details.minRenderedText !== null && details.minRenderedText < 8) {
           throw new Error(`${label} renders text at ${details.minRenderedText.toFixed(2)}px`);
         }

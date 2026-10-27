@@ -15,56 +15,9 @@ prerequisites: ["expectation-variance-covariance-correlation", "hypothesis-testi
 
 ## Summary
 
-The bootstrap estimates sampling uncertainty by repeatedly resampling observed units with replacement and recomputing a statistic. The distribution of those recomputed values approximates how the statistic would vary across new samples.
-
-The method is useful when analytic standard errors are hard to derive. Its validity depends on the resampling unit and whether the observed sample represents the target population.
-
-## Nonparametric bootstrap
-
-Suppose the data contains $n$ observations $x_1,\ldots,x_n$ and the statistic is $T(x_1,\ldots,x_n)$.
-
-For each bootstrap replicate:
-
-1. Draw $n$ observations with replacement from the original sample.
-2. Compute the statistic on that resample.
-3. Store the result.
-
-After $B$ replicates, the stored values approximate the sampling distribution of $T$.
-
-A bootstrap sample repeats some observations and omits others. Each original observation has probability
-
-$$
-\left(1-\frac{1}{n}\right)^n \approx e^{-1}
-$$
-
-of being omitted. About 63.2% of distinct observations appear in a large bootstrap sample.
-
-## Standard error and confidence intervals
-
-The bootstrap standard error is the sample standard deviation of the replicate statistics:
-
-$$
-\widehat{\operatorname{SE}}_{\text{boot}}(T)
-= \operatorname{sd}(T^{*(1)},\ldots,T^{*(B)}).
-$$
-
-A percentile interval uses empirical quantiles of the bootstrap distribution. A 95% interval takes the 2.5th and 97.5th percentiles.
-
-Percentile intervals are simple but can be inaccurate for biased or highly skewed estimators. Basic, studentized, and bias-corrected accelerated intervals address different errors. In an interview, explain the simple interval first and then name the limitation.
-
-## Paired model comparison
-
-When two models score the same examples, preserve that pairing.
-
-For each example $i$, compute the difference
-
-$$
-d_i = m_B(x_i)-m_A(x_i).
-$$
-
-Resample the examples, then average the selected differences. This paired bootstrap keeps the correlation between model outcomes. Resampling model A and model B separately throws away useful information and usually gives a wider or incorrect interval.
-
-For generated outputs, resample prompts and keep both models' outputs for a prompt together. For repeated human ratings, decide whether the target population is prompts, raters, users, or a combination.
+The bootstrap recomputes a statistic after drawing observed sampling units with replacement.
+Its empirical resampling distribution can approximate sampling uncertainty under appropriate sampling, dependence, and estimator conditions.
+Choose the target population and independent unit first; more simulated replicates cannot repair missing population information.
 
 ## Choose the resampling unit
 
@@ -79,9 +32,10 @@ The independent unit may be larger than one row.
 | Time series | time block |
 | Multi-seed training study | seed or complete run |
 
-If events from one user appear as independent bootstrap rows, the interval can become far too narrow. Resample the unit that could plausibly have been drawn again from the target population.
-
-**Learning objective:** identify the independent sampling unit and keep every dependent observation attached to it when constructing a bootstrap replicate.
+For a mechanics fixture, independent users U1, U2, and U3 have paired model differences $-1,0,1$ respectively.
+Each user has two perfectly correlated events with that same difference; the target is the equal-user mean, zero.
+Draw U3, U1, U3 and carry both events and both model outcomes whenever a user is selected.
+The replicate user mean is $(1-1+1)/3=1/3$.
 
 <!-- visual:bootstrap-resampling-unit -->
 <figure class="learning-figure plot-panel" aria-labelledby="bootstrap-unit-title">
@@ -136,8 +90,61 @@ If events from one user appear as independent bootstrap rows, the interval can b
 		<path d="M22 311L338 366M338 311L22 366" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2.5"></path>
 		<text class="viz-callout" x="180" y="384" text-anchor="middle">breaks within-user dependence → uncertainty can look too small</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> first draw a user ID with replacement; then copy that user's entire box into the replicate. Repeating U3 is allowed and omitting U2 is allowed, but separating a user's events is not. The same rule preserves paired model outcomes: A and B stay attached to every selected event. Procedure checked against <a href="https://doi.org/10.1214/aos/1176344552">Efron's bootstrap paper</a>, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html">SciPy's bootstrap documentation</a>, and <a href="https://doi.org/10.1017/CBO9780511802843"><cite>Bootstrap Methods and Their Application</cite></a>; the graphic is original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> draw a user and carry the entire cluster. U3 can repeat and U2 can be omitted. Keep both models' paired outcomes attached to every selected event. The original graphic follows <a href="https://doi.org/10.1214/aos/1176344552">Efron</a>, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html">SciPy</a>, and <a href="https://doi.org/10.1017/CBO9780511802843"><cite>Bootstrap Methods and Their Application</cite></a>.</figcaption>
 </figure>
+
+## Nonparametric bootstrap
+
+With $n$ independent units and statistic $T$, draw $n$ unit indices with replacement and recompute $T$.
+Repeat $B$ times while preserving the same estimand and within-unit structure.
+An original unit is omitted with probability $(1-1/n)^n$, approaching $e^{-1}$.
+The familiar $63.2\%$ inclusion figure is an asymptotic expectation, not an exact count in each replicate.
+
+The three-user fixture has $3^3=27$ equally likely ordered draws.
+Replicate sums $-3,-2,-1,0,1,2,3$ have counts $1,3,6,7,6,3,1$; divide each sum by three.
+Their probability-weighted mean is zero and variance is $2/9$, giving standard deviation $\sqrt{2/9}\approx0.471405$.
+Equivalently, the empirical user variance $2/3$ is divided by three independent empirical draws.
+This exact conditional distribution illustrates mechanics; three users do not establish reliable interval coverage.
+
+## Standard error and confidence intervals
+
+For randomly simulated replicates, estimate bootstrap standard error by their sample standard deviation.
+Exact enumeration instead uses the probability-weighted variance over all possible draws, as above.
+A percentile interval uses empirical quantiles, conventionally $2.5\%$ and $97.5\%$ for a nominal $95\%$ interval.
+Nominal coverage is not guaranteed; bias, skewness, dependence, and estimator irregularity matter.
+Increasing $B$ reduces simulation error, not the original sampling uncertainty.
+
+## Paired model comparison
+
+For models scored on the same units, retain $d_i=m_B(x_i)-m_A(x_i)$ within every resampled unit.
+Breaking pairing changes the resampling distribution; it need not always widen the interval.
+For the fixture, incorrectly drawing six detached events gives mean variance $1/9$, half the user-bootstrap variance.
+Decide whether prompts, raters, users, or training runs supply the independence relevant to the desired uncertainty.
+
+### Change Cluster Sizes
+
+**New task:** Give U1 and U2 one event each, but U3 eight events.
+
+**Picture and change:** Retain user means for equal-user performance.
+For event-weighted performance, divide summed event differences by selected event count.
+
+**Check:** Equal-user effect remains zero; observed event-weighted effect is $(-1+0+8)/10=0.7$.
+For draw U3, U1, U3, those estimators give $1/3$ versus $15/17$.
+
+**Use when:** Unequal exposure changes whether the target represents a random user or a random event.
+
+### Preserve Time Dependence
+
+**New task:** Resample `[0,0,1,1]` with dependence inside length-two blocks.
+
+**Picture and change:** Draw whole blocks `[0,0]` and `[1,1]`, retaining paired outcomes.
+
+**Check:** Drawing both blocks gives mean $0.5$; drawing the first twice gives zero.
+
+**Use when:** Relevant local dependence fits the declared block length and stationarity assumptions.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Block and cluster bootstrap
 
@@ -149,11 +156,10 @@ For hierarchical data, a multi-stage bootstrap can sample users first and events
 
 ## Worked example
 
-Two classifiers score the same 1,000 examples. Model B improves accuracy by 0.8 percentage points.
-
-A paired bootstrap resamples example indices 10,000 times and recomputes the accuracy difference. Suppose the 95% percentile interval is $[-0.3, 1.9]$ points.
-
-The estimate favors B, but the interval includes zero and meaningful losses. This result alone does not support a confident launch. More data or a clearer decision threshold is needed.
+As a separate hypothetical decision illustration, two fixed classifiers differ by positive $0.8$ accuracy percentage points on one thousand examples.
+Suppose a suitable paired analysis reports interval $[-0.3,1.9]$ points.
+These illustrative endpoints are not computed from the three-user fixture or unspecified per-example outcomes.
+The result includes possible losses; a launch still needs decision thresholds, guardrails, and an appropriate uncertainty argument.
 
 ## When the bootstrap fails
 
@@ -179,7 +185,8 @@ Use this order:
 5. Report the effect and interval.
 6. Discuss dependence, rare events, and sample coverage.
 
-A common follow-up asks how many replicates to use. A few thousand often estimates a standard error well; tail quantiles need more. Compute is rarely the main limit compared with choosing the right unit.
+Choose replicate count from the required simulation accuracy, particularly for tail quantiles, after establishing a defensible sampling unit.
+Fixed-model example resampling does not by itself capture variation from retraining with different seeds or datasets.
 
 ## Common mistakes
 
@@ -193,3 +200,5 @@ A common follow-up asks how many replicates to use. A few thousand often estimat
 ## Practice next
 
 Apply paired resampling in [hypothesis testing and confidence intervals](/concepts/hypothesis-testing-confidence-intervals/), [reproducible model comparison](/concepts/reproducibility-fair-model-comparison/), and [paper critique](/questions/critique-ml-paper/).
+
+</div>

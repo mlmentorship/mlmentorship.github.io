@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Build a membership set, then expand only values with no predecessor.
-Each consecutive run has one such start; interior members need no new scan.
+Find the longest run of consecutive integer values present anywhere in an unordered input list.
 
 ## Problem
 
-For `[100, 4, 200, 1, 3, 2]`, return 4 for values `1, 2, 3, 4`.
-These values need not occupy adjacent input positions. Integer duplicates do not lengthen a run; `[1, 1, 2]` returns 2.
-Empty input returns 0.
+**Input.** An unsorted integer list `nums`, possibly containing negatives and duplicates.
+
+**Output.** Return the greatest number of distinct values in any run increasing by exactly one each time.
+
+**Rules.** Values need not be adjacent or appear in increasing input order.
+Repeated copies of a value do not extend a run. Return only the length, not the values or indices.
+Do not change the input. Empty input returns zero.
+
+**Example.** `[100, 4, 200, 1, 3, 2]` returns `4` for the run `1, 2, 3, 4`.
+For `[1, 1, 2]`, return `2`, because the repeated 1 adds no new consecutive value.
 
 ## Picture: Expand Only a Run's First Value
 

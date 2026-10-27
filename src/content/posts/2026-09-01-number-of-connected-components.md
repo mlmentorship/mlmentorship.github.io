@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Start one search for each group still uncovered. That search marks the entire group, so none of its other vertices starts another count.
+Count the separate connected groups in an undirected graph, including vertices that have no edges.
 
 ## Problem
 
-> Count separate groups in an undirected graph.
+**Input.** A nonnegative `node_count` and undirected edge pairs with integer endpoints from `0` through `node_count - 1`.
 
-Use nonnegative `node_count` and valid integer endpoints `0..node_count-1`.
-Every listed vertex exists even without edges. Zero vertices gives zero components; six vertices without edges gives six.
+**Output.** Return the number of connected components among all declared vertices.
+
+**Rules.** Vertices belong together if an undirected path connects them, directly or through other vertices.
+Every isolated vertex forms its own component. Repeated edges and self-loops do not merge additional components.
+Preserve the inputs. Zero vertices returns zero.
+
+**Example.** Five vertices and edges `[[0, 1], [1, 2], [3, 4]]` return `2`.
+The components are `{0, 1, 2}` and `{3, 4}`; six vertices without edges return `6`.
 
 ## Picture
 

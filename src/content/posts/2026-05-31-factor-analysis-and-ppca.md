@@ -9,19 +9,25 @@ category: "concepts"
 
 ## Summary
 
-Factor analysis (FA) is a **latent linear-Gaussian model**: each observation is a linear map of a few low-dimensional latent factors plus Gaussian noise. **Probabilistic PCA (PPCA)** is the special case with **isotropic** noise, and classical PCA falls out as its zero-noise / maximum-likelihood limit.
+Factor analysis explains shared covariance through latent Gaussian factors and feature-specific measurement noise.
+Probabilistic PCA ties those noise variances together.
+Recognize the model when several measurements share variation but have different residual uncertainties.
 
-This is the model that turns PCA from "an eigen-decomposition trick" into "a probabilistic generative model," which is the framing senior interviewers want. It connects dimensionality reduction to the EM algorithm, to VAEs (a nonlinear PPCA), and to the generative-vs-discriminative discussion. It's also a clean example of how a **prior + likelihood** recovers a classical algorithm as a limiting case.
+Given two measurements, infer one hidden factor without treating either measurement as exact.
+Use the teaching fixture $W=(2,1)^\top$, zero mean, noise variances $(1,4)$, and observation $x=(2,1)^\top$.
 
 ## The generative model
 
-Latent factor $\mathbf{z} \in \mathbb{R}^k$ with $k \ll d$, observation $\mathbf{x} \in \mathbb{R}^d$:
+Let $z\in\mathbb R^k$, $x\in\mathbb R^d$, and $W\in\mathbb R^{d\times k}$.
+The factor and measurement noise are independent:
 
 $$
 \mathbf{z} \sim \mathcal{N}(0, I), \qquad \mathbf{x} \mid \mathbf{z} \sim \mathcal{N}(W\mathbf{z} + \boldsymbol{\mu},\ \Psi).
 $$
 
-$W \in \mathbb{R}^{d\times k}$ is the **factor loading matrix** (the directions), and $\Psi$ is the noise covariance. Marginalizing $\mathbf{z}$ gives a Gaussian with **low-rank-plus-structured** covariance:
+$\mu$ is the observation mean; $\Psi$ is diagonal with strictly positive entries.
+The loadings $W$ send each factor into the measured features.
+Marginalizing the factors gives
 
 $$
 \mathbf{x} \sim \mathcal{N}(\boldsymbol{\mu},\ WW^\top + \Psi).
@@ -34,7 +40,7 @@ $$
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 500" role="img" aria-labelledby="factor-covariance-svg-title factor-covariance-svg-desc">
 			<title id="factor-covariance-svg-title">Factor-model graph and covariance decomposition</title>
-			<desc id="factor-covariance-svg-desc">A shared latent factor z has solid arrows to observed features x1, x2, and x3. Separate noises epsilon1, epsilon2, and epsilon3 have dashed arrows to one feature each. Below, the covariance of x is decomposed into W W transpose, a full three-by-three matrix that creates variance and cross-feature covariance, plus Psi, a diagonal matrix that adds only feature-specific variance. Factor analysis permits different diagonal noise values, probabilistic PCA uses one shared sigma squared value, and classical PCA is the zero-noise limit.</desc>
+			<desc id="factor-covariance-svg-desc">A shared latent factor z reaches three features through loading arrows. Independent noises reach only their own features. The covariance is W W transpose plus diagonal Psi. Factor analysis permits unequal noise variances; probabilistic PCA ties them. Fitted PPCA has PCA's principal subspace at finite noise. Deterministic projection is a separate zero-noise limit.</desc>
 			<defs><marker id="factor-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0 0L7 3.5L0 7Z"></path></marker></defs>
 			<text class="viz-axis-label" x="12" y="18">GENERATIVE VIEW · xᵢ = wᵢᵀz + μᵢ + εᵢ</text>
 			<rect class="viz-node viz-node--focus" x="138" y="32" width="84" height="44" rx="5"></rect>
@@ -68,50 +74,111 @@ $$
 			<text class="viz-node-label" x="300" y="450">PCA limit</text><text class="viz-node-value" x="300" y="468">σ² → 0</text><text class="viz-node-value" x="300" y="481">no noise</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the solid arrows first: one latent vector reaches every feature, so WWᵀ can fill both diagonal and off-diagonal covariance cells. Each dashed noise path reaches only one feature, so Ψ adds variance only on the diagonal. FA lets those diagonal additions differ; PPCA ties them to one σ²; PCA is the zero-noise limit. The construction is original and checked against Tipping and Bishop (1999) and Ghahramani and Hinton (1996).</figcaption>
+	<table><caption>Two-feature teaching fixture</caption><thead><tr><th>Shared WWᵀ</th><th>Noise Ψ</th><th>Total C</th></tr></thead><tbody><tr><td>[[4, 2], [2, 1]]</td><td>[[1, 0], [0, 4]]</td><td>[[5, 2], [2, 5]]</td></tr></tbody></table>
+	<figcaption><strong>Read it this way:</strong> shared factor paths create both variance and covariance; each noise path adds only its feature's variance. The table applies that decomposition to two features. PPCA ties noise variances, but its fitted principal subspace already matches PCA at finite noise. Deterministic projection is a separate zero-noise limit. The original drawing retains its Tipping-Bishop (1999) and Ghahramani-Hinton (1996) provenance.</figcaption>
 </figure>
 
-The whole model is the claim: *the correlations between observed variables are explained by a few shared latent factors; whatever is left is independent per-feature noise.*
+### Work the posterior
+
+The shared contribution is $WW^\top=\begin{bmatrix}4&2\\2&1\end{bmatrix}$.
+Adding $\Psi$ gives $C=\begin{bmatrix}5&2\\2&5\end{bmatrix}$, whose eigenvalues are $7$ and $3$.
+The off-diagonal value $2$ comes entirely from the shared factor.
+
+Completing the square in the Gaussian log density gives posterior covariance $S$ and mean $m$:
+
+$$
+S=(I+W^\top\Psi^{-1}W)^{-1},\qquad
+m=SW^\top\Psi^{-1}(x-\mu).
+$$
+
+Here the prior contributes precision $1$; the measurements contribute $4$ and $1/4$.
+Therefore
+
+$$
+S=(1+4+1/4)^{-1}=4/21,\qquad
+m=(4/21)(4+1/4)=17/21.
+$$
+
+The noisier second feature supplies less precision.
+The prior shrinks the mean below the unregularized projection coefficient $1$.
+Neither the inferred coordinate nor its name establishes a causal explanation.
 
 ## FA vs PPCA vs PCA: it's all about $\Psi$
 
 | Model | Noise covariance $\Psi$ | Consequence |
 | --- | --- | --- |
-| **Factor analysis** | **diagonal** $\text{diag}(\psi_1,\dots,\psi_d)$ | per-feature noise; **scale-invariant**; models unique variances |
-| **Probabilistic PCA** | **isotropic** $\sigma^2 I$ | one shared noise level; MLE has closed form via eigendecomposition |
-| **Classical PCA** | $\sigma^2 \to 0$ limit | deterministic projection onto top-$k$ eigenvectors |
+| Factor analysis | Positive diagonal | Separate residual variances |
+| Probabilistic PCA | $\sigma^2I$ | Shared residual variance; spectral likelihood fit |
+| Classical PCA | No probabilistic noise requirement | Minimum squared reconstruction error |
 
-For interviews, distinguish the noise models: **FA has diagonal noise covariance, while PPCA uses the same isotropic noise for every feature.** FA is invariant to rescaling individual features. PCA and PPCA are sensitive to feature scaling, which is why inputs are usually standardized first.
+### Tie the measurement noise
+
+**New task:** require $\Psi=I$ while keeping $W$ and $x$ fixed.
+
+**Picture and change:** replace the unequal noise entries, then recompute both covariance and posterior precision.
+
+**Check:** $C=\begin{bmatrix}5&2\\2&2\end{bmatrix}$, $S=1/6$, and $m=5/6$.
+Reusing $17/21$ would retain the wrong measurement weights.
+
+**Use when:** one shared residual scale is an intended modeling restriction.
+
+### Predict an unobserved feature
+
+**New task:** observe only $x_1=2$ and predict $x_2$.
+
+**Picture and change:** condition using only the observed loading row and noise entry.
+Keep the missing feature's independent noise when predicting it.
+
+**Check:** $z\mid x_1$ has mean $4/5$ and variance $1/5$.
+Consequently, $x_2\mid x_1$ has mean $4/5$ and variance $1/5+4=21/5$.
+Using only $1/5$ would omit future measurement noise.
+
+**Use when:** incomplete observations have a justified observation model; missingness need not be harmless.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Fitting it
 
-- **PPCA** has a **closed-form MLE**: $W$ is recovered from the top-$k$ eigenvectors of the sample covariance scaled by $(\lambda_i - \sigma^2)^{1/2}$, with $\sigma^2$ = average of the discarded eigenvalues. So PPCA ≈ PCA plus a noise estimate.
-- **FA** has no closed form (the diagonal $\Psi$ couples things); it's fit with **EM**: the E-step infers the posterior over factors $p(\mathbf{z}\mid\mathbf{x})$, the M-step updates $W$ and $\Psi$. This is a textbook EM application.
+For $0<k<d$, order the sample covariance eigenvalues $\lambda_1\geq\cdots\geq\lambda_d$.
+At a regular PPCA likelihood solution,
+
+$$
+\widehat\sigma^2=\frac{\sum_{j=k+1}^d\lambda_j}{d-k},\qquad
+\widehat W=U_k(\Lambda_k-\widehat\sigma^2I)^{1/2}R,
+$$
+
+where $R$ is orthogonal.
+For our covariance, $\widehat\sigma^2=3$ and $\widehat W=\sqrt2(1,1)^\top$.
+The principal subspace already matches PCA; positive noise does not prevent that agreement.
+Sending noise to zero separately can make the observation density singular.
+FA generally uses iterative likelihood fitting, including [EM](/concepts/expectation-maximization/).
 
 ## Why the probabilistic version is worth it
 
-Recasting PCA as a model buys you things plain PCA can't do:
-
-- A proper **likelihood** → principled model comparison and a way to choose $k$.
-- Natural handling of **missing data** (marginalize unobserved dimensions in EM).
-- A generative model you can **sample** from.
-- **Mixtures of PPCA/FA** for non-linear, multi-modal structure.
-- The conceptual bridge to the **VAE**, which is "PPCA with a neural-network decoder and amortized inference."
+Likelihood supports held-out comparison, not automatic rank selection without an overfitting policy.
+Marginals support missing-feature prediction; the generative model supports sampling and mixtures of local factor models.
+[VAEs](/concepts/variational-autoencoders/) extend the decoder and inference family, not the exact Gaussian conditioning identity.
 
 ## What an interviewer expects you to say
 
-1. Write the **latent linear-Gaussian generative model** and the marginal covariance $WW^\top + \Psi$.
-2. State the difference: **FA = diagonal noise, PPCA = isotropic noise, PCA = zero-noise limit of PPCA**.
-3. Explain the practical consequence: **FA is scale-invariant; PCA/PPCA require feature standardization**.
-4. Know that **PPCA has a closed-form (eigendecomposition) MLE** while **FA needs EM**.
-5. Bonus: connect to **VAEs** (nonlinear PPCA) and note the probabilistic framing enables missing data, model selection, and sampling.
+Rescale $x_1$ by ten. Which parameters must change?
+
+<details><summary>Answer</summary>
+
+With $D=\operatorname{diag}(10,1)$, use $DW$, $D\mu$, $D\Psi D^\top$, and $DCD^\top$.
+An unrestricted diagonal-noise family remains compatible; fixed penalties or constraints may not.
+Isotropic noise generally stops being isotropic.
+
+</details>
 
 ## Common confusions
 
-- **"FA and PCA are the same."** FA models per-feature (diagonal) noise and explains *covariance*; PCA maximizes *retained variance* and assumes isotropic/zero noise. They give different loadings unless noise is uniform.
-- **"PPCA is fancier PCA with no payoff."** The payoff is the likelihood: model selection, missing data, sampling, mixtures.
-- **"The factors are unique."** $W$ is only identifiable up to rotation (you can rotate $\mathbf{z}$ and absorb it into $W$), hence "factor rotation" (varimax) for interpretability.
-- **"FA needs scaling like PCA."** FA is invariant to per-feature rescaling because its diagonal noise absorbs scale; PCA is not.
+For orthogonal $R$, $W$ and $WR$ have identical observed covariance.
+Factor axes are not uniquely identified causes; even one factor permits a sign reversal.
+
+</div>
 
 ---
 

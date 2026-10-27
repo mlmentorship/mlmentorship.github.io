@@ -7,9 +7,17 @@ tags: ["questions"]
 category: "questions"
 ---
 
-A defensible derivation makes its assumptions visible, checks the decisive step and explains what changes when an assumption fails.
+Derive an attention-score variance from stated random-variable assumptions and test whether the reasoning survives a change in dependence.
 
 ## Problem
+
+**Context.** The fixture below defines four-dimensional query and key vectors using independent random signs, then changes their within-vector dependence.
+
+**Task.** Find the unscaled and scaled dot-product variances in both cases, showing the assumptions needed at each step.
+Explain what the result does and does not establish about attention scaling in a learned model.
+
+**Constraints.** Use the specified zero-mean sign distributions rather than assuming arbitrary learned coordinates are independent.
+Check covariance terms when independence changes; a familiar formula is not a substitute for the derivation.
 
 Let $d=4$ and $z=q^Tk$.
 All eight coordinates of $q$ and $k$ independently take $+1$ or $-1$, each with probability $1/2$.

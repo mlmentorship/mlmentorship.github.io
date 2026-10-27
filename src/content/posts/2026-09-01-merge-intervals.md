@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Sort by start so earlier union components stay closed; only the final component can overlap the next range.
+Combine overlapping closed intervals into disjoint ranges covering exactly the same points as the original intervals.
 
 ## Problem
 
-Merge closed ranges `[[8,10],[1,3],[2,6],[15,18]]`.
-Return `[[1,6],[8,10],[15,18]]`, preserving every covered point.
-Each input is a two-element list with `start <= end`.
-Closed ranges sharing an endpoint overlap: `[[1,2],[2,3]]` becomes `[[1,3]]`.
+**Input.** A list `intervals` of closed integer ranges `[start, end]`, each with `start <= end`.
+
+**Output.** Return start-sorted, disjoint intervals whose union equals the union of all input ranges.
+
+**Rules.** Closed intervals sharing an endpoint overlap and must merge.
+Containment and repeated intervals do not add separate output ranges.
+The reference may reorder the input list; empty input returns `[]`.
+
+**Example.** `[[8, 10], [1, 3], [2, 6], [15, 18]]` returns `[[1, 6], [8, 10], [15, 18]]`.
+For `[[1, 2], [2, 3]]`, return `[[1, 3]]` because the ranges share point 2.
 
 ## Picture
 

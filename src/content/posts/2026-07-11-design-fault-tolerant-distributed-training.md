@@ -9,9 +9,22 @@ category: "questions"
 
 > A 2,048-GPU training job loses workers, stalls on collectives, and occasionally produces rank-local checksum mismatches. Design detection, recovery, and evidence preservation without corrupting the experiment.
 
-Start with failure semantics. "Add retries" is unsafe until you know whether the failed operation is idempotent, whether ranks still agree on step and parameters, and whether a retry can duplicate or omit an update.
+Design recovery for distributed training that preserves one coherent experiment state despite worker, communication, or numerical failures.
+
+## Problem
+
+**Context.** A hypothetical 2,048-GPU job loses workers, stalls during collectives, and sometimes reports rank-local checksum mismatches.
+Retries can duplicate or omit updates if ranks no longer agree on the committed step.
+
+**Task.** Specify detection, failure classification, evidence preservation, checkpoint publication, and recovery scopes.
+Explain how to prove that resumed ranks share compatible parameters, optimizer state, data position, and step identity.
+
+**Constraints.** Distinguish idempotent work from externally committed updates and partial checkpoint writes.
+Preserve diagnostic evidence, define rollback authority, and do not resume solely because a replacement worker starts successfully.
 
 **Learning objective:** Choose the narrowest safe recovery scope by testing whether ranks share one proven training state before retrying, rebuilding a group, or rolling back.
+
+<p class="visual-title">Restarting a rank does not prove a consistent training state</p>
 
 <!-- visual:distributed-recovery-consistency-gate -->
 ```mermaid

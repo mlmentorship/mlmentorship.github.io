@@ -10,9 +10,14 @@ aliases: ["cross val", "k-fold", "k fold validation", "grouped cross validation"
 
 ## Summary
 
-Cross-validation estimates a model's generalization error by repeatedly partitioning the training data into a fitting set and a validation set, training on the first, scoring on the second, and averaging the scores. The right partitioning scheme depends on the data's structure (i.i.d. vs. grouped vs. temporal).
+Cross-validation scores a training procedure on held-out observations under a declared deployment boundary.
+Decide whether the target is a new row, an unseen entity, or a future observation before choosing folds.
+The preprocessing, selection, fitting, scoring, and aggregation must all respect that boundary.
 
-Pick the wrong CV scheme and your validation score is optimistically biased. The model looks great in CV and falls apart in production. The classic failures are (a) k-fold on grouped data leaking the same group into both folds, and (b) random splits on time-series leaking the future into the past.
+For a hypothetical new-patient task, patients A, B, and C each supply three visits.
+Hold out each entire patient, fitting on the other two; suppose the respective held-out errors are zero, one, and two.
+Equal-patient mean error is $(0+1/3+2/3)/3=1/3$, matching $3/9$ because sizes are equal.
+Putting A1 into fitting and A2 into scoring fails this particular unseen-patient claim, even with balanced labels.
 
 <!-- visual:cross-validation-preserve-structure -->
 <figure class="learning-figure plot-panel" aria-labelledby="cv-structure-title">
@@ -66,59 +71,85 @@ Pick the wrong CV scheme and your validation score is optimistically biased. The
 		<text class="viz-callout" x="301.5" y="372" text-anchor="middle">VAL t5</text>
 		<text class="viz-label" x="204" y="406" text-anchor="middle">time moves left to right; training history expands →</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> first ask what a future prediction must generalize beyond. With exchangeable classification examples, preserve the class ratio. With repeated entities, move the whole entity together. With forecasts, train only on the past and validate on the future. The split should imitate the unit that will actually be unseen in production. Original diagram; semantics checked against <a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn's cross-validation guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first identify what will be unseen. Stratification can preserve class proportions. Unseen-entity evaluation keeps each entity intact. Forecast evaluation respects information available before its cutoff. These constraints can need composition. The original diagram follows <a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn's cross-validation guide</a>.</figcaption>
 </figure>
 
 ## Standard schemes
 
 ### Single hold-out
-Split once into train and val (e.g., 80/20). Cheap; high variance in the score.
-
-Use when: large dataset (millions of examples), or when a single CV iteration is too expensive (LLM fine-tuning).
+Fit on one subset and score once on another.
+Use when the held-out population is adequate and repeated training costs more than its expected diagnostic value.
+One split does not by itself quantify selection or sampling uncertainty.
 
 ### k-fold
-Partition data into $k$ folds. Train $k$ models, each holding out one fold. Average the scores.
-
-- $k = 5$ or $10$ are standard.
-- Average and standard deviation across folds give a confidence interval on generalization error.
-- Each example is used for training $k-1$ times and validation once.
-
-Use when: i.i.d. data, moderate size, and training is cheap relative to the value of a robust score.
+Fit $k$ models, holding out one fold each time.
+For equal-sized folds and the same loss definition, average their scores; unequal folds need estimand-appropriate weights.
+For equal-user risk, first average within users instead of letting frequent users silently dominate.
+Fold training sets overlap, so their scores are dependent.
+The fixture's fold sample standard deviation is $1/3$, descriptive variability rather than a justified confidence interval.
 
 ### Stratified k-fold
-k-fold where each fold preserves the class distribution of the full dataset. Essential for **imbalanced classification**.
-
-Use when: classification with skewed class frequencies. Always.
+Preserve label proportions when compatible with the deployment boundary and available independent units.
+Check that each fold supports the requested metric.
+Class balance does not repair group overlap, future-derived features, or preprocessing leakage.
 
 ### Group / GroupKFold
-Each example has a group identifier (user ID, patient ID, document ID). All examples from the same group go to the same fold. Prevents leakage from one group leaking labels into another.
-
-Use when: multiple examples come from the same entity. Examples: user-level recommendation models, patient-level medical models, document-level NLP tasks where one document has many sentences.
+Assign every observation of an entity to the same fold when evaluating unseen entities.
+User, patient, or document grouping prevents that identity from crossing the boundary, not every possible leakage mechanism.
 
 ### Time-series / TimeSeriesSplit
-Folds are chronological. Validation always comes *after* training in time. Earlier folds are smaller; later folds use more history. Never randomize.
+For forecasting, train on information available before the validation cutoff and score later observations.
+Check label availability, overlapping outcome windows, and necessary gaps or purging.
+A timestamp alone does not establish that forecasting is the intended evaluation task.
 
-Use when: any data with temporal ordering and predictions are forecasts. Examples: demand forecasting, recsys with time-evolving interests, fraud detection.
+**New task:** Predict later visits for already known patients.
+
+**Picture and change:** Replace unseen-patient exclusion with valid temporal cutoffs while retaining permitted identity history.
+
+**Check:** Training through day ten may score day eleven, not day nine using day-ten information.
+
+**Use when:** Future behavior, rather than unseen identity, is the claim.
 
 ### Nested CV
-Outer loop: estimate generalization. Inner loop: tune hyperparameters within each outer fold.
+Keep configuration selection inside each outer training subset; reserve its outer validation subset for scoring the selection procedure.
+Fit preprocessing, feature selection, and calibration only within their permitted training subsets too.
 
-Use when: hyperparameter tuning matters and you need an unbiased estimate of generalization. Standard in academic ML; rare in industry due to cost.
+**New task:** Compare two configurations using two inner folds inside each of three outer folds.
+
+**Picture and change:** Run the inner search, select, then refit on the outer training subset.
+
+**Check:** $3(2)(2)+3=15$ fits, versus three without tuning.
+A later full-data refit adds one more.
+
+**Use when:** Selection needs independent outer scoring and the compute budget supports it.
+The estimate still reflects its sampling design and training sizes, not an unconditional unbiasedness guarantee.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## When NOT to cross-validate
 
-- **Test set evaluation.** Test set is held out once and scored once at the end. Repeating on test set leaks information.
-- **Feature selection on full data.** Selecting features on the entire dataset before CV is leakage. Move feature selection inside the CV loop.
-- **Hyperparameter search on full data.** Same. Must be inside the loop or in nested CV.
-- **Hidden time leakage.** Even a "random" k-fold on time-stamped data can leak if features include future-derived signals.
+- **Adapted test set.** Repeatedly changing the procedure after seeing test results removes its untouched-test interpretation.
+- **Full-data fitting.** Feature selection, normalization, imputation, and target-derived transformations belong inside their training boundaries.
+- **Inappropriate deployment model.** Repeated random splits cannot establish a future-only or unseen-entity claim they do not enforce.
 
 ## Common pitfalls
 
-- **Random k-fold on time series.** Validation contains points from the same week as training → trivially memorizable. Use chronological splits.
-- **Random k-fold on user-grouped data.** Two reviews from the same user end up in different folds; the model learns user-specific patterns and "generalizes" via user identity. Use GroupKFold.
-- **Stratifying by the target on regression.** Stratification needs discrete bins; for regression, stratify by quantile bins of the target if needed.
-- **Reading too much into one fold's score.** Single-fold scores are noisy; report mean ± std across folds.
-- **Tuning on the test set.** Number-one source of fake research results.
+- **Wrong aggregation.** Equal-fold, equal-row, and equal-entity averages need not match when sizes differ.
+- **False interval.** Mean plus/minus fold standard deviation is not automatically a confidence interval.
+- **Wrong information time.** Event timestamps do not prove that their features and labels were available at training time.
+
+## Reconstruct
+
+<details>
+<summary>What does the three-patient result fail to establish?</summary>
+
+It does not provide a causal policy effect, a calibrated confidence interval, or a universal deployment guarantee.
+Its interpretation remains conditional on the hypothetical held-out predictions, chosen population, loss, and sampling design.
+
+</details>
+
+</div>
 
 ## Related
 

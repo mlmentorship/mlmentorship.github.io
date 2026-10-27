@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-An earlier-finishing compatible choice preserves every continuation available after a later finish; repeat this exchange to maximize kept count.
+Remove the fewest intervals needed so that all remaining intervals are compatible in time.
 
 ## Problem
 
-Remove as few ranges as possible from `[[1,3],[3,5],[2,4],[5,7]]` so the rest are compatible.
-Remove `[2,4]`: three remain, so the answer is `1`.
-Numeric endpoints must satisfy `start < end`.
-Touching is compatible here: `[1,3]` can precede `[3,5]`.
+**Input.** A list `intervals` of numeric pairs `[start, end]`, each satisfying `start < end`.
+
+**Output.** Return the smallest number of intervals to remove so that no remaining intervals overlap.
+
+**Rules.** Touching is compatible: one interval may start exactly when another ends.
+Count removed occurrences, including repeated intervals, rather than removed duration.
+Return only the removal count. The reference may reorder the input; an empty list returns zero.
+
+**Example.** `[[1, 3], [3, 5], [2, 4], [5, 7]]` returns `1`.
+Removing `[2, 4]` leaves three compatible intervals, including two pairs with touching endpoints.
 
 ## Picture
 

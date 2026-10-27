@@ -1,38 +1,46 @@
 ---
 title: "Epistemic vs aleatoric uncertainty"
-description: "Epistemic uncertainty shrinks with more data; aleatoric uncertainty does not. Confusing them causes miscalibration and wasted data collection."
+description: "Decompose a specified predictive mixture into within-model variation and disagreement, then test what new inputs, data and categorical outputs change."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
+Predictive uncertainty separates within-model variation from disagreement only relative to the chosen inputs, likelihood and model distribution.
+
 ## Summary
 
-**Aleatoric uncertainty** is irreducible noise in the data-generating process. **Epistemic uncertainty** is uncertainty about the model itself, due to limited data. More training data shrinks epistemic uncertainty but leaves aleatoric uncertainty unchanged.
+Which proposed collection action can reduce the predictive spread at this input?
+Fix input $x$, observed dataset $D$ and a distribution over models indexed by $m$.
+Use the hypothetical equal-weight mixture $Y\mid m=1\sim N(0,1)$ and $Y\mid m=2\sim N(2,1)$.
+Each normal's second parameter is its variance.
 
-Decision-making under uncertainty depends on which kind you have:
+| Quantity | Calculation | Result |
+| --- | --- | --- |
+| Predictive mean | $(0+2)/2$ | 1 |
+| Average conditional variance | $(1+1)/2$ | 1 |
+| Variance of conditional means | $((0-1)^2+(2-1)^2)/2$ | 1 |
+| Total variance | $1+1$ | 2 |
 
-- **High aleatoric, low epistemic**: the model knows the world well, but the world is noisy. Collect more diverse features, not more samples. A coin flip has 0.5 aleatoric uncertainty no matter how many flips you observe.
-- **Low aleatoric, high epistemic**: the model is uncertain because it has not seen this region of input space. Active learning, more data, ensemble disagreement signals.
-- **Both high**: the world is noisy and you have not modeled it well. Both data collection and model improvement help.
-
-Production ML systems that report a single "confidence" number conflate the two and make incorrect downstream decisions: refusing to predict when the world is just noisy, or being overconfident in regions the model has never seen.
+Independently, $E[Y^2]=((1+0^2)+(1+2^2))/2=3$.
+Subtracting the squared mean gives $3-1=2$ again.
 
 ## How they show up mathematically
 
-For a Bayesian predictive distribution $p(y \mid x, D) = \int p(y \mid x, \theta) p(\theta \mid D) \, d\theta$:
-
-- **Aleatoric**: spread within $p(y \mid x, \theta)$ for a fixed $\theta$.
-- **Epistemic**: spread of the conditional means $\mathbb{E}[y \mid x, \theta]$ over the posterior $p(\theta \mid D)$.
-
-For regression with a Gaussian likelihood, total variance decomposes as
+Let $\mu_m=E[Y\mid x,m]$ and $\mu=E_m[\mu_m]$; assume finite second moments.
+Write $Y-\mu=(Y-\mu_m)+(\mu_m-\mu)$ and square.
+The cross term vanishes after conditioning on $m$, because $E[Y-\mu_m\mid x,m]=0$.
+Thus, under the specified model mixture,
 
 $$
-\mathrm{Var}[y \mid x, D] = \underbrace{\mathbb{E}_\theta[\sigma^2(x; \theta)]}_{\text{aleatoric}} + \underbrace{\mathrm{Var}_\theta[\mu(x; \theta)]}_{\text{epistemic}}.
+\operatorname{Var}(Y\mid x,D)=E_m[\operatorname{Var}(Y\mid x,m)]+\operatorname{Var}_m(\mu_m).
 $$
 
-A clean separation: aleatoric is the average noise prediction; epistemic is the disagreement between models.
+Call these model-relative within and between terms aleatoric and epistemic, respectively.
+Both use squared output units.
+The identity does not require Gaussian components; their normal form only simplifies this example.
+More representative data can change model uncertainty, but no universal monotonic decrease is guaranteed.
 
 <!-- visual:uncertainty-within-between-models -->
 <figure class="learning-figure" aria-labelledby="uncertainty-decomposition-title">
@@ -80,59 +88,97 @@ A clean separation: aleatoric is the average noise prediction; epistemic is the 
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> each line is one model draw's predictive range; each diamond is that model's mean. On the left, individual models are uncertain even though their means agree, so the spread is aleatoric. On the right, each model is confident but their means disagree, so the spread is epistemic. Both panels cover the same overall output envelope, showing why one aggregate “confidence” cannot identify the remedy. This is an original construction based on the law of total variance and Kendall and Gal (2017).</figcaption>
+	<figcaption><strong>Read it this way:</strong> lines show qualitative conditional ranges; diamonds show conditional means. Compare range width with mean separation. Equal endpoint envelopes do not imply equal variances or coverage. These are schematic model draws, not measured posterior adequacy. Original construction based on total variance and Kendall and Gal (2017).</figcaption>
 </figure>
+
+## Change the information or output
+
+### Add an informative sensor
+
+**New task:** supply missing predictive information, rather than repeat the same observations.
+
+**Picture and change:** suppose each conditional variance falls from one to $0.25$, while means and mixture weights stay fixed.
+
+**Check:** within variance becomes $0.25$; between variance remains one; total variance is $1.25$.
+The old within-model noise was not irreducible relative to the expanded inputs.
+
+**Use when:** the proposed sensor changes the conditioning information; the stated reduction still needs empirical validation.
+
+### Predict a binary label
+
+**New task:** measure information spread for equally weighted probabilities $(0.9,0.1)$ and $(0.1,0.9)$.
+
+**Picture and change:** their mean is $(0.5,0.5)$.
+Use entropy in bits, not regression variance.
+
+**Check:** predictive entropy is one bit; average conditional entropy is approximately $0.468996$ bits.
+The difference is approximately $0.531004$ bits of mutual information between the label and this mixture's model index.
+
+**Use when:** categorical predictions make an entropy decomposition appropriate.
+A diverse ensemble is not automatically an exact posterior.
+
+## Failure and transfer
+
+All members can predict mean zero and variance $0.01$ while target outputs are near ten.
+Zero disagreement does not certify correctness, calibration or in-distribution inputs.
+Now change the Gaussian weights to three quarters and one quarter. What happens?
+
+<details>
+<summary>Reasoned answer</summary>
+
+The predictive mean is $0.5$.
+Between variance is $0.75$, within variance remains one, and total variance is $1.75$.
+Changing weights changes the distribution being averaged, not merely an uncertainty label.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Estimating each in practice
 
 ### Aleatoric
 
-Predict the noise directly. For regression, output both mean and log-variance: $\mu(x), \log \sigma^2(x)$. Train with the Gaussian negative log-likelihood ([Kendall & Gal, 2017](https://arxiv.org/abs/1703.04977)):
-
-$$
-\mathcal{L} = \frac{1}{2} \log \sigma^2(x) + \frac{(y - \mu(x))^2}{2 \sigma^2(x)}.
-$$
-
-The model learns to predict where the data is noisy (large $\sigma^2$) and where it is clean (small $\sigma^2$). For classification, the predicted probabilities themselves encode aleatoric uncertainty.
+For heteroskedastic Gaussian regression, predict mean $\mu(x)$ and log variance $s(x)$, making variance $e^{s(x)}$ positive.
+Ignoring the normalizing constant, NLL is $[s(x)+(y-\mu(x))^2e^{-s(x)}]/2$.
+Fit quality and likelihood assumptions determine whether this estimates actual conditional noise.
+See <a href="https://arxiv.org/abs/1703.04977">Kendall and Gal</a>.
 
 ### Epistemic
 
-Capture model uncertainty. Three practical approaches:
+| Approach | Approximation | Cost to assess |
+| --- | --- | --- |
+| Deep ensemble | diversity across separately fitted predictors | multiple training and serving runs |
+| MC dropout | stochastic masks in a compatible dropout-trained model | repeated forward passes |
+| Variational, SWAG or Laplace | a specified approximate parameter distribution | fitting, storage and sampling overhead |
 
-| Approach | What it does | Cost |
-|---|---|---|
-| **Deep ensembles** ([Lakshminarayanan et al., 2017](https://arxiv.org/abs/1612.01474)) | Train $N$ independent models, look at disagreement | $N$x training cost |
-| **MC dropout** ([Gal & Ghahramani, 2016](https://arxiv.org/abs/1506.02142)) | Keep dropout active at inference, take samples | $N$x inference cost |
-| **Variational Bayes / SWAG / Laplace approx.** | Approximate $p(\theta \mid D)$ with a tractable distribution | Training overhead |
-
-Deep ensembles are the strongest and simplest; MC dropout is cheaper but a less faithful posterior approximation. Both produce $N$ predictions whose disagreement is the epistemic estimate.
+Measure approximation adequacy instead of declaring a universal strongest method or minimum ensemble size.
+BatchNorm behavior must remain controlled when enabling dropout sampling.
+References: <a href="https://arxiv.org/abs/1612.01474">deep ensembles</a> and <a href="https://arxiv.org/abs/1506.02142">MC dropout</a>.
 
 ### Decomposition
 
-For classification with a deep ensemble of $M$ models producing probabilities $p_m(y \mid x)$:
-
-$$
-H[\bar{p}] = \underbrace{\frac{1}{M} \sum_m H[p_m]}_{\text{aleatoric}} + \underbrace{H[\bar{p}] - \frac{1}{M} \sum_m H[p_m]}_{\text{epistemic}},
-$$
-
-where $\bar{p} = \frac{1}{M} \sum_m p_m$ is the ensemble average. Predictive entropy splits into within-model (aleatoric) and between-model (epistemic) components.
+For discrete mixture weights $w_m$, let $p=\sum_m w_mp_m$.
+Then $H(p)=\sum_m w_mH(p_m)+I(Y;M)$.
+The difference is model-index mutual information under that joint distribution, not an automatic measurement of real-world ignorance.
 
 ## Where each matters in practice
 
-- **Active learning**: query labels for inputs with highest epistemic uncertainty. Aleatoric uncertainty is irreducible, so labeling a noisy input wastes budget.
-- **Out-of-distribution detection**: high epistemic uncertainty signals OOD; high aleatoric does not.
-- **Safe decision-making**: medical, autonomous driving. High epistemic uncertainty should trigger "abstain or fall back to human"; high aleatoric uncertainty should still produce a calibrated prediction.
-- **Reinforcement learning**: epistemic uncertainty drives exploration (UCB, RND); aleatoric is just reward noise.
+Active learning weighs expected information or decision benefit against acquisition cost; noisy labels can still be useful.
+Abstention, fallback and exploration require task-specific action costs and target-domain validation.
+No decomposition provides a universal out-of-distribution detector or safety guarantee.
 
 ## Common pitfalls
 
-- **Reporting "confidence" without saying which kind.** A single number conflates the two.
-- **Treating softmax probabilities as a measure of uncertainty.** They estimate aleatoric uncertainty but say nothing about epistemic uncertainty. A confidently wrong prediction far from training data has low entropy and high epistemic uncertainty.
-- **Using MC dropout in deployment without retraining the model with dropout active.** Dropout-as-Bayes only works if the model was trained with dropout in the same way.
-- **Comparing ensembles of size 2 to "Bayesian deep learning."** Ensembles need 5+ members to capture meaningful posterior spread.
+One softmax vector cannot identify how uncertainty divides across plausible models.
+Agreement can reflect common misspecification.
+A fair binary outcome has variance $0.25$ or entropy one bit; probability $0.5$ alone does not specify uncertainty units.
 
 ## Related
 
 - [Expected Calibration Error](/concepts/expected-calibration-error/).
 - [Calibration](/concepts/calibration/).
 - [Bayes' rule and the posterior](/concepts/bayes-rule-and-posterior/).
+
+</div>

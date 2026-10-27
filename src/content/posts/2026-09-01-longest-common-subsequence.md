@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Define one answer per prefix pair; matching endpoints extend the diagonal, while mismatches keep the better one-endpoint skip.
+Find the greatest number of characters that two strings can share while preserving their original order.
 
 ## Problem
 
-Find the longest common subsequence length for `first="abc"`, `second="ac"`.
-The answer is `2`, witnessed by `"ac"`.
-Relative order matters, but adjacency does not: the `b` can be skipped.
-Return a length, not the actual subsequence.
+**Input.** Two Python strings, `first` and `second`.
+
+**Output.** Return the length of their longest common subsequence, not the actual subsequence.
+
+**Rules.** A subsequence may skip characters but must retain their relative order in each string.
+Matching uses exact code-point equality. The chosen characters need not be adjacent.
+Preserve both strings. If either is empty, return zero.
+
+**Example.** For `first = "abc"` and `second = "ac"`, return `2`, witnessed by `"ac"`.
+For `"abc"` and `"cba"`, return `1`, not 3, because the common order cannot be reversed.
 
 ## Picture
 
@@ -28,12 +34,23 @@ Define $D[i,j]$ as the best length for `first[:i]` and `second[:j]`.
 Every empty-prefix border is zero.
 This cell's dependencies have different storage locations:
 
+<p class="visual-title" data-supplemental-visual="lcs-conditional-parent-cells">For x=AB and y=ACB, endpoint equality selects the recurrence</p>
+
 ```mermaid
-flowchart LR
-   Diagonal["D[i-1,j-1]<br/>previous row, diagonal"] -->|equal endpoints: +1| Answer["D[i,j]<br/>current row, this cell"]
-   Up["D[i-1,j]<br/>previous row, up"] -->|mismatch: compare| Answer
-   Left["D[i,j-1]<br/>current row, left"] -->|mismatch: compare| Answer
+flowchart TB
+   accTitle: Matching endpoints extend the diagonal; mismatches compare top and left
+   accDescr: With x equal to AB and y equal to ACB, cell D[2,3] compares matching B endpoints and extends D[1,2]=1 to length two. Cell D[2,2] compares B with C and takes max of D[1,2]=1 and D[2,1]=1, giving one. Diagonal extension is conditional on equal endpoints, not an unconditional extra candidate.
+   subgraph Equal["Match: B = B"]
+      Diagonal["D[1,2] = 1<br/>A vs AC"] -->|add matching B| Match["D[2,3] = 2<br/>AB vs ACB"]
+   end
+   subgraph Different["Mismatch: B != C"]
+      Up["D[1,2] = 1<br/>A vs AC"] -->|max| Mismatch["D[2,2] = 1<br/>AB vs AC"]
+      Left["D[2,1] = 1<br/>AB vs A"] -->|max| Mismatch
+   end
+   Equal ~~~ Different
+   class Diagonal,Match,Up,Mismatch,Left viz-fit
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> matching B endpoints add one to the diagonal. B versus C instead takes the larger top or left value.</p>
 
 Equal endpoints can extend an optimal shorter pair by one.
 An optimal common sequence can use those endpoints: move its final matching occurrences there, or append the shared endpoint.

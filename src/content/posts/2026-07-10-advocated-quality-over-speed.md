@@ -7,10 +7,18 @@ tags: ["questions"]
 category: "questions"
 ---
 
-Use a real launch decision. Explain the evidence that changed your recommendation and what you personally did.
-Separate your action from the team's decision.
+Describe a real delivery decision where you advocated for quality or safety and explain the evidence behind your actions.
 
 ## Problem
+
+**Context.** An interviewer asks about delivery pressure that conflicted with a quality or safety requirement in your actual work.
+
+**Task.** Explain the stakes, available evidence, your recommendation, alternatives, escalation, decision owner, and eventual outcome.
+Describe what you personally did and what you learned from the decision.
+
+**Constraints.** Separate mandatory obligations from negotiable risk and your contribution from the team's actions.
+Do not invent an incident or claim a hypothetical rehearsal as personal history.
+Judge the original decision using available evidence, not outcome luck alone.
 
 > Tell me about a time you advocated for quality or safety when a team faced delivery pressure.
 

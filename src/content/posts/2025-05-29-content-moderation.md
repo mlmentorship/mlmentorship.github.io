@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: trust-and-safety, social-platform, and LLM-deployment interviews.*
 
-The L4 candidate proposes "a classifier that filters bad content." The L6 candidate separates policy specification from model implementation, designs the human-review path, and addresses adversarial robustness and per-policy calibration.
+Design a content-moderation system that applies explicit policies while accounting for uncertainty, review capacity, and user appeals.
+
+## Problem
+
+**Context.** A hypothetical platform must assess incoming content under several policies, with different error costs across categories and languages.
+Automated scores are imperfect, and human review has limited capacity.
+
+**Task.** Define policy labels, decision thresholds, automated actions, review and appeal paths, and a measurement and rollout plan.
+Explain how policy changes and adversarial behavior affect operation.
+
+**Constraints.** Separate policy authority from model prediction. Specify false-positive and false-negative costs rather than optimizing accuracy alone.
+Protect user data, audit decisions, and provide a response when uncertainty exceeds the system's authority.
 
 ## What makes moderation hard
 
@@ -58,6 +69,8 @@ This is L5. Layered architecture with human-in-the-loop and feedback.
 > **The appeals process is part of the model**, not just a customer service function. Appeals data is the highest-quality label source you have; treat it as a first-class training signal.
 >
 > **Explainability is a regulatory and trust issue.** When auto-actioning content, surface a reason ('flagged for hate speech against [protected category]'); helps user understanding and reduces disputes."
+
+<p class="visual-title">Policy and appeal outcomes govern the next decision</p>
 
 <!-- visual:content-moderation-governed-decision-loop -->
 ```mermaid

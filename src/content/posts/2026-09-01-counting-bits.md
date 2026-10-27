@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Remove the low bit, reuse the smaller integer's count, then add the removed bit. Fill answers in increasing numeric order.
+Report the number of binary one bits in every integer from zero through a given bound.
 
 ## Problem
 
-> Return the set-bit count for every value from 0 through `n`.
+**Input.** A nonnegative integer `limit`.
 
-The reference calls this nonnegative integer bound `limit`. The output includes both zero and `limit`.
+**Output.** Return a list of length `limit + 1`; entry `i` is the number of ones in `i`'s binary representation.
+
+**Rules.** Include both endpoints, zero and `limit`, in increasing numeric order.
+Leading zero bits do not affect the count. The binary representation of zero has no one bits.
+Negative bounds are outside the contract.
+
+**Example.** For `limit = 5`, return `[0, 1, 1, 2, 1, 2]`.
+Entry 3 is 2 because binary `11` contains two ones. Bound zero returns `[0]`.
 
 ## Picture
 

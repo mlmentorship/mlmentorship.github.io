@@ -13,14 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Fix a possible sale day. Its cheapest eligible earlier buy gives its largest profit, so one minimum can replace many candidates.
+Choose at most one purchase and a later sale to maximize the profit from a daily price list.
 
 ## Problem
 
-> Buy once, then sell later. Return the largest profit.
+**Input.** A list of finite integer `prices` in chronological day order.
 
-Prices are finite integers in day order. Choose at most one buy and a strictly later sale, without fees or short selling.
-Doing nothing earns zero. Empty and singleton inputs return zero.
+**Output.** Return the largest achievable sale price minus purchase price, or zero if no profitable trade exists.
+
+**Rules.** Buy at most once and sell on a strictly later day.
+There are no fees, short sales, or multiple transactions.
+Doing nothing is allowed. Empty and singleton lists return zero; leave the list unchanged.
+
+**Example.** For prices `[7, 1, 5, 3, 6, 4]`, return `5`.
+Buy at index 1 for 1 and sell at index 4 for 6.
+For falling prices `[7, 6, 4]`, return `0`, not a negative forced-trade profit.
 
 ## Picture
 

@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Partition paths by their final move, add the disjoint predecessor counts, and retain only the next update's dependencies.
+Count the different ordered ways to reach a staircase's top using steps of size one or two.
 
 ## Problem
 
-Count ordered paths to step `5` using moves of one or two steps.
-The answer is `8`; `1,2` and `2,1` are different paths to step `3`.
-The step count must be a nonnegative integer.
+**Input.** A nonnegative integer `step_count`, the number of steps between the ground and the top.
+
+**Output.** Return the number of ordered sequences of one-step and two-step moves that reach the top exactly.
+
+**Rules.** Moves cannot overshoot the top. Different move orders count separately.
+For zero steps, count one way: take no moves.
+Negative or noninteger step counts are outside the contract.
+
+**Example.** For `step_count = 3`, the sequences are `[1, 1, 1]`, `[1, 2]`, and `[2, 1]`; return `3`.
+For `step_count = 5`, return `8`.
 
 ## Picture
 
@@ -28,11 +35,16 @@ It leaves exactly one path to either the previous step or the step before that.
 Appending that final move reverses the removal.
 No path belongs to both final-move cases, so addition does not double-count.
 
+<p class="visual-title" data-supplemental-visual="stairs-final-move-partition">Disjoint final moves give 3 + 5 = 8 paths</p>
+
 ```mermaid
 flowchart LR
+   accTitle: Paths to step five split by their final one-step or two-step move
+   accDescr: Three paths reach step three and each can append a two-step move. Five paths reach step four and each can append a one-step move. These final-move cases cannot overlap and cover all paths to step five, so their counts add to eight.
    Three["step 3: 3 paths<br/>old previous"] -->|final move +2| Five["step 5: 8 paths<br/>new current"]
    Four["step 4: 5 paths<br/>old current"] -->|final move +1| Five
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> group paths by their final move. The two groups cannot overlap, which justifies addition rather than merely memorizing the recurrence.</p>
 
 Counts for steps `0` through `5` are `1,1,2,3,5,8`.
 The empty path gives step zero one way.

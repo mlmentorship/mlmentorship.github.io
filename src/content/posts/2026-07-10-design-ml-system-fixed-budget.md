@@ -9,8 +9,18 @@ category: "questions"
 
 > Design a personalized ranking system for 20 million daily users. The serving budget is $3 million per year and p95 latency must stay below 80 ms. What do you ship?
 
-Estimate request volume and unit cost before choosing hardware.
-The useful picture is a narrowing candidate set: cheap stages reject work before an expensive model sees it.
+Design a personalized ranking service that fits an explicit annual serving budget and request-latency requirement.
+
+## Problem
+
+**Context.** The hypothetical product has 20 million daily users, a $3 million annual serving budget, and an 80 ms p95 limit.
+Requests per user, peak traffic, catalog size, and infrastructure prices are not yet specified.
+
+**Task.** State assumptions, estimate traffic and allowable unit cost, and choose retrieval, ranking, caching, and fallback stages.
+Show a feasible budget and a measurement plan, or identify which requirement must change.
+
+**Constraints.** Daily users are not requests per second; separate averages, peaks, and tail latency.
+Include replicated capacity, data access, and operating overhead within the declared budget boundary rather than counting accelerator inference alone.
 
 ## Clarify before calculating
 
@@ -34,6 +44,8 @@ Use 365 days and a fivefold peak factor for this example.
 The unit ceiling covers the declared budget scope, not just model kernels.
 Subtract included feature, logging, storage and operational costs before allocating inference spend.
 Excluded costs still belong in a separately reported total.
+
+<p class="visual-title">The serving budget constrains the whole ranking funnel</p>
 
 <!-- visual:fixed-budget-ranking-funnel -->
 ```mermaid

@@ -7,9 +7,17 @@ tags: ["questions"]
 category: "questions"
 ---
 
-An ablation tests a specific explanation by changing the system while controlling plausible rival causes.
+Design an ablation that distinguishes a claimed model mechanism from plausible alternative explanations for an observed gain.
 
 ## Problem
+
+**Context.** A hypothetical routing recipe improves accuracy over an original baseline, and its authors attribute the difference to content-dependent routing.
+
+**Task.** Specify a control, matched resources, measurement plan, and result patterns that would support or weaken that explanation.
+Explain whether the comparison tests the whole recipe or isolates the claimed mechanism.
+
+**Constraints.** Control training budget, data, optimization, and evaluation where relevant.
+Removing a component can also change capacity or compute, so a score drop alone does not isolate why it mattered.
 
 An explicitly hypothetical router F scores 83% accuracy on distant-evidence tasks; original baseline A scores 80%.
 The claim attributes the three-percentage-point gain to content-dependent routing.

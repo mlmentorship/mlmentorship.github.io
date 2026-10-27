@@ -13,25 +13,36 @@ aliases: []
 prerequisites: []
 ---
 
-Compare skipping the current position with taking it after the last compatible prefix; retain the larger total.
+Choose nonadjacent houses along a street to maximize the total value collected.
 
 ## Problem
 
-For values `[2,7,9,3,1]`, select nonadjacent positions with maximum total.
-The answer is `12`, achieved at indices `[0,2,4]`.
-Choosing nothing is allowed, so empty and all-negative inputs return `0`.
-Values are integers; positions form a line.
+**Input.** An integer list `nums` giving house values in linear street order.
+
+**Output.** Return the largest sum over selections containing no two adjacent positions.
+
+**Rules.** The first and last houses are not neighbors unless they are consecutive in the list.
+Selecting no houses is allowed, so empty and all-negative inputs return zero.
+Return only the total, not the selected indices. Preserve the input.
+
+**Example.** `[2, 7, 9, 3, 1]` returns `12`, achieved by indices `[0, 2, 4]`.
+Taking 7 and 9 together is forbidden because their positions are adjacent.
 
 ## Picture
 
 At index `3`, taking value `3` excludes index `2`.
 It can extend the best prefix through index `1`, not the immediately preceding prefix.
 
+<p class="visual-title" data-supplemental-visual="robber-take-skip-boundaries">Taking uses two-back; skipping uses one-back</p>
+
 ```mermaid
 flowchart LR
+   accTitle: The take and skip candidates use different prefix optima
+   accDescr: At house index three, taking value three adds it to the optimum through index one, seven, producing ten. Skipping keeps the optimum through index two, eleven. The maximum is eleven; taking cannot use the adjacent one-back optimum.
    Two["through index 1<br/>old two_houses_back = 7"] -->|take index 3: 7 + 3 = 10| Current["through index 3<br/>current = max 11,10 = 11"]
    One["through index 2<br/>old one_house_back = 11"] -->|skip index 3: 11| Current
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> trace the take edge back two houses. Using the one-back optimum there could illegally include an adjacent house.</p>
 
 These cases are exhaustive: a selection either contains the current position or does not.
 Neither saved prefix optimum must select its last position.

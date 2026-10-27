@@ -15,11 +15,18 @@ prerequisites: ["build-llm-coding-assistant", "evals-for-coding-assistant", "eva
 
 > *Asked in: AI developer-tool system design, coding-agent, LLM product, platform architecture, and upper-IC technical-strategy rounds.*
 
-A basic answer connects a code model to an editor. A senior answer separates inline completion, chat, review, and asynchronous agent work because they have different latency, context, authority, user experience, and evaluation contracts.
+Design an AI coding product with distinct contracts for inline completion, chat, review, and asynchronous repository-editing work.
 
-A staff answer builds shared repository intelligence and safe execution without forcing all modes through one pipeline. A principal answer chooses platform boundaries across editor, cloud, security, and product teams. A senior-principal answer defines durable rules for code authority, evidence, provenance, team context, and vendor change.
+## Problem
 
-The proposed product uses a permission-aware context broker, mode-specific model routes, reviewable patches, and an isolated agent executor. The developer keeps acceptance authority. Tests contribute evidence, while policy, static checks, diff review, and observed behavior cover failures that tests miss.
+**Context.** The product serves individuals and enterprises across private repositories, large monorepos, and uncommitted local work.
+The detailed prompt below specifies four languages, peak traffic, long-running tasks, and motivating security and correctness incidents.
+
+**Task.** Define mode-specific request paths, repository context, indexing, bounded execution, evaluation, developer controls, rollout, cost, and ownership.
+Explain shared infrastructure without granting every mode the asynchronous agent's write or tool authority.
+
+**Constraints.** Preserve repository permissions, regional processing options, auditability, and exclusion of private code from training by default.
+The developer retains acceptance authority. Tests are evidence, not permission to remove assertions, change public APIs silently, or publish code.
 
 ## The prompt
 
@@ -210,53 +217,23 @@ Do not let high inline acceptance hide one agent credential leak. Severe events 
 
 ## Build a shared context plane with separate execution paths
 
+<p class="visual-title" data-supplemental-visual="coding-product-mode-boundaries">Different response modes share context, not identical execution rights</p>
+
 ```mermaid
-flowchart LR
-  subgraph Client[Editor and web clients]
-    Cursor[Cursor and buffers]
-    ChatUI[Chat]
-    ReviewUI[Review]
-    AgentUI[Agent task]
-    PatchUI[Patch and undo]
-  end
-
-  Cursor --> Inline[Inline gateway]
-  ChatUI --> Interactive[Chat gateway]
-  ReviewUI --> Review[Review service]
-  AgentUI --> Orchestrator[Durable agent orchestrator]
-
-  Inline --> Context[Permission-aware context broker]
-  Interactive --> Context
-  Review --> Context
-  Orchestrator --> Context
-
-  Repo[Repository event ingestion] --> Index[Versioned lexical, symbol, and embedding indexes]
-  Index --> Context
-  LSP[Language and build metadata] --> Index
-  Buffers[Dirty-buffer overlays] --> Context
-
-  Context --> Router[Mode-aware model router]
-  Router --> Fast[Fast completion model]
-  Router --> Large[Large reasoning model]
-  Router --> ReviewModel[Review route]
-
-  Orchestrator --> Sandbox[Isolated workspace and tool gateway]
-  Sandbox --> Evidence[Build, test, static, and diff evidence]
-  Evidence --> Orchestrator
-  Orchestrator --> PatchUI
-
-  Policy[Identity, access, data, and action policy] --> Context
-  Policy --> Router
-  Policy --> Sandbox
-
-  Inline --> Events[Product event stream]
-  Interactive --> Events
-  Review --> Events
-  Orchestrator --> Events
-  Context --> Events
-  Sandbox --> Events
-  Events --> Eval[Evaluation, incidents, and cost]
+flowchart TB
+  accTitle: Coding product modes share permission-aware context but differ in execution
+  accDescr: Two paths start from permission-aware, revision-bound context. Inline, chat, and review routes return suggestions for user acceptance without tool execution. A durable agent instead requires action policy, an isolated workspace, and bounded tools. Build, test, and diff evidence can trigger another bounded attempt or become a reviewable patch; evidence never applies the patch automatically.
+  Context["Permission-aware context<br/>revision + dirty buffers"] --> Response["Inline / chat / review<br/>mode-aware model route"]
+  Context --> Agent["Durable agent<br/>time + cost limits"]
+  Response --> Suggestion["Suggestion or review<br/>no tool execution"]
+  Suggestion --> Accept["User accepts or edits"]
+  Agent -->|action policy| Sandbox["Isolated workspace<br/>bounded tool gateway"]
+  Sandbox --> Evidence["Build + test + diff<br/>evidence"]
+  Evidence -.->|revise| Agent
+  Evidence --> Patch["Reviewable patch<br/>user decides to apply"]
+  class Context,Response,Agent,Suggestion,Accept,Sandbox,Evidence,Patch viz-fit
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> compare the fast response routes with the durable agent's sandbox loop. Shared context does not imply shared action authority.</p>
 
 ### Client layer
 
@@ -579,25 +556,23 @@ Dynamic behavior, production configuration, missing tests, and external systems 
 
 Agent mode conducts a loop over repository state and tools. It should remain inspectable after cancellation, worker loss, or user return.
 
+<p class="visual-title" data-supplemental-visual="coding-product-task-lifecycle">Cancellation is complete only after the worker stops</p>
+
 ```mermaid
 stateDiagram-v2
-  [*] --> Queued
-  Queued --> Preparing: worker and policy assigned
-  Preparing --> Running: sandbox ready
-  Running --> WaitingForUser: approval or clarification
-  WaitingForUser --> Running: response received
-  Running --> Verifying: proposed patch complete
-  Verifying --> Running: evidence exposes a defect
-  Verifying --> ReadyForReview: gates satisfied
-  Running --> Paused: budget or dependency unavailable
-  Paused --> Running: authorized resume
-  Running --> Cancelled: user or policy cancels
-  ReadyForReview --> Applied: user accepts patch
-  ReadyForReview --> Rejected: user rejects patch
-  Applied --> [*]
-  Rejected --> [*]
-  Cancelled --> [*]
+  direction TB
+  accTitle: A durable coding task separates verification, approval, and confirmed cancellation
+  accDescr: This view starts after worker, policy, and sandbox preparation. A running task verifies a proposed patch; defects return it to running. Passing checks leads only to user review, where acceptance or rejection decides the outcome. A cancellation request instead enters Cancelling, and only confirmed worker stop enters Cancelled. Waiting, pause, and resume details are omitted to expose these two boundaries.
+  [*] --> Running: prepared
+  Running --> Verifying: patch ready
+  Verifying --> Running: defect
+  Verifying --> Review: checks pass
+  Review --> Applied: user accepts
+  Review --> Rejected: user rejects
+  Running --> Cancelling: cancel requested
+  Cancelling --> Cancelled: worker stopped
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> passing verification leads to review, not application. Requesting cancellation leads to stopping work, not an already-confirmed terminal outcome.</p>
 
 ### Task record
 

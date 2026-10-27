@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Follow only arrows toward larger values. A route cannot return to an earlier cell, so every caller can reuse that cell's longest continuation.
+Find the longest strictly increasing route through orthogonally adjacent cells in a matrix.
 
 ## Problem
 
-> Find the longest path that moves to a larger neighboring value each step.
+**Input.** A rectangular integer `matrix`, possibly empty.
 
-Use an unchanged rectangular integer matrix and four orthogonal neighbors. Count cells, not edges. Empty input returns zero.
+**Output.** Return the maximum number of cells in a path whose value strictly increases at every move.
+
+**Rules.** Start at any cell and move only up, down, left, or right within the matrix.
+Diagonal moves and equal-valued moves are forbidden.
+Count cells, not edges, and preserve the matrix. Empty input returns zero.
+
+**Example.** For `[[9, 9, 4], [6, 6, 8], [2, 1, 1]]`, return `4`.
+One path follows values `1 -> 2 -> 6 -> 9` through adjacent cells.
 
 ## Picture
 

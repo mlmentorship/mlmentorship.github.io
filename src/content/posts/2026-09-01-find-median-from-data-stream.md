@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Keep two ordered halves. Their sizes place the middle rank at one root, or the two middle ranks at both roots.
+Accept integers one at a time and report the median of all values inserted so far.
 
 ## Problem
 
-> Add numbers one at a time and return the current median.
+**Input.** Calls to `add_num(num)` and `find_median()` on an initially empty `MedianFinder`.
 
-Use integer values and query after at least one insertion. Empty `find_median()` raises `IndexError`.
-For an even count, median means the average of both middle values, not the lower middle rank.
-This structure retains the full history and supports insertion, not deletion or a sliding window.
+**Output.** Each median query returns the middle sorted value, or the average of both middle values for an even count.
+
+**Rules.** Inserted values are integers; repeats count separately.
+The reference returns floating-point answers and retains the full history, not a sliding window.
+There is no deletion operation. Query only after insertion; an empty query raises `IndexError`.
+Extremely large integers may overflow the reference's float conversion.
+
+**Example.** Insert 1, then 2: `find_median()` returns `1.5`.
+After inserting 3, it returns `2.0`, regardless of the insertion order of those three values.
 
 ## Picture
 

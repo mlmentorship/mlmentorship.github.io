@@ -13,10 +13,50 @@ Do not restore the frozen defects, recapture this baseline or modify the plannin
 Do not change branches or disturb concurrent publication work.
 Commit and push only when explicitly requested by the user.
 
+## Complete problem statements
+
+All 191 question articles now define the task before explaining its solution.
+This covers 106 coding questions and 85 implementation, mathematical, design and behavioral questions.
+Statement-only repairs did not increase the authored-lesson count; it was 232/391 at that repair checkpoint.
+Concepts retain their existing Summary contract; this repair does not claim a new rewrite of all 391 articles.
+The receipts in this section describe that earlier repair snapshot, not the current authoring checkpoint.
+
+Coding statements provide Input, Output, Rules and Example fields, including return conventions and relevant boundary cases.
+Other question statements provide Context, Task and Constraints, retaining supplied cases, tables and broken exercise programs.
+Openings frame the task rather than disclose its solution.
+The editorial gate requires nonempty fields in order before the solution sections.
+Complete statements are counted separately from solution prose, without increasing the existing Core or extension budgets.
+Sentence-length checks still apply to qualified statement prose.
+
+Every question now retains its visual at the authored position, after the statement.
+This also fixes 48 older pages whose layout previously promoted the visual above their new Problem section.
+The production visual-review gate checks the first section, final statement field and authored visual placement.
+Cold-practice regression coverage checks the complete ordered statement fields for all 191 questions.
+The old prep assertion for "continuous ranges" was updated to the equivalent "contiguous subarrays" wording.
+
+Repair evidence is under `/tmp/mlmentorship-coding-complete-20261025/`:
+
+- `problem-context-source-sealed.json` binds the repair's 191 question sources, production pages and matching preview responses. At that snapshot, all 106 coding solution tails and all 200 non-question manuscripts matched the initial repair audit. The 39 statement math expressions matched GFM parsing and built HTML-only KaTeX. Protected baseline and completed-guide hashes matched the authenticated 232-piece receipt.
+- `problem-context-examples-qualified.json` records 32 executed example and boundary checks across ten literal, unchanged Python implementations, using existing Python 3.11.13 and NumPy 1.26.4. This is representative checking, not new execution coverage for all 191 questions.
+- `problem-context-browser-qualified.json` records 40 passing cases on eight representative routes at measured 1280/390 CSS-pixel widths: 16 Full views, eight available Core views and 16 cold-practice dialogs. Native controls preserve complete statements, keep visuals after them and allow long prompts to scroll. No page or dialog horizontal overflow was reported.
+- The browser run retained 32 original captures. `problem-context-viewport-crops.json` binds 16 derived 900-pixel-high practice viewport crops; desktop image content excludes the normal 15-pixel scrollbar. Original pixels remain unchanged.
+- `problem-context-browser-cleanup.json` records the resolved temporary-profile shutdown race and reauthenticates all 32 original captures. Browser cases had passed before cleanup failed; a focused Chromium close/removal check passed after the cleanup repair.
+- Final complete gate logs are `problem-context-check-sealed.log` and `problem-context-build-sealed.log`, retained with the repair receipts. Astro reports zero errors, warnings or hints; all 23 prep tests, 106 coding-visual definitions, 391 preservation checks and 568 link targets pass. Pagefind indexes 497 pages.
+
+Failed and intermediate evidence remains separate, including the first prep failure and two corrected source-observer failures.
+The source observers needed GFM currency-table handling and the article-body div rather than a historical Answer heading.
+The first final seal rejected a changed enterprise-platform source; its current content was preserved and rebuilt.
+The original qualified snapshot remains separate; accepted evidence uses the refreshed sealed-source receipt.
+The final handoff receipt binds the accepted evidence and inspected captures to current sources and tooling.
+The repair stored PNGs under `/dev/shm/mlmentorship-coding-complete-20261025/problem-context-browser/`; these were volatile on reboot.
+Retained JSON receipts do not imply those historical images remain available.
+This repair adds no whole-library browser, light/dark matrix, motion, GPU or PDF-pagination qualification.
+The repair made no commit, push or deployment; the current preview is described in the latest checkpoint below.
+
 ## Actual authoring coverage
 
-One hundred sixty-two pieces have been authored so far, not 391.
-The current prose gate qualifies 162/391 articles, and both the normal check and production build pass at this checkpoint.
+A total of 252 pieces have been authored so far, not 391.
+The current prose gate qualifies 252/391 articles; normal check and production build pass for the 90-lesson continuation since published 162.
 All 391 articles pass original metadata, fragment, Python-fence, visual, frame and motion-identity preservation.
 Both previously empty files have been recovered; no empty-file exception or baseline change remains.
 Browser qualification is scoped to the receipts below, not the complete library or printed PDF pagination.
@@ -183,9 +223,99 @@ Browser qualification is scoped to the receipts below, not the complete library 
 - `edit-distance`: priced predecessor-prefix cases, actual operation arrows and executed asymmetric-cost/forbidden-replacement variants.
 - `minimum-window-substring`: exact missing-copy timing, intentional validity-breaking removal and executed required-only bounds/all-cover variants.
 - `find-median-from-data-stream`: ordered halves at completed insertions, explicit repair-state failures and executed exact-fraction/nearest-rank variants.
+- `meeting-rooms`: half-open adjacency proof, turnaround gaps, closed endpoints and explicit zero-duration limits.
+- `rotate-image`: clockwise coordinate mapping, row-aliasing preconditions and executed counterclockwise/rectangular-copy variants.
+- `set-matrix-zeroes`: original-zero discovery, honest row-replacement space and executed row-preserving/copy variants.
+- `spiral-matrix`: unread-rectangle boundaries, slicing space and executed lazy-coordinate/counterclockwise variants.
+- `mini-batches`: half-open partitions, shallow-slice behavior and executed full-batch/streaming variants.
+- `split-array-largest-sum`: nonnegative greedy feasibility, exact-count splitting and executed witness/signed-DP variants.
+- `largest-rectangle-in-histogram`: nondecreasing stack, inherited starts and executed witness/unequal-width variants.
+- `insert-interval`: closed-endpoint component merging, aliasing contracts and executed detached-copy/half-open variants.
+- `merge-k-sorted-lists`: disjoint node identity, heap tie safety and executed copying/iterator variants.
+- `reorder-list`: detached halves, saved successors and executed copying/inverse variants with identity and cycle checks.
+- `pairwise-squared-distances`: float64 broadcasting, exact shape contracts and executed blocking/Gram variants with cancellation controls.
+- `binary-precision-and-recall`: declared binary populations, zero-denominator policy and executed count-aggregation/weighted variants.
+- `eigenvalues-and-spectral-theorem`: exact signed eigenbasis coordinates, symmetric scope, powers/solves and defective-matrix limits.
+- `matrix-calculus`: declared Jacobian orientation, exact transpose pullback and checked trainable-matrix/Hessian-vector changes.
+- `kernel-methods-and-the-kernel-trick`: exact polynomial feature products, RBF scale, Nyström rank limits and PSD counterexamples.
+- `embedding-spaces-and-similarity`: objective-dependent ranking, exact normalized chords and magnitude/candidate-coverage changes.
+- `maximum-likelihood-estimation`: fixed-data Bernoulli likelihood, qualified asymptotics and checked prior/count-observation changes.
+- `cross-entropy-softmax`: categorical derivative, stable shifted loss and checked smoothing/temperature changes.
+- `attention-mechanism`: constructible key scores, exact value mixture and checked masking/hard-retrieval distinctions.
+- `backpropagation`: exact scalar reverse pass, shared-route accumulation and reproducible checkpoint recomputation.
+- `causal-attention`: executed causal reference, visibility-mask rejection and cached absolute-position variants.
+- `cross-entropy-from-logits`: executed rowwise likelihood, weighted means and explicit ignored-label/empty-reduction variants.
+- `svd-and-pca`: distinct map and centered-data factorizations, exact rank-one error and standardized-variance changes.
+- `linear-regression`: exact OLS projection, ridge/weighted fits, rank-deficient coefficients and qualified statistical assumptions.
+- `gradient-clipping`: radial projection, momentum and accumulation counterexamples, and distributed/numerical units.
+- `mixed-precision-training`: actual rounding/scaling, skipped nonfinite updates and corrected 112-GB training-state accounting.
+- `cnn-architecture`: exact output shapes, parameters, MACs, receptive fields and spatial-information/factorization changes.
+- `bayes-rule-and-posterior`: explicit positive-result denominators, changed base rates and conditionally independent versus copied evidence.
+- `markov-chains`: row-vector mass updates, separate stationary/convergent conditions, periodicity and expanded-state counterexamples.
+- `autoregressive-vs-diffusion`: append versus whole-state revision, prefix usability, compatible likelihoods and evaluated-call costs.
+- `cross-validation-strategies`: equal-patient risk, deployment boundaries, fold dependence and explicit nested-selection fit counts.
+- `causal-inference-for-ml-decisions`: exact standardized risks, matching propensity weights, positivity failure and changed assignment evidence.
+- `tf-idf-and-bm25`: six exact frequency/length factors, explicit IDF/analyzer conventions and candidate-displacing fusion controls.
+- `bootstrap-and-resampling`: all 27 ordered draws, exact conditional variance and distinct unequal-cluster estimands.
+- `debug-model-not-learning`: exact loss/gradient/update control, attainable-loss limits and falsifiable objective/distribution diagnostics.
+- `paged-attention`: explicit addresses, tail allocation, shared ownership and safe copy-on-write/release.
+- `quantization`: exact INT4 codes/errors, stated tie policy, outlier clipping and group-scale byte overhead.
+- `two-tower-retrieval`: executed stable masked objective, valid-positive sets and compatible catalog/query lifecycles.
+- `central-limit-theorem`: exact mean variance before asymptotics, finite-sample tail discrepancy, dependence and rare-event controls.
+- `entropy-mutual-information`: complete noisy-channel joint table, changed priors, weighted tree gain and redundant-observation limits.
+- `monte-carlo-and-importance-sampling`: support conditions, exact weighted expectation and proposal-concentration diagnostics.
+- `batchnorm-vs-layernorm`: exact shared-statistic groups, companion-row changes, RMS second moments and inference-state distinctions.
+- `dropout`: enumerated Bernoulli masks, inverted scaling, changed retention and variance versus deterministic inference.
+- `weight-initialization`: declared second-moment assumptions, exact layer factors, leaky slopes and residual-covariance limits.
+- `ranking-metrics-ndcg-map-mrr`: ordered relevance credit, explicit denominators, changed cutoffs and query-weight contracts.
+- `k-means-clustering`: exact assignment/update distortion, centroid changes, local-optimum and non-Euclidean limits.
+- `expectation-maximization`: normalized responsibilities, weighted sufficient statistics and exact-versus-generalized update guarantees.
+- `normalizing-flows`: change-of-variables direction, exact inverse/Jacobian factors and support/invertibility counterexamples.
+- `svm-and-kernels`: checked primal/dual objectives, soft-margin changes and exact RBF scale effects.
+- `encoder-decoder-architectures`: concrete visibility sets, shifted output inputs and cross-attention versus decoder-only contracts.
+- `diffusion-models`: exact corruption/loss/reconstruction fixture, distinct reverse-process uncertainty and guidance conventions.
+- `reparameterization-trick`: fixed base noise, checked pathwise gradients and discrete/support-boundary limits.
+- `rag-overview`: explicit retrieved evidence, unsupported-answer control, changed source freshness and authorization boundaries.
+- `mixup-and-cutmix`: coupled input/target mixtures, realized mask area and label-validity limits.
+- `sgd-with-momentum`: exact gradient-history updates, alternating components and learning-rate/Nesterov convention changes.
+- `adam-and-adamw`: separate direction and scale moments, bias correction, epsilon effects and qualified decoupled decay.
+- `weight-decay-vs-l2`: checked coupled/decoupled updates, adaptive-coordinate differences and parameter-group exemptions.
+- `fsdp-and-zero`: explicit training-state byte ledgers, temporary gathers and fixed-workload activation changes.
+- `kl-divergence`: directional expectations, exact support failures, cross-entropy identity and separately justified nonnegativity.
+- `variational-autoencoders`: exact Gaussian reconstruction, prior penalty, posterior gap and changed variance/beta objectives.
+- `transformer-architecture`: complete two-token block calculation, causal visibility and pre/post-normalization counterexamples.
+- `positional-encoding`: distinct insertion points, exact ALiBi probabilities and common-shift/bidirectional changes.
+- `regularization`: comparable validation evidence, exact penalty solutions, early-stopping selection and elastic-net changes.
+- `l1-vs-l2-beyond-formula`: complete scalar subgradient cases, exact shrinkage, rescaling and optimizer counterexamples.
+- `logistic-regression`: exact likelihood/gradient fixture, stable loss, cost thresholds, separation and interaction limits.
+- `decision-trees`: weighted split impurity, unequal-child counterexample, leaf constraints and regression/XOR changes.
+- `gradient-boosting`: exact residual stages, shrinkage effects and first-order versus Newton leaf updates.
+- `calibration`: explicit event/population contracts, reliability and Brier calculations, pooled isotonic groups and action thresholds.
+- `flashattention`: exact online-softmax state, rescaling and masking controls, and separate arithmetic/storage/latency claims.
+- `gradient-accumulation`: weighted objective normalization, executed complete windows, ignored targets and unchanged-parameter boundaries.
+- `object-detection-overview`: candidate-resolution paths, inference suppression and training-only set matching.
+- `approximate-nearest-neighbors`: candidate admission and approximate-score errors as separate failure paths.
+- `convolution-as-matmul`: explicit patch columns, shared values and layout/materialization costs.
+- `epistemic-vs-aleatoric-uncertainty`: within-model ranges, between-model means and qualified uncertainty interpretations.
+- `content-based-filtering`: item-feature scoring, new-item availability and profile assumptions.
+- `knowledge-graph-embeddings`: symmetric real products versus direction-sensitive complex scores.
+- `fault-tolerant-collectives`: mixed-state failure, coordinated rollback and a complete commit boundary.
+- `profiling-distributed-ml-workloads`: exposed collective tails, overlap and workload-matched profiling.
+- `factor-analysis-and-ppca`: exact covariance/posterior calculations, tied noise, missing features and finite-noise versus singular limits.
+- `graphical-models`: complete OR-collider cases, conditional chains, descendant evidence and nonfaithfulness.
+- `exploration-vs-exploitation`: exact epsilon/UCB/Beta examples, drift and randomized causal-comparison changes.
+- `mdps-and-bellman-equations`: weighted stochastic returns, policy/optimal continuation and action-eligibility constraints.
+- `decoding-strategies`: common-scale probability bars, normalized support and processor-order/sequence changes.
+- `semantic-segmentation`: erased spatial distinctions, background-heavy metrics, weighted loss and aligned tiled inference.
+- `delayed-labels-selective-labels-feedback-loops`: early positives, pending/censored/unobserved states, mature cohorts and support limits.
+- `domain-adaptation`: exact risk reweighting, support bounds, conditional-change failures and identifiable label-shift statistics.
+- `hypothesis-testing-confidence-intervals`: count-derived paired uncertainty, useful-effect thresholds and changed information/claim families.
+- `position-bias-counterfactual-learning-to-rank`: separate propensities, five-event estimator calculations, effective support and clipping bias.
+- `matrix-factorization-recsys`: observed-only targets, biases, implicit-feedback/cold-item changes and simultaneous row updates.
+- `factorization-machines`: aggregate interaction identity, sparse runtime, two-ID reduction and field-specific sharing.
 
 The 391-piece registry and 285-family index provide navigation, not completed lesson prose.
-The remaining 229 pieces still require source-specific authoring.
+All 106 coding-trace lessons are authored; the remaining 139 pieces still require source-specific authoring.
 Shared source and build gates now pass; complete-library browser qualification remains outstanding.
 Next: canonical owners in prerequisite order and their applications.
 
@@ -261,6 +391,187 @@ Preservation self-tests and an explicit missing-plan check also pass for indepen
 The complete gate logs are `check-consolidation.log` and `build-consolidation.log` under `/tmp/mlmentorship-resume-162-6wzVdY/`.
 Keep the 391-piece baseline immutable and publish on the existing `reconcile/visual-review-fixes` branch without force-pushing.
 A successful branch push does not by itself establish a new Pages deployment or whole-library browser qualification.
+
+### Coding completion and prerequisite continuation, 2026-10-26
+
+The continuation adds 14 coding lessons and eight mathematical owners, bringing authored coverage to 184/391.
+These changes remain uncommitted on the existing branch; the previously authorized publication was already completed.
+
+- Full `npm run check` and `npm run build` pass, with zero Astro errors, warnings or hints and 23 passing prep tests.
+  All 106 coding visual contracts synchronize; built links resolve across 568 HTML/RSS items.
+  The 391-piece baseline and completed coding-guide hashes remain unchanged.
+- Literal Python fences were parsed from Markdown and executed through isolated Python 3.12 environments.
+  NumPy examples use 2.2.6; no repository package or lockfile changes were needed.
+  Exhaustive checks cover interval, matrix, list, histogram and reduction changes; mathematical fixtures use independent scalar/finite-difference checks.
+  These numerical results are in the conversation's terminal history, not a new exhaustive numerical JSON receipt.
+- The last coding pair passes 40 attention-shape cases and 448 categorical-loss cases, including rejected all-masked/empty reductions.
+  Likelihood/gradient prerequisites pass 230 Bernoulli cases, 128 directional categorical gradients and 256 scalar reverse derivatives.
+- Evidence root: `/tmp/mlmentorship-coding-complete-20261025/`.
+  `qualification-summary.json` binds the 22 manuscript hashes, the baseline and completed guide, and the completed rendering report.
+  `render-report.json` records 110 five-mode renders and 384 coding-frame captures at measured widths 1280/390.
+  Reported clipped labels, unresolved SVG references and duplicate motion keys are zero.
+- Browser screenshots are under `/dev/shm/mlmentorship-coding-complete-20261025/render-final/` because the project filesystem filled.
+  Memory-backed images disappear on restart; the report and compact summary were copied to the evidence root on disk.
+  Original failed and interrupted captures remain under the evidence root, not clean qualification.
+- Matrix Calculus exposed a missing print reset for `.plot-panel svg`.
+  The existing print-only zero-minimum-width rule now covers it; focused five-mode checks and the complete 22-lesson matrix pass afterward.
+  This checks print layout, not PDF page breaks.
+- `reader-controls.json` records programmatic Full/Core checks on all 22 routes and selection of all 96 coding frames.
+  Isolated Chrome also passes native ArrowRight for reading depth and native End for Causal Attention.
+  `causal-attention-motion.json` and `cross-entropy-motion.json` record complete normal-motion sequences `0,1,2,3,4`.
+  `extension-fragment.json` verifies that a preserved fragment into an extension reveals Full despite a Core URL request.
+  Embedded-browser pointer/keyboard observer failures were not counted as successful native checks.
+- Initial verification hit `ENOSPC`; npm's regenerable download cache was cleared.
+  uv pruning timed out on another process's lock; no forced prune, source deletion or evidence deletion was performed.
+  Disk capacity remains constrained; use memory-backed browser scratch storage until capacity is restored.
+- No new commit, push, branch, PR, main merge, deployment, subagent or VS Code task was performed.
+  Whole-library browser lifecycle coverage and printed PDF pagination remain unqualified.
+
+### Further canonical owners, 200-piece checkpoint
+
+Sixteen additional owners bring authored coverage to 200/391, with 191 pieces remaining.
+The 184-piece receipt above remains historical and is not relabeled as broader qualification.
+
+- Evidence root remains `/tmp/mlmentorship-coding-complete-20261025/`.
+  `qualification-200.json` binds the sixteen manuscript and built-HTML hashes, protected hashes, and separate rendering report.
+  The immutable baseline and completed coding-guide hashes are unchanged.
+- `check-200-final.log` and `build-200-final.log` record the normal check and complete production build.
+  All 23 prep tests, 106 coding visual contracts and 568 built link targets pass.
+  The complete build restores Pagefind after focused Astro-only rebuilds; 497 pages are indexed.
+- Numerical receipts are `owners-ols-clipping-precision.json`, `owners-cnn-bayes-markov-generation.json`,
+  `owners-evaluation-ranking-bootstrap.json`, and `owners-serving-debug.json`.
+  These cover 4,096 projection candidates, 11,048 convolution shapes, 5,000 BM25 frequency comparisons and all 27 bootstrap draws.
+  The literal NumPy retrieval implementation passes 225 scalar-oracle cases plus extreme-score and invalid-mask controls.
+  SVD's 181 norm/approximation checks remain in terminal history rather than a separately retained numerical JSON receipt.
+- `render-report-200.json` records eighty final renders at actual widths 1280/390 across five modes.
+  The 92 PNGs are under `/dev/shm/mlmentorship-coding-complete-20261025/render-200-qualified/` and are volatile on restart.
+  Reported clipped SVG labels and unresolved SVG references are zero; representative mobile and print images were inspected.
+- The renderer first rejected a missing visible Mermaid title; both causal and debugging diagrams now have visible titles.
+  Pixel review also caught an unnecessarily wide three-node DAG and cache connectors crossing labels.
+  The DAG uses the existing fit class; the cache figure matches explicit physical IDs without crossing its labels.
+  All causal edges, block mappings, reference counts and original visual identities remain intact.
+  Initial failing and pre-pixel-review captures remain evidence, not final acceptance.
+- This static-owner receipt adds no native-control or normal-motion lifecycle claim beyond the scoped 184-piece receipt.
+  Whole-library browser coverage and printed PDF pagination remain outstanding.
+  No commit, push, new branch, PR, main merge, deployment, subagent or VS Code task was performed.
+
+### Probability and modeling owners, 216-piece checkpoint
+
+Sixteen further owners bring authored coverage to 216/391, with 175 pieces remaining.
+The 184-piece and 200-piece receipts remain historical; this is a separate qualification snapshot.
+
+- `qualification-216.json` in `/tmp/mlmentorship-coding-complete-20261025/` binds current manuscript and built-HTML hashes.
+  The immutable baseline and completed coding-guide hashes are unchanged.
+  `check-216-final.log` and `build-216-final.log` record passing normal gates, 23 prep tests and 568 built link targets.
+- `math-source-216-final.json` compiles all 542 math expressions across the sixteen manuscripts and rejects damaged command escapes.
+  `built-integrity-216.json` matches every expression against the actual HTML-only KaTeX output.
+  The initial MathML-based observer failed because the site intentionally emits HTML only; its failure log remains retained.
+- Ten numerical JSON receipts cover the authored examples and changed requirements.
+  The latest four are `numeric-clt-20261026.json`, `numeric-entropy-20261026.json`,
+  `numeric-normalization-20261026.json` and `numeric-initialization-20261026.json`.
+  These distinguish exact Gamma and Gaussian tails, redundant noisy observations, grouped normalization and initialized second moments.
+  Initialization includes 120 exact enumerated cases and 100,000 seeded Gaussian samples, not a training-performance claim.
+  Earlier SVM and diffusion checks remain in terminal history rather than separately retained numerical JSON receipts.
+- `render-report-216.json` accepts eighty five-mode renders at measured widths 1280/390.
+  Sixty initial cases remain applicable because all twelve manuscripts and their built HTML are unchanged.
+  Twenty replacement cases qualify entropy, normalization, diffusion and Mixup/CutMix after their final repairs.
+  Reported clipped SVG labels and unresolved SVG references are zero; selected mobile and print captures were inspected directly.
+- Entropy's unchanged SVG now sits in an explicit keyboard-focusable `.visual-scroll` region.
+  Mobile start/end captures show the uncertainty budget and the complete joint table; the caption stays outside the scroller.
+  Initial mobile captures did not expose that endpoint and remain pre-repair evidence, not final acceptance.
+  Initialization's growth vertices now follow the same declared logarithmic scale as its decay vertices; all ten vertices were checked.
+  Three manuscripts' leading TeX commands were repaired with empty groups after patch escaping had silently damaged them.
+- Captures are under `/dev/shm/mlmentorship-coding-complete-20261025/render-216-initial/` and `render-216-repaired/`.
+  PNGs are volatile on restart; compact reports and logs remain on disk.
+  This static-owner snapshot adds no native reader-control or normal-motion lifecycle claim.
+  Whole-library browser coverage and printed PDF pagination remain outstanding.
+  No commit, push, new branch, PR, main merge, deployment, subagent or VS Code task was performed.
+
+### Optimization and model owners, 232-piece checkpoint
+
+Sixteen additional owners bring authored coverage to 232/391, with 159 pieces remaining.
+The continuation since the published 162-piece checkpoint is 70 lessons, still uncommitted on the existing branch.
+Historical 184-piece, 200-piece and 216-piece receipts retain their original scopes.
+
+- Evidence root remains `/tmp/mlmentorship-coding-complete-20261025/`.
+  `qualification-232.json` binds all sixteen current manuscript and built-HTML hashes, protected hashes and accepted PNG hashes.
+  The immutable preservation baseline, completed coding guide and frozen planning package were not changed.
+- `check-232-qualified.log` and `build-232-qualified.log` record passing full gates.
+  All 23 prep tests, 106 coding visual contracts and 568 built link targets pass; Pagefind indexes 497 pages.
+  All sixteen preview responses match the final built HTML exactly.
+- `math-source-232-qualified.json` and `built-integrity-232-qualified.json` bind 657 unchanged source math expressions to built KaTeX HTML.
+  Source-only compilation initially missed GFM table-pipe corruption in Regularization and Calibration.
+  Explicit TeX norm and absolute-value delimiters repair those tables; the actual Astro Markdown and production-output checks pass.
+  Failed initial observers and pre-repair receipts remain retained, not relabeled as successful qualification.
+- Seventeen numerical JSON receipts cover the sixteen owners, including a separate accumulation runtime receipt.
+  `owner-decay-verified.json` is the passing decay receipt; the empty failed `owner-decay.json` is excluded.
+  `owner-flashattention.json` compares 3,690 dense/tiled float64 cases and 231 causal rows at tolerance 1e-12.
+  These are CPU arithmetic references, not GPU performance measurements.
+- `owner-accumulation-runtime.json` executes the three literal new Python fences using an existing Python 3.11.13/PyTorch 2.2.2 environment on CPU.
+  SGD with momentum and AdamW match independent concatenated objectives across 756 ordinary/ignored-target cases.
+  Maximum gradient and parameter errors are 2.23e-16 and 5.56e-17, respectively; parameters stay fixed during all 2,304 microbatch forwards.
+  Tail windows of sizes 2 and 1 make exactly two updates; empty, zero-target and all-ignored windows reject without stepping.
+  A BatchNorm counterexample distinguishes serial forwards from a concatenated batch.
+  All three executed fence hashes remain identical after the final SVG-only edits; no packages were installed.
+- `render-report-232-final.json` accepts 85 five-mode cases across seventeen visuals at measured widths 1280/390.
+  Seventy initial cases are reused only after exact source and built-HTML equality for thirteen unchanged pages.
+  Ten repaired cases cover VAE and Logistic Regression; five final cases cover Gradient Accumulation.
+  The accepted set has 93 PNGs, with zero reported clipped labels or unresolved SVG references.
+  Seventeen selected captures were inspected directly, not every image.
+- Pixel review repaired the Logistic Regression axis-title collision, VAE bound-callout overlap and accumulation buffer-label fit.
+  The final accumulation probe checks all 23 boxed labels in screen and print layouts; final mobile endpoints and print were inspected.
+  Initial and intermediate captures remain failure evidence and are excluded from final acceptance for those changed lessons.
+  FlashAttention preserves both visual IDs in their original order and uses one contiguous Full extension.
+- Accepted PNGs are under `/dev/shm/mlmentorship-coding-complete-20261025/render-232-initial/`, `render-232-repaired/` and `render-232-qualified/`.
+  After `ENOSPC`, only generated `.astro` and `dist` directories were moved to the same memory-backed root as `astro-cache-232` and `dist-232`.
+  At that checkpoint, repository paths were symlinks; a memory-root `node_modules` link resolved generated renderer imports.
+  That dependency link was required while using the memory-backed build. Build output, cache and PNGs were volatile on reboot.
+  After reboot, recreate the owned targets or restore only these generated paths before building; do not remove unrelated caches or evidence.
+  Compact JSON receipts and gate logs remain on disk, and the production preview remains at `http://127.0.0.1:4342/`.
+- This static-owner snapshot adds no native reader-control or normal-motion lifecycle claim.
+  AMP, DDP, FSDP and GPU kernel execution, whole-library browser coverage and printed PDF pagination remain unqualified.
+  No commit, push, new branch, PR, main merge, deployment, subagent or VS Code task was performed.
+
+### Cross-domain continuation, 252-piece checkpoint
+
+Current coverage is 252/391, with 139 unfinished and all 106 coding-trace lessons authored.
+This checkpoint qualifies twenty owners beyond the documented 232-piece snapshot.
+Eight were already authored when this continuation began; twelve were newly authored here.
+It does not attribute fresh numerical checks to the eight pre-existing additions.
+The continuation since the published 162-piece implementation is 90 lessons, still uncommitted on the existing branch.
+
+- `qualification-252.json` in `/tmp/mlmentorship-coding-complete-20261025/` binds all 391 article sources and the twenty selected production pages.
+  It distinguishes the eight pre-existing owners from the twelve new owners and records protected hashes and exact receipt hashes.
+  All 191 repaired question sources still match their earlier sealed repair; statement repairs and coding solutions were not rewritten.
+- `check-252-r4.log` and `build-252-r4.log` record passing complete normal gates on the final source snapshot.
+  Astro reports zero errors, warnings and hints; all 23 prep tests and 106 coding visual contracts pass.
+  Preservation covers all 391 articles; 568 link targets resolve and Pagefind indexes 497 pages.
+- `math-source-252-r4.json`, `built-integrity-252-r4.json` and `preview-integrity-252-r4.json` authenticate 528 math expressions across twenty owners.
+  Plain-source and GFM expressions agree; every expression matches actual HTML-only KaTeX output, including multiplicity.
+  Every selected preview response matches the production page exactly.
+- Twelve `owner-*-20261026.json` arithmetic receipts cover the new owners' fixtures and changed requirements.
+  Checks include 9,837 paired-difference vectors, 20,736 nuisance-model controls, 2,025 factor-gradient cases and 1,092 sparse interaction identities.
+  These are toy arithmetic and structural checks, not training, traffic or empirical-paper reproductions.
+  Segmentation vocabulary, the ranking caption and the label diagram's wrapper changed after their arithmetic receipts.
+  The qualification records those old whole-source hashes explicitly; current source, math, HTML and rendering have separate final bindings.
+- `render-report-252-final.json` accepts 100 five-mode cases at measured 1280/390 CSS-pixel widths, with 108 hashed PNGs.
+  Ninety-five cases remain applicable because all nineteen sources and their built HTML match the original captures exactly.
+  Five refreshed cases qualify the delayed-label diagram after the final direct-Mermaid repair, including native horizontal-scroll endpoints.
+  Reported clipped SVG text and unresolved references are zero; 27 selected captures were inspected directly.
+  Accepted captures are on disk under `render-252-r3/` and `render-252-r4-labels/`, not the old volatile image root.
+- Pixel review found that a nested Mermaid scroller was not observed by the figure-wrapper capture.
+  The final supported form places its title before the visual marker and keeps the direct Mermaid caption after the graph.
+  Mobile start/end and print captures expose the early-positive, pending, censored and mature paths.
+  Initial build failures and all five superseded label captures remain separate evidence, not final acceptance.
+- `reader-controls-252-pass.json` records forty route/viewport cases, eighty native radio-keyboard switches and forty extension-fragment reveals.
+  Every selected page defaults to Full, has one contiguous extension, hides it in Core and restores Full for extension deep links.
+  This adds no whole-library browser, normal-motion lifecycle, GPU or PDF-pagination qualification.
+- `generated-path-recovery-252-20261026.json` records the recovery of two confirmed dangling generated symlinks.
+  The old `.astro` and `dist` links were retained in the evidence directory; repository paths are now local generated directories.
+  No dependency, baseline, planning inventory or unrelated cache was changed; old memory-backed images were not recreated.
+  The production preview is `http://127.0.0.1:4342/`.
+- The separate visual-comprehension review ledger was not edited or advanced by this work.
+  No commit, push, new branch, PR, main merge, deployment, subagent, VS Code task or package installation was performed.
 
 ### Historical blocked checkpoint
 

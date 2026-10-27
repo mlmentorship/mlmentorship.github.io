@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-A value says which node exists. A null marker says where a child does not exist; both are needed to recover shape.
+Convert a binary tree to text and rebuild an independent tree with exactly the same values and structure.
 
 ## Problem
 
-> Convert a tree to text and rebuild the same tree from that text.
+**Input.** Serialization receives a finite integer-valued binary tree; deserialization receives complete text produced by the matching serializer.
 
-Use finite integer-valued binary trees without cycles or shared children. Duplicate values are allowed; shape is recorded independently.
+**Output.** Serialization returns a string. Deserialization returns newly created nodes with the original values and child positions.
 
-Decoding creates new nodes with the same values and child positions, not the original object identities.
+**Rules.** Duplicate and negative values are allowed, but cycles and shared children are not.
+Preserve the source tree. Missing left and right children must remain distinguishable.
+An empty tree must round-trip as `None`; original object identities need not survive.
+The reference assumes trusted, complete serialized input rather than validating arbitrary text.
+
+**Example.** A root 1 with left child 2 and no right child must rebuild with that same missing-right structure.
+Rebuilding root 1 with only a right child 2 would be incorrect despite preserving both values.
 
 ## Picture
 

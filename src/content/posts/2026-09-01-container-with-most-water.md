@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Choose two walls to maximize width times the smaller height.
-Moving inward reduces width; retaining the shorter wall cannot raise the limiting height.
+Choose two vertical walls that can hold the greatest rectangular area of water between them.
 
 ## Problem
 
-For nonnegative integer heights `[1, 8, 6, 2, 5, 4, 8, 3, 7]`, return 49.
-Walls at indices 1 and 8 have width 7 and limiting height 7.
-Positions are unit-spaced. Fewer than two walls return 0. Do not sort: positions determine widths.
+**Input.** A list `heights` of nonnegative integers; index `i` places a vertical wall at horizontal coordinate `i`.
+
+**Output.** Return the largest container area formed by two distinct walls and the horizontal ground.
+
+**Rules.** Walls cannot tilt, so the shorter wall limits the water height.
+Positions are unit-spaced; area is their separation multiplied by the smaller height.
+Preserve the input and its order. Fewer than two walls return zero.
+
+**Example.** `[1, 8, 6, 2, 5, 4, 8, 3, 7]` returns `49`.
+Walls at indices 1 and 8 have width 7 and limiting height 7, giving area `7 * 7`.
 
 ## Picture: Evaluate Before Discarding a Wall
 

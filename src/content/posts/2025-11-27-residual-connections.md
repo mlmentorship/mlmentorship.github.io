@@ -31,7 +31,7 @@ The input goes to both branches. Addition joins their values in the forward pass
 	<p class="visual-title" id="residual-gradient-title">Add branch values, then add branch gradient contributions.</p>
 	<svg viewBox="0 0 360 620" role="img" aria-labelledby="residual-gradient-svg-title residual-gradient-svg-desc">
 		<title id="residual-gradient-svg-title">Forward and backward paths through one residual addition</title>
-		<desc id="residual-gradient-svg-desc">Input two splits into f(x)=0.2 and unchanged x=2. Addition gives y=2.2 and loss y squared over two gives upstream gradient 2.2. Backward, the residual branch contributes 0.1 times 2.2, or 0.22. The identity contributes 2.2. Their sum is 2.42. The displayed matrix formula uses row gradients.</desc>
+		<desc id="residual-gradient-svg-desc">The specified function is f(x)=0.1x, so its derivative is 0.1. Input two splits into f(2)=0.2 and unchanged x=2. Addition gives y=2.2 and loss y squared over two gives upstream gradient 2.2. Backward, the residual branch contributes 0.1 times 2.2, or 0.22. The identity contributes 2.2. Their sum is 2.42.</desc>
 		<defs>
 			<marker id="arrow-forward" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="viz-arrow-forward" d="M0,0 L8,4 L0,8 Z"></path></marker>
 			<marker id="arrow-backward" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="viz-arrow-backward" d="M0,0 L8,4 L0,8 Z"></path></marker>
@@ -42,8 +42,8 @@ The input goes to both branches. Addition joins their values in the forward pass
 		<path class="viz-forward" d="M180 82V105H85V126"></path>
 		<path class="viz-forward" d="M180 82V105H275V126"></path>
 		<rect class="viz-node" x="25" y="128" width="120" height="54" rx="5"></rect>
-		<text class="viz-node-label" x="85" y="151">residual branch</text>
-		<text class="viz-node-value" x="85" y="169">f(x) = 0.2</text>
+		<text class="viz-node-label" x="85" y="151">f(x) = 0.1x</text>
+		<text class="viz-node-value" x="85" y="169">f(2) = 0.2</text>
 		<rect class="viz-node viz-node--focus" x="215" y="128" width="120" height="54" rx="5"></rect>
 		<text class="viz-node-label" x="275" y="151">identity branch</text>
 		<text class="viz-node-value" x="275" y="169">x = 2 unchanged</text>
@@ -57,14 +57,14 @@ The input goes to both branches. Addition joins their values in the forward pass
 		<line class="viz-gridline" x1="16" y1="322" x2="344" y2="322"></line>
 		<text class="viz-axis-label" x="16" y="349">BACKWARD · THE ADD NODE SENDS g DOWN BOTH BRANCHES</text>
 		<rect class="viz-node viz-node--input" x="80" y="368" width="200" height="44" rx="5"></rect>
-		<text class="viz-node-label" x="180" y="387">upstream gradient</text>
+		<text class="viz-node-label" x="180" y="387">Loss L = y² / 2</text>
 		<text class="viz-node-value" x="180" y="403">g = ∂L/∂y = 2.2</text>
 		<path class="viz-backward" d="M180 412V435H85V454"></path>
 		<path class="viz-backward" d="M180 412V435H275V454"></path>
 		<rect class="viz-node" x="20" y="456" width="130" height="62" rx="5"></rect>
 		<text class="viz-node-label" x="85" y="478">through f</text>
 		<text class="viz-node-value" x="85" y="496">g · J<tspan baseline-shift="sub" font-size="8">f</tspan> = 0.22</text>
-		<text class="viz-node-value" x="85" y="511">uses residual Jacobian</text>
+		<text class="viz-node-value" x="85" y="511">f'(x) = 0.1</text>
 		<rect class="viz-node viz-node--focus" x="210" y="456" width="130" height="62" rx="5"></rect>
 		<text class="viz-node-label" x="275" y="478">direct route</text>
 		<text class="viz-node-value" x="275" y="496">g · I = 2.2</text>

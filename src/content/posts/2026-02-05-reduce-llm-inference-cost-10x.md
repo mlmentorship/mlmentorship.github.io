@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team and platform interviews, especially at companies serving LLMs at scale.*
 
-The L4 answer picks one technique. The L6 answer diagnoses where the cost actually is, then picks the highest-leverage levers in order. Engineering judgment matters more than technique knowledge.
+Investigate whether an LLM service can reduce inference cost tenfold without violating its quality, latency, or reliability requirements.
+
+## Problem
+
+**Context.** A hypothetical production service has a measured baseline workload and spend, but the dominant cost components are not yet identified.
+The requested tenfold reduction is a target, not an established feasible outcome.
+
+**Task.** Define cost per useful completed request, attribute the baseline, prioritize interventions, and propose controlled evaluations and rollout.
+Estimate combined savings without double-counting and explain what would make the target infeasible.
+
+**Constraints.** Hold the compared task mix and quality contract explicit.
+Include retries, cache coverage, routing failures, output lengths, and operating costs; cheaper requests that fail more often may not save money.
 
 <p class="visual-kicker">Learning objective</p>
 <p class="visual-title">Measure, test, and compound cost reductions without hiding a quality regression</p>

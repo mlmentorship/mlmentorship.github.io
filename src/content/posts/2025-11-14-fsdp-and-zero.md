@@ -1,6 +1,6 @@
 ---
-title: "FSDP and ZeRO: sharding optimizer state, gradients, and parameters"
-description: "How modern training scales beyond a single GPU's memory by partitioning the optimizer state, gradients, and parameters across the data-parallel group."
+title: "FSDP and ZeRO: budget shards and temporary gathers"
+description: "Derive persistent bytes at each sharding stage, trace one gathered unit, and test communication and activation-memory changes."
 date: "2025-11-14"
 draft: false
 tags: ["concepts"]
@@ -10,20 +10,26 @@ aliases: ["ZeRO-3", "ZeRO stage 3", "fully sharded data parallel", "parameter sh
 
 ## Summary
 
-ZeRO stages progressively partition optimizer state, gradients, and model parameters across data-parallel GPUs. Fully Sharded Data Parallel (FSDP) partitions all three persistent state types. Earlier ZeRO stages leave some state replicated.
+Sharding removes replicated stored state; computation can still require a temporary full parameter unit.
+Budget both the persistent shards and the buffers live during computation.
 
-Training memory has four big consumers:
+**Task:** place one billion parameters across four ranks.
+Assume BF16 parameters and gradients, FP32 Adam moments, and a separate FP32 master stored with optimizer shards.
+Count decimal GB, not GiB, and initially exclude activations and temporary buffers.
+How many persistent bytes remain on each rank?
 
-| Component | Bytes per parameter (BF16 + FP32 master + Adam) |
+| Component | Bytes per parameter |
 |-----------|----------------------|
 | Parameters (BF16) | 2 |
 | Gradients (BF16) | 2 |
 | Adam first moment $m$ (FP32) | 4 |
 | Adam second moment $v$ (FP32) | 4 |
-| Master weights (FP32, optional) | 4 |
-| **Total** | **~12–16 bytes/param** |
+| Separate master weights (FP32, assumed here) | 4 |
+| **Total** | **16** |
 
-A 7B-parameter model therefore needs about 84–112 GB of persistent training state before activations and temporary buffers. The lower value omits separate FP32 master weights. The exact value depends on optimizer and framework storage. Ideal full sharding spreads persistent state across $N$ GPUs, but each GPU also needs transient gathered parameters, communication buffers, and activations.
+Without separate masters, this convention totals twelve bytes, not sixteen.
+Framework precision and storage choices must be checked rather than inferred from the parameter dtype alone.
+The figure traces one fully sharded unit; box widths distinguish ownership from temporary reconstruction, not byte proportions.
 
 <!-- visual:fsdp-wrapped-unit-lifecycle -->
 <figure class="learning-figure plot-panel" aria-labelledby="fsdp-lifecycle-visual-title">
@@ -65,52 +71,102 @@ A 7B-parameter model therefore needs about 84–112 GB of persistent training st
 		<rect class="viz-node viz-node--output" x="20" y="480" width="320" height="28" rx="4"></rect>
 		<text class="viz-callout" x="180" y="499" text-anchor="middle">local step: Oᵢ + Gᵢ updates Pᵢ</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> read the narrow shard boxes as what rank <var>i</var> owns across the step. The wide boxes are temporary peaks: full parameters for only the active wrapped unit are all-gathered for forward and again for backward, then freed. Reduce-scatter returns only <var>Gᵢ</var>, so the local optimizer shard can update <var>Pᵢ</var>. Activations and communication buffers still add to peak memory. Original schematic checked against the <a href="https://arxiv.org/abs/1910.02054">ZeRO paper</a>, <a href="https://docs.pytorch.org/docs/2.13/fsdp.html">PyTorch FSDP documentation</a>, and <a href="https://deepspeed.readthedocs.io/en/stable/zero3.html">DeepSpeed ZeRO documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> narrow boxes show what rank <var>i</var> owns across the step. Wide boxes show the temporary full unit gathered for compute. This policy frees parameters after forward, so backward needs another gather. Reduce-scatter leaves <var>Gᵢ</var>; the local optimizer updates <var>Pᵢ</var>. Activations and communication buffers add to the peak. Original schematic checked against the <a href="https://arxiv.org/abs/1910.02054">ZeRO paper</a>, <a href="https://docs.pytorch.org/docs/2.13/fsdp.html">PyTorch FSDP documentation</a>, and <a href="https://deepspeed.readthedocs.io/en/stable/zero3.html">DeepSpeed ZeRO documentation</a>.</figcaption>
 </figure>
-
-ZeRO ([Rajbhandari et al., 2019](https://arxiv.org/abs/1910.02054), DeepSpeed) and PyTorch FSDP implement this idea. They are the standard for any training run that doesn't fit in a single GPU's memory and doesn't need full tensor or pipeline parallelism.
 
 ## The three stages (ZeRO-1/2/3)
 
+Let $P$ be parameter count and $N$ the data-parallel group size.
+Optimizer storage here includes eight moment bytes and four master-weight bytes per parameter.
+
 ### Stage 1: shard optimizer state
-Each GPU holds the full parameters and gradients but only $1/N$ of the Adam moments. After the backward pass, each GPU updates its slice and then all-gathers updated parameters.
-Memory reduction: up to about 4× for large groups, depending on master-weight storage.
+
+Parameters and gradients stay replicated; optimizer storage divides across ranks:
+$M_1=P(4+12/N)$ bytes.
+For the fixture, $M_1=4+12/4=7$ GB, versus the replicated $16$ GB.
+Each rank updates its owned slice, then shares updated parameters as required by the implementation.
 
 ### Stage 2: shard optimizer state + gradients
-Same as Stage 1 plus gradients are reduced-scattered (each GPU keeps its slice) instead of all-reduced.
-Memory reduction: up to about 8× for large groups under the 16-byte assumption.
+
+Only parameters stay replicated: $M_2=P(2+14/N)=5.5$ GB here.
+Reduced gradient shards support local optimizer updates.
+The large-$N$ reduction tends to eightfold under this sixteen-byte convention; at four ranks it is only $16/5.5\approx2.91$.
 
 ### Stage 3 (FSDP): shard optimizer state + gradients + parameters
-Each GPU holds only its persistent slice of the parameters. It all-gathers one wrapped unit before computing that unit. If the full parameters are freed after forward, they must be gathered again for backward. Keeping them through backward saves that second gather but raises peak memory.
-Memory reduction: nearly $N$× for persistent model state. Peak memory also includes at least one gathered unit and temporary buffers.
 
-PyTorch FSDP and DeepSpeed ZeRO-3 are common implementations of full parameter sharding.
+Ideal persistent storage becomes $M_3=16P/N=4$ GB.
+All three formulas return sixteen GB at $N=1$.
+FSDP and ZeRO-3 implement related full-sharding approaches, not identical APIs or peak-memory policies.
+
+The lifecycle is gather, forward, free, gather again, backward, reduce-scatter, and local update.
+Prefetch and retained units can overlap those windows and increase live memory.
+
+### Trade a gather for retention
+
+**New task:** reduce communication when memory has headroom.
+Suppose a wrapped unit contains $250$ million BF16 parameters: its full gathered buffer is $0.5$ GB.
+Assume the four-GB persistent shard remains allocated alongside two-GB activations and $0.5$ GB of other buffers.
+Conservatively counting a separate full gather gives $4+2+0.5+0.5=7$ GB.
+
+**Check:** retaining this unit through backward avoids its second gather but keeps that buffer live.
+An ideal four-rank ring gather sends and receives $3/4\times0.5=0.375$ GB per rank.
+Retaining four equal units instead raises this ledger to $8.5$ GB, exceeding an eight-GB device.
+**Use when:** measured communication warrants a policy whose complete live-buffer set fits.
+
+### Change the dominant memory
+
+**New task:** activations grow to six GB while local batch and sequence length stay fixed across rank comparisons.
+At four ranks, the same ledger becomes $4+6+0.5+0.5=11$ GB.
+At eight ranks, persistent state halves, but $2+6+0.5+0.5=9$ GB still exceeds eight GB.
+
+**Check:** a hypothetical checkpointing change reducing activations to two GB gives five GB at eight ranks, with recomputation cost.
+**Use when:** activations dominate; state sharding alone does not divide that term.
+
+### Failure and transfer
+
+A giant wrapping unit can exceed capacity even when persistent shards are small.
+**Reconstruct:** why can smaller units be slower?
+
+<details><summary>Answer</summary>
+
+Smaller gathers reduce individual buffers but increase collective launches and can weaken efficient overlap.
+Choose from measured peak liveness and step time, not persistent bytes alone.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Tradeoffs
 
-- **Memory vs. communication**: each stage trades more communication for less memory.
-- **Sharding granularity**: FSDP can wrap individual layers ("auto-wrap policy") so all-gathers cover only one layer's parameters at a time, capping peak unsharded memory.
-- **Mixing with tensor parallelism**: FSDP shards across the data-parallel dimension. Very large runs often combine it with tensor parallelism on the fastest links. The exact placement follows the cluster topology.
+- Wrapping determines gather size, launch count, and parameter lifetime; prefetch can make multiple full units overlap.
+- Gather retention trades traffic for live memory; allocator reuse and storage aliasing change the actual peak.
+- Shard counts can be uneven, especially with small tensors or padding.
+- Hybrid groups shard within a selected group and replicate across groups; use that sharding degree, not total GPU count.
+- Checkpoint formats and reshard-on-load policies must preserve parameter identity, optimizer state, and update count.
 
 ## When to use what
 
 | Constraint | Strategy |
 |-----------|----------|
-| Fits on 1 GPU | DDP (no sharding) |
+| Replicated state fits across the target data-parallel workers | Consider DDP without state sharding |
 | Persistent optimizer state is the first limit | ZeRO-1 |
 | Optimizer state and gradients are the limit | ZeRO-2 |
 | Stored parameters are also the limit | FSDP / ZeRO-3 |
-| One gathered layer is too large | Add tensor parallelism |
+| One gathered layer is too large | Revisit wrapping or consider tensor parallelism |
 | Depth or topology needs another split | Consider pipeline parallelism |
 
 ## Common pitfalls
 
-- **FSDP alone does not shard activation dimensions.** Each GPU still holds activations for its data-parallel slice. Use [activation checkpointing](/concepts/activation-checkpointing/) or sequence/context parallelism when those activations dominate.
-- **All-gather overhead at small layer size.** Wrapping every linear layer separately can dominate runtime; wrap at transformer-block granularity instead.
-- **Confusing sharding with tensor parallelism.** Sharding (FSDP) splits state across data-parallel ranks and reconstructs it for compute. Tensor parallelism splits the *compute* of a single layer; the math is different.
+FSDP does not inherently partition every activation dimension.
+Use [activation checkpointing](/concepts/activation-checkpointing/) or an appropriate sequence/context layout for the actual dominant term.
+Tensor parallelism partitions a layer's computation; it has different layout and collective contracts.
+The numerical ledgers above are hypothetical accounting examples, not measured allocator peaks or performance claims.
 
 ## Related
 
 - [Strong scaling and parallelism selection](/concepts/strong-scaling-and-parallelism-selection/). Choose the lightest sharding stage that fits.
 - [Sharded matrix multiplication](/concepts/sharded-matrix-multiplication/). Connect layouts with all-gather and reduce-scatter.
 - [Transformer compute and memory accounting](/concepts/transformer-compute-memory-accounting/). Build the memory budget first.
+
+</div>

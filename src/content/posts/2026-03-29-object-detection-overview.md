@@ -7,57 +7,35 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
+Object detection constructs a scored set of boxes; candidate generation, training assignment and duplicate handling are separate choices.
+
 ## Summary
 
-**Object detection** outputs, for each input image, a set of (bounding box, class label, confidence) tuples for the objects present. The three architectural families: **two-stage** (Faster R-CNN family. First propose regions, then classify), **one-stage** (YOLO, RetinaNet. Predict box and class in one pass at every grid cell), and **set-prediction** (DETR. Transformer encoder-decoder predicts a fixed-size set of boxes).
-
-Detection is the **core production CV task**: autonomous driving, retail analytics, surveillance, medical imaging, robotics. The architectural choice determines latency-accuracy tradeoffs and what's possible in your inference budget.
+Where are candidates generated, assigned to target objects, and converted into the final prediction set?
+Declare box coordinates, classes, score meaning and the maximum output count.
+Background or no-object predictions are not additional objects.
 
 ## Two-stage: Faster R-CNN [(Ren et al., 2015)](https://arxiv.org/abs/1506.01497)
 
-Architecture:
-
-1. **Backbone** (ResNet, ConvNeXt) extracts feature map.
-2. **Region Proposal Network (RPN)** slides a small network over the feature map, predicts (objectness, box-refinement) at each anchor (preset boxes of various scales / aspect ratios).
-3. **RoI Pooling / RoIAlign**: extract fixed-size feature for each top-K proposed region.
-4. **Classification + bbox regression head**: per region.
-
-**Strengths**: high accuracy; standard for COCO leaderboards; basis for Mask R-CNN (adds segmentation head).
-
-**Weaknesses**: slow (two stages, hundreds of region computations per image); 5–30 FPS on a GPU.
-
-**Used when**: accuracy matters more than latency; offline analytics; medical imaging.
+Extract backbone features, generate RPN objectness/box proposals, then classify and refine selected regions.
+RoI pooling quantizes regions; RoIAlign samples aligned features without that coordinate quantization.
+Proposal and final duplicate handling belong to the specified implementation.
+Mask R-CNN adds a mask head; it does not change this comparison into a speed guarantee.
 
 ## One-stage: YOLO ([Redmon et al., 2015](https://arxiv.org/abs/1506.02640) onward), RetinaNet [(Lin 2017)](https://arxiv.org/abs/1708.02002)
 
-Predict boxes and classes directly at every grid cell of the feature map, in a single forward pass:
-
-- **YOLO v1**: $S \times S$ grid, each cell predicts B bounding boxes + class.
-- **YOLO v3**: multi-scale predictions across three feature-map levels.
-- **YOLO v5/v7/v8/v10/v12**: ongoing engineering improvements (anchor-free, attention, distillation).
-- **RetinaNet**: Focal Loss to handle the extreme class imbalance between foreground and background anchors.
-
-**Strengths**: real-time (60–300+ FPS); simpler to deploy.
-
-**Weaknesses**: historically lower accuracy than two-stage; gap closed by ~2020.
-
-**Used when**: real-time required; embedded / edge deployment; autonomous driving.
+Dense heads predict from feature locations without a separate region-classification stage.
+YOLO v1's grid differs from v3's multiscale predictions and later anchor-free or assignment variants.
+Name the version and head, not merely the family.
+RetinaNet uses focal loss to reduce easy-background dominance.
+Anchor-free parameterization does not imply NMS-free inference.
 
 ## Set prediction: DETR [(Carion et al., 2020)](https://arxiv.org/abs/2005.12872)
 
-A transformer encoder-decoder that outputs a **fixed set** of $N$ predictions (e.g., $N = 100$):
-
-1. CNN backbone extracts features.
-2. Flatten to a sequence; transformer encoder processes.
-3. Transformer decoder takes $N$ learned object queries; cross-attends to encoder features.
-4. Each query produces (box, class). Including a "no object" class for unused queries.
-5. Loss: bipartite matching (Hungarian) between predictions and ground-truth boxes.
-
-**Strengths**: no anchors, no NMS; cleaner formulation; scales with transformer pretraining.
-
-**Weaknesses**: slow training convergence; lower throughput than YOLO. **Deformable DETR**, **DINO** (DETR with denoising), **Co-DETR** addressed convergence and accuracy.
-
-**Used when**: research / leaderboard work; integration with vision-language pretraining (Grounding DINO, OWL-ViT).
+Learned object queries attend to encoded image features and predict boxes/classes, including no-object.
+During training, one-to-one matching assigns targets to distinct slots; unmatched queries receive the specified no-object loss.
+Inference does not match against unavailable ground truth.
+Original DETR emits slots without an NMS stage, but training incentives do not mathematically forbid all duplicate predictions.
 
 <!-- visual:detector-candidate-resolution -->
 <figure class="learning-figure" aria-labelledby="detector-resolution-title">
@@ -119,47 +97,106 @@ A transformer encoder-decoder that outputs a **fixed set** of $N$ predictions (e
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> classic proposal and dense detectors may score several boxes for the same object, so NMS removes lower-scoring overlaps at inference. DETR moves uniqueness into training: Hungarian matching gives each ground-truth object at most one query slot, unused slots learn “no object,” and inference emits the resulting set directly.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the left lane resolves scored overlaps with inference-time NMS. The right lane assigns targets one-to-one during training and predicts a set at inference. That objective discourages duplicates; it does not guarantee perfect uniqueness.</figcaption>
 </figure>
+
+## Work the assignment
+
+| Matching cost | Target one | Target two |
+| --- | --- | --- |
+| Query one | 1 | 2 |
+| Query two | 2 | 100 |
+
+Taking query one's cheapest target first leaves total cost $1+100=101$.
+Swapping assignments gives $2+2=4$, the global minimum.
+Matching cost selects pairs; subsequent training losses and their weights must be defined separately.
+This equal-count toy omits unmatched-query costs.
+
+## Change the deployment requirement
+
+### Meet a request deadline
+
+**New task:** complete an edge request within thirty milliseconds.
+
+**Picture and change:** a hypothetical serial trace takes four ms preprocessing, eighteen ms model time and ten ms postprocessing.
+
+**Check:** total time is 32 ms, so the model-only timing hides a miss.
+A compatible twelve-ms model gives 26 ms on that same assumed trace.
+Measure accuracy, memory and actual end-to-end tails; component percentiles cannot simply be added.
+
+**Use when:** service constraints change; family labels alone do not establish FPS or quality.
+
+### Prioritize small or crowded objects
+
+**New task:** one-pixel localization errors now determine usefulness.
+
+**Picture and change:** shift a two-by-two box one pixel horizontally: IoU becomes $2/6=1/3$.
+
+**Check:** the same shift of a twenty-by-twenty box gives $380/420=19/21$.
+Evaluate small/crowded slices and consider resolution, multiscale features and duplicate policy.
+Text-conditioned classes additionally need grounding checks; a vocabulary match is not localization evidence.
+
+**Use when:** the object distribution or class vocabulary differs from the benchmark average.
+
+## Reconstruct the distinction
+
+Does using no anchors remove duplicate-resolution requirements?
+
+<details>
+<summary>Reasoned answer</summary>
+
+No. Parameterization, training assignment and inference selection are independent design axes.
+An anchor-free head can still use NMS.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Key shared components
 
 ### Bounding box parameterization
-Either $(x_\text{center}, y_\text{center}, w, h)$ or $(x_\text{min}, y_\text{min}, x_\text{max}, y_\text{max})$. Critical for loss design.
+
+Declare center/size versus corner coordinates, normalization, resizing and padding transforms before losses or evaluation.
 
 ### IoU loss
-Intersection over Union directly measures box overlap. Variants: GIoU, DIoU, CIoU. Handle non-overlapping boxes better than naive L1 / L2 on coordinates.
+
+IoU compares intersection to union; disjoint boxes have zero IoU.
+GIoU adds enclosure geometry; DIoU uses center distance; CIoU includes an aspect-ratio term.
+These are different objectives, not interchangeable names for ordinary coordinate L1 loss.
 
 ### Non-Maximum Suppression (NMS)
-Post-processing for anchor-based detectors: remove duplicate boxes for the same object by keeping highest-confidence and suppressing others with IoU > threshold (typically 0.5). DETR-family removes the need for NMS by design.
+
+Specify score ordering, class grouping, IoU threshold and maximum detections.
+Aggressive suppression can remove distinct nearby objects.
+See the anchor/NMS owner for exact decode and threshold arithmetic.
 
 ### Anchors
-Predefined boxes of various scales / aspect ratios. The detector predicts offsets from these. **Anchor-free** methods (FCOS, CenterNet, YOLOv8) predict box centers directly.
+
+Anchors provide reference geometry for offsets; anchor-free heads use other coordinate conventions.
+Neither alone specifies assignment or postprocessing.
 
 ## Datasets and metrics
 
-- **PASCAL VOC** (legacy): 20 classes; mAP@IoU=0.5.
-- **COCO**: 80 classes; metric **mAP** averaged over IoU thresholds 0.5 → 0.95 (the dominant 2026 benchmark).
-- **Open Images, LVIS**: large-vocabulary detection.
-
-The standard evaluation: average precision per class, then mean across classes (mAP).
+VOC, COCO, Open Images and LVIS use different classes and evaluation conventions.
+Use the official evaluator and state IoU thresholds, interpolation, area slices, class averaging and maximum detections.
+AP integrates a ranked precision-recall curve under that protocol; duplicates do not universally reduce AP in every score order.
 
 ## Production considerations
 
-- **Latency**: YOLO-class models for real-time; Faster R-CNN for accuracy.
-- **Class imbalance**: many backgrounds, few foregrounds. Focal loss (RetinaNet) addresses this.
-- **Small objects**: hardest case; multi-scale features (FPN. Feature Pyramid Network) help.
-- **Open vocabulary**: align detector classes with text embeddings (CLIP-style) for zero-shot detection (OWL-ViT, Grounding DINO).
+FPN supplies multiscale features; test whether the small-object slice improves.
+Deformable DETR, DINO and related variants change computation or training; retain versioned comparisons.
+Open-vocabulary models add text-conditioned class support, not guaranteed grounding for arbitrary new objects.
 
 ## Common pitfalls
 
-- **Training on small datasets without strong augmentation.** Detection is data-hungry; mosaic, mixup, copy-paste augmentations standard.
-- **Confusing IoU thresholds.** mAP@0.5 ≠ mAP@0.5:0.95; specify which.
-- **Forgetting NMS / NMS thresholds.** Setting NMS too aggressive merges distinct objects; too loose duplicates them.
-- **Using the wrong evaluation tool.** COCO eval and VOC eval differ; use the one for your reporting benchmark.
-- **Treating YOLO as a single algorithm.** Many YOLO versions exist with very different performance; cite the specific version.
+An unspecified FPS number omits hardware, resolution, batching and postprocessing.
+Keep annotation policy, augmentation and class/area coverage visible when comparing detectors.
 
 ## Related
 
 - [CNN architecture](/concepts/cnn-architecture/). Backbone.
 - [Vision transformers](/concepts/vision-transformers/). Alternative backbone.
+
+</div>

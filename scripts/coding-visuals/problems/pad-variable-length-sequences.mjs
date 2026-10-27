@@ -3,13 +3,13 @@ import { defineVisual, frame, grid, visual } from '../primitives.mjs';
 const scene = (rows, row, col, extra = {}) => grid(rows, [
   { row, col, label: 'fill cursor', tone: extra.result ? 'output' : 'focus', key: 'fill-cursor' },
 ], {
-  input: 'sequences=[[3,4],[],[9]], pad_value=0',
+  input: 'sequences=[[3,0],[],[9]], pad_value=0',
   ...extra,
 });
 
 const draft = visual('Allocate one batch-width rectangle filled with pad values, then copy each sequence and mark the identical half-open slice as valid.', [
   frame('Find the rectangular width', 'Lengths 2, 0 and 1 give width 2. Both output arrays therefore have shape (3,2).', scene([
-    ['row 0: 3', 'row 0: 4'],
+    ['row 0: 3', 'row 0: 0'],
     ['row 1: empty', 'row 1: empty'],
     ['row 2: 9', 'row 2: empty'],
   ], 0, 0, {
@@ -23,15 +23,15 @@ const draft = visual('Allocate one batch-width rectangle filled with pad values,
   ], 0, 0, {
     shapes: 'tokens (3,2); mask (3,2)',
   }), 'allocate'),
-  frame('Fill row 0 through slice [0:2]', 'Copy [3,4] into tokens[0,:2] and set mask[0,:2]=True. Token and mask boundaries are identical.', scene([
-    ['3 | true', '4 | true'],
+  frame('Fill row 0 through slice [0:2]', 'Copy [3,0] into tokens[0,:2] and set mask[0,:2]=True. The input zero is valid, just like the input three.', scene([
+    ['3 | true', '0 | true'],
     ['0 | false', '0 | false'],
     ['0 | false', '0 | false'],
   ], 0, 1, {
-    assignment: 'tokens[0,:2]=[3,4]; mask[0,:2]=True',
+    assignment: 'tokens[0,:2]=[3,0]; mask[0,:2]=True',
   }), 'fill-row-zero'),
   frame('Process the empty row', 'For row 1, len(sequence)=0, so both [1,:0] assignments are empty slices and no cell changes.', scene([
-    ['3 | true', '4 | true'],
+    ['3 | true', '0 | true'],
     ['0 | false', '0 | false'],
     ['0 | false', '0 | false'],
   ], 1, 0, {
@@ -39,18 +39,18 @@ const draft = visual('Allocate one batch-width rectangle filled with pad values,
     decision: 'empty slice changes nothing',
   }), 'keep-empty-row'),
   frame('Fill row 2 through slice [0:1]', 'Copy [9] into the first token cell and mark only that position true; the second cell remains padding.', scene([
-    ['3 | true', '4 | true'],
+    ['3 | true', '0 | true'],
     ['0 | false', '0 | false'],
     ['9 | true', '0 | false'],
   ], 2, 0, {
     assignment: 'tokens[2,:1]=[9]; mask[2,:1]=True',
   }), 'fill-row-two'),
-  frame('Return aligned token and mask rectangles', 'The mask distinguishes the real token 0 convention from padding: every true cell came from input and every false cell remained allocated padding.', scene([
-    ['3 | true', '4 | true'],
+  frame('Return aligned token and mask rectangles', 'Compare row 0, column 1 with row 1, column 1: both tokens are zero, but only the first came from input. Validity depends on sequence length, not token value.', scene([
+    ['3 | true', '0 | true'],
     ['0 | false', '0 | false'],
     ['9 | true', '0 | false'],
   ], 2, 1, {
-    tokens: '[[3,4],[0,0],[9,0]]',
+    tokens: '[[3,0],[0,0],[9,0]]',
     mask: '[[T,T],[F,F],[T,F]]',
     result: 'tokens shape (3,2), mask shape (3,2)',
   }), 'return'),

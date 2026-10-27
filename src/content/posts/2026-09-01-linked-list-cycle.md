@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Two references moving at different speeds eventually identify the same node inside a cycle; equal stored values prove nothing.
+Determine whether repeatedly following a linked list's next references eventually revisits the same node.
 
 ## Problem
 
-Check whether following `next` from a head ever revisits a node.
-For `1 -> 2 -> 3 -> 4` with `4.next` pointing to node `2`, return `True`.
-Do not change links or store every visited node.
-Use ordinary `ListNode` objects with stable `next` links; an empty list returns `False`.
+**Input.** A `ListNode` head reference, or `None`, with stable `next` links that may form a cycle.
+
+**Output.** Return `True` if a node can be visited again by following `next`; otherwise return `False`.
+
+**Rules.** Compare node identity, not stored values: two different nodes may contain the same value.
+Do not change links or retain every visited node; use constant auxiliary pointer storage.
+An empty list returns `False`. A node pointing to itself returns `True`.
+
+**Example.** For `1 -> 2 -> 3 -> 4` with `4.next` pointing to the existing node 2, return `True`.
+Four distinct nodes with no backward link return `False`, even if two values are equal.
 
 ## Picture
 

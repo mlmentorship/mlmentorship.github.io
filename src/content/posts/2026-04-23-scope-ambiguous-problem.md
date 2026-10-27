@@ -8,10 +8,17 @@ category: "questions"
 ---
 
 
-Turn a symptom into a bounded decision before committing to a model.
-A prototype is useful when it resolves the deciding uncertainty.
+Turn an ambiguous request for a larger model into a bounded investigation with an explicit decision and success criterion.
 
 ## Problem
+
+**Context.** A requester attributes poor generated answers to model size, while selected complaint cases have the invented cause assignments below.
+
+**Task.** Clarify the desired outcome, identify the first deciding uncertainty, and propose a small investigation with predicted results.
+State a success criterion, scope boundary, owner, and conditions for changing direction.
+
+**Constraints.** The complaint sample is selected, not a representative estimate of all traffic.
+Do not convert its counts into a causal claim that one intervention solves the whole product problem.
 
 A requester wants a larger generator because answers are poor.
 In this fictional triage, 50 selected complaint cases have disjoint assigned causes:
@@ -25,6 +32,8 @@ In this fictional triage, 50 selected complaint cases have disjoint assigned cau
 What should the first investigation change? Which conclusion cannot be drawn from these counts?
 
 ## Picture: Find the Decision-Changing Unknown
+
+<p class="visual-title">A selected complaint sample does not estimate prevalence</p>
 
 <!-- visual:ambiguous-problem-scope-loop -->
 ```mermaid

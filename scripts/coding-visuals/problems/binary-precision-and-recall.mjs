@@ -19,7 +19,7 @@ const cursor = (row, extra = {}) => table(
 );
 
 const draft = visual('Build TP, FP, and FN with elementwise Boolean masks, then divide TP by predicted-positive and actual-positive totals with zero-denominator guards.', [
-  frame('Classify index 0 as true positive', 'label=1 and prediction=1 makes both equality masks true, so TP increases from 0 to 1.', cursor(0, {
+  frame('Classify index 0 as true positive', 'Both label and prediction equal one. TP increases from zero to one.', cursor(0, {
     masks: '(label==1)&(prediction==1) = true',
     counts: 'TP=1 FP=0 FN=0',
   }), 'index-zero'),

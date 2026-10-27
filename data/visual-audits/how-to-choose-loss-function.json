@@ -3,12 +3,12 @@
   "slug": "how-to-choose-loss-function",
   "article": "src/content/posts/2026-03-09-how-to-choose-loss-function.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Separate the training loss that elicits a predictive quantity from the deployment rule that converts that prediction into a cost-sensitive action.",
-  "mediumRationale": "A two-rail Mermaid flow is the smallest medium that separates estimation from decision-making while preserving their connection through held-out evaluation. One rail maps the required prediction to a compatible loss; the other maps calibrated predictions and deployment costs to an action rule. The tall responsive layout preserves the six-line quantity-to-loss mapping without adding an unnecessary horizontal scroll region.",
+  "mediumRationale": "Aligned, zero-based bars encode the exact loss and action-cost comparisons instead of placing the arithmetic inside a branching flow. Residual magnitudes remain visible above both prediction objectives, and a divider keeps the binary decision a separate task.",
   "mediumComparison": {
-    "mermaid": "Selected because the lesson is a relationship among prediction targets, training objectives, validation metrics, and deployment decisions rather than quantitative curve geometry.",
-    "svg": "Rejected because fixed coordinates add maintenance and mobile-label risk without improving the causal sequence.",
+    "mermaid": "Rejected because branching layout buries the quantitative comparisons and shrinks labels without adding useful dependencies.",
+    "svg": "Selected because common baselines within each objective make its preferred constant or action directly comparable. MSE, MAE and action cost retain separate scales and units.",
     "semanticHtml": "Rejected because a table could list canonical pairings but would reinforce lookup-table thinking and obscure the separation between estimation and action.",
     "interaction": "Rejected because swapping costs or thresholds would add controls without improving the prerequisite distinction between the two rails.",
     "paperReuse": "Rejected because the reviewed sources contain broader mathematical treatments or domain-specific results, not this interview-oriented synthesis; no source figure has both the required scope and verified reuse permission.",
@@ -81,6 +81,13 @@
     "visualIds": [
       "loss-estimation-vs-decision"
     ],
-    "accessibility": "The rendered learning title and Mermaid diagram provide a visible question, a specific accessible title, and a complete description of both rails. Every box names its role, arrow direction carries sequence, dashed feedback denotes held-out validation, and explicit labels distinguish training from deployment without relying on color. The established tall primitive fits the complete graph without horizontal scrolling and renders its smallest label at 11.60 pixels in an exact 390 CSS pixel viewport. Shared theme variables preserve dark-mode and print contrast."
+    "accessibility": "A visible title, linked SVG title and complete description explain both tasks. Numeric labels and shorter-bar comparisons identify winners without color. The vertically ordered comparison fits a single viewBox without a horizontal minimum width; theme variables support dark and print rendering."
+  },
+  "comprehensionRevision": {
+    "reviewedAt": "2026-10-26",
+    "problem": "The branching diagram hid simple comparisons and failed the earlier desktop text-size check.",
+    "change": "Draw residual magnitudes and objective-specific cost bars, with an explicit boundary before the independent action example.",
+    "readerCheck": "Why does squared loss prefer 3 while absolute loss prefers 0, and why can p=0.8 still lead to a negative action?",
+    "evidenceLimit": "Expert illustration redesign; learner improvement is not measured."
   }
 }

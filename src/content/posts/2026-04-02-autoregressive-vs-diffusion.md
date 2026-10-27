@@ -9,18 +9,18 @@ category: "concepts"
 
 ## Summary
 
-**Autoregressive (AR)** models factorize $p(x) = \prod_t p(x_t \mid x_{<t})$ and generate one element at a time. **Diffusion** models learn to invert a Markov noising process and generate by iteratively denoising from Gaussian noise. AR dominates language; diffusion dominates images.
+Autoregressive sampling appends an element conditioned on the retained prefix; conventional diffusion sampling revises a complete provisional state.
+Both can require dependent rounds even when a model call contains parallel computation.
+Compare output support, streaming behavior, quality, and actual work, not a modality stereotype.
 
 The two paradigms produce very different production tradeoffs:
 
 | Aspect | Autoregressive | Diffusion |
 |--------|---------------|-----------|
-| Sampling | $T$ sequential steps (one per token) | $S$ sequential steps (~10–1000 denoise steps) |
-| Parallelism within sample | None during generation | Full (one denoise step is parallel) |
-| Quality scaling | Compute and data | Compute and data + step count |
-| Modality strength | Discrete sequences (text, code) | Continuous (images, audio) |
-| Conditioning | Prefix prompt | Cross-attention or classifier-free guidance |
-| Likelihood | Exact, easy to compute | Variational lower bound; sample-based |
+| State change | Append under the ordinary sampler | Revise provisional positions |
+| Outer dependence | Next prefix depends on sampled elements | Next state depends on the previous transition |
+| Within-call work | Architecture-dependent matrix parallelism | Architecture-dependent whole-state work |
+| Likelihood | Normalized factors under the chosen representation | Bounds/estimates depend on the model and objective |
 
 <!-- visual:autoregressive-diffusion-sampling-steps -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="ar-diffusion-visual-title">
@@ -79,10 +79,10 @@ The two paradigms produce very different production tradeoffs:
 			<text class="viz-node-label" x="621" y="270">A</text><text class="viz-node-label" x="651" y="270">B</text><text class="viz-node-label" x="682" y="270">C</text><text class="viz-node-label" x="712" y="270">D</text>
 			<path d="M214 302 V314 H335 V302" fill="none" stroke="var(--viz-focus-stroke)" stroke-width="2"></path><text class="viz-edge-label" x="274" y="331">all positions revised together</text>
 			<path d="M410 302 V314 H531 V302" fill="none" stroke="var(--viz-focus-stroke)" stroke-width="2"></path><text class="viz-edge-label" x="470" y="331">all positions revised together</text>
-			<text class="viz-callout" x="380" y="375" text-anchor="middle">Both timelines are serial across calls; only diffusion parallelizes work across positions inside a call.</text>
+			<text class="viz-callout" x="380" y="375" text-anchor="middle">Both timelines are serial across calls; diffusion revises all positions within each illustrated call.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> scan left to right along both rows. An autoregressive call freezes the existing prefix and adds one element, so the three new elements shown require three dependent calls. A diffusion call consumes and revises the whole noisy state at once, but the next denoising call must still wait for that complete state. Mechanism checked against <a href="https://arxiv.org/abs/1601.06759">PixelRNN</a> and <a href="https://arxiv.org/abs/2006.11239">DDPM</a>; the schematic is original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> scan each row from left to right. An ordinary autoregressive call appends one element. A diffusion call revises the provisional whole state. Both illustrated timelines depend on earlier calls. The original schematic follows <a href="https://arxiv.org/abs/1601.06759">PixelRNN</a> and <a href="https://arxiv.org/abs/2006.11239">DDPM</a>.</figcaption>
 </figure>
 
 ## Autoregressive
@@ -93,52 +93,71 @@ $$
 p(x_1, x_2, \dots, x_T) = \prod_{t=1}^{T} p(x_t \mid x_1, \dots, x_{t-1}).
 $$
 
-A neural net (transformer, RNN) parameterizes each $p(x_t \mid x_{<t})$. Training: maximize log-likelihood = minimize cross-entropy (one prediction per token, all positions in parallel via teacher forcing). Sampling: feed back the previous output, generate the next.
-
-**Strengths**: exact likelihood, simple training, parallel teacher-forced loss, strong on discrete sequences.
-
-**Weakness**: serial sampling. Each step waits for the previous. This is the bottleneck that motivates [speculative decoding](/concepts/speculative-decoding/).
+Given prefix A, let $P(B\mid A)=0.5$, $P(C\mid AB)=0.8$, and $P(D\mid ABC)=0.25$.
+Then $P(BCD\mid A)=0.1$, and ordinary sampling needs three dependent append calls.
+Teacher-forced scoring knows the targets, allowing parallel positions in suitable causal-transformer implementations without revealing future targets.
+Teacher forcing does not remove every architecture's sequential dependencies.
 
 ## Diffusion
 
-Define a forward noising process: $x_0 \to x_1 \to \dots \to x_T$ with $x_T \sim \mathcal{N}(0, I)$. The forward step is a small Gaussian (variance schedule $\beta_t$). The reverse (denoising) step is approximated by a learned model $\epsilon_\theta(x_t, t)$:
+Gaussian diffusion trains a reverse model using corrupted states.
+Sampling begins from a chosen noise prior and applies valid reverse transitions.
+A three-transition teaching sampler can revise all four positions each round, but its rounds remain dependent.
+The AR product above supplies no diffusion likelihood.
+
+### Require an Immediately Usable Prefix
+
+**New task:** Release B before C or D exists.
+
+**Picture and change:** The append state AB is already a valid prefix; a conventional whole-state intermediate remains provisional.
+
+**Check:** One append releases B; one denoising transition does not generally finalize the first position.
+
+**Use when:** Streaming is an explicit service requirement.
+
+### Compare Actual Call Costs
+
+**New task:** Compare three-call fixtures costing two versus five milliseconds per call.
+
+**Picture and change:** Multiply evaluated calls by call cost; account for overhead separately.
+
+**Check:** Totals are six versus fifteen milliseconds despite equal round counts.
+
+**Use when:** Quality is separately qualified; these invented costs are not a performance benchmark.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+For a Gaussian schedule, $\alpha_t=1-\beta_t$ and $\bar\alpha_t=\prod_{s\le t}\alpha_s$.
+Training can construct $x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\epsilon$ and fit a noise predictor by squared error.
+A conventional reverse parameterization is
 
 $$
-x_{t-1} = \frac{1}{\sqrt{1 - \beta_t}} \left( x_t - \frac{\beta_t}{\sqrt{1 - \bar\alpha_t}} \epsilon_\theta(x_t, t) \right) + \sigma_t z, \quad z \sim \mathcal{N}(0, I).
+x_{t-1}=\frac{x_t-\beta_t\epsilon_\theta(x_t,t)/\sqrt{1-\bar\alpha_t}}{\sqrt{1-\beta_t}}+\sigma_tz.
 $$
 
-Training: sample a clean $x_0$, sample noise $\epsilon$, sample $t$, compute noisy $x_t = \sqrt{\bar\alpha_t} x_0 + \sqrt{1 - \bar\alpha_t} \epsilon$, fit $\epsilon_\theta(x_t, t) \approx \epsilon$ with MSE.
-
-Sampling: $x_T \sim \mathcal{N}(0, I)$, then iterate the reverse step $T$ times (typically 10–1000).
-
-**Strengths**: high-fidelity continuous generation, stable training (no GAN instability), good likelihood estimates with importance-weighted ELBO.
-
-**Weakness**: slow sampling. Most efforts (DDIM, distillation, consistency models) reduce step count.
+Use $z\sim\mathcal N(0,I)$ with the sampler's declared variance and endpoint policy.
+A finite forward schedule need not make its terminal marginal exactly standard Gaussian.
 
 ## When AR vs. diffusion
 
-| Modality | Production default 2026 |
+| Modality | Possible model families |
 |----------|------------------------|
-| Text | Autoregressive (Llama, GPT, Mistral) |
-| Code | Autoregressive (GPT-4, Codex) |
-| Images | Diffusion (Stable Diffusion, FLUX, Imagen) |
-| Audio | Mixed: AR (WaveNet legacy), diffusion (modern TTS), latent autoregressive |
-| Video | Diffusion (Sora, Veo, Stable Video) with latent compression |
-| Molecules / proteins | Diffusion (RFdiffusion) |
-
-For text, AR has structural advantages: discrete vocabulary, natural causal ordering, and chain-of-thought reasoning emerges from sequential generation. For images, no natural sequential ordering exists, and diffusion's iterative refinement maps better to gradual denoising.
+| Text/code | AR, discrete diffusion, hybrids |
+| Images/audio/video | AR, diffusion, flows, hybrids |
+| Structures | Representation-dependent generative models |
 
 ## Hybrid and emerging approaches
 
-- **Latent diffusion** (Stable Diffusion): VAE compresses to latent space; diffusion happens there.
-- **Discrete diffusion** for text (D3PM, Plaid): apply diffusion to discrete tokens with a categorical noise process.
-- **Flow matching** [(Meta, 2023)](https://arxiv.org/abs/2210.02747): generalizes diffusion to a deterministic ODE; faster sampling.
-- **Consistency models** [(Song 2023)](https://arxiv.org/abs/2303.01469): one or few-step diffusion via distillation.
-- **Diffusion language models** [(LLaDA, 2024)](https://arxiv.org/abs/2502.09992): diffusion applied to text; competitive with AR at smaller scale, scaling unclear.
+- **Latent diffusion:** noising in a learned representation.
+- **Discrete diffusion:** categorical corruption/reconstruction, including [LLaDA](https://arxiv.org/abs/2502.09992).
+- **[Flow matching](https://arxiv.org/abs/2210.02747):** learn a probability-path vector field.
+- **[Consistency models](https://arxiv.org/abs/2303.01469):** train compatible few-step mappings under their specified objectives.
 
 ## Common pitfalls
 
-- **Comparing AR perplexity with diffusion ELBO directly.** Different objectives; not directly comparable.
-- **Treating diffusion step count as fixed.** It is a sample-time hyperparameter; reducing improves throughput at quality cost.
-- **Forgetting AR is parallel during training.** The "AR is slow" concern applies to inference, not training.
-- **Assuming diffusion is universally better than GANs.** It is for image fidelity and training stability, not necessarily for inference speed; GANs still dominate latency-critical settings.
+- **Incompatible measures.** Probability masses, densities, and variational bounds are not interchangeable likelihood reports.
+- **Invalid skipping.** Removing trained timesteps without a compatible sampler need not preserve a valid transition or quality.
+- **Round-count rankings.** Work, batching, hardware, and quality matter separately.
+
+</div>

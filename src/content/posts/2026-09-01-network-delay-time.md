@@ -13,19 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Pop the cheapest pending path; its first visit finalizes that node when every edge cost is nonnegative.
+Find when a signal can first reach every node in a directed network with fixed travel costs.
 
 ## Problem
 
-Edges are `[source, target, cost]`:
-`[[1,2,1],[1,3,4],[2,3,2],[2,4,6],[3,4,1]]`.
-Start at node `1` in the universe `1..4`.
-Return **4**, the latest of all earliest arrivals: `[0,1,3,4]`.
-Return `-1` if any node is unreachable.
+**Input.** A positive `node_count`, a valid `start` node, and directed edges `[source, target, cost]` using IDs `1..node_count`.
 
-Require a positive node count, valid node IDs, and nonnegative fixed costs.
-Edges are directed; reverse travel is not implied.
-This is path-cost computation, not congestion-aware packet simulation.
+**Output.** Return the latest earliest-arrival time among all nodes, or `-1` if any node is unreachable from `start`.
+
+**Rules.** The signal starts at time zero. Edge costs are fixed and nonnegative; path cost is their sum.
+Edges are directed, so reverse travel is not implied. Preserve the edge list.
+This is shortest-path timing, not congestion-aware packet simulation.
+
+**Example.** Use edges `[[1, 2, 1], [1, 3, 4], [2, 3, 2], [2, 4, 6], [3, 4, 1]]`.
+Starting at node 1 with four nodes gives earliest arrivals `[0, 1, 3, 4]`; return `4`.
 
 ## Picture
 

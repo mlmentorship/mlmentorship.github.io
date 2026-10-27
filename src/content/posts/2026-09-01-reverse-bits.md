@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Reverse a declared number of positions, not just the digits before the input becomes zero. Leading zeros affect the result.
+Reverse all positions in a fixed-width 32-bit word and return its unsigned integer value.
 
 ## Problem
 
-> Reverse the 32 bits of an unsigned integer.
+**Input.** An unsigned integer `value` from 0 through 4294967295, interpreted as exactly 32 bits.
 
-The reference requires an integer from zero through $2^{32}-1$.
+**Output.** Return the unsigned integer represented by those 32 bits in reverse order.
+
+**Rules.** Reverse bit positions, not decimal digits or byte order.
+Leading zero bits are part of the word and become trailing zeros after reversal.
+The output remains a 32-bit unsigned value. Negative inputs require a different declared-width interpretation below.
+
+**Example.** Input `1` has only its least significant bit set; return `2147483648`, with only the highest bit set.
+Input `0` returns `0`.
 
 ## Picture
 

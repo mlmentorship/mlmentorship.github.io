@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Choose an unused input position for the next output slot. After exploring that branch, restore both the path and that position's flag.
+List every ordering of the input positions while preserving each position's associated value.
 
 ## Problem
 
-> Return every possible ordering of the input values.
+**Input.** A list `nums` of integers.
 
-The source permutes **input positions** without changing the integer list. With distinct values, every output is distinct.
-Equal-valued positions remain separate choices: `[1,1]` produces two independent lists, both `[1,1]`.
+**Output.** Return a separate list for every permutation of input positions, with each occurrence used once per result.
+
+**Rules.** The reference permutes positions, not distinct values, and leaves `nums` unchanged.
+Equal-valued positions remain separate choices, so duplicate value lists may occur.
+Returned lists must be independent. Result order is not part of the required contract.
 Empty input returns `[[]]`, one empty ordering.
+
+**Example.** `[1, 2]` returns `[[1, 2], [2, 1]]`.
+For `[1, 1]`, return two independent lists, both `[1, 1]`; unique-value permutations are a different variant.
 
 ## Picture
 

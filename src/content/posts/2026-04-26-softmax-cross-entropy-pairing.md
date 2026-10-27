@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth, math-screen, and LLM internals interviews.*
 
-The L4 candidate states the pairing. The L6 candidate derives the gradient simplification, explains the GLM connection, and discusses why frameworks compute the joint operation rather than the two separately.
+Derive the loss and logit gradient for mutually exclusive classification and explain why implementations combine softmax with cross-entropy.
+
+## Problem
+
+**Context.** A classifier produces one finite logit per class and observes one correct class index for each example.
+Softmax defines normalized class probabilities, and the objective is the negative log-probability of the observed class.
+
+**Task.** Derive the gradient with respect to every logit, then explain a numerically stable logits-based computation.
+Connect the result to the categorical likelihood and compare separate versus fused implementations.
+
+**Constraints.** Begin with one-hot targets and mutually exclusive classes; smoothing, weighting, and multilabel objectives require stated changes.
+Distinguish algebraic equivalence from floating-point behavior, and do not feed probabilities into an API that expects logits.
 
 ## The setup
 

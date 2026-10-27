@@ -7,9 +7,17 @@ tags: ["questions"]
 category: "questions"
 ---
 
-An online regression does not yet identify a model defect: contain unacceptable harm, verify measurement, then verify delivered treatment.
+Investigate why an offline model improvement accompanies an online product regression without assuming the model itself caused the gap.
 
 ## Problem
+
+**Context.** A report compares offline and online changes, while the separate delivery fixture below includes users receiving fallback instead of treatment.
+
+**Task.** Define the compared metrics, assess delivered treatment, and choose the next test that distinguishes measurement, serving, and modeling explanations.
+State any immediate containment needed before investigating further.
+
+**Constraints.** Preserve assignment denominators and separate assigned users from successfully served users.
+Check relative versus absolute changes, label maturity, and metric meaning; the supplied aggregates alone do not identify a causal defect.
 
 A report says offline quality improved 8% while the online primary metric declined 2%.
 Check each metric's denominator, baseline and relative-change definition before comparing them.
@@ -22,6 +30,8 @@ Where should the next discriminating check focus?
 ## Picture
 
 Keep assigned users in the product denominator while tracing delivery branches separately.
+
+<p class="visual-title">Separate assignment from successful model delivery</p>
 
 <!-- visual:offline-online-gap-diagnostic-order -->
 ```mermaid

@@ -13,16 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Count first, then follow the links. A connected graph already needs enough edges to reach every vertex. Exactly that many leaves no extra edge to close a cycle.
+Determine whether all supplied vertices and undirected edges form one connected tree without cycles.
 
 ## Problem
 
-> Check whether undirected edges form one valid tree.
+**Input.** A nonnegative `node_count` and a list `edges` of undirected endpoint pairs from `0` through `node_count - 1`.
 
-Use nonnegative `node_count` and valid integer endpoints `0..node_count-1`. Treat edges as undirected.
-Self-loops and repeated edges count as edges; neither can belong to a tree.
+**Output.** Return `True` exactly when the graph is connected and contains no cycle.
 
-Under this contract, zero nodes is not a tree. One node with no edges is a tree.
+**Rules.** Include isolated vertices in the declared vertex set.
+Self-loops and repeated edges count as edges; neither can belong to a valid tree.
+Leave the inputs unchanged. Zero nodes is not a tree; one node with no edges is a tree.
+
+**Example.** Five nodes with edges `[[0, 1], [0, 2], [0, 3], [1, 4]]` return `True`.
+Three nodes with `[[0, 1]]` return `False` because node 2 is disconnected.
 
 ## Picture
 

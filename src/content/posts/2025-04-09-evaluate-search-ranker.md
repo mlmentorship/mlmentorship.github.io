@@ -8,9 +8,17 @@ category: "questions"
 ---
 
 
-A ranker can improve average NDCG while regressing on important queries; keep judgment, offline screening and product impact separate.
+Decide whether a proposed search ranker improves the relevant metric and satisfies a required query-slice quality gate.
 
 ## Problem
+
+**Context.** Two rankers have relevance judgments for frequent head queries and less frequent tail queries.
+NDCG@10 summarizes ranking quality over the first ten results.
+
+**Task.** Compute the traffic-weighted comparison below, apply the tail gate, and identify evidence still needed for a launch decision.
+
+**Constraints.** Use the stated traffic weights rather than equal slice weights.
+These invented offline scores do not by themselves measure user outcomes or causal product impact.
 
 Compare A and B on two equally sized sets of judged queries: head and tail.
 Suppose traffic is 90% head and 10% tail.
@@ -40,6 +48,8 @@ $$
 B gains 0.08 in traffic-weighted NDCG but loses 0.10 on tail queries.
 It fails the declared 0.78 tail gate.
 Neither weighted average establishes causal user benefit.
+
+<p class="visual-title">A weighted gain cannot erase a failed tail guardrail</p>
 
 <!-- visual:search-ranker-evidence-flywheel -->
 ```mermaid

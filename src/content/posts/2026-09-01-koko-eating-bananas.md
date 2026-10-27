@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Each hour processes only one pile at a fixed positive integer speed.
-Faster speeds never require more hours. Find the first speed that meets the deadline.
+Find the smallest constant eating speed that finishes every banana pile within a fixed number of hours.
 
 ## Problem
 
-For positive piles `[3, 6, 7, 11]` and 8 hours, return speed 4.
-The reference requires nonempty positive integer piles and an integer deadline `hours >= len(piles)`.
-Unused time in one pile's hour cannot process another pile.
+**Input.** A nonempty list `piles` of positive integers and an integer deadline `hours >= len(piles)`.
+
+**Output.** Return the minimum positive integer speed, measured in bananas per hour, that finishes all piles by the deadline.
+
+**Rules.** During one hour, work on only one pile and consume up to the chosen speed.
+Finishing a smaller remainder still uses the whole hour; unused capacity cannot transfer to another pile.
+Use one speed throughout and preserve the piles. The reference assumes a feasible deadline.
+
+**Example.** Piles `[3, 6, 7, 11]` with 8 hours return `4`.
+At that speed the piles take 1, 2, 2, and 3 hours, totaling 8.
 
 ## Picture: Search Speeds, Not Pile Indices
 

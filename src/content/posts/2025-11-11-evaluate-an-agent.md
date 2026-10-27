@@ -10,11 +10,24 @@ category: "questions"
 
 > *Asked in: LLM-team and agent-platform interviews.*
 
-The L4 answer applies single-shot LLM eval to agents (and gets misleading numbers). The L6 answer evaluates trajectories at multiple granularities and tracks the offline-online correlation explicitly.
+Evaluate whether a tool-using agent completes authorized tasks reliably across entire trajectories, not just individual generated answers.
+
+## Problem
+
+**Context.** A hypothetical agent plans multiple steps, calls tools, observes results, and may create persistent external effects.
+A candidate model or orchestration change must be assessed before wider release.
+
+**Task.** Define task-level success, trajectory and step checks, an environment and task suite, repeated trials, and a staged deployment decision.
+Explain how offline results will be compared with observed production behavior.
+
+**Constraints.** Separate answer quality, tool correctness, authorization, and external-state outcomes.
+Control environment versions and budgets; account for stochasticity, retries, long-horizon failures, and consequential actions without executing unsafe tests.
 
 ## Why agent eval is harder
 
 A chat model produces one output per input. An agent produces a *trajectory*: plan, tool calls, intermediate results, final answer. Each step can fail, and failures compound. Standard end-to-end eval can't tell you whether the planner was wrong, the tool returned bad data, or the synthesis was bad.
+
+<p class="visual-title">Trace the failed step, then test the whole agent</p>
 
 <!-- visual:agent-eval-diagnostic-flywheel -->
 ```mermaid

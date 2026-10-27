@@ -13,11 +13,19 @@ priority: "Role-specific"
 prerequisites: ["streaming-asr", "multimodal-foundation-models", "automatic-speech-recognition", "long-context-llms", "design-production-llm-inference-service"]
 ---
 
-Use capture time for evidence and a direct device control path for interruption.
-Model output does not establish freshness or authority.
+Design a real-time multimodal assistant that uses current authorized evidence and stops audible output promptly when the user interrupts.
 
 <span id="the-prompt"></span>
 ## Problem
+
+**Context.** The fictional assistant combines voice, camera, selected-window sharing, text, and confirmed reversible tools across laptop and phone.
+The workload, regional restrictions, stale-screen timeline, and interruption timeline appear below.
+
+**Task.** Design session state, media transport, synchronization, model execution, tool confirmation, privacy, and reliability.
+Determine which frame supports the current-screen question and which measured interval represents audible interruption.
+
+**Constraints.** Evaluate freshness from capture time with clock uncertainty, not arrival time alone.
+Respect sharing consent, regional media rules, and training exclusions; server cancellation does not prove queued client audio has stopped.
 
 Design a laptop/phone assistant with voice, camera, selected-window sharing, text and confirmed reversible tools.
 Use these fictional first-release assumptions:
@@ -45,6 +53,8 @@ Queued assistant audio remains audible until 1,900 ms; an alternative client flu
 Which interval measures interruption?
 
 ## Picture: Arrival Is Not Current State
+
+<p class="visual-title">A newly arrived frame can already be stale</p>
 
 <!-- visual:multimodal-stale-frame-gate -->
 ```mermaid
@@ -270,6 +280,8 @@ Use the twelve core invariants as test obligations across releases, not as model
 
 ## Separate the media, reasoning, and action paths
 
+<p class="visual-title" data-supplemental-visual="multimodal-path-boundaries">Policy precedes execution</p>
+
 ```mermaid
 flowchart TB
   accTitle: Separate live media, reasoning and action paths
@@ -321,6 +333,7 @@ flowchart TB
   class Output,Play,Exec,Evidence,Obs viz-output
   class Registry viz-extra-wide
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> require authoritative evidence.</p>
 
 ### Device media controller
 
@@ -419,8 +432,12 @@ Cancel/revoke controls bypass media queues through reserved processing paths.
 
 VAD detects speech; endpointing commits a turn boundary; barge-in stops output. Their errors have different costs.
 
+<p class="visual-title" data-supplemental-visual="multimodal-turn-lifecycle">Cancellation must stop playback</p>
+
 ```mermaid
 stateDiagram-v2
+  accTitle: A resumed user turn can interrupt planning or require confirmed output stop
+  accDescr: Speech moves from listening to a possible endpoint, which returns to speaking if speech resumes before commitment. A committed turn enters planning and then assistant playback. New user speech can interrupt planning directly; during playback it first enters Cancelling and returns to user speaking only when output has stopped and input is active.
   [*] --> Listening
   Listening --> UserSpeaking: VAD onset
   UserSpeaking --> PossibleEnd: short silence
@@ -434,6 +451,7 @@ stateDiagram-v2
   AssistantPlanning --> UserSpeaking: user resumes before output
   class Listening viz-wide
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> stop playback.</p>
 
 ### Run fast VAD on the device
 

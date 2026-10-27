@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML platform and infra interviews.*
 
-The L4 candidate names Feast or Tecton. The L6 candidate explains the three problems a feature store solves, sketches the components, and discusses the build-vs-buy decision.
+Design shared feature infrastructure that reproduces training examples and serves consistent, sufficiently fresh features for online decisions.
+
+## Problem
+
+**Context.** Several models reuse features computed from event streams and historical tables.
+Training needs past feature values, while serving needs low-latency current values with known freshness and ownership.
+
+**Task.** Specify feature definitions, computation, historical storage, online serving, metadata, and point-in-time dataset construction.
+Explain backfills, late events, validation, failure recovery, and when a feature store is unnecessary or should be purchased.
+
+**Constraints.** Prevent future or unavailable information from entering historical examples.
+State event-time and availability semantics, version contracts, access controls, freshness targets, and consistency choices rather than promising perfect synchronization.
 
 ## Three problems a feature store solves
 

@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep the smallest value's position inside a shrinking interval. Discard a midpoint only when ordering proves it cannot be the minimum.
+Find the smallest value in a distinct sorted array whose starting position may have been rotated.
 
 ## Problem
 
-> Find the smallest value in a sorted array that was rotated once.
+**Input.** A nonempty integer list `nums` obtained by rotating a strictly increasing list at some position.
 
-The reference requires a nonempty rotation of a strictly increasing integer array. Zero rotation and a singleton are valid.
-Return the minimum without changing the input. Duplicate values are a changed contract, addressed below.
+**Output.** Return the smallest value, not its index or the amount of rotation.
+
+**Rules.** Rotation moves a prefix to the end without changing the relative order within either part.
+Zero rotation and singleton input are valid. Values must be distinct for this reference.
+Do not modify the list. Empty input is outside the contract; duplicates are a changed requirement below.
+
+**Example.** `[3, 4, 5, 1, 2]` returns `1`.
+The unrotated list `[1, 2, 3]` also returns `1`.
 
 ## Picture
 

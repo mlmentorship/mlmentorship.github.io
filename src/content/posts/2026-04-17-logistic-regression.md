@@ -1,6 +1,6 @@
 ---
 title: "Logistic regression"
-description: "Linear regression for binary classification: pass a linear combination through a sigmoid, train by maximum likelihood. Still the strongest non-trivial baseline for tabular classification."
+description: "Compute a Bernoulli likelihood and gradient, separate probability fitting from decision costs, and test interactions, separation, and odds interpretation."
 date: "2026-04-17"
 draft: false
 tags: ["concepts"]
@@ -9,11 +9,15 @@ category: "concepts"
 
 ## Summary
 
-Logistic regression models $p(y = 1 \mid x) = \sigma(w^\top x + b)$ where $\sigma(z) = 1 / (1 + e^{-z})$ is the sigmoid. Trained by maximum likelihood = minimizing binary cross-entropy.
+Logistic regression models binary outcomes with affine log-odds, not an affine probability.
+Fit probabilities using a Bernoulli likelihood; choose actions separately using deployment costs.
 
-Logistic regression is the **first model you should try** on any tabular classification problem. It is interpretable, calibrated by default (when trained on representative data), fast to fit, and competitive with much fancier methods on high-quality features. Most "production tabular models" at large companies have a strong logistic baseline they need to beat.
+**Task:** independent observations have $x=[0,1]$, $y=[0,1]$.
+Evaluate candidate intercept $b=0$ and slope $w=\log2$ using summed negative log-likelihood.
+Find both probabilities, the likelihood, and the intercept/slope gradient.
+These coefficients are a checked candidate, not an asserted finite optimum for separable data.
 
-It is also the canonical example of a [generalized linear model](/concepts/exponential-family/) and the building block for softmax regression, neural network output layers, and many fairness / calibration analyses.
+The [maximum-likelihood lesson](/concepts/maximum-likelihood-estimation/) supplies the fitting principle; here the conditional observation model is Bernoulli.
 
 ## The model
 
@@ -29,7 +33,8 @@ $$
 \log \frac{p(y=1 \mid x)}{p(y=0 \mid x)} = w^\top x + b.
 $$
 
-This is what "linear in the features" means here. Linear in the log-odds, not in the probability.
+Odds are $p/(1-p)=e^z$, with $z=w^\top x+b$.
+Equal score increments multiply odds equally, but do not add equal probability increments.
 
 <!-- visual:logit-odds-probability-map -->
 <figure class="learning-figure" aria-labelledby="logit-map-title">
@@ -38,14 +43,14 @@ This is what "linear in the features" means here. Linear in the log-odds, not in
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 290" role="img" aria-labelledby="logit-map-svg-title logit-map-svg-desc">
 			<title id="logit-map-svg-title">Linear logits mapped to odds and sigmoid probabilities</title>
-			<desc id="logit-map-svg-desc">A sigmoid curve maps the linear score z from negative values to probabilities near zero and positive values to probabilities near one. Five equally spaced scores, minus two through two, are marked. Their probabilities are 0.12, 0.27, 0.50, 0.73, and 0.88, while their odds relative to the preceding unit scale by the constant factor e. A dashed vertical line at score zero marks even odds, probability one half, and the usual decision boundary.</desc>
+			<desc id="logit-map-svg-desc">A sigmoid curve maps the linear score z to probability. Five equally spaced scores, minus two through two, have probabilities 0.12, 0.27, 0.50, 0.73, and 0.88. Unit score increments multiply odds by e. The dashed zero-score line is the probability-one-half decision boundary, a special case rather than a universal cost-sensitive threshold.</desc>
 			<rect class="viz-plot-bg" x="34" y="26" width="310" height="204" rx="4"></rect>
 			<path class="viz-gridline" d="M34 128H344M34 77H344M34 179H344"></path>
 			<path class="viz-axis" d="M34 26V230H344"></path>
 			<text class="viz-label" x="16" y="231">0</text>
 			<text class="viz-label" x="8" y="132">0.5</text>
 			<text class="viz-label" x="16" y="31">1</text>
-			<text class="viz-axis-label" transform="translate(16 174) rotate(-90)">probability p</text>
+			<text class="viz-axis-label" x="34" y="16">probability p</text>
 			<path d="M34 214.5C45 212.5 55 209.5 65 205.7S111 186 127 175.1S174 140 189 128S235 91.8 251 80.9S298 54.4 313 50.3S333 43.5 344 41.5" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:3;stroke-linecap:round"></path>
 			<path class="viz-operating-guide" d="M189 26V230"></path>
 			<circle class="viz-operating-point" cx="65" cy="205.7" r="5"></circle>
@@ -58,7 +63,7 @@ This is what "linear in the features" means here. Linear in the log-odds, not in
 			<text class="viz-callout" x="197" y="122">p=.50</text>
 			<text class="viz-callout" x="244" y="72" text-anchor="end">p=.73</text>
 			<text class="viz-callout" x="306" y="42" text-anchor="end">p=.88</text>
-			<text class="viz-axis-label" x="197" y="145">decision boundary</text>
+			<text class="viz-axis-label" x="197" y="145">p=.5 boundary</text>
 			<path d="M65 238V244M127 238V244M189 238V244M251 238V244M313 238V244M65 241H313" style="fill:none;stroke:var(--c-text-soft);stroke-width:1.4"></path>
 			<text class="viz-axis-label" x="65" y="258" text-anchor="middle">z=-2</text>
 			<text class="viz-axis-label" x="127" y="258" text-anchor="middle">-1</text>
@@ -72,7 +77,7 @@ This is what "linear in the features" means here. Linear in the log-odds, not in
 			<text class="viz-label" x="313" y="276" text-anchor="middle">7.39</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> move one equal step along the linear score z = w<sup>T</sup>x + b. Each step multiplies the odds by the same factor e (0.14, 0.37, 1, 2.72, 7.39), but the sigmoid compresses the resulting probabilities near 0 and 1. At z = 0, odds are 1:1 and p = 0.5, so the usual threshold is the linear boundary w<sup>T</sup>x + b = 0. Original schematic checked against <a href="https://www.statlearning.com/"><cite>An Introduction to Statistical Learning</cite></a> and the <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229 notes</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each unit score step multiplies odds by e. The five probability markers compress toward zero and one. The zero-score line marks p=0.5, appropriate for equal error costs under the stated probability model. Unequal costs can move the action threshold without refitting this sigmoid. Sources: <a href="https://www.statlearning.com/"><cite>An Introduction to Statistical Learning</cite></a> and <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229</a>.</figcaption>
 </figure>
 
 ## Training
@@ -83,38 +88,77 @@ $$
 L(w, b) = -\sum_{i=1}^{n} \big[ y_i \log p_i + (1 - y_i) \log (1 - p_i) \big].
 $$
 
-This loss is **convex** in $(w, b)$, so any local minimizer is global. No closed form (unlike linear regression); standard solvers:
+Our scores $[0,\log2]$ give probabilities $[1/2,2/3]$.
+The observed-label likelihood is $(1-1/2)(2/3)=1/3$, so $L=\log3\approx1.098612$.
+Residuals $p-y=[1/2,-1/3]$ give
 
-- **L-BFGS** (default in scikit-learn): full-batch quasi-Newton.
-- **SGD / Adam**: for very large datasets.
-- **Newton-Raphson / IRLS**: classic statistical solver, fast for small problems.
+$$
+\frac{\partial L}{\partial b}=\frac12-\frac13=\frac16,
+\qquad \frac{\partial L}{\partial w}=0\cdot\frac12+1\cdot\left(-\frac13\right)=-\frac13.
+$$
 
-Add L2 regularization (ridge) by appending $\lambda \|w\|^2$ to the loss; this is the default for most implementations.
+The negative gradient locally decreases the intercept and increases the slope.
+This is Bernoulli cross-entropy, not a Gaussian squared-error objective.
 
-## Multinomial / softmax regression
+With augmented design matrix $D$ containing the intercept column, $\nabla L=D^\top(p-y)$.
+Its Hessian is $D^\top\operatorname{diag}(p_i(1-p_i))D$, positive semidefinite for fixed features.
+Convexity does not ensure a finite, identifiable minimizer.
+Evaluate each term stably as $\operatorname{softplus}(z)-yz$, with $\operatorname{softplus}(z)=\max(z,0)+\log(1+e^{-|z|})$.
 
-Generalize to $K$ classes: $p(y = k \mid x) \propto \exp(w_k^\top x + b_k)$. Loss is categorical cross-entropy. Output layer of every classification network is exactly this.
+### Change decision costs
 
-## Properties
+**New task:** false positives cost $1$; false negatives cost $4$; correct actions cost zero.
+Keep the probabilities and compare positive-action cost $1-p$ with negative-action cost $4p$.
+**Check:** choose positive for $p>1/5$; at $p=0.3$, costs are $0.7$ versus $1.2$.
+**Use when:** these probabilities describe the deployment population and errors have unequal costs.
 
-- **Calibration**: when the linear log-odds assumption holds, predicted probabilities match empirical frequencies (well-calibrated by construction).
-- **Interpretability**: $w_j$ is the change in log-odds per unit change in $x_j$ (holding others constant). $e^{w_j}$ is the odds ratio.
-- **Decision boundary**: linear in feature space ($w^\top x + b = 0$). For non-linear boundaries, transform features first (interactions, polynomials, kernels). Equivalent to fitting in a transformed space.
+### Change the feature basis
 
-## When to use vs. alternatives
-
-| Setting | Logistic regression vs. alternative |
-|---------|------------------------------------|
-| Small-medium tabular, high-quality features | Logistic competitive with GBDT and neural nets |
-| Sparse high-dimensional (text bag-of-words) | Logistic with L1 is excellent |
-| Non-linear interactions matter | GBDT (xgboost, lightgbm) usually wins |
-| Calibration matters, simple model required | Logistic is the answer |
-| Large numbers of categorical features | Field-aware factorization machines or GBDT |
-| Production scoring with tight latency | Logistic is the cheapest option |
+**New task:** represent XOR at $(0,0),(0,1),(1,0),(1,1)$.
+Add interaction $x_1x_2$; candidate score $-1+2x_1+2x_2-4x_1x_2$ gives $[-1,1,1,-1]$.
+**Check:** threshold $0.5$ recovers all four classes.
+**Use when:** additive log-odds in original features misses a known interaction.
+The model remains linear in expanded coefficients; these are fixture coefficients, not an MLE claim.
 
 ## Common pitfalls
 
-- **Forgetting to scale features.** Solvers converge faster and regularization is more meaningful when features are standardized.
-- **Including the intercept in regularization.** Most implementations exclude it by default; if not, your model is biased toward predicting the prior near the boundary.
-- **Comparing logistic against tree models on the same features.** Trees handle non-linear interactions automatically; logistic does not. Make features comparable (one-hot, target encoding) before claiming "X beats Y."
-- **Using probability threshold 0.5 by default.** Pick the threshold from the precision-recall tradeoff at the deployment operating point.
+**Failure:** for $x=[-1,1]$, $y=[0,1]$, and $b=0$, increasing $w$ drives loss toward zero.
+No finite $w$ attains it: complete separation defeats the implied finite optimum.
+A sigmoid does not establish calibration under finite samples, misspecification, regularization, or deployment shift.
+
+**Reconstruct:** a coefficient $\log2$ doubles odds. Starting at $p=0.2$, what follows one feature unit, holding others fixed?
+
+<details><summary>Answer</summary>
+
+Odds move from $1/4$ to $1/2$, giving $p=(1/2)/(1+1/2)=1/3$, not $0.4$.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+## Multinomial / softmax regression
+
+For mutually exclusive classes, normalize affine class scores with softmax and fit categorical cross-entropy.
+Multilabel outcomes instead need an appropriate joint or separate-output model; not every classifier uses softmax.
+
+## Properties
+
+For an additive coefficient, $w_j$ is a conditional log-odds change holding other features fixed; $e^{w_j}$ is its odds ratio.
+Interactions alter that interpretation, and it is not automatically a causal effect.
+At probability threshold $t$, the boundary is $w^\top x+b=\log(t/(1-t))$.
+
+## When to use vs. alternatives
+
+Compare held-out probability quality, operating costs, latency, feature construction, and maintainability against relevant alternatives.
+Validate calibration separately; a model family is not a calibration certificate.
+
+L-BFGS uses quasi-Newton updates; SGD/Adam use gradient updates; Newton-Raphson/IRLS uses curvature through weighted least squares.
+Solver choice depends on sparsity, dimensions, penalties, and resource limits.
+
+An added $\lambda\|w\|^2/2$ is one declared L2 convention, not an automatic implementation default.
+State whether the intercept is penalized and scale features using training-only statistics.
+Control feature engineering and leakage when comparing trees or nonlinear models.
+Use [the separate derivation](/questions/derive-logistic-regression/) for the Bernoulli gradient cancellation.
+
+</div>

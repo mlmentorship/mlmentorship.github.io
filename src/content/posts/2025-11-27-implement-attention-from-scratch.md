@@ -10,7 +10,19 @@ category: "questions"
 
 > *Asked in: coding rounds at LLM-team interviews.*
 
-The code is short and most candidates get it right. The signal is in the conversation around it: the 1/sqrt(d) scaling, the masking convention, FlashAttention, KV cache, FP32 softmax in mixed precision.
+Implement scaled dot-product attention with explicit tensor shapes and mask semantics, then explain its numerical and serving implications.
+
+## Problem
+
+**Context.** Floating tensors `Q`, `K`, and `V` have shape `(B, H, T, d)`, sharing device and compatible dtype.
+An optional Boolean mask broadcasts to `(B, H, T, T)`; `True` means a key is allowed.
+
+**Task.** Return attended values shaped `(B, H, T, d)` using scaled query-key scores, key-axis normalization, and weighted values.
+Explain a causal mask and verify that disallowed keys contribute no weight.
+
+**Constraints.** Use tensor operations rather than a built-in attention module, and preserve input tensors.
+Assume positive feature size, representable arithmetic, and at least one allowed key per query.
+Fully masked rows require a separate policy because the reference softmax would produce invalid values.
 
 ## The minimum correct answer
 

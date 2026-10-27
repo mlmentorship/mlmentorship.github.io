@@ -13,15 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Read a length before interpreting payload content. The length, not the next delimiter, fixes where that payload ends.
+Encode a list of arbitrary strings into one string and recover the exact original list.
 
 ## Problem
 
-> Convert a list of any strings into one string and recover the exact list.
+**Input.** `encode_strings` receives a list of Python strings; `decode_strings` receives a complete string produced by the encoder.
 
-Preserve order, repeated strings, empty strings, and every Python string character. The reference decoder assumes complete output from `encode_strings`.
+**Output.** Encoding returns one string; decoding returns the original list, including every character and every list entry.
 
-`[]` encodes as `""`. `[""]` encodes as `"0#"`. These are different lists.
+**Rules.** Preserve order, repeated entries, empty strings, and punctuation that could also appear in the encoding format.
+An empty list and a list containing one empty string must remain distinguishable.
+Do not modify the input list. The reference decoder assumes trusted, complete encoder output.
+
+**Example.** Encoding then decoding `["hello", "", "a#b", "hello"]` must recover that exact four-item list.
+Under the reference format, `[]` encodes as `""`, while `[""]` encodes as `"0#"`.
 
 ## Picture
 

@@ -1,6 +1,6 @@
 ---
 title: "Factorization machines"
-description: "Linear models can't capture feature interactions. Polynomial models have too many parameters. Factorization machines find a middle path: factorize the interaction matrix and learn an embedding per feature."
+description: "Share vectors across feature pairs, derive sparse interaction evaluation, and separate available unseen-pair estimates from validated generalization."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
@@ -9,15 +9,21 @@ category: "concepts"
 
 ## Summary
 
-A **factorization machine** ([Rendle, 2010](https://cseweb.ucsd.edu/classes/fa17/cse291-b/reading/Rendle2010FM.pdf)) models pairwise feature interactions as $\langle v_i, v_j \rangle$ where each feature $i$ has an embedding $v_i \in \mathbb{R}^k$. The full prediction is
+Suppose training contains feature pairs A-B and B-C, but not A-C.
+A factorization machine assigns a shared vector to each feature, making the A-C dot product computable.
+That supplies an estimate, not evidence that the estimate is accurate.
+
+For $d$ features, give feature $i$ a scalar weight $w_i$ and vector $v_i\in\mathbb R^k$.
+With global bias $w_0$, the prediction score is
 
 $$
 \hat{y}(x) = w_0 + \sum_i w_i x_i + \sum_{i < j} \langle v_i, v_j \rangle x_i x_j.
 $$
 
-Linear models (logistic regression) are fast but miss interactions. A degree-2 polynomial model has $\binom{d}{2}$ interaction parameters, which is infeasible at $d = 10^6$ (typical for sparse categorical features) and learns nothing for unseen pairs. FMs sidestep both problems by factorizing the interaction matrix into rank-$k$ embeddings, sharing parameters across pairs.
-
-Result: the FM has $O(d k)$ parameters instead of $O(d^2)$, and it generalizes to unseen feature pairs because it only needs to have seen each feature, not each pair. This made FMs the default tabular-recsys model from roughly 2010 to 2018, and they remain a strong baseline today.
+An independent degree-two model stores $d(d-1)/2$ pair coefficients; FM stores $dk$ interaction parameters plus main effects.
+This changes statistical sharing as well as storage when $k\ll d$.
+An absent pair's independent coefficient lacks direct co-occurrence evidence; shared vectors impose an additional modeling assumption.
+The following vectors are chosen fixtures, not fitted outputs.
 
 <!-- visual:fm-shared-embeddings-unseen-pair -->
 <figure class="learning-figure plot-panel" aria-labelledby="fm-sharing-visual-title">
@@ -67,61 +73,104 @@ Result: the FM has $O(d k)$ parameters instead of $O(d^2)$, and it generalizes t
 			<text class="viz-axis-label" x="180" y="424" text-anchor="middle">O(d²) EDGE WEIGHTS → O(dk) FEATURE EMBEDDINGS</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the polynomial model needs a separately learned parameter on every edge, so its unseen A–C edge has no estimate. The FM learns one vector per feature through observed pairs; once A and C each have a vector, their dot product defines the A–C coefficient even though that pair was absent. Original example based on <a href="https://doi.org/10.1109/ICDM.2010.127">Rendle (2010)</a>.</figcaption>
+	<table aria-label="Aggregate interaction check with all three feature values equal to one">
+		<tbody>
+			<tr><th scope="row">Explicit AB + AC + BC</th><td>0.80 + 0.60 + 0.56 = 1.96</td></tr>
+			<tr><th scope="row">Squared norm of summed vectors</th><td>2.4² + 0.6² = 6.12</td></tr>
+			<tr><th scope="row">Sum of individual squared norms</th><td>1 + 0.68 + 0.52 = 2.20</td></tr>
+			<tr><th scope="row">Half the difference</th><td>(6.12 − 2.20) / 2 = 1.96</td></tr>
+		</tbody>
+	</table>
+	<figcaption><strong>Read it this way:</strong> one reusable vector per feature supplies the unseen A-C coefficient 0.60. With all inputs active, explicit pair summation and the aggregate identity below both give 1.96. Neither calculation validates unseen-pair accuracy. Original example based on <a href="https://doi.org/10.1109/ICDM.2010.127">Rendle (2010)</a>.</figcaption>
 </figure>
 
 ## The mechanism
 
-Each feature $i$ gets a weight $w_i \in \mathbb{R}$ (linear term) and an embedding $v_i \in \mathbb{R}^k$ (interaction term). The prediction includes:
-
-- A global bias $w_0$.
-- Per-feature linear terms $\sum_i w_i x_i$.
-- Pairwise interactions $\sum_{i < j} \langle v_i, v_j \rangle x_i x_j$.
-
-The naive interaction sum is $O(d^2)$ to evaluate, but Rendle showed it can be reformulated as
+For each coordinate $f$, expanding $(\sum_i v_{i,f}x_i)^2$ gives diagonal terms plus twice every $i<j$ pair.
+Subtract those self-terms, divide by two, and sum over coordinates:
 
 $$
 \sum_{i < j} \langle v_i, v_j \rangle x_i x_j = \frac{1}{2} \sum_{f=1}^{k} \left( \left(\sum_i v_{i,f} x_i\right)^2 - \sum_i v_{i,f}^2 x_i^2 \right).
 $$
 
-Linear in $d$. This is the trick that makes FMs scalable.
+For $s=\operatorname{nnz}(x)$ active inputs, this costs $O(ks)$ instead of enumerating $O(ks^2)$ vector pairs.
+Parameter storage still depends on the full feature vocabulary, $O(dk)$.
+
+Using the illustrated vectors and $x=(1,1,1)$, pair coefficients are $0.8,0.6,0.56$, summing to $1.96$.
+The vector sum is $(2.4,0.6)$; half of $6.12-2.20$ also gives $1.96$.
+Deactivating B leaves only A-C and score $0.6$, with bias and linear terms zero.
 
 ## Sparse one-hot inputs
 
-The natural use case: categorical features, one-hot encoded. Each user-id, item-id, or category becomes a feature $i$ with embedding $v_i$. The pairwise interaction $\langle v_i, v_j \rangle x_i x_j$ is nonzero only when both $x_i = x_j = 1$, i.e. only between active feature pairs.
+Categorical IDs can be one-hot encoded; numeric inputs can also participate with their actual values.
+A pair contributes only when both input values are nonzero.
 
-For a (user, item) example with one-hot features, the prediction is:
+### Change active inputs
+
+**New task:** activate only one user indicator and one item indicator, both equal to one.
+
+**Picture and change:** remove every inactive linear and interaction term:
 
 $$
 \hat{y} = w_0 + w_{\text{user}} + w_{\text{item}} + \langle v_{\text{user}}, v_{\text{item}} \rangle.
 $$
 
-This is exactly a matrix factorization recsys model with bias terms. FMs **generalize** matrix factorization to arbitrary numbers of features (user, item, category, time, device), all sharing the same embedding mechanism.
+**Check:** fitted values $w_0=3,w_{\rm user}=0.2,w_{\rm item}=-0.1$ and vectors $(2,1),(1.5,1)$ give $7.1$.
+This is biased matrix factorization's score, not an automatically bounded rating or probability.
+Adding category, time, or device features introduces their linear terms and active pairs, not explicit third-order terms.
+
+**Use when:** compare FM with MF on matched features.
+
+### Change field specificity
+
+**New task:** let a category feature interact differently with user and time fields.
+
+**Picture and change:** field-aware FM uses $\langle v_{i,F(j)},v_{j,F(i)}\rangle$ for feature fields $F$.
+In a separate one-dimensional fixture, category A uses value one against users and two against time.
+The counterpart vectors are three and four, respectively.
+
+**Check:** category-user interaction is $1(3)=3$; category-time is $2(4)=8$.
+Reusing A's value one for both would give four for the latter pair.
+The plain-FM aggregate-square computation cannot simply reuse one vector per feature here.
+
+**Use when:** measured field-specific benefits justify added storage and compute.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Variants
 
-- **Field-aware FM (FFM)** ([Juan et al., 2016](https://www.csie.ntu.edu.tw/~cjlin/papers/ffm.pdf)). Each feature has multiple embeddings, one per "field" (e.g. user-feature embeddings paired against item-features differ from user-feature embeddings paired against time-of-day). More parameters, better accuracy on click prediction.
-- **DeepFM** ([Guo et al., 2017](https://arxiv.org/abs/1703.04247)). Add a deep MLP on top of the same embeddings to capture high-order interactions. The dominant CTR-prediction architecture in industry from 2017 onwards.
-- **xDeepFM**, **AutoInt**, **DCN**: subsequent variations layering self-attention or explicit cross-feature networks over the FM embedding base.
+- [Field-aware FM](https://www.csie.ntu.edu.tw/~cjlin/papers/ffm.pdf) has field-indexed feature vectors, increasing storage to roughly $O(dkF)$ for $F$ fields.
+- [DeepFM](https://arxiv.org/abs/1703.04247) combines an FM component with a deep branch sharing feature embeddings.
+- xDeepFM uses a compressed interaction network; AutoInt uses attention; DCN uses cross layers. Their interaction computations differ.
 
 ## Tradeoffs
 
-| | |
-|---|---|
-| **vs logistic regression** | Captures pairwise interactions; needs more compute and tuning |
-| **vs polynomial regression** | $O(d k)$ vs $O(d^2)$ parameters; generalizes to unseen pairs |
-| **vs deep learning on raw features** | FM is simpler, trains faster, more interpretable; deep nets can capture higher-order interactions |
-| **vs matrix factorization** | FM generalizes MF to many sparse features beyond just (user, item) |
-
-For tabular click-through-rate prediction with high-cardinality categoricals, an FM-style embedding base (FM, DeepFM, FFM) is still the right starting point.
+FM shares pair coefficients instead of fitting them independently, trading flexibility for statistical reuse.
+Compare logistic regression, boosting, and interaction models with matched features and task metrics.
+Architectural complexity does not guarantee better accuracy, speed, or interpretation.
+Choose the loss/link separately: binary outcomes might use a sigmoid and logistic loss on the score.
 
 ## Common pitfalls
 
-- **Choosing $k$ too large**. $k = 8$ to $32$ is typical; larger $k$ overfits and is slower.
-- **Forgetting the linear term**. The pairwise interactions cannot model main effects; both terms matter.
-- **Using FM on dense numeric features without binning**. Dense features can be used, but the interaction $\langle v_i, v_j \rangle x_i x_j$ scales with the products, and the model is more sensitive to feature scaling. Bin or normalize first.
-- **Ignoring regularization**. L2 on $v$ is essential when most features are rare.
-- **Comparing FM to LR without matched features.** FM benefits from rich categorical features; on a clean numeric baseline it often loses to LR or gradient boosting.
+Keep main effects: with one active feature, there is no pair term.
+Numeric-feature scaling changes interaction magnitudes; normalize or otherwise validate preprocessing rather than requiring arbitrary binning.
+Tune $k$ and regularization, especially for rare features.
+A new untrained feature needs an unknown-feature/initialization policy; an available unseen-pair coefficient does not solve unseen-feature support.
+Removing Gram diagonal terms does not imply the remaining off-diagonal matrix itself has rank $k$.
+
+Does plain FM explicitly model arbitrary third-order interactions?
+
+<details><summary>Answer</summary>
+
+No. Its explicit interaction polynomial has degree two; higher-order behavior requires another computation.
+
+</details>
+
+Original formulation: [Rendle (2010)](https://cseweb.ucsd.edu/classes/fa17/cse291-b/reading/Rendle2010FM.pdf).
+
+</div>
 
 ## Related
 

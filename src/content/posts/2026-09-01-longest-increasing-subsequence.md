@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep the smallest ending value for each achieved subsequence length. A smaller end leaves more future values eligible.
+Find the longest strictly increasing sequence that can be selected without changing the input order.
 
 ## Problem
 
-> Find the longest strictly increasing subsequence. Values do not need to be next to each other.
+**Input.** A list `nums` of integers, possibly empty or containing repeated values.
 
-A subsequence keeps input order but may skip values. The reference accepts integers and returns only the length.
+**Output.** Return the length of the longest strictly increasing subsequence, not its values or indices.
+
+**Rules.** A subsequence can skip positions but must preserve their original order.
+Every selected value must be strictly greater than the preceding selected value; equality does not extend it.
+Leave the list unchanged. Empty input returns zero.
+
+**Example.** `[10, 9, 2, 5, 3, 7, 101, 18]` returns `4`, witnessed by `[2, 3, 7, 18]`.
+For `[2, 2, 2]`, return `1` rather than 3.
 
 ## Picture
 

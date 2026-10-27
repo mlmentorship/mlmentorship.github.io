@@ -8,9 +8,18 @@ category: "questions"
 ---
 
 
-Prompting changes request context, retrieval selects evidence, and fine-tuning updates model parameters; diagnose the failed requirement before choosing an intervention.
+Choose how to repair a model service that uses an outdated policy and violates its required output format.
 
 ## Problem
+
+**Context.** A fictional support service must follow an authorized policy revision and return a defined JSON response.
+Its baseline fails both policy correctness and output-format checks.
+
+**Task.** Design tests that isolate those failures, then choose among prompting, retrieval, fine-tuning, or a justified combination.
+Specify success measurements and rollback conditions.
+
+**Constraints.** Use only authorized policy evidence. Separate changing facts from learning behavior or enforcing an exact output contract.
+Compare operational cost and freshness needs without assuming one intervention fixes both failures.
 
 A fictional support service must apply yesterday's authorized policy revision B and return two JSON fields.
 Policy A allowed refunds within seven days; B allows thirty days.

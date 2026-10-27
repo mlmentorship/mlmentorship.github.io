@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team interviews; deeper variant of the standard question.*
 
-The basic question ([fine-tune vs prompt vs RAG](/questions/fine-tune-vs-prompt-vs-rag/)) covers when to choose each. The deep version drills into *which kind* of fine-tuning, why, and what each costs operationally.
+Choose a fine-tuning method and a defensible training plan once a model-adaptation requirement has been established.
+
+## Problem
+
+**Context.** A team has a base language model, task examples, and a behavior gap that requires evaluation before adaptation.
+The [intervention-choice question](/questions/fine-tune-vs-prompt-vs-rag/) addresses whether fine-tuning is needed at all.
+
+**Task.** Specify the training objective, data construction, trainable parameters, evaluation, and release plan for an appropriate fine-tuning method.
+Compare alternatives and explain what evidence would change the choice.
+
+**Constraints.** Respect compute, data rights, privacy, and serving requirements.
+Separate behavior learning from changing factual knowledge, guard against leakage and regressions, and do not presume adaptation always helps.
 
 ## What the L4 candidate misses
 

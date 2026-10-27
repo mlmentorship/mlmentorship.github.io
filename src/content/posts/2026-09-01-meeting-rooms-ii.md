@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Several meetings need different end times tracked together; the largest simultaneous population determines the minimum room count.
+Find the fewest rooms needed to hold every meeting without putting overlapping meetings in the same room.
 
 ## Problem
 
-Schedule `[[0,30],[5,10],[5,15],[20,25]]` using as few rooms as possible.
-Three meetings overlap at time `5`, so the answer is `3`.
-Require integer endpoints with `start < end`; zero-duration meetings are outside this contract.
-Each meeting occupies `[start,end)`: another meeting can reuse its room exactly at `end`.
+**Input.** A list `intervals` of integer meeting pairs `[start, end]`, each satisfying `start < end`.
+
+**Output.** Return the smallest number of rooms that accommodates every meeting at its specified time.
+
+**Rules.** Each meeting occupies a half-open interval `[start, end)` and needs one room throughout.
+A room may be reused exactly when its previous meeting ends.
+Meetings cannot move in time. Empty input returns zero; zero-duration meetings are outside this contract.
+
+**Example.** `[[0, 30], [5, 10], [5, 15], [20, 25]]` returns `3` because three meetings overlap at time 5.
+For `[[0, 5], [5, 10]]`, return `1`.
 
 ## Picture
 

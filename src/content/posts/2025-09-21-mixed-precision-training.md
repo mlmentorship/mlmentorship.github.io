@@ -1,6 +1,6 @@
 ---
 title: "Mixed precision training: FP16, BF16, and FP8"
-description: "How modern transformers train at 2-4× the throughput of FP32 without quality loss. The bit layouts matter; the loss-scaling recipe matters more."
+description: "Track tensor precision through computation, scaling, guarded updates, and optimizer memory without assuming every tensor shares one dtype."
 date: "2025-09-21"
 draft: false
 tags: ["concepts"]
@@ -10,58 +10,63 @@ category: "concepts"
 
 ## Summary
 
-Mixed precision training computes most operations in lower-precision formats (FP16, BF16, FP8) for speed and memory savings, while keeping a master copy of weights and certain operations in FP32 for numerical stability.
-
-Tensor cores on modern GPUs (A100, H100, B200) execute lower-precision matmuls several times faster than FP32 with proportionally less memory. Mixed precision is the default for large models in 2026.
+Mixed precision uses lower-precision arithmetic where appropriate while retaining enough range and precision for sensitive computations and persistent state.
+Track parameter storage, operation inputs, accumulation, saved activations, gradients, and optimizer state separately.
+Autocast selects eligible operations; it does not make every forward or backward tensor share one dtype.
 
 ## The bit layouts
 
-Three formats matter:
-
-| Format | Sign | Exponent | Mantissa | Range | Notes |
-|---|---|---|---|---|---|
-| FP32 | 1 | 8 | 23 | ±3.4&times;10&#8311;&#8309; | Reference precision |
-| FP16 | 1 | 5 | 10 | ±6.5&times;10&#8308; | Limited range; needs loss scaling |
-| BF16 | 1 | 8 | 7 | ±3.4&times;10&#8311;&#8309; | Range = FP32, less precision |
-| FP8 (E4M3) | 1 | 4 | 3 | ±~448 | Forward-pass only typically |
-| FP8 (E5M2) | 1 | 5 | 2 | ±~57344 | Wider range; for backward |
+The [floating-point owner](/concepts/floating-point-formats/) explains bit fields, rounding, and representable spacing.
+Here the question is when an intermediate loses information before a higher-precision operation can use it.
 
 ### FP16
 
-5-bit exponent → small dynamic range (10&#8315;&#8309; to ~6.5&times;10&#8308;). Underflows easily, small gradients become 0, large activations become inf. Requires loss scaling.
+FP16's minimum positive normal is $2^{-14}$; its minimum positive subnormal is $2^{-24}$ under gradual underflow.
+Its largest finite value is $65504$.
+Loss scaling can protect tiny backward intermediates, but cannot guarantee that all gradients fit one usable range.
 
 ### BF16
 
-8-bit exponent (same as FP32) → same dynamic range as FP32. 7-bit mantissa, lower precision than FP16 but rarely matters for deep learning. Available on A100 and later, all modern TPUs. **The recommended format for transformer training in 2026.**
+BF16 has the same exponent-bit count as FP32, giving a similar magnitude range but fewer significand bits.
+It directly represents $2^{-30}$, avoiding this fixture's FP16 underflow without a loss scale.
+Range, rounding, and hardware/operator support remain separate questions.
 
 ### FP8
 
-Available on H100, B100/B200. Two variants: E4M3 (more mantissa, less range, for forward) and E5M2 (more range, less mantissa, for backward gradients). Used for LLM training at extreme scale; requires careful handling.
+FP8 variants trade range against precision and need a declared encoding and scaling policy.
+For example, E4M3FN has maximum finite magnitude $448$, while E5M2 reaches $57344$.
+Neither is a universal dtype for every tensor in a training step.
 
 ## The FP16 recipe
 
-The original mixed-precision recipe [(Micikevicius et al. 2018)](https://arxiv.org/abs/1710.03740):
+A manual two-copy configuration follows the principle in [Micikevicius et al. (2018)](https://arxiv.org/abs/1710.03740):
 
-1. Master weights in FP32.
-2. Cast weights to FP16 for forward pass.
-3. Compute forward + backward in FP16. Activations and gradients are FP16.
-4. **Loss scaling**: multiply the loss by S (e.g., 2&#185;&#8309;) before backward. This shifts gradients up into FP16's representable range, preventing underflow.
-5. Before the optimizer step: cast gradients to FP32 and divide by S (unscale).
-6. Apply update to FP32 master weights.
+1. Keep an FP32 master parameter copy and the declared optimizer state.
+2. Supply lower-precision parameter operands to eligible operations; retain sensitive calculations at higher precision.
+3. Multiply a higher-precision scalar loss by $S$ before backward, since $\nabla(SL)=S\nabla L$.
+4. Accumulate scaled contributions using the same scale throughout one update.
+5. Convert as needed, unscale once, inspect finiteness, and clip only the valid unscaled gradient.
+6. Perform the optimizer update on persistent parameters, refresh operand copies, and clear gradients at the intended boundary.
+
+For $g=2^{-30}$ and $S=2^{20}$, FP16 stores $Sg=2^{-10}$ exactly; unscaling in FP32 recovers $g$.
+Without scaling, FP16 stores $g$ as zero, which a later cast cannot undo.
+At FP32 weight $\theta=2^{-10}$ and learning rate one, the updated weight is $2^{-10}-2^{-30}$.
+This equals approximately $0.0009765615686774254$ and remains representable in FP32.
 
 <!-- visual:fp16-loss-scaling-ledger -->
 <figure class="learning-figure" aria-labelledby="fp16-loss-scaling-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="fp16-loss-scaling-title">Follow one tiny gradient through scaling, FP16 backward, and FP32 unscaling.</p>
+	<p class="cm-equation">One plain SGD step, learning rate 1. Initial FP32 master weight: 2<sup>−10</sup>; no momentum or decay.</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of the same gradient without loss scaling and with loss scaling">
 		<section class="visual-panel" aria-labelledby="unscaled-gradient-title">
-			<h4 id="unscaled-gradient-title">Without scaling: the update disappears</h4>
+			<h4 id="unscaled-gradient-title">Without scaling: the gradient is erased</h4>
 			<table class="cm-grid" aria-label="Unscaled FP16 gradient path">
 				<thead><tr><th scope="col">Stage</th><th scope="col">Value</th><th scope="col">Result</th></tr></thead>
 				<tbody>
 					<tr><th scope="row">True gradient</th><td>g = 2<sup>−30</sup></td><td>Smaller than FP16's minimum nonzero 2<sup>−24</sup></td></tr>
 					<tr><th scope="row">FP16 backward</th><td class="cm-selected">store(g) = 0</td><td>Underflow loses the gradient</td></tr>
-					<tr><th scope="row">FP32 optimizer</th><td>update = 0</td><td>Master weight does not move</td></tr>
+					<tr><th scope="row">FP32 SGD step</th><td>update = 0</td><td>Master weight stays 2<sup>−10</sup></td></tr>
 				</tbody>
 			</table>
 			<p class="cm-equation">Casting zero to FP32 cannot recover what FP16 already lost.</p>
@@ -74,82 +79,89 @@ The original mixed-precision recipe [(Micikevicius et al. 2018)](https://arxiv.o
 					<tr><th scope="row">Scale loss</th><td>S = 2<sup>20</sup></td><td>Chain rule scales every gradient by S</td></tr>
 					<tr><th scope="row">FP16 backward</th><td class="cm-selected">Sg = 2<sup>−10</sup></td><td>Normal, exactly representable FP16 value</td></tr>
 					<tr><th scope="row">Cast + unscale</th><td>2<sup>−10</sup> / 2<sup>20</sup> = 2<sup>−30</sup></td><td>Original gradient restored in FP32</td></tr>
-					<tr><th scope="row">Clip, then step</th><td>update uses g</td><td>FP32 master weight receives the update</td></tr>
+					<tr><th scope="row">FP32 SGD step</th><td>2<sup>−10</sup> − 2<sup>−30</sup></td><td>Representable change for this weight</td></tr>
 				</tbody>
 			</table>
 			<p class="cm-equation">Scale before backward; unscale before clipping or stepping.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the FP16 backward rows. Without scaling, 2<sup>−30</sup> becomes zero and stays zero after casting. Multiplying the loss by 2<sup>20</sup> makes the backward gradient 2<sup>−10</sup>, which FP16 can store. Convert that value to FP32 and divide by the same scale before clipping or updating: the optimizer receives the original 2<sup>−30</sup>. This original ledger follows <a href="https://openreview.net/forum?id=r1gs9JgRZ">Micikevicius et al.</a> and the <a href="https://docs.pytorch.org/docs/stable/notes/amp_examples.html">PyTorch AMP sequence</a>.</figcaption>
+	<p class="cm-equation">Recovery is not guaranteed movement: at FP32 weight 1, subtracting this same 2<sup>−30</sup> rounds back to 1.</p>
+	<figcaption><strong>Read it this way:</strong> compare the FP16 backward rows. Without scaling, 2<sup>−30</sup> becomes zero. Scaling by 2<sup>20</sup> instead stores 2<sup>−10</sup>. Cast to FP32, then divide by the same scale before clipping or stepping. The original gradient survives this path. The ledger follows <a href="https://openreview.net/forum?id=r1gs9JgRZ">Micikevicius et al.</a> and the <a href="https://docs.pytorch.org/docs/stable/notes/amp_examples.html">PyTorch AMP sequence</a>.</figcaption>
 </figure>
 
-**Dynamic loss scaling**: start with large S (e.g., 2&#185;&#8309;). If any gradient is inf/NaN this step, skip the step and halve S. If N consecutive steps go fine, double S. Standard in PyTorch's `torch.cuda.amp.GradScaler`.
+### Change the Loss Scale
+
+**New task:** Lower $S$ to $2^{16}$ for the same tiny gradient.
+
+**Picture and change:** FP16 stores $Sg=2^{-14}$, its minimum positive normal; FP32 unscaling still recovers $2^{-30}$.
+
+**Check:** With $S=1$, the gradient vanishes again.
+For a different gradient $0.125$, scale $2^{20}$ produces $131072$, exceeding FP16's finite range.
+
+**Use when:** Dynamic scaling balances backward underflow and overflow.
+A nonfinite step must skip the optimizer update and adjust the scale; this does not automatically replay the batch.
+Scaling cannot repair an unscaled forward operation that already overflowed.
 
 ## The BF16 recipe
 
-Simpler than FP16:
+**New task:** Use supported BF16 operations instead of the FP16 path.
 
-1. Master weights in FP32.
-2. Cast to BF16 for forward.
-3. Forward + backward in BF16.
-4. Cast gradients to FP32 for the optimizer step.
-5. Apply update.
+**Picture and change:** Remove loss-scale/unscale boxes for this fixture, not sensitive reductions or persistent-state accounting.
 
-**No loss scaling needed** because BF16 has FP32's dynamic range. This is the main practical advantage of BF16 over FP16.
+**Check:** BF16 represents $2^{-30}$ directly with $S=1$.
+At weight one, however, a $2^{-30}$ subtraction still rounds away even in FP32.
 
-## The FP8 recipe (advanced)
-
-Used in some frontier LLM training (H100 era). Key elements:
-
-- Per-tensor scaling factors that get updated during training.
-- E4M3 for activations and weights in forward; E5M2 for gradients.
-- Some operations (LayerNorm, softmax, loss) still run in higher precision.
-- Frameworks like Transformer Engine (NVIDIA) handle the bookkeeping.
-
-For most teams in 2026, FP8 is an optimization for very large training runs (10B+ parameters); BF16 is sufficient for most use cases.
+**Use when:** BF16 operator support is available and FP16 range is the failure mechanism.
+The choice does not prove identical quality, universal speedup, or immunity to overflow.
 
 ## What stays in FP32
 
-Some operations are kept in FP32 for stability even in mixed precision:
-
-- **LayerNorm / RMSNorm**: variance computation needs the precision; small numerical errors compound.
-- **Softmax**: in attention specifically. Standard pattern: cast attention scores to FP32, softmax in FP32, cast back to BF16/FP16 for the matmul with V.
-- **Loss function**: usually in FP32.
-- **Optimizer state**: Adam moments in FP32 (this dominates memory cost).
-
-Frameworks (PyTorch's autocast, JAX's jax.numpy.bfloat16) handle most of this automatically; you just enable mixed precision and they cast operations as appropriate.
+Sensitive normalization statistics, softmax reductions, loss calculations, or optimizer moments may use FP32 according to the implementation.
+Read the operator and optimizer policy rather than inferring storage from an autocast context.
+Persistent FP32 parameters with autocast are another configuration; they do not require a separate master copy of those same parameters.
 
 ## The memory story
 
-For a 7B model in BF16:
-- Model weights: 14 GB
-- Gradients: 14 GB
-- Adam state (m, v in FP32): 56 GB
-- Activations: variable, but often largest
-- **Total**: ~84 GB plus activations, fits on a single H100 (80GB) only with careful activation management.
+For seven billion parameters, declare separate BF16 parameter/gradient copies, an FP32 master copy, and two FP32 moment tensors.
+In decimal GB, their sizes are $14+14+28+56=112$, before activations, temporary operands, communication buffers, or allocator overhead.
+This cannot fit in an eighty-decimal-GB budget merely by reducing activations.
+Different storage configurations need different ledgers; sharding changes per-rank ownership, not the number of logical model parameters.
 
-For a 70B model: 10&times; everything → no single GPU. Need FSDP / ZeRO-3 to shard.
+<!-- learning:core-end -->
+<div data-learning-extension>
 
-The Adam optimizer state in FP32 (m and v) is *the dominant memory consumer* for moderately-sized models in mixed precision. ZeRO Stage 1 shards optimizer state across data-parallel ranks; this is often the biggest single memory win.
+## The FP8 recipe (advanced)
+
+Tensor scaling, quantization encodings, observed maxima, and scale histories belong to the FP8 execution policy.
+E4M3/E5M2 roles depend on the selected implementation, not a universal forward/backward rule.
+Sensitive reductions and persistent state can remain higher precision.
+Frameworks such as Transformer Engine manage specific supported policies; benchmark their actual workload and quality effects.
 
 ## What an interviewer expects you to say
 
-If asked about mixed precision:
-
-1. Distinguish FP16 vs BF16 by exponent/mantissa.
-2. State that BF16 is preferred when available (no loss scaling needed).
-3. Explain the loss-scaling recipe for FP16.
-4. Mention the FP32 master copy + per-tensor casting.
-5. Mention which operations stay in FP32 (LayerNorm, softmax, loss).
-6. Bonus: mention FP8 for H100-era training; mention optimizer state memory dominance.
+Declare tensor lifetimes, reconstruct the exact gradient path, explain the nonfinite branch, and compute the chosen memory ledger.
+Distinguish information surviving backward from a representable final parameter increment.
 
 ## Common confusions
 
-- **"FP16 is faster than BF16."** No, they have the same throughput on tensor cores. BF16 is preferred because it doesn't need loss scaling.
-- **"Mixed precision halves my model size."** It halves *activation* size and *gradient* size, but the optimizer state is still FP32 (3x the model size for Adam). Total memory savings are smaller than naive 2x.
-- **"BF16 is always strictly better than FP16."** Worse precision can occasionally bite (e.g., BF16 loses precision on values near 0 that FP16 retains). For most transformer training, BF16 wins.
-- **"Quantization" and "mixed precision" are the same."** Different. Mixed precision is for *training*. Post-training quantization (INT8, INT4) is for *inference* and changes the actual stored data type, not just the compute precision.
+- **Format-only speed claims.** Kernel support, shapes, memory movement, and accumulation rules determine observed throughput.
+- **Automatic halving.** Not every state changes dtype; count bytes for each actual copy.
+- **Range versus precision.** BF16 has fewer significand bits than FP16 despite its wider exponent range.
+- **Workflow confusion.** Quantization can appear during training too; integer post-training quantization is one separate workflow.
+- **Mixed accumulation units.** Do not change loss scale or unscale only part of an accumulated update.
+
+## Reconstruct
+
+<details>
+<summary>Does casting a zero gradient to FP32 restore it?</summary>
+
+No. Scaling must protect the intermediate before rounding erases it.
+Even a recovered gradient can produce a rounded-away update when the persistent parameter's representable spacing is too large.
+
+</details>
 
 ---
 
 *Related: [Adam, AdamW, and modern optimizer choices](/concepts/adam-and-adamw/), [Transformer architecture](/concepts/transformer-architecture/).*
+
+</div>

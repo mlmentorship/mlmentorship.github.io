@@ -8,9 +8,17 @@ category: "questions"
 ---
 
 
-An authentic citation can still describe the wrong encounter; bind each claim to its patient, date and intended use.
+Design a clinician-reviewed record-summary service and decide whether a draft is supported by the correct patient's requested encounter.
 
 ## Problem
+
+**Context.** The fictional task requests a draft summary of patient P1's encounter E2, while records from multiple dates are available.
+
+**Task.** Assess the draft below and specify source selection, claim checks, reviewer responsibility, and operating and escalation boundaries.
+Explain what evidence is needed before accepting a summary claim.
+
+**Constraints.** This is draft-only summarization, not diagnosis or treatment advice.
+Preserve patient and encounter identity, temporal meaning, privacy, and human approval; an authentic citation can still support the wrong context.
 
 Design a draft-only record-summary service for this fictional case.
 The task requests patient P1's encounter E2, dated February 10.

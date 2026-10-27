@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Every matching substring has the pattern's length. Slide a window of that width, adding one character and removing one.
-Compare exact counts, not an enumeration of permutations.
+Determine whether a string contains a contiguous rearrangement of all characters in a given pattern.
 
 ## Problem
 
-For pattern `"ab"` and text `"eidbaooo"`, return `True`: the window `"ba"` starts at index 3.
-Use exact Python code points, including case and whitespace.
-A longer pattern returns `False`; an empty pattern returns `True`, including with empty text.
+**Input.** Two Python strings, `pattern` and `text`.
+
+**Output.** Return `True` if any substring of `text` is a permutation of `pattern`; otherwise return `False`.
+
+**Rules.** A matching substring must be contiguous and contain exactly the pattern's character counts.
+Use exact code points, including case and whitespace. Do not modify either string.
+A longer pattern returns `False`. An empty pattern returns `True`, including with empty text.
+
+**Example.** Pattern `"ab"` and text `"eidbaooo"` return `True` because `"ba"` starts at index 3.
+The same pattern with `"eidboaoo"` returns `False`; separated letters do not form a substring.
 
 ## Picture: Keep Exactly the Pattern's Width
 

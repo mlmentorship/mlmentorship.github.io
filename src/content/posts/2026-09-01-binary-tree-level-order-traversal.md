@@ -13,14 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Capture the current queue size, then consume exactly that many nodes before starting the next level.
+Return a binary tree's values grouped by depth, with each level listed from left to right.
 
 ## Problem
 
-For `[3,9,20,null,null,15,7]`, return `[[3],[9,20],[15,7]]`.
-Group nodes by depth, preserving left-to-right order within each group.
-An empty tree returns `[]`.
-Assume a finite tree without shared nodes or cycles.
+**Input.** The root of a finite binary tree whose nodes have a value and optional left and right children.
+
+**Output.** Return one list of values per depth, starting with the root's level.
+
+**Rules.** Within each level, preserve the nodes' left-to-right order.
+Missing children contribute no output value or placeholder.
+Assume no shared nodes or cycles. Leave the tree unchanged; an empty tree returns `[]`.
+
+**Example.** A root 3 has children 9 and 20; node 20 has children 15 and 7.
+Return `[[3], [9, 20], [15, 7]]`, not one flattened list.
+Its compact level-order input notation is `[3, 9, 20, null, null, 15, 7]`.
 
 ## Picture
 

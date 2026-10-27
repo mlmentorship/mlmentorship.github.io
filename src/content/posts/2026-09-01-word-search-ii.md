@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-A board path must also be a dictionary prefix; consume completed words once, but retain children needed by longer words.
+Find every dictionary word that can be spelled by an allowed path through a letter board.
 
 ## Problem
 
-Search board `oat / eth / eat` for `oat`, `oath`, `eat` and `pea`.
-Moves are orthogonal and cannot reuse a coordinate within one path.
-Return each found word once, not every coordinate occurrence.
-The reference requires rectangular independent mutable rows and single-character cells; `#` must be absent from board and dictionary.
-Dictionary words are nonempty; the reference ignores empty strings.
+**Input.** A rectangular `board` of independent mutable single-character rows and a dictionary list `words`.
+
+**Output.** Return each dictionary word that has at least one valid board path, once per distinct word.
+
+**Rules.** A path moves up, down, left, or right and cannot reuse a coordinate within that path.
+Separate candidate paths may share cells. Words must match complete paths, not merely dictionary prefixes.
+Exclude `#` from board and dictionary; the reference ignores empty dictionary strings.
+Result order is not required. The board is restored on normal return; empty boards return `[]`.
+
+**Example.** Rows `"oat"`, `"eth"`, `"eat"` with words `["oat", "oath", "eat", "pea"]` return `"oat"`, `"oath"`, and `"eat"`.
+The word `"pea"` is absent; finding several paths for `"eat"` would still emit it only once.
 
 ## Picture
 

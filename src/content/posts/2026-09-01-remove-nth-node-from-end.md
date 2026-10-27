@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keeping one pointer exactly `n` links ahead makes its arrival at the tail locate the target's predecessor.
+Remove the node at a specified one-based position counted backward from a linked list's end.
 
 ## Problem
 
-Remove the second node from the end of `1 -> 2 -> 3 -> 4 -> 5`.
-Return the chain `1 -> 2 -> 3 -> 5`, changing links rather than copying values.
-Require an acyclic chain and an integer rank `n`.
-The retained reference leaves the chain unchanged for nonpositive or oversized ranks.
+**Input.** The head of a finite acyclic linked list and an integer rank `n` counted from the end.
+
+**Output.** Return the head of the list after removing that occurrence, which may be a different head.
+
+**Rules.** Rank 1 means the tail; rank equal to the list length means the head.
+Rewrite links among retained original nodes rather than copying their values into new nodes.
+The reference leaves the chain unchanged for nonpositive or oversized ranks, including an empty chain.
+
+**Example.** Removing rank 2 from `1 -> 2 -> 3 -> 4 -> 5` returns `1 -> 2 -> 3 -> 5`.
+Removing rank 1 from a one-node list returns `None`.
 
 ## Picture
 

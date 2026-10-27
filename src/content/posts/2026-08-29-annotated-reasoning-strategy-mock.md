@@ -160,30 +160,43 @@ Recompute the plan with 64 accelerators, 20% maintenance loss, and 60B tokens. S
 <!-- visual:fixed-capacity-portfolio-guardrails -->
 <figure class="learning-figure" aria-labelledby="fixed-capacity-portfolio-title">
 	<p class="visual-kicker">One cluster · 100% allocated</p>
-	<h3 class="visual-title" id="fixed-capacity-portfolio-title">Which claim on capacity can move, and what must stay protected?</h3>
-	<div class="visual-grid--two" role="group" aria-label="Five capacity envelopes totaling 100 percent: online serving 55 percent, continued training 14 percent, post-training 12 percent, evaluation and verifiers 9 percent, and recovery reserve 10 percent.">
-		<section class="visual-panel">
-			<h4>55% · Online serving</h4>
-			<p><strong>Protect first.</strong> Funds launch traffic, interactive decode, and admitted KV state. Reduce optional branches or route supported work to the 3B model before breaking the serving floor.</p>
-		</section>
-		<section class="visual-panel">
-			<h4>14% · Continued training</h4>
-			<p><strong>Evidence-gated.</strong> Small mixture studies and short continuations earn one promoted run. Expand only when marginal hard-task gain repays displaced product evidence.</p>
-		</section>
-		<section class="visual-panel">
-			<h4>12% · Post-training</h4>
-			<p><strong>Count the full loop.</strong> Rollout generation, reference-policy calls, verifier execution, and updates all spend accelerator-hours, not only gradient steps.</p>
-		</section>
-		<section class="visual-panel">
-			<h4>9% · Evaluation and verifiers</h4>
-			<p><strong>Protect the evidence.</strong> Held-out cases, checkpoint evaluation, and verifier audits run throughout the program rather than waiting for the final checkpoint.</p>
-		</section>
-		<section class="visual-panel">
-			<h4>10% · Recovery reserve</h4>
-			<p><strong>Do not borrow informally.</strong> Keeps room for failed hosts, checkpoint restoration, canaries, and incident response even when a training result looks promising.</p>
-		</section>
-	</div>
-	<figcaption><strong>Read it this way:</strong> the five envelopes sum to the entire usable cluster. Training can grow only by naming the work it displaces and presenting evidence for greater marginal value; serving, ongoing evaluation, and the recovery floor are explicit constraints, not leftover capacity.</figcaption>
+	<h3 class="visual-title" id="fixed-capacity-portfolio-title">More training must displace something</h3>
+	<svg viewBox="0 0 600 480" role="img" aria-labelledby="fixed-budget-chart-title fixed-budget-chart-desc" style="width: 100%; min-width: 0; height: auto;">
+		<title id="fixed-budget-chart-title">Two allocations of the same usable capacity</title>
+		<desc id="fixed-budget-chart-desc">Initial allocation: serving 55%, continued training 14%, post-training 12%, evaluation 9%, recovery 10%. An illustrative proposal transfers six percentage points from post-training to continued training: 55%, 20%, 6%, 9%, 10%. Both bars total 100%. The serving, evaluation and hatched recovery segments do not move. This is a proposed trade-off, not an approved change or extra capacity.</desc>
+		<defs><pattern id="fixed-budget-reserve-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--viz-output-bg)"/><path d="M-2 2L2-2 M0 8L8 0 M6 10L10 6" stroke="var(--viz-output-stroke)" stroke-width="1"/></pattern></defs>
+		<g fill="var(--c-text)" font-family="var(--font-ui)" font-size="24">
+			<text x="40" y="27" font-size="26" font-weight="650">Initial allocation</text>
+			<path d="M40 66V57H560V66 M300 57V66" fill="none" stroke="var(--viz-edge)"/>
+			<text x="40" y="49">0%</text><text x="300" y="49" text-anchor="middle">50%</text><text x="560" y="49" text-anchor="end">100%</text>
+			<g data-capacity-row="initial" stroke="var(--viz-edge)">
+				<rect data-capacity="55" x="40" y="80" width="286" height="42" fill="var(--viz-input-bg)"/>
+				<rect data-capacity="14" x="326" y="80" width="72.8" height="42" fill="var(--viz-focus-bg)"/>
+				<rect data-capacity="12" x="398.8" y="80" width="62.4" height="42" fill="var(--viz-state-bg)"/>
+				<rect data-capacity="9" x="461.2" y="80" width="46.8" height="42" fill="var(--viz-neutral-bg)"/>
+				<rect data-capacity="10" x="508" y="80" width="52" height="42" fill="url(#fixed-budget-reserve-hatch)"/>
+			</g>
+			<g text-anchor="middle"><text x="183" y="107">55</text><text x="362.4" y="107">14</text><text x="430" y="107">12</text><text x="484.6" y="107">9</text><text x="534" y="107">10</text></g>
+			<text x="40" y="158">Proposed allocation</text>
+			<g data-capacity-row="proposal" stroke="var(--viz-edge)">
+				<rect data-capacity="55" x="40" y="178" width="286" height="42" fill="var(--viz-input-bg)"/>
+				<rect data-capacity="20" x="326" y="178" width="104" height="42" fill="var(--viz-focus-bg)"/>
+				<rect data-capacity="6" x="430" y="178" width="31.2" height="42" fill="var(--viz-state-bg)"/>
+				<rect data-capacity="9" x="461.2" y="178" width="46.8" height="42" fill="var(--viz-neutral-bg)"/>
+				<rect data-capacity="10" x="508" y="178" width="52" height="42" fill="url(#fixed-budget-reserve-hatch)"/>
+			</g>
+			<g text-anchor="middle"><text x="183" y="205">55</text><text x="378" y="205">20</text><text x="445.6" y="205">6</text><text x="484.6" y="205">9</text><text x="534" y="205">10</text></g>
+			<path d="M326 122V178 M461.2 122V178 M508 122V178" stroke="var(--viz-edge)" stroke-dasharray="3 5"/>
+			<path d="M398.8 124L430 176 M398.8 228V240H430V228" fill="none" stroke="var(--viz-focus-stroke)" stroke-width="2"/>
+			<text x="414.4" y="266" text-anchor="middle">6 points transferred</text>
+			<rect x="40" y="292" width="22" height="22" fill="var(--viz-input-bg)" stroke="var(--viz-edge)"/><text x="76" y="310">Serving: 55% held fixed</text>
+			<rect x="40" y="327" width="22" height="22" fill="var(--viz-focus-bg)" stroke="var(--viz-edge)"/><text x="76" y="345">Continued training: 14% to 20%</text>
+			<rect x="40" y="362" width="22" height="22" fill="var(--viz-state-bg)" stroke="var(--viz-edge)"/><text x="76" y="380">Post-training: 12% to 6%</text>
+			<rect x="40" y="397" width="22" height="22" fill="var(--viz-neutral-bg)" stroke="var(--viz-edge)"/><text x="76" y="415">Evaluation: 9% held fixed</text>
+			<rect x="40" y="432" width="22" height="22" fill="url(#fixed-budget-reserve-hatch)" stroke="var(--viz-edge)"/><text x="76" y="450">Recovery: 10% held fixed</text>
+		</g>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> both bars spend the same 100%. The proposed training increase costs half the post-training allocation, not unused capacity. Serving, evaluation and recovery stay fixed in this illustration. Evidence must justify that loss before approval.</figcaption>
 </figure>
 
 ### Annotation

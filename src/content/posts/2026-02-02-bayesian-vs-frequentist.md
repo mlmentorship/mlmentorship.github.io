@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth, especially in research-heavy or stats-heavy roles.*
 
-The interviewer is checking whether you can use the Bayesian framing as a *tool*, not just describe it as a viewpoint. The L6 answer maps the philosophy onto specific practical decisions.
+Compare Bayesian and frequentist inference through their assumptions, interval interpretations, and consequences for an actual decision.
+
+## Problem
+
+**Context.** Suppose a fixed-probability coin produces 12 heads in 20 independent flips.
+You want to express uncertainty about its unknown head probability; a Bayesian analysis must also specify a prior.
+
+**Task.** Explain the likelihood, what is treated as random, and the meaning of confidence versus credible intervals.
+Use the coin example to discuss prior sensitivity, repeated-sampling guarantees, and a decision requiring uncertainty estimates.
+
+**Constraints.** State assumptions and any prior explicitly. Do not interpret a frequentist confidence interval as a posterior probability statement.
+Neither framework removes model misspecification, selection bias, or the need to validate decision consequences.
 
 ## What an L4 answer sounds like
 

@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-One rotation can disrupt global order without disrupting both halves around a midpoint. Use the ordered half to justify each discard.
+Find a target's original position in a distinct sorted array whose starting position may have been rotated.
 
 ## Problem
 
-> Find a target in a sorted array that was rotated once.
+**Input.** An integer list `nums` obtained by rotating a strictly increasing list, and an integer `target`.
 
-The reference accepts a rotation of a strictly increasing integer array. Zero rotation is valid.
-Return the target's index, or `-1` when absent. Empty input returns `-1`; the input stays unchanged.
+**Output.** Return the target's zero-based index in the supplied rotated list, or `-1` if absent.
+
+**Rules.** Values are distinct, and zero rotation is valid.
+Do not sort or otherwise modify the input; returned positions refer to its current order.
+Empty input returns `-1`. Supporting duplicate values is a changed contract below.
+
+**Example.** For `[4, 5, 6, 7, 0, 1, 2]` and target `0`, return `4`.
+Target `3` in that list returns `-1`.
 
 ## Picture
 

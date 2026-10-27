@@ -1,6 +1,6 @@
 ---
 title: "PagedAttention and the vLLM serving model"
-description: "Treat the KV cache like virtual memory: allocate in fixed-size pages, share pages across sequences, eliminate fragmentation. The reason vLLM is the default LLM server."
+description: "Resolve logical KV positions through block tables, calculate shared allocation and tail waste, and preserve ownership during release or branching."
 date: "2025-08-13"
 draft: false
 tags: ["concepts"]
@@ -9,21 +9,26 @@ category: "concepts"
 
 ## Summary
 
-PagedAttention stores the KV cache in fixed-size physical blocks indexed by a per-sequence block table, so the cache is no longer a contiguous tensor and can be allocated, freed, and shared at block granularity. Like virtual memory pages in an OS.
-
-Naive KV-cache management pre-allocates `max_seq_len` of contiguous memory for every request in the batch. Most requests are short, so most of that memory is wasted (internal fragmentation). Shared prefixes (system prompts, few-shot examples) are duplicated across requests (no sharing). The result: serving throughput is bottlenecked by KV-cache memory, not by compute.
-
-PagedAttention ([Kwon et al., 2023](https://arxiv.org/abs/2309.06180), the core idea behind vLLM) solves both: physical fragmentation drops near zero, and shared prefixes use the same physical blocks. vLLM has become the default open-source LLM serving runtime since 2023.
+PagedAttention resolves logical KV positions through per-sequence tables pointing to fixed-size physical blocks.
+This permits scattered allocation and compatible-prefix sharing without changing the intended logical attention sequence.
+It reduces allocation waste relative to some contiguous reservation policies, but does not eliminate tail waste or guarantee higher throughput.
 
 ## The mechanism
 
-1. **Block size**: pick a small fixed number of tokens per block, e.g. $B = 16$.
-2. **Physical block pool**: allocate a large pool of $B$-sized KV blocks in HBM at startup.
-3. **Per-sequence block table**: each in-flight request has a logical-to-physical block table mapping its position $p$ to a physical block index.
-4. **Attention kernel**: a custom CUDA kernel reads K/V through the block table, gathering blocks as needed for the attention computation.
-5. **Allocation**: when a sequence grows, allocate a new physical block on demand; when it finishes, free its blocks back to the pool.
+For token position $p$ and block capacity $b$, lookup is:
 
-Internal fragmentation is at most $B - 1$ tokens per request (vs. potentially thousands without paging).
+$$
+\operatorname{address}(p)=(table[\lfloor p/b\rfloor],\;p\bmod b).
+$$
+
+Allocate blocks as sequences grow; the kernel gathers K/V in logical order with the same masks and position conventions.
+For the pictured tables, use hypothetical $b=4$, ten valid positions per request, and shared positions zero through seven.
+A has table `[7,1,5]`; B has `[7,1,3]`.
+Position nine has logical block two and offset one: A reads `P5[1]`, B reads `P3[1]`.
+
+Six logical blocks alias four physical blocks, reserving sixteen token slots rather than twenty-four without sharing.
+There are twelve distinct valid KV positions: eight shared and two private per request.
+Private tails still waste four slots total; sharing reserves sixteen slots, not twelve.
 
 <!-- visual:paged-attention-block-table-indirection -->
 <figure class="learning-figure plot-panel" aria-labelledby="paged-attention-visual-title">
@@ -59,13 +64,8 @@ Internal fragmentation is at most $B - 1$ tokens per request (vs. potentially th
 		<path class="viz-gridline" d="M86 88 H254"></path>
 		<text class="viz-callout" x="170" y="93" text-anchor="middle">same prefix mappings</text>
 		<text class="viz-axis-label" x="12" y="180">2 · THE TABLE RESOLVES EACH LOOKUP IN HBM</text>
+		<text class="viz-label" x="180" y="197" text-anchor="middle">Match each physical ID to the pool below.</text>
 		<rect class="viz-node" x="14" y="214" width="336" height="190" rx="8"></rect>
-		<path class="viz-forward" d="M126 82 C126 170 278 190 278 324"></path>
-		<path class="viz-forward" d="M126 142 C126 200 278 220 278 324"></path>
-		<path class="viz-forward" d="M214 82 C214 170 134 190 134 244"></path>
-		<path class="viz-forward" d="M214 142 C214 200 134 210 134 244"></path>
-		<path class="viz-forward" d="M302 82 C350 170 134 280 134 324"></path>
-		<path class="viz-forward" d="M302 142 C302 190 278 205 278 244"></path>
 		<text class="viz-node-label" x="180" y="235" text-anchor="middle">physical KV blocks · scattered</text>
 		<rect x="30" y="250" width="64" height="58" rx="4" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5;stroke-dasharray:4 3"></rect>
 		<rect class="viz-node viz-node--focus" x="102" y="250" width="64" height="58" rx="4"></rect>
@@ -96,30 +96,54 @@ Internal fragmentation is at most $B - 1$ tokens per request (vs. potentially th
 		<text class="viz-node-value" x="278" y="368" text-anchor="middle">prefix</text>
 		<text class="viz-node-value" x="278" y="381" text-anchor="middle">refs = 2</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> scan each request left to right: its logical blocks stay in token order, but the block-table entries jump to physical blocks 7, 1, then 5 or 3. Both requests point to P7 and P1 for the common prefix, so those blocks have two references and exist only once. Shape, labels, line style, and reference counts carry the meaning; color is redundant. Original schematic checked against <a href="https://arxiv.org/abs/2309.06180">Kwon et al.’s PagedAttention paper</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> logical order stays fixed while physical addresses jump. Both tables reference P7 and P1; each shared block has two owners. P5 and P3 are private tails. The original schematic follows <a href="https://arxiv.org/abs/2309.06180">Kwon et al.</a>.</figcaption>
 </figure>
 
 ## Prefix sharing
 
-Two requests with the same system prompt can share the physical blocks for that prefix:
+After A's outstanding uses finish, release P5 and decrement P7/P1 reference counts from two to one.
+B's prefix must remain valid; a shared block is freed only after all live owners and in-flight uses are gone.
+Matching visible prompt text is insufficient: tokenization, model/adapters, positions, and relevant cache state must be compatible.
 
-- The first request fills physical blocks for the prefix.
-- The second request's block table points to the same physical blocks for matching positions.
-- Reference counts track when a shared block can be freed.
+### Append into a Shared Partial Tail
 
-For systems with long shared prefixes (chat with a long system prompt; structured generation; agent loops with tool descriptions), prefix sharing gives a multiplicative throughput boost. Fewer KV-cache writes, less memory used per request, more batch concurrency.
+**New task:** Two requests share six positions in four-token blocks, then diverge.
+
+**Picture and change:** Copy the two valid entries of shared logical block one before A appends at offset two.
+Redirect A's table entry and decrement the old block's reference count before its private write.
+
+**Check:** B's position six remains absent and B's existing bytes are unchanged.
+
+**Use when:** A shared writable tail branches; directly mutating the shared block would corrupt isolation.
+
+### Use Larger Blocks
+
+**New task:** Change a unique ten-token request from four-token to eight-token blocks.
+
+**Picture and change:** Rebuild table indexing and allocator units together without changing logical positions.
+
+**Check:** Reserved slots rise from twelve to sixteen; tail waste rises from two to six.
+Generally, one unshared sequence wastes $\lceil S/b\rceil b-S\le b-1$ slots.
+
+**Use when:** Measured lookup costs justify additional tail waste; fewer table entries alone do not establish faster execution.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Continuous batching pairs naturally with paging
 
-PagedAttention enables **continuous batching**: requests of different lengths can be batched together because the kernel reads each sequence's KV through its own block table. New requests can join an in-flight batch at any step (instead of waiting for the slowest request in a static batch to finish). See [continuous batching](/concepts/continuous-batching/).
+Paging can support [continuous batching](/concepts/continuous-batching/) through per-request cache addressing.
+Admission and scheduling remain separate policies constrained by available blocks, compute, and latency targets.
 
 ## Tradeoffs
 
-- **Kernel overhead**: gathering K/V through a block table is slightly slower per FLOP than reading contiguous memory; the throughput gain from higher batch concurrency dominates in practice.
-- **Block size**: smaller $B$ means less fragmentation but more block-table lookups; $B = 16$ is the standard.
-- **Implementation complexity**: paging logic, block tables, copy-on-write for shared blocks. Worth it for any production deployment.
+- **Kernel/layout cost:** indirection, bandwidth, locality, and concurrency interact; measure actual workloads.
+- **Block size:** smaller blocks reduce bounded tail waste but increase metadata and potentially lookup work.
+- **Policy state:** allocation, eviction, caching, and copy-on-write must preserve ownership and identity.
 
 ## Common pitfalls
 
-- **Confusing PagedAttention with FlashAttention.** PagedAttention is about memory layout for the KV cache; FlashAttention is about the attention kernel itself. Both can (and should) coexist.
-- **Treating throughput as the only metric.** Paging trades a small per-token compute overhead for much higher batch sizes; check tail latency under load.
+- **Different mechanisms:** paging addresses cache layout/ownership; FlashAttention addresses attention's memory-access computation. Implementations can combine them when supported.
+- **Incomplete measurement:** report throughput, memory, and tail latency under stated load rather than a universal serving-speed claim.
+
+</div>

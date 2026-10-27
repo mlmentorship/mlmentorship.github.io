@@ -9,15 +9,13 @@ category: "concepts"
 
 ## Summary
 
-Ranking metrics evaluate **ordered** lists of items. **NDCG** (Normalized Discounted Cumulative Gain) handles graded relevance with position discount. **MAP** (Mean Average Precision) handles binary relevance averaged over recall levels. **MRR** (Mean Reciprocal Rank) handles a single correct answer per query.
-
-Search, recommendation, retrieval, and question-answering systems produce ranked lists, not classifications. Treating these problems as classification (precision / recall / F1) ignores order. A wrong top-1 hurts more than a wrong top-10. Ranking metrics quantify "right things at the top."
-
-For senior interviews, knowing which metric to use for which ranking problem is expected.
+Ranking metrics assign different credit to gain, coverage, precision at hits, and the first useful result.
+Choose the decision target, judged universe, cutoff, relevance definition, and query weights before comparing systems.
+A high score under one credit rule need not establish performance under another.
 
 ## NDCG. The dominant ranking metric
 
-For a query with predicted ranking and ground-truth relevance grades $\text{rel}_1, \dots, \text{rel}_K$ (e.g., 0 = irrelevant, 1 = relevant, 2 = highly relevant):
+Use nonnegative graded judgments and exponential gain for this lesson:
 
 **Discounted Cumulative Gain at $K$**:
 
@@ -25,7 +23,8 @@ $$
 \text{DCG}_K = \sum_{i=1}^{K} \frac{2^{\text{rel}_i} - 1}{\log_2(i + 1)}.
 $$
 
-The numerator rewards high-relevance items more than linearly. The denominator (the discount) penalizes putting relevant items deeper.
+For the hypothetical fully judged ranking `[3,0,2,1]` at cutoff four, DCG is $7+0+3/2+1/\log_2(5)=8.93068$.
+Sort the judged grades only for the ideal reference: `[3,2,1,0]` gives IDCG $9.39279$.
 
 **NDCG** normalizes by the ideal ranking's DCG so scores live in [0, 1]:
 
@@ -33,9 +32,9 @@ $$
 \text{NDCG}_K = \frac{\text{DCG}_K}{\text{IDCG}_K}.
 $$
 
-Average NDCG across queries to get a system-level metric.
-
-**Why NDCG is the default**: handles graded relevance, position-discounts deeper results, normalized for cross-query comparison, has standardized $K$ (NDCG@5, @10).
+The ratio is approximately $0.95080$.
+It lies in $[0,1]$ under the stated nonnegative-gain and common-universe conventions when IDCG is positive.
+Normalization does not make different gain scales or judging populations interchangeable.
 
 ## MAP. Average precision averaged over queries
 
@@ -49,19 +48,24 @@ $$
 \text{AP} = \frac{1}{R} \sum_{k=1}^{K} \text{P@k} \cdot \mathbf{1}[\text{item at } k \text{ is relevant}]
 $$
 
-where $R$ is total relevant items. Averages precision over the recall levels at which relevant items appear.
+Define binary relevance as grade greater than zero; the fixture has total $R=3$.
+Use the full-universe R denominator even when truncating at K here.
+Then AP@4 is $(1+2/3+3/4)/3=29/36\approx0.80556$.
+Alternative denominators, such as $\min(R,K)$, define different truncated metrics and must be labeled.
 
-**MAP** (Mean Average Precision) = average AP across queries. Used heavily in information retrieval (TREC) before NDCG took over for graded relevance.
+MAP is the declared query-weighted mean of AP; equal-query averaging and traffic-weighted averaging target different populations.
 
 ## MRR. When there's one right answer
 
-For each query with a single correct answer at position $r$ (or no correct in top-K):
+Let r be the first relevant rank, even if multiple relevant items exist:
 
 $$
 \text{RR} = \begin{cases} 1/r & \text{if a correct answer is in top-K} \\ 0 & \text{otherwise} \end{cases}
 $$
 
-**MRR** = mean of RR across queries. Used in: question answering (one correct answer per question), passage retrieval (one gold passage per query), some entity disambiguation.
+MRR averages reciprocal rank over queries.
+The left fixture has first hit at rank one, so RR is one.
+The separate right-hand example has first hit at rank three, so RR is $1/3$.
 
 <!-- visual:ranking-metrics-per-rank-credit -->
 <figure class="learning-figure" aria-labelledby="ranking-metrics-credit-title">
@@ -71,8 +75,8 @@ $$
 		<section class="visual-panel">
 			<h4>Many relevant items: graded or binary?</h4>
 			<p>The same four results support two different judgments.</p>
-			<table class="cm-grid" aria-label="At ranks one through four, graded relevance is 3, 0, 2, 1; NDCG credit is 7.00, 0, 1.50, 0.43; MAP precision checkpoints are 1 over 1, none, 2 over 3, and 3 over 4">
-				<thead><tr><th scope="col">Rank</th><th scope="col">Grade</th><th scope="col">NDCG credit</th><th scope="col">AP checkpoint</th></tr></thead>
+			<table class="cm-grid" aria-label="At ranks one through four, graded relevance is 3, 0, 2, 1; unnormalized DCG credit is 7.00, 0, 1.50, 0.43; AP precision checkpoints are 1 over 1, none, 2 over 3, and 3 over 4">
+				<thead><tr><th scope="col">Rank</th><th scope="col">Grade</th><th scope="col">DCG credit</th><th scope="col">AP checkpoint</th></tr></thead>
 				<tbody>
 					<tr><th scope="row">1</th><td><strong>3</strong> · relevant</td><td>(2³−1) / 1 = <strong>7.00</strong></td><td><strong>1 / 1</strong></td></tr>
 					<tr><th scope="row">2</th><td><strong>0</strong> · not relevant</td><td><strong>0</strong></td><td>Skip</td></tr>
@@ -83,7 +87,7 @@ $$
 			<p class="cm-equation">NDCG@4 = 8.93 / 9.39 = 0.95<br>AP = (1 + 2/3 + 3/4) / 3 = 0.81</p>
 		</section>
 		<section class="visual-panel">
-			<h4>One correct answer: stop at the first hit</h4>
+			<h4>First useful answer: stop at its rank</h4>
 			<p>MRR ignores later ranks once the answer is found.</p>
 			<table class="cm-grid" aria-label="The first two ranked results are wrong, the third is correct, and reciprocal rank is one third">
 				<thead><tr><th scope="col">Rank</th><th scope="col">Answer?</th><th scope="col">MRR action</th></tr></thead>
@@ -96,37 +100,63 @@ $$
 			<p class="cm-equation">RR = 1 / first correct rank = 1 / 3 = 0.33</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> scan the left table by row. NDCG uses every grade and discounts lower ranks; AP uses only relevant rows and records precision at each hit. Use the right table only when one answer matters: MRR stops at the first correct result. The calculations are an original example checked against the <a href="https://doi.org/10.1145/582415.582418">original cumulative-gain paper</a>, the <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">IR textbook definition of MAP</a>, and the <a href="https://trec.nist.gov/pubs/trec8/papers/qa8.pdf">TREC-8 QA evaluation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the left table accumulates unnormalized DCG terms and precision at binary-relevant hits. Divide by IDCG or R under the stated conventions. The separate right example stops at its first useful answer. Original calculations follow the <a href="https://doi.org/10.1145/582415.582418">cumulative-gain paper</a>, <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">IR textbook</a>, and <a href="https://trec.nist.gov/pubs/trec8/papers/qa8.pdf">TREC-8 QA evaluation</a>.</figcaption>
 </figure>
 
 ## Hit rate and recall@K
 
-**Hit rate@K** (or recall@K): fraction of queries where a relevant item appears in the top $K$. Used heavily in retrieval / candidate-generation evaluation, where the goal is "get the gold into the candidate pool" and a downstream ranker handles ordering.
+Recall@K is retrieved relevant count divided by R; hit@K is an indicator that any relevant result was retrieved.
+They coincide only under particular relevance settings, such as exactly one relevant item per query.
+
+### Change Retrieval Depth
+
+**New task:** Permit only two candidates to reach the next stage.
+
+**Picture and change:** Set K to two without changing total R or the judged universe.
+
+**Check:** The fixture has hit@2 one, recall@2 $1/3$, and full-R AP@2 $1/3$.
+One successful hit does not mean complete candidate coverage.
+
+**Use when:** Candidate-generation capacity binds and the downstream stage cannot recover omitted items.
+
+### Change the Reward Target
+
+**New task:** One useful answer suffices regardless of later results.
+
+**Picture and change:** Use reciprocal first-hit rank instead of AP.
+
+**Check:** Adding a relevant result at rank four after a first hit at rank three leaves RR at $1/3$.
+
+**Use when:** The user stops at the first satisfactory answer; multiple valid answers remain possible.
+
+For R zero or IDCG zero, the corresponding ratios are undefined; this lesson excludes those queries and reports their count.
+Benchmark zero-value conventions are alternatives, not silent substitutions.
+Declare unjudged-item handling, duplicates, score ties, and query weights before evaluation; unjudged does not automatically mean irrelevant.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 | Metric | Order matters? | Graded relevance? | Multi-relevant per query? |
 |--------|----------------|-------------------|--------------------------|
 | **NDCG** | Yes | Yes | Yes |
 | **MAP** | Yes | No (binary) | Yes |
-| **MRR** | Yes | No | One per query |
+| **MRR** | Yes | No | Yes, but only first hit earns credit |
 | **Recall@K** | No (just need in top-K) | No | Yes |
 | **Precision@K** | No | No | Yes |
 
 ## When to use which
 
-- **Web search, e-commerce search**: NDCG@10 (graded relevance, deep results matter less).
-- **Recommendations** with implicit feedback: NDCG@K with binary relevance, or hit rate@K.
-- **Information retrieval academic benchmarks**: MAP (TREC tradition).
-- **Question answering, fact retrieval**: MRR (one correct answer).
-- **Retrieval candidate generation**: Recall@K (downstream ranker handles order).
-- **Top-1 critical applications**: precision@1 or accuracy.
+- **Graded utility:** choose gains and discounts justified by the judgment/task model.
+- **Multiple relevant items:** AP rewards precision at successive hits; recall measures coverage.
+- **First-answer utility:** RR ignores later relevant items after the first.
+- **Candidate generation:** inspect coverage at its actual capacity and query slices.
 
 ## Common pitfalls
 
-- **Reporting NDCG at one $K$**: report NDCG@5, @10, @20 to show whether order or coverage matters more.
-- **Comparing NDCG across systems with different relevance grading scales.** A system rated on a 0-3 scale gives different NDCG than the same system on 0-4. Standardize.
-- **Treating MRR as MAP for QA.** If there can be multiple correct answers, MAP is more informative.
-- **Using accuracy for ranking.** Accuracy ignores order entirely; nearly always wrong choice for ranking problems.
-- **Confusing macro vs. micro averaging across queries.** Standard ranking metrics average per-query (one score per query, then mean). Analogous to macro. Don't pool TP/FP across queries.
+- **Different gain scales:** grades zero-to-three and zero-to-four need common semantics before comparing their exponential-gain scores.
+- **Wrong universe:** computing IDCG over only returned items can conceal missing relevant candidates.
+- **Pooling queries:** equal-query, traffic-weighted, and pooled-count measurements need not agree.
+- **One number:** report intended cutoffs, uncertainty, judging coverage, and important slices rather than treating one metric as universal utility.
 
 ## Related
 
@@ -134,3 +164,5 @@ $$
 - [Two-tower retrieval](/concepts/two-tower-retrieval/). What gets evaluated with these metrics in production.
 - [Learning-to-rank losses](/concepts/learning-to-rank-losses/). Surrogate objectives for ordered results.
 - [Position bias and counterfactual ranking](/concepts/position-bias-counterfactual-learning-to-rank/). Evaluation from biased interaction logs.
+
+</div>

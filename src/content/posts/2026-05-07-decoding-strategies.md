@@ -1,6 +1,6 @@
 ---
 title: "Decoding strategies: greedy, beam, top-k, top-p, temperature"
-description: "Same model, different samplers, very different outputs. The choice of decoder is often more impactful than the last percent of training. Know the tradeoffs."
+description: "Calculate eligible tokens, normalized probabilities and sequence scores under a declared decoding pipeline."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
@@ -9,9 +9,13 @@ category: "concepts"
 
 ## Summary
 
-**Decoding** turns a language model's per-token distributions into actual text. Strategies differ in how they pick the next token from the distribution. Each makes a tradeoff between fidelity (high probability) and diversity (broader sampling).
+Decoding turns next-token scores into eligible outputs using a declared selection or search policy.
+Temperature changes probabilities; truncation removes tokens before the retained distribution is normalized.
+Neither high model probability nor low temperature establishes factual correctness.
 
-A trained LLM produces a probability distribution $p(x_t \mid x_{<t})$ at every step. The text the user sees depends entirely on how you sample from those distributions. Bad decoding makes a strong model look weak: greedy can repeat, beam can be bland, pure sampling can be incoherent. Modern systems typically combine top-p with a moderate temperature, but the right choice depends on the task.
+Specify vocabulary, allowed-token mask, processor order, tie policy, and EOS or budget stopping.
+Our default calculation uses temperature $T=1$, then truncation, renormalization, and sampling.
+An empty allowed set is an error requiring an explicit recovery policy, not an arbitrary token.
 
 ## The strategies
 
@@ -19,38 +23,32 @@ A trained LLM produces a probability distribution $p(x_t \mid x_{<t})$ at every 
 
 Pick $\arg\max_x p(x \mid x_{<t})$ at every step.
 
-- **Pros**: deterministic, fast, optimal for tasks where the highest-probability completion is the right answer (translation with strong evidence, classification reformulated as generation).
-- **Cons**: gets stuck in loops (the same token becomes most probable again because the previous step made it more likely). Bland and repetitive on open-ended generation.
+Declare tie-breaking among allowed maxima.
+Local argmax need not maximize complete-sequence probability or task quality.
 
 ### Beam search
 
-Track the $k$ highest-probability sequences at every step. Expand each, keep the top $k$.
-
-- **Pros**: better than greedy for tasks with a clear correct answer (machine translation, summarization).
-- **Cons**: tends to produce short, bland outputs. The most likely sequence under the model is often boring or repetitive ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751)). Length-normalization tweaks help but do not fully fix this.
+Retain a declared number of prefixes, expanding them by cumulative score $\sum_t\log p(x_t\mid x_{<t})$.
+Finite beams prune possibilities and need not find the global optimum.
+Specify completed-EOS handling, length normalization, and stopping together; these can change the selected sequence.
 
 ### Temperature sampling
 
 Sample from $\text{softmax}(z / T)$ where $z$ is the logit vector and $T$ is the temperature.
 
-- $T = 1$: model's native distribution.
-- $T < 1$: sharper, more deterministic. $T \to 0$ recovers greedy.
-- $T > 1$: flatter, more diverse. $T \to \infty$ recovers uniform.
-
-Default for chat: $T \approx 0.7$. Default for code: lower ($T \approx 0.2$).
+Require $T>0$.
+Lower values sharpen relative probabilities; $T\to0$ concentrates on maximizers, with ties requiring a policy.
+Large $T$ approaches uniform over finite allowed logits, not masked tokens.
 
 ### Top-k sampling
 
-Restrict the sampling pool to the $k$ most probable tokens, then sample with temperature ([Fan et al., 2018](https://arxiv.org/abs/1805.04833)).
-
-- **Cons**: $k$ is a hyperparameter, but the right $k$ depends on the entropy of the distribution. When the model is very confident, $k = 50$ includes garbage; when it is uncertain, $k = 50$ may be too restrictive.
+Retain exactly $k$ highest-probability allowed tokens, resolving cutoff ties by a declared order ([Fan et al., 2018](https://arxiv.org/abs/1805.04833)).
+Renormalize their probabilities; a fixed count does not fix retained mass.
 
 ### Top-p (nucleus) sampling
 
-Restrict the sampling pool to the smallest set of tokens whose cumulative probability exceeds $p$ ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751)).
-
-- $p = 0.9$ is the modern default.
-- Adapts to the entropy of each step: confident steps sample from a small set, uncertain steps from a larger one. The standard choice for open-ended generation.
+Retain the smallest sorted prefix whose mass reaches at least threshold $p$, including the crossing token.
+Choose a threshold in $(0,1]$; declare cutoff ties and renormalize ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751)).
 
 <!-- visual:decoding-fixed-count-adaptive-mass -->
 <figure class="learning-figure" aria-labelledby="decoding-support-title">
@@ -69,9 +67,9 @@ Restrict the sampling pool to the smallest set of tokens whose cumulative probab
 					<rect class="viz-node" x="58" y="142" width="26" height="18"></rect><text x="71" y="137">12%</text><text x="71" y="176">B</text>
 					<rect class="viz-node" x="96" y="151" width="26" height="9"></rect><text x="109" y="146">6%</text><text x="109" y="176">C</text>
 					<rect class="viz-node" x="134" y="154" width="26" height="6"></rect><text x="147" y="149">4%</text><text x="147" y="176">D</text>
-					<rect class="viz-node" x="172" y="155" width="26" height="5"></rect><text x="185" y="150">3%</text><text x="185" y="176">E</text>
-					<rect class="viz-node" x="210" y="156" width="26" height="4"></rect><text x="223" y="151">2%</text><text x="223" y="176">F</text>
-					<rect class="viz-node" x="248" y="156" width="26" height="4"></rect><text x="261" y="151">1%</text><text x="261" y="176">G</text>
+					<rect class="viz-node" x="172" y="155.5" width="26" height="4.5"></rect><text x="185" y="150.5">3%</text><text x="185" y="176">E</text>
+					<rect class="viz-node" x="210" y="157" width="26" height="3"></rect><text x="223" y="152">2%</text><text x="223" y="176">F</text>
+					<rect class="viz-node" x="248" y="158.5" width="26" height="1.5"></rect><text x="261" y="153.5">1%</text><text x="261" y="176">G</text>
 				</g>
 				<path d="M20 190V196H122V190" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
 				<text class="viz-callout" x="150" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 90% mass</text>
@@ -87,13 +85,13 @@ Restrict the sampling pool to the smallest set of tokens whose cumulative probab
 				<text class="viz-axis-label" x="12" y="16">UNCERTAIN NEXT TOKEN</text>
 				<path class="viz-gridline" d="M18 160H282"></path>
 				<g class="viz-label" text-anchor="middle">
-					<rect class="viz-node viz-node--focus" x="20" y="88" width="26" height="72"></rect><text x="33" y="83">24%</text><text x="33" y="176">A</text>
-					<rect class="viz-node" x="58" y="100" width="26" height="60"></rect><text x="71" y="95">20%</text><text x="71" y="176">B</text>
-					<rect class="viz-node" x="96" y="109" width="26" height="51"></rect><text x="109" y="104">17%</text><text x="109" y="176">C</text>
-					<rect class="viz-node" x="134" y="118" width="26" height="42"></rect><text x="147" y="113">14%</text><text x="147" y="176">D</text>
-					<rect class="viz-node" x="172" y="127" width="26" height="33"></rect><text x="185" y="122">11%</text><text x="185" y="176">E</text>
-					<rect class="viz-node" x="210" y="136" width="26" height="24"></rect><text x="223" y="131">8%</text><text x="223" y="176">F</text>
-					<rect class="viz-node" x="248" y="142" width="26" height="18"></rect><text x="261" y="137">6%</text><text x="261" y="176">G</text>
+					<rect class="viz-node viz-node--focus" x="20" y="124" width="26" height="36"></rect><text x="33" y="119">24%</text><text x="33" y="176">A</text>
+					<rect class="viz-node" x="58" y="130" width="26" height="30"></rect><text x="71" y="125">20%</text><text x="71" y="176">B</text>
+					<rect class="viz-node" x="96" y="134.5" width="26" height="25.5"></rect><text x="109" y="129.5">17%</text><text x="109" y="176">C</text>
+					<rect class="viz-node" x="134" y="139" width="26" height="21"></rect><text x="147" y="134">14%</text><text x="147" y="176">D</text>
+					<rect class="viz-node" x="172" y="143.5" width="26" height="16.5"></rect><text x="185" y="138.5">11%</text><text x="185" y="176">E</text>
+					<rect class="viz-node" x="210" y="148" width="26" height="12"></rect><text x="223" y="143">8%</text><text x="223" y="176">F</text>
+					<rect class="viz-node" x="248" y="151" width="26" height="9"></rect><text x="261" y="146">6%</text><text x="261" y="176">G</text>
 				</g>
 				<path d="M20 190V196H122V190" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:2"></path>
 				<text class="viz-callout" x="150" y="210" text-anchor="middle">top-k = 3 · 3 tokens · 61% mass</text>
@@ -102,38 +100,82 @@ Restrict the sampling pool to the smallest set of tokens whose cumulative probab
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the solid top-k brackets first: both keep exactly three tokens, although their captured probability mass falls from 90% to 61%. Then compare the dashed top-p brackets: the candidate pool expands from two tokens to five so that each pool reaches the 80% mass threshold. Probabilities are renormalized over the retained pool before sampling.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both panels use the same vertical probability scale. Solid top-k brackets retain three tokens with masses 0.90 and 0.61. Dashed top-p brackets retain two and five tokens, reaching at least 0.80 with masses 0.84 and 0.86. Divide by the retained mass before sampling; do not sample from the original probabilities without renormalizing.</figcaption>
 </figure>
+
+Confident top-k becomes $(0.8,2/15,1/15)$; confident top-p becomes $(6/7,1/7)$.
+Uncertain top-k becomes $(24,20,17)/61$; uncertain top-p becomes $(24,20,17,14,11)/86$.
+
+### Change processor order
+
+**New task:** use $T=2$ and top-p $0.85$ on probabilities $(0.6,0.3,0.1)$.
+
+**Picture and change:** temperature transforms probabilities proportionally to their square roots.
+
+**Check:** temperature first gives approximately $(0.472734,0.334273,0.192993)$, requiring all three tokens.
+Truncation first retains mass $0.9$, then temperature gives $(0.585786,0.414214)$.
+
+**Use when:** reproducing a serving pipeline; processor order is part of the distribution.
+
+### Search complete sequences
+
+**New task:** maximize a two-token sequence's probability, then stop.
+
+**Picture and change:** first-token probabilities are $p(A)=0.6,p(B)=0.4$.
+Their best continuation probabilities are $0.5$ and $0.9$.
+
+**Check:** greedy follows A, obtaining joint probability $0.30$.
+A width-two search can retain B and its $0.36$ completion.
+
+**Use when:** sequence-score search, rather than a single-step sample, matches the actual objective.
 
 ### Min-p sampling
 
-Restrict to tokens with probability at least $p_{\min} \cdot \max_x p(x)$. Closer to "filter out implausible options" than nucleus's "keep the top mass."
+Retain $p_i\geq p_{\min}\max_j p_j$ and renormalize.
+This compares individual probabilities with the maximum, not cumulative mass.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Repetition penalty and other modifiers
 
 Real systems layer modifications on top of the base sampler:
 
-- **Repetition penalty**: divide logits of recently used tokens by some factor. Prevents loops.
+- **Repetition penalty:** one sign-aware convention divides positive repeated-token logits by $c>1$ and multiplies negative ones by $c$.
 - **Frequency / presence penalty**: linear adjustment based on how often a token has appeared.
 - **No-repeat n-gram**: forbid repeating any n-gram already in the output.
-- **Logit bias**: add a constant to specific token logits to nudge or forbid them.
+- **Logit bias:** add token-specific offsets; use an explicit hard mask to forbid tokens.
+
+Dividing a negative logit alone is wrong: $-2/2=-1$ increases its score, while $-2\times2=-4$ decreases it.
+Grammar constraints restrict allowed tokens but do not establish semantic or factual correctness.
 
 ## Choosing per task
 
-| Task | Default |
+| Task | Policy to evaluate |
 |---|---|
-| Translation, factual QA, summarization with reference | Beam (k=4 to 8) or low-temperature greedy |
-| Code generation | Temperature 0.2 + top-p 0.95, or greedy with a stop-condition |
-| Open chat | Temperature 0.7 + top-p 0.9 |
-| Creative writing | Temperature 0.9 to 1.2 + top-p 0.95 |
-| Constrained / structured output | Greedy + grammar-guided decoding (constrained decoding) |
+| Translation, QA, summarization | Compare search/sampling against task metrics, not likelihood alone |
+| Code | Declare sampling and stopping; evaluate generated programs |
+| Open chat | Evaluate quality and diversity under fixed settings |
+| Creative writing | Choose support and temperature against a declared objective |
+| Structured output | Enforce grammar, then validate the completed result |
 
 ## Common pitfalls
 
-- **Comparing models with different decoders.** The decoding strategy is part of the system. State it.
-- **Using beam search for open-ended generation.** Likelihood maximization is not the goal here.
-- **Setting temperature to 0 and calling it "deterministic."** It is, modulo numerical ties at the argmax. With ties, behavior is library-dependent.
-- **Mixing temperature and top-k/top-p naively.** The order matters: typical implementations apply top-p truncation first, then temperature, then sample. Verify your stack.
+Compare models under declared policies, random states, masks, and stop rules.
+An EOS mask can make a budget endpoint differ from a naturally completed sequence.
+Zero temperature is an implementation's argmax policy, not a division operation.
+
+What does min-p $0.2$ retain from the uncertain seven-token fixture?
+
+<details><summary>Answer</summary>
+
+All seven: the threshold is $0.2(0.24)=0.048$, below the smallest probability $0.06$.
+Neither top-k's count nor top-p's cumulative threshold describes that support.
+
+</details>
+
+</div>
 
 ## Related
 

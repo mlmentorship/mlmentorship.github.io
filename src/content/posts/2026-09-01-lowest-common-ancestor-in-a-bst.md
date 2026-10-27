@@ -13,15 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Move down only while both targets choose the same child. Their first split, or equality with a target, ends the search.
+Find the deepest original tree node that is an ancestor of both given target nodes.
 
 ## Problem
 
-> Find the lowest node whose subtree contains both target nodes.
+**Input.** A finite strict binary search tree and two target references that are actual nodes in that tree.
 
-Assume a finite strict BST with unique integer values. Both target arguments must be actual nodes in this tree.
+**Output.** Return their lowest common ancestor as the original node object, not a value or copied node.
 
-A node counts as its own ancestor. The two targets may therefore be the same node.
+**Rules.** Values are unique integers, with no cycles or shared children.
+A node counts as its own ancestor. The targets may be identical or one may be the other's ancestor.
+Both targets must exist; missing targets require the checked variant below. Preserve the tree.
+
+**Example.** In a BST with root 6 and children 2 and 8, those children have common ancestor node 6.
+If node 4 lies below node 2, targets 2 and 4 instead return node 2.
 
 ## Picture
 

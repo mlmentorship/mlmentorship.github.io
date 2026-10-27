@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Subtracting two prefix sums gives the sum between their boundaries.
-Save earlier prefixes when a range may start anywhere, including before negative values.
+Count the nonempty contiguous ranges whose values add to a requested target sum.
 
 ## Problem
 
-Given integers `nums` and an integer `target`, count the nonempty continuous ranges with that sum.
-For `[1, -1, 1, -1, 1]` and target `0`, return `6`.
-Do not change the input. An empty input returns `0`.
+**Input.** An integer list `nums` and an integer `target`.
+
+**Output.** Return the number of nonempty contiguous subarrays whose sum equals `target`.
+
+**Rules.** Count ranges by their start and end positions; overlapping ranges and identical value sequences count separately.
+Negative values, zeros, and duplicates are allowed. Do not count the empty range, even for target zero.
+Leave the input unchanged. Empty input returns zero.
+
+**Example.** `[1, -1, 1, -1, 1]` with target zero returns `6`.
+The valid ranges have lengths two or four. For `[1, 1, 1]` and target 2, return `2`.
 
 ## Picture
 

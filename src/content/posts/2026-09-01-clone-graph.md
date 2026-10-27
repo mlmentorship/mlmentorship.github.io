@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Allocate and memoize each copy before following its edges; resolve every copied neighbor through that identity map.
+Create an independent copy of every node and edge reachable from a given graph node.
 
 ## Problem
 
-Copy the component reachable from one `GraphNode`, preserving integer values and adjacency topology.
-In the triangle, original nodes `O1`, `O2`, and `O3` must become separate copies `C1`, `C2`, and `C3`.
-Every copied edge must stay inside the copies.
-Preserve neighbor order, repeated entries, shared targets, and self-loops.
-`None` returns `None`; unreachable components are not copied.
+**Input.** One `GraphNode` reference, or `None`, in a finite graph with integer values and ordered neighbor lists.
+
+**Output.** Return the corresponding node in a newly allocated copy of the reachable component.
+
+**Rules.** Preserve node values, neighbor order, repeated entries, shared targets, cycles, and self-loops.
+Every copied edge must refer to copied nodes, never originals.
+Equal values do not make two nodes identical. Leave the original graph unchanged.
+Do not copy unreachable components; `None` returns `None`.
+
+**Example.** A triangle of original nodes `O1`, `O2`, and `O3` becomes a triangle of `C1`, `C2`, and `C3`.
+Changing a copied node must not change its original.
 
 ## Picture
 

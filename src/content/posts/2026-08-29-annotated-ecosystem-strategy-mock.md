@@ -49,6 +49,8 @@ The candidate must address both periods. The later result does not erase the vie
 
 **Learning objective:** Trace how one ranking policy creates an immediate viewer-feedback loop and a delayed creator-supply loop, so evidence from the first loop does not settle the second.
 
+<p class="visual-title">Fast viewer feedback cannot settle delayed creator effects</p>
+
 <!-- visual:ecosystem-delayed-feedback-loop -->
 ```mermaid
 flowchart TB
@@ -162,20 +164,25 @@ Take four conflicting metrics. Classify each as a hard constraint, guardrail, pr
 
 > I would use source-aware retrieval, calibrated multi-task ranking, and constrained session composition. New supply must have a route that does not depend on prior creator exposure.
 
+<p class="visual-title" data-supplemental-visual="ecosystem-serving-stages">Exposure logs record what was shown, not every candidate</p>
+
 ```mermaid
-flowchart LR
-  Context[Viewer, session, region, and age context] --> Sources[Parallel candidate sources]
-  Fresh[Fresh and new-creator indexes] --> Sources
-  Catalog[Eligibility and content catalog] --> Sources
-  Sources --> Merge[Merge, deduplicate, and recheck eligibility]
-  Merge --> Rank[Multi-task ranker]
-  Rank --> Cal[Per-head calibration and uncertainty]
-  Cal --> Compose[Session and ecosystem composer]
-  Policy[Versioned safety, exposure, exploration, and ad policy] --> Compose
-  Compose --> Feed[Feed page and prefetch]
-  Feed --> Exposure[Actual exposure events]
-  Exposure --> Evidence[Experiment, cohort, and training data]
+flowchart TB
+  accTitle: The serving path narrows eligible candidates into actual exposure
+  accDescr: Context and fresh indexes feed candidate retrieval, which is merged and checked before ranking, calibration, and policy-constrained composition. Only the displayed feed produces actual exposure events. Those events, not every retrieved candidate, enter experiment and training evidence.
+  Context["Viewer + session<br/>region + age"] --> Sources["Parallel candidate<br/>retrieval"]
+  Fresh["Fresh + new-creator<br/>indexes"] --> Sources
+  Catalog["Eligibility<br/>catalog"] --> Sources
+  Sources --> Merge["Merge + deduplicate<br/>recheck eligibility"]
+  Merge --> Rank["Rank + calibrate<br/>predictions + uncertainty"]
+  Rank --> Compose["Constrained<br/>session composition"]
+  Policy["Versioned policy<br/>safety + exposure"] --> Compose
+  Compose --> Feed["Feed page<br/>and prefetch"]
+  Feed --> Exposure["Actual exposure events"]
+  Exposure --> Evidence["Experiment + training<br/>exposure denominators"]
+  class Context,Fresh,Catalog,Sources,Merge,Rank,Compose,Policy,Feed,Exposure,Evidence viz-fit
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> distinguish the candidate set from the displayed feed. Only actual exposure can enter an exposure-based outcome denominator.</p>
 
 > Candidate sources include personalized embeddings, recent sequence continuation, follows, content matching, fresh uploads, new creators, regional trends, and bounded exploration. Each source has a quota range, recall target, owner, and fallback.
 >

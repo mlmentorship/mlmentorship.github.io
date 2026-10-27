@@ -7,9 +7,18 @@ tags: ["questions"]
 category: "questions"
 ---
 
-Give each metric a decision role: primary outcomes support release, guardrails can veto, and diagnostics explain behavior.
+Choose metrics and a release decision that account for user outcomes, cost, uncertainty, and mandatory operating limits.
 
 ## Problem
+
+**Context.** An invented randomized experiment compares two product versions on independent eligible users, each with one binary task outcome.
+The results and predeclared quality, cost, and latency rules appear below.
+
+**Task.** Compute the improvement and cost per success, assess the practical-effect rule, and apply every release gate.
+Explain which measurements are primary outcomes, guardrails, or diagnostics.
+
+**Constraints.** Preserve the stated unit of analysis and predeclared thresholds.
+A positive headline result cannot override a failed mandatory guardrail; distinguish observed estimates from confidence guarantees.
 
 An invented randomized, independent-user experiment has 10,000 eligible users per arm, each contributing one binary task outcome.
 Arm A completes 6,000 tasks for $10,000; B completes 6,600 for $13,000.

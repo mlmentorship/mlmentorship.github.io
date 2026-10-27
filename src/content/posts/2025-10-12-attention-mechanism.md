@@ -9,22 +9,17 @@ category: "concepts"
 
 ## Summary
 
-For queries $Q \in \mathbb{R}^{n_q \times d}$, keys $K \in \mathbb{R}^{n_k \times d}$, and values $V \in \mathbb{R}^{n_k \times d_v}$:
+Attention forms one permitted weighted value mixture for each query.
+Queries $Q\in\mathbb R^{n_q\times d}$ and keys $K\in\mathbb R^{n_k\times d}$ determine weights.
+Values $V\in\mathbb R^{n_k\times d_v}$ supply the mixed payload; key and value rows must remain paired.
 
 $$
 \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{Q K^\top}{\sqrt{d}}\right) V.
 $$
 
-Each query is replaced by a weighted average of values, with weights given by query-key similarities normalized by softmax.
-
-Attention is a central architectural primitive in modern ML:
-
-- **Transformers** are stacks of attention + FFN. Every modern LLM is mostly attention by parameter and FLOP count.
-- **Retrieval** (two-tower, cross-encoder) is dot-product attention between queries and items.
-- **Vision transformers**, **graph attention networks**, **diffusion models** all use it.
-- **Memory-augmented networks** use attention to access external memory.
-
-Understanding attention at the computational and conceptual level is non-negotiable for senior ML.
+Normalize each query's allowed scores separately, then multiply the resulting $n_q\times n_k$ matrix by $V$.
+Without dropout or later projections, every nonempty row is a convex value combination.
+This primitive appears in sequence, vision, graph, and memory models; an architecture's dominant cost depends on its actual dimensions.
 
 ## The mechanism step by step
 
@@ -34,7 +29,10 @@ For a single query $q \in \mathbb{R}^d$ and set of $n$ key-value pairs:
 2. **Normalize** with softmax: $\alpha_i = \exp(s_i) / \sum_j \exp(s_j)$. The $\alpha_i$ sum to 1. They form an attention distribution.
 3. **Aggregate**: output $= \sum_i \alpha_i v_i$.
 
-Each output is a convex combination of values, biased toward keys most similar to the query.
+Take one-dimensional query $q=1$, keys $(\log6,\log3,0)$, and values $(1,4,7)$.
+Exponentiated scores are $(6,3,1)$, so weights are $(0.6,0.3,0.1)$.
+The output is $0.6(1)+0.3(4)+0.1(7)=2.5$.
+Changing a value changes the mixture's payload without changing these query-key scores.
 
 <!-- visual:attention-keys-choose-values-contribute -->
 <figure class="learning-figure" aria-labelledby="attention-routing-title">
@@ -89,48 +87,82 @@ Each output is a convex combination of values, biased toward keys most similar t
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the query only with the keys to get weights that sum to one. Then carry those same weights across to the paired values and add their contributions. Keys decide the mixture; values are what gets mixed.</figcaption>
+	<figcaption><strong>Read it this way:</strong> query-key scores determine weights summing to one. Those same weights mix the paired values into 2.5. Keys select the mixture; values supply its contents.</figcaption>
 </figure>
 
-The $\sqrt{d}$ scaling is critical: without it, the variance of an unscaled dot product grows with $d$ (and its typical magnitude with $\sqrt{d}$), pushing softmax into saturation regions where gradients vanish.
+If corresponding query-key coordinates are independent, zero-mean, and unit-variance, their summed dot product has variance $d$.
+Dividing by $\sqrt d$ gives unit variance under those assumptions.
+Learned correlations or different coordinate scales can change that analysis; scaling is not a universal nonsaturation guarantee.
 
 ## Self-attention vs. cross-attention
 
-- **Self-attention**: $Q, K, V$ are all derived from the same input. Each token attends to all other tokens in the same sequence. Used in transformer encoder layers and the self-attention sub-block of decoder layers.
-- **Cross-attention**: $Q$ comes from one source (e.g., decoder hidden state), $K, V$ from another (e.g., encoder outputs). Used in encoder-decoder transformers (T5, NMT) and modern diffusion text conditioning.
+- **Self-attention:** queries, keys, and values derive from the same sequence; a mask may restrict visible positions.
+- **Cross-attention:** queries derive from one source and paired keys/values from another; their sequence lengths can differ.
 
 ## Multi-head attention
 
-Run attention $H$ times in parallel with different learned $Q, K, V$ projections (each of dimension $d / H$), concatenate the outputs, project back. Each "head" can specialize to different relationships (syntactic, semantic, positional). Standard transformer uses 8–96 heads.
+Apply learned projections for several heads, mix values separately, concatenate the outputs, and apply an output projection.
+Head dimensions and counts are architecture choices; semantic specialization must be demonstrated rather than assumed.
 
 In modern LLMs, heads are reduced via [grouped-query attention](/concepts/grouped-query-attention/) where multiple Q heads share K/V heads.
 
 ## Causal (autoregressive) masking
 
-For decoder language models: token $t$ should not attend to tokens $t+1, t+2, \dots$. Implement by adding $-\infty$ to the corresponding entries of $Q K^\top$ before softmax. After softmax, those positions become 0 weight.
+**New task:** Exclude future or padded positions from each mixture.
 
-This is what enables next-token prediction without leakage.
+**Picture and change:** Set forbidden scores to $-\infty$ before normalization; keep absolute position and cache-offset conventions explicit.
+
+**Check:** Excluding the third key in the example renormalizes weights to $(2/3,1/3,0)$ and changes output to $2$.
+Simply zeroing its old weight without renormalization gives $1.8$, a different operation.
+
+**Use when:** Only a permitted subset may contribute.
+An entirely masked row has no categorical distribution; reject it or define a separate zero-output policy explicitly.
 
 ## Connection to retrieval
 
-Dot-product attention with a single query against many keys is mathematically identical to nearest-neighbor retrieval with cosine similarity (after softmax). The softmax just turns the top-$k$ retrieval into a soft weighting.
+**New task:** Return one retrieved item instead of a value mixture.
+
+**Picture and change:** Replace aggregation with the maximum-score key's associated item.
+
+**Check:** The example selects the first key and value $1$, not the attention output $2.5$.
+
+**Use when:** A hard candidate is required.
+Positive-temperature softmax preserves score order, but a weighted sum is not nearest-neighbor retrieval.
+Cosine and raw dot-product rankings agree only under appropriate normalization, not in general.
 
 ## Cost
 
-- Forward: $O(n_q \cdot n_k \cdot d) + O(n_q \cdot n_k \cdot d_v)$ FLOPs.
-- Memory: $O(n_q \cdot n_k)$ for the attention matrix. The dominant cost at long context.
+- Score and mixture arithmetic costs $O(n_qn_k(d+d_v))$, excluding projections.
+- Explicit scores and weights need $O(n_qn_k)$ intermediate storage, in addition to inputs and $O(n_qd_v)$ output.
 
-[FlashAttention](/concepts/flashattention/) reorders the computation to never materialize the full matrix, dropping memory to $O(n)$.
+[FlashAttention](/concepts/flashattention/) tiles exact dense attention without retaining the full score matrix.
+Its storage still includes dimension-dependent inputs, outputs, row statistics, and tile workspace.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common pitfalls
 
-- **Forgetting the $\sqrt{d}$ scaling.** Softmax saturates; gradients vanish; training fails.
-- **Wrong masking for causal LM.** Off-by-one errors leak future tokens; quality looks great in training but inference is broken.
-- **Treating attention weights as interpretation.** Attention weights show *what was averaged*, not *what was used*; downstream computation may ignore the weighted result. Don't over-interpret heatmaps.
-- **Confusing attention with self-attention.** Attention is the general operation; self-attention is one usage.
+- **Unpaired rows.** Permuting keys without the same value permutation changes the operation.
+- **Wrong causal offset.** Cached decoding compares absolute query and key positions, not an arbitrary local triangle.
+- **Explanatory overreach.** Mixture weights do not establish a causal explanation for the final model prediction.
+- **All-masked rows.** Subtracting a row maximum of negative infinity produces invalid arithmetic without a special policy.
+
+## Reconstruct
+
+<details>
+<summary>What survives a joint permutation of keys and values?</summary>
+
+Permuting paired keys and values merely permutes weights and their corresponding payloads, leaving the final sum unchanged.
+The mask and position-dependent score terms must receive the same permutation.
+Permuting only keys breaks that pairing guarantee.
+
+</details>
 
 ## Related
 
 - [Transformer architecture](/concepts/transformer-architecture/). Full assembly.
 - [FlashAttention](/concepts/flashattention/). Efficient implementation.
 - [Grouped-query attention](/concepts/grouped-query-attention/). Modern KV-cache optimization.
+
+</div>

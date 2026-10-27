@@ -7,9 +7,18 @@ tags: ["questions"]
 category: "questions"
 ---
 
-Investigate observable behavior with controlled queries, competing predictions and a fixed budget, without inferring hidden architecture from outputs alone.
+Investigate why an undocumented model follows conflicting content using controlled queries, competing predictions, and a fixed investigation budget.
 
 ## Problem
+
+**Context.** An undocumented API receives a user request for `BLUE` and conflicting content asking for `RED`.
+The content's source, wording, order, and simulated consequence cues can vary.
+
+**Task.** Design a query ledger within 90 minutes and 32 queries, test competing explanations, and report supported behavioral conclusions.
+State which next observation would discriminate remaining hypotheses.
+
+**Constraints.** Execute no external actions, including in simulated high-risk conditions.
+Control query changes and uncertainty; observed outputs do not establish hidden architecture, training data, or internal reasoning.
 
 You have an undocumented model API, 90 minutes and a ceiling of 32 queries.
 The user requests the exact token `BLUE`; conflicting data requests `RED`.

@@ -1,6 +1,6 @@
 ---
-title: "Entropy, mutual information, and information gain"
-description: "Entropy measures uncertainty, while mutual information measures shared dependence. Both require careful estimation and neither proves causation or calibrated confidence."
+title: "Entropy and mutual information: a noisy observation"
+description: "Derive uncertainty removed from a joint table, then change the prior and the observation grouping without confusing information with causation."
 date: "2026-08-29"
 draft: false
 tags: ["concepts"]
@@ -13,185 +13,64 @@ priority: "Core"
 prerequisites: ["expectation-variance-covariance-correlation", "probability-distributions-in-ml", "kl-divergence"]
 ---
 
+Entropy measures expected surprisal, while mutual information measures the uncertainty removed by observing another variable.
+Can two fair bits each have one bit of uncertainty while one reveals only part of the other?
+
 ## Summary
 
-Entropy is the expected surprisal of a random variable. Conditional entropy is the uncertainty left after observing another variable. Mutual information is the reduction in uncertainty from that observation. Information gain applies the same reduction to a candidate decision-tree split.
-
-These are population properties of chosen random variables. Finite samples, sparse joint tables, binning, learned representations, and confounding can distort their estimates. Mutual information measures association, not causation. Low predictive entropy does not imply that a model is correct or calibrated.
+Use finite discrete variables and base-two logarithms unless stated otherwise.
+Our teaching fixture sends a fair bit through independent noise that flips it with probability $0.1$.
+We will compute the joint table before subtracting uncertainty.
+Population information is not a causal effect or a guarantee about an empirical estimate.
 
 ## Discrete entropy and units
 
-For a discrete random variable $X$ with probability mass function $p(x)$, entropy with logarithm base $b$ is
+Outcome $x$ has surprisal $-\log_b p(x)$ for logarithm base $b>1$.
+Entropy averages that quantity:
 
 $$
-H_b(X)=-\sum_{x}p(x)\log_b p(x).
+H_b(X)=-\sum_xp(x)\log_b p(x),\qquad 0\log_b0=0.
 $$
 
-Use the convention $0\log_b 0=0$. The surprisal of outcome $x$ is $-\log_b p(x)$, so entropy is expected surprisal.
-
-The logarithm base fixes the unit:
-
-- Base 2 gives bits.
-- Base $e$ gives nats.
-- Base 10 gives hartleys, also called decimal digits of information.
-
-Changing the base rescales the value:
-
-$$
-H_b(X)=\frac{H_e(X)}{\ln b}.
-$$
-
-Always state the base when reporting a number. An entropy value without a base has an unspecified unit.
-
-A deterministic variable has entropy zero. If $X$ is uniform over $K$ outcomes, then
-
-$$
-H_b(X)=\log_b K,
-$$
-
-which is the largest entropy among distributions on that fixed support. Entropy depends on both probabilities and the variable definition. Relabeling outcomes preserves it, while merging outcomes can reduce it.
-
-## Coding interpretation
-
-Suppose a source draws independent symbols from a known distribution $p$. For binary prefix codes, the expected code length cannot be below $H_2(p)$. A Huffman code has expected length below $H_2(p)+1$ bit per symbol.
-
-Arithmetic coding works on sequences and can approach the entropy rate more closely. The claim concerns average length over source draws. It does not promise that every individual message has length $H_2(p)$.
-
-Dependence changes the relevant rate. If each symbol depends on its history, a coder can use conditional probabilities. The chain rule gives
-
-$$
-H(X_1,\ldots,X_T)=\sum_{t=1}^{T}H(X_t\mid X_1,\ldots,X_{t-1}).
-$$
-
-A code built for a wrong distribution $q$ has ideal expected length $H(p,q)$. Its excess over the entropy is the KL divergence from $p$ to $q$, measured in the same log-base units.
-
-## Conditional entropy
-
-Conditional entropy averages the remaining uncertainty in $X$ after observing $Y$:
-
-$$
-H_b(X\mid Y)
-=\sum_y p(y)H_b(X\mid Y=y)
-=-\sum_{x,y}p(x,y)\log_b p(x\mid y).
-$$
-
-The average over $Y$ is required. One rare value of $Y$ may determine $X$, while common values leave substantial uncertainty.
-
-The chain rule decomposes joint uncertainty:
-
-$$
-H_b(X,Y)=H_b(Y)+H_b(X\mid Y)
-=H_b(X)+H_b(Y\mid X).
-$$
-
-For discrete variables, conditioning cannot increase entropy on average:
-
-$$
-H_b(X\mid Y)\le H_b(X).
-$$
-
-Equality holds when $X$ and $Y$ are independent. Conditional entropy can be zero even when $X$ is random. This happens when $Y$ determines $X$ exactly.
-
-## Mutual information in equivalent forms
-
-Mutual information measures how much observing one variable reduces uncertainty about the other:
-
-$$
-I_b(X;Y)=H_b(X)-H_b(X\mid Y).
-$$
-
-The chain rule gives several equivalent forms:
-
-$$
-\begin{aligned}
-I_b(X;Y)
-&=H_b(Y)-H_b(Y\mid X)\\
-&=H_b(X)+H_b(Y)-H_b(X,Y)\\
-&=\sum_{x,y}p(x,y)\log_b\frac{p(x,y)}{p(x)p(y)}\\
-&=D_{\mathrm{KL},b}\!\left(p_{X,Y}\,\middle\|\,p_Xp_Y\right).
-\end{aligned}
-$$
-
-It is also an expected change from prior to posterior:
-
-$$
-I_b(X;Y)
-=\sum_y p(y)D_{\mathrm{KL},b}\!\left(p(X\mid y)\,\middle\|\,p(X)\right).
-$$
-
-The KL form shows that mutual information is nonnegative. It is zero exactly when discrete $X$ and $Y$ are independent. Although one entropy-reduction form starts with $X$, mutual information is symmetric:
-
-$$
-I_b(X;Y)=I_b(Y;X).
-$$
-
-It has no causal direction. It is bounded by the uncertainty available in either variable:
-
-$$
-0\le I_b(X;Y)\le \min\{H_b(X),H_b(Y)\}.
-$$
-
-## Conditional mutual information
-
-Conditional mutual information measures the additional association between $X$ and $Y$ after $Z$ is known:
-
-$$
-I(X;Y\mid Z)
-=H(X\mid Z)-H(X\mid Y,Z)
-=\sum_z p(z)I(X;Y\mid Z=z).
-$$
-
-It can vanish when $Z$ explains a marginal association. It can also be positive when marginal mutual information is zero, as in interactions that cancel across groups. Conditioning on a common effect can create association, so conditional mutual information is not automatically a causal test.
-
-This quantity helps measure the incremental value of a feature after other features are selected. Its empirical estimation is harder because each conditioning context receives fewer observations.
+Base two gives bits, base $e$ gives nats, and base ten gives hartleys.
+The conversion is $H_b=H_e/\ln b$.
+A deterministic variable has zero entropy.
+On a fixed support of $K$ outcomes, uniform mass maximizes entropy at $\log_b K$.
+Relabeling preserves entropy; merging outcomes can reduce it.
 
 ## Three worked examples
 
 ### Fair bit
 
-Let $X\sim\operatorname{Bernoulli}(1/2)$. Then
-
-$$
-H_2(X)
-=-\frac12\log_2\frac12-\frac12\log_2\frac12
-=1\text{ bit}.
-$$
-
-Before observing the bit, one binary question is needed on average. A deterministic bit would have zero entropy.
+For $\Pr(X=1)=1/2$, each outcome has surprisal one bit.
+Therefore $H_2(X)=-(1/2)\log_2(1/2)-(1/2)\log_2(1/2)=1$.
 
 ### Perfect copy
 
-Let $X$ be a fair bit and let $Y=X$. Both marginal entropies are one bit, but $H_2(X\mid Y)=0$. Therefore,
-
-$$
-I_2(X;Y)=H_2(X)-H_2(X\mid Y)=1\text{ bit}.
-$$
-
-The joint entropy is one bit, not two, because the pair has only two possible values: $(0,0)$ and $(1,1)$.
+If $Y=X$, observing $Y$ determines $X$.
+The remaining entropy is zero, so the removed uncertainty is one bit.
+The pair has only two possible states, not four equally likely states.
 
 ### Binary noisy channel
 
-Let $X$ be a fair bit, let $N\sim\operatorname{Bernoulli}(\varepsilon)$ be independent noise, and define $Y=X\mathbin{\oplus}N$. The output remains fair. The binary entropy function is
+Let $N\sim\operatorname{Bernoulli}(0.1)$ be independent of the fair input, and set $Y=X\mathbin{\oplus}N$.
+Multiply input mass by the copy or flip probability:
 
-$$
-h_2(\varepsilon)
-=-\varepsilon\log_2\varepsilon
--(1-\varepsilon)\log_2(1-\varepsilon).
-$$
+| Joint mass | $Y=0$ | $Y=1$ | Row total |
+| --- | --- | --- | --- |
+| $X=0$ | $0.45$ | $0.05$ | $0.50$ |
+| $X=1$ | $0.05$ | $0.45$ | $0.50$ |
+| Column total | $0.50$ | $0.50$ | $1$ |
 
-Given $Y$, the remaining uncertainty about $X$ is $h_2(\varepsilon)$. Thus,
-
-$$
-I_2(X;Y)=1-h_2(\varepsilon).
-$$
-
-For $\varepsilon=0.1$, $h_2(0.1)\approx0.469$, so the channel carries about $0.531$ bits per input bit. At $\varepsilon=0.5$, the output is independent of the input and mutual information is zero.
+Both marginals are fair, but agreement has probability $0.9$.
+Independent fair bits would instead give $0.25$ in every cell.
 
 <!-- visual:mutual-information-noisy-channel-budget -->
 <figure class="learning-figure" aria-labelledby="mutual-information-budget-title" aria-describedby="mutual-information-budget-description">
 <p class="visual-kicker">Worked uncertainty budget</p>
 <p class="visual-title" id="mutual-information-budget-title">Observing Y removes the shared part of X's uncertainty.</p>
 <p id="mutual-information-budget-description">One bit splits into 0.531 bits removed by Y and 0.469 bits still uncertain.</p>
+<div class="visual-scroll" tabindex="0" role="region" aria-label="Noisy-channel joint table and uncertainty budget">
 <svg class="information-budget-visual" viewBox="0 0 900 420" role="img" aria-labelledby="mutual-information-svg-title mutual-information-svg-description" width="900" height="420">
 <title id="mutual-information-svg-title">Mutual information is the uncertainty removed by observing another variable</title>
 <desc id="mutual-information-svg-description">A one-bit horizontal bar for H of X is split into zero point five three one bits removed by Y and zero point four six nine bits still uncertain after Y. A second inset shows a two by two joint table where diagonal match probabilities are zero point four five and off-diagonal flip probabilities are zero point zero five, with both marginals equal to one half.</desc>
@@ -236,188 +115,255 @@ For $\varepsilon=0.1$, $h_2(0.1)\approx0.469$, so the channel carries about $0.5
 <text x="640" y="350" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12">That diagonal concentration</text>
 <text x="640" y="368" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12">is the shared information.</text>
 </svg>
-<figcaption><strong>Read it this way:</strong> the full bar is the one bit you do not know about X. Observing Y cuts away 0.531 bits because the channel usually copies X; the 0.469-bit segment is the remaining flip uncertainty. The inset explains why this can happen even though X and Y each still look fair on their own.</figcaption>
+</div>
+<figcaption><strong>Read it this way:</strong> the full bar is the input's one bit of uncertainty. Observing Y removes 0.531 bits and leaves 0.469 bits. The diagonal table entries explain the dependence despite fair marginals. The circles are a memory aid, not a proof or causal diagram.</figcaption>
 </figure>
 
-## Cross-entropy and KL divergence
+## Conditional entropy
 
-For a true distribution $p$ and model distribution $q$, cross-entropy is
-
-$$
-H_b(p,q)=-\sum_x p(x)\log_b q(x).
-$$
-
-Adding and subtracting $\log_b p(x)$ gives
+Given either output, the input matches it with probability $0.9$.
+Write $h_2(t)=-t\log_2t-(1-t)\log_2(1-t)$.
+Average the posterior entropies over the output probabilities:
 
 $$
-H_b(p,q)=H_b(p)+D_{\mathrm{KL},b}(p\|q).
+H_2(X\mid Y)=\sum_yp(y)H_2(X\mid Y=y)
+=\tfrac12h_2(0.1)+\tfrac12h_2(0.1)
+\approx0.468996.
 $$
 
-The first term is fixed when fitting $q$ to a fixed data distribution. Minimizing cross-entropy therefore minimizes forward KL divergence. If $q(x)=0$ where $p(x)>0$, both cross-entropy and KL divergence are infinite.
+Conditioning reduces entropy on average, not necessarily for every particular observed value.
+Using $p(x,y)=p(y)p(x\mid y)$ inside the logarithm proves the chain rule:
 
-This identity concerns expected log loss. A low empirical cross-entropy does not by itself prove good calibration under deployment shift or on poorly represented slices.
+$$
+H(X,Y)=H(Y)+H(X\mid Y)=1.468996\text{ bits}.
+$$
+
+## Mutual information in equivalent forms
+
+Subtract remaining uncertainty:
+
+$$
+\begin{aligned}
+I(X;Y)&=H(X)-H(X\mid Y)\\
+&=H(X)+H(Y)-H(X,Y)\\
+&=\sum_{x,y}p(x,y)\log_2\frac{p(x,y)}{p(x)p(y)}.
+\end{aligned}
+$$
+
+The reference gives $1-0.468996=0.531004$ bits.
+The table independently gives $0.9\log_2(1.8)+0.1\log_2(0.2)$, the same result.
+The middle expression proves symmetry; it does not supply a causal direction.
+Gibbs' inequality applied to the last expression gives nonnegativity, with equality exactly at independence.
+Nonnegative conditional entropies also give $I(X;Y)\le\min(H(X),H(Y))$.
+
+### Change the input prior
+
+Set $\Pr(X=1)=0.9$, retaining independent flips with probability $0.1$.
+The four joint cells become $0.09,0.01,0.09,0.81$ in row order.
+Now $\Pr(Y=1)=0.82$, and
+
+$$
+I(X;Y)=H(Y)-H(Y\mid X)=h_2(0.82)-h_2(0.1)\approx0.211081.
+$$
+
+Recompute marginals when class priors change; the fair-input shortcut no longer applies.
 
 ## Information gain in decision trees
 
-At a classification-tree node, let $Y$ be the class label and let $S$ identify the child selected by a candidate split. Information gain is
+Let $X$ be a label and $S$ identify its tree child.
+Split four balanced-label records into one pure record and three records with class counts one and two.
 
 $$
-\operatorname{IG}(Y;S)
-=H(Y)-\sum_s \frac{n_s}{n}H(Y\mid S=s)
-=I(Y;S)
+\operatorname{IG}=H(X)-\sum_s\frac{n_s}{n}H(X\mid S=s)
+=1-\tfrac14(0)-\tfrac34h_2(1/3)
+\approx0.311278\text{ bits}.
 $$
 
-under the node's empirical distribution. The child entropies must be weighted by their sample counts.
+Use record weights, not an unweighted child average.
+Perfect separation gives one bit; unchanged child proportions give zero.
+This is mutual information under the node's empirical distribution, not evidence of generalization.
 
-If balanced binary labels become perfectly separated, the gain is one bit. If every child keeps the parent class proportions, the gain is zero.
+## Conditional mutual information
 
-Greedy trees choose the split with the largest estimated gain. Features with many possible split points can gain by chance. Minimum leaf sizes, pruning, held-out evaluation, and adjusted criteria help control this bias. Regression trees usually use variance or squared-error reduction instead of Shannon entropy.
+For independent fair $X_1,X_2$, the target $T=X_1\mathbin{\oplus}X_2$ is independent of either input alone.
+Thus $I(T;X_1)=I(T;X_2)=0$, while $I(T;(X_1,X_2))=1$ bit.
+Marginal ranking misses the interaction.
+Conditional information measures the added association after context $Z$ is known:
+
+$$
+I(X;Y\mid Z)=H(X\mid Z)-H(X\mid Y,Z)
+=\sum_zp(z)I(X;Y\mid Z=z).
+$$
+
+For XOR, $I(T;X_2\mid X_1)=1$ bit.
+Conditioning can create association, including through a common effect; this is not automatically a causal test.
+
+**Reconstruct:** what changes at flip probability $0.9$, or when the observation is replaced by a constant?
+
+<details><summary>Answer</summary>
+
+Inverting the $0.9$ channel recovers the $0.1$ channel, preserving $0.531004$ bits.
+A constant observation leaves all input uncertainty, giving zero mutual information.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+## Coding interpretation
+
+For known iid symbols, a binary prefix code's expected length is at least $H_2(p)$.
+Huffman coding achieves expected length below $H_2(p)+1$.
+Arithmetic coding over sequences can approach the entropy rate more closely.
+These are average-length statements, not lengths promised for every message.
+Dependent symbols instead permit conditional coding:
+
+$$
+H(X_1,\ldots,X_T)=\sum_{t=1}^TH(X_t\mid X_1,\ldots,X_{t-1}).
+$$
+
+## Cross-entropy and KL divergence
+
+For source law $p$ and model law $q$, expected log loss decomposes as
+
+$$
+H_b(p,q)=-\sum_xp(x)\log_bq(x)
+=H_b(p)+D_{\mathrm{KL},b}(p\|q).
+$$
+
+Add and subtract $\log_b p(x)$ to obtain the identity.
+For fixed $p$, minimizing cross-entropy minimizes forward KL.
+Missing $q$ support where $p>0$ makes both quantities infinite.
+A mismatched ideal coder incurs this same expected excess length.
+
+The joint-table expression above is $D_{\mathrm{KL}}(p_{X,Y}\|p_Xp_Y)$.
+Equivalently, information averages posterior-to-prior divergence:
+
+$$
+I(X;Y)=\sum_yp(y)D_{\mathrm{KL}}(p(X\mid y)\|p(X)).
+$$
 
 ## Independence, symmetry, and processing
 
-Mutual information detects any population dependence, including nonlinear dependence. Zero Pearson correlation does not imply zero mutual information. Zero mutual information does imply independence when the distributions are well defined.
-
-For a Markov chain $X\rightarrow Y\rightarrow Z$, the data processing inequality states
-
-$$
-I(X;Z)\le I(X;Y).
-$$
-
-Processing $Y$ without new access to $X$ cannot create information about $X$. In particular, for a deterministic function $g$,
+Zero Pearson correlation does not imply independence.
+For a Markov chain $X\rightarrow Y\rightarrow Z$, data processing gives
 
 $$
-I(X;g(Y))\le I(X;Y).
+I(X;Z)\le I(X;Y),\qquad I(X;g(Y))\le I(X;Y).
 $$
 
-Equality can hold when $g(Y)$ retains all information about $X$, as with an invertible transformation. A task-focused representation may discard nuisance information while retaining label information. The inequality does not require every useful representation to preserve every detail.
+Processing without new access to $X$ cannot create information about it.
+Invertible transformations preserve information.
+A useful representation can discard nuisance details while retaining task information.
 
 ## Continuous variables need different care
 
-For a continuous variable with density $p(x)$, differential entropy is
+For a density, differential entropy is $h_b(X)=-\int p(x)\log_b p(x)\,dx$.
+It can be negative and depends on scale:
 
 $$
-h_b(X)=-\int p(x)\log_b p(x)\,dx.
+h_b(aX)=h_b(X)+\log_b|a|,\qquad a\ne0.
 $$
 
-Differential entropy can be negative. It also changes with measurement scale. For nonzero scalar $a$,
-
-$$
-h_b(aX)=h_b(X)+\log_b|a|.
-$$
-
-A value measured in meters therefore has a different differential entropy after conversion to centimeters. Discrete entropy does not have this coordinate dependence.
-
-Continuous mutual information remains a KL divergence between the joint density and product of marginals. It is nonnegative and invariant under suitable invertible reparameterizations. A perfect continuous copy often has infinite mutual information because its joint distribution lies on a lower-dimensional set.
-
-Binning a continuous variable creates a discrete variable whose entropy depends on bin width. Finer bins can keep increasing discrete entropy. State whether a result uses differential entropy, quantization, or a continuous mutual-information estimator.
+A uniform variable on $[0,0.5]$ has differential entropy $-1$ bit.
+Converting meters to centimeters adds $\log_b100$ without adding information.
+Continuous mutual information remains nonnegative and invariant under suitable invertible reparameterizations.
+For a non-atomic continuous variable, an exact copy has infinite mutual information.
+The joint law is singular relative to the product law, so an ordinary joint-density formula is unavailable.
+Binning creates a discrete variable whose entropy depends on bin width.
+State whether the quantity uses densities, quantized values, or a continuous information estimator.
 
 ## Estimation from finite data
 
-For discrete observations, the plug-in estimator replaces probabilities with frequencies:
+The plug-in entropy substitutes empirical frequencies:
 
 $$
-\widehat{H}_b(X)=-\sum_x \widehat{p}(x)\log_b\widehat{p}(x).
+\widehat H_b=-\sum_x\widehat p(x)\log_b\widehat p(x).
 $$
 
-It is usually biased downward because unobserved outcomes receive no mass. With $K_+$ observed categories, the Miller-Madow correction adds approximately
+It is downward biased; unseen outcomes receive zero mass.
+For well-sampled fixed discrete support, Miller-Madow adds approximately
 
 $$
 \frac{K_+-1}{2n\ln b}.
 $$
 
-Plug-in mutual information is often biased upward under independence. A flexible joint table fits accidental dependence. Under regular large-sample conditions, the leading null bias is approximately
+Here $K_+$ counts observed categories and $n$ counts iid observations.
+Under regular fixed-support independence, plug-in mutual information has approximate upward null bias
 
 $$
 \frac{(K_X-1)(K_Y-1)}{2n\ln b}.
 $$
 
-These approximations fail when counts are sparse. High-dimensional joint supports grow rapidly, so most configurations may never appear. More dimensions can make a direct frequency table unusable even with thousands of samples.
-
-Continuous estimators use bins, kernels, nearest neighbors, density ratios, or learned critics. Each choice adds assumptions and tuning. Results can change with scaling, neighborhood size, architecture, and negative sampling.
-
-Report the estimator, log base, sample size, preprocessing, and tuning choices. Use permutation tests to measure spurious dependence under a null. Use resampling or repeated datasets for uncertainty. A bootstrap measures sample variation, but it cannot restore unseen support or remove structural estimator bias.
+Sparse joint tables invalidate these expansions; more dimensions rapidly exhaust observed support.
+Continuous estimators use bins, kernels, neighbors, density ratios, or learned critics, each with tuning assumptions.
+Report the estimator, units, sample size, preprocessing, and tuning choices.
+Use an appropriate permutation null for spurious dependence and repeated sampling for uncertainty.
+Bootstrap variation cannot restore unseen support or eliminate structural estimator bias.
 
 ## Feature selection does not establish causation
 
-Mutual information can rank features that have nonlinear association with a target. Compute the ranking inside each training fold. Selecting features on the full dataset leaks target information into evaluation.
-
-High marginal mutual information can come from a confounder, a target-derived field, or a logging policy. It does not show that intervening on the feature changes the target.
-
-Marginal ranking also misses redundancy and synergy. Two copies of one feature can each score highly while adding little together. For $Y=X_1\mathbin{\oplus}X_2$ with independent fair bits, each input alone has zero mutual information with $Y$, while the pair determines $Y$.
-
-Conditional mutual information can ask what a feature adds after a selected set. It is harder to estimate because the conditioning space is larger. Validate the final feature set on held-out data and inspect its provenance.
+Compute feature selection inside each training fold; full-data ranking leaks target information into evaluation.
+Confounding, target-derived fields, and logging policies can all create association.
+None establishes the effect of intervening on the feature.
+Duplicate features can each score highly while adding nothing together; XOR shows the opposite interaction.
+Conditional information asks about incremental association but requires estimating a larger conditioning space.
+Validate selected features on held-out data and inspect provenance.
+Tree split searches can exploit accidental gain; constrain leaf size, prune, and evaluate independently.
+Regression trees usually optimize variance or squared-error reduction, not Shannon entropy.
 
 ## InfoNCE and representation learning
 
-Contrastive learning often trains a critic to identify one positive pair among $N$ candidates. Under the standard construction, the positive comes from the joint distribution and the other candidates come independently from the marginal distribution.
-
-With natural logarithms, the expected InfoNCE loss has the form
-
-$$
-\mathcal{L}_{\mathrm{NCE}}
-=-\mathbb{E}\left[
-\log\frac{\exp f(x,y_1)}{\sum_{j=1}^{N}\exp f(x,y_j)}
-\right].
-$$
-
-Under those sampling assumptions,
+Under the standard construction, $(x,y_1)$ comes from the joint law.
+The other $N-1$ candidates are independent marginal draws.
+With natural logarithms and critic $f$, the expected loss satisfies
 
 $$
-I(X;Y)\ge \log N-\mathcal{L}_{\mathrm{NCE}}.
+\mathcal L_{\mathrm{NCE}}=-\mathbb E\log
+\frac{e^{f(x,y_1)}}{\sum_{j=1}^Ne^{f(x,y_j)}},\qquad
+I(X;Y)\ge\ln N-\mathcal L_{\mathrm{NCE}}.
 $$
 
-This gives lower-bound intuition for contrastive objectives. The bound is capped by $\log N$ and can be loose. A lower loss shows that the critic distinguishes positives from the sampled alternatives. It does not prove that the representation preserves every downstream factor.
-
-In-batch negatives may be correlated or contain semantically valid matches. False negatives and sampling shortcuts through source, position, or formatting can loosen the bound's practical interpretation. Treat InfoNCE as a training objective with a population interpretation under assumptions, rather than an exact mutual-information meter.
+This lower bound is capped at $\ln N$ and can be loose.
+Correlated negatives or sampling shortcuts can violate its construction or weaken its relevance.
+Semantically matching negatives can also occur under valid marginal sampling; semantics alone do not invalidate the bound.
+Lower loss demonstrates discrimination against sampled alternatives, not an exact information measurement or universal downstream preservation.
 
 ## Predictive entropy, calibration, and confidence
 
-Predictive entropy describes the spread of a model's predicted distribution. A wrong model can assign 0.999 probability to one class and have very low entropy. A high-entropy prediction can reflect real ambiguity, missing features, or model failure.
-
-Calibration asks whether events predicted with probability $p$ occur about fraction $p$ of the time. Expected cross-entropy is a proper scoring rule, but finite training, misspecification, regularization, selection, and distribution shift can leave a model miscalibrated.
-
-Do not report entropy as a confidence interval. Attach sampling uncertainty to estimated information quantities. When using ensemble disagreement or parameter-label mutual information, state that the result depends on the model class and posterior approximation.
+Predictive entropy measures spread within the model's stated distribution.
+A wrong prediction with probability $0.999$ can have very low entropy.
+High entropy can reflect ambiguity, missing inputs, or model failure.
+Calibration compares predicted probabilities with frequencies in a stated population.
+Proper population log loss does not make finite, misspecified, selected, or shifted predictions automatically calibrated.
+Entropy is not a confidence interval.
+Ensemble and parameter-label information also depend on model and posterior assumptions.
 
 ## Interview procedure
 
-Use this order:
-
-1. Name the variables and whether they are discrete or continuous.
-2. Define entropy as expected surprisal and state the log base.
-3. Define conditional entropy and give the chain rule.
-4. Derive mutual information in entropy and KL forms.
-5. State symmetry, independence, bounds, and data processing.
-6. Check a fair bit, a perfect copy, and an independent channel.
-7. Connect information gain to weighted tree splits.
-8. Discuss estimator bias, dimensionality, causation, and calibration.
-
-If the interviewer changes an assumption, recompute the marginals before reusing a memorized formula.
+Name the variables, probability law, and log base.
+Rebuild marginals, then conditionals, before calculating removed uncertainty.
+Check the entropy and joint-ratio forms agree.
+State sampling, causation, and confidence limitations separately from population identities.
 
 ## Common mistakes
 
-- Reporting entropy without a log base or unit.
-- Forgetting to weight child entropy in a tree split.
-- Calling mutual information directional because one formula uses conditional entropy.
-- Claiming high mutual information proves a causal effect.
-- Treating empirical zero correlation as independence.
-- Applying discrete entropy intuition directly to differential entropy.
-- Calling an InfoNCE value the exact mutual information.
-- Ignoring upward bias in empirical mutual information.
-- Reading low predictive entropy as calibrated confidence.
-- Adding information from correlated observations as if they were independent.
+- Missing units or child weights changes the reported quantity.
+- Symmetry is not causation, and zero correlation is not independence.
+- Discrete and differential entropies have different scale behavior.
+- InfoNCE and plug-in estimates are not exact population measurements.
+- Low predictive entropy is not calibrated confidence.
+- Dependent observations cannot contribute independent information merely because they occupy different rows.
 
 ## Changed-assumption practice
 
-Start with the fair binary channel where $\varepsilon=0.1$.
-
-1. **Set $\varepsilon=0.5$.** The output becomes independent of the input, so mutual information falls to zero.
-2. **Set $\varepsilon=0.9$.** The mutual information returns to about $0.531$ bits. Flipping the output converts it into a channel with error $0.1$.
-3. **Change the prior to $P(X=1)=0.9$.** Now $P(Y=1)=0.82$. The mutual information is $h_2(0.82)-h_2(0.1)\approx0.211$ bits, which is below the fair-input value.
-4. **Replace $Y$ with a constant.** All information is discarded, so $I(X;g(Y))=0$. Replacing $Y$ with its inverse preserves mutual information.
-5. **Observe two noisy copies.** Information increases but cannot exceed $H(X)=1$ bit. Do not add the two single-channel values because the outputs are dependent through $X$.
-6. **Give a tree feature a unique value per row.** Training information gain can rise through memorization. Evaluate the split on fresh data or constrain leaf size.
-
-For each change, identify which equality or assumption stopped applying before calculating.
+At flip probability $0.5$, every joint cell is $0.25$ and information is zero.
+At $0.9$, invert the output to recover the reference information.
+With prior $0.9$, recompute the output mass $0.82$ instead of assuming fairness.
+A constant transformation discards all information; inversion preserves it.
+Two conditionally independent $0.1$-flip copies yield about $0.742086$ bits jointly, not twice $0.531004$.
+Their outputs are dependent through the shared input.
+A unique-per-row tree feature can memorize labels; fresh-data evaluation or leaf constraints are still required.
 
 ## Related links
 
@@ -426,3 +372,5 @@ For each change, identify which equality or assumption stopped applying before c
 - [Decision trees](/concepts/decision-trees/)
 - [Contrastive and self-supervised learning](/concepts/contrastive-self-supervised-learning/)
 - [Calibration](/concepts/calibration/)
+
+</div>

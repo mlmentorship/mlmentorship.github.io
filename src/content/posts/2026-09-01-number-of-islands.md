@@ -13,11 +13,19 @@ aliases: []
 prerequisites: []
 ---
 
-Count one unseen land seed, then permanently mark its entire four-neighbor component before continuing the scan.
+Count separate islands of land in a rectangular grid where only side-sharing cells are connected.
 
 ## Problem
 
-Count islands in this rectangular grid:
+**Input.** A rectangular grid of independent mutable rows containing string cells `"1"` for land and `"0"` for water.
+
+**Output.** Return the number of connected land regions, not the number of land cells.
+
+**Rules.** Land connects only through up, down, left, and right neighbors, not diagonally.
+The reference consumes land by changing visited `"1"` cells to `"0"`.
+Use strings rather than integer cells. Empty input returns zero.
+
+**Example.** Build rows with `[list(row) for row in ["1100", "0101", "1001", "1011"]]`:
 
 ```text
 1100
@@ -26,11 +34,7 @@ Count islands in this rectangular grid:
 1011
 ```
 
-Return **3**, not the nine land cells.
-Build mutable rows with `[list(row) for row in ["1100","0101","1001","1011"]]`.
-Cells are strings `"1"` and `"0"`, not integers.
-Only orthogonal neighbors connect; coordinates are zero-based.
-The reference consumes the grid by changing every discovered land cell to `"0"`.
+Return `3`, not the nine land cells. The reference leaves this grid containing only water.
 
 ## Picture
 

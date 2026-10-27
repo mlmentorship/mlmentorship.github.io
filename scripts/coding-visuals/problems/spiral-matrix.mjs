@@ -6,7 +6,7 @@ const matrix = (row, col, extra = {}) => grid(values, [
 ], { ...extra });
 
 const draft = visual('Read one side of the current rectangle at a time, shrink that boundary, and guard sides that may have disappeared.', [
-  frame('Initialize the outer rectangle', 'For the 3x4 matrix, start top=0, bottom=2, left=0, right=3 with an empty answer.', matrix(0, 0, {
+  frame('Initialize the outer rectangle', 'Bounds are top=0, bottom=2, left=0, right=3. The answer starts empty.', matrix(0, 0, {
     boundaries: 'top=0 bottom=2 left=0 right=3',
     answer: '[]',
   }), 'initialize'),

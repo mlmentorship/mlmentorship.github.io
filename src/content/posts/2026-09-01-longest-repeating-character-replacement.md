@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep a substring's most frequent character and replace the rest.
-True edit cost uses the **current** maximum count; the fast length-only scan uses a **historical** maximum instead.
+Find the longest contiguous string segment that can become uniform within a fixed replacement budget.
 
 ## Problem
 
-For `"AABABBA"` with one replacement, return maximum length 4. `"AABA"` is a real witness.
-Require a nonnegative integer budget. Characters are Python code points; empty input returns 0.
+**Input.** A Python string `text` and a nonnegative integer `replacements`.
+
+**Output.** Return the greatest substring length that can contain one repeated character after at most `replacements` edits.
+
+**Rules.** Each edit replaces one character with any other character.
+The chosen substring must be contiguous; its final repeated character can be chosen freely.
+Use exact code points. Return a length without modifying the string; empty input returns zero.
+
+**Example.** For `text = "AABABBA"` and one replacement, return `4`.
+The substring `"AABA"` becomes `"AAAA"` by replacing its single B.
 
 ## Picture: A Retained Candidate Is Not Always Valid
 

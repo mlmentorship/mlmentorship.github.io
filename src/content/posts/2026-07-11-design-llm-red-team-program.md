@@ -9,7 +9,18 @@ category: "questions"
 
 > Design the security evaluation for an enterprise agent that reads documents, calls tools, writes code, and acts on user accounts.
 
-Red-team the system, not the chat window. The attack surface includes instructions, retrieved content, tool output, memory, identity, permissions, generated code, logs, plugins, and the humans who approve actions. A model-only jailbreak score misses the failures with the highest operational consequence.
+Design an authorized security-evaluation program for an enterprise agent, covering its complete tool-using system and operational controls.
+
+## Problem
+
+**Context.** A hypothetical enterprise agent reads documents, calls tools, writes code, and acts on user accounts.
+Untrusted content, identity boundaries, retained state, and approval workflows can affect its behavior.
+
+**Task.** Define the threat model, bounded test environment, representative test categories, evidence, prioritization, remediation, and release gates.
+Explain how findings become reproducible regressions and inform incident response.
+
+**Constraints.** Use authorized synthetic accounts and data, with explicit test scope, containment, and stop conditions.
+Evaluate actual permission and state boundaries rather than only response wording; no test should create uncontrolled real-world effects.
 
 ## Start with the threat model
 
@@ -61,6 +72,8 @@ Track:
 Use adaptive attackers. A static prompt list becomes a regression suite, not a red team.
 
 **Learning objective:** Trace how an adaptive red-team finding becomes an owned mitigation, a residual-risk release decision, and a static regression test while production evidence updates the threat model.
+
+<p class="visual-title">An adaptive finding needs a mitigation and a release owner</p>
 
 <!-- visual:adaptive-red-team-release-loop -->
 ```mermaid

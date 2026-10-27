@@ -8,9 +8,18 @@ category: "questions"
 ---
 
 
-Allowed payments can produce delayed outcomes; declined payments do not reveal what would have happened if allowed.
+Design payment-fraud decisions and evaluation when outcomes arrive late and the current policy determines which payments can produce labels.
 
 ## Problem
+
+**Context.** A hypothetical payment policy allows some attempts and declines others; allowed outcomes mature only after a declared observation window.
+The cohort below contains mature outcomes, pending outcomes, and declined attempts.
+
+**Task.** Define labels, model and policy inputs, operating actions, and evaluation for the cohort.
+Explain what can be estimated now and what evidence is needed to compare a changed decision policy.
+
+**Constraints.** Missing, pending, and declined outcomes are not confirmed legitimate transactions.
+Separate fraud risk from action costs, preserve decision-time feature availability, and account for selection and label delay.
 
 Design payment-risk decisions for this hypothetical cohort of 1,000 attempts under policy P1.
 P1 allows 900 and declines 100.

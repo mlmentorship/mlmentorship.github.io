@@ -1,6 +1,6 @@
 ---
 title: "Matrix factorization for recsys"
-description: "Decompose the user-item interaction matrix into user and item embeddings whose dot product approximates the rating. The original collaborative filtering."
+description: "Predict missing user-item ratings from shared factors, while separating observed targets, implicit-feedback assumptions, and cold-item support."
 date: "2026-02-16"
 draft: false
 tags: ["concepts"]
@@ -9,9 +9,14 @@ category: "concepts"
 
 ## Summary
 
-**Matrix factorization** for collaborative filtering [(Koren et al., 2009)](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf) factorizes a sparse user-item rating matrix $R \in \mathbb{R}^{m \times n}$ into two low-rank matrices: $R \approx U V^\top$ where $U \in \mathbb{R}^{m \times k}$ contains user embeddings and $V \in \mathbb{R}^{n \times k}$ contains item embeddings. Predicted rating: $\hat r_{ui} = u_u^\top v_i$.
+A missing rating supplies two indices: a user row and an item row.
+Matrix factorization shares learned rows across many observed ratings rather than storing an independent prediction per cell.
+Its low-rank assumption is a modeling choice, not a guarantee of matrix completion.
 
-MF was the dominant collaborative-filtering method from the Netflix Prize era (2006–2009) through about 2018. It still underlies modern two-tower retrieval, embedding-based recsys, and has clean equivalences to many later techniques (matrix completion, neural MF, etc.). Knowing MF makes the move to two-tower neural models obvious.
+Let $R\in\mathbb R^{m\times n}$, $U\in\mathbb R^{m\times k}$, and $V\in\mathbb R^{n\times k}$.
+The shared coordinate count is $k$, and $R\approx UV^\top$.
+With zero biases, fixture rows $u_A=(2,1)$ and $v_3=(1.5,1)$ predict $2(1.5)+1(1)=4$.
+These are chosen vectors, not a fitted solution for all displayed ratings.
 
 <!-- visual:mf-missing-rating-dot-product -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="mf-rating-visual-title">
@@ -74,8 +79,14 @@ MF was the dominant collaborative-filtering method from the Netflix Prize era (2
 			<text class="viz-edge-label" x="380" y="329">R_A3 ≈ u_A^T v_3: the shared k coordinates are learned from observed ratings.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the missing cell supplies two indices: user A selects row A of <var>U</var>, and item 3 selects row 3 of <var>V</var>. Multiply matching latent coordinates and add them: 2 × 1.5 + 1 × 1 = 4, the prediction placed at <var>R</var><sub>A3</sub>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> user A selects row A of <var>U</var>; item 3 selects row 3 of <var>V</var>. Matching-coordinate products sum to four. The question mark is unknown, not a zero training target.</figcaption>
 </figure>
+
+| Entry in user A's row | Observation | Explicit-rating loss |
+| --- | --- | --- |
+| Item 1 | Rating 5 | Included |
+| Item 3 | Unknown | Excluded |
+| Item 4 | Rating 1 | Included |
 
 ## The objective
 
@@ -85,63 +96,97 @@ $$
 \min_{U, V} \sum_{(u, i) \in \Omega} (r_{ui} - u_u^\top v_i)^2 + \lambda (\|U\|_F^2 + \|V\|_F^2).
 $$
 
-Often add bias terms: $\hat r_{ui} = \mu + b_u + b_i + u_u^\top v_i$ ($\mu$ = global mean, $b_u, b_i$ = user/item biases).
+The observed set $\Omega$ excludes unknown entries, and $\lambda\ge0$ controls the stated L2 penalty.
+With biases, use $\hat r_{ui}=\mu+b_u+b_i+u_u^\top v_i$, defining global mean and user/item offsets.
+Fit these together; adding $\mu=3,b_A=0.2,b_3=-0.1$ afterward changes four to $7.1$.
+That exceeds a 1-5 rating scale and is not automatically a calibrated prediction.
 
-## Training
+### Change observed signal
 
-Loss is **non-convex jointly in $U, V$** but **convex when one is fixed**. Standard solvers:
+**New task:** replace explicit ratings with clicks whose exposure is not fully observed.
 
-- **Alternating least squares (ALS)**: fix $V$, solve for $U$ in closed form (it's a per-user least squares); fix $U$, solve for $V$. Iterate. Highly parallelizable per user / item.
-- **SGD**: sample $(u, i, r)$ at random, update $u_u$ and $v_i$ along the gradient. Easier to extend with side information.
-
-For implicit feedback (clicks, views. No explicit rating), the loss changes:
+**Picture and change:** a confidence-weighted implicit model uses
 
 $$
 \min_{U, V} \sum_{u, i} c_{ui} (p_{ui} - u_u^\top v_i)^2 + \lambda (\|U\|_F^2 + \|V\|_F^2)
 $$
 
-where $p_{ui} = 1$ if the user interacted with $i$, else $0$, and $c_{ui}$ is a confidence weight [(Hu et al., 2008)](http://yifanhu.net/PUB/cf.pdf). Critical: includes all $(u, i)$ pairs (with low confidence for negatives), not just observed positives.
+Here $p_{ui}$ is an interaction indicator and $c_{ui}\ge0$ is modeling confidence, not an identified exposure probability.
+Unlike explicit-rating loss, this objective includes all pairs, usually with lower confidence for unobserved interactions.
+
+**Check:** a separate two-item fixture has scores $(0.8,0.2)$, preferences $(1,0)$, and confidences $(5,1)$.
+Its unregularized loss is $5(1-0.8)^2+(0-0.2)^2=0.24$, not the positive-only value $0.20$.
+A never-shown item's weak zero preference remains an assumption, not evidence of dislike.
+
+**Use when:** revise the objective and evaluation when observation semantics change.
 
 ## Cold start
 
-MF works only for users and items observed during training. For new users and items, MF gives no embedding. Workarounds:
+### Change item availability
 
-- **Hybrid models**: incorporate side information (item features, user demographics).
-- **Two-tower neural models**: encoders take features, can embed arbitrary new users/items at inference.
-- **Average-of-similar**: until enough interactions accumulate, use content-based similarity.
+**New task:** score a new item without a trained ID row.
 
-This is why two-tower models displaced pure MF for production: they handle cold start naturally.
+**Picture and change:** use a separately validated feature encoder or content/context fallback, rather than a nonexistent lookup row.
+
+**Check:** if an encoder supplies $(1,0)$, user A's zero-bias score is $2(1)+1(0)=2$.
+Increasing $k$ alone cannot produce a trained row for an unseen ID.
+An encoder can compute a vector without proving cold-item accuracy.
+
+**Use when:** evaluate the cold-item slice and fallback separately from seen-ID performance.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Training
+
+Squared-error factorization is nonconvex jointly, but convex in either factor when the other is fixed.
+[ALS](/concepts/alternating-least-squares/) solves conditional ridge problems; SGD updates selected rows.
+For one pair's squared residual and two-row L2 penalty, hold biases fixed and save both old rows.
+Set $e=r-\mu-b_u-b_i-u_{\rm old}^\top v_{\rm old}$, then compute simultaneously
+
+$$
+u_{\rm new}=(1-2\eta\lambda)u_{\rm old}+2\eta e v_{\rm old},
+\qquad
+v_{\rm new}=(1-2\eta\lambda)v_{\rm old}+2\eta e u_{\rm old}.
+$$
+
+Using the updated user row for the item gradient changes this step.
+Sampling and regularization scaling must match the full objective.
 
 ## Properties
 
-- **Embeddings are not interpretable directly**. They live in an arbitrary basis. PCA-rotate them if you want to look.
-- **Rank $k$ is the main hyperparameter**: typical 32–512 for production. Too small → underfits; too large → overfits and slow.
-- **Implicit dimensions**: $k$ "latent factors" emerge that often correlate with interpretable concepts (genre, popularity, user activity level).
+For orthogonal $Q$, replacing $(U,V)$ with $(UQ,VQ)$ preserves predictions and L2 norms.
+The fixture rows can become $(1,-2)$ and $(1,-1.5)$ while retaining dot product four.
+Tune $k$ and regularization against matched baselines; coordinates are not uniquely identifiable tastes.
 
 ## Connection to two-tower models
 
-Two-tower retrieval (see [two-tower retrieval](/concepts/two-tower-retrieval/)) is exactly MF generalized to neural encoders:
-
-- MF: $u_u, v_i$ are free embedding parameters.
-- Two-tower: $u_u = f_\theta(\text{user features})$, $v_i = g_\phi(\text{item features})$.
-
-Training is similar (sampled-softmax loss replaces squared error for retrieval). The neural version handles cold-start, side info, and personalization beyond ID embeddings.
+[Two-tower retrieval](/concepts/two-tower-retrieval/) replaces free rows with feature encoders $f_\theta,g_\phi$.
+An ID-only tower still lacks trained parameters for new IDs.
+Sampled retrieval losses differ from squared-error ratings and all-pair implicit fitting.
 
 ## When to use plain MF in 2026
 
-- Small-scale prototypes, when neural infrastructure is overkill.
-- Strong baseline before complex models.
-- Pure rating prediction tasks (Netflix Prize style).
-- Embedding initialization for downstream models.
-
-For most production systems: two-tower neural models or transformer-based ranking models have replaced MF as the primary architecture.
+MF can be a rating baseline, prototype, or embedding initializer.
+Choose architecture from task, latency, features, and measured validation, not a universal deployment-prevalence claim.
 
 ## Common pitfalls
 
-- **Treating MF as a similarity-based system.** MF embeddings are learned for prediction, not similarity; cosine of MF embeddings is *not* automatically meaningful as user/item similarity.
-- **Ignoring biases.** Without user/item biases, MF spends embedding capacity modeling popular-vs-niche, which is better captured by a scalar.
-- **Using MF with explicit-feedback loss on implicit data.** The "missing = zero rating" assumption is wrong; use weighted ALS for implicit feedback.
-- **Comparing MF accuracy on RMSE alone.** RMSE doesn't capture top-k ranking quality, which is what matters in recsys.
+Dot-product prediction does not validate within-type cosine; normalization changes scores.
+Compare bias baselines and ranking metrics when top-K quality matters; RMSE answers a different question.
+
+Can a PCA rotation identify unique causal tastes?
+
+<details><summary>Answer</summary>
+
+No. It chooses coordinates without removing equivalent factorizations or establishing causal meanings.
+
+</details>
+
+References: [Koren et al. (2009)](https://datajobs.com/data-science-repo/Recommender-Systems-[Netflix].pdf), [Hu et al. (2008)](http://yifanhu.net/PUB/cf.pdf).
+
+</div>
 
 ## Related
 

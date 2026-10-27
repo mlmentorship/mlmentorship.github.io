@@ -13,27 +13,38 @@ aliases: []
 prerequisites: []
 ---
 
-Compute new sums from the old reachable set before merging them; each input occurrence can then contribute only once.
+Determine whether all input occurrences can be divided into two groups with equal total value.
 
 ## Problem
 
-Can `[1,5,11,5]` split into equal-sum groups?
-Its total is `22`; one group must sum to `11`.
-The answer is `True`, for example `[11]` and `[1,5,5]`.
-Return feasibility, not the groups themselves.
-Inputs are nonnegative integers; empty groups are allowed.
+**Input.** A list `nums` of nonnegative integers, possibly containing zeros and duplicates.
+
+**Output.** Return `True` if the occurrences can be partitioned into two equal-sum groups; otherwise return `False`.
+
+**Rules.** Every occurrence belongs to exactly one group and may not be reused.
+Groups need not be contiguous, and repeated values remain separate occurrences.
+Empty groups are allowed, so empty input returns `True`. Preserve the list; return feasibility rather than group contents.
+
+**Example.** `[1, 5, 11, 5]` returns `True`, using `[11]` and `[1, 5, 5]`.
+For `[1, 2, 3, 5]`, return `False`.
 
 ## Picture
 
 After processing `1`, the old reachable set is `{0,1}`.
 The first `5` extends only that snapshot:
 
+<p class="visual-title" data-supplemental-visual="subset-sum-old-snapshot">The current 5 creates 5 and 6, not 10</p>
+
 ```mermaid
-flowchart LR
-   Old["old snapshot<br/>{0,1}"] -->|add current 5 once| New["temporary additions<br/>{5,6}"]
-   Old -->|retain old sums| Merged["union after computation<br/>{0,1,5,6}"]
-   New -->|merge completed additions| Merged
+flowchart TB
+   accTitle: Compute additions from the old reachable-sum snapshot only
+   accDescr: The old reachable set is zero and one. Adding the current value five once creates five and six. Merge only after computing those additions, producing zero, one, five, six. Reading newly created five again in the same pass would illegally reuse the current item to make ten.
+   Old["Old snapshot<br/>{0,1}"] -->|add 5 once| New["New sums<br/>{5,6}"]
+   Old -->|retain| Merged["Union after computation<br/>{0,1,5,6}"]
+   New -->|merge| Merged
+   class Old,New,Merged viz-fit
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> compute every addition from the old set before merging. Reusing the new five in this pass would reuse one item twice.</p>
 
 The temporary set is complete before union changes `possible`.
 New sums cannot feed more additions in this same occurrence's update.

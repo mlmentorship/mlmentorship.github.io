@@ -13,13 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Only the first differing characters of adjacent sorted words imply precedence; later differences do not justify more edges.
+Infer a possible alphabet from words already sorted under an unknown character order.
 
 ## Problem
 
-Infer an order of observed characters from `["wrt","wrf","er","ett","rftt"]`.
-Return a consistent alphabet, or `""` when constraints are impossible.
-The observations may not determine a unique alphabet.
+**Input.** A list of words sorted lexicographically under an unknown alphabet.
+
+**Output.** Return a string containing every observed character exactly once in a compatible alphabet order.
+
+**Rules.** At the first unequal character, the earlier word's character must come earlier in the alphabet.
+A word precedes any longer word that has it as a prefix.
+Return any compatible order if several exist, or `""` if no order exists.
+An empty word list also returns `""`. Leave the words unchanged.
+
+**Example.** `["wrt", "wrf", "er", "ett", "rftt"]` permits `"wertf"`.
+`["abc", "ab"]` returns `""`: a longer word cannot precede its own prefix.
 
 ## Picture
 

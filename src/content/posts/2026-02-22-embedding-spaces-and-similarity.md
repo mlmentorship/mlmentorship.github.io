@@ -1,6 +1,6 @@
 ---
 title: "Embedding spaces and similarity metrics"
-description: "How learned vector representations encode meaning, and why cosine similarity is the default metric for retrieval and recsys."
+description: "Choose dot product, cosine, or distance from the retrieval objective, then verify normalization and approximate indexing."
 date: "2026-02-22"
 draft: false
 tags: ["concepts"]
@@ -9,9 +9,9 @@ category: "concepts"
 
 ## Summary
 
-An embedding space is a learned vector space in which points represent objects (words, sentences, images, items, users) and geometric relationships. Distance, angle. Encode semantic relationships such as similarity or relevance.
-
-Embeddings are the substrate for retrieval, recommendation, search, clustering, classification, and most LLM-adjacent products. A senior interview will check whether you can pick the right similarity metric, the right normalization, and the right index.
+An embedding maps an object to a vector; its training objective determines which vector relationships should predict relevance.
+Choose whether length, direction, or absolute distance should affect retrieval before choosing the index.
+Normalization changes the ranking objective unless the model and task already make length irrelevant.
 
 ## Common similarity metrics
 
@@ -24,15 +24,27 @@ For two vectors $u, v \in \mathbb{R}^d$:
 | **Euclidean / L2** | $\|u - v\|_2$ | When distances have physical meaning (image patches in pixel space, geographic coordinates). |
 | **Negative Euclidean²** | $-\|u-v\|^2$ | Equivalent to dot product on L2-normalized vectors plus a constant. |
 
-Cosine is the default for sentence embeddings (BERT-family), CLIP, two-tower retrieval, and most embedding APIs. Reason: training objectives (contrastive, triplet) typically L2-normalize, making magnitude meaningless.
+Cosine requires nonzero vectors and explicitly discards positive scale.
+Some models train with normalized similarities; others use unnormalized scores.
+Follow the model's documented scoring contract instead of assuming all embedding models share one metric.
 
 ## L2 normalization
 
-A common convention: project every embedding onto the unit sphere by dividing by its L2 norm before storing or comparing. Effects:
+For nonzero $u,v$, define $\widehat u=u/\lVert u\rVert$ and $\widehat v=v/\lVert v\rVert$.
+Then
 
-- Dot product equals cosine similarity (no extra division at query time).
-- Vector index (FAISS, ScaNN, HNSW) can use Inner Product mode for cosine retrieval.
-- Magnitude (which often correlates with item popularity or training frequency) is removed as a confound.
+$$
+\widehat u^\top\widehat v=\cos(u,v),\qquad
+\lVert\widehat u-\widehat v\rVert^2=2-2\cos(u,v).
+$$
+
+Thus normalized dot product, cosine, and normalized squared distance induce the same exact ranking, including ties.
+The identity follows by expanding the squared difference and substituting both unit norms.
+
+Take query $q=(1,0)$ and candidates $A=(1.8,1.6)$, $B=(0.9,0.2)$.
+Raw dot product favors A: $1.8>0.9$.
+Cosine favors B: approximately $0.976>0.747$.
+Their normalized chord distances are approximately $0.218<0.711$.
 
 <!-- visual:embedding-normalization-metric-equivalence -->
 <figure class="learning-figure" aria-labelledby="embedding-normalization-title">
@@ -84,36 +96,72 @@ A common convention: project every embedding onto the unit sphere by dividing by
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow each ray from the origin. Before normalization, A's extra length overwhelms its worse angle, so dot product ranks A first. On the unit circle only direction remains: dot equals cosine, and the shorter L2 chord identifies the same winner, B.</figcaption>
+	<figcaption><strong>Read it this way:</strong> raw dot product favors the longer A. Unit normalization preserves angles but discards length. Cosine, normalized dot product, and normalized chord distance then agree on B.</figcaption>
 </figure>
 
-If you store unnormalized embeddings and compare with cosine, you're paying the normalization cost at every query.
+Normalize stored candidates once when cosine is the intended objective.
+Normalize each nonzero query or divide scores by its norm when actual cosine values are needed.
+Declare a rejection or fallback policy for zero vectors; adding an arbitrary epsilon changes the score definition.
+
+## Change the Requirement
+
+### Retain Meaningful Magnitude
+
+**New task:** Serve a model trained to encode relevance through both vector length and direction.
+
+**Picture and change:** Use the raw dot product rather than projecting onto the unit sphere.
+
+**Check:** The same fixture now ranks A above B, matching its unnormalized objective.
+
+**Use when:** Training and evaluation support that scoring contract.
+Length may be useful signal or an unwanted association; geometry alone cannot determine which.
+
+### Trade Exact Search for Candidate Speed
+
+**New task:** Retrieve from an approximate index under a latency budget.
+
+**Picture and change:** Candidate generation may omit the exact nearest item; reranking cannot recover an absent candidate.
+
+**Check:** If exact top-one is B but the index returns only A, top-one recall is zero despite correct reranking.
+
+**Use when:** Measured latency and recall justify approximation under the same metric, filters, and data version.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Geometry of learned embeddings
 
-Empirical regularities in well-trained embedding spaces:
-
-- **Clusters** form for semantically similar items.
-- **Linear analogies** (king − man + woman ≈ queen) hold in word2vec / GloVe; less reliably in modern contextual embeddings.
-- **Anisotropy**: contextual LM embeddings (BERT, GPT) often concentrate in a narrow cone; cosine on raw embeddings can be misleading. Whitening or mean-centering helps.
-- **Curse of dimensionality**: in high-d, all pairwise distances concentrate. Distinguishing top-1 from top-10 becomes noisier. Useful embedding dimensions are typically 64–1024 even when the model space is much larger.
+Clusters, linear analogies, anisotropy, and distance concentration depend on the model and input distribution.
+Whitening or centering changes geometry; validate relevance afterward rather than assuming improvement.
+Compare dimensions through measured retrieval quality, memory, and latency, not a universal preferred range.
 
 ## Indexing for fast retrieval
 
 For $N$ items and queries:
 
-| Method | Build | Query | Recall |
-|--------|-------|-------|--------|
-| Brute force |. | $O(Nd)$ | exact |
-| **HNSW** [(Malkov & Yashunin, 2018)](https://arxiv.org/abs/1603.09320) | $O(N \log N)$ | $O(\log N)$ | tunable, ~95–99% |
-| **IVF + PQ** (FAISS) | $O(Nd)$ | $O(\sqrt{N})$ | tunable |
-| **ScaNN** (Google) | $O(Nd)$ | $O(\log N)$ | tunable |
+| Method | Decision to measure |
+| --- | --- |
+| Exact scan | $O(Nd)$ arithmetic; establishes the same-metric reference ranking |
+| [HNSW](https://arxiv.org/abs/1603.09320) | Graph-search breadth, build cost, recall, and memory |
+| IVF with product quantization | Number of searched partitions and quantization error |
+| ScaNN | Candidate-search and quantization settings under the workload |
 
-HNSW is the default for most production embedding stores (Pinecone, Weaviate, pgvector with hnsw index, Qdrant).
+Approximate latency and recall are empirical workload properties, not universal logarithmic guarantees or fixed percentages.
 
 ## Common pitfalls
 
-- **Mixing normalized and unnormalized vectors in the same index.** Cosine and dot give different rankings.
-- **Comparing across embedding models.** Vectors from BERT and CLIP live in unrelated spaces; concatenating or comparing across them is meaningless without alignment.
-- **Treating embedding dimension as quality.** Higher-d embeddings are not strictly better; tradeoff is recall vs. storage and query latency.
-- **Ignoring popularity bias.** Magnitude correlates with frequency; if you don't L2-normalize, popular items dominate top-k for everyone.
+- **Mixed objectives.** Normalizing only some candidates invalidates the unit-vector equivalence.
+- **Mixed coordinate systems.** Independently trained encoders need a validated shared-space or alignment contract.
+- **Unproved bias claims.** Removing length changes scores; it does not establish fairer or better retrieval.
+
+## Reconstruct
+
+<details>
+<summary>Can exact reranking fix a missing relevant candidate?</summary>
+
+No. Reranking only reorders supplied candidates.
+Measure candidate coverage separately from ranking quality, including filtered and tail-query populations.
+
+</details>
+
+</div>

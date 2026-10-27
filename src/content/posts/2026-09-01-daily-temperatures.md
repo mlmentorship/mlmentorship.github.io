@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep indices of days still waiting for a strictly warmer temperature.
-A new warmer day resolves every colder index it pops, at that index's first qualifying later day.
+For each day, report how long the wait is until a strictly warmer day occurs.
 
 ## Problem
 
-For `[73, 74, 75, 71, 69, 72, 76, 73]`, return `[1, 1, 4, 2, 1, 1, 0, 0]`.
-Zero means no qualifying later day in this input, not a zero-day wait. Empty input returns `[]`.
+**Input.** A list `temperatures` of integer daily temperatures in chronological order.
+
+**Output.** Return an equally long list whose entry at day `i` is the distance to its first warmer later day.
+
+**Rules.** Warmer means strictly greater; an equal temperature does not qualify.
+Return zero when no later day qualifies, not the number of remaining days.
+Preserve the input. An empty list returns `[]`.
+
+**Example.** `[73, 74, 75, 71, 69, 72, 76, 73]` returns `[1, 1, 4, 2, 1, 1, 0, 0]`.
+Day 2 waits four days for 76; day 6 has no warmer later day.
 
 ## Picture: Resolve Only the Colder Waiting Days
 

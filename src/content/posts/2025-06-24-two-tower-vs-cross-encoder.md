@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: recsys, search, and retrieval interviews.*
 
-The textbook answer is "two-tower is faster, cross-encoder is more accurate." The senior answer is "both, in sequence: bi-encoder for retrieval, cross-encoder for reranking." Trade-offs and training discipline are where the level signal sits.
+Choose how to score query-item relevance when a large candidate collection must be searched under serving constraints.
+
+## Problem
+
+**Context.** A retrieval service must match queries against many items, then produce a short relevance-ranked result list.
+Two-tower models encode queries and items separately; cross-encoders jointly process each query-item pair.
+
+**Task.** Compare their representation, training, retrieval, and serving trade-offs, then justify a design for the workload.
+Explain how a two-stage design would be evaluated if you choose one.
+
+**Constraints.** Account for candidate recall, latency, index freshness, memory, and training-serving consistency.
+Do not assume either architecture is universally more accurate; distinguish measured relevance from representational capacity.
 
 <!-- visual:two-tower-cross-encoder-fanout -->
 <figure class="learning-figure" aria-labelledby="two-stage-fanout-title">

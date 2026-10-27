@@ -1,6 +1,6 @@
 ---
-title: "Transformer architecture: a senior-level mental model"
-description: "Strip away the diagram clutter. A transformer is a stack of (residual + LayerNorm + (attention or FFN)) blocks. Understanding why each piece is there is more important than memorizing the diagram."
+title: "Transformer architecture: trace one complete block"
+description: "Compute both residual updates, test causal visibility, and distinguish token communication, feature projections, normalization, and architectural variants."
 date: "2025-11-05"
 draft: false
 tags: ["concepts"]
@@ -10,9 +10,15 @@ category: "concepts"
 
 ## Summary
 
-A transformer stacks blocks of (1) self-attention layers mixing information across positions, and (2) feed-forward layers mixing information across features, bound by residual connections and normalization.
+A transformer block lets positions exchange information, then transforms each position's features.
+Residual additions and normalization connect those operations without changing the token-by-feature output shape.
 
-The transformer is the dominant ML architecture of 2017-2026. It powers nearly every modern NLP system, most computer vision systems, all current LLMs, and increasingly recommendation, biology, and reinforcement learning systems. Understanding *why* it works (not just what it does) is foundational.
+**Task:** trace a two-token, two-feature pre-norm block with input $X=[[1,3],[3,1]]$.
+Use per-row LayerNorm with unit gain, zero bias, and zero epsilon only for this nonconstant-row calculation.
+Production normalization uses declared positive epsilon.
+Set query/key projections to zero and value/output projections to identity, with one causal attention head.
+Use a row-wise FFN with identity matrices, zero biases, and ReLU.
+What reaches each residual output, and can the second input row change the first output?
 
 ## The minimum mental model
 
@@ -23,9 +29,12 @@ x = x + Attention(LayerNorm(x))   # mix across positions
 x = x + FFN(LayerNorm(x))         # mix across features
 ```
 
-Stack L of these. Add an embedding layer at the bottom and an output projection at the top. That's it.
+The second line uses the first line's updated tensor, not the original input.
+Write these states as $X_1=X+A(\operatorname{LN}(X))$ and $X_2=X_1+F(\operatorname{LN}(X_1))$.
+Token embeddings and the task's output projection sit outside this block.
 
-**Learning objective:** distinguish attention's cross-position communication from the FFN's independent, per-position feature transformation while tracing the unchanged token-by-feature tensor shape through a pre-norm block.
+The retained figure shows unmasked encoder connectivity; our numerical trace changes visibility to a causal decoder mask.
+Attention also contains feature projections: the picture distinguishes primary communication roles, not exclusive ownership of feature mixing.
 
 <!-- visual:transformer-two-mixing-axes -->
 <figure class="learning-figure plot-panel" aria-labelledby="transformer-mixing-title">
@@ -84,104 +93,149 @@ Stack L of these. Add an embedding layer at the bottom and an output projection 
 		<text class="viz-label" x="180" y="384" text-anchor="middle">no row-to-row path: each position is processed independently</text>
 		<text class="viz-callout" x="180" y="405" text-anchor="middle">x′ = x + Attention(LN(x))  →  x″ = x′ + FFN(LN(x′))</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> hold the <code>T × d</code> tensor shape fixed. In this unmasked encoder example, attention lets each token row gather context from every row; a causal decoder would omit future-token links. The same FFN then transforms features inside each row independently. Each sublayer contributes an update through its own residual addition. The primary communication roles, not every internal projection, are shown. Original schematic checked against <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. (2017)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">PyTorch encoder-layer documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> hold the <code>T × d</code> tensor shape fixed. Here, unmasked encoder attention connects every token row; a causal decoder omits future links. The shared FFN transforms each row independently. Each sublayer contributes an update through its own residual addition. Attention's internal feature projections are not shown. Sources: <a href="https://arxiv.org/abs/1706.03762">Vaswani et al. (2017)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.TransformerEncoderLayer.html">PyTorch encoder-layer documentation</a>.</figcaption>
 </figure>
 
-The two information-mixing operations:
-- **Attention**: a learned, content-dependent weighted sum across positions. The weights come from a (query, key) dot product.
-- **FFN**: a position-wise MLP, typically `Linear → activation (GELU/SwiGLU) → Linear`. Same weights applied at every position.
+### Compute the two residuals
 
-Plus the operational glue:
-- **Residual connections**: `x = x + Sublayer(x)`. Without these, transformers don't train at depth.
-- **LayerNorm (pre-norm or post-norm)**: keeps activations in a sane range across layers.
-- **Positional encoding**: attention is permutation-invariant; the model needs position information injected somewhere. Original was sinusoidal; modern is RoPE (rotary), ALiBi, or learned.
+Each input row has mean $2$ and variance $1$, so normalized rows are $[-1,1]$ and $[1,-1]$.
+Zero queries and keys give equal logits on allowed positions.
+The causal first row sees only itself; the second averages both value rows.
+
+| State | Row 0 | Row 1 |
+| --- | --- | --- |
+| $X$ | $[1,3]$ | $[3,1]$ |
+| $\operatorname{LN}(X)$ | $[-1,1]$ | $[1,-1]$ |
+| Attention contribution | $[-1,1]$ | $[0,0]$ |
+| First residual $X_1$ | $[0,4]$ | $[3,1]$ |
+| $\operatorname{LN}(X_1)$ | $[-1,1]$ | $[1,-1]$ |
+| Row-wise FFN contribution | $[0,1]$ | $[1,0]$ |
+| Second residual $X_2$ | $[0,5]$ | $[4,1]$ |
+
+The first residual's row zero has mean $2$ and variance $4$; renormalization still gives $[-1,1]$.
+ReLU acts within each row, and the same FFN parameters serve both rows.
+No FFN edge directly joins different positions, although its inputs already contain attention-derived context.
+
+### Change normalization placement
+
+**New task:** use post-norm, $h=\operatorname{LN}(X+A(X))$, then $Y=\operatorname{LN}(h+F(h))$.
+**Picture and change:** move normalization outside each addition and recompute branch inputs too.
+**Check:** isolate zero branches on row $[1,3]$.
+Pre-norm returns $[1,3]$; post-norm returns $[-1,1]$ under the same toy normalization.
+**Use when:** the architecture changes residual-normalization order; its direct identity path is no longer the same.
+
+### Change position visibility
+
+**New task:** encode a complete document bidirectionally instead of predicting a next token.
+Remove the causal restriction where allowed, while retaining padding validity and position semantics.
+With the original input, both attention rows now average to $[0,0]$, giving first final row $[1,4]$.
+
+**Check:** replace the second input row with $[1,3]$.
+Bidirectional attention now changes the first final row to $[0,5]$.
+The causal block's first final row remains $[0,5]$ before and after that perturbation.
+**Use when:** the entire input is available; the future-perturbation invariant is no longer required.
+
+### Shapes and failure boundaries
+
+For $T$ tokens and width $d$, each residual contribution must return shape $T\times d$.
+A head computes $Q=ZW_Q$, $K=ZW_K$, $V=ZW_V$, and $\operatorname{softmax}(QK^\top/\sqrt{d_k}+M)V$.
+The additive mask $M$ is zero on allowed keys and negative infinity on forbidden keys.
+Require an allowed key per query; concatenate head outputs and project back to residual width.
+The position-wise FFN expands $d$ to its chosen hidden width, applies a nonlinearity or gate, then returns to $d$.
+
+A causal mask alone does not validate training if teacher-forced inputs expose the target token.
+Check shifted inputs, target alignment, padding, and absolute positions as part of the prediction contract.
 
 ## What an interviewer expects you to articulate
 
-If asked "explain transformers":
+Name the objective and available positions before naming a model family.
+Encoder-only, decoder-only, and encoder-decoder systems differ in visibility, cross-attention, and prediction targets.
+See [their task-specific routes](/concepts/encoder-decoder-architectures/) rather than assuming every transformer is a causal language model.
 
-1. The block structure: attention + FFN, both wrapped in residual + LayerNorm.
-2. Self-attention math: Q, K, V from input projections; attention = softmax(QK^T / sqrt(d)) V.
-3. Multi-head: split d into H heads, run attention per head in parallel, concatenate.
-4. Positional encoding: attention is permutation-invariant, so position information is added; mention RoPE for modern systems.
-5. Pre-norm vs post-norm; mention pre-norm is the modern default.
-6. Why each piece is there (residual for gradient flow, LayerNorm for stability, multi-head for diverse attention patterns).
+**Reconstruct:** does representing an identity with zero residual branches prove a deeper model always trains at least as well?
 
-If you can additionally discuss the *scale story* (more parameters + more data + more compute = monotonically better, per Kaplan/Hoffmann/Chinchilla scaling laws) and the production reality (FlashAttention, KV cache, RoPE, GQA), you're at strong-senior depth.
+<details><summary>Answer</summary>
+
+No. Representational availability does not make optimization find that identity.
+Normalization, finite precision, regularization, and changed training dynamics also prevent an automatic performance ordering.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## The why behind each piece
 
 ### Why attention?
 
-The naive way to build a sequence model is RNNs (sequential) or convolutions (local). Both have limits: RNNs can't parallelize across time, CNNs have limited receptive field per layer. Attention is *parallelizable across positions* (everything is a matmul) and has *unlimited receptive field per layer* (every position attends to every other). These two properties are why transformers won.
+Attention permits content-dependent communication among allowed keys.
+Dense unmasked attention connects the supplied context in one layer; causal, sparse, and window masks restrict that graph.
+Parallel training across supplied positions does not remove autoregressive generation dependencies or finite context limits.
 
 ### Why multi-head?
 
-A single attention head can attend to one pattern at a time. Multi-head allows the model to attend to multiple patterns simultaneously, one head might track syntactic dependencies, another might track topic, another might track entity references. Empirically, even with no labels, different heads end up learning different patterns.
-
-The d_model dimension is split across H heads, so multi-head adds no parameters or FLOPs over single-head with the same total d. It's purely a structural inductive bias.
+Heads form separate learned query/key/value subspaces and attention distributions.
+No theorem assigns each head a particular linguistic role.
+At fixed total projection widths, parameter counts can match a single-head design.
+Logits and softmax storage still depend on head count.
 
 ### Why residual connections?
 
-Two reasons. (1) Gradient flow: residuals create direct paths from any layer to the loss, preventing vanishing gradients in deep networks. (2) Identity preservation: the model can learn to "do nothing" by setting the sublayer output to zero, which means adding more layers is at worst a no-op, you can always train deeper.
+[Residual addition](/concepts/residual-connections/) supplies a direct route alongside a learned branch.
+Its derivative includes an identity contribution, but branch derivatives can cancel or amplify it.
+Neither vanishing-gradient prevention nor successful deeper training follows automatically.
 
 ### Why LayerNorm (not BatchNorm)?
 
-BatchNorm normalizes across the batch dimension, which doesn't work for variable-length sequences and breaks at small batch sizes. LayerNorm normalizes per-token across the feature dimension, independently of other tokens or other examples. This works for transformers because tokens within a sequence are already a "batch" of features for normalization purposes. See [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/).
+Feature-axis LayerNorm computes statistics within each token, avoiding cross-sample statistical coupling.
+BatchNorm is a different reduction and train/evaluation contract, not mathematically impossible for sequence inputs.
+The configured normalized axes matter; see [the shared-statistics trace](/concepts/batchnorm-vs-layernorm/).
 
 ### Why pre-norm vs post-norm?
 
-The original transformer used post-norm: `LN(x + Sublayer(x))`. This is unstable to train at depth without careful warmup.
-
-Pre-norm: `x + Sublayer(LN(x))`. The norm is *inside* the residual, so the residual passes the raw activation through. Easier to train, more stable at scale. Slightly worse final quality in some settings, but the training stability win dominates at scale. Almost all modern transformers (GPT, LLaMA, Mistral, etc.) use pre-norm.
+Their equations and identity paths differ, as the core's zero-branch check shows.
+Depth, initialization, warmup, residual scaling, optimizer, and final normalization affect empirical stability and quality.
+The [original transformer](https://arxiv.org/abs/1706.03762) used post-norm; that does not define every later architecture.
 
 ### Why FFN?
 
-Attention mixes across positions but doesn't mix across features within a position (each output dim is a weighted sum of input dims with the same weights for all positions). FFN does the per-position feature mixing. The two operations are complementary.
-
-FFN intermediate dimension is typically 4&times; d_model (the "expansion factor"). Modern variants use SwiGLU instead of GELU, which uses three matrices instead of two and effectively gives a multiplicative gating mechanism.
+It supplies a shared row-wise nonlinear transformation alongside attention's communication.
+Attention's projections already mix features; the FFN is not the sole feature-mixing operation.
+Hidden width is architectural, not necessarily four times residual width.
 
 ### Why positional encoding?
 
-Attention with no position info is permutation-invariant: shuffling the input tokens gives the same outputs (in different positions). For sequence modeling, position matters.
-
-Solutions:
-- **Sinusoidal** (original): fixed sinusoidal patterns added to embeddings. Works, but limited extrapolation to longer sequences.
-- **Learned**: learnable position embeddings. Works, but doesn't extrapolate at all beyond training length.
-- **Rotary (RoPE)**: rotate Q and K by position-dependent angles before the attention dot product. Encodes *relative* position naturally. Better long-context extrapolation than learned. Used in LLaMA, Mistral, and most modern open LLMs.
-- **ALiBi**: bias the attention scores by a function of relative position. No additional parameters, good extrapolation. Used in MPT and some other models.
-
-Modern default in 2026: **RoPE**. If you're discussing transformers and mention sinusoidal positional encoding without acknowledging RoPE, you're showing your knowledge stops in 2020.
+Without positional information or asymmetric masks, row permutation permutes attention outputs: the operation is equivariant, not invariant.
+Causal masks already introduce an order-dependent restriction.
+Position schemes add distinct absolute or relative signals; defined beyond-training-length values do not guarantee useful extrapolation.
 
 ## The scale story
 
-The transformer's biggest property isn't any one design choice. It's that **performance scales smoothly with parameters, data, and compute** ([Kaplan et al. 2020](https://arxiv.org/abs/2001.08361), [Hoffmann et al. 2022](https://arxiv.org/abs/2203.15556)). This is what made GPT-3, GPT-4, Claude, Gemini, etc. possible.
-
-Roughly: loss `L ~ A * N^-alpha + B * D^-beta` where N is parameters, D is tokens, with empirically-determined alpha, beta. Optimal allocation: scale N and D roughly proportionally (Chinchilla compute-optimal scaling).
-
-This scaling property is the most important fact about transformers that wasn't obvious in 2017 and is foundational to the modern field.
+[Kaplan et al.](https://arxiv.org/abs/2001.08361) and [Hoffmann et al.](https://arxiv.org/abs/2203.15556) fit empirical loss/resource relationships under specified training regimes.
+Compute-optimal parameter/token allocation depends on those fits and constraints.
+They do not guarantee monotonic downstream improvements from every added parameter or dataset.
 
 ## What's changed since 2017
 
-The original architecture has evolved:
-
-- **Pre-norm** instead of post-norm.
-- **RoPE / ALiBi** instead of sinusoidal positional encoding.
-- **GQA / MQA** instead of standard MHA (saves KV cache memory).
-- **SwiGLU** instead of GELU (better quality at marginal compute cost).
-- **RMSNorm** instead of LayerNorm in some models (LLaMA family).
-- **No bias terms** in linear layers (small simplification, no quality cost).
-- **No dropout** during pretraining at scale.
-
-If you describe a "transformer" in 2026 using only the 2017 paper, you're behind. Reference the modern stack.
+| Choice | Actual change |
+| --- | --- |
+| RMSNorm | Scales by a root mean square without subtracting the token mean. |
+| SwiGLU | Adds a multiplicative gate and separate input projections. |
+| RoPE | Rotates queries and keys by position-dependent angles. |
+| ALiBi | Adds a relative-distance term to allowed attention scores. |
+| Learned or sinusoidal embeddings | Add a specified positional vector to the token representation. |
+| GQA / MQA | Share key/value heads among query heads, changing cache dimensions. |
+| Conditional experts | Route tokens among FFNs with additional capacity and dispatch contracts. |
+| Bias or dropout removal | Changes the specified training computation, not an automatic quality-preserving simplification. |
 
 ## Common confusions
 
-- **"Transformers don't have inductive bias."** They have *less* inductive bias than CNNs/RNNs, but they have plenty (residuals, LayerNorm, multi-head, position encoding). The right framing is "scale-friendly architecture with weak structural priors."
-- **"Attention is the most expensive part."** For long sequences, yes. For typical transformer training (sequence ~1K-4K), the FFN is comparable or larger.
-- **"All transformers are GPT-style."** No. Encoder-only (BERT), encoder-decoder (T5), decoder-only (GPT). Different objectives, different mask patterns.
-- **"You need positional encoding."** True for vanilla attention; some recent models (eg. with implicit RoPE) blur this.
+Parameter sharing, masks, normalization, and position mechanisms impose structural priors.
+The dominant compute or memory term depends on width, length, batch, implementation, and training versus generation.
+Architecture names do not replace a shape, visibility, or resource ledger.
 
 ---
 
 *Related: [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/), [FlashAttention](/concepts/flashattention/), [KV cache](/concepts/kv-cache/).*
+
+</div>

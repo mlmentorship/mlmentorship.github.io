@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-A boundary is reachable only when the entire preceding prefix can be segmented; isolated dictionary matches do not suffice.
+Determine whether an entire string can be split into consecutive words from a supplied dictionary.
 
 ## Problem
 
-Can `catsandog` be covered completely using `["cats","dog","sand","and","cat"]`?
-Words may be reused; characters cannot be skipped or overlapped between tokens.
-Matching uses exact Python strings, without normalization or fuzzy matches.
-Return existence, not the number of possible parses.
+**Input.** A Python string `text` and a list `words` of dictionary strings.
+
+**Output.** Return `True` if dictionary words can concatenate to exactly `text`; otherwise return `False`.
+
+**Rules.** Words may be reused, but characters cannot be skipped, reordered, or shared between consecutive tokens.
+Match exact code points without normalization or fuzzy matching. Duplicate dictionary entries add no new feasibility.
+Return existence, not the number of parses. Preserve inputs; empty text returns `True`.
+
+**Example.** `"leetcode"` with `["leet", "code"]` returns `True`, using `"leet" + "code"`.
+For `"catsandog"` with `["cats", "dog", "sand", "and", "cat"]`, return `False`.
 
 ## Picture
 

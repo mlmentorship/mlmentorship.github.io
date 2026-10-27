@@ -115,6 +115,8 @@ $$
 
 When expansion ratio $F > D$ and per-expert batch size $t$ is moderate, the intermediate activation $tF$ dominates memory traffic. Fusing the up-projection, activation, and down-projection into one tile program removes the $4tF$ HBM traffic term.
 
+<p class="visual-title">Fusion removes a round trip, not the weight-read floor</p>
+
 <!-- visual:fused-moe-triton-sram-roofline -->
 ```mermaid
 flowchart TB

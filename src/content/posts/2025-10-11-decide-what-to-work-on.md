@@ -8,10 +8,17 @@ category: "questions"
 ---
 
 
-Choose work against its next-best feasible alternative, not against doing nothing.
-Protect obligations before comparing optional projects.
+Choose a feasible work portfolio under a fixed capacity limit and explain what assumptions could change the priority.
 
 ## Problem
+
+**Context.** Several optional projects compete for the same four engineer-weeks in the invented exercise below.
+
+**Task.** Compare feasible portfolios, select one, and explain opportunity cost and evidence that could reverse the choice.
+Connect the reasoning to how you prioritize real work without claiming invented values as measured outcomes.
+
+**Constraints.** Projects are indivisible and independent, and their modeled benefits add on one common scale.
+Respect capacity and mandatory obligations before optimizing optional value; dependencies or overlapping benefits change the calculation.
 
 In this hypothetical exercise, four engineer-weeks are available:
 
@@ -25,6 +32,8 @@ All projects are optional, independently staffed and indivisible; benefits add w
 Which portfolio fits? What could reverse the choice?
 
 ## Picture: Choosing One Uses Capacity Elsewhere
+
+<p class="visual-title">A chosen project consumes another project's capacity</p>
 
 <!-- visual:work-prioritization-counterfactual-portfolio -->
 ```mermaid

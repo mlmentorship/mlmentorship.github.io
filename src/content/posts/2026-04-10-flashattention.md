@@ -1,6 +1,6 @@
 ---
 title: "FlashAttention"
-description: "I/O-aware exact attention replaces O(n²) HBM traffic with a tiled streaming softmax in SRAM. It is a core transformer kernel optimization."
+description: "Derive a mergeable softmax row, rescale its numerator and denominator across tiles, and distinguish mathematical equivalence, storage, traffic, and latency."
 date: "2026-04-10"
 draft: false
 tags: ["concepts"]
@@ -10,15 +10,55 @@ category: "concepts"
 
 ## Summary
 
-Attention is **memory-bound**: not compute-bound, on modern GPUs. The bottleneck for long sequences is moving the n×n attention matrix between HBM and SRAM, not the matmuls. The n×n matrix never goes to HBM; only the n×d output and two n-sized per-row statistics are stored.
+Attention needs a normalized weighted sum, not a permanently stored score matrix.
+FlashAttention tiles that computation to reduce global-memory storage and data movement while preserving the mathematical attention operator.
+Floating-point reduction order can change bits; validate numerical tolerance rather than claiming bitwise identity.
 
-Result: same numerical output as standard attention, but **2-4&times; faster wall-clock and O(n) memory** instead of O(n²).
+**Task:** one query sees scores $[0,\log3]$ with scalar values $[2,6]$.
+Process one score/value pair per tile without retaining prior scores.
+Recover the same output as dense softmax, then change masking and the performance regime.
 
-Essential in modern transformer training/inference. Every serious framework uses it or a close variant. Knowledge of FlashAttention is expected for 2026.
+Use finite allowed scores and a float64 reference tolerance of $10^{-12}$ for these checks.
+Production tolerances depend on dtype, shape, and kernel.
 
 ## The mechanism
 
-Standard attention reads and writes the n×n attention matrix to HBM at every step:
+A materialized baseline writes score and probability matrices of size $n\times n$ to high-bandwidth memory, HBM.
+The tiled algorithm keeps a score tile and row summaries in on-chip working storage.
+It still computes every allowed dense pair; memory traffic, auxiliary storage, arithmetic, and latency are different quantities.
+
+For processed scores $s_j$ and value vectors $v_j$, retain
+
+$$
+m=\max_j s_j,\qquad
+\ell=\sum_j e^{s_j-m},\qquad
+u=\sum_j e^{s_j-m}v_j.
+$$
+
+Here $u$ is an **unnormalized numerator**; output is $O=u/\ell$.
+For a new valid block, set
+
+$$
+m'=\max(m,\max s_{block}),\quad a=e^{m-m'},\qquad
+\ell'=a\ell+\sum_{block}e^{s_j-m'},\quad
+u'=au+\sum_{block}e^{s_j-m'}v_j.
+$$
+
+Changing reference from $m$ to $m'$ multiplies every earlier exponential by $a$.
+Rescaling both totals preserves their ratio and admits the new block under a common reference.
+Initialize $m=-\infty$, $\ell=0$, and $u=0$; the first valid block has old-state scale zero.
+Skip entirely forbidden blocks without evaluating an undefined $-\infty-(-\infty)$.
+
+| Processed tile | Maximum | Denominator | Numerator | Output |
+| --- | --- | --- | --- | --- |
+| Score $0$, value $2$ | $0$ | $1$ | $2$ | $2$ |
+| Then score $\log3$, value $6$ | $\log3$ | $1/3+1=4/3$ | $2/3+6=20/3$ | $5$ |
+
+The second maximum rescales old totals by $1/3$.
+Dense evaluation agrees: $(1\cdot2+3\cdot6)/(1+3)=5$.
+Forgetting rescaling gives $(2+6)/(1+1)=4$, a useful failing check.
+
+<p class="visual-title">A materialized baseline sends scores and probabilities through HBM.</p>
 
 <!-- visual:flashattention-standard-hbm-path -->
 ```mermaid
@@ -39,43 +79,56 @@ flowchart LR
     class O viz-output
 ```
 
-  <p class="diagram-caption"><strong>Read it this way:</strong> standard attention materializes the full n×n matrix in HBM twice. FlashAttention keeps small tiles and running softmax statistics in SRAM instead.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> this baseline writes full score and probability matrices between separate stages. Tiled attention avoids those global intermediates, not all HBM reads or writes.</p>
 
-Standard attention does this:
+### Change masking
 
-1. Compute S = QKᵀ / &radic;d (size n&times;n) → write to HBM
-2. Read S, compute P = softmax(S, axis=-1) → write to HBM
-3. Read P, compute O = PV → write to HBM
+**New task:** the second score/value pair is future-only for this causal query.
+Exclude it before local reductions and skip that empty tile.
+**Check:** retained state stays $(m,\ell,u)=(0,1,2)$, giving output $2$, not $5$.
+**Use when:** visibility, padding, or a window restricts the allowed pairs.
+This reference rejects a fully masked row; match the chosen library's declared empty-row behavior rather than dividing by zero.
 
-HBM traffic: **O(n² + nd)**. For n = 8192 and d = 128, the simplified ratio of the quadratic matrix term to the output term is n/d = 64; the exact traffic ratio depends on the implementation and other tensors.
+### Change the performance regime
 
-FlashAttention restructures it:
+**New task:** compare a short sequence on a different GPU.
+Keep output tolerance checks and measure kernel time, launch overhead, utilization, and peak memory separately.
+**Check:** illustrative baseline $7$ microseconds versus tiled $8$ gives speedup $7/8=0.875$, despite unchanged mathematical output.
+Those timings are invented inputs to the comparison, not measurements.
+**Use when:** shape or hardware changes the bottleneck; asymptotics cannot supply a universal crossover length.
 
-- Tile Q into blocks Q&#7522; of size B&#7479;&times;d. Tile K, V into blocks K&#11388;, V&#11388; of size B&#7580;&times;d.
-- Outer loop over Q&#7522; (output rows). Inner loop over K&#11388;, V&#11388; (key blocks).
-- Per Q&#7522;, maintain three running statistics in SRAM:
-  - **m&#7522;** = max-so-far across processed key blocks (numerical-stable softmax)
-  - **&#8467;&#7522;** = denominator of the partial softmax
-  - **O&#7522;** = running weighted sum of values
-- On each new tile (Q&#7522;, K&#11388;, V&#11388;):
-  - compute S&#7522;&#11388; = Q&#7522;K&#11388;ᵀ / &radic;d entirely in SRAM
-  - update statistics using the streaming log-sum-exp identity:
+## Backward pass: trade memory for compute
 
-```
-m_new = max(m_i, max(S_ij))
-ell_new = exp(m_i - m_new) * ell_i + sum(exp(S_ij - m_new))
-O_new   = (exp(m_i - m_new) * ell_i * O_i + exp(S_ij - m_new) @ V_j) / ell_new
-```
+Backward can recompute score/probability tiles from Q/K and saved row normalization information.
+It need not retain the entire probability matrix.
+Saved outputs, statistics, and RNG requirements depend on the algorithm and dropout convention.
+This is a kernel-level recompute-versus-store tradeoff, not cost-free memory removal.
+
+Dense arithmetic remains $O(n^2d)$.
+Auxiliary attention storage can be $O(nd)$, linear in sequence length at fixed width.
+This does not imply linear HBM traffic or latency; tile sizes, on-chip capacity, and scheduling matter.
+
+**Reconstruct:** does reducing quadratic storage make dense attention subquadratic in sequence length?
+
+<details><summary>Answer</summary>
+
+No. The algorithm still evaluates the allowed dense query/key pairs.
+Sparse attention changes that pair set; linear-attention methods change the operator or its representation.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 <!-- visual:flashattention-sram-tile-stream -->
 <figure class="learning-figure" aria-labelledby="flashattention-tile-title" aria-describedby="flashattention-tile-description">
 <p class="visual-kicker">Learning objective</p>
 <p class="visual-title" id="flashattention-tile-title">Follow one query block as key and value blocks stream through SRAM.</p>
-<p id="flashattention-tile-description">The full score matrix is shown as a grid, but only the highlighted query-key tile enters SRAM at one time. The tile updates running softmax state and the output block before the next key and value block is loaded.</p>
+<p id="flashattention-tile-description">The grid represents the full score matrix; only a query-key tile enters working storage here. Each tile updates row summaries before the next key/value block arrives.</p>
 <div class="visual-scroll attention-tile-scroll">
 <svg class="attention-tile-visual" viewBox="0 0 1000 500" role="img" aria-labelledby="flashattention-tile-svg-title flashattention-tile-svg-description" width="1000" height="500">
 <title id="flashattention-tile-svg-title">FlashAttention streams one score tile through SRAM instead of materializing the full matrix</title>
-<desc id="flashattention-tile-svg-description">On the left, a query-by-key score matrix has one highlighted Bq by Bk tile. An arrow points to the right, where HBM supplies one query block and one key-value block to SRAM. The SRAM tile computes scores, updates m, ell, and O, then writes only an output block and per-row statistics.</desc>
+<desc id="flashattention-tile-svg-description">The conceptual score grid highlights one Bq by Bk tile. HBM supplies query and key/value blocks to on-chip storage. The running maximum m, denominator ell, and unnormalized numerator u are updated. Output O equals u divided by ell. The final output block and row statistics are written, not the global score matrix.</desc>
 <defs><marker id="flashattention-tile-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--viz-focus-stroke)" /></marker></defs>
 <rect x="24" y="24" width="420" height="370" rx="10" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
 <text x="48" y="58" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="20" font-weight="700">Global score matrix S</text>
@@ -97,58 +150,53 @@ O_new   = (exp(m_i - m_new) * ell_i * O_i + exp(S_ij - m_new) @ V_j) / ell_new
 <rect x="672" y="145" width="78" height="50" rx="4" fill="var(--viz-canvas)" stroke="var(--c-rule)" /><rect x="761" y="145" width="78" height="50" rx="4" fill="var(--viz-canvas)" stroke="var(--c-rule)" /><rect x="850" y="145" width="62" height="50" rx="4" fill="var(--viz-canvas)" stroke="var(--c-rule)" />
 <text x="711" y="174" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Qi</text><text x="800" y="174" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Kj, Vj</text><text x="881" y="174" text-anchor="middle" fill="var(--c-text)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Sij</text>
 <text x="711" y="188" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="10">Bq x d</text><text x="800" y="188" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="10">Bk x d</text><text x="881" y="188" text-anchor="middle" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="10">Bq x Bk</text>
-<line x1="792" y1="242" x2="792" y2="270" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#flashattention-tile-arrow)" /><rect x="650" y="274" width="284" height="68" rx="8" fill="var(--viz-neutral-bg)" stroke="var(--viz-output-stroke)" stroke-width="2" /><text x="792" y="299" text-anchor="middle" fill="var(--viz-output-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">streaming softmax update</text><text x="792" y="322" text-anchor="middle" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">mi, elli, Oi -&gt; next tile</text>
-<text x="494" y="374" fill="var(--viz-output-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Write Oi (Bq x d), mi and elli; never S</text>
+<line x1="792" y1="242" x2="792" y2="270" stroke="var(--viz-focus-stroke)" stroke-width="2" marker-end="url(#flashattention-tile-arrow)" /><rect x="650" y="274" width="284" height="68" rx="8" fill="var(--viz-neutral-bg)" stroke="var(--viz-output-stroke)" stroke-width="2" /><text x="792" y="299" text-anchor="middle" fill="var(--viz-output-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">streaming softmax update</text><text x="792" y="322" text-anchor="middle" fill="var(--c-text-soft)" font-family="Lato, sans-serif" font-size="12">mi, elli, ui -&gt; next tile</text>
+<text x="494" y="374" fill="var(--viz-output-stroke)" font-family="Lato, sans-serif" font-size="13" font-weight="700">Final write: Oi and row statistics; never S</text>
 </svg>
 </div>
-<figcaption><strong>Read it this way:</strong> the left grid is the score matrix the naive implementation would materialize. FlashAttention keeps one highlighted query-key tile in SRAM, streams the next K/V block from HBM, updates the running softmax state, and moves on. The full n&times;n matrix never needs a trip to HBM.</figcaption>
+<figcaption><strong>Read it this way:</strong> the left grid is conceptual, not a retained global matrix. A query block consumes key/value tiles, updating its maximum, denominator, and unnormalized numerator. After all allowed keys, divide numerator by denominator and write the output. Actual on-chip residency and saved statistics depend on the kernel version.</figcaption>
 </figure>
-
-The final O&#7522; is **exact** (mathematically identical to the standard implementation; no approximation). The n&times;n matrix S is never materialized; only two n-sized per-row vectors, (m, &#8467;), are saved for the backward pass.
-
-## Backward pass: trade memory for compute
-
-Standard backprop needs the attention matrix P stored from the forward pass, that's the O(n²) memory cost.
-
-FlashAttention discards P and recomputes the relevant tile S&#7522;&#11388; on the fly during backward, using the saved (m&#7522;, &#8467;&#7522;). Extra FLOPs spent recomputing attention are far cheaper than the HBM reads they save. **Memory drops from O(n²) to O(n).**
-
-This is the same idea as gradient checkpointing applied at kernel level.
 
 ## What an interviewer expects you to say
 
-If asked to explain FlashAttention:
+Report mathematical equivalence, numerical tolerance, arithmetic, auxiliary memory, traffic, and observed latency as distinct claims.
+Memory-boundedness depends on the actual shape, device, and implementation.
 
-1. Frame the problem as memory-bound, not compute-bound. The cost model then determines the design.
-2. Mention HBM vs SRAM and that the n&times;n attention matrix is the bottleneck.
-3. Describe tiling + streaming softmax + recomputation in backward.
-4. State the result: exact, 2-4&times; faster, O(n) memory.
-5. Bonus: mention FlashAttention-2 (better warp scheduling) and FlashAttention-3 (FP8 support, async overlap).
+At $n=8192$, $d=128$, the term ratio $n^2/(nd)=n/d=64$ compares tensor sizes only.
+It is not a measured traffic ratio or speedup.
 
-Explaining why streaming log-sum-exp works (numerical stability via running max) marks senior-level depth.
+The original normalized-output recurrence is an alternative state convention:
+
+```
+m_new = max(m_i, max(S_ij))
+ell_new = exp(m_i - m_new) * ell_i + sum(exp(S_ij - m_new))
+O_new   = (exp(m_i - m_new) * ell_i * O_i + exp(S_ij - m_new) @ V_j) / ell_new
+```
+
+Here $O_i$ is already normalized; multiplying by $\ell_i$ reconstructs its numerator before merging.
+Do not substitute unnormalized $u_i$ into that recurrence unchanged.
 
 ## Common confusions
 
-- **"FlashAttention is approximate."** No. It is **bit-exact** with standard attention (modulo floating-point reordering). The win is purely from I/O reduction.
-- **"It's a sub-quadratic attention algorithm."** No. The compute is still O(n²d). It's the *memory* that drops from O(n²) to O(n), and the *wall clock* improves because the operation was memory-bound. Sub-quadratic attention (BigBird, Linformer, LongNet) is a separate axis.
-- **"It only helps long sequences."** It helps any non-trivial sequence (n &geq; 256 or so), and the gain grows with n. At n = 64 it is similar to standard attention; at n = 8K-128K it can change what fits in memory.
-- **"It saves FLOPs."** No, it does *more* FLOPs in backward (the recomputation). The wins are I/O and memory.
+Mathematical equivalence does not imply identical floating-point bits or equal low-precision errors.
+Validate forward and backward against a stable reference across masks, extreme logits, and dtypes.
+Recomputation increases some arithmetic while removing stored intermediates.
 
 ## Why interviewers care
 
-Knowing FlashAttention shows you understand:
-1. GPU memory hierarchy and arithmetic intensity (what makes an op memory-bound vs compute-bound).
-2. The difference between exact and approximate optimization.
-3. The recompute-vs-store trade-off at kernel level (same logic as activation checkpointing).
-
-Foundational for large-model training/inference work. Explains KV-cache, paged attention, and inference optimization reasoning.
+FlashAttention-2 changes work partitioning; FlashAttention-3 adds hardware-oriented asynchrony and low-precision techniques.
+Check supported device, head dimensions, masks, and dtype in the version being deployed.
+Low-precision variants need their own error characterization.
 
 ## Reading list
 
 - *FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness* [(Dao et al., 2022)](https://arxiv.org/abs/2205.14135)
 - *FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning* [(Dao, 2023)](https://arxiv.org/abs/2307.08691)
 - *FlashAttention-3: Fast and Accurate Attention with Asynchrony and Low-precision* [(Shah et al., 2024)](https://arxiv.org/abs/2407.08608)
-- Tri Dao's blog posts, the clearest explanations of the algorithm
+- Tri Dao's implementation notes complement the papers; they are not a substitute for workload-specific measurements.
 
 ---
 
 *Related: [speculative decoding](/concepts/speculative-decoding/), [LayerNorm versus BatchNorm](/concepts/batchnorm-vs-layernorm/), and [production LLM inference design](/questions/design-production-llm-inference-service/).*
+
+</div>

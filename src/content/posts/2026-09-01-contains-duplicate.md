@@ -13,15 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep one entry per value when only equality matters. Retain positions or counts only when the question needs them.
+Determine whether a list contains equal values at two different input positions.
 
 ## Problem
 
-> Check whether any value appears more than once.
+**Input.** A list `nums` of hashable integers, possibly empty.
 
-Input is a list of hashable integers. Equal values at different indices count as duplicates, even when they are not adjacent.
+**Output.** Return `True` if any integer appears at least twice; otherwise return `False`.
 
-Return a Boolean without changing the list. Empty and singleton lists return `False`.
+**Rules.** Repeated values count even when their positions are not adjacent.
+Return existence, not a repeated value, its positions, or its number of occurrences.
+Leave the list unchanged. Empty and singleton lists return `False`.
+
+**Example.** `[1, 2, 3, 1]` returns `True` because positions 0 and 3 both contain 1.
+For `[1, 2, 3]`, return `False`.
 
 ## Picture
 

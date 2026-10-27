@@ -31,6 +31,7 @@ const visualAudit = getImplementedVisualAudit(slug);
 const learning = getLearningContext(slug);
 const hasExtension = rawContent.includes('data-learning-extension');
 const patternFirst = rawContent.includes('<!-- learning:core-end -->');
+const inlineVisual = patternFirst || category === 'questions';
 const coldPrompt = category === 'questions' ? getColdPrompt(rawContent) : undefined;
 
 const CATEGORY_META: Record<Category, { singular: string; plural: string }> = {
@@ -156,7 +157,7 @@ const fullContentLabel: Record<Category, string> = {
       {SITE.features.prepTools && category === 'questions' && <PracticeMode title={title} slug={slug} mode={practiceMode} prompt={coldPrompt} />}
 
       {visualAudit && (
-        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-inline-visual={patternFirst ? 'true' : undefined} hidden={patternFirst} data-pagefind-ignore="all">
+        <div data-article-quick-review data-visual-id={visualAudit.visualIds[0]} data-inline-visual={inlineVisual ? 'true' : undefined} hidden={inlineVisual} data-pagefind-ignore="all">
           <VisualReviewCard
             id="quick-review"
             eyebrow={quickReviewLabel[category]}

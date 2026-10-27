@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Find a target in a sorted array, or return -1.
-One middle comparison rules out a whole side because the values are ordered.
+Find the position of a requested integer in a sorted list, or report that it is absent.
 
 ## Problem
 
-Search `[-9, -3, 0, 4, 7, 11, 18, 25]` for 11; return index 5.
-Require nondecreasing integer values and random access. Empty arrays or absent targets return -1.
-Duplicates may return **any matching index**, not necessarily the first.
+**Input.** A random-access list `nums` of integers in nondecreasing order and an integer `target`.
+
+**Output.** Return a zero-based index whose value equals `target`, or `-1` if no such index exists.
+
+**Rules.** Do not modify the list. Empty input returns `-1`.
+Duplicates are allowed; any matching index is valid, not necessarily the first.
+An unsorted list is outside the contract.
+
+**Example.** In `[-9, -3, 0, 4, 7, 11, 18, 25]`, target `11` returns `5`.
+Target `12` returns `-1`. For `[2, 2, 2]` and target `2`, any index from 0 through 2 is valid.
 
 ## Picture: Preserve the Inclusive Candidate Interval
 

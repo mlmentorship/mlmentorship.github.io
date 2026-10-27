@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Pushing a node postpones its emission. Popping it emits the next value in the BST's sorted order.
+Return the value at a requested ascending rank in a binary search tree.
 
 ## Problem
 
-> Return the `k`th smallest tree value.
+**Input.** The root of a finite strict binary search tree and a one-based integer rank `k`.
 
-Assume a finite strict BST with no cycles or shared children. The integer rank is one-based; duplicate values are excluded.
+**Output.** Return the `k`th smallest stored value, not the node object or its depth.
+
+**Rules.** Every left descendant is smaller than its ancestor; every right descendant is larger.
+Values are distinct, and there are no cycles or shared children.
+Require `1 <= k <=` the node count. Leave all nodes and links unchanged.
+
+**Example.** A tree with root 3, left child 1, right child 4, and `1.right = 2` has values `[1, 2, 3, 4]`.
+For `k = 2`, return `2`.
 
 ## Picture
 

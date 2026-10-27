@@ -1,6 +1,6 @@
 ---
 title: "Linear regression"
-description: "Predict a continuous target as a linear combination of features by minimizing squared error. Closed-form solution, MLE under Gaussian noise, and the foundation everything else builds on."
+description: "Fit an affine prediction by squared residuals, verify its projection, and separate solver, sampling, penalty, and variance assumptions."
 date: "2025-09-18"
 draft: false
 tags: ["concepts"]
@@ -9,25 +9,29 @@ category: "concepts"
 
 ## Summary
 
-Linear regression models $y = w^\top x + b + \varepsilon$ with $\varepsilon \sim \mathcal{N}(0, \sigma^2)$. The MLE / least-squares estimator is
-
-$$
-\hat w = (X^\top X)^{-1} X^\top y.
-$$
-
-Linear regression is the most-analyzed model in statistics and the building block for almost everything: GLMs, kernel ridge regression, MLP last layers, factor models. Knowing its assumptions and failure modes is essential. If you don't know when OLS is wrong, you don't know when fancier models help.
+Ordinary least squares chooses linear predictions that minimize squared residuals.
+Its fitted vector is the orthogonal projection of observed responses onto the design matrix's column space.
+This deterministic optimization problem does not require Gaussian noise; sampling assumptions justify additional statistical claims.
 
 ## Ordinary least squares (OLS)
 
-Loss: $L(w, b) = \sum_i (y_i - w^\top x_i - b)^2 = \|y - Xw\|^2$ (absorb $b$ into $w$ by adding a column of 1s).
+Put observations in rows of $X$ and include a ones column if fitting an intercept.
+With coefficient vector $\beta$, minimize $L=\|y-X\beta\|_2^2$.
+Differentiating gives $\nabla_\beta L=-2X^\top(y-X\beta)$, so stationarity means $X^\top r=0$.
 
-Closed-form minimizer (when $X^\top X$ is invertible):
+For full column rank, the unique coefficient vector is
 
 $$
-\hat w = (X^\top X)^{-1} X^\top y.
+\widehat\beta=(X^\top X)^{-1}X^\top y.
 $$
 
-This is the **normal equations** solution. Derived by setting $\nabla_w L = 0$.
+The fitted vector remains unique without full column rank, but coefficients need not be.
+An SVD pseudoinverse selects the minimum-Euclidean-norm coefficient solution.
+
+Take $x=(0,1,2)$ and $y=(1,2,2)$, with design rows $(1,x_i)$.
+Then $X^\top X=\left[\begin{smallmatrix}3&3\\3&5\end{smallmatrix}\right]$ and $X^\top y=(5,6)^\top$.
+Solving gives intercept $7/6$, slope $1/2$, and predictions $(7/6,5/3,13/6)$.
+Residuals $(-1/6,1/3,-1/6)$ sum to zero, as does their dot product with $x$; SSE is $1/6$.
 
 <!-- visual:ols-orthogonal-projection -->
 <figure class="learning-figure" aria-labelledby="ols-projection-title">
@@ -65,57 +69,87 @@ This is the **normal equations** solution. Derived by setting $\nabla_w L = 0$.
 			<text class="viz-callout" x="265" y="257" text-anchor="middle">X^T r = 0</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> every coefficient vector produces a fitted vector inside Col(X). OLS chooses the point y_hat closest to the observed y, so the leftover residual meets that space at a right angle. Writing that orthogonality as X<sup>T</sup>(y - Xw_hat) = 0 gives the normal equations. This is the geometry of the solution, not advice to form an inverse numerically: use QR or SVD as described below. Original schematic checked against <a href="https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/positive-definite-matrices-and-applications/orthogonal-projections-and-their-applications/">MIT OpenCourseWare's projection notes</a> and the <a href="https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm">NIST least-squares handbook</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> fitted responses lie in Col(X), an observation-space subspace. The closest fit leaves a perpendicular residual, giving X<sup>T</sup>r = 0. The picture is not a feature-scatter plot or advice to form an inverse. Use QR or SVD numerically. Original schematic follows <a href="https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/positive-definite-matrices-and-applications/orthogonal-projections-and-their-applications/">MIT's projection notes</a> and the <a href="https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm">NIST least-squares handbook</a>.</figcaption>
 </figure>
 
-Numerically, never compute it that way. Use:
+The inverse expression identifies a solution; it is not the preferred numerical algorithm.
 
-- **QR decomposition**: $X = QR$ then $\hat w = R^{-1} Q^\top y$. Stable.
-- **SVD**: works even when $X^\top X$ is singular (gives minimum-norm solution).
-- **Gradient descent**: for huge $n$ where matrix factorization doesn't fit.
+- **QR:** for full column rank, solve triangular $R\widehat\beta=Q^\top y$ without forming an inverse.
+- **SVD:** handles rank deficiency with a declared numerical rank threshold.
+- **Gradient methods:** useful when factorization costs exceed the available resources; stopping accuracy remains part of the contract.
 
 ## Probabilistic interpretation
 
-OLS is MLE for $y \mid x \sim \mathcal{N}(w^\top x, \sigma^2)$. The Gaussian-noise assumption is what motivates the squared-error loss; if errors are heavy-tailed, OLS is no longer optimal (consider Huber loss or quantile regression).
+Independent conditional Gaussian errors with a common variance make OLS a maximum-likelihood coefficient estimate.
+Other error models can change efficiency, robustness, or interval calculations without changing the definition of least squares.
 
 ## Ridge and lasso
 
-When $X^\top X$ is ill-conditioned (collinear features, $p > n$), OLS variance explodes. Add regularization:
+Regularization changes the objective rather than merely stabilizing an otherwise identical estimator.
 
 | Method | Penalty | Effect |
 |--------|---------|--------|
-| **Ridge** (L2) | $\lambda \|w\|_2^2$ | Shrinks all coefficients toward 0; closed form: $\hat w = (X^\top X + \lambda I)^{-1} X^\top y$ |
-| **Lasso** (L1) | $\lambda \|w\|_1$ | Drives some coefficients to exactly 0 (sparsity); no closed form (use coordinate descent / proximal gradient) |
-| **Elastic net** | both | Combines sparsity with grouping |
+| **Ridge** (L2) | $\lambda\|w\|_2^2$ | Shrinks singular-direction coefficients; solve the modified linear system |
+| **Lasso** (L1) | $\lambda\|w\|_1$ | Can produce exact zeros; use an appropriate convex solver |
+| **Elastic net** | Both | Combines quadratic and absolute-value penalties |
 
-Ridge is the default for prediction; lasso for variable selection or interpretability.
+### Penalize Only the Slope
+
+**New task:** Add slope penalty $\lambda w^2$ with $\lambda=1$, leaving the intercept unpenalized.
+
+**Picture and change:** Add $\operatorname{diag}(0,1)$ to the fixture's normal-equation matrix.
+
+**Check:** Coefficients become $(4/3,1/3)$; the penalized slope no longer requires ordinary residual orthogonality.
+
+**Use when:** A justified bias-variance trade-off favors shrinkage; coefficient sparsity alone does not establish causal importance.
+
+### Weight by Precision
+
+**New task:** Give the middle observation one-quarter the noise variance of the others.
+
+**Picture and change:** Set $W=\operatorname{diag}(1,4,1)$ and solve $X^\top WX\widehat\beta=X^\top Wy$.
+
+**Check:** Coefficients become $(4/3,1/2)$, satisfying $X^\top Wr=0$ rather than ordinary orthogonality.
+
+**Use when:** Positive observation variances are known or defensibly estimated; the weighted inner product changes the projection.
 
 ## Assumptions and diagnostics
 
-The classical OLS assumptions:
-
-1. **Linearity**: $\mathbb{E}[y \mid x]$ is linear in $x$.
-2. **Independence**: residuals are independent.
-3. **Homoskedasticity**: residual variance is constant.
-4. **Normality**: residuals are normally distributed (only matters for inference, not for prediction).
-
-Check by plotting residuals: vs. predicted (linearity, homoskedasticity), vs. each feature (linearity), QQ plot (normality), Durbin-Watson (independence in time series).
+Separate conditional mean specification, error covariance, and distributional assumptions.
+Residual plots against predictions/features can suggest misspecification or unequal variance; time plots can reveal dependence.
+QQ plots assess distributional shape but do not prove exogeneity or independence.
 
 ## Gauss–Markov theorem
 
-Under the first three assumptions (with finite variance), OLS is the **B**est **L**inear **U**nbiased **E**stimator (BLUE). Minimum variance among all linear unbiased estimators. Note: biased estimators (ridge) can do better in MSE.
+For full-column-rank fixed $X$, require $E[\varepsilon\mid X]=0$ and $\operatorname{Cov}(\varepsilon\mid X)=\sigma^2I$ with finite variance.
+Then OLS has minimum conditional covariance among linear unbiased coefficient estimators: BLUE.
+Normality is unnecessary for this theorem; it supports additional exact Gaussian-model inference.
+Biased estimators can have smaller mean squared error.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## When to use vs. alternatives
 
-- **Linear is enough**: low-dimensional clean data, interpretability needed.
-- **Non-linear**: add basis functions (polynomial features), kernels (kernel ridge regression), or use trees / neural nets.
-- **Heavy-tailed errors**: Huber regression, quantile regression.
-- **Many irrelevant features**: lasso or elastic net.
-- **Hierarchical / clustered data**: mixed-effects (linear mixed model).
+- **Nonlinear mean:** justify basis functions, kernels, trees, or neural networks against held-out objectives.
+- **Heavy tails/outliers:** compare robust losses; quantile regression targets a conditional quantile, not automatically the conditional mean.
+- **Dependent observations:** consider covariance-aware estimation or hierarchical models and suitable inference.
+- **Variable selection:** evaluate lasso or elastic net without treating selected features as automatically causal.
 
 ## Common pitfalls
 
-- **Inverting $X^\top X$ directly.** Use QR / SVD; the inverse is numerically unstable and ridge-style regularization is often needed.
-- **Including highly collinear features without regularization.** Coefficients become unstable and uninterpretable; drop one or use ridge.
-- **Reporting $R^2$ on training data and calling it generalization.** Use cross-validated $R^2$.
-- **Confusing prediction intervals with confidence intervals.** Confidence intervals cover the *mean*; prediction intervals cover individual outcomes (much wider).
+- **Unidentified coefficients.** Duplicate columns permit offsetting coefficient changes without changing any fitted response.
+- **Training-score claims.** Evaluate generalization with a split matching the sampling and deployment process.
+- **Interval confusion.** Mean confidence intervals and individual prediction intervals target different quantities; the latter include observation noise.
+
+## Reconstruct
+
+<details>
+<summary>If the observed vector is already in Col(X), what does the projection prove?</summary>
+
+The fit has zero residual and zero training SSE.
+This does not prove zero future error, correct sampling assumptions, or a causal coefficient interpretation.
+
+</details>
+
+</div>

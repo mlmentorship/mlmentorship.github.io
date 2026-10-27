@@ -7,9 +7,18 @@ tags: ["questions"]
 category: "questions"
 ---
 
-A paper critique connects a specific claim to evidence and a test that could change the conclusion.
+Assess an ML paper's central claim by identifying what its reported experiment establishes and which alternative explanation remains unresolved.
 
 ## Problem
+
+**Context.** You have ten minutes and only an abstract, method figure, and main table from a hypothetical routing paper.
+The table reports accuracy and total tuning/training cost for two recipes.
+
+**Task.** Separate the empirical observation from the mechanism and efficiency claims, then propose one feasible deciding experiment.
+Explain how its possible outcomes would change your conclusion.
+
+**Constraints.** Do not invent missing implementation details, variance estimates, datasets, or unpublished results.
+Account for unequal resource budgets and distinguish absence of evidence from evidence that the mechanism cannot work.
 
 You have ten minutes to inspect an abstract, method figure and main result table.
 An explicitly hypothetical paper claims: “Our routing mechanism improves accuracy efficiently.”
@@ -27,6 +36,8 @@ Do not assume anything else about the unpublished method or evaluation.
 The reported four-percentage-point gain is a real strength within this hypothetical table.
 But routing and resource advantage changed together.
 Matched resources could distinguish a resource-only explanation from a gain that survives the comparison.
+
+<p class="visual-title">Does the gain survive matched compute?</p>
 
 <!-- visual:paper-critique-prioritization-funnel -->
 ```mermaid

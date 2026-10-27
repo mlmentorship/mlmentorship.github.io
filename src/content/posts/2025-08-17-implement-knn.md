@@ -10,7 +10,19 @@ category: "questions"
 
 > *Asked in: coding round at recsys, search, and embedding-team interviews.*
 
-The L4 candidate writes the brute-force version. The L6 candidate names the regimes (small N, medium N, large N) and the right algorithm for each.
+Find the nearest reference vectors to each query and explain how the search should scale as the collection grows.
+
+## Problem
+
+**Context.** Reference vectors `X` have shape `(N, d)`; a query has shape `(d,)`, or batched queries have shape `(Q, d)`.
+Distance is Euclidean distance over matching numeric features.
+
+**Task.** Return `k` original reference-row indices per query with the smallest distances, then compare exact and approximate scaling options.
+For reference points `[[0, 0], [3, 0], [8, 0]]`, query `[2, 0]`, and `k = 1`, return index `1`.
+
+**Constraints.** The provided partition-based sketches assume finite, representable arithmetic and `1 <= k < N`.
+The selected indices need not be distance-sorted; ties may select any valid neighbors.
+Preserve inputs. Approximate search requires an explicit recall target and comparison against exact ground truth.
 
 ## The naive solution
 

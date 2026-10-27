@@ -9,7 +9,19 @@ category: "questions"
 
 > Implement a scalar `Value` type supporting addition, multiplication, powers, tanh, and `backward()`.
 
-The key is gradient accumulation on a directed acyclic computation graph. Backprop is not recursive symbolic differentiation. Each operation records its parents and a local backward function; one reverse topological pass composes those local derivatives.
+Implement scalar automatic differentiation and verify gradients when an intermediate value contributes through more than one path.
+
+## Problem
+
+**Context.** A scalar `Value` stores a numeric result and participates in a finite directed acyclic computation graph.
+Required operations are addition, multiplication, constant powers, tanh, and a scalar-output `backward()` call.
+
+**Task.** Produce correct forward values and input gradients, including repeated operands and shared intermediate nodes.
+For `loss = x * x + x` at `x = 2`, the loss is 6 and the gradient is 5.
+
+**Constraints.** Accumulate every path's contribution rather than overwriting gradients.
+State how gradients are initialized or reset between backward calls, and constrain powers to their differentiable numeric domain.
+The operation snippets below illustrate parts of the implementation, not a complete general-purpose tensor engine.
 
 ## Build graph nodes during the forward pass
 

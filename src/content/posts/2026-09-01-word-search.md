@@ -13,14 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Mark a cell only while its candidate path is active, then restore it so other paths can use it.
+Determine whether a word can be spelled along a nonrepeating orthogonal path through a letter board.
 
 ## Problem
 
-Find `ABCCED` in the board `ABCE / SFCS / ADEE` using up, down, left or right moves.
-A candidate cannot reuse a coordinate; different candidates may reuse it.
-The reference expects independent mutable rows, a rectangular board and single-character cells, with `#` excluded from board and word.
-An empty word succeeds even on an empty board.
+**Input.** A rectangular `board` of independent mutable single-character rows and a string `word`.
+
+**Output.** Return `True` if some allowed path spells the complete word; otherwise return `False`.
+
+**Rules.** Consecutive characters must use up, down, left, or right neighbors, never diagonal neighbors.
+A path cannot reuse a coordinate; different candidates may reuse cells.
+Exclude `#` from board and word. The reference restores the board on normal return.
+An empty word succeeds even on an empty board; a nonempty word fails on an empty board.
+
+**Example.** Rows `"ABCE"`, `"SFCS"`, `"ADEE"` contain a path spelling `"ABCCED"`, so return `True`.
+The same board returns `False` for `"ABCB"` because the only candidate would need to reuse its B cell.
 
 ## Picture
 

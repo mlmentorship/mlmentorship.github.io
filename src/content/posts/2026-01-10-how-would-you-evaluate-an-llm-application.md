@@ -8,9 +8,18 @@ category: "questions"
 ---
 
 
-Evaluate the user's task and unacceptable failures before choosing scorers, then connect offline evidence to product outcomes.
+Define an LLM application's release decision using task success, unacceptable failures, cost, and representative evidence.
 
 ## Problem
+
+**Context.** A document-answering application is assessed on held-out questions for valid citations and substantive source support.
+The invented counts and a predeclared joint-quality floor appear below.
+
+**Task.** Report each quality dimension, their intersection, cost, uncertainty, and the gate decision.
+Describe follow-up evaluation and online evidence needed before claiming product improvement.
+
+**Constraints.** Both quality requirements must hold on the same answer.
+Do not substitute citation validity for factual support or treat a small observed pass rate as a population guarantee.
 
 For 20 hypothetical held-out document questions, 18 answers cite valid IDs and 14 have independently human-reviewed substantive support.
 Thirteen satisfy both requirements; total cost is $0.40.
@@ -26,27 +35,39 @@ Five answers pass citation validation alone, one passes support alone, and one p
 <p class="visual-title">Eighteen valid citation IDs and 14 supported answers yield 13 jointly valid answers.</p>
 
 <!-- visual:llm-eval-calibration-loop -->
-```mermaid
-flowchart TB
-	accTitle: LLM application evaluation as a human-grounded calibration loop
-	accDescr: The hypothetical fixture contains 20 held-out questions. Eighteen answers have valid citation IDs, fourteen have human-reviewed semantic support and thirteen pass both requirements. The joint observed score is 65 percent, below its predeclared 70 percent floor. Humans validate the rubric and scalable scorers. Cost, latency, uncertainty and consequential slices remain separate report fields. Production task outcomes test whether offline results predict useful behavior; failures trigger new development cases and independent confirmation, not silent reuse of the same final set.
-	A["1 · Product contract<br/>valid citation AND supported answer"] --> B["2 · Version held-out cases<br/>20 questions + known slices"]
-	B --> C["3 · Humans apply an explicit rubric<br/>resolve disagreement · preserve labels"]
-	C --> D["4 · Validate scalable scorers<br/>closed tasks: deterministic checks<br/>open tasks: bias-tested LLM judge"]
-	D --> E["5 · Joint gate<br/>13/20 = 65%; required 70%<br/>cost + latency + uncertainty"]
-	E --> F["6 · Observe production<br/>task outcomes · guardrails · drift"]
-	F --> G{"Do offline trends<br/>predict production?"}
-	G ==>|"yes"| H["Continue monitoring<br/>keep the eval versioned"]
-	G -. "no · drift or new failure" .-> I["Refresh cases + rubric<br/>recalibrate scorers"]
-	I -. "rerun" .-> B
-	class A,B viz-input
-	class C,D viz-focus
-	class E viz-state
-	class F,H viz-output
-	class G,I viz-warning
-	class A viz-tall
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> keep hard-check validity and human-reviewed support separate before applying their joint gate. Offline success still needs confirmation against the product outcome.</p>
+<figure class="learning-figure" aria-labelledby="joint-eval-visual-title">
+	<h3 class="visual-title" id="joint-eval-visual-title">The same answer must pass both checks</h3>
+	<svg viewBox="0 0 600 540" role="img" aria-labelledby="joint-eval-chart-title joint-eval-chart-desc" style="width: 100%; min-width: 0; height: auto;">
+		<title id="joint-eval-chart-title">Thirteen joint passes fail the seventy-percent release floor</title>
+		<desc id="joint-eval-chart-desc">Each of twenty tiles represents one hypothetical answer, grouped in one possible ordering. Thirteen tiles marked VS pass citation validity and support. Five marked V pass citation validity only, one marked S passes support only, and one dash passes neither. Thus eighteen pass validity, fourteen pass support, but only thirteen of twenty, or 65%, pass both. The joint-rate bar stops before the required 70% marker. Hold this candidate; the existing production version remains unchanged. Repair on development cases and use fresh independent confirmation.</desc>
+		<g fill="var(--c-text)" font-family="var(--font-ui)" font-size="24">
+			<text x="40" y="30" font-weight="650">20 hypothetical answers; one tile each</text>
+			<g data-eval-status="both" fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)">
+				<rect x="40" y="68" width="44" height="42"/><rect x="92" y="68" width="44" height="42"/><rect x="144" y="68" width="44" height="42"/><rect x="196" y="68" width="44" height="42"/><rect x="248" y="68" width="44" height="42"/>
+				<rect x="300" y="68" width="44" height="42"/><rect x="352" y="68" width="44" height="42"/><rect x="404" y="68" width="44" height="42"/><rect x="456" y="68" width="44" height="42"/><rect x="508" y="68" width="44" height="42"/>
+				<rect x="40" y="122" width="44" height="42"/><rect x="92" y="122" width="44" height="42"/><rect x="144" y="122" width="44" height="42"/>
+			</g>
+			<g data-eval-status="citation-only" fill="var(--viz-input-bg)" stroke="var(--viz-input-stroke)"><rect x="196" y="122" width="44" height="42"/><rect x="248" y="122" width="44" height="42"/><rect x="300" y="122" width="44" height="42"/><rect x="352" y="122" width="44" height="42"/><rect x="404" y="122" width="44" height="42"/></g>
+			<g data-eval-status="support-only" fill="var(--viz-state-bg)" stroke="var(--viz-state-stroke)"><rect x="456" y="122" width="44" height="42"/></g>
+			<g data-eval-status="neither" fill="var(--viz-warning-bg)" stroke="var(--viz-warning-stroke)"><rect x="508" y="122" width="44" height="42"/></g>
+			<g font-size="20" text-anchor="middle">
+				<text x="62" y="95">VS</text><text x="114" y="95">VS</text><text x="166" y="95">VS</text><text x="218" y="95">VS</text><text x="270" y="95">VS</text><text x="322" y="95">VS</text><text x="374" y="95">VS</text><text x="426" y="95">VS</text><text x="478" y="95">VS</text><text x="530" y="95">VS</text>
+				<text x="62" y="149">VS</text><text x="114" y="149">VS</text><text x="166" y="149">VS</text><text x="218" y="149">V</text><text x="270" y="149">V</text><text x="322" y="149">V</text><text x="374" y="149">V</text><text x="426" y="149">V</text><text x="478" y="149">S</text><text x="530" y="149">-</text>
+			</g>
+			<text x="40" y="207" font-size="22">VS: 13 pass both</text><text x="320" y="207" font-size="22">V: 5 citation only</text>
+			<text x="40" y="241" font-size="22">S: 1 support only</text><text x="320" y="241" font-size="22">-: 1 passes neither</text>
+			<text x="40" y="282" font-weight="650">Joint pass rate</text>
+			<rect x="40" y="304" width="520" height="32" fill="var(--viz-neutral-bg)" stroke="var(--viz-edge)"/>
+			<rect data-eval-passes="13" data-eval-total="20" x="40" y="304" width="338" height="32" fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)"/>
+			<path data-eval-floor="0.7" d="M404 292V352" stroke="var(--viz-warning-stroke)" stroke-width="3"/>
+			<text x="378" y="374" text-anchor="end">65% observed</text><text x="404" y="402" font-size="22">70% floor</text>
+			<text data-eval-decision="hold" x="40" y="446" font-size="28" font-weight="650">HOLD this candidate</text>
+			<text x="40" y="482" font-size="22">Existing production stays unchanged.</text>
+			<text x="40" y="518" font-size="22">Repair, then confirm on fresh cases.</text>
+		</g>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> count answers passing both requirements, not their average or union. Thirteen of twenty fails the 70% observed floor. Monitoring the existing production version does not authorize releasing this candidate.</figcaption>
+</figure>
 <p class="diagram-source">References: <a href="https://arxiv.org/abs/2306.05685">LLM-as-judge study</a>, <a href="https://developers.openai.com/api/docs/guides/evaluation-best-practices">OpenAI evaluation guidance</a>, and <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
 
 ## Report the joint outcome

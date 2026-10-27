@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Preorder chooses the next root. Inorder tells which values belong to that root's left and right subtrees.
+Reconstruct the unique binary tree described by compatible preorder and inorder traversals with distinct values.
 
 ## Problem
 
-> Rebuild a binary tree from its preorder and inorder value lists. Values are unique.
+**Input.** Two integer lists, `preorder` and `inorder`, describing the same finite binary tree with unique values.
 
-The reference assumes compatible traversals of the same finite integer-valued tree. The tree need not be a BST.
+**Output.** Return the root of a newly allocated tree with exactly those traversals.
 
-For valid empty traversals, return `None`. For nonempty input, create a new node for every value without modifying either list.
+**Rules.** Preorder visits root, left subtree, then right subtree.
+Inorder visits left subtree, root, then right subtree.
+The tree need not be a BST. Assume compatible inputs; leave both lists unchanged.
+Two empty lists return `None`. Every nonempty result node must be newly created.
+
+**Example.** Preorder `[3, 9, 20, 15, 7]` and inorder `[9, 3, 15, 20, 7]` reconstruct root 3.
+Its children are 9 and 20; node 20 has children 15 and 7.
 
 ## Picture
 

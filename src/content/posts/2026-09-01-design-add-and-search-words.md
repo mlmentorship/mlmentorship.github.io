@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Each dot branches over one character edge; success still requires a complete stored word at the query's exact length.
+Maintain a word collection that supports insertion and whole-word searches containing single-character wildcards.
 
 ## Problem
 
-Store `bat`, `dad`, `mad`; search `.ad`.
-The dot matches one character, so `dad` and `mad` qualify.
-Query `.a` fails despite valid prefixes.
-Repeated insertion is idempotent.
+**Input.** A sequence of calls to `add_word(word)` and `search(pattern)` on an initially empty `WordDictionary`.
+
+**Output.** Insertion stores the word; each search returns whether any stored word matches the complete pattern.
+
+**Rules.** A dot in a search pattern matches exactly one character, not zero or several.
+All other pattern characters match literally. A matching prefix alone is insufficient.
+Repeated insertion is idempotent. An empty pattern matches only an explicitly inserted empty word.
+
+**Example.** After inserting `"bat"`, `"dad"`, and `"mad"`, searching `".ad"` returns `True`.
+Searching `".a"` returns `False` because it has length two, while all stored words have length three.
 
 ## Picture
 

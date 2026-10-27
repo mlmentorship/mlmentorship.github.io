@@ -1,6 +1,6 @@
 ---
 title: "RAG: retrieval-augmented generation"
-description: "The standard pattern for grounding LLMs in your own data. Reference page; the full essay is linked at the bottom."
+description: "Trace an authorized, versioned passage from corpus to answer, then distinguish citation existence from actual claim support."
 date: "2025-09-02"
 draft: false
 tags: ["concepts"]
@@ -10,23 +10,32 @@ category: "concepts"
 
 ## Summary
 
-RAG augments an LLM's input with relevant documents retrieved from an external corpus, so the model can answer questions about content it wasn't trained on (or content that changes after training).
-
-The default LLM has two problems for any production application: (1) it doesn't know your private data, and (2) what it does know becomes stale. RAG solves both by separating "knowledge" (retrieval over a corpus you control) from "reasoning" (the LLM acts as a fluent answerer over retrieved facts).
-
-In 2026, RAG is the dominant production pattern for LLM-backed Q&A, agents, search, and customer support.
+Retrieval-augmented generation supplies external evidence as model context without requiring that evidence to be stored in model weights.
+Success requires authorized evidence to survive retrieval and selection, then support the actual response claims.
+A resolving citation alone proves neither support nor truth.
 
 ## The architecture
 
-A production RAG system has roughly seven components:
+Offline, parse documents into chunks while retaining source IDs, versions, boundaries, and access metadata.
+Build the chosen indexes and update or delete entries when their sources change.
+Keep each plan name and retention value together; preserve heading or neighbor references when splitting would separate them.
 
-1. **Document ingestion and chunking**: parse and split source documents.
-2. **Embedding and indexing**: compute dense vectors, store in vector DB.
-3. **Lexical index**: BM25 or similar over the same chunks.
-4. **Query understanding**: rewrite, expand, or decompose the user query.
-5. **Hybrid retrieval**: run dense + lexical, fuse results.
-6. **Reranking**: cross-encoder reorders the top ~100 candidates to top ~5-10.
-7. **Generation**: LLM with retrieved chunks in context, instructed to cite sources.
+Online, apply the requester's access policy, retrieve a bounded candidate set, select bounded context, and generate claim-linked citations.
+The pictured hybrid retrieval and reranking are possible choices, not mandatory stages for every corpus or latency budget.
+Query rewriting can also change intent, so evaluate it rather than assuming improvement.
+
+For a hypothetical fully authorized corpus:
+
+| Passage | Version | Text |
+|---------|---------|------|
+| P1 | v1 | Plan A retains logs for seven days. |
+| P2 | v1 | Plan B retains logs for thirty days. |
+
+Ask about plan B, with candidate limit two and context limit one.
+Retrieval returns P1/P2; selection retains P2 with its version and an allowed access decision.
+The answer "thirty days" linked to P2 follows the evidence path.
+A seven-day answer citing P2 resolves to an existing passage but fails support.
+If P2 never enters the candidate set, merely reranking P1 cannot recover it.
 
 <!-- visual:rag-index-request-paths -->
 <figure class="learning-figure" aria-labelledby="rag-paths-title">
@@ -36,82 +45,83 @@ A production RAG system has roughly seven components:
 		<section class="visual-panel">
 			<h4>1 · OFFLINE: PREPARE KNOWLEDGE</h4>
 			<p><strong>Source documents</strong><br />Parse and split into citable chunks.</p>
-			<p><strong>Same chunks, two indexes</strong><br />Dense vectors preserve semantic similarity; a lexical index preserves exact terms.</p>
+			<p><strong>Same chunks, two indexes</strong><br />Dense similarity and lexical terms supply different matching signals.</p>
 			<p><strong>Refresh on change</strong><br />Update the indexes when the corpus changes, without retraining the LLM.</p>
 		</section>
 		<section class="visual-panel">
 			<h4>2 · ONLINE: ANSWER THIS REQUEST</h4>
-			<p><strong>User query → understand</strong><br />Rewrite, expand, or decompose the request.</p>
+			<p><strong>User query → understand</strong><br />Preserve intent; optionally rewrite, expand, or decompose.</p>
 			<p><strong>Both indexes → retrieve and fuse</strong><br />Keep a broad candidate pool from complementary signals.</p>
 			<p><strong>Candidates → rerank</strong><br />Spend the slower query-passage model on the bounded pool and retain a small evidence set.</p>
 			<p><strong>Evidence + query → generate</strong><br />The LLM answers from the selected chunks and cites them.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> build the corpus path before requests arrive, then follow one query down the request path. The two indexes meet only at retrieval; reranking narrows their fused candidates before the LLM sees evidence. Updating knowledge changes the indexes, not the model weights. Original schematic checked against <a href="https://arxiv.org/abs/2005.11401">Lewis et al. (2020)</a>, <a href="https://aclanthology.org/2020.emnlp-main.550/">Karpukhin et al. (2020)</a>, and <a href="https://arxiv.org/abs/1901.04085">Nogueira and Cho (2019)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> prepare versioned chunks offline, then follow one authorized request through candidate and context selection. This hybrid example uses both indexes and a reranker; other evidence pipelines can omit those optional stages. Updating corpus evidence need not retrain model weights. Original schematic follows <a href="https://arxiv.org/abs/2005.11401">Lewis et al.</a>, <a href="https://aclanthology.org/2020.emnlp-main.550/">Karpukhin et al.</a>, and <a href="https://arxiv.org/abs/1901.04085">Nogueira and Cho</a>.</figcaption>
 </figure>
 
-Skipping any of 4-6 is typically why RAG systems underperform.
+### Change Matching Needs
+
+**New task:** Retrieve both exact error identifiers and paraphrased descriptions.
+
+**Picture and change:** Compare lexical and dense candidate sets, then fuse deduplicated document identities with their provenance.
+Tune candidates, fusion, and limits on development queries, not the final test set.
+
+**Check:** A lexical `ERR-42` match remains eligible rather than being vetoed solely by a low dense score.
+Inspect whether subsequent candidate/context cutoffs retain its supporting passage.
+
+**Use when:** Query slices need complementary matching signals, rather than a universally mandated hybrid pipeline.
+
+### Change Evidence Availability
+
+**New task:** The authorized corpus lacks the answer.
+
+**Picture and change:** Return the defined no-evidence or partial-answer outcome instead of inventing a supporting passage.
+
+**Check:** Neither P1 nor P2 supports a claim about plan C.
+
+**Use when:** Coverage or authorization prevents a grounded answer.
+
+Measure retrieval coverage at the actual candidate limit separately from context support, answer correctness, citation resolution, and abstention behavior.
+Use judged query slices and report denominators; first-hit utility and relevant-passage coverage are distinct targets.
+Time and cost budgets must include retrieval, selection, generation, and any verification actually used.
+
+Revoking access or deleting a document must invalidate old index entries and context caches before serving its text again.
+Preserve source/version IDs through citations and recheck request authorization; a cached passage is not a permanent access grant.
+Retrieved instructions are untrusted data, not policy.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## What an interviewer expects you to say
 
-If asked "design a RAG system":
-
-1. Frame the problem (knowledge separation, freshness).
-2. Describe the 7-component architecture (or a defensible variant).
-3. Mention hybrid retrieval (dense + lexical).
-4. Mention reranking as a separate stage, the highest-leverage quality lever.
-5. Mention query understanding (HyDE, decomposition, rewriting).
-6. Discuss eval: separate retrieval metrics (hit rate at K, MRR) from generation metrics (faithfulness, citation accuracy).
-7. Discuss failure modes: retrieval misses, hallucinated citations, stale index.
+Explain one request's evidence path, access decision, limits, and unsupported-answer outcome before discussing optional components.
 
 ## Common confusions
 
-- **"RAG is just embedding + LLM."** That's the toy version. Production RAG involves chunking strategy, hybrid retrieval, reranking, query understanding, and verification.
-- **"Better embeddings solve RAG."** The differences between modern embedding models are small (a few percentage points). The differences between embedding-only and embedding + reranking are huge (10-15pp).
-- **"RAG eliminates hallucinations."** It reduces them for facts in the corpus. Hallucinations of facts *not* in the corpus are unaffected. Out-of-distribution queries can still hallucinate.
-- **"Just stuff everything into the prompt."** Long contexts have well-documented "lost in the middle" issues; even modern long-context models lose track of mid-context information. Curated top-K beats stuffed context.
+Evidence availability does not guarantee evidence use, correct reasoning, or faithful citations.
+Embedding changes, reranking, and context selection need workload-specific evaluation, not fixed percentage-point promises.
 
 ## Failure modes (in frequency order)
 
-1. **Retrieval is bad and team doesn't realize.** They evaluate end-to-end and try to fix it with prompt engineering. **Fix**: separately evaluate retrieval.
-2. **Chunk size wrong.** Default 512 used everywhere. **Fix**: tune empirically.
-3. **No reranker.** Pure bi-encoder retrieval. **Fix**: add Cohere Rerank or BGE Reranker; usually a one-day 10pp improvement.
-4. **No lexical retrieval.** Embeddings only fail on exact-match queries. **Fix**: hybrid with BM25.
-5. **Eval set doesn't reflect real queries.** Hand-crafted Q&A pairs don't match production. **Fix**: build eval from production samples.
-6. **Citations don't actually verify.** Model cites passages that don't support the claim. **Fix**: add citation-verification step.
-7. **Stale index.** Documents change; index doesn't. **Fix**: incremental indexing pipeline.
+The retained heading is not a measured frequency ordering.
+Distinguish missing evidence, lost chunk boundaries, stale versions, access violations, unsupported claims, and distribution-shifted evaluation queries.
 
 ## When RAG is and isn't the right tool
 
-**Use RAG when**:
-- Knowledge needs to come from your own corpus (docs, knowledge base, code).
-- Knowledge changes faster than you can fine-tune.
-- You need verifiable citations.
-- You can iterate on retrieval quickly.
-
-**Don't use RAG when**:
-- The "knowledge" is really *behavior* you want the model to exhibit. Behavior comes from prompting or fine-tuning, not RAG.
-- Latency budget is too tight for a multi-stage retrieve-then-generate pipeline.
-- The corpus is small enough to fit in the prompt directly.
-- The task is structured enough that an LLM is overkill.
+Choose retrieval when selecting external, changing evidence fits the task.
+Compare direct context, structured queries, prompting, or fine-tuning against the required behavior and evidence lifecycle.
 
 ## Tools (mid-2026)
 
-- **Vector store**: pgvector for &lt; 10M docs; Qdrant or Weaviate for larger; Vespa if you need both lexical and dense in one system.
-- **Embeddings**: BGE-M3, NVIDIA NV-Embed (open); OpenAI text-embedding-3-large, Cohere v3 (managed).
-- **Reranker**: Cohere Rerank, BGE Reranker v2.
-- **Lexical**: Elasticsearch / OpenSearch / Tantivy.
-- **Orchestration**: thin custom layer; LlamaIndex if you want managed primitives. **Avoid LangChain at scale.**
-- **Eval**: Inspect AI, Promptfoo, Braintrust, or just pytest.
+Select storage and orchestration by measured recall, access filtering, update latency, cost, and operational constraints.
+No specific framework or document-count threshold follows from the RAG mechanism.
 
 ## Why interviewers ask
 
-RAG questions test:
-1. Whether you've built one (vs. read about them).
-2. Whether you understand the retrieval-vs-generation decomposition.
-3. Whether you know to separately evaluate retrieval and generation.
-4. Whether you know modern best practices (hybrid, reranking, query understanding).
+The useful distinction is between finding evidence and producing claims that the evidence supports.
 
 ---
 
 *Related essay: [Designing a RAG system that actually works](/guides/designing-rag-that-works/) for the long form. Related interview: [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/).*
+
+</div>

@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Count nonempty ranges containing exactly a requested number of odd values.
-First count ranges with at most that many odds, then subtract those below the exact target.
+Count contiguous input ranges containing exactly a requested number of odd integers.
 
 ## Problem
 
-For `nums = [1, 1, 2, 1, 1]` and `odd_count = 3`, return 2: ranges `[0..3]` and `[1..4]`.
-Inputs are integers, including negatives; require `odd_count >= 0`.
+**Input.** An integer list `nums` and a nonnegative integer `odd_count`.
+
+**Output.** Return the number of nonempty contiguous subarrays containing exactly `odd_count` odd values.
+
+**Rules.** Count ranges by their starting and ending positions, even when their values are identical.
+Values may be negative, zero, or repeated. Exactly zero odd values means an all-even range.
+Do not modify the input. An empty list contains zero qualifying ranges.
+
+**Example.** For `nums = [1, 1, 2, 1, 1]` and `odd_count = 3`, return `2`.
+The zero-based inclusive ranges are `[0..3]` and `[1..4]`; both contain three odd values.
 
 ## Picture: Count Valid Starts at Each Ending
 

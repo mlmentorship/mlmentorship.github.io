@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Each closing bracket must finish the newest unmatched opener.
-Keep unfinished openers on a stack; matching totals alone cannot establish nesting.
+Determine whether a bracket string has matching types, correct nesting, and no unmatched brackets.
 
 ## Problem
 
-For bracket-only text `"([{}])"`, return `True`; `"([)]"` returns `False` despite equal counts of each type.
-The permitted alphabet is `()[]{}`. Empty text is valid.
+**Input.** A string `text` containing only the six bracket characters `()[]{}`.
+
+**Output.** Return `True` if every bracket is correctly matched and nested; otherwise return `False`.
+
+**Rules.** Each opener needs a later closer of the same type.
+Pairs may be nested or adjacent, but may not cross. Equal counts alone are insufficient.
+Leave the string unchanged. Empty text is valid; other characters require the filtering variant below.
+
+**Example.** `"([{}])"` and `"()[]"` return `True`.
+For `"([)]"`, return `False` because the pairs cross; a lone `"("` also returns `False`.
 
 ## Picture: Close From Newest to Oldest
 

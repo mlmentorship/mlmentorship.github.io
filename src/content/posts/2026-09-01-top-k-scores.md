@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Select the highest-score group first, then order that smaller group using original indices.
+Return the original positions of the highest scores, ordered from highest selected score to lowest.
 
 ## Problem
 
-For finite scores `[0.1, 0.9, 0.4, 0.8]`, return the two highest-score indices in descending score order.
-The answer is `[1, 3]`, not sorted scores or positions within a selected subset.
-The reference requires a one-dimensional NumPy array and integer `1 <= k <= n`.
+**Input.** A one-dimensional NumPy array `scores` of finite values and an integer `k` with `1 <= k <= len(scores)`.
+
+**Output.** Return an array of `k` distinct original indices, in nonincreasing order of their corresponding scores.
+
+**Rules.** Return input positions, not scores or positions within a selected subset.
+At a tied cutoff, any highest-scoring membership is valid; equal-score indices need no particular order.
+Preserve the input. Empty input and out-of-range `k` raise `ValueError` in the reference.
+
+**Example.** Scores `[0.1, 0.9, 0.4, 0.8]` with `k = 2` return `[1, 3]`.
+Those original positions contain 0.9 and 0.8, respectively.
 
 ## Picture
 

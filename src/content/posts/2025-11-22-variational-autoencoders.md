@@ -1,6 +1,6 @@
 ---
-title: "Variational autoencoders (VAE)"
-description: "Encode inputs to a latent distribution, decode samples back, optimize evidence lower bound. The cleanest gateway to deep generative models."
+title: "Variational autoencoders: calculate the bound and its gap"
+description: "Evaluate a complete Gaussian ELBO, improve the approximate posterior, and test why changing the KL weight changes the guarantee."
 date: "2025-11-22"
 draft: false
 tags: ["concepts"]
@@ -9,28 +9,21 @@ category: "concepts"
 
 ## Summary
 
-A **variational autoencoder** [(Kingma & Welling, 2013)](https://arxiv.org/abs/1312.6114) is a generative model with a latent variable $z$, learned encoder $q_\phi(z \mid x)$, and decoder $p_\theta(x \mid z)$, trained to maximize the **evidence lower bound** (ELBO):
+A variational autoencoder fits a latent-variable model using approximate posterior inference.
+Its encoder estimates latent uncertainty for observed data; its decoder specifies an observation distribution, not merely a reconstructed mean.
 
-$$
-\log p_\theta(x) \ge \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x \mid z)] - \mathrm{KL}(q_\phi(z \mid x) \,\|\, p(z)).
-$$
-
-VAEs introduced **amortized variational inference** to deep learning: a neural network learns to predict the posterior of a latent given the input, enabling end-to-end training of latent variable models with backprop. This idea now powers:
-
-- Diffusion models (often built on top of a VAE in latent space. Stable Diffusion).
-- Disentanglement research (β-VAE, factor-VAE).
-- Generative pretraining for tabular and molecular data.
-- Probabilistic recsys and time series.
-
-The VAE is also the canonical example of the **reparameterization trick**, a tool used everywhere in modern probabilistic deep learning.
+**Task:** observe $x=2$ under $p(z)=\mathcal N(0,1)$ and $p(x\mid z)=\mathcal N(z,1)$.
+Use approximate posterior $q(z\mid x)=\mathcal N(1,1/4)$, where the second argument denotes variance.
+Compute the training bound and compare it with the exact log-likelihood.
+This scalar teaching model is solvable; neural models often make the marginal integral difficult.
 
 ## The model
 
-- **Prior**: $p(z) = \mathcal{N}(0, I)$.
-- **Encoder**: $q_\phi(z \mid x) = \mathcal{N}(\mu_\phi(x), \mathrm{diag}(\sigma_\phi(x)^2))$. A neural net outputs mean and diagonal covariance.
-- **Decoder**: $p_\theta(x \mid z)$. A neural net mapping $z$ back to a distribution over $x$ (Gaussian for continuous, Bernoulli for binary, categorical for discrete).
+Generally, $p_\theta(x,z)=p(z)p_\theta(x\mid z)$ and the encoder is $q_\phi(z\mid x)$.
+Parameters $\theta$ define the generative model; $\phi$ defines its approximate inference network.
+One encoder shares inference parameters across observations: amortization does not make each inferred posterior exact.
 
-**Learning objective:** trace the training path from an observed input through the approximate posterior and both ELBO terms, then contrast it with generation, which samples the prior and uses only the decoder.
+Read the training lane and generation lane as different computations.
 
 <!-- visual:vae-training-and-generation-paths -->
 <figure class="learning-figure plot-panel" aria-labelledby="vae-paths-title">
@@ -43,7 +36,7 @@ The VAE is also the canonical example of the **reparameterization trick**, a too
 			<marker id="vae-solid-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0 0L7 3.5L0 7Z"></path></marker>
 			<marker id="vae-dashed-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-backward" d="M0 0L7 3.5L0 7Z"></path></marker>
 		</defs>
-		<rect class="viz-plot-bg" x="5" y="5" width="350" height="314" rx="6"></rect>
+		<rect class="viz-plot-bg" x="5" y="5" width="350" height="324" rx="6"></rect>
 		<text class="viz-axis-label" x="18" y="28">TRAIN: INFER z FROM THIS x</text>
 		<rect class="viz-node viz-node--input" x="18" y="48" width="72" height="46" rx="5"></rect>
 		<text class="viz-node-label" x="54" y="68">x</text>
@@ -78,7 +71,7 @@ The VAE is also the canonical example of the **reparameterization trick**, a too
 		<path d="M278 262V275" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#vae-solid-arrow)"></path>
 		<path d="M90 82V293H141" style="fill:none;stroke:var(--viz-edge);stroke-width:1.4;stroke-dasharray:4 4;marker-end:url(#vae-solid-arrow)"></path>
 		<text class="viz-label" x="25" y="200">target x</text>
-		<text class="viz-callout" x="18" y="304">ELBO = reconstruction - KL</text>
+		<text class="viz-callout" x="18" y="322">ELBO = reconstruction - KL</text>
 		<rect class="viz-plot-bg" x="5" y="335" width="350" height="150" rx="6"></rect>
 		<text class="viz-axis-label" x="18" y="358">GENERATE: SAMPLE z WITHOUT AN INPUT x</text>
 		<rect class="viz-node" x="18" y="384" width="82" height="46" rx="5" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke)"></rect>
@@ -94,56 +87,106 @@ The VAE is also the canonical example of the **reparameterization trick**, a too
 		<path d="M221 407H256" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#vae-dashed-arrow)"></path>
 		<text class="viz-label" x="180" y="461" text-anchor="middle">No observed x, encoder, q<tspan baseline-shift="sub" font-size="8">φ</tspan>, or KL step.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the solid training path first: observed <var>x</var> determines <var>q</var><sub>φ</sub>, a reparameterized sample <var>z</var> reaches the decoder, reconstruction scores how well the decoder explains that same <var>x</var>, and KL pulls <var>q</var><sub>φ</sub> toward the prior. Then follow the dashed generation path: sample <var>z</var> directly from <var>p</var>(<var>z</var>) and run only the decoder to produce a new observation. Original schematic checked against <a href="https://arxiv.org/abs/1312.6114">Kingma and Welling</a>, <a href="https://arxiv.org/abs/1401.4082">Rezende et al.</a>, and <a href="https://arxiv.org/abs/1906.02691">the VAE tutorial</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> observed <var>x</var> enters the encoder on the solid training path. A posterior sample reaches the decoder; reconstruction scores the conditional density of that same <var>x</var>. The KL term compares the approximate posterior with the prior. The dashed generation path instead samples the prior and uses the decoder without an observed <var>x</var>. Sources: <a href="https://arxiv.org/abs/1312.6114">Kingma and Welling</a>, <a href="https://arxiv.org/abs/1401.4082">Rezende et al.</a>, and <a href="https://arxiv.org/abs/1906.02691">the VAE tutorial</a>.</figcaption>
 </figure>
 
 ## The ELBO
 
-The ELBO has two terms:
+For these everywhere-positive Gaussian densities, insert $q$ and apply Jensen's inequality:
 
 $$
-\mathcal{L}_\text{ELBO} = \underbrace{\mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x | z)]}_\text{reconstruction} - \underbrace{\mathrm{KL}(q_\phi(z | x) \,\|\, p(z))}_\text{regularizer}.
+\log p_\theta(x)=\log\mathbb E_q\left[\frac{p_\theta(x,z)}{q(z\mid x)}\right]
+\ge\mathbb E_q[\log p_\theta(x,z)-\log q(z\mid x)]
+=\mathbb E_q[\log p_\theta(x\mid z)]-\operatorname{KL}(q\|p(z)).
 $$
 
-- **Reconstruction**: rewards the decoder for assigning high probability to $x$ given samples from the encoder.
-- **KL**: penalizes the encoder for diverging from the prior. Keeps the latent space compact and continuous.
+Call the final expression $\mathcal L$, the evidence lower bound, or ELBO.
+Bayes' rule also gives the exact gap identity:
 
-Maximizing ELBO ≤ maximizing log-likelihood (true objective). The gap is $\mathrm{KL}(q_\phi \| p_\text{true posterior})$.
+$$
+\log p_\theta(x)=\mathcal L+
+\operatorname{KL}\bigl(q_\phi(z\mid x)\|p_\theta(z\mid x)\bigr).
+$$
+
+The penalty inside $\mathcal L$ compares $q$ with the prior; the gap compares $q$ with the model posterior.
+These are different distributions.
+
+For the fixture, $\mathbb E_q[(2-z)^2]=(2-1)^2+1/4=1.25$.
+For a Gaussian encoder with mean $\mu$ and variance $s^2$, the prior KL is $(\mu^2+s^2-1-\log s^2)/2$.
+
+| Quantity, natural-log units | Calculation | Value |
+| --- | --- | --- |
+| Expected reconstruction log density | $-\frac12\log(2\pi)-0.625$ | $-1.54394$ |
+| Prior KL | $(1+1/4-1-\log(1/4))/2$ | $0.81815$ |
+| ELBO | Reconstruction minus prior KL | $-2.36209$ |
+| Exact log-likelihood, $x\sim\mathcal N(0,2)$ | $-\frac12\log(4\pi)-1$ | $-2.26551$ |
+
+The exact posterior is $\mathcal N(1,1/2)$.
+Directly computing its KL from $q$ gives $(1/2-1-\log(1/2))/2=0.09657$, exactly the likelihood-minus-bound gap.
+
+### Improve inference variance
+
+**New task:** change $q$'s variance from $1/4$ to the exact posterior variance $1/2$.
+Update both reconstruction and prior KL, not just the penalty.
+**Check:** reconstruction becomes $-1.66894$, prior KL $0.59657$, and ELBO $-2.26551$.
+The posterior gap is zero.
+**Use when:** the inference family can better represent the model posterior.
+
+### Change the KL weight
+
+**New task:** keep the original $q$ but optimize reconstruction minus $\beta$ times prior KL, with $\beta=1/2$.
+**Check:** the objective becomes $-1.95301$, exceeding the exact log-likelihood $-2.26551$.
+It is not the ordinary ELBO; its usual lower-bound guarantee cannot be asserted.
+**Use when:** deliberately changing a representation or rate-distortion tradeoff rather than claiming the same likelihood objective.
 
 ## The reparameterization trick
 
-To backprop through sampling, write $z = \mu_\phi(x) + \sigma_\phi(x) \odot \varepsilon$ with $\varepsilon \sim \mathcal{N}(0, I)$. The randomness is now external; the gradient flows through $\mu_\phi$ and $\sigma_\phi$ deterministically. Without this, the gradient of an expectation over a parameter-dependent distribution would require REINFORCE (high variance).
+Write $z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon$, with parameter-independent $\epsilon\sim\mathcal N(0,I)$.
+For log variance $\ell$, use $\sigma=\exp(\ell/2)$, not $\exp\ell$.
+The randomness remains; its sampling law no longer depends on $\phi$.
+See the [pathwise-gradient derivation](/questions/reparameterization-trick/) for conditions and alternatives.
+
+**Reconstruct:** which observed $x$ enters the encoder during unconditional generation?
+
+<details><summary>Answer</summary>
+
+None. Sample $z$ from the prior, then sample or summarize the decoder distribution $p_\theta(x\mid z)$.
+Reconstruction instead conditions on a supplied observation through the encoder.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## What VAEs are good and bad at
 
-**Good**:
-
-- Smooth, continuous latent space useful for interpolation and editing.
-- Stable training (unlike GANs).
-- Good likelihood estimation (after IWAE-style correction).
-- Excellent as compressors / latent encoders for downstream models (Stable Diffusion's first stage).
-
-**Bad**:
-
-- Image samples are **blurry** compared to GANs and diffusion. The Gaussian decoder + per-pixel MSE penalizes high-frequency detail.
-- KL penalty causes **posterior collapse** in some configurations (decoder ignores $z$, output becomes nearly mean-only).
-- Lower-quality samples than diffusion at the same parameter count.
+Continuous latent models can support interpolation and learned compression, including latent representations used by downstream diffusion models.
+Their usefulness depends on the learned distribution and reconstruction contract, not continuity alone.
+Gaussian squared error corresponds to a specified decoder variance; it is not a universal reconstruction likelihood.
+Blur depends on that likelihood, uncertainty, architecture, and optimization, not simply the VAE name.
+No universal stability or sample-quality ranking follows against GANs or diffusion.
 
 ## Common pitfalls
 
-- **Posterior collapse.** When the decoder is too powerful relative to the encoder, $q_\phi(z|x) \to p(z)$ and the latent becomes useless. Mitigations: KL annealing, free bits, reduce decoder capacity, β-VAE with $\beta < 1$ early in training.
-- **Forgetting the reparameterization trick.** Sampling $z$ inside the network and trying to backprop through `z = sample(N(mu, sigma))` doesn't work; use `z = mu + sigma * epsilon`.
-- **Treating ELBO as the model's likelihood.** ELBO is a lower bound; for likelihood comparison use IWAE estimates.
-- **Using VAEs as competitive standalone image generators.** They aren't anymore; use them as latent compressors with diffusion / AR on top.
+Posterior collapse means inferred latents carry little observation-specific information and the decoder can ignore them.
+An expressive autoregressive decoder can still produce varied outputs; collapse does not imply a constant image.
+Annealing, free bits, decoder changes, and inference improvements alter different parts of training and offer no universal cure.
+Not using a pathwise estimator does not uniquely force REINFORCE; other estimators depend on the latent family.
+Check likelihood sums, minibatch reductions, and KL units before interpreting their relative weight.
 
 ## Variants
 
-- **β-VAE**: scale the KL term by $\beta$. Higher $\beta$ encourages disentanglement; lower $\beta$ improves reconstruction.
-- **VQ-VAE**: discrete (categorical) latent via vector quantization. Used in language-image models, audio.
-- **IWAE** (importance-weighted): tighter ELBO via $K$-sample importance weighting.
-- **NVAE, Hierarchical VAEs**: deep hierarchical latents for higher-fidelity generation.
+- **Beta-VAE:** changes the KL weight; disentanglement is not guaranteed by that coefficient alone.
+- **VQ-VAE:** introduces discrete codebooks and a different training construction, not Gaussian reparameterization unchanged.
+- **IWAE:** uses an importance-weighted objective with its own support and sampling conditions.
+- **NVAE and hierarchical VAEs:** introduce multiple conditional latent levels, retaining a distinct factorization.
+
+The [IWAE bound](https://arxiv.org/abs/1509.00519) is an expectation, not an exact likelihood correction.
+A single Monte Carlo realization need not lie below log-likelihood.
 
 ## Related
 
 - [Reparameterization trick](/questions/reparameterization-trick/). The gradient enabler.
 - [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Alternative generative paradigms.
+
+</div>

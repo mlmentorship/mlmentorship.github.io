@@ -8,10 +8,18 @@ category: "questions"
 ---
 
 
-A training loop carries parameter gradients and module mode between batches.
-Trace those states before changing the loss or guessing which task the model performs.
+Inspect a faulty training loop and distinguish demonstrable state-management defects from questions that require missing model or data information.
 
 ## Problem
+
+**Context.** The supplied exercise alternates optimization and evaluation inside an ordinary PyTorch training loop.
+Model architecture, target semantics, and device setup are not supplied.
+
+**Task.** Trace gradients and module mode across consecutive batches, identify supported defects, and propose a corrected execution sequence.
+State which additional facts are needed before changing the loss or moving tensors.
+
+**Constraints.** Treat the code below as deliberately broken exercise input, not a runnable reference.
+Use ordinary optimizer and module semantics; do not infer a classification task merely from variable names.
 
 Inspect the supplied loop. Assume ordinary PyTorch module and optimizer behavior.
 Identify persistent-state defects, then separate them from questions requiring missing model, data or device information.
@@ -51,6 +59,8 @@ for epoch in range(10):
 `optimizer.step()` does not clear `.grad` buffers.
 `model.eval()` persists until the mode is changed again.
 Gradient recording is a third, separate setting: `no_grad()` does not restore training mode.
+
+<p class="visual-title">Gradients and module mode persist until explicitly reset</p>
 
 <!-- visual:training-loop-persistent-state -->
 ```mermaid

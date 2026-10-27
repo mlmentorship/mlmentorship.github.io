@@ -8,9 +8,17 @@ category: "questions"
 ---
 
 
-A shopper chose a printer; compatible ink and another printer solve different tasks, so choose the shelf's purpose first.
+Design a complementary-product shelf and distinguish useful add-ons from substitutes or merely popular items.
 
 ## Problem
+
+**Context.** A shopper has selected a printer, and the hypothetical store has basket co-occurrence counts for possible add-ons.
+
+**Task.** Compare the evidence below, propose candidate retrieval and ranking, and define an experiment for useful purchase effects.
+Explain how compatibility, eligibility, and the shelf's purpose affect selection.
+
+**Constraints.** Observed co-purchases are associations, not proof that showing an item causes incremental value.
+Account for item popularity, exposure, and substitutes; this is not a claim about Amazon's internal implementation.
 
 Build an illustrative complementary shelf, not a claim about current Amazon internals.
 In 1,000 fictional baskets, 100 contain the printer, 80 contain ink and 50 contain both.

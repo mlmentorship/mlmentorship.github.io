@@ -13,17 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-An edge closes an undirected cycle when its endpoints already have the same representative root.
+Find the first arriving undirected edge whose addition would create a cycle among previously accepted edges.
 
 ## Problem
 
-Process `[[1,2],[3,4],[2,3],[4,2]]` in order.
-Return the first rejected edge: **[4,2]**.
-Previously accepted edges already connect `4` to `2` through `3`.
-Use nonnegative integer labels; no rejection returns `[]`.
+**Input.** An ordered list `edges` of undirected endpoint pairs using nonnegative integer labels.
 
-This reports the first failed union, not every cycle edge in a general graph.
-Under the usual tree-plus-one-edge assumption, it identifies the last arriving edge of that cycle.
+**Output.** Return the first edge whose endpoints are already connected by previously accepted edges, or `[]` if none exists.
+
+**Rules.** Process edges in their given order without changing the list.
+A self-loop or repeated connection can be the rejected edge.
+This reports one first cycle-closing edge, not every cycle edge in a general graph.
+Under the usual tree-plus-one-edge assumption, it is the last arriving edge of that cycle.
+
+**Example.** `[[1, 2], [3, 4], [2, 3], [4, 2]]` returns `[4, 2]`.
+The previously accepted edges already connect 4 to 2 through 3.
 
 ## Picture
 
@@ -31,8 +35,12 @@ Each component has one representative root.
 Following parent pointers finds that root; only roots have authoritative component sizes.
 After the first three edges, the two size-two components have merged under root `1`.
 
+<p class="visual-title" data-supplemental-visual="dsu-edges-versus-parents">Graph edges and DSU parent pointers are different structures</p>
+
 ```mermaid
 flowchart TB
+   accTitle: Accepted input edges are not the disjoint-set parent forest
+   accDescr: The accepted undirected graph contains edges one-two, two-three, and three-four. A possible disjoint-set parent forest instead has two pointing to one, three pointing to one, and four pointing to three. Finding four follows four-three-one and may compress four directly to one without changing any accepted graph edge.
    subgraph accepted[Accepted graph edges]
       direction LR
       G1[1] --- G2[2] --- G3[3] --- G4[4]
@@ -44,6 +52,7 @@ flowchart TB
       P4[4] --> P3
    end
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> compare an undirected input edge with a directed parent pointer. Path compression changes the parent forest, not the accepted graph.</p>
 
 Read it this way: plain links are accepted graph edges.
 Arrows are DSU parent pointers, not input edges.

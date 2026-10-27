@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: recsys, search, and platform-ML interviews.*
 
-The L4 candidate jumps to model architecture. The L6 candidate first asks how fresh "real-time" needs to be, where the latency budget goes, and how the feature pipeline ensures consistent training/serving features.
+Design personalization that responds to new user events within an explicitly defined freshness and request-latency budget.
+
+## Problem
+
+**Context.** A recommendation service should adapt to recent interactions, but ingestion, feature computation, retrieval, and ranking have different delays.
+Events may arrive late, repeat, or be missing.
+
+**Task.** Define what must update in real time, design the event-to-decision path, and specify measurements and fallback behavior.
+Explain how training examples reproduce the information actually available at each historical decision.
+
+**Constraints.** State freshness and latency objectives rather than treating real time as instantaneous.
+Preserve privacy and eligibility, handle event ordering and duplicate processing, and distinguish feature freshness from model retraining frequency.
 
 ## Define "real-time" first
 

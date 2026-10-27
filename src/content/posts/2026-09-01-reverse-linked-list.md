@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Save the original successor before redirecting a link; that saved reference preserves access to every unprocessed node.
+Reverse the order of a linked list's existing nodes by changing their next references.
 
 ## Problem
 
-Reverse `1 -> 2 -> 3 -> 4 -> None` into `4 -> 3 -> 2 -> 1 -> None`.
-Return the new head using the same nodes and changing their next links.
-Require an acyclic chain and permission to mutate it.
-Empty input returns `None`.
+**Input.** The head of a finite acyclic singly linked list, with permission to change its `next` links.
+
+**Output.** Return the new head after reversing the original nodes' order.
+
+**Rules.** Reuse every node and retain its value; do not copy values into replacement nodes.
+The former head becomes the tail and must point to `None`.
+Repeated values are allowed. An empty list returns `None`; a singleton returns the same node.
+
+**Example.** `1 -> 2 -> 3 -> 4 -> None` becomes `4 -> 3 -> 2 -> 1 -> None`.
+The returned head is the original node valued 4.
 
 ## Picture
 

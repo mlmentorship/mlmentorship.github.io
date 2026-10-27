@@ -13,16 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Grow a slice until it contains every required copy. Save valid slices while moving the left boundary, including the final removal that breaks coverage.
+Find the shortest contiguous piece of text containing every required character with its requested multiplicity.
 
 ## Problem
 
-> Find the shortest substring that contains all required characters and counts.
+**Input.** Two Python strings: `text` to search and `required` specifying the needed characters and their counts.
 
-For `ABAAC` and requirement `AAC`, return `AAC` at half-open range `[2,5)`.
-Order within the slice does not matter, but multiplicity does: `AC` lacks one required `A`.
-Empty requirement or no match returns `""`. Equal-length ties retain the first shortest occurrence.
-Characters are exact Python code points.
+**Output.** Return the shortest substring of `text` containing at least every character count found in `required`.
+
+**Rules.** Required character order does not matter, but repetitions do.
+The selected range must be contiguous. Compare exact Python code points and preserve both strings.
+An empty requirement or no qualifying range returns `""`. Equal-length ties retain the first shortest occurrence.
+
+**Example.** For `text = "ABAAC"` and `required = "AAC"`, return `"AAC"` from half-open range `[2, 5)`.
+The shorter `"AC"` does not qualify because it lacks a second A.
 
 ## Picture
 

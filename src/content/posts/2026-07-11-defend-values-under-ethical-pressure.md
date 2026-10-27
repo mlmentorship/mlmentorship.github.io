@@ -7,10 +7,18 @@ tags: ["questions"]
 category: "questions"
 ---
 
-Judge a values decision using evidence available then, not eventual luck.
-Keep hard obligations separate from negotiable risk.
+Explain a values-based decision under pressure using the obligations, evidence, and alternatives available when the choice was made.
 
 ## Problem
+
+**Context.** An interviewer asks about a real decision under ethical pressure; the fictional risk exercise below probes reasoning about outcomes.
+Its two options are explicitly permitted and reversible.
+
+**Task.** Explain the decision process, authority, escalation, and evidence, then assess what a single incident-free trial establishes.
+Distinguish the quality of the original decision from the eventual observed outcome.
+
+**Constraints.** Mandatory legal, safety, or privacy obligations are not interchangeable with a negotiable expected-risk calculation.
+Use your own experience for personal claims; one outcome cannot validate a probability estimate or reveal the unchosen counterfactual.
 
 This fictional exercise compares two permitted, reversible options:
 

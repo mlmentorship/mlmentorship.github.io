@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-A path records a shared prefix; a separate terminal marker records whether that exact prefix is a stored word.
+Maintain a word collection supporting both exact whole-word lookup and lookup by prefix.
 
 ## Problem
 
-Insert `app`, then `apple`.
-Full-word search for `app` must succeed, while full-word search for `ap` must fail.
-Prefix search for `ap` must succeed.
-Support arbitrary Python strings with exact code-point matching, including empty strings and repeated insertions.
+**Input.** Calls to `insert(word)`, `search(word)`, and `starts_with(prefix)` on an initially empty `Trie`.
+
+**Output.** Insertion stores a word; `search` reports exact membership, while `starts_with` reports whether the prefix can be followed.
+
+**Rules.** Match Python string code points exactly, without case conversion or normalization.
+A prefix is not automatically a stored word. Repeated insertion has no additional effect.
+Empty strings are supported. The empty prefix returns `True` even before any insertion.
+
+**Example.** After inserting `"app"` and `"apple"`, `search("app")` returns `True`.
+The call `search("ap")` returns `False`, while `starts_with("ap")` returns `True`.
 
 ## Picture
 

@@ -13,17 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Mirror both child subtrees, attach their roots on opposite sides, and return the same current node.
+Mirror an entire binary tree in place while retaining the identities of its existing nodes.
 
 ## Problem
 
-Mirror `[4,2,7,1,3,6,9]` into `[4,7,2,9,6,3,1]`.
-Swap left and right at **every** node, not just the root.
-Reuse the existing nodes and return the original root object.
-An empty tree returns `None`.
+**Input.** The root of an owned finite binary tree, with `val`, `left`, and `right` fields on each node.
 
-Assume an owned, finite tree without cycles or shared nodes.
-The platform supplies `TreeNode` with `val`, `left`, and `right` fields.
+**Output.** Return the original root object after mirroring the complete tree.
+
+**Rules.** Exchange left and right children at every node, not only at the root.
+Reuse existing nodes and retain their values; do not create a separate copied tree.
+Assume no cycles or shared nodes. An empty tree returns `None`.
+
+**Example.** A root 4 with children 2 and 7 becomes a root 4 with children 7 and 2.
+The full level-order tree `[4, 2, 7, 1, 3, 6, 9]` becomes `[4, 7, 2, 9, 6, 3, 1]`.
 
 ## Picture
 

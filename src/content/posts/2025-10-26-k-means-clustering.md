@@ -9,23 +9,34 @@ category: "concepts"
 
 ## Summary
 
-**k-means** partitions $n$ data points into $k$ clusters by minimizing the sum of squared distances from each point to its cluster's centroid:
+K-means seeks low squared Euclidean distortion by alternating nearest-center assignment with fixed-membership mean updates:
 
 $$
 \min_{\mu_1, \dots, \mu_k,\ C} \sum_{i=1}^{n} \|x_i - \mu_{C(i)}\|^2.
 $$
 
-**Lloyd's algorithm** (1957) alternates: (a) assign each point to its nearest centroid; (b) recompute each centroid as the mean of its assigned points. Iterate to convergence.
-
-k-means is the canonical clustering algorithm: $O(n k d)$ per iteration, easy to implement, and a good first attempt at any unsupervised structure problem. It is used directly (customer segmentation, vector-quantization codebooks) and as a building block (initialization for GMMs, anchor selection for object detection, sub-sampling for retrieval index training).
+Each half-step minimizes the same objective while holding different variables fixed.
+This optimization definition does not require equal cluster sizes or establish that the resulting groups are natural classes.
 
 ## The algorithm
 
-Initialize $k$ centroids (random points or **k-means++** for stability). Then repeat:
+Use finite points in meaningful Euclidean units, $1\le k\le n$, and an explicit initialization.
+Break distance ties by a fixed center order; retain an old center if its cluster is empty in this trace.
+Then repeat:
 
 1. **Assignment**: $C(i) = \arg\min_j \|x_i - \mu_j\|^2$ for each $i$.
 2. **Update**: $\mu_j = \tfrac{1}{|C^{-1}(j)|} \sum_{i \in C^{-1}(j)} x_i$ for each $j$.
 
+For a nonempty cluster, $\sum_i\|x_i-\mu\|^2=\sum_i\|x_i-\bar x\|^2+m\|\mu-\bar x\|^2$.
+The second term proves the mean minimizes fixed-membership squared distortion.
+An empty cluster has no defined mean, which is why an explicit policy is needed.
+
+In the figure, initial centers are A0 $(110,130)$ and B0 $(210,120)$.
+Points $(50,80),(70,110),(90,80)$ choose A; $(230,70),(250,100),(270,70)$ choose B.
+For $(90,80)$, squared distances are $2900$ versus $16000$.
+Each group's initial assigned SSE is $11000$, giving total $22000$.
+Updates produce A1 $(70,90)$ and B1 $(250,80)$.
+Each group then contributes $500+400+500=1400$, so total SSE drops to $2800$.
 <!-- visual:kmeans-assign-then-update -->
 <figure class="learning-figure" aria-labelledby="kmeans-iteration-title">
 	<p class="visual-kicker">Learning objective</p>
@@ -78,10 +89,40 @@ Initialize $k$ centroids (random points or **k-means++** for stability). Then re
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> in the assignment panel, compare distances while A₀ and B₀ stay fixed; circles and squares encode the resulting memberships without relying on color. In the update panel, freeze those memberships and move each × to the arithmetic mean of its three points. Alternating these two objective-nonincreasing steps reaches a fixed point, but the result can still be only a local minimum. Original construction checked against <a href="https://doi.org/10.1109/TIT.1982.1056489">Lloyd's least-squares quantization paper</a> and the <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means">scikit-learn k-means guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> assignment changes memberships while centers stay fixed. Updating then holds membership fixed and moves each center to its mean. The illustrated SSE decreases from 22,000 to 2,800. Original construction follows <a href="https://doi.org/10.1109/TIT.1982.1056489">Lloyd's paper</a> and the <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means">scikit-learn guide</a>.</figcaption>
 </figure>
 
-Stop when assignments don't change (or change below a threshold). Convergence is guaranteed in finite steps but only to a local minimum. K-means is **not convex**.
+Dense assignment costs $O(nkd)$ per iteration; mean updates add $O(nd)$.
+Standard exact updates with stable tie/empty-cluster policies reach a fixed point on finite data, not a guaranteed global optimum.
+Floating-point tolerances and iteration limits add numerical stopping policies.
+
+### Give Observations Unequal Weight
+
+**New task:** Double the weight of $(90,80)$ in A's fixed membership.
+
+**Picture and change:** Minimize $\sum_i a_i\|x_i-\mu\|^2$ with positive weights, using $\mu=\sum_i a_ix_i/\sum_i a_i$.
+Positive per-observation weights leave fixed-center nearest assignment unchanged.
+
+**Check:** A becomes $((50+70+180)/4,(80+110+160)/4)=(75,87.5)$.
+
+**Use when:** Rows represent justified frequencies or importance in the distortion objective.
+
+### Update from an Arriving Point
+
+**New task:** After the reference update, assign $(110,70)$ to A, whose count is three.
+
+**Picture and change:** Increment the count to four and use $\mu_{new}=\mu_{old}+(x-\mu_{old})/4$.
+
+**Check:** A moves from $(70,90)$ to $(80,85)$ while B remains unchanged.
+
+**Use when:** A stream or mini-batch budget prevents full reassignment and mean recomputation.
+An incremental step does not inherit full-data Lloyd objective nonincrease.
+
+Adding outlier $(1000,80)$ to B's fixed membership moves its mean to $(437.5,80)$.
+Squared distance strongly rewards accommodating outliers, even when the resulting center is not typical.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## k-means++ initialization
 
@@ -90,49 +131,37 @@ Random initialization sometimes converges to bad local minima. **k-means++** [(A
 1. Pick $\mu_1$ uniformly at random.
 2. For $j = 2, \dots, k$: pick $\mu_j$ from data with probability proportional to $\min_{j' < j} \|x - \mu_{j'}\|^2$. Points far from existing centers are more likely to be picked.
 
-Gives an $O(\log k)$-approximation to the optimum in expectation. Used as default initialization in scikit-learn and most modern implementations.
+The $O(\log k)$ expected approximation guarantee concerns seeded distortion under the theorem's conditions, not global-optimum recovery or runtime.
 
 ## Choosing $k$
 
 There is no universally right answer. Heuristics:
 
-- **Elbow method**: plot total within-cluster sum of squares vs $k$; look for the "elbow" where adding more clusters stops paying off.
+- **Elbow method:** plot within-cluster SSE against k. Inspect diminishing returns; an elbow need not be distinct or objectively best.
 - **Silhouette score**: average similarity of each point to its own cluster vs. nearest other cluster; pick $k$ maximizing it.
 - **Gap statistic**: compare to clustering on uniform random data of the same shape.
 - **Domain knowledge**: often the right answer.
 
-For very large data, run k-means with a few values of $k$ in parallel and pick the one with the best silhouette on a subsample.
+Choose geometry, downstream usefulness, and stability criteria before selecting among these heuristics.
 
 ## Assumptions
 
-k-means implicitly assumes:
-
-- **Spherical, equal-variance clusters** (penalizes non-spherical clusters by splitting them).
-- **Equal cluster sizes** (large clusters are sometimes split, small ones merged).
-- **Euclidean distance is meaningful** in the input space.
-
-When clusters are elongated, of unequal density, or non-convex, k-means fails. Try GMMs (allows ellipsoidal clusters), DBSCAN (density-based, arbitrary shapes), or spectral clustering.
+Euclidean units and squared distortion define the task; standardizing features changes that task rather than automatically repairing it.
+Spherical mixture interpretations require additional probabilistic assumptions, not equal-size constraints in the objective.
+Replacing squared distance with absolute coordinate differences yields coordinate medians, not the same mean update.
 
 ## Mini-batch k-means
 
-For huge $n$, full assignment is expensive. **Mini-batch k-means** [(Sculley, 2010)](https://research.google/pubs/web-scale-k-means-clustering/): each iteration uses a small random subset to update centroids. Trades accuracy for huge speedup.
+[Mini-batch updates](https://research.google/pubs/web-scale-k-means-clustering/) trade full reassignment work for stochastic updates; evaluate quality, count policy, and workload-specific cost.
 
 ## When k-means is and isn't appropriate
 
-| Setting | Verdict |
-|---------|---------|
-| Roughly spherical clusters in low-d | Excellent |
-| Vector quantization codebook | Excellent (k = codebook size) |
-| Image segmentation by color | Good (k = number of colors) |
-| Customer segmentation on raw features | Try, but standardize first |
-| Text or sparse data | Use spherical k-means (cosine distance) |
-| Non-convex shapes (moons, rings) | Fails; use DBSCAN or spectral |
-| Large $k$ (thousands) | Use HNSW-accelerated variants |
+Use it when squared-distance compression or grouping matches the task, including vector-quantization codebooks.
+Nonconvex shape discovery, categorical semantics, and alternative similarity objectives need separately justified methods.
 
 ## Common pitfalls
 
-- **Forgetting to standardize features.** k-means uses Euclidean distance; features with larger scale dominate.
-- **Random initialization without k-means++.** Different runs give different clusterings; report consensus or use k-means++.
-- **Treating cluster IDs as meaningful.** Cluster 0 in one run may be cluster 7 in the next; permutation invariance.
-- **Using k-means on categorical data without thought.** Use k-modes, k-prototypes, or one-hot + k-means with care.
-- **Reporting one clustering as "the answer."** Run multiple times, take the best by within-cluster SS.
+Cluster IDs are permutation-invariant; compare partitions or aligned centers, not raw labels across runs.
+Alternating minimization alone does not make this algorithm an arbitrary mixture model's EM procedure.
+
+</div>

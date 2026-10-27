@@ -13,13 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Save each character's latest position. A repeat inside the current window forces its left boundary past that occurrence.
-Old history outside the window must not move the boundary backward.
+Find the longest contiguous piece of a string in which every character occurs only once.
 
 ## Problem
 
-For `text="abba"`, return length 2, from `"ab"` or `"ba"`.
-The substring must be contiguous. Characters mean exact Python code points; empty input returns 0.
+**Input.** A Python string `text`.
+
+**Output.** Return the maximum length of a substring containing no repeated character.
+
+**Rules.** A substring is contiguous; skipping interior characters is not allowed.
+Compare exact Python code points, so case and whitespace remain significant.
+Return only the length and leave the string unchanged. Empty input returns zero.
+
+**Example.** `"abba"` returns `2`, witnessed by `"ab"` or `"ba"`.
+For `"bbbb"`, return `1`; for `""`, return `0`.
 
 ## Picture: Repair Only the Newly Repeated Character
 

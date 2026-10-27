@@ -13,16 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Remove irrelevant endpoints before testing symmetry. Move inward only after discarding an irrelevant endpoint or verifying a matching pair.
+Check whether a string reads the same both ways after ignoring nonalphanumeric characters and letter case.
 
 ## Problem
 
-> Ignore punctuation and letter case, then check whether text reads the same both ways.
+**Input.** A Python string `text`.
 
-The precise reference policy uses Python `isalnum()` and compares each retained code point's `lower()` result.
-It does not implement whole-string case folding or grapheme comparison.
+**Output.** Return `True` if its retained characters match in forward and reverse order; otherwise return `False`.
 
-Return a Boolean without changing the string. Empty and entirely filtered strings return `True`.
+**Rules.** Retain characters accepted by Python `isalnum()` and compare each retained code point's `lower()` result.
+Punctuation and whitespace are ignored. This is not whole-string case folding, normalization, or grapheme comparison.
+Leave the string unchanged. Empty and entirely filtered strings return `True`.
+
+**Example.** `"A man, a plan, a canal: Panama"` returns `True`.
+For `"race a car"`, return `False`; for `"!!!"`, return `True`.
 
 ## Picture
 

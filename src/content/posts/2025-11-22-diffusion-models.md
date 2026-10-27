@@ -1,26 +1,20 @@
 ---
 title: "Diffusion models"
-description: "Learn to invert a fixed noising process. The dominant generative paradigm for images, audio, video, and molecules in 2026."
+description: "Construct one noisy training pair, recover a clean estimate, and distinguish noise prediction from dependent reverse sampling."
 date: "2025-11-22"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
+Gaussian diffusion learns reverse transitions for a fixed process that corrupts clean data with noise.
+
 ## Summary
 
-A **diffusion model** ([Ho et al., 2020](https://arxiv.org/abs/2006.11239); [Sohl-Dickstein et al., 2015](https://arxiv.org/abs/1503.03585)) defines a forward Markov chain that gradually adds Gaussian noise to data $x_0 \to x_1 \to \dots \to x_T \approx \mathcal{N}(0, I)$, and learns a neural network $\epsilon_\theta(x_t, t)$ to reverse it by predicting the noise added at each step. Sampling iterates the learned reverse process from pure noise.
-
-Diffusion is the **dominant 2026 paradigm** for high-fidelity generation in continuous modalities:
-
-- Images: Stable Diffusion, DALL-E 3, Midjourney, Imagen, FLUX.
-- Video: Sora, Veo, Runway Gen-3.
-- Audio: Stable Audio, AudioLDM, Suno.
-- Molecules / proteins: RFdiffusion [(Watson, Juergens, Bennett et al., 2023)](https://www.nature.com/articles/s41586-023-06415-8) for protein structure generation; widely used in the lab of David Baker, who shared the 2024 Chemistry Nobel for computational protein design.
-
-Compared to GANs and VAEs, diffusion offers stable training, excellent sample diversity, and natural conditional generation. Its main weakness. Slow iterative sampling. Is the focus of active research (DDIM, distillation, consistency models).
-
-**Learning objective:** Distinguish one-step diffusion training at an independently sampled noise level from sampling, which must chain learned reverse transitions from noise to a clean sample.
+Why can training jump directly to one noise level while generation needs dependent updates?
+Take clean scalar $x_0=2$, retained signal variance $\bar\alpha_t=0.64$, and sampled standard-normal noise $\epsilon=-1$.
+A predictor returns $\hat\epsilon=-0.5$.
+We will compute its training error and clean estimate, then identify what a sampler still needs.
 
 <!-- visual:diffusion-training-sampling-asymmetry -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="diffusion-asymmetry-visual-title">
@@ -89,88 +83,104 @@ Compared to GANs and VAEs, diffusion offers stable training, excellent sample di
 			<text class="viz-callout" x="380" y="389" text-anchor="middle">One shared time-conditioned network learns across noise levels; only generation chains its calls.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the arrow structure, not the colors. On the top row, independently sampled <em>t</em> and noise combine with known clean data to construct any <em>x<sub>t</sub></em> directly, supervise one network call, and update the shared parameters. On the bottom row, the network predicts noise and a separate reverse update computes or samples <em>x<sub>t−1</sub></em>. That state becomes the next input, so reverse steps remain serial even when a faster sampler skips selected noise levels. Mechanism checked against <a href="https://arxiv.org/abs/2006.11239">DDPM</a> and <a href="https://arxiv.org/abs/2010.02502">DDIM</a>; the schematic is original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the arrows in the two lanes. Training knows clean data and sampled noise, so one marginal draw supplies a target. Generation knows neither target. Each noise prediction feeds a separate reverse update, whose result becomes the next input. Skipping levels requires compatible solver coefficients. Sources: <a href="https://arxiv.org/abs/2006.11239">DDPM</a> and <a href="https://arxiv.org/abs/2010.02502">DDIM</a>.</figcaption>
 </figure>
 
 ## The forward process
 
-Define a variance schedule $\beta_1, \dots, \beta_T$ (small values, increasing). The forward step:
+Choose $0<\beta_t<1$, define $\alpha_t=1-\beta_t$, and let $\bar\alpha_t=\prod_{s=1}^t\alpha_s$.
+Independent forward Gaussian increments give
 
 $$
-q(x_t \mid x_{t-1}) = \mathcal{N}(\sqrt{1 - \beta_t}\, x_{t-1},\; \beta_t I).
+q(x_t\mid x_{t-1})=\mathcal N(\sqrt{\alpha_t}x_{t-1},\beta_t I),
+\qquad x_t=\sqrt{\bar\alpha_t}x_0+\sqrt{1-\bar\alpha_t}\epsilon.
 $$
 
-This is a fixed (non-learned) Markov chain. After $T$ steps with appropriate schedule, $x_T \approx \mathcal{N}(0, I)$.
-
-A useful identity: you can sample $x_t$ directly from $x_0$ in closed form:
-
-$$
-q(x_t \mid x_0) = \mathcal{N}(\sqrt{\bar\alpha_t}\, x_0,\; (1 - \bar\alpha_t) I), \quad \bar\alpha_t = \prod_{s=1}^{t}(1 - \beta_s).
-$$
-
-So $x_t = \sqrt{\bar\alpha_t}\, x_0 + \sqrt{1 - \bar\alpha_t}\, \epsilon$ for $\epsilon \sim \mathcal{N}(0, I)$.
+Composition multiplies the signal coefficients.
+The noise variance recurs as $\alpha_t(1-\bar\alpha_{t-1})+\beta_t=1-\bar\alpha_t$.
+Thus the marginal is $\mathcal N(\sqrt{\bar\alpha_t}x_0,(1-\bar\alpha_t)I)$.
+It approaches standard normal only when residual signal becomes negligible for the data distribution.
 
 ## Training
 
-For a sample $x_0$:
+Sample data, a time index and independent $\epsilon\sim\mathcal N(0,I)$.
+Construct $x_t$ directly and minimize $\mathbb E\|\epsilon-\epsilon_\theta(x_t,t)\|^2$.
+This simplified objective need not equal every time-weighted variational bound.
+Our fixture gives $x_t=0.8(2)+0.6(-1)=1$ and squared error $(-1+0.5)^2=0.25$.
+The model sees $x_t,t$, not the sampled target noise.
 
-1. Pick a random timestep $t \in \{1, \dots, T\}$.
-2. Sample noise $\epsilon \sim \mathcal{N}(0, I)$.
-3. Form $x_t = \sqrt{\bar\alpha_t} x_0 + \sqrt{1 - \bar\alpha_t} \epsilon$.
-4. Train $\epsilon_\theta(x_t, t) \approx \epsilon$ with MSE.
+**Change the requirement:** predict clean data instead.
+For $0<\bar\alpha_t<1$, convert using
 
-That's it. One simple loss, no adversary, no special tricks. This is why diffusion is so stable. Denoising regression on a closed-form forward process.
+$$
+\hat x_0=\frac{x_t-\sqrt{1-\bar\alpha_t}\hat\epsilon}{\sqrt{\bar\alpha_t}}.
+$$
+
+The estimate is $(1+0.3)/0.8=1.625$; using the true noise would recover two.
+Noise MSE equals clean-data MSE multiplied by $\bar\alpha_t/(1-\bar\alpha_t)$ under this conversion.
+Changing prediction targets without their loss weights and sampler coefficients changes the training problem.
+At zero retained signal, this inverse formula is singular.
 
 ## Sampling (reverse process)
 
-DDPM-style ancestral sampling [(Ho et al., 2020)](https://arxiv.org/abs/2006.11239):
+Start from an appropriate Gaussian prior and compute dependent reverse states:
 
-1. Start with $x_T \sim \mathcal{N}(0, I)$.
-2. For $t = T, T-1, \dots, 1$:
-   - Compute predicted noise $\epsilon_\theta(x_t, t)$.
-   - Sample $z \sim \mathcal{N}(0, I)$ (or $z = 0$ at $t = 1$).
-   - Update $x_{t-1} = \frac{1}{\sqrt{1 - \beta_t}}(x_t - \frac{\beta_t}{\sqrt{1 - \bar\alpha_t}} \epsilon_\theta(x_t, t)) + \sigma_t z$.
-3. Return $x_0$.
+$$
+x_{t-1}=\frac{1}{\sqrt{\alpha_t}}
+\left(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\epsilon_\theta(x_t,t)\right)+\sigma_t z.
+$$
 
-DDPM uses $T = 1000$. **DDIM** [(Song et al., 2020)](https://arxiv.org/abs/2010.02502) reduces to ~50 steps with a deterministic update. **Consistency models** [(Song 2023)](https://arxiv.org/abs/2303.01469) and **distillation** further reduce to 1–4 steps.
+Here $z$ is fresh standard-normal transition noise, with $z=0$ at the final step by convention.
+The variance $\sigma_t^2$ is a declared model or sampler choice.
+One choice is $\beta_t(1-\bar\alpha_{t-1})/(1-\bar\alpha_t)$; it is not the only supported variance.
+A noise prediction alone supplies neither the update coefficients nor the next state.
+Using adjacent-step DDPM coefficients for an arbitrary timestep jump is not justified.
 
 ## Conditional generation
 
-Add condition $c$ (text embedding, class label, image) to the network: $\epsilon_\theta(x_t, t, c)$. Standard conditioning mechanism: cross-attention from $x_t$ to text embeddings (T5 or CLIP).
-
-**Classifier-free guidance** [(Ho & Salimans, 2022)](https://arxiv.org/abs/2207.12598) interpolates between conditional and unconditional predictions:
+**Change the requirement:** strengthen a condition $c$ using a model trained to support unconditional prediction.
+[Classifier-free guidance](https://arxiv.org/abs/2207.12598) combines
 
 $$
-\tilde\epsilon_\theta(x_t, t, c) = (1 + w) \epsilon_\theta(x_t, t, c) - w \epsilon_\theta(x_t, t, \emptyset)
+{}\tilde\epsilon=(1+w)\epsilon_\theta(x_t,t,c)-w\epsilon_\theta(x_t,t,\emptyset).
 $$
 
-with $w \approx 7$ for text-to-image. Trades sample diversity for adherence to the prompt.
+Conditional prediction two, unconditional prediction one and $w=2$ produce $3(2)-2(1)=4$.
+The alternative convention $s=1+w$ writes unconditional plus $s$ times the conditional difference.
+Guidance changes the sampled distribution; it is not simply a speed setting.
+
+**Transfer:** ten transitions with two denoiser evaluations each require twenty evaluations, absent reuse.
+Batching the pair changes execution scheduling, not the number of logical evaluations.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Latent diffusion (Stable Diffusion)
 
-Train a VAE to compress images to a small latent space (typically 1/8 spatial resolution, 4 channels). Run diffusion in the latent space. Decode the final latent with the VAE decoder.
-
-Result: 64×64 latent diffusion ≈ 512×512 image quality at much lower compute. The 2022 SD release (Rombach et al.) made high-quality text-to-image practical on consumer GPUs.
+An additional learned encoder maps data to a smaller latent; diffusion models that latent distribution.
+The decoder maps generated latents back to the data space.
+[Latent diffusion](https://arxiv.org/abs/2112.10752) changes the representation and reconstruction limits, not the Gaussian composition identity.
+Compression ratio and channel count depend on the autoencoder.
+Text cross-attention and protein conditioning, as in [RFdiffusion](https://www.nature.com/articles/s41586-023-06415-8), are distinct application choices.
 
 ## Sample quality vs. step count
 
-Diffusion sample quality is determined by:
-
-- Model capacity and training data.
-- Number of denoising steps (more = better, with diminishing returns).
-- Sampler (DDIM, DPM-Solver, Euler, Heun). Different ODE/SDE solvers with different quality/speed tradeoffs.
-- Classifier-free guidance scale.
-
-A useful rule: 30–50 DDIM steps with a modern sampler matches 1000-step DDPM quality.
+Measure quality, coverage, latency and denoiser evaluations for the actual model, schedule, guidance and solver.
+More evaluations do not universally improve every metric.
+[DDIM](https://arxiv.org/abs/2010.02502), [consistency models](https://arxiv.org/abs/2303.01469) and distillation require compatible updates or learned objectives.
+Their reported speedups are not universal equivalence rules.
 
 ## Common pitfalls
 
-- **Confusing $\epsilon_\theta$ prediction with $x_0$ prediction.** Diffusion can be parameterized as predicting the noise, the clean image, or the velocity (v-parameterization). They are mathematically related but not identical.
-- **Forgetting that the forward process is fixed, not learned.** Only the reverse is parameterized.
-- **Treating diffusion as a likelihood model directly.** Diffusion has a variational ELBO; for likelihood-based comparison, use IWAE or compare on FID/sample quality instead.
-- **Running fewer steps than the model was trained for, without testing.** Some samplers degrade past 10 steps; check empirically.
+Likelihood bounds and likelihood estimates evaluate probability assignment under stated approximations.
+FID evaluates feature-distribution statistics; it is not a likelihood estimate or a complete coverage test.
+Noise, clean-data and velocity parameterizations require matching time-dependent conversions.
+The forward corruption here is fixed; the learned reverse remains an approximation.
+Foundations: [DDPM](https://arxiv.org/abs/2006.11239) and [Sohl-Dickstein et al.](https://arxiv.org/abs/1503.03585).
 
 ## Related
 
 - [Variational autoencoders](/concepts/variational-autoencoders/). VAEs are the latent compressor in latent diffusion.
 - [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Broader paradigm comparison.
+
+</div>

@@ -3,13 +3,13 @@
   "slug": "annotated-reasoning-strategy-mock",
   "article": "src/content/posts/2026-08-29-annotated-reasoning-strategy-mock.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "See how one fixed accelerator budget becomes a complete five-envelope portfolio whose protected serving, evaluation, and recovery capacity cannot be silently consumed by a promoted training run.",
-  "mediumRationale": "A compact semantic HTML allocation map is the smallest medium that keeps all five percentages, their sum, and each envelope's evidence or protection rule readable together. It uses existing responsive panels instead of implying a measured continuous curve or adding article-specific styling.",
+  "mediumRationale": "Two equal-length, proportionally segmented 100% bars make the opportunity cost visible. A declared six-point transfer moves one boundary while serving, evaluation and the hatched reserve remain aligned. This synthetic proposal is not an empirical allocation or approval.",
   "mediumComparison": {
     "mermaid": "Rejected because automatic graph layout emphasizes process flow, while the learning task is to reconcile five simultaneous claims on one finite total and read their distinct allocation rules.",
-    "svg": "Rejected because fixed coordinates would add drawing complexity without improving on labelled semantic panels for these discrete percentages and rules.",
-    "semanticHtml": "Selected because existing figure and panel primitives provide a responsive, screen-reader-readable grouping of all five envelopes, exact text labels, theme support, and print behavior.",
+    "svg": "Selected because a common ruler, proportional widths, aligned protected segments and one changed boundary expose the finite-budget constraint directly.",
+    "semanticHtml": "Rejected for the primary explanation because equal-sized prose panels hide the relative allocations and the capacity displaced by a training increase.",
     "interaction": "Rejected because changing percentages would suggest an optimization model that the article does not supply; the teaching point is the allocation discipline and evidence gates, not slider exploration.",
     "paperReuse": "Rejected because the cited sources establish compute-budget, test-time-allocation, and serving-memory mechanisms but do not contain this article's five-envelope operating policy. Public access is not treated as artwork reuse permission.",
     "noVisual": "Rejected because the prose states percentages across separated turns, making it easy to miss that they exhaust one shared 100% budget and that serving, evaluation, and recovery have different protection rules from speculative work."
@@ -91,6 +91,13 @@
     "visualIds": [
       "fixed-capacity-portfolio-guardrails"
     ],
-    "accessibility": "The figure uses native headings and text with an explicit aria-label; every envelope includes its percentage, purpose, and rule, so no meaning depends on color. Existing learning-figure and visual-grid primitives stack the panels into one column below 640 pixels for 390-CSS-pixel screens, use site theme variables in dark mode, and switch to the shared light high-contrast print palette."
+    "accessibility": "The SVG has a linked title and complete text description of both allocations. Visible percentages, ordered labels, fixed boundary guides and a hatched reserve provide redundant identities without relying on color. The whole comparison fits one responsive viewBox with no screen minimum width and remains static in print."
+  },
+  "comprehensionRevision": {
+    "reviewedAt": "2026-10-26",
+    "problem": "Equal-sized cards state five percentages but do not encode their magnitudes or the work displaced by a training increase.",
+    "change": "Replace the cards with exact proportional bars and an explicitly hypothetical transfer from post-training to continued training.",
+    "readerCheck": "Where do the six extra training points come from, and did recovery capacity change?",
+    "evidenceLimit": "Expert illustration redesign; no measured learner-comprehension improvement is claimed."
   }
 }

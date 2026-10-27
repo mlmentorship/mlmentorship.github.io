@@ -9,34 +9,26 @@ category: "concepts"
 
 ## Summary
 
-A Markov decision process, or MDP, models repeated decisions with states, actions, transition probabilities, rewards, and a time horizon. Bellman equations express a value as the current reward plus the value of the next state.
+A Markov decision process specifies sequential decisions through sufficient state, available actions, transitions, rewards, and task boundaries.
+Bellman equations combine immediate reward with continuation value, then average the environment's possible outcomes.
 
-## Why AI labs care
-
-MDPs are the base model for reinforcement learning. They appear in:
-
-- game-playing agents;
-- robot control;
-- recommendation and ranking policies;
-- language-model post-training;
-- tool-using agents;
-- resource scheduling.
-
-An RL answer is hard to assess if the state, action, reward, and episode are not clear.
+In our hypothetical support task, asking for one fact either resolves the request or needs follow-up.
+Compute this fixed action's expected return before comparing it with another action.
 
 ## MDP components
 
 An MDP is often written as $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$:
 
 - $\mathcal{S}$: states;
-- $\mathcal{A}$: actions;
+- $\mathcal{A}(s)$: actions available in state $s$;
 - $P(s'\mid s,a)$: chance of next state $s'$ after action $a$ in state $s$;
 - $R(s,a,s')$: reward for the transition;
-- $\gamma$: discount factor between 0 and 1.
+- $\gamma$: discount factor, with $0\leq\gamma<1$ for bounded-reward infinite-horizon guarantees.
 
 A policy $\pi(a\mid s)$ gives a distribution over actions in each state.
 
-The Markov property says the current state contains the information needed to predict the next transition. If important history is missing, the state definition is incomplete.
+The Markov property requires state to retain the information predicting transitions and rewards, given the chosen action.
+Permission checks constrain actions before reward optimization.
 
 ## Return and value
 
@@ -58,7 +50,8 @@ $$
 Q^\pi(s,a) = \mathbb{E}_\pi[G_t \mid s_t=s, a_t=a].
 $$
 
-$V$ asks how good a state is. $Q$ asks how good one action is in that state.
+$V$ averages the policy's current action; $Q$ fixes that action, then follows the policy afterward.
+Here $r_t$ is the reward from the transition beginning at time $t$.
 
 ## Bellman expectation equations
 
@@ -76,14 +69,14 @@ Q^\pi(s,a) = \mathbb{E}_{s'\sim P}
 \left[R(s,a,s') + \gamma\mathbb{E}_{a'\sim\pi}Q^\pi(s',a')\right].
 $$
 
-These equations are recursive. They turn a long-horizon problem into a one-step target plus a value estimate.
-
-**Learning objective:** trace one action-value Bellman backup from a current state through stochastic next states, then probability-weight their immediate-reward-plus-discounted-value returns.
+For a terminal indicator $D$, the target is $R+\gamma(1-D)V^\pi(s')$.
+Actual termination contributes no continuation, even if a stored terminal value is nonzero.
 
 <!-- visual:bellman-stochastic-backup -->
 <figure class="learning-figure plot-panel" aria-labelledby="bellman-backup-title">
 	<p class="visual-kicker">One Bellman backup</p>
 	<p class="visual-title" id="bellman-backup-title">Expectation combines every possible next-state return.</p>
+	<p><strong>Action gate:</strong> choose only authorized actions before evaluating rewards; reward cannot grant permission.</p>
 	<svg viewBox="0 0 360 400" role="img" aria-labelledby="bellman-backup-svg-title bellman-backup-svg-desc">
 		<title id="bellman-backup-svg-title">A stochastic action-value Bellman backup</title>
 		<desc id="bellman-backup-svg-desc">From the current support state, the agent takes the action ask for one missing fact. The environment then resolves the request with probability three quarters, giving immediate reward 2 and terminal continuation value 0, or needs follow-up with probability one quarter, giving immediate reward negative 1 and next-state value 4. With discount one half, the two branch returns are 2 and 1. Their probability-weighted average is Q pi of s comma a equals 1.75.</desc>
@@ -120,7 +113,7 @@ These equations are recursive. They turn a long-horizon problem into a one-step 
 		<text class="viz-callout" x="180" y="344" text-anchor="middle">Qᵖⁱ(s,a) = 0.75(2) + 0.25(1)</text>
 		<text class="viz-callout" x="180" y="367" text-anchor="middle">= 1.75</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> fix the action first, then follow every transition the environment might produce. On each branch, add the immediate reward to the discounted next-state value; only then weight those branch returns by their transition probabilities. The backup is <em>not</em> the best-looking branch or an unweighted average: here it is <code>0.75 × 2 + 0.25 × 1 = 1.75</code>. Original schematic checked against <a href="https://incompleteideas.net/book/the-book-2nd.html">Sutton and Barto (2018)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first fix an available action. The resolved branch returns 2; follow-up returns −1 + 0.5 × 4 = 1. Weight those returns by 0.75 and 0.25, giving 1.75. An unweighted average gives 1.5; choosing the best random branch gives 2. Neither is this expectation. Original schematic checked against <a href="https://incompleteideas.net/book/the-book-2nd.html">Sutton and Barto (2018)</a>.</figcaption>
 </figure>
 
 ## Bellman optimality
@@ -132,54 +125,75 @@ Q^*(s,a) = \mathbb{E}_{s'\sim P}
 \left[R(s,a,s') + \gamma \max_{a'} Q^*(s',a')\right].
 $$
 
-Q-learning uses a sample version of this target. Policy-gradient methods optimize the policy directly instead of taking a max over learned action values.
+The maximum chooses a future available action, not the most favorable stochastic next state.
+For bounded rewards and $\gamma<1$, the Bellman operator is a contraction in the maximum norm.
+
+### Evaluate a different policy
+
+**New task:** evaluate the current follow-up policy rather than its best possible action.
+
+**Picture and change:** follow-up offers terminal action returns $0$ and $8$.
+The current policy chooses them with probabilities $0.75$ and $0.25$, so continuation value becomes $2$.
+
+**Check:** the original action now has value $0.75(2)+0.25(-1+0.5\times2)=1.5$.
+Always choosing the follow-up return $8$ instead gives $2.25$.
+Those answer different policy questions.
+
+**Use when:** the estimand is a declared policy's return, not optimal continuation.
 
 ## Small example: a support agent
 
-A support agent can read an account, ask a question, issue a refund, or escalate.
+**New task:** two identical messages arrive after different verification histories.
 
-- **State:** verified account facts, conversation history, policy state, and tool results.
-- **Action:** one tool call or one message.
-- **Transition:** customer reply or tool outcome.
-- **Reward:** successful resolution, with hard penalties for unauthorized actions.
-- **Terminal state:** resolved, escalated, refused, or timed out.
+**Picture and change:** retain trusted verification state $v$ and enforce the available-action set.
+When $v=0$, allow asking or escalating; when $v=1$, a policy-compliant refund may also be available.
 
-If the state omits whether identity was verified, the policy cannot make a safe refund decision. If reward measures only resolution, the policy may take unsafe shortcuts.
+**Check:** assigning refund reward $1000$ cannot enable that action when $v=0$.
+The visible message alone is insufficient state; inferred confidence cannot manufacture authorization.
+
+**Use when:** omitted history changes predictions or valid actions.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Why AI labs care
+
+Control, scheduling, recommendations, language-model post-training, and tool-using agents all require a declared decision problem.
+An algorithm name cannot replace its transition, information, or authority contract.
 
 ## Partial observability
 
-Many real systems do not expose the full state. A robot has noisy sensors. A language-model agent does not know the user's hidden goal. This is a partially observable MDP.
-
-The policy needs a belief or memory based on past observations. For an LLM agent, the prompt and tool history act as a limited memory. They may still omit important state.
+Noisy observations may omit the Markov state.
+A belief distribution or justified memory summarizes relevant history; a text prompt is not automatically sufficient.
+Trusted permission state remains authoritative even when a policy maintains a belief about hidden conditions.
 
 ## Horizon and discount
 
-- A finite task may end after a fixed number of steps.
-- An ongoing task may use discounting.
-- A smaller $\gamma$ favors near rewards.
-- A larger $\gamma$ gives more weight to long-term outcomes.
-
-For bounded agent tasks, a clear terminal rule is often easier to reason about than choosing a discount factor without need.
+Finite-horizon values need time-to-go, either in state or in time-indexed policies and values.
+An undiscounted continuing task needs additional convergence assumptions; $\gamma=1$ alone supplies no finite-value guarantee.
+Discounting changes reward preferences, not hard task boundaries.
+Termination and external truncation need separate bootstrap policies.
 
 ## In an interview
 
-Use this order:
+Can the same location require different actions with one step or two steps remaining?
 
-1. Define state, action, transition, reward, and terminal conditions.
-2. Check whether the state is Markov.
-3. Define the policy and return.
-4. Write the Bellman equation.
-5. Explain whether value learning, policy learning, or planning fits the action space.
-6. Discuss partial observability, reward failure, and offline versus online data.
+<details><summary>Answer</summary>
+
+Yes. Cashing out gives $1$ immediately; waiting gives zero now and enables terminal reward $2$ next step.
+With $\gamma=1$, cash out when only one step remains; wait when two remain.
+Location alone cannot encode that distinction for a stationary policy.
+
+</details>
 
 ## Common mistakes
 
-- Calling the text prompt the whole environment.
-- Leaving terminal conditions undefined.
-- Using a reward that ignores safety or side effects.
-- Confusing $V(s)$ with $Q(s,a)$.
-- Using the optimality equation while evaluating a fixed policy.
-- Treating a partially observed problem as fully observed.
-- Choosing an RL algorithm before defining the MDP.
+An omitted verification bit plus a callable forbidden action creates a defective environment contract.
+Penalties do not repair that access path.
+State estimation, policy evaluation, and authorization answer different questions.
+Q-learning samples an optimality target; policy-gradient methods optimize policy parameters using their own estimators.
+
+</div>
 
 *Related: [Q-learning](/concepts/q-learning/), [policy-gradient methods](/concepts/policy-gradient/), and [RL environments and graders](/concepts/rl-environments-and-graders/).*

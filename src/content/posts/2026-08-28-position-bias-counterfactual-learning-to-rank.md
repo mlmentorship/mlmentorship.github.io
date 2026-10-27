@@ -15,9 +15,12 @@ prerequisites: ["causal-inference-for-ml-decisions", "ranking-metrics-ndcg-map-m
 
 ## Summary
 
-A click is evidence about both relevance and exposure. Items near the top are examined more often, so raw click rate rewards the logging ranker and its positions.
+Clicks reflect both relevance and whether users examined the result under the displayed ranking.
+Identical relevance can produce different click counts at different positions.
+Define the desired outcome and the probability creating its observation before choosing a correction.
 
-Counterfactual learning and evaluation correct for known assignment or examination probabilities. Inverse propensity scoring reweights observed outcomes, self-normalization can reduce instability, and doubly robust estimators combine weighting with an outcome model. Every method still needs overlap between logged actions and the policy being evaluated.
+Examination weighting estimates a signal under a click model; policy ratios target an alternative policy's reward.
+These are different estimands and different propensities.
 
 ## The observation process
 
@@ -31,9 +34,9 @@ $$
 
 where $E$ means the user examined position $k$ and $R$ means document $d$ was relevant to query $q$.
 
-This factorization is an assumption. Trust, snippets, neighboring results, device type, and query intent can make examination depend on more than position.
-
-The useful lesson remains: no click can mean either “seen and rejected” or “not seen.” Raw logs do not identify which case occurred.
+Here $C,E,R$ denote click, examination, and relevance; $q,d,k$ denote query, document, and position.
+The factorization excludes effects such as trust-driven clicks and examination dependencies on snippets or neighboring results.
+No click does not distinguish an unexamined result from an examined rejection.
 
 <!-- visual:position-bias-inverse-examination-weight -->
 <figure class="learning-figure" aria-labelledby="position-bias-visual-title">
@@ -65,21 +68,28 @@ The useful lesson remains: no click can mean either “seen and rejected” or �
 			</table>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare “Expected clicks” first: identical relevance produces 60 clicks at position 1 but only 15 at position 4 because fewer users examine the lower result. Then apply the inverse examination weight: each lower-position click represents four exposure opportunities, so both positions contribute 60 in expectation. This is an illustrative calculation under the stated position-based examination model, not a claim that real users examine position 4 exactly 25% of the time. Original example checked against <a href="https://arxiv.org/abs/1608.04468">Joachims, Swaminathan, and Schnabel’s counterfactual LTR formulation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> hold relevance probability at 0.60 over 100 impressions. Examination rates 1 and 0.25 produce 60 and 15 expected clicks. Weights 1 and 4 restore expected signals of 60 under this model. These are hypothetical expectations, not measured clicks or a target-policy value estimate. Original example checked against <a href="https://arxiv.org/abs/1608.04468">Joachims, Swaminathan, and Schnabel</a>.</figcaption>
 </figure>
 
 ## Estimate propensities
 
-A propensity is the probability that the logging process creates an observation used by the estimator.
+Examination propensity is the probability of examination; policy propensity is the probability of assigning an action or slate.
+Randomized swaps or a validated click model can inform examination probabilities.
+Randomized assignment should log its actual conditional policy probability, candidates, and policy version.
+Propensities inferred from click outcomes alone need an identification model.
 
-Two propensities appear in ranking work:
+## Worked example
 
-- **examination propensity:** probability that a position is examined;
-- **policy propensity:** probability that the logging policy chooses an item or slate in a context.
+Fix one context and deterministic toy rewards, with a five-event log containing four A actions and one B.
 
-Estimate examination effects with randomized swaps, interventions on result order, or a validated click model. Log policy propensities directly when traffic uses randomized exploration.
+| Action | Logger $\mu$ | Target $\pi$ | Reward | Policy ratio |
+| --- | --- | --- | --- | --- |
+| A | 0.8 | 0.2 | 1 | 0.25 |
+| B | 0.2 | 0.8 | 0 | 4 |
+| B under a different, unsupported logger | 0 | 0.8 | Unknown | Undefined |
 
-A deterministic production ranker has no support for actions it never chooses. Historical logs from that policy cannot evaluate arbitrary new rankings without additional assumptions or exploration.
+The last row is a separate failure scenario, not part of the five-event log.
+Raw reward is $4/5=0.8$, but the original target policy's value is $0.2(1)+0.8(0)=0.2$.
 
 ## Inverse propensity scoring
 
@@ -92,11 +102,12 @@ $$
 \frac{\pi(a_i\mid x_i)}{\mu(a_i\mid x_i)}r_i.
 $$
 
-The ratio gives more weight to actions that the target policy favors but the logging policy chose rarely.
+Here $x_i,a_i,r_i$ are context, chosen action, and mature reward; $\mu,\pi$ are logger and target policies.
+The fixture gives $(4(0.25)(1)+4(0))/5=0.2$.
+The action counts match logger expectations by construction, not by a precision guarantee.
 
-Under correct logged propensities, overlap, and stable outcomes, IPS is unbiased. It can have very high variance when $\mu(a_i\mid x_i)$ is small.
-
-For position-debiased training, inverse examination propensity can weight clicked examples. The exact estimator depends on the click model and loss. State which observation process the weight corrects.
+With correct assignment probabilities, overlap, consistent outcomes, and no hidden assignment confounding, the expectation becomes target-policy reward.
+Very small logger probabilities can create large variance; reward maturity and interference remain separate assumptions.
 
 ## Self-normalization and clipping
 
@@ -110,15 +121,18 @@ $$
 w_i=\frac{\pi(a_i\mid x_i)}{\mu(a_i\mid x_i)}.
 $$
 
-Self-normalization often lowers variance but introduces finite-sample bias.
+The fixture's weight sum is $4(0.25)+4=5$, so SNIPS also equals $0.2$.
+Its effective sample-size diagnostic is $5^2/(4(0.25)^2+4^2)=20/13\approx1.538$.
+Self-normalization has finite-sample bias and is undefined when the realized weight sum is zero.
 
 Weight clipping applies
 
 $$
-\tilde{w}_i=\min(w_i,c).
+w_i^{\mathrm{clip}}=\min(w_i,c).
 $$
 
-It prevents a few rare actions from dominating the estimate. Clipping also adds bias. Report the threshold and show sensitivity to it. SNIPS and clipping are separate choices and may be used together.
+Clipping changes weights, whereas SNIPS changes normalization.
+Either can trade variance against bias; neither is an identification repair.
 
 ## Doubly robust estimation
 
@@ -141,25 +155,46 @@ $$
 \hat{r}(x,\pi)=\sum_a\pi(a\mid x)\hat{r}(x,a).
 $$
 
-The outcome model supplies a baseline, and the weighted residual corrects it on logged actions. Under standard assumptions, the estimator can remain consistent if either the propensity model or outcome model is correct.
+For outcome predictions $\hat r(A)=0.4,\hat r(B)=0.6$, the target-model baseline is $0.56$.
+The average weighted residual is $(4(0.25)(0.6)+4(-0.6))/5=-0.36$, restoring estimate $0.20$.
+Under valid identification and regularity, DR can remain consistent if either nuisance model is correct.
+Use independent nuisance fitting or suitable cross-fitting; reusing evaluation outcomes naively can invalidate that claim.
 
-It does not fix missing support, interference, bad reward definitions, or hidden confounding in a nonrandom logging process.
+### Leave logged support
+
+**New task:** evaluate a candidate the deterministic logger never exposes.
+
+**Picture and change:** check $\pi(a\mid x)>0\Rightarrow\mu(a\mid x)>0$ before forming ratios.
+
+**Check:** the unsupported table row requires division by zero.
+More logs from the same deterministic policy do not reveal its missing reward.
+An extrapolating outcome model adds assumptions; calling it doubly robust does not supply observed evidence.
+
+**Use when:** restrict the target policy/population or obtain permitted evidence where coverage is absent.
+
+### Change weight tails
+
+**New task:** reduce sensitivity to a few large weights.
+
+**Picture and change:** compare declared clipping, normalization, nuisance models, and additional supported data separately.
+
+**Check:** clipping at $c=1$ changes the B weight from four to one.
+The clipped SNIPS denominator becomes $4(0.25)+1=2$, giving $1/2$ instead of $1/5$.
+Lower dispersion therefore need not preserve the estimate.
+
+**Use when:** report ESS, weight quantiles/maxima, and clipping sensitivity rather than trusting nominal sample size.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Slates and ranking policies
 
-A ranked list is a structured action. The probability of a complete slate may be tiny, which makes full-slate IPS impractical.
-
-Common simplifications model positions or item choices separately. These require assumptions about interaction among results. A click on one item can change whether later items are examined, so independent-position models may be wrong.
-
-Use randomized interleaving or online A/B tests when reliable offline identification would require unrealistic slate assumptions.
-
-## Worked example
-
-A logging policy places item A first with probability 0.8 and item B first with probability 0.2. The target policy reverses those probabilities.
-
-When B appears first, its target-to-logging weight is $0.8/0.2=4$. When A appears first, its weight is $0.2/0.8=0.25$.
-
-The large weight for B makes the estimate sensitive to a small number of B observations. More exploration, a larger sample, clipping, or a useful outcome model can reduce variance.
+A ranked list is a structured action whose full assignment probability may be very small.
+Replacing slate propensities with independent item or position probabilities requires assumptions about interactions and examination.
+One click may change whether later items are examined.
+An inverse-examination weight is not a generic whole-slate policy-value ratio.
+Randomized interleaving or online experiments can answer suitable comparisons when offline identification is inadequate.
 
 ## Diagnostics
 
@@ -174,28 +209,27 @@ Before trusting a counterfactual estimate, report:
 - reward maturity and missing outcomes;
 - policy and data versions.
 
-A low-variance estimate for a narrow supported population may be more useful than a nominal estimate for unsupported traffic.
+A precise result on a supported slice does not identify value for unsupported traffic.
+Report target population, reward definition, and unknown outcomes alongside numerical uncertainty.
 
 ## In an interview
 
-Use this order:
+Does doubly robust mean assumption-free?
 
-1. Separate exposure from relevance.
-2. State the logging and target policies.
-3. Identify the propensity being used.
-4. Write the IPS ratio and support condition.
-5. Explain SNIPS, clipping, and doubly robust estimation.
-6. Discuss slate structure, variance, and online validation.
+<details><summary>Answer</summary>
+
+No. Its nuisance-model robustness operates within a valid identification setup.
+It does not fix zero support, interference, confounded assignment, immature rewards, or an ill-defined outcome.
+
+</details>
 
 ## Common mistakes
 
-- Calling raw clicks relevance labels.
-- Treating examination propensity and policy propensity as the same quantity.
-- Saying SNIPS is weight clipping.
-- Ignoring actions with zero logging probability.
-- Estimating propensities from outcomes without an assignment model.
-- Reporting IPS without weight diagnostics.
-- Assuming doubly robust means assumption-free.
+Do not treat the toy log as a confidence interval or empirical reproduction.
+More independent supported data can improve precision; more unsupported traffic cannot create an absent counterfactual.
+Neither a smaller variance estimate nor a fitted reward model proves examination or assignment assumptions.
+
+</div>
 
 ## Practice next
 

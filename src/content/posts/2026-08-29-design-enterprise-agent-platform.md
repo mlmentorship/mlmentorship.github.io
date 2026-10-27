@@ -13,11 +13,20 @@ priority: "Role-specific"
 prerequisites: ["evaluate-an-agent", "llm-security-threat-models", "rl-environments-and-graders", "design-multi-team-ml-platform"]
 ---
 
-Agents propose, policy authorizes, and tools create effects; a timeout does not prove an effect failed.
+Design an enterprise agent platform that coordinates authorized tool use, durable execution, and evidence across independent teams and runtimes.
 
 <span id="the-prompt"></span>
 
 ## Problem
+
+**Context.** A fictional company has 40 agent teams, several providers, and about 300 tools with inconsistent execution and permission contracts.
+The detailed workload below includes duplicate credits after a timeout and an unauthorized export proposal induced by uploaded content.
+
+**Task.** Define a two-year platform direction and useful first-quarter release, including tool contracts, authorization, state, retries, evidence, and migration.
+Explain how the two incidents are prevented or reconciled without requiring one planning runtime.
+
+**Constraints.** Preserve regional restrictions and delegated authority; model proposals do not grant permission.
+A timeout is an unknown effect outcome, not proof of failure. Separate logical actions, attempts, committed effects, and authoritative reconciliation.
 
 A fictional company has 40 agent teams, several model providers and about 300 tools.
 Independent systems disagree on schemas, permissions, memory, traces and retries.
@@ -51,46 +60,25 @@ Revocation after dispatch cannot erase the committed credit.
 
 Control decides authority and versions; execution performs bounded work; evidence records decisions and observed effects.
 
+<p class="visual-title">Only authorized execution may cross the effect boundary</p>
+
 <!-- visual:enterprise-agent-three-plane-boundary -->
 ```mermaid
 flowchart TB
   accTitle: Control authorizes, execution performs, and evidence records an enterprise action
-  accDescr: An authenticated request enters a bounded runtime under explicit delegation. The runtime proposes structured tool arguments but receives no general action credential. Policy checks current authority, arguments and approval. Consequential dispatch waits for durable authorized state. A narrow executor invokes the enterprise system, whose commit or status lookup provides authoritative completion evidence. A lost response remains unknown until reconciliation. Evidence records decisions and effects but cannot itself authorize an action.
-  User["User or service<br/>verified identity"]
-  subgraph Control["CONTROL · authority and versions"]
-    Registry[("Versions + registry")]
-    Admission{"Identity + delegation valid?"}
-    Policy{"Current authority + arguments<br/>approval + destination valid?"}
-  end
-  subgraph Execution["EXECUTION · bounded work"]
-    Entry["Agent entry API"]
-    Runtime["Runtime adapter<br/>model + scoped context"]
-    Gateway["Structured tool proposal"]
-    Durable{"Authorized state<br/>durably written?"}
-    Executor["Narrow executor<br/>logical call + downstream key"]
-    Systems["Enterprise system<br/>commit / authoritative status"]
-  end
-  subgraph Evidence["EVIDENCE · observable decisions and effects"]
-    Events[("Durable execution events")]
-    Uses["Audit · evaluation · incidents<br/>budgets · cost"]
-    Events --> Uses
-  end
-  User ==> Entry ==> Admission
-  Admission ==>|"allow workflow"| Runtime
-  Runtime ==> Gateway ==> Policy
-  Policy ==>|"allow exact action"| Durable
-  Durable ==>|"yes"| Executor ==> Systems
-  Registry -. "approved versions" .-> Admission
-  Registry -. "contract + policy" .-> Policy
-  Admission -. "decision" .-> Events
-  Policy -. "decision" .-> Events
-  Durable -. "pre-dispatch record" .-> Events
-  Systems -. "commit or status receipt" .-> Events
-  class User,Entry viz-input
-  class Admission,Policy,Gateway,Durable viz-focus
-  class Registry,Events viz-state
-  class Runtime,Executor viz-neutral
-  class Systems,Uses viz-output
+  accDescr: Follow the same credit-123 call and downstream key k-456 as the preceding table. A model proposes exact arguments. Current identity, delegation, arguments, approval, and destination must pass control policy; failure holds the call without dispatch. Durable authorized state must exist before a narrow executor sends the call. In this example the account system commits one 50-unit credit but its reply is lost. The outcome remains unknown until an authorized status lookup of the same key returns the commit ID. An execution log or model explanation does not prove that effect.
+  Proposal["EXECUTION: propose<br/>credit-123 + exact args"] --> Policy{"CONTROL: current authority<br/>+ exact action valid?"}
+  Policy -->|no| Hold["HOLD<br/>no dispatch"]
+  Policy -->|yes| Durable["EVIDENCE: persist<br/>authorized call record"]
+  Durable --> Executor["EXECUTION: narrow executor<br/>send key k-456"]
+  Executor --> Systems["Account system commits<br/>one 50-unit credit; reply lost"]
+  Systems --> Unknown["Outcome unknown<br/>no new logical credit"]
+  Unknown -->|authorized lookup of k-456| Receipt["EVIDENCE: commit ID<br/>same 50-unit credit"]
+  class Proposal,Executor viz-neutral
+  class Policy,Hold,Unknown viz-focus
+  class Durable viz-state
+  class Systems,Receipt viz-output
+  class Proposal,Policy,Hold,Durable,Executor,Systems,Unknown,Receipt viz-fit
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> a model proposes; policy authorizes; durable state precedes consequential dispatch. Completion comes from authoritative effect evidence, not a successful-looking model explanation.</p>

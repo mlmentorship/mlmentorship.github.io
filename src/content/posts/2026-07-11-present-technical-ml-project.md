@@ -7,10 +7,17 @@ tags: ["questions"]
 category: "questions"
 ---
 
-Present decisions through evidence, ownership and a concrete mechanism, not just an architecture tour.
-Keep each decision understandable when questions interrupt.
+Present a technical ML project through its problem, your decisions, supporting evidence, and outcomes while handling detailed follow-up questions.
 
 ## Problem
+
+**Context.** An interviewer requests a project you personally worked on; the fictional critical-path trace below is a separate presentation rehearsal.
+
+**Task.** Explain the goal, ownership, constraints, mechanism, alternatives, validation, and outcome of your project.
+For the rehearsal, choose the first dependency to investigate and state what one trace cannot establish.
+
+**Constraints.** Distinguish your contribution from the team's and observed results from estimates or counterfactuals.
+Do not claim the fictional example as personal experience or infer a population p99 from one request trace.
 
 In this fictional rehearsal, the complete request has a 100 ms p99 objective.
 One critical-path trace starts at 0 ms:

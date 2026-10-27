@@ -13,12 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Each output needs everything except its own input. Save the product strictly before it, then combine the product strictly after it.
+For every input position, multiply all the other values without using division.
 
 ## Problem
 
-For integer input `[1, 2, 3, 4]`, return `[24, 12, 8, 6]` without division.
-Zeros and negative values are allowed. Empty input returns `[]`; one value returns `[1]`, using the empty-product convention.
+**Input.** An integer list `nums`, possibly containing zeros, negatives, and repeated values.
+
+**Output.** Return an equally long list whose entry `i` is the product of all input values except `nums[i]`.
+
+**Rules.** Exclude only the current occurrence, not every occurrence with the same value.
+Do not use division or mutate the input. Zeros must be handled correctly.
+Empty input returns `[]`; a singleton returns `[1]`, using the empty-product convention.
+
+**Example.** `[1, 2, 3, 4]` returns `[24, 12, 8, 6]`.
+For `[0, 2, 3]`, return `[6, 0, 0]`; with two zeros every output is zero.
 
 ## Picture: Two Exclusive Sides
 

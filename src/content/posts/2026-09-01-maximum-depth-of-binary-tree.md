@@ -13,17 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-A leaf returns `1`; a parent returns one plus the larger child height.
+Measure the longest root-to-leaf path in a binary tree by counting its nodes.
 
 ## Problem
 
-The tree `[3,9,20,null,null,15,7]` has root `3`, left child `9`, and right child `20`.
-Node `20` has children `15` and `7`.
-Return the number of nodes on its longest root-to-leaf path: **3**.
-The empty tree returns `0`; a leaf returns `1`.
+**Input.** The root of a finite binary tree with `val`, `left`, and `right` fields.
 
-Assume a finite tree without shared nodes or cycles.
-The platform supplies `TreeNode` with `val`, `left`, and `right` fields.
+**Output.** Return the greatest number of nodes on any path from the root to a leaf.
+
+**Rules.** Count nodes, not edges. A leaf has depth one and an empty tree has depth zero.
+Assume no shared nodes or cycles. Leave node values and child links unchanged.
+
+**Example.** A root 3 has children 9 and 20; node 20 has children 15 and 7.
+Return `3`, for either path `3 -> 20 -> 15` or `3 -> 20 -> 7`.
+Its compact level-order notation is `[3, 9, 20, null, null, 15, 7]`.
 
 ## Picture
 

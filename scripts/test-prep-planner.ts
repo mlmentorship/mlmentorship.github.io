@@ -12,11 +12,28 @@ import { getColdPrompt, getLearningContext, getMechanismFamilies, mechanismReadi
 test('cold questions expose the task and exclude the picture, code and changed requirements', () => {
   const source = readFileSync(new URL('../src/content/posts/2026-09-01-subarray-sum-equals-k.md', import.meta.url), 'utf8');
   const prompt = getColdPrompt(source)!;
-  assert.ok(prompt.includes('nonempty continuous ranges'));
+  assert.ok(prompt.includes('nonempty contiguous subarrays'));
   assert.ok(prompt.includes('[1, -1, 1, -1, 1]'));
   assert.ok(!prompt.includes('prefix_count'));
   assert.ok(!prompt.includes('longest_sum'));
   assert.equal(getColdPrompt('## Problem\n\nFind a route.\n\n## Picture\n\nSecret solution.'), 'Find a route.');
+  const posts = readdirSync(new URL('../src/content/posts/', import.meta.url));
+  const coding = new Set(readdirSync(new URL('./coding-visuals/problems/', import.meta.url)).map(file => file.replace(/\.mjs$/, '')));
+  const questions = mechanismReadingOrder.filter(slug => getLearningContext(slug)?.article.href.startsWith('/questions/'));
+  assert.equal(questions.length, 191);
+  for (const slug of questions) {
+    const file = posts.find(name => name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '') === slug);
+    assert.ok(file, slug);
+    const statement = getColdPrompt(readFileSync(new URL(`../src/content/posts/${file}`, import.meta.url), 'utf8'))!;
+    assert.ok(statement, slug);
+    const labels = coding.has(slug) ? ['Input', 'Output', 'Rules', 'Example'] : ['Context', 'Task', 'Constraints'];
+    let previous = -1;
+    for (const label of labels) {
+      const position = statement.indexOf(`${label}.`);
+      assert.ok(position > previous, `${slug}: cold prompt must retain ${label} in statement order`);
+      previous = position;
+    }
+  }
 });
 
 test('mechanism reading links resolve one owner without changing question identity', () => {

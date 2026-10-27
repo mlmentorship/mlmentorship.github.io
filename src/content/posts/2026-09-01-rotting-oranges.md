@@ -13,17 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Every initial rotten orange starts at time zero. Each orthogonal move takes one minute, so the next wave must wait behind earlier arrivals.
+Determine how many minutes it takes for rotting to spread from all initially rotten oranges to every fresh orange.
 
 ## Problem
 
-> Find how many minutes all reachable fresh oranges need to rot.
+**Input.** A rectangular mutable integer `grid`: `0` means empty, `1` fresh, and `2` rotten.
 
-Return the minute when every fresh orange has rotted, or `-1` if any fresh orange is unreachable.
-No fresh cells means zero minutes.
+**Output.** Return the first minute when every fresh orange has rotted, or `-1` if some fresh orange is unreachable.
 
-The mutable grid is rectangular and contains `0` for empty, `1` for fresh, and `2` for rotten.
-Only the four orthogonal neighbors connect. The function changes each reachable fresh cell to `2` and leaves unreachable fresh cells unchanged.
+**Rules.** All initially rotten oranges begin spreading at time zero.
+Each minute they infect fresh orthogonal neighbors simultaneously; empty cells block spread.
+The reference changes reached fresh cells to `2` and leaves unreachable fresh cells unchanged.
+No fresh oranges, including an empty grid, means zero minutes.
+
+**Example.** `[[2, 1, 1], [1, 1, 0], [0, 1, 1]]` returns `4`.
+For `[[2, 0, 1]]`, return `-1` because the empty middle cell separates the fresh orange.
 
 ## Picture
 

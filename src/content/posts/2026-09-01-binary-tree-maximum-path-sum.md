@@ -13,15 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-A parent can extend one child branch. A completed path may use both children because it will not extend upward.
+Find the greatest sum of node values along any single connected path in a binary tree.
 
 ## Problem
 
-> Find the largest sum of any connected path in a binary tree.
+**Input.** The root of a finite integer-valued binary tree without cycles or shared children.
 
-For a nonempty tree, choose at least one node. A simple path cannot revisit a node or fork into three branches.
+**Output.** Return the largest sum over all nonempty simple paths in the tree.
 
-Assume a finite integer-valued tree without cycles or shared children. The reference defines an empty tree's answer as zero.
+**Rules.** A path follows parent-child edges and cannot revisit a node or fork into three branches.
+It may begin and end anywhere; it need not include the root or reach a leaf.
+Negative values are allowed. Preserve the tree; the reference returns zero for an empty tree.
+
+**Example.** Root -10 has children 9 and 20; node 20 has children 15 and 7.
+Return `42` for the path `15 -> 20 -> 7`.
+A single node valued -3 returns `-3`, not zero.
 
 ## Picture
 

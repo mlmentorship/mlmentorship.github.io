@@ -110,6 +110,8 @@ The architecture directly supports incremental migration. Runtime adapters prese
 
 **Learning objective:** Trace one consequential action from model proposal to authoritative outcome, and identify which owner controls each boundary.
 
+<p class="visual-title">A proposed action is not an authoritative outcome</p>
+
 <!-- visual:agent-governed-action-path -->
 ```mermaid
 flowchart TB

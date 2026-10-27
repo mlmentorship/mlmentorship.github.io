@@ -1,6 +1,6 @@
 ---
 title: "Hypothesis testing and confidence intervals"
-description: "Use uncertainty, effect size, and test assumptions to decide whether a measured model gain is likely to be real."
+description: "Quantify paired model gains under sampling assumptions, then compare uncertainty with a predeclared useful-effect threshold."
 date: "2026-08-28"
 draft: false
 tags: ["concepts"]
@@ -9,23 +9,17 @@ category: "concepts"
 
 ## Summary
 
-A hypothesis test asks whether observed data is hard to explain under a stated baseline. A confidence interval gives a range of effect sizes that are consistent with the data and the model assumptions.
-
-## Why AI labs care
-
-Model results contain noise. Training seeds, data order, sampled outputs, human ratings, and test examples can all change a score.
-
-A result such as "the new model improved accuracy by 0.4 points" is incomplete. An interviewer will ask:
-
-- How uncertain is the estimate?
-- Were the same examples used for both models?
-- How many model variants were tried?
-- Is the gain large enough to matter?
-- Which assumptions make the test valid?
+A hypothesis test compares observed data with a null model under explicit sampling and test assumptions.
+A confidence interval quantifies uncertainty using a procedure whose coverage is defined across repeated samples.
+Statistical evidence of improvement is different from evidence of a practically useful gain.
 
 ## The basic setup
 
-Suppose a baseline model has performance $m_A$ and a new model has performance $m_B$. The measured change is:
+Compare two fixed models on independent paired examples from a declared target population.
+Before inspection, choose the accuracy difference, test direction, significance level, and minimum useful gain of one percentage point.
+All counts and intervals here are teaching fixtures, not measured model results.
+
+For scores $m_A,m_B$, the observed change is
 
 $$
 \hat{\delta} = m_B - m_A.
@@ -37,42 +31,31 @@ $$
 H_0: \delta = 0.
 $$
 
-The alternative hypothesis says that the true change is not zero, or that it is positive if the direction was chosen before the experiment.
-
-A test statistic compares the measured change with its standard error:
+Choose a two-sided alternative $\delta\ne0$, or a predeclared directional alternative.
+A standardized statistic compares the estimate with its standard error:
 
 $$
 z = \frac{\hat{\delta}}{\operatorname{SE}(\hat{\delta})}.
 $$
 
-A large absolute value means the measured change is large relative to the noise estimate.
+Its null distribution and standard error require justification; the formula alone is not a valid test.
 
 ## What a p-value means
 
-A p-value is the chance of seeing a result at least this extreme if the null hypothesis and test assumptions are true.
-
-It is not:
-
-- the chance that the null hypothesis is true;
-- the chance that the result will reproduce;
-- the size or value of the improvement;
-- proof that the new method caused the change.
-
-A small p-value can describe a tiny effect on a very large dataset. Report the effect size and its interval.
+A p-value is a null-conditional probability of a statistic at least as extreme as observed.
+It is not the null's posterior probability, replication probability, effect size, or evidence of causation by itself.
 
 ## Confidence intervals
 
-A simple approximate confidence interval is:
+A normal-approximation interval uses
 
 $$
 \hat{\delta} \pm z^* \operatorname{SE}(\hat{\delta}).
 $$
 
-For a 95% interval under a normal approximation, $z^*$ is about 1.96.
-
-Example: a model gain is $0.8$ points with a 95% interval from $0.1$ to $1.5$ points. Zero is outside the interval. The data supports a positive effect under the assumptions. The interval also shows that the true gain may be too small to justify added cost.
-
-**Learning objective:** classify a model-gain confidence interval by whether it rules out no effect and whether it establishes a gain large enough to change the decision.
+For approximate 95% coverage, use $z^*=1.96$ under the matching assumptions.
+Across repetitions, about 95% of intervals constructed this way cover the fixed effect when the approximation is accurate.
+This is not a 95% posterior probability statement about the realized interval.
 
 <!-- visual:model-gain-evidence-decision -->
 <figure class="learning-figure plot-panel" aria-labelledby="model-gain-decision-title">
@@ -117,22 +100,65 @@ Example: a model gain is $0.8$ points with a 95% interval from $0.1$ to $1.5$ po
 		<text class="viz-label" x="323" y="301" text-anchor="middle">+2.0</text>
 		<text class="viz-axis-label" x="200" y="326" text-anchor="middle">model B gain over model A (percentage points)</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare each interval's left endpoint with both vertical rules. Crossing zero means the direction remains uncertain. Clearing zero but not the predeclared +1.0-point threshold supports a positive effect without establishing enough gain to act. Only row 3 clears both bars; that conclusion still depends on the test assumptions and whether +1.0 point was chosen before seeing the result. Definitions checked against the <a href="https://doi.org/10.1080/00031305.2016.1154108">ASA statement on p-values</a>, the <a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm">NIST handbook</a>, and <a href="https://doi.org/10.1098/rsta.1937.0005">Neyman's confidence-interval formulation</a>; the graphic and values are original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare each interval with zero and the predeclared useful gain. Row 1 establishes neither direction nor usefulness. Row 2 excludes zero but still crosses one point; row 3 lies wholly above one point. The paired calculation below produces row 1's rounded endpoints; the other rows are separate synthetic examples. Definitions retain the <a href="https://doi.org/10.1080/00031305.2016.1154108">ASA</a>, <a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm">NIST</a>, and <a href="https://doi.org/10.1098/rsta.1937.0005">Neyman</a> reference provenance.</figcaption>
 </figure>
 
 ## Use paired comparisons
 
-Model A and Model B often score the same examples. Their errors are linked. Use the per-example difference instead of treating the two score sets as independent.
-
-For accuracy, define one value per example:
+Keep one difference per paired example:
 
 $$
 d_i = \mathbf{1}(B\text{ correct}) - \mathbf{1}(A\text{ correct}).
 $$
 
-Estimate the mean and uncertainty of $d_i$. A paired bootstrap or a test for paired binary outcomes is usually more efficient than an unpaired test.
+Among 1,000 pairs, B alone is correct on 20 and A alone on 12; 968 differences are zero.
+Therefore $\bar d=(20-12)/1000=0.008$, and $\sum_i d_i^2=32$.
+The paired sample variance and standard error are
 
-For generation tasks, pair outputs by prompt. If humans compare two outputs, randomize their order and keep the prompt as the unit of analysis.
+$$
+s_d^2=\frac{\sum_i d_i^2-n\bar d^2}{n-1}
+=\frac{32-1000(0.008)^2}{999}\approx0.031967968,
+\qquad \operatorname{SE}=\sqrt{s_d^2/n}\approx0.005654022.
+$$
+
+The interval is $0.008\pm1.96(0.005654022)$, or approximately $[-0.3082,1.9082]$ percentage points.
+The statistic is about $1.415$.
+Discarding the 32 discordant pairs loses the covariance needed for this variance.
+The interval neither establishes direction nor equivalence within a $\pm0.5$-point margin.
+
+### Increase independent information
+
+**New task:** evaluate 4,000 new independent pairs with the same hypothetical discordance proportions.
+
+**Picture and change:** use 80 positive differences, 48 negative differences, and 3,872 zeros.
+Recompute variance and standard error rather than copying the old interval.
+
+**Check:** $\bar d=0.008$, $s_d^2=(128-4000(0.008)^2)/3999$, and SE is approximately $0.002826$.
+The interval becomes approximately $[0.246,1.354]$ points: positive, but still crossing the useful threshold.
+Duplicating the original observations four times would not provide this independent information.
+
+**Use when:** fresh evaluation units can improve precision without changing the estimand.
+
+### Make twenty formal claims
+
+**New task:** control family-wise error at $0.05$ for twenty prespecified tests.
+
+**Picture and change:** Bonferroni compares each p-value with $0.05/20$.
+
+**Check:** the threshold is $0.0025$; p-value $0.01$ does not reject under this procedure.
+Record the entire claim family rather than selecting its size after seeing results.
+
+**Use when:** formal claims span multiple metrics, variants, or slices.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Why AI labs care
+
+Evaluation examples, training seeds, generated outputs, and human ratings are different randomness sources.
+The paired fixture addresses evaluation-example uncertainty conditional on fixed models, not every training recipe's variation.
+Report failed and missing runs; do not select the best seed and hide the rest.
 
 ## Type I and Type II errors
 
@@ -140,51 +166,39 @@ For generation tasks, pair outputs by prompt. If humans compare two outputs, ran
 - **Type II error:** miss a real gain.
 - **Power:** the chance of detecting an effect of a chosen size when it exists.
 
-Low power does not make a negative result useful. Before running an expensive study, choose a minimum effect that would change the decision and estimate the required sample size.
+Non-rejection does not establish equality.
+An equivalence claim needs a predeclared margin and an appropriate procedure.
+Choose a minimum decision-relevant effect and plan power under plausible variance and clustering before an expensive study.
 
 ## Multiple comparisons
 
-If a team tries many models, prompts, benchmarks, and slices, one result may look strong by chance.
-
-Good practice:
-
-1. Choose the primary metric before looking at results.
-2. Record all tested variants.
-3. Treat broad slice analysis as exploration unless it was planned.
-4. Confirm promising findings on fresh data.
-5. Use a multiple-testing correction when many formal claims are made.
+Model or prompt selection on the evaluation set changes what the reported interval covers.
+Keep exploratory slices distinct from planned claims and confirm selected findings on fresh data.
+Repeated peeking needs a sequentially valid design, not repeated use of a fixed-sample threshold.
 
 ## Common assumptions
 
-Check whether:
-
-- examples are independent, or grouped by user, document, or task;
-- the evaluation sample matches the target use;
-- the metric has a stable variance;
-- the test direction was chosen before seeing the result;
-- failed or missing runs were included honestly;
-- the test set was not used for model selection.
-
-For repeated prompts from the same user or tasks from the same source, compute uncertainty at the group level.
+Pair generation outputs by prompt and randomize human presentation order.
+If users or documents contribute repeated observations, retain clusters when estimating uncertainty.
+Normal approximations need adequate sampling behavior; paired bootstrap and paired-binary tests require their own assumptions.
+Representative sampling, causal assignment, and training-run uncertainty are separate concerns.
 
 ## In an interview
 
-Use this order:
+An interval is $[0.1,1.5]$ points and the useful threshold is one point. What follows?
 
-1. State the decision and primary effect.
-2. Name the unit of analysis.
-3. Use a paired comparison when both models see the same examples.
-4. Report effect size and confidence interval.
-5. Discuss power, multiple comparisons, and important slices.
-6. State what result would change the launch or research decision.
+<details><summary>Answer</summary>
+
+It supports a positive effect under the matching test and assumptions, but not a gain exceeding one point.
+It is not a posterior probability statement or a complete launch decision.
+
+</details>
 
 ## Common mistakes
 
-- Reporting only a p-value.
-- Calling a non-significant result "no difference."
-- Treating prompts from one user as independent samples.
-- Picking the best seed and hiding the rest.
-- Checking many metrics and reporting only the one that passed.
-- Using statistical significance as the launch rule.
+CI exclusion corresponds to rejection only for a matching direction, level, and test construction.
+A statistically precise tiny gain can still lose against cost, latency, or safety constraints.
+
+</div>
 
 *Related: [expectation, variance, covariance, and correlation](/concepts/expectation-variance-covariance-correlation/), [bootstrap and resampling](/concepts/bootstrap-and-resampling/), [A/B testing for ML systems](/concepts/ab-testing-for-ml/), and [design an ablation study](/questions/design-ablation-study/).*

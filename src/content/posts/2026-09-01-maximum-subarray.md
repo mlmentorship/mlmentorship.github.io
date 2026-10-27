@@ -13,13 +13,19 @@ aliases: []
 prerequisites: []
 ---
 
-Keep the best nonempty sum ending at the cursor. Separately save the best sum seen anywhere, even when the current range falls.
+Find the largest sum obtainable from one nonempty contiguous range of an integer list.
 
 ## Problem
 
-> Find the largest sum of a nonempty continuous subarray.
+**Input.** A nonempty list `nums` of integers, including possible negative values and zeros.
 
-The reference accepts a nonempty integer list. A subarray is contiguous; skipping an interior value is not allowed.
+**Output.** Return the largest sum over all nonempty contiguous subarrays.
+
+**Rules.** At least one value must be selected. Skipping an interior position or returning an empty zero-sum selection is forbidden.
+Return the sum, not its endpoints. Leave the list unchanged; empty input is outside the contract.
+
+**Example.** `[-2, 1, -3, 4, -1, 2, 1, -5, 4]` returns `6` from `[4, -1, 2, 1]`.
+For `[-3, -1, -2]`, return `-1`, not zero.
 
 ## Picture
 

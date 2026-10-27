@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-An optimal coin construction contains an optimal solution for the amount left after removing its final coin.
+Find the fewest available coins needed to make an exact amount, with unlimited reuse of each denomination.
 
 ## Problem
 
-Make amount `7` from denominations `[2,3]`, using each value as often as needed.
-Return the fewest coins, or `-1` if impossible.
-The amount is a nonnegative integer and denominations are integers; the source ignores nonpositive values.
-Duplicate denominations do not change the optimum.
+**Input.** An integer list `coins` of denominations and a nonnegative integer `amount`.
+
+**Output.** Return the smallest number of coins totaling exactly `amount`, or `-1` if that amount is impossible.
+
+**Rules.** Each positive denomination may be used any number of times.
+Duplicate denominations do not change the answer; the reference ignores nonpositive denominations.
+Amount zero requires zero coins. Leave `coins` unchanged.
+
+**Example.** For `coins = [2, 3]` and `amount = 7`, return `3` using `2 + 2 + 3`.
+For `coins = [2]` and `amount = 3`, return `-1`.
 
 ## Picture
 

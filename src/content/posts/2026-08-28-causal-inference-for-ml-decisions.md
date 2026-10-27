@@ -15,9 +15,21 @@ prerequisites: ["hypothesis-testing-confidence-intervals", "ab-testing-for-ml"]
 
 ## Summary
 
-Prediction asks what outcome is likely given observed data. Causal inference asks how an outcome would change under an intervention. A predictive association can be accurate and still give the wrong intervention decision.
+Prediction asks what is likely under observed data; a causal decision asks what a defined intervention would change.
+Specify the target population, assignment mechanism, identification assumptions, and estimator before interpreting an association as an effect.
 
-A causal answer needs four parts: a target estimand, an assignment process, identification assumptions, and an estimator. Randomized experiments provide the clearest assignment process. Observational methods require stronger assumptions that cannot be verified from the data alone.
+## A Support-Message Decision
+
+Consider this hypothetical two-hundred-user population, with difficulty measured before any message:
+
+| Difficulty | Messaged: churn/users | Unmessaged: churn/users |
+| --- | --- | --- |
+| High | $16/80$ | $6/20$ |
+| Low | $1/20$ | $8/80$ |
+
+Recipients churn at $17/100$ versus $14/100$ for nonrecipients, an observed difference of positive three percentage points.
+Should messages be withheld because recipients churn more?
+Not from this association alone: the high-difficulty group is much more likely to receive messages.
 
 ## Potential outcomes and estimands
 
@@ -27,7 +39,9 @@ $$
 Y_i(1) \quad \text{and} \quad Y_i(0).
 $$
 
-They are the outcomes under treatment and control. The individual treatment effect is $Y_i(1)-Y_i(0)$, but only one potential outcome is observed for each unit.
+Let treatment one mean receiving the defined support message and treatment zero mean not receiving it.
+Fix a churn window and assume no cross-user spillovers for this simple unit-level target.
+Only one potential outcome is observed per user; the individual effect $Y_i(1)-Y_i(0)$ is unavailable directly.
 
 A common target is the average treatment effect:
 
@@ -35,23 +49,18 @@ $$
 \operatorname{ATE}=\mathbb{E}[Y(1)-Y(0)].
 $$
 
-Other targets include:
-
-- average effect on treated units;
-- effect for an eligible population;
-- effect among compliers;
-- conditional effects by user or context;
-- policy value under a treatment rule.
-
-State the population, intervention, outcome window, and aggregation before choosing a method.
+Effects on treated users, eligible users, compliers, or conditional subgroups target different populations.
+Policy value additionally depends on the proposed treatment rule and its constraints.
 
 ## Why prediction can mislead
 
-Suppose users who receive support messages have higher churn. A predictive model may learn that message receipt predicts churn. Sending fewer messages may still increase churn because the messages were triggered by earlier signs of user difficulty.
-
-The treatment and outcome share a cause. This is confounding.
+Difficulty affects both message assignment and churn, opening a noncausal route between the two.
+The graph asserts that causal structure; predictive accuracy alone cannot establish or remove the confounding.
 
 A directed acyclic graph can express the claim:
+
+<p class="visual-kicker">Confounding</p>
+<p class="visual-title">Difficulty changes both message assignment and churn, so observed association alone cannot identify the intervention effect.</p>
 
 <!-- visual:causal-confounding-dag -->
 ```mermaid
@@ -65,15 +74,29 @@ flowchart TB
 	class T viz-focus
 	class Y viz-output
 	class D,T,Y viz-compact
+	class D viz-fit
 ```
 
 <p class="diagram-caption"><strong>Read it this way:</strong> difficulty opens a backdoor path from support messages to churn. The observed association mixes that path with the message's causal effect.</p>
 
-Conditioning on sufficient pre-treatment causes of both treatment and outcome may identify the effect. Conditioning on variables caused by treatment can instead introduce bias.
+For this calculation only, assume pre-treatment difficulty suffices to block confounding and both actions have support in each group.
+Within high difficulty, observed rates are $0.20$ versus $0.30$; within low difficulty, $0.05$ versus $0.10$.
+The target population is half high difficulty and half low difficulty, so standardization gives:
+
+$$
+\widehat E[Y(1)]=0.5(0.20)+0.5(0.05)=0.125,
+\qquad
+\widehat E[Y(0)]=0.5(0.30)+0.5(0.10)=0.20.
+$$
+
+The adjusted contrast is $-0.075$, or 7.5 percentage points less churn, under the declared assumptions.
+This is teaching arithmetic without estimated uncertainty, not evidence that actual support messages reduce churn.
 
 ## Randomized experiments
 
-Random assignment makes treatment independent of potential outcomes in expectation. Estimate the effect with a difference in group means, adjusted for the assignment design.
+Valid random assignment provides independence from potential outcomes under its design.
+Analyze assignment and the resulting intervention using the correct randomization units and outcome weights.
+With noncompliance, the assignment effect need not equal the effect of actually receiving the message.
 
 Check:
 
@@ -85,7 +108,7 @@ Check:
 - heterogeneous effects;
 - guardrail outcomes.
 
-Randomization does not fix a vague intervention or wrong outcome. It identifies the effect of the treatment as implemented on the measured population and period.
+Randomization does not fix an undefined intervention, missing outcomes, interference, or an inappropriate target population.
 
 ## Backdoor adjustment
 
@@ -101,9 +124,37 @@ These assumptions mean:
 
 - **consistency:** the observed outcome under the received treatment matches the defined potential outcome;
 - **positivity:** each relevant covariate group has some chance of each treatment;
-- **exchangeability:** after conditioning on $X$, treatment assignment contains no remaining outcome information.
+- **exchangeability:** conditional on $X$, treatment assignment is independent of the potential outcomes, not necessarily the observed outcome.
 
-Do not control for every available feature. Post-treatment variables, colliders, and proxies affected by treatment can create bias.
+These assumptions cannot all be verified from this table.
+Adjusting for post-message satisfaction can remove mediated effects or introduce bias; adding variables is not automatic identification.
+
+## Change the Requirement
+
+### Remove Observable Support
+
+**New task:** Nobody with severe difficulty goes untreated.
+
+**Picture and change:** That group's untreated propensity becomes zero, removing its observed comparison.
+
+**Check:** A zero untreated count cannot supply the group's $0.30$ counterfactual risk.
+
+**Use when:** A proposed policy includes actions absent from historical data.
+Seek defensible additional evidence or explicitly narrow the target; outcome-model extrapolation alone does not restore identification.
+
+### Change the Assignment Evidence
+
+**New task:** Compare before/after churn in rollout and comparison regions.
+
+**Picture and change:** Use outcome changes and justify parallel untreated trends, including anticipation and composition checks.
+
+**Check:** Treated churn $20\%\to16\%$ versus comparison $15\%\to14\%$ gives $-4-(-1)=-3$ percentage points.
+
+**Use when:** A defensible time-comparison design replaces individual randomization.
+The two before/after numbers alone cannot verify the counterfactual parallel-trends assumption.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Propensity scores and weighting
 
@@ -115,13 +166,17 @@ $$
 
 Inverse-propensity weighting estimates a pseudo-population in which treatment is less associated with measured covariates. For the ATE, treated units receive weight $1/e(X)$ and control units receive weight $1/(1-e(X))$.
 
-Large weights indicate weak overlap and high variance. Inspect propensity distributions, cap or stabilize weights when justified, and report the population for which overlap holds.
+The fixture has propensities $0.8$ and $0.2$.
+Its weighted message risk is $(16/0.8+1/0.2)/200=0.125$; untreated risk is $(6/0.2+8/0.8)/200=0.20$.
+Large weights can indicate weak overlap and high variance; inspect distributions and effective sample sizes.
+Weight capping changes the estimator and can introduce bias; trimming or redefining the population needs an explicit target and justification.
 
 A propensity model balances measured covariates. It does not remove unmeasured confounding.
 
 ## Doubly robust estimation
 
-A doubly robust estimator combines an outcome model with a propensity model. It can remain consistent when either model is correctly specified under the identification assumptions.
+A doubly robust estimator combines outcome and propensity models.
+Under identification, overlap, and suitable convergence conditions, consistency can survive misspecification of one nuisance model if the other is correct.
 
 This does not protect against a wrong estimand, poor overlap, interference, or unmeasured confounding. Use cross-fitting for flexible ML nuisance models to reduce overfitting bias.
 
@@ -139,21 +194,23 @@ The main assumption is parallel trends: without treatment, the average outcome p
 
 ## Regression discontinuity
 
-Regression discontinuity uses a treatment rule with a cutoff, such as eligibility above a score threshold. Units near the cutoff can be comparable if they cannot precisely manipulate the running variable.
-
-The estimate is local to the cutoff. Check sorting or manipulation, smooth covariates, bandwidth sensitivity, and alternative functional forms.
+A sharp cutoff design can identify a local effect when potential-outcome means are continuous through the threshold.
+Check manipulation, other simultaneous policy changes, covariate behavior, bandwidth sensitivity, and functional forms.
+An inability to manipulate the score is not alone sufficient; fuzzy compliance needs a separate identification argument.
+Do not generalize the local effect across the entire population without additional assumptions.
 
 ## Interference and feedback
 
 Standard potential-outcome notation assumes one unit's treatment does not change another unit's outcome. This fails in social networks, marketplaces, auctions, and shared-capacity systems.
 
-Possible designs include cluster randomization, switchback experiments, or explicit exposure models. In recommendation systems, treatment can also change future training data. The estimand must include the time horizon and policy feedback.
+Cluster randomization, switchbacks, and exposure models must match the plausible spillovers and carryover; their names do not remove interference.
+Recommendation policies also change future training data, so define the horizon and feedback included in the target policy value.
 
 ## Worked example
 
-A ranking model shows premium content more often to users predicted to subscribe. Premium exposure and subscription are positively associated.
-
-That association does not identify the effect of showing premium content because high-intent users receive more exposure. A randomized exposure change can estimate the intervention effect. If randomization is unavailable, the analysis needs a defensible assignment model, overlap, and sensitivity to unmeasured intent.
+As a separate decision illustration, high-intent users receive more premium content and subscribe more often.
+The observed association does not identify exposure's effect because intent changes both assignment and outcome.
+Transporting the support-message calculation would require this setting's own population, intervention, support, and identification argument.
 
 ## In an interview
 
@@ -184,3 +241,5 @@ A strong answer says what cannot be learned from the available data. Method name
 Apply this framework in [A/B testing for ML](/concepts/ab-testing-for-ml/), [ML experiment design](/questions/design-ml-ab-test/), [offline-online metric debugging](/questions/debug-offline-online-metric-gap/), and [personalized ranking](/guides/personalized-search-ranking/).
 
 For deeper study, see [Causal Inference: What If](https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/) by Hernán and Robins.
+
+</div>

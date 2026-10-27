@@ -9,7 +9,18 @@ category: "questions"
 
 > A large language-model run is stable for 18,000 steps, then loss spikes, gradient norms jump, and two ranks report NaNs. What do you do in the first hour?
 
-Freeze the evidence before restarting. A fast rollback that destroys the first bad batch, rank logs, optimizer state, and environment diff can turn a recoverable incident into an expensive mystery.
+Investigate a distributed language-model training incident while preserving evidence and preventing an unsafe or uninformative restart.
+
+## Problem
+
+**Context.** A hypothetical run is stable for 18,000 steps, then loss and gradient norms spike and two ranks report NaNs.
+You have the first hour to coordinate containment and diagnosis.
+
+**Task.** Preserve the relevant run state, prioritize hypotheses, choose discriminating replay or numerical checks, and define a safe recovery decision.
+Specify communication, ownership, and evidence needed before resuming expensive training.
+
+**Constraints.** Do not overwrite the first bad batch, checkpoints, rank logs, optimizer state, or environment differences.
+Separate data, arithmetic, optimizer, collective, and hardware explanations; a successful restart alone does not establish the cause.
 
 ## The first-hour sequence
 
@@ -20,6 +31,8 @@ Freeze the evidence before restarting. A fast rollback that destroys the first b
 5. **Reproduce cheaply.** Replay the offending batch and checkpoint on fewer devices where possible.
 6. **Test one causal family at a time.** Data, numerics, optimizer state, distributed state, hardware, or code/config drift.
 7. **Recover from a known-good state.** Apply the smallest justified mitigation and retain the original failure for root-cause work.
+
+<p class="visual-title">Locate the first bad transition before changing causes</p>
 
 <!-- visual:frontier-training-divergence-zoom -->
 ```mermaid

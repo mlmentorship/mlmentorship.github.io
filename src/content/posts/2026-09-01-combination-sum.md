@@ -13,16 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-Keep subtracting a chosen value without moving backward in the sorted choices. Reuse is allowed; reordered versions of the same combination are not new answers.
+List the distinct value combinations that reach an exact target, allowing each positive candidate to be reused.
 
 ## Problem
 
-> Return combinations that add to a target. A value may be used more than once.
+**Input.** An integer list `candidates` and an integer `target`.
 
-Candidates and target are integers. The source **sorts, deduplicates and silently removes nonpositive candidates** before searching.
-It does not solve unrestricted signed combinations. It leaves the input unchanged.
+**Output.** Return every distinct combination of positive candidate values whose sum equals `target`.
 
-Return value combinations, not occurrence choices or permutations. Target zero returns `[[]]`, one empty combination; a negative target returns `[]`.
+**Rules.** Reuse is unlimited. Reordering the same values does not create a new combination.
+The reference ignores duplicate and nonpositive candidates; it does not solve unrestricted signed combinations.
+Leave the input unchanged. Target zero returns `[[]]`; a negative target returns `[]`.
+
+**Example.** For `candidates = [2, 3, 6, 7]` and `target = 7`, return `[[2, 2, 3], [7]]`.
+`[2, 3, 2]` is not an additional answer because it repeats the same value combination.
 
 ## Picture
 

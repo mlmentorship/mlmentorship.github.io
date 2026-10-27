@@ -5,9 +5,9 @@
   "status": "implemented",
   "medium": "mermaid",
   "learningObjective": "Distinguish the control plane's authorization and version decisions from execution work and from the evidence plane's durable record of decisions and effects.",
-  "mediumRationale": "A full-width Mermaid flowchart is the smallest medium that can separate three architectural planes while showing their necessary cross-plane contracts: control constrains execution before a side effect, and execution emits evidence at each boundary. The lesson is relational rather than geometric, and the tall-flow primitive preserves readable labels with themed and printable rendering.",
+  "mediumRationale": "A fitted vertical Mermaid trace follows the article's one logical credit through proposal, current authorization, durable pre-dispatch state, a lost response, and authoritative reconciliation. Plane names label the relevant decisions and observations instead of requiring a wide component catalogue. The lesson is relational rather than geometric.",
   "mediumComparison": {
-    "mermaid": "Selected because subgraphs and labelled solid and dashed edges directly express plane ownership, the governed execution path, and independent evidence emission without introducing a new rendering primitive.",
+    "mermaid": "Selected because the labelled vertical path and explicit no-dispatch branch reveal which plane authorizes, which performs the effect, and which observation establishes completion. The same logical call and downstream key remain visible without subgraph-driven width compression.",
     "svg": "Rejected because fixed coordinates add maintenance cost without teaching a quantitative, geometric, or shape-based relationship.",
     "semanticHtml": "Rejected because a responsibility table can compare the planes but cannot show that control constrains the live path while evidence is emitted alongside it rather than after it.",
     "interaction": "Rejected because stepping through a fixed architecture adds controls and hidden state without changing the inference the reader must make.",
@@ -105,6 +105,12 @@
     "visualIds": [
       "enterprise-agent-three-plane-boundary"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and a full text description. Plane headings, direct node labels, arrow labels, numbered path nodes, subgraph boundaries, and solid versus dashed edges carry the meaning without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; established theme tokens preserve dark-mode contrast and print resets the width floor for page-safe rendering."
+    "accessibility": "The Mermaid source provides an accessible title and a full text description. Direct CONTROL, EXECUTION, and EVIDENCE labels, an explicit HOLD branch, and repeated call/key identities carry the distinction without color. The fitted vertical trace passes native desktop, exact-390 phone, dark-theme, and print-style checks. These checks do not establish PDF pagination or learner comprehension."
+  },
+  "comprehensionRevision": {
+    "reviewedAt": "2026-10-27",
+    "scope": "Replace the 7.33px component map with the existing credit-123 / k-456 example, preserving the registered visual identity and surrounding lesson.",
+    "readerCheck": "After the reply is lost, why must the worker reconcile k-456 rather than issue a new credit, and which observation proves completion?",
+    "verification": "Five native modes pass; the phone capture was directly inspected. Full current registered-library desktop/phone qualification also passes. No learner study is claimed."
   }
 }

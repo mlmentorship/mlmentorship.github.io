@@ -1,6 +1,6 @@
 ---
 title: "CNN architecture"
-description: "Convolutions encode translation equivariance and locality. The structural inductive bias that powered the deep learning revolution in vision."
+description: "Calculate convolution shapes, shared parameters, arithmetic, and receptive fields, then distinguish spatial information from channel capacity."
 date: "2025-09-15"
 draft: false
 tags: ["concepts"]
@@ -9,25 +9,33 @@ category: "concepts"
 
 ## Summary
 
-A **convolutional neural network** stacks **convolutional layers** (sliding-window linear operators with shared weights), **non-linearities**, and **pooling / downsampling** to map images to feature maps that grow in semantic abstraction and shrink in spatial resolution with depth.
-
-CNNs powered the deep-learning revolution in computer vision (AlexNet 2012, VGG 2014, ResNet 2015). Their structural priors. Translation equivariance via weight sharing, local receptive fields, hierarchical composition. Match the structure of natural images and gave them a huge sample-efficiency advantage over fully-connected networks. Even in the transformer era, modern CNNs (ConvNeXt) remain competitive on standard benchmarks.
+A convolution reuses one local linear operator across spatial positions; a CNN composes these operators with nonlinearities and other layers.
+Weight sharing ties parameters, while stride, padding, dilation, and channel counts determine shapes and information loss.
+The architectural bias does not by itself guarantee invariance, semantic hierarchy, or superior sample efficiency.
 
 ## The building block: convolutional layer
 
-Apply a small filter (e.g., $3 \times 3 \times C_{\text{in}}$) at every spatial position of the input, producing one output channel. Repeat with $C_{\text{out}}$ filters → output of shape $H \times W \times C_{\text{out}}$.
+Use channels-last notation here, with input $H\times W\times C_{in}$.
+An ungrouped layer has $k_Hk_WC_{in}C_{out}$ weights and optionally $C_{out}$ biases.
+Along either spatial axis,
 
-Per output:
+$$
+H_{out}=\left\lfloor\frac{H+2p-d(k-1)-1}{s}\right\rfloor+1.
+$$
+
+Here $p,d,s$ are padding, dilation, and stride; require valid positive output dimensions.
+
+For unit stride and dilation, omitting boundary indexing, the common cross-correlation implementation computes:
 
 $$
 y_{ij,c_{\text{out}}} = \sum_{c_{\text{in}}} \sum_{u, v} W_{u, v, c_{\text{in}}, c_{\text{out}}} \cdot x_{i+u, j+v, c_{\text{in}}} + b_{c_{\text{out}}}.
 $$
 
-Critical properties:
-
-- **Weight sharing**: the same filter is applied at every position. Vastly fewer parameters than fully-connected.
-- **Translation equivariance**: shifting the input shifts the output by the same amount. Hard-coded inductive bias.
-- **Locality**: each output depends only on a small spatial neighborhood of the input.
+For a numerical fixture, use input $32\times32\times3$, sixteen $3\times3$ filters, stride one, padding one, and dilation one.
+Output is $32\times32\times16$; parameters total $3(3)(3)(16)+16=448$.
+There are $32(32)(16)(27)=442368$ multiply-accumulates, excluding biases.
+Counting one multiply and one add per MAC gives $884736$ FLOPs under that convention.
+The diagram uses different illustrative channel counts: thirty-two, then sixty-four.
 
 <!-- visual:cnn-spatial-channel-pyramid -->
 <figure class="learning-figure" aria-labelledby="cnn-pyramid-title">
@@ -69,18 +77,50 @@ Critical properties:
 			<text class="viz-axis-label" x="184" y="222" text-anchor="middle">channels and receptive field increase</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> Move left to right. Convolution preserves the image grid while detecting the same local pattern everywhere. Later stages usually downsample height and width, add feature channels, and combine earlier neighborhoods, so each unit summarizes more of the original image. Global average pooling collapses the remaining locations before classification. Dimensions are illustrative.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the stated grid and channel dimensions from left to right. These illustrated layers preserve, then downsample, the grid while changing channel width. Global average pooling produces one value per channel. The spatial choices determine which locations remain distinguishable.</figcaption>
 </figure>
 
 ## Standard CNN ingredients
 
-- **Conv $3 \times 3$**: workhorse; captures local features.
-- **ReLU / GELU**: pointwise non-linearity.
-- **Batch normalization**: stabilizes training, allows higher LRs.
-- **Max pooling / average pooling**: downsample by taking max / average over $2 \times 2$ windows.
-- **Strided convolution**: alternative downsampling that learns the filter.
-- **Global average pooling**: reduce $H \times W \times C$ to $1 \times 1 \times C$ before the classifier head.
-- **$1 \times 1$ convolution**: per-pixel linear projection across channels; cheap channel mixing.
+- **Spatial convolution:** shared local feature computation.
+- **ReLU/GELU:** nonlinear composition rather than one collapsed affine map.
+- **Normalization:** an implementation choice, not a prerequisite for every trainable CNN.
+- **Pooling/strided convolution:** different downsampling operators with distinct aliasing and information effects.
+- **Global average pooling:** one spatial mean per channel, not universal input-transformation invariance.
+- **$1\times1$ convolution:** channel mixing at each location.
+
+## Receptive field
+
+Track receptive-field extent $r$ and input-coordinate spacing $j$, starting from $r=j=1$.
+One layer gives $r'=r+(k-1)dj$ and $j'=js$ per axis.
+Two stride-one $3\times3$ layers therefore span five input positions, not an exponential extent.
+Boundary handling and strided sampling qualify translation equivariance; arbitrary one-pixel shifts need not produce one-cell output shifts.
+
+## Change the Requirement
+
+### Preserve Fine Spatial Evidence
+
+**New task:** Retain small-object or boundary information that downsampling removes.
+
+**Picture and change:** Consider higher-resolution paths, suitable dilation, or multiscale features rather than merely widening channels.
+
+**Check:** Two $2\times2$ patches with one active pixel in different locations have the same average, $1/4$.
+More channels after that scalar average cannot reconstruct which location was active.
+
+**Use when:** Localization matters; measure compute, aliasing, and dense-task performance together.
+
+### Reduce Channel Work
+
+**New task:** Replace full convolution with depthwise spatial filtering followed by pointwise mixing.
+
+**Picture and change:** For the fixture, weight counts become $3(3)(3)+3(16)=75$, ignoring biases.
+
+**Check:** Arithmetic becomes $32(32)(75)=76800$ MACs, but the restricted factorization cannot represent every full convolution.
+
+**Use when:** Measured hardware cost binds; fewer MACs do not guarantee lower latency.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Architectural eras
 
@@ -96,13 +136,7 @@ Critical properties:
 | 2020 | ViT | Transformers replace CNN backbones |
 | 2022 | ConvNeXt | Modernized ResNet matching ViT performance |
 
-In 2026, **ViT and ConvNeXt are the dominant ImageNet-class backbones**; classic ResNet-50 still ubiquitous in transfer-learning pipelines.
-
-## Receptive field
-
-The receptive field of a unit is the spatial extent of the input that influences it. Stacking $L$ layers of $3 \times 3$ conv with stride 1 gives receptive field $1 + 2L$. Pooling and strided convolution multiply the effective stride, growing the receptive field exponentially.
-
-For dense prediction (segmentation), large receptive field matters; for classification, global pooling at the end aggregates over all spatial locations.
+The table names historical design examples, not a measured ranking or deployment census.
 
 ## ConvNeXt and the modern CNN
 
@@ -113,15 +147,16 @@ ConvNeXt [(Liu et al., 2022)](https://arxiv.org/abs/2201.03545) modernized ResNe
 - Larger kernels ($7 \times 7$ depthwise).
 - Inverted bottleneck (channels-up then down).
 
-Result: matches or beats ViT on ImageNet at the same compute. CNNs are not obsolete; transformers won by being *better-designed*, not by inherent architectural superiority.
+Compare complete training recipes, workloads, quality targets, and hardware before attributing a result solely to convolution versus attention.
 
 ## Common pitfalls
 
-- **Forgetting padding.** Without padding, each conv layer shrinks $H, W$. Use `padding='same'` to preserve spatial dimensions.
-- **Channels-first vs. channels-last.** PyTorch defaults to channels-first $(B, C, H, W)$; TensorFlow / Keras to channels-last. Conversions are common bug sources.
-- **Skipping batch normalization.** Deep CNNs without BN are very hard to train.
-- **Using max-pool too aggressively.** Halving spatial resolution at every layer destroys fine detail; stride-2 conv blocks let you control it.
-- **Treating CNNs as universally outperformed by transformers.** They are competitive on ImageNet at scale; on small datasets, CNNs often beat ViT due to inductive biases.
+- **Shape assumptions.** A $1\times1$ valid convolution need not shrink the grid; stride and padding must be declared.
+- **Axis confusion.** Distinguish the chosen tensor layout from the library's default and physical memory layout.
+- **Invariance claims.** Pooling averages feature positions; it does not make every input transformation irrelevant.
+- **Theoretical versus effective context.** A receptive-field bound lists possible dependencies, not equal influence from every input pixel.
+
+</div>
 
 ## Related
 

@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-The first and last houses conflict. Excluding either endpoint leaves a linear problem.
+Choose nonadjacent houses around a circle to maximize the total value collected.
 
 ## Problem
 
-> Houses form a circle, so the first and last houses are neighbors.
+**Input.** A list `nums` of nonnegative integer house values in circular order.
 
-Maximize the sum of selected **nonnegative** house values. Select no adjacent houses, including the first-last pair.
-Taking none is allowed. Empty input returns zero; a singleton returns its value without a self-conflict.
+**Output.** Return the largest sum obtainable by selecting houses without selecting any adjacent pair.
+
+**Rules.** The first and last houses are neighbors, as are consecutive positions.
+Taking no houses is allowed. Preserve the input.
+Empty input returns zero; a single house may be selected without conflicting with itself.
+
+**Example.** `[2, 3, 2]` returns `3`, not `4`, because the two endpoint houses are neighbors.
+For `[1, 2, 3, 1]`, return `4` by selecting values 1 and 3 at indices 0 and 2.
 
 ## Picture
 

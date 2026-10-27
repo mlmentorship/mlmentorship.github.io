@@ -1,23 +1,37 @@
 ---
-title: "Central limit theorem"
-description: "Sums of many independent random variables become Gaussian. Why nearly every error bar in ML and statistics is computed from a normal distribution."
+title: "Central limit theorem: what becomes Gaussian?"
+description: "Calculate the spread of repeated sample means, compare exact and Gaussian tails, and check what changes under dependence."
 date: "2025-12-21"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
+The central limit theorem approximates standardized averages without changing the distribution of individual observations.
+Which distribution narrows when we average fresh samples of skewed waiting times?
+
 ## Summary
 
-If $X_1, \dots, X_n$ are i.i.d. with mean $\mu$ and finite variance $\sigma^2$, then as $n \to \infty$:
+Suppose $X_1,\ldots,X_n$ are independent, identically distributed observations with mean $\mu$ and finite variance $0<\sigma^2<\infty$.
+Each repetition draws a fresh sample and computes $\bar X_n=n^{-1}\sum_iX_i$.
+The population law stays unchanged across repetitions.
+
+Linearity and independence give exact identities:
 
 $$
-\sqrt{n} \cdot (\bar X_n - \mu) \xrightarrow{d} \mathcal{N}(0, \sigma^2).
+\mathbb E[\bar X_n]=\mu,\qquad
+\operatorname{Var}(\bar X_n)=\frac{1}{n^2}\sum_i\sigma^2=\frac{\sigma^2}{n}.
 $$
 
-The standardized sample mean converges in distribution to a Gaussian, regardless of the original distribution's shape (as long as variance is finite).
+The standard error, $\sigma/\sqrt n$, describes variation across repeated means, not individual observations.
+The theorem separately supplies a limiting shape:
 
-**Learning objective:** distinguish the unchanged distribution of individual observations from the sampling distribution of the mean, which becomes more Gaussian and narrows at rate $1/\sqrt{n}$.
+$$
+Z_n=\frac{\sqrt n(\bar X_n-\mu)}{\sigma}
+\xrightarrow{d}\mathcal N(0,1).
+$$
+
+This is convergence of distribution functions at continuity points, not exact finite-sample normality.
 
 <!-- visual:clt-data-vs-sample-means -->
 <figure class="learning-figure plot-panel" aria-labelledby="clt-sampling-title">
@@ -48,45 +62,100 @@ The standardized sample mean converges in distribution to a Gaussian, regardless
 		<path class="viz-roc-curve" d="M171 280C188 279 195 264 204 240C211 221 218 214 224 214C230 214 237 221 244 240C253 264 260 279 277 280"></path>
 		<text class="viz-label" x="224" y="301" text-anchor="middle">possible values of X or X̄</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare rows at the dashed mean. The top distribution remains skewed because it describes individual observations. Each lower curve describes means from many hypothetical samples of the stated size: it becomes more bell-shaped while its spread shrinks from σ to σ/√n. The curves are schematic and assume independent observations with finite variance. Definitions checked against <a href="https://openstax.org/books/introductory-statistics-2e/pages/7-1-the-central-limit-theorem-for-sample-means-averages">OpenStax Introductory Statistics</a>; the graphic is original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare rows at the dashed mean. The top row describes unchanged individual observations. Each lower curve describes means across fresh independent samples. Their standard error is σ/√n. These are schematic curves, not exact finite-sample densities. The reference is <a href="https://openstax.org/books/introductory-statistics-2e/pages/7-1-the-central-limit-theorem-for-sample-means-averages">OpenStax Introductory Statistics</a>; the graphic is original.</figcaption>
 </figure>
-
-The CLT is why we can:
-
-- Build Gaussian-based confidence intervals for almost any estimator (sample mean, regression coefficients, A/B test deltas).
-- Use $z$-tests and $t$-tests on data that isn't itself Gaussian.
-- Trust that with enough samples, our reported metric ± std is approximately calibrated.
-
-It also explains the prevalence of Gaussian assumptions in ML. Many quantities are sums or averages, and so naturally trend Gaussian.
 
 ## What "enough samples" means
 
-The Berry–Esseen theorem bounds how fast convergence happens:
+Use hypothetical waiting times with an exponential distribution of rate $0.5$ per minute.
+Then $\mu=2$ minutes and $\sigma^2=4$ square minutes.
+
+| Independent observations | Mean of repeated averages | Variance | Standard error |
+| --- | --- | --- | --- |
+| $4$ | $2$ | $1$ | $1$ |
+| $25$ | $2$ | $0.16$ | $0.4$ |
+
+At $n=25$, the threshold $\bar X_n>2.8$ standardizes to $(2.8-2)/0.4=2$.
+The Gaussian upper tail is about $0.02275$.
+The exact sum has a Gamma distribution with shape $25$ and scale $2$:
 
 $$
-\sup_x \big| F_n(x) - \Phi(x) \big| \le \frac{C \cdot \mathbb{E}[|X - \mu|^3]}{\sigma^3 \sqrt{n}}
+\Pr(\bar X_{25}>2.8)
+=e^{-35}\sum_{j=0}^{24}\frac{35^j}{j!}
+\approx0.032374.
 $$
 
-with $C \approx 0.4$. For symmetric, light-tailed distributions, $n = 30$ already gives an excellent Gaussian approximation. For heavy-tailed or skewed distributions you may need $n = 1000$ or more.
+The exact variance calculation did not require a Gaussian approximation; the tail calculation did.
+No universal sample count makes every tail approximation accurate.
 
-Heuristic check: plot a histogram of bootstrap means; if it looks Gaussian, the CLT has kicked in.
+### Change the precision target
 
-## Variants
+To halve standard error from $0.4$ to $0.2$, solve $2/\sqrt n=0.2$.
+The answer is $n=100$, four times the observations.
+Doubling observations only divides standard error by $\sqrt2$.
+Use this calculation when precision, rather than sample count, is the design target.
 
-- **Multivariate CLT**: $\sqrt{n}(\bar X_n - \mu) \to \mathcal{N}(0, \Sigma)$ for a vector-valued sum with covariance matrix $\Sigma$.
-- **Lyapunov / Lindeberg CLT**: relaxes the i.i.d. assumption to independent (not identical) with mild moment conditions.
-- **Martingale CLT**: extends to dependent data forming a martingale; used in online learning regret analysis.
-- **CLT for U-statistics, M-estimators**: extends to functions of multiple samples.
+### Change the independent unit
+
+Repeat each of five independent waiting times five times, producing 25 rows.
+Their average equals the average of the original five times.
+Its variance is $4/5=0.8$, with standard error $\sqrt{0.8}\approx0.894427$, not $0.4$.
+Covariances between repeated rows prevent the independent-row variance calculation.
+Use the actual independent units when designing clustered or repeated-measurement inference.
 
 ## When CLT fails
 
-- **Infinite variance** (e.g., Cauchy distribution): CLT does not apply; sample means do not concentrate. Use stable distributions instead.
-- **Strong dependence**: highly correlated samples violate the i.i.d. assumption; effective sample size is much less than $n$.
-- **Discrete distributions on small support**: CLT applies but the discrete approximation may be visibly bad until $n$ is large.
+Averages of independent standard Cauchy observations remain standard Cauchy.
+Their variance is undefined, so this theorem's premises fail.
+
+Finite variance alone does not make $n=30$ sufficient.
+For Bernoulli probability $0.001$, all 30 observations are zero with probability $0.999^{30}\approx0.970431$.
+That discrete mass defeats a universal bell-shape rule.
+
+**Reconstruct:** independent observations have variance $9$. Which sample count gives standard error $0.3$? Does it change the observation law?
+
+<details><summary>Answer</summary>
+
+Solve $3/\sqrt n=0.3$ to obtain $n=100$.
+The observation law stays unchanged; only the standardized mean has the stated Gaussian limit.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+## Variants
+
+For iid observations with finite third absolute centered moment $\rho$, Berry-Esseen bounds approximation error:
+
+$$
+\sup_x|\Pr(Z_n\le x)-\Phi(x)|
+\le C\frac{\rho}{\sigma^3\sqrt n}.
+$$
+
+Here $\Phi$ is the standard normal distribution function and $C$ is a universal constant.
+For this iid bound, $C=0.4748$ is valid by [Shevtsova's upper estimate](https://arxiv.org/abs/1111.6554).
+The third-moment condition is stronger than finite variance.
+Large standardized third moments make this bound less informative.
+
+Multivariate CLTs replace scalar variance with covariance for iid vectors with finite second moments.
+Lindeberg conditions handle suitable independent nonidentical triangular arrays.
+Martingale CLTs require conditional-variance convergence and controls on large increments; dependence alone does not establish them.
+Estimator-specific CLTs need their own expansions and regularity conditions.
+Neither arbitrary estimators nor degenerate U-statistics automatically have this mean's normalization or Gaussian limit.
+
+The law of large numbers concerns concentration toward $\mu$, not the standardized fluctuation's shape.
+These are different conclusions even when both theorems apply.
 
 ## Common pitfalls
 
-- **Treating $n = 30$ as universally enough.** It is not for skewed or heavy-tailed data.
-- **Using CLT on small sample sizes for inference.** Below $n \approx 30$, prefer the $t$-distribution (which uses the sample-estimated variance) rather than $z$.
-- **Using parametric CLT confidence intervals on data that isn't independent.** A/B tests with user-level dependence (one user, multiple events) have effective $n$ much smaller than event count; cluster-bootstrap or use mixed-effects models.
-- **Confusing "the mean is normally distributed" with "the data is normally distributed."** The CLT is about the *mean*, not individual samples.
+Student's exact small-sample $t$ law requires iid Gaussian observations and their sample variance.
+Consistent variance estimation instead permits asymptotic studentization under appropriate conditions.
+It is not a generic small-sample repair.
+
+A bootstrap histogram describes resampling from observed data.
+It cannot establish coverage when the sample missed rare outcomes or used the wrong sampling unit.
+Metric uncertainty requires an estimand, independent units, a suitable scale estimate, and a justified approximation.
+Writing a metric plus or minus an unspecified standard deviation supplies none of those guarantees.
+
+</div>

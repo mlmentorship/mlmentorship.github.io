@@ -13,14 +13,21 @@ aliases: []
 prerequisites: []
 ---
 
-Expand matching character pairs around a character or a gap. Save a longer accepted range; keep the earlier answer when lengths tie.
+Return a longest contiguous piece of a string that reads identically forward and backward.
 
 ## Problem
 
-> Return the longest continuous palindrome in a string.
+**Input.** A Python string `text`.
 
-The range must be contiguous, not a subsequence. Empty input returns `""`.
-Equality is exact Python code-point equality, without case conversion, Unicode normalization or grapheme grouping.
+**Output.** Return a longest palindromic substring, not merely its length.
+
+**Rules.** The selected characters must be contiguous; skipping intervening characters is not allowed.
+Use exact code-point equality, without case conversion, Unicode normalization, or grapheme grouping.
+Any longest palindrome is valid; the reference retains its first equal-length answer.
+Leave the string unchanged. Empty input returns `""`.
+
+**Example.** `"babad"` permits `"bab"` or `"aba"`; the reference returns `"bab"`.
+For `"cbbd"`, return `"bb"`.
 
 ## Picture
 

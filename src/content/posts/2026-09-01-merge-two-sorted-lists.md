@@ -13,14 +13,20 @@ aliases: []
 prerequisites: []
 ---
 
-The smaller of two sorted heads is globally next; attach that node and advance only its source cursor.
+Combine two sorted linked lists into one sorted chain while reusing all their original nodes.
 
 ## Problem
 
-Merge `A: 1 -> 4 -> 7` and `B: 2 -> 3 -> 8` into `1 -> 2 -> 3 -> 4 -> 7 -> 8`.
-Reuse the original nodes, rather than copying their values into new output nodes.
-Require ascending, acyclic, disjoint chains with comparable values and permission to change their links.
-An empty source is allowed.
+**Input.** Two heads of nondecreasing linked lists with comparable values; either head may be `None`.
+
+**Output.** Return the head of a nondecreasing chain containing every node from both lists exactly once.
+
+**Rules.** The input chains must be acyclic and node-disjoint, with permission to rewrite their links.
+Reuse the original nodes rather than creating replacement output nodes.
+Retain equal-valued occurrences. Two empty inputs return `None`; one empty input leaves the other chain as the result.
+
+**Example.** `A: 1 -> 4 -> 7` and `B: 2 -> 3 -> 8` produce `1 -> 2 -> 3 -> 4 -> 7 -> 8`.
+The nodes valued 1 and 2 are still the original A and B nodes, not copies.
 
 ## Picture
 
