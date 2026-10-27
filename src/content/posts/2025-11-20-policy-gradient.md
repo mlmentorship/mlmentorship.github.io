@@ -46,7 +46,29 @@ $$
 \nabla_\theta J = \mathbb{E}\!\left[ \sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t) \cdot (G_t - b(s_t)) \right].
 $$
 
-Optimal baseline: a value function $V(s_t)$. This leads directly to actor-critic.
+A common baseline is the value function $V(s_t)$, leading to actor-critic.
+It is not generally the minimum-variance baseline.
+For one conditional score-function term, let $u=\nabla_\theta\log\pi_\theta(a\mid s)$.
+When the denominator is nonzero, the scalar baseline minimizing the estimator's total conditional variance is
+
+$$
+b^*(s)=\frac{\mathbb{E}[G\lVert u\rVert^2\mid s]}{\mathbb{E}[\lVert u\rVert^2\mid s]}.
+$$
+
+This equals $V(s)$ only under additional conditions on the score-norm weighting.
+Treat the baseline as constant when differentiating the policy term.
+
+**Predict before revealing:** a one-step policy chooses action 1 with probability 0.8, receives reward equal to its action, and has logit score `action - 0.8`.
+Must baseline $V=0.8$ have less variance than baseline 0.2?
+
+<details><summary>Compare the mean and variance separately</summary>
+
+No. With baseline 0.8, the two gradient estimates are 0.04 and 0.64, with probabilities 0.8 and 0.2.
+Their mean is 0.16 and variance is 0.0576.
+With baseline 0.2, both actions give gradient 0.16, so variance is zero.
+Both baselines are action-independent and unbiased; that does not make their variances equal.
+
+</details>
 
 <!-- visual:policy-gradient-advantage-sign -->
 <figure class="learning-figure" aria-labelledby="policy-gradient-sign-title">
@@ -103,7 +125,7 @@ $$
 A_t^{\text{GAE}(\gamma, \lambda)} = \sum_{l=0}^{\infty} (\gamma \lambda)^l \delta_{t+l}, \quad \delta_t = r_t + \gamma V(s_{t+1}) - V(s_t).
 $$
 
-$\lambda \in [0, 1]$ trades bias for variance. $\lambda = 0$ → one-step TD. $\lambda = 1$ → Monte-Carlo. Standard $\lambda = 0.95$ in PPO.
+$\lambda \in [0, 1]$ trades bias for variance. $\lambda = 0$ gives one-step TD; $\lambda = 1$ gives the full-return form, with terminal or truncation handling stated separately. A value such as 0.95 is a tuning choice, not a universal PPO requirement.
 
 ## Trust regions and PPO
 
@@ -115,7 +137,19 @@ $$
 
 with $r_t(\theta) = \pi_\theta(a_t \mid s_t) / \pi_{\theta_\text{old}}(a_t \mid s_t)$ and $\varepsilon = 0.2$ typical.
 
-PPO is the dominant policy gradient algorithm in 2026: simpler than TRPO, robust, well-understood, used in RLHF.
+PPO is used in control and some RLHF pipelines.
+Its clipped objective removes the incentive for certain sampled-action changes beyond the clipping boundary; it is not a hard constraint on policy ratios or KL.
+
+**Predict before revealing:** old action probability is 0.1, advantage is 1, and clipping parameter is 0.2.
+Can new probability 0.9 have the same clipped objective as new probability 0.12?
+
+<details><summary>Inspect the objective, not an imaginary constraint</summary>
+
+Yes. The ratios are 9 and 1.2, but both clipped surrogate values are 1.2.
+A flat objective beyond the boundary does not make those policy parameters infeasible.
+Monitor ratios and KL; optional early stopping is a separate implementation safeguard, not a guarantee supplied by clipping.
+
+</details>
 
 ## Off-policy actor-critic
 
@@ -123,10 +157,10 @@ For sample efficiency in continuous control, use a replay buffer with importance
 
 ## Common pitfalls
 
-- **High variance.** Always use a baseline; always normalize advantages within a batch (subtract mean, divide by std).
-- **No entropy bonus.** Policies collapse to deterministic; add $-\beta \cdot H(\pi_\theta)$ to the loss to encourage exploration.
-- **Reusing samples without importance correction.** On-policy methods (REINFORCE, PPO) sample from the current policy; using stale samples introduces bias. PPO's clipping caps the staleness.
-- **Mismatch between rollout and learning.** GPU-driven RL often has the policy version drift between rollout and gradient update; PPO's IS ratio handles small mismatches.
+- **High variance.** Test an action-independent baseline. Advantage normalization changes finite-batch estimates and scale; evaluate it rather than assuming every baseline or normalization must help.
+- **Insufficient exploration.** An entropy bonus can help when appropriate; deterministic policies are not automatically a failure. For a minimized loss, $-\beta H(\pi_\theta)$ rewards entropy.
+- **Reusing stale samples.** PPO uses rollout-policy probabilities in its importance ratios, but clipping does not bound staleness or make arbitrary off-policy reuse valid. Collect fresh rollouts and inspect drift.
+- **Mismatch between rollout and learning.** Record the behavior-policy version and log probabilities. Ratios require matching support and do not by themselves guarantee a safe update.
 - **Treating policy gradient as universally low-variance.** It isn't. Q-learning often has lower variance for discrete-action problems.
 
 ## Related

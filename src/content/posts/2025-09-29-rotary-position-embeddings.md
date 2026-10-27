@@ -69,13 +69,13 @@ In code, RoPE is implemented as elementwise multiplies with precomputed `cos` an
 
 To run a RoPE model past its training length:
 - **Position interpolation** [(Chen et al., 2023)](https://arxiv.org/abs/2306.15595): linearly compress positions so the new max length maps to the original training range.
-- **NTK-aware scaling**: increase the RoPE base $10000$ to a larger value so high-frequency components don't alias.
+- **NTK-aware scaling**: change the rotary frequency grid, for example through a base adjustment. Variants modify frequency bands differently; a changed base does not by itself establish reliable long-context behavior.
 - **YaRN** [(Peng et al., 2023)](https://arxiv.org/abs/2309.00071): per-frequency interpolation tuned by training length statistics.
 
 They alter the position-to-angle mapping without changing the attention architecture.
 
 ## Common pitfalls
 
-- **Applying RoPE to V.** Only Q and K are rotated; V is not.
+- **Changing the checkpoint's construction.** In standard RoPE here, rotate Q and K, not V. A different position mechanism requires its own compatible training and implementation contract.
 - **Confusing with ALiBi.** ALiBi adds a fixed slope to attention scores; RoPE rotates Q/K. Both encode relative position but are different mechanisms.
-- **Forgetting the base when extending context.** Naively running a 4K model at 32K without scaling produces garbage past 4K.
+- **Assuming the formula proves extrapolation.** Evaluation beyond the trained range must test position mapping, actual context use, and serving/cache limits. Degradation can occur, but there is no universal failure point shared by all RoPE checkpoints. See the [position-mechanism comparison](/concepts/positional-encoding/).

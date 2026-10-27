@@ -97,19 +97,29 @@ The L6 answer adds the things that come from running this in production for a co
 
 > "...and a few more things I've learned the hard way:
 >
-> **Citation-checking is harder than it sounds.** A model can cite a passage that doesn't actually support its claim. The standard pattern is to use an LLM-based verifier that takes the (claim, cited passage) pair and decides whether the passage supports the claim. The verifier itself can hallucinate, but its error rate is much lower than the answer model's because the task is more constrained. This catches a meaningful fraction of the worst hallucinations in production.
+> **Citation-checking is a separate task.** A resolving citation does not prove that its passage supports the claim. A verifier can score a claim/passage pair, but its false accepts and false rejects need independent, representative labels. A narrower task does not guarantee a lower error rate. The [RAG mechanism](/concepts/rag-overview/) separates authorized retrieval, claim support, and release permission.
 >
 > **Refusal is a quality, not a failure.** A model that says 'I don't know' on the questions it shouldn't answer is *better* than one that confidently makes things up. Train your team and your eval to reward refusals on out-of-scope questions.
 >
 > **Pure RAG isn't enough for adversarial inputs.** Users will ask things that look like the documents but aren't actually in them. The model will pattern-match and hallucinate. Mitigations: explicit instruction to refuse if no relevant passage found, retrieval thresholds (don't pass low-confidence retrievals to the model), distinct prompt branches for 'high confidence retrieval' vs 'low confidence retrieval'.
 >
-> **Self-consistency is real but expensive.** Sample N completions with high temperature, take the majority answer. Improves accuracy on reasoning tasks at N times the cost. Useful for high-stakes single-shot questions; not viable for high-throughput.
+> **Self-consistency is a candidate method, not a verifier.** Multiple samples can improve some tasks, but correlated errors can make the majority confidently wrong. Compare accuracy and total resource cost with the same baseline budget, including any selection or verification step.
 >
-> **Calibration matters more than confidence scores.** Most LLMs report confidence (or you can get a probability from logprobs), but those numbers are uncalibrated; a 'highly confident' wrong answer is just as wrong. The most reliable confidence signal in production tends to be *consistency across multiple samples*: if 5 sampled answers agree, the model is probably right; if they disagree, it's probably wrong, regardless of any individual confidence score.
+> **Agreement is not a calibrated probability.** Five answers can repeat the same unsupported claim. Token likelihood is also not the probability that a factual claim is true. Define the event, gather independent labels, and evaluate any proposed confidence signal by population and slice before setting abstention thresholds.
 >
-> **The hardest hallucinations are subtle.** Not 'the capital of France is Berlin', those are easy to catch. The hard ones are 'the SOC analyst should investigate this alert because it's correlated with X' where X is a plausible-sounding but wrong correlation. These slip past most automated checks. The only defense is human review of high-stakes outputs and a strong eval set built from real failure cases."
+> **Plausible reasoning can still be unsupported.** Require evidence for consequential intermediate claims, not merely a fluent final answer. Depending on the task, deterministic checks, independent source review, restricted actions, abstention, and expert review can complement a failure-focused evaluation set. Human review is not an infallible final oracle."
 
 This is L6. You've gone past the techniques into the *operational discipline* of managing hallucinations in a real product, with specific examples from your own experience.
+
+**Predict before revealing:** five sampled answers all repeat an approval promise absent from the authorized passage. Does agreement justify releasing the promise?
+
+<details><summary>Test support independently of repetition</summary>
+
+No. The five answers may share one mistaken assumption.
+The claim remains unsupported, and any separate release-authorization requirement still applies.
+Agreement can be an evaluated feature, not a substitute for evidence.
+
+</details>
 
 ## The tells that get you a strong-hire vote
 

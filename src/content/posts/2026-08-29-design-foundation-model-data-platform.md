@@ -30,6 +30,38 @@ Preserve reproducible data identities without requiring one processing engine. Q
 
 ## The prompt
 
+**Worked case: an approved source loses permission.** This hypothetical traces one release decision before the full platform design.
+
+**Objective.** Prepare useful training mixtures while enforcing the source's currently approved uses.
+The [curation mechanism](/concepts/foundation-model-data-curation/) separates retention decisions from claims about model capability.
+
+**Invariant.** A content hash proves an identity, not permission to use those bytes.
+A training release needs both an immutable data identity and valid policy evidence for its intended use.
+
+**State.** Source `S17` produced raw objects, parsed records, and token shards referenced by mixture manifest `M12`.
+Transformation edges record those dependencies; a policy version records the source's approved training use.
+
+**Decision.** When that use is withdrawn, block new affected releases and find every downstream manifest through forward lineage.
+Source, policy, privacy, and model owners decide the required treatment of retained artifacts and already-trained checkpoints.
+Do not silently edit `M12` to erase its historical contents.
+
+**Failure and recovery.** Deleting one raw object does not remove its derived shards or prove that a trained checkpoint has forgotten it.
+Build a new eligible manifest, preserve only evidence that may lawfully be retained, and verify exclusion at the release gate.
+A rollback target must satisfy current policy; being older does not make it safe.
+
+**Transfer check.** A researcher regenerates exactly the same bytes under a new filename. Can the next run admit them automatically?
+
+<details>
+<summary>Check the release decision</summary>
+
+No. Renaming or reproducing bytes does not create source permission or discharge deletion obligations.
+Resolve the source identity, intended use, and current policy before admitting the derived artifact.
+The release boundary is approved use plus lineage evidence, not a filename or one successful hash comparison.
+
+</details>
+
+<section data-learning-extension="true" aria-label="Full foundation-model data-platform reference">
+
 A laboratory trains text and multimodal foundation models. It expects to prepare 10 trillion retained text-equivalent tokens over the next two years. Raw inputs come from licensed collections, public sources, partner deliveries, internal data, human annotation, model-generated examples, and task environments.
 
 Today, research groups run separate scripts. Source terms live in spreadsheets. Parser versions are missing from many datasets. Exact duplicates are removed inconsistently. Benchmark owners cannot prove that held-out items stayed out of training. Privacy reviewers receive samples after processing has already started.
@@ -1275,5 +1307,7 @@ A staff target should score 2 on provenance, reliability, deletion, and communic
 For each follow-up, state the changed assumption, affected invariant, decision authority, required evidence, immediate containment, and reversible next step.
 
 ---
+
+</section>
 
 *Related: [foundation-model data curation](/concepts/foundation-model-data-curation/), [ML data lineage and versioning](/concepts/ml-data-lineage-versioning/), [evaluation validity and benchmark contamination](/concepts/evaluation-validity-benchmark-contamination/), [synthetic data generation and verification](/concepts/synthetic-data-generation-verification/), [preference data and reward models](/concepts/preference-data-and-reward-models/), and [design a multi-team ML platform](/questions/design-multi-team-ml-platform/).*

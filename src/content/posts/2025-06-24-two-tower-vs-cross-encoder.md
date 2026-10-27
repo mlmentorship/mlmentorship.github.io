@@ -54,13 +54,13 @@ Right idea, missing the architectural point. You've heard the comparison but hav
 
 > "These solve different problems and the right answer is usually 'both, in sequence.'
 >
-> **Two-tower** (also called bi-encoder, dual-encoder, or dual-tower) encodes query and item *independently* into a shared embedding space. At serving time, you compute query embeddings on demand, look up item embeddings from a precomputed index, and rank by dot product or cosine similarity. The advantage: item embeddings can be precomputed, so retrieval over a billion items is a sub-10ms approximate-nearest-neighbor lookup. The disadvantage: query and item embeddings are computed without seeing each other, so fine-grained interactions are missed.
+> **Two-tower** independently encodes queries and items, allowing item-vector reuse. Search cost and recall depend on catalog size, dimension, hardware, index parameters, filters, and freshness. A single-vector interaction compresses pair detail; it does not imply a universal latency or relevance score. Keep query and item/index versions compatible, as in the [two-tower mechanism](/concepts/two-tower-retrieval/).
 >
 > **Cross-encoder** takes (query, item) as a *joint* input, runs them through the same model, and outputs a relevance score. Strictly more expressive because it can model cross-attention between query and item tokens. The disadvantage: you have to score every (query, item) pair at serving time, which is O(N) per query, infeasible for large catalogs.
 >
 > **The standard production architecture is two-stage**: use a two-tower for *retrieval* (reduce billions to ~thousands of candidates), then a cross-encoder (or other reranker) for *ranking* (reorder the top thousands down to the final ~10). This gets you the speed of two-tower for the bulk of the work and the accuracy of cross-encoder where it matters.
 >
-> The cross-encoder reranker is typically the highest-ROI quality lever in any retrieval system, providing a meaningful precision gain on top-K for modest additional latency."
+> A cross-encoder can improve bounded candidate scoring, but it cannot recover an omitted relevant item. Measure candidate recall, final relevance, cost, and latency separately; the extra stage is worthwhile only when the observed gain justifies its budget."
 
 This is L5. You've named the architectures, the trade-offs, the standard composition, and the operational reality.
 
@@ -68,11 +68,11 @@ This is L5. You've named the architectures, the trade-offs, the standard composi
 
 > "...and a few more things that come up in practice:
 >
-> **Training data is different.** Two-tower is usually trained with contrastive objectives (in-batch negatives, hard negative mining), where the loss is symmetric and the negative samples have outsize impact on quality. Cross-encoder can be trained with simpler pointwise or pairwise losses because each (query, item) pair is independent.
+> **Representation does not uniquely determine the loss.** Contrastive, pointwise, pairwise, or listwise objectives require appropriate labels and candidate sets. A two-tower objective need not be symmetric, and separately scored pairs need not be statistically independent.
 >
 > **The 'right' two-tower architecture has subtleties.** Modern variants include ColBERT (multi-vector representations, one embedding per token, late interaction at scoring time), which gets some of the accuracy of cross-encoder while keeping retrieval tractable; and SPLADE (sparse representations) for hybrid lexical-dense retrieval. These bridge the gap.
 >
-> **Hard negatives are everything for two-tower training.** In-batch negatives alone give you mediocre two-towers. The real wins come from mining hard negatives, items that are *almost* relevant. Common techniques: BM25-mined hard negatives, model-mined negatives from an earlier checkpoint, or curriculum negatives starting easy and getting harder.
+> **Negative semantics need auditing.** Hard-negative mining is a candidate intervention, not an automatic gain. A plausible retrieved item can be another valid positive; exclude or model such cases instead of training them as known negatives. Compare mining policies with matched evaluation and budgets.
 >
 > **Cross-encoder distillation back into two-tower** is a real lever. You can train your two-tower to mimic the cross-encoder's scores on a labeled set, gaining some of the cross-encoder's quality without its serving cost.
 >

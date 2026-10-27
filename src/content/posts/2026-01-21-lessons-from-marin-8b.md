@@ -85,11 +85,14 @@ The prerequisite is observability. You can only react if you can see. Marin had 
 
 ## 2. Z-loss is a regularizer on logit scale, not a stability hack
 
-Standard advice says "use z-loss if you see logit blowup." Marin's actual finding is sharper: z-loss is the only regularizer pressuring the logit scale, so you need it whenever the rest of your training pressure relaxes.
+The retrospective reports a logit-control problem in Marin's particular cooldown and a successful z-loss intervention.
+That does not establish z-loss as the only possible regularizer or a requirement for every cooldown.
 
 The evidence came from a deep cooldown ("Raccoon") where they decayed LR from 1.7e-3 to 1.7e-5 to improve SFT-ability. Training loss started slowly creeping up at the deepest end. Resetting the optimizer didn't help. Removing weight decay didn't help. Eventually they tracked per-layer norms and found the `lm_head` was exploding. A z-loss penalty of 1e-4 on the final logits fixed it cleanly, and z-loss is now a Marin default.
 
-The mechanism (full version on the [z-loss reference page](/concepts/z-loss/)) is that layer norms are typically excluded from weight decay. At very low LR with no other regularization, the final layer norm and `lm_head` can drift in pathological ways even when nothing is technically diverging. If you're doing any kind of long deep cooldown, turn z-loss on by default.
+Cross-entropy is invariant to a common logit offset, whereas z-loss penalizes the log-partition term; see the [z-loss mechanism](/concepts/z-loss/).
+Parameter decay, normalization, optimizer state, and precision also affect the training system.
+Use the [training-recipe approach](/concepts/neural-network-training-recipe/) to compare a controlled intervention with a recoverable baseline before adopting it.
 
 ## 3. "High-quality data" without format diversity hurts downstream tasks
 
@@ -101,7 +104,8 @@ This is the most counterintuitive finding in the retrospective. Marin's microann
 
 The diagnosis is that "high quality" web data lacks the few-shot-learning-inducing structure (multiple choice Q&A, instruction-like patterns) that broad web text contains. FLAN reintroduces that structure. HQ alone removes it. The real signal is format diversity, not "quality" in the academic sense.
 
-If you've ever gotten worse benchmarks after switching to a "cleaner" dataset, this is probably why. Eval performance lives in formats the model has seen during training, and academic-clean text is a narrower distribution of formats than the open web.
+This finding motivates a format-diversity ablation, not a diagnosis of every regression after cleaning data.
+Control mixture composition, token budget, training settings, and held-out task coverage before attributing the result to one mechanism.
 
 ## 4. Perplexity is mostly a measurement of preprocessing, not capability
 

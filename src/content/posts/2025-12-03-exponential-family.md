@@ -38,6 +38,10 @@ $$
 
 This is why MLE via moment-matching works: the gradient of the log-likelihood is "data sufficient stat minus model expected sufficient stat."
 
+For independent observations in a regular exponential family, an interior MLE satisfies that moment equation.
+Such a finite interior optimum need not exist; boundary data, support restrictions, or nonidentifiability require separate treatment.
+The [MLE lesson](/concepts/maximum-likelihood-estimation/) distinguishes a likelihood objective from a guarantee of existence or uniqueness.
+
 <!-- visual:exponential-family-sufficient-stat-moment-match -->
 <figure class="learning-figure" aria-labelledby="expfam-moment-title">
 	<p class="visual-kicker">Learning objective</p>

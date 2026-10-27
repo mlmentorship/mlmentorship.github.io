@@ -30,6 +30,38 @@ The developer retains acceptance authority. Tests are evidence, not permission t
 
 ## The prompt
 
+**Worked case: tests pass against the wrong repository state.** This hypothetical follows one asynchronous edit without granting other modes its tool authority.
+
+**Objective.** Return a useful, reviewable change for the developer's actual task and repository state.
+The [inline-completion mechanism](/questions/build-llm-coding-assistant/) shows why a useful answer can become stale before it arrives.
+
+**Invariant.** Shared context does not imply shared execution authority.
+Bind each request to its repository, revision, dirty overlay, mode, permissions, and bounded action budget.
+
+**State.** An agent starts from revision `r1` and overlay `o7`, edits inside an isolated worktree, and records the patch and test evidence.
+Meanwhile, the developer changes the branch to `r2` and overlay `o8`.
+
+**Decision.** Do not apply the old patch as though its checks covered the new state.
+Return the pinned diff and evidence; detect the mismatch at acceptance and require reconciliation against the current target.
+Review mode can report the mismatch but cannot silently acquire write authority to repair it.
+
+**Failure and recovery.** A green test report for `r1` does not prove compatibility with `r2`, and deleting an assertion invalidates rather than strengthens evidence.
+Rebase or regenerate the change in an authorized workspace, rerun relevant independent checks, and return a new reviewable artifact.
+The developer still decides whether to accept it; tests do not authorize a merge or publication.
+
+**Transfer check.** The old patch applies without a textual conflict. Does that make its earlier tests sufficient?
+
+<details>
+<summary>Check the acceptance boundary</summary>
+
+No. Textual applicability does not establish semantic compatibility or current authority.
+Changes in dependencies, call sites, configuration, or the dirty overlay can invalidate the result without producing a merge conflict.
+Revalidate the reconciled artifact against the actual target and retain its provenance.
+
+</details>
+
+<section data-learning-extension="true" aria-label="Full AI coding-product reference">
+
 Design an AI coding product for individual developers and enterprise teams. It supports four modes:
 
 1. inline completion while a developer types;
@@ -1439,5 +1471,7 @@ A staff target should score 2 on repository state, security, verification, and d
 For each follow-up, name the affected mode, changed invariant, authority boundary, evidence, fallback, owner, and rollback unit.
 
 ---
+
+</section>
 
 *Related: [build an LLM coding assistant](/questions/build-llm-coding-assistant/), [build evals for a coding assistant](/questions/evals-for-coding-assistant/), [evaluate an agent](/questions/evaluate-an-agent/), [LLM security threat models](/concepts/llm-security-threat-models/), and [extend an unfamiliar ML codebase with an AI coding agent](/questions/agentic-ml-codebase-interview/).*

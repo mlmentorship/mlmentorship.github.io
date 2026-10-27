@@ -60,13 +60,13 @@ This is L5. Layered architecture with human-in-the-loop and feedback.
 >
 > **Adversarial robustness.** Users will test the system, find phrasings that bypass it, and share. Augment training data with known evasion patterns; track 'evasion rate' (flagged content that mutates to unflagged versions); maintain a fast-update path for new patterns.
 >
-> **Calibrate on minority groups separately.** A model with overall 95% accuracy can have 70% accuracy on content from a specific demographic, language, or cultural context. Required to track per-slice; required to fix gaps.
+> **Audit relevant slices.** Measure probability quality, false positives, false negatives, and policy consistency across languages and other appropriate slices. An accuracy gap is not itself a calibration diagnosis. Group-specific calibration or thresholds require a justified policy and an assessment of legal, privacy, fairness, and data-support constraints.
 >
-> **Borderline content is the hardest.** Models score most things confidently; the high-judgment content is in the middle of the score distribution. Humans should review borderline cases, not extremes; calibrate routing thresholds so review queue is high-value.
+> **Route review by risk and uncertainty.** Near-threshold cases can be useful, but a confidently wrong extreme can also be consequential. Reserve some representative and risk-targeted audits outside the borderline queue; measure reviewer agreement and capacity.
 >
 > **Counterfactual eval for false negatives.** False positives are visible (users complain). False negatives are invisible by definition (the bad content stayed up). Track via periodic random audits and via reports from users / partners.
 >
-> **The appeals process is part of the model**, not just a customer service function. Appeals data is the highest-quality label source you have; treat it as a first-class training signal.
+> **Appeals are valuable but selected evidence.** Appealers differ from users who cannot or do not appeal, and reviewers can disagree. Version the policy and adjudication, audit label quality, and keep representative sampling separate. As in the [fraud-design lesson](/questions/design-fraud-detection/), observed outcomes depend on the policy; appeal accuracy alone cannot estimate population error rates.
 >
 > **Explainability is a regulatory and trust issue.** When auto-actioning content, surface a reason ('flagged for hate speech against [protected category]'); helps user understanding and reduces disputes."
 

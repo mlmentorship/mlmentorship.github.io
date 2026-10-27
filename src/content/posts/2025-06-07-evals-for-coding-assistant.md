@@ -35,11 +35,11 @@ This is leaderboard eval, useful for vendor selection but useless for a product.
 >
 > Three layers:
 >
-> 1. **Functional correctness via tests.** For each task: a problem statement, a reference solution, and a test suite. Generated code passes if the tests pass. Public benchmarks (HumanEval, MBPP, SWE-bench, LiveCodeBench) provide this format. For your own product, build an internal benchmark from real user requests with hand-written tests.
+> 1. **Functional checks via tests.** Bind the task, repository/environment version, and test oracle. Passing establishes the tested properties, not correctness outside that coverage. Public suites and internal user-derived tasks have different sampling and contamination risks; neither format alone makes the oracle complete.
 >
-> 2. **Code quality.** Tests passing isn't enough; the code should also be readable, idiomatic, and not introduce bugs in adjacent code. Linters and static analysis catch some of this. LLM judges catch the rest, but need calibration.
+> 2. **Code quality.** Use static analysis, a specific review rubric, and human-reviewed samples for properties outside the functional oracle. LLM judges can miss or invent defects; validate their agreement and failure modes instead of assuming they catch everything else.
 >
-> 3. **Real-task evaluation.** For an IDE assistant: completion acceptance rate, edit-distance from generated to final code, time-to-task-completion. These are the online metrics that actually predict business value.
+> 3. **Real-task evaluation.** Acceptance, edits, and completion time are candidate product signals. Define the task endpoint, include review and repair, and use an appropriate controlled comparison before attributing productivity or business value to the assistant.
 >
 > Public benchmarks are useful for vendor selection. Real-task metrics are what you ship on."
 
@@ -83,16 +83,16 @@ This is L5. You've named the three layers and distinguished benchmarks from prod
 >
 > **Per-language slicing matters.** A model can be excellent at Python, mediocre at Java, terrible at Rust. Aggregate scores hide this. Slice by language at minimum; by codebase pattern (web vs systems vs ML) for maturity.
 >
-> **Hallucinated APIs are the dominant failure mode.** Model invents methods that don't exist. Standard verification catches them; without execution-based eval they slip through.
+> **Inventory failure modes rather than assuming a winner.** Invented APIs are one class; incorrect requirements, incomplete edits, regressions, authorization errors, and inadequate tests are others. Measure their frequencies on representative tasks. Execution and static checks have coverage limits.
 >
-> **For online metrics**: completion acceptance rate is the standard, but it's noisy (users accept things they later modify). Time-to-final-code (until the user stops editing) is a better signal."
+> **For online metrics:** acceptance can precede later rewrites, and stopped editing can mean completion, abandonment, or interruption. Use an explicit verified task outcome and total developer effort rather than treating either proxy as a universal productivity measure. The [application-evaluation framework](/questions/how-would-you-evaluate-an-llm-application/) separates success evidence from release criteria."
 
 ## Tells that get you a strong-hire vote
 
 - You distinguish **benchmarks (vendor selection)** from **product metrics (shipping)**.
 - You bring up **test contamination** as a benchmark gotcha.
 - You mention **SWE-bench** as a more realistic evaluator.
-- You name **hallucinated APIs** as the dominant failure mode.
+- You measure **invented APIs and other failure modes** instead of assuming their relative frequency.
 - You discuss **slicing by language and codebase type**.
 
 ## Tells that get you down-leveled

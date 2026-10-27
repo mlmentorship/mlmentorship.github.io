@@ -31,6 +31,39 @@ Respect routine-request latency, asynchronous task limits, real operating costs,
 
 ## The prompt
 
+**Worked case: a node fails during a capacity experiment.** This hypothetical is a capacity ledger, not proof that the resulting allocation meets the traffic SLOs.
+
+**Objective.** Improve useful task completion without spending the same accelerator capacity twice or sacrificing the online service floor.
+The [fixed-budget design mechanism](/questions/design-ml-system-fixed-budget/) makes feasibility and opportunity cost explicit.
+
+**Invariant.** Every concurrent allocation belongs to one envelope, and recovery reserve is not simultaneously promised to offline work.
+Model quality cannot compensate for a violated safety or latency gate.
+
+**State.** An illustrative allocation is `[64,24,8,16,16]`: online serving, continued training, post-training, evaluation/verifiers, and recovery reserve.
+The entries sum to 128 accelerators.
+Actual replica placement, throughput, queueing, memory, and task quality still need measurement before admitting this plan.
+
+**Decision.** If one eight-accelerator node fails, 120 accelerators remain.
+Maintaining the other 112 allocations leaves eight in reserve, assuming compatible placement and recovery.
+If the failure disrupts a serving replica or those assumptions fail, pause checkpointable offline work and restore the online floor first.
+
+**Failure and recovery.** Do not schedule 128 accelerators of training while claiming the same machines also serve requests.
+Checkpoint offline jobs at safe boundaries, reconcile lost work, and admit expanded reasoning budgets only after measured headroom returns.
+A verifier's high score is not a universal correctness certificate; preserve task-specific checks and separate severe-failure gates.
+
+**Transfer check.** A hard-task benchmark improves when each request gets four candidates. May the router enable that policy for everyone?
+
+<details>
+<summary>Check the admission decision</summary>
+
+No. Count every candidate, verifier call, failed attempt, and added queueing cost under the shared capacity ledger.
+Measure the relevant task population and peak-load latency, including node-loss operation.
+Admit the policy only where its independently evaluated benefit fits the remaining resource and risk envelope.
+
+</details>
+
+<section data-learning-extension="true" aria-label="Full fixed-budget reasoning-model reference">
+
 A company wants a reasoning model for coding, quantitative analysis, structured research, and internal decision support. The model must improve difficult-task success without making routine requests too slow or expensive.
 
 The company owns 128 H100-class accelerators with 80 GB of memory. They sit in 16 eight-accelerator nodes with fast links inside each node. The cluster cannot burst into public cloud during the first year because customer data and cost approvals are constrained.
@@ -1030,5 +1063,7 @@ A staff target should score 2 on capacity math, verification, serving, and relia
 For each follow-up, restate the fixed constraint, preserve hard controls, and name the evidence that changes allocation.
 
 ---
+
+</section>
 
 *Related: [Transformer compute and memory accounting](/concepts/transformer-compute-memory-accounting/), [test-time compute, search, and verifiers](/concepts/test-time-compute-search-verifiers/), [design a production LLM inference service](/questions/design-production-llm-inference-service/), [neural scaling laws](/concepts/neural-scaling-laws/), and the [annotated upper-IC reasoning mock](/guides/annotated-reasoning-strategy-mock/).*

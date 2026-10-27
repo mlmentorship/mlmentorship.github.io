@@ -1,6 +1,6 @@
 ---
 title: "Sequence packing with block-diagonal masks"
-description: "Concatenate multiple short examples into one fixed-length sequence to eliminate padding waste. The single largest throughput win for training on skewed-length corpora."
+description: "Pack short examples without cross-example attention. Separate padding savings, position handling, loss masking, and measured throughput."
 date: "2026-01-25"
 draft: false
 tags: ["concepts"]
@@ -17,7 +17,9 @@ $$
 1 - \frac{\bar{\ell}}{\ell_{\max}}
 $$
 
-For C4-like web text this is often 50–80%. Padded positions cost full FLOPs and memory but contribute nothing to the loss. Sequence packing recovers nearly all of that throughput.
+This ratio counts padded token positions, not total attention FLOPs or end-to-end throughput.
+Dense padded implementations can still compute on masked positions; efficient variable-length kernels can avoid that work.
+How much packing helps depends on lengths, bucketing, kernels, and the rest of the training step.
 
 ## The mechanism
 
@@ -27,7 +29,8 @@ For C4-like web text this is often 50–80%. Padded positions cost full FLOPs an
 4. Compute attention with a kernel that respects `cu_seqlens` (FlashAttention-2 supports this natively via the `varlen` API).
 5. Apply the loss only on response tokens within each example (mask the boundaries and any prompt tokens for SFT).
 
-Position IDs reset at each example boundary so position 0 is the start of each packed example.
+The worked construction resets position IDs at each boundary.
+The block-diagonal mask provides attention isolation; position handling must separately match the model and kernel contract.
 
 **Learning objective:** map packed-example boundaries to reset position IDs and a causal block-diagonal attention mask that permits no cross-example attention.
 
@@ -68,26 +71,38 @@ Position IDs reset at each example boundary so position 0 is the start of each p
 
 ## Numbers
 
-For pretraining on web text packed at $L = 8192$:
+For the illustrated lengths `[3,2,1]`, padding three examples to length three allocates nine token positions for six real tokens.
+The six-token packed row has no slack, reducing physical positions from nine to six.
+That 1.5x position ratio is not a measured GPU speedup.
 
-- Wasted tokens drop from ~50% (naive batching) to <2% (just the slack at the end of the packed sequence).
-- Throughput per GPU roughly doubles.
-- Quality is unchanged when the mask is correct.
-
-Most modern training stacks pack by default. Llama, Mistral, Qwen, and major SFT toolkits (axolotl, TRL) all support it.
+Compare packed and unpacked steps with matched examples, labels, position semantics, and loss weighting.
+Benchmark tokens per second, peak memory, and task quality on the actual model, precision, hardware, and kernel.
+Packing can otherwise change per-example weighting even when the attention mask is correct.
 
 ## Common implementation pitfalls
 
-- **Forgetting to reset positions.** If position IDs continue across boundaries, attention learns to treat packed boundaries as long-range dependencies and quality drops.
-- **Wrong loss masking.** Loss must not flow from one example to another; mask boundaries explicitly.
+- **Confusing positions with isolation.** A correct block-diagonal mask forbids cross-example attention regardless of numbering. Standard fixed-frequency RoPE preserves within-example attention under a common position shift; absolute embeddings or other scaling rules may not. Follow the specific model/API contract.
+- **Wrong target boundaries.** Mask any next-token target that would train one example to predict the first token of another. Attention masking and label masking solve different problems.
 - **Mixing prompt and response in SFT without masking.** For SFT, mask out prompt tokens from the loss within each packed example.
-- **Using a kernel that doesn't support varlen.** Without FlashAttention-2 varlen (or equivalent), the block-diagonal mask materializes the full $L \times L$ matrix and you lose the speedup.
+- **Assuming the mask saves computation.** A dense implementation can still materialize the full $L \times L$ matrix. Use a boundary-aware kernel and measure end-to-end savings rather than inferring them from zero attention weights.
+
+**Predict before revealing:** keep the causal block-diagonal mask, but change positions from `[0,1,2,0,1,0]` to `[0,1,2,3,4,5]`.
+With standard fixed-frequency RoPE, does this create cross-example attention?
+
+<details><summary>Identify which contract changed</summary>
+
+No. The mask still excludes other examples.
+Each example received only a common position shift, so relative rotary positions and its attention weights are unchanged.
+Removing the mask would break isolation even with reset positions.
+Do not extend this invariance claim to arbitrary positional embeddings or scaling variants.
+
+</details>
 
 ## When not to pack
 
 - Very long single examples that fill or exceed $L$ on their own (no concatenation possible; padding is already minimal).
 - When examples have inter-document context that should attend across boundaries (rare).
-- During inference, where examples come one at a time.
+- During inference, use the serving engine's multi-request batching and KV-cache contracts; training-style concatenation is not a drop-in replacement.
 
 ## Related
 

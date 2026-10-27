@@ -13,6 +13,48 @@ Do not restore the frozen defects, recapture this baseline or modify the plannin
 Do not change branches or disturb concurrent publication work.
 Commit and push only when explicitly requested by the user.
 
+## Content-review repairs, 2026-10-27
+
+This repair starts from published feature checkpoint `8ae02fb86b394f29f33dba9f661019ff66f47c87`.
+It changes 31 lessons without changing their routes, existing headings, Problem statements, Python examples, or visual identities.
+It does not represent completion of the remaining 139 pattern-first treatments; authored coverage remains 252/391.
+
+The seven verified technical findings are repaired:
+
+- Calibration distinguishes shared positive temperature, class-specific maps, argmax, and threshold actions.
+- PPO objective clipping is not a hard probability-ratio or KL constraint.
+- Speculation distinguishes exact sampling from latency, counts replacement-or-bonus output once, and includes a slower toy case.
+- A value baseline is unbiased under the stated conditions but is not universally minimum-variance.
+- Packing distinguishes cross-example masks, label boundaries, and positional/API contracts; standard fixed-frequency RoPE permits common shifts.
+- Recall-weighted average precision and trapezoidal PR area are different declared conventions.
+- HMM probability-space underflow depends on probabilities, precision, and recurrence, not a universal sequence length.
+
+All 65 unfinished companions with authored owners received a bounded shared-claim screen.
+Selected mechanism and claim-bearing excerpts were compared, with nearby direct reads for repairs; this is not a full factual qualification of every paragraph.
+Twenty-five companions received a targeted repair or worked path; consistent screened passages were retained rather than wrapped in generic replacement prose.
+Repairs cover dropout scaling, selection and evaluation units, unsupported confidence, loss assumptions, retrieval and normalization contracts, mixed precision, likelihood conditions, and workload-dependent performance claims.
+Behavioral guidance now favors genuine ownership evidence over universal duration, user-count, or hiring-level cutoffs.
+The agent-evaluation lesson distinguishes attempts from tasks, paired comparisons, task-level dependence, and separate authorization-failure gates.
+Post-training guidance no longer asserts a universal 2026 method default, bounded SFT cost, guaranteed quality gain, or hard KL guarantee.
+
+Four long design references now begin with distinct hypothetical worked cases: source-permission withdrawal, stale coding patches, aggregate action reservations, and shared accelerator allocation.
+Each includes an objective, invariant, state, decision, failure/recovery, and a contrastive transfer check with a closed answer disclosure.
+One contiguous extension retains the full original reference; Full remains the default and existing fragments reveal hidden reference content.
+These short paths intentionally do not claim the stricter whole-article pattern-first qualification or add the qualification marker.
+
+`npm run test:content` adds nine source-backed reasoning and reading-boundary regressions to the normal `check:site` gate.
+Complete `npm run check` and `npm run build` pass, including the existing 23 prep tests, 106 coding-visual definitions, 391 preservation contracts, 497 indexed pages, and 568 link targets.
+An additional comparison against the starting commit preserves all 391 heading and statement identities, 368 Python fences, 392 ordered visual IDs, 797 frame keys, and 8,739 ordered motion keys.
+All 283 math expressions in the 31 edited lessons match GFM parsing and built HTML-only KaTeX, and preview responses match their built pages.
+
+Native Chromium qualification covers the 31 edited routes at measured 1280/390 CSS pixels: 114 layout, disclosure, reading-depth, keyboard, and fragment checks passed.
+Twenty-two captures were retained; eight selected originals were inspected, including all four mobile worked paths.
+The first observer incorrectly targeted hidden generated provenance controls; the corrected run excludes those controls, and its failed predecessor remains separate.
+Evidence is under `/tmp/mlmentorship-publication-review-20261027-jsi7AJ/`, including `content-fixes-qualified-feature-r1.json`, `content-fixes-browser-r2.json`, and the complete check/build logs.
+Protected baseline, completed coding guide, and approved source-map hashes remain unchanged.
+These checks do not establish measured learner improvement, whole-library factual accuracy, every visual state, GPU behavior, or PDF pagination.
+Commit, merge, push, and deployment results must be recorded separately from these pre-publication receipts.
+
 ## Complete problem statements
 
 All 191 question articles now define the task before explaining its solution.

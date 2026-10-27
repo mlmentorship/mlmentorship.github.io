@@ -31,7 +31,19 @@ The interviewer is looking for a project that:
 - Required you to operate at the edge of what you knew how to do.
 - You can describe at multiple levels (strategic, technical, organizational).
 
-A project that took 1 quarter and shipped to internal users isn't ambitious by L6 standards. A project that took 18 months, pivoted twice, ultimately shipped to millions of users, and you can articulate the strategic and operational lessons from is.
+Duration and user count provide context, not a universal hiring cutoff.
+A one-quarter internal project can involve consequential uncertainty and cross-team decisions.
+An eighteen-month public launch does not by itself establish the candidate's judgment or ownership.
+Use the [project-presentation framework](/questions/present-technical-ml-project/) to separate the goal, your decisions, alternatives, evidence, and limitations.
+
+Consider two hypothetical stories:
+
+| Story | What the description establishes | What remains to demonstrate |
+| --- | --- | --- |
+| One-quarter internal migration with a release-stopping data risk | A short deadline and a consequential constraint | Your diagnosis, alternatives, coordination, and evidence that the chosen boundary held |
+| Eighteen-month public launch used by millions | Duration and audience size | Your actual decisions, causal contribution, trade-offs, and measured outcome |
+
+Neither description alone determines a hiring level.
 
 ## The structure of a strong answer
 
@@ -123,7 +135,19 @@ The interviewer will probe for ~30 minutes. They'll ask:
 - "What's the one thing you'd do differently?"
 - "How did you know it worked?"
 
-Be ready to answer all of these in detail. If your answers thin out under follow-up, the project wasn't really yours, or wasn't really ambitious.
+Prepare the evidence behind each answer and say when a detail belonged to someone else.
+A thin answer can reflect missing preparation or unavailable evidence; it does not prove dishonesty or insufficient project scope.
+
+**Predict before revealing:** a truthful internal project has clearer ownership and harder trade-offs than a large launch where you owned one minor component.
+Must the larger launch be the stronger story?
+
+<details><summary>Choose evidence rather than borrowed scale</summary>
+
+No. Compare your consequential decisions and evidence against the role's scope.
+Do not inflate duration, invent a failure, claim others' work, or convert an uncertain association into measured personal impact.
+Hiring processes vary; these questions are a preparation rubric, not a guaranteed level assignment.
+
+</details>
 
 ---
 

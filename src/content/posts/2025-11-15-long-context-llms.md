@@ -35,13 +35,15 @@ Frontier models in 2026 advertise 128K–2M-token context windows. The headline 
 
 ### 1. Position encoding has to extrapolate
 
-Trained absolute or learned positions don't work past the training length. Modern decoder LLMs use [RoPE](/concepts/rotary-position-embeddings/) and extend it via:
+A learned position table has a finite index range; other mechanisms may be defined beyond training positions without working reliably there.
+For RoPE checkpoints, candidate extension methods include:
 
 - **Position interpolation** [(Chen et al., 2023)](https://arxiv.org/abs/2306.15595): linearly compress positions.
-- **NTK-aware scaling**: increase the RoPE frequency base so high-frequency components don't alias.
+- **NTK-aware scaling**: alter the rotary frequency grid, with implementation-specific changes to different bands.
 - **YaRN** [(Peng et al., 2023)](https://arxiv.org/abs/2309.00071): per-frequency interpolation tuned by training-length statistics.
 
-Most production long-context models use YaRN or NTK scaling, often combined with a brief continued-pretraining stage on long documents.
+These mapping changes may be paired with continued training.
+Evaluate actual long-context behavior; a defined rotation formula is not evidence that the checkpoint uses distant information correctly.
 
 ### 2. Attention must fit in memory
 
@@ -49,15 +51,18 @@ Naively materialized dense attention is $O(n^2)$ in memory; at $n = 128{,}000$, 
 
 - **[FlashAttention](/concepts/flashattention/)**: exact, tiled streaming softmax in SRAM. Memory drops to $O(n)$. Standard for both training and serving.
 - **[Sparse attention](/concepts/sparse-attention/)** (BigBird, Longformer): mask is sparse. Used for some encoder long-context models.
-- **[Linear attention](/concepts/linear-attention/)** (Performer, Linformer): low-rank approximation. Used in research and a few production niches; quality lags dense at chat-model scale.
+- **[Linear attention](/concepts/linear-attention/)**: methods change or approximate attention with different quality, arithmetic, and state trade-offs. Do not equate every such method with one low-rank construction.
 
-Production decoder LLMs at long context use dense FlashAttention plus aggressive KV-cache compression rather than sparse / linear approximations.
+Dense, sparse, and alternative attention mechanisms have different contracts.
+Choose them using a matched workload and task evaluation rather than an asserted universal production recipe.
 
 ### 3. KV cache becomes the cost driver
 
-KV cache size scales linearly with context (see [KV cache](/concepts/kv-cache/)). A 70B model at 128K context: ~40 GB of KV per request. Solutions:
+Under a fixed cache layout, retained KV bytes scale linearly with stored positions; the [KV-cache lesson](/concepts/kv-cache/) derives the ledger.
+For an illustrative 80-layer model with 8 KV heads, head width 128, two-byte entries, and 131,072 positions, one request needs 40 GiB of logical KV tensors.
+That excludes weights, allocator slack, temporary buffers, replication, and effects of sharding or compression.
 
-- **[GQA / MQA](/concepts/grouped-query-attention/)**: share K/V heads. 4–8× cache reduction.
+- **[GQA / MQA](/concepts/grouped-query-attention/)**: share K/V heads. Relative to otherwise matched multi-head attention, the logical KV reduction is the query-head count divided by the KV-head count, not a universal multiplier.
 - **[PagedAttention](/concepts/paged-attention/)**: eliminate cache fragmentation and enable block reuse, including shared prefixes; it does not reduce the logical K/V bytes for a unique sequence.
 - **[Quantization](/concepts/quantization/)**: int8 or int4 KV cache. 2–4× cache reduction.
 - **Sliding-window attention** (Mistral): keep only the last $w$ KV positions per layer; lose strict global attention.

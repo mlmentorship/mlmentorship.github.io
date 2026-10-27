@@ -106,7 +106,23 @@ This is L5. You've broken the eval into the right levels and named the operation
 
 The L6 answer:
 
-> "Two angles. (1) Run each task multiple times (5-10 samples) and report mean and variance; small differences may be noise. (2) For deterministic comparisons, fix temperature to 0 and seeds where possible. (3) For metrics like 'success rate', binomial confidence intervals are honest about uncertainty when N is small. The biggest mistake is reporting a single run as if it were the population mean: many 'X% better' claims about agents are within run-to-run noise."
+> "First define the sampling unit and the claim. Repeated attempts estimate variation on the fixed suite; independently sampled tasks support a different generalization claim. Suggested counts such as 5-10 attempts are starting points, not universally sufficient release criteria.
+>
+> Compare candidate and baseline on matched tasks under the same budgets, environment versions, and outcome rubric. State whether success means one attempt, eventual success after retries, or success within a total budget. Count failed attempts and retries in cost.
+>
+> A binomial interval needs an appropriate independent-trial model. Repeated heterogeneous tasks are not automatically independent observations for a new-task claim. When tasks are the sampled units, preserve that clustering in uncertainty estimates, for example by resampling paired task results rather than pooling every attempt.
+>
+> Temperature and seeds can reduce some sampling variation; they do not guarantee deterministic hardware, tools, or hosted execution. Report the task-level differences and uncertainty, not a single lucky run. The [application-evaluation lesson](/questions/how-would-you-evaluate-an-llm-application/) supplies the separate outcome, support, and release checks."
+
+**Predict before revealing:** two tasks each run ten times produce twenty outcomes. Have you evaluated twenty independently sampled tasks?
+
+<details><summary>Keep attempts and task clusters separate</summary>
+
+No. There are twenty attempts nested within two task clusters.
+Those outcomes can characterize repeatability on the fixed pair, but new-task uncertainty cannot be justified by pretending there were twenty task draws.
+State how tasks were sampled, preserve candidate/baseline pairing, and gate consequential authorization failures separately from average success.
+
+</details>
 
 ---
 

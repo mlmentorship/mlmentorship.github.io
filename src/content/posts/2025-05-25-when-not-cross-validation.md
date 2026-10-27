@@ -52,9 +52,9 @@ This is fine for textbook ML. It misses several real-world cases where CV is mis
 >
 > 2. **The training cost is too high.** For deep networks with day-long training, 10x the cost is impractical. A single hold-out validation set with a representative distribution is the right call.
 >
-> 3. **There's a separate, decisive evaluation signal.** If you have a held-out production traffic sample, an A/B test, or a domain-expert evaluation set, that signal beats CV on the training distribution.
+> 3. **A different evaluation answers the deployment question.** A production sample, randomized experiment, or expert-labeled set may target a more relevant population or outcome. Check selection, maturation, and assignment assumptions; none automatically supersedes every CV estimate.
 >
-> 4. **The dataset is large enough.** Past ~10K samples for tabular tasks, the variance reduction from CV is small compared to a single well-chosen split."
+> 4. **One split has adequate precision for the decision.** There is no universal row-count cutoff. Dependence, rare outcomes, slice coverage, candidate differences, and training cost determine whether repeated fitting adds useful information."
 
 This is L5. You've named the cases concretely and given the right alternative for each.
 
@@ -64,9 +64,9 @@ This is L5. You've named the cases concretely and given the right alternative fo
 >
 > **CV doesn't fix distribution shift.** If your test data has a different distribution than your training data (which it usually does in production), CV on training data tells you about training-distribution generalization, not deployment performance.
 >
-> **CV can mislead model selection at scale.** With many candidate models and small CV variance, the best CV score is often a noisy lucky pick. Repeated CV (averaging over multiple random splits) reduces this. Bootstrap-CI on the CV difference is more honest than 'model A beat model B.'
+> **Model selection reuses evidence.** Searching many candidates can select a lucky CV score. Repeated folds do not create an untouched confirmation set. Compare candidates on matched splits and use uncertainty methods that respect shared training data and entity/time dependence.
 >
-> **Nested CV is needed for honest hyperparameter selection.** Picking hyperparameters with CV and reporting that same CV score as your generalization estimate is a form of leakage. Nested CV (outer loop for evaluation, inner loop for hyperparameter tuning) is the principled fix, but it's expensive and rarely done in practice. Most people use a separate held-out test set instead."
+> **Separate selection from final evaluation.** CV can select hyperparameters, but the selected CV score is optimistic as an independent performance estimate. Nested CV evaluates the selection procedure in outer folds; a genuinely untouched, relevant test set is another option. Keep preprocessing and tuning inside each training boundary."
 
 ## Tells that get you a strong-hire vote
 

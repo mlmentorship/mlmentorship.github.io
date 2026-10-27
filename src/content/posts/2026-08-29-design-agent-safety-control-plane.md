@@ -31,6 +31,39 @@ Respect product-specific action consequences and define enforceable behavior whe
 
 ## The prompt
 
+**Worked case: individually permitted actions exceed an aggregate limit.** This hypothetical adds a safety decision to an already-authorized account workflow.
+
+**Objective.** Keep authorized automation inside the product owner's declared action envelope.
+The [enterprise-platform mechanism](/questions/design-enterprise-agent-platform/) supplies the underlying identity, delegation, and executor contracts.
+
+**Invariant.** A safety control can preserve or narrow granted authority, never expand it.
+Passing one action-level check does not prove that the cumulative workflow remains permitted.
+
+**State.** The product policy allows changes to at most 20 accounts in a window.
+Two concurrent proposals each request 12 accounts; both are individually authorized and both learned monitors agree.
+The control plane also holds policy versions, reserved and observed impact, idempotency keys, and an incident state.
+
+**Decision.** Reserve the aggregate budget atomically before dispatch.
+After reserving the first 12, the second proposal has only eight accounts of headroom; narrow it if the contract permits, queue it, or block it.
+Monitor agreement cannot turn the requested total of 24 into an allowed total of 20.
+
+**Failure and recovery.** If the executor times out, the external effect is unknown, not necessarily absent.
+Keep the reservation until an authoritative outcome check reconciles it; retry only under the existing idempotency contract.
+Freeze or narrow the affected path when outcome evidence is unavailable, and give the incident owner a record of the unresolved effect.
+
+**Transfer check.** Both monitors independently return "allow" after the timeout. Can that release the reservation or authorize another attempt?
+
+<details>
+<summary>Check the evidence boundary</summary>
+
+No. A model judgment is not an authoritative read of the external system.
+Even genuinely independent judgments cannot establish that an unobserved side effect did not happen.
+Reconcile the outcome and remaining budget before allowing a new effect; preserve rather than widen the original authority.
+
+</details>
+
+<section data-learning-extension="true" aria-label="Full agent safety-control-plane reference">
+
 A company operates agents in finance operations, customer accounts, internal infrastructure, healthcare administration, and enterprise support. Product teams already use a governed agent platform. Every tool call has a workload identity, user or service delegation, typed arguments, an idempotency key, and an audit event.
 
 The existing platform prevents calls without permission. It does not catch every harmful authorized action. One agent recently applied a valid account operation to a much larger population than its product owner intended. Each call satisfied static authorization. The dangerous pattern appeared in the arguments, cumulative rate, and downstream state.
@@ -1188,5 +1221,7 @@ A staff target should score 2 on deterministic policy, action lifecycle, breaker
 For each follow-up, state the affected safety claim, failed assumption, available authority, immediate action, evidence gap, product fallback, and conditions for restoring automation.
 
 ---
+
+</section>
 
 *Related: [enterprise agent-platform design](/questions/design-enterprise-agent-platform/), [LLM security threat models](/concepts/llm-security-threat-models/), [scalable oversight and AI control](/concepts/scalable-oversight-and-ai-control/), [decision thresholds and abstention](/concepts/decision-thresholds-asymmetric-costs-abstention/), [chain-of-thought monitorability](/concepts/chain-of-thought-monitorability/), [design an LLM red-team program](/questions/design-llm-red-team-program/), and [evaluate an agent](/questions/evaluate-an-agent/).*
