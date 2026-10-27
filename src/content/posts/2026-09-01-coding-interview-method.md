@@ -13,42 +13,141 @@ aliases: ["coding interview practice", "coding questions phone guide"]
 prerequisites: []
 ---
 
-The goal is not to remember 106 solutions. The goal is to recognize the state a problem needs, preserve its invariant, and rebuild the code when the surface details change.
+Two values must add to a target, and their positions must differ.
+Each new value determines a missing partner. Query earlier values before saving the current value.
+
+## Problem
+
+Given `nums = [3, 2, 4, 7]` and `target = 6`, return one pair of distinct original indices.
+The result is `[1, 2]`: `2 + 4 == 6`. Return `[]` when no pair exists.
+Do not sort or reuse one position. Assume integer inputs.
+
+## Picture: Remember Earlier Partners
 
 <!-- visual:coding-interview-method-state -->
-<figure class="learning-figure coding-visual-figure" aria-labelledby="coding-interview-method-state-title"><p class="visual-kicker">A four-question rehearsal</p><p class="visual-title" id="coding-interview-method-state-title">Turn a new prompt into a small state machine</p><div class="coding-visual coding-visual--state" role="img" aria-label="A four-step coding interview learning loop: identify the cue, name the state, explain the invariant, and make the safe move. The loop ends by rebuilding the solution and reviewing it later."><div class="coding-visual-example"><span>Memory target</span><strong>Cue -> state -> invariant -> move</strong></div><div class="coding-visual-flow"><div class="coding-visual-step"><span class="coding-visual-step-label">1. Cue</span><strong>What repeats?</strong><small>Pair, range, dependency, path, or state.</small></div><div class="coding-visual-step"><span class="coding-visual-step-label">2. State</span><strong>What survives?</strong><small>Keep only facts future steps may need.</small></div><div class="coding-visual-step"><span class="coding-visual-step-label">3. Invariant</span><strong>What stays true?</strong><small>State the rule that makes the next move safe.</small></div><div class="coding-visual-step"><span class="coding-visual-step-label">4. Move</span><strong>Why now?</strong><small>Advance, choose, merge, pop, or update.</small></div></div><p class="coding-visual-invariant"><span>Rebuild</span>Close the page, write the algorithm, test one edge case, and revisit after 1, 3, 7, and 14 days.</p></div><figcaption><strong>Read it this way:</strong> begin with the repeated work, then name what must remain in memory. The invariant is the bridge between the state and the move. That bridge is what you want to remember, not the exact variable names.</figcaption></figure>
+<figure class="learning-figure coding-visual-figure" aria-labelledby="coding-interview-method-state-title">
+	<p class="visual-kicker">A four-question rehearsal</p>
+	<p class="visual-title" id="coding-interview-method-state-title">Turn the missing partner into sufficient state</p>
+	<div class="coding-visual coding-visual--state" role="img" aria-label="For target six, index two has value four and needs two. Earlier value two maps to index one. Query before storing the current index, so the returned indices one and two differ.">
+		<div class="coding-visual-example"><span>At index 2</span><strong>Need 2 -> return [1, 2]</strong></div>
+		<div class="coding-visual-flow">
+			<div class="coding-visual-step"><span class="coding-visual-step-label">1. Cue</span><strong>Repeated partner search</strong><small>Each num needs target - num.</small></div>
+			<div class="coding-visual-step"><span class="coding-visual-step-label">2. State</span><strong>seen: value -> index</strong><small>One earlier index per value suffices for one witness.</small></div>
+			<div class="coding-visual-step"><span class="coding-visual-step-label">3. Invariant</span><strong>Every saved index is earlier</strong><small>The current position is absent during its query.</small></div>
+			<div class="coding-visual-step"><span class="coding-visual-step-label">4. Move</span><strong>Query, then store</strong><small>This prevents matching one position with itself.</small></div>
+		</div>
+		<p class="coding-visual-invariant"><span>Rebuild</span>Hide the code, explain the invariant, implement it and test a changed input.</p>
+	</div>
+	<figcaption><strong>Read it this way:</strong> replace the repeated partner scan with earlier-value state. Query before storing to guarantee distinct indices. Remember the proof, not a variable spelling.</figcaption>
+</figure>
+
+| index | num | needed | seen before query | Action |
+| ---: | ---: | ---: | --- | --- |
+| 0 | 3 | 3 | `{}` | Save `3: 0` |
+| 1 | 2 | 4 | `{3: 0}` | Save `2: 1` |
+| 2 | 4 | 2 | `{3: 0, 2: 1}` | Return `[1, 2]` |
 
 ## The four things to remember
 
 ### Cue
 
-The cue is the shape of the prompt, not a keyword to memorize. A contiguous range suggests a window or prefix sum. A sorted list suggests two pointers or binary search. A dependency list suggests topological order.
+A missing partner suggests replacing repeated scans; the clue alone is not a proof.
 
 ### State
 
-Ask what a future step needs from the past. A hash map may keep an index, a stack may keep unfinished openings, and dynamic programming may keep one answer per prefix. If the state is larger than the future needs, the solution is probably carrying noise.
+`seen` retains one earlier index per value. Any such index suffices for one witness, but not for counting every pair.
 
 ### Invariant
 
-An invariant is the rule that stays true while the algorithm runs. Examples:
-
-- the window contains exactly the tracked characters;
-- the queue is ordered by nondecreasing distance;
-- every finalized shortest-path distance is final;
-- each DP cell is the complete answer for its smaller problem;
-- the path contains exactly the choices made on this branch.
-
-Say the invariant aloud before trusting the code.
+Before each query, `seen` represents all earlier values, with an earlier index for each.
 
 ### Move
 
-Every pointer movement, pop, merge, and recursive call needs a reason. Move a left boundary because the current window has extra information. Pop a heap item because no cheaper frontier item exists. Remove a stack entry because the new value resolves it. Return from a subtree because its promised fact is complete.
+Query, then store. A hit is valid; otherwise saving the current value preserves the invariant for the next index.
+
+## Code
+
+This is the literal [Two Sum owner](/questions/two-sum/) implementation:
+
+```python
+def two_sum(nums: list[int], target: int) -> list[int]:
+   seen: dict[int, int] = {}
+   for index, num in enumerate(nums):
+      needed = target - num
+      if needed in seen:
+         return [seen[needed], index]
+      seen[num] = index
+   return []
+```
+
+Under usual dictionary and unit-cost arithmetic assumptions, time is expected $O(n)$ and auxiliary space is $O(n)$.
+Check `[3]`, target 6: no earlier partner, so `[]`. Check `[3, 3]`: the second query returns `[0, 1]`.
+
+## Change 1: Count Every Index Pair
+
+**New task.** Return the number of distinct index pairs, not one witness.
+
+**Picture and change.** Keep prior frequencies rather than one index. Add matches before incrementing the current frequency.
+
+**Code.**
+
+```python
+def count_pairs(nums, target):
+	counts = {}
+	answer = 0
+	for value in nums:
+		answer += counts.get(target - value, 0)
+		counts[value] = counts.get(value, 0) + 1
+	return answer
+```
+
+**Check.** `[3, 3, 3]`, target 6, adds 0, 1, then 2: total 3. `[3]` gives 0.
+
+**Use when.** The output asks how many witnesses exist.
+
+## Change 2: Count Signed Zero-Sum Ranges
+
+**New task.** Without a pattern heading, count contiguous zero-sum ranges in `[1, -1, 1]`.
+
+**Picture and change.** Equal prefix totals mark range boundaries. Store boundary multiplicity, including the initial zero boundary.
+
+**Code.**
+
+```python
+def count_zero_ranges(nums):
+	counts = {0: 1}
+	prefix = answer = 0
+	for value in nums:
+		prefix += value
+		answer += counts.get(prefix, 0)
+		counts[prefix] = counts.get(prefix, 0) + 1
+	return answer
+```
+
+**Check.** Prefixes `0, 1, 0, 1` contain two equal-boundary pairs, so the answer is 2. Empty input gives 0.
+
+**Use when.** Signed sums lack the monotonicity needed for a simple shrinking window.
+
+## Failure: Remembering Only "Hash Map"
+
+A family name cannot explain query order, state multiplicity or the assumptions behind a safe move.
+
+## Transfer Check
+
+Why does a contiguous range not always imply a sliding window?
+
+### Reasoned Answer
+
+Adding a negative value can decrease a sum. Without the needed repair monotonicity, derive the prefix relation instead.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
 
 ## A three-pass practice loop
 
 ### First pass: learn one anchor per pattern
 
-Start with these 20 anchor problems, in order:
+These 20 anchors form one suggested sequence, not a universal optimum:
 
 1. Two Sum
 2. Subarray Sum Equals K
@@ -71,19 +170,11 @@ Start with these 20 anchor problems, in order:
 19. Reverse Linked List
 20. Implement Trie
 
-For each anchor, look at the visual first. Cover the code. Explain the trace, state, invariant, and move. Then write the implementation.
+Read the problem first; hide code, inspect the picture, explain the invariant, then implement and test.
 
 ### Second pass: study nearby variations
 
-Solve related problems together. Notice what changes and what stays fixed:
-
-- Two Sum becomes 3Sum after sorting and fixing one value.
-- BFS becomes Dijkstra when edges have different nonnegative costs.
-- DFS becomes dynamic programming when repeated states are cached.
-- Implement Trie becomes wildcard search when a dot can follow any child.
-- Reverse Linked List becomes one step inside Reorder List.
-
-Variation is the antidote to memorizing one example.
+Change the output, admissible inputs or state requirements; re-prove the move. A surface resemblance does not establish correctness.
 
 ### Mixed pass: choose the pattern yourself
 
@@ -96,39 +187,42 @@ Hide the pattern heading and ask:
 5. Why is the next move safe?
 6. What are the time and space costs?
 
-After 15 focused minutes, read only the visual and simple idea. Try again. Read the code only when needed, close it, and rebuild it from the invariant.
+An optional 15-minute attempt can precede a limited hint. Hide the hint and rebuild; adjust timing to observed needs.
 
 ## Review schedule
 
-Rebuild missed problems after 1, 3, 7, and 14 days. Record the reason for each miss:
+Optional retry delays are 1, 3, 7 and 14 days; adapt them to performance, not a learning guarantee.
+Record six miss types:
 
-- I did not recognize the pattern.
-- I chose the pattern but kept the wrong state.
-- I could not explain why a move was safe.
-- I knew the idea but could not write the code.
-- I missed an edge case.
-- I gave the wrong complexity.
+- Recognition.
+- Wrong state.
+- Unsafe move.
+- Implementation.
+- Edge case.
+- Complexity.
 
-The review card is meant to be a retrieval cue. The full page is for repairing the explanation. Keep those jobs separate.
+Use a card for retrieval and the full lesson to repair the explanation.
 
 ## Quick pattern map
 
 | Prompt shape | State to draw first | Likely family |
 | --- | --- | --- |
-| Pair, duplicate, fast lookup | seen values or counts | Hash map or set |
-| Contiguous range | left/right window or prefix totals | Sliding window or prefix sum |
-| Sorted values | two ends or low/high answer bounds | Two pointers or binary search |
-| Nested input | newest unfinished item | Stack |
-| Next greater item | waiting indices in order | Monotonic stack |
-| Fewest unweighted steps | distance layers | BFS |
-| Lowest weighted path | cheapest frontier | Dijkstra |
-| All reachable groups | visited frontier | DFS or graph search |
-| Every valid choice | partial path and choices left | Backtracking |
-| Repeated smaller question | complete saved state | Dynamic programming |
-| Time ranges | active end boundary | Intervals or greedy |
-| Prerequisites | incoming-edge counts | Topological sort |
-| Edges joining groups | representative roots | Union-find |
-| Changed node order | saved next pointer | Linked list |
-| Shared word beginnings | prefix path | Trie |
+| Pair/duplicate | Prior values/counts | Map/set |
+| Contiguous range | Boundaries/prefixes | Window/prefix |
+| Sorted values | Ends/answer bounds | Pointers/bisection |
+| Nested input | Unfinished items | Stack |
+| Next greater | Waiting indices | Monotonic stack |
+| Fewest unweighted steps | Layers | BFS |
+| Nonnegative weighted path | Cheapest frontier | Dijkstra |
+| Reachability | Visited frontier | Graph search |
+| Every valid choice | Path/options | Backtracking |
+| Repeated subproblem | Complete cached state | Dynamic programming |
+| Time ranges | Active end | Intervals/greedy |
+| Prerequisites | Incoming counts | Topological sort |
+| Joining groups | Roots | Union-find |
+| Node reordering | Saved next | Linked list |
+| Shared prefixes | Prefix path | Trie |
 
-The companion book starts with [Learn by rebuilding](/library/coding-interview/method/) and then keeps every problem in the order used by the supplied phone guide. Each problem has a visual state map before its implementation, so the first question is always: what should I be able to see?
+Continue at [Learn by rebuilding](/library/coding-interview/method/).
+
+</div>

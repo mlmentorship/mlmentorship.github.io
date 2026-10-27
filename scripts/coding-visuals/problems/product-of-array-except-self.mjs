@@ -6,7 +6,7 @@ const scan = (index, phase) => [mark(index, phase, 'focus', 'scan')];
 const draft = visual('At index i, combine the product strictly before i with the product strictly after i.', [
   frame(
     'Initialize the prefix pass',
-    'For nums = [1, 2, 3, 4], output starts as [1, 1, 1, 1] and prefix starts at 1.',
+    'Start output as four ones and prefix as 1. Write each exclusive product before consuming the current input.',
     array(values(['1', '1', '1', '1']), scan(0, 'prefix i=0'), {
       phase: 'left to right',
       prefix: '1',

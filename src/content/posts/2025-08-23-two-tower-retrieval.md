@@ -1,6 +1,6 @@
 ---
 title: "Two-tower retrieval"
-description: "Encode queries and items with separate networks into a shared embedding space; retrieve by approximate nearest neighbors. The default architecture for industrial recommenders and search."
+description: "Separate query and catalog encoding, preserve candidate and model-version contracts, and measure approximate retrieval before reranking."
 date: "2025-08-23"
 draft: false
 tags: ["concepts"]
@@ -9,11 +9,9 @@ category: "concepts"
 
 ## Summary
 
-A two-tower model encodes the query and item with separate neural networks into a shared embedding space. A dot product or cosine scores each pair. Contrastive or sampled-softmax training pushes positive pairs above negatives.
-
-Two-tower (a.k.a. dual-encoder) is the dominant architecture for the **retrieval** stage of large-scale ranking systems: web search, e-commerce search, YouTube recommendations, ad targeting, dense passage retrieval for RAG, semantic search.
-
-The structural advantage: item embeddings can be precomputed once per item and indexed. At query time you only run the query tower (cheap) and do an approximate-nearest-neighbor lookup (sub-linear in catalog size). Cross-encoders (where query and item are concatenated into a single network) cannot be precomputed and are 100–10000× too slow for retrieval at scale.
+A two-tower model independently encodes queries and items, then scores their vector interaction.
+Independent item encoding permits reuse until its inputs or representation contract change.
+Index approximation, candidate eligibility, negative semantics, and model-version compatibility remain separate correctness obligations.
 
 ## Architecture
 
@@ -23,11 +21,9 @@ item   → item_tower   → i ∈ R^d
 score  = q · i  (or cosine)
 ```
 
-- **Towers**: typically transformers, MLPs, or a mix. Towers usually do **not** share weights (different input modalities or feature sets).
-- **Embedding dim $d$**: 64–512 in production. Higher $d$ is more expressive; lower $d$ is faster to index and more cache-friendly.
-- **Output normalization**: L2-normalize so dot product equals cosine; lets the index use Inner Product mode (see [embedding spaces](/concepts/embedding-spaces-and-similarity/)).
-
-**Learning objective:** trace which tower runs during a catalog refresh and which tower runs on every request, so you can explain why two-tower retrieval scales.
+The towers can share weights; normalization and vector dimension are design choices, not definitions.
+For nonzero unit vectors, dot product equals cosine; otherwise magnitude changes dot-product ranking.
+Stored item features must not require query-specific joint computation under this architecture.
 
 <!-- visual:two-tower-offline-online-split -->
 <figure class="learning-figure plot-panel" aria-labelledby="two-tower-serving-heading">
@@ -78,52 +74,119 @@ score  = q · i  (or cosine)
 		<text class="viz-label" x="297" y="260" text-anchor="middle">to ranker</text>
 		<text class="viz-callout" x="18" y="287">No item-tower call occurs on this request path.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the dashed refresh path once for the catalog: encode every item, then store its vector in the ANN index. For each request, follow only the solid lower path: encode one query, search the stored vectors, and send top-K IDs to the ranker. The speedup comes from moving item-tower work out of the request path. Original schematic checked against <a href="https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/">Yi et al.</a>, the <a href="https://www.tensorflow.org/recommenders/examples/basic_retrieval">TensorFlow Recommenders retrieval guide</a>, and <a href="https://cloud.google.com/architecture/implement-two-tower-retrieval-large-scale-candidate-generation">Google Cloud's two-tower serving architecture</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the dashed refresh path computes and stores catalog vectors. The request path computes a query and searches those compatible stored vectors. The original schematic follows <a href="https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/">Yi et al.</a>, <a href="https://www.tensorflow.org/recommenders/examples/basic_retrieval">TensorFlow Recommenders</a>, and <a href="https://cloud.google.com/architecture/implement-two-tower-retrieval-large-scale-candidate-generation">Google Cloud</a>.</figcaption>
 </figure>
 
 ## Training
 
-Standard losses:
+With query matrix $Q\in\mathbb R^{B\times d}$ and item matrix $I\in\mathbb R^{M\times d}$, scores are $QI^T/\tau$.
+Require positive temperature and declare acceptable positives and eligible candidates per row.
 
 ### In-batch sampled softmax
-For a batch of $B$ positive (query, item) pairs, treat the other $B-1$ items in the batch as negatives. Loss per query:
+The one-positive, temperature-one case uses:
 
 $$
 L = -\log \frac{\exp(q \cdot i^+)}{\sum_{j=1}^{B} \exp(q \cdot i_j)}.
 $$
 
-Cheap, parallelizes well, but biases toward popular items (popular items appear as negatives more often).
+For $q=(1,0)$, positive A $=(1,0)$, and valid negative B $=(0,1)$, scores are one and zero.
+Positive probability is $e/(e+1)\approx0.731059$ and loss is $\log(1+e^{-1})\approx0.313262$.
+If B is also acceptable, treating it as a known negative is wrong.
+
+Deduplicate item IDs first; this implementation maximizes total probability of the acceptable-positive set, not each positive's individual probability.
+It uses Boolean masks and float64 scores with representable score gaps:
+
+```python
+import numpy as np
+
+def retrieval_loss(query, items, positive_mask, valid_mask, temperature=1.0):
+	query = np.asarray(query, dtype=np.float64)
+	items = np.asarray(items, dtype=np.float64)
+	positive = np.asarray(positive_mask)
+	valid = np.asarray(valid_mask)
+	if query.ndim != 2 or items.ndim != 2:
+		raise ValueError("Expected two embedding matrices")
+	if min(query.shape) == 0 or min(items.shape) == 0:
+		raise ValueError("Embedding axes must be nonempty")
+	if query.shape[1] != items.shape[1]:
+		raise ValueError("Embedding dimensions differ")
+	shape = (len(query), len(items))
+	if positive.shape != shape or valid.shape != shape:
+		raise ValueError("Mask shape differs from score shape")
+	if positive.dtype != np.bool_ or valid.dtype != np.bool_:
+		raise ValueError("Masks must be Boolean")
+	if np.any(positive & ~valid) or not np.all(positive.any(axis=1)):
+		raise ValueError("Each row needs eligible positive candidates")
+	if not np.isfinite(temperature) or temperature <= 0:
+		raise ValueError("Temperature must be finite and positive")
+	if not np.isfinite(query).all() or not np.isfinite(items).all():
+		raise ValueError("Embeddings must be finite")
+	with np.errstate(over="raise", invalid="raise", divide="raise"):
+		scores = query @ items.T / temperature
+		scores = np.where(valid, scores, -np.inf)
+		relative = scores - scores.max(axis=1, keepdims=True)
+		denominator = np.logaddexp.reduce(relative, axis=1)
+		numerator = np.logaddexp.reduce(
+			np.where(positive, relative, -np.inf), axis=1
+		)
+		return float(np.mean(denominator - numerator))
+```
+
+Both candidates acceptable gives loss zero; rejecting every positive raises instead of silently creating an undefined objective.
+
+### Need Joint Token Detail
+
+**New task:** Distinguish subtle query-item phrase relations lost by independent compression.
+
+**Picture and change:** Evaluate a bounded cross-encoder or late-interaction reranker with its extra work and storage.
+
+**Check:** A reranker cannot recover an omitted relevant item, so inspect candidate recall separately.
+
+**Use when:** Added pair detail improves the measured decision under its budget.
+
+### Change the Item Model
+
+**New task:** Retrain the item encoder or tokenizer.
+
+**Picture and change:** Re-encode/reindex or prove a compatible migration; version the query tower, analyzer, scoring policy, and index together.
+
+**Check:** Rotating only the query from $(1,0)$ to $(0,1)$ reverses A/B scores against the unchanged index.
+Equal vector dimension is insufficient evidence of compatibility.
+
+**Use when:** Stored representation semantics change; retain an atomic rollback bundle and enforce current eligibility/deletions after retrieval.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ### Importance-corrected sampled softmax
-Correct the in-batch sampling bias by subtracting $\log p(\text{item}_j)$ from each negative's logit. Standard in YouTube's two-tower [(Yi et al., 2019)](https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/).
+Sampled-softmax correction must specify proposal probabilities, inclusion multiplicities, positive handling, and the intended full-catalog objective.
+Subtracting a log-proposal term is not a universal exposure-bias cure; follow the estimator's derivation, such as [Yi et al.](https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/).
 
 ### Hard negative mining
-Sample hard negatives (high-scoring but incorrect items) explicitly. More expensive but improves quality, especially after the model is past the easy-negatives stage.
+High-scoring alternatives may be unlabeled positives; validate their negative status and evaluate the changed sampling distribution.
 
 ## Two-stage architecture
 
-In production systems, two-tower is almost always the **retrieval** stage, followed by a cross-encoder **ranker**:
-
-1. **Retrieval (recall-oriented)**: two-tower returns top-K (e.g., 1000) candidates from millions of items in <10 ms via ANN.
-2. **Ranking (precision-oriented)**: cross-encoder or feature-rich tree model ranks the K candidates with full feature interactions.
+Candidate generation followed by richer ranking is one useful arrangement, not a required architecture or guaranteed latency target.
+Approximate search trades recall, memory, and work under its actual index and workload; sublinear scaling is not unconditional.
 
 ## Tradeoffs vs. cross-encoder
 
 | Property | Two-tower | Cross-encoder |
 |---------|-----------|---------------|
-| Latency at scale | sub-linear (ANN) | linear in catalog |
-| Quality | lower (no query-item interactions) | higher |
-| Memory | one vector per item | none (recomputed per query) |
-| Use case | retrieval | reranking |
+| Pair computation | Independent encodings plus vector interaction | Joint query/item computation |
+| Reusable catalog state | Stored item vectors | Architecture-dependent; joint scores still need the query |
+| Quality/cost | Measure for task and budget | Measure for task and budget |
 
 ## Common pitfalls
 
-- **Using two-tower for ranking when accuracy matters.** Lacks fine-grained feature interactions.
-- **Ignoring negative sampling bias.** In-batch sampled softmax favors popular items; always combine with importance correction or popularity de-biasing.
-- **Forgetting to refresh item embeddings.** When the item tower changes (new training run), all item embeddings must be re-encoded and re-indexed. Plan for periodic offline re-embedding.
-- **Comparing dot vs. cosine inconsistently.** Pick one (usually L2-normalized + dot) and use it everywhere.
+- **No interactions:** dot product is an interaction, but not arbitrary joint token computation.
+- **Incompatible updates:** changing only the query tower can also invalidate the index.
+- **Unproven quality:** reranking and negative mining require evaluation, not an assumed improvement.
 
 ## Related
 
 - [Embedding spaces](/concepts/embedding-spaces-and-similarity/). Vector representations and indexing.
 - [RAG overview](/concepts/rag-overview/). Retrieval-augmented generation uses two-tower for the retrieval step.
+
+</div>

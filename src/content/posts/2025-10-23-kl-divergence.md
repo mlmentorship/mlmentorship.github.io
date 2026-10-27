@@ -1,6 +1,6 @@
 ---
-title: "KL divergence"
-description: "Asymmetric distance between probability distributions. Cross-entropy minus entropy. The mathematical glue holding most of probabilistic ML together."
+title: "KL divergence: which distribution weights the error?"
+description: "Score fixed candidates in both directions, derive the cross-entropy identity, and test support and approximation-family changes."
 date: "2025-10-23"
 draft: false
 tags: ["concepts"]
@@ -9,39 +9,36 @@ category: "concepts"
 
 ## Summary
 
-For probability distributions $p$ and $q$ over the same space:
+KL divergence averages a log probability ratio under its first distribution.
+Swapping the arguments changes that weighting, so the same candidates can receive opposite rankings.
+Start with [expected surprisal](/concepts/entropy-mutual-information/), not a distance analogy.
+
+**Task:** compare only two candidates for a three-outcome target:
 
 $$
-\mathrm{KL}(p \,\|\, q) = \sum_x p(x) \log \frac{p(x)}{q(x)} \quad (\text{or } \int p \log(p/q)\, dx \text{ for continuous}).
+p=(0.49,0.02,0.49),\quad
+q_{cover}=(0.34,0.32,0.34),\quad
+q_{left}=(0.96,0.02,0.02).
 $$
 
-It's the expected log-ratio of $p$ to $q$ under $p$. Measuring how much information is lost using $q$ to encode samples from $p$.
+Each vector sums to one.
+Use natural logarithms, giving scores in nats:
 
-KL divergence is the fundamental object of statistical learning. It connects:
-
-- Maximum likelihood (minimizing $\mathrm{KL}(\hat p_\text{data} \| p_\theta)$).
-- Variational inference (minimizing $\mathrm{KL}(q_\phi \| p)$).
-- Cross-entropy loss = entropy of data + KL.
-- Information bottleneck and mutual information.
-- Policy gradient methods in RL (TRPO, PPO use KL constraints).
-- Knowledge distillation (student matches teacher distribution via KL).
+$$
+\operatorname{KL}(p\|q)=\mathbb E_p\left[\log\frac{p(X)}{q(X)}\right]
+=\sum_x p(x)\log\frac{p(x)}{q(x)}.
+$$
 
 ## Properties
 
-- **Non-negative**: $\mathrm{KL}(p \| q) \ge 0$, with equality iff $p = q$ (Gibbs' inequality).
-- **Asymmetric**: $\mathrm{KL}(p \| q) \ne \mathrm{KL}(q \| p)$ in general. Choose direction based on whether you are "fitting $q$ to $p$" or vice versa.
-- **Not a metric**: no triangle inequality, not symmetric.
-- **Infinite if $q(x) = 0$ where $p(x) > 0$**: $q$ must cover the support of $p$.
-- **Information-theoretic**: equals expected extra bits (or nats) per sample needed to encode $p$ using a code optimized for $q$.
+Terms with $p(x)=0$ contribute zero, including when $q(x)=0$.
+If $p(x)>0$ but $q(x)=0$, the divergence is infinite.
+Otherwise finite probability vectors give a nonnegative score, zero exactly when the distributions agree.
+KL is not symmetric and does not satisfy metric guarantees such as the triangle inequality.
 
 ## Forward vs. reverse KL
 
-The asymmetry matters in practice. For approximating $p$ with $q$:
-
-- **Forward KL**, $\mathrm{KL}(p \| q)$: penalizes $q$ for missing modes of $p$ ("**mass-covering**"; under a restricted unimodal family, the result often sits between modes). Used in standard MLE.
-- **Reverse KL**, $\mathrm{KL}(q \| p)$: penalizes $q$ for placing mass where $p$ has none ("**mode-seeking**". $q$ collapses to one mode). Used in variational inference.
-
-For a multimodal $p$ and a restricted approximation family, forward KL often gives a broad average while reverse KL can pick one mode.
+Hold the target and both candidates fixed while changing only the sampling weights.
 
 <!-- visual:kl-direction-candidate-ranking -->
 <figure class="learning-figure plot-panel" aria-labelledby="kl-direction-title">
@@ -95,34 +92,107 @@ For a multimodal $p$ and a restricted approximation family, forward KL often giv
 		<text class="viz-callout" x="318" y="467" text-anchor="middle">0.58 · PICK</text>
 		<text class="viz-label" x="18" y="485">Same target and candidates; only the expectation changes.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> hold the target and both candidates fixed, then read each score row from left to right. In <code>KL(p || q)</code>, target mass weights the penalty, so nearly missing the right mode makes the one-mode candidate expensive. In <code>KL(q || p)</code>, candidate mass weights the penalty, so the broad candidate pays for its extra middle mass while the one-mode candidate scarcely samples the missed mode. This original three-outcome construction illustrates a restricted choice between two candidates, not a universal optimizer. Values are in nats and were checked against the KL definition in <a href="https://doi.org/10.1214/aoms/1177729694">Kullback and Leibler (1951)</a> and the inclusive/exclusive analysis in <a href="https://www.microsoft.com/en-us/research/publication/divergence-measures-and-message-passing/">Minka (2005)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> hold the target and both candidates fixed, then compare the score rows. Forward KL weights errors by target mass; nearly missing the right mode is expensive. Reverse KL weights errors by candidate mass; the broad candidate pays for its extra middle mass. This is a restricted choice between two candidates, not a universal optimizer. Values are in nats, following <a href="https://doi.org/10.1214/aoms/1177729694">Kullback and Leibler (1951)</a>. For divergence direction, see <a href="https://www.microsoft.com/en-us/research/publication/divergence-measures-and-message-passing/">Minka (2005)</a>.</figcaption>
 </figure>
 
 ## Connection to cross-entropy
 
-For empirical distribution $\hat p$ over a finite dataset:
+Combining equal terms gives four complete expectations:
+
+| Expectation | Weighted log terms | Score, nats |
+| --- | --- | --- |
+| $\operatorname{KL}(p\|q_{cover})$ | $0.98\log(0.49/0.34)+0.02\log(0.02/0.32)$ | $0.302699$ |
+| $\operatorname{KL}(p\|q_{left})$ | $0.49\log(0.49/0.96)+0.49\log(0.49/0.02)$ | $1.237811$ |
+| $\operatorname{KL}(q_{cover}\|p)$ | $0.68\log(0.34/0.49)+0.32\log16$ | $0.638716$ |
+| $\operatorname{KL}(q_{left}\|p)$ | $0.96\log(0.96/0.49)+0.02\log(0.02/0.49)$ | $0.581653$ |
+
+Forward KL prefers cover; reverse KL prefers left among these candidates.
+Reversing KL is not negating a forward score: it also changes the weights.
+For fixed discrete $p$, add and subtract $\log p$:
 
 $$
-H(\hat p, p_\theta) = -\mathbb{E}_{\hat p}[\log p_\theta] = H(\hat p) + \mathrm{KL}(\hat p \,\|\, p_\theta).
+H(p,q)=-\sum_xp(x)\log q(x)
+=-\sum_xp(x)\log p(x)+\sum_xp(x)\log\frac{p(x)}{q(x)}
+=H(p)+\operatorname{KL}(p\|q).
 $$
 
-Cross-entropy = entropy + KL. Since entropy of the data doesn't depend on $\theta$, minimizing cross-entropy = minimizing KL = MLE. This is why "the loss is cross-entropy" and "we're minimizing KL to the data" are the same statement.
+Only $H(p)$ stays constant when optimizing $q$.
+Categorical log-loss minimization and forward-KL minimization therefore have the same optimizer over the chosen model family.
+
+### Remove candidate support
+
+**New task:** replace the left candidate with $(0.98,0.02,0)$.
+**Picture and change:** the target's final outcome still has mass $0.49$, but the candidate now assigns zero.
+**Check:** forward KL becomes infinite; reverse KL remains $0.98\log2\approx0.679284$ nats.
+**Use when:** truncation or exact zeros remove support; exchanging arguments changes the requirement.
+
+### Expand the candidate set
+
+**New task:** permit $q=p$ as another candidate.
+Every log ratio is now zero for that candidate.
+**Check:** both objectives attain zero at $p$, beating the original choices.
+**Use when:** a richer approximation family becomes available; reverse KL does not inevitably select one mode.
+
+### Failure and transfer
+
+For $p=(0.9,0.1)$ and $q=(0.5,0.5)$, the wrong average $\mathbb E_q[\log(p/q)]$ is $-0.510826$.
+The actual $\operatorname{KL}(p\|q)$ is $0.368064$.
+Wrong sampling weights changed the quantity, not the nonnegativity theorem.
+
+**Reconstruct:** fixed $p$ has entropy $0.7$ nats and cross-entropy $1.2$ nats. What is KL?
+
+<details><summary>Answer</summary>
+
+It is $0.5$ nats.
+Minimizing cross-entropy over $q$ also minimizes forward KL only because this $p$, and hence its entropy, stays fixed.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+### Why the divergence is nonnegative
+
+For positive $r$, $-\log r\ge1-r$.
+Apply this with $r=q(x)/p(x)$ wherever $p(x)>0$:
+
+$$
+\operatorname{KL}(p\|q)\ge
+\sum_{p(x)>0}\bigl(p(x)-q(x)\bigr)
+=1-\sum_{p(x)>0}q(x)\ge0.
+$$
+
+Equality requires $q(x)=p(x)$ on the positive support and no remaining candidate mass outside it.
+Zero candidate probability at positive target mass instead gives infinite KL immediately.
+The coding interpretation compares expected ideal code lengths under the same sampling law; base-two logarithms give bits rather than nats.
+
+### Continuous laws and empirical samples
+
+For general measures, finite KL requires absolute continuity $p\ll q$ and suitable integrability.
+For densities, use $\int p\log(p/q)$ against the common base measure.
+An atomic empirical measure has infinite KL to a continuous law assigning zero probability to every observed point.
+Empirical negative log density remains meaningful; it is not that literal finite empirical-to-continuous KL identity.
 
 ## Common usage in ML
 
 | Use case | Direction |
 |---------|-----------|
 | Classification cross-entropy loss | Forward $\mathrm{KL}(\text{data} \| \text{model})$ |
-| Variational inference (ELBO) | Reverse $\mathrm{KL}(q \| p)$ |
-| RLHF / PPO penalty | Reverse $\mathrm{KL}(\pi_\theta \| \pi_\text{ref})$. Keep new policy close to reference |
-| Knowledge distillation | Forward $\mathrm{KL}(\text{teacher} \| \text{student})$ with temperature |
-| t-SNE | Forward $\mathrm{KL}(P \| Q)$ on pairwise similarities |
+| Variational inference | Approximate posterior $q(z\mid x)$ versus model posterior $p(z\mid x)$ |
+| Policy regularization | Name both policies, expectation, and penalty direction explicitly |
+| Knowledge distillation | Teacher versus student distributions at the specified temperature |
+| t-SNE | High-dimensional versus low-dimensional pairwise probability distributions |
+
+PPO's clipped surrogate is not generally an exact KL constraint.
+Information bottleneck objectives also use distinct joint, marginal, and conditional laws; name them before applying an identity.
 
 ## Common pitfalls
 
-- **Computing KL between distributions with different supports.** If $p(x) > 0$ and $q(x) = 0$, KL is $+\infty$.
-- **Confusing JS divergence (symmetric) with KL.** GANs originally used JS; modern variants (Wasserstein) avoid both.
-- **Forgetting the asymmetry direction.** Forward and reverse KL produce qualitatively different optimizers.
-- **Using KL on samples without density estimates.** KL is between distributions, not between sample sets; sample-based estimators are noisy and biased.
+Jensen-Shannon divergence averages $\operatorname{KL}(p\|m)$ and $\operatorname{KL}(q\|m)$ with $m=(p+q)/2$.
+That symmetric bounded quantity is not KL with swapped arguments or a universal GAN objective.
+Finite-sample density estimates introduce their own support choices and estimation bias.
+Changing the feasible family can matter as much as divergence direction.
 
 *Related: [entropy, mutual information, and information gain](/concepts/entropy-mutual-information/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), and [variational autoencoders](/concepts/variational-autoencoders/).*
+
+</div>

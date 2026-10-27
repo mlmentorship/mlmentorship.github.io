@@ -1,75 +1,51 @@
 ---
 title: "Approximate nearest neighbors: HNSW, IVF, and product quantization"
-description: "Exact k-NN over a billion vectors is infeasible. ANN trades a small recall hit for a 100x to 10,000x speedup. The reason vector search at scale exists."
+description: "Separate candidate routing from vector compression, then measure neighbor recall, task quality, latency and complete index memory against exact search."
 date: "2026-05-07"
 draft: false
 tags: ["concepts"]
 category: "concepts"
 ---
 
+Approximate nearest-neighbor indexes save routing work or vector bytes, creating different errors that need separate checks.
+
 ## Summary
 
-**Approximate Nearest Neighbors** finds vectors close to a query without comparing against every stored vector. The three dominant methods are graph-based (HNSW), inverted-file (IVF), and quantization-based (PQ, OPQ). Production systems combine them.
-
-Modern embedding models produce 768- to 4096-dimensional vectors. Brute-force k-NN over $N$ vectors is $O(N \cdot d)$ per query. At $N = 10^9$ and $d = 1024$, that is roughly a teraflop per query, infeasible at retrieval QPS.
-
-ANN delivers a tunable accuracy-speed-memory tradeoff. Modern vector databases (Faiss, Vespa, Milvus, Pinecone, Weaviate, pgvector) all use one or more of HNSW, IVF, and PQ. RAG, recommender retrieval, image search, and semantic search at scale would not exist without ANN.
+Which neighbors disappear because routing skipped them, and which change order because distances were approximated?
+First define the eligible catalog, metric, query distribution, $K$ and deterministic tie policy.
+Exact top-$K$ under that same contract is the neighbor-recall reference, not a relevance oracle.
 
 ## The three families
 
 ### HNSW (Hierarchical Navigable Small World)
 
-A multi-layer proximity graph ([Malkov & Yashunin, 2018](https://arxiv.org/abs/1603.09320)).
-
-- Each node is connected to its closest neighbors at each layer.
-- Top layers are sparse (long-range jumps), bottom layer is dense.
-- Search: enter at the top, greedily walk toward the query, drop down a layer, repeat.
-
-| | |
-|---|---|
-| Recall@10 at typical config | 95 to 99 percent |
-| Memory | 1.5 to 2x the raw vectors |
-| Build time | Slow (graph construction is iterative) |
-| Insert | Supported, online |
-| Best for | High-recall, latency-critical, in-memory deployments |
+Route through sparse upper graph layers, then search a broader bottom-layer frontier.
+Neighbor selection is heuristic, not an exact nearest-neighbor guarantee.
+Record degree parameter $M$, construction breadth and query breadth `efSearch`.
 
 ### IVF (Inverted File Index)
 
-Cluster the vectors with k-means into $K$ partitions ([Jégou et al., 2011](https://hal.inria.fr/inria-00514462/document)). At query time, find the nearest $\text{nprobe}$ centroids and only compare against vectors in those partitions.
-
-| | |
-|---|---|
-| Recall trade-off | Tunable via $\text{nprobe}$ |
-| Memory | Same as raw vectors |
-| Build time | Fast (one k-means) |
-| Best for | Disk-backed indexes, easy to shard |
+Assign stored vectors to coarse centroids, then scan selected inverted lists.
+`nlist` controls partitioning; `nprobe` controls lists visited.
+A nearby point can belong to a skipped list.
 
 ### PQ (Product Quantization)
 
-Compress each vector by splitting it into $m$ subvectors of dimension $d / m$ and quantizing each subvector independently to one of $2^b$ codewords ([Jégou et al., 2011](https://hal.inria.fr/inria-00514462/document)).
-
-A 1024-dim float32 vector (4096 bytes) becomes $m$ codes of $b$ bits each. With $m = 64, b = 8$: 64 bytes. 64x memory reduction.
-
-Distance computation uses precomputed lookup tables: for a query, precompute the squared distance from each query subvector to each codebook entry; the distance to a stored vector is the sum of $m$ table lookups.
-
-| | |
-|---|---|
-| Memory | 32x to 128x reduction |
-| Recall | Lower than HNSW; depends on codebook quality |
-| Best for | Memory-constrained scale, billion-vector indexes |
+Split a vector into $m$ subvectors and store one $b$-bit code per subvector.
+For squared Euclidean search, build query-to-codeword distance tables and sum selected entries.
+The original query need not be quantized.
+A 1024-dimensional float32 payload uses 4096 bytes; sixty-four eight-bit codes use 64 bytes.
 
 ### OPQ (Optimized PQ)
 
-Apply a learned rotation before PQ to align variance with subvector boundaries. Strictly better than PQ at the same code budget.
+Learn a rotation before PQ to redistribute quantization difficulty across subvectors.
+Measure improvement; it is not guaranteed for every dataset, query or trained codebook.
 
 ## Production combinations
 
-Real systems combine these:
-
-- **IVF + PQ**: cluster, then quantize each partition's vectors. The Faiss workhorse.
-- **HNSW + PQ**: HNSW graph for routing, PQ-compressed vectors for distance. Trades a recall hit for major memory savings.
-- **HNSW + reranking**: use HNSW to get the top 100 candidates, rerank with the exact float vectors.
-- **IVF-HNSW**: HNSW within each IVF partition.
+IVF-PQ combines routing and compression.
+Graph routing can also use compressed distances or supply candidates for exact reranking.
+An IVF-HNSW index may use a graph over coarse centroids; inspect its actual implementation roles.
 
 <!-- visual:ivf-pq-query-funnel -->
 <figure class="learning-figure" aria-labelledby="ivf-pq-funnel-title">
@@ -143,32 +119,87 @@ Real systems combine these:
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> IVF first limits the search to the two centroid lists nearest Q, so the dashed lists are never scanned. PQ then scores each remaining candidate by summing one lookup per subvector code instead of reading and comparing every float. IVF reduces the candidate count; PQ reduces the cost per candidate.</figcaption>
+	<figcaption><strong>Read it this way:</strong> IVF selects lists; dashed lists are skipped. PQ sums the four selected lookup entries to 0.65 for each retained candidate. Candidate omission and distance distortion are separate failure paths.</figcaption>
 </figure>
+
+The lookup sum is $0.04+0.31+0.08+0.22=0.65$.
+Now compare returned IDs with exact neighbors:
+
+| Set | IDs |
+| --- | --- |
+| Exact top-five | A, B, C, D, E |
+| ANN top-five | A, C, D, F, G |
+| Retained exact IDs | A, C, D |
+| Missing exact IDs | B, E |
+
+Neighbor recall@5 is $3/5=0.6$.
+Exact reranking cannot recover B or E from this fixed set.
+
+## Change the resource constraint
+
+### Increase search breadth
+
+**New task:** raise neighbor recall above this floor.
+
+**Picture and change:** increase `efSearch` or `nprobe`, holding queries, filters and catalog fixed.
+
+**Check:** if broader routing adds B but not E, exact reranking can achieve $4/5=0.8$ here.
+It still cannot produce the missing E.
+Record candidate recall and tail latency, not only reranking accuracy.
+
+**Use when:** omission, rather than retained-candidate ordering, dominates.
+
+### Reduce stored bytes
+
+**New task:** one million raw vectors exceed the memory budget.
+
+**Picture and change:** raw payload is 4.096 decimal GB; the stated PQ codes use 64 MB.
+
+**Check:** eight-byte IDs add another 8 MB before codebooks, lists, graph links and allocator overhead.
+Keeping raw vectors for reranking retains their storage cost somewhere.
+The 64-fold payload reduction is not a whole-service memory or speed guarantee.
+
+**Use when:** storage or vector transfer is binding; evaluate compression, encoder dimension or tiering with quality controls.
+
+## Reconstruct the error
+
+Could neighbor recall decrease without changing useful-document recall?
+
+<details>
+<summary>Reasoned answer</summary>
+
+Yes, if omitted neighbors are irrelevant or redundant.
+Alternatively one missing ID can remove the only useful item.
+Measure neighbor approximation and task relevance separately.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Recall vs latency vs memory
 
-ANN has three knobs:
-
-- **Recall@k**: fraction of true k-NN found.
-- **Latency**: query time.
-- **Memory**: bytes per vector.
-
-You pick two. Examples:
-
-- HNSW with high $efSearch$: high recall, low latency, high memory.
-- IVF-PQ with small $\text{nprobe}$ and aggressive PQ: low memory, decent latency, lower recall.
-- Brute force: 100 percent recall, infinite cost.
+Measure a workload-specific frontier, not a universal pick-two rule.
+Include query concurrency, filters, vector distribution, build/update cost and resident plus peak memory.
+Graph links, IDs, codebooks, deletions and optional originals all contribute.
+Exact search has finite $O(Nd)$ work and can be preferable for small or highly filtered candidate sets.
+For dot products, state whether a multiply-add counts as one operation or two FLOPs.
+Bandwidth may dominate arithmetic.
+ANN does not guarantee sublinear worst-case work.
 
 ## Common pitfalls
 
-- **Reporting recall without specifying k.** Recall@1 and recall@100 measure different failure modes.
-- **Confusing index size with vector size.** HNSW adds graph overhead; PQ subtracts vector size.
-- **Building once on cold data.** Most systems need incremental insert and delete; pick an index that supports them (HNSW, not raw IVF-PQ).
-- **Over-indexing precision.** For semantic search, the embedding model is usually the noisier component; chasing 99.5 percent ANN recall is wasted effort if the embeddings have 90 percent retrieval precision.
+Report $K$, ground-truth metric, ties and filtered eligibility with recall.
+Normalize vectors consistently when cosine is implemented through inner product.
+Check versioned insertion, deletion, tombstone, retraining and filter behavior rather than inferring it from a family name.
+Strong static unfiltered recall does not qualify a frequently updated filtered service.
+Original algorithms: <a href="https://arxiv.org/abs/1603.09320">HNSW</a> and <a href="https://hal.inria.fr/inria-00514462/document">product quantization</a>.
 
 ## Related
 
 - [Two-tower retrieval](/concepts/two-tower-retrieval/).
 - [Embedding spaces and similarity metrics](/concepts/embedding-spaces-and-similarity/).
 - [RAG: retrieval-augmented generation](/concepts/rag-overview/).
+
+</div>

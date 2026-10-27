@@ -29,7 +29,7 @@ const candidate = (left, right, best, move, reason, result) => bars(heights, {
 const draft = visual('Evaluate both boundary walls, then move only the shorter wall because keeping it cannot produce a taller container at a smaller width.', [
   frame(
     'Initialize at both ends',
-    'For heights [1, 8, 6, 2, 5, 4, 8, 3, 7], L=0 and R=8 give width 8 and area 8. Height 1 is limiting, so move L right.',
+    'Indices 0 and 8 give width 8 and area 8. Left height 1 limits area; move left inward.',
     candidate(0, 8, 'max(0, 8) = 8', 'L: 0 -> 1', 'left height 1 < right height 7'),
     'range-0-8',
   ),

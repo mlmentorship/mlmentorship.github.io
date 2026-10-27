@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-palindromic-substrings.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Each successful radius around each odd or even center identifies exactly one distinct palindromic substring occurrence.",
+  "learningObjective": "Each accepted radius contributes one range. Equal text at different positions counts separately.",
   "mechanismReview": {
     "pattern": "Count successful expansions from every odd and even center.",
     "recognitionCue": "The task counts contiguous palindrome occurrences, including equal text at different positions, so each center-radius pair should contribute separately.",

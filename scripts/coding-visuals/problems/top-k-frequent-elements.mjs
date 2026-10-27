@@ -5,7 +5,7 @@ const bucketAxis = ['f=0 []', 'f=1 [3]', 'f=2 [2]', 'f=3 [1]', 'f=4 []', 'f=5 []
 const draft = visual('Frequency is a bounded coordinate: place each value at its count, then scan counts from n down until k values are collected.', [
   frame(
     'Count the concrete input',
-    'For nums = [1,1,1,2,2,3] and k = 2, Counter produces 1 -> 3, 2 -> 2, and 3 -> 1.',
+    'Value 1 appears three times, value 2 twice, and value 3 once. Select two distinct values.',
     arrayMap(['1', '1', '1', '2', '2', '3'], [['1', '3'], ['2', '2'], ['3', '1']], [], { k: '2', mapLabel: 'frequency' }),
     'count-values',
   ),

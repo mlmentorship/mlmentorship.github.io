@@ -13,7 +13,7 @@ const list = (left, right, extra = {}) => linked(
 const draft = visual('Maintain a two-node gap so left stops immediately before the second node from the end.', [
   frame(
     'Start both pointers at the dummy',
-    'A dummy points to 1, so removing the head would use the same link update. Both left and right start at dummy.',
+    'Both pointers start at a dummy before the head. The same bypass can remove the head.',
     list('dummy', 'dummy', { right: 'dummy', gap: '0 nodes' }),
     'initialize-dummy',
   ),

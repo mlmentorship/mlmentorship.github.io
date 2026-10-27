@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-find-median-from-data-stream.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "The lower max-heap owns the extra item, and its root plus the upper min-heap root are always the middle value or values.",
+  "learningObjective": "After completed insertions, ordered halves and balanced sizes expose the middle ranks at the heap roots.",
   "mechanismReview": {
     "pattern": "Online median maintenance with a negated max-heap for the lower half and a min-heap for the upper half.",
     "recognitionCue": "Use two heaps when numbers arrive online and every median query must avoid sorting the entire history.",

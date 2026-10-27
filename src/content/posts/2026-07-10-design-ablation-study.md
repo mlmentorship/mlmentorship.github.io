@@ -7,109 +7,204 @@ tags: ["questions"]
 category: "questions"
 ---
 
-> A new architecture beats the baseline by 3%. Design the ablations needed to support the claim that the proposed component causes the improvement.
+Design an ablation that distinguishes a claimed model mechanism from plausible alternative explanations for an observed gain.
 
-Ablation is not "remove every component one at a time." The goal is experiments where the proposed mechanism and the strongest alternative explanation (more parameters, more compute, more tuning) predict different outcomes. Design for that contrast and you separate the science from the confounds.
+## Problem
 
-## Clarify the claim
+**Context.** A hypothetical routing recipe improves accuracy over an original baseline, and its authors attribute the difference to content-dependent routing.
 
-Ask:
+**Task.** Specify a control, matched resources, measurement plan, and result patterns that would support or weaken that explanation.
+Explain whether the comparison tests the whole recipe or isolates the claimed mechanism.
 
-- Is the claim about quality, efficiency, convergence, robustness, or transfer?
-- Did the new model use more parameters, FLOPs, data, tuning trials, or training time?
-- Is the component expected to matter only in a specific regime?
-- How much variance is there across seeds and datasets?
-- What is the strongest plausible alternative explanation?
+**Constraints.** Control training budget, data, optimization, and evaluation where relevant.
+Removing a component can also change capacity or compute, so a score drop alone does not isolate why it mattered.
 
-## A strong ablation sequence
+An explicitly hypothetical router F scores 83% accuracy on distant-evidence tasks; original baseline A scores 80%.
+The claim attributes the three-percentage-point gain to content-dependent routing.
+Design a control and decide what evidence would support that explanation.
 
-1. **Reproduce the result** across seeds with confidence intervals.
-2. **Match resources:** parameters, training tokens, compute, wall time, and tuning budget.
-3. **Remove the component** while holding the rest of the implementation fixed.
-4. **Replace with a simple control** that matches capacity or compute without the claimed mechanism.
-5. **Vary the mechanism strength** and test whether outcomes change as predicted.
-6. **Test boundary regimes** where the claim predicts a larger benefit or none.
-7. **Measure mediators**, not only the final metric, when the mechanism predicts observable internal behavior.
-8. **Replicate across tasks or datasets** only as broadly as the claim requires.
+## Picture
+
+Use the same router architecture with position-only input as control C.
+Suppose C scores 82.8%, while F scores 83%.
+Most of the headline improvement remains without content-dependent input.
+These are teaching means, not measured research results or uncertainty estimates.
+
+Before confirmation, predict at least two points for F−C on distant evidence.
+Predict at most 0.5 on short evidence.
+The control must retain usable capacity, not merely unused parameters.
+
+| Regime | F | C | F−C |
+| --- | --- | --- | --- |
+| Distant evidence | $83\%$ | $82.8\%$ | $0.2$ points |
+| Short evidence | $91\%$ | $90.9\%$ | $0.1$ points |
+
+The difference of controlled gaps is $0.2-0.1=0.1$ points.
+The displayed distant mean misses the predicted useful effect; control validity and uncertainty determine how strongly to narrow the claim.
 
 <!-- visual:ablation-rival-hypotheses -->
 <figure class="learning-figure plot-panel" aria-labelledby="ablation-rival-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ablation-rival-title">Choose an ablation where the claimed mechanism and its strongest rival predict different results.</p>
+	<p class="visual-kicker">Hypothetical controlled comparison</p>
+	<p class="visual-title" id="ablation-rival-title">Separate the headline gain from the content-routing contrast.</p>
 	<svg viewBox="0 0 360 530" role="img" aria-labelledby="ablation-rival-svg-title ablation-rival-svg-desc">
-		<title id="ablation-rival-svg-title">Ablation plan that distinguishes a mechanism from a resource confound</title>
-		<desc id="ablation-rival-svg-desc">The full model improves by three percent, which is consistent with either the claimed mechanism or extra parameters, compute, and tuning. First test a matched control that keeps those resources but removes or replaces the mechanism. The mechanism hypothesis predicts that the gain disappears, while the resource hypothesis predicts that it remains. Then vary mechanism strength at fixed resources and test a boundary regime. The mechanism hypothesis predicts a dose or regime pattern specified in advance; the resource hypothesis predicts no such specific pattern. Prefer the explanation whose preregistered predictions match repeated-seed estimates and uncertainty.</desc>
+		<title id="ablation-rival-svg-title">Three-point headline improvement versus a 0.2-point controlled gap</title>
+		<desc id="ablation-rival-svg-desc">Hypothetical distant-evidence accuracy is 80 percent for original baseline A, 82.8 for matched position-only control C and 83 for content router F. The axis is deliberately restricted to 80 through 84 percent, with x equal to 60 plus 64 times accuracy minus 80. The full versus original gain spans three points; the full versus control gap is only 0.2. A second regime has controlled gap 0.1, so the difference of gaps is 0.1. The predeclared prediction requires distant gain at least two points and short gain at most 0.5. Means alone do not provide uncertainty.</desc>
 		<defs><marker id="ablation-rival-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
-		<rect class="viz-node viz-node--input" x="30" y="10" width="300" height="50" rx="4"></rect>
-		<text class="viz-label" x="180" y="29" text-anchor="middle">OBSERVATION</text>
-		<text class="viz-callout" x="180" y="49" text-anchor="middle">Full model beats baseline by 3%</text>
-		<path d="M180 64V82H95V98" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#ablation-rival-arrow)"></path>
-		<path d="M180 82H265V98" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#ablation-rival-arrow)"></path>
-		<rect class="viz-node viz-node--focus" x="10" y="102" width="165" height="70" rx="4"></rect>
-		<text class="viz-axis-label" x="92.5" y="122" text-anchor="middle">H1: MECHANISM</text>
-		<text class="viz-label" x="92.5" y="143" text-anchor="middle">component causes</text>
-		<text class="viz-label" x="92.5" y="158" text-anchor="middle">the improvement</text>
-		<rect class="viz-node" x="185" y="102" width="165" height="70" rx="4"></rect>
-		<text class="viz-axis-label" x="267.5" y="122" text-anchor="middle">H2: RESOURCES</text>
-		<text class="viz-label" x="267.5" y="143" text-anchor="middle">extra capacity, compute,</text>
-		<text class="viz-label" x="267.5" y="158" text-anchor="middle">or tuning causes the gain</text>
-		<text class="viz-axis-label" x="10" y="204">TEST 1 - MATCH THE RIVAL EXPLANATION</text>
-		<rect class="viz-node" x="10" y="214" width="340" height="48" rx="4"></rect>
-		<text class="viz-callout" x="180" y="234" text-anchor="middle">Same parameters, FLOPs, data, and tuning budget;</text>
-		<text class="viz-label" x="180" y="251" text-anchor="middle">remove or replace the claimed mechanism</text>
-		<path d="M92.5 266V282" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#ablation-rival-arrow)"></path>
-		<path d="M267.5 266V282" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#ablation-rival-arrow)"></path>
-		<rect class="viz-node viz-node--focus" x="10" y="286" width="165" height="52" rx="4"></rect>
-		<text class="viz-axis-label" x="92.5" y="306" text-anchor="middle">H1 PREDICTS</text>
-		<text class="viz-callout" x="92.5" y="326" text-anchor="middle">gain disappears</text>
-		<rect class="viz-node" x="185" y="286" width="165" height="52" rx="4"></rect>
-		<text class="viz-axis-label" x="267.5" y="306" text-anchor="middle">H2 PREDICTS</text>
-		<text class="viz-callout" x="267.5" y="326" text-anchor="middle">gain remains</text>
-		<text class="viz-axis-label" x="10" y="370">TEST 2 - SEEK A MECHANISM-SPECIFIC PATTERN</text>
-		<rect class="viz-node" x="10" y="380" width="340" height="48" rx="4"></rect>
-		<text class="viz-callout" x="180" y="400" text-anchor="middle">At fixed resources, vary mechanism strength</text>
-		<text class="viz-label" x="180" y="417" text-anchor="middle">and test a predicted boundary regime</text>
-		<rect class="viz-node viz-node--focus" x="10" y="440" width="165" height="52" rx="4"></rect>
-		<text class="viz-axis-label" x="92.5" y="460" text-anchor="middle">H1 PREDICTS</text>
-		<text class="viz-callout" x="92.5" y="480" text-anchor="middle">specified dose pattern</text>
-		<rect class="viz-node" x="185" y="440" width="165" height="52" rx="4"></rect>
-		<text class="viz-axis-label" x="267.5" y="460" text-anchor="middle">H2 PREDICTS</text>
-		<text class="viz-callout" x="267.5" y="480" text-anchor="middle">no specific pattern</text>
-		<path class="viz-operating-guide" d="M10 498H350"></path>
-		<text class="viz-axis-label" x="180" y="521" text-anchor="middle">DECIDE WITH REPEATED-SEED ESTIMATES + UNCERTAINTY</text>
+		<text class="viz-axis-label" x="14" y="27">DISTANT EVIDENCE: ACCURACY (%)</text>
+		<text class="viz-label" x="14" y="47">Axis starts at 80%; bars show gains above 80.</text>
+		<rect class="viz-plot-bg" x="60" y="74" width="256" height="180" rx="3"></rect>
+		<path class="viz-gridline" d="M60 74V254 M124 74V254 M188 74V254 M252 74V254 M316 74V254"></path>
+		<path class="viz-axis" d="M60 74V254H316"></path>
+		<text class="viz-callout" x="14" y="104">A</text>
+		<circle class="viz-operating-point" cx="60" cy="100" r="4"></circle>
+		<text class="viz-callout" x="75" y="104">80</text>
+		<text class="viz-callout" x="14" y="160">C</text>
+		<rect class="viz-node" x="60" y="147" width="179.2" height="18" rx="2"></rect>
+		<text class="viz-callout" x="247" y="160">82.8</text>
+		<text class="viz-callout" x="14" y="216">F</text>
+		<rect class="viz-node viz-node--focus" x="60" y="203" width="192" height="18" rx="2"></rect>
+		<text class="viz-callout" x="260" y="216">83</text>
+		<text class="viz-label" x="60" y="273" text-anchor="middle">80</text>
+		<text class="viz-label" x="124" y="273" text-anchor="middle">81</text>
+		<text class="viz-label" x="188" y="273" text-anchor="middle">82</text>
+		<text class="viz-label" x="252" y="273" text-anchor="middle">83</text>
+		<text class="viz-label" x="316" y="273" text-anchor="middle">84</text>
+		<path class="viz-operating-guide" d="M60 284V292H252V284"></path>
+		<text class="viz-callout" x="156" y="311" text-anchor="middle">F − A = 3 points</text>
+		<rect class="viz-node" x="14" y="332" width="332" height="78" rx="4"></rect>
+		<text class="viz-callout" x="26" y="352">Distant: F − C = 0.2 points</text>
+		<text class="viz-callout" x="26" y="373">Short: F − C = 0.1 points</text>
+		<text class="viz-label" x="26" y="395">Difference of gaps = 0.1 points</text>
+		<rect class="viz-node viz-node--focus" x="14" y="430" width="332" height="64" rx="4"></rect>
+		<text class="viz-axis-label" x="26" y="450">PREDECLARED MECHANISM PREDICTION</text>
+		<text class="viz-callout" x="26" y="477">Distant gain ≥ 2; short gain ≤ 0.5 points</text>
+		<text class="viz-label" x="180" y="521" text-anchor="middle">Hypothetical means; uncertainty is not supplied.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the original 3% result cannot choose between two explanations because both predict a gain. Spend the next runs on contrasts that split their predictions: a resource-matched replacement and a pre-specified dose or boundary test. Only then do repeated-seed estimates support the mechanism rather than merely restating the improvement. Original synthesis informed by the <a href="https://www.itl.nist.gov/div898/handbook/pri/section3/pri332.htm">NIST treatment of nuisance factors</a> and <a href="https://arxiv.org/abs/1707.05589">Melis et al.'s controlled model comparisons</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the full model beats A by three points but beats matched C by only 0.2. These comparisons support different claims.</figcaption>
 </figure>
 
-## What an L4 answer sounds like
+<p class="diagram-source">References: <a href="https://www.itl.nist.gov/div898/handbook/pri/section3/pri332.htm">NIST blocking guidance</a> and <a href="https://arxiv.org/abs/1707.05589">Melis et al.</a></p>
 
-> "Remove each layer and see how accuracy changes."
+## Specify the experiment before running it
 
-A start, but it can compare models of different capacity and never tests the causal story.
+| Arm | Input or intervention | Purpose |
+| --- | --- | --- |
+| A | Original smaller architecture | Reproduction anchor, not capacity-matched control |
+| F | Full content input, $\lambda=1$ | Claimed mechanism |
+| C | Position-only input, $\lambda=0$ | Usable matched replacement |
+| Half | Half content, half position | Predeclared mechanism-strength test |
 
-## What an L5 answer adds
+For routing arms, use the same gate on $\lambda c_{\rm norm}+(1-\lambda)p_{\rm norm}$.
+Compute the same input-blend path and verify actual resource differences.
+Predeclare the expected strength and regime pattern, not a pattern chosen after inspecting scores.
 
-An L5 answer controls compute and tuning, repeats seeds, designs a simple matched baseline, and states which result would falsify the mechanism.
+Three paired runs per arm, each capped at four GPU-hours including tuning, training and evaluation, cost at most 48 GPU-hours.
+Both regimes evaluate the same checkpoints; they do not double the run count.
+Count failed and stabilizing trials against the cap.
 
-## What an L6 answer adds
+Record config identity, initialization policy, data/evaluation versions, hardware, tokens, FLOPs, wall time and tuning opportunities.
+Choose the resource contract relevant to the claim and disclose residual differences.
+Parameters, FLOPs, utilization and wall time cannot generally all match exactly.
 
-An L6 answer narrows the claim before expanding the experiment set. It asks which ablation could change the scientific conclusion, whether choices were made after seeing results, and whether the component only helps optimization at one scale. It also tests cheaper interventions and whether the observations can identify the claimed mechanism.
+Retain paired run/item outputs, primary and secondary measures, uncertainty method and stopping rule.
+Three seeds are an affordable pilot plan, not a universal adequacy rule.
 
-## Tells that get you a strong-hire vote
+## Change the intervention
 
-- You separate final performance from mechanism evidence.
-- You match compute, capacity, and tuning opportunity.
-- You state a falsifying result.
-- You use predicted boundary conditions.
-- You account for variance and multiple comparisons.
+### 1. Removal causes divergence
 
-## Tells that get you down-leveled
+**New task:** deleting the router disrupts optimization instead of yielding a lower converged score.
 
-- One seed.
-- Comparing models with unequal training budgets.
-- Calling feature importance an ablation with no causal claim.
-- Reporting only the best configuration.
-- Running every combination without prioritization.
+**Picture and change:** retain deletion as a diagnostic, not a clean mechanism estimate.
+Inspect loss/gradient trajectories and compare stable matched replacements with equal predeclared stabilization opportunities.
+
+**Check:** recovery by a stable control shows intervention sensitivity, not necessity of content routing.
+
+**Use when:** removal changes initialization, residual scale or numerical stability.
+
+### 2. Two components may interact
+
+**New task:** routing and a normalization change might matter jointly.
+
+**Picture and change:** use a reviewed $2\times2$ on/off design within a revised authorized run allocation.
+Do not silently add another study.
+
+**Check:** for scores $Y_{00}=80$, $Y_{10}=80.2$, $Y_{01}=80.1$, $Y_{11}=83$:
+
+$$
+Y_{11}-Y_{10}-Y_{01}+Y_{00}=2.7\text{ points}.
+$$
+
+**Use when:** one-at-a-time removals cannot separate main effects from interaction.
+
+## Failure and transfer
+
+Adding unused weights does not match usable capacity or optimization.
+A correlated mediator score without a matched quality effect does not establish that mediator's causal role.
+
+What if average performance improves, but the effect is absent where theory predicts the largest benefit?
+
+<details>
+<summary>Check your answer</summary>
+
+Retain the performance result while narrowing the tested mechanism claim according to uncertainty and control validity.
+Do not invent a replacement boundary prediction after seeing results.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Clarify the claim
+
+Separate quality, efficiency, convergence, robustness and transfer claims.
+Check data, parameters, compute, tuning and regime differences before interpreting a gain.
+
+## A strong ablation sequence
+
+1. Reproduce results across declared seeds and estimate relevant uncertainty.
+2. Match the chosen resource contract.
+3. Remove the component with other implementation choices fixed.
+4. Add a usable simple replacement.
+5. Vary mechanism strength under controlled resources.
+6. Test predicted boundary regimes.
+7. Measure predicted mediators without equating correlation with causation.
+8. Replicate across tasks only as broadly as the claim requires.
+
+<span id="what-an-l4-answer-sounds-like"></span>
+
+## An incomplete removal
+
+Removing a layer tests that intervention, but can also change capacity, optimization and numerical behavior.
+
+<span id="what-an-l5-answer-adds"></span>
+
+## A controlled contrast
+
+State which observation would falsify the proposed explanation and which rival factors remain.
+
+<span id="what-an-l6-answer-adds"></span>
+
+## Scope and identification
+
+Ask whether the effect survives scale and cheaper interventions.
+Even a matched replacement can retain or introduce another mechanism.
+No single ablation automatically identifies a unique universal cause.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+
+## Useful evidence
+
+Distinguish final performance from mechanism evidence and account for multiple comparisons and post-selection.
+An answer format does not guarantee a hiring outcome.
+
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Incomplete reporting
+
+One seed, unequal hidden tuning, or only the best configuration cannot establish a robust controlled comparison.
+Feature importance is not automatically a causal ablation.
 
 ## Common follow-ups
 
@@ -119,4 +214,13 @@ An L6 answer narrows the claim before expanding the experiment set. It asks whic
 - How many seeds are enough?
 - What result would make you reject the claim despite a positive average gain?
 
+## Sources
+
+- [Melis et al., controlled language-model comparisons](https://arxiv.org/abs/1707.05589).
+- [We need to talk about random seeds](https://arxiv.org/abs/2210.13393).
+- [NIST randomized block designs](https://www.itl.nist.gov/div898/handbook/pri/section3/pri332.htm).
+- [Rules of Machine Learning](https://developers.google.com/machine-learning/guides/rules-of-ml).
+
 *Related: [cross-validation strategies](/concepts/cross-validation-strategies/), [bias and variance of estimators](/concepts/bias-variance-of-estimators/), and [critique an ML paper](/questions/critique-ml-paper/).*
+
+</div>

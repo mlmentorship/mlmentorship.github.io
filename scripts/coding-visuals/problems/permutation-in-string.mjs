@@ -11,7 +11,7 @@ const state = (window) => [
 ];
 
 const draft = visual('Slide one width-2 window over "eidbaooo"; add R, remove the outgoing L character, then compare counts.', [
-  frame('Count the first width-2 window', 'pattern = "ab" needs a:1,b:1. text[0..1] = "ei" has e:1,i:1, so the counters differ.', arrayMap(items, state('e:1, i:1'), pointers(0, 1), {
+  frame('Count the first width-2 window', 'Pattern ab needs one a and one b. Initial window ei has different counts.', arrayMap(items, state('e:1, i:1'), pointers(0, 1), {
     range: '[0..1] = "ei"',
     comparison: 'e:1,i:1 != a:1,b:1',
   }), 'initial-window'),

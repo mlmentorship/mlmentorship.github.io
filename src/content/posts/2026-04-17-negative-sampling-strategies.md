@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: recsys, retrieval, and embedding-training interviews.*
 
-The L4 candidate samples random items as negatives. The L6 candidate explains why hard negatives dominate quality and how to mine them without breaking training.
+Choose negative examples for retrieval training and explain how the sampling policy changes the learning signal and evaluation.
+
+## Problem
+
+**Context.** A query-item model has observed positive pairs, but scoring every possible alternative item during training is too expensive.
+Unobserved items are not necessarily irrelevant, and some plausible alternatives are much harder than random items.
+
+**Task.** Compare random, in-batch, and mined negatives; propose a mixture, mining refresh policy, and quality measurements.
+Explain the consequences for the loss, false negatives, and training-serving candidate mismatch.
+
+**Constraints.** Keep evaluation independent of mining and prevent held-out or future information from leaking into training.
+Specify duplicate and accidental-positive handling; harder negatives do not automatically produce better or more stable learning.
 
 ## Why negatives matter
 

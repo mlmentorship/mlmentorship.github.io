@@ -155,13 +155,27 @@ Both work because the operations form a semiring (associativity, distributivity)
 
 ## In log space (always)
 
-Multiplying many small probabilities underflows in float32. Always work in log space:
+Unscaled products can underflow; the risk depends on the probabilities, sequence length, and dtype.
+Use the log-space recurrence below as a stable default.
+Explicitly scaled probability-space recurrences are another valid strategy when their normalizers are tracked:
 
 $$
 \log \alpha_t(k) = \log B_k(x_t) + \mathrm{logsumexp}_i \big(\log \alpha_{t-1}(i) + \log A_{i k}\big).
 $$
 
-The `logsumexp` trick (subtract the max before exponentiating) keeps everything stable.
+The `logsumexp` trick subtracts the maximum before exponentiating.
+Handle an all-impossible state vector separately: its log likelihood is negative infinity, not a finite normalized posterior.
+
+**Predict before revealing:** a one-state HMM has transition probability one.
+Which repeated emission is more vulnerable in float32: probability 0.9 for 100 observations, or 0.001 for 16?
+
+<details><summary>Compare accumulated magnitude, not length alone</summary>
+
+The shorter sequence underflows in the checked unscaled float32 recurrence: $0.001^{16}=10^{-48}$ is too small to represent.
+The longer sequence retains likelihood $0.9^{100}\approx2.66\times10^{-5}$.
+Log-domain computation or per-step scaling avoids losing the small likelihood; scaling must retain the accumulated log-normalizers.
+
+</details>
 
 ## Modern uses
 
@@ -171,8 +185,8 @@ The `logsumexp` trick (subtract the max before exponentiating) keeps everything 
 
 ## Common pitfalls
 
-- **Working in probability space instead of log space.** Numerical underflow guaranteed beyond $T \approx 50$.
-- **Forgetting to renormalize when doing forward-backward in float32.** Some implementations renormalize $\alpha_t$ at each step and accumulate the log-normalizer separately.
+- **Unscaled probability products.** There is no universal safe sequence length. Use log space or explicit scaling appropriate to the dtype and accumulated magnitudes.
+- **Discarding scaling factors.** When renormalizing $\alpha_t$, accumulate the log-normalizers and use a consistent backward-scaling convention to recover likelihoods and posteriors.
 - **Confusing the per-timestep argmax of forward-backward with Viterbi.** They are different: Viterbi gives the most likely full sequence; per-timestep argmax gives the sequence of most likely states, which can be infeasible (i.e., have zero probability under the model).
 
 ## Related

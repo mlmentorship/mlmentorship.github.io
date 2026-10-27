@@ -2,52 +2,94 @@ import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const nodes = ['1', '2', '3', '4'];
 const edges = ['1 -> 2', '1 -> 3', '3 -> 4'];
-const treeState = (node, label, extra = {}) => array(nodes, [
-  mark(nodes.indexOf(node), label, 'focus', 'preorder-cursor'),
-], {
-  ...extra,
-  activeState: label,
-  topology: edges.join(', '),
-});
+const tokens = ['1','2','#','#','3','4','#','#','#'];
+const nodePositions = {
+  t0: { x: 210, y: 40 },
+  t1: { x: 95, y: 140 },
+  t2: { x: 40, y: 240 },
+  t3: { x: 150, y: 240 },
+  t4: { x: 340, y: 140 },
+  t5: { x: 285, y: 240 },
+  t6: { x: 235, y: 340 },
+  t7: { x: 345, y: 340 },
+  t8: { x: 420, y: 240 },
+};
+const treeState = (node, label, extra = {}) => {
+  const { tokenCount, ...metadata } = extra;
+  const decoding = metadata.consumed !== undefined;
+  const visible = Object.keys(nodePositions).slice(0, decoding ? tokenCount : tokens.length);
+  const openSlots = tokens.slice(0, tokenCount).reduce((slots, value) => slots + (value === '#' ? -1 : 1), 1);
+  return array(nodes, [mark(nodes.indexOf(node), label, 'focus', 'preorder-cursor')], {
+    ...metadata,
+    activeState: label,
+    topology: edges.join(', '),
+    graphCompanion: {
+      nodes: visible,
+      nodeLabels: Object.fromEntries(tokens.map((value, index) => [`t${index}`, value])),
+      edges: ['t0->t1','t0->t4','t1->t2','t1->t3','t4->t5','t4->t8','t5->t6','t5->t7'].filter((edge) => edge.split('->').every((slot) => visible.includes(slot))),
+      positions: nodePositions,
+      width: 460,
+      height: 450,
+      treeLayout: true,
+      start: `t${tokenCount - 1}`,
+      stateNodes: visible.filter((slot) => Number(slot.slice(1)) < tokenCount - 1),
+      markerId: `codec-slot-${decoding ? 'read' : 'write'}-${tokenCount}`,
+      edgeLabels: false,
+      ariaLabel: `Tree child slots after ${decoding ? 'reading' : 'writing'} ${tokenCount} tokens; hash marks are missing children`,
+      regions: [{ x: 230, y: 425, label: `${decoding ? 'read' : 'write'} ${tokenCount}/9; open slots ${openSlots}` }],
+    },
+    arraySummary: 'Original real-node inventory',
+  });
+};
 
 const draft = visual('Preorder records each node and each missing child, so the decoder can consume one token per recursive slot and recover the exact topology.', [
-  frame('Initialize preorder at the root', 'For root 1 with left leaf 2 and right child 3 whose left child is 4, visit(1) appends 1.', treeState('1', 'visit 1', {
+  frame('Initialize preorder at the root', 'Visit root 1 and append its value. Its left child is 2; its right child is 3.', treeState('1', 'visit 1', {
+    tokenCount: 1,
     stream: '[1]',
     callStack: 'visit(1)',
   }), 'serialize-1'),
   frame('Serialize the left node', 'Preorder enters 2 and appends it before either child.', treeState('2', 'visit 2', {
+    tokenCount: 2,
     stream: '[1,2]',
     callStack: 'visit(1) > visit(2)',
   }), 'serialize-2'),
   frame('Record both null children of 2', 'visit(None) appends # twice, closing the complete subtree rooted at 2.', treeState('2', 'return 2', {
+    tokenCount: 4,
     stream: '[1,2,#,#]',
     calls: '2.left=None; 2.right=None',
   }), 'serialize-2-nulls'),
   frame('Serialize the right node', 'The recursion returns to 1, enters 3, and appends 3.', treeState('3', 'visit 3', {
+    tokenCount: 5,
     stream: '[1,2,#,#,3]',
     callStack: 'visit(1) > visit(3)',
   }), 'serialize-3'),
   frame('Serialize node 4 and its nulls', 'visit(4) appends 4,#,#, completing the left subtree of 3.', treeState('4', 'return 4', {
+    tokenCount: 8,
     stream: '[1,2,#,#,3,4,#,#]',
     calls: '4.left=None; 4.right=None',
   }), 'serialize-4'),
   frame('Close the final missing child', '3.right is None, so the ninth token is # and serialize returns "1,2,#,#,3,4,#,#,#".', treeState('3', 'return 3', {
+    tokenCount: 9,
     stream: '[1,2,#,#,3,4,#,#,#]',
     serialized: '1,2,#,#,3,4,#,#,#',
   }), 'serialize-finish'),
   frame('Deserialize token 1', 'build() consumes 1, creates the root, and recursively reserves its left slot first.', treeState('1', 'build 1', {
+    tokenCount: 1,
     consumed: '1 / 9',
     remaining: '2,#,#,3,4,#,#,#',
   }), 'deserialize-1'),
   frame('Build and close node 2', 'The next token creates 2; the following two # tokens return None for its left and right slots.', treeState('2', 'build 2; #; #', {
+    tokenCount: 4,
     consumed: '4 / 9',
     built: '1.left = 2 with two null children',
   }), 'deserialize-2'),
   frame('Build node 3, then node 4', 'Token 3 fills 1.right; token 4 fills 3.left before its two # child markers.', treeState('4', 'build 4; #; #', {
+    tokenCount: 8,
     consumed: '8 / 9',
     built: '1.right = 3; 3.left = 4',
   }), 'deserialize-4'),
   frame('Consume the final null and return', 'The last # sets 3.right=None. Every recursive slot consumed exactly one token, recreating all original edges.', treeState('3', 'final #; return root', {
+    tokenCount: 9,
     consumed: '9 / 9',
     result: 'tree 1 -> (left 2, right 3 -> left 4)',
   }), 'deserialize-finish'),
@@ -58,7 +100,7 @@ const review = {
   recognitionCue: 'Use structural sentinels when a tree must round-trip through a linear stream and node values alone do not uniquely identify its shape.',
   invariant: 'Each recursive serialize call emits exactly one leading token for its slot, and each deserialize call consumes exactly one leading token before recursively rebuilding the same left and right slots.',
   stateModel: 'Serialization retains an output token list and recursion stack; deserialization retains only the token iterator and the recursive parent slot currently being filled.',
-  visualRationale: 'A stable node strip paired with the explicit parent-child edge list keeps the full tree topology readable at narrow widths; one authored cursor plus the growing and consumed token streams exposes why each null marker is required.',
+  visualRationale: 'Actual node-and-edge topology includes every missing child slot. Encoding marks emitted slots; decoding reveals consumed slots progressively, with an explicit open-slot count and the original cursor inventory preserved.',
   rejectedAlternatives: [
     'Preorder values without null markers cannot distinguish different tree shapes.',
     'Level-order serialization is valid but does not match the supplied recursive implementation.',

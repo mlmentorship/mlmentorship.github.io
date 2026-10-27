@@ -2,28 +2,34 @@ import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const prices = ['7', '1', '5', '3', '6', '4'];
 const state = (day, lowDay, extra = {}) => array(prices, [
-  mark(lowDay, 'lowest earlier buy', 'state', 'lowest-buy'),
-  mark(day, 'selling day', 'focus', 'sell-cursor'),
-], { scannedPrefix: `[0..${day}]`, ...extra });
+  mark(lowDay, 'low', 'state', 'lowest-buy'),
+  mark(day, 'day', 'focus', 'sell-cursor'),
+], {
+  scannedPrefix: `[0..${day}]`,
+  fitArray: true,
+  arrayColumns: 6,
+  savedRange: day >= 2 ? { start: 1, end: day >= 4 ? 5 : 3 } : undefined,
+  ...extra,
+});
 
 const draft = visual('For each possible selling day, subtract the lowest price in its scanned prefix and preserve the largest profit.', [
-  frame('Initialize from infinity', 'On day 0 price 7, lowest=min(infinity,7)=7 and best=max(0,7-7)=0.', state(0, 0, {
+  frame('Initialize from infinity', 'Day 0 sets lowest=min(infinity,7)=7. Its same-day zero cannot improve the no-trade best=0.', state(0, 0, {
     arithmetic: 'lowest=7; profit=7-7=0; best=0',
   }), 'day-zero'),
-  frame('Move the buy boundary to day 1', 'Price 1 is below 7, so lowest becomes 1 before profit is evaluated; selling the same day yields 0.', state(1, 1, {
+  frame('Move the low to day 1', 'Price 1 becomes the new minimum before scoring. Its same-day zero does not improve the no-trade option.', state(1, 1, {
     arithmetic: 'lowest=min(7,1)=1; profit=1-1=0; best=0',
     movement: 'lowest-buy moves right because 1 is cheaper',
   }), 'day-one'),
   frame('Evaluate selling at 5', 'On day 2, lowest stays 1 and selling at 5 gives 5-1=4, so best becomes 4.', state(2, 1, {
     arithmetic: 'lowest=1; profit=5-1=4; best=4',
   }), 'day-two'),
-  frame('Evaluate selling at 3', 'On day 3, price 3 is not a new low; profit 3-1=2 does not replace best 4.', state(3, 1, {
+  frame('Evaluate selling at 3', 'Day 3 is not a new low. Profit 3-1=2 does not beat best 4.', state(3, 1, {
     arithmetic: 'lowest=1; profit=3-1=2; best=4',
   }), 'day-three'),
   frame('Save the best sale at 6', 'On day 4, lowest remains 1 and profit 6-1=5 raises best from 4 to 5.', state(4, 1, {
     arithmetic: 'lowest=1; profit=6-1=5; best=5',
   }), 'day-four'),
-  frame('Finish at price 4', 'On day 5, profit 4-1=3 cannot beat 5; buy day 1 and sell day 4 remain optimal.', state(5, 1, {
+  frame('Finish at price 4', 'Day 5 gives profit 4-1=3, below best 5. Keep buy day 1 and sell day 4.', state(5, 1, {
     arithmetic: 'lowest=1; profit=4-1=3; best=5',
     result: '5 (buy day 1 at 1; sell day 4 at 6)',
   }), 'day-five'),
@@ -34,7 +40,7 @@ const review = {
   recognitionCue: 'Use a running minimum when an ordered one-pass problem asks for the best later-minus-earlier difference and the buy or baseline must occur before the current item.',
   invariant: 'After each day, lowest is the minimum price in the scanned prefix and best is the largest valid sell-minus-earlier-buy profit whose selling day lies in that prefix.',
   stateModel: 'Keep only lowest and best while scanning prices; the visual retains the low day and current selling day so temporal order and the candidate interval are explicit.',
-  visualRationale: 'A fixed indexed price array with stable lowest-buy and sell-cursor pointers depicts the actual ordered range, pointer movement, scanned prefix, and every subtraction without relying on color.',
+  visualRationale: 'A fixed indexed price array with stable lowest-buy and sell-cursor pointers depicts the actual ordered range and every subtraction. The saved-best underline separates the retained optimum from the moving sale cursor.',
   rejectedAlternatives: [
     'A price line chart is intuitive but less precise for indexed pointer motion and visible arithmetic.',
     'A table of all buy-sell pairs depicts the quadratic brute force rather than the running-minimum mechanism.',

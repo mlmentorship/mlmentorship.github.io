@@ -15,13 +15,54 @@ prerequisites: ["transformer-compute-memory-accounting", "neural-scaling-laws", 
 
 > *Asked in: staff, principal, and company-dependent senior-principal reasoning-model, LLM systems, research systems, and technical-strategy rounds.*
 
-A basic answer estimates training and inference demand, divides the cluster, and proposes a model plus serving stack. A senior answer adds a measured quality-cost frontier, routing, verifier support, admission control, rollout, recovery, and explicit ownership.
+Plan a reasoning model's training and serving program when all online and offline work shares a fixed accelerator cluster.
 
-The recommended plan starts from a capable dense base model rather than pretraining from random initialization. It reserves online capacity first, funds a staged continued-training and post-training program, and varies inference effort by task difficulty and risk. Every allocation has evidence that can expand, narrow, or stop it.
+## Problem
 
-The cluster should never spend the maximum reasoning budget on every request. Extra samples or tokens help only on slices where the policy can generate better candidates and a supported verifier can select them. Longer reasoning can waste capacity, repeat an error, or create new errors.
+**Context.** A company has 128 H100-class 80 GB accelerators, licensed 14B and existing 3B models, and partial task-specific correctness checks.
+The detailed prompt specifies traffic, token distributions, latency limits, and resilience requirements.
+
+**Task.** Design the next two quarters of training, post-training, verification, evaluation, routing, and inference capacity allocation.
+Specify the first launch and measurements that would expand, narrow, or stop each investment.
+
+**Constraints.** No extra accelerators or public-cloud burst capacity is available in the first year.
+Do not double-count shared capacity or assume a universal correctness verifier.
+Respect routine-request latency, asynchronous task limits, real operating costs, and continued service after a node failure.
 
 ## The prompt
+
+**Worked case: a node fails during a capacity experiment.** This hypothetical is a capacity ledger, not proof that the resulting allocation meets the traffic SLOs.
+
+**Objective.** Improve useful task completion without spending the same accelerator capacity twice or sacrificing the online service floor.
+The [fixed-budget design mechanism](/questions/design-ml-system-fixed-budget/) makes feasibility and opportunity cost explicit.
+
+**Invariant.** Every concurrent allocation belongs to one envelope, and recovery reserve is not simultaneously promised to offline work.
+Model quality cannot compensate for a violated safety or latency gate.
+
+**State.** An illustrative allocation is `[64,24,8,16,16]`: online serving, continued training, post-training, evaluation/verifiers, and recovery reserve.
+The entries sum to 128 accelerators.
+Actual replica placement, throughput, queueing, memory, and task quality still need measurement before admitting this plan.
+
+**Decision.** If one eight-accelerator node fails, 120 accelerators remain.
+Maintaining the other 112 allocations leaves eight in reserve, assuming compatible placement and recovery.
+If the failure disrupts a serving replica or those assumptions fail, pause checkpointable offline work and restore the online floor first.
+
+**Failure and recovery.** Do not schedule 128 accelerators of training while claiming the same machines also serve requests.
+Checkpoint offline jobs at safe boundaries, reconcile lost work, and admit expanded reasoning budgets only after measured headroom returns.
+A verifier's high score is not a universal correctness certificate; preserve task-specific checks and separate severe-failure gates.
+
+**Transfer check.** A hard-task benchmark improves when each request gets four candidates. May the router enable that policy for everyone?
+
+<details>
+<summary>Check the admission decision</summary>
+
+No. Count every candidate, verifier call, failed attempt, and added queueing cost under the shared capacity ledger.
+Measure the relevant task population and peak-load latency, including node-loss operation.
+Admit the policy only where its independently evaluated benefit fits the remaining resource and risk envelope.
+
+</details>
+
+<section data-learning-extension="true" aria-label="Full fixed-budget reasoning-model reference">
 
 A company wants a reasoning model for coding, quantitative analysis, structured research, and internal decision support. The model must improve difficult-task success without making routine requests too slow or expensive.
 
@@ -481,27 +522,22 @@ A separate safety system should enforce permissions, data flow, sandbox boundari
 
 The serving service allocates accelerator compute and key-value cache memory. Both can bind before average traffic reaches the nominal throughput limit.
 
-```mermaid
-flowchart LR
-  Request[Request and product policy] --> Classify[Task, risk, and deadline classifier]
-  Classify --> Route[Difficulty and value router]
-  Route --> Admit[Compute and KV admission]
-  Admit --> Small[3B routine pool]
-  Admit --> Reason[14B reasoning pool]
-  Admit --> Async[Asynchronous hard-task queue]
-  Small --> Check[Supported verifiers]
-  Reason --> Check
-  Async --> Check
-  Check --> Select[Select, abstain, or escalate]
-  Select --> Response[Response or reviewed artifact]
+<p class="visual-title" data-supplemental-visual="reasoning-admission-and-capacity">Choosing a model does not reserve its compute or memory</p>
 
-  Capacity[Capacity broker] --> Admit
-  Capacity --> Train[Checkpointable offline jobs]
-  Telemetry[Quality, cost, latency, and support telemetry] --> Capacity
-  Telemetry --> Route
-  Check --> Telemetry
-  Train --> Telemetry
+```mermaid
+flowchart TB
+  accTitle: Task routing and capacity admission are separate decisions
+  accDescr: Task, consequence, and deadline classification proposes a 3B routine or 14B reasoning route but does not reserve resources. Admission checks both compute and key-value memory against one finite pool shared with reclaimable offline jobs. A request can execute only after capacity is reserved. Otherwise it must queue within its deadline, reduce its budget, or be declined. Supported verification still determines selection, abstention, or escalation after execution.
+  Request["Task + risk<br/>deadline + policy"] --> Route["Desired model route<br/>3B routine / 14B reasoning"]
+  Route --> Admit{"Compute + KV<br/>available?"}
+  Capacity["One finite pool<br/>serving + reclaimable offline"] --> Admit
+  Admit -->|yes| Run["Reserve, then execute<br/>bounded compute + KV"]
+  Admit -->|no| Defer["Queue within deadline,<br/>reduce, or decline"]
+  Run --> Check["Supported verification<br/>select / abstain / escalate"]
+  Check --> Response["Response or<br/>reviewed artifact"]
+  class Request,Route,Admit,Capacity,Run,Defer,Check,Response viz-fit
 ```
+<p class="diagram-caption"><strong>Read it this way:</strong> routing chooses a desired path; admission decides whether its resources are available. Offline work shares capacity rather than creating another budget.</p>
 
 The request path contains:
 
@@ -1027,5 +1063,7 @@ A staff target should score 2 on capacity math, verification, serving, and relia
 For each follow-up, restate the fixed constraint, preserve hard controls, and name the evidence that changes allocation.
 
 ---
+
+</section>
 
 *Related: [Transformer compute and memory accounting](/concepts/transformer-compute-memory-accounting/), [test-time compute, search, and verifiers](/concepts/test-time-compute-search-verifiers/), [design a production LLM inference service](/questions/design-production-llm-inference-service/), [neural scaling laws](/concepts/neural-scaling-laws/), and the [annotated upper-IC reasoning mock](/guides/annotated-reasoning-strategy-mock/).*

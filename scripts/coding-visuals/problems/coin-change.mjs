@@ -1,12 +1,31 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const example = 'coins = [2, 3], amount = 7; unreachable = 8';
-const current = (total) => mark(total, `total=${total}`, 'focus', 'current-total');
-const source = (index) => mark(index, `predecessor=${index}`, 'state', 'predecessor');
+const current = (total) => mark(total, `t=${total}`, 'focus', 'current-total');
+const source = (index) => mark(index, `p=${index}`, 'state', 'predecessor');
+let dependencyGraphId = 0;
 const state = (values, total, predecessor, extra = {}) => array(
   values.map(String),
   [current(total), ...(predecessor === null ? [] : [source(predecessor)])],
-  { example, indexMeaning: 'amount', ...extra },
+  {
+    fitArray: true,
+    ...(predecessor === null ? {} : {
+      graphCompanion: {
+        nodes: [String(total), String(predecessor)],
+        edges: [`${total}->${predecessor}`],
+        edgeLabels: { [`${total}->${predecessor}`]: `coin ${total - predecessor}` },
+        positions: { [total]: { x: 270, y: 65 }, [predecessor]: { x: 90, y: 65 } },
+        width: 360,
+        height: 130,
+        start: String(total),
+        markerId: `coin-change-edge-${dependencyGraphId++}`,
+        ariaLabel: `Current amount ${total} depends on solved amount ${predecessor} after removing coin ${total - predecessor}`,
+      },
+    }),
+    example,
+    indexMeaning: 't = current total; p = total - coin; arrow points to p',
+    ...extra,
+  },
 );
 
 const draft = visual('For each amount, minimize one plus every already-solved predecessor amount.', [

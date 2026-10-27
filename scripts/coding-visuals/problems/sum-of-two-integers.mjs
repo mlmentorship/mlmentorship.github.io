@@ -1,45 +1,51 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const places = ['8', '4', '2', '1'];
-const example = 'first = 7 (0111), second = 5 (0101), shown in 4 bits';
+const example = 'first=7, second=5; four low bits of 32';
 const bit = (index, label, tone = 'focus', key = 'active-bit') => mark(index, label, tone, key);
-const state = (marks, extra = {}) => array(places, marks, { example, columns: '8 4 2 1', ...extra });
+const state = (marks, extra = {}) => array(places, marks, {
+  fitArray: true,
+  indexLabels: [3,2,1,0],
+  example,
+  columns: 'weights 8 4 2 1; labels are bit positions',
+  ...extra,
+});
 
 const draft = visual('XOR writes sum-without-carry bits while shifted AND carries shared 1 bits into the next pass.', [
   frame(
     'Initialize the two operands',
     'The loop starts with first=0111 and second=0101. Because second is nonzero, another carry-resolution pass is required.',
-    state([bit(3, 'inspect operands')], { first: '0111 (7)', second: '0101 (5)', mask: '1111…1111 (32 bits)' }),
+    state([bit(3, 'read')], { first: '0111 (7)', second: '0101 (5)', mask: '1111…1111 (32 bits)' }),
     'initialize-operands',
   ),
   frame(
     'Compute pass 1',
     '0111 XOR 0101 = 0010. Their shared 1 bits are 0101, and shifting left gives carry 1010.',
-    state([bit(2, 'xor bit', 'state', 'sum-bit'), bit(0, 'shifted carry', 'focus', 'carry-bit')], { xor: '0111 ^ 0101 = 0010', andShift: '(0111 & 0101) << 1 = 1010' }),
+    state([bit(2, 'xor', 'state', 'sum-bit'), bit(0, 'carry', 'focus', 'carry-bit')], { xor: '0111 ^ 0101 = 0010', andShift: '(0111 & 0101) << 1 = 1010' }),
     'compute-first-pass',
   ),
   frame(
-    'Commit pass 1 simultaneously',
+    'Commit pass 1',
     'The tuple assignment commits first=0010 and second=1010 together; the old operands supplied both expressions.',
-    state([bit(2, 'first has 1', 'state', 'sum-bit'), bit(0, 'second carry', 'focus', 'carry-bit')], { first: '0010 (2)', second: '1010 (10)' }),
+    state([bit(2, 'first', 'state', 'sum-bit'), bit(0, 'carry', 'focus', 'carry-bit')], { first: '0010 (2)', second: '1010 (10)' }),
     'commit-first-pass',
   ),
   frame(
     'Resolve the remaining shared bit',
     '0010 XOR 1010 = 1000. The operands share the 2-bit, so (0010 AND 1010) shifted left is 0100.',
-    state([bit(0, 'xor result', 'state', 'sum-bit'), bit(1, 'carry moves here', 'focus', 'carry-bit')], { xor: '0010 ^ 1010 = 1000', andShift: '(0010 & 1010) << 1 = 0100' }),
+    state([bit(0, 'xor', 'state', 'sum-bit'), bit(1, 'carry', 'focus', 'carry-bit')], { xor: '0010 ^ 1010 = 1000', andShift: '(0010 & 1010) << 1 = 0100' }),
     'compute-second-pass',
   ),
   frame(
     'Commit pass 2',
     'The next loop state is first=1000 and second=0100. Carry is still nonzero, so continue.',
-    state([bit(0, 'first has 1', 'state', 'sum-bit'), bit(1, 'second carry', 'focus', 'carry-bit')], { first: '1000 (8)', second: '0100 (4)' }),
+    state([bit(0, 'first', 'state', 'sum-bit'), bit(1, 'carry', 'focus', 'carry-bit')], { first: '1000 (8)', second: '0100 (4)' }),
     'commit-second-pass',
   ),
   frame(
     'Clear the final carry',
     '1000 and 0100 have no shared 1 bit: XOR is 1100 and shifted AND is 0000.',
-    state([bit(0, 'sum bit', 'output', 'sum-bit'), bit(1, 'sum bit', 'output', 'carry-bit')], { xor: '1000 ^ 0100 = 1100', andShift: '(1000 & 0100) << 1 = 0000', first: '1100 (12)', second: '0000' }),
+    state([bit(0, 'sum', 'output', 'sum-bit'), bit(1, 'sum', 'output', 'carry-bit')], { xor: '1000 ^ 0100 = 1100', andShift: '(1000 & 0100) << 1 = 0000', first: '1100 (12)', second: '0000' }),
     'clear-final-carry',
   ),
   frame(

@@ -1,6 +1,6 @@
 ---
 title: "Decision trees"
-description: "Recursively split the feature space along axis-aligned thresholds chosen to maximize a purity criterion. The base learner of GBDT and random forests."
+description: "Compute weighted split improvement, trace a root-to-leaf region, and test larger leaves, regression targets, and a greedy XOR failure."
 date: "2026-04-19"
 draft: false
 tags: ["concepts"]
@@ -9,24 +9,22 @@ category: "concepts"
 
 ## Summary
 
-A **decision tree** partitions the feature space by a sequence of axis-aligned threshold tests on individual features, assigning a constant prediction (class probability for classification, mean target for regression) to each leaf. Trained greedily by choosing splits that maximize information gain or equivalently minimize a purity / impurity criterion.
+A decision tree predicts a constant value within each terminal feature region.
+Training chooses threshold splits greedily, using a stated criterion and stopping rules.
 
-Single trees are rarely the production model. Variance is too high. But they are the building block of the dominant tabular learners: **gradient boosting** (xgboost, lightgbm, catboost) and **random forests**. Understanding tree training is the prerequisite for using or tuning either.
+**Task:** the diagram has four circles, class zero, and four triangles, class one.
+Candidate root $x_1\le4$ puts three circles and one triangle left; one circle and three triangles go right.
+Calculate its Gini reduction and predict a new point $(6,2)$ after the right-only child split $x_2\le3$.
 
-Trees naturally handle missing values, mixed-type features, non-linear interactions, and require essentially no feature scaling. This is why they remain the strongest baseline on heterogeneous tabular data.
+The drawn split is a candidate, not a proven best threshold among unenumerated alternatives.
 
 ## The algorithm (CART, [Breiman et al., 1984](https://www.routledge.com/Classification-and-Regression-Trees/Breiman-Friedman-Stone-Olshen/p/book/9780412048418))
 
-For each node:
+1. Enumerate allowed feature thresholds, usually midpoints between distinct ordered numeric values.
+2. Route $x_j\le t$ left and $x_j>t$ right; reject candidates violating leaf constraints.
+3. Choose maximum sample-weighted impurity reduction, then recurse under the stopping rules.
 
-1. For each feature $j$ and each candidate threshold $t$:
-   - Split data into $\{x : x_j \le t\}$ (left child) and $\{x : x_j > t\}$ (right child).
-   - Compute the impurity of each child (Gini, entropy, or MSE).
-   - Compute the weighted impurity reduction.
-2. Pick the $(j, t)$ with maximum reduction.
-3. Recurse on each child until a stopping criterion (max depth, min samples per leaf, no further reduction).
-
-The greedy choice is locally optimal but not globally; finding the globally optimal tree is NP-hard.
+This local choice need not produce the globally best tree.
 
 **Learning objective:** map each root-to-leaf rule path to one axis-aligned region of feature space and its constant leaf prediction.
 
@@ -71,65 +69,88 @@ The greedy choice is locally optimal but not globally; finding the globally opti
 		<rect class="viz-node" x="278" y="405" width="76" height="30" rx="4"></rect>
 		<text class="viz-callout" x="316" y="425" text-anchor="middle">R2: P(△)=0</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> begin with the solid vertical root split: every point goes left or right. The dashed horizontal test belongs only to the right child, so it cuts only that half-plane. A root-to-leaf path is therefore an intersection of threshold rules, forming a rectangle here, and every point in that rectangle receives the leaf's constant class probability. The highlighted triangle follows “no, then yes” to leaf R1. Original schematic checked against the <a href="https://scikit-learn.org/stable/modules/tree.html#mathematical-formulation">scikit-learn tree formulation</a> and <a href="https://hastie.su.domains/ElemStatLearn/">The Elements of Statistical Learning</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the solid root split routes every point. The dashed child test cuts only the right region. Intersecting the path's predicates gives its leaf region and constant empirical class fraction. The highlighted point follows “no, then yes” to R1. Sources: <a href="https://scikit-learn.org/stable/modules/tree.html#mathematical-formulation">scikit-learn's formulation</a> and <a href="https://hastie.su.domains/ElemStatLearn/">The Elements of Statistical Learning</a>.</figcaption>
 </figure>
 
 ## Split criteria
 
-For classification at a node with class proportions $p_k$:
+For class proportions $p_k$, Gini impurity is $I=1-\sum_kp_k^2$.
+Use
 
-- **Gini impurity**: $1 - \sum_k p_k^2$. Equals expected error of random labeling proportional to $p$.
-- **Entropy**: $-\sum_k p_k \log p_k$. Information gain = parent entropy minus weighted child entropies.
+$$
+\Delta I=I(parent)-\frac{n_L}{n}I(L)-\frac{n_R}{n}I(R).
+$$
 
-Gini and entropy give nearly identical splits in practice; Gini is slightly cheaper.
+| State | Calculation | Gini |
+| --- | --- | --- |
+| Parent | $1-(1/2)^2-(1/2)^2$ | $0.5$ |
+| Each root child | $1-(3/4)^2-(1/4)^2$ | $0.375$ |
+| Weighted root children | $(4/8)(0.375)+(4/8)(0.375)$ | $0.375$ |
 
-For regression: variance of the target within the node, equivalent to MSE under constant prediction.
+Root improvement is $0.5-0.375=0.125$.
+The right child separates three triangles from one circle, leaving total weighted impurity $(4/8)(0.375)=0.1875$.
+Point $(6,2)$ reaches that pure-triangle R1 leaf, with empirical triangle fraction $1$.
+
+Sample weights matter: a separate pure child of size three and impurity-$0.32$ child of size five give weighted impurity $0.2$.
+An unweighted mean gives $0.16$, incorrectly treating unequal child sizes equally.
+
+Entropy $-\sum_kp_k\log p_k$ gives entropy information gain, not the same numerical quantity as Gini reduction.
+For regression, a leaf mean minimizes its summed squared error.
 
 ## Stopping and pruning
 
-Stop splitting when:
+**New task:** require at least four samples per leaf.
+The 4/4 root remains legal; its proposed 3/1 right split does not.
+**Check:** $(6,2)$ now receives the unsplit right leaf's triangle fraction $3/4$, not $1$.
+**Use when:** tiny leaves provide insufficient support or excessive variance.
 
-- Max depth reached.
-- Number of samples at the node falls below a threshold.
-- Best impurity reduction is below a threshold.
-- All samples have the same target.
+**New task:** predict numeric targets with $x_1=[1,2,5,6]$, $y=[1,1,3,3]$, and threshold $4$.
+Replace class fractions and Gini with means and squared residuals.
+**Check:** the unsplit mean $2$ has SSE $4$; leaf means $1$ and $3$ give SSE zero.
+**Use when:** the output is a continuous response.
 
-**Pruning**: train deep, then collapse branches that don't reduce held-out error. Cost-complexity pruning (CCP) trades depth against penalty $\alpha \times |\text{leaves}|$.
+Depth, minimum leaf size, purity, and improvement limits stop growth.
+Cost-complexity pruning compares subtrees using $R(T)+\alpha|leaves(T)|$; select $\alpha$ using validation, not test outcomes.
 
-In practice with ensembles (boosting, forests), individual trees are kept shallow (depth 6–8 for boosting, depth limited or full for forests with bagging variance averaging).
+**Failure:** either first axis split on four XOR corners has zero gain, although a depth-two tree separates them.
+Stopping on nonpositive immediate gain can miss that interaction.
+
+**Reconstruct:** at $x_1=4$ exactly, does the right child inspect $x_2$?
+
+<details><summary>Answer</summary>
+
+No. The $\le$ rule routes left; a child test applies only to the region reaching it.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Strengths and weaknesses
 
-**Strengths:**
-
-- Handles non-linear interactions for free.
-- No feature scaling needed.
-- Handles missing values (with surrogate splits or built-in handling in xgboost/lightgbm).
-- Handles mixed numeric / categorical (with appropriate encoding).
-- Interpretable: every prediction is a path of explicit rules.
-
-**Weaknesses:**
-
-- High variance: small data perturbations change splits dramatically.
-- Greedy: locally optimal, not globally.
-- Axis-aligned splits make it hard to capture rotated decision boundaries (need oblique trees or feature engineering).
-- Single trees are weak. Usually combined into ensembles.
+Paths provide explicit rules and can represent interactions through successive splits.
+Strictly increasing numeric transformations preserve candidate partitions when ordering and implementation arithmetic are preserved.
+Rotated boundaries may require many axis-aligned regions; feature engineering or oblique tests changes that representation.
+Small data changes can change selected splits.
+Neither a single tree nor an ensemble has a universal production ranking.
 
 ## Categorical features
 
-Two main approaches:
-
-- **One-hot**: each level becomes a binary feature. Slow; trees grow many useless branches.
-- **Native handling** (lightgbm, catboost): pre-sort levels by target mean, then split as if the feature were numeric. Much faster and often more accurate.
+One-hot encoding and native categorical splitting define different candidate partitions and costs.
+Arbitrary integer codes impose an ordering that may not match category meaning.
+Target-based category statistics require leakage controls.
+Library algorithms, including CatBoost's ordered statistics, are not interchangeable with simply sorting all categories by target mean.
 
 ## Common pitfalls
 
-- **Letting trees grow unbounded on small data.** Memorizes training set; high variance.
-- **Treating categorical features as numeric without one-hot or native handling.** Tree splits are ordered; "encoding" a categorical with arbitrary integer codes imposes a meaningless order.
-- **Comparing single trees against ensembles unfairly.** Single trees should not beat boosted forests; check you are evaluating the right model class.
-- **Reading feature importance from a single split.** Importance from a single tree is noisy; use ensemble averages or permutation importance.
+Missing-value routing needs an explicit supported strategy: imputation, learned default directions, or surrogate splits, depending on implementation.
+Do not assume every tree accepts missing or categorical values.
+Empirical leaf fractions are not guaranteed calibrated probabilities for new populations.
+Feature importance can reflect split-selection biases; evaluate stability and held-out perturbations before interpreting it.
 
 ## Related
 
 - [Random forests](/concepts/random-forests/). Bagged ensembles of trees.
 - [Gradient boosting](/concepts/gradient-boosting/). Boosted ensembles of trees.
+
+</div>

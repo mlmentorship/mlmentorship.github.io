@@ -2,17 +2,17 @@ import { defineVisual, frame, grid, trie, visual } from '../primitives.mjs';
 
 const board = [['o', 'a', 't'], ['e', 't', 'h'], ['e', 'a', 't']];
 const trieNodes = [
-  { key: 'root', label: 'root', x: 240, y: 28 },
-  { key: 'o', label: 'o', x: 80, y: 82 },
-  { key: 'e', label: 'e', x: 240, y: 82 },
-  { key: 'p', label: 'p', x: 400, y: 82 },
-  { key: 'oa', label: 'oa', x: 80, y: 136 },
-  { key: 'ea', label: 'ea', x: 240, y: 136 },
-  { key: 'pe', label: 'pe', x: 400, y: 136 },
-  { key: 'oat', label: 'oat', x: 80, y: 190, terminal: true },
-  { key: 'eat', label: 'eat', x: 240, y: 190, terminal: true },
-  { key: 'pea', label: 'pea', x: 400, y: 190, terminal: true },
-  { key: 'oath', label: 'oath', x: 80, y: 244, terminal: true },
+  { key: 'root', label: 'root', x: 180, y: 42 },
+  { key: 'o', label: 'o', x: 60, y: 96 },
+  { key: 'e', label: 'e', x: 180, y: 96 },
+  { key: 'p', label: 'p', x: 300, y: 96 },
+  { key: 'oa', label: 'oa', x: 60, y: 150 },
+  { key: 'ea', label: 'ea', x: 180, y: 150 },
+  { key: 'pe', label: 'pe', x: 300, y: 150 },
+  { key: 'oat', label: 'oat', x: 60, y: 204, terminal: true },
+  { key: 'eat', label: 'eat', x: 180, y: 204, terminal: true },
+  { key: 'pea', label: 'pea', x: 300, y: 204, terminal: true },
+  { key: 'oath', label: 'oath', x: 60, y: 258, terminal: true },
 ];
 const trieEdge = (from, to, label) => ({ key: `edge-${from}-${to}`, from, to, label });
 const trieEdges = [
@@ -30,7 +30,7 @@ const boardState = (row, col, path, extra = {}) => {
     marks.push({
       row: pathRow,
       col: pathCol,
-      label: index === path.length - 1 ? 'search cursor' : `path ${index + 1}`,
+      label: index === path.length - 1 ? `${board[pathRow][pathCol]}: cursor` : `${board[pathRow][pathCol]}: path ${index + 1}`,
       tone: index === path.length - 1 ? 'focus' : 'state',
       key: index === path.length - 1 ? 'board-cursor' : `path-cell-${index}`,
     });
@@ -38,19 +38,21 @@ const boardState = (row, col, path, extra = {}) => {
   if (!coordinates.has(`${row},${col}`)) {
     marks.push({ row, col, label: 'search cursor', tone: 'focus', key: 'board-cursor' });
   }
-  return grid(board, marks, extra);
+  const rows = board.map((values) => [...values]);
+  for (const [pathRow, pathCol] of path) rows[pathRow][pathCol] = '#';
+  return grid(rows, marks, { pathRoute: path, ...extra });
 };
 
 const draft = visual('Follow board cells and trie children together, mark the current path in place, emit terminal words once, and prune exhausted trie branches while backtracking.', [
-  frame('Build the shared prefix trie', 'Insert words oat, oath, eat, and pea. oat is terminal at t while oath continues from that same t to h.', trie(triePaths, {
+  frame('Build the shared prefix trie', 'Store oat and oath on one shared prefix; eat and pea start separate root branches.', trie(triePaths, {
     nodes: trieNodes,
     edges: trieEdges,
     active: ['root'],
-    width: 480,
-    height: 275,
+    width: 360,
+    height: 289,
     board: '[[o,a,t],[e,t,h],[e,a,t]]',
     terminals: 'double borders mark oat, oath, eat, and pea',
-    motion: [{ key: 'trie-cursor', kind: 'pointer', x: 240, y: 28, label: 'current root' }],
+    motion: [{ key: 'trie-cursor', kind: 'pointer', x: 180, y: 42, label: 'current root' }],
   }), 'build-trie'),
   frame('Start at board (0,0)=o', 'Root has child o, so descend into that trie node and temporarily mark board (0,0) as visited.', boardState(0, 0, [[0, 0]], {
     triePrefix: 'o',

@@ -8,97 +8,174 @@ category: "questions"
 ---
 
 
-> *Asked in: ML breadth at every level.*
+Choose a loss by identifying the quantity to predict and separating that estimate from the later deployment decision.
 
-The L4 candidate names the canonical loss for the task type. The L6 candidate explains that the loss is a model of the noise distribution and the cost structure, and reasons from the problem to the loss.
+## Problem
 
-## What an L4 answer sounds like
+**Context.** Three equally weighted outcomes, 0, 0, and 9, represent the intended population for a constant predictor.
 
-> "For classification, cross-entropy. For regression, MSE. For ranking, pairwise hinge. Use what fits the task."
+**Task.** Find the best constant under squared and absolute error, compare their objective values, and explain the implied prediction targets.
+Then distinguish changing a prediction loss from changing the costs of a downstream action.
 
-Right inputs, no model. You've memorized which loss goes with which task type, but you can't reason about it.
+**Constraints.** Use the same stipulated population and weights for both fits.
+Neither loss is universally better. A changed decision threshold does not always require retraining the probability model.
 
-## What an L5 answer sounds like
+Predict one constant $a$ for three equally weighted outcomes: $0,0,9$.
+All three represent the intended population.
+Find the best constant under squared error and absolute error.
+Then ask whether changing action costs requires a different prediction model.
 
-> "The loss encodes two things: the *noise model* of the targets and the *cost structure* of errors.
->
-> - **Cross-entropy** for classification: assumes targets are samples from a categorical distribution, recovers MLE.
-> - **MSE** for regression: assumes Gaussian noise on the targets, recovers MLE.
-> - **MAE** for regression with heavy-tailed errors or median-targeting: assumes Laplace noise, more robust to outliers.
-> - **Huber** for regression: a smooth interpolation between MSE (small errors) and MAE (large errors). Common when occasional outliers shouldn't dominate gradients.
-> - **Pairwise / listwise losses** for ranking: encode the ordering of items, not absolute scores.
-> - **Triplet / contrastive losses** for representation learning: encode that similar items should be close, dissimilar far.
->
-> If the cost structure is asymmetric (e.g., false negatives much worse than false positives in fraud detection), I'd start with a calibrated probability model and tune the decision threshold for those costs. I might also weight the corresponding training examples. Focal loss is for down-weighting easy examples under severe imbalance; it does not specify which error is more costly."
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
 
-This is L5. You've connected losses to noise models and cost structures.
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Separate the quantity a loss estimates from the action a product takes</p>
+<p class="visual-kicker">Estimate a quantity, then choose an action</p>
+<p class="visual-title">The same observations support different prediction targets</p>
 
 <!-- visual:loss-estimation-vs-decision -->
-```mermaid
-flowchart TB
-	accTitle: Choosing a training loss is separate from choosing a deployment action
-	accDescr: The training rail begins by asking what quantity the model must estimate. A probability distribution maps to log loss, a conditional mean to squared error, a conditional median to absolute error, a robust location to Huber loss, an ordering to a ranking loss, and embedding geometry to a contrastive loss. These produce predictions on held-out data. The deployment rail evaluates those predictions against the real metric, calibrates scores when probabilities are required, and combines predictions with error costs, constraints, and capacity to choose a threshold, ranking, abstention, or route. A dashed feedback arrow sends deployment evidence back to the prediction target and surrogate choice.
-	subgraph Train["TRAIN · estimate the right quantity"]
-		direction TB
-		Q{"What must the output mean?"}
-		Q --> L["class probability → log loss<br/>conditional mean → squared error<br/>conditional median → absolute error<br/>robust location → Huber loss<br/>relative order → ranking loss<br/>embedding geometry → contrastive loss"]
-		L --> O["Predictions on held-out data"]
-	end
-	subgraph Deploy["DEPLOY · choose the right action"]
-		direction TB
-		O --> V["Evaluate the real metric<br/>on representative data"]
-		V --> C["Calibrate if scores must<br/>represent probabilities"]
-		C --> K["Combine predictions with<br/>error costs · constraints · capacity"]
-		K --> A["Choose action rule<br/>threshold · rank · abstain · route"]
-	end
-	V -. "evidence may change the target or surrogate" .-> Q
-	class Q viz-focus
-	class L viz-input
-	class O,V,C viz-neutral
-	class K viz-state
-	class A viz-output
-	class Q viz-tall
-```
+<figure class="learning-figure" aria-labelledby="loss-comparison-title">
+	<h3 class="visual-title" id="loss-comparison-title">A better estimate and a cheaper action are different questions</h3>
+	<svg viewBox="0 0 600 700" role="img" aria-labelledby="loss-chart-title loss-chart-desc" style="width: 100%; min-width: 0; height: auto;">
+		<title id="loss-chart-title">Loss changes the preferred constant; action costs change the preferred action</title>
+		<desc id="loss-chart-desc">For the same outcomes zero, zero and nine, constant zero has absolute residuals zero, zero and nine; constant three has residual magnitudes three, three and six. Squaring then averaging gives MSE 27 versus 18, favoring three. Averaging the distances gives MAE 3 versus 4, favoring zero. Each pair of bars shares a zero baseline and scale; MSE and MAE have different units. In a separate binary task with calibrated positive probability 0.8, false-positive cost 9 and false-negative cost 1, positive action costs 1.8 and negative action costs 0.8. The lower-cost action is negative without changing the probability estimate.</desc>
+		<g fill="var(--c-text)" font-family="var(--font-ui)" font-size="24">
+			<text x="40" y="30" font-weight="650">1. Same outcomes: 0, 0, 9</text>
+			<text x="40" y="76">a = 0: distances 0, 0, 9</text>
+			<text x="40" y="112">a = 3: distances 3, 3, 6</text>
+			<text x="40" y="162" font-weight="650">MSE: square, then average</text>
+			<text x="40" y="209">a = 0</text><rect data-loss="mse" data-value="27" x="150" y="187" width="324" height="28" fill="var(--viz-input-bg)" stroke="var(--viz-input-stroke)"/><text x="486" y="209">27</text>
+			<text x="40" y="255">a = 3</text><rect data-loss="mse" data-value="18" x="150" y="233" width="216" height="28" fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)"/><text x="378" y="255">18</text>
+			<text x="150" y="290" font-size="22">Minimum at the mean: 3</text>
+			<text x="40" y="326" font-weight="650">MAE: average the distances</text>
+			<text x="40" y="363">a = 0</text><rect data-loss="mae" data-value="3" x="150" y="341" width="120" height="28" fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)"/><text x="282" y="363">3</text>
+			<text x="40" y="409">a = 3</text><rect data-loss="mae" data-value="4" x="150" y="387" width="160" height="28" fill="var(--viz-input-bg)" stroke="var(--viz-input-stroke)"/><text x="322" y="409">4</text>
+			<text x="150" y="444" font-size="22">Minimum at the median: 0</text>
+			<path d="M40 466H560" stroke="var(--c-rule)"/>
+			<text x="40" y="504" font-weight="650">2. Separate binary decision</text>
+			<text x="40" y="540" font-size="22">p = 0.8; false positive 9, false negative 1</text>
+			<text x="40" y="582">Positive</text><rect data-loss="action-cost" data-value="1.8" x="220" y="560" width="288" height="28" fill="var(--viz-warning-bg)" stroke="var(--viz-warning-stroke)"/><text x="520" y="582">1.8</text>
+			<text x="40" y="630">Negative</text><rect data-loss="action-cost" data-value="0.8" x="220" y="608" width="128" height="28" fill="var(--viz-output-bg)" stroke="var(--viz-output-stroke)"/><text x="360" y="630">0.8</text>
+			<text x="40" y="678" font-weight="650">Choose negative: 0.8 &lt; 1.8</text>
+		</g>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> lower bars win within each comparison, not across different losses. Squared distances favor 3; absolute distances favor 0. The separate action example chooses negative despite an unchanged positive probability of 0.8.</figcaption>
+</figure>
+<p class="diagram-source">References: <a href="https://doi.org/10.1198/016214506000001437">Gneiting and Raftery on proper scoring rules</a>, <a href="https://doi.org/10.1214/aoms/1177703732">Huber on robust location</a>, and <a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn's threshold guidance</a>.</p>
 
-<p class="diagram-caption"><strong>Read it this way:</strong> go down the training rail first: name the statistical quantity you need, then choose a loss that elicits it. Only after checking held-out predictions should you enter the deployment rail, where calibration, costs, constraints, and capacity choose the action. A metric can send you back to revise the surrogate, but it is not automatically a differentiable loss. Original synthesis informed by <a href="https://doi.org/10.1198/016214506000001437">Gneiting and Raftery on proper scoring rules</a>, <a href="https://doi.org/10.1214/aoms/1177703732">Huber on robust location</a>, and <a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn's threshold guidance</a>.</p>
+## Calculate both targets
 
-## What an L6 answer sounds like
+For $n$ observations, define $\mathrm{MSE}(a)=n^{-1}\sum_i(a-y_i)^2$ and $\mathrm{MAE}(a)=n^{-1}\sum_i|a-y_i|$.
+Here,
 
-> "...a few practical considerations:
->
-> **The loss should be a useful surrogate for the metric you actually care about.** Cross-entropy estimates class probabilities; AUC and precision at K evaluate ranking or a chosen operating region. Ranking-aware or top-K surrogates may align better, but I would verify that on representative held-out data.
->
-> **Multi-task losses are weighted sums of per-task losses.** The weighting matters and is hard to set; uncertainty-weighted multi-task loss (Kendall et al.) and gradient-magnitude balancing (GradNorm) are principled approaches.
->
-> **For LLMs, the loss is usually next-token cross-entropy, but the *important* loss is the downstream behavior**. SFT trains on next-token CE; DPO replaces it with a preference loss; RLHF replaces it with a reward-model-derived gradient. Each shapes the model differently for the same evaluation goal.
->
-> **Auxiliary losses can stabilize training without changing the main objective**: an auxiliary reconstruction loss for representation learning, an auxiliary load-balance loss for mixture-of-experts. These are tools to shape gradient flow, not just to add tasks."
+$$
+\mathrm{MSE}(a)=\frac{a^2+a^2+(a-9)^2}{3},\qquad
+\frac{d\,\mathrm{MSE}}{da}=2a-6.
+$$
 
-## Tells that get you a strong-hire vote
+Squared error selects $a=3$, the mean. Absolute error selects $a=0$, the median.
 
-- You connect the loss to the **noise model** (Gaussian / Laplace / categorical).
-- You distinguish **mean** vs **median** targeting (MSE vs MAE).
-- You bring up **calibration vs the downstream metric** as separate concerns.
-- You separate **threshold tuning or explicit cost weighting** from focal loss for hard-example emphasis.
+| Constant | MSE | MAE |
+| --- | --- | --- |
+| $0$ | $27$ | $3$ |
+| $3$ | $18$ | $4$ |
 
-## Tells that get you down-leveled
+If nine is a genuine costly outcome, discarding it as an outlier changes the task.
+At each input, squared and absolute loss similarly target conditional means and medians when their risks exist.
 
-- Memorized list with no underlying reasoning.
-- Suggesting MSE for classification (vanishing gradients on confident-wrong predictions).
-- No mention of cost asymmetry or imbalance.
-- Treating loss selection as a closed problem.
+## Change the requirement
+
+### 1. Limit contamination influence
+
+**New task:** nine may be corrupted, and the required output is a robust location.
+
+**Picture and change:** Huber loss bounds each residual's gradient.
+For residual $r=a-y$ and scale $\delta>0$,
+
+$$
+H_\delta(r)=\begin{cases}
+r^2/2,&|r|\le\delta,\\
+\delta(|r|-\delta/2),&|r|>\delta.
+\end{cases}
+$$
+
+**Check:** with $\delta=1$ at $a=0$, the nine observation contributes gradient $-1$, not squared-error gradient $-18$.
+The mean Huber loss here is minimized at $a=0.5$ because $2a-1=0$.
+
+**Use when:** contamination may cause large residuals, rather than a genuine tail needed for mean estimation.
+
+### 2. Change action costs
+
+**New task:** false positives cost $9$, false negatives cost $1$, and the calibrated positive probability is $p=0.8$.
+Correct decisions have zero cost.
+
+**Picture and change:** compare the expected costs of both actions before retraining.
+Choose positive when
+
+$$
+C_{\mathrm{FP}}(1-p)<C_{\mathrm{FN}}p
+\quad\Longleftrightarrow\quad
+p>\frac{C_{\mathrm{FP}}}{C_{\mathrm{FP}}+C_{\mathrm{FN}}}.
+$$
+
+**Check:** the threshold is $0.9$.
+Positive action costs $1.8$ in expectation; negative costs $0.8$. Choose negative.
+
+**Use when:** probabilities remain suitable but the cost of acting changes.
+Capacity and other constraints may require a different decision rule.
+
+## Do not treat every score as a probability
+
+Weighted or focal objectives can change score meaning.
+Check calibration before applying a threshold derived for true probabilities.
+Focal modulation emphasizes difficult examples; it does not specify which error costs more.
+
+## Try increasing the precision requirement
+
+The model already ranks relevant cases well. What changes first?
+
+<details>
+<summary>Check your answer</summary>
+
+Test thresholds on representative validation data, separate from final evaluation.
+Report recall and accepted volume. Retrain only if the resulting operating choices fail the requirement.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+<span id="what-an-l6-answer-sounds-like"></span>
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Likelihood and output meaning
+
+Negative log likelihood is $-\log p_\theta(y\mid x)$.
+Fixed-variance Gaussian likelihood gives squared error up to constants and scale.
+Fixed-scale Laplace likelihood gives absolute error. Learned scales require their log terms too.
+These likelihood assumptions are not required merely to target means or medians.
+
+Categorical cross-entropy is $-\sum_c y_c\log p_c$ for one-hot targets.
+Squared error on probability vectors can also be a proper Brier score.
+Gradient problems depend on the output link and parameterization, not just the loss name.
+
+Focal loss multiplies log loss by $(1-p_t)^\gamma$ for the true-class probability $p_t$.
+Optional class weights are separate from that modulation; see the [original focal-loss paper](https://arxiv.org/abs/1708.02002).
 
 ## Common follow-up
 
-"How would you train a model that values precision much more than recall?"
+For a higher precision target, thresholding may suffice.
+Other options include cost-sensitive retraining, a ranking surrogate, or high-recall retrieval followed by a precision-focused filter.
+Evaluate representative held-out precision, recall, volume and segment behavior.
 
-The L6 answer:
+## Combined objectives
 
-> "Several options, ranked by complexity. (1) Tune the threshold on representative validation data for the required precision, while checking the resulting recall and volume. (2) If retraining is justified, use a cost-sensitive loss that gives more weight to negative examples that become false positives. (3) For retrieval, optimize a ranking or top-K surrogate. (4) Train two-stage: a high-recall first stage, then a high-precision filter. The right answer depends on whether thresholding a calibrated model meets the operating constraint or the ranking itself must change."
+Ranking losses target order; contrastive and triplet losses shape embedding relationships.
+Multi-task weights change the combined objective.
+[Uncertainty weighting](https://arxiv.org/abs/1705.07115) and [GradNorm](https://arxiv.org/abs/1711.02257) use different weight-selection rules.
+Auxiliary reconstruction or load-balancing losses also change the optimized objective, even when the main term stays unchanged.
+Next-token, preference and reward-based training objectives need downstream behavioral evaluation rather than assuming equal loss reductions mean equal improvements.
 
----
+Related: [multi-task learning](/concepts/multi-task-learning-objective-interference/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), [regularization](/concepts/regularization/), and [calibration](/concepts/calibration/).
 
-*Related: [multi-task learning and objective interference](/concepts/multi-task-learning-objective-interference/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), [regularization](/concepts/regularization/), and [calibration](/concepts/calibration/).*
+</div>

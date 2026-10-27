@@ -7,8 +7,8 @@ const waiting = (rows, extra = {}) => grid(rows.map((value) => [value]), top(row
   ...extra,
 });
 
-const draft = visual('A decreasing stack keeps unresolved day indices until the first warmer temperature can pop them.', [
-  frame('Initialize unanswered days', 'Start with answer=[0,0,0,0,0,0,0,0] and an empty waiting stack.', waiting(['empty'], {
+const draft = visual('Unresolved temperatures are nonincreasing; a strictly warmer day pops waiting indices and writes their first qualifying distances.', [
+  frame('Initialize unanswered days', 'Initialize eight zero answers and an empty stack of waiting indices.', waiting(['empty'], {
     current: 'before day 0',
     answer: '[0,0,0,0,0,0,0,0]',
     action: 'initialize',

@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: trust-and-safety, social-platform, and LLM-deployment interviews.*
 
-The L4 candidate proposes "a classifier that filters bad content." The L6 candidate separates policy specification from model implementation, designs the human-review path, and addresses adversarial robustness and per-policy calibration.
+Design a content-moderation system that applies explicit policies while accounting for uncertainty, review capacity, and user appeals.
+
+## Problem
+
+**Context.** A hypothetical platform must assess incoming content under several policies, with different error costs across categories and languages.
+Automated scores are imperfect, and human review has limited capacity.
+
+**Task.** Define policy labels, decision thresholds, automated actions, review and appeal paths, and a measurement and rollout plan.
+Explain how policy changes and adversarial behavior affect operation.
+
+**Constraints.** Separate policy authority from model prediction. Specify false-positive and false-negative costs rather than optimizing accuracy alone.
+Protect user data, audit decisions, and provide a response when uncertainty exceeds the system's authority.
 
 ## What makes moderation hard
 
@@ -49,15 +60,17 @@ This is L5. Layered architecture with human-in-the-loop and feedback.
 >
 > **Adversarial robustness.** Users will test the system, find phrasings that bypass it, and share. Augment training data with known evasion patterns; track 'evasion rate' (flagged content that mutates to unflagged versions); maintain a fast-update path for new patterns.
 >
-> **Calibrate on minority groups separately.** A model with overall 95% accuracy can have 70% accuracy on content from a specific demographic, language, or cultural context. Required to track per-slice; required to fix gaps.
+> **Audit relevant slices.** Measure probability quality, false positives, false negatives, and policy consistency across languages and other appropriate slices. An accuracy gap is not itself a calibration diagnosis. Group-specific calibration or thresholds require a justified policy and an assessment of legal, privacy, fairness, and data-support constraints.
 >
-> **Borderline content is the hardest.** Models score most things confidently; the high-judgment content is in the middle of the score distribution. Humans should review borderline cases, not extremes; calibrate routing thresholds so review queue is high-value.
+> **Route review by risk and uncertainty.** Near-threshold cases can be useful, but a confidently wrong extreme can also be consequential. Reserve some representative and risk-targeted audits outside the borderline queue; measure reviewer agreement and capacity.
 >
 > **Counterfactual eval for false negatives.** False positives are visible (users complain). False negatives are invisible by definition (the bad content stayed up). Track via periodic random audits and via reports from users / partners.
 >
-> **The appeals process is part of the model**, not just a customer service function. Appeals data is the highest-quality label source you have; treat it as a first-class training signal.
+> **Appeals are valuable but selected evidence.** Appealers differ from users who cannot or do not appeal, and reviewers can disagree. Version the policy and adjudication, audit label quality, and keep representative sampling separate. As in the [fraud-design lesson](/questions/design-fraud-detection/), observed outcomes depend on the policy; appeal accuracy alone cannot estimate population error rates.
 >
 > **Explainability is a regulatory and trust issue.** When auto-actioning content, surface a reason ('flagged for hate speech against [protected category]'); helps user understanding and reduces disputes."
+
+<p class="visual-title">Policy and appeal outcomes govern the next decision</p>
 
 <!-- visual:content-moderation-governed-decision-loop -->
 ```mermaid

@@ -3,6 +3,9 @@ import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 const data = '4#lint1##0#'.split('');
 const cursor = (index, label, extra = {}) => array(data, [mark(index, label, extra.result ? 'output' : 'focus', 'decoder-index')], {
   encoded: '4#lint1##0#',
+  fitArray: true,
+  arrayColumns: 6,
+  indexLabels: ['0 len', '1 sep', '2 text', '3 text', '4 text', '5 text', '6 len', '7 sep', '8 text', '9 len', '10 sep'],
   ...extra,
 });
 
@@ -27,6 +30,6 @@ export default defineVisual('encode-and-decode-strings', draft, {
     'Escaping delimiters adds a second grammar and more error-prone scanning.',
     'A result-only round trip hides the separator and slice arithmetic.',
   ],
-  transferLesson: 'Prefix variable-length records with a parseable size so payload bytes remain opaque; this framing pattern transfers to network protocols, file formats, and binary serialization.',
+  transferLesson: 'Prefix each record with a parseable size in the same unit used for slicing. Byte transport must count encoded bytes, while complete-input validation and streaming state require additional checks.',
   reviewStatus: 'reviewed',
 });

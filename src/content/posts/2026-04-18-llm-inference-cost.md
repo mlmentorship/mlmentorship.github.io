@@ -1,6 +1,6 @@
 ---
 title: "How to think about LLM inference cost"
-description: "Most teams calculate inference cost by multiplying token price by token count. The actual cost structure has five layers and most of the optimization wins are in the bottom four."
+description: "Count each billed model call once, including cache state, outputs, tools and retries; compare complete cost under quality and authority limits."
 date: "2026-04-18"
 draft: false
 tags: ["guides"]
@@ -8,30 +8,43 @@ category: "guides"
 ---
 
 
-Teams underestimating costs by 5-10x typically use `(input_tokens + output_tokens) * price_per_token`. That formula works at API level but fails at scale.
+One user request can trigger many billed calls; count each once before diagnosing repeated context, retries or expensive tails.
 
-The model below decomposes inference cost into five layers. Most of the optimization wins are in layers 2 to 4, not layer 1.
+## Problem
 
-## The five layers of cost
+Three model calls consume 1,200, 1,400 and 1,600 input tokens, plus 200 output tokens each.
+Each input includes the same 1,000-token prefix.
+The first use is uncached; the next two receive a prefix discount.
+Tools cost 0.001 dollars in total.
 
-LLM inference cost decomposes into:
+Use fictional prices per million tokens: 1 dollar uncached input, 0.2 cached input and 4 output.
+There are no additional cache-write charges in this example.
+Compute the request total and compare it with the same calls without caching.
+These are teaching prices, not current provider quotes.
 
-1. **Per-request token cost**: what most people calculate.
-2. **Prompt amortization cost**: the system prompt you pay on every request.
-3. **Retrieval / context overhead**: tokens added by RAG, tools, conversation history.
-4. **Multi-step / agentic cost**: cost multiplier from chained or iterative LLM calls.
-5. **Tail cost**: the heavy 1-5% of requests that consume disproportionate compute.
+## Picture: Price Three Rows, Not Five Overlapping Buckets
 
-For a typical production LLM feature, the actual cost is dominated by layers 2-4, with layer 5 driving the variance. Optimizing layer 1 (the model choice) without addressing the rest is a common mistake.
+| Call | Total input | Cached input | Uncached input | Output | Model cost, dollars |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1,200 | 0 | 1,200 | 200 | 0.0020 |
+| 2 | 1,400 | 1,000 | 400 | 200 | 0.0014 |
+| 3 | 1,600 | 1,000 | 600 | 200 | 0.0016 |
+| Total | 4,200 | 2,000 | 2,200 | 600 | 0.0050 |
+
+The prefix and history are already inside each input count.
+Do not add them again as separate token charges.
+Add tools once: the full request costs 0.006 dollars.
+Without caching, it costs 0.0076 dollars; the saving is about 21.05%.
+The 80% cached-token discount does not apply to the entire request.
 
 <!-- visual:llm-cost-compounds-across-agent-calls -->
 <figure class="learning-figure" aria-labelledby="llm-cost-compounding-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="llm-cost-compounding-title">Why can one user request become a growing stack of model input?</p>
-	<div class="visual-panel plot-panel">
-		<svg viewBox="0 0 360 470" role="img" aria-labelledby="llm-cost-svg-title llm-cost-svg-desc">
-			<title id="llm-cost-svg-title">Input context compounds across three calls in an agent loop</title>
-			<desc id="llm-cost-svg-desc">One user request triggers three model calls. Each call includes the same fixed prompt and retrieved context. Call one adds the current turn. Call two also carries turn one as prior history. Call three carries turns one and two as prior history. The aligned bars therefore grow from 210 illustrative units to 260 and then 310. A dashed tail box shows that a retry would pay for another full call. The segment patterns and direct labels distinguish all categories without color.</desc>
+	<p class="visual-kicker">Input tokens, not currency</p>
+	<p class="visual-title" id="llm-cost-compounding-title">The same prefix recurs, while other input grows.</p>
+	<div class="visual-scroll">
+		<svg viewBox="0 0 360 470" style="width: 400px; min-width: 400px" role="img" aria-labelledby="llm-cost-svg-title llm-cost-svg-desc">
+			<title id="llm-cost-svg-title">Three input bars show 1,200, 1,400 and 1,600 tokens</title>
+			<desc id="llm-cost-svg-desc">Each input bar contains a 1,000-token stable prefix and respectively 200, 400 or 600 other input tokens. Prefix width is 180 units; the other widths are 36, 72 and 108, so total lengths scale exactly with token counts. Call one prices the prefix as uncached; calls two and three price it as cached. Each call also has 200 output tokens, priced separately and not included in the input bars. An extra call adds a ledger row with its own actual cache and output usage.</desc>
 			<defs>
 				<pattern id="llm-cost-fixed-hatch" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--viz-state-bg)"></rect><path d="M-2 2 L2 -2 M0 8 L8 0 M6 10 L10 6" stroke="var(--viz-state-stroke)" stroke-width="1"></path></pattern>
 				<pattern id="llm-cost-history-dots" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="var(--viz-focus-bg)"></rect><circle cx="2" cy="2" r="1.2" fill="var(--viz-focus-stroke)"></circle><circle cx="6" cy="6" r="1.2" fill="var(--viz-focus-stroke)"></circle></pattern>
@@ -39,149 +52,191 @@ For a typical production LLM feature, the actual cost is dominated by layers 2-4
 			</defs>
 			<text class="viz-axis-label" x="18" y="24">ONE USER REQUEST</text>
 			<path d="M180 34 V58" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#llm-cost-arrow)"></path>
-			<text class="viz-axis-label" x="18" y="82">CALL 1 · plan</text>
-			<rect x="18" y="94" width="90" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
-			<rect class="viz-node viz-node--input" x="108" y="94" width="70" height="54"></rect>
-			<rect class="viz-node viz-node--output" x="178" y="94" width="50" height="54" rx="3"></rect>
-			<text class="viz-edge-label" x="63" y="117"><tspan x="63">fixed</tspan><tspan x="63" dy="13">prompt</tspan></text>
-			<text class="viz-edge-label" x="143" y="117"><tspan x="143">retrieved</tspan><tspan x="143" dy="13">context</tspan></text>
-			<text class="viz-edge-label" x="203" y="117"><tspan x="203">turn</tspan><tspan x="203" dy="13">1</tspan></text>
+			<text class="viz-axis-label" x="18" y="82">CALL 1: 1,200 IN + 200 OUT</text>
+			<rect x="18" y="94" width="180" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
+			<rect class="viz-node viz-node--input" x="198" y="94" width="36" height="54" rx="3"></rect>
+			<text class="viz-edge-label" x="108" y="117"><tspan x="108">1,000 prefix</tspan><tspan x="108" dy="13">uncached</tspan></text>
+			<text class="viz-edge-label" x="216" y="117"><tspan x="216">other</tspan><tspan x="216" dy="13">200</tspan></text>
 			<path d="M180 157 V181" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#llm-cost-arrow)"></path>
-			<text class="viz-axis-label" x="18" y="205">CALL 2 · use tool</text>
-			<rect x="18" y="217" width="90" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
-			<rect class="viz-node viz-node--input" x="108" y="217" width="70" height="54"></rect>
-			<rect x="178" y="217" width="50" height="54" fill="url(#llm-cost-history-dots)" stroke="var(--viz-focus-stroke)" stroke-width="1.5"></rect>
-			<rect class="viz-node viz-node--output" x="228" y="217" width="50" height="54" rx="3"></rect>
-			<text class="viz-edge-label" x="63" y="240"><tspan x="63">fixed</tspan><tspan x="63" dy="13">prompt</tspan></text>
-			<text class="viz-edge-label" x="143" y="240"><tspan x="143">retrieved</tspan><tspan x="143" dy="13">context</tspan></text>
-			<text class="viz-edge-label" x="203" y="240"><tspan x="203">prior</tspan><tspan x="203" dy="13">turn 1</tspan></text>
-			<text class="viz-edge-label" x="253" y="240"><tspan x="253">turn</tspan><tspan x="253" dy="13">2</tspan></text>
+			<text class="viz-axis-label" x="18" y="205">CALL 2: 1,400 IN + 200 OUT</text>
+			<rect x="18" y="217" width="180" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
+			<rect x="198" y="217" width="72" height="54" rx="3" fill="url(#llm-cost-history-dots)" stroke="var(--viz-focus-stroke)" stroke-width="1.5"></rect>
+			<text class="viz-edge-label" x="108" y="240"><tspan x="108">1,000 prefix</tspan><tspan x="108" dy="13">cached</tspan></text>
+			<text class="viz-edge-label" x="234" y="240"><tspan x="234">other</tspan><tspan x="234" dy="13">400</tspan></text>
 			<path d="M180 280 V304" fill="none" stroke="var(--viz-edge)" stroke-width="2" marker-end="url(#llm-cost-arrow)"></path>
-			<text class="viz-axis-label" x="18" y="328">CALL 3 · synthesize</text>
-			<rect x="18" y="340" width="90" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
-			<rect class="viz-node viz-node--input" x="108" y="340" width="70" height="54"></rect>
-			<rect x="178" y="340" width="100" height="54" fill="url(#llm-cost-history-dots)" stroke="var(--viz-focus-stroke)" stroke-width="1.5"></rect>
-			<rect class="viz-node viz-node--output" x="278" y="340" width="50" height="54" rx="3"></rect>
-			<text class="viz-edge-label" x="63" y="363"><tspan x="63">fixed</tspan><tspan x="63" dy="13">prompt</tspan></text>
-			<text class="viz-edge-label" x="143" y="363"><tspan x="143">retrieved</tspan><tspan x="143" dy="13">context</tspan></text>
-			<text class="viz-edge-label" x="228" y="363"><tspan x="228">prior history</tspan><tspan x="228" dy="13">turns 1 + 2</tspan></text>
-			<text class="viz-edge-label" x="303" y="363"><tspan x="303">turn</tspan><tspan x="303" dy="13">3</tspan></text>
-			<path d="M328 367 H344 V420 H232" fill="none" stroke="var(--viz-warning-stroke)" stroke-width="2" stroke-dasharray="6 4"></path>
+			<text class="viz-axis-label" x="18" y="328">CALL 3: 1,600 IN + 200 OUT</text>
+			<rect x="18" y="340" width="180" height="54" rx="3" fill="url(#llm-cost-fixed-hatch)" stroke="var(--viz-state-stroke)" stroke-width="1.5"></rect>
+			<rect x="198" y="340" width="108" height="54" rx="3" fill="url(#llm-cost-history-dots)" stroke="var(--viz-focus-stroke)" stroke-width="1.5"></rect>
+			<text class="viz-edge-label" x="108" y="363"><tspan x="108">1,000 prefix</tspan><tspan x="108" dy="13">cached</tspan></text>
+			<text class="viz-edge-label" x="252" y="363"><tspan x="252">other</tspan><tspan x="252" dy="13">600</tspan></text>
+			<path d="M306 367 H344 V420 H232" fill="none" stroke="var(--viz-warning-stroke)" stroke-width="2" stroke-dasharray="6 4"></path>
 			<rect x="18" y="411" width="214" height="40" rx="4" fill="var(--viz-warning-bg)" stroke="var(--viz-warning-stroke)" stroke-width="1.5" stroke-dasharray="5 3"></rect>
-			<text class="viz-gradient-label" x="125" y="428"><tspan x="125">TAIL: retry or extra step</tspan><tspan x="125" dy="13">pays for another full call</tspan></text>
+			<text class="viz-gradient-label" x="125" y="428"><tspan x="125">Extra call: another row</tspan><tspan x="125" dy="13">price its actual usage</tspan></text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> scan downward. The fixed prompt and retrieved context recur in every model call, while prior turns accumulate before the next call. A retry in the tail repeats the largest request. Prefix caching can discount eligible repeated input, but it does not remove new history, output, tool, or miss costs. Original synthesis informed by <a href="https://developers.openai.com/api/docs/guides/prompt-caching">OpenAI</a>, <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching">Anthropic</a>, <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html">Amazon Bedrock</a>, and the <a href="https://arxiv.org/abs/2309.06180">PagedAttention paper</a>; segment widths are illustrative, not measurements.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each input bar repeats 1,000 prefix tokens. Other input grows from 200 to 400 to 600 tokens. Widths represent token counts, not cost. The 200 output tokens per call are separate. Another call adds its actual usage, not an assumed full-price retry.</figcaption>
 </figure>
 
-## Layer 1: per-request token cost
+## A Practical Cost Model
 
-The naive calculation. Cost per request &asymp; (input_tokens + output_price_ratio &times; output_tokens) &times; price_per_token.
+For each call, input is partitioned into uncached and cached tokens.
+Rates below have currency-per-token units; add explicit write/tool charges and allocated costs only once.
 
-For most modern API models, output tokens cost 3-5&times; more than input tokens. Don't average them; track separately.
+$$
+C_{\mathrm{request}}=
+\sum_{\mathrm{calls}}
+\left(I_u r_u+I_c r_c+O r_o+C_{\mathrm{write}}+C_{\mathrm{tool}}\right)
++C_{\mathrm{allocated}}.
+$$
 
-The optimization levers here are well-known: pick a smaller / cheaper model, distill, quantize, batch. These get the most attention but are usually not the biggest wins.
+```python
+from decimal import Decimal
 
-## Layer 2: prompt amortization
 
-Every request pays for the system prompt. If your system prompt is 5,000 tokens (instructions, persona, format specifications, examples) and your user query is 100 tokens, then the system prompt is 98% of your input cost. At a million queries a month, you're paying 5 billion tokens just for the prompt.
+def model_cost(calls):
+	total = Decimal("0")
+	million = Decimal("1000000")
+	for call in calls:
+		input_tokens = call["input_tokens"]
+		cached = call["cached_input_tokens"]
+		output = call["output_tokens"]
+		if not 0 <= cached <= input_tokens or output < 0:
+			raise ValueError("invalid token partition")
+		total += (
+			Decimal(input_tokens - cached) * Decimal("1")
+			+ Decimal(cached) * Decimal("0.2")
+			+ Decimal(output) * Decimal("4")
+		) / million
+		total += call.get("cache_write_cost", Decimal("0"))
+	return total
 
-"Prompt engineering" often backfires: adding context to fix 0.1% of cases costs you in 100% of cases.
 
-The optimizations:
-
-- **Trim the prompt aggressively.** Most production prompts have 2-3&times; more text than they need. Run an A/B with shorter variants and measure.
-- **Use prompt caching.** Anthropic, OpenAI, and Bedrock all support some form of caching for repeated prefixes. Cached tokens are 5-10&times; cheaper. If your system prompt is stable, this is the single largest cost win available.
-- **Move static instructions into a fine-tune.** If you're paying for 5K tokens of "always format like this" on every request, you may be better off fine-tuning a smaller model with that behavior baked in.
-
-## Layer 3: retrieval / context overhead
-
-For RAG systems, the retrieved context is often the largest single contributor to per-request token count. A typical RAG query with 10 retrieved chunks of 500 tokens each adds 5,000 tokens to every request.
-
-For agentic systems with tool use, conversation history, and tool results, context can grow to 30K+ tokens by mid-conversation.
-
-The optimizations:
-
-- **Retrieve fewer chunks** by adding a reranker (top 5 after rerank > top 20 before rerank, both in cost and quality).
-- **Compress retrieved context**: LLM-based summarization of retrieved chunks before passing to the answer model. Costs a small extra LLM call but can cut answer-model context by 5&times;+.
-- **Truncate conversation history**: sliding window over recent turns, with a summary of older ones. Naive "send the whole history" gets very expensive very fast.
-- **Trim tool results**: tool outputs are often verbose JSON; pre-process to keep only the fields the model actually needs.
-
-RAG context can dominate request cost so completely that improving retrieval (better reranking, so fewer chunks are needed) drives substantial cost reduction without any change to the underlying model.
-
-## Layer 4: multi-step / agentic cost
-
-A single user request to an agent triggers planning + N tool-calling iterations + synthesis. If each step uses 10K tokens and you average 5 steps, that's 50K tokens per request. The user sees one query; you pay for ten. This grows O(N²) as each step includes all previous outputs.
-
-The optimizations:
-
-- **Cap iterations.** Set a hard maximum and fail loudly if exceeded.
-- **State summarization between steps**: instead of carrying the full history, summarize and start fresh.
-- **Tiered models**: use a small fast model for routine planning; reserve the expensive model for hard reasoning steps.
-- **Speculative or parallel execution**: if you can predict the likely tool calls, run them in parallel before the planning model finishes.
-
-## Layer 5: tail cost
-
-Cost per request is heavily right-skewed. The 95th percentile can consume 10x the median; the 99th can consume 100x. Causes: long inputs (50-page pastes), verbose outputs, agentic iteration caps, retry logic cascades.
-
-The optimizations:
-
-- **Hard limits on max input and output length.** Reject early; return graceful errors.
-- **Output-length steering** in the prompt and generation parameters, explicit "respond in &lt; 200 tokens" instructions, plus `max_tokens` in the generation config.
-- **Tail monitoring.** Track p95 and p99 cost per request, not just the mean. Cost regressions usually show up in the tail before the mean.
-- **Per-user rate limiting** to prevent a single power user from dominating cost.
-
-## A practical cost model
-
-A back-of-envelope formula:
-
-```
-monthly_cost ~ requests * (
-   input_tokens_per_request * price_in
- + output_tokens_per_request * price_out
- + n_agent_steps * step_overhead * price_in
- + tail_cost_multiplier
-)
+calls = [
+	{"input_tokens": 1200, "cached_input_tokens": 0, "output_tokens": 200},
+	{"input_tokens": 1400, "cached_input_tokens": 1000, "output_tokens": 200},
+	{"input_tokens": 1600, "cached_input_tokens": 1000, "output_tokens": 200},
+]
+assert model_cost(calls) == Decimal("0.005")
+assert model_cost(calls) + Decimal("0.001") == Decimal("0.006")
 ```
 
-Where:
-- `input_tokens_per_request` includes prompt + retrieved context + history
-- `n_agent_steps` is the average number of intermediate LLM calls per user request
-- `step_overhead` is the average tokens per intermediate call
-- `tail_cost_multiplier` accounts for the right tail (typically 1.3&times;-2&times; of the mean)
+Reconcile request/call/attempt IDs, usage categories, cache state, rate version and tool receipts against billed totals.
+Include every retry, cancellation and failed task that incurred charges.
 
-For a typical production RAG-backed agent, the breakdown often looks like:
+## Change 1: Stable Prefixes Dominate
 
-- Layer 1 (raw token cost of the answer): 15%
-- Layer 2 (system prompt amortization): 20%
-- Layer 3 (retrieval context): 30%
-- Layer 4 (agentic multiplier): 25%
-- Layer 5 (tail): 10%
+**New task.** Most input repeats an authorized prefix.
 
-Optimizing only layer 1 (e.g., switching to a cheaper model) caps your savings at 15%. Optimizing layers 2-3 (prompt caching + better retrieval) can easily cut total cost in half.
+**Picture and change.** Measure eligible cache hits, not just repeated text.
+Check provider/model support, exact-prefix rules, expiry, write/miss charges and tenant isolation.
+Compare safe prompt trimming under the same evaluation.
 
-## What an interviewer expects you to discuss
+**Check.** Cached input does not discount outputs, tools or newly added history.
+Authorization and source freshness still apply independently of cache reuse.
 
-If asked "how would you reduce inference cost by 10&times;", a senior answer covers:
+**Use when.** Measured eligible repeated work makes caching worthwhile.
 
-- Identifies the dominant cost layer first, "let me ask, where is the cost coming from? Is it system prompt, retrieved context, or agent steps?"
-- Mentions prompt caching as an immediate win.
-- Mentions retrieval reduction (better reranking → fewer chunks).
-- Mentions a smaller/distilled/quantized model as one option among several, not the first.
-- Mentions tiered serving (small model for easy queries, large for hard).
-- Mentions cap-and-fail for tail requests.
-- Acknowledges that cost reduction usually requires some quality trade-off and how to measure it.
+## Change 2: Long Agent Runs Dominate
 
-The L4 answer is "use a smaller model." The L6 answer is "let's identify where the cost actually is, then propose 5 changes ranked by likely impact, with an eval that gates each change on quality regression."
+**New task.** Retries and growing tool history make some tasks expensive.
 
-## The thing nobody mentions
+**Picture and change.** Bound steps, retries, tokens, time and money at enforced limits.
+Summarize only while preserving source evidence, authority, unresolved effects and stop conditions.
+Charge the summary calls too.
 
-Inference optimizations can compound. A shorter context lowers per-token cost and prefill latency. Faster agent steps can then support tighter iteration limits, which reduces total request cost.
+**Check.** With first input $I_0$ and $h$ additional history tokens per step, cumulative input is
 
-Cost improvements are *contagious* across layers. Reducing context helps per-token cost and latency, improving agentic step time, enabling earlier iteration caps, reducing total cost. Optimizations compound.
+$$
+I_{\mathrm{total}}=mI_0+h\frac{m(m-1)}2.
+$$
 
-Cost regressions compound too. Adding 1K tokens to the system prompt becomes 1K extra on every agentic step, potentially doubling monthly spend. Review cost in code review like security.
+Our three-call ledger fits $I_0=1200$, $h=200$, giving 4,200 input tokens.
+Bounded fixed-size context instead gives approximately linear cumulative input, excluding additional compaction work.
 
----
+**Use when.** Measured multi-call tails dominate spend.
+An exhausted run is incomplete, not a cheap success.
+
+<span id="what-an-interviewer-expects-you-to-discuss"></span>
+
+## Preserve Release Requirements
+
+Compare quality, severe failures, authority, latency and cost per successful task on the same population.
+Keep a rollback for prompt, routing, retrieval, model and budget changes.
+Lower cost can come from removing waste or from losing useful work; distinguish them.
+
+## Failure: Charge the Same Work Twice
+
+Prompt and retrieval tokens cannot be added again after counting full input.
+Actual tail calls already appear in the ledger; do not add another arbitrary tail charge.
+A dimensionless multiplier cannot be added directly to currency.
+
+## Transfer Check
+
+Must cumulative input grow quadratically with the number of calls?
+
+### Reasoned Answer
+
+No. Quadratic growth requires each call to resend roughly linearly growing history.
+Fixed-size context can grow approximately linearly, and cache pricing changes cost separately from token count.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## The Five Layers of Cost
+
+Treat these as diagnostic views of one ledger, not five additive charges.
+
+## Layer 1: Per-Request Token Cost
+
+Separate input/output rates and usage classes.
+Benchmark smaller models, distillation, quantization and batching under the same quality/latency requirements.
+Price ratios and savings depend on the actual service.
+
+## Layer 2: Prompt Amortization
+
+Measure repeated instructions, examples and schemas.
+Compare trimming, eligible caching and adaptation, including training, refresh and validation costs.
+For example, 5,000 system tokens plus 100 query tokens make the system portion about 98% of uncached input.
+That is not 98% of the full bill.
+
+## Layer 3: Retrieval / Context Overhead
+
+Measure retrieved passages, conversation history and tool results.
+Reranking, field selection and compression can reduce tokens but add compute or remove necessary evidence.
+Validate both effects; fewer chunks are not automatically better.
+
+## Layer 4: Multi-Step / Agentic Cost
+
+Measure planning, tools, verification, synthesis and retries separately.
+Evaluate smaller-model routing and safe parallel work without speculating unauthorized or irreversible side effects.
+Concurrent calls still consume resources and money.
+
+## Layer 5: Tail Cost
+
+Inspect p50/p95/p99, cohort sizes, completion and expensive traces.
+Apply input/output/step caps and tenant quotas; prompt wording alone is not a hard limit.
+Forecast tails with explicit assumptions rather than claiming universal percentile multipliers.
+
+<span id="the-thing-nobody-mentions"></span>
+
+## Changes Can Interact
+
+Shorter context can reduce input work yet worsen answers and increase retries.
+Evaluate complete request economics, not independent percentage reductions multiplied without evidence.
+
+Self-hosted cost uses allocated accelerator capacity/time, utilization, memory, networking and operations.
+Do not charge the same work both a hypothetical API token bill and its hosting cost.
+Distinct external calls can still add real API charges.
+
+## Provider References
+
+Verify current dated pricing and cache semantics before applying any real rate.
+
+- [OpenAI prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching).
+- [Anthropic prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching).
+- [Amazon Bedrock prompt caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html).
+- [PagedAttention](https://arxiv.org/abs/2309.06180), a serving-memory design, not a provider pricing schedule.
 
 *Related: [Designing a RAG system that actually works](/guides/designing-rag-that-works/), [When would you fine-tune vs prompt vs RAG?](/questions/fine-tune-vs-prompt-vs-rag/).*
+
+</div>

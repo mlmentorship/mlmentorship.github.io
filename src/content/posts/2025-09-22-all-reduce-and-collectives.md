@@ -1,6 +1,6 @@
 ---
 title: "All-reduce and other collectives"
-description: "The communication primitives behind every distributed training job. All-reduce, all-gather, reduce-scatter, broadcast. What they do, costs, and when each is used."
+description: "Choose a collective from each rank's required output, then account for reduction, shard ownership, traffic, latency and overlap."
 date: "2025-09-22"
 draft: false
 tags: ["concepts"]
@@ -10,63 +10,103 @@ aliases: ["allreduce", "allgather", "reduce scatter", "collective communication"
 
 ## Summary
 
-A **collective communication operation** is a coordinated message-passing primitive across a group of processes. The five most common in deep learning: **broadcast** (one-to-all copy), **reduce** (all-to-one sum), **all-reduce** (all-to-all sum into all), **all-gather** (concatenate everyone's data into all), **reduce-scatter** (sum-then-shard).
+Choose a collective by each rank's required output: concatenate pieces, combine aligned values, or distribute a completed result.
 
-Every distributed training run is built on these primitives. Knowing which collective is invoked when is the difference between explaining "DDP all-reduces gradients" and actually understanding the cost of FSDP, TP, or pipeline parallelism. Communication time is often the bottleneck. Collective choice determines throughput.
+## Problem
 
-## The five primitives
+The process group contains ranks 0 and 1, holding `[1, 2]` and `[3, 4]`.
+Both buffers have shape `(2,)`, dtype int64 and the same index meanings.
+Specify what each rank holds after a sum all-reduce, reduce-scatter and all-gather.
+Use rank order for concatenation and equal, index-aligned chunks for scattering.
 
-Let $N$ be the number of ranks and $B$ be the size of the full logical tensor. A useful communication model is:
+## Picture: Add Aligned Positions or Join Pieces
 
-$$
-T \approx \alpha \times \text{communication steps} + \frac{\text{bytes moved per rank}}{\text{effective bandwidth}},
-$$
+Sum reduction combines corresponding positions: `[1+3, 2+4]` becomes `[4, 6]`.
+All-reduce gives that result to both ranks.
+Reduce-scatter keeps `[4]` on rank 0 and `[6]` on rank 1.
+All-gather of those reduced shards restores `[4, 6]` on both.
 
-where $\alpha$ is fixed latency per step. The exact algorithm depends on message size and topology.
+All-gather of the original buffers instead produces `[1, 2, 3, 4]`.
+It concatenates; it does not add.
+The all-reduce identity therefore needs compatible reduction, chunk boundaries and rank order.
 
-### Broadcast
-One process sends its buffer to all others.
-- **Traffic**: each receiver obtains $B$ bytes. A tree lowers the number of sequential hops for small messages.
-- **Use**: distribute initial weights, broadcast a hyperparameter.
+<span id="the-five-primitives"></span>
 
-### Reduce
-All processes contribute; one receives the sum (or max, min, etc.).
-- **Traffic**: the root receives a reduced tensor of size $B$. Ring and tree algorithms divide the work differently.
-- **Use**: aggregating metrics to rank 0 for logging.
+## Six Output Contracts
 
-### All-reduce
-All processes contribute and all receive the sum.
-- **Ring traffic per rank**: $2B(N-1)/N$, split across reduce-scatter and all-gather phases.
-- **Use**: gradient aggregation in DDP; output sum in tensor parallelism.
+<span id="broadcast"></span>
+<span id="reduce"></span>
+<span id="all-reduce"></span>
+<span id="all-gather"></span>
+<span id="reduce-scatter"></span>
 
-### All-gather
-Each process has a chunk of size $B/N$; all end with the full $B$ concatenation.
-- **Ring traffic per rank**: $B(N-1)/N$.
-- **Use**: FSDP. Gather sharded parameters before forward pass.
+| Operation on the stated inputs | Rank 0 afterward | Rank 1 afterward |
+| --- | --- | --- |
+| Broadcast rank 0 | `[1, 2]` | `[1, 2]` |
+| Sum reduce to rank 0 | `[4, 6]` | No required result |
+| Sum all-reduce | `[4, 6]` | `[4, 6]` |
+| All-gather original buffers | `[1, 2, 3, 4]` | `[1, 2, 3, 4]` |
+| Sum reduce-scatter | `[4]` | `[6]` |
+| All-to-all, one value per destination | `[1, 3]` | `[2, 4]` |
 
-### Reduce-scatter
-Each process contributes a buffer of size $B$; all end with their slice $B/N$ of the sum.
-- **Ring traffic per rank**: $B(N-1)/N$.
-- **Use**: FSDP. Sum gradients and keep only your shard.
+Sum does not divide by rank count.
+Equal-sized data-parallel batches can average by dividing the summed gradients appropriately.
+Unequal local batches require weighting by example counts, not blindly averaging local means.
 
-**Identity**: all-reduce $=$ reduce-scatter $+$ all-gather.
+## Reference the Values Before the Network
 
-## The ring all-reduce
+This reference models values and order, not transport, dtype enforcement or synchronization.
 
-The dominant implementation in 2026 (Baidu Ring, Horovod, NCCL):
+```python
+def sum_by_index(buffers):
+	if not buffers:
+		raise ValueError("the process group must be nonempty")
+	width = len(buffers[0])
+	if any(len(buffer) != width for buffer in buffers):
+		raise ValueError("rank inputs must have matching shapes")
+	return [sum(contributions) for contributions in zip(*buffers)]
 
-1. Each process splits its buffer into $N$ chunks.
-2. **Reduce-scatter phase** ($N - 1$ steps): each process sends one chunk to its right neighbor, receives one from the left, accumulates.
-3. **All-gather phase** ($N - 1$ steps): each process has the final value of one chunk; cycle around so everyone has the full buffer.
 
-Total: $2(N-1)$ steps, each transferring $B/N$ bytes per rank. **Traffic per rank is $2B(N-1)/N$, which approaches $2B$.** A ring uses link bandwidth well for large messages. Its many sequential steps can make small messages latency-bound.
+def reduce_scatter_reference(buffers):
+	reduced = sum_by_index(buffers)
+	ranks = len(buffers)
+	if len(reduced) % ranks:
+		raise ValueError("equal chunks require a divisible width")
+	width = len(reduced) // ranks
+	return [reduced[rank * width:(rank + 1) * width] for rank in range(ranks)]
+
+
+def all_gather_reference(shards):
+	if not shards or any(len(shard) != len(shards[0]) for shard in shards):
+		raise ValueError("this reference requires equal-sized rank shards")
+	return [value for shard in shards for value in shard]
+
+
+buffers = [[1, 2], [3, 4]]
+assert sum_by_index(buffers) == [4, 6]
+assert reduce_scatter_reference(buffers) == [[4], [6]]
+assert all_gather_reference(reduce_scatter_reference(buffers)) == [4, 6]
+assert all_gather_reference(buffers) == [1, 2, 3, 4]
+```
+
+## The Ring All-Reduce
+
+Now use four ranks and full input size $B=8$ MB, with decimal MB.
+Split each input into four equal, aligned chunks.
+For chunk A, rank-local contributions are $a_0,a_1,a_2,a_3$.
+Three receive-and-add steps finish $A^*$; three forwarding steps distribute it without further addition.
+Other chunks follow the corresponding schedule concurrently.
+
+Each rank sends $B/4=2$ MB per step: six steps send 12 MB.
+It also receives 12 MB; do not count sent-plus-received bytes as sent traffic.
+Generally, ring sent traffic is $2B(N-1)/N$ per rank over $2(N-1)$ steps.
 
 <!-- visual:ring-all-reduce-chunk-trace -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="ring-trace-title">
 	<p class="visual-kicker">One chunk, four ranks</p>
 	<p class="visual-title" id="ring-trace-title">Reduction moves the partial sum; gathering moves the finished chunk.</p>
 	<div class="visual-scroll">
-		<svg viewBox="0 0 760 370" role="img" aria-labelledby="ring-trace-svg-title ring-trace-svg-desc">
+		<svg viewBox="0 0 760 370" style="min-width: 800px" role="img" aria-labelledby="ring-trace-svg-title ring-trace-svg-desc">
 			<title id="ring-trace-svg-title">One chunk traced through a four-rank ring all-reduce</title>
 			<desc id="ring-trace-svg-desc">In reduce-scatter, rank zero sends its contribution a zero to rank one, which adds a one. Rank one sends that partial sum to rank two, which adds a two. Rank two sends the next partial sum to rank three, which adds a three and finishes chunk A. In all-gather, rank three sends the finished chunk to rank zero, then rank zero forwards it to rank one, and rank one forwards it to rank two without further addition. Every rank concurrently sends one chunk of size B divided by four in each of the six steps, for three B divided by two bytes per rank.</desc>
 			<text class="viz-axis-label" x="20" y="24">REDUCE-SCATTER · 3 hops · receive, then add the local contribution</text>
@@ -113,62 +153,107 @@ Total: $2(N-1)$ steps, each transferring $B/N$ bytes per rank. **Traffic per ran
 				<text class="viz-node-value" x="665" y="227">RANK 2 RECEIVES</text>
 				<text class="viz-node-label" x="665" y="249">A*</text>
 			</g>
-			<text class="viz-axis-label" x="20" y="301">PER-RANK TRAFFIC FOR N = 4</text>
+			<text class="viz-axis-label" x="20" y="301">PER-RANK SENT BYTES FOR N = 4</text>
 			<rect class="viz-node viz-node--focus" x="20" y="315" width="720" height="38" rx="4"></rect>
 			<text class="viz-callout" x="380" y="339" text-anchor="middle">[3 reduce-scatter sends + 3 all-gather sends] × B/4 = 6B/4 = 3B/2</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow chunk A from left to right. Three reduce-scatter hops build A* from four rank-local contributions; three all-gather hops copy A* to the other ranks without more arithmetic. Every rank does this concurrently for one B/4 chunk per step, so it sends 6 × B/4 = 3B/2 bytes, exactly 2B(N − 1)/N for N = 4. Original schematic based on the <a href="https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/">Baidu ring all-reduce explanation</a> and <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html">NCCL collective semantics</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> three receive-and-add steps build A*. Three forwarding steps distribute that completed chunk. All chunks follow the schedule concurrently. Each rank sends six chunks of size B/4, totaling 3B/2 bytes. This is sent traffic, not sent-plus-received traffic. Sources: <a href="https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/">Baidu ring explanation</a> and <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html">NCCL semantics</a>.</figcaption>
 </figure>
 
-## Where each appears
+## Change 1: The Consumer Needs Only Its Shard
+
+**New task.** The optimizer needs its own portion of the summed gradient, not the full sum everywhere.
+
+**Picture and change.** Stop after reduce-scatter and preserve the optimizer's shard mapping.
+Do not all-gather a result merely to discard the other shards.
+
+**Check.** The two-rank outputs remain `[4]` and `[6]`, not two full buffers.
+In the four-rank ring model, this phase sends 6 MB per rank instead of 12 MB.
+
+**Use when.** Downstream work can consume sharded results.
+
+## Change 2: Thousands of Tiny Buffers
+
+**New task.** Replace one 8 MB buffer with 1,000 separate 8 KB buffers.
+
+**Picture and change.** Total ring bytes stay fixed, but sequential communication steps multiply.
+For effective bandwidth $b$ and per-step latency $\alpha$, use the simplified unoverlapped model
+
+$$
+T_{\mathrm{ring}}\approx2(N-1)\alpha+\frac{2B(N-1)}{Nb}.
+$$
+
+At four ranks, $\alpha=5$ microseconds and $b=1$ GB/s give 12.03 ms for the single buffer.
+The 1,000 serial collectives take 42 ms in this model, despite sending the same 12 MB per rank.
+
+**Check.** Measure backend launch/hop costs, bucketing, tree alternatives and actual topology before selecting an algorithm.
+These calculations are not hardware measurements.
+
+**Use when.** Fixed overhead dominates small messages.
+
+## Failure: Ranks Disagree About the Operation
+
+A skipped call or mismatched shape, dtype, chunk order or collective sequence can hang, fail or invalidate results.
+All participating ranks must follow the process group's matching communication contract.
+
+## Transfer Check
+
+Does a long total collective duration establish the training bottleneck?
+
+### Reasoned Answer
+
+No. Measure its exposed critical-path tail after overlap and contention.
+Summed durations can include work already hidden behind computation.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Where Each Appears
 
 | Distributed pattern | Collectives |
 |---------------------|------------|
-| **DDP** (data parallel) | All-reduce on gradients per backward pass |
-| **FSDP / ZeRO-3** | All-gather on parameters before forward; reduce-scatter on gradients after backward |
-| **Tensor parallelism** | All-reduce on activations after each parallel matmul |
+| **DDP** (data parallel) | Gradient all-reduce at synchronized backward boundaries; accumulation can defer synchronization |
+| **FSDP / ZeRO-3** | Parameter all-gather when needed; gradient reduce-scatter under the selected sharding strategy |
+| **Tensor parallelism** | All-reduce, reduce-scatter or all-gather according to input/output layouts |
 | **Pipeline parallelism** | Point-to-point sends (not collective) between adjacent stages |
 | **Expert parallelism (MoE)** | All-to-all to route tokens to experts |
 | **Embedding lookup at scale** | All-to-all to gather sharded embedding rows |
 
 ## All-to-all
 
-A sixth primitive: each process sends a different chunk to every other process. It is used in MoE token routing and to move a tensor split from one axis to another. Its cost depends on bytes per peer, network bisection bandwidth, routing balance, and topology. It is often a bottleneck, but it is not always more expensive than every other collective.
+Each rank sends destination-specific pieces; receive order follows the agreed source layout.
+MoE routing and layout changes use this exchange.
+Cost depends on peer traffic, balance, bisection bandwidth and topology, not the operation name alone.
 
 ## Hardware backends
 
-- **NCCL** (Nvidia): the dominant backend on Nvidia GPUs; ring + tree implementations, NVLink and InfiniBand aware.
-- **RCCL**: AMD equivalent.
-- **MPI**: classical HPC backend; used outside ML.
-- **Gloo**: PyTorch CPU collective backend (slow).
+- **NCCL:** NVIDIA accelerator communication.
+- **RCCL:** AMD accelerator communication.
+- **MPI:** broader high-performance message passing.
+- **Gloo:** commonly used for CPU collectives and supported distributed interfaces.
+
+Supported operations and selected algorithms depend on version, hardware, group and message size.
 
 ## Bandwidth and topology
 
-At least two physical bandwidth levels matter:
-
-- **Inside a fast accelerator domain**: links such as NVLink, NVSwitch, or an accelerator torus.
-- **Across nodes or slices**: networks such as InfiniBand or Ethernet with RDMA.
-
-A large cluster usually has faster local groups and slower links between groups. Hierarchical collectives reduce or gather inside each local group before using the scale-out network. Use measured bandwidth for the target message size rather than a peak link specification.
+Distinguish local accelerator links from inter-node or inter-slice networks.
+Hierarchical algorithms combine local and scale-out phases.
+Use measured effective bandwidth for the message and schedule, not advertised peak bandwidth.
 
 ## Cost model in DDP
 
-For a model with $P$ parameters, gradient dtype size $s$, and $N$ data-parallel ranks, a ring gradient all-reduce has:
-
-- Logical gradient tensor: $B = Ps$ bytes.
-- Traffic per rank: $2Ps(N-1)/N$ bytes.
-- Large-message lower bound: traffic divided by effective ring bandwidth.
-
-For a 7B parameter model with BF16 gradients, $B=14$ GB. On 32 ranks at 200 GB/s effective ring bandwidth, the bandwidth lower bound is about 136 ms. Fixed latency and contention can increase it. **Gradient bucketing** avoids tiny messages. **Overlap with backward** can hide part of the reduction, so the exposed time in a step trace is more important than total collective duration.
+For $P$ parameters and gradient element size $s$, $B=Ps$ bytes in the ring model.
+Suppose seven billion gradients use BF16, 32 ranks participate, and effective ring bandwidth is 200 GB/s.
+Then $B=14$ GB and per-rank sent traffic is 27.125 GB.
+The bandwidth term is 135.625 ms, not a measured step time.
 
 ## Common pitfalls
 
-- **All-reducing every parameter separately.** Tiny messages are latency-dominated. Use gradient buckets and tune their size, such as PyTorch's `bucket_cap_mb` setting.
-- **No overlap with compute.** PyTorch DDP overlaps automatically; FSDP needs explicit configuration (`forward_prefetch`, `backward_prefetch`).
-- **Mixed dtypes across ranks.** All-reduce requires identical dtype on all ranks; mismatch → cryptic NCCL error.
-- **Hangs from rank desync.** If one rank skips a collective (e.g., divergent code path), all others hang waiting. Use the same control flow on every rank.
-- **Ranking collectives by name alone.** Cost follows bytes, message size, algorithm, balance, and topology. All-to-all is difficult on oversubscribed networks, while a very large all-reduce can still cost more.
+Buckets trade fixed overhead against readiness, memory and overlap.
+DDP/FSDP overlap depends on configuration and schedule; inspect traces rather than assuming it.
+Reduction order can change floating-point rounding even when mathematical outputs agree.
+The integer reference does not model those numerical differences or diagnose distributed hangs.
 
 ## Related
 
@@ -177,3 +262,5 @@ For a 7B parameter model with BF16 gradients, $B=14$ GB. On 32 ranks at 200 GB/s
 - [Pipeline parallelism](/concepts/pipeline-parallelism/). Uses point-to-point, not collectives.
 - [Sharded matrix multiplication](/concepts/sharded-matrix-multiplication/). Select collectives from array layouts.
 - [Accelerator network topology](/concepts/accelerator-network-topology/). Understand the links that carry them.
+
+</div>

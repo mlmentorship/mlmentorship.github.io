@@ -6,8 +6,8 @@ const slots = (values) => [...values.map(String), ...Array(8 - values.length).fi
 const state = (tails, inputIndex, slot, extra = {}) => grid(
   [input.map(String), slots(tails)],
   [
-    { row: 0, col: inputIndex, label: `input i=${inputIndex}`, tone: 'state', key: 'input-cursor' },
-    { row: 1, col: slot, label: `bisect slot=${slot}`, tone: 'focus', key: 'bisect-slot' },
+    { row: 0, col: inputIndex, label: `i=${inputIndex}`, tone: 'state', key: 'input-cursor' },
+    { row: 1, col: slot, label: `j=${slot}`, tone: 'focus', key: 'bisect-slot' },
   ],
   {
     example,

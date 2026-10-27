@@ -5,7 +5,7 @@ const values = ['-9', '-3', '0', '4', '7', '11', '18', '25'];
 const draft = visual('Preserve the inclusive sorted interval that can still contain target 11.', [
   frame(
     'Initialize the candidate interval',
-    'For target 11, left=0 and right=7 keep every index; middle=floor((0+7)/2)=3, whose value is 4.',
+    'Start with left=0, right=7 and target 11. The midpoint is index 3, value 4.',
     array(values, [
       mark(0, 'left', 'state', 'pointer-left'),
       mark(3, 'middle', 'focus', 'pointer-middle'),

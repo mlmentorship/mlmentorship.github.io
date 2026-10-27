@@ -8,7 +8,7 @@ const pointers = (left, right) => [
 const counts = (a, b) => [['A count', String(a)], ['B count', String(b)]];
 
 const draft = visual('Keep a candidate length while window length - historical max frequency stays within k = 1.', [
-  frame('Initialize the scan', 'For "AABABBA" with k = 1, start L = 0, largest_count = 0, best = 0, and inspect R = 0.', arrayMap(items, [], pointers(0, 0), {
+  frame('Initialize the scan', 'For AABABBA, use budget 1. Start both boundaries at 0, historical maximum at 0, and best at 0.', arrayMap(items, [], pointers(0, 0), {
     range: 'empty before reading index 0',
     budget: 'k = 1',
     best: '0',
@@ -33,10 +33,13 @@ const draft = visual('Keep a candidate length while window length - historical m
     formula: '4 - 3 = 1 <= 1',
     best: '4',
   }), 'read-a-3'),
-  frame('Shrink after the budget breaks', 'Adding B at R = 4 makes 5 - 3 = 2. Remove items[0] = A and move L right to 1; the retained length is 4.', arrayMap(items, counts(2, 2), pointers(1, 4), {
+  frame('Shrink after the budget breaks', 'ABAB has current maximum 2 but historical maximum 3. Its length 4 is retained, not certified valid.', arrayMap(items, counts(2, 2), pointers(1, 4), {
     range: '[1..4] = "ABAB"',
     direction: 'L: 0 -> 1 because 5 - 3 > 1',
     formula: '4 - historical max 3 = 1',
+    currentMax: '2',
+    historicalMax: '3',
+    actualEdits: '4 - 2 = 2 > 1: invalid',
     best: '4',
   }), 'shrink-at-4'),
   frame('Shrink again at R = 5', 'Adding B makes counts A:2, B:3 over length 5, so remove items[1] = A and move L right to 2.', arrayMap(items, counts(1, 3), pointers(2, 5), {
@@ -45,10 +48,13 @@ const draft = visual('Keep a candidate length while window length - historical m
     formula: '4 - historical max 3 = 1',
     best: '4',
   }), 'shrink-at-5'),
-  frame('Finish without exceeding four', 'Adding A at R = 6 makes length 5 with historical max 3, so remove items[2] = B and move L to 3. best remains 4.', arrayMap(items, counts(2, 2), pointers(3, 6), {
+  frame('Finish without exceeding four', 'ABBA also needs two edits: current maximum 2, historical maximum 3. Earlier AABA already established the valid best length 4.', arrayMap(items, counts(2, 2), pointers(3, 6), {
     range: '[3..6] = "ABBA"',
     direction: 'L: 2 -> 3 because 5 - 3 > 1',
     formula: 'best = max(4, 4) = 4',
+    currentMax: '2',
+    historicalMax: '3',
+    actualEdits: '4 - 2 = 2 > 1: invalid',
     result: '4',
   }), 'finish-at-6'),
 ]);

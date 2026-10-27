@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: legal-tech, fintech, and regulated-domain LLM interviews.*
 
-The L4 answer is generic RAG. The L6 answer is RAG with explicit handling of citation accuracy, structure-aware chunking, refusal behavior, and regulated-domain operational concerns.
+Design a document-grounded legal information service whose answers can be checked against the correct authorized source passages.
+
+## Problem
+
+**Context.** A hypothetical organization searches legal documents that vary by jurisdiction, effective date, structure, and access permissions.
+Users need answers with source support, including when documents conflict or the evidence is insufficient.
+
+**Task.** Specify ingestion, versioning, retrieval, answer generation, citation verification, abstention, and evaluation.
+Explain how a reviewer can trace a claim to the applicable document version and passage.
+
+**Constraints.** Enforce access permissions before evidence reaches generation, preserve provenance, and distinguish superseded material from current authority.
+Do not present unsupported synthesis as verified legal advice; define escalation and audit requirements.
 
 ## Domain-specific concerns vs generic RAG
 

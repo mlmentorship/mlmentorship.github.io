@@ -76,5 +76,12 @@
       "residual-add-gradient-split"
     ],
     "accessibility": "The SVG has a linked learning title and a detailed description that states the forward equation, both backward branches, their local derivatives, and the final sum. Solid forward arrows and dashed backward arrows, direct branch names, multiplication labels, and explicit algebra preserve all meaning without color. The 360-unit-wide viewBox scales to the content column without a minimum width, keeping labels readable at 390 CSS pixels. Existing theme variables provide light and dark contrast, while the established print rules force a light high-contrast palette and keep the figure together."
+  },
+  "comprehensionRevision": {
+    "date": "2026-10-26",
+    "problem": "A displayed function value f(2)=0.2 did not define the derivative used in the backward calculation, and the loss behind the upstream gradient was implicit.",
+    "change": "Put f(x)=0.1x, its derivative 0.1, and loss y squared over two in the drawing; retain the useful identity and residual paths.",
+    "readerCheck": "Can a reader derive the identity contribution 2.2, residual contribution 0.22, and total gradient 2.42 from the visible function and loss?",
+    "evidenceLimit": "Analytic and finite-difference checks plus expert illustration review, not measured learning outcomes."
   }
 }

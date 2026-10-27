@@ -8,6 +8,25 @@ const adjacency = [
   ['2', '-', '-', '-', '2->3'],
   ['3', '-', '-', '-', '-'],
 ];
+const positions = { 0: { x: 60, y: 105 }, 1: { x: 240, y: 45 }, 2: { x: 240, y: 165 }, 3: { x: 420, y: 105 } };
+const graphCompanion = (extra) => {
+  const counts = extra.indegree.map((entry) => Number(entry.split(':')[1]));
+  const edges = [
+    ...(counts[1] > 0 ? ['0->1'] : []),
+    ...(counts[2] > 0 ? ['0->2'] : []),
+    ...(counts[3] > 1 ? ['1->3'] : []),
+    ...(counts[3] > 0 ? ['2->3'] : []),
+  ];
+  return {
+    nodes: ['0', '1', '2', '3'], edges, positions, edgeLabels: false,
+    ariaLabel: 'Remaining prerequisite edges and course requirement counts',
+    start: extra.current,
+    regions: Object.entries(positions).map(([node, position]) => ({
+      x: position.x, y: position.y + 41,
+      label: `${node}: ${extra.completedCourses?.includes(node) ? 'emitted' : extra.ready?.includes(node) ? 'ready' : `needs ${counts[Number(node)]}`}`,
+    })),
+  };
+};
 const state = (edge, extra = {}) => grid(
   adjacency,
   edge ? [{ row: edge[0], col: edge[1], label: 'remove edge', tone: 'focus', key: 'edge-cursor' }] : [],
@@ -25,13 +44,14 @@ const state = (edge, extra = {}) => grid(
       ...(edge ? [{ key: 'edge-cursor', kind: 'pointer', x: edge[1], y: edge[0], label: adjacency[edge[0]][edge[1]] }] : []),
     ],
     ...extra,
+    graphCompanion: graphCompanion(extra),
   },
 );
 
 const draft = visual('Only dequeue zero-indegree courses; removing their outgoing edges may make new courses ready.', [
   frame(
     'Build the dependency graph',
-    'The four prerequisite pairs create edges 0->1, 0->2, 1->3, and 2->3 with indegrees [0,1,1,2].',
+    'The prerequisite diamond starts with indegrees [0,1,1,2]. Only course 0 is ready.',
     state(null, { indegree: ['0:0', '1:1', '2:1', '3:2'], ready: ['0'], completed: '0' }),
     'initialize-graph-and-queue',
   ),
@@ -96,7 +116,7 @@ const review = {
   recognitionCue: 'Directed prerequisite pairs ask whether every node can be placed after all requirements; failure to process every node means a directed cycle blocks the remainder.',
   invariant: 'Every queued course has indegree zero in the remaining graph, completed counts dequeued courses, and each outgoing edge is removed exactly once when its prerequisite completes.',
   stateModel: 'Retain the directed adjacency graph, one indegree per course, FIFO ready queue, and completed count. A full ordering is unnecessary for this boolean variant.',
-  visualRationale: 'A compact adjacency matrix keeps all four directed edges explicit while a stable edge cursor, ready queue, completed set, and indegrees expose each exact zero transition.',
+  visualRationale: 'A directed diamond removes each residual requirement edge at its exact decrement while node labels, ready queue and counts expose eligibility. The input adjacency matrix remains an optional representation comparison with its original motion identities.',
   rejectedAlternatives: [
     'An indegree table without edges hides which completed prerequisite decrements which course.',
     'A generic queue flowchart omits the dependency topology and cannot explain a blocked cycle.',

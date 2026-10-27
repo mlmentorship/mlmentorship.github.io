@@ -7,7 +7,7 @@ const matrix = (rows, row, col, extra = {}) => grid(rows, cursor(row, col), {
 });
 
 const draft = visual('Preserve first-row and first-column facts, store interior zero instructions in those borders, then apply markers before restoring the borders.', [
-  frame('Inspect the original borders', 'For [[1,0,3],[4,5,6],[7,8,0]], the first row contains 0 but the first column does not.', matrix(
+  frame('Inspect the original borders', 'The first row contains zero. The first column does not.', matrix(
     [['1', '0', '3'], ['4', '5', '6'], ['7', '8', '0']],
     0,
     1,

@@ -9,7 +9,18 @@ category: "questions"
 
 > You inherit a small ML evaluation service with failing tests. Fix a distributed metric bug, add a slice guardrail, and use the provided coding agent where it helps.
 
-The strongest candidate does not start by prompting. They first map the execution path, state the invariant, and decide which work is safe to delegate. The agent accelerates implementation; the candidate owns the plan, review, and proof.
+Repair a small ML evaluation service and demonstrate that its distributed metric and slice guardrail satisfy explicit correctness requirements.
+
+## Problem
+
+**Context.** In this interview exercise, an inherited evaluation codebase has failing tests and a provided coding agent is available.
+The requested changes concern distributed metric aggregation and a slice-level release guardrail.
+
+**Task.** Reproduce the failure, identify the execution path and invariant, implement the smallest repair, and add focused regression tests.
+Explain any agent assistance, review its output, and present evidence that the requested behavior works.
+
+**Constraints.** Follow the exercise's tool and data permissions; assistance is optional and does not transfer responsibility.
+Preserve unrelated behavior, distinguish global from shard-level metrics, and do not weaken tests to make the suite pass.
 
 ## The first eight minutes
 

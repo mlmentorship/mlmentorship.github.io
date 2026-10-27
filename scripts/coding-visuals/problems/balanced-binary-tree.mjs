@@ -5,7 +5,7 @@ const levels = [['1'], ['2', '5'], ['3', '-', '6', '7'], ['4', '-', '-', '-', '-
 const draft = visual('A postorder height function returns a nonnegative height for a balanced subtree and -1 as a failure sentinel that ancestors propagate immediately.', [
   frame(
     'Start bottom-up height evaluation',
-    'For tree [1,2,5,3,null,6,7,4], call height(1), then descend its left chain 1 -> 2 -> 3 -> 4 before evaluating any right sibling.',
+    'Call height(1), then descend through 2 and 3 to leaf 4. No right sibling has been evaluated.',
     tree(levels, [mark(0, 'stack start', 'state'), mark(1, 'stack', 'state'), mark(3, 'stack', 'state'), mark(7, 'current', 'focus')], {
       callStack: '[1,2,3,4]',
       untouchedRightSubtree: '5 with children 6,7',

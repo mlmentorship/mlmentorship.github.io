@@ -11,7 +11,7 @@ const bounds = (left, middle, right, extra = {}) => array(speeds, [
 const draft = visual('Binary-search the first speed whose ceiling-division total is at most 8 hours.', [
   frame(
     'Test the initial midpoint',
-    'Initialize left=1 and right=max(piles)=11, then test speed floor((1+11)/2)=6. Hours are 1+1+2+2=6, so 6 <= 8 and right becomes 6.',
+    'Speed 6 takes 1+1+2+2=6 hours. It meets the eight-hour limit; set right=6.',
     bounds(1, 6, 11, { tested: 'k=6: ceil(3/6)+ceil(6/6)+ceil(7/6)+ceil(11/6)=1+1+2+2=6', decision: '6 <= 8: right = 6' }),
     'keep-feasible-six',
   ),

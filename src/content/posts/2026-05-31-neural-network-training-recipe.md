@@ -1,6 +1,6 @@
 ---
 title: "The neural-network training recipe"
-description: "A systematic procedure for taking a model from 'not training' to 'tuned', the order of operations that separates disciplined practitioners from people who randomly change hyperparameters and hope."
+description: "Inspect data, verify updates, fit a known signal, then test generalization and tune within a declared budget."
 date: "2026-05-31"
 draft: false
 tags: ["concepts"]
@@ -9,25 +9,27 @@ category: "concepts"
 
 ## Summary
 
-A repeatable, ordered procedure for training neural networks: **become one with the data → build a dumb baseline end-to-end → overfit a tiny set → regularize → tune → squeeze**. The discipline is in the *order* and in changing **one thing at a time**.
+A training recipe orders evidence checks before expensive changes: inspect, build a baseline, fit, regularize, tune and refine.
+Passing a fitting check does not establish generalization.
 
-Most failed training runs aren't caused by a bad architecture; they're caused by silent bugs, mis-scaled data, or skipping verification steps. This recipe (popularized by Karpathy's "A Recipe for Training Neural Networks") is what an interviewer is probing when they ask *"your model isn't learning, what do you do?"* It complements the interview-framed answer in [How would you debug a model that's not learning?](/questions/debug-model-not-learning/); this page is the procedural checklist.
+Consider 32 distinct separable inputs, eight per class, with four classes and no regularization.
+Zero logits predict each class with probability $1/4$, giving mean cross-entropy $\log4\approx1.386294$.
+Suppose gradients are nonzero but parameters never change.
+Should you search architectures, or inspect the update path?
 
-The governing principle: **neural net training fails silently.** A wrong label map, an off-by-one in masking, or unnormalized inputs won't crash; they just quietly cap your accuracy. So the recipe is built around *verification at every step*, not speed.
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Use each training phase as an evidence gate; return to the earliest failed assumption instead of tuning around an unverified pipeline.</p>
+<p class="visual-kicker">Return to the earliest failed check</p>
+<p class="visual-title">Nonzero gradients do not prove that an optimizer changed the model.</p>
 
 <!-- visual:training-recipe-evidence-gates -->
 ```mermaid
 flowchart TB
 	accTitle: The neural-network training recipe as evidence gates
-	accDescr: Start by inspecting data and building a simple end-to-end baseline. Advance only if labels, metrics, initial loss, and predictions are trustworthy. Next train without regularization on one tiny fixed batch. If it cannot reach the minimum loss, repair the inputs, loss, gradients, modes, or updates and repeat. If it passes, increase capacity until the full training set can be fit. If that fails, repair optimization or capacity before continuing. Only then add data or regularization and judge validation behavior. Once generalization is credible, tune one variable at a time with random search, then consider ensembles, longer training, or distillation.
+	accDescr: Inspect data and establish a trustworthy baseline. The teaching fixture has 32 distinct inputs in four classes. Zero logits give mean cross-entropy log four. A backward pass produces gradients but leaves parameters unchanged until an optimizer step occurs. Check updates and an attainable fixed-batch fitting threshold before testing full-set fitting, generalization and budgeted tuning. A failed check returns to its supporting assumptions. Tiny-batch success does not establish validation quality, and failure need not imply a software bug if labels conflict or capacity is insufficient.
 	D["1 · Inspect data<br/>simple end-to-end baseline"] --> G1{"Trust labels, metrics,<br/>init loss, predictions?"}
 	G1 -->|"no"| R1["Repair data or evaluation<br/>then repeat the baseline"]
 	R1 -.-> D
-	G1 ==>|"yes"| T["2 · Tiny fixed batch<br/>no regularization"]
-	T --> G2{"Reaches minimum<br/>training loss?"}
+	G1 ==>|"yes"| T["2 · Known 32-example batch<br/>no regularization"]
+	T --> G2{"Weights change?<br/>Known fitting check passes?"}
 	G2 -->|"no"| R2["Repair inputs, loss, gradients,<br/>mode, or parameter updates"]
 	R2 -.-> T
 	G2 ==>|"yes"| F["3 · Fit the full training set<br/>simple known architecture"]
@@ -38,7 +40,7 @@ flowchart TB
 	V --> G4{"Generalization<br/>credible?"}
 	G4 -->|"no"| R4["Run error analysis<br/>revise data or regularization"]
 	R4 -.-> V
-	G4 ==>|"yes"| H["5 · Tune with random search<br/>one controlled change at a time"]
+	G4 ==>|"yes"| H["5 · Budgeted search<br/>record every trial"]
 	H --> S["6 · Squeeze<br/>longer training · ensemble · distill"]
 	class D,T,F,V viz-input
 	class G1,G2,G3,G4 viz-focus
@@ -48,71 +50,166 @@ flowchart TB
 	class D viz-wide
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the heavy “yes” spine downward. Every gate earns the next kind of work: trustworthy data earns a tiny-batch test, memorizing that batch earns full-set fitting, fitting earns regularization, and credible validation earns tuning. A “no” loops locally to repair evidence; it never skips ahead to hyperparameter search. Original synthesis checked against <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy’s training recipe</a>, <a href="https://www.deeplearningbook.org/contents/guidelines.html"><cite>Deep Learning</cite>’s practical methodology</a>, and <a href="https://jmlr.org/papers/v13/bergstra12a.html">Bergstra and Bengio’s random-search paper</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> verify the update before tuning its hyperparameters. Each failed gate sends you back to the evidence needed for that stage, not to an unrelated architecture search.</p>
+<p class="diagram-source">References: <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's recipe</a>, <a href="https://www.deeplearningbook.org/contents/guidelines.html">Deep Learning practical methodology</a>, and <a href="https://jmlr.org/papers/v13/bergstra12a.html">Bergstra and Bengio</a>.</p>
+
+## Check the update, then fit the known batch
+
+With no update, the same fixed inputs retain the same predictions and loss.
+Inspect optimizer ownership, learning rate and `step()`, not only `backward()`.
+
+This complete CPU fixture separates gradient creation from a parameter update.
+Its 500-update budget and $0.02$ loss threshold are diagnostic choices, not convergence guarantees for other datasets.
+
+```python
+import torch
+from torch import nn
+
+torch.manual_seed(0)
+scales = torch.linspace(0.9, 1.1, 8).repeat(4)
+inputs = torch.eye(4).repeat_interleave(8, dim=0) * scales[:, None]
+targets = torch.arange(4).repeat_interleave(8)
+model = nn.Linear(4, 4)
+with torch.no_grad():
+	model.weight.zero_()
+	model.bias.zero_()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.05)
+criterion = nn.CrossEntropyLoss()
+model.train()
+
+before = model.weight.detach().clone()
+optimizer.zero_grad(set_to_none=True)
+initial_loss = criterion(model(inputs), targets)
+initial_loss.backward()
+assert model.weight.grad.abs().sum().item() > 0
+assert torch.equal(before, model.weight)
+optimizer.step()
+assert not torch.equal(before, model.weight)
+
+for update in range(499):
+	optimizer.zero_grad(set_to_none=True)
+	loss = criterion(model(inputs), targets)
+	loss.backward()
+	optimizer.step()
+
+model.eval()
+with torch.no_grad():
+	final_loss = criterion(model(inputs), targets)
+assert final_loss.item() < 0.02
+print(initial_loss.item(), final_loss.item())
+```
+
+A true-class probability of $0.99$ gives $-\log0.99\approx0.0100503$, below that illustrative threshold.
+Neither number establishes held-out performance.
+
+## Follow the evidence gates
+
+| Stage | Evidence before proceeding |
+| --- | --- |
+| Inspect | Raw and transformed examples, labels, duplicates, corruption, leakage and slice distributions |
+| End-to-end baseline | Checkable metrics, predictions, expected loss and correct updates |
+| Fit | Appropriate known architecture can fit the attainable training signal |
+| Regularize | Held-out quality improves under task-valid interventions |
+| Tune | Search space, budget, selection and all outcomes recorded |
+| Refine | Longer training, ensemble or distillation justified by measured value and cost |
+
+## Change the prior or search purpose
+
+### 1. Initialize a nonuniform prior
+
+**New task:** class proportions become `[0.7, 0.1, 0.1, 0.1]`.
+
+**Picture and change:** use zero final-layer weights and biases $b_k=\log\pi_k$, for positive priors.
+Softmax then predicts the declared proportions.
+
+**Check:** mean loss at those frequencies is $-\sum_k\pi_k\log\pi_k\approx0.940448$, not $\log4$.
+That lower initial loss is not a bug.
+
+**Use when:** a deliberate marginal baseline replaces uniform predictions.
+
+### 2. Spend 12 trials on search
+
+**New task:** the verified pipeline has 12 tuning trials left.
+
+**Picture and change:** sample learning rate and weight decay jointly over declared log ranges.
+For causal diagnosis, instead vary one factor under a matched comparison.
+
+**Check:** a three-rate by four-decay grid tests only three rates.
+Twelve continuous random draws can explore twelve, but do not isolate a causal learning-rate effect.
+
+**Use when:** broad search coverage, rather than an explanatory intervention, is the goal.
+
+## A tiny-batch failure is not always a bug
+
+Two identical inputs with contradictory binary labels cannot both be fitted by a deterministic predictor.
+Their minimum mean cross-entropy is $\log2$, reached by predicting one half.
+Inspect target consistency, capacity and the attainable loss before demanding zero.
+
+## Transfer to a binary baseline
+
+For a 1% positive prior, must initial loss equal $\log2$?
+
+<details>
+<summary>Check your answer</summary>
+
+No. With zero weights, bias $\log(0.01/0.99)\approx-4.5951$ predicts that prior.
+At matching class frequencies, binary entropy is about $0.0560$.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Step 1: Become one with the data
 
-Before writing a model, **look at the data**. Scroll through hundreds of examples, check label distributions, look for duplicates, corruption, and leakage. Search for patterns the model could exploit. Write simple filters to find outliers. Most of the eventual error analysis is foreshadowed here. Do **not** touch model code yet.
+Inspect the exact transformed tensors and labels entering the model, not only raw files.
+Look for shortcuts, outliers and corruption.
 
 ## Step 2: End-to-end skeleton + dumb baseline
 
-Build the full training/eval pipeline with a trivial model, and establish trustworthy baselines. Key checks:
-
-- **Fix the random seed.** Reproducibility first.
-- **Disable augmentation/regularization** initially; you're verifying the pipeline, not generalization.
-- **Verify the loss at init.** A softmax over $C$ classes should start near $-\log(1/C)$. If it doesn't, your init or loss is wrong.
-- **Init the final-layer bias** to the data's marginal (e.g. log base rate) so the model doesn't waste the first epochs learning the prior.
-- **Overfit one batch.** A correct model with enough capacity should drive a single batch's loss to ~0. If it can't, you have a bug; stop and find it.
-- **Visualize predictions** on a fixed batch across training to watch them evolve.
-- **Use a baseline** (human, simple model, or input-independent) to know what "good" even is.
+Use simple, input-independent and task-appropriate human baselines.
+Track fixed predictions as well as loss.
+Simplify augmentation and regularization during diagnosis.
+Seeds help reproduce a comparison but do not guarantee determinism or generalization.
 
 ## Step 3: Overfit
 
-Get a model big enough to **overfit the training set** (drive training loss low), proving the architecture + optimization can fit the signal. Pick a well-known architecture for the task rather than inventing one. Use **Adam at lr ≈ 3e-4** as a safe default early; complexify **one piece at a time**. Don't trust learning-rate-decay schedules copied from other settings yet.
-
-At this point you've separated the two problems: **can it fit** (step 3) and **does it generalize** (step 4).
+Prefer a known architecture while separating fitting from generalization.
+Adam near $3\times10^{-4}$ is a starting hypothesis for some tasks, not a correctness condition.
+Do not copy an epoch-based schedule without checking its update and data units.
 
 ## Step 4: Regularize
 
-Now trade some training fit for validation performance. In rough order of leverage:
-
-- **Get more data** (by far the best regularizer).
-- **Data augmentation** (and aggressive/synthetic augmentation if needed).
-- **Pretraining / transfer learning** where applicable.
-- **Smaller model / bottleneck**, **weight decay**, **dropout**, **early stopping**.
-- Reduce input dimensionality / remove leaky features.
-- Prefer a **larger model with early stopping** over a perfectly-sized one; it usually generalizes at least as well.
+Options include relevant clean data, valid augmentation, synthetic data, pretraining, smaller models, bottlenecks and lower input dimensionality.
+Also test weight decay, dropout and early stopping.
+Remove leakage before evaluation; it is not a regularization strategy.
+More data or a larger early-stopped model is not universally better.
 
 ## Step 5: Tune
 
-With a working, regularized model, search hyperparameters:
-
-- **Random search > grid search** (some hyperparameters matter far more than others; random covers them better).
-- Tune learning rate and weight decay first; they dominate.
-- Consider Bayesian optimization once the cheap wins are taken.
+Random search can cover influential dimensions more effectively than a grid with repeated values.
+Bayesian optimization is another budget-dependent option.
+Preserve untouched confirmation data after adaptive selection.
 
 ## Step 6: Squeeze the last drops
 
-- **Ensembles** reliably add ~1–2%: average several independently trained models.
-- **Train longer than feels reasonable**: models often keep improving well past where people stop.
-- Knowledge distillation if you need the ensemble's quality in one model.
+Evaluate longer training, ensembles and distillation against latency, memory, quality and compute budgets.
+No fixed ensemble gain or improvement from indefinite training is guaranteed.
 
 ## What an interviewer expects you to say
 
-1. Emphasize that **NN training fails silently**, so the method is *verify at every step*, not *change things fast*.
-2. **Inspect the data first**; never start with the model.
-3. Build an **end-to-end skeleton**, verify **init loss** and **overfit a single batch** before scaling.
-4. Separate **"can it fit" (overfit first) from "does it generalize" (regularize second)**, and only then tune.
-5. Change **one variable at a time**; use **random search**; the biggest regularizer is **more data**.
+Name the failed gate and the observation that would justify proceeding.
+For loop-state details, use [the complete debugging fixture](/questions/debug-training-loop/).
 
 ## Common confusions
 
-- **"Just grid-search hyperparameters."** Premature: if you can't overfit one batch, no hyperparameter will save you. Find the bug first.
-- **"A low training loss at init is fine."** Verify it equals the theoretical value ($-\log(1/C)$). A wrong value signals a bug.
-- **"Regularize from the start."** Regularizing before you can overfit hides whether the model can fit the signal at all. Overfit first, regularize second.
-- **"Bigger models overfit, so go small."** A larger model with early stopping usually generalizes as well or better; capacity isn't the enemy, lack of regularization is.
-- **"Stop when the curve flattens."** Many models keep improving with much longer training; don't stop early by reflex.
+Initial loss depends on predictions, targets, weighting and reduction.
+Failed fitting, generalization and search are different problems.
+Use declared evidence and stopping rules, not remembered defaults.
 
 ---
 
 *Related: [How would you debug a model that's not learning?](/questions/debug-model-not-learning/), [Debug this training loop](/questions/debug-training-loop/), [How to choose a learning rate](/questions/how-to-choose-learning-rate/), [Regularization](/concepts/regularization/), [Exploding and vanishing gradients](/concepts/exploding-vanishing-gradients/).*
+
+</div>

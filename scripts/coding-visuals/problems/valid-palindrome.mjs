@@ -4,29 +4,29 @@ const chars = ['A', ',', 'space', 'b', 'space', 'a', '!'];
 const state = (left, right, extra = {}) => array(chars, [
   mark(left, 'L', 'state', 'left-pointer'),
   mark(right, 'R', 'focus', 'right-pointer'),
-], { coveredRange: `[${left}..${right}]`, ...extra });
+], { coveredRange: `[${left}..${right}]`, fitArray: true, arrayColumns: 7, ...extra });
 
 const draft = visual('Keep raw text in place, skip non-alphanumeric endpoints one at a time, and move both pointers only after a case-insensitive match.', [
   frame('Initialize at both raw endpoints', 'For "A, b a!", L=0 points to A and R=6 points to !.', state(0, 6, {
     action: 'initialize opposite-end pointers',
   }), 'initialize'),
-  frame('Skip punctuation on the right', 'L points to alphanumeric A, but R points to !, so the elif branch decrements only R from 6 to 5.', state(0, 5, {
+  frame('Skip punctuation on the right', 'L points to alphanumeric A. R points to !, so decrement only R from 6 to 5.', state(0, 5, {
     movement: 'R: 6 -> 5 because ! is not alphanumeric',
   }), 'skip-right-punctuation'),
-  frame('Compare the first real pair', 'A.lower() equals a.lower(), so both pointers move inward: L 0->1 and R 5->4.', state(1, 4, {
+  frame('Compare the first pair', 'A and a match after lowercase comparison. Advance L from 0 to 1 and R from 5 to 4.', state(1, 4, {
     comparison: 'a == a',
     movement: 'L: 0 -> 1; R: 5 -> 4 after match',
   }), 'match-a'),
-  frame('Skip the comma on the left', 'At L=1, comma is not alphanumeric; the first if branch increments only L to 2.', state(2, 4, {
+  frame('Skip the comma on the left', 'At L=1, comma is not alphanumeric. Increment only L to 2.', state(2, 4, {
     movement: 'L: 1 -> 2 because comma is not alphanumeric',
   }), 'skip-comma'),
   frame('Skip the space on the left', 'At L=2, space is not alphanumeric, so L advances again to index 3.', state(3, 4, {
     movement: 'L: 2 -> 3 because space is not alphanumeric',
   }), 'skip-left-space'),
-  frame('Skip the space on the right', 'L now points to b, while R=4 is a space; decrement only R to 3.', state(3, 3, {
+  frame('Skip the space on the right', 'L points to b and R=4 points to a space. Decrement only R to 3.', state(3, 3, {
     movement: 'R: 4 -> 3 because space is not alphanumeric',
   }), 'skip-right-space'),
-  frame('Stop when pointers meet', 'Now L=R=3 at b, so left < right is false; every compared pair matched and the function returns true.', state(3, 3, {
+  frame('Stop when pointers meet', 'Now L=R=3 at b, so left < right is false. Every outer pair matched, so return True.', state(3, 3, {
     guard: '3 < 3 is false',
     result: 'true',
   }), 'finish'),

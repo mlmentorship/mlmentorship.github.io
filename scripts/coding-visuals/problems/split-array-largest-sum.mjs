@@ -9,7 +9,7 @@ const searchScene = (mid, marks, extra) => array(nums, marks, {
 });
 
 const draft = visual('Binary-search the first feasible capacity because the greedy number of contiguous parts never increases when capacity grows.', [
-  frame('Initialize answer bounds', 'For nums = [7,2,5,10,8] and k = 2, no limit below max(nums)=10 can hold 10, while sum(nums)=32 always fits in one part.', searchScene(21, [], {
+  frame('Initialize answer bounds', 'Capacity must cover the largest value, 10. Capacity 32 fits the whole array.', searchScene(21, [], {
     bounds: 'lo = 10, hi = 32',
     midpoint: '(10 + 32) // 2 = 21',
     partition: 'not tested yet',

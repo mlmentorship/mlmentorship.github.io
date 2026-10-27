@@ -1,42 +1,43 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const values = ['6', '7', '8', '1', '2', '3', '4', '5'];
+const fitted = (items, marks, extra) => array(items, marks, { fitArray: true, arrayColumns: 8, ...extra });
 
 const draft = visual('Retain the minimum by comparing middle with the current right boundary.', [
   frame(
-    'Keep middle and everything left',
-    'left=0, right=7, middle=3. Since nums[3]=1 <= nums[7]=5, middle may be the minimum; set right=middle=3.',
-    array(values, [
-      mark(0, 'left', 'state', 'pointer-left'),
-      mark(3, 'middle', 'focus', 'pointer-middle'),
-      mark(7, 'right', 'state', 'pointer-right'),
+    'Keep the midpoint',
+    'left=0, right=7, middle=3. The comparison 1 < 5 permits a midpoint minimum, so set right=3.',
+    fitted(values, [
+      mark(0, 'L', 'state', 'pointer-left'),
+      mark(3, 'm', 'focus', 'pointer-middle'),
+      mark(7, 'R', 'state', 'pointer-right'),
     ], { interval: '[0, 7]', comparison: '1 <= 5', decision: 'right = 3' }),
     'retain-middle',
   ),
   frame(
-    'Discard middle and everything left',
-    'Now left=0, right=3, middle=1. Since nums[1]=7 > nums[3]=1, the rotation drop is strictly right of middle; set left=middle+1=2.',
-    array(values, [
-      mark(0, 'left', 'state', 'pointer-left'),
-      mark(1, 'middle', 'focus', 'pointer-middle'),
-      mark(3, 'right', 'state', 'pointer-right'),
+    'Discard the left part',
+    'Now left=0, right=3, middle=1. Since 7 > 1, the drop follows middle, so set left=2.',
+    fitted(values, [
+      mark(0, 'L', 'state', 'pointer-left'),
+      mark(1, 'm', 'focus', 'pointer-middle'),
+      mark(3, 'R', 'state', 'pointer-right'),
     ], { interval: '[0, 3]', comparison: '7 > 1', decision: 'left = 2' }),
     'discard-left-run',
   ),
   frame(
-    'Move left past middle again',
-    'Now left=2, right=3, middle=2. Since nums[2]=8 > nums[3]=1, index 2 cannot be the minimum; set left=3.',
-    array(values, [
-      mark(2, 'left = middle', 'focus', 'pointer-middle'),
-      mark(3, 'right', 'state', 'pointer-right'),
+    'Discard midpoint 2',
+    'Now left=2, right=3, middle=2. Since 8 > 1, index 2 cannot be minimum, so set left=3.',
+    fitted(values, [
+      mark(2, 'L=m', 'focus', 'pointer-middle'),
+      mark(3, 'R', 'state', 'pointer-right'),
     ], { interval: '[2, 3]', comparison: '8 > 1', decision: 'left = 3' }),
     'discard-eight',
   ),
   frame(
     'Return the converged value',
     'left and right meet at index 3. The invariant leaves nums[3]=1 as the only possible minimum.',
-    array(values, [
-      mark(3, 'left = right = minimum', 'output', 'pointer-middle'),
+    fitted(values, [
+      mark(3, 'min', 'output', 'pointer-middle'),
     ], { interval: '[3, 3]', result: '1' }),
     'return-minimum',
   ),

@@ -8,12 +8,24 @@ const rows = [
   { value: 5, shifted: 2, low: 1, answer: [0, 1, 1, 2, 1, 2, 0] },
   { value: 6, shifted: 3, low: 0, answer: [0, 1, 1, 2, 1, 2, 2] },
 ];
+const dependency = (value, shifted, low) => ({
+  nodes: [String(value), String(shifted)],
+  edges: [`${value}->${shifted}`],
+  edgeLabels: { [`${value}->${shifted}`]: `+ ${low}` },
+  positions: { [value]: { x: 270, y: 65 }, [shifted]: { x: 90, y: 65 } },
+  width: 360,
+  height: 130,
+  start: String(value),
+  markerId: `counting-bits-edge-${value}`,
+  ariaLabel: `Count for integer ${value} reuses integer ${shifted}, then adds low bit ${low}`,
+});
 
 const draft = visual('The set-bit count for value reuses the completed count for value >> 1 and adds value & 1.', [
   frame(
     'Initialize answer[0]',
     'For limit 6, allocate seven cells. Zero has no set bits, so answer[0] = 0 before the loop starts.',
-    array(['0', '?', '?', '?', '?', '?', '?'], [mark(0, 'base value 0', 'state', 'current-value')], {
+    array(['0', '?', '?', '?', '?', '?', '?'], [mark(0, 'v=0', 'state', 'current-value')], {
+      fitArray: true,
       input: 'limit = 6',
       invariant: 'entries below the next value are complete',
     }),
@@ -23,9 +35,12 @@ const draft = visual('The set-bit count for value reuses the completed count for
     `Compute answer[${value}]`,
     `${value} is ${value.toString(2)}₂: answer[${value}] = answer[${shifted}] + ${low} = ${answer[shifted]} + ${low} = ${answer[value]}.`,
     array(answer.map((count, index) => index <= value ? String(count) : '?'), [
-      mark(shifted, `dependency ${shifted}`, 'state', 'shifted-value'),
-      mark(value, `write ${value}`, value === 6 ? 'output' : 'focus', 'current-value'),
+      mark(shifted, `p=${shifted}`, 'state', 'shifted-value'),
+      mark(value, `v=${value}`, value === 6 ? 'output' : 'focus', 'current-value'),
     ], {
+      fitArray: true,
+      graphCompanion: dependency(value, shifted, low),
+      indexMeaning: 'v = value being solved; p = value >> 1',
       shift: `${value} >> 1 = ${shifted}`,
       lowBit: `${value} & 1 = ${low}`,
       recurrence: `answer[${value}] = ${answer[shifted]} + ${low} = ${answer[value]}`,

@@ -1,6 +1,6 @@
 ---
-title: "Reverse Linked List"
-description: "Reverse all links in a singly linked list."
+title: "Save the remaining chain before reversing the current link"
+description: "Maintain disjoint reversed and untouched regions, preserve node identity, then copy the result or use bounded recursive control."
 date: "2026-09-01"
 draft: false
 tags: ["coding interview", "data structures"]
@@ -13,17 +13,49 @@ aliases: []
 prerequisites: []
 ---
 
-> Reverse all links in a singly linked list.
+Reverse the order of a linked list's existing nodes by changing their next references.
 
-Start with the concrete trace below. It shows the state the algorithm must carry as it runs.
+## Problem
+
+**Input.** The head of a finite acyclic singly linked list, with permission to change its `next` links.
+
+**Output.** Return the new head after reversing the original nodes' order.
+
+**Rules.** Reuse every node and retain its value; do not copy values into replacement nodes.
+The former head becomes the tail and must point to `None`.
+Repeated values are allowed. An empty list returns `None`; a singleton returns the same node.
+
+**Example.** `1 -> 2 -> 3 -> 4 -> None` becomes `4 -> 3 -> 2 -> 1 -> None`.
+The returned head is the original node valued 4.
+
+## Picture
+
+Maintain two disjoint regions containing every original node exactly once:
+
+- `previous` heads the reversed prefix.
+- `head` is the current node heading the untouched suffix.
+
+Initially, the prefix is empty and the suffix contains all four nodes.
+Save node `2`, set `1.next` to `None`, then move `previous` to `1` and `head` to `2`.
+After the next iteration, the regions are `previous: 2 -> 1 -> None` and `head: 3 -> 4 -> None`.
+
+Redirecting the current node's edge cannot lose the suffix because `next_node` still references its original successor.
+Moving both working references restores the same two-region invariant with one more reversed node.
+When `head` becomes `None`, `previous` heads the complete result.
 
 <!-- visual:reverse-linked-list-state -->
-<figure class="learning-figure coding-visual-figure" aria-labelledby="reverse-linked-list-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="reverse-linked-list-state-title">Reverse Linked List: Preserve the unreversed suffix before redirecting each current.next, then advance the previous/current boundary one node.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="reverse-linked-list" role="group" tabindex="0" aria-label="Reverse Linked List: Preserve the unreversed suffix before redirecting each current.next, then advance the previous/current boundary one node."><div class="coding-visual-example"><span>Input and goal</span><strong>Reverse all links in a singly linked list.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize-pointers" role="group" aria-label="Initialize the two list regions"><div class="coding-trace-frame-heading"><span>Initialize the two list regions</span><strong>For 1-&gt;2-&gt;3-&gt;4-&gt;null, previous = null and head/current = 1. The whole list is still the unreversed suffix.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span><small data-motion-key="pointer-current">current</small></span><span class="coding-trace-link-arrow" data-motion-key="link-1-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-4">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span></span></div></div><div class="coding-trace-meta"><span><b>previous</b>null</span><span><b>actualLinks</b>1-&gt;2, 2-&gt;3, 3-&gt;4, 4-&gt;null</span></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="reverse-node-1" hidden role="group" aria-label="Reverse the link at node 1"><div class="coding-trace-frame-heading"><span>Reverse the link at node 1</span><strong>Save next_node = 2, write 1.next = null, then set previous = 1 and head = 2. The saved pointer prevents losing nodes 2-&gt;3-&gt;4.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span><small data-motion-key="pointer-current">current</small></span><span class="coding-trace-link-arrow" data-motion-key="link-2-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-4">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span></span></div><div class="coding-trace-linked-row"><span class="coding-trace-label">second</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>reversedPrefix</b>1-&gt;null</span><span><b>unreversedSuffix</b>2-&gt;3-&gt;4-&gt;null</span><span><b>savedNext</b>2</span></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="reverse-node-2" hidden role="group" aria-label="Reverse the link at node 2"><div class="coding-trace-frame-heading"><span>Reverse the link at node 2</span><strong>Save next_node = 3, write 2.next = 1, then advance previous = 2 and head = 3.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span><small data-motion-key="pointer-current">current</small></span><span class="coding-trace-link-arrow" data-motion-key="link-3-4">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span></span></div><div class="coding-trace-linked-row"><span class="coding-trace-label">second</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>reversedPrefix</b>2-&gt;1-&gt;null</span><span><b>unreversedSuffix</b>3-&gt;4-&gt;null</span><span><b>savedNext</b>3</span></div></div><div class="coding-trace-frame" data-coding-frame="3" data-frame-key="reverse-node-3" hidden role="group" aria-label="Reverse the link at node 3"><div class="coding-trace-frame-heading"><span>Reverse the link at node 3</span><strong>Save next_node = 4, write 3.next = 2, then advance previous = 3 and head = 4.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span><small data-motion-key="pointer-current">current</small></span></div><div class="coding-trace-linked-row"><span class="coding-trace-label">second</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>reversedPrefix</b>3-&gt;2-&gt;1-&gt;null</span><span><b>unreversedSuffix</b>4-&gt;null</span><span><b>savedNext</b>4</span></div></div><div class="coding-trace-frame" data-coding-frame="4" data-frame-key="reverse-node-4" hidden role="group" aria-label="Reverse the final link"><div class="coding-trace-frame-heading"><span>Reverse the final link</span><strong>Save next_node = null, write 4.next = 3, then set previous = 4 and head = null. The while condition now fails.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node trace-tone-output" data-motion-key="node-4"><span>4</span><small data-motion-key="pointer-previous">previous</small></span><span class="coding-trace-link-arrow" data-motion-key="link-4-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>current</b>null</span><span><b>actualLinks</b>4-&gt;3, 3-&gt;2, 2-&gt;1, 1-&gt;null</span></div></div><div class="coding-trace-frame" data-coding-frame="5" data-frame-key="return-previous" hidden role="group" aria-label="Return the new head"><div class="coding-trace-frame-heading"><span>Return the new head</span><strong>previous points to node 4, the head of the fully reversed chain 4-&gt;3-&gt;2-&gt;1-&gt;null.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node trace-tone-output" data-motion-key="node-4"><span>4</span><small data-motion-key="pointer-new head">new head</small></span><span class="coding-trace-link-arrow" data-motion-key="link-4-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>result</b>4 -&gt; 3 -&gt; 2 -&gt; 1</span></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 6</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize the two list regions</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Reverse the link at node 1</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Reverse the link at node 2</strong></button><button type="button" data-coding-frame-button="3"><span>4</span><strong>Reverse the link at node 3</strong></button><button type="button" data-coding-frame-button="4"><span>5</span><strong>Reverse the final link</strong></button><button type="button" data-coding-frame-button="5"><span>6</span><strong>Return the new head</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">Use it when a forward-only chain must reverse direction in constant extra space and changing current.next would otherwise destroy access to the unprocessed suffix.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">Before each iteration, previous heads a fully reversed prefix, head heads the untouched forward suffix, and together those disjoint regions contain every original node exactly once.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">Before mutating the only route to remaining work, save that route; then rewire and advance the boundary. This applies to list splicing, segment reversal, and in-place pointer transformations.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> For 1-&gt;2-&gt;3-&gt;4-&gt;null, previous = null and head/current = 1. The whole list is still the unreversed suffix. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
+<figure class="learning-figure coding-visual-figure" aria-labelledby="reverse-linked-list-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="reverse-linked-list-state-title">Save the remaining chain before reversing the current link: Preserve the unreversed suffix before redirecting each current.next, then advance the previous/current boundary one node.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="reverse-linked-list" role="group" tabindex="0" aria-label="Save the remaining chain before reversing the current link: Preserve the unreversed suffix before redirecting each current.next, then advance the previous/current boundary one node."><div class="coding-visual-example"><span>Input and goal</span><strong>Reverse all links in a singly linked list.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize-pointers" role="group" aria-label="Initialize the two list regions"><div class="coding-trace-frame-heading"><span>Initialize the two list regions</span><strong>Start with an empty reversed prefix. The current reference points to the untouched four-node chain.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span><small data-motion-key="pointer-current">current</small></span><span class="coding-trace-link-arrow" data-motion-key="link-1-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-4">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span></span></div></div><div class="coding-trace-meta"><span><b>previous</b>null</span><span><b>actualLinks</b>1-&gt;2, 2-&gt;3, 3-&gt;4, 4-&gt;null</span></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="reverse-node-1" hidden role="group" aria-label="Reverse the link at node 1"><div class="coding-trace-frame-heading"><span>Reverse the link at node 1</span><strong>Save next_node = 2, write 1.next = null, then set previous = 1 and head = 2. The saved pointer prevents losing nodes 2-&gt;3-&gt;4.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span><small data-motion-key="pointer-current">current</small></span><span class="coding-trace-link-arrow" data-motion-key="link-2-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-4">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span></span></div><div class="coding-trace-linked-row"><span class="coding-trace-label">previous</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>reversedPrefix</b>1-&gt;null</span><span><b>unreversedSuffix</b>2-&gt;3-&gt;4-&gt;null</span><span><b>savedNext</b>2</span></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="reverse-node-2" hidden role="group" aria-label="Reverse the link at node 2"><div class="coding-trace-frame-heading"><span>Reverse the link at node 2</span><strong>Save next_node = 3, write 2.next = 1, then advance previous = 2 and head = 3.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span><small data-motion-key="pointer-current">current</small></span><span class="coding-trace-link-arrow" data-motion-key="link-3-4">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span></span></div><div class="coding-trace-linked-row"><span class="coding-trace-label">previous</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>reversedPrefix</b>2-&gt;1-&gt;null</span><span><b>unreversedSuffix</b>3-&gt;4-&gt;null</span><span><b>savedNext</b>3</span></div></div><div class="coding-trace-frame" data-coding-frame="3" data-frame-key="reverse-node-3" hidden role="group" aria-label="Reverse the link at node 3"><div class="coding-trace-frame-heading"><span>Reverse the link at node 3</span><strong>Save next_node = 4, write 3.next = 2, then advance previous = 3 and head = 4.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node" data-motion-key="node-4"><span>4</span><small data-motion-key="pointer-current">current</small></span></div><div class="coding-trace-linked-row"><span class="coding-trace-label">previous</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>reversedPrefix</b>3-&gt;2-&gt;1-&gt;null</span><span><b>unreversedSuffix</b>4-&gt;null</span><span><b>savedNext</b>4</span></div></div><div class="coding-trace-frame" data-coding-frame="4" data-frame-key="reverse-node-4" hidden role="group" aria-label="Reverse the final link"><div class="coding-trace-frame-heading"><span>Reverse the final link</span><strong>Save next_node = null, write 4.next = 3, then set previous = 4 and head = null. The while condition now fails.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node trace-tone-output" data-motion-key="node-4"><span>4</span><small data-motion-key="pointer-previous">previous</small></span><span class="coding-trace-link-arrow" data-motion-key="link-4-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>current</b>null</span><span><b>actualLinks</b>4-&gt;3, 3-&gt;2, 2-&gt;1, 1-&gt;null</span></div></div><div class="coding-trace-frame" data-coding-frame="5" data-frame-key="return-previous" hidden role="group" aria-label="Return the new head"><div class="coding-trace-frame-heading"><span>Return the new head</span><strong>previous points to node 4, the head of the fully reversed chain 4-&gt;3-&gt;2-&gt;1-&gt;null.</strong></div><div class="coding-trace-linked"><div class="coding-trace-linked-row"><span class="coding-trace-linked-node trace-tone-output" data-motion-key="node-4"><span>4</span><small data-motion-key="pointer-new head">new head</small></span><span class="coding-trace-link-arrow" data-motion-key="link-4-3">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-3"><span>3</span></span><span class="coding-trace-link-arrow" data-motion-key="link-3-2">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-2"><span>2</span></span><span class="coding-trace-link-arrow" data-motion-key="link-2-1">&rarr;</span><span class="coding-trace-linked-node" data-motion-key="node-1"><span>1</span></span></div></div><div class="coding-trace-meta"><span><b>result</b>4 -&gt; 3 -&gt; 2 -&gt; 1</span></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 6</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize the two list regions</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Reverse the link at node 1</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Reverse the link at node 2</strong></button><button type="button" data-coding-frame-button="3"><span>4</span><strong>Reverse the link at node 3</strong></button><button type="button" data-coding-frame-button="4"><span>5</span><strong>Reverse the final link</strong></button><button type="button" data-coding-frame-button="5"><span>6</span><strong>Return the new head</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">Use it when a forward-only chain must reverse direction in constant extra space and changing current.next would otherwise destroy access to the unprocessed suffix.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">Before each iteration, previous heads a fully reversed prefix, head heads the untouched forward suffix, and together those disjoint regions contain every original node exactly once.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">Before mutating the only route to remaining work, save that route; then rewire and advance the boundary. This applies to list splicing, segment reversal, and in-place pointer transformations.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> Start with an empty reversed prefix. The current reference points to the untouched four-node chain. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
 
-**Pattern:** Previous, current, and next pointers.
+## Code
 
-**Simple idea:** Save the next node. Point the current node backward. Move both working
-pointers forward.
+The platform supplies `ListNode`; use this definition when running all blocks together locally.
+
+```python
+class ListNode:
+   def __init__(self, val=0, next=None):
+      self.val = val
+      self.next = next
+```
 
 ```python
 def reverse_list(head: ListNode | None) -> ListNode | None:
@@ -38,6 +70,67 @@ def reverse_list(head: ListNode | None) -> ListNode | None:
    return previous
 ```
 
-**Cost:** $O(n)$ time and $O(1)$ space.
+Each node crosses the boundary once, giving $O(N)$ link work and $O(1)$ extra references.
+The old head becomes the null-ended tail; payload values stay attached to their original nodes.
 
-The platform supplies `ListNode` with `val` and `next`; this snippet assumes that definition.
+### Failure Check
+
+Writing `head.next = previous` before saving the successor can destroy the only route to the untouched suffix.
+Returning the exhausted `head` gives `None`, not the new head.
+Reversing twice must restore original identity order and all original links, not merely the same values.
+
+<!-- learning:core-end -->
+
+## Change to a Reversed Copy
+
+**New task:** Preserve every original link and allocate an independent result chain.
+
+**Picture and change:** Read the original forward, prepending one copied value to the new chain at each step.
+
+```python
+def reversed_copy(head):
+   copied = None
+   while head:
+      copied = ListNode(head.val, copied)
+      head = head.next
+   return copied
+```
+
+**Check:** The example returns new nodes with values `[4,3,2,1]`; the original still links `[1,2,3,4]`.
+No output node belongs to the input.
+Payloads are assigned, not recursively copied.
+Time remains linear; output allocation becomes $O(N)$ nodes.
+
+**Use when:** Input ownership forbids destructive rewiring.
+
+## Change to Recursive Control
+
+**New task:** Express reversal through call-return structure, with safely bounded input depth.
+
+**Picture and change:** Reverse the suffix first.
+Point the head's original successor back to the head, then clear `head.next`.
+
+```python
+def reverse_recursive(head):
+   if head is None or head.next is None:
+      return head
+   new_head = reverse_recursive(head.next)
+   head.next.next = head
+   head.next = None
+   return new_head
+```
+
+**Check:** `[1,2,3]` returns the same nodes as `[3,2,1]`; empty input returns `None`.
+Omitting `head.next = None` leaves a two-node cycle during unwinding.
+This implementation uses $O(N)$ call-stack space and can exceed Python's recursion limit.
+
+**Use when:** A bounded chain and recursive reasoning justify the additional stack cost.
+
+### Transfer Check
+
+What must an interleaving operation preserve before changing links in two independent chains?
+
+### Answer
+
+Both unconsumed continuations.
+One saved successor protects one-chain reversal, but not two independently advancing sources.

@@ -1,6 +1,6 @@
 ---
-title: "Gradient boosting (xgboost, lightgbm, catboost)"
-description: "Train trees sequentially, each one fitting the gradient of the loss with respect to the current ensemble's prediction. The dominant tabular learner in 2026."
+title: "Gradient boosting: fit the next correction"
+description: "Trace a residual stump, recompute losses after shrinkage, and distinguish loss gradients, binary logits, and regularized Newton leaf weights."
 date: "2026-02-21"
 draft: false
 tags: ["concepts"]
@@ -9,23 +9,34 @@ category: "concepts"
 
 ## Summary
 
-Gradient boosting builds an ensemble $F(x) = \sum_t \eta \cdot h_t(x)$ one weak learner at a time. Each learner $h_t$, usually a small decision tree, fits the **negative gradient** of the current loss. The learning rate $\eta$ controls how much of that learner is added.
+Gradient boosting adds a learner to an existing prediction function.
+Its training targets are negative loss gradients at current predictions, not generally the original labels.
+Shrinkage scales the new contribution before addition.
 
-Gradient-boosted decision trees (GBDT) are the **dominant model class for tabular data in 2026**. xgboost, lightgbm, and catboost win the majority of Kaggle tabular competitions and are heavily used in production at scale (search ranking, ad CTR, fraud, credit risk). Knowing the algorithm at a level that distinguishes you from "I called `xgboost.fit`" is a core senior-ML expectation.
+**Task:** ordered features are $x=[1,2,3,4]$, targets $y=[2,2,8,8]$, and current prediction $F_0=5$.
+Use per-example loss $(y-F)^2/2$ and learning rate $\eta=0.5$.
+Fit one residual stump, update all predictions, and recompute total loss.
+This is a training fixture, not a held-out improvement claim.
 
 ## The algorithm [(Friedman, 2001)](https://www.jstor.org/stable/2699986)
 
-Initialize with a constant prediction $F_0$ (mean target for regression, log-odds prior for classification). Then for $t = 1, \dots, T$:
+Initialize $F_0=\arg\min_c\sum_iL(y_i,c)$.
+For half-squared loss this is the mean; for Bernoulli loss it is finite log-odds when both classes occur.
+Then repeat:
 
 1. Compute the negative gradient (pseudo-residuals) at each training point:
    $$
    r_{i,t} = -\left[\frac{\partial L(y_i, F(x_i))}{\partial F(x_i)}\right]_{F = F_{t-1}}.
    $$
 2. Fit a regression tree $h_t$ to $\{(x_i, r_{i,t})\}$.
-3. Optimize the leaf values to minimize $L$ in the new ensemble (line search per leaf).
+3. If required, optimize leaf values against the original objective; squared-error residual means already supply its reference correction.
 4. Update: $F_t = F_{t-1} + \eta \cdot h_t$.
 
-For squared error, $r_{i,t} = y_i - F_{t-1}(x_i)$. Literal residuals. For other losses (logistic, Huber, ranking) the residuals are the loss gradients.
+Our gradients $F_0-y=[3,3,-3,-3]$ give pseudo-residuals $[-3,-3,3,3]$.
+A stump at $x=2.5$ fits leaf values $-3$ and $3$.
+Adding $\eta h=[-1.5,-1.5,1.5,1.5]$ gives $F_1=[3.5,3.5,6.5,6.5]$.
+SSE falls from $4(3^2)=36$ to $4(1.5^2)=9$; summed half-squared loss falls from $18$ to $4.5$.
+This split is the diagram's “sample ≤ 2” rule for these ordered features.
 
 **Learning objective:** trace one squared-error boosting round from the current prediction, through signed residual targets, to the learning-rate-scaled correction.
 
@@ -82,63 +93,99 @@ For squared error, $r_{i,t} = y_i - F_{t-1}(x_i)$. Literal residuals. For other 
 		</g>
 		<text class="viz-label" x="180" y="497" text-anchor="middle">remaining residuals: −1.5 | +1.5; half as long</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> start at the flat prediction <var>F</var><sub>0</sub> = 5. Each signed arrow is both a target gap and, for squared error, a training label for the next tree. The stump fits −3 on the left and +3 on the right; shrinkage adds only half of that correction. The updated step <var>F</var><sub>1</sub> therefore moves toward every target without jumping all the way there, and each residual is halved. Original schematic checked against <a href="https://www.jstor.org/stable/2699986">Friedman's gradient-boosting formulation</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost boosted-tree tutorial</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at the flat prediction five. Under half-squared loss, target gaps are the next tree's negative-gradient labels. The stump predicts −3 and +3; shrinkage adds −1.5 and +1.5. Each remaining gap halves, while SSE falls from 36 to 9. Sources: <a href="https://www.jstor.org/stable/2699986">Friedman</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost tutorial</a>.</figcaption>
 </figure>
+
+### Change the step size
+
+**New task:** use $\eta=0.25$ with the same first stump.
+Keep its fit and scale the corrections to $-0.75$ and $0.75$.
+**Check:** predictions become $[4.25,4.25,5.75,5.75]$ and SSE becomes $4(2.25^2)=20.25$.
+**Use when:** smaller updates are desired and extra rounds remain affordable.
+Later rounds must recompute gradients at their changed ensemble predictions.
+
+### Change the objective
+
+**New task:** use labels $[0,0,1,1]$, Bernoulli cross-entropy, and initial raw logits $F=0$.
+Probabilities are $p=\sigma(F)=0.5$, so negative gradients $y-p$ are $[-0.5,-0.5,0.5,0.5]$.
+**Check:** they are not the regression gaps $[-3,-3,3,3]$ or the raw labels.
+**Use when:** fitting probabilities instead of numeric responses; trees update logits before the sigmoid.
 
 ## Newton boosting (xgboost)
 
-xgboost uses second-order information: each new tree minimizes a Taylor expansion of the loss including both the gradient and Hessian (diagonal). This gives faster convergence and tighter leaf-value updates than first-order GBDT.
+For logistic loss, $g_i=p_i-y_i$ and curvature $h_i=p_i(1-p_i)$.
+In one fixed leaf, the quadratic approximation with L2 leaf penalty is
+
+$$
+G w+\frac12(H+\lambda)w^2,
+\qquad G=\sum_i g_i,\quad H=\sum_i h_i.
+$$
+
+With positive denominator, differentiating gives $w=-G/(H+\lambda)$.
+For the two negative labels above, $G=1$, $H=0.5$, and $\lambda=1$, hence $w=-2/3$.
+This Newton weight differs from the first-order leaf mean $-0.5$.
+Split structure scoring, leaf optimization, and learning-rate shrinkage are separate operations.
+Curvature does not guarantee faster convergence or better generalization on every workload.
 
 ## Why it works
 
-GBDT has a self-correcting property: each tree fixes the mistakes of the current ensemble. Combined with a small learning rate ($\eta = 0.05$ to $0.1$), this gives gradual, stable improvement.
+When $\sum_i r_i h_t(x_i)>0$, the learner points downhill locally in prediction space.
+A finite step still needs suitable scale; approximate fitting is not a guaranteed useful correction on new data.
+Each tree depends on the current ensemble, unlike independent averaging of separately fitted trees.
 
-The bias-variance picture flips compared to random forests:
+**Failure:** a flexible tree can fit label noise, lowering training loss while validation loss rises.
+Choose early stopping on validation and restore the selected ensemble; selecting on test outcomes leaks evaluation information.
 
-- RF: low-bias trees, average → low variance.
-- GBDT: shallow (high-bias) trees, but each adapts to current residuals → ensemble has low bias.
+**Reconstruct:** what does the first reference update produce at $\eta=1$?
+
+<details><summary>Answer</summary>
+
+Predictions equal $[2,2,8,8]$, giving zero reference training SSE.
+That exact fit says nothing about unseen points.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## The four implementations
 
-| Library | Distinguishing feature |
+| Library | Distinction to inspect in the chosen version |
 |---------|----------------------|
-| **xgboost** | Mature; great parallelization; sparsity-aware splits; default for many shops. |
-| **lightgbm** | Histogram-based splits → much faster on large data; native categorical handling; leaf-wise growth. |
-| **catboost** | Best out-of-the-box on categorical-heavy data; ordered boosting reduces target-leakage in categorical encodings. |
-| sklearn `GradientBoostingClassifier` | Simple, slow on large data; mostly for teaching. |
+| **XGBoost** | Regularized second-order objectives, split methods, and sparse/missing-value routing. |
+| **LightGBM** | Histogram construction, leaf-wise growth, and declared categorical features. |
+| **CatBoost** | Ordered boosting and ordered categorical statistics with their leakage controls. |
+| sklearn `GradientBoostingClassifier` | Stagewise gradient boosting; compare separately with its histogram-based estimators. |
 
-For new projects in 2026: lightgbm for raw speed, catboost for categorical-heavy data, xgboost for everything else.
+Benchmark actual data, hardware, objective, category policy, and quality constraints rather than ranking libraries universally.
 
 ## Hyperparameters that matter
 
-| Parameter | Typical | Effect |
-|-----------|---------|--------|
-| `learning_rate` | 0.05–0.1 | Smaller → more trees, better generalization, more compute. |
-| `n_estimators` (or `num_round`) | 500–2000 | Use early stopping on validation. |
-| `max_depth` | 4–8 | Most important regularizer. |
-| `min_child_weight` / `min_data_in_leaf` | varies | Prevent overfitting to small leaves. |
-| `subsample` | 0.7–0.9 | Stochastic gradient boosting; row sampling. |
-| `colsample_bytree` | 0.5–1.0 | Feature subsampling per tree. |
-| `reg_alpha`, `reg_lambda` | 0–10 | L1, L2 on leaf weights (xgboost). |
+| Control | What changes |
+| --- | --- |
+| Learning rate and rounds | Update magnitude and number of dependent corrections. |
+| Depth or leaf count | Each learner's partition complexity. |
+| Minimum leaf support or Hessian weight | Which candidate regions are admissible. |
+| Row and feature sampling | Observations and candidate predictors used during fitting. |
+| L1/L2 leaf penalties | Leaf optimization and associated split scoring. |
 
-Use **early stopping** on a validation set: train until validation loss stops improving for $k$ rounds.
+Names and defaults differ by library.
+Learning rate and round count interact, but halving one and doubling the other is not an exact equivalence.
 
 ## When GBDT wins
 
-- Mixed numeric + categorical features.
-- Non-linear interactions matter.
-- Modest sample size ($10^3$ to $10^7$).
-- Heterogeneous feature scales.
+It can be a useful candidate for heterogeneous features and threshold-based interactions.
+Measure probability quality, task metrics, latency, and maintenance cost against meaningful alternatives.
 
 ## When GBDT loses
 
-- High-dimensional unstructured data (text, images, audio): use neural nets.
-- Truly tiny data ($n < 100$): logistic / linear with strong priors.
-- Ranking with millions of items per query: dedicated learning-to-rank stacks (often still GBDT under the hood with pairwise / listwise losses).
+Raw unstructured inputs may need a different representation; tiny or shifted datasets can invalidate apparent gains.
+Pairwise/listwise ranking needs its own objective and query grouping, not an ordinary regression interpretation.
 
 ## Common pitfalls
 
-- **No early stopping → overfit.** Always stop on validation.
-- **Tuning learning rate without retuning n_estimators.** They trade off; halving LR roughly doubles needed trees.
-- **Default categorical handling = one-hot.** For lightgbm/catboost, declare categorical features explicitly to use native splits.
-- **Comparing against a single tree.** That's not the right baseline; compare against RF and a strong logistic.
+Fit preprocessing and target-based encodings without validation or test leakage.
+Compare learning curves and restore best validated weights; neither fixed rounds nor early stopping automatically prevents overfitting.
+See [decision trees](/concepts/decision-trees/) for weighted split mechanics and [logistic regression](/concepts/logistic-regression/) for Bernoulli probabilities.
+
+</div>

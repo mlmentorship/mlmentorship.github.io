@@ -8,6 +8,7 @@ const cache = (map, order, extra = {}) => linked(
   ],
   {
     input: 'capacity=2; put(1,10), put(2,20), get(1), put(3,30), get(2)',
+    bidirectional: true,
     map: map.length > 0 ? map.map(([key, value]) => `${key} -> ${value}`).join(', ') : '{}',
     links: 'each shown adjacency has both previous and next links',
     ...extra,

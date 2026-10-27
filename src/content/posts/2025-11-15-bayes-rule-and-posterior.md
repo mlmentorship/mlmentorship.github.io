@@ -1,6 +1,6 @@
 ---
 title: "Bayes' rule and the posterior"
-description: "How to update beliefs given evidence: posterior ∝ likelihood × prior. The foundation of Bayesian inference, naive Bayes, and probabilistic graphical models."
+description: "Normalize prior-weighted likelihoods over the right evidence population, then distinguish changed base rates from genuinely new evidence."
 date: "2025-11-15"
 draft: false
 tags: ["concepts"]
@@ -9,41 +9,32 @@ category: "concepts"
 
 ## Summary
 
-For random variables $\theta$ (parameters / hypothesis) and $D$ (data / evidence):
+Bayes' rule conditions a declared probability model on observed evidence.
+For hypothesis or parameter $\theta$, multiply its prior weight by its evidence likelihood, then normalize:
 
 $$
 p(\theta \mid D) = \frac{p(D \mid \theta)\, p(\theta)}{p(D)} \propto p(D \mid \theta)\, p(\theta).
 $$
 
-The **posterior** $p(\theta \mid D)$ is proportional to the **likelihood** $p(D \mid \theta)$ times the **prior** $p(\theta)$.
-
-Bayes' rule is the only mathematically consistent way to update probabilistic beliefs given new evidence. It underlies probabilistic ML (Gaussian processes, Bayesian deep learning), classification (naive Bayes), generative models (latent variable inference), and many engineering systems (Kalman filtering, sensor fusion).
-
-The connection to MLE: the posterior peak (MAP estimate) collapses to MLE under a uniform prior. So MLE is a special case of Bayesian inference with no prior beliefs.
-
-## The four pieces
-
-| Piece | Name | What it is |
-|-------|------|-----------|
-| $p(\theta)$ | Prior | Beliefs about $\theta$ before seeing data |
-| $p(D \mid \theta)$ | Likelihood | How probable the data is under each hypothesis |
-| $p(\theta \mid D)$ | Posterior | Updated beliefs after seeing data |
-| $p(D)$ | Evidence / marginal likelihood | Normalizing constant; $\int p(D \mid \theta) p(\theta)\, d\theta$ |
-
-The evidence is often intractable (high-dimensional integral). For point estimates and many decisions you can ignore it.
+The evidence normalizer must be positive and finite.
+For discrete hypotheses, sum their weighted likelihoods; continuous parameters require an integral under the declared measure.
+Posterior probabilities, a posterior mode, and a chosen action are different outputs.
 
 ## The classic example
 
-A medical test is 99% accurate: $p(\text{pos} \mid \text{disease}) = 0.99$ and $p(\text{neg} \mid \text{healthy}) = 0.99$. The disease has prevalence $p(\text{disease}) = 0.001$. A random person tests positive. What is $p(\text{disease} \mid \text{pos})$?
+Consider a hypothetical test with sensitivity $P(+\mid disease)=0.99$ and specificity $P(-\mid healthy)=0.99$.
+Assume prevalence $0.001$ and random sampling from that population; these are teaching assumptions, not measured clinical evidence.
+In $100000$ people, expected branch counts are $100$ diseased and $99900$ healthy.
+The branches contribute $99$ and $999$ positive results respectively, so the positive-result population has $1098$ members.
 
 $$
-p(\text{disease} \mid \text{pos}) = \frac{0.99 \times 0.001}{0.99 \times 0.001 + 0.01 \times 0.999} \approx 0.09.
+P(disease\mid+)=\frac{99}{99+999}=\frac{11}{122}\approx0.090164.
 $$
 
 <!-- visual:bayes-positive-test-denominator -->
 <figure class="learning-figure plot-panel" aria-labelledby="bayes-denominator-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="bayes-denominator-title">Why can a 99%-accurate test still make most positive results false?</p>
+	<p class="visual-title" id="bayes-denominator-title">Why can 99% sensitivity and specificity still leave most positive results false?</p>
 	<svg viewBox="0 0 360 350" role="img" aria-labelledby="bayes-denominator-svg-title bayes-denominator-svg-desc">
 		<title id="bayes-denominator-svg-title">Natural-frequency funnel for a rare disease test</title>
 		<desc id="bayes-denominator-svg-desc">Start with 100,000 people. At 0.1 percent prevalence, 100 have the disease and 99,900 are healthy. With 99 percent sensitivity, the diseased branch contributes 99 true-positive results. With 99 percent specificity, one percent of the healthy branch contributes 999 false-positive results. The branches merge into 1,098 positive results, of which only 99, or about 9 percent, indicate disease.</desc>
@@ -75,37 +66,89 @@ $$
 		<text class="viz-node-label" x="180" y="307">99 / (99 + 999) = 9%</text>
 		<text class="viz-node-value" x="180" y="324">disease given a positive result</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the rare prior creates only 100 opportunities for a true positive but 99,900 opportunities for a false positive. Both branches feed the positive-result denominator, so 999 false positives outnumber 99 true positives and only about 9% of positive results indicate disease.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the prior splits the population into 100 diseased and 99,900 healthy people. Both branches contribute to the positive-result denominator. The posterior is 99 divided by 1,098, not the test's sensitivity.</figcaption>
 </figure>
 
-Despite 99% test accuracy, about 91% of positive results are false. The prior strongly affects the posterior.
+The healthy posterior is $999/1098$; together the two posterior masses sum to one.
+
+## The four pieces
+
+| Piece | Name | Role |
+|-------|------|------|
+| $p(\theta)$ | Prior | Weight before this observation |
+| $p(D\mid\theta)$ | Likelihood | Evidence model at a candidate parameter |
+| $p(\theta\mid D)$ | Posterior | Normalized conditional distribution |
+| $p(D)$ | Evidence | Sum or integral of prior-weighted likelihoods |
+
+The evidence is constant across parameters within one model, so maximizing an unnormalized posterior can locate its mode.
+It cannot be discarded when reporting posterior probabilities or comparing model evidence.
+A constant prior density can preserve an MLE maximizer in that parameterization, when the posterior and maximizer exist.
+This is a prior assumption, not an absence of assumptions.
+
+## Change the Requirement
+
+### Change the Population
+
+**New task:** Increase prevalence to one percent while keeping sensitivity and specificity unchanged.
+
+**Picture and change:** Begin with $1000$ diseased and $99000$ healthy people.
+
+**Check:** Both branches contribute $990$ positives; posterior disease probability becomes $1/2$.
+
+**Use when:** Screening and referral populations have different base rates and the transported test properties remain justified.
+
+### Observe Another Positive
+
+**New task:** Add a second positive result, conditionally independent of the first given disease status.
+
+**Picture and change:** Multiply each branch by its second-result likelihood.
+
+**Check:** Original-population expected double-positive counts are $98.01$ and $9.99$, giving $98.01/108=0.9075$.
+
+**Use when:** The observation supplies genuinely new conditional evidence.
+Copying the same test report is perfectly dependent evidence and leaves the original posterior unchanged.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Conjugate priors
 
-A prior is **conjugate** to a likelihood if the resulting posterior is in the same family (so updating stays in closed form).
+A conjugate prior produces a posterior in the same family, with parameters updated from the observations.
 
 | Likelihood | Conjugate prior | Posterior family |
 |-----------|-----------------|------------------|
 | Bernoulli/binomial | Beta | Beta |
 | Categorical/multinomial | Dirichlet | Dirichlet |
 | Gaussian (mean, known $\sigma^2$) | Gaussian | Gaussian |
-| Gaussian (precision) | Gamma | Gamma |
+| Gaussian precision, known mean | Gamma | Gamma |
 | Poisson | Gamma | Gamma |
 
 Used in: Thompson sampling for bandits (Beta-Bernoulli), online recsys updates, conjugate Gibbs samplers.
 
 ## Approximate inference (when conjugacy fails)
 
-Modern Bayesian deep learning rarely has closed-form posteriors. Standard approximations:
+When closed-form conditioning is unavailable, distinguish the approximation from the desired posterior:
 
-- **Laplace approximation**: Gaussian centered at MAP with covariance from the Hessian.
-- **Variational inference**: optimize a parametric family $q_\phi(\theta)$ to minimize $\mathrm{KL}(q_\phi \| p(\theta \mid D))$.
-- **MCMC** (Metropolis-Hastings, HMC, NUTS): draw samples from the posterior asymptotically.
-- **Stochastic-gradient Langevin / SGHMC**: scale to large data via mini-batches.
+- **Laplace:** approximate a suitable interior mode with a Gaussian using local curvature.
+- **Variational inference:** optimize within a chosen distribution family; the family and divergence affect the approximation.
+- **MCMC:** construct a target-invariant chain; convergence and Monte Carlo uncertainty still require diagnosis.
+- **Stochastic-gradient samplers:** introduce data subsampling and step-size/approximation considerations.
 
 ## Common pitfalls
 
-- **Confusing likelihood with posterior.** $p(D \mid \theta)$ is not a probability distribution over $\theta$; it does not integrate to 1 over $\theta$.
-- **Ignoring the prior in low-data regimes.** With small $n$, the posterior is dominated by the prior.
-- **Reporting MAP without uncertainty.** A posterior contains more than its mode; the spread is often the more useful information.
-- **Improper priors.** Some "uniform" priors over unbounded parameter spaces don't integrate; the posterior may still be proper (or may not be).
+- **Reversed conditioning.** A likelihood does not need to normalize over parameters.
+- **Prior sensitivity.** Weak evidence can leave substantial sensitivity to the prior; small sample size alone does not prove prior dominance.
+- **Mode-only reporting.** A mode omits uncertainty and can change under reparameterization.
+- **Improper priors.** An unnormalized prior can produce either a proper or improper posterior; check the integral.
+
+## Reconstruct
+
+<details>
+<summary>Why cannot two copies of one positive report be treated as independent tests?</summary>
+
+Once the first report is known, its exact copy is certain under either disease status.
+The copy supplies likelihood ratio one, not another factor of ninety-nine.
+
+</details>
+
+</div>

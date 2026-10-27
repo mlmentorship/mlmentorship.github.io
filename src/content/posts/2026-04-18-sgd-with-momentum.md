@@ -1,6 +1,6 @@
 ---
-title: "SGD with momentum"
-description: "Add a moving average of past gradients to the update. Smoother trajectories, faster convergence in narrow valleys, and the foundation of Adam's first moment."
+title: "SGD with momentum: keep the update history"
+description: "Trace the saved gradient sum from startup to steady behavior, then change history length and learning-rate placement."
 date: "2026-04-18"
 draft: false
 tags: ["concepts"]
@@ -9,9 +9,16 @@ category: "concepts"
 
 ## Summary
 
-SGD with momentum maintains a velocity $v_t = \beta v_{t-1} + g_t$ (an exponential moving average of past gradients) and updates parameters with $\theta_{t+1} = \theta_t - \eta v_t$ instead of with the raw gradient. Typical $\beta = 0.9$.
+Momentum saves a decaying sum of gradients and uses it to choose the next parameter step.
+It is useful when successive gradients contain persistent direction, but history can also delay a necessary reversal.
 
-Vanilla SGD bounces around in narrow loss valleys: gradients perpendicular to the valley axis cancel slowly, gradients along the axis are small. Momentum accumulates the consistent along-axis component while perpendicular components average to zero.
+**Task:** filter four prescribed descent directions $(1,2),(1,-2),(1,2),(1,-2)$ with retention $\beta=1/2$ and learning rate $\eta=1$.
+Start the parameter and buffer at zero.
+What changes relative to ordinary SGD?
+
+Write gradient $g_t$, descent direction $d_t=-g_t$, gradient buffer $v_t$, and descent buffer $u_t=-v_t$.
+The figure shows the warmed-up response, not the first four updates from zero.
+These are prescribed inputs, not gradients reevaluated along two measured optimization trajectories.
 
 <!-- visual:momentum-alternating-components -->
 <figure class="learning-figure" aria-labelledby="momentum-components-title">
@@ -63,59 +70,105 @@ Vanilla SGD bounces around in narrow loss valleys: gradients perpendicular to th
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> use the same axes in both panels. For alternating descent directions <var>d<sub>t</sub></var> = −<var>g<sub>t</sub></var> = (1, ±2), raw SGD moves forward by 1 while crossing the valley by 2. With <var>u<sub>t</sub></var> = 0.5<var>u<sub>t−1</sub></var> + <var>d<sub>t</sub></var> after warm-up, the alternating steady-state updates are (2, ±4/3): the consistent component doubles, while the cross-valley-to-forward ratio falls from 2 to 2/3. Momentum makes faster, less zigzagging progress, but the larger forward step is also why its learning rate must be tuned. This original trace was checked against <a href="https://doi.org/10.1016/0041-5553(64)90137-5">Polyak (1964)</a>, <a href="https://proceedings.mlr.press/v28/sutskever13.html">Sutskever et al. (2013)</a>, and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html">PyTorch SGD definition</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> use the same axes in both panels. Raw SGD follows descent directions <var>d<sub>t</sub></var> = −<var>g<sub>t</sub></var> = (1, ±2). Each step moves forward by 1 and across the valley by 2. With <var>u<sub>t</sub></var> = 0.5<var>u<sub>t−1</sub></var> + <var>d<sub>t</sub></var> after warm-up, the alternating steady-state updates are (2, ±4/3). The consistent component doubles; the cross-valley-to-forward ratio falls from 2 to 2/3. This is a filter response, not evidence of measured convergence. Compare learning rates as well as paths. This original trace was checked against <a href="https://doi.org/10.1016/0041-5553(64)90137-5">Polyak (1964)</a>, <a href="https://proceedings.mlr.press/v28/sutskever13.html">Sutskever et al. (2013)</a>, and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.SGD.html">PyTorch SGD definition</a>.</figcaption>
 </figure>
 
-Empirically, momentum is essential for SGD to be competitive with adaptive optimizers on most problems. SGD without momentum is rarely used in modern training. Adam's first-moment estimate $m_t$ is essentially momentum, which is why Adam inherits this benefit.
+### Start from zero
+
+Compute $u_t=\beta u_{t-1}+d_t$, then $\theta_t=\theta_{t-1}+\eta u_t$:
+
+| Step | $d_t$ | $u_t$ | $\theta_t$ |
+| --- | --- | --- | --- |
+| 1 | $(1,2)$ | $(1,2)$ | $(1,2)$ |
+| 2 | $(1,-2)$ | $(3/2,-1)$ | $(5/2,1)$ |
+| 3 | $(1,2)$ | $(7/4,3/2)$ | $(17/4,5/2)$ |
+| 4 | $(1,-2)$ | $(15/8,-5/4)$ | $(49/8,5/4)$ |
+
+Ordinary SGD ends at $(4,0)$; the startup momentum path ends at $(6.125,1.25)$.
+The warmed-up figure instead ends at $(8,0)$.
+
+For constant input $a$, the limiting buffer solves $u=\beta u+a$, giving $a/(1-\beta)$.
+For alternating input $+a,-a$, let the positive-phase limit be $b$.
+Then $b=\beta(-b)+a$, so $b=a/(1+\beta)$.
+Here the steady components are $2$ and $\pm4/3$.
 
 ## Two formulations
 
 ### Classical momentum (Polyak, 1964)
 
 $$
-v_t = \beta v_{t-1} + g_t \\
-\theta_{t+1} = \theta_t - \eta v_t
+g_t=\nabla L(\theta_{t-1}),\qquad
+v_t=\beta v_{t-1}+g_t,\qquad
+{}\theta_t=\theta_{t-1}-\eta v_t.
 $$
 
-Effective LR for a constant gradient: $\eta / (1 - \beta)$. With $\beta = 0.9$, that's $10\eta$, so reducing $\beta$ effectively reduces the step size.
+Assume $0\le\beta<1$, zero initial buffer, and no dampening.
+Expanding the recurrence gives $v_t=\sum_{j=1}^t\beta^{t-j}g_j$.
+This is a decaying sum, not a normalized exponential moving average.
+
+For the average $m_t=\beta m_{t-1}+(1-\beta)g_t$, matching initialization gives $m_t=(1-\beta)v_t$.
+An update using $m_t$ needs learning rate $\eta/(1-\beta)$ to match the sum-based update at constant $\beta$.
 
 ### Nesterov momentum (Nesterov, 1983)
 
-Compute the gradient at the *look-ahead* position $\theta_t - \eta \beta v_{t-1}$ instead of at $\theta_t$. Updates:
+**New task:** evaluate the gradient at a lookahead point.
+Replace $g_t$ above with $\nabla L(\theta_{t-1}-\eta\beta v_{t-1})$; keep the parameter update based at $\theta_{t-1}$.
 
-$$
-v_t = \beta v_{t-1} + \nabla L(\theta_t - \eta \beta v_{t-1}) \\
-\theta_{t+1} = \theta_t - \eta v_t
-$$
-
-In practice, only marginally better than classical momentum on most workloads. Used in some vision training (e.g., ResNet original paper).
+**Check:** for $L(\theta)=\theta^2/2$, current $\theta=2$, previous $v=1$, $\eta=0.1$, and $\beta=0.5$, lookahead is $1.95$.
+The new buffer is $2.45$ and parameter $1.755$, versus classical $2.5$ and $1.75$.
+**Use when:** the specified algorithm calls for lookahead; this is not merely a changed label on the same gradient.
 
 ## Picking $\beta$
 
-| Workload | $\beta$ |
-|----------|---------|
-| ResNet / CNN training | 0.9 |
-| Reinforcement learning policy nets | 0.9 |
-| Very noisy gradients (RL, contrastive) | 0.95 or 0.99 |
-| Small batch with high noise | lower (0.5–0.8) to track recent gradients |
+**New task:** respond faster when older directions become stale.
+Reduce $\beta$ and reconsider the learning rate together.
 
-$\beta$ controls the effective averaging window: $1/(1-\beta)$ steps. $\beta = 0.9$ averages over ~10 steps; $\beta = 0.99$ averages over ~100.
+**Check:** constant gradient one gives limiting buffers $10$ at $\beta=0.9$ and $2$ at $\beta=0.5$.
+At learning rate $0.1$, limiting step magnitudes are $1$ and $0.2$.
+Using $0.02$ with $\beta=0.9$ matches the latter scale, but not its response speed.
+**Use when:** history length changes; equal learning rates do not isolate smoothing.
+
+### Change the learning-rate placement
+
+**New task:** resume across a learning-rate reduction from $0.1$ to $0.05$.
+With $v_{old}=2$, $g=1$, and $\beta=0.5$, the gradient buffer stays $2$; the new step magnitude is $0.1$.
+The stored gradients do not contain the old learning rate.
+
+For a displacement buffer $p_t=\beta p_{t-1}+\eta_tg_t$, old $p=0.2$ instead gives $p_t=0.15$.
+**Use when:** resuming or translating implementations; preserve state according to the actual recurrence, not a universal reset rule.
+
+### Failure and transfer
+
+**Reconstruct:** why is $(2,\pm4/3)$ not the zero-buffer startup trace?
+
+<details><summary>Answer</summary>
+
+Those values solve steady-state equations after transients decay.
+The four-row ledger retains the missing initial history explicitly; its final parameter differs from the warmed-up figure.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## When SGD+momentum vs. Adam
 
-| Situation | Default |
-|-----------|--------|
-| Vision (CNN, ViT) classification with strong regularization | SGD + momentum + cosine LR |
-| Transformers (NLP, LLM training) | Adam / AdamW |
-| Small datasets, fine-tuning | Adam (less hyperparameter tuning needed) |
-| Sparse gradients (recsys embeddings) | Adam (per-parameter adaptive LR) |
-| Reinforcement learning | Adam (default in PPO / DQN implementations) |
+Momentum changes the history filter; [Adam](/concepts/adam-and-adamw/) also tracks coordinatewise squared gradients.
+Neither mechanism establishes a universal speed or generalization ordering.
+Compare tuned learning rates, schedules, regularization, stopping criteria, compute budgets, and repeated seeds on the target workload.
 
-SGD+momentum often generalizes slightly better than Adam at convergence (sharp vs. flat minima discussion); Adam converges faster initially. For LLMs, Adam wins because the gradient distribution across parameters is highly non-uniform.
+The scale $1/(1-\beta)$ is a useful history horizon, not an exact count of equally weighted observations.
+For independent scalar gradient noise of variance $\sigma^2$, the stationary sum has variance $\sigma^2/(1-\beta^2)$.
+The normalized average instead has variance $\sigma^2(1-\beta)/(1+\beta)$.
+These noise assumptions do not describe every minibatch process.
 
 ## Common pitfalls
 
-- **Forgetting that momentum scales the effective LR.** Switching from $\beta = 0.9$ to $\beta = 0.99$ effectively multiplies the LR by 10.
-- **Initializing $v_0 = 0$ without bias correction.** Early steps have biased velocity; for SGD this is usually fine, but Adam explicitly bias-corrects.
-- **Mixing momentum across LR changes.** When the LR jumps, momentum carries old-LR-scaled velocities. Some implementations zero momentum at LR transitions.
-- **Using SGD without momentum.** Almost always strictly worse; pick momentum or use Adam.
+- A zero buffer creates startup transients, not an error that every momentum implementation must bias-correct.
+- A zero current gradient does not imply a zero update while history remains.
+- Larger retention can amplify overshoot as well as persistent progress.
+- Frameworks differ in dampening, first-buffer initialization, Nesterov parameterization, and learning-rate placement.
+- Algebraically related Nesterov forms require matching state definitions and schedule assumptions before comparing saved buffers.
+- Resume checkpoints must preserve parameters, optimizer buffers, step count, schedule state, and any random or sampling state needed for replay.
+
+</div>

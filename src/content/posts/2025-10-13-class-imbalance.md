@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth, especially in fraud, medical, search, and rare-event domains.*
 
-The L4 candidate names SMOTE. The L6 candidate asks what the cost asymmetry is, what metric is being optimized, and whether the imbalance is even the problem.
+Decide how to train and evaluate a classifier when positive events are rare and errors have unequal consequences.
+
+## Problem
+
+**Context.** In a hypothetical rare-event classifier, positive examples are scarce and deployment prevalence may differ from the training sample.
+Missed events and false alerts impose different costs.
+
+**Task.** Define the operating objective, evaluation population, useful metrics, threshold policy, and any justified training-data or loss intervention.
+Explain how you would distinguish poor discrimination, miscalibration, and a mismatched decision threshold.
+
+**Constraints.** Keep evaluation representative and leakage-free. Apply resampling only within training boundaries and account for changed class priors.
+Do not assume balancing the dataset improves the relevant outcome or that accuracy reflects rare-event performance.
 
 ## What an L4 answer sounds like
 

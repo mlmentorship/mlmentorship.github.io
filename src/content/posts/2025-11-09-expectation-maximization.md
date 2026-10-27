@@ -1,6 +1,6 @@
 ---
 title: "Expectation-Maximization (EM)"
-description: "Iterate between estimating latent variables given parameters (E-step) and updating parameters given latents (M-step). The standard tool for latent-variable MLE when the latents are unobserved."
+description: "Compute posterior expected complete-data statistics, then improve a touching likelihood bound. Trace one exact two-coin EM iteration."
 date: "2025-11-09"
 draft: false
 tags: ["concepts"]
@@ -9,26 +9,14 @@ category: "concepts"
 
 ## Summary
 
-**Expectation-Maximization** ([Dempster, Laird & Rubin, 1977](https://www.jstor.org/stable/2984875)) is an iterative algorithm for finding MLE / MAP parameter estimates in latent-variable models. Each iteration alternates:
-
-1. **E-step**: compute the posterior $q(z) = p(z \mid x; \theta_t)$ over latents.
-2. **M-step**: update $\theta_{t+1} = \arg\max_\theta \mathbb{E}_{q(z)}[\log p(x, z; \theta)]$.
-
-EM monotonically increases the log-likelihood. Under standard regularity conditions, its limit points are stationary points, which may be local maxima or saddle points.
-
-When you have a latent variable model and the latents are unobserved, direct MLE involves a marginalization $\log p(x; \theta) = \log \sum_z p(x, z; \theta)$ that is usually intractable. EM avoids this by alternately filling in expected values of $z$ and optimizing $\theta$ on the completed data.
-
-EM underlies:
-
-- Gaussian mixture model (GMM) fitting.
-- Hidden Markov model (HMM) parameter estimation (Baum-Welch is EM).
-- Probabilistic PCA, factor analysis, ICA.
-- LDA topic models.
-- Many missing-data imputation methods.
+[Expectation-Maximization](https://www.jstor.org/stable/2984875) alternates posterior computation with parameter improvement for a latent-variable model.
+An exact posterior makes a likelihood lower bound touch the current objective; improving that fixed bound cannot decrease observed likelihood.
+This guarantee is not a global-optimum or component-identification guarantee.
 
 ## The two steps
 
-For a model with observed $x$, latent $z$, parameters $\theta$:
+Let x be observations, z latent variables, and theta parameters.
+Require available exact posteriors, common support, finite required expectations, and an M-step that does not reduce its target.
 
 ### E-step
 
@@ -38,7 +26,9 @@ $$
 q_t(z) = p(z \mid x; \theta_t).
 $$
 
-For models with conjugate or finite latent structure, this is closed-form (GMM: posterior responsibilities; HMM: forward-backward).
+Current theta stays fixed while q is computed.
+Calculate expected complete-data sufficient statistics, not merely a substituted mean latent value.
+For example, $E[zz^\top]$ generally differs from $E[z]E[z]^\top$.
 
 ### M-step
 
@@ -48,7 +38,20 @@ $$
 \theta_{t+1} = \arg\max_\theta \mathbb{E}_{z \sim q_t}[\log p(x, z; \theta)].
 $$
 
-Often this expectation reduces to weighted MLE over the data with the latents replaced by their expected values.
+Here q stays fixed while theta changes.
+Write $Q(\theta\mid\theta_t)=E_{q_t}\log p(x,z;\theta)$.
+
+For a teaching mixture, choose a coin independently for each two-toss group.
+Initial weights are $(0.5,0.5)$ and head probabilities $(0.75,0.25)$; observe head counts two and one.
+The binomial probability includes $\binom{2}{h}p^h(1-p)^{2-h}$.
+Count two has likelihoods $(0.5625,0.0625)$, giving responsibilities $(0.9,0.1)$.
+Count one has likelihoods $(0.375,0.375)$, giving responsibilities $(0.5,0.5)$.
+
+Effective group counts are $(1.4,0.6)$; weighted heads are $(2.3,0.7)$.
+The M-step sets weights to $(0.7,0.3)$ and head probabilities to $(2.3/2.8,0.7/1.2)=(23/28,7/12)$.
+The denominators count expected tosses, not expected groups.
+Observed likelihood rises from $0.3125\times0.375=0.1171875$ to approximately $0.20172548$.
+Its log rises from $-2.143980$ to $-1.600848$.
 
 ## Why it works
 
@@ -58,12 +61,14 @@ $$
 \log p(x; \theta) = \mathbb{E}_q[\log p(x, z; \theta)] - \mathbb{E}_q[\log q(z)] + \mathrm{KL}(q \| p_\theta(z \mid x)).
 $$
 
-The first two terms are the **ELBO** (evidence lower bound). The KL is non-negative. EM:
+Write $F(q,\theta)=Q(\theta\mid\theta_t)+H(q)$ when q is the current posterior.
+The identity says $\ell(\theta)=F(q,\theta)+\mathrm{KL}(q\|p_\theta)$, with a nonnegative KL gap.
+Exact E sets the gap to zero at theta_t.
+Improving Q with q fixed then yields:
 
-- E-step sets $q = p_\theta(z \mid x)$ → KL = 0 → ELBO = $\log p(x; \theta)$.
-- M-step maximizes ELBO over $\theta$ holding $q$ fixed → never decreases $\log p(x; \theta)$.
-
-So $\log p(x; \theta_{t+1}) \ge \log p(x; \theta_t)$. This monotonicity does not guarantee a global or even local maximum; EM can approach a saddle point.
+$$
+\ell(\theta_{t+1})\ge F(q_t,\theta_{t+1})\ge F(q_t,\theta_t)=\ell(\theta_t).
+$$
 
 <!-- visual:em-lower-bound-climb -->
 <figure class="learning-figure plot-panel" aria-labelledby="em-bound-title">
@@ -104,48 +109,62 @@ So $\log p(x; \theta_{t+1}) \ge \log p(x; \theta_t)$. This monotonicity does not
 		<text class="viz-node-label" x="180" y="389">3 · Likelihood stays above its bound</text>
 		<text class="viz-node-value" x="180" y="404">log p(x; θ<tspan baseline-shift="sub" font-size="8">t+1</tspan>) ≥ F(q<tspan baseline-shift="sub" font-size="8">t</tspan>, θ<tspan baseline-shift="sub" font-size="8">t+1</tspan>)</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the E-step chooses the posterior so the dashed bound touches the solid likelihood at <code>θ_t</code>. The M-step holds that bound fixed and moves to a parameter where it is no lower. Because the likelihood always lies above the bound, its value at <code>θ_{t+1}</code> cannot be below its value at <code>θ_t</code>. The next E-step closes the new gap.</figcaption>
+	<figcaption><strong>Read it this way:</strong> exact E makes the dashed bound touch observed log likelihood at the current parameter. M improves that fixed bound. Likelihood remains above it, proving nondecrease under the stated assumptions. The next exact E-step closes the new gap.</figcaption>
 </figure>
+
+### Add a Parameter Prior
+
+**New task:** Prefer interior coin probabilities with independent Beta(2,2) priors; leave mixture weights unregularized.
+
+**Picture and change:** Keep posterior responsibilities, but maximize Q plus log prior.
+
+**Check:** Probability updates become $3.3/4.8=0.6875$ and $1.7/3.2=0.53125$.
+
+**Use when:** A MAP estimator is required.
+The protected objective is log posterior, not bare observed likelihood.
+
+### Improve Only Part of M
+
+**New task:** Update mixture weights while keeping both coin probabilities at their initial values.
+
+**Picture and change:** This generalized M-step improves Q without jointly maximizing every parameter.
+
+**Check:** Weights $(0.7,0.3)$ give observed likelihood $0.4125\times0.375=0.1546875$, above the initial value.
+
+**Use when:** A verified improving parameter block is available but joint optimization is expensive.
+
+Identical components can remain identical; nondecreasing likelihood does not distinguish them or identify a global solution.
+Under appropriate regularity and convergence conditions, limit points can be stationary, including saddles.
+Unconstrained Gaussian mixtures can instead diverge through covariance collapse.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Canonical example: GMM
 
-A GMM has $K$ Gaussian components with mixture weights $\pi_k$, means $\mu_k$, covariances $\Sigma_k$. Latent $z_i \in \{1, \dots, K\}$ assigns each point to a component.
-
-**E-step**: posterior responsibility of component $k$ for point $i$:
-
-$$
-r_{ik} = \frac{\pi_k \mathcal{N}(x_i; \mu_k, \Sigma_k)}{\sum_j \pi_j \mathcal{N}(x_i; \mu_j, \Sigma_j)}.
-$$
-
-**M-step**: weighted MLE updates:
-
-$$
-\mu_k = \frac{\sum_i r_{ik} x_i}{\sum_i r_{ik}}, \quad \pi_k = \frac{1}{n} \sum_i r_{ik}, \quad \Sigma_k = \frac{\sum_i r_{ik} (x_i - \mu_k)(x_i - \mu_k)^\top}{\sum_i r_{ik}}.
-$$
-
-Iterate until log-likelihood stabilizes.
+[Gaussian mixtures](/concepts/gaussian-mixture-models/) apply this owner to posterior component responsibilities and weighted Gaussian sufficient statistics.
+Detailed covariance updates belong to that application, not a second generic EM derivation.
 
 ## Variants
 
-- **Hard-assignment EM** (k-means): replace soft responsibilities with hard 0/1 assignments. k-means is EM for a GMM with shared identity covariance and $\pi_k = 1/K$.
-- **Stochastic EM**: sample $z_i$ instead of computing expected values; useful for large $z$.
-- **Variational EM**: replace exact posterior with a variational approximation; modern incarnation is the VAE.
-- **MAP-EM**: include a prior $p(\theta)$; M-step maximizes $\log p(\theta) + \mathbb{E}_q[\log p(x, z; \theta)]$.
+- **Hard assignment:** k-means relates to restricted mixtures through hard-assignment or small-variance limits, not ordinary finite-variance exact EM.
+- **Stochastic approximations:** sampling noise need not preserve likelihood nondecrease at every iteration.
+- **Variational E:** improving a restricted lower bound does not automatically increase observed likelihood; the touching-bound step may be missing.
+- **MAP-EM:** an explicit prior changes the optimized objective.
 
 ## Limitations
 
-- **Local optima**: EM converges to a local maximum; results depend on initialization. Multiple random restarts are standard.
-- **Slow near optimum**: linear convergence; gets sluggish near a flat region.
-- **Requires known model structure**: number of components, latent dimensions, etc.
+Initialization, latent-model specification, missing information, and numerical optimization affect convergence and usefulness.
+Comparing restarts does not turn a nonconvex model into a globally solved problem.
 
 ## Common pitfalls
 
-- **Initializing GMM means at the same point.** All components collapse to the same Gaussian; initialize by k-means++ or random data points.
-- **Singular covariances.** A component centered on a single point gets $\Sigma_k \to 0$; log-likelihood diverges. Add regularization $\Sigma_k + \varepsilon I$.
-- **Comparing log-likelihood across runs without checking convergence.** EM monotonically increases it within a run, but different inits give different local optima.
-- **Confusing EM with k-means.** k-means is hard-assignment EM with restricted GMM; EM gives soft assignments and arbitrary covariances.
+Ad hoc covariance stabilization and approximate E/M updates require their own objective/monotonicity analysis.
+Alternating two convenient steps is not enough to establish the exact EM proof.
 
 ## Related
 
 - [Gaussian mixture models](/concepts/gaussian-mixture-models/). The canonical EM application.
 - [Hidden Markov models](/concepts/hidden-markov-models/). Sequential model trained by EM (Baum-Welch).
+
+</div>

@@ -4,7 +4,7 @@ const scan = (label, x, y) => [{ key: 'scan-interval', kind: 'interval', x, y, l
 const range = (label, start, end, tone = 'neutral') => ({ label, start, end, tone });
 
 const draft = visual('Sort ranges by start; compare each range with the last merged end, extending on overlap or appending on a gap.', [
-  frame('Sort the concrete input', 'Input [[8,10],[1,3],[2,6],[15,18]] becomes [[1,3],[2,6],[8,10],[15,18]], so possible overlaps are adjacent.', intervals([
+  frame('Sort the concrete input', 'Sort the four ranges by start. Only the final merged component can overlap the next range.', intervals([
     range('1: [1,3]', 1, 3, 'focus'),
     range('2: [2,6]', 2, 6),
     range('3: [8,10]', 8, 10),

@@ -10,11 +10,24 @@ category: "questions"
 
 > *Asked in: LLM-team and agent-platform interviews.*
 
-The L4 answer applies single-shot LLM eval to agents (and gets misleading numbers). The L6 answer evaluates trajectories at multiple granularities and tracks the offline-online correlation explicitly.
+Evaluate whether a tool-using agent completes authorized tasks reliably across entire trajectories, not just individual generated answers.
+
+## Problem
+
+**Context.** A hypothetical agent plans multiple steps, calls tools, observes results, and may create persistent external effects.
+A candidate model or orchestration change must be assessed before wider release.
+
+**Task.** Define task-level success, trajectory and step checks, an environment and task suite, repeated trials, and a staged deployment decision.
+Explain how offline results will be compared with observed production behavior.
+
+**Constraints.** Separate answer quality, tool correctness, authorization, and external-state outcomes.
+Control environment versions and budgets; account for stochasticity, retries, long-horizon failures, and consequential actions without executing unsafe tests.
 
 ## Why agent eval is harder
 
 A chat model produces one output per input. An agent produces a *trajectory*: plan, tool calls, intermediate results, final answer. Each step can fail, and failures compound. Standard end-to-end eval can't tell you whether the planner was wrong, the tool returned bad data, or the synthesis was bad.
+
+<p class="visual-title">Trace the failed step, then test the whole agent</p>
 
 <!-- visual:agent-eval-diagnostic-flywheel -->
 ```mermaid
@@ -93,7 +106,23 @@ This is L5. You've broken the eval into the right levels and named the operation
 
 The L6 answer:
 
-> "Two angles. (1) Run each task multiple times (5-10 samples) and report mean and variance; small differences may be noise. (2) For deterministic comparisons, fix temperature to 0 and seeds where possible. (3) For metrics like 'success rate', binomial confidence intervals are honest about uncertainty when N is small. The biggest mistake is reporting a single run as if it were the population mean: many 'X% better' claims about agents are within run-to-run noise."
+> "First define the sampling unit and the claim. Repeated attempts estimate variation on the fixed suite; independently sampled tasks support a different generalization claim. Suggested counts such as 5-10 attempts are starting points, not universally sufficient release criteria.
+>
+> Compare candidate and baseline on matched tasks under the same budgets, environment versions, and outcome rubric. State whether success means one attempt, eventual success after retries, or success within a total budget. Count failed attempts and retries in cost.
+>
+> A binomial interval needs an appropriate independent-trial model. Repeated heterogeneous tasks are not automatically independent observations for a new-task claim. When tasks are the sampled units, preserve that clustering in uncertainty estimates, for example by resampling paired task results rather than pooling every attempt.
+>
+> Temperature and seeds can reduce some sampling variation; they do not guarantee deterministic hardware, tools, or hosted execution. Report the task-level differences and uncertainty, not a single lucky run. The [application-evaluation lesson](/questions/how-would-you-evaluate-an-llm-application/) supplies the separate outcome, support, and release checks."
+
+**Predict before revealing:** two tasks each run ten times produce twenty outcomes. Have you evaluated twenty independently sampled tasks?
+
+<details><summary>Keep attempts and task clusters separate</summary>
+
+No. There are twenty attempts nested within two task clusters.
+Those outcomes can characterize repeatability on the fixed pair, but new-task uncertainty cannot be justified by pretending there were twenty task draws.
+State how tasks were sampled, preserve candidate/baseline pairing, and gate consequential authorization failures separately from average success.
+
+</details>
 
 ---
 

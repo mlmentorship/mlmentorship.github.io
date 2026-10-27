@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team and inference-platform interviews.*
 
-The L4 candidate describes a draft model and verification. The L6 candidate explains *why* the verify pass costs roughly the same as a single decode step (memory bandwidth, not compute), and proves the output distribution is preserved.
+Walk through speculative decoding and explain when it can accelerate sampling without changing the target model's output distribution.
+
+## Problem
+
+**Context.** An autoregressive target model defines next-token probabilities, while a cheaper draft model can propose several tokens.
+Both models use compatible token identities and the same accepted prefix.
+
+**Task.** Explain proposal, target verification, acceptance, rejection correction, and continuation through one speculative block.
+Justify distribution preservation and identify the workload conditions needed for a speedup.
+
+**Constraints.** Distinguish exact sampling from greedy agreement or approximate decoding.
+Account for proposal probabilities, normalized correction, draft cost, acceptance rate, and hardware utilization; verification is not universally free.
 
 <!-- visual:speculative-decoding-weight-read-ledger -->
 <figure class="learning-figure" aria-labelledby="speculative-cost-title">

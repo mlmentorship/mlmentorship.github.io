@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team and platform interviews, especially at companies serving LLMs at scale.*
 
-The L4 answer picks one technique. The L6 answer diagnoses where the cost actually is, then picks the highest-leverage levers in order. Engineering judgment matters more than technique knowledge.
+Investigate whether an LLM service can reduce inference cost tenfold without violating its quality, latency, or reliability requirements.
+
+## Problem
+
+**Context.** A hypothetical production service has a measured baseline workload and spend, but the dominant cost components are not yet identified.
+The requested tenfold reduction is a target, not an established feasible outcome.
+
+**Task.** Define cost per useful completed request, attribute the baseline, prioritize interventions, and propose controlled evaluations and rollout.
+Estimate combined savings without double-counting and explain what would make the target infeasible.
+
+**Constraints.** Hold the compared task mix and quality contract explicit.
+Include retries, cache coverage, routing failures, output lengths, and operating costs; cheaper requests that fail more often may not save money.
 
 <p class="visual-kicker">Learning objective</p>
 <p class="visual-title">Measure, test, and compound cost reductions without hiding a quality regression</p>
@@ -61,17 +72,17 @@ Three techniques, no diagnosis, no prioritization. Each technique is right but t
 > 4. Multi-step / agentic overhead (chained LLM calls).
 > 5. Tail cost (the 1-5% of requests that consume disproportionate compute).
 >
-> The mix differs by use case. For a chatbot with no RAG and no agent loops, layer 1 dominates. For a RAG-backed agent (which is most production LLM systems in 2026), layers 2-4 typically dominate.
+> The mix differs by workload. Attribute each billed call and token category once; do not infer the dominant term from a chatbot or agent label. The [inference-cost ledger](/guides/llm-inference-cost/) separates repeated context, retries, model prices, and total request cost.
 >
 > Assuming a typical RAG-backed agent, my prioritized levers:
 >
-> - **Prompt caching** (Anthropic, OpenAI, Bedrock support this): if your system prompt is stable, cached tokens cost 5-10&times; less. This is often the single largest win and takes a day to implement.
-> - **Better retrieval**: top-5 after a reranker beats top-20 raw, both in cost and quality. Retrieval is often the largest contributor to per-request token count in RAG systems.
-> - **Tiered models**: cheap fast model for routine planning steps; expensive model only for the hard reasoning steps. Often 2-3&times; cost savings without quality loss.
-> - **Output length steering**: explicit instructions and `max_tokens` can cut output cost by 30-50%, especially for chat models that default to verbose.
+> - **Prompt caching:** price reads, writes, minimum lengths, hit rate, and expiry for the actual provider/version. A stable prefix alone does not establish a saving or an implementation schedule.
+> - **Retrieval:** compare bounded context policies on required-evidence recall and answer quality. Fewer chunks can lose necessary evidence, and reranking itself has a cost.
+> - **Tiered models:** measure routing accuracy, fallback frequency, and every attempted call. A cheaper first model can cost more overall if it creates extra retries or regressions.
+> - **Output control:** test whether shorter outputs still satisfy the task. A token cap can truncate necessary work rather than remove waste.
 > - **Cap iteration count for agent loops**: prevents runaway cost on hard requests; one of the easiest tail-cost reductions.
 >
-> Only after these would I consider switching to a smaller / fine-tuned / quantized model. Those are bigger projects with quality risk; the prompt-cache and retrieval wins are nearly free."
+> Prioritize by measured cost contribution, implementation effort, and quality risk. Caching, retrieval changes, and model changes all need a valid comparison; no intervention is universally free or guaranteed to achieve the requested tenfold target."
 
 This is L5. You've named the cost decomposition, prioritized correctly (cheap structural wins first), and acknowledged the quality risk of the deeper changes.
 
@@ -91,9 +102,9 @@ The L6 answer adds the things that come from running cost optimization for sever
 >
 > **Distillation is a real option but expensive to do well.** If you have enough production data and a quality eval, you can distill a 70B model down to a 7B that handles 80% of your traffic and falls back to 70B for the remaining 20%. This is a months-long project but pays off significantly at scale.
 >
-> **Self-hosted vs API**: there's a crossover point at scale where self-hosting open-weight models becomes cheaper than API. The crossover is roughly at ~$10K-50K/month of API spend for typical models. Below that, API is cheaper because you don't pay for idle GPU time.
+> **Self-hosted vs API:** calculate a workload-specific crossover using utilization, accelerator and engineering costs, peak capacity, model quality, latency, and provider pricing. Monthly API spend alone does not determine the answer.
 >
-> **The least obvious lever**: making the eval set faster. Most teams have eval pipelines that take hours to run, which means they can't iterate on cost optimizations. Cutting eval time from 4 hours to 20 minutes triples how often you can experiment with cost changes, and most cost wins compound across iterations."
+> **Evaluation turnaround:** reducing a run from four hours to twenty minutes is a 12x reduction in that runtime, not a guarantee of 12x experiment throughput. Human review, queues, and other stages remain. Preserve test coverage and failure sensitivity while shortening the loop."
 
 This is L6. You've gone past the techniques into the *operational discipline* of cost reduction, with specific patterns from running this in production.
 

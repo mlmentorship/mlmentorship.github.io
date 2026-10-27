@@ -9,7 +9,18 @@ category: "questions"
 
 > You receive a correct but slow kernel on a simulated accelerator with scratchpad memory, SIMD lanes, multiple execution units, and a cycle trace. Improve it under a fixed time limit.
 
-Do not optimize source code by aesthetic instinct. Establish a verified baseline, identify the limiting resource, predict which change moves it, and measure. The trace is the evidence that connects code to cycles.
+Optimize a correct accelerator kernel by connecting measured execution traces to a bottleneck hypothesis and a verified performance change.
+
+## Problem
+
+**Context.** A simulated accelerator provides scratchpad memory, SIMD lanes, several execution units, and a cycle trace for a slow correct kernel.
+You have a fixed optimization time budget and a supplied correctness check.
+
+**Task.** Establish the baseline, identify the limiting resource, predict an intervention's effect, implement it, and report correctness and performance evidence.
+Explain a failed optimization and the next discriminating measurement if the hypothesis is rejected.
+
+**Constraints.** Preserve required numerical behavior and respect the simulator's dependency and memory model.
+Use the measured workload and cycle accounting; shorter code or higher nominal utilization alone does not prove lower latency.
 
 ## Start with a bottleneck model
 

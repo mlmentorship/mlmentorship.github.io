@@ -13,17 +13,40 @@ aliases: []
 prerequisites: []
 ---
 
-> Check whether all brackets close in the correct order.
+Determine whether a bracket string has matching types, correct nesting, and no unmatched brackets.
 
-Start with the concrete trace below. It shows the state the algorithm must carry as it runs.
+## Problem
+
+**Input.** A string `text` containing only the six bracket characters `()[]{}`.
+
+**Output.** Return `True` if every bracket is correctly matched and nested; otherwise return `False`.
+
+**Rules.** Each opener needs a later closer of the same type.
+Pairs may be nested or adjacent, but may not cross. Equal counts alone are insufficient.
+Leave the string unchanged. Empty text is valid; other characters require the filtering variant below.
+
+**Example.** `"([{}])"` and `"()[]"` return `True`.
+For `"([)]"`, return `False` because the pairs cross; a lone `"("` also returns `False`.
+
+## Picture: Close From Newest to Oldest
 
 <!-- visual:valid-parentheses-state -->
 <figure class="learning-figure coding-visual-figure" aria-labelledby="valid-parentheses-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="valid-parentheses-state-title">Valid Parentheses: A closing bracket is valid only when it removes its matching newest unmatched opening bracket.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="valid-parentheses" role="group" tabindex="0" aria-label="Valid Parentheses: A closing bracket is valid only when it removes its matching newest unmatched opening bracket."><div class="coding-visual-example"><span>Input and goal</span><strong>Check whether all brackets close in the correct order.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize" role="group" aria-label="Initialize an empty stack"><div class="coding-trace-frame-heading"><span>Initialize an empty stack</span><strong>Before scanning ([{}]), there is no unmatched opening bracket.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>empty</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>before index 0</span><span><b>action</b>initialize</span></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="push-round" hidden role="group" aria-label="Push the first opening"><div class="coding-trace-frame-heading"><span>Push the first opening</span><strong>At index 0, ( is not a closing key, so the implementation appends it.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>(</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>index 0: (</span><span><b>action</b>push (</span></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="push-square" hidden role="group" aria-label="Push the nested opening"><div class="coding-trace-frame-heading"><span>Push the nested opening</span><strong>At index 1, [ is newer unfinished work and sits above (.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell" data-motion-key="grid-0-0"><span>(</span></span><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>[</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>index 1: [</span><span><b>action</b>push [</span></div></div><div class="coding-trace-frame" data-coding-frame="3" data-frame-key="push-curly" hidden role="group" aria-label="Push the innermost opening"><div class="coding-trace-frame-heading"><span>Push the innermost opening</span><strong>At index 2, { becomes the only opening that the next closer may finish.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell" data-motion-key="grid-0-0"><span>(</span></span><span class="coding-trace-grid-cell" data-motion-key="grid-1-0"><span>[</span></span><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>{</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>index 2: {</span><span><b>action</b>push {</span></div></div><div class="coding-trace-frame" data-coding-frame="4" data-frame-key="pop-curly" hidden role="group" aria-label="Match the curly pair"><div class="coding-trace-frame-heading"><span>Match the curly pair</span><strong>At index 3, } expects {. pop() returns {, so the scan may continue.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell" data-motion-key="grid-0-0"><span>(</span></span><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>[</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>index 3: }</span><span><b>action</b>pop {; expected {</span></div></div><div class="coding-trace-frame" data-coding-frame="5" data-frame-key="pop-square" hidden role="group" aria-label="Match the square pair"><div class="coding-trace-frame-heading"><span>Match the square pair</span><strong>At index 4, ] expects [. pop() returns [, preserving correct nesting.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>(</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>index 4: ]</span><span><b>action</b>pop [; expected [</span></div></div><div class="coding-trace-frame" data-coding-frame="6" data-frame-key="pop-round" hidden role="group" aria-label="Match the outer pair"><div class="coding-trace-frame-heading"><span>Match the outer pair</span><strong>At index 5, ) expects (. pop() returns (, leaving no unfinished opening.</strong></div><div class="coding-trace-grid" style="--trace-cols:1" role="group" aria-label="Grid state"><span class="coding-trace-grid-cell trace-tone-focus" data-motion-key="stack-top"><span>empty</span><small>top</small></span></div><div class="coding-trace-meta"><span><b>input</b>([{}])</span><span><b>layout</b>bottom to top</span><span><b>current</b>index 5: )</span><span><b>action</b>pop (; expected (</span><span><b>result</b>true</span></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 7</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize an empty stack</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Push the first opening</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Push the nested opening</strong></button><button type="button" data-coding-frame-button="3"><span>4</span><strong>Push the innermost opening</strong></button><button type="button" data-coding-frame-button="4"><span>5</span><strong>Match the curly pair</strong></button><button type="button" data-coding-frame-button="5"><span>6</span><strong>Match the square pair</strong></button><button type="button" data-coding-frame-button="6"><span>7</span><strong>Match the outer pair</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">Use this pattern when nested delimiters must close in reverse opening order and each closer must validate the most recent unfinished opener.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">After each processed character, the stack contains exactly the unmatched opening brackets from the processed prefix, ordered oldest at the bottom and newest at the top.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">For tags, expression delimiters, and nested scopes, store only unfinished openers and let each closer inspect the newest one; an empty stack at the end proves completion.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> Before scanning ([{}]), there is no unmatched opening bracket. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
 
-**Pattern:** Stack.
+| Read | Stack, oldest to newest | Action |
+| --- | --- | --- |
+| `(` | `(` | Push |
+| `[` | `(`, `[` | Push |
+| `{` | `(`, `[`, `{` | Push |
+| `}` | `(`, `[` | Match and pop `{` |
+| `]` | `(` | Match and pop `[` |
+| `)` | Empty | Match and pop `(` |
 
-**Simple idea:** Save opening brackets. A closing bracket must match the newest opening
-bracket.
+After every accepted prefix, `opening` contains exactly the unmatched openers in their original order.
+Its top is the only opener the next closer may finish; searching deeper would permit crossing pairs.
+Reject a closer with no opener or the wrong top. Final emptiness proves completion only after those checks passed.
+
+## Code
 
 ```python
 def valid_parentheses(text: str) -> bool:
@@ -39,4 +62,88 @@ def valid_parentheses(text: str) -> bool:
    return not opening
 ```
 
-**Cost:** $O(n)$ time and $O(n)$ space.
+Time is $O(n)$ with amortized constant-time list pushes and pops.
+Space is $O(h)$ for maximum nesting depth, $O(n)$ in the worst case.
+The original pushes every noncloser; it does not ignore ordinary text.
+
+## Change 1: Ignore Nonbracket Text
+
+**New task.** Ordinary characters are irrelevant; bracket nesting still matters.
+
+**Picture and change.** Push only explicit openers. Ignore other nonclosers.
+
+**Code.**
+
+```python
+def balanced_brackets_in_text(text):
+   stack = []
+   matching = {")": "(", "]": "[", "}": "{"}
+   for character in text:
+      if character in "([{":
+         stack.append(character)
+      elif character in matching:
+         if not stack or stack.pop() != matching[character]:
+            return False
+   return not stack
+```
+
+**Check.** `"a(b[c])"` passes; `"a([)]"` fails. Quotes and comments have no special treatment.
+
+**Use when.** The declared input grammar makes nonbrackets irrelevant, not for parsing a programming language.
+
+## Change 2: Permit Only Round Parentheses
+
+**New task.** The alphabet is only `()`; reject every other character.
+
+**Picture and change.** One type needs only a depth counter. Every prefix must stay nonnegative; final depth must be zero.
+
+**Code.**
+
+```python
+def balanced_round(text):
+   depth = 0
+   for character in text:
+      if character == "(":
+         depth += 1
+      elif character == ")":
+         depth -= 1
+         if depth < 0:
+            return False
+      else:
+         return False
+   return depth == 0
+```
+
+**Check.** `"(())()"` passes; `")("` fails despite final balance zero. This variant uses constant auxiliary space.
+
+**Use when.** Removing type distinctions makes ordered obligations reducible to one count.
+
+## Failure: Counts Without Nesting
+
+`"([)]"` fails as soon as `)` meets `[`. Also reject early `")"` and unfinished `"("`.
+
+## Transfer Check
+
+Why does a queue fail?
+
+### Reasoned Answer
+
+A closer finishes the most recently opened unfinished scope, not the oldest. First-in-first-out order contradicts nesting.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Separate Matching From Completion
+
+The short-circuit `not opening or ...` prevents popping an empty stack.
+A nonempty stack after the scan means unfinished work remains, even if no mismatch occurred.
+An empty final stack is not enough if earlier closers were never validated.
+
+For mixed brackets, depth alone cannot distinguish `([)]` from `([])`.
+The ordered type sequence is necessary state. For one type, the counter retains everything needed and removes unnecessary type storage.
+
+The text-ignoring variant still treats bracket characters inside quoted strings or comments as delimiters.
+It is not an HTML/XML parser, a Python parser, or a tokenizer that recognizes escapes.
+Use a grammar-aware parser when those constructs affect whether a bracket is active.
+
+</div>

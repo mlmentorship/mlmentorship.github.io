@@ -10,7 +10,19 @@ category: "questions"
 
 > *Asked in: coding round at recsys, search, and embedding-team interviews.*
 
-The L4 candidate writes the brute-force version. The L6 candidate names the regimes (small N, medium N, large N) and the right algorithm for each.
+Find the nearest reference vectors to each query and explain how the search should scale as the collection grows.
+
+## Problem
+
+**Context.** Reference vectors `X` have shape `(N, d)`; a query has shape `(d,)`, or batched queries have shape `(Q, d)`.
+Distance is Euclidean distance over matching numeric features.
+
+**Task.** Return `k` original reference-row indices per query with the smallest distances, then compare exact and approximate scaling options.
+For reference points `[[0, 0], [3, 0], [8, 0]]`, query `[2, 0]`, and `k = 1`, return index `1`.
+
+**Constraints.** The provided partition-based sketches assume finite, representable arithmetic and `1 <= k < N`.
+The selected indices need not be distance-sorted; ties may select any valid neighbors.
+Preserve inputs. Approximate search requires an explicit recall target and comparison against exact ground truth.
 
 ## The naive solution
 
@@ -99,7 +111,7 @@ This is the form used by FAISS's flat index. Order-of-magnitude faster than the 
 
 ## What an L5 answer should add
 
-> "Brute-force scales as O(N * d) per query. For N up to ~100K and d ~ 100, brute-force on GPU with batched queries is fast enough.
+> "Brute-force distance evaluation costs O(N * d) per query. Whether it meets the budget depends on hardware, batching, distance, precision, and data movement; a row-count threshold is not a latency guarantee.
 >
 > Past that, use approximate nearest neighbor (ANN):
 >
@@ -107,7 +119,7 @@ This is the form used by FAISS's flat index. Order-of-magnitude faster than the 
 > - **HNSW**: hierarchical navigable small world graphs. State-of-the-art for moderate-d (~100-1000). Sublinear query time, high recall. Used in Qdrant, Weaviate, pgvector with HNSW.
 > - **IVF (inverted file)**: cluster the index, search only nearest clusters. Lower recall but very memory efficient. Used in FAISS.
 > - **PQ (product quantization)**: compress vectors to bytes, do approximate distance computation. Trades recall for memory dramatically.
-> - **HNSW + PQ**: best of both worlds for billion-scale.
+> - **Graph search plus quantization**: another candidate with build, recall, memory, and update trade-offs; no combination is universally best at a catalog size.
 >
 > Trade-off knobs: recall vs query latency vs memory vs build time. Tune to your use case."
 
@@ -115,13 +127,13 @@ This is the form used by FAISS's flat index. Order-of-magnitude faster than the 
 
 > "...practical things:
 >
-> **Distance metric matters for index choice.** Cosine similarity, dot product, and L2 are different but related. For normalized vectors, cosine and L2 give the same ranking. For unnormalized, they differ. Some indexes (like inner-product HNSW) require careful normalization to be correct.
+> **Preserve the intended score.** Nonzero unit-normalized vectors have equivalent cosine, dot-product, and squared-L2 rankings. Normalizing arbitrary item vectors can change an inner-product task; inner-product search does not universally require it. Match query/index transforms and test against an exact [top-k oracle](/questions/top-k-scores/) with a declared tie policy.
 >
 > **GPU vs CPU.** For very high-throughput query workloads, GPU brute-force (FAISS-GPU, ScaNN) is competitive with CPU ANN up to surprisingly large N (millions). For low-throughput or memory-constrained, CPU ANN wins.
 >
-> **Index updates are expensive.** Most ANN indexes are built once; adding/removing items is slow or unsupported. For dynamic catalogs, either rebuild periodically or use indexes with explicit incremental support (newer Qdrant, Vespa).
+> **Updates are an index contract.** Insertion, deletion, compaction, and concurrent-query behavior vary by implementation. For a changing catalog, evaluate freshness and update cost alongside query recall instead of assuming every index is static.
 >
-> **Recall is task-dependent.** 95% recall@10 is fine for recommendation; 99% is needed for some search applications. Tune the index parameters (HNSW M / efConstruction / efSearch, IVF nprobe) to your recall floor.
+> **Recall requirements are task-dependent.** Set an acceptable miss cost and recall floor from the application; neither a recommendation nor search label determines a universal percentage. Tune index parameters against that floor and measured serving cost.
 >
 > **Don't roll your own.** FAISS, Qdrant, ScaNN, and Annoy cover the design space. Use them. The implementation details (cache-aware data layouts, SIMD-friendly distance computation) are decade-tuned."
 

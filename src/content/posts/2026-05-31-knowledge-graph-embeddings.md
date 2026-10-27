@@ -7,45 +7,48 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
+Knowledge-graph embeddings score typed triples, but the scoring operator determines which relation distinctions are even possible.
+
 ## Summary
 
-Knowledge-graph embeddings map **entities** and **relations** of a graph of (head, relation, tail) triples into a continuous vector space, with a **scoring function** $f(h, r, t)$ that ranks true triples above false ones, turning **link prediction** into a geometric / algebraic operation.
-
-Knowledge graphs (entities like titles, people, genres, products linked by typed relations) power recommendation, search, and question answering. Embedding them lets you **predict missing links** ("which genre is this new title?"), compute entity similarity, and inject structured side-information into recsys and RAG. The interview angle is sharp: **the choice of scoring function determines which relation patterns (symmetry, antisymmetry, inversion, composition) the model can represent**, a clean test of representational reasoning.
+Ada is Ben's parent; the reverse relation is false in this example.
+Can swapping the entity embeddings change the proposed score?
+If not, increasing width cannot teach this score the missing direction.
 
 ## The task: knowledge-graph completion
 
-A KG is a set of triples $(h, r, t)$, e.g. (`Inception`, `directed_by`, `Nolan`). Graphs are radically incomplete, so the goal is **link prediction**: score candidate triples and rank the true tail (or head) highly. Trained with a **margin / ranking loss** against **negative samples** (corrupt $h$ or $t$), evaluated with **Mean Reciprocal Rank (MRR)** and **Hits@k**.
+Represent a fact as head, relation and tail, $(h,r,t)$, with corresponding learned vectors.
+Score candidate heads or tails under a stated higher-is-better convention.
+An unobserved triple is not necessarily false; corrupted-entity negatives need a declared validity policy.
+Architecture, training loss and ranking evaluation are separate choices.
 
 ## The four models to know
 
 ### TransE: translation
 
-Model the relation as a translation in embedding space:
-
-$$
-f(h,r,t) = -\lVert \mathbf{h} + \mathbf{r} - \mathbf{t}\rVert,
-$$
-
-so a true triple satisfies $\mathbf{h} + \mathbf{r} \approx \mathbf{t}$. Simple, scalable, intuitive. **Limitation**: it cannot model **symmetric** relations (would force $\mathbf{r} = 0$) or **one-to-many / many-to-one** relations (many valid tails collapse to one point).
+Use $f(h,r,t)=-\lVert h+r-t\rVert_2$.
+Under exact zero residual, two true tails require $t_1=h+r=t_2$.
+Likewise, two reversed zero-residual facts require $2r=0$ and collapse their entity embeddings.
+These are exact-constraint limits; approximate ranking need not satisfy those equalities.
 
 ### DistMult: bilinear diagonal
 
 $$
-f(h,r,t) = \mathbf{h}^\top \operatorname{diag}(\mathbf{r})\, \mathbf{t} = \sum_i h_i r_i t_i.
+f(h,r,t)=\sum_j h_jr_jt_j=\sum_j t_jr_jh_j=f(t,r,h).
 $$
 
-Efficient, captures pairwise feature interactions. **Limitation**: the score is **symmetric in $h$ and $t$**, so it cannot distinguish $(h,r,t)$ from $(t,r,h)$, which is useless for antisymmetric relations like `parent_of`.
+For real scalars $h=1,r=2,t=3$, both scores are six.
+Commutativity holds in every coordinate, so adding dimensions preserves the equality.
 
 ### ComplEx: complex bilinear
 
-Move embeddings into $\mathbb{C}^k$ and use the Hermitian product:
+Use complex embeddings and $f(h,r,t)=\operatorname{Re}\sum_j h_jr_j\overline{t_j}$.
+Choose $h=1,r=i,t=i$, with $i^2=-1$.
+Forward score is $\operatorname{Re}(1\cdot i\cdot(-i))=1$.
+Reverse score is $\operatorname{Re}(i\cdot i\cdot1)=-1$.
 
-$$
-f(h,r,t) = \mathrm{Re}\big(\mathbf{h}^\top \operatorname{diag}(\mathbf{r})\, \bar{\mathbf{t}}\big).
-$$
-
-The complex conjugate $\bar{\mathbf{t}}$ breaks the symmetry, so ComplEx handles **symmetric *and* antisymmetric** relations, a strict generalization of DistMult.
+Conjugation changes which factors contribute imaginary signs.
+It permits this directed distinction; it does not guarantee learning the correct facts.
 
 <!-- visual:kge-antisymmetry-score-swap -->
 <figure class="learning-figure" aria-labelledby="kge-antisymmetry-title">
@@ -101,50 +104,89 @@ The complex conjugate $\bar{\mathbf{t}}$ breaks the symmetry, so ComplEx handles
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the two score pairs after swapping Ada and Ben. DistMult only reorders real scalar factors, so equality is unavoidable at every width. ComplEx moves the conjugate to the other entity; its score need not stay equal, so the directed fact can outrank its reversal. The broad pattern table below applies this same operator-first test to all four models. Original schematic checked against the <a href="https://proceedings.mlr.press/v48/trouillon16.html">ComplEx paper</a> and the <a href="https://arxiv.org/abs/1902.10197">RotatE comparison of relation patterns</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> swap Ada and Ben. DistMult only reorders real factors, forcing equal scores. ComplEx changes which entity is conjugated, permitting unequal scores. The worked scalar example gives 1 versus -1. Original schematic checked against <a href="https://proceedings.mlr.press/v48/trouillon16.html">ComplEx</a> and <a href="https://arxiv.org/abs/1902.10197">RotatE</a>.</figcaption>
 </figure>
 
 ### RotatE: rotation in complex space
 
-$$
-f(h,r,t) = -\lVert \mathbf{h} \circ \mathbf{r} - \mathbf{t}\rVert, \quad |r_i| = 1,
-$$
-
-each relation is an element-wise **rotation** (unit-modulus complex multiply). Rotations compose and invert, so RotatE can express **symmetry, antisymmetry, inversion, and composition**, the most expressive of the four on relation patterns.
+Use $f(h,r,t)=-\lVert h\odot r-t\rVert_2$, with unit-modulus relation coordinates.
+Multiplying $1$ by $i$ gives $i$ with zero residual; inverse rotation $-i$ maps it back to one.
+The inverse is coordinatewise conjugation; composing exact rotations multiplies their coordinates.
 
 ## Which patterns each model expresses
 
-| Model | Space | Symmetry | Antisymmetry | Inversion | Composition |
-| --- | --- | --- | --- | --- | --- |
-| **TransE** | $\mathbb{R}^k$ | ✗ | ✓ | ✓ | ✓ |
-| **DistMult** | $\mathbb{R}^k$ | ✓ | ✗ | ✗ | ✗ |
-| **ComplEx** | $\mathbb{C}^k$ | ✓ | ✓ | ✓ | ✗ |
-| **RotatE** | $\mathbb{C}^k$ | ✓ | ✓ | ✓ | ✓ |
+| Operator | Discriminating test | Scope |
+| --- | --- | --- |
+| TransE | distinct tails force conflicting translations | exact zero residual |
+| DistMult | head/tail swap leaves score unchanged | every shared-entity real score |
+| ComplEx | conjugated swap can change real score | capacity, not learned accuracy |
+| RotatE | conjugate inverse and componentwise composition | unit-modulus, exact rotations |
 
-This table *is* the interview answer: pick the model by which relation patterns your graph contains.
+Pattern claims depend on their formal definitions and residual assumptions, not a universal expressivity ordering.
+
+## Change the required information
+
+### Require direction
+
+**New task:** replace undirected similarity with `parent_of`.
+
+**Picture and change:** reject the forced-symmetric score or use a directional operator with explicitly distinct entity roles.
+
+**Check:** duplicating the DistMult coordinate gives twelve in both directions, still tied.
+The one-coordinate ComplEx example gives one and minus one.
+
+**Use when:** reversal must change the ranking; test held-out directed facts.
+
+### Add an unseen entity
+
+**New task:** score a new title with metadata but no trained ID vector.
+
+**Picture and change:** supply an explicit feature/neighbor encoder or fallback, then evaluate unseen-entity generalization.
+
+**Check:** a toy feature map $E([u,v])=u+iv$ maps $[1,0]$ to one.
+It can enter the example's forward score, which becomes one.
+That arithmetic supplies an embedding, not evidence that the asserted fact is true.
+
+**Use when:** deployment must cover entities absent from the transductive training IDs.
+
+## Reconstruct the limitation
+
+Does algebraic capacity prove that a missing link is correct?
+
+<details>
+<summary>Reasoned answer</summary>
+
+No. Observation coverage, negative validity, split leakage, training evidence and optimization remain separate requirements.
+Changing width cannot remove DistMult's forced equality; changing its operator can.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Where this fits in recsys / RAG
 
-- **Recsys side-information**: embed a catalog KG (titles, actors, genres) and concatenate entity embeddings with user/item collaborative-filtering vectors to fight cold-start and add semantics.
-- **Beyond shallow embeddings**: **R-GCN** and other relational GNNs generalize these scoring functions with message passing; **node2vec / metapath2vec** learn embeddings from random walks.
-- **KG + LLM**: structured triples ground LLM answers and constrain RAG retrieval.
+Catalog graphs can supply typed side-information alongside collaborative features.
+Relational GNNs add neighborhood computation; random-walk embeddings learn another neighborhood objective.
+Neither is a universal replacement or winner.
+Structured RAG inputs can also contain stale or false triples; graph grounding does not establish truth.
 
 ## What an interviewer expects you to say
 
-1. Frame the task as **link prediction over (h, r, t) triples**, trained with **negative sampling** and a ranking loss, evaluated with **MRR / Hits@k**.
-2. Give **TransE** ($\mathbf{h}+\mathbf{r}\approx\mathbf{t}$) and immediately name its failure on **symmetric and 1-to-many** relations.
-3. Explain that **DistMult is symmetric** (can't do antisymmetry), **ComplEx fixes it via complex conjugation**, and **RotatE models relations as rotations** to also capture composition.
-4. Tie model choice to **relation patterns** in the data.
-5. Bonus: connect to **GNNs (R-GCN)** and to recsys cold-start / RAG grounding.
+Define the fact population, candidate set, negative construction and temporal/train/test split.
+Evaluate filtered MRR or Hits@K under a declared known-positive filtering protocol and tie policy.
+State whether encoder inputs can expose future or test information.
 
 ## Common confusions
 
-- **"More dimensions is the main lever."** The **scoring function's inductive bias** matters more than dimensionality: DistMult literally cannot represent antisymmetry at any width.
-- **"TransE handles any relation."** It breaks on symmetric and many-to-one relations by construction.
-- **"These are just word embeddings."** They jointly embed **entities and typed relations** with a relation-specific operator, not a single similarity space.
-- **"Link prediction is classification."** It's a **ranking** problem over corrupted negatives; accuracy is the wrong metric, MRR/Hits@k are standard.
-- **"KG embeddings replaced GNNs."** They're the shallow end; relational GNNs add message passing and usually win when neighborhood structure is rich.
+Classification or ranking losses can train a triple score; the evaluation task determines the appropriate metrics.
+Unobserved does not mean negative.
+ID-only embeddings do not provide an unseen entity's representation.
+Relation-pattern theorems use specific definitions; approximate learned scores need separate empirical evaluation.
 
 ---
 
 *Related: [Graph neural networks](/concepts/graph-neural-networks/), [Word embeddings](/concepts/word-embeddings/), [Negative sampling strategies](/questions/negative-sampling-strategies/), [Matrix factorization for recsys](/concepts/matrix-factorization-recsys/), [Content-based filtering](/concepts/content-based-filtering/).*
+
+</div>

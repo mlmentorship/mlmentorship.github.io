@@ -10,8 +10,9 @@ const xorSteps = [
 const draft = visual('Initialize with n, then XOR every expected index and actual value so matched numbers cancel and the missing value survives.', [
   frame(
     'Seed the unmatched endpoint',
-    'For nums = [3, 0, 1], n = 3. Initialize missing = 3 because enumerate supplies expected indices 0, 1, and 2 but not endpoint 3.',
-    array(nums, [mark(0, 'next i=0', 'focus', 'scan')], {
+    'Seed missing with 3 to include the domain endpoint omitted by enumerate.',
+    array(nums, [mark(0, 'i=0', 'focus', 'scan')], {
+      fitArray: true,
       expectedDomain: '[0, 1, 2, 3]',
       accumulator: 'missing = len(nums) = 3 = 0011₂',
     }),
@@ -20,7 +21,8 @@ const draft = visual('Initialize with n, then XOR every expected index and actua
   ...xorSteps.map(({ index, before, num, after }) => frame(
     `XOR index ${index} and value ${num}`,
     `missing = ${before} XOR ${index} XOR ${num} = ${after}; XOR order does not change the eventual cancellations.`,
-    array(nums, [mark(index, `i=${index}, num=${num}`, index === 2 ? 'output' : 'focus', 'scan')], {
+    array(nums, [mark(index, `i=${index}`, index === 2 ? 'output' : 'focus', 'scan')], {
+      fitArray: true,
       before: `${before} = ${before.toString(2).padStart(4, '0')}₂`,
       operation: `${before} xor ${index} xor ${num} = ${after}`,
       binaryResult: `${after.toString(2).padStart(4, '0')}₂`,

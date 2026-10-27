@@ -1,6 +1,6 @@
 ---
-title: "Regularization: L1, L2, dropout, early stopping, and the modern view"
-description: "The classical regularizers + the modern reality that SGD's noise is itself a regularizer. The hierarchy of choices when your model is overfitting."
+title: "Regularization: diagnose the gap and choose a constraint"
+description: "Check train/validation comparability, distinguish sparse and small coefficients, and return the best validated state instead of stacking penalties."
 date: "2026-01-30"
 draft: false
 tags: ["concepts"]
@@ -10,9 +10,14 @@ category: "concepts"
 
 ## Summary
 
-Regularization constrains effective model capacity to reduce overfitting. It includes explicit forms (L1/L2, dropout, early stopping, data augmentation) and implicit forms (SGD noise, optimizer choice, architecture).
+Regularization changes fitting to improve generalization under stated assumptions.
+A validation error alone does not identify overfitting.
+Compare unregularized training and validation losses in evaluation mode, with matched metrics and preprocessing.
+Check leakage, split shift, label conventions, and optimization before selecting a constraint.
 
-Overfitting is the most common failure mode of moderately-sized models on moderately-sized datasets. Regularization is the response. Modern large-scale models often don't need explicit regularization (they're underfitting at trillion-token scale), but for almost everything outside frontier LLM pretraining, regularization choices matter.
+**Task:** fit independent coordinates with $L_{data}(\theta)=\frac12\sum_i(\theta_i-a_i)^2$, where $a=[0.1,2]$.
+Choose between small coefficients and exact zeros at penalty strength $\lambda=0.2$.
+These are analytic fixtures, not measured generalization gains.
 
 <!-- visual:regularization-diagnose-and-target -->
 <figure class="learning-figure" aria-labelledby="regularization-choice-title">
@@ -21,108 +26,108 @@ Overfitting is the most common failure mode of moderately-sized models on modera
 	<div class="visual-grid--two" role="group" aria-label="A diagnosis panel compares training and validation behavior before a second panel matches an observed overfitting mechanism to one regularization lever">
 		<section class="visual-panel">
 			<h4>1 - DIAGNOSE BEFORE ADDING</h4>
-			<p><strong>Train poor + validation poor</strong><br />Both sets are underfit. Fix optimization, representation, capacity, or data quality; stronger regularization usually worsens this.</p>
-			<p><strong>Train good + validation worse</strong><br />A persistent generalization gap is evidence of overfitting. Regularize and judge the change on held-out data.</p>
+			<p><strong>Train poor + validation poor</strong><br />Check optimization, representation, data quality, and objective alignment before tightening constraints.</p>
+			<p><strong>Train good + validation worse</strong><br />A gap warrants split and mode checks before calling it overfitting. Test the proposed constraint on held-out data.</p>
 			<p><strong>Train good + validation good</strong><br />Do not add a penalty by default. More regularization can create underfitting.</p>
 		</section>
 		<section class="visual-panel">
 			<h4>2 - TARGET ONE SOURCE OF CAPACITY</h4>
 			<p><strong>Missing known invariance &rarr; augmentation</strong><br />Teach label-preserving input variation.</p>
-			<p><strong>Large weights &rarr; decoupled weight decay</strong><br />Shrink parameters directly; use AdamW with Adam.</p>
+			<p><strong>Magnitude constraint &rarr; test decoupled decay</strong><br />Shrink selected parameters directly; distinguish AdamW from a loss penalty.</p>
 			<p><strong>Co-adapted activations &rarr; dropout</strong><br />Randomly mask training-time activations.</p>
 			<p><strong>Validation degrades with more steps &rarr; early stopping</strong><br />Restore the best held-out checkpoint.</p>
 			<p><strong>Exact feature sparsity required &rarr; L1</strong><br />Use a nonsmooth penalty that can produce zeros.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> first compare training with validation. Only the middle pattern is evidence that fitting the training set has outrun generalization. Then choose the lever whose intervention matches the failure instead of stacking every regularizer; batch size, optimizer, and architecture already add implicit effects that change the amount you need. Original synthesis checked against <a href="https://www.deeplearningbook.org/contents/regularization.html">Goodfellow et al., chapter 7</a>, <a href="https://www.jmlr.org/papers/v15/srivastava14a.html">Srivastava et al. (2014)</a>, and <a href="https://arxiv.org/abs/1711.05101">Loshchilov and Hutter (2019)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare matched training and validation evidence first. A gap prompts checks; it does not prove a capacity problem. Choose one lever whose intervention tests the proposed cause, then measure held-out behavior. Optimizer, batch size, and architecture can also change fitting. Sources: <a href="https://www.deeplearningbook.org/contents/regularization.html">Goodfellow et al., chapter 7</a>, <a href="https://www.jmlr.org/papers/v15/srivastava14a.html">Srivastava et al. (2014)</a>, and <a href="https://arxiv.org/abs/1711.05101">Loshchilov and Hutter (2019)</a>.</figcaption>
 </figure>
 
 ## The classical lineup
 
-### L2 regularization (weight decay)
+For this unit-curvature quadratic, the penalty determines the optimum:
 
-Add `lambda * ||theta||^2` to the loss. Penalizes large weights.
+| Added penalty | Optimum | At $\lambda=0.2$ |
+| --- | --- | --- |
+| $\lambda\lVert\theta\rVert_1$ | $\operatorname{sign}(a_i)\max(\lvert a_i\rvert-\lambda,0)$ | $[0,1.8]$ |
+| $\lambda\lVert\theta\rVert_2^2/2$ | $a_i/(1+\lambda)$ | $[1/12,5/3]$ |
 
-- Bayesian interpretation: a Gaussian prior on the weights centered at zero.
-- Effect: weights shrink toward zero; model preferentially uses many small weights instead of few large ones.
-- Default `lambda` is typically 1e-4 to 1e-2 for SGD; smaller for Adam (1e-2 in AdamW for transformers).
-- **Important**: in AdamW, weight decay is decoupled from the gradient (applied directly to weights). In standard Adam with `weight_decay > 0`, the weight decay gets scaled by the adaptive learning rate, which is usually wrong.
-
-### L1 regularization
-
-Add `lambda * ||theta||_1` to the loss. Penalizes sum of absolute values.
-
-- Bayesian interpretation: a Laplace prior on the weights.
-- Effect: induces *sparsity*, many weights become exactly zero. Useful when feature selection is desired.
-- Less common in deep learning; more common in classical ML (LASSO).
-
-### L1 + L2 (Elastic Net)
-
-Combination of both. Sparsity from L1 + stability from L2. Common in classical ML, rarely used in deep learning.
-
-### Dropout
-
-Randomly zero a fraction `p` of activations during training; scale by `1/(1-p)` during training so the expected output is unchanged at test time (inverted dropout).
-
-- Why it works (three frames): regularization (prevents co-adaptation), implicit ensembling (averaging exponentially many sub-networks), Bayesian approximation (variational inference over weights).
-- Default `p = 0.1` to `0.3` for most networks; lower (0.0-0.1) for very large models.
-- **In transformers**: usually applied to attention weights, attention output, and FFN intermediate. Not on residual stream, not on layer norms, not on embedding lookup.
-- **Modern LLMs often use no dropout** during pretraining because they're not overfitting at scale. SFT and RLHF stages may add small dropout.
-
-### Early stopping
-
-Monitor validation loss; stop training when it stops improving for `N` epochs (or steps).
-
-- Implicitly limits model capacity by limiting the number of update steps.
-- Equivalent to L2 regularization in some idealized settings (Goodfellow, 7.8).
-- Cheap, effective, hard to mess up. Should be standard in any training pipeline that doesn't run to a fixed budget.
-
-### Data augmentation
-
-Apply label-preserving transformations to inputs during training. Random crops, flips, color jitter for images; back-translation, synonym replacement for text; SpecAugment for audio.
-
-- Effectively multiplies your data by the number of augmentations.
-- One of the highest-ROI regularization techniques when applicable.
-- For LLMs: not used in the classical sense, but data mixing strategies serve a similar role.
-
-## The modern view: implicit regularization
-
-A surprising 2017-2020 result: SGD itself is a regularizer. The noise from mini-batch sampling biases SGD toward "flat" minima that generalize better than the sharper minima found by full-batch optimization.
-
-Consequences:
-
-- Smaller batch sizes can generalize better than larger ones (when controlling for compute), because the gradient noise is larger.
-- Adam's adaptivity reduces this implicit regularization, which is part of why SGD sometimes generalizes better than Adam in some settings.
-- Momentum and weight decay interact non-trivially with this; the optimal weight decay value is different in different optimizers and at different batch sizes.
-
-For modern LLM-scale training, the picture is more complicated. The implicit regularization framing is most useful for moderately-sized supervised models.
+The first L1 coordinate is zero because $|a_1|\le\lambda$ satisfies its subgradient condition.
+For L2, differentiating gives $(1+\lambda)\theta_i=a_i$, retaining both nonzero coordinates.
+Exact L1 zeros require an objective optimum or an appropriate nonsmooth solver, not merely a few ordinary gradient steps.
 
 ## When to use what
 
-A practical hierarchy:
+**New task:** retain the weak feature by reducing L1 strength to $0.05$.
+Move the threshold inward without changing the data quadratic.
+**Check:** $[\max(0.1-0.05,0),2-0.05]=[0.05,1.95]$; neither coordinate is zero.
+**Use when:** held-out evidence and the desired feature count favor retaining it.
 
-1. **Are you overfitting?** Train accuracy &gt;&gt; validation accuracy. If yes, regularize.
-2. **Is your dataset small?** First try data augmentation (often biggest win) and dropout.
-3. **Are your weights large or unstable?** Add L2 (AdamW with `weight_decay`).
-4. **Are you stopping too late?** Add early stopping.
-5. **Do you want sparsity?** Add L1 (rare in DL).
-6. **Are you in the LLM-pretraining regime?** Skip dropout; weight decay still helps; data is the regularizer.
+**New task:** select a checkpoint from epoch losses $[0.8,0.6,0.65,0.7]$ on validation.
+Save epoch two; patience controls stopping time, not returned weights.
+**Check:** restore loss $0.6$, not the final epoch's $0.7$.
+**Use when:** further fitting worsens a trustworthy held-out objective; never select on the test set.
+
+**Failure:** flipped validation label conventions can create a gap that weight decay cannot repair.
+
+**Reconstruct:** combine L1 strength $0.2$ with L2 strength $0.5$ in this fixture. What is the optimum?
+
+<details><summary>Answer</summary>
+
+Threshold to $[0,1.8]$, then divide by $1.5$, giving $[0,1.2]$.
+This Elastic Net formula depends on the separable unit-curvature quadratic.
+
+</details>
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+### L2 regularization (weight decay)
+
+Use $\lambda\|\theta\|_2^2/2$ for a loss penalty.
+Its Gaussian MAP-prior interpretation depends on likelihood scaling.
+[Decoupled decay](/concepts/weight-decay-vs-l2/) is not generally the same optimizer update.
+
+### L1 regularization
+
+The absolute-value penalty corresponds to independent Laplace priors under matching MAP assumptions.
+Feature scaling and solver choice affect sparse solutions.
+
+### L1 + L2 (Elastic Net)
+
+Combining penalties changes both threshold and shrinkage, as the reconstruction example shows.
+
+### Dropout
+
+Follow the [mask-expectation calculation](/concepts/dropout/) rather than treating nonlinear inference as exact ensemble averaging.
+Placement and probability are architecture-specific.
+Monte Carlo dropout deliberately retains sampling for a separate uncertainty procedure.
+
+### Early stopping
+
+Finite optimization time changes the learned solution.
+Equivalence to an L2 penalty holds only under particular model, optimization, and spectral assumptions.
+
+### Data augmentation
+
+Specify an assumed label-preserving transformation; flipping an image or replacing a word can instead change the target.
+Augmented samples are not additional independent observations.
+
+## The modern view: implicit regularization
+
+Optimizer, initialization, sampling, and architecture can bias solutions without an explicit penalty.
+Small-batch or flat-minimum generalization advantages are conditional findings, not universal guarantees or optimizer rankings.
 
 ## Common confusions
 
-- **"L1 = sparse, L2 = small."** Roughly right. L1 induces hard zeros; L2 shrinks but rarely to zero.
-- **"Dropout in inference."** Standard recipe is OFF at inference. *Monte Carlo dropout* (keeping it ON to sample from the implicit posterior) is a separate technique for uncertainty estimation, not a default.
-- **"More regularization = better generalization."** No. Too much regularization → underfitting. The right amount is task-dependent and must be tuned.
-- **"Use weight decay AND dropout AND L2 etc."** Stacking many regularizers is fine but rarely necessary. Pick one or two that target your actual problem.
+More regularization can worsen fitting and generalization.
+Joint changes obscure which hypothesis the experiment tested.
 
 ## Why interviewers ask
 
-Regularization questions test:
-1. Whether you know multiple techniques and can choose between them.
-2. Whether you understand the Bayesian interpretations.
-3. Whether you've kept up with the modern view (implicit regularization, the LLM-scale "regularization is data" view).
-4. Whether you know the per-technique gotchas (AdamW vs Adam+weight_decay, dropout placement in transformers).
+Explain the evidence, selected constraint, validation decision, and a counterexample to the diagnosis.
 
 ---
 
 *Related: [Why does dropout work?](/questions/why-does-dropout-work/), [Adam, AdamW, and modern optimizer choices](/concepts/adam-and-adamw/).*
+
+</div>

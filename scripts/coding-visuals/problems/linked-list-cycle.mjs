@@ -38,7 +38,7 @@ const state = (slowNode, fastNode, extra = {}) => linked(positions.map((node) =>
 const draft = visual('With a cycle, a pointer moving two links per round gains one cycle position on a pointer moving one link, so they must meet.', [
   frame(
     'Initialize both pointers at head',
-    'For 1->2->3->4 with 4.next = 2, set slow = fast = node 1. The loop guard passes because fast and fast.next both exist.',
+    'Start both pointers at node 1 without comparing them. Guard the two-link move before advancing.',
     state('1', '1', { guard: 'fast=1 and fast.next=2' }),
     'initialize-at-head',
   ),

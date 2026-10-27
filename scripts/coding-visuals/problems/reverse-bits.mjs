@@ -2,6 +2,7 @@ import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const original = 43261596;
 const originalBits = original.toString(2).padStart(32, '0');
+const bitView = { fitArray: true, arrayColumns: 8, indexLabels: Array.from({ length: 32 }, (_, index) => 31 - index) };
 let value = original;
 let answer = 0;
 const iterations = [];
@@ -24,7 +25,8 @@ const draft = visual('Across exactly 32 iterations, consume input bits from leas
   frame(
     'Initialize the 32-bit word',
     'Input 43261596 is 00000010100101000001111010011100₂. Set answer = 0 before reading bit position 0.',
-    array(originalBits.split(''), [mark(31, 'next: bit 0', 'focus', 'read-cursor')], {
+    array(originalBits.split(''), [mark(31, 'b=0', 'focus', 'read-cursor')], {
+      ...bitView,
       input: '43261596',
       value: originalBits,
       answer: '00000000000000000000000000000000',
@@ -37,7 +39,8 @@ const draft = visual('Across exactly 32 iterations, consume input bits from leas
     return frame(
       `Read bit ${iteration}: ${bit}`,
       `Iteration ${iteration + 1}: answer = (${beforeAnswer} << 1) | ${bit} = ${nextAnswer}; value shifts right to ${remaining}.`,
-      array(originalBits.split(''), [mark(readIndex, `read #${iteration + 1}: ${bit}`, iteration === 31 ? 'output' : 'focus', 'read-cursor')], {
+      array(originalBits.split(''), [mark(readIndex, `b=${iteration}`, iteration === 31 ? 'output' : 'focus', 'read-cursor')], {
+        ...bitView,
         sourceBitPosition: String(iteration),
         appendOperation: `(${beforeAnswer} << 1) | ${bit} = ${nextAnswer}`,
         answerBits: outputBits,

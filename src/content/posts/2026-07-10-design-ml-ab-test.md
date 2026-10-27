@@ -9,9 +9,21 @@ category: "questions"
 
 > A new ranking model improves offline NDCG by 6%. Design the online experiment and decide what result would justify launch.
 
-Turn the offline gain into a launch decision: choose a randomization unit, one primary metric with guardrails, a minimum worthwhile effect fixed in advance, and a rule for what result ships. A p-value is not a decision, and a test that harms users to chase significance is a failed design.
+Design an online test that turns a ranking model's offline improvement into a defensible product launch decision.
+
+## Problem
+
+**Context.** A proposed ranking model improves offline NDCG by 6%, but its effect on user outcomes has not been established.
+
+**Task.** Choose randomization and analysis units, a primary outcome, guardrails, a minimum worthwhile effect, and an explicit release rule.
+Specify power assumptions, exposure logging, ramp stages, and how validity failures or inconclusive results will be handled.
+
+**Constraints.** Predeclare thresholds and stopping rules, account for interference and repeated observations, and stop unacceptable harm.
+Offline relevance and statistical significance alone do not establish a practically valuable or safe launch.
 
 **Learning objective:** Apply validity, practical-effect, and guardrail gates in order so a statistically significant result is not mistaken for a ship decision.
+
+<p class="visual-title">Validity, practical effect, and harm are separate gates</p>
 
 <!-- visual:ml-ab-test-launch-gates -->
 ```mermaid

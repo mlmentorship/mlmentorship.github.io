@@ -8,63 +8,47 @@ category: "questions"
 ---
 
 
-> *Asked in: behavioral and ML system design rounds at every senior level.*
+Turn an ambiguous request for a larger model into a bounded investigation with an explicit decision and success criterion.
 
-The L4 candidate jumps to solutions. The L6 candidate has an explicit scoping process that they apply consistently.
+## Problem
 
-## What "scoping an ambiguous problem" means
+**Context.** A requester attributes poor generated answers to model size, while selected complaint cases have the invented cause assignments below.
 
-Open-ended business problem ("we need better recommendations," "the agent isn't reliable enough," "users complain about response quality") arrives at your desk. Your job is to turn it into a tractable ML problem with:
-- A clear success criterion.
-- A defined scope (what's in, what's out).
-- A measurable plan.
-- Identified risks and unknowns.
+**Task.** Clarify the desired outcome, identify the first deciding uncertainty, and propose a small investigation with predicted results.
+State a success criterion, scope boundary, owner, and conditions for changing direction.
 
-The senior signal is whether you can do this *before* writing code.
+**Constraints.** The complaint sample is selected, not a representative estimate of all traffic.
+Do not convert its counts into a causal claim that one intervention solves the whole product problem.
 
-## What an L4 answer sounds like
+A requester wants a larger generator because answers are poor.
+In this fictional triage, 50 selected complaint cases have disjoint assigned causes:
 
-> "I'd start prototyping a solution and iterate based on what works."
+| Assigned cause | Cases |
+| --- | ---: |
+| Missing source information | 30 |
+| Retrieval omission | 15 |
+| Answer synthesis | 5 |
 
-Reasonable for L4 (execution within someone else's scope). Failure at L5+ where you're expected to set scope.
+What should the first investigation change? Which conclusion cannot be drawn from these counts?
 
-## What an L5 answer sounds like
+## Picture: Find the Decision-Changing Unknown
 
-> "My process:
->
-> 1. **Talk to the requesters.** What are they actually trying to achieve? What does success look like in business terms? What's the cost of failure?
->
-> 2. **Reframe in ML terms.** What's the prediction or decision? What's the input, the output, the ground truth, the evaluation metric? Sometimes the answer is 'this isn't an ML problem,' and that's a valid output.
->
-> 3. **Identify the data.** What data exists, what would we need, what's the quality? Often the available data determines what's possible.
->
-> 4. **Sketch a baseline.** What's the simplest reasonable solution? Sometimes a heuristic or a small model is enough; that's a useful answer.
->
-> 5. **Identify risks.** What could make this not work? Data quality, distribution shift, label noise, regulatory constraints, cost, latency.
->
-> 6. **Write a one-pager.** Document the framing, the metric, the proposed approach, the risks. Get sign-off before investing significantly.
->
-> The output of scoping is a one-pager, not code."
-
-This is L5. Process is named, output is documented, the 'this isn't an ML problem' option is on the table.
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">How does an ambiguous request become an evidence-backed v1 decision?</p>
+<p class="visual-title">A selected complaint sample does not estimate prevalence</p>
 
 <!-- visual:ambiguous-problem-scope-loop -->
 ```mermaid
 %%{init: {"themeVariables": {"fontSize": "19px"}, "flowchart": {"nodeSpacing": 12}}}%%
 flowchart TB
-	accTitle: A senior scoping loop from an ambiguous request to an evidence-backed decision
-	accDescr: Start with a stakeholder's symptom, interrogate it to identify the actual user or business outcome, then define success, constraints, data, and non-goals. Decide whether machine learning is justified. If not, choose a non-ML baseline or stop. If it is, write a time-boxed one-pager that names scope, metrics, risks, and open questions. Select the biggest unknown, run the smallest experiment that can resolve it, and use evidence to proceed, rescope and repeat, or stop.
-	A["Stated symptom<br/>“recommendations are bad”"] --> B["Interrogate the request<br/>users · costs · context"]
+	accTitle: A selected complaint sample guides a bounded scoping test
+	accDescr: The fictional sample contains 30 missing-source, 15 retrieval and five synthesis cases. These are selected complaint categories, not population rates. Validate their assignment, identify the affected user outcome and define scope, constraints and non-goals. Check authoritative source availability before assuming a larger generator addresses the dominant assigned cause. A bounded test can support v1, rescope, select a non-ML path or stop; its owner records evidence and a decision date.
+	A["50 selected complaints<br/>30 source · 15 retrieval<br/>5 synthesis"] --> B["Validate triage + sample<br/>users · costs · context"]
 	B ==> C["Actual outcome<br/>what must change for whom?"]
-	C --> D["Define the boundary<br/>success · constraints · data<br/>in · out · deferred"]
-	D --> E{"Is ML justified<br/>and measurable?"}
-	E -->|"no"| F["Use a non-ML baseline<br/>or stop"]
-	E ==>|"yes"| G["Time-boxed one-pager<br/>metric · scope · risks<br/>owners · open questions"]
-	G --> H["Name the biggest unknown<br/>that could invalidate the plan"]
-	H ==> I["Smallest experiment<br/>that resolves that unknown"]
+	C --> D["Define the boundary<br/>success · guardrails · data<br/>in · out · deferred"]
+	D --> E{"Model change justified<br/>by available evidence?"}
+	E -->|"no"| F["Instrumentation / non-ML<br/>baseline or stop"]
+	E ==>|"yes"| G["One-page decision<br/>scope · owner · timebox<br/>test · open questions"]
+	G --> H["Key uncertainty<br/>required facts available?"]
+	H ==> I["Bounded availability check<br/>decision rule set in advance"]
 	I --> J{"What did the<br/>evidence change?"}
 	J -->|"supports"| K["Proceed to v1<br/>with agreed scope"]
 	J -. "changes assumptions" .-> D
@@ -76,47 +60,104 @@ flowchart TB
 	class F,L viz-warning
 	class I,K viz-output
 ```
-<p class="diagram-caption"><strong>Read it this way:</strong> do not turn the first request directly into a model. Move from the stated symptom to an agreed outcome and explicit boundary, then allow “non-ML” or “stop” as valid decisions. If ML remains justified, the first build is not v1: it is the smallest time-boxed experiment that can retire the plan’s biggest unknown. Its evidence either supports proceeding to v1, changes the scope, or ends the approach. Original synthesis checked against the <a href="https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works">GOV.UK discovery guidance</a>, the <a href="https://www.gov.uk/service-manual/agile-delivery/how-the-alpha-phase-works">GOV.UK alpha guidance</a>, and <a href="https://developers.google.com/machine-learning/problem-framing/problem">Google’s ML problem-framing guidance</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> the request names a component, not yet a scoped problem. Define the decision and evidence before choosing v1, a non-ML baseline, further discovery or stop.</p>
 
-## What an L6 answer adds
+## Work the Triage
 
-> "...practical things:
->
-> **Distinguish the stated problem from the actual problem.** Requesters often state symptoms ('the recommendations are bad') when the actual problem is something else (the *category* of recommendations is wrong, the metric they're using is wrong, the user expectation is mismatched). The first conversation usually surfaces this; sometimes it takes several. The skill is asking the questions that distinguish.
->
-> **Time-box the scoping.** Scoping can expand to consume the project. I commit to producing the one-pager by a specific date and force convergence even if some questions are still open. The one-pager names the open questions explicitly; some can be deferred until the prototype answers them.
->
-> **Negotiate scope explicitly.** The default outcome of an unscoped project is scope creep. The one-pager should say what's in v1, what's in v2, and what's explicitly out. Get sign-off on each.
->
-> **Build in measurement before the model.** A scoped project specifies how you'll measure success before you build the solution. If you can't measure it, you can't ship it.
->
-> **Identify the smallest experiment that resolves the biggest unknown.** Often the dominant risk is one specific question (will the model generalize to this distribution? does the data even contain the signal we think it does?). The first prototype should target that question, not the full system."
+$30+15+5=50$. Under this taxonomy, a generator-only change directly targets the five synthesis cases.
+The other 45 motivate source/retrieval investigation, not an assumed larger-model fix.
 
-## Tells that get you a strong-hire vote
+First validate the categories and source availability against an authoritative version.
+If required facts are absent but permitted to obtain, scope ingestion; if already available, revisit retrieval and triage.
+If necessary inputs cannot lawfully be obtained, narrow the task or stop.
 
-- You have an **explicit, repeatable process**.
-- You bring up **'maybe this isn't an ML problem'** as a valid scoping output.
-- You write a **one-pager** as the deliverable.
-- You distinguish **stated vs actual problem**.
-- You **time-box** the scoping itself.
-- You target the **biggest unknown** with the first experiment.
+The sample estimates neither overall failure prevalence nor causal improvement.
+Real failures can overlap; the disjoint categories are an exercise assumption.
 
-## Tells that get you down-leveled
+## Make the Decision Artifact
 
-- Jumping to model architecture.
-- No discussion of measurement.
-- Treating scoping as the requesters' problem.
-- No mention of risks or unknowns.
-- Not knowing when to *stop* scoping and start building.
+Name the affected population, outcome/guardrails, inputs/outputs/labels, data quality, owner, timebox and deciding uncertainty.
+Record in-scope work, explicit non-goals, deferred work and the result that means proceed, rescope or stop.
+Agree a decision date and review authority; duration depends on risk and evidence cost, not a universal week.
+
+## Change 1: Labels or Logging Are Missing
+
+**New task.** Reliable outcome evidence does not exist.
+
+**Picture and change.** Scope instrumentation, representative labeling or a smaller decision first.
+
+**Check.** A convenient proxy does not automatically identify the intended outcome.
+
+**Use when.** Evidence availability is the biggest unknown.
+
+## Change 2: A Quality Promise Is Demanded
+
+**New task.** Stakeholders request a guarantee before discovery.
+
+**Picture and change.** Give conditional ranges, assumptions, a decision date and staged scope; escalate incompatible constraints honestly.
+
+**Check.** Do not say yes externally while hiding an incompatible internal plan.
+
+**Use when.** Commitment pressure conflicts with unresolved uncertainty.
+
+## Failure: Architecture Without a Stop Rule
+
+An elaborate design does not define non-goals, required evidence or when discovery should end.
+
+## Transfer Check
+
+When is coding a valid first scoping action?
+
+### Reasoned Answer
+
+When a bounded prototype targets a named uncertainty and its result changes scope or allocation.
+It need not build the complete system.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-scoping-an-ambiguous-problem-means"></span>
+## Six Scoping Steps
+
+1. Ask requesters about actual users, outcomes and failure costs.
+2. Define the decision, inputs, outputs, truth and evaluation; allow non-ML.
+3. Inspect data availability, quality, labels and permission.
+4. Compare the simplest reasonable rule/model baseline.
+5. Identify shift, noise, regulation, cost, latency and other invalidating risks.
+6. Agree a bounded one-page decision with the responsible stakeholders.
+
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
+<span id="what-an-l6-answer-adds"></span>
+## Use a Real Incident
+
+State your actual negotiation, framing and test contribution, what changed and what remained uncertain.
+The hypothetical triage is not a story to claim as personal experience.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+## Check the Scope
+
+Can another person reconstruct the boundary, baseline, biggest unknown, test, owner and end date?
+Make v1, later work and exclusions explicit; document open questions instead of concealing them.
+
+<span id="tells-that-get-you-down-leveled"></span>
+## Missing Evidence
+
+Add the missing measurement, risk, non-goal or decision rule before assuming model choice answers the request.
 
 ## Common follow-up
 
-"How do you handle a stakeholder who wants you to commit to a quality bar before you've scoped the problem?"
+If asked for quality before discovery, state assumptions and the evidence needed to narrow the range.
+Distinguish an estimate, a target and an accepted commitment.
 
-The L6 answer:
+## Sources
 
-> "Push back productively. The honest answer is 'I can give you an estimate after a week of scoping; if I commit to a quality bar without understanding the problem, I'll either over-promise and miss, or sandbag and waste opportunity.' If they insist on a number, I'll provide a range with explicit assumptions ('if the data has X property, we can hit Y; if not, we may only hit Z'). Bad: committing to a number you don't believe to look responsive. Worse: doing the scoping invisibly while saying yes externally; you build a debt you can't pay."
+- [GOV.UK discovery](https://www.gov.uk/service-manual/agile-delivery/how-the-discovery-phase-works).
+- [GOV.UK alpha](https://www.gov.uk/service-manual/agile-delivery/how-the-alpha-phase-works).
+- [Google ML problem framing](https://developers.google.com/machine-learning/problem-framing/problem).
 
 ---
 
 *Related: [The 5 things every applied scientist interview is testing for](/guides/five-things-as-interview-tests/), [senior through senior-principal ML scope](/guides/l5-vs-l6-faang-ml/), [How do you decide what to work on?](/questions/decide-what-to-work-on/).*
+
+</div>

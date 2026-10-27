@@ -1,6 +1,6 @@
 ---
 title: "How do you choose a learning rate?"
-description: "The right answer is a procedure, not a number. The wrong answers are 'use the default' and 'try a few values.'"
+description: "Check update stability, propose a learning-rate peak, then test its schedule from a clean starting state."
 date: "2026-03-22"
 draft: false
 tags: ["questions"]
@@ -8,35 +8,28 @@ category: "questions"
 ---
 
 
-> *Asked in: ML breadth at every level.*
+Choose a learning-rate policy by comparing update behavior and validating a complete training schedule rather than a single sweep result.
 
-The right answer is a procedure, not a number. The wrong answers are "use the framework default" and "try a few values."
+## Problem
 
-## What an L4 answer sounds like
+**Context.** The exact one-dimensional SGD fixture below isolates learning-rate behavior before considering noisy, scheduled training.
 
-> "I'd start with 1e-3 for Adam or 0.1 for SGD, then try a few values and pick the one that works best on validation."
+**Task.** Compare the three constant rates, explain convergence or divergence, and propose a controlled learning-rate selection procedure.
+Describe how warmup, decay, optimizer choice, and intended run length affect the final comparison.
 
-Right number ranges, no method. You've copy-pasted from tutorials.
+**Constraints.** Use the stated loss, gradient, and starting point for the fixture; do not add momentum or stochastic noise.
+A short range test proposes candidates rather than proving the best full-run schedule.
 
-## What an L5 answer sounds like
+Use plain SGD on $L(w)=5w^2$, starting at $w_0=1$ with exact gradient $10w$.
+Compare constant rates $0.1$, $0.2$ and $0.25$.
+Which rates reduce the loss, and what changes when the intended run uses a schedule?
 
-> "Learning rate is the single most impactful hyperparameter, so I'd be deliberate about it. My standard procedure:
->
-> **For a new model on a new dataset**: run an LR range test. Train for 200-500 steps with LR linearly increasing from 1e-7 to 1e-1. Plot loss vs LR on a log axis. The right LR is roughly in the steepest descent region, with a safety margin (1/3 of the LR where loss starts blowing up).
->
-> **For SGD with momentum**: typically 0.01-0.1 with cosine annealing or step decay.
->
-> **For Adam / AdamW**: typically 1e-4 to 1e-3 for most tasks; lower (1e-5 to 5e-5) for fine-tuning a pretrained model.
->
-> **Schedule matters more than initial value**. A linear warmup over the first ~5% of steps followed by cosine decay to ~10% of the peak is the standard transformer recipe. Without warmup, large transformers diverge in the first hundred steps; the warm-up gives Adam's moment estimates time to stabilize.
->
-> **For LLM pretraining**: peak LRs are surprisingly small (1e-4 to 6e-4) at standard scales, with decay to ~10% of peak. The Chinchilla-style training recipes use cosine decay over the full training horizon."
-
-This is L5. You've named the LR range test, the schedule structure, the per-optimizer ranges, and the LLM-specific recipe.
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
 
 <!-- visual:learning-rate-range-to-schedule -->
 <figure class="learning-figure" aria-labelledby="learning-rate-procedure-title">
-	<p class="visual-kicker">Learning objective</p>
+	<p class="visual-kicker">Candidate first, controlled run second</p>
 	<p class="visual-title" id="learning-rate-procedure-title">Turn a range test into a peak learning rate, then schedule around it</p>
 	<div class="visual-grid--two" role="group" aria-label="Two-stage learning-rate selection procedure">
 		<section class="visual-panel plot-panel">
@@ -91,43 +84,114 @@ This is L5. You've named the LR range test, the schedule structure, the per-opti
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> sweep from left to right on the first plot. Ignore the flat region, then choose inside the sustained descent with margin before the loss turns upward; the minimum and blow-up are warning boundaries, not targets. In the second plot, that candidate becomes a peak reached after warmup and reduced during decay. Re-run the test when the model, optimizer, data, batch, or training regime changes, and confirm the candidate with a short controlled run. Original qualitative schematic informed by <a href="https://arxiv.org/abs/1506.01186">Smith (2017)</a> and the <a href="https://docs.fast.ai/callback.schedule.html#lrfind">fastai learning-rate finder documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the first plot proposes a rate before instability. The second assigns that candidate to a schedule. These qualitative curves are not measured results or proof of an optimal peak.</figcaption>
 </figure>
+<p class="diagram-source">Range-test references: <a href="https://arxiv.org/abs/1506.01186">Smith (2017)</a> and the <a href="https://docs.fast.ai/callback.schedule.html#lrfind">fastai learning-rate finder documentation</a>.</p>
 
-## What an L6 answer sounds like
+## Calculate the updates
 
-> "...and a few practical things I've learned:
->
-> **The right LR depends on batch size.** The linear scaling rule (LR proportional to batch size) holds approximately for SGD but not for Adam. For Adam, the LR-batch relationship is roughly square-root. Doubling batch size, you'd want roughly 1.4&times; the LR for Adam.
->
-> **Warmup matters more for adaptive optimizers.** Adam's per-parameter step size depends on the running variance estimate, which is unreliable for the first few hundred steps. Without warmup, you can get huge effective steps that destabilize training. SGD doesn't have this issue but benefits from warmup for other reasons (the gradient direction is noisy at the start).
->
-> **For fine-tuning vs from-scratch, the LR is dramatically different.** Pretrained models have well-conditioned weights; large LRs will destroy them. The standard recipe is 5-100&times; smaller than from-scratch.
->
-> **For LLM SFT and RLHF, even smaller.** Standard SFT recipes use LRs in the 1e-6 to 5e-5 range. RLHF/DPO is even more delicate; some papers use 1e-7. The right LR here is empirically determined and varies a lot by base model.
->
-> **Cyclical LR or one-cycle policy** can sometimes beat cosine decay, especially for shorter training runs. Worth trying if cosine isn't giving great results.
->
-> **The LR is downstream of the loss landscape.** A lot of what looks like 'wrong LR' is actually 'wrong initialization' or 'bad loss surface' or 'gradient pathology elsewhere.' If you find yourself needing very strange LRs to make training work, the LR isn't the issue."
+For plain SGD, $w_{t+1}=w_t-\eta\nabla L(w_t)=(1-10\eta)w_t$.
+Contraction requires $|1-10\eta|<1$, so $0<\eta<0.2$.
 
-This is L6. You're past the recipe and into the operational reality.
+| Rate | $w_0,w_1,w_2$ | $L(w_0),L(w_1),L(w_2)$ | Decision |
+| --- | --- | --- | --- |
+| $0.1$ | $1,0,0$ | $5,0,0$ | Reaches the minimum |
+| $0.2$ | $1,-1,1$ | $5,5,5$ | Oscillates without progress |
+| $0.25$ | $1,-1.5,2.25$ | $5,11.25,25.3125$ | Diverges |
 
-## The tells that get you a strong-hire vote
+Finite values alone do not establish progress. The boundary rate $0.2$ never improves this loss.
+This calculation is not an Adam benchmark or a universal neural-network bound.
 
-- You describe **a procedure** (LR range test) for picking the LR, not a guess.
-- You distinguish **SGD vs Adam** ranges and **from-scratch vs fine-tuning** ranges.
-- You bring up **the schedule** (warmup + decay) as separately important.
-- You mention **LR-batch-size scaling**: especially the Adam-specific square-root rule.
-- You acknowledge that **the LR is often downstream of other issues**.
+## Test a candidate
 
-## The tells that get you down-leveled
+Record the optimizer, loss reduction, batch, initialization, precision and intended training length.
+Use a disposable run to increase rates while recording loss and update behavior.
+For $N\ge2$ sweep steps, a geometric sweep can use
 
-- Single number answer ("1e-3").
-- No mention of warmup for transformers.
-- "Just use the default in the framework", no calibration.
-- Same LR for from-scratch and fine-tuning.
-- No mention of schedule.
+$$
+\eta_j=\eta_{\mathrm{low}}\left(\frac{\eta_{\mathrm{high}}}{\eta_{\mathrm{low}}}\right)^{j/(N-1)},\qquad j=0,\ldots,N-1.
+$$
 
----
+Choose a candidate in sustained descent, with margin before instability.
+Restore the starting model and optimizer state, then test the intended schedule on controlled runs.
+Compare representative validation results and stability at the same budget.
+A sweep changes weights along its path; its points are not independent rate trials.
 
-*Related: [How would you debug a model that's not learning?](/questions/debug-model-not-learning/), [Walk me through the bias-variance tradeoff](/questions/bias-variance-tradeoff/).*
+## Change the run
+
+### 1. Double the curvature
+
+**New task:** replace the loss by $10w^2$.
+
+**Picture and change:** the gradient becomes $20w$. Recompute contraction from $|1-20\eta|<1$.
+
+**Check:** the interval becomes $0<\eta<0.1$. The old rate $0.1$ now oscillates without progress.
+
+**Use when:** loss scaling, parameterization or optimizer changes the effective update.
+
+### 2. Specify a shorter training horizon
+
+**New task:** use $S=1000$ steps, $W=100$ warmup steps, peak $0.001$ and final rate $0.0001$.
+
+**Picture and change:** choose the schedule separately from the peak.
+At schedule position $t\in[0,S]$, use
+
+$$
+\eta(t)=\begin{cases}
+0.001t/W,&0\le t\le W,\\
+0.0001+\frac{0.0009}{2}\left[1+\cos\left(\pi\frac{t-W}{S-W}\right)\right],&W<t\le S.
+\end{cases}
+$$
+
+**Check:** positions $50$, $100$, $550$ and $1000$ give rates $0.0005$, $0.001$, $0.00055$ and $0.0001$.
+
+**Use when:** the step budget changes. These fractions describe this fixture, not a universal schedule.
+
+## Do not continue from a failed sweep
+
+Diverged weights and accumulated Adam moments are not a clean starting state.
+Reload model, optimizer and schedule state; control data order and randomness for the comparison.
+Otherwise a failed sweep can invalidate the candidate test.
+
+## Try changing the batch
+
+Doubling batch size also changes loss reduction from mean to sum. What must be checked first?
+
+<details>
+<summary>Check your answer</summary>
+
+Restore the intended reduction or account for its doubled gradient scale.
+Only then test a batch-scaling heuristic under controlled conditions.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+<span id="what-an-l6-answer-sounds-like"></span>
+<span id="the-tells-that-get-you-a-strong-hire-vote"></span>
+<span id="the-tells-that-get-you-down-leveled"></span>
+
+## Optimizer and training regime
+
+Adam uses accumulated, coordinate-dependent moments, so its effective update is not simply plain SGD's gradient times a rate.
+Batch-scaling rules require assumptions. Neither linear scaling for SGD nor square-root scaling for Adam is universal.
+The [large-minibatch SGD recipe](https://arxiv.org/abs/1706.02677) combines scaling with specific training conditions and warmup.
+
+Fine-tuning must balance adaptation against preserving useful behavior.
+Compare layer updates and held-out behavior instead of assuming pretrained weights are well-conditioned.
+Fixed fine-tuning, SFT or preference-training rate ranges do not transfer automatically between models and objectives.
+
+## Schedules and diagnostics
+
+Warmup limits early updates; its usefulness and mechanism depend on optimizer, parameterization and model.
+The [Transformer schedule](https://arxiv.org/abs/1706.03762), cosine decay, step decay and one-cycle use different time profiles.
+Compare them at a stated training budget rather than declaring one always superior.
+
+If every reasonable rate fails, inspect data, initialization, gradient scale, loss implementation and numerical precision.
+Reducing the rate does not repair incorrect labels or a broken backward pass.
+
+Related: [debug a model that is not learning](/questions/debug-model-not-learning/) and [bias and variance](/questions/bias-variance-tradeoff/).
+
+</div>

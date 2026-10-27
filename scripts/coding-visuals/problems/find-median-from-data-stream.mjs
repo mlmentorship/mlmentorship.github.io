@@ -1,28 +1,34 @@
 import { defineVisual, frame, heap, table, visual } from '../primitives.mjs';
 
-const valuesFrom = (value) => String(value ?? '[]').slice(1, -1).split(',').map((item) => item.trim()).filter(Boolean);
+const valuesFrom = (value) => JSON.parse(value ?? '[]').map(String);
 const scene = (nodes, _edges, extra = {}) => {
   const lower = valuesFrom(extra.lowerLogical);
   const upper = valuesFrom(extra.upper);
+  const ordered = !lower.length || !upper.length || Number(lower[0]) <= Number(upper[0]);
+  const balanced = lower.length === upper.length || lower.length === upper.length + 1;
   return heap([...lower, ...upper], {
     groups: [
       { label: 'lower max-heap', values: lower },
       { label: 'upper min-heap', values: upper },
     ],
-  stream: '[5,2,10,4]',
+    stream: '[5,2,10,4]',
     seen: nodes.join(', '),
-  ...extra,
+    status: extra.complete || extra.result ? 'completed insertion: query allowed' : 'insertion repair: not a query point',
+    partitionOrder: ordered ? 'all lower <= all upper' : `violated: lower root ${lower[0]} > upper root ${upper[0]}`,
+    sizes: `lower ${lower.length}, upper ${upper.length}: ${balanced ? 'final size rule holds' : 'final size rule violated'}`,
+    rootSummary: `lower ${lower[0] ?? 'none'}, upper ${upper[0] ?? 'none'}`,
+    ...extra,
   });
 };
 
-const draft = visual('The lower max-heap owns the extra item, and its root plus the upper min-heap root are always the middle value or values.', [
+const draft = visual('After completed insertions, ordered halves and balanced sizes expose the middle ranks at the heap roots.', [
   frame(
     'Initialize two empty heaps',
-    'lower and upper both start empty. Python stores negated values in lower so its minimum stored key represents the largest lower-half value.',
+    'Both heaps start empty, so a median query is undefined. Negated lower values make its stored minimum the logical maximum.',
     table(['heap', 'stored values', 'logical role'], [
       ['lower', '[]', 'max-heap via negatives'],
       ['upper', '[]', 'min-heap'],
-    ], [], { stream: '[5,2,10,4]' }),
+    ], [], { stream: '[5,2,10,4]', status: 'initialized: no median yet' }),
     'initialize-heaps',
   ),
   frame(
@@ -33,14 +39,14 @@ const draft = visual('The lower max-heap owns the extra item, and its root plus 
   ),
   frame(
     'Transfer 5 to upper',
-    'heappop(lower) returns -5; negate it and push 5 into upper. lower is empty and upper is [5].',
+    'Pop stored negative five from lower. Push logical five into upper. Sizes zero and one still need repair.',
     scene(['5'], [], { current: '5', lowerStored: '[]', lowerLogical: '[]', upper: '[5]', roots: ['upper=5'], phase: 'lower->upper' }),
     'transfer-5-upper',
   ),
   frame(
     'Rebalance 5 back to lower',
-    'upper has size 1 and lower size 0, so pop upper root 5 and push -5 into lower. Sizes become 1 and 0.',
-    scene(['5'], [], { lowerStored: '[-5]', lowerLogical: '[5]', upper: '[]', roots: ['lower=5'], balance: '1 >= 0 and difference=1' }),
+    'Upper is larger, so transfer its root five back to lower. Sizes one and zero complete the insertion.',
+    scene(['5'], [], { lowerStored: '[-5]', lowerLogical: '[5]', upper: '[]', roots: ['lower=5'], balance: '1 >= 0 and difference=1', complete: true }),
     'rebalance-5-lower',
   ),
   frame(
@@ -57,8 +63,8 @@ const draft = visual('The lower max-heap owns the extra item, and its root plus 
   ),
   frame(
     'Transfer lower root 5 to upper',
-    'Pop stored -5, leaving lower [-2], and push logical 5 into upper. Both heaps now have size 1, so the rebalance condition is false.',
-    scene(['5', '2'], [], { lowerStored: '[-2]', lowerLogical: '[2]', upper: '[5]', roots: ['lower=2', 'upper=5'], rebalance: '1 > 1 is false' }),
+    'Transfer lower maximum five to upper. Both heaps now have size one. No further repair is needed.',
+    scene(['5', '2'], [], { lowerStored: '[-2]', lowerLogical: '[2]', upper: '[5]', roots: ['lower=2', 'upper=5'], rebalance: '1 > 1 is false', complete: true }),
     'transfer-5-after-2',
   ),
   frame(
@@ -69,7 +75,7 @@ const draft = visual('The lower max-heap owns the extra item, and its root plus 
   ),
   frame(
     'Push 10 into lower',
-    'heappush(lower, -10) produces stored [-10,-2], temporarily placing logical 10 above 2 in lower.',
+    'Pushing ten gives logical lower [10,2], above upper root five. Sizes fit, but partition order is temporarily wrong.',
     scene(['5', '2', '10'], ['10-2'], { current: '10', lowerStored: '[-10,-2]', lowerLogical: '[10,2]', upper: '[5]', phase: 'push lower' }),
     'push-10-lower',
   ),
@@ -81,8 +87,8 @@ const draft = visual('The lower max-heap owns the extra item, and its root plus 
   ),
   frame(
     'Rebalance upper root 5',
-    'Because upper is larger, pop 5 and push -5 into lower. Stored lower [-5,-2] represents [5,2]; upper becomes [10].',
-    scene(['5', '2', '10'], ['5-2'], { lowerStored: '[-5,-2]', lowerLogical: '[5,2]', upper: '[10]', roots: ['lower=5', 'upper=10'], balance: 'sizes 2 and 1' }),
+    'Upper is larger, so move its minimum five back to lower. Lower [5,2] and upper [10] satisfy both conditions.',
+    scene(['5', '2', '10'], ['5-2'], { lowerStored: '[-5,-2]', lowerLogical: '[5,2]', upper: '[10]', roots: ['lower=5', 'upper=10'], balance: 'sizes 2 and 1', complete: true }),
     'rebalance-5-after-10',
   ),
   frame(
@@ -99,8 +105,8 @@ const draft = visual('The lower max-heap owns the extra item, and its root plus 
   ),
   frame(
     'Transfer lower root 5 to upper',
-    'Pop stored -5, leaving lower [-4,-2], and push 5 into upper [5,10]. Sizes are equal, so no rebalance occurs.',
-    scene(['5', '2', '10', '4'], ['4-2', '5-10'], { lowerStored: '[-4,-2]', lowerLogical: '[4,2]', upper: '[5,10]', roots: ['lower=4', 'upper=5'], rebalance: '2 > 2 is false' }),
+    'Transfer lower maximum five to upper. Lower [4,2] and upper [5,10] have equal sizes, completing the insertion.',
+    scene(['5', '2', '10', '4'], ['4-2', '5-10'], { lowerStored: '[-4,-2]', lowerLogical: '[4,2]', upper: '[5,10]', roots: ['lower=4', 'upper=5'], rebalance: '2 > 2 is false', complete: true }),
     'transfer-5-after-4',
   ),
   frame(
@@ -114,9 +120,9 @@ const draft = visual('The lower max-heap owns the extra item, and its root plus 
 const review = {
   pattern: 'Online median maintenance with a negated max-heap for the lower half and a min-heap for the upper half.',
   recognitionCue: 'Use two heaps when numbers arrive online and every median query must avoid sorting the entire history.',
-  invariant: 'Every lower value is at most every upper value, and lower has either the same size as upper or exactly one extra item. Therefore the middle values are always heap roots.',
+  invariant: 'After each completed insertion, every lower value is at most every upper value, and lower has either equal size or one extra item. These two conditions expose the middle ranks at roots. Repair frames need not satisfy them.',
   stateModel: 'The minimal state is lower and upper. Each insertion pushes a negated value to lower, transfers its maximum to upper, then moves upper minimum back only if upper became larger.',
-  visualRationale: 'Two semantic heap trees keep every parent-child edge and root readable at narrow widths. Stored negatives remain explicit in metadata while values visibly transfer between lower and upper during balancing.',
+  visualRationale: 'Both actual heap trees and every original motion identity remain. Stored negative keys and logical roots are separate, and each frame explicitly labels completion or repair, partition order and sizes. The push-ten frame exposes a real order violation rather than claiming every transient root is already a median.',
   rejectedAlternatives: [
     'A fully sorted array was rejected because insertion would be linear and would not expose the supplied heap mechanism.',
     'One heap was rejected because it cannot expose both middle boundaries efficiently.',

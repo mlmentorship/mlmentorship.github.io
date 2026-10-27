@@ -1,6 +1,6 @@
 ---
 title: "Maximum Product Subarray"
-description: "Find the largest product of a nonempty continuous subarray."
+description: "Keep both ending-product extremes because a negative multiplier reverses which one can win."
 date: "2026-09-01"
 draft: false
 tags: ["coding interview", "data structures"]
@@ -13,17 +13,37 @@ aliases: []
 prerequisites: []
 ---
 
-> Find the largest product of a nonempty continuous subarray.
+Find the largest product obtainable from one nonempty contiguous range of an integer list.
 
-Start with the concrete trace below. It shows the state the algorithm must carry as it runs.
+## Problem
+
+**Input.** A nonempty integer list `nums`, possibly containing negative numbers and zeros.
+
+**Output.** Return the largest product of all values in any nonempty contiguous subarray.
+
+**Rules.** Select at least one value and do not skip positions inside the selected range.
+Return the product, not the range or a selection of unrelated values.
+Leave the list unchanged. Empty input is outside the reference contract.
+
+**Example.** `[2, 3, -2, 4]` returns `6` from `[2, 3]`.
+For `[-2, 0, -1]`, return `0`, not 2, because the two negative values are separated by zero.
+
+## Picture
+
+At a completed position, `current_max` and `current_min` summarize all nonempty ranges ending there. `best` saves the largest product seen anywhere.
+
+The swap frames prepare the sources for a negative multiplier. They are intermediate states, not completed endpoint summaries.
 
 <!-- visual:maximum-product-subarray-state -->
 <figure class="learning-figure coding-visual-figure" aria-labelledby="maximum-product-subarray-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="maximum-product-subarray-state-title">Maximum Product Subarray: Track both extreme products ending at each index because multiplying by a negative swaps which extreme can become largest.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="maximum-product-subarray" role="group" tabindex="0" aria-label="Maximum Product Subarray: Track both extreme products ending at each index because multiplying by a negative swaps which extreme can become largest."><div class="coding-visual-example"><span>Input and goal</span><strong>Find the largest product of a nonempty continuous subarray.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize" role="group" aria-label="Initialize both extremes"><div class="coding-trace-frame-heading"><span>Initialize both extremes</span><strong>At index 0, the only ending product is 2, so current_max=current_min=best=2.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..0]</span><span><b>endingRange</b>[2]</span><span><b>arithmetic</b>max=2; min=2; best=2</span></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="multiply-three" hidden role="group" aria-label="Extend through 3"><div class="coding-trace-frame-heading"><span>Extend through 3</span><strong>At index 1, 3 is positive: current_max=max(3,2*3)=6 and current_min=min(3,2*3)=3.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..1]</span><span><b>endingRange</b>max [2,3]; min [3]</span><span><b>arithmetic</b>max(3,6)=6; min(3,6)=3; best=6</span></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="swap-minus-two" hidden role="group" aria-label="Swap before multiplying by -2"><div class="coding-trace-frame-heading"><span>Swap before multiplying by -2</span><strong>Because -2 is negative, swap the prior extremes: max source becomes 3 and min source becomes 6.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..2]</span><span><b>action</b>swap current_max=6 and current_min=3</span><span><b>sourcesAfterSwap</b>max source 3; min source 6</span></div></div><div class="coding-trace-frame" data-coding-frame="3" data-frame-key="multiply-minus-two" hidden role="group" aria-label="Update both products at -2"><div class="coding-trace-frame-heading"><span>Update both products at -2</span><strong>After the swap, max(-2,3*-2=-6)=-2 and min(-2,6*-2=-12)=-12; best remains 6.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..2]</span><span><b>endingRange</b>max [-2]; min [2,3,-2]</span><span><b>arithmetic</b>max(-2,-6)=-2; min(-2,-12)=-12; best=6</span></div></div><div class="coding-trace-frame" data-coding-frame="4" data-frame-key="multiply-four" hidden role="group" aria-label="Process positive 4"><div class="coding-trace-frame-heading"><span>Process positive 4</span><strong>At index 3, max(4,-2*4=-8)=4 restarts, while min(4,-12*4=-48)=-48 extends the negative product.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..3]</span><span><b>endingRange</b>max [4]; min [2,3,-2,4]</span><span><b>arithmetic</b>max(4,-8)=4; min(4,-48)=-48; best=6</span></div></div><div class="coding-trace-frame" data-coding-frame="5" data-frame-key="swap-minus-one" hidden role="group" aria-label="Swap before multiplying by -1"><div class="coding-trace-frame-heading"><span>Swap before multiplying by -1</span><strong>Because -1 is negative, the prior minimum -48 becomes the source for current_max and prior maximum 4 becomes the source for current_min.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..4]</span><span><b>action</b>swap current_max=4 and current_min=-48</span><span><b>sourcesAfterSwap</b>max source -48; min source 4</span></div></div><div class="coding-trace-frame" data-coding-frame="6" data-frame-key="multiply-minus-one" hidden role="group" aria-label="Turn the minimum into the maximum"><div class="coding-trace-frame-heading"><span>Turn the minimum into the maximum</span><strong>max(-1,-48*-1=48)=48 and min(-1,4*-1=-4)=-4; best becomes 48.</strong></div><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">2</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">3</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">-2</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">4</span><small class="coding-trace-array-index">3</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-4"><span class="coding-trace-array-pointer" data-motion-key="scan-cursor">scan</span><span class="coding-trace-array-cell">-1</span><small class="coding-trace-array-index">4</small></span></div><div class="coding-trace-meta"><span><b>processedPrefix</b>[0..4]</span><span><b>endingRange</b>max [2,3,-2,4,-1]; min [4,-1]</span><span><b>arithmetic</b>max(-1,48)=48; min(-1,-4)=-4; best=48</span><span><b>result</b>48 from [2,3,-2,4,-1]</span></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 7</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize both extremes</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Extend through 3</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Swap before multiplying by -2</strong></button><button type="button" data-coding-frame-button="3"><span>4</span><strong>Update both products at -2</strong></button><button type="button" data-coding-frame-button="4"><span>5</span><strong>Process positive 4</strong></button><button type="button" data-coding-frame-button="5"><span>6</span><strong>Swap before multiplying by -1</strong></button><button type="button" data-coding-frame-button="6"><span>7</span><strong>Turn the minimum into the maximum</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">Use paired extremes for contiguous products when negative values can reverse ordering and zero or a single value may force a restart.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">After each index, current_max and current_min are respectively the largest and smallest products of nonempty subarrays ending exactly there, and best is the largest current_max seen in the processed prefix.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">When a transition is not monotone, retain every extreme that can become optimal after the next operation; sign-changing multiplication is the canonical max/min pair example.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> At index 0, the only ending product is 2, so current_max=current_min=best=2. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
 
-**Pattern:** DP with current maximum and minimum.
+## Code
 
-**Simple idea:** A negative value can turn the smallest negative product into the largest
-positive product. Keep both extremes. Swap them before multiplying by a negative value.
+Every ending range either starts at `num` or extends a range ending immediately before it.
+
+A positive multiplier preserves product order. A negative multiplier reverses it, so the old minimum feeds the new maximum and vice versa.
+
+The singleton candidate permits restarting, including after zero. Multiplication by zero collapses both current extremes to zero without deleting the saved global best.
 
 ```python
 def max_product_subarray(nums: list[int]) -> int:
@@ -38,4 +58,81 @@ def max_product_subarray(nums: list[int]) -> int:
    return best
 ```
 
-**Cost:** $O(n)$ time and $O(1)$ space.
+### Follow the Old Sources
+
+After `[2,3]`, the maximum is six and the minimum is three. Multiplying by `-2` gives ending extremes `-2` and `-12`.
+
+At `4`, the maximum restarts at four. The minimum extends the whole prefix to `-48`.
+
+The final `-1` turns that minimum into `48`. Tracking only the prior maximum would lose this winning range.
+
+Both updates must use the correct old source. The swap formulation does this without recomputing the new minimum from the newly updated maximum.
+
+### Boundaries and Cost
+
+Initialize from `nums[0]`, not zero or one. For `[-2]`, the nonempty answer is `-2`. Empty input raises `IndexError`.
+
+The reference performs $O(n)$ arithmetic operations and leaves the input unchanged. Its literal `nums[1:]` slice uses $O(n)$ auxiliary references.
+
+The recurrence needs three integer slots, but their products may grow. Constant slots do not imply constant bit storage or constant-time multiplication.
+
+**Recall:** Why did addition need only the maximum? Addition preserves order; multiplication can reverse it, so both extremes may become useful.
+
+<!-- learning:core-end -->
+
+## Return the Product's Range
+
+**Choose this when:** The answer must identify a contiguous witness.
+
+Carry a start index with each ending extreme. Construct all three candidates before replacing either old state.
+
+```python
+def maximum_product_range(nums):
+   high = low = (nums[0], 0)
+   best = [nums[0], 0, 1]
+   for index in range(1, len(nums)):
+      value = nums[index]
+      candidates = [
+         (value, index),
+         (high[0] * value, high[1]),
+         (low[0] * value, low[1]),
+      ]
+      high = max(candidates, key=lambda item: item[0])
+      low = min(candidates, key=lambda item: item[0])
+      if high[0] > best[0]:
+         best = [high[0], high[1], index + 1]
+   return best
+```
+
+For `[-2,3,-4]`, the result is `[24,0,3]`: product 24 over `nums[0:3]`.
+
+Candidate ties prefer the singleton, then the old maximum, then the old minimum. The global range changes only on strict improvement.
+
+This returns one optimum, not an earliest-start guarantee. Empty input raises `IndexError`.
+
+## Optimize the Minimum Instead
+
+**Choose this when:** The requested answer is the smallest nonempty product.
+
+Keep both ending extremes, but reduce the minimum into the saved global answer. The objective changes; the sign-dependent transition does not.
+
+```python
+def minimum_product_subarray(nums):
+   high = low = best = nums[0]
+   for index in range(1, len(nums)):
+      value = nums[index]
+      candidates = (value, high * value, low * value)
+      high, low = max(candidates), min(candidates)
+      best = min(best, low)
+   return best
+```
+
+For `[2,3,-2,4,-1]`, the minimum is `-48`, ending before the final value. For `[0,-2,0]`, it is `-2`.
+
+Both adaptations avoid the input suffix copy and leave the input unchanged. They use $O(n)$ arithmetic operations and a constant number of integer/index slots.
+
+Growing product bits still determine numeric storage and multiplication cost. Neither adaptation accepts an empty list.
+
+## Transfer
+
+Ask how the transition transforms ordering before compressing its candidates. Sign-dependent reversal requires both extremes; a more general nonmonotone transformation may require richer state.

@@ -1,6 +1,6 @@
 ---
 title: "Normalizing flows"
-description: "Generative models built from invertible transformations. Compute exact likelihoods and sample efficiently. At the cost of architectural restrictions."
+description: "Transport a base density through invertible maps and track local volume. Likelihood and sampling costs depend on the architecture."
 date: "2025-10-26"
 draft: false
 tags: ["concepts"]
@@ -9,23 +9,20 @@ category: "concepts"
 
 ## Summary
 
-A **normalizing flow** transforms a simple base distribution (typically standard Gaussian) into a target distribution through a sequence of **invertible**, **differentiable** mappings $f_K \circ \dots \circ f_1$. The change-of-variables formula gives exact log-likelihood:
+A normalizing flow transports a base density through invertible transformations, accounting for their local volume changes.
+For the differentiable bijections here, density evaluation uses the inverse coordinate and the inverse Jacobian's absolute determinant:
 
 $$
 \log p_X(x) = \log p_Z(f^{-1}(x)) + \log \left| \det \frac{\partial f^{-1}}{\partial x} \right|.
 $$
 
-Flows are the only family of deep generative models that simultaneously offer:
-
-- **Exact likelihoods** (unlike VAEs and diffusion, which give bounds).
-- **Efficient sampling** (single forward pass, unlike diffusion's iterative denoise).
-- **Tractable posterior** (the inverse function gives the exact $z$ for any $x$).
-
-The architectural restriction (each layer must be invertible with a tractable Jacobian) limits expressiveness. Flows have been displaced by diffusion for high-fidelity image generation but remain useful for likelihood-critical applications: density estimation, anomaly detection, simulation-based inference, molecular generation.
+An invertible coordinate is not a nontrivial VAE-style posterior distribution.
+Tractable discrete-layer likelihood and fast sampling depend on the selected architecture; neither property uniquely belongs to flows.
 
 ## The change-of-variables formula
 
-For an invertible $f$ with $z = f^{-1}(x)$:
+Require a differentiable inverse and nonzero Jacobian determinant on the relevant support.
+For $z=f^{-1}(x)$:
 
 $$
 p_X(x) = p_Z(z) \cdot \left| \det J_{f^{-1}}(x) \right| = p_Z(z) \cdot \left| \det J_f(z) \right|^{-1}.
@@ -35,6 +32,17 @@ For a composition of $K$ flows, the log-determinant decomposes additively:
 
 $$
 \log p_X(x) = \log p_Z(z) - \sum_{k=1}^{K} \log \left| \det J_{f_k}(z_{k-1}) \right|.
+$$
+
+Evaluate each layer's determinant at its actual intermediate state.
+Evaluate standard Gaussian density at $z=(1,2)$.
+Set $f_1(z)=(2z_1,z_2)$ and $f_2(u)=(u_1,1.5u_2)$.
+The states are $(1,2)\to(2,2)\to(2,3)$, with determinant factors two and $1.5$.
+The local area triples while probability mass is conserved, so $p_X(2,3)=p_Z(1,2)/3$.
+Gaussian log density gives:
+
+$$
+\log p_X(2,3)=-\log(2\pi)-2.5-\log3\approx-5.43649.
 $$
 
 <!-- visual:flow-local-volume-density -->
@@ -86,19 +94,10 @@ $$
 		<text class="viz-callout" x="180" y="578" text-anchor="middle">log pₓ = log p₀ − log 2 − log(3/2)</text>
 		<text class="viz-node-value" x="180" y="598" text-anchor="middle">= log p₀ − log 3</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the solid arrows down to sample: each bijection stretches the same six-point probability-mass patch. Read the dashed arrows up to evaluate density: divide by each layer's local volume multiplier. Here the areas multiply, <code>2 × 3/2 = 3</code>, while the log corrections add, <code>log 2 + log(3/2) = log 3</code>. This is an original local construction checked against <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">JMLR normalizing-flows review</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> forward transforms stretch a local patch without changing its probability mass. Inverse density evaluation divides by the total volume multiplier. Here area multiplies by three and log density loses log three. Dots illustrate mass; they are not point-probability density values. Original construction follows <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">flows review</a>.</figcaption>
 </figure>
 
-The engineering challenge: design each $f_k$ to be (a) invertible, (b) expressive, and (c) have a **cheap-to-compute log-determinant**.
-
-## Common flow families
-
-| Family | Idea | Tradeoff |
-|--------|------|----------|
-| **Affine coupling** (NICE, RealNVP, Glow) | Split $x$ in half; one half passes through, the other is affinely transformed by a function of the first | Triangular Jacobian → $\det$ is product of diagonal; needs many layers for expressiveness |
-| **Autoregressive** (MAF, IAF) | Each output dimension is an affine function of preceding ones; Jacobian is triangular | MAF: fast density, slow sample. IAF: fast sample, slow density. |
-| **Continuous-time / Neural ODE** (FFJORD) | Define $f$ via $dx/dt = g_\theta(x, t)$ and integrate; Jacobian via Hutchinson trace estimator | Very expressive; expensive integration |
-| **Invertible 1×1 convolutions** (Glow) | Permutation generalization for image flows | Used inside Glow for permutation between coupling layers |
+Inverting $(2,3)$ returns $(1,2)$; multiplying its transformed density by tripled local area recovers the same mass.
 
 ## RealNVP / coupling layers (the workhorse)
 
@@ -108,29 +107,63 @@ $$
 y_a = x_a, \qquad y_b = x_b \odot \exp(s(x_a)) + t(x_a)
 $$
 
-with neural nets $s, t$. The Jacobian is lower triangular with $\exp(s(x_a))$ on the diagonal of the $y_b$ block. Determinant: $\prod_i \exp(s(x_a)_i)$.
+The Jacobian is block triangular, with log absolute determinant $\sum_i s(x_a)_i$.
+Inverse reconstruction uses $x_a=y_a$ and $x_b=(y_b-t(y_a))\odot\exp(-s(y_a))$.
+The internal s/t networks need not themselves be invertible.
 
 Stack many coupling layers, alternating which half passes through, with shuffles or 1×1 convs between them.
 
+### Change a Scale into Coupling
+
+**New task:** Use $x_1=z_1$, $x_2=2z_2+1$ through constant $s=\log2$, $t=1$.
+
+**Picture and change:** Apply the triangular coupling and evaluate its explicit inverse.
+
+**Check:** $(1,2)$ maps to $(1,5)$, determinant two; inverse second coordinate is $(5-1)/2=2$.
+
+**Use when:** A structured invertible layer needs a tractable determinant without inverting its internal neural networks.
+
+### Change the Required Fast Direction
+
+**New task:** Prioritize density scoring in three coordinates over generation latency.
+
+**Picture and change:** In MAF, known x prefixes support masked parallel inverse-coordinate evaluation.
+Sampling must resolve the x prefixes sequentially; IAF reverses this directional convenience.
+
+**Check:** Generating x1, x2, x3 takes three dependent coordinate stages in this ordering.
+
+**Use when:** Density queries and sample generation have different serving priorities.
+
+The map $x=z^2$ is not a bijection on the real line: positive and negative z collide.
+Using only one inverse branch in the stated formula loses probability mass.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
+
+## Common flow families
+
+| Family | Structure | Important limit |
+|--------|-----------|-----------------|
+| Coupling | Triangular Jacobian; NICE is an additive special case | Expressiveness needs suitable compositions |
+| MAF/IAF | Autoregressive coordinate dependence | Fast direction differs |
+| Continuous time | ODE and divergence integration | Solver/trace estimation introduces numerical or Monte Carlo error |
+| Invertible channel mixing | Learned nonsingular linear transform | Retain determinant and conditioning checks |
+
 ## When to use flows in 2026
 
-| Setting | Flows vs. alternatives |
-|---------|----------------------|
-| High-fidelity image generation | Use diffusion; flows are non-competitive |
-| Density estimation, OOD detection | Flows give exact likelihood |
-| Simulation-based inference (likelihood-free) | Flows excellent (NPE, NRE) |
-| Molecular conformation / coordinates | Flows used (E-NF, equivariant flows) |
-| Probabilistic forecasting | Flows + RNN backbones (Real-NVP-style) |
-| Variational inference posterior approx | Flows as flexible $q$ |
+Compare density estimation, simulation-based conditional inference, forecasting, and generative tasks under their actual accuracy and compute criteria.
+A high likelihood does not automatically identify in-distribution semantics or provide a reliable anomaly/OOD score.
+Do not infer a universal image-quality or training-speed ranking from model-family names.
 
 ## Common pitfalls
 
-- **Computing log-determinants without exploiting structure.** General log-det is $O(d^3)$. Always use a flow with a structured Jacobian (triangular, low-rank).
-- **Confusing log $|\det|$ with log-likelihood directly.** The full formula has both the base density term and the determinant term.
-- **Treating flows as fast-to-train.** They are usually slower per epoch than VAE / diffusion at matched parameter count due to expensive Jacobian computations.
-- **Using flows on discrete data.** Flows assume continuous, differentiable spaces. For discrete: dequantize (add uniform noise), or use discrete normalizing flows (more complex).
+- **Wrong determinant direction:** density evaluation adds inverse log determinant, equivalently subtracting forward log determinant.
+- **Discrete observations:** dequantization models a continuous auxiliary distribution; relate its density objective to discrete likelihood explicitly.
+- **Numerics:** finite precision, nearly singular transforms, and ODE tolerances can invalidate an unqualified "exact" claim.
 
 ## Related
 
 - [Variational autoencoders](/concepts/variational-autoencoders/). Alternative latent-variable generative model.
 - [Autoregressive vs. diffusion](/concepts/autoregressive-vs-diffusion/). Broader paradigm comparison.
+
+</div>

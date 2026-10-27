@@ -7,6 +7,22 @@ const scene = (extra = {}) => {
   return queueGrid(adjacency, frontier, {
     edgeTopology: edges.join(', '),
     rowMeaning: 'row index = node; cells = adjacent nodes',
+    frontierLabel: 'stack: top at right',
+    graphCompanion: {
+      nodes: ['0', '1', '2', '3', '4'],
+      edges,
+      positions: { '0': { x: 185, y: 35 }, '1': { x: 95, y: 125 }, '2': { x: 285, y: 125 }, '3': { x: 35, y: 225 }, '4': { x: 155, y: 225 } },
+      width: 340,
+      height: 270,
+      treeLayout: true,
+      start: metadata.start,
+      stateNodes: metadata.visited ?? [],
+      seen: metadata.visited ? `{${metadata.visited.join(',')}}` : 'not seeded',
+      markerId: `valid-tree-${metadata.start ?? 'gate'}-${frontier.join('-') || 'empty'}`,
+      edgeLabels: false,
+      ariaLabel: 'Undirected five-node tree with current expansion and discovered vertices',
+    },
+    gridSummary: 'Original undirected adjacency lists',
     ...metadata,
     motion: [
       { key: 'graph-topology', kind: 'state', x: 0, y: 0, label: edges.join(', ') },
@@ -18,7 +34,7 @@ const scene = (extra = {}) => {
 const draft = visual('With exactly n-1 undirected edges, reaching all n nodes proves the graph is one connected acyclic tree.', [
   frame(
     'Pass the edge-count gate',
-    'For node_count = 5 and edges [[0,1],[0,2],[1,3],[1,4]], len(edges) = 4 = 5 - 1, so build the undirected adjacency lists.',
+    'Five nodes and four edges pass the count gate. Build the undirected adjacency lists.',
     scene({ adjacency: '0:[1,2]; 1:[0,3,4]; 2:[0]; 3:[1]; 4:[1]', edgeCheck: '4 = n-1' }),
     'check-edge-count',
   ),
@@ -54,7 +70,7 @@ const draft = visual('With exactly n-1 undirected edges, reaching all n nodes pr
   ),
   frame(
     'Pop leaf 3',
-    'Node 3 only links to seen node 1. Add nothing; the stack is empty and traversal ends.',
+    'Node 3 only links to seen node 1. Add nothing. The stack is empty, so traversal ends.',
     scene({ start: '3', visited: ['0', '1', '2', '3', '4'], stackState: '[]', transition: '3->1 skipped: seen' }),
     'expand-3',
   ),
@@ -71,7 +87,7 @@ const review = {
   recognitionCue: 'Use this proof when an undirected graph must be exactly one tree: reject any edge count other than n-1, then test whether one traversal reaches every vertex.',
   invariant: 'seen contains every discovered vertex and stack contains discovered vertices not yet expanded. After the n-1 gate passes, full reachability is equivalent to being a tree.',
   stateModel: 'The minimal state is an adjacency list, a seen set, and a DFS stack. The trace follows the supplied neighbor order and shows every pop, seen-neighbor skip, discovery, push, and final cardinality comparison.',
-  visualRationale: 'Persistent adjacency rows expose every undirected edge in both directions while the adjacent frontier and seen labels make iterative DFS readable without color. A stable topology key preserves graph identity across all expansions and remains legible at 390px.',
+  visualRationale: 'The actual undirected topology separates discovered vertices from the current expansion. An explicitly labeled stack shows its next pop at the right. Original adjacency rows remain in a disclosure, preserving every row, frontier and motion identity.',
   rejectedAlternatives: [
     'Union-find was rejected because it would depict a different implementation and omit the supplied reachability proof.',
     'An edge-count formula alone was rejected because n-1 edges can still be disconnected.',

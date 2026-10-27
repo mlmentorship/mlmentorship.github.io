@@ -1,6 +1,6 @@
 ---
 title: "SVD and PCA"
-description: "The singular value decomposition factorizes any matrix into rotation × stretching × rotation. PCA is SVD applied to mean-centered data."
+description: "Separate singular directions of a linear map from principal directions of centered data, then choose rank using reconstruction error."
 date: "2025-09-09"
 draft: false
 tags: ["concepts"]
@@ -9,45 +9,58 @@ category: "concepts"
 
 ## Summary
 
-Every real matrix $A \in \mathbb{R}^{m \times n}$ admits the factorization $A = U \Sigma V^\top$ where $U \in \mathbb{R}^{m \times m}$ and $V \in \mathbb{R}^{n \times n}$ are orthogonal and $\Sigma$ is diagonal with non-negative entries (singular values). **PCA** is SVD applied to a mean-centered data matrix.
-
-SVD is the universal matrix factorization. It exists for every matrix, even rectangular and rank-deficient ones. Reading off properties from the SVD answers "what does this matrix do?": singular values give scaling factors, $V$ gives input directions, $U$ gives output directions.
-
-PCA is the canonical use of SVD: project data onto the directions of largest variance to get a low-dimensional representation that preserves as much information as possible.
+SVD identifies input directions, output directions, and nonnegative scaling factors for any real matrix.
+PCA applies that decomposition to centered observations, retaining directions that minimize Euclidean squared reconstruction error.
+Large retained variance does not guarantee retained label information.
 
 ## The decomposition
 
-$A = U \Sigma V^\top$:
+$A\in\mathbb R^{m\times n}$ has $A=U\Sigma V^\top$.
+Full factors have orthogonal $U:m\times m$, orthogonal $V:n\times n$, and rectangular diagonal $\Sigma:m\times n$.
 
-- $V$'s columns are orthonormal input directions; the first $r$ span the row space and the rest span the nullspace.
-- $U$'s columns are orthonormal output directions; the first $r$ span the column space and the rest span the left nullspace.
-- $\Sigma$'s diagonal entries $\sigma_1 \ge \sigma_2 \ge \dots \ge 0$ are the singular values (how much each input direction is stretched into its output direction).
+- The first $r$ columns of $V$ span the row space; remaining columns span the nullspace.
+- The first $r$ columns of $U$ span the column space; remaining columns span the left nullspace.
+- Singular values satisfy $\sigma_1\ge\sigma_2\ge\cdots\ge0$; rank $r$ counts strictly positive values in exact arithmetic.
 
-Geometrically: any linear map is "rotate the input, stretch axis-by-axis, rotate the output." That's it.
-
-The rank of $A$ is the number of non-zero singular values. For a full-rank map, the 2-norm condition number is $\sigma_1 / \sigma_{\min}$. A rank-deficient map has infinite condition number; $\sigma_1 / \sigma_r$ instead describes conditioning after restricting to its rank-$r$ subspace.
+The orthogonal factors can include reflections, not just rotations.
+For an invertible square map, the spectral condition number is $\sigma_1/\sigma_n$.
+Null directions prevent unrestricted inversion; $\sigma_1/\sigma_r$ describes conditioning only on the retained nonzero subspace.
 
 ## Truncated SVD and low-rank approximation
 
-The best rank-$k$ approximation of $A$ in Frobenius (or spectral) norm is
+For rank at most $k$, a best approximation in Frobenius or spectral norm is
 
 $$
 A_k = U_k \Sigma_k V_k^\top
 $$
 
-where $U_k, V_k$ keep the first $k$ columns and $\Sigma_k$ keeps the first $k$ singular values (Eckart–Young theorem). Used in: dimensionality reduction, image compression, embedding regularization, low-rank LoRA fine-tuning.
+Keep the leading $k$ singular values and their corresponding directions.
+Orthogonal changes of basis preserve these norms, reducing the error calculation to discarded diagonal entries:
+
+$$
+\|A-A_k\|_F^2=\sum_{i>k}\sigma_i^2,\qquad
+\|A-A_k\|_2=\sigma_{k+1}.
+$$
+
+Take omitted singular values as zero when none remain.
+This is the Eckart–Young result; a low-rank model constraint does not automatically prescribe truncating an unrelated matrix.
 
 ## PCA as SVD
 
-Given a data matrix $X \in \mathbb{R}^{n \times d}$ ($n$ samples, $d$ features):
+For $n>1$ observations in rows, fit a training mean $\mu$ and center $\widetilde X=X-\mathbf1\mu^\top$.
 
-1. Mean-center: $\tilde X = X - \bar x$.
-2. Compute SVD: $\tilde X = U \Sigma V^\top$.
-3. The columns of $V$ are the **principal components** (directions of maximum variance in feature space).
-4. The variance along the $i$-th component is $\sigma_i^2 / (n - 1)$.
-5. Project to $k$ dimensions: $Z = \tilde X V_k = U_k \Sigma_k$.
+1. Decompose $\widetilde X=U\Sigma V^\top$.
+2. Use leading columns $V_k$ as feature-space principal directions.
+3. Compute scores $Z=\widetilde XV_k$ and reconstruct $\widehat X=ZV_k^\top+\mathbf1\mu^\top$.
+4. Component sample variance is $\sigma_i^2/(n-1)$.
 
-Equivalent formulation: PCA = eigendecomposition of the sample covariance $\tilde X^\top \tilde X / (n-1)$. SVD is numerically more stable.
+The covariance is $\widetilde X^\top\widetilde X/(n-1)$; its eigenvectors are these same principal directions.
+Direct SVD avoids explicitly forming a Gram matrix, which squares the nonzero singular-value condition ratio.
+
+For an exact numerical companion to the schematic, use rows $(-2,-1),(-2,1),(2,-1),(2,1)$.
+They are centered, and $X^\top X=\operatorname{diag}(16,4)$, giving singular values $4,2$ and $V=I$.
+Rank-one scores are $(-2,-2,2,2)^\top$; reconstruct each second coordinate as zero.
+Four unit residuals give squared error $4$, while retained variance is $16/(16+4)=80\%$.
 
 <!-- visual:pca-rank-one-projection -->
 <figure class="learning-figure" aria-labelledby="pca-projection-title">
@@ -84,15 +97,55 @@ Equivalent formulation: PCA = eigendecomposition of the sample covariance $\tild
 			<text class="viz-label" x="350" y="85">perpendicular residual</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> each circle drops perpendicularly to a diamond on PC1. The diamond keeps the coordinate with the largest spread; the dashed segment is the discarded PC2 coordinate and therefore the rank-1 reconstruction error.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each circle projects perpendicularly to a diamond on PC1. The diamond retains its PC1 coordinate. The dashed segment is the discarded residual. This six-point schematic illustrates the projection, not the separate four-point arithmetic fixture.</figcaption>
 </figure>
+
+## Change the Requirement
+
+### Retain Ninety Percent of Variance
+
+**New task:** Choose the smallest rank retaining at least $90\%$ of total squared singular-value mass.
+
+**Picture and change:** Accumulate $\sigma_i^2$ in descending order; change scores and reconstruction dimensions together.
+
+**Check:** The fixture's first component retains only $80\%$; rank two retains $100\%$ and reconstructs exactly.
+
+**Use when:** A declared reconstruction requirement determines storage or representation size.
+
+### Standardize the Features
+
+**New task:** Give both features equal sample variance before fitting PCA.
+
+**Picture and change:** Divide centered columns by their training sample standard deviations, changing the feature-space metric.
+
+**Check:** Fixture covariance becomes $I$; every unit direction is a possible first component, retaining $50\%$.
+
+**Use when:** Units or domain priorities justify equalized feature weighting.
+Carry the fitted mean, scales, and directions into inference; refitting on test data changes the transformation.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common pitfalls
 
-- **Forgetting to center.** PCA on uncentered data finds the direction toward the mean as PC1, which is rarely what you want.
-- **Forgetting to scale.** If features have different units, large-magnitude features dominate; standardize (divide by std) before PCA when units differ.
-- **Confusing PCA with whitening.** PCA gives uncorrelated components but not unit variance. Whitening = PCA + scale to unit variance.
-- **Using PCA on categorical / sparse data without thought.** PCA assumes Euclidean structure; for sparse / categorical data, look at NMF, LDA, or contrastive embeddings.
+- **Different objective.** Uncentered SVD includes the mean's contribution; its leading direction need not equal the mean direction.
+- **Automatic scaling.** Standardization changes the objective and is undefined for zero-variance columns without a policy.
+- **Whitening confusion.** PCA scores are uncorrelated, not generally unit variance.
+  Dividing by positive component standard deviations whitens them; zero singular values need exclusion or regularization.
+- **Direction ambiguity.** Singular-vector signs and tied-eigenvalue bases can vary without changing the reconstructed subspace.
+- **Data geometry.** Centering sparse matrices can destroy sparsity; categorical data need a justified metric.
+
+## Reconstruct
+
+<details>
+<summary>What if the label is the sign of the second feature?</summary>
+
+The rank-one fixture discards that feature completely despite retaining eighty percent of variance.
+Unsupervised reconstruction quality is not a guarantee of predictive sufficiency.
+
+</details>
+
+</div>
 
 ## Related
 

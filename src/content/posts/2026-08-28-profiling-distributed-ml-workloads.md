@@ -7,89 +7,21 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
+Distributed workload profiling follows unfinished dependencies to the synchronized step boundary before selecting an optimization.
+
 ## Summary
 
-Distributed ML profiling compares a measured step with compute, memory, and network limits. It finds which work extends the critical path and tests one repair at a time.
+Which dependency must finish before the next optimizer transition can begin?
+Compare these hypothetical schedules, holding work and numerical results fixed.
+Assume aligned clocks and no compute/network resource interference.
 
-## Why AI labs care
+| Schedule | Compute interval, ms | Collective interval, ms | Completion, ms | Exposed tail, ms |
+| --- | --- | --- | --- | --- |
+| Overlap | 0..10 | 4..10 | 10 | 0 |
+| Serialized | 0..10 | 10..16 | 16 | 6 |
 
-Low utilization is a symptom, not a diagnosis. It can come from:
-
-- input stalls;
-- many small kernels;
-- memory-bound operations;
-- exposed collectives;
-- pipeline bubbles;
-- device imbalance;
-- host synchronization;
-- compilation or memory allocation;
-- failed overlap between communication and compute.
-
-A trace makes these causes visible.
-
-## Start with stable measurements
-
-Before reading one trace:
-
-1. verify correctness;
-2. exclude compilation and warm-up steps;
-3. use a representative batch and sequence-length mix;
-4. record several steady-state steps;
-5. report the median and tail step time;
-6. save configuration, software versions, and topology.
-
-Do not compare traces from different batch sizes without saying so.
-
-## Build three lower bounds
-
-### Compute bound
-
-$$
-T_{\text{compute}} \geq \frac{\text{useful model FLOPs}}{\text{peak FLOPs}}.
-$$
-
-Measured model FLOPs utilization compares this lower bound with wall time.
-
-### Memory bound
-
-For each important kernel:
-
-$$
-T_{\text{memory}} \geq \frac{\text{bytes moved}}{\text{effective memory bandwidth}}.
-$$
-
-The roofline model compares arithmetic intensity with the machine's compute-to-bandwidth ratio.
-
-### Communication bound
-
-$$
-T_{\text{comm}} \geq T_{\text{fixed}} + \frac{\text{bytes moved per device}}{\text{effective collective bandwidth}}.
-$$
-
-Use measured collective bandwidth for the same message size and device group. Peak link bandwidth is not enough.
-
-These bounds can overlap. Do not add all three as if every event were serial.
-
-## Read the trace from the outside in
-
-### 1. Mark the training or inference step
-
-Find true boundaries and synchronize only when measurement requires it. Hidden asynchronous work can make one operation appear cheap while a later wait pays its cost.
-
-### 2. Find large idle gaps
-
-Ask what each accelerator is waiting for:
-
-- input data;
-- another rank;
-- a collective;
-- a host callback;
-- a pipeline stage;
-- memory allocation or compilation.
-
-### 3. Find the longest exposed operations
-
-An operation can consume much total time without extending the step if it overlaps with other work. Focus on the critical path.
+Both schedules contain sixteen milliseconds of aggregate activity, but only one needs sixteen milliseconds of elapsed time.
+The retained schematic also changes compute length; use the table, not that extra difference, to isolate overlap alone.
 
 **Learning objective:** distinguish an operation's total duration from the exposed portion that extends synchronized step time.
 
@@ -130,98 +62,150 @@ An operation can consume much total time without extending the step if it overla
 			<text class="viz-label" x="300" y="287" text-anchor="middle">step end</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the rounded collective bars: their duration is identical. In the upper trace, communication finishes under backward compute and does not move the step boundary. In the lower trace, it begins after compute and the whole bar extends the step. Optimize the exposed tail on the critical path, not a large cumulative time that is already hidden. This original schematic is informed by the <a href="https://docs.pytorch.org/docs/2.13/notes/ddp.html">PyTorch DDP design note</a>, the <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX Scaling Book profiling guide</a>, and the <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">NVIDIA Nsight Systems Analysis Guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the rounded network bars have equal duration. The upper collective finishes before compute; the lower collective extends completion. Compute lengths also differ here; the table isolates overlap with equal compute. This original schematic follows the <a href="https://docs.pytorch.org/docs/2.13/notes/ddp.html">DDP design note</a>, <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX profiling guide</a>, and <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">Nsight Systems guide</a>.</figcaption>
 </figure>
 
-### 4. Group kernels by type
+## Read the trace from the outside in
 
-Classify matrix multiplications, attention, elementwise operations, memory copies, and collectives. Many tiny elementwise kernels may point to missing fusion. Poorly shaped matrix multiplications may fail to use tensor units well.
+### 1. Mark the training or inference step
 
-### 5. Compare ranks
+Let compute finish at $c$, a ready collective start at $s$, and its duration be $d$.
+If both results are required, completion is $T=\max(c,s+d)$.
+The network tail is $\max(0,s+d-c)$, not automatically $d$.
+This simplified model excludes additional dependencies and interference.
+Launching an asynchronous operation does not establish that its result is ready.
 
-One slow rank can hold every other rank at a collective. Compare start times, kernel durations, input lengths, network paths, and device clocks.
+### 2. Find large idle gaps
 
-## Common trace patterns
+Trace each wait back to input readiness, a producing kernel, another rank, or host synchronization.
+If one rank's required bucket is ready at twelve ms, the collective cannot start at four ms.
+With a six-ms collective, completion is at least eighteen ms in this simplified arrival model.
+Inspect all ranks, not only the fastest backward pass.
 
-| Trace pattern | Likely cause | First check |
-| --- | --- | --- |
-| Device idle before each step | input pipeline | batch-ready time and host work |
-| Many tiny kernels with gaps | launch overhead or missing fusion | operation fusion and shapes |
-| Long matrix operations with high unit use | compute-bound work | model FLOPs and kernel shape |
-| Long memory stalls with low arithmetic intensity | memory-bound work | bytes moved and data reuse |
-| Collective starts after backward compute ends | no overlap | gradient bucket timing |
-| Collective overlaps most compute, then has a long tail | last bucket exposed | bucket order, size, and straggler |
-| Regular empty pipeline regions | pipeline bubble | stage count, micro-batches, balance |
-| One rank arrives late at every collective | load or input imbalance | per-rank work and network placement |
-| Repeated reshard operations | poor layout choices | producer and consumer tensor layouts |
+### 3. Find the longest exposed operations
 
-For one late rank, compare input-ready time, backward compute duration, and accelerator utilization across ranks. A late input points to the data path. A longer backward pass points to uneven shapes, extra work, throttling, or a slow device. Similar compute followed by a longer collective points to network placement or contention.
-
-## Profiling a sharded program
-
-For every large tensor, record its layout before and after an operation. A compiler or framework may insert:
-
-- all-gather;
-- reduce-scatter;
-- all-reduce;
-- all-to-all;
-- host-device transfer.
-
-Unexpected resharding often comes from incompatible layouts between adjacent operations. Removing one layout change can matter more than tuning a kernel.
-
-## Profiling compilation
-
-A framework may show high-level operations while the accelerator executes a compiled graph.
-
-Inspect both levels:
-
-- source-level operation and tensor shape;
-- compiled fusion or kernel;
-- device timeline;
-- communication events;
-- memory allocation and peak use.
-
-Do not assume a source operation maps to one kernel.
+Moving the six-ms collective inside the ten-ms compute window saves six ms in the controlled example.
+Halving a completely hidden collective saves zero ms there.
+Resource contention can invalidate either prediction; measure the resulting compute duration too.
 
 ## Run controlled experiments
 
-Keep an experiment table:
+Keep shapes, batch, dtype, topology and timing scope fixed.
+Check numerical outputs before accepting a speedup.
+Record one hypothesis, change, predicted boundary movement, correctness result, measured median/tail, trace difference and keep/revert decision.
+Retain unsuccessful trials.
 
-| Field | Record |
+### Change bucket readiness
+
+**New task:** overlap the last bucket without using gradients before they exist.
+
+**Picture and change:** move readiness from ten ms to four ms by changing bucket order or size.
+The six-ms collective then ends at ten instead of sixteen ms, if compute remains unchanged.
+
+**Check:** a bucket ready at nine ms ends at fifteen ms; the tail is still five ms.
+An earlier API call without earlier data readiness does not produce the predicted gain.
+
+**Use when:** the trace shows a genuinely exposed final communication bucket.
+
+### Change tensor handoff
+
+**New task:** remove a redundant gather/reshard between adjacent operations.
+
+**Picture and change:** a serial handoff costs two ms around ten-ms useful work, giving twelve ms total.
+A compatible producer/consumer layout removes that event, predicting ten ms before resource effects.
+
+**Check:** two ranks holding additive partial results two and three represent five, not two.
+Removing their reduction is incorrect, even if the trace becomes shorter.
+Verify global outputs, communication semantics and temporary memory peaks.
+
+**Use when:** layout conversion, rather than required mathematical reduction, extends the dependency path.
+
+## Reconstruct the diagnosis
+
+Why can a shorter local backward pass leave the synchronized step unchanged?
+
+<details>
+<summary>Reasoned answer</summary>
+
+Another rank or required transfer may still finish later.
+Compare input-ready, kernel and collective timestamps on aligned clocks.
+Only movement of the completion dependency establishes a step-time improvement.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
+
+## Why AI labs care
+
+Low utilization can reflect input stalls, small kernels, memory traffic, network waits, pipeline bubbles or host work.
+It does not identify a repair.
+
+## Start with stable measurements
+
+Verify correctness, exclude compilation/warmup and capture several representative steady steps.
+Store software versions, topology, shapes, seed and profiler settings.
+State whether median and p95 measure rank-local device work or synchronized wall-clock steps.
+Check instrumentation overhead and clock alignment.
+
+## Build three lower bounds
+
+### Compute bound
+
+Useful FLOPs divided by applicable peak FLOPs gives an optimistic compute-time floor.
+State precision and the FLOP convention.
+
+### Memory bound
+
+Bytes moved divided by effective bandwidth bounds a specified kernel's memory time.
+Roofline compares intensity against the compute/bandwidth ratio.
+
+### Communication bound
+
+Use latency plus per-device bytes divided by measured collective bandwidth for the matching message size and group.
+Peak link bandwidth is insufficient.
+These bounds may overlap; adding them is not a general elapsed-time bound.
+
+### 4. Group kernels by type
+
+Separate matmuls, attention, elementwise work, copies and collectives.
+Tiny kernels suggest launch/fusion investigations; poor matmul shapes suggest a different experiment.
+
+### 5. Compare ranks
+
+Compare input lengths, arrivals, device clocks, network placement and thermal behavior.
+
+## Common trace patterns
+
+| Pattern | Discriminating check |
 | --- | --- |
-| Hypothesis | what limits the step |
-| Change | one controlled modification |
-| Prediction | expected direction and size |
-| Correctness | invariant or test result |
-| Median result | stable step time or throughput |
-| Trace evidence | what moved on the critical path |
-| Decision | keep, revert, or test again |
+| Early idle gap | input-ready timestamp |
+| Tiny kernels and gaps | launch overhead versus fusion |
+| Late bucket | readiness and rank arrivals |
+| Repeated reshard | producer/consumer layouts |
+| Pipeline bubbles | stage balance and microbatches |
 
-Useful controlled changes include message size, bucket size, local batch, sequence length, sharding layout, data-loader workers, and kernel choice.
+## Profiling a sharded program
+
+Record layouts and identify inserted gathers, reduce-scatters, all-reduces, all-to-alls and host transfers.
+Preserve the distinction between complete values and additive partial results.
+
+## Profiling compilation
+
+Match source operations and shapes to compiled fusions, device kernels, communications and allocation peaks.
+One source operation need not correspond to one kernel.
 
 ## In an interview
 
-Use this order:
-
-1. Define workload, metric, and correctness test.
-2. Remove warm-up and collect several steady steps.
-3. Compute simple compute, memory, and communication bounds.
-4. Find idle gaps and the critical path.
-5. Compare devices or ranks.
-6. Check for unexpected layout changes and exposed collectives.
-7. State one hypothesis with a predicted result.
-8. Change one mechanism, measure again, and keep a ledger.
+Define the workload and metric, locate the completion dependency, predict one change, then measure correctness and timing together.
 
 ## Common mistakes
 
-- Optimizing from average utilization alone.
-- Treating total operation time as exposed time.
-- Using peak bandwidth instead of measured bandwidth.
-- Measuring only one step.
-- Including compilation in steady-state throughput.
-- Changing batch size and calling the result a kernel speedup.
-- Looking at one rank only.
-- Making several changes before collecting a new trace.
-- Accepting a speedup without checking model outputs.
+One fast warmup-contaminated sample is not a steady-state speedup.
+Changing batch size confounds a kernel comparison.
+Synthetic timelines establish arithmetic, not measured hardware performance.
 
 *Related: [GPU memory hierarchy](/concepts/gpu-memory-hierarchy/), [strong scaling and parallelism selection](/concepts/strong-scaling-and-parallelism-selection/), and [optimize an accelerator workload](/questions/optimize-accelerator-workload/). Further reading: [profiling in the JAX Scaling Book](https://jax-ml.github.io/scaling-book/profiling).*
+
+</div>

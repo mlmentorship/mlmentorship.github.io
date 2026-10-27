@@ -7,7 +7,7 @@ const marks = (row, col) => [
 ];
 
 const draft = visual('Sweep a 3 by 3 grid row by row; each interior count is old ways[col] from above plus new ways[col-1] from the left.', [
-  frame('Initialize the first row', 'For a 3 by 3 grid, ways = [1,1,1] because each top-row cell has exactly one all-right path from the start.', grid([
+  frame('Initialize the first row', 'Each top-row cell has one route; initialize ways to [1,1,1].', grid([
     ['1', '1', '1'],
     ['?', '?', '?'],
     ['?', '?', '?'],

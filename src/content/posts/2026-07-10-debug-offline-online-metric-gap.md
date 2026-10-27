@@ -1,106 +1,158 @@
 ---
 title: "Your offline metric improved but the online metric got worse. Debug it."
-description: "A senior experimentation question about objective mismatch, leakage, serving skew, feedback loops, and disciplined diagnosis."
+description: "Separate experiment validity, delivered treatment and product outcomes before attributing an online regression to the model."
 date: "2026-07-10"
 draft: false
 tags: ["questions"]
 category: "questions"
 ---
 
-> A model improves the main offline metric by 8%, but the online primary metric declines by 2%. What do you do?
+Investigate why an offline model improvement accompanies an online product regression without assuming the model itself caused the gap.
 
-Order your measurements so each step rules out a class of causes. The weak answer free-associates explanations; the strong answer verifies the experiment first, then the serving path, then model quality, and reaches for "drift" only after the cheaper causes are gone.
+## Problem
 
-## First: verify the observation
+**Context.** A report compares offline and online changes, while the separate delivery fixture below includes users receiving fallback instead of treatment.
 
-Before explaining the gap:
+**Task.** Define the compared metrics, assess delivered treatment, and choose the next test that distinguishes measurement, serving, and modeling explanations.
+State any immediate containment needed before investigating further.
 
-1. Validate assignment, exposure, sample-ratio, and metric instrumentation.
-2. Confirm the online change exceeds normal variance and is not novelty or seasonality.
-3. Check latency, error rate, fallback rate, and whether the treatment was actually delivered.
-4. Reproduce the production feature and prediction path offline.
+**Constraints.** Preserve assignment denominators and separate assigned users from successfully served users.
+Check relative versus absolute changes, label maturity, and metric meaning; the supplied aggregates alone do not identify a causal defect.
 
-If the treatment was not delivered as intended, this is not yet a model-quality mystery.
+A report says offline quality improved 8% while the online primary metric declined 2%.
+Check each metric's denominator, baseline and relative-change definition before comparing them.
 
-**Learning objective:** Order the investigation so each check eliminates an entire layer of causes before you form a narrower model-quality hypothesis.
+In a separate hypothetical delivery fixture, A serves 1,000 assigned users and records 800 successes.
+B delivers the new model to 900 users, recording 738 successes.
+Its other 100 users receive fallback, with 40 successes.
+Where should the next discriminating check focus?
+
+## Picture
+
+Keep assigned users in the product denominator while tracing delivery branches separately.
+
+<p class="visual-title">Separate assignment from successful model delivery</p>
 
 <!-- visual:offline-online-gap-diagnostic-order -->
 ```mermaid
 flowchart TB
-	accTitle: Diagnose an offline improvement and online regression in evidence order
-	accDescr: Start with an observed offline improvement and online regression. First test whether assignment, exposure, sample ratio, instrumentation, and statistical interpretation make the experiment trustworthy. If not, repair and rerun the experiment. If it is trustworthy, replay the production path and compare model version, features, candidates, latency, errors, and fallbacks. If delivery differs, fix or roll back the serving path. Only when both gates pass should you localize the regression by slice, test objective mismatch, evaluation bias, system effects, or feedback, and use a shadow comparison, replay, or controlled rollback to discriminate among them.
-	O["Observed gap<br/>offline +8% · online −2%"] --> V{"1 · Trust the experiment?<br/>assignment · exposure · SRM<br/>instrumentation · uncertainty"}
-	V -->|"no"| R["Repair measurement<br/>then rerun"]
-	V ==>|"yes"| S{"2 · Same treatment path?<br/>model · features · candidates<br/>latency · errors · fallbacks"}
-	S -->|"no"| F["Fix or roll back<br/>the serving path"]
-	S ==>|"yes"| L["3 · Localize the loss<br/>by user, item, time, and surface"]
-	L --> H["4 · Test one cause family"]
-	H -.-> P["Proxy / objective<br/>mismatch"]
-	H -.-> B["Leakage / biased<br/>offline evaluation"]
-	H -.-> Y["System or candidate<br/>effects"]
-	H -.-> E["Feedback / equilibrium<br/>effects"]
-	P --> D["5 · Discriminate safely<br/>replay · shadow · small rollback"]
-	B --> D
-	Y --> D
-	E --> D
-	class O viz-input
-	class V,S,L,H viz-focus
-	class R,F viz-warning
-	class P,B,Y,E viz-state
+	accTitle: Assigned users split into delivered-model and fallback outcomes
+	accDescr: This invented fixture assigns one thousand users to each arm. Arm A records eight hundred successes. In arm B, nine hundred users reach the new model and produce seven hundred thirty-eight successes; one hundred receive fallback and produce forty successes. Merging both branches gives seven hundred seventy-eight successes out of one thousand, or 77.8 percent, below A's 80 percent. The 82 percent delivered-model success rate is conditional on routing, not a randomized comparison against A. Inspect routing and delivery before attributing this aggregate loss to model quality.
+	A["A · 1,000 assigned"] --> AP["800 successes<br/>80% overall"]
+	B["B · 1,000 assigned"] --> M["900 delivered to model<br/>738 successes · 82%"]
+	B --> F["100 receive fallback<br/>40 successes · 40%"]
+	M --> BP["738 + 40 = 778 successes<br/>77.8% of all assigned B users"]
+	F --> BP
+	AP --> D["B − A = −2.2 percentage points<br/>inspect delivery; preserve assignment"]
+	BP --> D
+	class A,B viz-input
+	class M viz-focus
+	class F viz-warning
+	class AP,BP viz-state
 	class D viz-output
-	class O viz-wide
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the heavy “yes” spine downward. A failed validity or delivery gate is already an explanation, so repair it before blaming model quality. Only after both gates pass should you branch into cause families, then choose a replay, shadow comparison, or small rollback whose result separates those hypotheses.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> add branch successes before dividing by assigned users. The delivered subset's 82% success rate cannot replace B's 77.8% product outcome.</p>
+
+## Calculate, then test a cause
+
+$$
+	ext{B overall}=\frac{738+40}{1000}=0.9(0.82)+0.1(0.40)=0.778.
+$$
+
+A's rate is $0.80$; the difference is $-0.022$, or $-2.2$ percentage points.
+This is not the prompt's separate reported relative change.
+The $0.82$ delivered-model rate conditions on routing and does not identify a causal model improvement.
+
+## First: verify the observation
+
+1. Contain harm under declared rollback conditions; preserve logs and versions.
+2. Check assignment, exposure, sample ratios, instrumentation, uncertainty, delayed outcomes and novelty or seasonality.
+3. Replay production inputs through the actual model, feature, candidate and preprocessing versions.
+4. Inspect latency, errors, fallback and differences by user, item, time and surface.
+5. After validity and delivery pass, test a specific model-quality or feedback hypothesis.
+
+| Hypothesis | Predicted observation | Cheap discriminating check | Next action |
+| --- | --- | --- | --- |
+| Latency triggers fallback | Fallback rises on slow requests | Join routing reasons with latency/version records | Contain; repair and measure again |
+| Preprocessor is stale | Same raw input yields different features | Compare versioned feature snapshots | Fix parity before retraining |
+
+Record actual results and rollback conditions alongside the hypothesis.
+These observations can localize delivery faults; they do not prove fallback is the only cause.
+Restoring delivery needs a new controlled measurement of product effects.
+
+## Change the population or label source
+
+### 1. Only new users regress
+
+**Picture and change:** compare feature defaults, candidate coverage and exposure using new-user traces.
+
+**Check:** a replay matching returning users but failing new users localizes the next parity test.
+
+**Use when:** a specific slice explains the aggregate change; do not jump directly to general drift.
+
+### 2. Labels came from the old ranker
+
+**Picture and change:** inspect logged exposure support and negative sampling after delivery checks.
+Use independent judgments or justified randomized exploration.
+
+**Check:** an unexposed item with no click is not an observed negative.
+
+**Use when:** the previous policy selected the evaluation population.
+
+## Failure and transfer
+
+Immediate retraining changes the model while a stale serving preprocessor remains deployed, obscuring the fault.
+
+What can shadow replay establish?
+
+<details>
+<summary>Check your answer</summary>
+
+Prediction-path parity on replayed inputs, not how users respond to a changed live policy.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## The main cause families
 
-**Objective mismatch.** The offline label or metric is a proxy. Better NDCG, AUC, or accuracy need not improve the user outcome: the model may lift clicks while cutting satisfaction, or raise average relevance while hurting high-value slices.
+**Objective mismatch:** a better proxy such as clicks or NDCG need not improve satisfaction or the declared user outcome.
 
-**Data leakage or evaluation bias.** Time leakage, label leakage, repeated entities, biased negatives, or an unrepresentative test set inflate offline results.
+**Evaluation bias:** inspect time/label leakage, repeated entities, biased negatives and unrepresentative data.
 
-**Training-serving skew.** Feature definitions, freshness, defaults, preprocessing, model version, or candidate sets differ in production.
+**Skew:** check feature definitions, freshness, defaults, preprocessing, versions and candidates.
 
-**System effects.** The model may add latency, cut inventory diversity, overload a downstream service, or trigger more fallbacks.
+**System effects:** latency, downstream load, inventory diversity and fallbacks can change product outcomes.
 
-**Feedback and equilibrium effects.** A ranking model changes what users see and therefore changes future labels; suppliers, fraudsters, or users adapt.
+**Feedback:** exposure changes future labels; users, suppliers and adversaries may adapt.
 
-## What an L4 answer sounds like
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-adds"></span>
+<span id="what-an-l6-answer-adds"></span>
 
-> "I would check data drift and retrain the model."
+## Distinguish evidence types
 
-Drift is one candidate, but retraining before you validate experiment and serving integrity only makes the diagnosis harder.
+Counterfactual estimates require exposure support and justified assumptions.
+Long-term holdbacks need valid assignment, enough duration and consideration of interference.
+Neither is a universal substitute for controlled product measurement.
 
-## What an L5 answer adds
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
 
-An L5 answer builds a decision tree. First verify assignment and exposure, then compare production predictions with an offline replay. Find the slices that explain the regression. Check metric alignment, latency, fallbacks, and candidate coverage. Use a small rollback or shadow comparison to isolate the cause safely.
+## Keep the investigation falsifiable
 
-## What an L6 answer adds
-
-An L6 answer questions the offline evaluation system. The benchmark may contain the old policy's selection bias or omit labels for unseen items. Proxy optimization may also create a predictable second-order effect. The answer considers counterfactual evaluation, randomized exploration, long-term holdbacks, and the process gap that missed the risk.
-
-## Tells that get you a strong-hire vote
-
-- You verify the experiment before debugging the model.
-- You separate model quality from system delivery.
-- You use slice and counterfactual analysis to test hypotheses.
-- You propose rollback or containment before a broad investigation.
-- You improve the eval pipeline once you find the mismatch.
-
-## Tells that get you down-leveled
-
-- Immediately retraining on more data.
-- Listing ten possible causes with no diagnostic order.
-- Assuming the online metric is wrong because the offline metric improved.
-- Ignoring latency, fallback, or candidate-generation changes.
-- Looking only at averages.
+Compare permissioned sampled inputs and outputs without exposing sensitive data.
+Predeclare what result changes the next action, then improve the evaluation that missed the fault.
 
 ## Common follow-ups
 
-- How do you compare online and offline predictions safely?
-- What if the regression appears only for new users?
-- What if the online primary metric is noisy and delayed?
-- How would selection bias enter a recommender's offline dataset?
-- When would you keep the model running despite the initial regression?
+New-user regression needs slice-specific parity checks.
+For noisy delayed outcomes, wait for mature cohorts and use the planned uncertainty method.
+Keep running only within authorized risk limits and predeclared monitoring/stopping rules, not because offline quality improved.
 
 *Related: [delayed and selective labels](/concepts/delayed-labels-selective-labels-feedback-loops/), [point-in-time correctness](/concepts/data-leakage-point-in-time-correctness/), [causal inference](/concepts/causal-inference-for-ml-decisions/), and [A/B testing for ML](/concepts/ab-testing-for-ml/).*
+
+</div>

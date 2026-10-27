@@ -9,9 +9,12 @@ category: "concepts"
 
 ## Summary
 
-A **probabilistic graphical model** (PGM) is a representation of a joint probability distribution as a graph whose nodes are random variables and whose edges encode dependencies. The graph structure determines a factorization of the joint and a set of conditional independence relations.
+A probabilistic graphical model pairs a graph with factors defining a joint probability distribution.
+Nodes represent variables, not necessarily causal mechanisms.
+The graph constrains independence; probability tables or densities supply the numerical parameters.
 
-PGMs were the dominant framework for probabilistic ML from the 1990s through the early 2010s. Many modern probabilistic methods. VAEs, latent-variable diffusion, message passing in transformers (loosely). Descend from PGM ideas. Knowing PGMs gives you the right conceptual vocabulary for any latent-variable model: independence, factorization, marginalization, conditioning.
+Ask whether observing a middle node blocks or opens information between two endpoints.
+Our teaching fixture uses independent fair binary variables $A,B$ and their common effect $C=A\operatorname{OR}B$.
 
 ## Two main families
 
@@ -23,9 +26,9 @@ $$
 p(x_1, \dots, x_n) = \prod_{i=1}^{n} p(x_i \mid \mathrm{parents}(x_i)).
 $$
 
-Examples: naive Bayes (one parent class node, leaf observation nodes), HMM, Bayesian linear regression, hierarchical Bayesian models.
-
-Encoded independence: each node is conditionally independent of its non-descendants given its parents (local Markov property).
+The local Markov property makes each node independent of its non-descendants given its parents.
+For our collider, $p(a,b,c)=p(a)p(b)p(c\mid a,b)$.
+The last factor is one when $c=a\operatorname{OR}b$, zero otherwise.
 
 ### Markov random fields (undirected graphs)
 
@@ -35,22 +38,24 @@ $$
 p(x_1, \dots, x_n) = \frac{1}{Z} \prod_C \psi_C(x_C),
 $$
 
-with potential functions $\psi_C \ge 0$ and partition function $Z = \sum_x \prod_C \psi_C(x_C)$.
-
-Examples: image MRFs (pairwise potentials between neighboring pixels), CRFs (conditional random fields, discriminative MRFs), Boltzmann machines.
-
-Encoded independence: $X_A \perp X_B \mid X_C$ if $C$ separates $A$ from $B$ in the graph.
+Potentials $\psi_C$ are nonnegative; require finite, positive $Z$.
+For continuous variables, replace the sum defining $Z$ with an integral.
+An undirected separator blocks every path between the sets whose independence it establishes.
+Strict positivity is required for the general equivalence between undirected Markov properties and clique factorization.
 
 ## d-separation (Bayesian networks)
 
-A path between two nodes is **blocked** by a set $C$ if either:
+A path is blocked by an observation set $O$ if either:
 
-- A non-collider on the path is in $C$, or
-- A collider (node with two incoming arrows on the path) and none of its descendants are in $C$.
+- A non-collider on that path is observed.
+- A collider and all its descendants are unobserved.
 
-Two nodes are **d-separated** by $C$ if every path between them is blocked. d-separation $\Rightarrow$ conditional independence given $C$ (in the model).
+At a collider, both path arrows point toward the middle node.
+All paths must be blocked for d-separation to imply conditional independence.
+Chains $A\to M\to B$ and forks $A\leftarrow M\to B$ both close when $M$ is observed.
 
-This formalism explains the famous explaining-away phenomenon: conditioning on a common effect makes its causes correlated.
+An observed collider or its descendant instead opens that path.
+An open path permits association; it does not guarantee association for every choice of parameters.
 
 <!-- visual:d-separation-conditioning-switch -->
 <figure class="learning-figure" aria-labelledby="d-separation-conditioning-title">
@@ -59,7 +64,7 @@ This formalism explains the famous explaining-away phenomenon: conditioning on a
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 388" role="img" aria-labelledby="d-separation-svg-title d-separation-svg-desc">
 			<title id="d-separation-svg-title">Conditioning closes a chain path but opens a collider path</title>
-			<desc id="d-separation-svg-desc">Four directed three-node graphs compare a chain A to M to B with a collider A to C from B. In the unconditioned chain, the path from A to B is active, so A and B may be dependent. Observing middle node M blocks the chain, so A and B are conditionally independent. In the unconditioned collider, the path is blocked, so A and B are independent. Observing common effect C opens the collider path, so its causes A and B become conditionally dependent through explaining away. Observed nodes have a double outline and the word observed; blocked paths have a central cross and dashed outer edges.</desc>
+			<desc id="d-separation-svg-desc">Four three-node graphs compare a chain with a collider. Observing the middle of the chain blocks its path. An unobserved collider blocks its path; observing the collider opens it and permits association. Open paths do not force dependence for every parameterization. Observed nodes have double outlines; blocked paths have a cross and dashed edges.</desc>
 			<rect class="viz-plot-bg" x="8" y="8" width="344" height="178" rx="5"></rect>
 			<text class="viz-axis-label" x="18" y="29">CHAIN · A → M → B</text>
 			<text class="viz-label" x="18" y="53">Do not observe M</text>
@@ -114,37 +119,76 @@ This formalism explains the famous explaining-away phenomenon: conditioning on a
 			<path d="M192 312L199 316L192 320ZM248 312L241 316L248 320Z" style="fill:var(--viz-edge)"></path>
 			<text class="viz-node-value" x="220" y="352">OBSERVED</text>
 			<text class="viz-callout" x="140" y="369" text-anchor="middle">PATH OPENS</text>
-			<text class="viz-label" x="275" y="369" text-anchor="middle">A and B depend | C</text>
+			<text class="viz-label" x="275" y="369" text-anchor="middle">A and B may depend | C</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the middle node in each pair. Observing a non-collider blocks the chain, but a collider starts blocked and observing its common effect opens the path. If two independent causes can produce the same effect, learning that the effect occurred makes evidence for one cause evidence against the other: explaining away. The graph encodes the independence pattern; it does not by itself assert causation. Original schematic checked against <a href="https://probml.github.io/pml-book/book1.html">Murphy (2022)</a> and <a href="https://dl.acm.org/doi/10.1016/0890-5401%2890%2990060-T">Geiger, Verma, and Pearl (1990)</a>.</figcaption>
+	<table><caption>OR collider: independent fair inputs</caption><thead><tr><th>A</th><th>B</th><th>C</th><th>Joint mass</th><th>Mass given C=1</th></tr></thead><tbody><tr><td>0</td><td>0</td><td>0</td><td>1/4</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td><td>1/4</td><td>1/3</td></tr><tr><td>1</td><td>0</td><td>1</td><td>1/4</td><td>1/3</td></tr><tr><td>1</td><td>1</td><td>1</td><td>1/4</td><td>1/3</td></tr></tbody></table>
+	<figcaption><strong>Read it this way:</strong> observing the chain's middle blocks its path; observing the collider opens its path. The OR table gives an actual dependence: once C=1 is known, evidence for B reduces the probability of A. The arrows alone do not guarantee that numerical result or establish causation. The original schematic retains its <a href="https://probml.github.io/pml-book/book1.html">Murphy (2022)</a> and <a href="https://dl.acm.org/doi/10.1016/0890-5401%2890%2990060-T">Geiger-Verma-Pearl (1990)</a> provenance.</figcaption>
 </figure>
+
+### Normalize the collider
+
+The four input pairs each have probability $1/4$.
+Observing $C=1$ excludes only $(0,0)$, so $p(C=1)=3/4$.
+The three remaining pairs each receive conditional mass $1/3$:
+
+$$
+p(A=1\mid C=1)=\frac{1/2}{3/4}=\frac23.
+$$
+
+Further observing $B=1$ leaves two equally likely pairs, giving $p(A=1\mid C=1,B=1)=1/2$.
+Observing $B=0$ instead forces $A=1$.
+This is explaining away within the specified model, not an observational proof of causation.
+
+### Observe a non-collider
+
+**New task:** use $A\to M\to B$, with fair $A$ and binary copying probabilities $0.8$, then $0.9$.
+
+**Picture and change:** replace the common effect with a middle transition.
+Before observing $M$,
+
+$$p(B=1\mid A=1)=0.8(0.9)+0.2(0.1)=0.74.$$
+
+**Check:** given $M=1$, the probability of $B=1$ is $0.9$ regardless of $A$.
+Conditioning blocks this path rather than opening it.
+
+**Use when:** the observed middle node is a non-collider on the relevant path.
+
+### Observe a collider's descendant
+
+**New task:** add $C\to D$ with deterministic $D=C$ and observe $D=1$.
+
+**Picture and change:** evidence arrives downstream instead of at $C$ directly.
+
+**Check:** the same three OR cases survive, so $p(A=1\mid D=1)=2/3$.
+
+**Use when:** selection or measurement depends on a common effect's descendant.
+
+### An active path need not produce association
+
+Keep the collider graph, but set $p(C=1\mid A,B)=1/2$ for every input pair.
+Observing $C$ then leaves $A,B$ independent.
+This parameterization is Markov to the graph but not faithful: it has extra independence beyond graphical separation.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Inference tasks
 
-For a graphical model, the standard tasks are:
+Marginalization sums out variables; conditioning renormalizes evidence-compatible cases; joint MAP finds the most probable assignment.
+Separate marginal modes need not form the joint MAP assignment.
 
-- **Marginal**: compute $p(x_i)$ or $p(x_S)$ for a subset $S$.
-- **Conditional**: compute $p(x_S \mid x_O)$ given observations.
-- **MAP**: find $\arg\max_x p(x \mid x_O)$.
-
-Exact methods:
-
-- **Variable elimination**: marginalize out variables one by one, exploiting factorization.
-- **Belief propagation / sum-product**: message passing on tree-structured graphs (or cluster graphs / junction trees for general graphs).
-- **Junction tree algorithm**: exact inference in any graph by clustering into a tree of cliques.
-
-For graphs with high tree-width, exact inference is exponential. Approximate methods:
-
-- **MCMC** (Gibbs, Metropolis-Hastings).
-- **Variational inference** (mean-field, structured, neural).
-- **Expectation propagation**.
+Variable elimination exploits factors; exact cost depends on variable domains and induced treewidth.
+Sum-product is exact on trees; junction trees cluster variables for exact general-graph inference.
+Large cliques can make that impractical.
+MCMC, variational inference, and expectation propagation instead require approximation or convergence checks.
 
 ## Special cases that became their own fields
 
 | Graphical model | Modern name |
 |----------------|-------------|
-| Latent variable Bayesian network | VAE (with neural conditional distributions) |
+| Latent variable Bayesian network | VAE with approximate amortized inference |
 | Linear-Gaussian state space | Kalman filter |
 | Discrete latent chain | HMM |
 | Conditional MRF | CRF |
@@ -154,20 +198,22 @@ For graphs with high tree-width, exact inference is exponential. Approximate met
 
 ## Relevance in 2026
 
-PGM as a framework is less central than it was in 2010, replaced by neural networks for most practical inference. But graphical-model thinking persists in:
-
-- Diffusion models (Markov chain over noise levels).
-- VAEs (latent → observation Bayesian network).
-- Probabilistic programming (Pyro, Stan, NumPyro).
-- Causal inference (DAGs are the language).
-- Structured prediction with CRFs in some NLP pipelines.
+Neural conditional distributions can parameterize a graphical model; they do not generally replace inference.
+Probabilistic programming, state-space models, and structured prediction still require explicit distributions and conditioning operations.
 
 ## Common pitfalls
 
-- **Confusing causation with d-separation.** PGMs model dependencies; causation requires additional assumptions (intervention, do-calculus).
-- **Treating the joint distribution as fully specified by the graph alone.** The graph only specifies *structure*; the conditional distributions are separate.
-- **Forgetting that exact inference is intractable for general MRFs.** Tree-width matters.
-- **Reading missing edges as independence.** They imply *conditional* independence given the rest, not marginal independence.
+Does a missing $A$-$B$ edge always imply marginal independence?
+
+<details><summary>Answer</summary>
+
+No: a chain can connect them through another variable.
+Use the graph-specific separation rule and actual conditioning set.
+Causal interpretations additionally require a causal model and identifying assumptions.
+
+</details>
+
+</div>
 
 ## Related
 

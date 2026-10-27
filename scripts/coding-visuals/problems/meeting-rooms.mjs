@@ -44,7 +44,7 @@ const draft = visual('Sorting by start time makes the first overlap appear betwe
       { ...sorted[1], tone: 'warning' },
       { ...sorted[2], tone: 'warning' },
       sorted[3],
-    ], { max: 14, index: '2', boundary: '10 <= 9: false', overlap: '[9,10]' }),
+    ], { max: 14, index: '2', boundary: '10 <= 9: false', overlap: '[9,10)' }),
     'check-index-2',
   ),
   frame(

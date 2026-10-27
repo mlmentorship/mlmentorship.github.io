@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth, especially in NLP and time-series interviews.*
 
-The question is mechanical for L4 (define BPTT) and conceptual for L6 (truncated BPTT, vanishing/exploding gradients, and why transformers don't need it).
+Explain how a recurrent model receives gradients through time and what changes when its training history is truncated.
+
+## Problem
+
+**Context.** A recurrent state is computed as `h[t] = f(h[t-1], x[t]; parameters)`, reusing parameters across sequence positions.
+The scalar training objective contains losses from one or more positions.
+
+**Task.** Trace how earlier states and shared parameters contribute to the gradient, then compare full and truncated backpropagation through time.
+Explain memory costs, vanishing or exploding gradients, and the distinction from a nonrecurrent attention computation.
+
+**Constraints.** State the sequence and truncation boundaries, including whether state values continue while their gradient history is detached.
+Distinguish clipping from truncation; neither makes an arbitrarily long dependency automatically learnable.
 
 ## What an L4 answer sounds like
 

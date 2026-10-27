@@ -11,7 +11,7 @@ const batch = (start, end, extra = {}) => array(items, [
 });
 
 const draft = visual('Advance one start cursor by batch size and yield the half-open slice; sequence slicing automatically clips the final end.', [
-  frame('Validate the batch size', 'For items [0,1,2,3,4,5,6] and batch_size=3, the positive-size guard passes.', batch(0, 3, {
+  frame('Validate the batch size', 'Seven examples use batch_size=3. The positive-size guard passes.', batch(0, 3, {
     guard: '3 > 0',
     nextStart: '0',
   }), 'validate'),

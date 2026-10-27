@@ -67,21 +67,19 @@ Equivalent view: the optimal $p_c$ for label smoothing is $1 - \varepsilon + \va
 
 ## When to use
 
-- **Language modeling** (transformer training): standard $\varepsilon = 0.1$.
-- **Image classification** with hard labels: standard, $\varepsilon = 0.1$.
-- **Distillation**: not needed; the teacher's soft targets already provide the regularization.
-- **Retrieval / contrastive learning**: usually skipped; sharp distributions are sometimes needed for good top-1.
+- **Language modeling or image classification:** compare the declared smoothing convention and strength with unsmoothed training under matched validation.
+- **Distillation:** teacher probabilities already supply soft targets; extra smoothing is a separate intervention, not automatically necessary or redundant.
+- **Retrieval / contrastive learning:** assess ranking and representation quality under the actual candidate/label semantics instead of transferring a classification default.
 
 ## Side effects
 
-- **Calibration improves**: temperature 1 softmax becomes closer to actual confidence.
-- **Top-1 accuracy roughly unchanged or marginally improved**.
-- **Worse for retrieval / nearest-neighbor**: the embeddings cluster less tightly because the model is penalized for confidence (Müller et al., 2019).
-- **Worse for distillation as teacher**: a label-smoothed teacher provides less informative soft targets.
+- **Calibration and accuracy can change in either direction.** Smoothing changes the training target; it does not prove probability-frequency agreement on deployment data.
+- **Representation and distillation effects depend on the task.** Studies such as Müller et al. (2019) motivate checking teacher information and embedding geometry, not declaring one outcome universal.
+- **Keep the evaluation target explicit.** Report ordinary held-out likelihood and task metrics separately from the smoothed training objective; see the [cross-entropy mechanism](/concepts/cross-entropy-softmax/).
 
 ## Common pitfalls
 
-- **Stacking with mixup / cutmix.** These already softening targets; adding label smoothing on top double-counts.
+- **Stacking target changes without testing them.** Mixup/CutMix and smoothing have different constructions; their combination needs an ablation rather than automatic approval or rejection.
 - **Using on a regression problem.** Label smoothing is for categorical cross-entropy; it has no meaning for MSE.
-- **Choosing $\varepsilon$ too large.** $\varepsilon = 0.5$ destroys signal; $\varepsilon = 0.1$ is the universal default.
+- **Treating a coefficient as universal.** Include zero and task-appropriate candidates in validation; the class count and smoothing convention affect what any chosen value means.
 - **Forgetting to disable for eval-only metrics.** Loss numbers with label smoothing are not directly comparable to one-hot loss numbers.

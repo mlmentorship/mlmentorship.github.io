@@ -12,7 +12,7 @@ const keyedGrid = (rows, active, extra = {}) => {
 };
 
 const draft = visual('Reverse row order, then swap every above-diagonal cell with its reflected below-diagonal partner.', [
-  frame('Start with the original coordinates', 'The 3x3 input is [[1,2,3],[4,5,6],[7,8,9]] before any in-place mutation.', keyedGrid(
+  frame('Start with the original coordinates', 'The original square contains three rows: [1,2,3], [4,5,6], and [7,8,9].', keyedGrid(
     [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']],
     [],
     { action: 'initialize' },

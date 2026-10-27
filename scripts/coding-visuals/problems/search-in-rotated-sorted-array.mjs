@@ -1,33 +1,34 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const values = ['4', '5', '6', '7', '0', '1', '2'];
+const fitted = (items, marks, extra) => array(items, marks, { fitArray: true, arrayColumns: 7, ...extra });
 
 const draft = visual('Keep the interval containing target 0 by identifying one sorted half at each probe.', [
   frame(
-    'Use the sorted left half',
-    'left=0, right=6, and middle=3. Since nums[0]=4 <= nums[3]=7, indices 0..3 are sorted; target 0 is not in [4,7), so set left=4.',
-    array(values, [
-      mark(0, 'left', 'state', 'pointer-left'),
-      mark(3, 'middle', 'focus', 'pointer-middle'),
-      mark(6, 'right', 'state', 'pointer-right'),
+    'Reject the sorted half',
+    'left=0, right=6, middle=3. The left half is sorted, but zero is outside [4,7), so set left=4.',
+    fitted(values, [
+      mark(0, 'L', 'state', 'pointer-left'),
+      mark(3, 'm', 'focus', 'pointer-middle'),
+      mark(6, 'R', 'state', 'pointer-right'),
     ], { target: '0', sorted: 'indices 0..3', decision: '0 not in [4, 7): left = 4' }),
     'discard-sorted-left',
   ),
   frame(
-    'Keep the sorted left half',
-    'Now left=4, right=6, and middle=5. Values 0..1 are sorted and 0 is in [nums[4], nums[5])=[0,1), so set right=middle-1=4.',
-    array(values, [
-      mark(4, 'left', 'state', 'pointer-left'),
-      mark(5, 'middle', 'focus', 'pointer-middle'),
-      mark(6, 'right', 'state', 'pointer-right'),
+    'Keep the sorted half',
+    'Now left=4, right=6, middle=5. The target fits [0,1), so set right=4 and keep index 4.',
+    fitted(values, [
+      mark(4, 'L', 'state', 'pointer-left'),
+      mark(5, 'm', 'focus', 'pointer-middle'),
+      mark(6, 'R', 'state', 'pointer-right'),
     ], { target: '0', sorted: 'indices 4..5', decision: '0 in [0, 1): right = 4' }),
     'keep-sorted-left',
   ),
   frame(
     'Return the target',
     'left=right=middle=4 and nums[4]=0, so the search returns index 4.',
-    array(values, [
-      mark(4, 'left = middle = right', 'output', 'pointer-middle'),
+    fitted(values, [
+      mark(4, 'found', 'output', 'pointer-middle'),
     ], { target: '0', comparison: '0 = 0', result: 'index 4' }),
     'return-target',
   ),

@@ -13,17 +13,41 @@ aliases: []
 prerequisites: []
 ---
 
-> Find the longest substring with no repeated character.
+Find the longest contiguous piece of a string in which every character occurs only once.
 
-Start with the concrete trace below. It shows the state the algorithm must carry as it runs.
+## Problem
+
+**Input.** A Python string `text`.
+
+**Output.** Return the maximum length of a substring containing no repeated character.
+
+**Rules.** A substring is contiguous; skipping interior characters is not allowed.
+Compare exact Python code points, so case and whitespace remain significant.
+Return only the length and leave the string unchanged. Empty input returns zero.
+
+**Example.** `"abba"` returns `2`, witnessed by `"ab"` or `"ba"`.
+For `"bbbb"`, return `1`; for `""`, return `0`.
+
+## Picture: Repair Only the Newly Repeated Character
 
 <!-- visual:longest-substring-without-repeating-characters-state -->
 <figure class="learning-figure coding-visual-figure" aria-labelledby="longest-substring-without-repeating-characters-state-title"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="longest-substring-without-repeating-characters-state-title">Longest Substring Without Repeating Characters: Keep [L..R] duplicate-free by jumping L past a repeated character that is still inside the window.</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="longest-substring-without-repeating-characters" role="group" tabindex="0" aria-label="Longest Substring Without Repeating Characters: Keep [L..R] duplicate-free by jumping L past a repeated character that is still inside the window."><div class="coding-visual-example"><span>Input and goal</span><strong>Find the longest substring with no repeated character.</strong></div><div class="coding-trace" data-coding-trace><div class="coding-trace-frame" data-coding-frame="0" data-frame-key="initialize" role="group" aria-label="Initialize the empty history"><div class="coding-trace-frame-heading"><span>Initialize the empty history</span><strong>For text &quot;abba&quot;, start L = 0, best = 0, and inspect R = 0.</strong></div><div class="coding-trace-array-map"><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item trace-tone-state trace-tone-focus" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-pointer" data-motion-key="left">L</span><span class="coding-trace-array-pointer" data-motion-key="right">R</span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">3</small></span></div><div class="coding-trace-meta"><span><b>range</b>empty before reading index 0</span><span><b>best</b>0</span></div><div class="coding-trace-map"><span class="coding-trace-label">saved state</span><span class="coding-trace-empty">empty</span></div></div></div><div class="coding-trace-frame" data-coding-frame="1" data-frame-key="read-a-0" hidden role="group" aria-label="Read a at index 0"><div class="coding-trace-frame-heading"><span>Read a at index 0</span><strong>No earlier a exists, so keep L = 0, save a -&gt; 0, and set best = max(0, 1) = 1.</strong></div><div class="coding-trace-array-map"><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item trace-tone-state trace-tone-focus" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-pointer" data-motion-key="left">L</span><span class="coding-trace-array-pointer" data-motion-key="right">R</span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">3</small></span></div><div class="coding-trace-meta"><span><b>range</b>[0..0] = &quot;a&quot;</span><span><b>length</b>0 - 0 + 1 = 1</span><span><b>best</b>1</span></div><div class="coding-trace-map"><span class="coding-trace-label">saved state</span><span class="coding-trace-map-entry"><b>a</b><span>0</span></span></div></div></div><div class="coding-trace-frame" data-coding-frame="2" data-frame-key="read-b-1" hidden role="group" aria-label="Extend through b at index 1"><div class="coding-trace-frame-heading"><span>Extend through b at index 1</span><strong>b is new, so [0..1] stays distinct; save b -&gt; 1 and raise best to 2.</strong></div><div class="coding-trace-array-map"><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-pointer" data-motion-key="left">L</span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-pointer" data-motion-key="right">R</span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">3</small></span></div><div class="coding-trace-meta"><span><b>range</b>[0..1] = &quot;ab&quot;</span><span><b>length</b>1 - 0 + 1 = 2</span><span><b>best</b>2</span></div><div class="coding-trace-map"><span class="coding-trace-label">saved state</span><span class="coding-trace-map-entry"><b>a</b><span>0</span></span><span class="coding-trace-map-entry"><b>b</b><span>1</span></span></div></div></div><div class="coding-trace-frame" data-coding-frame="3" data-frame-key="repair-b-2" hidden role="group" aria-label="Jump past the repeated b"><div class="coding-trace-frame-heading"><span>Jump past the repeated b</span><strong>At R = 2, the old b is at 1 inside [0..1], so move L right to max(0, 1 + 1) = 2.</strong></div><div class="coding-trace-array-map"><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item trace-tone-state trace-tone-focus" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-pointer" data-motion-key="left">L</span><span class="coding-trace-array-pointer" data-motion-key="right">R</span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">3</small></span></div><div class="coding-trace-meta"><span><b>range</b>[2..2] = &quot;b&quot;</span><span><b>direction</b>L: 0 -&gt; 2</span><span><b>best</b>max(2, 1) = 2</span></div><div class="coding-trace-map"><span class="coding-trace-label">saved state</span><span class="coding-trace-map-entry"><b>a</b><span>0</span></span><span class="coding-trace-map-entry"><b>b</b><span>2</span></span></div></div></div><div class="coding-trace-frame" data-coding-frame="4" data-frame-key="finish-a-3" hidden role="group" aria-label="Ignore an occurrence left of L"><div class="coding-trace-frame-heading"><span>Ignore an occurrence left of L</span><strong>At R = 3, the old a is at 0, outside [2..2]; max(2, 0 + 1) keeps L = 2, so &quot;ba&quot; has length 2.</strong></div><div class="coding-trace-array-map"><div class="coding-trace-array" role="list" aria-label="Array state"><span class="coding-trace-array-item" role="listitem" data-motion-key="value-0"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">0</small></span><span class="coding-trace-array-item" role="listitem" data-motion-key="value-1"><span class="coding-trace-array-mark"></span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">1</small></span><span class="coding-trace-array-item trace-tone-state" role="listitem" data-motion-key="value-2"><span class="coding-trace-array-pointer" data-motion-key="left">L</span><span class="coding-trace-array-cell">b</span><small class="coding-trace-array-index">2</small></span><span class="coding-trace-array-item trace-tone-focus" role="listitem" data-motion-key="value-3"><span class="coding-trace-array-pointer" data-motion-key="right">R</span><span class="coding-trace-array-cell">a</span><small class="coding-trace-array-index">3</small></span></div><div class="coding-trace-meta"><span><b>range</b>[2..3] = &quot;ba&quot;</span><span><b>direction</b>L stays 2; R: 2 -&gt; 3</span><span><b>best</b>max(2, 2) = 2</span><span><b>result</b>2</span></div><div class="coding-trace-map"><span class="coding-trace-label">saved state</span><span class="coding-trace-map-entry"><b>a</b><span>3</span></span><span class="coding-trace-map-entry"><b>b</b><span>2</span></span></div></div></div><div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of 5</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps"><button type="button" data-coding-frame-button="0" aria-current="step"><span>1</span><strong>Initialize the empty history</strong></button><button type="button" data-coding-frame-button="1"><span>2</span><strong>Read a at index 0</strong></button><button type="button" data-coding-frame-button="2"><span>3</span><strong>Extend through b at index 1</strong></button><button type="button" data-coding-frame-button="3"><span>4</span><strong>Jump past the repeated b</strong></button><button type="button" data-coding-frame-button="4"><span>5</span><strong>Ignore an occurrence left of L</strong></button></div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p></div><dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">Use it when the answer is a longest contiguous span constrained by uniqueness and a repeated value tells exactly how far the left boundary can safely jump.</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">After processing index R, [L..R] has no repeated character; L never moves backward, and best is the maximum length of every valid window ending at or before R.</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">For longest windows repaired by the newest violation, store enough history to jump over the violating occurrence, but clamp the new left boundary so stale history can never move it backward.</dd></div></dl></div><figcaption><strong>Read it this way:</strong> For text &quot;abba&quot;, start L = 0, best = 0, and inspect R = 0. Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>
 
-**Pattern:** Sliding window with last positions.
+The figure's `L`, `R` correspond to `left`, `right` in code.
 
-**Simple idea:** When a repeated character is inside the current window, move `left` to one
-position after its last copy. Never move `left` backward.
+| Read index | Previous occurrence | New `left` | Window | Best |
+| ---: | --- | ---: | --- | ---: |
+| 0: a | Absent | 0 | `a` | 1 |
+| 1: b | Absent | 0 | `ab` | 2 |
+| 2: b | 1, inside | 2 | `b` | 2 |
+| 3: a | 0, outside | 2 | `ba` | 2 |
+
+Before extension, the window has no duplicates. Only the incoming character can break that property.
+Its latest occurrence is the furthest-right conflict; jumping past it also excludes all older copies.
+Use `max(left, last_seen[char]+1)` to retain previous exclusions.
+After repair, this is the longest valid suffix ending at `right`; checking every endpoint finds the global maximum.
+
+## Code
 
 ```python
 def length_of_longest_substring(text: str) -> int:
@@ -40,4 +64,88 @@ def length_of_longest_substring(text: str) -> int:
    return best
 ```
 
-**Cost:** $O(n)$ time and $O(k)$ space.
+Expected time is $O(n)$ with ordinary map operations; space is $O(d)$ for distinct code points seen.
+The map retains history, not just characters currently inside the window.
+
+## Change 1: Return the Text
+
+**New task.** Return one longest substring; retain the first encountered best on ties.
+
+**Picture and change.** Save its start only on strict improvement. Copy the winning slice once, after scanning.
+
+**Code.**
+
+```python
+def longest_unique_text(text):
+   last_seen = {}
+   left = best_left = best_length = 0
+   for right, character in enumerate(text):
+      left = max(left, last_seen.get(character, -1) + 1)
+      last_seen[character] = right
+      if right - left + 1 > best_length:
+         best_left, best_length = left, right - left + 1
+   return text[best_left:best_left + best_length]
+```
+
+**Check.** `"abba"` returns `"ab"`; empty input returns `""`. Copying costs the returned length.
+
+**Use when.** The caller needs a witness, not just a number.
+
+## Change 2: Allow At Most a Declared Number of Distinct Characters
+
+**New task.** Repetitions are allowed, but at most `limit` distinct characters may occur. Require a nonnegative integer limit.
+
+**Picture and change.** Count the current window. Remove from the left until its positive-count keys fit.
+
+**Code.**
+
+```python
+def longest_k_distinct(text, limit):
+   counts = {}
+   left = best = 0
+   for right, character in enumerate(text):
+      counts[character] = counts.get(character, 0) + 1
+      while len(counts) > limit:
+         outgoing = text[left]
+         counts[outgoing] -= 1
+         if counts[outgoing] == 0:
+            del counts[outgoing]
+         left += 1
+      best = max(best, right - left + 1)
+   return best
+```
+
+**Check.** `("eceba", 2)` gives 3 from `"ece"`; `("abc", 0)` gives 0.
+
+**Use when.** Validity counts distinct values instead of forbidding repeats.
+
+## Failure: A Backward Jump
+
+Without `max`, the final `a` in `"abba"` moves `left` back to 1, admitting invalid `"bba"` and reporting 3.
+
+## Transfer Check
+
+Must entries left of the window be deleted?
+
+### Reasoned Answer
+
+No. The clamp makes stale history harmless; each saved index still identifies the latest occurrence.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+## Preserve the Validity Rule, Not Just the Loop Shape
+
+Update `last_seen` only after using its previous value to repair the boundary.
+Saving `right` first would make the incoming character conflict with itself.
+
+The distinct-count variant needs actual current counts, including deletion when a count reaches zero.
+Otherwise `len(counts)` would include characters no longer in the window.
+Each endpoint moves only forward, so total shrinking work is linear despite the nested loop.
+Its state holds at most `limit+1` keys during insertion, subject to the available alphabet.
+These are expected hash-cost bounds, not worst-case guarantees against every hash behavior.
+
+A subsequence need not be contiguous and requires a different contract.
+Code-point uniqueness also differs from uniqueness of visible grapheme clusters; normalization and segmentation would be explicit task changes.
+
+</div>

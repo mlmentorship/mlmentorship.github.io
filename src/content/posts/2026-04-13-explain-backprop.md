@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth at every level.*
 
-The interviewer is checking whether you understand backprop as a *computation*, not as a formula. The L4 answer recites the chain rule. The L6 answer connects it to reverse-mode auto-differentiation, the cost relative to forward, and what breaks it in practice.
+Explain backpropagation as a computation over a graph, including how gradients from multiple uses of a value combine.
+
+## Problem
+
+**Context.** A differentiable computation produces a scalar loss from parameters and intermediate values that may feed several later operations.
+For a small illustration, take `loss = x * x + x` at `x = 2`.
+
+**Task.** Trace the forward values and reverse derivatives, explain gradient accumulation, and relate the procedure to reverse-mode automatic differentiation.
+Discuss computational cost, saved intermediates, and common ways gradient flow is interrupted.
+
+**Constraints.** Distinguish the derivative calculation from the optimizer update.
+Account for every path to a reused value, and state conventions for nondifferentiable operations rather than assuming all graphs are smooth.
 
 ## What an L4 answer sounds like
 

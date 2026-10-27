@@ -9,7 +9,18 @@ category: "questions"
 
 > *Asked in: staff-level behavioral and project rounds.*
 
-The L4 story is "the model missed its accuracy bar so the team cancelled it." The L6 story is a project you stopped on evidence, against sunk cost and your own attachment, then redirected the people and infrastructure to something higher-leverage. Killing the right project on time is a senior signal; treating only launches as impact is a junior one.
+Describe a project you helped stop or materially redirect, including the evidence, alternatives, and consequences of that decision.
+
+## Problem
+
+**Context.** An interviewer asks about ending an ML effort despite prior investment or personal attachment.
+The decision may involve technical feasibility, user value, operating cost, or a changed requirement.
+
+**Task.** Explain the original goal, new evidence, options considered, your role, decision authority, and what happened to people or reusable work.
+Describe what would have justified continuing instead.
+
+**Constraints.** Use an actual experience and distinguish your recommendation from the final team decision.
+Separate sunk costs from future alternatives, protect confidential information, and avoid claiming unmeasured counterfactual savings as established impact.
 
 ## What a strong answer covers
 

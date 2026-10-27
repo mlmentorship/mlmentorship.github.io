@@ -1,6 +1,6 @@
 ---
-title: "Design Amazon's people also bought"
-description: "A simple-sounding feature with deep recsys ground underneath. The senior answer chooses between item-item collaborative filtering, embedding similarity, and learned co-purchase models, with explicit handling of feedback loops."
+title: "Design a complementary purchase shelf"
+description: "Distinguish complements from similarity, compare co-purchase rates with lift, and separate attributed orders from useful incremental purchases."
 date: "2026-02-13"
 draft: false
 tags: ["questions"]
@@ -8,104 +8,144 @@ category: "questions"
 ---
 
 
-> *Asked in: e-commerce and recsys interviews.*
+Design a complementary-product shelf and distinguish useful add-ons from substitutes or merely popular items.
 
-The L4 candidate proposes "find similar items." The L6 candidate decomposes "similar" into specific behavioral signals (co-view, co-purchase, complementary) and reasons about which the surface should optimize for.
+## Problem
 
-## What "people also bought" actually means
+**Context.** A shopper has selected a printer, and the hypothetical store has basket co-occurrence counts for possible add-ons.
 
-Three distinct signals, often confused:
-1. **Co-purchase**: people who bought X also bought Y. Captures complementary items (printer + ink).
-2. **Co-view**: people who viewed X also viewed Y. Captures substitutes (looking at multiple printers before deciding).
-3. **Item similarity**: items with similar attributes / embeddings. Captures features (similar printers).
+**Task.** Compare the evidence below, propose candidate retrieval and ranking, and define an experiment for useful purchase effects.
+Explain how compatibility, eligibility, and the shelf's purpose affect selection.
 
-The product question: which one should the shelf optimize for? On a product page, you usually want *complementary* recommendations (you've already decided on this printer; what else might you need?), not substitutes (which would distract from the purchase). So co-purchase, not co-view, not item similarity.
+**Constraints.** Observed co-purchases are associations, not proof that showing an item causes incremental value.
+Account for item popularity, exposure, and substitutes; this is not a claim about Amazon's internal implementation.
+
+Build an illustrative complementary shelf, not a claim about current Amazon internals.
+In 1,000 fictional baskets, 100 contain the printer, 80 contain ink and 50 contain both.
+Another add-on appears in 300 baskets and 60 printer baskets.
+Which evidence should retrieve candidates, and how would you measure useful purchase effects?
+
+<span id="what-people-also-bought-actually-means"></span>
+
+## Picture: Hold the Printer Fixed
 
 <!-- visual:people-also-bought-three-relations -->
 <figure class="learning-figure" aria-labelledby="people-also-bought-relations-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="people-also-bought-relations-title">For one anchor product, which meaning of “related” serves a complementary shelf?</p>
-	<div class="visual-grid--two" role="group" aria-label="Comparison of an anchor printer and the candidates produced by co-purchase, co-view, and attribute-similarity evidence">
+	<p class="visual-kicker">One anchor, three kinds of evidence</p>
+	<p class="visual-title" id="people-also-bought-relations-title">Compatible ink can complete a printer purchase; another printer can help compare alternatives.</p>
+	<div class="visual-grid--two" role="group" aria-label="Printer anchor with co-purchase, co-view and attribute-similarity evidence">
 		<section class="visual-panel">
-			<h4>ANCHOR · PRINTER</h4>
-			<p><strong>Product-page intent</strong><br />The shopper is close to choosing this item. Help complete the job rather than restart the comparison.</p>
+			<h4>Anchor: printer</h4>
+			<p>The declared task is completing this purchase, not restarting printer comparison.</p>
 		</section>
 		<section class="visual-panel">
-			<h4>1 · CO-PURCHASE → INK</h4>
-			<p><strong>Evidence</strong><br />The printer and ink appear in the same orders or purchase sessions.</p>
-			<p><strong>Relationship</strong><br />Complement: bought in addition to the anchor.</p>
-			<p><strong>Best use</strong><br />Primary signal for the “people also bought” shelf.</p>
+			<h4>Co-purchase: ink</h4>
+			<p>50 printer baskets contain ink. Association suggests a candidate; verify the cartridge fits this printer.</p>
 		</section>
 		<section class="visual-panel">
-			<h4>2 · CO-VIEW → ANOTHER PRINTER</h4>
-			<p><strong>Evidence</strong><br />Shoppers inspect both products while comparing options.</p>
-			<p><strong>Relationship</strong><br />Often a substitute: chosen instead of the anchor.</p>
-			<p><strong>Best use</strong><br />Comparison or discovery surfaces.</p>
+			<h4>Co-view: another printer</h4>
+			<p>Shared inspection can indicate alternatives, but does not prove substitution.</p>
 		</section>
 		<section class="visual-panel">
-			<h4>3 · ATTRIBUTE SIMILARITY → SIMILAR PRINTER</h4>
-			<p><strong>Evidence</strong><br />Features or embeddings place the products near each other.</p>
-			<p><strong>Relationship</strong><br />Feature-level similarity, without requiring co-behavior.</p>
-			<p><strong>Best use</strong><br />Cold-item fallback, not proof of complementarity.</p>
+			<h4>Attribute similarity: similar printer</h4>
+			<p>Nearby features support matching, including cold items; they do not establish complementarity.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> hold the anchor printer fixed, then read what changes in each card: evidence, candidate, and product purpose. Same-order behavior points toward the complementary ink, while co-view and attribute similarity tend to return alternative printers. Choose co-purchase for this shelf because its relation matches the post-decision cross-sell objective; keep similarity as a cold-item fallback. Original schematic checked against <a href="https://doi.org/10.1109/MIC.2003.1167344">Linden et al.'s item-to-item method</a> and <a href="https://doi.org/10.1145/2783258.2783381">McAuley et al.'s complement-versus-substitute distinction</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> keep the printer fixed and change the relation sought. Observed behavior supplies evidence, not compatibility or causality. Verify product fit before display.</figcaption>
 </figure>
 
-## What an L5 answer sounds like
+## Calculate Two Different Associations
 
-> "I'd build it as a candidate-generation + ranking system optimized for co-purchase:
->
-> **Candidate generation**:
-> - Item-item co-purchase matrix from order history. For item X, candidates are items frequently purchased in the same order or session.
-> - Item-embedding similarity as a fallback for cold items.
-> - Hybrid: union from both sources.
->
-> **Ranking**: a small neural ranker scoring (anchor item, candidate, user, context) and predicting purchase probability. Multi-task: predict click, add-to-cart, purchase. Combined into a final score.
->
-> **Eval**: offline (precision-at-K on held-out co-purchase pairs), online (CTR, add-to-cart-rate, attributed purchases on the recommendation surface, basket-size lift).
->
-> **Cold-start**: new items have no co-purchase signal; rely on content-based candidates from item attributes / embeddings, boost in early period."
+Define one basket and one observation window; count each item once per basket here.
+The conditional rate divides joint baskets by printer baskets.
+Lift divides that rate by the candidate's overall basket rate.
 
-This is L5. Decomposed signals, two-stage architecture, eval framework.
+| Candidate | Joint baskets | Conditional rate | Overall rate | Lift |
+| --- | ---: | ---: | ---: | ---: |
+| Ink | 50 | 50/100 = 0.50 | 80/1,000 = 0.08 | 6.25 |
+| Popular add-on | 60 | 60/100 = 0.60 | 300/1,000 = 0.30 | 2.00 |
 
-## What an L6 answer adds
+Counts and lift disagree on order.
+Neither proves compatibility, reliable confidence or incremental customer value.
 
-> "...practical things:
->
-> **Feedback loops are aggressive here.** Today's recommendations create tomorrow's training data. Without exploration, the system collapses to recommending the most-purchased items everywhere. Mitigations: exploration in candidate gen, counterfactual augmentation, popularity discounting in the score (don't rank purely by raw co-purchase volume; that just amplifies the head).
->
-> **Position-aware bias correction**: items in shelf position 1 get ~5x the engagement of position 5 regardless of relevance. Either model position explicitly when training the ranker, or randomize position for a small fraction of impressions for unbiased estimation.
->
-> **Time decay matters.** Co-purchase from 5 years ago is less informative than co-purchase from last month. Exponential decay on the co-purchase weights, with the half-life tuned to the catalog churn rate.
->
-> **Attribution is a measurement minefield.** When a user buys a recommended item, did the recommendation cause the purchase, or were they going to buy it anyway? Last-touch attribution overstates recsys impact; counterfactual measurement (showing the recommendation to half the traffic, no recommendation to the other half) is the only way to know.
->
-> **Multi-objective: don't optimize for purchases alone.** Long-term metrics (return rate, customer lifetime value) sometimes prefer different recommendations than short-term purchase optimization. The product team has to set the weighting; the model learns to that weighting."
+## Decision: Retrieve, Check Fit, Then Rank
 
-## Tells that get you a strong-hire vote
+Union decayed item-pair candidates with content-based cold-item candidates.
+Apply current stock, region, device compatibility and customer-state rules before display.
+Predict declared click/cart/purchase/return outcomes for the anchor, candidate, customer and context.
+Loss weights are not automatically calibrated product utility.
 
-- You distinguish **co-purchase, co-view, and similarity** as different signals.
-- You match the signal to the **product purpose** (complementary on PDP).
-- You bring up **feedback loops** and exploration.
-- You mention **counterfactual attribution** for measuring impact.
-- You discuss **time decay** in the co-purchase signal.
+## Change 1: Help Compare Printers
 
-## Tells that get you down-leveled
+**New task.** The shopper has not selected a printer.
 
-- "Use cosine similarity on item embeddings" without considering co-purchase signal.
-- No mention of feedback loops.
-- No attribution discussion.
-- Treating "purchases caused by the model" as observable.
+**Picture and change.** Retrieve substitutes and compare useful attributes, rather than optimize complementary attach rate.
 
-## Common follow-up
+**Check.** Ink need not help this decision.
 
-"What if the user has already bought X? How would you avoid recommending X?"
+**Use when.** The surface's purpose changes.
 
-The L6 answer:
+<span id="common-follow-up"></span>
 
-> "Two patterns: (1) hard exclusion of items the user has already bought in their account history, (2) soft de-ranking for items the user has viewed recently or has in cart (avoid recommending the obvious things they're already considering). Both need a user-state lookup at request time, which adds latency; cache user-purchased-set per user with TTL. The hard part is when 'already bought' is ambiguous (consumables they buy repeatedly: dog food, ink); use category-level rules for repeat-purchase signals."
+## Change 2: The Customer Already Bought Ink
+
+**New task.** Support replenishment, not permanent exclusion.
+
+**Picture and change.** Use category, recency, purchase/cart state and exact consumable compatibility.
+
+**Check.** A prior ink purchase is not a universal reason to suppress another.
+
+**Use when.** Repeat purchases are legitimate.
+
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Failure: Similarity Is Called Useful Incremental Revenue
+
+Cosine-near printers can crowd out compatible ink.
+Last-touch purchases are observable attribution, not purchases caused by the shelf.
+
+## Transfer Check
+
+Does high co-purchase lift prove displaying the pair causes more useful purchases?
+
+### Reasoned Answer
+
+No. Identify the display effect through a valid design, with return maturity and customer outcomes.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-an-l5-answer-sounds-like"></span>
+<span id="what-an-l6-answer-adds"></span>
+
+## Observation, Decay and Evaluation
+
+Recommendations change tomorrow's co-purchase data.
+Log source, candidates, versions, propensity where known, position, actual exposure and mature outcomes.
+Randomized eligible exposure/positions can identify specific effects under their assumptions; position features alone do not remove selection.
+Other causal designs require explicit identification assumptions and support.
+
+Decay an event aged $d$ days with $2^{-d/h}$ for half-life $h$.
+At $d=h=30$, its weight is 0.5, not zero.
+Choose decay by category and validate sparse-pair uncertainty; do not impose arbitrary popularity penalties or broad cold-item boosts.
+
+Offline held-out pairs test association prediction, not causal basket lift.
+Online assignment must match the estimand and cover returns, satisfaction, long-term value and displacement.
+Keep attribution separate from randomized or otherwise identified incremental effects.
+
+Customer-state caches need identity, freshness and invalidation contracts; recheck current exclusions.
+Durable purchases may warrant exclusion, whereas consumables need replenishment rules.
+Views and cart state are not interchangeable with purchases.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+
+## Sources and Related Mechanisms
+
+- [Linden et al.: item-to-item recommendations](https://doi.org/10.1109/MIC.2003.1167344).
+- [McAuley et al.: complements and substitutes](https://doi.org/10.1145/2783258.2783381).
 
 ---
 
 *Related: [Design YouTube's recommender](/questions/design-youtube-recommender/), [Two-tower vs cross-encoder: when to use which?](/questions/two-tower-vs-cross-encoder/), [System design case study: personalized search ranking](/guides/personalized-search-ranking/).*
+
+</div>

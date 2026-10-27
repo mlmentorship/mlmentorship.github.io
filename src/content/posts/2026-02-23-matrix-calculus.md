@@ -9,9 +9,10 @@ category: "concepts"
 
 ## Summary
 
-Matrix calculus extends the ordinary derivative to functions whose inputs and/or outputs are vectors or matrices. The two organizing objects are the **gradient** (for scalar-valued functions) and the **Jacobian** (for vector-valued functions); the **Hessian** is the matrix of second partial derivatives.
-
-Every learning algorithm computes derivatives of a scalar loss with respect to vector- or tensor-valued parameters. Knowing the right shapes and conventions saves hours of debugging. Backpropagation is matrix calculus applied recursively through a computation graph.
+Matrix calculus transports local changes through vector-valued maps while preserving which output depends on which parameter.
+Use column gradients and the Jacobian convention $J_{ij}=\partial y_i/\partial\theta_j$ throughout this lesson.
+For a scalar loss, the gradient has the parameter's shape; the Jacobian records every output-parameter sensitivity.
+Twice continuously differentiable scalar losses also have a symmetric Hessian of second derivatives.
 
 ## The four shape combinations
 
@@ -20,12 +21,9 @@ Every learning algorithm computes derivatives of a scalar loss with respect to v
 | **Gradient** $\nabla f \in \mathbb{R}^n$ | **Jacobian** $J_f \in \mathbb{R}^{m \times n}$, $(J_f)_{ij} = \partial f_i / \partial x_j$ |
 | Second derivative: **Hessian** $\nabla^2 f \in \mathbb{R}^{n \times n}$, $(\nabla^2 f)_{ij} = \partial^2 f / \partial x_i \partial x_j$ | (rarely used; tensor-valued) |
 
-Two competing conventions exist:
-
-- **Numerator layout** (used in physics, calculus textbooks): $\nabla f$ is a column vector matching $x$.
-- **Denominator layout** (used in stats, ML): same; modern ML universally uses gradient = column vector with the same shape as the parameter.
-
-For matrix parameters $W \in \mathbb{R}^{m \times n}$, the gradient $\partial L / \partial W \in \mathbb{R}^{m \times n}$ has the same shape as $W$.
+Layout names differ across references; inspect the declared Jacobian entries and dimensions rather than guessing from a field's terminology.
+Define the matrix gradient by $dL=\operatorname{tr}((\nabla_W L)^\top dW)$.
+For $W\in\mathbb R^{m\times n}$, that gradient has shape $m\times n$.
 
 ## Identities you actually use
 
@@ -41,12 +39,24 @@ For matrix parameters $W \in \mathbb{R}^{m \times n}$, the gradient $\partial L 
 
 ## Chain rule
 
-For $L(\theta) = g(f(\theta))$:
+Let $y=f(\theta)\in\mathbb R^m$ and let $g_y=\nabla_y L$ be the incoming loss gradient.
+Since $dy=J_f\,d\theta$, the loss change is
 
-- Scalar $\to$ scalar $\to$ scalar: $\frac{dL}{d\theta} = g'(f(\theta)) \cdot f'(\theta)$.
-- Vector $\to$ vector $\to$ scalar: $\nabla_\theta L = J_f^\top \cdot \nabla_y g$ where $y = f(\theta)$.
+$$
+dL=g_y^\top dy=g_y^\top J_f\,d\theta=(J_f^\top g_y)^\top d\theta.
+$$
 
-Backprop is just this chain rule applied to a computation graph layer-by-layer, with the **Jacobian-vector product** computed implicitly to avoid materializing the full Jacobian.
+Therefore $\nabla_\theta L=J_f^\top g_y$.
+This reverse operation is a vector-Jacobian product under the usual row-cotangent terminology, not the forward product $J_fv$.
+
+For $f(\theta)=(2\theta_1-\theta_2,\ \theta_1+3\theta_2+4\theta_3)^\top$, the Jacobian is
+
+$$
+J_f=\begin{bmatrix}2&-1&0\\1&3&4\end{bmatrix}.
+$$
+
+With $g_y=(5,-2)^\top$, its transpose returns $(8,-11,-8)^\top$.
+For example, parameter two receives $(-1)(5)+(3)(-2)=-11$ through the two output routes.
 
 <!-- visual:jacobian-transpose-pullback -->
 <figure class="learning-figure plot-panel" aria-labelledby="jacobian-pullback-title">
@@ -89,22 +99,68 @@ Backprop is just this chain rule applied to a computation graph layer-by-layer, 
 		<text class="viz-callout" x="30" y="366">dL/dtheta2 = -1(5) + 3(-2) = -11</text>
 		<text class="viz-callout" x="30" y="393">dL/dtheta3 =  0(5) + 4(-2) =  -8</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> rows of <em>J</em> belong to outputs and columns belong to parameters. Transposing <em>J</em> puts one parameter on each result row, so multiplying by the two upstream loss gradients sums every output route into that parameter's gradient. The inner dimensions cancel: <code>(3 x 2)(2 x 1) = 3 x 1</code>. This is an original worked example checked against the <a href="https://docs.jax.dev/en/latest/_autosummary/jax.vjp.html">JAX vector-Jacobian product contract</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> rows of <em>J</em> belong to outputs; columns belong to parameters. Transposition collects every output route into each parameter's gradient. The shapes are <code>(3 x 2)(2 x 1) = 3 x 1</code>. The example follows the <a href="https://docs.jax.dev/en/latest/_autosummary/jax.vjp.html">JAX vector-Jacobian product contract</a>.</figcaption>
 </figure>
+
+## Change the Requirement
+
+### Differentiate a Trainable Matrix
+
+**New task:** Differentiate $y=Wx+b$ with respect to the matrix, input, and bias.
+
+**Picture and change:** Expand $dy=(dW)x+W\,dx+db$ inside $dL=g_y^\top dy$.
+
+$$
+\nabla_W L=g_yx^\top,\qquad \nabla_xL=W^\top g_y,\qquad \nabla_bL=g_y.
+$$
+
+**Check:** For $x=(1,2)^\top$ and $g_y=(5,-2)^\top$, $\nabla_WL=\begin{bmatrix}5&10\\-2&-4\end{bmatrix}$.
+
+**Use when:** Parameters are arrays rather than one vector.
+For a shared bias across examples, sum example gradients; a mean loss additionally divides by batch size.
 
 ## Hessian and second-order methods
 
-The Hessian $\nabla^2 L$ describes local curvature. Second-order methods (Newton's method, K-FAC, Shampoo) use it to scale gradients by inverse curvature: $\theta \leftarrow \theta - (\nabla^2 L)^{-1} \nabla L$.
+**New task:** Obtain curvature along a fixed direction $v$ without storing the Hessian $H$.
 
-In modern deep learning, the Hessian is too large to materialize ($O(P^2)$ for $P$ parameters). Approximations:
+**Picture and change:** Differentiate the scalar $\nabla L(\theta)^\top v$ with respect to $\theta$.
+For a twice continuously differentiable loss, this returns $Hv$.
 
-- **Diagonal**: keep only diagonal entries (RMSProp, Adam's $v_t$ approximates this).
-- **Block-diagonal**: per-layer Fisher information (K-FAC).
-- **Hessian-vector products**: $\nabla^2 L \cdot v$ via two backward passes. Used in conjugate gradient, influence functions.
+**Check:** $L(\theta)=\theta_1^2+3\theta_2^2$ has $H=\operatorname{diag}(2,6)$.
+For $v=(1,-1)^\top$, the result is $(2,-6)^\top$.
+Its Newton step reaches the minimum in one update because this particular loss is a strictly convex quadratic.
+
+**Use when:** A solver needs Hessian products, not all $P^2$ entries.
+Automatic differentiation can compose forward and reverse operations without materializing $H$.
+An indefinite Hessian does not guarantee a descending Newton direction; damping or trust-region safeguards may be needed.
+
+Adam's second moment is an average of squared stochastic gradients, not generally a Hessian diagonal.
+K-FAC approximates Fisher-related blocks; Shampoo uses gradient-based preconditioners.
+Neither should be described as an exact Hessian inverse.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common pitfalls
 
-- **Mismatched layout conventions.** Always check whether your reference uses numerator or denominator layout; the difference is a transpose.
-- **Treating gradients as having the same shape as the loss.** They have the shape of the *parameter*, not the loss.
-- **Computing Jacobians explicitly.** For a vector-to-vector function with $m, n$ both large, the Jacobian is $mn$ entries. Use vector-Jacobian products via `torch.autograd.grad` or `jax.vjp` instead.
-- **Forgetting bias dimensions.** $W x + b$ has $\partial L / \partial b = \sum_i \partial L / \partial y_i$ summed over the batch dimension.
+- **Wrong orientation.** Multiplying a $2\times3$ Jacobian by a two-coordinate incoming gradient is dimensionally invalid.
+	Its transpose has the required $3\times2$ shape.
+- **Wrong parameter shape.** A scalar loss can have a matrix gradient.
+- **Full Jacobian allocation.** A dense $m\times n$ Jacobian has $mn$ entries.
+	Reverse products avoid building that matrix when only one incoming gradient is needed.
+- **Wrong reduction.** Sum shared-parameter contributions before applying the loss's declared sum or mean normalization.
+
+## Reconstruct
+
+Why is the gradient of $x^\top A x$ not always $2Ax$?
+
+<details>
+<summary>Reasoned answer</summary>
+
+The differential contributes through both occurrences of $x$, giving $(A+A^\top)x$.
+It reduces to $2Ax$ only when $A$ is symmetric.
+For $A=\begin{bmatrix}0&1\\0&0\end{bmatrix}$ and $x=(1,2)^\top$, the gradient is $(2,1)^\top$, not $(4,0)^\top$.
+
+</details>
+
+</div>

@@ -45,6 +45,13 @@
     "visualIds": [
       "pad-variable-length-sequences-state"
     ],
-    "accessibility": "The figure has a labelled title, a complete group description, visible values and state labels, a direct Read it this way caption, keyboard controls, and a static first-frame fallback."
+    "accessibility": "The figure retains its labeled title, six named frames, keyboard controls, and static first-frame fallback. Each grid cell displays token and Boolean validity together; input zero with a true mask is directly comparable to padding zero with a false mask without relying on color. Current mode, print, and frame checks are recorded separately."
+  },
+  "comprehensionRevision": {
+    "date": "2026-10-26",
+    "problem": "The note claimed the mask distinguishes a real zero token from zero padding, but the fixture contained no real zero.",
+    "change": "Use sequences [[3,0],[],[9]] and update every dependent copied value and assignment, retaining the empty row, final shape, and all six frame and cursor identities.",
+    "readerCheck": "Which of the identical zero tokens came from input, and why is token value alone insufficient to construct the mask?",
+    "evidenceLimit": "Executed fixture and expert illustration revision, not measured learner comprehension."
   }
 }

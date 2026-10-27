@@ -3,12 +3,12 @@
   "slug": "recsys-llm-era",
   "article": "src/content/posts/2025-12-12-recsys-llm-era.md",
   "status": "implemented",
-  "medium": "mermaid",
-  "learningObjective": "Trace where an LLM can enrich a production recommender while the high-throughput retrieve-then-rank backbone and behavioral personalization remain in control.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest useful spatial explanation because the lesson is about boundaries in a staged system: LLMs can interpret the request, encode item content offline, and inspect a small final set, but fast retrieval and the behavioral ranker still carry the catalog-scale path. A dashed frontier branch can distinguish generative retrieval from the production-default backbone without presenting it as a proven replacement.",
+  "medium": "svg",
+  "learningObjective": "Explain why optional reranking needs a deadline-valid fallback, why mean service time does not identify a tail, and why generated IDs still require live catalog resolution.",
+  "mediumRationale": "A shared time ruler makes one declared missed deadline visible, instead of compressing many architectural alternatives into tiny nodes. Separate offline and generated-ID examples preserve the placement and validity distinctions without implying a universal production architecture.",
   "mediumComparison": {
-    "mermaid": "Selected because labelled nodes and edges directly expose the main production path, two bounded LLM augmentations, the offline content path, and a clearly dashed research branch. The established renderer supplies accessible metadata, responsive overflow, dark-mode tokens, and print behavior.",
-    "svg": "Rejected because the lesson does not depend on measured geometry, a quantitative axis, or exact scale. A custom pipeline drawing would duplicate Mermaid's relationship layout and established theme behavior.",
+    "mermaid": "Replaced because the many optional branches shrank the labels and hid the concrete deadline and invalid-ID failures the current article asks readers to reason about.",
+    "svg": "Selected for a common-scale 0/50/100 ms ruler, a visibly separate offline path, and an actual missing-ID rejection example at readable narrow-screen scale.",
     "semanticHtml": "Rejected because cards could list what changes and what stays, but would make it harder to follow which LLM work happens before retrieval, offline during item preparation, or only after the candidate set is small.",
     "interaction": "Rejected because changing candidate counts or latency budgets would require invented values and hidden state. The durable lesson is the placement and bounded scope of each intervention, not a simulator.",
     "paperReuse": "Rejected because the reviewed sources answer adjacent architectural questions with source-specific figures. Public access was not treated as permission to copy artwork, layout, examples, or wording; the shipped flow is independently authored.",
@@ -103,6 +103,13 @@
     "visualIds": [
       "recsys-llm-bounded-augmentation"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description that names the production backbone, each bounded LLM role, the offline item-content path, and the separate generative frontier. Direct labels, node shapes, stage order, solid production arrows, and dashed optional or research arrows carry the meaning without color. The established wide-canvas marker preserves readable labels through horizontal scrolling at 390 CSS pixels; existing theme tokens provide light and dark contrast, and print removes the width floor and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "The SVG has a linked title and complete description, directly labeled times and actions, and explicit hold/reject text. Its vertical viewBox and zero minimum width keep the whole comparison visible without horizontal scrolling. Theme tokens support light, dark, and print; current pixel and label checks are recorded separately."
+  },
+  "comprehensionRevision": {
+    "date": "2026-10-26",
+    "problem": "The crowded flow mixed architectural alternatives, rendered very small labels, and did not expose a concrete missed deadline or failed catalog lookup.",
+    "change": "Show a declared 100 ms call crossing a 50 ms deadline, the valid fast fallback, workload accounting, separate offline work, and rejection of missing generated ID Z.",
+    "readerCheck": "Can a reader choose the fallback at 50 ms, reject missing ID Z, and explain why neither the illustrated call nor mean service time establishes p99?",
+    "evidenceLimit": "Expert illustration revision and source arithmetic, not measured learner performance or observed production latency."
   }
 }

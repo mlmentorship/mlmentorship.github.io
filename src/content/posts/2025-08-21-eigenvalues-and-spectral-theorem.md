@@ -9,19 +9,17 @@ category: "concepts"
 
 ## Summary
 
-An **eigenvector** of $A$ is a non-zero vector $v$ such that $A v = \lambda v$ for some scalar $\lambda$ (the **eigenvalue**). $A$ acts on $v$ purely by scaling. The **spectral theorem** states that every real symmetric matrix is orthogonally diagonalizable: $A = Q \Lambda Q^\top$ with $Q$ orthogonal and $\Lambda$ diagonal real.
-
-Eigendecompositions explain stability of dynamical systems, convergence of optimization, structure of covariance matrices, and properties of attention / graph operators. The spectral theorem is the mathematical reason PCA works on covariance matrices, why Laplacian eigenmaps make sense for graphs, and why second-order optimizers reason about Hessian eigenvalues.
+A real symmetric matrix acts by independent signed scaling along an orthonormal eigenbasis.
+An eigenvector is a nonzero vector $v$ satisfying $Av=\lambda v$; the scalar $\lambda$ is its eigenvalue.
+The spectral theorem supplies a complete orthonormal basis, not merely one unchanged direction.
+Use this decomposition when a symmetric linear map must be applied, inverted, or understood through its principal directions.
 
 ## Eigenvalues, eigenvectors, characteristic polynomial
 
-For a square matrix $A \in \mathbb{R}^{n \times n}$:
-
-- $A v = \lambda v$ is equivalent to $(A - \lambda I) v = 0$, so eigenvalues are roots of $\det(A - \lambda I) = 0$ (the characteristic polynomial).
-- An $n \times n$ matrix has $n$ eigenvalues (counted with multiplicity), possibly complex, possibly repeated.
-- Trace $= \sum_i \lambda_i$. Determinant $= \prod_i \lambda_i$.
-
-For symmetric matrices, **all eigenvalues are real** and there exists an orthonormal eigenbasis.
+For square $A\in\mathbb R^{n\times n}$, $(A-\lambda I)v=0$ has a nonzero solution exactly when its determinant vanishes.
+The characteristic polynomial has $n$ complex roots counting multiplicity.
+Their sum is the trace; their product is the determinant.
+Symmetry guarantees real eigenvalues and an orthonormal eigenbasis, including when eigenvalues repeat.
 
 ## The spectral theorem (symmetric case)
 
@@ -33,7 +31,18 @@ $$
 
 where $Q = [q_1 | \dots | q_n]$ is orthogonal ($Q^\top Q = I$) and $\Lambda = \mathrm{diag}(\lambda_1, \dots, \lambda_n)$.
 
-Geometric meaning: in the eigenbasis $\{q_i\}$, the action of $A$ is independent scaling along each axis. Symmetric matrices have **no rotational component**. They are pure stretches in some orthogonal frame.
+First express the input as $z=Q^\top v$; then scale with $\Lambda$ and return with $Q$.
+Negative eigenvalues reverse their axis; zero eigenvalues erase its component.
+
+Take $A=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ and $v=(2,1)^\top$.
+The diagram uses $q_1=(1,1)^\top/\sqrt2$, $q_2=(-1,1)^\top/\sqrt2$, and eigenvalues $3,1$.
+Thus $z=(3,-1)^\top/\sqrt2$, $\Lambda z=(9,-1)^\top/\sqrt2$, and $Av=(5,4)^\top$.
+
+Why does an entire basis exist?
+The continuous Rayleigh quotient reaches a maximum on the unit sphere.
+Its constrained stationary condition gives $Aq=\lambda q$.
+Symmetry makes the orthogonal complement invariant: $q^\top Aw=(Aq)^\top w=0$ whenever $q^\top w=0$.
+Repeat on that smaller symmetric subspace to construct the basis.
 
 <!-- visual:spectral-theorem-change-basis -->
 <figure class="learning-figure" aria-labelledby="spectral-change-basis-title">
@@ -80,32 +89,80 @@ Geometric meaning: in the eigenbasis $\{q_i\}$, the action of $A$ is independent
 			<text class="viz-label" x="24" y="521">Q(Λz) = QΛQᵀv = (5, 4)</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> <var>Q</var><sup>T</sup> does not stretch <var>v</var>; it only reports <var>v</var> along the orthogonal eigenvector axes. <var>Λ</var> then triples the q₁ coordinate and leaves the q₂ coordinate unchanged. <var>Q</var> returns those scaled coordinates to the original axes, giving <var>Av</var> = (5, 4).</figcaption>
+	<figcaption><strong>Read it this way:</strong> <var>Q</var><sup>T</sup> changes coordinates without changing length. <var>Λ</var> triples the first coordinate and preserves the second. <var>Q</var> returns the result to the original axes: <var>Av</var> = (5, 4).</figcaption>
 </figure>
 <p class="diagram-source">Original coordinate construction checked against <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-25-symmetric-matrices-and-positive-definiteness/">MIT OpenCourseWare 18.06</a> and Sheldon Axler's open-access <a href="https://linear.axler.net/">Linear Algebra Done Right</a>.</p>
 
 ## Connection to SVD
 
-For symmetric positive semi-definite $A$: SVD and eigendecomposition coincide ($U = V = Q$, $\Sigma = \Lambda$). For general matrices they differ. SVD is the more general tool; eigendecomposition is the specialized one for symmetric / square matrices.
+For symmetric positive-semidefinite $A$, one SVD uses $U=V=Q$ and $\Sigma=\Lambda$.
+For symmetric indefinite $A$, singular values are $|\lambda_i|$, not the signed eigenvalues.
+General rectangular matrices have an SVD but no square-matrix eigendecomposition of the same form.
+
+## Change the Requirement
+
+### Apply the Map Repeatedly
+
+**New task:** Compute $A^2v$ without two dense applications after the eigenbasis is available.
+
+**Picture and change:** Replace each $\lambda_i$ by $\lambda_i^2$, preserving the coordinate basis.
+
+**Check:** $Q\operatorname{diag}(9,1)Q^\top v=(14,13)^\top$, matching $A(5,4)^\top$.
+
+**Use when:** Many powers or repeated queries reuse the same decomposition.
+Dense decomposition costs $O(n^3)$; one dense basis transform costs $O(n^2)$.
+
+### Solve Instead of Apply
+
+**New task:** Recover $x$ satisfying $Ax=v$.
+
+**Picture and change:** Divide each eigen-coordinate by its nonzero eigenvalue.
+
+**Check:** $x=Q\operatorname{diag}(1/3,1)Q^\top(2,1)^\top=(1,0)^\top$.
+
+**Use when:** Every eigenvalue is nonzero.
+A zero eigenvalue makes some right-hand sides impossible and others nonunique.
+Adding a ridge changes the system; it is not an exact inverse of the original map.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Where eigenvalues show up in ML
 
 | Object | What its eigenvalues tell you |
 |--------|------------------------------|
 | Covariance matrix | Variances along principal axes (PCA) |
-| Hessian of loss | Local curvature; condition number = $\lambda_{\max} / \lambda_{\min}$ |
+| Positive-definite Hessian | Local curvature; spectral condition number $\lambda_{\max}/\lambda_{\min}$ |
 | Graph Laplacian | Connectivity, spectral clustering, GNN smoothness |
-| Markov transition matrix | Mixing rate (second-largest eigenvalue) |
-| Attention $Q K^\top$ | Effective rank; low-rank structure |
-| Recurrent weight matrix | Whether RNN gradients explode/vanish |
+| Reversible Markov chain | Mixing depends on nontrivial eigenvalue magnitudes and the chain's assumptions |
+| General attention score matrix | May be asymmetric; singular values describe rank and norm structure |
+| Recurrent weight matrix | Long-run dynamics; finite-step gradient norms also depend on singular values and nonnormality |
 
 ## Common pitfalls
 
-- **Treating asymmetric matrices like symmetric ones.** Asymmetric matrices may have complex eigenvalues and may not be diagonalizable at all (Jordan form).
-- **Computing eigendecomposition for huge matrices.** Use Lanczos / Arnoldi or randomized SVD for large-scale; full eigendecomposition is $O(n^3)$.
-- **Confusing eigenvalues with singular values.** Equal only for symmetric PSD matrices; otherwise singular values are $\sqrt{\lambda_i(A^\top A)}$.
+- **Dropping symmetry.** The matrix $\begin{bmatrix}1&1\\0&1\end{bmatrix}$ has only one independent eigenvector.
+	Its repeated eigenvalue does not provide a basis.
+- **Dropping positivity.** $\operatorname{diag}(-2,1)$ has eigenvalues $-2,1$ but singular values $2,1$.
+- **Ignoring scale.** Dense decompositions need cubic arithmetic and quadratic storage.
+	Lanczos targets symmetric eigenproblems; Arnoldi handles more general operators.
+	Approximate methods require residual and convergence checks.
+
+## Reconstruct
+
+Why may repeated eigenvalues still have orthogonal eigenvectors for a symmetric matrix?
+
+<details>
+<summary>Reasoned answer</summary>
+
+Inside a repeated-eigenvalue eigenspace, every linear combination remains an eigenvector with that eigenvalue.
+Choose an orthonormal basis inside that subspace.
+Symmetry, not distinctness of all eigenvalues, guarantees a complete orthonormal collection.
+
+</details>
 
 ## Related
 
 - [SVD and PCA](/concepts/svd-and-pca/). Generalization to all matrices.
 - [Positive definite matrices](/concepts/positive-definite-matrices/). The cone of PSD matrices.
+
+</div>

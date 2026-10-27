@@ -15,13 +15,54 @@ prerequisites: ["design-enterprise-agent-platform", "llm-security-threat-models"
 
 > *Asked in: agent safety architecture, ML system design, control, reliability, and principal technical-strategy rounds.*
 
-A basic answer validates tool arguments and adds a block rule. A senior answer combines pre-action checks, observed-outcome checks, rate limits, monitors, evidence, and recovery. A staff answer operates those controls across several products without making one team approve every action.
+Design an independent runtime safety layer for already-authorized high-impact agent actions without replacing the underlying agent platform.
 
-A principal answer chooses the shared safety boundary, calibrates the false-allow and false-block frontier, separates product and control authority, and funds incident readiness. A senior-principal answer defines safety doctrine across business units while preserving local action semantics, independent evidence, succession, and credible authority reduction.
+## Problem
 
-Assume identity, delegated permissions, versioned tool contracts, and durable agent execution already exist. Add an independent safety control plane around high-impact actions. It can narrow, pause, challenge, or revoke granted authority. It cannot expand authority, replace product evaluation, or make a risky action safe through a monitor score alone.
+**Context.** A governed enterprise agent platform already supplies identity, delegation, typed tool contracts, idempotency keys, and audit events.
+The scenario below includes harmful authorized action patterns and correlated agent-monitor failures.
+
+**Task.** Design pre-action, observed-outcome, and aggregate controls with escalation, circuit breakers, independent evidence, degraded operation, and incident ownership.
+Specify interfaces, evaluation, staged adoption, and conditions for reducing or restoring authority.
+
+**Constraints.** Controls may preserve or narrow granted authority, never expand it.
+Do not rebuild the general agent runtime or treat monitor agreement as independent proof of safety.
+Respect product-specific action consequences and define enforceable behavior when a control dependency is unavailable.
 
 ## The prompt
+
+**Worked case: individually permitted actions exceed an aggregate limit.** This hypothetical adds a safety decision to an already-authorized account workflow.
+
+**Objective.** Keep authorized automation inside the product owner's declared action envelope.
+The [enterprise-platform mechanism](/questions/design-enterprise-agent-platform/) supplies the underlying identity, delegation, and executor contracts.
+
+**Invariant.** A safety control can preserve or narrow granted authority, never expand it.
+Passing one action-level check does not prove that the cumulative workflow remains permitted.
+
+**State.** The product policy allows changes to at most 20 accounts in a window.
+Two concurrent proposals each request 12 accounts; both are individually authorized and both learned monitors agree.
+The control plane also holds policy versions, reserved and observed impact, idempotency keys, and an incident state.
+
+**Decision.** Reserve the aggregate budget atomically before dispatch.
+After reserving the first 12, the second proposal has only eight accounts of headroom; narrow it if the contract permits, queue it, or block it.
+Monitor agreement cannot turn the requested total of 24 into an allowed total of 20.
+
+**Failure and recovery.** If the executor times out, the external effect is unknown, not necessarily absent.
+Keep the reservation until an authoritative outcome check reconciles it; retry only under the existing idempotency contract.
+Freeze or narrow the affected path when outcome evidence is unavailable, and give the incident owner a record of the unresolved effect.
+
+**Transfer check.** Both monitors independently return "allow" after the timeout. Can that release the reservation or authorize another attempt?
+
+<details>
+<summary>Check the evidence boundary</summary>
+
+No. A model judgment is not an authoritative read of the external system.
+Even genuinely independent judgments cannot establish that an unobserved side effect did not happen.
+Reconcile the outcome and remaining budget before allowing a new effect; preserve rather than widen the original authority.
+
+</details>
+
+<section data-learning-extension="true" aria-label="Full agent safety-control-plane reference">
 
 A company operates agents in finance operations, customer accounts, internal infrastructure, healthcare administration, and enterprise support. Product teams already use a governed agent platform. Every tool call has a workload identity, user or service delegation, typed arguments, an idempotency key, and an audit event.
 
@@ -1180,5 +1221,7 @@ A staff target should score 2 on deterministic policy, action lifecycle, breaker
 For each follow-up, state the affected safety claim, failed assumption, available authority, immediate action, evidence gap, product fallback, and conditions for restoring automation.
 
 ---
+
+</section>
 
 *Related: [enterprise agent-platform design](/questions/design-enterprise-agent-platform/), [LLM security threat models](/concepts/llm-security-threat-models/), [scalable oversight and AI control](/concepts/scalable-oversight-and-ai-control/), [decision thresholds and abstention](/concepts/decision-thresholds-asymmetric-costs-abstention/), [chain-of-thought monitorability](/concepts/chain-of-thought-monitorability/), [design an LLM red-team program](/questions/design-llm-red-team-program/), and [evaluate an agent](/questions/evaluate-an-agent/).*

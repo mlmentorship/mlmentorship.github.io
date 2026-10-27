@@ -4,7 +4,7 @@
   "article": "src/content/posts/2026-09-01-rotting-oranges.md",
   "status": "implemented",
   "medium": "semantic-html",
-  "learningObjective": "Seeding every rotten cell makes BFS time equal the shortest orthogonal distance from any source; the last timestamp is the required minute.",
+  "learningObjective": "Seed every rotten cell at time zero. FIFO processes nearest-source arrivals. Mark each fresh cell before enqueueing it.",
   "mechanismReview": {
     "pattern": "Multi-source breadth-first search on a four-neighbor grid with distance timestamps.",
     "recognitionCue": "Use multi-source BFS for simultaneous unweighted spreading, infection, nearest-source distance, or minimum elapsed steps when every source acts at time zero and each move has equal cost.",

@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team interviews, especially in regulated domains (healthcare, fintech, legal-tech).*
 
-The question separates candidates who have *deployed* LLMs from those who have *demoed* them. Hallucinations are managed, not solved; the senior answer is a layered system that catches different hallucination types at different stages.
+Design a production response to unsupported model claims without assuming that fluent text or a citation makes an answer correct.
+
+## Problem
+
+**Context.** In a hypothetical document-answering service, some generated claims lack support in the authorized sources.
+Sources can also be outdated, and the service sometimes lacks enough evidence to answer.
+
+**Task.** Define failure categories, detection and prevention measures, fallback behavior, and an evaluation and incident-response plan.
+Explain what happens when the system cannot substantiate a consequential claim.
+
+**Constraints.** Preserve source access controls and distinguish factual support from formatting or citation presence.
+Account for latency, abstention, and false alarms. Do not promise zero hallucinations or treat a detector score as proof.
 
 ## What an L4 answer sounds like
 
@@ -38,42 +49,45 @@ you've read about hallucinations in tutorials but haven't fought them in product
 >
 > Importantly: the goal isn't zero hallucinations, that's not achievable with current technology. The goal is *acceptable hallucination rate for the use case*, with detection and graceful handling for the rest."
 
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace how evidence and consequence gate a generated answer</p>
-
 <!-- visual:hallucination-claim-release-gates -->
-```mermaid
-flowchart TB
-	accTitle: A generated answer must pass evidence and claim-level release gates
-	accDescr: A user question first enters retrieval. If no sufficiently relevant evidence is found, the system refuses instead of asking the model to guess. With evidence, the model drafts a cited answer, which is split into atomic claims. Each claim is checked against its cited passage. If every claim is supported, the answer is published with citations. If any claim is unsupported, low-consequence requests are retried with stricter evidence or refused, while high-consequence requests go to human review. Production audits and adversarial evals update retrieval thresholds, prompts, and verifier tests. Direct action labels and solid versus dashed paths make the flow understandable without color.
-	Q["User question"]
-	R["Retrieve evidence<br/>with relevance threshold"]
-	E{"Enough relevant<br/>evidence?"}
-	G["Generate cited draft<br/>allow explicit “I don't know”"]
-	C["Split into atomic claims"]
-	V{"Does each cited passage<br/>support its claim?"}
-	P["PUBLISH<br/>answer + citations"]
-	K{"High-consequence<br/>use?"}
-	T["RETRY OR REFUSE<br/>tighten evidence"]
-	H["HUMAN REVIEW<br/>claim + passage + context"]
-	A[("Production audits +<br/>adversarial eval set")]
-	Q --> R --> E
-	E -->|"yes"| G --> C --> V
-	E -->|"no"| T
-	V -->|"all supported"| P
-	V -->|"any unsupported"| K
-	K -->|"no"| T
-	K -->|"yes"| H
-	A -. "tune thresholds, prompts,<br/>and verifier tests" .-> R
-	A -.-> V
-	class Q viz-input
-	class R,G,C,A viz-state
-	class E,V,K viz-focus
-	class P viz-output
-	class T,H viz-warning
-	class Q viz-wide
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path and notice that retrieval is only the first gate. A draft earns release only when each atomic claim is supported by its cited passage; unsupported claims branch by consequence into retry or refusal versus human review. The verifier is another imperfect model component, so dashed production audits improve its tests and thresholds rather than declaring the system solved. Original synthesis informed by <a href="https://arxiv.org/abs/2005.11401">Lewis et al. on retrieval-augmented generation</a>, <a href="https://aclanthology.org/2023.emnlp-main.398/">Gao et al. on citation correctness</a>, <a href="https://aclanthology.org/2023.emnlp-main.741/">Min et al. on atomic factual evaluation</a>, and the <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST Generative AI Profile</a>.</p>
+<figure class="learning-figure" data-visual-id="hallucination-claim-release-gates" aria-labelledby="claim-release-heading">
+<p class="visual-kicker">Learning objective</p>
+<p class="visual-title" id="claim-release-heading">A citation can support a claim without authorizing its release</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-labelledby="claim-gates-title claim-gates-desc" style="width:100%; min-width:0; height:auto; font-family:var(--font-ui); font-size:24px; fill:var(--c-text)">
+<title id="claim-gates-title">Claim support and release permission are separate gates</title>
+<desc id="claim-gates-desc">An invented authorized source says applications are reviewed within five days and approval is not guaranteed. The claim that review takes at most five days is supported. The claim that the applicant will be approved within five days is not, despite citing the same passage. Unsupported claims are held for correction, abstention, or escalation, not released with a warning. A supported claim still needs current evidence and a separate policy, permission, and consequence check; consequential decisions require authorized review. Automated support checks remain fallible.</desc>
+<rect x="40" y="18" width="520" height="136" rx="4" fill="var(--viz-input-bg)" stroke="var(--viz-input-stroke)"/>
+<text x="60" y="50" font-weight="700">Fictional authorized passage [1]</text>
+<text x="60" y="90">Applications are reviewed within 5 days.</text>
+<text x="60" y="124">Approval is not guaranteed.</text>
+<g data-claim-support="supported">
+<path d="M110 154V184" fill="none" stroke="var(--viz-edge)" stroke-width="2"/>
+<rect x="40" y="184" width="520" height="122" rx="4" fill="var(--viz-state-bg)" stroke="var(--viz-state-stroke)"/>
+<text x="60" y="216" font-weight="700">Claim A: support check passes</text>
+<text x="60" y="254">Review takes at most 5 days. [1]</text>
+<text x="60" y="286" font-size="22">Same event and bound as the passage.</text>
+</g>
+<g data-claim-support="unsupported" data-claim-decision="hold">
+<path d="M530 154V332H510" fill="none" stroke="var(--viz-edge)" stroke-width="2" stroke-dasharray="6 4"/>
+<rect x="40" y="332" width="470" height="142" rx="4" fill="var(--viz-warning-bg)" stroke="var(--viz-warning-stroke)"/>
+<text x="60" y="364" font-weight="700">Claim B: HOLD, even with [1]</text>
+<text x="60" y="402">You will be approved within 5 days.</text>
+<text x="60" y="438" font-size="22">Review is not approval.</text>
+<text x="60" y="464" font-size="22">Correct, abstain, or escalate.</text>
+</g>
+<path d="M110 306H24V494H140V514" fill="none" stroke="var(--viz-state-stroke)" stroke-width="3"/>
+<rect x="40" y="514" width="520" height="154" rx="4" fill="var(--viz-focus-bg)" stroke="var(--viz-focus-stroke)"/>
+<g data-claim-release-gate="required-for-supported">
+<text x="60" y="548" font-weight="700">Claim A needs release permission</text>
+<text x="60" y="584" font-size="22">Is the evidence current? Is this use allowed?</text>
+<text x="60" y="616" font-size="22">Consequential decision: authorized review.</text>
+<text x="60" y="648" font-size="22">No policy clearance -> HOLD or abstain.</text>
+</g>
+<text x="40" y="710" font-size="22">Support checks can err; audit real failures.</text>
+<text x="40" y="742" font-size="22">Neither a citation nor a pass proves truth.</text>
+</svg>
+<figcaption><strong>Read it this way:</strong> compare each claim with the same passage. The unsupported approval promise must stop, while the supported review-time claim reaches a separate release-policy gate, not automatic publication. The passage is an invented example. Automated entailment checks remain fallible. Original synthesis informed by <a href="https://arxiv.org/abs/2005.11401">Lewis et al. on retrieval-augmented generation</a>, <a href="https://aclanthology.org/2023.emnlp-main.398/">Gao et al. on citation correctness</a>, <a href="https://aclanthology.org/2023.emnlp-main.741/">Min et al. on atomic factual evaluation</a>, and the <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST Generative AI Profile</a>.</figcaption>
+</figure>
 
 This is L5. You've decomposed the problem, named specific mitigations per type, and acknowledged the operational reality.
 
@@ -83,19 +97,29 @@ The L6 answer adds the things that come from running this in production for a co
 
 > "...and a few more things I've learned the hard way:
 >
-> **Citation-checking is harder than it sounds.** A model can cite a passage that doesn't actually support its claim. The standard pattern is to use an LLM-based verifier that takes the (claim, cited passage) pair and decides whether the passage supports the claim. The verifier itself can hallucinate, but its error rate is much lower than the answer model's because the task is more constrained. This catches a meaningful fraction of the worst hallucinations in production.
+> **Citation-checking is a separate task.** A resolving citation does not prove that its passage supports the claim. A verifier can score a claim/passage pair, but its false accepts and false rejects need independent, representative labels. A narrower task does not guarantee a lower error rate. The [RAG mechanism](/concepts/rag-overview/) separates authorized retrieval, claim support, and release permission.
 >
 > **Refusal is a quality, not a failure.** A model that says 'I don't know' on the questions it shouldn't answer is *better* than one that confidently makes things up. Train your team and your eval to reward refusals on out-of-scope questions.
 >
 > **Pure RAG isn't enough for adversarial inputs.** Users will ask things that look like the documents but aren't actually in them. The model will pattern-match and hallucinate. Mitigations: explicit instruction to refuse if no relevant passage found, retrieval thresholds (don't pass low-confidence retrievals to the model), distinct prompt branches for 'high confidence retrieval' vs 'low confidence retrieval'.
 >
-> **Self-consistency is real but expensive.** Sample N completions with high temperature, take the majority answer. Improves accuracy on reasoning tasks at N times the cost. Useful for high-stakes single-shot questions; not viable for high-throughput.
+> **Self-consistency is a candidate method, not a verifier.** Multiple samples can improve some tasks, but correlated errors can make the majority confidently wrong. Compare accuracy and total resource cost with the same baseline budget, including any selection or verification step.
 >
-> **Calibration matters more than confidence scores.** Most LLMs report confidence (or you can get a probability from logprobs), but those numbers are uncalibrated; a 'highly confident' wrong answer is just as wrong. The most reliable confidence signal in production tends to be *consistency across multiple samples*: if 5 sampled answers agree, the model is probably right; if they disagree, it's probably wrong, regardless of any individual confidence score.
+> **Agreement is not a calibrated probability.** Five answers can repeat the same unsupported claim. Token likelihood is also not the probability that a factual claim is true. Define the event, gather independent labels, and evaluate any proposed confidence signal by population and slice before setting abstention thresholds.
 >
-> **The hardest hallucinations are subtle.** Not 'the capital of France is Berlin', those are easy to catch. The hard ones are 'the SOC analyst should investigate this alert because it's correlated with X' where X is a plausible-sounding but wrong correlation. These slip past most automated checks. The only defense is human review of high-stakes outputs and a strong eval set built from real failure cases."
+> **Plausible reasoning can still be unsupported.** Require evidence for consequential intermediate claims, not merely a fluent final answer. Depending on the task, deterministic checks, independent source review, restricted actions, abstention, and expert review can complement a failure-focused evaluation set. Human review is not an infallible final oracle."
 
 This is L6. You've gone past the techniques into the *operational discipline* of managing hallucinations in a real product, with specific examples from your own experience.
+
+**Predict before revealing:** five sampled answers all repeat an approval promise absent from the authorized passage. Does agreement justify releasing the promise?
+
+<details><summary>Test support independently of repetition</summary>
+
+No. The five answers may share one mistaken assumption.
+The claim remains unsupported, and any separate release-authorization requirement still applies.
+Agreement can be an evaluated feature, not a substitute for evidence.
+
+</details>
 
 ## The tells that get you a strong-hire vote
 

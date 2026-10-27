@@ -9,7 +9,18 @@ category: "questions"
 
 > Design a multi-tenant service for a 70B model. Traffic mixes 200-token chat prompts with 32K document prompts. Define the SLOs, capacity model, scheduler, overload behavior, and evaluation plan.
 
-Start with the workload. "Use vLLM" is an implementation choice, not a design. The core decision is how the service allocates model compute and KV-cache memory while protecting time to first token, inter-token latency, throughput, fairness, and cost.
+Design a multi-tenant language-model service that handles short chat and long document prompts under explicit capacity and latency requirements.
+
+## Problem
+
+**Context.** A hypothetical service hosts a 70B model and mixes 200-token chat prompts with 32K-token document prompts.
+Output lengths, arrival rates, hardware, and tenant service tiers must be clarified.
+
+**Task.** Define service objectives, estimate compute and cache capacity, and design scheduling, admission, isolation, overload handling, and rollout evaluation.
+Explain the trade-off between time to first token, inter-token latency, throughput, fairness, and cost.
+
+**Constraints.** Account separately for prompt processing and iterative generation, including future cache growth and cancellation.
+State workload and precision assumptions; naming a serving framework does not establish feasible capacity or tail-latency guarantees.
 
 ## Split the two phases
 

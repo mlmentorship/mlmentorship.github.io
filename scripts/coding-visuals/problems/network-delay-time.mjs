@@ -8,7 +8,7 @@ const state = (extra) => graph(nodes, edges, { positions, edgeLabelMode: 'weight
 const draft = visual('Finalize shortest signal times by always popping the cheapest pending path.', [
   frame(
     'Initialize the source path',
-    'For start=1, the min-heap contains only (distance 0, node 1); no node has a finalized distance yet.',
+    'Seed only (0,1) in the heap. No node is finalized.',
     state({ start: '1', frontier: ['(0,1)'], visited: [], input: 'n=4, start=1' }),
     'initialize-source',
   ),

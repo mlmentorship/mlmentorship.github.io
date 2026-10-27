@@ -7,19 +7,26 @@ tags: ["concepts"]
 category: "concepts"
 ---
 
+Content-based filtering can score a new item's features against a known profile before that item receives any interactions.
+
 ## Summary
 
-Content-based filtering recommends items whose **features** (genre, text, tags, embeddings) match a **profile built from the items a user already engaged with**: it scores item–profile similarity, using **no other users' behavior**.
-
-Content-based filtering is the standard answer to the **item cold-start** problem: a brand-new item with zero interactions has no collaborative signal, but it *does* have features, so a content model can recommend it on day one. It also drives **explainability** ("because you watched X") and works for niche users with unique tastes. Every recsys interview expects you to contrast it with collaborative filtering and explain why production systems combine them.
+Can a telescope guide with no interactions outrank a popular drama using this user's history?
+Use features ordered as science, drama and short.
+The liked vectors are $x_1=[1,0,1]$ and $x_2=[1,1,0]$.
 
 ## The mechanism
 
-1. **Item representation.** Turn each item into a feature vector: structured attributes (genre, brand, price), TF-IDF / embeddings of text, image/audio embeddings, or learned content encoders.
-2. **User profile.** Aggregate the representations of items the user engaged with, e.g. the (weighted) average of liked-item vectors, or a learned user encoder.
-3. **Score and rank.** Recommend items with the highest similarity (cosine / dot product) to the profile, excluding already-seen items.
+Their mean is $p=[1,0.5,0.5]$, with squared length $1.5$.
+For nonzero vectors, cosine is the dot product divided by both lengths.
+The guide $[1,0,1]$ scores $1.5/\sqrt{3}\approx0.866025$.
+The drama $[0,1,0]$ scores $0.5/\sqrt{1.5}\approx0.408248$.
+Neither candidate's interaction count enters this runtime calculation.
 
-This is structurally a **two-tower** idea (a user/profile tower and an item/content tower) when both sides are learned, which is why content features feed naturally into modern retrieval models.
+More generally, use $p=(\sum_i a_i x_i)/(\sum_i a_i)$ for nonnegative weights with positive total.
+Define feature version, metric, recency weights and eligibility exclusions separately.
+Zero profiles or zero candidate vectors need an explicit fallback; their cosine is undefined.
+Learned encoders may still have used cross-user evidence during training.
 
 <!-- visual:content-profile-scores-new-item -->
 <figure class="learning-figure plot-panel" aria-labelledby="content-profile-title">
@@ -39,12 +46,12 @@ This is structurally a **two-tower** idea (a user/profile tower and an item/cont
 		<text class="viz-label" x="206" y="98">x₂ = [1, 1, 0]</text>
 		<path d="M92 116V138H180V154" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#content-profile-arrow)"></path>
 		<path d="M268 116V138H180" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
-		<text class="viz-axis-label" x="18" y="152">2 · AVERAGE INTO ONE PROFILE</text>
+		<text class="viz-axis-label" x="18" y="152">2 · AVERAGE VECTORS</text>
 		<rect class="viz-node viz-node--focus" x="98" y="164" width="164" height="56" rx="4"></rect>
 		<text class="viz-callout" x="180" y="185" text-anchor="middle">user profile</text>
 		<text class="viz-callout" x="180" y="205" text-anchor="middle">p = [1, 0.5, 0.5]</text>
 		<path d="M180 226V251" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#content-profile-arrow)"></path>
-		<text class="viz-axis-label" x="18" y="248">3 · SCORE CANDIDATE FEATURES</text>
+		<text class="viz-axis-label" x="18" y="248">3 · SCORE ITEMS</text>
 		<rect class="viz-node viz-node--output" x="18" y="263" width="158" height="78" rx="4"></rect>
 		<text class="viz-callout" x="30" y="284">#1 · Telescope guide</text>
 		<text class="viz-label" x="30" y="302">new · 0 interactions</text>
@@ -58,58 +65,84 @@ This is structurally a **two-tower** idea (a user/profile tower and an item/cont
 		<path d="M28 359H332" style="fill:none;stroke:var(--c-rule);stroke-width:1"></path>
 		<text class="viz-axis-label" x="180" y="378" text-anchor="middle">OTHER USERS' COUNTS ARE NOT INPUTS TO THIS SCORE</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> average the two liked-item vectors to build the profile, then compare that profile only with each candidate's features. The telescope guide can rank first on day one because its feature vector already exists; the 0 and 12k interaction counts are shown only to emphasize that this content score does not use them. The vectors and layout are original; mechanism checked against <a href="https://developers.google.com/machine-learning/recommendation/content-based/basics">Google's recommendation-systems documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> average the liked vectors, then score each candidate in the same feature space. The interaction counts are annotations, not score inputs. Original vectors and layout; mechanism checked against <a href="https://developers.google.com/machine-learning/recommendation/content-based/basics">Google's recommendation documentation</a>.</figcaption>
 </figure>
+
+## Change the evidence or list policy
+
+### A user has no history
+
+**New task:** recommend before any liked-item profile exists.
+
+**Picture and change:** an empty mean is not the profile above.
+Request an optional genre preference or use a separately evaluated contextual prior.
+
+**Check:** explicit drama preference gives $p=[0,1,0]$.
+Drama now scores one; the telescope guide scores zero.
+Absent that evidence, do not pretend a zero profile has meaningful cosine scores.
+
+**Use when:** the missing evidence belongs to the user, not merely a new item.
+
+### Avoid a duplicate list
+
+**New task:** return two items from different categories.
+
+**Picture and change:** two identical guides both score $0.866025$; drama scores $0.408248$.
+Unconstrained top-two returns both guides, totaling $1.73205$.
+
+**Check:** a one-per-category constraint selects a guide and drama, totaling $1.274274$.
+The reduced similarity sum buys the stated diversity constraint, not guaranteed user benefit.
+
+**Use when:** repeated near-duplicates violate the list requirement; evaluate discovery and useful outcomes separately.
+
+## Reconstruct the information path
+
+Can a content item tower prove that the entire recommender uses no collaborative information?
+
+<details>
+<summary>Reasoned answer</summary>
+
+No. Inspect user inputs, training objectives and encoder provenance.
+Two items with identical features remain indistinguishable to this score even when their quality differs.
+A similarity contribution is not a causal explanation of satisfaction.
+
+</details>
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Content-based vs collaborative filtering
 
-| | **Content-based** | **Collaborative filtering** |
+| Mechanism | Required evidence | Test separately |
 | --- | --- | --- |
-| Signal | item **features** + this user's history | the **user–item interaction matrix** |
-| New item (item cold-start) | **works** (has features) | fails (no interactions) |
-| New user | needs a little history | fails (no interactions) |
-| Serendipity / discovery | weak (stays near known tastes → **filter bubble**) | strong (finds non-obvious patterns) |
-| Niche users | strong | weak |
-| Needs other users? | no | yes |
-| Quality ceiling | limited by feature quality | learns latent taste it can't name |
-
-The crisp summary: **content-based asks "what is this item like?"; collaborative asks "who else behaved like you?"** They fail in opposite situations, which is exactly why they're combined.
+| Content score | compatible item features and user/context profile | new-item feature coverage |
+| Collaborative score | shared interaction structure or learned behavioral factors | interaction sparsity and exposure |
+| Hybrid | explicitly combined feature and behavioral paths | cold/warm quality and resource costs |
 
 ## Strengths and weaknesses
 
-**Strengths**: handles item cold-start, needs no other users, recommendations are explainable, works for unique tastes.
-
-**Weaknesses**:
-
-- **Limited serendipity**: recommendations cluster around what the user already likes (the **filter-bubble / over-specialization** problem).
-- **Feature-bound**: quality is capped by how good your item features are; it can't discover preferences your features don't encode.
-- **Still has user cold-start**: a brand-new user with no history has no profile.
+Features enable scoring before item interactions, but missing attributes and domain shifts can defeat that benefit.
+Concentrated recommendations establish overspecialization, not a causal filter-bubble conclusion.
+Neither approach has universal accuracy, niche-user or discovery superiority.
 
 ## Hybrid systems (what's actually deployed)
 
-Production recommenders blend both:
-
-- **Cold-start handoff**: content-based for new items/users, sliding to collaborative as interactions accumulate.
-- **Feature-rich two-tower / wide-and-deep models** that take both content features *and* collaborative IDs as input, learning a single ranker.
-- **Knowledge-graph and embedding side-information** layered onto collaborative factors.
-
-So "content-based vs collaborative" is rarely a real either/or in 2026: the design question is *how* to fuse them.
+Mixtures, feature-rich two-tower models and graph side-information can combine evidence.
+Specify fusion weights and compare baselines on cold/warm, diversity and eligibility slices.
+Do not assume a mandatory age-based handoff to collaborative filtering.
 
 ## What an interviewer expects you to say
 
-1. Define it as **profile (from the user's items) × item features**, with **no reliance on other users**.
-2. Lead with its killer use case: **item cold-start** and **explainability**.
-3. Contrast cleanly with collaborative filtering on the cold-start and serendipity axes ("what is this item like" vs "who behaves like you").
-4. Name its weaknesses: **over-specialization / filter bubble**, **feature-quality ceiling**, and remaining **user cold-start**.
-5. Conclude with **hybrid** systems and feature-rich two-tower models as the production reality.
+Trace profile construction, candidate information, score, exclusions and evidence gaps before choosing a hybrid.
 
 ## Common confusions
 
-- **"Content-based solves all cold-start."** It solves **item** cold-start; a brand-new **user** still has no profile.
-- **"It's just collaborative filtering with features."** It uses *no* cross-user signal; that's the defining difference and the source of both its cold-start strength and its serendipity weakness.
-- **"It's more accurate than collaborative filtering."** Usually the opposite once interaction data exists: collaborative filtering learns latent preferences content features can't capture. Content shines specifically when behavioral data is sparse.
-- **"Two-tower retrieval is collaborative filtering."** Two-tower can be either or both: with content features in the item tower it's content-based; with pure ID embeddings it's collaborative.
+Item cold-start is not user cold-start.
+A named architecture does not specify its actual information sources.
 
 ---
 
 *Related: [Matrix factorization for recsys](/concepts/matrix-factorization-recsys/), [Two-tower retrieval](/concepts/two-tower-retrieval/), [How would you do cold-start for a new user?](/questions/cold-start-new-user/), [Knowledge-graph embeddings](/concepts/knowledge-graph-embeddings/), [TF-IDF and BM25](/concepts/tf-idf-and-bm25/).*
+
+</div>

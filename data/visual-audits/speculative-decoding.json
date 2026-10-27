@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace what survives a speculative-decoding cycle when the target model accepts an initial draft prefix but rejects a later token.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can keep the draft positions aligned with their verification outcomes and make the first-rejection boundary spatially explicit. The fixed trace shows that accepted tokens remain, the rejected position is replaced from the corrected distribution, and every later unverified draft is discarded.",
+  "mediumRationale": "A compact vertical SVG keeps the retained prefix and invalid suffix aligned, then shows the actual conditional draft and target probabilities at rejection. Their positive difference and normalization make the corrected replacement distribution inspectable rather than hiding it behind the word resample.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart can enumerate draft, verify, and resample, but automatic layout obscures the positional boundary between the retained prefix and discarded suffix.",
     "svg": "Selected: deterministic token alignment, explicit outcome labels, distinct solid and dashed outlines, and a fixed first-rejection boundary communicate the prefix invariant without runtime code or color dependence.",
@@ -67,6 +67,13 @@
     "visualIds": [
       "speculative-decoding-first-rejection-boundary"
     ],
-    "accessibility": "The SVG has a linked title and description that narrate all five draft positions and the committed output. Each position is numbered and directly labelled ACCEPT, REJECT, REPLACE, or DISCARD; solid accepted tokens, a heavy rejection mark, and dashed discarded tokens make color redundant. The established scrollable wide-figure primitive preserves legible text at 390 CSS pixels, theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette."
+    "accessibility": "The SVG has a linked title and description, directly labeled retained and discarded token positions, and an explicit three-category probability table. A vertical viewBox with zero minimum width keeps the correction calculation and final committed prefix visible together without a horizontal scroller. Direct words and crossed-out suffix positions make color redundant; theme and print checks are qualified separately."
+  },
+  "comprehensionRevision": {
+    "date": "2026-10-26",
+    "problem": "The wide token timeline named a corrected replacement without showing how its distribution differs from an ordinary target-model draw.",
+    "change": "Show draft [0.5,0.3,0.2], target [0.2,0.3,0.5], positive difference [0,0,0.3], and normalized correction [0,0,1] alongside the first-rejection boundary and invalidated suffix.",
+    "readerCheck": "Why must the replacement be C in this conditional example, and why are the later draft positions unusable?",
+    "evidenceLimit": "Exact sampling-identity checks over 15,376 toy distribution pairs and expert illustration review; no empirical speedup or learner-study claim."
   }
 }

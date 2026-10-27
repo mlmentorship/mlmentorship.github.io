@@ -9,7 +9,12 @@ category: "concepts"
 
 ## Summary
 
-Training on one distribution and deploying on a related but shifted one is the normal case, not the exception: a fraud model meets new fraud, a medical model meets a new hospital's scanner, a speech model meets a new accent. Domain adaptation transfers a predictor from a source distribution $P_s(X,Y)$ to a target $P_t(X,Y)$ where the label space is usually the same but the inputs, prevalences, or input-label relationship have moved. The first job is to name which of those moved, because that decides whether the problem is even solvable from the data you have.
+Domain adaptation transfers a predictor between source and target populations under explicit assumptions about what changed.
+Specify the shared label space, sampling unit, available target supervision, time period, and deployment slices.
+Unlabeled target inputs can reveal an input mixture without identifying a changed labeling rule.
+
+Our teaching fixture has two input bins, fixed predictor errors $(0.1,0.4)$, and different population mixtures.
+Compute target risk before choosing a correction.
 
 ## Shift types
 
@@ -17,9 +22,7 @@ Training on one distribution and deploying on a related but shifted one is the n
 - **Label shift:** $P(Y)$ changes while $P(X\mid Y)$ is stable.
 - **Concept shift:** $P(Y\mid X)$ changes; unlabeled target data alone is generally not enough.
 
-Naming the assumed shift determines which correction is defensible.
-
-**Learning objective:** distinguish covariate, label, and concept shift by the factor that changes, then decide whether unlabeled target inputs contain enough evidence to adapt.
+Multiple factors can move together; a drift test on inputs does not establish an unchanged conditional distribution.
 
 <!-- visual:domain-adaptation-shift-assumptions -->
 <figure class="learning-figure plot-panel" aria-labelledby="domain-adaptation-visual-title">
@@ -76,34 +79,100 @@ Naming the assumed shift determines which correction is defensible.
 			<text class="viz-label" x="260" y="344">structure</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> read each row from left to right. A correction is justified only after naming both the factor that changed and the one assumed fixed. Target inputs can expose a changed input mix and, with identifiability conditions, a changed class mix; they cannot reveal a new label rule by themselves. Original synthesis checked against <a href="https://jmlr.org/papers/v8/sugiyama07a.html">Sugiyama et al. (2007)</a>, <a href="https://proceedings.mlr.press/v80/lipton18a.html">Lipton et al. (2018)</a>, and <a href="https://proceedings.mlr.press/v9/david10a.html">Ben-David et al. (2010)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> name both the changed factor and the invariant in each row. Input ratios require overlap and stable conditional labels. Label-prior estimation requires an identifiable, stable class-conditional statistic. Target inputs alone cannot reveal an unrestricted new labeling rule. Original synthesis checked against <a href="https://jmlr.org/papers/v8/sugiyama07a.html">Sugiyama et al. (2007)</a>, <a href="https://proceedings.mlr.press/v80/lipton18a.html">Lipton et al. (2018)</a>, and <a href="https://proceedings.mlr.press/v9/david10a.html">Ben-David et al. (2010)</a>.</figcaption>
 </figure>
+
+### Work the target risk
+
+| Input bin | Source mass | Target mass | Conditional error | Target/source weight |
+| --- | --- | --- | --- | --- |
+| 0 | 0.8 | 0.2 | 0.1 | 0.25 |
+| 1 | 0.2 | 0.8 | 0.4 | 4 |
+
+Source risk is $0.8(0.1)+0.2(0.4)=0.16$.
+Target risk is $0.2(0.1)+0.8(0.4)=0.34$.
+Under stable $P(Y\mid X)$ and target support contained in source support,
+
+$$
+R_t(f)=\mathbb E_s\left[\frac{p_t(X)}{p_s(X)}\ell(f(X),Y)\right].
+$$
+
+The weighted source calculation gives $0.8(0.25)(0.1)+0.2(4)(0.4)=0.34$.
+This verifies the algebra, not the real-world invariance assumption.
+For 80/20 source rows, the weight-based effective sample size is
+
+$$\frac{(80(0.25)+20(4))^2}{80(0.25)^2+20(4)^2}=\frac{400}{13}\approx30.77.$$
+
+Large weights can reduce precision; clipping them changes the estimate and can introduce bias.
+
+### Receive target labels
+
+**New task:** use a small representative labeled target sample to test the assumed relationship.
+
+**Picture and change:** reserve separate target evaluation; use adaptation labels for calibration or fitting, not both fitting and final scoring.
+
+**Check:** target conditional error rates $(0.1,0.7)$ would instead give risk $0.2(0.1)+0.8(0.7)=0.58$.
+Input reweighting alone still returns $0.34$, so it cannot repair that changed error relationship.
+Allow sampling uncertainty before concluding that a finite sample establishes concept drift.
+
+**Use when:** labeled evidence can discriminate assumptions that target inputs alone cannot test.
+
+### Lose support or the labeling invariant
+
+**New task:** deploy where the source has no observations or the target label rule differs.
+
+**Picture and change:** restrict claims, collect justified labels, or abstain rather than inventing density ratios.
+
+**Check:** if source mass on bin 1 is zero, its target mass $0.8$ has no source-label support.
+With error $0.1$ in bin 0 and bounded loss, target risk can range from $0.02$ to $0.82$.
+Separately, uniform inputs can accompany either $Y=X$ or $Y=1-X$.
+Predictor $f(X)=X$ then has risk zero or one despite identical input distributions.
+
+**Use when:** overlap or conditional invariance fails; matching feature distributions is not proof of transfer.
+
+<!-- learning:core-end -->
+
+<div data-learning-extension>
 
 ## Approaches
 
-- Importance weighting under a covariate- or label-shift assumption
-- Fine-tuning on a small labeled target set
-- Feature alignment with a discrepancy or adversarial objective
-- Self-training with confidence and calibration controls
-- Domain-specific normalization or adapters
-- Robust optimization across the environments you can observe
+- Importance weighting requires the named invariant and support.
+- Target fine-tuning requires representative supervision and separate evaluation.
+- Feature alignment requires preserving label-relevant distinctions.
+- Self-training can reinforce confident mistakes; validate its assumptions and calibration.
+- Domain-specific normalization or adapters change the fitted model, not identifiability by themselves.
+- Robust objectives compare the environments actually observed, not every possible future shift.
+
+Under label shift, a fixed classifier statistic can satisfy $q_t=C\pi_t$.
+Columns of $C$ are its stable prediction distributions given each class; $\pi_t$ contains target class priors.
+For binary true-positive/false-positive rates $0.8/0.2$ and target positive-prediction rate $0.5$, the target prior is
+
+$$\pi_t(1)=\frac{0.5-0.2}{0.8-0.2}=0.5.$$
+
+If the two conditional rates coincide, this statistic cannot identify that prior.
 
 ## Evaluation
 
-Use a true target-domain holdout and report the slices that matter. Validate calibration, not just ranking or accuracy, and measure negative transfer: adaptation can help the aggregate while hurting a target subgroup or eroding source performance.
+Compare source-only and target-supervised baselines on a true target holdout.
+Report target slices, calibration, source retention, uncertainty, and negative transfer.
+Reusing target evaluation labels for adaptation requires a new evaluation split.
 
 ## In an interview
 
-1. Define source, target, labels, and how much target supervision you have.
-2. State the shift assumption.
-3. Establish source-only and target-labeled baselines.
-4. Pick the simplest method the evidence justifies.
-5. Monitor drift and collect the labels that distinguish concept shift from covariate shift.
+Can unlabeled target inputs distinguish the two opposite label rules above?
+
+<details><summary>Answer</summary>
+
+No. Their input likelihoods agree exactly.
+Target labels or additional structural assumptions are necessary.
+
+</details>
 
 ## Common confusions
 
-- **"Align the feature distributions and the task transfers."** Alignment can mix classes or erase the predictive structure you needed.
-- **"Unlabeled target data solves domain shift."** Not when the label relationship itself changed.
-- **"Fine-tuning always helps."** A small, biased target set can cause negative transfer and calibration failure.
+Aligned features or lower adaptation loss do not establish preserved class structure.
+Biased target labels can worsen transfer even when their training loss decreases.
+
+</div>
 
 *Related: [cross-validation strategies](/concepts/cross-validation-strategies/), [epistemic versus aleatoric uncertainty](/concepts/epistemic-vs-aleatoric-uncertainty/), and [calibration](/concepts/calibration/).*

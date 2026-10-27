@@ -9,7 +9,19 @@ category: "questions"
 
 > Implement beam search around a next-token function. Keep at most $k$ live hypotheses, stop expanding finished sequences, and return the best completed result.
 
-Use log probabilities and separate live from finished hypotheses. Most bugs come from mixing those two states, normalizing at inconsistent times, or continuing to expand EOS.
+Implement a bounded sequence search that handles end-of-sequence tokens and a consistently declared final scoring rule.
+
+## Problem
+
+**Context.** A next-token function maps a token prefix to log probabilities over a fixed vocabulary.
+Inputs include beginning/end token IDs, positive beam width `k`, and a maximum number of newly generated tokens.
+
+**Task.** Return the highest-final-score completed sequence found; if none completes within the budget, return the best remaining live sequence.
+Specify the length-normalization rule, including whether beginning and end tokens count, before comparing results.
+
+**Constraints.** Keep at most `k` live hypotheses and never expand a completed sequence.
+Accumulate token log probabilities consistently, define tie behavior, and respect the generation budget.
+Beam search is approximate search over sequences, not a guarantee of finding the global highest-probability completion.
 
 ## The baseline algorithm
 

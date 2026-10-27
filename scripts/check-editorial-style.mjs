@@ -1,5 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import assert from 'node:assert/strict';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import { parseFragment } from 'parse5';
 
 const root = process.cwd();
 const scanRoots = ['.github', 'docs', 'public', 'scripts', 'src'];
@@ -32,6 +38,11 @@ const contentRules = [
   ['related-reference inconsistency', /^\*Related reference:/i],
 ];
 const violations = [];
+const parser = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
+const sentenceSegmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
+const qualified = [];
+const learningPieces = new Map(JSON.parse(fs.readFileSync(path.join(root, 'src/data/learningMechanisms.json'), 'utf8')).pieces.map((piece) => [piece.slug, piece]));
+const requestedSlugs = new Set((process.argv.find((argument) => argument.startsWith('--slugs='))?.slice('--slugs='.length) ?? '').split(',').filter(Boolean));
 
 function wordCount(value) {
   return (value.match(/[A-Za-z0-9]+(?:['’-][A-Za-z0-9]+)*/g) ?? []).length;
@@ -41,8 +52,93 @@ function preserveNewlines(value) {
   return '\n'.repeat((value.match(/\n/g) ?? []).length);
 }
 
+export function qualifyProse(body, { separateProblem = false } = {}) {
+  const result = { problem: 0, core: 0, extension: 0, sentences: [] };
+  let layer = 'core';
+  let inProblem = false;
+  function markdownText(node) {
+    if (node.type === 'text') return node.value;
+    if (node.type === 'inlineCode') return 'identifier';
+    if (node.type === 'inlineMath') return 'formula';
+    if (node.type === 'break') return ' ';
+    return (node.children ?? []).map(markdownText).join('');
+  }
+  function record(text, line, quoted = false) {
+    const readable = text.replace(/\s+/g, ' ').trim();
+    result[inProblem ? 'problem' : layer] += wordCount(readable);
+    if (quoted) return;
+    const ordinary = readable.replace(/"[^"\n]*"|“[^”\n]*”/g, 'quotation');
+    for (const { segment } of sentenceSegmenter.segment(ordinary)) {
+      const words = wordCount(segment);
+      if (words > 20) result.sentences.push({ line, words, text: segment.trim() });
+    }
+  }
+  function htmlText(node) {
+    if (['code', 'pre', 'svg', 'style', 'script'].includes(node.nodeName)) return '';
+    return node.nodeName === '#text' ? node.value : (node.childNodes ?? []).map(htmlText).join('');
+  }
+  function htmlWalk(node, startLine) {
+    const attributes = Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
+    const classes = new Set((attributes.class ?? '').split(/\s+/));
+    if (['svg', 'pre', 'style', 'script'].includes(node.nodeName) || ['diagram-source', 'visual-title', 'visual-kicker'].some((name) => classes.has(name))) return;
+    if (node.nodeName === 'p' || node.nodeName === 'figcaption') {
+      record(htmlText(node), startLine + (node.sourceCodeLocation?.startLine ?? 1) - 1);
+      return;
+    }
+    for (const child of node.childNodes ?? []) htmlWalk(child, startLine);
+  }
+  function walk(node, quoted = false) {
+    if (node.type === 'html') {
+      if (node.value.includes('<!-- learning:core-end -->')) {
+        layer = 'extension';
+        inProblem = false;
+      }
+      htmlWalk(parseFragment(node.value, { sourceCodeLocationInfo: true }), node.position.start.line);
+      return;
+    }
+    if (node.type === 'heading' && node.depth === 2) {
+      inProblem = separateProblem && layer === 'core' && markdownText(node) === 'Problem';
+      return;
+    }
+    if (['heading', 'code', 'math', 'table', 'definition'].includes(node.type)) return;
+    if (node.type === 'paragraph') {
+      const text = markdownText(node);
+      if (!/^Related:/.test(text)) record(text, node.position.start.line, quoted);
+      return;
+    }
+    for (const child of node.children ?? []) walk(child, quoted || node.type === 'blockquote');
+  }
+  walk(parser.parse(body));
+  return result;
+}
+
+export function problemStatementIssues(body, { coding = true } = {}) {
+  const nodes = parser.parse(body).children;
+  const headingText = (node) => node.value ?? (node.children ?? []).map(headingText).join('');
+  const start = nodes.findIndex((node) => node.type === 'heading' && node.depth === 2);
+  if (start < 0 || headingText(nodes[start]) !== 'Problem') return [`first ${coding ? 'coding' : 'question'} section must be "## Problem"`];
+  const next = nodes.findIndex((node, index) => index > start && node.type === 'heading' && node.depth === 2);
+  const statement = nodes.slice(start + 1, next < 0 ? nodes.length : next);
+  const labels = statement.filter((node) => node.type === 'paragraph' && node.children[0]?.type === 'strong')
+    .map((node) => ({ label: headingText(node.children[0]).replace(/[.:]$/, ''), text: headingText(node).slice(headingText(node.children[0]).length).trim() }));
+  const issues = [];
+  const required = coding ? ['Input', 'Output', 'Rules', 'Example'] : ['Context', 'Task', 'Constraints'];
+  let previous = -1;
+  for (const label of required) {
+    const index = labels.findIndex((field) => field.label === label && field.text.length > 0);
+    if (index < 0) issues.push(`Problem must state **${label}.** before the solution`);
+    else if (index <= previous) issues.push(`Problem fields must follow ${required.join(', ')} order`);
+    previous = Math.max(previous, index);
+  }
+  if (nodes.slice(0, start).some((node) => node.type === 'code')) issues.push('solution code must follow the problem statement');
+  return issues;
+}
+
 function scanContentFile(file, text) {
   const relative = path.relative(root, file);
+  const slug = path.basename(file).replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '');
+  if (requestedSlugs.size && !requestedSlugs.has(slug)) return;
+  const coding = fs.existsSync(path.join(root, 'scripts/coding-visuals/problems', `${slug}.mjs`));
   const lines = text.split('\n');
 
   for (const [label, pattern] of contentRules) {
@@ -61,6 +157,9 @@ function scanContentFile(file, text) {
 
   const frontmatter = text.match(/^---[\s\S]*?---\s*/)?.[0] ?? '';
   const body = text.slice(frontmatter.length);
+  if (coding || category === 'questions') {
+    for (const issue of problemStatementIssues(body, { coding })) violations.push(`${relative}: ${issue}`);
+  }
   const firstHeading = body.match(/^## (.+)$/m)?.[1];
   if (category === 'concepts' && firstHeading !== 'Summary') {
     violations.push(`${relative}: first concept section must be "## Summary"`);
@@ -80,10 +179,22 @@ function scanContentFile(file, text) {
     const opening = (firstHeadingIndex >= 0 ? body.slice(0, firstHeadingIndex) : body)
       .replace(/^>.*$/gm, '')
       .trim();
-    if (wordCount(opening) < 10) violations.push(`${relative}: opening must state the answer or thesis before the first section`);
+    if (wordCount(opening) < 10) violations.push(`${relative}: opening must frame the task or topic before the first section`);
   }
 
   const bodyLineOffset = frontmatter.split('\n').length - 1;
+  if (body.includes('<!-- learning:core-end -->')) {
+    const piece = learningPieces.get(slug);
+    const prose = qualifyProse(body, { separateProblem: coding || category === 'questions' });
+    for (const sentence of prose.sentences) {
+      violations.push(`${relative}:${bodyLineOffset + sentence.line}: sentence exceeds 20 words (${sentence.words}): ${sentence.text}`);
+    }
+    for (const layer of ['core', 'extension']) {
+      if (piece && prose[layer] > piece.budget[layer]) violations.push(`${relative}: ${layer} prose exceeds ${piece.budget[layer]} words (${prose[layer]})`);
+    }
+    qualified.push({ slug, problem: prose.problem, core: prose.core, extension: prose.extension });
+    return;
+  }
   const prose = body
     .replace(/```[\s\S]*?```/g, preserveNewlines)
     .replace(/\$\$[\s\S]*?\$\$/g, preserveNewlines);
@@ -122,6 +233,40 @@ function walk(directory) {
   }
 }
 
+if (process.argv.includes('--self-test')) {
+  const long = Array.from({ length: 21 }, (_, index) => `word${index}`).join(' ');
+  assert.equal(qualifyProse(`${long}.`).sentences.length, 1);
+  assert.equal(qualifyProse(`${long.replace('word10 ', 'word10\n')}.`).sentences.length, 1);
+  for (const source of [`\`\`\`python\n${long}\n\`\`\``, `$$\n${long}\n$$`, `> ${long}.`, `"${long}."`, `| Header |\n| --- |\n| ${long} |`]) {
+    assert.equal(qualifyProse(source).sentences.length, 0);
+  }
+  assert.equal(qualifyProse(`<figure><figcaption>${long}.</figcaption></figure>`).sentences.length, 1);
+  const layers = qualifyProse('One.\n\n<!-- learning:core-end -->\n\n<div data-learning-extension>\n\nTwo.\n\n</div>');
+  assert.deepEqual([layers.core, layers.extension], [1, 1]);
+  const statement = 'Find distinct indices for a target sum without reusing a position.\n\n## Problem\n\n**Input.** Integer values and a target.\n\n**Output.** Return two original indices.\n\n**Rules.** Positions must differ.\n\n**Example.** Two threes make six.\n\n## Picture\n\nExplain the solution.';
+  assert.deepEqual(problemStatementIssues(statement), []);
+  for (const label of ['Input', 'Output', 'Rules', 'Example']) {
+    assert(problemStatementIssues(statement.replace(`**${label}.**`, '**Missing.**')).length > 0);
+  }
+  assert(problemStatementIssues(statement.replace('## Problem', '## Solution')).length > 0);
+  assert(problemStatementIssues(statement.replace('**Input.**', '**Output.**').replace('**Output.** Return', '**Input.** Return')).length > 0);
+  const question = 'Frame a model decision before comparing possible interventions and their evidence.\n\n## Problem\n\n**Context.** A support model cites an old policy.\n\n**Task.** Specify evidence needed before changing the system.\n\n**Constraints.** Preserve authorization and distinguish missing facts from formatting errors.\n\n## Answer\n\nCompare the evidence.';
+  assert.deepEqual(problemStatementIssues(question, { coding: false }), []);
+  for (const label of ['Context', 'Task', 'Constraints']) {
+    assert(problemStatementIssues(question.replace(`**${label}.**`, '**Missing.**'), { coding: false }).length > 0);
+  }
+  assert(problemStatementIssues(question.replace('## Problem', '## Answer'), { coding: false }).length > 0);
+  assert(problemStatementIssues(question.replace('**Context.**', '**Task.**').replace('**Task.** Specify', '**Context.** Specify'), { coding: false }).length > 0);
+  const separated = qualifyProse(statement, { separateProblem: true });
+  assert(separated.problem > 0);
+  assert.equal(qualifyProse(statement).core, separated.core + separated.problem);
+  assert.equal(qualifyProse(`## Problem\n\n${long}.\n\n## Picture\n\nShort.`, { separateProblem: true }).sentences.length, 1);
+  const boundary = qualifyProse('## Problem\n\nTask.\n\n<!-- learning:core-end -->\n\nExtension.', { separateProblem: true });
+  assert.deepEqual([boundary.problem, boundary.extension], [1, 1]);
+  console.log('Editorial selftest passed: sentences, reading layers, complete problem fields and separate statement budgets.');
+  process.exit(0);
+}
+
 scanRoots.forEach((directory) => walk(path.join(root, directory)));
 rootFiles.forEach((file) => scanFile(path.join(root, file)));
 
@@ -131,4 +276,6 @@ if (violations.length > 0) {
   process.exit(1);
 }
 
-console.log('Editorial style check passed: pyramid openings, concise prose, and banned-language rules satisfied.');
+console.log('Editorial style check passed: complete question statements, task context, concise prose, and banned-language rules satisfied.');
+console.log(`Pattern-first prose qualified: ${qualified.length}/${learningPieces.size} articles; 20-word sentences and approved prose budgets.`);
+if (process.argv.includes('--report')) console.log(JSON.stringify(qualified, null, 2));

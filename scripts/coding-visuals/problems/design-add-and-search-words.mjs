@@ -1,16 +1,16 @@
 import { defineVisual, frame, trie, visual } from '../primitives.mjs';
 
 const nodes = [
-	{ key: 'root', label: 'root', x: 240, y: 30 },
-	{ key: 'b', label: 'b', x: 90, y: 90 },
-	{ key: 'd', label: 'd', x: 240, y: 90 },
-	{ key: 'm', label: 'm', x: 390, y: 90 },
-	{ key: 'ba', label: 'ba', x: 90, y: 150 },
-	{ key: 'da', label: 'da', x: 240, y: 150 },
-	{ key: 'ma', label: 'ma', x: 390, y: 150 },
-	{ key: 'bat', label: 'bat', x: 90, y: 210, terminal: true },
-	{ key: 'dad', label: 'dad', x: 240, y: 210, terminal: true },
-	{ key: 'mad', label: 'mad', x: 390, y: 210, terminal: true },
+	{ key: 'root', label: 'root', x: 180, y: 42 },
+	{ key: 'b', label: 'b', x: 60, y: 102 },
+	{ key: 'd', label: 'd', x: 180, y: 102 },
+	{ key: 'm', label: 'm', x: 300, y: 102 },
+	{ key: 'ba', label: 'ba', x: 60, y: 162 },
+	{ key: 'da', label: 'da', x: 180, y: 162 },
+	{ key: 'ma', label: 'ma', x: 300, y: 162 },
+	{ key: 'bat', label: 'bat', x: 60, y: 222, terminal: true },
+	{ key: 'dad', label: 'dad', x: 180, y: 222, terminal: true },
+	{ key: 'mad', label: 'mad', x: 300, y: 222, terminal: true },
 ];
 const edge = (from, to, label) => ({ key: `edge-${from}-${to}`, from, to, label });
 const edges = [
@@ -26,8 +26,8 @@ const state = (current, queued = [], extra = {}) => {
 		edges,
 		active: [current],
 		queued,
-		width: 480,
-		height: 245,
+		width: 360,
+		height: 257,
 		words: 'bat,dad,mad',
 		query: '.ad',
 		motion: [{ key: 'trie-cursor', kind: 'pointer', x: activeNode.x, y: activeNode.y, label: `current ${current}` }],
@@ -37,7 +37,7 @@ const state = (current, queued = [], extra = {}) => {
 
 const draft = visual('A literal follows one child; a dot recursively tries each child until one full-length terminal path succeeds.', [
 	frame('Store three terminal paths', 'bat, dad, and mad share root but have separate first-letter branches.', state('root', [], { terminal: 'bat,dad,mad' }), 'store-word-trie'),
-	frame('Branch at the wildcard', 'At index 0, dot queues root children b, d, and m for index 1.', state('b', ['d', 'm'], { frontier: 'match(1,b), match(1,d), match(1,m)' }), 'branch-root-wildcard'),
+	frame('Branch at the wildcard', 'Dot tries first-letter branches in insertion order; later branches are pending alternatives.', state('b', ['d', 'm'], { frontier: 'match(1,b), match(1,d), match(1,m)' }), 'branch-root-wildcard'),
 	frame('Follow a on the b branch', 'Literal a moves b->ba at index 1.', state('ba', ['d', 'm'], { path: 'root->b->ba', next: 'literal d' }), 'follow-b-a'),
 	frame('Fail and backtrack', 'ba has child t, not required d, so the b branch returns false and DFS tries d.', state('ba', ['d', 'm'], { decision: 'd not in {t}; false' }), 'fail-b-branch'),
 	frame('Follow a on the d branch', 'Literal a moves d->da at index 1.', state('da', ['m'], { path: 'root->d->da' }), 'follow-d-a'),

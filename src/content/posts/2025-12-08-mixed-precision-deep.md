@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth at LLM-team and infra interviews.*
 
-The interviewer wants more than "use AMP." The L6 answer explains the recipe: master weights in FP32, compute in BF16/FP16, certain ops kept in FP32 for stability, loss scaling for FP16.
+Explain how mixed-precision training assigns numerical formats while preserving useful gradients and stable optimization.
+
+## Problem
+
+**Context.** A model-training workload seeks the speed or memory benefits of FP16 or BF16 without silently corrupting training.
+Activations, reductions, gradients, parameters, and optimizer state can have different numerical requirements.
+
+**Task.** Specify a precision policy, explain range and rounding failure modes, and describe how to validate it against a higher-precision baseline.
+Compare the role of loss scaling for FP16 and BF16, including the order of unscaling, clipping, and stepping.
+
+**Constraints.** Distinguish storage dtype, compute dtype, and accumulation dtype; automatic casting does not choose every policy for you.
+Account for nonfinite gradients and skipped steps, and do not assume every operation or parameter needs identical precision.
 
 ## What an L4 answer sounds like
 
@@ -20,14 +31,14 @@ True, no mechanism. You've turned it on, never debugged it.
 
 ## What an L5 answer sounds like
 
-> "Mixed precision computes most operations in lower-precision (BF16 on A100/H100, or FP16 on V100) while keeping a master copy of weights in FP32 for the optimizer step. The recipe:
+> "One common mixed-precision recipe keeps FP32 parameters and optimizer state while autocasting eligible operations to BF16 or FP16. The exact policy depends on the device, kernel, framework, and operation:
 >
-> 1. **Master weights in FP32.** Cast a BF16/FP16 view for the forward pass.
-> 2. **Forward + backward in BF16/FP16.** Activations and gradients are low-precision.
-> 3. **Cast gradients back to FP32** before the optimizer step.
-> 4. **Apply update to FP32 master weights.**
+> 1. **Persistent parameters.** FP32 model parameters can already be the authoritative weights; a separate master copy is not always allocated.
+> 2. **Operation-specific compute.** Autocast chooses eligible lower-precision operations; it does not make every forward/backward value low-precision.
+> 3. **Gradient accumulation.** FP32 leaf parameters normally accumulate FP32 gradients, even though intermediate arithmetic may use lower precision. Casting after underflow cannot recover a lost gradient.
+> 4. **Guarded update.** Unscale before clipping, reject non-finite updates, and update the persistent parameters with the intended optimizer-state precision.
 >
-> For FP16, add **loss scaling**: multiply the loss by S (e.g., 2^15) before backward to push small gradients above FP16 underflow, then unscale before the optimizer step. BF16 doesn't need loss scaling because it has the same exponent range as FP32.
+> FP16 training commonly uses loss scaling before backward to preserve small intermediate gradients, followed by unscaling before the optimizer step. BF16's wider exponent range often removes that need, but finite precision, overflow, and unstable operations still require checks. Preserving a gradient also does not guarantee its weight update is representable; the [mixed-precision mechanism](/concepts/mixed-precision-training/) separates those cases.
 >
 > Some operations stay in FP32 for stability:
 > - **LayerNorm/RMSNorm**: variance computation needs precision.
@@ -92,9 +103,9 @@ This is L5. You've described the full recipe with the stability ops named.
 
 > "...practical things that bite people:
 >
-> **The memory savings are smaller than people think.** Activations and gradients shrink 2x in BF16, but optimizer state (Adam m, v in FP32) is 4x the model size and dominates. ZeRO/FSDP sharding is what actually unblocks large models, not mixed precision alone.
+> **Use a byte ledger.** Two FP32 Adam moment arrays cost eight bytes per parameter; FP32 parameters and their FP32 gradient buffers add four bytes each. Activation savings and temporary casts depend on the implementation. Mixed precision and state sharding address different memory terms.
 >
-> **BF16 is preferred over FP16.** Same throughput on tensor cores, no loss scaling needed, no NaN spirals from gradient overflow. FP16 is what you use when you're stuck on V100 or consumer hardware.
+> **BF16 changes range, not mathematical stability.** It often avoids FP16 range failures, but it does not prevent every NaN or guarantee a throughput ordering. Check device support, kernel behavior, reductions, and task quality.
 >
 > **FP8 (H100+) is the next step.** Two variants: E4M3 (more mantissa, less range, for forward) and E5M2 (more range, for backward gradients). Per-tensor scaling factors that update during training. Frameworks like Transformer Engine handle the bookkeeping.
 >

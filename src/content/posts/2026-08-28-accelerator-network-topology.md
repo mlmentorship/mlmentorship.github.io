@@ -123,6 +123,8 @@ A large GPU cluster can reduce data in stages:
 
 **Learning objective:** Trace why only one partial result per fast local group needs to participate in the slower scale-out step.
 
+<p class="visual-title">Local reduction limits what crosses the slower network</p>
+
 <!-- visual:hierarchical-all-reduce-path -->
 ```mermaid
 flowchart TB

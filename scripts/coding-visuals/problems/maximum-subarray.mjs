@@ -1,13 +1,19 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const nums = ['-2', '1', '-3', '4', '-1', '2', '1', '-5', '4'];
+const bestRanges = [[0,1,-2], [1,2,1], [1,2,1], [3,4,4], [3,4,4], [3,6,5], [3,7,6], [3,7,6], [3,7,6]];
 const state = (index, start, extra = {}) => array(nums, [
-  mark(start, 'current start', 'state', 'current-start'),
+  mark(start, 'start', 'state', 'current-start'),
   mark(index, 'scan', 'focus', 'scan-cursor'),
-], { ...extra });
+], {
+  fitArray: true,
+  savedRange: { start: bestRanges[index][0], end: bestRanges[index][1] },
+  bestRange: `[${bestRanges[index][0]}:${bestRanges[index][1]}] sum ${bestRanges[index][2]}`,
+  ...extra,
+});
 
 const draft = visual('At each index, keep the best sum ending exactly there by either extending the prior range or restarting at the current value.', [
-  frame('Initialize at index 0', 'The only nonempty subarray ending at -2 is [-2], so current=-2 and best=-2.', state(0, 0, {
+  frame('Initialize at index 0', 'Only [-2] ends at index 0; initialize current and best to -2.', state(0, 0, {
     currentRange: '[0..0]',
     arithmetic: 'current = best = -2',
   }), 'initialize'),

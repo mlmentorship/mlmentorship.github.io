@@ -1,6 +1,6 @@
 ---
 title: "Explain the reparameterization trick"
-description: "How VAEs propagate gradients through a sampling step. The senior answer explains the why (you can't differentiate through a sample) and the how (move the randomness outside the parameters)."
+description: "Differentiate a smooth parameterized sample path with fixed base noise, then distinguish its gradient estimate from the expectation gradient."
 date: "2025-10-29"
 draft: false
 tags: ["questions"]
@@ -8,15 +8,25 @@ category: "questions"
 ---
 
 
-> *Asked in: ML breadth and generative-model interviews.*
+Derive a gradient estimator for an expected loss whose sampled latent variable depends on trainable distribution parameters.
 
-A standard generative-model question. The L4 candidate states the formula. The L6 candidate explains why naive sampling breaks gradients and how the trick fixes it.
+## Problem
+
+**Context.** A Gaussian latent variable has trainable mean and positive standard deviation, and a differentiable loss depends on its sample.
+Training requires the derivative of the expected loss, not merely a derivative of the density.
+
+**Task.** Express sampling through parameter-independent noise, derive the pathwise gradient, and explain how Monte Carlo estimation uses it.
+Compare what can change for discrete samples or nondifferentiable transformations.
+
+**Constraints.** State conditions permitting differentiation under the expectation.
+Hold base noise fixed during a sample's derivative; distinguish that sample estimate from the exact expectation gradient.
+Do not assume every distribution or objective supports the same transformation.
 
 ## The problem
 
-Suppose you want to train a model that samples a latent variable `z` from a distribution `q_phi(z | x)` and uses `z` to reconstruct `x`. Loss `L(theta, phi)` depends on `z`, which is a *sample*.
-
-To train, you need `dL / dphi`. But `z = sample(q_phi)` is a stochastic operation; the gradient through a sample isn't well-defined in general.
+Let $F(\phi)=E_{q_\phi(z\mid x)}[f(z)]$ for fixed x.
+A sampler returning a detached draw supplies no ordinary local autodiff path to its distribution parameters.
+This is a property of the representation and estimator, not proof that every stochastic expectation is nondifferentiable.
 
 ## The trick
 
@@ -26,9 +36,20 @@ Reparameterize the sample:
 z = mu_phi(x) + sigma_phi(x) * epsilon,  where epsilon ~ N(0, I)
 ```
 
-The randomness now comes from `epsilon`, which doesn't depend on `phi`. The sample `z` is now a deterministic function of `(phi, epsilon)`. The gradient `dL / dphi` is computed straightforwardly via chain rule.
+For positive standard deviation sigma, the Gaussian sample has the desired distribution while its transform is differentiable.
+When differentiation and expectation can be interchanged,
 
-In short: instead of "sample `z` from `q_phi`," do "sample `epsilon` from a fixed distribution, then transform deterministically."
+$$
+\nabla_\phi F=E_\epsilon[\nabla_z f(z)\,\nabla_\phi z].
+$$
+
+If f also depends explicitly on phi, include that additional derivative.
+For $\mu=1$, $\sigma=2$, $\epsilon=0.5$, and $f(z)=(z-3)^2$, the sample is two and loss one.
+The local derivative is $2(z-3)=-2$, so $df/d\mu=-2$ and $df/d\sigma=-1$ for this fixed draw.
+
+The expected loss instead is $F=(\mu-3)^2+\sigma^2=8$, with derivatives $(-4,4)$.
+Noise values minus one and plus one give sample gradients $(-8,8)$ and $(0,0)$, averaging to $(-4,4)$.
+That two-point check matches this quadratic's moments; it is not Gaussian sampling or a general integration rule.
 
 <!-- visual:reparameterization-gradient-path -->
 <figure class="learning-figure" aria-labelledby="reparameterization-visual-title">
@@ -43,7 +64,7 @@ In short: instead of "sample `z` from `q_phi`," do "sample `epsilon` from a fixe
 				<marker id="reparameterization-backward-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-backward" d="M0 0L7 3.5L0 7Z"></path></marker>
 			</defs>
 			<rect class="viz-plot-bg" x="5" y="5" width="350" height="170" rx="6"></rect>
-			<text class="viz-axis-label" x="18" y="27">1 · NAIVE SAMPLE: STOCHASTIC NODE BREAKS THE PATH</text>
+			<text class="viz-axis-label" x="18" y="27">1 · DETACHED DRAW: NO LOCAL AUTODIFF PATH</text>
 			<rect class="viz-node viz-node--input" x="16" y="54" width="74" height="48" rx="5"></rect>
 			<text class="viz-node-label" x="53" y="75">φ</text><text class="viz-node-value" x="53" y="92">encoder params</text>
 			<rect class="viz-node" x="111" y="54" width="82" height="48" rx="5"></rect>
@@ -82,60 +103,68 @@ In short: instead of "sample `z` from `q_phi`," do "sample `epsilon` from a fixe
 			<text class="viz-edge-label" x="180" y="433" style="font-size:11px">epsilon supplies a value; no derivative through its draw is needed</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow solid arrows to sample in either panel. Then follow the dashed gradient backward. The naive graph meets a stochastic draw with no ordinary local derivative; the reparameterized graph holds the sampled epsilon fixed and differentiates through <code>z = mu + sigma * epsilon</code> all the way to <code>phi</code>. The distribution of <code>z</code> is unchanged. Original construction checked against <a href="https://arxiv.org/abs/1312.6114">Kingma and Welling's VAE formulation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> a detached draw supplies no ordinary local autodiff path. The lower graph holds base noise fixed and differentiates its deterministic Gaussian transform. It preserves the sampling distribution while changing the available gradient path. Original construction follows <a href="https://arxiv.org/abs/1312.6114">Kingma and Welling</a>.</figcaption>
 </figure>
 
 ## Lower-variance gradients
 
-This is the foundational trick for variational autoencoders (VAE). Without it, you'd have to use REINFORCE / score-function gradients, which have much higher variance and need many samples to be useful.
+Pathwise estimates can reduce variance relative to score-function estimates, but no distribution-free variance ordering or sample-count guarantee holds.
+Score-function methods, baselines, analytic terms, and other estimators remain useful under their respective conditions.
 
 ## What an L5 answer sounds like
 
-> "When you sample `z = sample(q_phi(z | x))` and use `z` in a downstream loss, you can't backprop through the sampling because the operation is stochastic.
->
-> The trick: rewrite the sample as a deterministic function of (parameters, noise), where the noise comes from a fixed distribution.
->
-> For a Gaussian: `z = mu(x) + sigma(x) * epsilon`, `epsilon ~ N(0, I)`. Now `z` is differentiable w.r.t. `mu` and `sigma`, which are computed by the encoder network. Gradients flow through normally.
->
-> Used in VAEs, in some RL algorithms (Gumbel-softmax for discrete actions is the discrete analog), in normalizing flows, in continuous-control policy gradient methods."
-
-This is L5. Mechanism explained, examples given.
+A complete explanation states the noise law, transform, held-fixed sample, distributional identity, and interchange assumptions before applying the chain rule.
 
 ## What an L6 answer adds
 
-> "...some additional points:
->
-> **It only works for distributions you can reparameterize.** Gaussian, Laplace, exponential, uniform: easy. Discrete distributions: hard (requires Gumbel-softmax with continuous relaxation). General distributions: requires implicit differentiation tricks.
->
-> **Variance is much lower than score-function gradients.** For a 1D Gaussian, reparameterization gradient variance scales with the Jacobian of the network; score-function variance scales with `1 / sigma^2` of the sample, which can be huge. Empirically, reparameterization needs 1-10 samples to estimate a useful gradient; REINFORCE often needs 1000+.
->
-> **For discrete latents (e.g., latent-variable models with categorical z), Gumbel-softmax / concrete distribution** is the standard relaxation. Use a continuous relaxation that's differentiable; anneal the temperature toward zero to make samples nearly discrete. Trade-off: differentiable but biased.
->
-> **In LLM-RL (RLHF, DPO), reparameterization isn't used** because text generation is discrete and Gumbel-softmax over a vocabulary of 50K tokens is impractical. RLHF uses score-function gradients (PPO), accepting the variance cost. DPO sidesteps this entirely with an analytical objective that doesn't need sampling at all."
+### Change the Encoder's Scale Output
+
+**New task:** The encoder emits log variance r instead of standard deviation sigma.
+
+**Picture and change:** Use $\sigma=\exp(r/2)$ and retain the same epsilon, chaining through $d\sigma/dr=\sigma/2$.
+
+**Check:** At $r=\log4$, sigma is two; the reference sample's $df/dr=(-1)(2/2)=-1$.
+Using variance four as the standard deviation changes the distribution and derivative.
+
+**Use when:** An unconstrained encoder output needs conversion to positive scale.
+
+### Change the Latent Support
+
+**New task:** Replace the Gaussian latent with Bernoulli probability p.
+
+**Picture and change:** Thresholding uniform noise gives $z=1[u<p]$, whose sample derivative is zero almost everywhere.
+
+**Check:** Nevertheless, $E[z]=p$ has derivative one; averaging those zero derivatives fails to recover it.
+
+**Use when:** Discrete support breaks the smooth sample-path argument.
+Use a suitable score-function estimator or a justified relaxation, not a Gaussian substitution.
+
+For framework use, keep mu/log-variance/noise axes aligned, commonly `[B,D]`, and preserve the draw's differentiable transform.
+PyTorch Gaussian `rsample()` supplies that path; `sample()` ordinarily does not.
+K samples require $O(KBD)$ noise/transform work plus downstream computation.
+Detaching z blocks the path; fresh noise invalidates the finite-difference comparison.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Tells that get you a strong-hire vote
 
-- You explain **why** sampling breaks gradients before stating the trick.
-- You give the **Gaussian formula** explicitly.
-- You bring up **Gumbel-softmax** for discrete latents.
-- You compare **variance** to score-function gradients.
-- You mention **DPO sidesteps this** for LLM RL.
+Explain the sample derivative, expected derivative, and their different numerical values rather than presenting a level speech.
 
 ## Tells that get you down-leveled
 
-- Stating the formula without explanation.
-- Confusion about why naive sampling doesn't work.
-- No knowledge of discrete-relaxation alternatives.
-- Treating reparameterization as a VAE-only trick (it's broader).
+Avoid claiming that all stochastic nodes are intrinsically nondifferentiable or that pathwise gradients always have lower variance.
+Gumbel-softmax differentiates a relaxed objective; annealing temperature does not guarantee unbiased discrete-objective gradients.
 
 ## Common follow-up
 
-"How does this apply to RL?"
-
-The L6 answer:
-
-> "Two cases. For *continuous-action policies* (e.g., robotic control with a Gaussian policy), reparameterize the action sample and backprop through the value function (this is the basic trick behind DDPG and SAC). For *discrete-action policies* (e.g., RL on discrete decisions), reparameterization doesn't directly apply; you use score-function gradients (REINFORCE, A2C, PPO) and accept the variance cost, sometimes mitigated by control variates and baselines. The 'continuous vs discrete' choice often dominates the algorithm choice in modern RL."
+SAC can differentiate a reparameterized continuous-action sample through a learned critic under its objective.
+DDPG instead uses a deterministic policy gradient; it is not the same Gaussian sampling construction.
+Discrete-action policies can use score-function estimators and baselines; algorithm choice also depends on data, constraints, and learning assumptions.
+DPO uses a preference-data objective rather than backpropagating through generated discrete tokens; this does not make all data collection unnecessary.
 
 ---
 
 *Related: [RLHF and DPO](/concepts/rlhf-and-dpo/), [cross-entropy and softmax](/concepts/cross-entropy-softmax/), and [Bayesian versus frequentist](/questions/bayesian-vs-frequentist/).*
+
+</div>

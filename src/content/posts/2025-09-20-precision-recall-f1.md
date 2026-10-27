@@ -26,7 +26,7 @@ These are the three most-cited classification metrics. Picking the wrong one for
 
 Different metrics weight these differently:
 
-- **Accuracy** = $(TP + TN) / N$. Fraction correct overall. Useless on imbalanced data.
+- **Accuracy** = $(TP + TN) / N$. Fraction correct overall; it can hide poor rare-class performance and does not encode unequal error costs.
 - **Precision** = $TP / (TP + FP)$. Column purity (predicted positive).
 - **Recall** = $TP / (TP + FN)$. Row purity (actual positive). Also called **sensitivity** or **true positive rate**.
 - **Specificity** = $TN / (TN + FP)$. True negative rate.
@@ -43,7 +43,11 @@ Choose based on the relative cost of false positives vs. false negatives:
 | Fraud detection | Legitimate transaction blocked | Fraud succeeds | Both. Depends on dollar values |
 | Recommendation candidate generation | Boring rec | Missing a perfect rec | Recall (filter later) |
 
-There is **always a tradeoff**: increasing one decreases the other along the precision-recall curve. The right choice depends on the operating cost.
+Recall is nondecreasing as a fixed ranking's threshold falls, but precision can rise, fall, or stay unchanged.
+For ranked labels `[1,0,1]`, accepting the first two gives precision and recall both $1/2$.
+Accepting the third gives precision $2/3$ and recall one: both increase.
+Compare actual operating points and costs rather than assuming every change exchanges precision for recall.
+Declare the treatment of zero denominators; the [confusion-matrix lesson](/concepts/confusion-matrix-and-classification-metrics/) distinguishes counts from undefined ratios and averaging conventions.
 
 ## F1 and F-beta
 

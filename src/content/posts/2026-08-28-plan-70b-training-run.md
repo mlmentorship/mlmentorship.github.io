@@ -7,9 +7,34 @@ tags: ["questions"]
 category: "questions"
 ---
 
-> You need to train a dense decoder-only transformer on 300 billion tokens. It has 80 layers, width 8,192, gated feed-forward width 28,672, 64 query heads, 8 key/value heads, head size 128, and a tied vocabulary of 128,000 tokens. You have 512 GPUs in 64 eight-GPU nodes. Each GPU has 80 GB of memory, about 1 PFLOP/s peak BF16 compute, a fast switched link inside its node, and 45 GB/s effective per-rank transfer bandwidth for large cross-node collectives under load. Plan the run.
+Plan a dense language-model training run by turning the supplied model dimensions and cluster limits into a testable resource and parallelism plan.
 
-This question tests whether a candidate can turn dimensions into a measured systems plan. There is no single correct parallel layout. Assumptions and checks matter more than naming a framework.
+## Problem
+
+**Context.** Train a dense decoder-only Transformer on 300 billion tokens using the model and hardware specifications below.
+
+**Task.** Estimate parameters, model and optimizer state, activation memory, compute, communication, and run duration.
+Choose an initial parallel layout, batch and checkpoint strategy, then define measurements that could reject the plan.
+
+**Constraints.** Distinguish GB from GiB, peak BF16 compute from achieved throughput, and effective cross-node bandwidth from an unconstrained fabric rate.
+State missing sequence-length, precision, optimizer, utilization, and recovery assumptions; there is no single prescribed parallel layout.
+
+| Model Specification | Given Value |
+| --- | --- |
+| Layers | 80 |
+| Model width | 8,192 |
+| Gated feed-forward width | 28,672 |
+| Query heads / KV heads | 64 / 8 |
+| Head size | 128 |
+| Tied vocabulary | 128,000 tokens |
+
+| Cluster Specification | Given Value |
+| --- | --- |
+| GPUs / nodes | 512 / 64, with eight GPUs per node |
+| Memory per GPU | 80 GB |
+| Peak BF16 compute per GPU | About 1 PFLOP/s |
+| Intra-node connection | Fast switched link |
+| Effective per-rank cross-node bandwidth | 45 GB/s for large collectives under load |
 
 ## Try it before reading the answer
 

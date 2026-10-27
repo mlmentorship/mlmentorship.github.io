@@ -25,6 +25,7 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
       <p>Book {volume.number}</p>
       <h1>{volume.title}</h1>
       <div class="volume-intro"><p>{volume.description}</p><span>{volume.chapters.length} chapters · {entryCount} entries</span></div>
+      <p class="mechanism-index-link"><a href="/mechanisms/">Mechanism index</a></p>
     </header>
 
     <div class="chapters-head"><h2>Chapters</h2><span>{volume.chapters.length}</span></div>
@@ -73,6 +74,7 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
   .volume-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; align-items: end; }
   .volume-intro p { max-width: 36rem; margin: 0; color: var(--c-text-soft); font-family: var(--font-reading); font-size: .92rem; line-height: 1.5; }
   .volume-intro span { color: var(--c-muted); font-size: .68rem; white-space: nowrap; }
+  .mechanism-index-link { margin: .75rem 0 0; font-size: .75rem; }
 
   .chapters-head { display: flex; align-items: baseline; justify-content: space-between; margin-top: 1.6rem; padding-bottom: .35rem; border-bottom: 1px solid var(--c-rule); }
   .chapters-head h2 { margin: 0; font-size: .85rem; }

@@ -1,6 +1,6 @@
 ---
 title: "Cross-entropy and softmax"
-description: "The pairing isn't arbitrary. Cross-entropy is the negative log-likelihood under a categorical distribution, and the softmax+CE gradient simplifies to (p − y), which is why it's stable."
+description: "Derive categorical negative log-likelihood and its logit gradient, then change target smoothing and temperature without losing the normalization contract."
 date: "2025-09-05"
 draft: false
 tags: ["concepts"]
@@ -10,25 +10,28 @@ category: "concepts"
 
 ## Summary
 
-**Cross-entropy loss** is the negative log-likelihood of the true class under a probability distribution predicted by the model. **Softmax** is the standard parameterization that turns logits into a categorical distribution. The two are nearly always paired because the math composes cleanly.
-
-Almost every classification model uses softmax + cross-entropy. The reasons are not arbitrary:
-
-1. **Cross-entropy is the right loss for classification under MLE**. If you assume your label is a sample from a categorical distribution and you want maximum likelihood, the loss is exactly cross-entropy.
-2. **The gradient simplifies to (p − y)**. The composition of softmax and cross-entropy has the unique property that the gradient of the loss with respect to the logits is `softmax_output − one_hot_label`. Numerically stable, easy to compute.
-3. **MSE on classification has vanishing gradients for confident-but-wrong predictions**. Cross-entropy doesn't; the gradient stays large precisely when the model is most wrong.
+Categorical cross-entropy is negative log-likelihood when one class label is observed from a predicted categorical distribution.
+Softmax maps finite logits to that distribution; differentiating their composition gives a prediction-minus-target logit gradient.
+Stable evaluation comes from shifted log-normalization, not from the gradient formula alone.
 
 ## The math, briefly
 
-For C classes and a single example with true class y:
+Let $z\in\mathbb R^C$ be one logit vector and $y$ its observed class index.
+Define $p_i=e^{z_i}/\sum_j e^{z_j}$.
+Then
 
-**Softmax**: `p_i = exp(z_i) / sum_j exp(z_j)` for logits z = (z_1, ..., z_C).
+$$
+L=-\log p_y=-z_y+\log\sum_j e^{z_j},\qquad
+\frac{\partial L}{\partial z_i}=p_i-\mathbf1[i=y].
+$$
 
-**Cross-entropy**: `L = -log p_y = -z_y + log(sum_j exp(z_j))`.
+The derivative of the log-normalizer is $e^{z_i}/\sum_j e^{z_j}=p_i$.
+The observed-class term contributes $-1$ only at index $y$.
+For logits $(\log3,0)$ and class zero, $p=(3/4,1/4)$, loss is $\log(4/3)$, and gradient is $(-1/4,1/4)$.
 
-Note the second form (log-sum-exp): this is the numerically stable way to compute cross-entropy, you never explicitly form the softmax, you compute LSE on the logits directly. PyTorch's `nn.CrossEntropyLoss` does this.
-
-**Gradient w.r.t. logits**: `dL/dz_i = p_i − y_i` where y is one-hot. Three lines of algebra; the cleanest gradient in deep learning.
+The diagram instead uses a binary true-class probability $q=0.01$.
+Cross-entropy's true-logit gradient is $q-1=-0.99$.
+Half squared error on the sigmoid probability introduces another derivative factor, giving magnitude $q(1-q)^2=0.009801$.
 
 <!-- visual:cross-entropy-confident-wrong-gradient -->
 <figure class="learning-figure plot-panel" aria-labelledby="ce-gradient-visual-title">
@@ -61,45 +64,81 @@ Note the second form (log-sum-exp): this is the numerically stable way to comput
 		<text class="viz-axis-label" x="60" y="17">logit-gradient magnitude |g|</text>
 		<text class="viz-axis-label" x="197.5" y="280" text-anchor="middle">true-class probability q · true label y = 1</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> move left toward a confidently wrong prediction. For cross-entropy, the true-logit gradient <code>q − 1</code> approaches −1, so the correction stays strong. For half squared error on this binary probability, the chain rule adds the saturating factor <code>q(1 − q)</code>; its gradient magnitude <code>q(1 − q)²</code> collapses toward zero. The dashed curve is the binary slice used to expose that extra factor; multiclass softmax plus cross-entropy gives <code>dL/dzᵢ = pᵢ − yᵢ</code>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> move left toward confident error. Cross-entropy's gradient approaches minus one. Probability-MSE includes the saturating sigmoid derivative, so its magnitude approaches zero. The dashed curve describes this binary comparison, not every possible squared-error model.</figcaption>
 </figure>
 
 ## What an interviewer expects you to say
 
-If asked "why softmax + cross-entropy":
+State the observation model, derive the log-normalizer gradient, declare the reduction, and explain stable evaluation.
+For independent examples, summed negative log-likelihood is the joint training objective; a mean divides its gradients by sample count.
+For multilabel tasks with independent binary targets, categorical normalization changes the model and is generally inappropriate.
 
-1. State the MLE interpretation.
-2. State the gradient simplification.
-3. Mention the numerical stability of computing them jointly (log-sum-exp trick).
-4. Mention the contrast with MSE on classification (vanishing gradients).
+## Change the Requirement
 
-Bonus depth: temperature `tau` (dividing logits by `tau` before softmax) controls the sharpness of the distribution, high `tau` makes it more uniform, low `tau` makes it more peaked. Used in distillation (high `tau` to extract more information from the teacher) and in sampling from LLMs (low `tau` for greedy-like behavior).
+### Smooth the Target
+
+**New task:** Replace a one-hot target with $t=(1-\varepsilon)e_y+\varepsilon\mathbf1/C$, where $0\le\varepsilon\le1$.
+
+**Picture and change:** Optimize $-\sum_i t_i\log p_i$; normalization $\sum_i t_i=1$ preserves gradient $p-t$.
+
+**Check:** With $p=(0.75,0.25)$, class zero, and $\varepsilon=0.1$, target $(0.95,0.05)$ gives gradient $(-0.20,0.20)$.
+
+**Use when:** A deliberately softened training target is appropriate.
+The target and its interpretation have changed; improved calibration is not guaranteed by the algebra.
+
+### Change Temperature
+
+**New task:** Use probabilities $p_T=\operatorname{softmax}(z/T)$, with fixed $T>0$.
+
+**Picture and change:** The chain rule adds $1/T$: $\nabla_zL=(p_T-e_y)/T$.
+
+**Check:** For $z=(\log3,0)$ and $T=2$, $p_{T,0}=\sqrt3/(1+\sqrt3)\approx0.6340$.
+The gradient is approximately $(-0.1830,0.1830)$.
+
+**Use when:** The task specifies temperature-scaled training or inference probabilities.
+Distillation may additionally scale its loss; state that convention separately.
 
 ## Common confusions
 
-- **"Softmax" vs "softmax + cross-entropy" as separate operations.** Conceptually distinct, but in practice always computed jointly because the joint gradient is so much cleaner.
-- **Computing cross-entropy on probabilities you already softmaxed.** PyTorch's `nn.CrossEntropyLoss` takes *logits*, not probabilities. Passing `softmax(logits)` will give wrong gradients and (often silently) bad training.
-- **"Cross-entropy" vs "categorical cross-entropy" vs "binary cross-entropy".** All the same idea; "binary" is just C=2 (often parameterized with sigmoid instead of softmax).
-- **MSE for classification "as a baseline".** Don't. Vanishing gradients for confident-wrong predictions; train slowly.
+- **Wrong API input.** A logits-based cross-entropy API does not expect already normalized probabilities.
+- **Wrong task.** Multiclass normalization and independent multilabel Bernoulli losses encode different outcome spaces.
+- **Unnormalized targets.** For general target weights $t$, the gradient is $(\sum_i t_i)p-t$, not automatically $p-t$.
 
 ## Numerical stability: the LSE trick
 
-The naive `log(sum_j exp(z_j))` overflows for large z_j. The fix:
+Let $m=\max_i z_i$ and evaluate the shifted expression:
 
 ```
 log_sum_exp(z) = max(z) + log(sum_j exp(z_j - max(z)))
 ```
 
-Subtract the max before exponentiating; add back outside the log. The maximum exponential argument is now 0; no overflow.
+For the loss itself, use $(m-z_y)+\log\sum_i e^{z_i-m}$.
+This avoids exponentiating positive shifted logits and avoids subtracting two large log-normalized quantities afterward.
+For logits $(1000,1000)$, class-zero loss is $\log2$, despite naive exponentiation overflowing.
+Nonfinite logits, unrepresentable differences, and all-masked rows still need a declared policy.
 
-Every framework's `cross_entropy_loss` does this internally. If you write your own, you must too.
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Why MSE fails on classification
 
-MSE gradient for a single output is proportional to `(p - y) * p * (1-p)` (when paired with sigmoid). When the model is *very* confident and wrong (`p ≈ 1` for the wrong class), the `p*(1-p)` term vanishes, the model can't learn its way out of the bad prediction. Cross-entropy's gradient is `(p - y)` directly, which stays large.
+The heading describes sigmoid saturation in the displayed example, not a universal impossibility theorem.
+Squared probability error is related to the Brier score and can be a meaningful evaluation or training objective.
+Its optimization behavior differs because the sigmoid derivative can suppress a confident-error logit update.
+Cross-entropy avoids that extra factor for logits, but parameter gradients can still vanish through other network operations.
 
-This is why no one uses MSE for classification despite the textbook deriving it for completeness.
+## Reconstruct
+
+<details>
+<summary>Does the simple logit gradient guarantee numerical stability or successful training?</summary>
+
+No. Naive exponentiation can overflow before a gradient is computed.
+Stable normalization addresses that arithmetic issue; optimization, model suitability, and upstream derivatives remain separate concerns.
+
+</details>
 
 ---
 
 *Related: [BatchNorm vs LayerNorm](/concepts/batchnorm-vs-layernorm/). Related interview: [Why does dropout work?](/questions/why-does-dropout-work/).*
+
+</div>

@@ -9,29 +9,27 @@ category: "concepts"
 
 ## Summary
 
-**Backpropagation** computes gradients of a scalar loss with respect to every parameter in a neural network in one backward pass through the computation graph, by applying the chain rule from the output back to the inputs and reusing intermediate computations.
-
-Without backprop, training a deep network would require either:
-
-- Numerical differentiation: $O(P)$ forward passes for $P$ parameters. Infeasible.
-- Forward-mode autodiff: $O(P)$ as well; works for small parameter counts but not for neural nets.
-
-Backprop computes all $P$ gradients in $O(F)$ time where $F$ is the cost of a forward pass. Typically 2–3× the forward cost. This is the algorithmic enabler of all modern deep learning.
+Backpropagation accumulates a scalar loss's sensitivity through every recorded route into each parameter.
+It applies reverse-mode automatic differentiation to a computation graph, reusing forward values needed by local derivative rules.
+For standard operations with comparable derivative costs, one scalar-output reverse pass costs $O(F)$ for forward work $F$.
+It computes gradients, not a parameter update or a guarantee of optimization progress.
 
 ## The algorithm
 
-Compute the loss as a function of inputs and parameters by composing simple operations: $L = f_n(f_{n-1}(\dots f_1(x; \theta_1) \dots ; \theta_{n-1}); \theta_n)$. Each $f_i$ has known local derivatives.
-
-**Forward pass**: compute and store $z_1, z_2, \dots, z_n = L$ along the way. The intermediates $z_i$ (activations) are needed for backward.
-
-**Backward pass**: starting from $\partial L / \partial L = 1$, recursively apply:
+Execute operations in dependency order and retain the values their backward rules need.
+Initialize all accumulated sensitivities to zero and seed $\overline L=1$.
+Visit operations in reverse dependency order, adding each contribution rather than overwriting earlier contributions:
 
 $$
-\frac{\partial L}{\partial z_{i-1}} = \frac{\partial L}{\partial z_i} \cdot \frac{\partial z_i}{\partial z_{i-1}}, \quad
-\frac{\partial L}{\partial \theta_i} = \frac{\partial L}{\partial z_i} \cdot \frac{\partial z_i}{\partial \theta_i}.
+\overline z\mathrel{+}=J_f(z)^\top\overline y,\qquad y=f(z).
 $$
 
-The "gradient w.r.t. $z_i$" is the **upstream gradient**; the local Jacobian $\partial z_i / \partial \cdot$ is multiplied in (as a vector-Jacobian product, never materialized as a full matrix).
+The [matrix-calculus pullback](/concepts/matrix-calculus/) explains this transposed-Jacobian rule.
+Local reverse products usually avoid constructing the full Jacobian.
+
+For $x=2$, $w=3$, let $z_1=xw=6$, $z_2=z_1+1=7$, and $L=z_2^2=49$.
+The reverse chain gives $\overline z_2=14$, $\overline z_1=14$, $\overline x=14w=42$, and $\overline w=14x=28$.
+These are the exact values and arrows in the diagram.
 
 <!-- visual:backprop-forward-reverse-trace -->
 <figure class="learning-figure backprop-visual" aria-labelledby="backprop-visual-title">
@@ -84,39 +82,71 @@ The "gradient w.r.t. $z_i$" is the **upstream gradient**; the local Jacobian $\p
 
 ## Vector-Jacobian products (VJPs)
 
-For an op $z_{i+1} = f(z_i)$ where both $z_i, z_{i+1}$ are vectors, the Jacobian $J$ would be enormous. Backprop computes only the **VJP**: $g_i = J^\top g_{i+1}$ where $g_{i+1} = \partial L / \partial z_{i+1}$.
+For $y=f(z)$, an incoming output gradient $g_y$ produces $g_z=J_f^\top g_y$.
+Primitive rules combine to implement this vector-Jacobian product without materializing a network-wide Jacobian.
 
-Each elementary op has a hand-coded VJP rule. Frameworks (PyTorch, JAX, TensorFlow) compose them automatically.
+### Reuse an Intermediate
+
+**New task:** Differentiate $t=xw$ and $L=t+t$.
+
+**Picture and change:** Two outgoing routes contribute to the same intermediate; sum them before propagating through multiplication.
+
+**Check:** $\overline t=1+1=2$, hence at $x=2,w=3$, gradients are $\overline x=6$, $\overline w=4$.
+Overwriting one contribution would incorrectly halve both answers.
+
+**Use when:** Parameters or intermediate results feed multiple operations.
+Repeated references are multiple derivative contributions even when the graph node is stored once.
 
 ## Memory cost
 
-Backprop must store all forward activations until the backward pass uses them. Memory is proportional to the depth of the network times batch size times activation size. Often dominating GPU memory in deep transformer training.
+**New task:** Compute the same gradient with less retained activation memory.
 
-Mitigations:
+**Picture and change:** Save selected boundaries and recompute needed forward values during backward.
 
-- **[Activation checkpointing](/concepts/activation-checkpointing/)**: recompute selected activations during backward instead of storing.
-- **Mixed precision**: store activations in BF16 instead of FP32.
-- **Sequence packing** + smaller batch.
+**Check:** Recomputing $z_1=6$ and $z_2=7$ in the original example still gives gradients $42,28$.
+
+**Use when:** [Activation checkpointing](/concepts/activation-checkpointing/) can trade extra work for a lower memory peak.
+Recomputation must reproduce required random choices and state-dependent behavior.
+Storing lower-precision activations is a separate numerical trade-off, not exact checkpointing.
+Total memory depends on retained tensors, lifetimes, parameters, optimizer state, and temporary workspace, not depth alone.
 
 ## Connection to reverse-mode autodiff
 
-Backprop is reverse-mode autodiff applied to scalar-output, vector-input functions ($L: \mathbb{R}^P \to \mathbb{R}$). Reverse mode is efficient when output dimension $\ll$ input dimension; for the opposite ($P$ inputs, $M$ outputs with $M \gg P$), forward mode is preferred. Neural network gradients always have $M = 1$, so reverse is the right choice.
+For a full Jacobian with $P$ inputs and $M$ outputs, forward mode needs roughly $P$ directional sweeps.
+Reverse mode needs roughly $M$ output-seeded sweeps.
+One scalar loss therefore favors reverse mode for many parameters; a few requested directional derivatives may favor forward mode.
 
 ## What backprop does NOT do
 
-- It is **not learning**. Backprop computes gradients; SGD / Adam uses them to update parameters.
-- It is **not specific to neural networks**. Any composition of differentiable ops with a scalar output can be backpropagated through.
-- It does **not enforce convergence**. The gradient may point downhill, but optimization may still get stuck.
+- It does not choose a learning rate, regularizer, or optimizer.
+- It is not specific to neural networks; differentiable programs can use the same accumulation rule.
+- It does not differentiate through unrecorded operations or automatically supply a derivative for discrete choices.
+- It does not prove convergence; even an exact gradient can be used in a non-descending finite update.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Common pitfalls
 
-- **Calling `loss.backward()` twice without `retain_graph=True`.** Backward frees the graph by default; second call fails.
-- **Forgetting `optimizer.zero_grad()`.** Gradients accumulate by default; not zeroing means each step uses the sum of all past gradients (unintended, breaks convergence).
-- **`detach()` errors.** Tensors `.detach()`'d from the graph have no gradient; using them where you wanted gradients to flow gives subtle wrong learning.
-- **Memory leaks from holding loss tensors.** Keeping references to loss objects keeps the entire computation graph alive; use `loss.item()` for logging.
-- **Confusing `requires_grad` with `is_leaf`.** Parameters are typically leaves with `requires_grad=True`; intermediate tensors are non-leaves with `requires_grad=True` because they depend on params.
+- **Unintended accumulation.** Framework parameter gradients may persist across backward calls; reset them at the intended optimization boundary.
+- **Saved-value reuse.** Backward may release needed saved tensors; a second backward through the same graph can require explicit retention.
+- **Detached routes.** `detach()` stops gradient flow through that route.
+- **Retained graphs.** Holding differentiable loss objects can retain graph metadata or saved values; log detached scalars when appropriate.
+- **Leaf confusion.** Requiring gradients and being a leaf are different properties; retained intermediate gradients need their own policy.
+
+## Reconstruct
+
+<details>
+<summary>Why must a shared node wait until every downstream contribution has arrived?</summary>
+
+Its sensitivity is the sum over downstream routes.
+Propagating a partial sum and then discarding the node loses later routes; reverse dependency order prevents that mistake.
+
+</details>
 
 ## Related
 
 - [Matrix calculus](/concepts/matrix-calculus/). The chain rule formalism.
 - [Activation checkpointing](/concepts/activation-checkpointing/). Memory optimization for backprop.
+
+</div>

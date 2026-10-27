@@ -1,6 +1,6 @@
 ---
 title: "Design YouTube's recommender"
-description: "The canonical recsys design question. The real test is whether you'll dive into model architecture or scope the problem first."
+description: "Scope a video recommendation surface, compare conditional objectives, trace candidate coverage and preserve exposure before learning from feedback."
 date: "2025-10-20"
 draft: false
 tags: ["questions"]
@@ -8,106 +8,72 @@ category: "questions"
 ---
 
 
-> *Asked in: ML system design, especially recsys teams.*
+Design a large-catalog video home feed and define how candidate selection, ranking, and feedback support its objective.
 
-The test is whether you can scope, decompose, and reason about trade-offs at scale, not whether you know the YouTube paper.
+## Problem
 
-## The single biggest mistake
+**Context.** The surface is a YouTube-like home feed with eligible videos and uncertain estimates of viewing behavior.
+The component estimates below illustrate a choice of ranking objective.
 
-Diving straight into model architecture in the first 30 seconds. This is the number-one reason candidates get down-leveled on this question. A senior candidate spends the first 5-10 minutes asking questions and establishing scope before discussing any architecture.
+**Task.** Specify requirements, compare the two videos under both objectives, and design retrieval, ranking, slate composition, and evaluation.
+Explain what exposure records are needed to interpret later feedback.
 
-## What an L4 answer sounds like
+**Constraints.** This is hypothetical, not a description of YouTube internals.
+State scale, latency, cost, permitted signals, and safety assumptions; an offline expected-value calculation does not establish causal user benefit.
 
-> "I'd use collaborative filtering with matrix factorization, then add content features. We can use a deep learning model with embeddings for users and videos. For ranking we can use gradient-boosted trees or a neural ranker. We'd serve it through a low-latency API."
+Design a YouTube-like home feed, not search or watch-next.
+This is a hypothetical design, not a claim about YouTube's current internal system.
+Specify catalog/request scale, permitted signals, useful viewing, cost, latency and safety before selecting models.
 
-Correct ingredients, no architecture, no scoping. You've memorized recsys components but haven't built one.
+Two eligible videos have stipulated component estimates:
 
-## What an L5 answer sounds like
+| Video | P(watch given impression) | Expected seconds given watch |
+| --- | ---: | ---: |
+| A | 0.90 | 20 |
+| B | 0.50 | 60 |
 
-A senior approach has structure. The L5 answer follows it:
+Choose between watch probability and expected watch duration.
+Then explain what retrieval, composition and exposure must retain for reliable feedback.
 
-### Step 1: Scope (5-10 minutes)
+## Picture: The Objective Changes the Order
 
-> "Before I propose an architecture, I'd want to clarify a few things:
->
-> - **Surface**: are we talking about home page recommendations, watch-next, search ranking, or all of these? They have very different characteristics.
-> - **Objective**: long-term watch time? Engagement? Subscriptions? User retention? These point to different model architectures and labels.
-> - **User signal**: are we counting clicks, watch duration, completion rate, likes, shares? Each has different reliability and bias profile.
-> - **Scale**: how many videos in the catalog? How many users? How many requests per second?
-> - **Cold-start**: how do we handle new users and new videos? Can we use side information?
-> - **Constraints**: latency budget for ranking? Cost? Existing infrastructure?
->
-> Let me assume the home page surface, optimizing for long-term satisfaction (a combination of watch time, engagement, and signals like 'survey responses'), serving billions of users and a multi-billion video catalog at ~100ms p95."
+Assume zero watch seconds without a watch and the stated conditional durations.
+Multiplying each video's probability by its conditional seconds gives its expected seconds per impression.
 
-The interviewer is now visibly relieved. You've signaled you can scope.
+$$
+\begin{aligned}
+A &: 0.90\times20=18\text{ seconds}\\
+B &: 0.50\times60=30\text{ seconds}.
+\end{aligned}
+$$
 
-### Step 2: Two-stage architecture
+Watch probability prefers A; expected duration prefers B.
+Neither order establishes satisfaction, safety, content quality or long-term retention.
 
-> "At YouTube scale you can't score every video for every request. The standard architecture is two-stage:
->
-> **Stage 1: Candidate generation**: reduce the catalog from billions to thousands.
-> - Two-tower model with user and video embeddings, trained with sampled softmax or in-batch negatives.
-> - User tower input: watch history (sequence of recently watched video embeddings, often via a sequence model), demographics, context (time, device).
-> - Video tower input: video embedding (often pre-trained on co-watch or content), category, freshness.
-> - Serve via approximate nearest neighbor (HNSW, Scann) with sub-10ms retrieval.
->
-> **Stage 2: Ranking**: score the ~thousands of candidates more carefully.
-> - A larger neural ranker (DCN-V2, deep cross network, or a transformer-based ranker).
-> - Many more features: full user history, video metadata, contextual signals.
-> - Multi-task learning: predict multiple targets simultaneously (watch probability, watch duration, like, comment) and combine in a final score.
-> - Calibrate the score so it's interpretable as a probability."
+For one toy request, three sources return 800 collaborative, 300 content and 100 fresh candidates.
+Overlap leaves 1,000 unique candidates; eligibility leaves 900, and the displayed slate contains ten.
+Ranking cannot recover a useful video absent from retrieval.
 
-### Step 3: Labels and training
-
-> "The trickiest part of recsys is what to predict. A few choices:
->
-> - **Implicit feedback** (clicks, watches) is abundant but biased, we only see what we showed. Need inverse propensity weighting or counterfactual reasoning to debias.
-> - **Watch time** is a stronger signal than clicks but requires careful normalization (a 30-second click on a 30-second video is different from a 30-second click on a 30-minute video).
-> - **Long-term outcomes** (next-day return, subscription) are most important but sparsest. Often modeled as auxiliary tasks.
->
-> I'd predict multiple targets in a multi-task ranker, then combine them. Final score might be `f(P(watch), P(complete), P(like), P(survey_positive))` with weights tuned via offline counterfactual eval and confirmed in A/B."
-
-### Step 4: Eval and serving
-
-> "Offline eval: held-out user sessions, with metrics like NDCG, MRR, and counterfactual estimators (IPS, doubly robust). But offline metrics on observational data are unreliable for recsys; the *real* eval is the A/B test.
->
-> Online: A/B test on a small fraction of traffic. Primary metric is long-term satisfaction proxy (e.g., next-week return rate); guardrails on engagement and on diversity / fairness slices.
->
-> Serving: candidate generation in ~10ms (ANN lookup), ranking in ~50ms (batched scoring), final composition / re-ranking in ~10ms. Total p95 ~100ms."
-
-This is L5. Structured, scope-aware, technically defensible. You'd be hired.
-
-## What an L6 answer sounds like
-
-The L6 answer is the L5 answer plus the things only people who've shipped at this scale know:
-
-### Add: the calibration / multi-task subtleties
-
-> "...one thing I'd want to flag is calibration. In a multi-task ranker, each head is trained on a different positive/negative ratio, clicks are dense, completions are sparser, surveys are very sparse. Without explicit calibration, the head with the noisiest probabilities will dominate the final score. I'd add a calibration step (Platt scaling or isotonic regression) per head before combining."
-
-### Add: the feedback loop problem
-
-> "...recsys has a strong **feedback loop**: today's recommendations create tomorrow's training data, so the system can self-reinforce a narrow distribution. I've seen teams ship a 'better' model offline that immediately tanked diversity online because it learned to recommend exactly what users had previously clicked. Mitigations: explicit diversity terms in the ranker, exploration in candidate generation (epsilon-greedy or Thompson sampling on the head distribution), counterfactual augmentation."
-
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace how a two-stage recommender narrows the catalog, then identify why its displayed slate, not the whole catalog, determines tomorrow's ordinary training labels.</p>
+<p class="visual-kicker">Candidate coverage and selective feedback</p>
+<p class="visual-title">The ten displayed videos, not the 1,000 retrieved candidates, generate ordinary exposed feedback.</p>
 
 <!-- visual:youtube-recommender-selective-feedback-loop -->
 ```mermaid
 flowchart TB
-  accTitle: A two-stage recommender also acts as a selective data-collection policy
-  accDescr: A catalog of billions plus content, fresh-item, and randomized-exploration sources enter candidate generation, producing thousands of candidates. A richer multi-task ranker scores those candidates, and a composition policy applies diversity, freshness, and safety constraints. This creates an exposure gate: the small displayed slate can produce observed outcomes, while unshown outcomes remain unknown rather than negative. Logged exposure-policy context and outcomes train later retrieval and ranking models, closing a feedback loop. Randomized exploration broadens which items receive exposure.
-  Sources["CATALOG + COVERAGE SOURCES<br/>billions · content · fresh · exploration"]
-  Retrieve["1 · CANDIDATE GENERATION<br/>retrieve thousands"]
-  Rank["2 · MULTI-TASK RANKER<br/>watch · satisfaction · return"]
-  Compose{"COMPOSITION POLICY<br/>diversity · freshness · safety"}
-  Gate["EXPOSURE GATE<br/>displayed: observable · unshown: unknown"]
-  Outcomes["OBSERVED OUTCOMES<br/>watch · skip · survey · return"]
-  Logs[("EXPOSURE + OUTCOME LOG<br/>policy context included")]
-  Train["TRAIN NEXT MODELS<br/>retrieval + ranking"]
+  accTitle: A concrete retrieval funnel limits both choices and ordinary feedback
+  accDescr: In a fictional request, collaborative, content and fresh sources return 800, 300 and 100 candidates. Deduplication yields 1000 unique candidates and eligibility leaves 900. Rich ranking can order those 900, but cannot recover an absent video. A has expected watch time 18 seconds and B has 30, though A has higher watch probability. Composition selects ten eligible displayed videos. Their exposure and mature outcomes enter the policy log; the other outcomes remain unknown. Later training changes retrieval and ranking, so exposure selection must remain visible.
+  Sources["SOURCES: 800 + 300 + 100<br/>collaborative / content / fresh"]
+  Retrieve["DEDUPLICATE<br/>1,000 unique candidates"]
+  Eligible{"Eligibility and current policy<br/>900 candidates remain"}
+  Rank["RICH RANKER: 900 candidates<br/>expected seconds: A 18, B 30"]
+  Compose{"COMPOSITION<br/>diversity, freshness, eligibility"}
+  Gate["10 DISPLAYED VIDEOS<br/>unshown outcomes remain unknown"]
+  Outcomes["EXPOSURE + MATURE OUTCOMES<br/>watch / skip / survey / return"]
+  Logs[("VERSIONED POLICY LOG<br/>candidates, exposure, propensities")]
+  Train["TRAIN NEXT RETRIEVER / RANKER<br/>support and selection remain explicit"]
 
   Sources ==> Retrieve
-  Retrieve ==> Rank
+  Retrieve ==> Eligible ==> Rank
   Rank ==> Compose
   Compose ==> Gate
   Gate ==>|"displayed slate only"| Outcomes
@@ -117,7 +83,7 @@ flowchart TB
   Train -.->|"changes later ordering"| Rank
 
   class Logs viz-state
-  class Retrieve,Rank,Compose viz-focus
+  class Retrieve,Eligible,Rank,Compose viz-focus
   class Sources viz-input
   class Train viz-neutral
   class Outcomes viz-output
@@ -125,43 +91,110 @@ flowchart TB
   class Sources viz-tall
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid funnel from billions of videos to the exposure gate, then follow the feedback loop. A watch or skip is observed only after display; an unshown video's outcome is unknown, not negative. Deliberate exploration widens exposure so future training and evaluation are not limited entirely to yesterday's choices.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> follow the candidate counts, then compare A and B's expected seconds. Only displayed videos can produce ordinary exposed feedback; unshown outcomes remain unknown.</p>
 <p class="diagram-source">Original synthesis informed by the <a href="https://research.google/pubs/deep-neural-networks-for-youtube-recommendations/">YouTube candidate-generation and ranking paper</a>, its <a href="https://research.google/pubs/recommending-what-video-to-watch-next-a-multitask-ranking-system/">multitask ranking follow-up</a>, and <a href="https://arxiv.org/abs/1710.11214">Chaney, Stewart, and Engelhardt on algorithmic confounding</a>. No source figure or layout is reproduced.</p>
 
-### Add: the cold-start strategy
+<span id="the-single-biggest-mistake"></span>
+<span id="what-an-l4-answer-sounds-like"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
+<span id="step-1-scope-5-10-minutes"></span>
+<span id="step-2-two-stage-architecture"></span>
+<span id="step-3-labels-and-training"></span>
+<span id="step-4-eval-and-serving"></span>
 
-> "...for new videos, the embedding-based two-tower has nothing to retrieve. I'd add a content-based candidate source (text/audio/visual features extracted from the video) running in parallel with the collaborative source, and explicitly boost new content in early hours. For new users, I'd start with popularity-based recommendations and switch to the personalized model after a few sessions of signal."
+## Decision Contract
 
-### Add: the long-term-vs-short-term trade-off
+| Boundary | Required record/check |
+| --- | --- |
+| Surface | Home-feed users, catalog/request scale, permissions, useful-viewing objective and constraints |
+| Retrieval | Source coverage, eligible candidates, model/index/embedding versions and recall diagnostics |
+| Ranking | Richer features, conditional targets, units, missing-label rules and serving utility |
+| Composition | Eligible slate, freshness/diversity constraints, exposure policy and bounded exploration |
+| Feedback | Request/item/position, policy/propensity, observed exposure, outcome definition, maturity and censoring |
+| Release | Temporal/user separation, slice metrics, supported counterfactual checks, mature experiment, guardrails and rollback |
 
-> "...the hardest open problem in recsys is reconciling short-term engagement (clicks, watch time today) with long-term satisfaction (does this user still come back in 6 months). Pure engagement optimization can lead to clickbait and dissatisfaction. The standard mitigation is to include long-term proxies (survey responses, return rate) in the multi-task objective, but the weights are hard to set and require careful A/B over long horizons. This is the area where I'd expect to spend most of my product judgment."
+Measure end-to-end latency, including queueing, networking and feature retrieval; stage p95 values do not sum into an end-to-end p95.
+Retain compatible versions and a policy-approved fallback when retrieval, features or ranking fail.
 
-This is L6. You've gone past the architecture into the *operational hard problems* that real recsys teams spend most of their time on.
+## Change 1: A Video Has Content but No History
 
-## The tells that get you a strong-hire vote
+**New task.** A new eligible video has no interaction data.
 
-- You **scope before solving**. 5-10 minutes of clarifying questions before any architecture.
-- You distinguish **candidate generation vs ranking** as a fundamental architectural decision.
-- You bring up **feedback loops**: **calibration across tasks**: and **cold-start** unprompted.
-- You acknowledge that **A/B tests are the real eval** and that offline metrics on observational data are unreliable.
-- You discuss **what could go wrong in production** (clickbait, filter bubbles, distribution drift).
+**Picture and change.** A content-aware tower can embed it; alternatively add a validated content/new-item source.
+Use bounded exploration, retaining exposure and quality checks.
+For new users, combine permitted context, optional preferences and content without a fixed session-count switch.
 
-## The tells that get you down-leveled
+**Check.** Not all towers require item history; a boost cannot bypass policy or prove value.
 
-- Diving into model architecture in the first minute.
-- "I'd use a transformer for ranking" without justification.
-- No mention of two-stage architecture (candidate gen + ranking).
-- No mention of A/B testing or counterfactual eval.
-- Treating the question as "list recsys techniques."
-- Forgetting cold-start, diversity, and feedback loops.
+**Use when.** Collaborative evidence is missing.
 
-## A common follow-up
+<span id="a-common-follow-up"></span>
 
-"How would you measure if your recsys is causing filter bubbles?"
+## Change 2: Category Exposure Narrows
 
-This is a senior probe. The L6 answer:
+**New task.** Users see fewer categories over time.
 
-> "I'd track diversity at multiple levels: per-user diversity over time (entropy of recommended categories per user, week over week), system-level diversity (gini coefficient of impressions across the catalog), and demographic / content slice fairness (is one creator type systematically under-recommended). I'd also run periodic counterfactual analyses where I replay user sessions with diversity-augmented candidate sets to estimate the gap. The fundamental issue is that 'filter bubble' isn't precisely defined, you have to operationalize it as a specific metric you'll defend, and that operationalization is itself a product decision."
+**Picture and change.** Define per-user category entropy, catalog impression concentration and eligible creator/content coverage.
+Inspect exposure, position, user intent and satisfaction; test a justified coverage intervention with explicit constraints.
+
+**Check.** Entropy, replay or concentration alone does not prove a harmful filter bubble or a causal remedy.
+
+**Use when.** Feedback may reduce coverage or satisfaction.
+
+<span id="the-tells-that-get-you-a-strong-hire-vote"></span>
+<span id="the-tells-that-get-you-down-leveled"></span>
+
+## Failure: More Clicks Become Long-Term Satisfaction
+
+Learning only from narrow displayed slates and labeling unshown items negative reinforces the prior policy.
+Higher click rates do not establish useful viewing or mature retention.
+
+## Transfer Check
+
+Can calibrated task heads automatically produce one calibrated probability after combination?
+
+### Reasoned Answer
+
+No. Heads can represent different events, conditional populations and units.
+Define the serving utility and estimate each required component on its proper population.
+The expected-seconds score above is not a probability.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-an-l6-answer-sounds-like"></span>
+<span id="add-the-calibration--multi-task-subtleties"></span>
+
+## Conditional Heads and Training
+
+Two-tower retrieval can use sampled softmax or in-batch negatives, with attention to sampling, false negatives and train/serve compatibility.
+Approximate-neighbor search trades recall, latency and cost; benchmark it on eligible candidate coverage.
+A richer ranker can share features across tasks, but shared training can create interference.
+Architecture names such as DCN-V2 or transformers do not establish fitness.
+
+Calibrate probability heads on their declared populations, using suitable held-out data and slice checks.
+Platt or isotonic calibration does not correct missing exposure or survey-response selection by itself.
+Watch duration conditional on watching differs from per-impression duration; completion fractions also change the product objective.
+Handle censoring explicitly.
+
+<span id="add-the-feedback-loop-problem"></span>
+
+## Exposure and Long-Horizon Limits
+
+Inverse-propensity and doubly robust estimators need supported actions, valid logged policy information and identified outcomes.
+They do not reveal arbitrary unseen-video outcomes or remove every confound.
+Exploration needs safety constraints, acceptable exposure risk and an observation policy, not synthetic negative labels.
+
+<span id="add-the-cold-start-strategy"></span>
+<span id="add-the-long-term-vs-short-term-trade-off"></span>
+
+Surveys measure respondents under their sampling process, not automatic all-user satisfaction.
+Choose an appropriate randomized experiment, duration, assignment unit, mature target and safety/diversity/cost guardrails.
+Account for interference and attrition where relevant.
+Offline screening, surveys and experiments each contribute evidence with different population and measurement limits.
+None is a universal replacement for the others.
+
+</div>
 
 ---
 

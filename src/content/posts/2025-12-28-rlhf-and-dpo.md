@@ -1,6 +1,6 @@
 ---
 title: "RLHF, DPO, and the alignment training stack"
-description: "How LLMs get from 'next-token predictor' to 'helpful assistant.' The post-training pipeline in 2026."
+description: "Compare supervised tuning, offline preference optimization, reward-model RL, and task-specific verification by their data, objectives, costs, and failure modes."
 date: "2025-12-28"
 draft: false
 tags: ["concepts"]
@@ -10,12 +10,14 @@ category: "concepts"
 
 ## Summary
 
-The post-training pipeline turning a base LLM (fluent, raw next-token predictor) into a useful assistant. Standard 2026 stack: **supervised fine-tuning (SFT) -> preference optimization (DPO or RLHF)** plus optional safety / RL.
+Post-training adapts a pretrained model toward desired task behavior.
+A useful comparison is **supervised fine-tuning, offline preference optimization, and reward-driven policy optimization**; real programs need not use one fixed order or every stage.
 
-A base LLM trained on internet text is fluent but not useful. It will continue your prompt as if it were the next bit of internet text, not as a helpful answerer. Post-training is what turns the base model into Claude, ChatGPT, or any other production assistant.
+A base model's next-token objective does not itself specify the assistant behavior a product requires.
+Post-training changes that behavior, but pretraining data, architecture, inference policy, tools, and deployment controls also affect the resulting system.
 
 Understanding the post-training stack matters because:
-- Most of the differences between LLMs in 2026 come from post-training, not from architecture or pretraining.
+- Distinguish changes caused by data, objectives, and sampling from changes elsewhere in the model or product.
 - Many production fine-tuning decisions are about which post-training stage to invest in.
 - Interviewers test this because it's the live frontier of LLM development.
 
@@ -31,12 +33,13 @@ Train on trillions of tokens of internet text with next-token prediction. Produc
 
 Train the base model on examples of (prompt, ideal response) pairs. The model learns the *format* of being a helpful assistant.
 
-- Data: 10K-1M instruction-response pairs, often a mix of human-written and model-generated.
+- Data: instruction-response examples with an explicit target distribution, provenance, coverage, and quality checks. Dataset size is a design input, not a universal recipe.
 - Loss: standard cross-entropy on the response tokens (mask the prompt).
-- Effect: model now follows instructions, uses formatting, refuses obvious bad requests.
-- Cost: a few thousand GPU-hours at most for a 70B model; trivially feasible.
+- Effect: behavior can move toward the demonstrations; generalization and policy adherence still require evaluation.
+- Cost: estimate processed tokens, epochs, sequence lengths, parameter-update method, hardware throughput, memory, and evaluation overhead. Parameter count alone does not provide an upper bound or feasibility guarantee.
 
-The quality of SFT data is the dominant factor. A small (~10K) high-quality SFT dataset typically beats a large (~1M) noisy one.
+Compare data quality, diversity, coverage, and volume with matched budgets and held-out tasks.
+A small curated set beating a larger noisy set in one study is not a universal size-versus-quality law.
 
 ### Stage 2: Preference optimization
 
@@ -86,16 +89,19 @@ Cons: complex pipeline, RL stability issues, requires careful reward model maint
 Pros: no separate reward model, no RL, much simpler pipeline.
 Cons: requires offline preference data; can be less stable than RLHF in some regimes.
 
-**The 2026 picture**: DPO and its variants (IPO, KTO, ORPO) have become the default for most teams because of simplicity. Big labs (Anthropic, OpenAI) still use RL-based methods for the most polished models, but the gap is narrowing.
+**Choose by the learning problem:** offline preference methods remove a rollout loop, whereas RL methods can collect new policy samples against a reward signal.
+Compare objectives, data support, reward reliability, compute, and held-out behavior rather than infer a universal team default or quality ordering.
 
 ### Stage 3 (optional): On-policy RL with verifiable rewards
 
-For tasks where correctness is checkable (math, code, factual Q&A), use RL with the verifier as the reward signal:
+When a task has a sufficiently reliable checker, its output can supply a reward signal:
 - Sample multiple responses from the model.
 - Verify each (run the code, check the math, look up the fact).
 - Use the verification signal as a reward (PPO, GRPO, or similar).
 
-This is what produced the recent jumps in math/reasoning capability (DeepSeek-R1 style training, OpenAI's o-series, etc.). Not yet universal but clearly the direction the frontier is going.
+Passing visible tests, matching one answer key, or finding a citation verifies only the checker's covered properties.
+Measure false accepts, exploitation, task coverage, and held-out behavior before treating the reward as correctness.
+Named reasoning-model results are evidence about their reported recipes, not a guarantee for every checker or task.
 
 ### Stage 4 (optional): Safety and constitutional training
 
@@ -108,10 +114,11 @@ If asked about the LLM post-training stack:
 1. Distinguish pretraining from post-training.
 2. Describe SFT (instruction tuning) as the first step.
 3. Describe preference optimization (RLHF or DPO) as the second step.
-4. Mention DPO has largely displaced RLHF in 2026 due to simplicity.
-5. Mention that on-policy RL with verifiable rewards is the new frontier for reasoning capabilities.
+4. Explain which components offline DPO removes and which data/reference assumptions remain.
+5. State when a task-specific verifier supplies useful reward and which failures its checks miss.
 
-Bonus: discuss data quality (SFT data quality &gt;&gt; SFT data quantity), reward hacking (models gaming the reward model), and KL penalties (preventing the policy from deviating too far from the SFT model).
+Bonus: discuss data coverage, reward hacking, and KL regularization.
+A KL penalty changes the optimization trade-off; it does not establish a hard bound on every policy change.
 
 ## DPO vs RLHF in detail
 
@@ -121,11 +128,14 @@ L_DPO = -log sigmoid(beta * [log(pi_theta(y_w|x) / pi_ref(y_w|x)) - log(pi_theta
 ```
 where `y_w` is the winning response, `y_l` is the losing response, `pi_theta` is the policy, `pi_ref` is the SFT model, `beta` is a temperature.
 
-Intuition: increase the model's likelihood of `y_w` relative to `y_l`, normalized by the SFT model's likelihoods (the implicit reward). The KL constraint to the SFT model is built into the loss form.
+Intuition: increase the winning-versus-losing response log-likelihood margin relative to the reference.
+This does not require the winning response's absolute probability to increase at every update.
+DPO is derived from a KL-regularized preference setup under its modeling assumptions; the empirical pairwise objective is not a hard measured-KL constraint.
 
 vs RLHF: separate reward model, sampling from the policy, gradient updates via PPO with the reward model providing rewards. More moving parts; more flexible.
 
-The empirical picture: comparable quality, much simpler implementation. For most teams, DPO is the right choice unless you have specific reasons to need RL.
+Offline DPO can simplify infrastructure, but comparative quality depends on the data, objective, model, and evaluation.
+Choose after testing the relevant behavior and cost trade-offs, not from an assumed universal preference for one method.
 
 ## Common confusions
 
@@ -137,7 +147,7 @@ The empirical picture: comparable quality, much simpler implementation. For most
 ## Open problems in 2026
 
 - **Reward hacking**: model finds ways to get high reward that don't correspond to actual quality (e.g., sycophancy, length bias, format gaming).
-- **Calibration**: post-trained models are typically *less* calibrated than base models. Hard to recover.
+- **Calibration**: post-training changes the model and score distribution. Measure the declared confidence target on independent data rather than assume a universal direction of change.
 - **Long-horizon RL**: hard to do RL on tasks requiring many tokens of reasoning before the reward is observable.
 - **Generalization of safety**: a model trained to refuse one category of harmful request may or may not generalize to related categories.
 

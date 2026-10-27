@@ -10,7 +10,7 @@ const pointers = (fixed, left, right, fixedLabel = `fixed i=${fixed}`) => [
 const draft = visual('After sorting and fixing one value, pointer moves discard pairs that cannot sum to its complement.', [
   frame(
     'Sort and test first -4',
-    'Input [-1, 0, 1, 2, -1, -4] sorts to [-4, -1, -1, 0, 1, 2]. With fixed -4, -4 + -1 + 2 = -3, so move L right.',
+    'Sort the input and fix -4. The smallest left value with the largest right value still gives a low total.',
     array(sorted, pointers(0, 1, 5), {
       coveredRange: 'pair search [1..5]',
       total: '-4 + -1 + 2 = -3 < 0',

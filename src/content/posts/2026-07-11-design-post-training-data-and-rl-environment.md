@@ -9,7 +9,18 @@ category: "questions"
 
 > Improve a tool-using agent's ability to resolve support tickets. Design the data, environment, grader, training loop, and evaluation. The agent must not access unauthorized account data.
 
-Begin with behavior, not an RL algorithm. Define what a successful trajectory looks like, which actions are forbidden, and what evidence distinguishes genuine success from reward hacking. PPO, DPO, or another optimizer cannot rescue an environment that rewards the wrong thing.
+Design post-training data and an evaluation environment that improve a support agent's authorized task completion rather than merely its reward score.
+
+## Problem
+
+**Context.** A hypothetical tool-using agent resolves support tickets using account data and actions governed by user permissions.
+Training may use demonstrations, preferences, or environment feedback.
+
+**Task.** Specify target behavior, data provenance, environment state and tools, graders, training objective, and independent evaluation.
+Explain how you would detect reward exploitation, overfitting, and failure to transfer to real support work.
+
+**Constraints.** Unauthorized account access is forbidden, even if it improves measured ticket completion.
+Separate training rewards from held-out success evidence; preserve privacy, environment versioning, and realistic action consequences in contained tests.
 
 ## The design sequence
 

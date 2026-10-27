@@ -1,12 +1,73 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { getPracticeMode, INTERVIEW_ROUNDS } from '../src/data/prepCurriculum';
 import { getSubcategoryMap } from '../src/utils/subcategories';
 import { buildPrepTracks, buildReadingTopics, buildStudyRoutes, practiceStatus, prepTrackMinutes, questionPair, studyBudget } from '../src/utils/prepRoutes';
 import { currentPlanWeek, nextPrepTasks, parsePrepBackup, PREP_PLAN_KEY, restorePrepBackup, type PrepPlanState } from '../src/utils/prepPlan';
 import { ACTIVITY_PROGRESS_KEY } from '../src/utils/activityProgress';
 import { markMixedSessionVerified, PREP_PROGRESS_KEY, savePracticeProgress, type PracticeProgressRecord } from '../src/utils/prepProgress';
+import { getColdPrompt, getLearningContext, getMechanismFamilies, mechanismReadingOrder } from '../src/utils/learningMechanisms';
+
+test('cold questions expose the task and exclude the picture, code and changed requirements', () => {
+  const source = readFileSync(new URL('../src/content/posts/2026-09-01-subarray-sum-equals-k.md', import.meta.url), 'utf8');
+  const prompt = getColdPrompt(source)!;
+  assert.ok(prompt.includes('nonempty contiguous subarrays'));
+  assert.ok(prompt.includes('[1, -1, 1, -1, 1]'));
+  assert.ok(!prompt.includes('prefix_count'));
+  assert.ok(!prompt.includes('longest_sum'));
+  assert.equal(getColdPrompt('## Problem\n\nFind a route.\n\n## Picture\n\nSecret solution.'), 'Find a route.');
+  const posts = readdirSync(new URL('../src/content/posts/', import.meta.url));
+  const coding = new Set(readdirSync(new URL('./coding-visuals/problems/', import.meta.url)).map(file => file.replace(/\.mjs$/, '')));
+  const questions = mechanismReadingOrder.filter(slug => getLearningContext(slug)?.article.href.startsWith('/questions/'));
+  assert.equal(questions.length, 191);
+  for (const slug of questions) {
+    const file = posts.find(name => name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/\.md$/, '') === slug);
+    assert.ok(file, slug);
+    const statement = getColdPrompt(readFileSync(new URL(`../src/content/posts/${file}`, import.meta.url), 'utf8'))!;
+    assert.ok(statement, slug);
+    const labels = coding.has(slug) ? ['Input', 'Output', 'Rules', 'Example'] : ['Context', 'Task', 'Constraints'];
+    let previous = -1;
+    for (const label of labels) {
+      const position = statement.indexOf(`${label}.`);
+      assert.ok(position > previous, `${slug}: cold prompt must retain ${label} in statement order`);
+      previous = position;
+    }
+  }
+});
+
+test('mechanism reading links resolve one owner without changing question identity', () => {
+  const question = getLearningContext('why-does-dropout-work');
+  assert.equal(question?.article.slug, 'why-does-dropout-work');
+  assert.equal(question?.article.href, '/questions/why-does-dropout-work/');
+  assert.equal(question?.owner.slug, 'dropout');
+  assert.ok(getLearningContext('dropout')?.applications.some((piece) => piece.slug === question?.article.slug));
+  assert.equal(getLearningContext('not-a-real-article'), undefined);
+});
+
+test('cold debugging tasks retain the supplied program and indentation without its repair', () => {
+  const source = readFileSync(new URL('../src/content/posts/2025-12-01-debug-training-loop.md', import.meta.url), 'utf8');
+  const prompt = getColdPrompt(source)!;
+  assert.ok(prompt.includes('model = MyModel()'));
+  assert.ok(prompt.includes('    for x, y in dataloader:'));
+  assert.ok(prompt.includes('        loss.backward()'));
+  assert.ok(!prompt.includes('TensorDataset'));
+  assert.ok(!prompt.includes('set_to_none=True'));
+});
+
+test('every mechanism has its own member owner and ordered prerequisites', () => {
+  assert.equal(getMechanismFamilies().length, 285);
+  assert.equal(mechanismReadingOrder.length, 391);
+  const positions = new Map(mechanismReadingOrder.map((slug, index) => [slug, index]));
+  for (const slug of mechanismReadingOrder) {
+    const context = getLearningContext(slug)!;
+    assert.ok(context.family.members.includes(context.owner.slug));
+    assert.ok(context.required.every((piece) => positions.get(piece.slug)! < positions.get(slug)!));
+    const destinations = [...context.applications, ...context.related].map((piece) => piece.slug);
+    assert.equal(new Set(destinations).size, destinations.length);
+    assert.ok(!destinations.includes(slug));
+  }
+});
 
 const today = '2026-09-05';
 const plan: PrepPlanState = {

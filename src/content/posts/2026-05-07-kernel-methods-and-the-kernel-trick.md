@@ -9,23 +9,30 @@ category: "concepts"
 
 ## Summary
 
-A **kernel** $k(x, x') = \langle \phi(x), \phi(x') \rangle$ computes the inner product of two points in a feature space defined by $\phi$, without explicitly evaluating $\phi$. Algorithms expressible in terms of inner products (SVM, Gaussian processes, kernel PCA, kernel ridge regression) can swap dot products for $k$ and operate implicitly in feature space.
-
-Linear models are limited to linear decision boundaries. The classical fix was to engineer nonlinear features and run a linear model on them. Kernel methods give you that move for free: any positive-definite kernel implicitly defines a (potentially infinite-dimensional) feature space, and the algorithm only ever touches inner products.
-
-This was the dominant nonlinear ML approach from roughly 1995 to 2012. Then deep learning replaced it for almost every supervised task. Kernels remain central to Gaussian processes, attention (the softmax of $Q K^\top$ is a kernelized similarity), and certain interpretability and theoretical-analysis tools (NTK, kernel ridge regression as a baseline).
+A kernel computes a feature-space inner product without explicitly constructing the feature vectors.
+Write $k(x,x')=\langle\phi(x),\phi(x')\rangle$.
+An algorithm expressed through these inner products can use the kernel directly, preserving the feature-space calculation.
+The shortcut avoids feature construction; it does not automatically avoid pairwise dataset storage or expensive training solves.
 
 ## The trick
 
-Suppose your algorithm only reads data through inner products $\langle x_i, x_j \rangle$. Substitute $k(x_i, x_j)$. You are now running the algorithm in the feature space defined by $\phi$, where $k(x_i, x_j) = \langle \phi(x_i), \phi(x_j) \rangle$, without touching $\phi$.
-
-Concrete example: polynomial kernel of degree 2 in $\mathbb{R}^d$:
+Suppose the desired feature-space algorithm reads inputs only through $\langle\phi(x_i),\phi(x_j)\rangle$.
+For two-dimensional inputs, consider
 
 $$
 k(x, x') = (x^\top x' + 1)^2.
 $$
 
-Expand it. You will find this equals $\langle \phi(x), \phi(x') \rangle$ where $\phi$ maps to a $\binom{d+2}{2}$-dimensional space of monomials up to degree 2. Computing $\phi$ explicitly is $O(d^2)$ memory and compute; computing $k$ is $O(d)$.
+An exact feature map is
+
+$$
+\phi(x)=(x_1^2,\sqrt2x_1x_2,x_2^2,\sqrt2x_1,\sqrt2x_2,1).
+$$
+
+Expanding the feature inner product reproduces the squared polynomial, including its cross-term coefficients.
+For $x=(2,1)$ and $x'=(1,3)$, the six contributions are $4,12,9,4,6,1$, totaling $36$.
+The shortcut obtains $(5+1)^2=36$ from the original coordinates.
+In $d$ dimensions, explicit degree-two features number $\binom{d+2}{2}$; one kernel evaluation needs $O(d)$ arithmetic.
 
 <!-- visual:kernel-trick-exact-shortcut -->
 <figure class="learning-figure plot-panel" aria-labelledby="kernel-shortcut-title">
@@ -66,60 +73,102 @@ Expand it. You will find this equals $\langle \phi(x), \phi(x') \rangle$ where $
 		<text class="viz-callout" x="180" y="378" text-anchor="middle">same inner product: 36</text>
 		<text class="viz-node-value" x="180" y="395">exact shortcut, not an approximation</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare the routes from top to bottom. The explicit route builds two six-coordinate vectors and dots them. The kernel route keeps the original two coordinates, computes <var>x</var> · <var>x</var>′ = 5, and returns (5 + 1)² = 36 directly. Both routes produce exactly the same inner product; the trick skips materializing φ(<var>x</var>) and φ(<var>x</var>′), not mathematical accuracy. This is an original worked schematic checked against <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's SVM tutorial</a> and the <a href="https://scikit-learn.org/stable/modules/svm.html#svm-kernels">scikit-learn SVM formulation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both routes return 36. The explicit route constructs six-coordinate features; the kernel route evaluates the polynomial directly. This skips feature construction without approximating the inner product. References: <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's SVM tutorial</a> and <a href="https://scikit-learn.org/stable/modules/svm.html#svm-kernels">scikit-learn's SVM formulation</a>.</figcaption>
 </figure>
 
-For the **RBF kernel** $k(x, x') = \exp(-\|x - x'\|^2 / 2\sigma^2)$, the implicit feature space is infinite-dimensional. You cannot compute $\phi$ explicitly even in principle.
+### Change the Distance Scale
+
+**New task:** Define similarity through distance rather than a fixed polynomial expansion.
+
+**Picture and change:** Use the Gaussian RBF kernel $k(x,x')=\exp(-\lVert x-x'\rVert^2/(2\sigma^2))$, with $\sigma>0$.
+
+**Check:** The example's squared distance is $5$.
+Bandwidths $\sigma=1,2$ give $e^{-5/2}\approx0.0821$ and $e^{-5/8}\approx0.5353$.
+
+**Use when:** A distance-based smooth similarity matches the task.
+Over a continuous input domain, this kernel generally needs an infinite-dimensional exact feature space, not a finite polynomial map.
 
 ## The Gram matrix
 
-For a dataset of $N$ points, the kernel defines an $N \times N$ **Gram matrix** $K_{ij} = k(x_i, x_j)$. Many kernel algorithms reduce to operations on $K$:
+For $N$ points, the Gram matrix has entries $K_{ij}=k(x_i,x_j)$ and shape $N\times N$.
 
-- **Kernel ridge regression**: $\hat{f}(x) = \sum_i \alpha_i k(x_i, x)$ where $\alpha = (K + \lambda I)^{-1} y$.
+- **Kernel ridge regression**: solve $(K+\lambda I)\alpha=y$, then predict $\sum_i\alpha_i k(x_i,x)$.
+	This convention uses an unnormalized squared-error sum plus $\lambda$ times the squared function norm.
 - **Kernel PCA**: eigendecompose the centered $K$.
 - **Gaussian processes**: use $K + \sigma^2 I$ as the covariance.
 - **SVM**: dual formulation depends only on $K$ and labels.
 
-The Gram matrix shape is the bottleneck: $O(N^2)$ memory, $O(N^3)$ to invert. Limits naive kernel methods to roughly $N \le 10^5$.
+**New task:** Train when a dense Gram matrix exceeds the memory budget.
+
+**Picture and change:** Approximate $K$ with landmark columns $C$ and their Gram matrix $W$: $\widetilde K=CW^\dagger C^\top$.
+
+**Check:** For $K=I_2$ and only the first landmark, $\widetilde K=\operatorname{diag}(1,0)$.
+The second direction is lost; this is no longer the exact kernel trick.
+
+**Use when:** Measured approximation error is acceptable.
+A float64 matrix with $100{,}000$ rows requires $80$ decimal GB before factorization or solver workspace.
+Dense direct solves cost cubic arithmetic; practical limits depend on hardware and solver structure.
 
 ## What makes a valid kernel
 
-$k$ must be **positive semi-definite**: for any finite set of points, the Gram matrix $K$ is PSD ($v^\top K v \ge 0$ for all $v$). Equivalently, $k(x, x') = \langle \phi(x), \phi(x') \rangle$ for some $\phi$ into some inner-product space (Mercer's theorem).
+A real kernel must be symmetric and give a positive-semidefinite Gram matrix for every finite input collection.
+Feature inner products satisfy this because
+
+$$
+a^\top Ka=\left\lVert\sum_i a_i\phi(x_i)\right\rVert^2\ge0.
+$$
+
+The converse supplies a Hilbert-space feature representation.
+Mercer expansions additionally require their own domain and regularity conditions.
 
 Common kernels:
 
 - **Linear**: $k(x, x') = x^\top x'$. The trivial case.
-- **Polynomial**: $k(x, x') = (x^\top x' + c)^d$.
-- **RBF / Gaussian**: $k(x, x') = \exp(-\gamma \|x - x'\|^2)$. The default.
-- **Laplacian**: $k(x, x') = \exp(-\gamma \|x - x'\|_1)$.
+- **Polynomial**: $(x^\top x'+c)^p$, with nonnegative integer degree $p$ and $c\ge0$.
+- **RBF / Gaussian**: $\exp(-\gamma\lVert x-x'\rVert^2)$, with $\gamma\ge0$.
+- **Laplacian**: $\exp(-\gamma\lVert x-x'\rVert_1)$, with $\gamma\ge0$.
 - **String kernels**: count shared substrings.
 - **Graph kernels**: count shared subgraphs.
 
-Combinations of valid kernels (sums, products, scalings) are valid kernels. Standard recipe for engineering domain-specific kernels.
+Sums, pointwise products, and nonnegative scalings preserve validity; arbitrary negative scaling does not.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## Kernel trick in attention
 
-A bilinear attention score $s(q, k) = q^\top k / \sqrt{d}$ is the linear kernel. Linear attention papers replace this with feature-map kernels $\phi(q)^\top \phi(k)$ for cheaper computation; a softmax-attention variant can be approximated by random Fourier features for the RBF kernel.
+An inner product in a common feature space is a linear kernel.
+Attention may use different query and key maps, producing an asymmetric cross-score matrix.
+Row-normalized attention is not automatically a symmetric PSD Gram matrix.
+Feature-map attention methods require their particular approximation and normalization guarantees; they are not all RBF random-feature substitutions.
 
 ## Why deep learning won
 
-Kernels make a strong assumption: the right similarity function is fixed in advance. Deep learning learns the feature representation jointly with the task. For high-dimensional structured data (images, text, audio), learned representations beat hand-picked kernels by huge margins.
-
-Kernels remain useful when:
-
-- Data is small (Gaussian processes).
-- The kernel encodes domain knowledge (string kernels in computational biology).
-- Theoretical analysis is the goal (NTK, infinite-width networks).
+Learned representations can adapt similarity to a task; a fixed kernel imposes a chosen geometry.
+Neither guarantees better results across all datasets.
+Kernels remain useful for structured prior similarity, Gaussian processes, controlled baselines, and theoretical analysis.
 
 ## Common pitfalls
 
-- **Confusing the kernel trick with the kernel matrix**. The trick is the substitution; the matrix is the data structure.
-- **Using RBF without scaling**. Standardize or whiten features first; the bandwidth $\gamma$ is sensitive to feature scale.
-- **Treating kernel methods as scalable**. The $O(N^2)$ Gram matrix kills naive applications above $\sim 10^5$ points. Approximations (Nyström, random Fourier features, inducing points for GPs) exist.
-- **Conflating "kernel" in the SVM sense with "kernel" in the convolution sense**. Two unrelated meanings of the same word.
+- **Missing coefficients.** Omitting the square-root-two factors changes the polynomial feature inner product.
+- **Uncontrolled scale.** Feature units change RBF distances and the effective bandwidth.
+- **Confusing shortcuts.** An exact kernel evaluation and an approximate low-rank Gram matrix make different guarantees.
+- **Overloaded terminology.** A convolution filter called a kernel need not define a PSD similarity function.
+
+## Reconstruct
+
+<details>
+<summary>Does a symmetric similarity matrix always define a valid kernel?</summary>
+
+No. $\begin{bmatrix}1&2\\2&1\end{bmatrix}$ is symmetric but has eigenvalue $-1$.
+For $a=(1,-1)^\top$, its quadratic form is $-2$, which cannot be a squared feature norm.
+
+</details>
 
 ## Related
 
 - [SVM and the kernel trick](/concepts/svm-and-kernels/).
 - [Gaussian processes](/concepts/gaussian-processes/).
 - [The attention mechanism](/concepts/attention-mechanism/).
+
+</div>

@@ -9,7 +9,19 @@ category: "questions"
 
 > Implement exact top-k cosine retrieval for query matrix `Q` and item matrix `X`. The full `Q @ X.T` matrix does not fit in memory.
 
-This is the retrieval stage of an embedding system (two-tower recsys, semantic search, RAG) written by hand: score a batch of query embeddings against the item matrix and keep the top-k neighbors when the full score matrix will not fit in memory. It tests vectorization, numerical hygiene, and memory reasoning, not knowledge of a particular ANN library.
+Retrieve the highest-scoring item indices for many queries without storing the full query-by-item similarity matrix.
+
+## Problem
+
+**Context.** Floating matrices `Q` and `X` have shapes `(num_queries, dim)` and `(num_items, dim)` with matching feature dimensions.
+The full score matrix exceeds available memory.
+
+**Task.** Return item indices and cosine scores shaped `(num_queries, k)`, sorted by nonincreasing score for each query.
+For query `[1, 0]`, items `[[1, 0], [0, 1], [-1, 0]]`, and `k = 2`, return indices `[0, 1]`, scores `[1, 0]`.
+
+**Constraints.** Use `1 <= k <= num_items`, a positive block size, and finite representable arithmetic.
+For exact cosine under the reference's norm floor, nonzero norms must be at least `1e-12`; zero vectors score zero.
+Preserve inputs and avoid the full score matrix. Tied membership and ordering may be arbitrary unless a stricter policy is added.
 
 ## Contract
 

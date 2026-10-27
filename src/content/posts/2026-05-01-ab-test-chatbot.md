@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: LLM-team and product-ML interviews.*
 
-The L4 candidate proposes thumbs up/down. The L6 candidate identifies the right unit of randomization, the right metric, and the operational constraints of testing on conversations rather than single requests.
+Design an online chatbot experiment whose randomization, outcomes, and safety checks reflect complete user conversations.
+
+## Problem
+
+**Context.** A candidate chatbot differs from the current version, and users may exchange several dependent messages across sessions.
+The product needs evidence of better task outcomes before a broad release.
+
+**Task.** Choose a randomization unit, primary outcome, guardrails, exposure logging, sample-size assumptions, and a launch rule.
+Explain how session continuity, carryover, user feedback, and delayed outcomes affect interpretation.
+
+**Constraints.** Do not count correlated turns as independent users or substitute thumbs-up rates for task success without validation.
+Predeclare stopping and harm boundaries, preserve privacy, and distinguish assignment from the treatment actually delivered.
 
 ## What an L4 answer sounds like
 

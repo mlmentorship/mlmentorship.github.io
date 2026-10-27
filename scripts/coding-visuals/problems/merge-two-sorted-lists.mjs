@@ -65,7 +65,7 @@ const draft = visual('Compare the two frontier nodes, link the smaller after tai
   frame('Attach B3', '4 > 3, so B2.next=B3; advance second to B8 and tail to B3.', state(['A1', 'B2', 'B3'], 'B3', 'A4', 'B8', { comparison: '4 > 3', fixedPrefix: '1->2->3' }), 'attach-b3'),
   frame('Attach A4', '4 <= 8, so B3.next=A4; advance first to A7 and tail to A4.', state(['A1', 'B2', 'B3', 'A4'], 'A4', 'A7', 'B8', { comparison: '4 <= 8', fixedPrefix: '1->2->3->4' }), 'attach-a4'),
   frame('Attach A7', '7 <= 8, so A4.next=A7; advance first to null and tail to A7.', state(['A1', 'B2', 'B3', 'A4', 'A7'], 'A7', null, 'B8', { comparison: '7 <= 8', fixedPrefix: '1->2->3->4->7' }), 'attach-a7'),
-  frame('Append the remaining suffix', 'first is null, so set A7.next=B8 and return dummy.next.', state(['A1', 'B2', 'B3', 'A4', 'A7', 'B8'], 'B8', null, null, { fixedPrefix: '1->2->3->4->7->8', result: '[1,2,3,4,7,8]' }), 'append-b8'),
+  frame('Append the remaining suffix', 'Set A7.next=B8 and return dummy.next. Tail stays at A7; second stays at B8.', state(['A1', 'B2', 'B3', 'A4', 'A7', 'B8'], 'A7', null, 'B8', { fixedPrefix: '1->2->3->4->7->8', result: '[1,2,3,4,7,8]' }), 'append-b8'),
 ]);
 
 export default defineVisual('merge-two-sorted-lists', draft, {

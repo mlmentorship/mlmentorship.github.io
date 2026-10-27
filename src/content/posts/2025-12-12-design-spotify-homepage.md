@@ -1,6 +1,6 @@
 ---
 title: "Design Spotify's homepage"
-description: "A multi-shelf, multi-objective recommendation surface. The senior answer scopes the shelves first, then designs each as its own ranker with a meta-layer above."
+description: "Compose coherent music shelves under page-level utility, repetition, editorial, freshness and privacy constraints rather than sorting unrelated local scores."
 date: "2025-12-12"
 draft: false
 tags: ["questions"]
@@ -8,117 +8,170 @@ category: "questions"
 ---
 
 
-> *Asked in: recsys system design at music / video / content companies.*
+Design a music homepage whose selected shelves work together rather than merely ranking each shelf independently.
 
-The L4 candidate proposes one ranker. The L6 candidate decomposes the surface into shelves with distinct objectives and a meta-layer that decides what gets shown.
+## Problem
 
-## What's distinctive about a homepage
+**Context.** A Spotify-like homepage combines shelves for different listening intents; the invented candidates below can overlap.
 
-It's not one recommendation problem. A homepage like Spotify's has many shelves (Made For You, Recently Played, New Releases, Daily Mix, Discover Weekly, Podcasts, etc.), each with a distinct purpose:
-- Some surface what the user already loves (low novelty, high engagement).
-- Some surface new things (high novelty, lower per-item engagement, long-term retention).
-- Some are personalized; some are editorial.
+**Task.** Choose two shelves under the stated page-utility model, then explain selection, ordering, feedback, and evaluation in a full design.
+Distinguish choosing a pair from choosing its display order.
 
-The hardest design decision is how the shelves *interact*: which appear, in what order, with what content.
+**Constraints.** Use the stipulated common utility units and pair penalties only for this toy calculation.
+Respect eligibility and policy boundaries; do not present the example as Spotify's internal implementation or a causal user-benefit estimate.
 
-<p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace why ranked item lists become candidates for a second decision that composes the whole homepage.</p>
+Design a Spotify-like homepage with coherent shelves for familiar favorites, discovery, new releases and editorial selections.
+These names illustrate the surface, not Spotify's current internal implementation.
+
+Choose two shelves from three eligible candidates.
+For this toy calculation only, local scores share utility units; showing A with B incurs an overlap penalty of four.
+Other pair penalties are zero, and every pair meets the hard policy constraints.
+
+| Shelf | Intent and illustrative contents | Local score |
+| --- | --- | ---: |
+| A | Familiar: songs 1, 2 | 6 |
+| B | Repeat: songs 1, 3 | 5 |
+| C | Discovery: songs 4, 5 | 4 |
+
+Which pair wins page utility, and does that calculation establish its display order?
+
+## Picture: A Shelf Is One Page Candidate
+
+Keep each shelf's coherent item list intact, then compare whole-page choices.
+
+$$
+U(\{i,j\})=s_i+s_j-\operatorname{penalty}(i,j).
+$$
+
+| Pair | Raw local score | Pair penalty | Page utility |
+| --- | ---: | ---: | ---: |
+| A+B | 11 | 4 | 7 |
+| A+C | 10 | 0 | 10 |
+| B+C | 9 | 0 | 9 |
+
+Sorting local scores selects A+B; the explicit page objective selects A+C.
+This symmetric utility determines membership, not relative position.
+Ordering needs a position-sensitive policy and exposure evidence.
+
+<p class="visual-kicker">Local scores versus whole-page utility</p>
+<p class="visual-title">A+C beats the locally strongest pair under the stated overlap penalty.</p>
 
 <!-- visual:spotify-two-level-shelf-composition -->
 ```mermaid
 flowchart TB
-  accTitle: Two ranking levels compose a multi-shelf recommendation homepage
-  accDescr: At the first level, separate pipelines build or rank coherent shelves for familiar favorites, discovery, new releases, and editorial content. Each produces a completed shelf candidate with its own intent and local objective. At the second level, a page composer receives those completed shelf candidates plus user and session context. It selects which shelves appear and orders them while enforcing cross-shelf diversity, editorial commitments, and repetition constraints. The output is an ordered homepage of intact shelves. Evaluation keeps local shelf outcomes separate from page and long-term outcomes, so a locally strong shelf does not automatically dominate the page.
-
-  subgraph LOCAL["LEVEL 1 · BUILD OR RANK EACH SHELF"]
-	direction TB
-    Familiar["FAMILIAR FAVORITES<br/>retrieve + rank items<br/>completion · repeat"]
-    Discovery["DISCOVERY<br/>retrieve + rank items<br/>appeal · novelty"]
-    Fresh["NEW RELEASES<br/>retrieve + rank items<br/>taste · freshness"]
-    Editorial["EDITORIAL<br/>curated coherent list<br/>market · cultural context"]
-    Familiar ~~~ Discovery ~~~ Fresh ~~~ Editorial
-  end
-
-  Context["USER + SESSION CONTEXT<br/>history · device · time<br/>recent activity"]
-  Composer{"LEVEL 2 · PAGE COMPOSER<br/>select + order shelves<br/>diversity · repetition<br/>editorial mix"}
-  Homepage["ORDERED HOMEPAGE<br/>shelf 1 · shelf 2 · shelf 3 · …"]
-  Evidence["KEEP TWO SCORECARDS<br/>local: shelf engagement<br/>global: session quality<br/>return · satisfaction"]
-
-  Familiar -->|"shelf candidate"| Composer
-  Discovery -->|"shelf candidate"| Composer
-  Fresh -->|"shelf candidate"| Composer
-  Editorial -->|"shelf candidate"| Composer
-  Context ==> Composer
-  Composer ==> Homepage
-  Homepage --> Evidence
-  Evidence -.->|"improve a<br/>learned shelf"| Familiar
-  Evidence -.->|"improve page policy"| Composer
-
-  class Familiar,Discovery,Fresh,Editorial viz-input
-  class Context viz-state
-  class Composer viz-focus
-  class Homepage,Evidence viz-output
-  class Familiar viz-wide
+  accTitle: Three intact shelf candidates produce three distinct pair utilities
+  accDescr: Shelf A has familiar songs 1 and 2 and local score 6. Shelf B has repeat songs 1 and 3 and local score 5. Shelf C has discovery songs 4 and 5 and local score 4. A page composer compares eligible pairs with a stated penalty of four only for A plus B. A plus B has utility 7, A plus C has 10, and B plus C has 9. It selects intact shelves A and C. This symmetric example does not determine display order; position policy and local versus page outcomes require separate evidence.
+  Familiar["A: FAMILIAR<br/>songs 1, 2<br/>local score 6"]
+  Repeat["B: REPEAT<br/>songs 1, 3<br/>local score 5"]
+  Discovery["C: DISCOVERY<br/>songs 4, 5<br/>local score 4"]
+  Composer{"Eligible whole-page pairs<br/>shared toy utility units"}
+  PairAB["A+B: 6+5-4 = 7<br/>overlap penalty 4"]
+  PairAC["A+C: 6+4-0 = 10<br/>highest page utility"]
+  PairBC["B+C: 5+4-0 = 9"]
+  Select["SELECT INTACT A AND C<br/>display order remains unresolved"]
+  Evidence["Separate evidence:<br/>local shelf / page / long-term<br/>position and exposure retained"]
+  Familiar --> Composer
+  Repeat --> Composer
+  Discovery --> Composer
+  Composer --> PairAB
+  Composer --> PairAC
+  Composer --> PairBC
+  PairAC ==> Select --> Evidence
+  class Familiar,Repeat,Discovery viz-input
+  class Composer,PairAC viz-focus
+  class PairAB,PairBC viz-neutral
+  class Select,Evidence viz-output
 ```
 
-<p class="diagram-caption"><strong>Read it this way:</strong> read the first stage as four complete recommendation products, not four item pools. Each emits a completed shelf with a distinct promise; editorial shelves may be curated rather than ranked. Only then does the page composer use session context to select and order those shelves under cross-shelf constraints. A shelf can win its local metric and still lose page position if it repeats another intent or harms longer-term outcomes. Original synthesis checked against Spotify's <a href="https://arxiv.org/abs/2607.25823">shelf-generation research</a> and <a href="https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage">homepage calibration work</a>, plus the <a href="https://doi.org/10.3389/fdata.2022.910030">multi-carousel evaluation study</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> compare intact pairs, not pooled songs. The penalty reverses the local-score choice; it is an explicit assumption, not a measured interaction effect.</p>
 
-## What an L5 answer sounds like
+<span id="whats-distinctive-about-a-homepage"></span>
+<span id="what-an-l5-answer-sounds-like"></span>
 
-> "Treat the homepage as two layers:
->
-> **Layer 1: per-shelf rankers.** Each shelf has its own retrieval and ranking pipeline tuned to its purpose:
-> - Made For You / Daily Mix: retrieve from user's listening history embedding space, rank by predicted listen-completion + repeat-listen probability.
-> - New Releases: retrieve from new content (last 7-30 days) matched to user taste; rank balancing freshness with personalization.
-> - Discover Weekly: retrieve far from user's history (exploration); rank by predicted appeal calibrated for novelty.
-> - Recently Played: simple recency.
->
-> Each shelf is its own multi-stage retrieve-then-rank pipeline.
->
-> **Layer 2: shelf composition.** A meta-ranker decides which shelves appear on the homepage and in what order, per user, per session. Inputs: user features, time of day, device, recent shelf engagement. Output: an ordered list of shelves to show.
->
-> **Eval**: each shelf has its own metrics (CTR, listen-time, completion). The composition layer optimizes a session-level metric (total session time, return rate, satisfaction). A/B test composition changes against a fixed baseline shelf order."
+## Decision Contract
 
-This is L5. Two layers, each shelf as its own ranker, meta-layer for composition.
+| Stage | Required state |
+| --- | --- |
+| Shelf | ID, intent, content membership, eligibility, score semantics and generator version |
+| Page | Candidate shelves, session context, position/exposure, utility and hard constraints |
+| Editorial | Authorized curation, market/rights constraints, commitments and overrides |
+| Freshness | Cache/version dependencies, privacy scope, expiry and invalidation |
+| Evaluation | Separate local, page and mature long-term targets, assignment, uncertainty and guardrails |
 
-## What an L6 answer adds
+Local click, completion and listen-time scores do not automatically share units.
+Use a defensible composer model or explicit common utility, and validate whole-page interactions.
+Specify diversity within shelves, across shelf intents and over time.
+Keep safety/rights constraints separate from soft novelty or repetition penalties.
 
-> "...practical things:
->
-> **Diversity is critical.** Without explicit diversity, the homepage collapses to similar items everywhere. Explicit diversification at three levels: within-shelf (don't show 10 songs from the same artist), across-shelf (different shelves should serve different intents), and over-time (don't show the same item every day).
->
-> **Editorial vs algorithmic mix.** Pure algorithmic recsys is fragile (filter bubbles, missed cultural moments). Editorial shelves (Today's Top Hits, regional charts, curated playlists) anchor the experience. The meta-ranker decides the mix.
->
-> **Cold-start handling.** New users see fewer personalized shelves and more popularity-based / editorial. Transition to personalized as listen history accumulates. New items get a freshness boost in candidate generation; their long-term ranking depends on accumulated engagement.
->
-> **Multi-task ranking per shelf.** Don't predict 'click probability' alone. Predict listen-time, completion, save, share, return-next-day. Combine with weights tuned via offline counterfactual eval and confirmed in A/B.
->
-> **Latency budget**: homepage loads need ~200ms p99. Cache aggressively per user (re-compute every few hours, not per request). For real-time signals (just-finished song), update only the affected shelves.
->
-> **Long-term metrics gate launches.** Short-term engagement is easy to optimize and easy to cannibalize the long-term experience. Track session-quality, return rate, churn proxies; require long-window A/B (4-8 weeks) for any composition change."
+<span id="common-follow-up"></span>
 
-## Tells that get you a strong-hire vote
+## Change 1: No Personal History or Preferences
 
-- You decompose into **shelves with distinct objectives**.
-- You add a **meta-ranker for composition**.
-- You bring up **editorial / algorithmic mix**.
-- You discuss **diversity at multiple levels**.
-- You insist on **long-window A/B tests** for composition changes.
+**New task.** A new user supplies no optional preferences.
 
-## Tells that get you down-leveled
+**Picture and change.** Use permitted context, eligible editorial/content priors and bounded exploration.
+Test new-user outcomes and abandonment; no universal familiar-first ordering is established.
 
-- One ranker for the whole homepage.
-- No mention of diversity or editorial content.
-- No cold-start handling.
-- Optimizing only short-term clicks.
+**Check.** Weak evidence does not authorize demographic inference or a fixed interaction-count switch.
 
-## Common follow-up
+**Use when.** Personalized shelf scores lack support.
 
-"How would you order the shelves for a brand-new user?"
+## Change 2: One Item Just Finished
 
-The L6 answer:
+**New task.** Recent activity changes one shelf while most cached candidates remain valid.
 
-> "For a new user with no history, the meta-ranker has no personal signal, so it falls back on three things: (1) editorial defaults (top playlists, popular new releases), (2) onboarding signal if any (genre selections from sign-up flow), (3) demographic and contextual proxies (region, device, time of day). The order should make engagement easy: hits and recognized content first, exploration second, personalized last (since the personalization will be weak). After a few sessions, transition to the personalized rank."
+**Picture and change.** Invalidate affected compatible state when useful; recheck page-wide repetition and policy constraints.
+Keep version, session, privacy and eligibility dependencies in cache keys/invalidation rules.
+
+**Check.** A high hit rate can hide stale or duplicated content.
+
+**Use when.** Recomputing every shelf is unnecessary.
+
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Failure: Every Shelf Wins the Same Click
+
+Independent local optimization can repeat one artist and intent across the page.
+Local engagement then overstates the value of the composed session.
+
+## Transfer Check
+
+Must every shelf have a learned multi-stage ranker?
+
+### Reasoned Answer
+
+No. Recently played can use recency; editorial shelves can be curated.
+Use retrieval and learned ranking only when justified by the shelf's requirements.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="what-an-l6-answer-adds"></span>
+
+## Shelf and Page Evidence
+
+Familiar, discovery and new-release shelves need different definitions of useful listening, novelty and freshness.
+Do not define discovery solely as distance from history or assume novelty improves retention.
+Content features can support eligible new items before interactions; any exposure boost remains bounded by policy and quality.
+
+Multi-task heads can estimate listen, completion, save, share and return outcomes on their proper populations.
+Combining calibrated heads does not automatically yield a calibrated utility or correct exposure bias.
+Log position, slate, eligibility and selection policy; counterfactual estimates require support and valid assumptions.
+
+Choose an end-to-end latency/cost target from product needs, then measure it under load.
+Cache duration depends on content, policy and session change, not a universal refresh interval.
+Compare composer changes with an appropriate randomized baseline and predefined local/page/long-term targets.
+Set experiment duration from outcome maturity, cycles and power; there is no mandatory four-to-eight-week window.
+Check attrition, creator/content coverage, satisfaction and operational guardrails before staged release and rollback readiness.
+
+## Sources
+
+- [Spotify shelf-generation research](https://arxiv.org/abs/2607.25823).
+- [Spotify homepage calibration](https://research.atspotify.com/2025/9/calibrated-recommendations-with-contextual-bandits-on-spotify-homepage).
+- [Multi-carousel evaluation study](https://doi.org/10.3389/fdata.2022.910030).
+
+</div>
 
 ---
 

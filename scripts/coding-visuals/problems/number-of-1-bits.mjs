@@ -1,10 +1,12 @@
 import { array, defineVisual, frame, mark, visual } from '../primitives.mjs';
 
 const bitCells = (value) => value.toString(2).padStart(8, '0').split('');
+const bitView = { fitArray: true, indexLabels: [7,6,5,4,3,2,1,0] };
 const clearFrame = (before, after, count, position, key) => frame(
   `Clear set bit ${count}`,
   `${before} & (${before} - 1) = ${after}; exactly the lowest remaining 1 changes to 0.`,
-  array(bitCells(after), [mark(position, `cleared #${count}`, after === 0 ? 'output' : 'focus', 'lowest-set-bit')], {
+  array(bitCells(after), [mark(position, `b=${7 - position}`, after === 0 ? 'output' : 'focus', 'lowest-set-bit')], {
+    ...bitView,
     input: 'value = 45 (00101101)',
     binaryOperation: `${before.toString(2).padStart(8, '0')} & ${(before - 1).toString(2).padStart(8, '0')} = ${after.toString(2).padStart(8, '0')}`,
     decimalOperation: `${before} & ${before - 1} = ${after}`,
@@ -17,8 +19,9 @@ const clearFrame = (before, after, count, position, key) => frame(
 const draft = visual('Each value & (value - 1) update removes one lowest set bit, so the number of loop iterations is the Hamming weight.', [
   frame(
     'Initialize value and count',
-    'For value 45 = 00101101, count starts at 0 and the lowest set bit is at bit position 0.',
-    array(bitCells(45), [mark(7, 'lowest 1', 'focus', 'lowest-set-bit')], {
+    'Start at 45 = 00101101 with count zero; the next removed bit is bit 0.',
+    array(bitCells(45), [mark(7, 'b=0', 'focus', 'lowest-set-bit')], {
+      ...bitView,
       value: '45',
       count: '0',
       loopCondition: '45 != 0',

@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import process from 'node:process';
+import { parse } from 'parse5';
 
 const root = resolve(import.meta.dirname, '..');
 const dist = join(root, 'dist');
@@ -22,6 +23,19 @@ const implementedVisuals = new Map();
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+function elements(root) {
+  const result = [];
+  const pending = [root];
+  while (pending.length) {
+    const node = pending.pop();
+    if (node.tagName) result.push(node);
+    pending.push(...(node.childNodes ?? []).toReversed());
+  }
+  return result;
+}
+
+const attribute = (node, name) => node.attrs?.find((item) => item.name === name)?.value;
 
 for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.json'))) {
   const audit = JSON.parse(readFileSync(join(auditsDir, filename), 'utf8'));
@@ -48,6 +62,21 @@ for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.j
   if (!html.includes(`/review/#${audit.slug}`)) failures.push(`${audit.slug}: library-wide visual-review link is missing`);
   if (!html.includes('href="#full-explanation"')) failures.push(`${audit.slug}: full-content jump is missing`);
   if (!html.includes('data-full-explanation')) failures.push(`${audit.slug}: full-content boundary is missing`);
+  if (category === 'questions') {
+    const nodes = elements(parse(html));
+    const lead = nodes.find((node) => attribute(node, 'data-article-quick-review') !== undefined);
+    if (!lead || attribute(lead, 'data-inline-visual') !== 'true' || attribute(lead, 'hidden') === undefined) {
+      failures.push(`${audit.slug}: question visuals must start hidden and retain authored placement after the statement`);
+    }
+    const answer = nodes.find((node) => attribute(node, 'id') === 'answer');
+    const body = answer ? elements(answer) : [];
+    const firstSection = body.find((node) => node.tagName === 'h2');
+    const lastField = body.findIndex((node) => node.tagName === 'strong' && ['Example.', 'Constraints.'].includes(node.childNodes?.map((child) => child.value ?? '').join('')));
+    const visual = body.findIndex((node) => /(?:^|\s)(?:learning-figure|mermaid)(?:\s|$)/.test(attribute(node, 'class') ?? ''));
+    if (attribute(firstSection ?? {}, 'id') !== 'problem' || lastField < 0 || visual <= lastField) {
+      failures.push(`${audit.slug}: the complete Problem statement must precede the solution visual`);
+    }
+  }
   implemented.set(audit.slug, 0);
   implementedVisuals.set(audit.slug, audit.implementation?.visualIds ?? []);
 }

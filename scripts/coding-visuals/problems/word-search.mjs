@@ -26,6 +26,7 @@ function searchGrid(depth, currentDepth, extra = {}) {
     key: index === currentDepth ? 'current-cell' : `path-${index}`,
   }));
   return grid(rows, marks, {
+    pathRoute: path.slice(0, depth).map(([row, col]) => [row, col]),
     word: 'ABCCED',
     matchedPrefix: path.slice(0, depth).map(([, , char]) => char).join(' -> ') || 'empty',
     callStack: path.slice(0, depth).map(([row, col, char], index) => `${char}@(${row},${col}),i=${index}`).join(' | ') || 'empty',
@@ -36,8 +37,9 @@ function searchGrid(depth, currentDepth, extra = {}) {
 const draft = visual('A recursive path owns its marked cells; failed directions return false, and every accepted cell is restored before that call returns.', [
   frame(
     'Start the outer scan',
-    'For the shown board and word ABCCED, the outer generator first calls search(0, 0, 0); A matches word[0].',
+    'Start ABCCED at A in cell (0,0); each active call owns one marked coordinate.',
     grid(board, [{ row: 0, col: 0, label: 'start A', tone: 'focus', key: 'current-cell' }], {
+      pathRoute: [],
       word: 'ABCCED',
       call: 'search(0, 0, 0)',
       check: 'board[0][0] = A = word[0]',
@@ -117,6 +119,7 @@ const draft = visual('A recursive path owns its marked cells; failed directions 
       tone: 'output',
       key: `path-${index}`,
     })), {
+      pathRoute: path.map(([row, col]) => [row, col]),
       restoredOrder: 'D, E, C, C, B, A',
       callStack: 'empty after unwinding',
       result: 'true',

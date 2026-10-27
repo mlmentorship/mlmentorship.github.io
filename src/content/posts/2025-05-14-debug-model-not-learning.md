@@ -1,6 +1,6 @@
 ---
 title: "How would you debug a model that's not learning?"
-description: "The 'tell me how you'd debug' question is a behavioral round in disguise. The interviewer is probing your debugging instinct, not testing facts."
+description: "Isolate loss, gradient, and parameter-update failures with a reproducible batch before escalating to optimization or task mismatch."
 date: "2025-05-14"
 draft: false
 tags: ["questions"]
@@ -8,105 +8,119 @@ category: "questions"
 ---
 
 
-> *Asked in: ML breadth or behavioral rounds at every level.*
+Investigate a training run that appears not to learn, and propose checks that distinguish competing explanations.
 
-The interviewer is checking debugging instinct, not facts. The L4 candidate gives a list of things to check. The L6 candidate describes a procedure ordered by cost and information value.
+## Problem
+
+**Context.** A hypothetical model-training run shows flat loss or unchanging task performance, despite apparently completing training steps.
+You can inspect a small batch, the objective, gradients, parameters, and evaluation outputs.
+
+**Task.** Define the failing observation, prioritize hypotheses, and choose cheap tests with predicted results before changing the training system.
+Explain how the investigation changes if loss falls but task performance does not.
+
+**Constraints.** Distinguish objective computation, gradient flow, optimizer updates, and evaluation correctness.
+Control randomness and change one causal factor per check; an observed correlation alone does not identify the defect.
+The retained level headings organize examples, not hiring guarantees.
 
 ## What an L4 answer sounds like
 
-> "I'd check the learning rate. Maybe try a smaller one. I'd also check if there's a bug in the data loader or the loss function. Make sure the model isn't stuck at a local minimum."
-
-This is a list of things, in no particular order, each generic. You've heard the canonical advice but haven't internalized a method.
+"Check the learning rate, loader, loss, and optimizer" names possibilities without an observation that distinguishes them.
+Changing all four together may improve loss while leaving the actual fault unidentified.
 
 ## What an L5 answer sounds like
 
-> "The way I'd actually debug this is: top-down, fastest-checks-first.
->
-> **First, can the model overfit a single batch?** Take 8 examples, train on them for a few hundred steps. If loss doesn't go to ~zero, the problem is fundamental, broken loss, broken gradient flow, broken data pipeline, model architecture can't represent the function. Fix that before anything else.
->
-> **Second, are the gradients reasonable?** Check gradient norms per layer. If they're zero or NaN, look for non-differentiable ops, broken initialization, or numerical issues. If they're huge, learning rate is too high or there's an exploding gradient.
->
-> **Third, is the loss going down at all?** If yes but slowly, it's an LR or optimizer issue. Try an LR sweep across 4 orders of magnitude. If no, go back to step 1, the model genuinely isn't training.
->
-> **Fourth, is the validation loss diverging from training?** If yes, you've found the right problem and the issue is overfitting. Add regularization, more data, or augmentation.
->
-> **Fifth, is the validation loss tracking training but neither is good enough?** Then you're underfitting, you need more capacity, more data, or a better representation."
+Freeze a tiny batch, inspect its actual inputs and targets, and disable optional regularization or augmentation for the diagnostic.
+State an attainable loss before asking the model to memorize it.
+Two identical inputs with opposite binary labels have minimum mean cross-entropy $\log2$, not zero, for a deterministic shared prediction.
 
-This is L5. You've described a *procedure* (top-down, fast checks first), with specific tests at each stage and a clear branch on what each result implies.
+Use a scalar control with parameter $w=0$, loss $L=\tfrac12(w-3)^2$, and SGD rate $0.1$.
+The initial loss is $4.5$, gradient $-3$, expected updated parameter $0.3$, and new loss $3.645$.
+If the gradient is $-3$ but $w$ remains zero, the gradient alone has not established a working update.
+Inspect optimizer membership, whether the step executed, resets, finite-value guards, and frozen parameters before changing capacity.
+
+For the real batch, record the hand-computed loss, reduction, gradient, and before/after parameter values.
+Keep a hypothesis/test/result ledger; change one supported cause, then repeat the same check.
+
+<p class="visual-kicker">Diagnostic path</p>
+<p class="visual-title">A fixed-batch check selects hypotheses; its symptoms do not identify one cause automatically.</p>
 
 <!-- visual:model-not-learning-diagnostic-path -->
 ```mermaid
 flowchart TB
 	accTitle: A fastest-checks-first path for debugging a model that is not learning
-	accDescr: First try to overfit one tiny fixed batch without regularization. Failure means the training foundation is broken, so inspect exact inputs and labels, verify the loss by hand, and check gradient flow, train mode, and the parameter update. Success earns escalation to full training, where stuck, chaotic, improving training, and diverging validation behavior lead to different diagnoses.
+	accDescr: Establish an attainable fixed-batch loss, then inspect inputs, labels, loss, gradients, mode, and parameter updates. Full-training symptoms suggest hypotheses to test rather than uniquely identifying their causes.
 	A["Overfit one tiny fixed batch<br/>no regularization"] --> B{"Loss reaches its<br/>minimum?"}
-	B -->|"no"| C["Foundation is broken"]
+	B -->|"no"| C["Check minimum assumptions<br/>and training path"]
 	C --> D["Inspect exact inputs + labels<br/>verify loss by hand"]
 	D --> E["Check gradient flow, train mode,<br/>and the parameter update"]
 	E -. "fix, then repeat" .-> A
 	B ==>|"yes: escalate"| F["Run full training<br/>watch a fixed batch"]
 	F --> G{"What do predictions<br/>and loss do?"}
 	G -->|"stuck"| H["Recheck foundation;<br/>then LR, optimizer, batch"]
-	G -->|"chaotic"| I["Lower LR; check exploding<br/>gradients and numerics"]
+	G -->|"chaotic"| I["Inspect numerics and updates;<br/>test LR hypothesis"]
 	G -->|"training improves"| J{"Validation follows<br/>training?"}
-	J -->|"no: gap grows"| K["Overfitting<br/>regularize or add data"]
-	J -->|"yes, both plateau"| L["Underfitting or task mismatch<br/>capacity, data, representation"]
+	J -->|"no: gap grows"| K["Split, drift, objective,<br/>or overfitting?"]
+	J -->|"yes, both plateau"| L["Capacity, optimization,<br/>or task mismatch?"]
 	class A,F viz-input
 	class B,G,J viz-focus
 	class C,D,E,H,I viz-warning
 	class K,L viz-output
 	class A viz-wide
 ```
-<p class="diagram-caption"><strong>Read it this way:</strong> earn the right to tune by first proving that the complete training path can memorize a tiny batch. If it cannot, stay with inputs, labels, loss, gradients, mode, and updates. Only after it can should full-training behavior route you toward optimization, numerical stability, overfitting, or underfitting. Original synthesis checked against <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's training recipe</a> and the <a href="https://cs231n.github.io/neural-networks-3/">CS231n learning notes</a>.</p>
+<p class="diagram-caption"><strong>Read it this way:</strong> establish the batch's attainable minimum first. Check exact inputs, loss, gradients, and updates before escalating. Later symptoms select hypotheses, not unique diagnoses. Original synthesis follows <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's training recipe</a> and the <a href="https://cs231n.github.io/neural-networks-3/">CS231n learning notes</a>.</p>
 
 ## What an L6 answer sounds like
 
-The L6 answer adds the things that come from having debugged a hundred models:
+Extend the evidence, not the number of simultaneous interventions.
+Check target conventions, masks, sum-versus-mean reduction, accumulation counts, train/eval mode, and finite gradients alongside parameter changes.
+Evaluation mode does not universally disable gradients; its effect depends on the layers.
+Measure device throughput and completed optimizer steps separately from mathematical learning progress.
 
-> "...and a few things I've learned to check that aren't obvious:
->
-> **Are the labels correct?** I once spent two weeks debugging a model that wasn't learning, only to discover the data team had silently flipped a label convention. Now I always print 5-10 random (input, label) pairs and *verify visually that the labels make sense*. This catches data pipeline bugs that no metric will.
->
-> **Is the loss function actually what I think it is?** Compute the loss on a single example by hand and compare to what the code outputs. Common bugs: reduction='sum' vs 'mean' silently changing the effective learning rate, ignored class weights, broken masking on padding tokens.
->
-> **Is the model in train mode?** It sounds dumb. I've seen models 'not learn' because someone left them in eval mode and dropout / BN were behaving wrong. Check `model.train()` is called before the train loop.
->
-> **Is the data shuffled?** If you forgot to shuffle, the model sees N batches of all-class-0 followed by N batches of all-class-1 and the optimizer will do something weird.
->
-> **Are you running on the GPU?** Specifically, is the data on the GPU? If you're moving tensors back and forth between CPU and GPU on every step, training will be 100&times; slower than it should be and look like it's not learning when it actually just hasn't done enough steps yet.
->
-> **What's your effective batch size?** If you have gradient accumulation set up wrong, your effective batch can be 8 instead of 2048 and the optimizer dynamics look completely different.
->
-> **Is the training distribution shifted?** If your eval set has a class your training set doesn't, no amount of training will help.
->
-> A useful diagnostic that catches most issues: print the first prediction the model makes on a fixed batch every 100 steps. Watch how it evolves. If it's stuck at the same value, you have a gradient problem. If it's chaotic, you have an LR problem. If it's slowly improving, you have a patience problem. If it's improving on training but not validation, you have an overfitting problem."
+### The Loss Improves but the Task Does Not
 
-This is L6. You've gone past the standard checklist into the things that come from real failure stories. Notice the *specific bug stories*: this is what makes the answer feel earned rather than rehearsed.
+**New task:** Diagnose useful-output failure after verifying the update path.
+
+**Picture and change:** Construct low-loss failure cases and inspect targets, masks, scoring, and deployment objectives.
+
+**Check:** Ninety-nine padding tokens improving from loss one to zero can hide one important token remaining at loss one.
+The all-token mean falls from one to $0.01$ without fixing that important prediction.
+
+**Use when:** The optimized measurement and required task disagree; this does not establish a gradient fault.
+
+### Training Improves but Validation Degrades
+
+**New task:** Explain a growing gap without assuming one cause.
+
+**Picture and change:** Audit split validity, target consistency, distribution differences, and evaluation mode before testing ordinary overfitting.
+
+**Check:** A validation-only class cannot be supplied merely by adding dropout.
+
+**Use when:** The two datasets may no longer support the same inference.
+Regularize or change data only after a discriminating check supports that intervention.
+
+<!-- learning:core-end -->
+<div data-learning-extension>
 
 ## The tells that get you a strong-hire vote
 
-- You describe a **procedure** (overfit-a-batch first, then gradients, then LR sweep), not a list.
-- You give **specific bug stories**: "I once spent two weeks because..."
-- You mention **looking at predictions, not just losses**: the most underrated debugging move.
-- You think about **data quality** as a debugging axis, not just model code.
+Use the retained heading as a response-quality checklist, not a prediction of an interviewer vote.
+Show an ordered test, its possible outcomes, actual observed evidence, and the next conditional action.
+Discuss real experience honestly; do not invent debugging history to imitate these examples.
 
 ## The tells that get you down-leveled
 
-- You give an unordered list of things to check.
-- You don't mention overfit-a-single-batch, the canonical first check.
-- You say "try Adam instead of SGD" or other surface-level model swaps as if those are debugging.
-- You can't describe a real model you debugged and what was wrong.
+An unordered optimizer/LR/initialization/loader sweep cannot isolate a fault, even if the final run improves.
+Likewise, frozen predictions can reflect update failures, saturation, insensitive measurements, or logging errors rather than one proven cause.
 
 ## A follow-up the interviewer often asks
 
-"What if the loss is going down but slowly?" or "what if the loss looks fine but the model is bad at the task?"
-
-The first is an LR / capacity question; the second is a question about the *eval-vs-task gap* and is often more interesting. The L6 answer to the second:
-
-> "If the loss looks fine but the model is bad, the loss isn't measuring what I care about. Either the loss function is wrong (e.g., MSE on classification), or the data distribution doesn't reflect the use case, or there's a labeling issue, or the eval metric is wrong. I'd construct a small set of failure cases by hand, compute loss on them, and see if low-loss-but-bad cases exist, that's the disconnect."
-
-If you have this conversation fluently, you're at the senior bar.
+For slow progress, compare loss per completed update and wall-clock step rate before selecting an optimization or systems hypothesis.
+Inspect gradient scale, numerical precision, conditioning, data coverage, and update magnitude where evidence points.
+Squared error on class probabilities can be a legitimate Brier objective; classification alone does not make MSE invalid.
+It can still differ from cross-entropy in gradients, calibration behavior, and the intended decision target.
 
 ---
 
 *Related: [How would you evaluate an LLM application?](/questions/how-would-you-evaluate-an-llm-application/), [Walk me through bias-variance tradeoff](/questions/bias-variance-tradeoff/).*
+
+</div>

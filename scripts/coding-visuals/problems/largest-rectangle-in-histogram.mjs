@@ -21,7 +21,7 @@ const stackScene = (index, values, extra) => bars(heights, {
 });
 
 const draft = visual('Keep increasing (start,height) candidates; the first shorter bar closes each taller candidate at its exact maximal width.', [
-  frame('Initialize the increasing stack', 'Start with an empty stack, best = 0, and scan the real histogram before an appended zero sentinel.', stackScene(0, [], {
+  frame('Initialize the increasing stack', 'Start with an empty stack and best=0. A final zero sentinel closes positive candidates.', stackScene(0, [], {
     current: 'index 0, height 2',
     best: '0',
   }), 'initialize'),

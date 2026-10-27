@@ -91,22 +91,25 @@ Skipping components 4-6 is the single most common failure.
 
 ### Chunking
 
-The naive approach: split documents into 512-token chunks. This is wrong almost everywhere.
+Fixed-size chunks are a valid baseline, not a universal mistake.
+Compare what each boundary preserves or separates under the corpus, query distribution, and token budget.
 
 Better approaches, in rough order of sophistication:
 
 - **Semantic chunking**: split on paragraph or section boundaries, then merge to a target token count.
-- **Heading-aware chunking**: each chunk inherits the parent document's title and section headers as a prefix, massively improves retrieval for any structured document (technical docs, legal contracts, academic papers).
+- **Heading-aware chunking**: retain parent titles and section context when these clarify a passage; measure whether repeated metadata helps retrieval or consumes useful context.
 - **Sliding-window with overlap**: 256-token chunks with 50-token overlap, so context near boundaries isn't lost.
 - **Hierarchical chunking**: keep chunks at multiple granularities (paragraph + section + document) and retrieve at the right level for each query.
 
-The best practice depends on your document type. For free-form conversational data, sliding-window is fine. For structured documents, heading-aware semantic chunking is dramatically better. For long technical documents, hierarchical is worth the complexity.
+These are candidate boundary policies, not a guaranteed quality ordering.
+Measure whether the required authorized evidence survives chunking, retrieval, selection, and generation, as in the [RAG mechanism](/concepts/rag-overview/).
 
 Tune chunk size empirically against your eval set. The right size varies more by domain than people expect; retuning it is often a high-impact, low-effort change.
 
 ### Embedding model
 
-The decision space is smaller than people think. Pick a recent strong open model (BGE, E5, GTE, NVIDIA embed family) or a managed option (OpenAI, Cohere, Voyage). The differences between modern embedding models on standard benchmarks are small. The difference between dense embeddings alone and a hybrid setup (dense + BM25) is much larger.
+Compare embedding candidates on representative queries, languages, access-controlled corpora, and serving constraints.
+A public benchmark ranking does not establish either small model differences or a larger guaranteed hybrid-retrieval gain for this corpus.
 
 Two non-obvious points:
 
@@ -122,7 +125,9 @@ The most common architecture mistake in RAG is using only dense retrieval. Lexic
 - Acronyms, abbreviations, and domain jargon
 - Numeric references ("CVE-2023-1234")
 
-Hybrid retrieval (dense + lexical, fused with reciprocal rank fusion or weighted score combination) consistently beats either alone in production. Set this up from day one. It's a few hundred lines of code; it pays for itself quickly.
+Hybrid retrieval combines different candidate signals, for example through reciprocal rank fusion.
+Evaluate authorized evidence recall, latency, and failure slices against the lexical-only and dense-only baselines.
+Additional stages have engineering and resource costs; they are not automatically the right first release.
 
 ### Query understanding
 
@@ -132,7 +137,8 @@ The user's query is rarely the right query for retrieval. A few transformations 
 - **Query decomposition**: for complex queries ("how does our refund policy interact with the EU consumer protection law"), break into sub-queries, retrieve for each, combine. Especially important for multi-document RAG.
 - **Query rewriting**: rephrase ambiguous queries into clearer ones. Often as simple as "given this conversation history, rewrite the user's last message into a self-contained query."
 
-Without query understanding, retrieval depends entirely on user phrasing. With it, retrieval is robust.
+Query transformations can improve a retrieval request or change its intent.
+Retain an interpretable original-query baseline and test ambiguous, adversarial, and multi-part requests before claiming robustness.
 
 ### Reranking (the highest-leverage step)
 
@@ -140,13 +146,15 @@ After retrieval returns the top ~50-200 candidates, a reranker scores each (quer
 
 Why it works: a bi-encoder embedding model has to encode query and document independently, so it can only model coarse similarity. A cross-encoder reranker sees both at once and can model fine-grained relevance, which terms matched, which paraphrases hold, whether the candidate actually answers the question.
 
-Modern rerankers (Cohere Rerank, BGE Reranker, Jina Reranker, etc.) substantially improve top-K precision for modest additional latency, and are typically the single best quality lever in the pipeline.
-
-Skipping reranking is the #1 cause of RAG underperformance.
+Whether reranking is the highest-value change depends on the diagnosed failure and measured costs.
+A reranker can reorder the retrieved set but cannot recover a required passage that never entered it.
+If the failure is missing evidence, improve recall or the retrieval boundary; if candidates are adequate, test bounded reranking before adopting it.
 
 ### Generation
 
-Last and least. By this point most of the work is done. Things that still matter:
+Generation remains a separate failure boundary even when retrieval is correct.
+Test whether each consequential claim is supported, current, and permitted for release; a resolving citation alone proves none of those.
+Useful candidate controls include:
 
 - **Cite-by-passage prompting**: instruct the model to cite which retrieved passage each claim comes from, with passage IDs. Improves trustworthiness and makes hallucinations easier to catch.
 - **Grounding instructions**: explicitly tell the model "if the answer is not in the provided documents, say so." Without this, models will hallucinate confidently.

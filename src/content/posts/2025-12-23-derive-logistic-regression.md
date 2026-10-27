@@ -10,7 +10,18 @@ category: "questions"
 
 > *Asked in: ML breadth and math-screen rounds.*
 
-The L4 candidate states the logistic regression formula. The L6 candidate derives it from first principles and connects it to cross-entropy.
+Derive the binary logistic-regression training objective and its gradient from an explicit probabilistic model.
+
+## Problem
+
+**Context.** Independent examples have feature vectors `x` and binary labels `y` in `{0, 1}`.
+The conditional model is Bernoulli with probability `sigmoid(w.T @ x)`; an intercept may be included as a constant feature.
+
+**Task.** Form the joint likelihood, derive the negative log-likelihood and weight gradient, and connect the objective to binary cross-entropy.
+Explain the sign of a single example's update for each label.
+
+**Constraints.** Begin with the unregularized summed loss and state any change to averaging or regularization.
+Separate the assumed probability model from empirical calibration; algebraic equivalence alone does not establish deployment quality.
 
 ## The setup
 

@@ -1,6 +1,6 @@
 ---
 title: "Design fraud detection for a payment company"
-description: "Fraud has the worst data of any ML problem: heavily imbalanced, biased labels, adversarial actors, and direct money on the line. The senior answer respects all four."
+description: "Design payment-risk decisions while preserving action, label maturity, audit provenance, point-in-time features and the costs of mistakes."
 date: "2025-12-25"
 draft: false
 tags: ["questions"]
@@ -8,55 +8,76 @@ category: "questions"
 ---
 
 
-> *Asked in: fintech and risk-team interviews.*
+Design payment-fraud decisions and evaluation when outcomes arrive late and the current policy determines which payments can produce labels.
 
-The L4 candidate proposes "train an XGBoost on transactions." The L6 candidate addresses label bias, adversarial drift, the precision-recall trade-off as a business decision, and the rules-vs-ML hybrid that defines the field.
+## Problem
 
-## Why fraud is uniquely hard
+**Context.** A hypothetical payment policy allows some attempts and declines others; allowed outcomes mature only after a declared observation window.
+The cohort below contains mature outcomes, pending outcomes, and declined attempts.
 
-1. **Heavy imbalance**: typical fraud rates are well under 1%.
-2. **Biased labels**: you only see fraud you caught (or that customers reported). Missed fraud is a hidden majority.
-3. **Adversarial drift**: fraudsters adapt. Today's good model is tomorrow's bypassed one.
-4. **Asymmetric cost**: missed fraud costs money; false positives cost customer trust and revenue.
-5. **Latency budget**: real-time decisions in tens of milliseconds.
+**Task.** Define labels, model and policy inputs, operating actions, and evaluation for the cohort.
+Explain what can be estimated now and what evidence is needed to compare a changed decision policy.
 
-Every architectural choice follows from one or more of these.
+**Constraints.** Missing, pending, and declined outcomes are not confirmed legitimate transactions.
+Separate fraud risk from action costs, preserve decision-time feature availability, and account for selection and label delay.
 
-**Learning objective:** Trace how the deployed fraud policy determines which outcomes become labels, then identify why an independently reviewed sample must cover both allowed and declined transactions.
+Design payment-risk decisions for this hypothetical cohort of 1,000 attempts under policy P1.
+P1 allows 900 and declines 100.
+Of the allowed payments, 800 have completed the declared observation window; eight have confirmed fraud reports.
+The other 100 allowed payments remain pending.
+
+Define training labels, operating actions and evaluation without converting missing outcomes into legitimate transactions.
+
+## Picture: Follow the Action Before Naming the Label
+
+| Population | Count | What is observed |
+| --- | --- | --- |
+| Mature allowed | 800 | Eight confirmed reports; 792 without reports in the window |
+| Pending allowed | 100 | Observation window incomplete; not negative |
+| Declined | 100 | No realized outcome from allowing that payment |
+
+The confirmed-report fraction is $8/800=1\%$ among mature allowed payments.
+It is not population fraud prevalence.
+The 792 no-report records are negative only under the declared, noisy reporting definition.
+The ratio $8/1000=0.8\%$ describes currently confirmed reports per attempt, not complete fraud coverage.
+
+Keep action, maturity, outcome source and uncertainty attached to every label.
+Independent investigation can provide evidence about declined attempts.
+It cannot observe their exact losses under an action that never occurred.
 
 <!-- visual:fraud-policy-label-coverage -->
 <figure class="learning-figure plot-panel" aria-labelledby="fraud-policy-label-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="fraud-policy-label-title">See how the deployed policy selects its own fraud labels.</p>
+	<p class="visual-kicker">One cohort, three observation states</p>
+	<p class="visual-title" id="fraud-policy-label-title">Policy P1 selects which outcomes can become reports.</p>
 	<svg viewBox="0 0 360 530" role="img" aria-labelledby="fraud-policy-label-svg-title fraud-policy-label-svg-desc">
 		<title id="fraud-policy-label-svg-title">Fraud actions create different label coverage</title>
-		<desc id="fraud-policy-label-svg-desc">All attempted payments pass through current rules and a model. The allow branch enters an outcome window. A confirmed report becomes an observed fraud positive; a mature payment with no report is only a noisy negative; and an immature outcome remains pending, not negative. The decline or challenge branch has no realized payment outcome, so its counterfactual is missing and cannot be labelled legitimate. Dashed paths sample both action branches for independent analyst review, creating audit labels with coverage across actions. Policy-selected outcome labels and audit labels enter training and evaluation with their sources retained.</desc>
+		<desc id="fraud-policy-label-svg-desc">Policy P1 allows 900 of 1,000 attempted payments and declines 100. Among allowed payments, 800 are mature: eight have confirmed reports and 792 have no report under the noisy reporting definition. Another 100 remain pending, not negative. Declined payments have no realized allowed-payment outcome. Dashed paths sample both actions for independent adjudication. Audit labels retain their source and do not reveal exact counterfactual payment losses.</desc>
 		<defs><marker id="fraud-label-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path class="viz-arrow-forward" d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs>
 		<rect class="viz-node viz-node--input" x="55" y="12" width="250" height="42" rx="4"></rect>
-		<text class="viz-callout" x="180" y="30" text-anchor="middle">ALL ATTEMPTED PAYMENTS</text>
+		<text class="viz-callout" x="180" y="30" text-anchor="middle">1,000 ATTEMPTED PAYMENTS</text>
 		<text class="viz-label" x="180" y="46" text-anchor="middle">same decision-time population</text>
 		<path d="M180 56V74" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#fraud-label-arrow)"></path>
 		<rect class="viz-node viz-node--focus" x="55" y="80" width="250" height="42" rx="4"></rect>
-		<text class="viz-callout" x="180" y="98" text-anchor="middle">CURRENT RULES + MODEL</text>
+		<text class="viz-callout" x="180" y="98" text-anchor="middle">P1: RULES + MODEL</text>
 		<text class="viz-label" x="180" y="114" text-anchor="middle">policy chooses the action</text>
 		<path d="M180 124V140H91V154" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#fraud-label-arrow)"></path>
 		<path d="M180 140H269V154" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#fraud-label-arrow)"></path>
 		<rect class="viz-node" x="14" y="160" width="154" height="50" rx="4"></rect>
-		<text class="viz-callout" x="91" y="180" text-anchor="middle">ALLOW</text>
-		<text class="viz-label" x="91" y="198" text-anchor="middle">wait through outcome window</text>
+		<text class="viz-callout" x="91" y="180" text-anchor="middle">ALLOW: 900</text>
+		<text class="viz-label" x="91" y="198" text-anchor="middle">800 mature + 100 pending</text>
 		<rect class="viz-node" x="192" y="160" width="154" height="50" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke)"></rect>
-		<text class="viz-callout" x="269" y="180" text-anchor="middle">DECLINE / CHALLENGE</text>
-		<text class="viz-label" x="269" y="198" text-anchor="middle">no realized payment outcome</text>
+		<text class="viz-callout" x="269" y="180" text-anchor="middle">DECLINE: 100</text>
+		<text class="viz-label" x="269" y="198" text-anchor="middle">unobserved allowed outcome</text>
 		<path d="M91 212V230" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#fraud-label-arrow)"></path>
 		<rect class="viz-node" x="14" y="236" width="154" height="72" rx="4"></rect>
-		<text class="viz-callout" x="91" y="254" text-anchor="middle">MATURE OUTCOMES</text>
-		<text class="viz-label" x="26" y="273">report -> observed positive</text>
-		<text class="viz-label" x="26" y="290">no report -> noisy negative</text>
-		<text class="viz-label" x="26" y="303">pending -> not negative</text>
+		<text class="viz-callout" x="91" y="254" text-anchor="middle">OUTCOME WINDOW</text>
+		<text class="viz-label" x="26" y="273">8 confirmed reports</text>
+		<text class="viz-label" x="26" y="290">792 no report: noisy</text>
+		<text class="viz-label" x="26" y="303">100 pending: unknown</text>
 		<rect class="viz-node" x="192" y="236" width="154" height="72" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke)"></rect>
-		<text class="viz-callout" x="269" y="254" text-anchor="middle">MISSING != LEGITIMATE</text>
-		<text class="viz-label" x="269" y="275" text-anchor="middle">exclude from ordinary</text>
-		<text class="viz-label" x="269" y="292" text-anchor="middle">outcome evaluation</text>
+		<text class="viz-callout" x="269" y="254" text-anchor="middle">NO OUTCOME</text>
+		<text class="viz-label" x="269" y="275" text-anchor="middle">Do not label as</text>
+		<text class="viz-label" x="269" y="292" text-anchor="middle">legitimate</text>
 		<path d="M91 310V328" style="fill:none;stroke:var(--viz-edge);stroke-width:2;marker-end:url(#fraud-label-arrow)"></path>
 		<rect class="viz-node" x="14" y="334" width="154" height="48" rx="4" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke)"></rect>
 		<text class="viz-callout" x="91" y="353" text-anchor="middle">OUTCOME LABELS</text>
@@ -73,72 +94,134 @@ Every architectural choice follows from one or more of these.
 		<text class="viz-callout" x="180" y="498" text-anchor="middle">TRAIN + EVALUATE</text>
 		<text class="viz-label" x="180" y="513" text-anchor="middle">retain label source and action</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the solid operational path first. Only allowed payments can produce the ordinary chargeback outcome, and even a mature payment with no report is a noisy negative; a declined payment has no realized payment outcome at all. Then follow both dashed paths: independent review samples allowed and declined traffic, and its audit labels remain distinguishable from policy-selected outcome labels.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the 1,000 attempts to their actions. Of 900 allowed payments, 800 matured and eight have confirmed reports. The 100 pending payments are not negative. The 100 declines have no realized allowed-payment outcome. Dashed paths sample both actions for independent review. Audit labels retain their source, not exact counterfactual losses.</figcaption>
 </figure>
 
-## What an L5 answer sounds like
+<span id="what-an-l5-answer-sounds-like"></span>
 
-> "Two-layer architecture, common across the industry:
->
-> **Layer 1: rules engine.** Hard-coded checks for known patterns (velocity limits, blacklists, country mismatches). Fast, explainable, easy to update when new patterns emerge. Catches the obvious.
->
-> **Layer 2: ML model.** Gradient-boosted trees (XGBoost, LightGBM) or a neural network on engineered features: transaction amount, time, merchant category, geographic distance, device fingerprint, account age, recent transaction history. Outputs a fraud score; threshold determines action (allow, challenge, block).
->
-> **Features**:
-> - Transaction-level (amount, currency, merchant, time).
-> - User-level aggregates (transactions per day/week, total spend, location entropy).
-> - Network features (shared device, shared IP, shared payment instrument across accounts).
-> - Sequence features (recent transaction velocity, deviation from typical pattern).
->
-> **Eval**: precision-recall curve at multiple operating thresholds. Pick the threshold based on the business cost trade-off (cost per false positive vs cost per missed fraud), not on F1.
->
-> **Online**: shadow mode for new models before they make decisions; A/B against the current model on a fraction of traffic with explicit business-metric tracking (chargeback rate, false-positive complaints)."
+## Define the Decision Path
 
-This is L5. Two-layer architecture, feature taxonomy, eval framework.
+Start with approved rules plus a measured model baseline, such as gradient-boosted trees on point-in-time features.
+Use transaction amount/time, account aggregates, recent velocity and permitted device/network relationships.
+Every feature must have been available before its decision deadline.
 
-## What an L6 answer adds
+A challenge is intermediate, not necessarily a declined payment.
+Record passed, failed or abandoned challenges and their final allow/decline actions.
+Challenge failure alone does not prove fraud.
 
-> "...the things that make fraud hard in production:
->
-> **Label bias is the dominant problem.** You only have labels for fraud you caught. Negatives in training data include actual frauds you missed. This biases the model toward the existing system's blindspots. Mitigations: semi-supervised methods (use unlabeled transactions in an auxiliary objective), active learning to invest expensive label investigation in uncertain cases, periodic 'random sample' investigations to estimate true fraud base rate.
->
-> **Adversarial drift demands continuous retraining.** Frequency of retraining: weekly to monthly for traditional models. Plus an explicit detection-and-respond pipeline for sudden new attack patterns.
->
-> **Concept drift detection**: monitor model score distributions, feature distributions, and per-segment performance over time. Alert on significant shifts.
->
-> **Threshold tuning is a business decision, not an ML decision.** A threshold that catches 95% of fraud at 0.5% false positive rate may be the right answer; or 80% at 0.1% false positive rate may be. The risk team owns the decision; the ML team enables it with calibrated probabilities.
->
-> **Calibration matters more than usual.** Downstream actions (auto-block at score > 0.95, manual review at 0.7-0.95, allow at < 0.7) require well-calibrated probabilities, not just a ranking. Apply Platt scaling or isotonic regression post-hoc.
->
-> **Model explainability is a regulatory requirement** in some jurisdictions. SHAP values per decision, model documentation for regulators.
->
-> **Network / graph features matter increasingly.** Fraudsters operate in connected rings (shared devices, shared addresses). Graph features (shortest path to known fraud accounts, community detection) catch ring fraud that single-account models miss."
+```text
+Decision
+	transaction_id, decision_id, event_time, decision_time
+	policy_version, action, challenge_state, feature_version
+	availability_cutoff, score, calibration_population
+	latency, fallback_reason
+Outcome
+	transaction_id, event_time, available_time, observation_window
+	maturity, report_status, label_source, uncertainty
+Audit
+	decision_id, sampling_stratum, selection_probability
+	adjudication_task, evidence_refs, reviewer, available_time
+```
 
-## Tells that get you a strong-hire vote
+## Choose Actions From Consequences
 
-- You name the **two-layer rules + ML** architecture explicitly.
-- You bring up **label bias** as the dominant statistical problem.
-- You discuss **threshold tuning as a business decision**.
-- You insist on **calibration**.
-- You name **graph / network features** for ring fraud.
-- You have an **incident-response and continuous-retraining** plan.
+Suppose a separately validated probability $p$ and the following simplified loss model apply.
 
-## Tells that get you down-leveled
+| Action | Expected loss in currency units | Required evidence |
+| --- | --- | --- |
+| Allow | $100p$ | Relevant probability of loss under allowance |
+| Decline | $3(1-p)$ | Cost of rejecting a legitimate payment |
+| Challenge | Friction/fee plus residual loss | Completion, abandonment, fraud and capacity estimates |
 
-- ML alone with no rules engine.
-- Reporting F1 instead of precision-recall curve.
-- No mention of label bias.
-- No drift detection.
-- Treating fraud detection as a static problem.
+With only allow/decline, $p=0.02$ gives losses 2 versus 2.94; allow has lower modeled loss.
+At $p=0.10$, losses are 10 versus 2.7; decline has lower modeled loss.
+The cohort's observed report fraction is not automatically a valid $p$ for this decision.
 
-## Common follow-up
+The risk owner approves costs, constraints and capacity; ML supplies justified estimates and uncertainty.
+Calibration must name its target, population and observation process.
+PR-AUC describes ranking, not the action policy.
 
-"How would you debias the labels?"
+## Change 1: The New Policy Declines More Payments
 
-The L6 answer:
+**New task.** P2 declines more high-risk attempts than P1.
 
-> "No silver bullet, but two reasonable approaches. (1) Periodic random investigation: sample some declined and some allowed transactions; have analysts label them; use the labeled sample to estimate the true fraud rate and calibrate model scores. (2) Semi-supervised techniques: use unlabeled transactions in an auxiliary self-supervised task (e.g., masked-feature reconstruction); the model learns 'normal' transaction structure from unlabeled data, and labels supervise the discriminative head. The semi-supervised approach helps when labels are sparse and noisy; in fraud both apply."
+**Picture and change.** Recompute action coverage and compare equally mature cohorts.
+Use appropriately sampled audits and validated causal designs where feasible before claiming better population detection.
+Preserve propensity/support assumptions; audits do not supply every missing counterfactual.
 
----
+**Check.** Blocking nearly everyone can reduce allowed losses while destroying legitimate approvals.
+Track approval, challenge friction, loss, review capacity and customer impact together.
+
+**Use when.** The policy changes which outcomes can become labels.
+
+## Change 2: Shared-Device Activity Rises
+
+**New task.** Related accounts begin sharing more devices.
+
+**Picture and change.** Verify event timing, velocity, graph construction and source integrity.
+Inspect legitimate shared-device cohorts, privacy constraints and segment effects before changing actions.
+Use bounded approved rules or investigation while testing the suspected pattern.
+
+**Check.** Shared infrastructure is evidence, not proof of fraud.
+
+**Use when.** Adaptive or correlated behavior changes feature meaning.
+
+<span id="tells-that-get-you-down-leveled"></span>
+
+## Failure: Missing Becomes Legitimate
+
+Combining declined, pending and mature no-report transactions as negatives hides different observation processes.
+Semi-supervised reconstruction can learn structure; it does not identify missing allowed-payment outcomes by itself.
+
+## Transfer Check
+
+Does high PR-AUC identify the correct blocking threshold?
+
+### Reasoned Answer
+
+No. Use relevant calibrated evidence, consequence/friction costs, policy constraints and operating capacity.
+Check the resulting policy, not only its score ranking.
+
+<!-- learning:core-end -->
+<div class="learning-extension" data-learning-extension>
+
+<span id="why-fraud-is-uniquely-hard"></span>
+<span id="common-follow-up"></span>
+
+## Audit the Observation Process
+
+Outcome delay, reporting noise, selection and adaptive behavior require separate diagnostics.
+Fraud prevalence and available latency vary by product; do not substitute generic industry rates.
+
+Sample allowed and declined traffic using recorded strata and selection probabilities.
+Define the adjudication target, independent evidence, reviewer uncertainty and any weighting assumptions.
+Active-learning cases are not automatically representative samples.
+An audit can estimate its defined target under justified assumptions, not every unobserved monetary loss.
+
+Use time-based splits, decision-time feature snapshots and mature outcome windows.
+Prevent future reports or later graph labels from leaking into earlier features.
+Report precision/recall, calibration, losses and uncertainty for the population each dataset supports.
+
+<span id="what-an-l6-answer-adds"></span>
+<span id="tells-that-get-you-a-strong-hire-vote"></span>
+
+## Operate a Changing Policy
+
+Shadow scoring tests service behavior without changing actions; it does not reveal alternative payment outcomes.
+Use approved staged experiments only where risk, customer protection and identification assumptions permit them.
+
+Monitor feature/score changes, maturity, action mix, segment outcomes and service deadlines.
+A distribution shift is a diagnostic signal, not proof that retraining solves the incident.
+Choose update cadence from label readiness and validated operating needs.
+
+Name risk-policy, fraud-operations, model and service owners.
+Define temporary-rule expiry, incident escalation, fallback actions and model/policy rollback separately.
+Revalidate after changing features, calibration, thresholds or label definitions.
+Platt scaling or isotonic regression still requires suitable data and independent evaluation.
+
+Explanation, retention and access requirements depend on jurisdiction, product and current rules.
+Feature attributions can support investigation; they are not automatically a compliant explanation.
 
 *Related: [delayed and selective labels](/concepts/delayed-labels-selective-labels-feedback-loops/), [decision thresholds and abstention](/concepts/decision-thresholds-asymmetric-costs-abstention/), [class imbalance](/questions/class-imbalance/), and [calibration](/concepts/calibration/).*
+
+</div>

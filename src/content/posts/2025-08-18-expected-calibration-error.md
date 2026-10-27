@@ -33,7 +33,10 @@ For a classifier producing a predicted label $\hat y_i$ and its confidence $c_i 
    - $\text{acc}(B_m) = \frac{1}{|B_m|} \sum_{i \in B_m} \mathbf{1}[\hat y_i = y_i]$ (empirical accuracy).
 3. **Aggregate**: ECE = weighted average of bin gaps.
 
-A perfectly calibrated model has ECE = 0: every bin's empirical accuracy equals its average predicted confidence. Common modern deep classifiers have ECE 0.05–0.20. Predicted confidence is systematically inflated.
+Sample ECE is zero when each populated bin's empirical accuracy equals its average confidence.
+Finite-sample noise and binning mean this does not prove population calibration.
+Conversely, a calibrated model need not have zero empirical ECE on a finite sample.
+The worked example below is multiclass, so predicted-class confidence can be below 50%.
 
 <!-- visual:ece-weighted-bin-contributions -->
 <figure class="learning-figure plot-panel" aria-labelledby="ece-aggregation-visual-title">
@@ -108,20 +111,32 @@ Always plot the reliability diagram alongside reporting ECE. Single ECE number c
 
 Modern neural networks [(Guo et al., 2017)](https://arxiv.org/abs/1706.04599) are typically **overconfident**:
 
-- Trained on cross-entropy, which keeps pushing logits toward $\pm \infty$ on training data.
-- Standard regularization (weight decay, dropout) helps generalization but doesn't fix calibration.
-- Modern architectures (ResNets, transformers) are more miscalibrated than older small models.
+- Guo et al. observed overconfidence in the classification models and datasets they studied, not every architecture or deployment population.
+- Cross-entropy is a proper probability objective; fitting it on finite training data does not guarantee calibrated deployment probabilities.
+- Regularization, model fitting, sample size, and distribution shift can affect calibration. Measure their effect rather than assuming an architecture ordering.
 
 ## Calibration methods
 
-Post-hoc rescaling of predicted probabilities, learned on a held-out set:
+Fit a post-hoc map on calibration data, then evaluate the frozen map on separate, representative cases.
+The [calibration lesson](/concepts/calibration/) derives the maps and their effects on downstream decisions.
 
-- **Temperature scaling** [(Guo et al., 2017)](https://arxiv.org/abs/1706.04599): divide logits by a single learned scalar $T > 1$. Cheap; preserves accuracy; usually halves ECE. The default modern choice.
-- **Platt scaling**: fit a logistic regression on the logits. Used historically with SVMs.
-- **Isotonic regression**: fit a non-parametric monotonic mapping. More flexible; can overfit.
-- **Vector / matrix scaling**: per-class temperature. More parameters; risk of overfitting if calibration set is small.
+- **Temperature scaling** [(Guo et al., 2017)](https://arxiv.org/abs/1706.04599): divide every class logit by one learned scalar $T>0$. Values above one soften probabilities; values below one sharpen them. Shared positive scaling preserves multiclass argmax, not every probability-threshold action.
+- **Platt scaling**: fit a binary logistic map with a slope and intercept. A shifted intercept can change decisions at probability 0.5.
+- **Isotonic regression**: fit a nondecreasing map. Plateaus can create ties or move scores across an operating threshold; flexible maps need enough calibration data.
+- **Vector / matrix scaling**: use class-specific scales/biases or a full affine logit map. These can change class ordering and accuracy.
 
-Calibration is **lossless on accuracy** (monotonic transformations preserve argmax). There's no reason not to do it.
+Calibration is not generally lossless on accuracy or decision cost.
+Evaluate probability quality and the actual decision rule, including relevant slices, after fitting the map.
+
+**Predict before revealing:** logits `[2,1]` choose class 0. Which class wins after shared temperature 10, versus class-specific temperatures `[10,1]`?
+
+<details><summary>Check the ordering and the action</summary>
+
+Shared scaling gives `[0.2,0.1]`, so class 0 still wins.
+Class-specific scaling gives `[0.2,1]`, so class 1 wins.
+Even shared scaling changes probabilities, so a cost-based threshold can trigger a different action without changing argmax.
+
+</details>
 
 ## Limits of ECE
 
@@ -131,9 +146,9 @@ Calibration is **lossless on accuracy** (monotonic transformations preserve argm
 
 ## Common pitfalls
 
-- **Computing ECE on training data.** Always use held-out data.
+- **Fitting and evaluating on the same cases.** Keep calibration fitting separate from final evaluation; retest after population changes.
 - **Reporting ECE without a reliability diagram.** Visual asymmetries can be invisible in the single number.
-- **Skipping calibration in production.** Temperature scaling is one line of code and often halves ECE.
+- **Assuming rescaling must help.** Compare the frozen map with the uncalibrated baseline on held-out probability and decision metrics.
 - **Confusing calibration with accuracy.** A 95%-accuracy model with ECE 0.20 is still untrustworthy whenever the probability matters.
 
 ## Related

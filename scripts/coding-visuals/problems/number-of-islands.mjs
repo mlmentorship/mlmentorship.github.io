@@ -23,7 +23,7 @@ const visited = (cells, active, extra = {}) => {
 const draft = visual('Count each unseen land seed once, then erase its entire four-neighbor component with DFS.', [
   frame(
     'Start island 1',
-    'Row-major scan reaches unseen land (0,0): increment islands to 1, change it to 0, and initialize stack=[(0,0)].',
+    'Mark (0,0) as water before pushing it. This seed starts island 1.',
     visited([[0, 0]], [0, 0], { stack: '[(0,0)]', islands: '1' }),
     'start-island-one',
   ),

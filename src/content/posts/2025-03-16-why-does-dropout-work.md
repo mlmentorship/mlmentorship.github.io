@@ -10,7 +10,17 @@ category: "questions"
 
 > *Asked in: ML breadth, every level.*
 
-Three valid explanations exist (regularization, implicit ensembling, Bayesian approximation) and which ones you reach for tells the level. Modern large models often use no dropout, which is also a tell.
+Explain why randomly suppressing activations during training can improve a neural network's behavior on unseen data.
+
+## Problem
+
+**Context.** A network fits its training data but generalizes poorly. Training may randomly zero some activations using dropout.
+
+**Task.** Explain the proposed benefit, how training and prediction differ, and when dropout may be unnecessary or counterproductive.
+Distinguish regularization, model-averaging intuition, and uncertainty estimation rather than treating them as interchangeable claims.
+
+**Constraints.** Different masks share the same learned weights; they are not independently trained models.
+State the keep-probability and scaling convention. Approximate ensemble or Bayesian interpretations do not guarantee calibrated uncertainty.
 
 **Learning objective:** trace how changing only the dropout mask creates many weight-sharing subnetworks, then distinguish deterministic approximate model averaging from repeated stochastic passes for uncertainty.
 
@@ -67,9 +77,9 @@ Correct, but lacks depth. The interviewer is checking whether "prevents overfitt
 >
 > The textbook explanation is **regularization**: by randomly zeroing units during training, you prevent the network from co-adapting features. Each unit can't rely on any specific other unit being present, so it has to learn features that are useful in many contexts. This reduces overfitting in the same general sense as L2 regularization, it constrains the effective capacity.
 >
-> The deeper explanation is **implicit ensembling**: training with dropout is approximately like training an exponentially large ensemble of subnetworks (one per dropout mask) that share weights. At test time, scaling the activations by the keep probability approximates averaging the ensemble's predictions.
+> The ensemble view is an approximation, not an exact average of a nonlinear network's predictions. With keep probability $q$, ordinary dropout masks at training time and scales by $q$ at evaluation. Inverted dropout instead scales surviving training activations by $1/q$ and uses identity at evaluation. Do not apply both conventions. The [dropout mechanism](/concepts/dropout/) shows what expectation is actually preserved.
 >
-> Practically: I'd use dropout when training accuracy is much higher than validation accuracy and other regularization isn't enough. I wouldn't use it everywhere, in transformers, dropout is mostly applied to the attention output and FFN, not to the embedding layer or layer norms."
+> Practically, compare held-out behavior with and without dropout under matched training conditions. Placement and rate are architecture choices; a train/validation gap is a diagnostic cue, not proof that dropout is the right repair."
 
 This is L5. You've named multiple frames, used the right vocabulary, and connected to practice.
 
@@ -81,9 +91,9 @@ The L6 answer adds the part most candidates don't know:
 >
 > A few things I've learned from using dropout in practice:
 >
-> - For transformers, the standard recipe is to apply dropout to attention weights, attention output, and FFN intermediate. *Don't* dropout the residual stream or layer norms; you'll hurt training.
-> - Dropout interacts badly with BatchNorm, the variance shift between training and inference is amplified. Layer norm + dropout is fine; BN + dropout often isn't.
-> - Modern large models often *don't* use dropout at all (or use very low rates) because they're trained on enough data that overfitting isn't the bottleneck. Pretraining a 70B-parameter LLM on a trillion tokens, you're underfitting, not overfitting; dropout would just slow you down.
+> - Distinguish dropout on a computed residual branch from modifying the identity path. Follow the actual architecture, then evaluate the change instead of declaring every placement beneficial or harmful.
+> - Dropout before BatchNorm can change the activation distribution used to fit running statistics. The effect depends on placement and training/evaluation behavior; LayerNorm does not use those running statistics.
+> - Some training recipes omit dropout, but model size and token count alone do not prove underfitting or make dropout categorically useless.
 > - The 'keep probability scaling' trick is what frameworks call 'inverted dropout', rescaling during training rather than at inference. This is what PyTorch's `nn.Dropout` does."
 
 This is L6. You know the math frame (Bayesian), the production reality (when not to use it), and the implementation details.
