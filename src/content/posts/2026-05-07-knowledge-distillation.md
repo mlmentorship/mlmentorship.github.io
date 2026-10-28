@@ -56,7 +56,7 @@ $$
 		<text class="viz-callout" x="253.5" y="319" text-anchor="middle">1 remains above 9</text>
 		<text class="viz-label" x="100" y="334">Student matches this distribution at τ = 3</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare each class vertically. Dividing the fixed teacher logits <code>[5, 2, 1]</code> by a higher temperature moves probability away from class 7, but it does not change the ranking: class 1 remains more plausible than class 9. The softened <code>22.5%</code> versus <code>16.2%</code> target gives the student similarity information that the one-hot label discards. Teacher and student use the same temperature for the KL term; the separate hard-label term still points to class 7. Values are an original calculation following <a href="https://arxiv.org/abs/1503.02531">Hinton et al. (2015)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare each class vertically. Dividing the fixed teacher logits <code>[5, 2, 1]</code> by a higher temperature moves probability away from class 7, but it does not change the ranking: class 1 remains more plausible than class 9. The softened <code>22.5%</code> versus <code>16.2%</code> target gives the student similarity information that the one-hot label discards. Teacher and student use the same temperature for the KL term; the separate hard-label term still points to class 7. Values are an original calculation following <a href="https://arxiv.org/abs/1503.02531">Hinton et al. (2015)</a>. <span class="visual-reader-check" data-reader-check="distillation-temperature-dark-knowledge"><strong>Check:</strong> What changes between the two teacher distributions? What preference remains unchanged?</span></figcaption>
 </figure>
 
 ## Variants

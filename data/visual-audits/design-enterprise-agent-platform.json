@@ -3,9 +3,9 @@
   "slug": "design-enterprise-agent-platform",
   "article": "src/content/posts/2026-08-29-design-enterprise-agent-platform.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Distinguish the control plane's authorization and version decisions from execution work and from the evidence plane's durable record of decisions and effects.",
-  "mediumRationale": "A fitted vertical Mermaid trace follows the article's one logical credit through proposal, current authorization, durable pre-dispatch state, a lost response, and authoritative reconciliation. Plane names label the relevant decisions and observations instead of requiring a wide component catalogue. The lesson is relational rather than geometric.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the labelled vertical path and explicit no-dispatch branch reveal which plane authorizes, which performs the effect, and which observation establishes completion. The same logical call and downstream key remain visible without subgraph-driven width compression.",
     "svg": "Rejected because fixed coordinates add maintenance cost without teaching a quantitative, geometric, or shape-based relationship.",
@@ -105,7 +105,7 @@
     "visualIds": [
       "enterprise-agent-three-plane-boundary"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and a full text description. Direct CONTROL, EXECUTION, and EVIDENCE labels, an explicit HOLD branch, and repeated call/key identities carry the distinction without color. The fitted vertical trace passes native desktop, exact-390 phone, dark-theme, and print-style checks. These checks do not establish PDF pagination or learner comprehension."
+    "accessibility": "One illustrative 50-unit credit preserves credit-123 and downstream key k-456 across control, durable evidence, dispatch, a committed effect with a lost reply, and authoritative reconciliation. Denied actions or failed durable writes stop before dispatch. Unknown transport outcome does not permit a second logical credit. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   },
   "comprehensionRevision": {
     "reviewedAt": "2026-10-27",

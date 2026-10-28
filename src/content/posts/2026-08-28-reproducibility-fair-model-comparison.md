@@ -61,7 +61,7 @@ Keep a failed run in its row with its status.
 			<p class="cm-equation">conclusion allowed: effect size + uncertainty + disclosed cost</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the resource rows before the scores. Unequal data, compute or search can explain a win. The right panel declares the comparison before training and retains every planned run, including failures. Report the complete set's effect size, uncertainty and cost.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the resource rows before the scores. Unequal data, compute or search can explain a win. The right panel declares the comparison before training and retains every planned run, including failures. Report the complete set's effect size, uncertainty and cost. <span class="visual-reader-check" data-reader-check="fair-comparison-evidence-ledger"><strong>Check:</strong> Why does the best observed score alone not isolate a method effect when tuning opportunities differ?</span></figcaption>
 </figure>
 <p class="diagram-source">Original synthesis informed by the <a href="https://arxiv.org/abs/2103.03098">benchmark-variance study</a>, <a href="https://aclanthology.org/D19-1224/">experimental-reporting study</a>, and <a href="https://jmlr.org/papers/v22/20-303.html">NeurIPS reproducibility report</a>.</p>
 

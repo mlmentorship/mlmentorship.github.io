@@ -75,7 +75,7 @@ The latent $z$ is what makes GMM a soft-clustering algorithm: posterior $p(z = k
 		<text class="viz-node-label" x="180" y="473">x ENTERS BOTH M-STEP UPDATES</text>
 		<text class="viz-node-value" x="180" y="487">component 1 with weight r₁ · component 2 with weight r₂</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the ellipses show where each component assigns density, not a hard boundary. At <code>x</code>, multiply each density by its prior weight <code>π</code>, then normalize those scores into <code>r₁</code> and <code>r₂</code>. Because both responsibilities are between zero and one, the same point contributes fractionally to both components' effective counts, means, and covariances. The construction is original and checked against Dempster, Laird, and Rubin (1977), Bishop (2006), and the scikit-learn GaussianMixture documentation.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the ellipses show where each component assigns density, not a hard boundary. At <code>x</code>, multiply each density by its prior weight <code>π</code>, then normalize those scores into <code>r₁</code> and <code>r₂</code>. Because both responsibilities are between zero and one, the same point contributes fractionally to both components' effective counts, means, and covariances. The construction is original and checked against Dempster, Laird, and Rubin (1977), Bishop (2006), and the scikit-learn GaussianMixture documentation. <span class="visual-reader-check" data-reader-check="gmm-soft-responsibility"><strong>Check:</strong> Why can one observation contribute to both M-step updates without being counted twice at full weight?</span></figcaption>
 </figure>
 
 ## Training: EM

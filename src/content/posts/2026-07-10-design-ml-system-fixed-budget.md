@@ -45,39 +45,8 @@ The unit ceiling covers the declared budget scope, not just model kernels.
 Subtract included feature, logging, storage and operational costs before allocating inference spend.
 Excluded costs still belong in a separately reported total.
 
-<p class="visual-title">The serving budget constrains the whole ranking funnel</p>
-
 <!-- visual:fixed-budget-ranking-funnel -->
-```mermaid
-flowchart TB
-	accTitle: A ranking funnel constrained by one serving budget
-	accDescr: One hundred million daily requests imply about 1,160 average QPS and 5,800 QPS at a five-times peak. Each request enters one measured envelope: p95 latency stays below 80 milliseconds and serving cost stays at or below about eight cents per thousand requests before non-serving costs. Cheap candidate generation starts with a large set, a light pre-ranker scores a smaller set, and the expensive final model scores only the smallest set before returning ranked results. Precomputed embeddings and cached popular candidates reduce repeated work. Under overload or budget pressure, the system bypasses expensive scoring for a degraded path using cached or reduced candidates and a simple scorer.
-	Q["100M requests/day<br/>~1,160 average QPS<br/>~5,800 QPS at 5x peak"]
-	S[("Precomputed embeddings<br/>+ popular-item cache")]
-	subgraph E["ONE MEASURED REQUEST ENVELOPE<br/>p95 below 80 ms | serving at or below ~$0.08 / 1K requests"]
-		direction TB
-		C["Candidate generation<br/>large set | cheapest work per candidate"]
-		P["Light pre-ranker<br/>smaller set | moderate work per candidate"]
-		F["Final ranker<br/>smallest set | expensive model only here"]
-		O["Ranked results"]
-		C -->|"discard low-value candidates"| P
-		P ==>|"spend where it can change the order"| F
-		F --> O
-	end
-	Q --> C
-	S -->|"reuse stable work"| C
-	C -.->|"overload or budget pressure"| B["Degraded fallback<br/>cached or reduced candidates<br/>+ simple scorer"]
-	B -.-> O
-	class Q viz-input
-	class S viz-state
-	class F viz-focus
-	class O viz-output
-	class B viz-warning
-	class Q viz-tall
-	class Q viz-wide
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow one request as its candidate set shrinks. Expensive scoring runs on fewer candidates. Measure the whole path against the latency and cost ceilings. The dashed fallback also needs measured cost and quality.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="fixed-budget-ranking-funnel-edition-title"><p class="visual-title" id="fixed-budget-ranking-funnel-edition-title">Spend expensive scoring only after shrinking the candidate set</p><svg viewBox="0 0 360 473" role="img" aria-labelledby="fixed-budget-ranking-funnel-edition-svg-title fixed-budget-ranking-funnel-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="fixed-budget-ranking-funnel-edition-svg-title">Spend expensive scoring only after shrinking the candidate set</title><desc id="fixed-budget-ranking-funnel-edition-svg-desc">Explicitly illustrative candidate counts shrink from 10,000 to 1,000 to 100. Widths communicate ordered narrowing rather than a linear count scale. The separate request-level target remains p95 below 80 milliseconds and cost at most 0.08 dollars per 1,000 requests. Stage p95s are not added as if they were request p95.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative counts, not measured stage</tspan><tspan x="180" dy="19">latencies</tspan></text><g data-editorial-node><rect x="25" y="67" width="310" height="59" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="92" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">retrieve</tspan><tspan x="180" dy="19">10,000 candidates</tspan></text></g><path d="M180 126L180 150" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,143.8569220667674L180,150L183.35597877022943,143.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="65" y="154" width="230" height="59" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="180" y="179" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">pre-rank</tspan><tspan x="180" dy="19">1,000 candidates</tspan></text></g><path d="M180 213L180 237" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,230.8569220667674L180,237L183.35597877022943,230.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="105" y="241" width="150" height="59" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="180" y="266" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">final rank</tspan><tspan x="180" dy="19">100 candidates</tspan></text></g><text x="180" y="348" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Widths show narrowing, not a linear count</tspan><tspan x="180" dy="19">scale.</tspan></text><text x="180" y="391" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Measure request p95 &lt; 80 ms and cost &lt;= $0.08 /</tspan><tspan x="180" dy="19">1K.</tspan></text><text x="180" y="437" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Overload: fewer candidates or a bounded</tspan><tspan x="180" dy="19">fallback.</tspan></text></svg><figcaption><strong>Read it this way:</strong> The counts are illustrative, and funnel widths are schematic. Measure latency and cost for the whole request. Under overload, reduce work or use fallback. <span class="visual-reader-check" data-reader-check="fixed-budget-ranking-funnel"><strong>Check:</strong> Where should expensive work be spent? Which work can be removed before exceeding the shared request budget?</span></figcaption></figure>
 
 ## A defensible architecture progression
 

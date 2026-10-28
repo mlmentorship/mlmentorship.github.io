@@ -59,7 +59,7 @@ Multiply each point's horizontal and vertical deviations, then average those pro
 		<text class="viz-axis-label" x="283" y="181" style="font-size:15px">(1, 1)</text>
 		<text class="viz-callout" x="240" y="317" text-anchor="middle" style="font-size:15px">Cov(X, Y) averages every signed centered product.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> each point has probability one quarter. Two centered products equal two; two equal zero. Their average is one. Opposite-sign deviations would contribute negatively.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each point has probability one quarter. Two centered products equal two; two equal zero. Their average is one. Opposite-sign deviations would contribute negatively. <span class="visual-reader-check" data-reader-check="covariance-centered-product-signs"><strong>Check:</strong> Why do points with Y equal to its mean contribute zero even when X differs from its mean?</span></figcaption>
 </figure>
 
 ## Expectation

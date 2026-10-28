@@ -30,41 +30,8 @@ Knowing GAN training dynamics is also key to understanding why diffusion's stabl
 - **Discriminator $D$**: binary classifier distinguishing real from fake. Trained to maximize correct classification.
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace which network receives an update in each half of GAN training.</p>
-
 <!-- visual:gan-alternating-update-ownership -->
-```mermaid
-flowchart TB
-	accTitle: Alternating discriminator and generator updates in GAN training
-	accDescr: Phase one updates only the discriminator. A real sample goes directly to the discriminator, while noise passes through a frozen generator to make a generated sample for the same discriminator. The discriminator learns to score real samples toward one and generated samples toward zero. Phase two updates only the generator. Fresh noise passes through the generator and then a frozen discriminator. The generator receives gradients through that discriminator and learns to raise the generated sample's real score toward one. Training then repeats with the newly updated networks.
-
-	subgraph DSTEP["1 · DISCRIMINATOR STEP · UPDATE D, FREEZE G"]
-		direction TB
-		X["Real sample x"] --> DPAIR["Same discriminator D<br/>compares both sources"]
-		ZD["Noise z"] --> GF["Generator G(z)<br/>FROZEN"] --> DPAIR
-		DPAIR --> DT["D targets<br/>D(x) → 1 · D(G(z)) → 0"]
-		DT ==> DU["UPDATE D ONLY"]
-	end
-
-	subgraph GSTEP["2 · GENERATOR STEP · UPDATE G, FREEZE D"]
-		direction TB
-		ZG["Fresh noise z"] --> GG["Generator G(z)<br/>UPDATED"]
-		GG --> DF["Discriminator D(G(z))<br/>FROZEN"]
-		DF -->|"increase generated sample's real score"| GT["Non-saturating target<br/>D(G(z)) → 1"]
-		GT ==> GU["UPDATE G ONLY<br/>gradient passes through D"]
-	end
-
-	DU ==>|"then"| ZG
-	GU -.->|"repeat with updated networks"| X
-
-	class X,ZD,ZG viz-input
-	class GF,DF viz-state
-	class DPAIR,DT,GT viz-focus
-	class DU,GG,GU viz-output
-	class X viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> first train <var>D</var> on both sources while <var>G</var> is only a sample factory. Then freeze <var>D</var> but keep it in the differentiable path: its judgment sends a gradient into <var>G</var>, whose practical non-saturating target is to push <var>D</var>(<var>G</var>(<var>z</var>)) toward “real.” Alternating changes who learns, not which networks participate in the forward pass.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="gan-alternating-update-ownership-edition-title"><p class="visual-title" id="gan-alternating-update-ownership-edition-title">Freezing discriminator parameters must not detach the generator's gradient path</p><svg viewBox="0 0 360 430" role="img" aria-labelledby="gan-alternating-update-ownership-edition-svg-title gan-alternating-update-ownership-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="gan-alternating-update-ownership-edition-svg-title">Freezing discriminator parameters must not detach the generator's gradient path</title><desc id="gan-alternating-update-ownership-edition-svg-desc">The discriminator step detaches generated samples, updating D but not G. The generator step freezes D parameters while a dashed loss-gradient path passes through D back into G. The two panels distinguish no parameter update from no gradient path.</desc><text x="180" y="23" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">1. DISCRIMINATOR STEP</tspan></text><g data-editorial-node><rect x="18" y="54" width="126" height="67" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="81" y="73.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="81" dy="0">G produces</tspan><tspan x="81" dy="19">fake</tspan><tspan x="81" dy="19">G NOT updated</tspan></text></g><g data-editorial-node><rect x="216" y="54" width="126" height="67" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="279" y="73.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="279" dy="0">D sees real +</tspan><tspan x="279" dy="19">fake</tspan><tspan x="279" dy="19">UPDATE D</tspan></text></g><path d="M144 88L216 88" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M209.8569220667674,91.35597877022943L216,88L209.8569220667674,84.64402122977057" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="145" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">fake is detached: no gradient back into G</tspan></text><path d="M18 180L342 180" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="223" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">2. GENERATOR STEP</tspan></text><g data-editorial-node><rect x="18" y="252" width="126" height="67" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="81" y="271.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="81" dy="0">G produces</tspan><tspan x="81" dy="19">fake</tspan><tspan x="81" dy="19">UPDATE G</tspan></text></g><g data-editorial-node><rect x="216" y="252" width="126" height="67" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="279" y="271.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="279" dy="0">D evaluates</tspan><tspan x="279" dy="19">fake</tspan><tspan x="279" dy="19">D NOT updated</tspan></text></g><path d="M144 285L216 285" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M209.8569220667674,288.3559787702294L216,285L209.8569220667674,281.6440212297706" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M278 319L278 349" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><path d="M278 349L81 349" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><path d="M81 349L81 319" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75"></path><path d="M84.35597877022943,325.14307793323263L81,319L77.64402122977057,325.14307793323263" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75"></path><text x="180" y="383" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Gradient passes through D into G.</tspan></text><text x="180" y="411" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Frozen parameters != a detached computation</tspan></text></svg><figcaption><strong>Read it this way:</strong> The discriminator step detaches G's output. The generator step instead differentiates through frozen D. No parameter update and no gradient path are different operations. <span class="visual-reader-check" data-reader-check="gan-alternating-update-ownership"><strong>Check:</strong> Why must gradients pass through frozen D during the generator step?</span></figcaption></figure>
 
 At equilibrium (Nash), $G$ produces samples indistinguishable from real, and $D$ outputs $\tfrac{1}{2}$ everywhere.
 

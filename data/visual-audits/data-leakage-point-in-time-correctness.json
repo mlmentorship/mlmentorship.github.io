@@ -3,9 +3,9 @@
   "slug": "data-leakage-point-in-time-correctness",
   "article": "src/content/posts/2026-08-28-data-leakage-point-in-time-correctness.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Distinguish an event that was available by prediction time from a late-arriving event whose event timestamp alone makes it look eligible.",
-  "mediumRationale": "A compact Mermaid flowchart makes one valid path and one forbidden path visibly cross a named prediction-time boundary. Deterministic SVG would add manual geometry without improving the topological lesson; semantic HTML is weaker at showing paths; interaction is unnecessary for a fixed cutoff; source-figure reuse adds licensing risk; and no visual leaves the distinction between event time and availability time abstract.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "deckReview": {
     "pages": [
       {
@@ -64,7 +64,9 @@
     "summary": "Reviewed the complete article, relevant deck workflow pages, and authoritative feature-store and stream-time documentation. Recommended a compact flowchart with the prediction cutoff as the central boundary and a dashed path that reaches into not-yet-known data."
   },
   "implementation": {
-    "visualIds": ["point-in-time-availability-boundary"],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. The cutoff, timestamps, valid path, and leakage path are directly labeled; solid and dashed paths plus node shapes preserve meaning without color; and the caption restates the inference."
+    "visualIds": [
+      "point-in-time-availability-boundary"
+    ],
+    "accessibility": "The Monday-noon cutoff divides knowable evidence from the future. Payment A occurs Monday at 09:00 and is available at 09:05. Payment B occurs at 10:00 but is unavailable until Wednesday. Its early event timestamp cannot authorize using its later-arriving information. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

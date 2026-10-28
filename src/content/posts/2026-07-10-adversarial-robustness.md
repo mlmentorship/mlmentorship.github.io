@@ -53,7 +53,7 @@ Projected gradient descent iterates gradient steps and projects back into the al
 			<text class="viz-axis-label" x="16" y="205" transform="rotate(-90 16 205)">input feature 2</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start at the clean circle, then follow the signed input-gradient arrow. The diamond crosses the dashed decision boundary but stays inside the allowed square: ordinary accuracy gets the circle right, while worst-case robustness asks whether every point in that threat set keeps the same prediction.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at the clean circle, then follow the signed input-gradient arrow. The diamond crosses the dashed decision boundary but stays inside the allowed square: ordinary accuracy gets the circle right, while worst-case robustness asks whether every point in that threat set keeps the same prediction. <span class="visual-reader-check" data-reader-check="adversarial-threat-set-boundary"><strong>Check:</strong> How can a prediction change while both coordinate changes remain within the allowed budget?</span></figcaption>
 </figure>
 
 ## Defenses

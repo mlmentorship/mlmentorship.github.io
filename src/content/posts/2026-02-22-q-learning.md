@@ -88,7 +88,7 @@ For small finite state-action spaces, store $Q$ as a table. Sample transitions $
 		<rect class="viz-node viz-node--output" x="68" y="400" width="224" height="32" rx="4"></rect>
 		<text class="viz-callout" x="180" y="421" text-anchor="middle">Q(s, a) ← 4 + 0.25 × 1 = 4.25</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> use the sampled transition to obtain <var>s</var>′ and <var>r</var>, then scan every action value at <var>s</var>′ for the maximum. Here exploration samples down, but the target uses right because its value is 6. That mismatch is intentional: behavior gathers data, while the greedy target defines what Q-learning learns.</figcaption>
+	<figcaption><strong>Read it this way:</strong> use the sampled transition to obtain <var>s</var>′ and <var>r</var>, then scan every action value at <var>s</var>′ for the maximum. Here exploration samples down, but the target uses right because its value is 6. That mismatch is intentional: behavior gathers data, while the greedy target defines what Q-learning learns. <span class="visual-reader-check" data-reader-check="q-learning-off-policy-backup"><strong>Check:</strong> Why does the target use the right action's value six even though behavior samples down?</span></figcaption>
 </figure>
 
 ## Deep Q-Networks (DQN)

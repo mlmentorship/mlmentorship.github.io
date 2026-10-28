@@ -3,9 +3,9 @@
   "slug": "most-ambitious-project",
   "article": "src/content/posts/2025-05-11-most-ambitious-project.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Distinguish a merely large project from a senior-level ambitious-project story by checking project scale, personal decision ownership, and depth under follow-up together.",
-  "mediumRationale": "A semantic evidence map is the smallest medium that places project scale beside the candidate's personal ownership and then makes follow-up depth a separate gate. It corrects the prose-only temptation to treat duration or launch size as sufficient evidence of senior scope without inventing a scoring formula.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is a simultaneous comparison of three evidence dimensions, not a process or state transition, and arrows would imply a required chronology beyond the existing STAR(L) guidance.",
     "svg": "Rejected: fixed geometry adds no quantitative or spatial precision. Native text panels preserve the hierarchy while wrapping more reliably at 390 CSS pixels.",
@@ -65,6 +65,6 @@
     "visualIds": [
       "ambitious-project-three-evidence-test"
     ],
-    "accessibility": "The figure uses a linked learning question, native sections, headings, and a labelled evidence group in source reading order. Each dimension is named and explained in text, and the caption states the combined inference, so no meaning depends on color or two-column position. The established two-column primitive stacks below 640 pixels, all panels permit ordinary text wrapping with no minimum width, and existing theme tokens provide dark-mode and print contrast without JavaScript or external assets."
+    "accessibility": "A fictional multi-tenant migration risks cross-account data exposure. The narrator chose a shadow comparison rather than immediate replacement and owned the comparison harness; a platform team owned rollout. Technical diff P17 and a team decision note support that boundary. Project scope alone is not evidence of personal seniority. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

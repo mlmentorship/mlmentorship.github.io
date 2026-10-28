@@ -110,7 +110,7 @@ The goal determines the generator, verifier, filters, and held-out test.
 			<text class="viz-gradient-label" x="380" y="370">NO RETURN ARROW · final evidence does not select the system.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the top lane into training: correctness evidence and coverage checks decide which generated rows may teach the student. Then cross the heavy line only after freezing the student; fresh held-out families meet it at final evaluation and never flow back into development.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the top lane into training: correctness evidence and coverage checks decide which generated rows may teach the student. Then cross the heavy line only after freezing the student; fresh held-out families meet it at final evaluation and never flow back into development. <span class="visual-reader-check" data-reader-check="synthetic-data-two-independent-evidence-gates"><strong>Check:</strong> Which evidence may filter training rows? What happens to final-test independence if that final result is used to tune the next student?</span></figcaption>
 </figure>
 
 ## Verification methods

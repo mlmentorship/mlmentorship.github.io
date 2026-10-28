@@ -3,9 +3,9 @@
   "slug": "frontier-lab-proof-of-work-and-references",
   "article": "src/content/posts/2026-07-11-frontier-lab-proof-of-work-and-references.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Build one bounded ownership claim that a concise statement, an inspectable artifact, and an independent witness can each support without requiring identical wording.",
-  "mediumRationale": "A two-panel semantic card is the smallest useful medium: one panel defines the claim core and the other applies three independent checks. It makes corroboration and ownership boundaries visible without inventing scores or implying that the three surfaces should be scripted.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because the lesson is not a process with causal branches; a flowchart would imply that statement, artifact, and reference happen sequentially rather than independently checking one claim.",
     "svg": "Rejected because the model is categorical rather than geometric or quantitative, and fixed drawing text would wrap less naturally at a 390 CSS-pixel viewport.",
@@ -82,6 +82,6 @@
     "visualIds": [
       "proof-of-work-three-checks"
     ],
-    "accessibility": "The figure has a linked learning question and an explicitly labelled group of two semantic sections. The claim core and all three checks are numbered and stated in text, including the required ownership boundary and caveat, so color carries no meaning. The established two-column primitive stacks below 640 CSS pixels with normal text wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast and shared print rules produce a high-contrast light rendering."
+    "accessibility": "Fictional contributor claims authorship of parser-boundary patch P17, not the team rollout. A shareable diff supports the implementation, a witness observed review but not productivity impact, and no controlled outcome comparison is available. Authorship is supported, the broad effect unknown, and a solo-deployment claim conflicts with team ownership. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

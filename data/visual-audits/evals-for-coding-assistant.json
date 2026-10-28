@@ -3,9 +3,9 @@
   "slug": "evals-for-coding-assistant",
   "article": "src/content/posts/2025-06-07-evals-for-coding-assistant.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Choose the evaluation layer that can answer a coding-assistant claim, and state what evidence that layer still cannot provide.",
-  "mediumRationale": "A semantic evidence ladder is the smallest useful medium for pairing each evaluation layer with both the claim it supports and its remaining blind spot. Native headings and text preserve the logic without requiring quantitative geometry or client-side rendering.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart could connect stages, but automatic graph layout would emphasize process order over the more important claim-and-limitation pairing within each layer.",
     "svg": "Rejected: the lesson depends on readable evidence boundaries rather than scale or geometry, so fixed-position text would be less responsive and accessible than semantic HTML.",
@@ -105,6 +105,6 @@
     "visualIds": [
       "coding-assistant-evidence-ladder"
     ],
-    "accessibility": "The figure has a programmatically associated title and a labelled semantic list with three native sections in source order. Every layer, evidence type, and limitation is stated in text, so meaning does not depend on color or position alone. The single-column panel uses ordinary wrapping text with no fixed or minimum width for readability at 390 CSS pixels; established theme variables supply dark-mode contrast and shared print rules provide a high-contrast light palette with page-break protection."
+    "accessibility": "A fictional patch passes eight specified tests, then review finds a new dependency, and the developer accepts but rewrites the patch three hours later. Each observation supports only its own bounded claim. None alone establishes causal productivity improvement. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

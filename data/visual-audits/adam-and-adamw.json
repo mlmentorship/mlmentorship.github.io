@@ -3,9 +3,9 @@
   "slug": "adam-and-adamw",
   "article": "src/content/posts/2025-09-15-adam-and-adamw.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Compare how two equal parameters with different gradient-history scales receive unequal coupled L2 shrinkage in Adam but equal direct shrinkage in AdamW.",
-  "mediumRationale": "A two-column semantic table is the smallest medium that keeps the equal parameter values, unequal preconditioners, and resulting shrinkage terms aligned. Mermaid emphasizes flow rather than arithmetic; deterministic SVG would make selectable table data less accessible; interaction adds no useful state; paper reuse carries licensing and density costs; and no visual leaves the parameter-wise inequality difficult to see.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is a numerical comparison, not a graph topology.",
     "svg": "Rejected: fixed geometry adds complexity and makes the tabular values less accessible.",
@@ -68,7 +68,9 @@
     "summary": "Independently reviewed the complete article, deck, primary papers, and official framework documentation. The hardest prose-only model is why equal parameters can receive different regularization under adaptive scaling, so the final design rejects a generic loss surface in favor of one fixed-preconditioner comparison."
   },
   "implementation": {
-    "visualIds": ["adamw-decoupled-shrinkage"],
-    "accessibility": "The comparison uses a real table with scoped headers, explicit equations, visible Adam and AdamW labels, and a caption that states the conclusion without relying on color. Shared semantic-figure styles stack the panels below 640 pixels, use theme tokens in dark mode, and provide print-safe borders and text."
+    "visualIds": [
+      "adamw-decoupled-shrinkage"
+    ],
+    "accessibility": "With theta one, alpha .01, lambda .1, and fixed adaptive scales one and ten, coupled L2 contributes shrinkage .001 and .0001. AdamW contributes equal .001 shrinkage. Leftward arrows share the same parameter-distance scale; this isolates the penalty and is not a full Adam recurrence. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -3,9 +3,9 @@
   "slug": "causal-inference-for-ml-decisions",
   "article": "src/content/posts/2026-08-28-causal-inference-for-ml-decisions.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "See the backdoor path that makes an observed support-message association differ from the intervention effect.",
-  "mediumRationale": "The lesson is topological rather than quantitative. A compact causal DAG makes the competing paths visible and remains editable with the article.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "deckReview": {
     "pages": [],
     "notes": "The 214-slide source deck was searched by extracted headings and text. It does not contain a dedicated causal-inference or confounding slide, so the visual is derived from this article's worked example rather than imitating a deck figure."
@@ -27,7 +27,9 @@
     "summary": "Recommended Mermaid for a compact treatment-confounder-outcome DAG, with the causal edge emphasized and the two confounding edges distinguished by line style."
   },
   "implementation": {
-    "visualIds": ["causal-confounding-dag"],
-    "accessibility": "The Mermaid source includes an accessible title and full description. Labels and line styles preserve the lesson without relying on color, and a prose caption repeats the inference."
+    "visualIds": [
+      "causal-confounding-dag"
+    ],
+    "accessibility": "Difficulty D points to both treatment T and outcome Y, creating the backdoor association path T left arrow D right arrow Y. The separate T to Y edge is the effect of interest. Adjustment conditions on D without physically removing a causal arrow. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

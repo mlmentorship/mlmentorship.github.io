@@ -74,7 +74,7 @@ The 80% cached-token discount does not apply to the entire request.
 			<text class="viz-gradient-label" x="125" y="428"><tspan x="125">Extra call: another row</tspan><tspan x="125" dy="13">price its actual usage</tspan></text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> each input bar repeats 1,000 prefix tokens. Other input grows from 200 to 400 to 600 tokens. Widths represent token counts, not cost. The 200 output tokens per call are separate. Another call adds its actual usage, not an assumed full-price retry.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each input bar repeats 1,000 prefix tokens. Other input grows from 200 to 400 to 600 tokens. Widths represent token counts, not cost. The 200 output tokens per call are separate. Another call adds its actual usage, not an assumed full-price retry. <span class="visual-reader-check" data-reader-check="llm-cost-compounds-across-agent-calls"><strong>Check:</strong> Which parts of calls 2 and 3 receive a cache discount? Why is their output still charged separately?</span></figcaption>
 </figure>
 
 ## A Practical Cost Model

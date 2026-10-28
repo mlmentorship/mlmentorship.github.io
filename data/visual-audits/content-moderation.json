@@ -3,9 +3,9 @@
   "slug": "content-moderation",
   "article": "src/content/posts/2025-05-29-content-moderation.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how a versioned policy becomes per-policy decisions while human review and appeals correct decisions and supply evidence for evaluation and retraining.",
-  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that keeps policy ownership separate from model scoring while showing the allow, review, and auto-action routes and their shared correction loop.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: labelled directed edges make responsibility, routing, and feedback explicit, while the established renderer supplies responsive layout and theme support.",
     "svg": "Rejected: the lesson is an architecture and lifecycle rather than quantitative geometry, so fixed coordinates would add maintenance without improving the causal sequence.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "content-moderation-governed-decision-loop"
     ],
-    "accessibility": "The Mermaid block provides a specific accessible title and a complete description. Every responsibility, action, and feedback path is directly labelled, and node text plus solid and dashed edge semantics preserve the lesson without color. The top-to-bottom compact layout is designed for the reading column at 390 CSS pixels; the shared Mermaid theme handles dark mode and print."
+    "accessibility": "Under explicitly illustrative policy P7, score 0.62 falls between review thresholds 0.40 and 0.80 and therefore enters human review. The corrected decision retains policy version and reviewer provenance. Allowed-item audits and appeals also contribute corrected records. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

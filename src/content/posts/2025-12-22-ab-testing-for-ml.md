@@ -71,7 +71,7 @@ where `sigma` is the metric's standard deviation and `N` is the sample size **pe
 			<text class="viz-axis-label" transform="translate(14 190) rotate(-90)">MDE (metric units)</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow either line from 1k to 4k to 16k users per arm: each 4× increase halves the effect the test can detect. At any sample size, the dashed σ = 2 line is twice as high, so a metric with twice the noise needs 4× the users to detect the same effect.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow either line from 1k to 4k to 16k users per arm: each 4× increase halves the effect the test can detect. At any sample size, the dashed σ = 2 line is twice as high, so a metric with twice the noise needs 4× the users to detect the same effect. <span class="visual-reader-check" data-reader-check="ab-test-mde-sample-size"><strong>Check:</strong> How much must N increase to keep the same MDE when noise doubles?</span></figcaption>
 </figure>
 
 For a small movement on a noisy metric, you need many users. If "no significant effect" appears, first check whether the test had power to detect your target effect.

@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Distinguish covariate, label, and concept shift by the joint-distribution factor that changes, then decide whether unlabeled target inputs contain enough evidence to adapt.",
-  "mediumRationale": "A deterministic SVG is the smallest useful medium for aligning each shift assumption with its changed factor, fixed factor, and evidence requirement in one left-to-right scan.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart could show method selection, but it would make the parallel changed-versus-fixed factorization harder to compare and would add a client-side rendering dependency.",
     "svg": "Selected: fixed rows, direct labels, and arrows make the assumptions spatially comparable while preserving exact wording and deterministic mobile and print rendering.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "domain-adaptation-shift-assumptions"
     ],
-    "accessibility": "The SVG includes a linked title and complete description. Every distinction is directly labeled with CHANGED or FIXED, and the concept-shift row additionally uses a dashed warning border and dashed arrow, so color is redundant. Its 360-unit viewBox has no minimum width and scales within a 390 CSS-pixel viewport; established theme variables provide dark-mode contrast and the shared print palette renders high-contrast light output."
+    "accessibility": "Toy joint tables change only the declared factor. Covariate shift moves P(X=1) from .2 to .8 with fixed label conditionals. Label shift moves P(Y=1) from .2 to .8 with fixed input conditionals. Two concept-shift worlds then share identical balanced inputs but opposite deterministic label rules. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

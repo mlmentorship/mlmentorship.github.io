@@ -98,7 +98,7 @@ A path from bottom-left to top-right is one alignment. The training loss sums ov
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> move right only on <strong>blank ∅</strong> to consume an acoustic frame; move up only on a <strong>token</strong> to extend the transcript without consuming time. Both labelled paths end at (t=3, u=2) and emit <code>A B</code>, so training adds both path probabilities rather than choosing one alignment. This original schematic was checked against <a href="https://arxiv.org/abs/1211.3711">Graves (2012)</a> and <a href="https://arxiv.org/abs/1811.06621">He et al. (2019)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> move right only on <strong>blank ∅</strong> to consume an acoustic frame; move up only on a <strong>token</strong> to extend the transcript without consuming time. Both labelled paths end at (t=3, u=2) and emit <code>A B</code>, so training adds both path probabilities rather than choosing one alignment. This original schematic was checked against <a href="https://arxiv.org/abs/1211.3711">Graves (2012)</a> and <a href="https://arxiv.org/abs/1811.06621">He et al. (2019)</a>. <span class="visual-reader-check" data-reader-check="rnnt-two-axis-alignment-lattice"><strong>Check:</strong> Which edge advances acoustic time without emitting a token? Why do both shown paths contribute to the probability of AB?</span></figcaption>
 </figure>
 
 $$

@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace how evidence about severity, exposure, uncertainty, and reversibility leads to the smallest mitigation that bounds harm without treating delay as free.",
-  "mediumRationale": "A deterministic SVG decision path keeps the risk evidence, decision question, and two proportionate outcomes visible together in a narrow reading column. Mermaid could express the branches but adds runtime layout and less predictable mobile sizing; semantic HTML would preserve the words but weaken the branching relationship; interaction is unnecessary because the lesson does not require parameter exploration; paper or deck reuse adds no value and has unclear artwork permissions; and no visual leaves the article's hardest judgment call as a list of disconnected considerations.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: it can render the decision tree, but runtime layout is unnecessary for four fixed nodes and less predictable at 390 CSS pixels.",
     "svg": "Selected: exact placement keeps the evidence packet, decision point, and two labelled outcomes readable as one compact, deterministic path.",
@@ -67,6 +67,6 @@
     "visualIds": [
       "quality-speed-proportionate-path"
     ],
-    "accessibility": "The responsive SVG has a title and detailed description. Every branch is directly labelled, arrow paths differ by solid versus dashed treatment, outcomes use distinct shapes and explicit action text, and the caption restates the inference, so color is supplementary. The 360-pixel viewBox scales without a minimum width; shared theme variables provide dark-mode contrast and print overrides."
+    "accessibility": "A fictional staged export release has forty ordinary test cases and ten protected-record cases. Ordinary cases show zero permission violations, but two protected-record cases expose forbidden fields. The decision owner holds the protected path; a reversible ordinary cohort remains subject to authorization and a zero-violation stop rule. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

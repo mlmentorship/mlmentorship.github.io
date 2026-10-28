@@ -91,7 +91,7 @@ Can text-side preferences change the winner without changing acoustic weights?
 		<text class="viz-label" x="180" y="459" text-anchor="middle">valid blend</text>
 		<text class="viz-label" x="324" y="442" text-anchor="end">core adaptation</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> trace text and pronunciation into decoding, not acoustic weights. A jointly trained core can also retain external controls; compatible updates still require validation.</figcaption>
+	<figcaption><strong>Read it this way:</strong> trace text and pronunciation into decoding, not acoustic weights. A jointly trained core can also retain external controls; compatible updates still require validation. <span class="visual-reader-check" data-reader-check="asr-adaptation-boundaries"><strong>Check:</strong> For the marked vocabulary change, which knowledge source can change without retraining the acoustic core?</span></figcaption>
 </figure>
 
 ## Calculate the Changed Preference

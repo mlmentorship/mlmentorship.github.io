@@ -99,7 +99,7 @@ A single backward pass over the trajectory.
 			<text class="viz-gradient-label" x="545" y="339">dashed arrows: recursion direction</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start at the right edge of the rollout and scan left. Each step keeps its own TD residual at full strength, then adds <var>&gamma;&lambda;</var> times the value already accumulated from later steps. Unrolling that recursion gives weights 1, <var>&gamma;&lambda;</var>, (<var>&gamma;&lambda;</var>)<sup>2</sup>, ... for <var>&delta;</var><sub>t</sub>, <var>&delta;</var><sub>t+1</sub>, <var>&delta;</var><sub>t+2</sub>, ... .</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at the right edge of the rollout and scan left. Each step keeps its own TD residual at full strength, then adds <var>&gamma;&lambda;</var> times the value already accumulated from later steps. Unrolling that recursion gives weights 1, <var>&gamma;&lambda;</var>, (<var>&gamma;&lambda;</var>)<sup>2</sup>, ... for <var>&delta;</var><sub>t</sub>, <var>&delta;</var><sub>t+1</sub>, <var>&delta;</var><sub>t+2</sub>, ... . <span class="visual-reader-check" data-reader-check="gae-residual-weight-trace"><strong>Check:</strong> How much does the residual three steps later contribute? Why can one reverse scan compute the total?</span></figcaption>
 </figure>
 
 ## The two knobs

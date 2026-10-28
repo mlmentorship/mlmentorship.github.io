@@ -73,7 +73,7 @@ In $d$ dimensions, explicit degree-two features number $\binom{d+2}{2}$; one ker
 		<text class="viz-callout" x="180" y="378" text-anchor="middle">same inner product: 36</text>
 		<text class="viz-node-value" x="180" y="395">exact shortcut, not an approximation</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> both routes return 36. The explicit route constructs six-coordinate features; the kernel route evaluates the polynomial directly. This skips feature construction without approximating the inner product. References: <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's SVM tutorial</a> and <a href="https://scikit-learn.org/stable/modules/svm.html#svm-kernels">scikit-learn's SVM formulation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both routes return 36. The explicit route constructs six-coordinate features; the kernel route evaluates the polynomial directly. This skips feature construction without approximating the inner product. References: <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's SVM tutorial</a> and <a href="https://scikit-learn.org/stable/modules/svm.html#svm-kernels">scikit-learn's SVM formulation</a>. <span class="visual-reader-check" data-reader-check="kernel-trick-exact-shortcut"><strong>Check:</strong> Which calculation gives the same 36 without materializing either six-dimensional feature vector?</span></figcaption>
 </figure>
 
 ### Change the Distance Scale

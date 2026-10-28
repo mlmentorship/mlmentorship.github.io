@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "See rank-1 PCA as orthogonal projection onto the direction of greatest variance, with the discarded perpendicular residual becoming reconstruction error.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can place centered samples, orthogonal principal directions, projections, and residuals in one checkable coordinate system. Mermaid is suited to relationships rather than geometry; semantic HTML would obscure angles; interaction adds no necessary inference; reusing a paper figure creates avoidable provenance and licensing risk; and prose alone leaves the projection difficult to picture.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "deckReview": {
     "pages": [
       {
@@ -64,7 +64,9 @@
     "summary": "Reviewed the complete article, deck pages 4-6 and 21-23, and authoritative sources. Recommended one static projection diagram because the missing mental model is the geometric meaning of retaining one component, not the mechanics of computing an SVD."
   },
   "implementation": {
-    "visualIds": ["pca-rank-one-projection"],
-    "accessibility": "The figure uses a title and detailed description, direct labels, orthogonal line geometry, distinct circle and diamond markers, and dashed perpendicular residuals. Meaning does not depend on color, the SVG scales through its viewBox, and the existing learning-figure primitives provide dark-mode and print treatment."
+    "visualIds": [
+      "pca-rank-one-projection"
+    ],
+    "accessibility": "The original six centered toy samples are drawn at PC coordinates (130,10), (-130,-10), (85,-20), (-85,20), (40,10), and (-40,-10). Orthogonal PC axes are rotated thirty degrees. Each circle connects perpendicularly to its diamond projection. Cross-covariance is zero and PC1 variance is larger. Squared discarded coordinates sum to twelve hundred. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

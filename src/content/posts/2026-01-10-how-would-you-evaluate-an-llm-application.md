@@ -66,7 +66,7 @@ Five answers pass citation validation alone, one passes support alone, and one p
 			<text x="40" y="518" font-size="22">Repair, then confirm on fresh cases.</text>
 		</g>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> count answers passing both requirements, not their average or union. Thirteen of twenty fails the 70% observed floor. Monitoring the existing production version does not authorize releasing this candidate.</figcaption>
+	<figcaption><strong>Read it this way:</strong> count answers passing both requirements, not their average or union. Thirteen of twenty fails the 70% observed floor. Monitoring the existing production version does not authorize releasing this candidate. <span class="visual-reader-check" data-reader-check="llm-eval-calibration-loop"><strong>Check:</strong> Does the illustrated candidate pass the stated gate? Which arrow shows what happens after it fails?</span></figcaption>
 </figure>
 <p class="diagram-source">References: <a href="https://arxiv.org/abs/2306.05685">LLM-as-judge study</a>, <a href="https://developers.openai.com/api/docs/guides/evaluation-best-practices">OpenAI evaluation guidance</a>, and <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
 

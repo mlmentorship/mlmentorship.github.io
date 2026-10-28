@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "status": "review-complete",
-  "implementationStatus": "Prioritized repairs verified; further redesign and refinement recommendations remain open.",
+  "implementationStatus": "Editorial edition implemented; see editionReconciliation for scope and qualification. Original assessments and previous qualification remain historical.",
   "expectedArticles": 391,
   "expectedVisuals": 392,
   "authoredCodingStates": 797,
@@ -96,26 +96,86 @@
     ],
     "titleRepairPolicy": "These 24 title repairs are not 24 structural redesigns. Enterprise also received a substantive revision. The delayed-label title was already present in current source.",
     "preexistingSourceReconciliations": [
-      { "slug": "approximate-nearest-neighbors", "currentFinding": "The caption now separates candidate omission from PQ distance distortion and identifies the four lookup entries totaling 0.65." },
-      { "slug": "content-based-filtering", "currentFinding": "Interaction counts are explicitly annotations, not score inputs; the candidate scores still use the same content-feature profile." },
-      { "slug": "convolution-as-matmul", "currentFinding": "Labels and caption identify repeated center value 5, four column scores of -4, and forward reshaping rather than summation." },
-      { "slug": "decoding-strategies", "currentFinding": "The figure now has common-scale probability bars and explicit retained masses. Do not retain a claim that those bars are absent." },
-      { "slug": "delayed-labels-selective-labels-feedback-loops", "currentFinding": "A confirmed positive can precede window closure; pending, censored, and mature outcomes are separate. The visible title is already present." },
-      { "slug": "domain-adaptation", "currentFinding": "The caption names changed and invariant factors and states overlap, identifiability, and unrestricted-label-rule limits." },
-      { "slug": "epistemic-vs-aleatoric-uncertainty", "currentFinding": "Ranges and means are explicitly qualitative; equal envelopes do not imply equal variance, coverage, or posterior adequacy." },
-      { "slug": "exploration-vs-exploitation", "currentFinding": "The caption states epsilon-greedy total probability, illustrative UCB coefficient, one-round Thompson draws, and initialization requirements." },
-      { "slug": "factor-analysis-and-ppca", "currentFinding": "The current description distinguishes PPCA's finite-noise principal subspace from the separate deterministic zero-noise projection limit." },
-      { "slug": "factorization-machines", "currentFinding": "The caption gives unseen-pair coefficient 0.60 and equal 1.96 computations without claiming unseen-pair accuracy." },
-      { "slug": "fault-tolerant-collectives", "currentFinding": "The caption separates replay from mixed states from restoring one complete boundary and conditions coherent replay on the restoration protocol." },
-      { "slug": "graphical-models", "currentFinding": "Open paths now say may depend. The caption separates path opening, the specific OR-table dependence, and causal interpretation." },
-      { "slug": "hypothesis-testing-confidence-intervals", "currentFinding": "The current caption compares zero and useful-gain thresholds and identifies only the first interval as the paired calculation's result." },
-      { "slug": "knowledge-graph-embeddings", "currentFinding": "The swap caption distinguishes forced DistMult equality from permitted ComplEx asymmetry and names the worked 1 versus -1 scores." },
-      { "slug": "matrix-factorization-recsys", "currentFinding": "The caption states exact row selection, matching-coordinate products, and that an unknown rating is not a zero target." },
-      { "slug": "mdps-and-bellman-equations", "currentFinding": "The caption shows branch returns, probability weights, expected value 1.75, and the two incorrect alternatives 1.5 and 2." },
-      { "slug": "object-detection-overview", "currentFinding": "The caption separates inference NMS from training-time one-to-one assignment and does not guarantee perfect uniqueness." },
-      { "slug": "position-bias-counterfactual-learning-to-rank", "currentFinding": "Counts and inverse-examination corrections are explicitly hypothetical expectations, not measured clicks or a target-policy value estimate." },
-      { "slug": "profiling-distributed-ml-workloads", "currentFinding": "The caption acknowledges differing compute lengths and points to the equal-compute table for an isolated overlap comparison." },
-      { "slug": "semantic-segmentation", "currentFinding": "The caption makes lost coarse-grid distinctions and the conditional usefulness of fine skip evidence explicit; a sharp boundary is not guaranteed." }
+      {
+        "slug": "approximate-nearest-neighbors",
+        "currentFinding": "The caption now separates candidate omission from PQ distance distortion and identifies the four lookup entries totaling 0.65."
+      },
+      {
+        "slug": "content-based-filtering",
+        "currentFinding": "Interaction counts are explicitly annotations, not score inputs; the candidate scores still use the same content-feature profile."
+      },
+      {
+        "slug": "convolution-as-matmul",
+        "currentFinding": "Labels and caption identify repeated center value 5, four column scores of -4, and forward reshaping rather than summation."
+      },
+      {
+        "slug": "decoding-strategies",
+        "currentFinding": "The figure now has common-scale probability bars and explicit retained masses. Do not retain a claim that those bars are absent."
+      },
+      {
+        "slug": "delayed-labels-selective-labels-feedback-loops",
+        "currentFinding": "A confirmed positive can precede window closure; pending, censored, and mature outcomes are separate. The visible title is already present."
+      },
+      {
+        "slug": "domain-adaptation",
+        "currentFinding": "The caption names changed and invariant factors and states overlap, identifiability, and unrestricted-label-rule limits."
+      },
+      {
+        "slug": "epistemic-vs-aleatoric-uncertainty",
+        "currentFinding": "Ranges and means are explicitly qualitative; equal envelopes do not imply equal variance, coverage, or posterior adequacy."
+      },
+      {
+        "slug": "exploration-vs-exploitation",
+        "currentFinding": "The caption states epsilon-greedy total probability, illustrative UCB coefficient, one-round Thompson draws, and initialization requirements."
+      },
+      {
+        "slug": "factor-analysis-and-ppca",
+        "currentFinding": "The current description distinguishes PPCA's finite-noise principal subspace from the separate deterministic zero-noise projection limit."
+      },
+      {
+        "slug": "factorization-machines",
+        "currentFinding": "The caption gives unseen-pair coefficient 0.60 and equal 1.96 computations without claiming unseen-pair accuracy."
+      },
+      {
+        "slug": "fault-tolerant-collectives",
+        "currentFinding": "The caption separates replay from mixed states from restoring one complete boundary and conditions coherent replay on the restoration protocol."
+      },
+      {
+        "slug": "graphical-models",
+        "currentFinding": "Open paths now say may depend. The caption separates path opening, the specific OR-table dependence, and causal interpretation."
+      },
+      {
+        "slug": "hypothesis-testing-confidence-intervals",
+        "currentFinding": "The current caption compares zero and useful-gain thresholds and identifies only the first interval as the paired calculation's result."
+      },
+      {
+        "slug": "knowledge-graph-embeddings",
+        "currentFinding": "The swap caption distinguishes forced DistMult equality from permitted ComplEx asymmetry and names the worked 1 versus -1 scores."
+      },
+      {
+        "slug": "matrix-factorization-recsys",
+        "currentFinding": "The caption states exact row selection, matching-coordinate products, and that an unknown rating is not a zero target."
+      },
+      {
+        "slug": "mdps-and-bellman-equations",
+        "currentFinding": "The caption shows branch returns, probability weights, expected value 1.75, and the two incorrect alternatives 1.5 and 2."
+      },
+      {
+        "slug": "object-detection-overview",
+        "currentFinding": "The caption separates inference NMS from training-time one-to-one assignment and does not guarantee perfect uniqueness."
+      },
+      {
+        "slug": "position-bias-counterfactual-learning-to-rank",
+        "currentFinding": "Counts and inverse-examination corrections are explicitly hypothetical expectations, not measured clicks or a target-policy value estimate."
+      },
+      {
+        "slug": "profiling-distributed-ml-workloads",
+        "currentFinding": "The caption acknowledges differing compute lengths and points to the equal-compute table for an isolated overlap comparison."
+      },
+      {
+        "slug": "semantic-segmentation",
+        "currentFinding": "The caption makes lost coarse-grid distinctions and the conditional usefulness of fine skip evidence explicit; a sharp boundary is not guaranteed."
+      }
     ],
     "verification": {
       "registeredArticles": 391,
@@ -3788,5 +3848,687 @@
       "improvement": "Use the exact shift -log(1+e) with rounded display marked approximate, connect unchanged logit differences to the same probability bars, and draw a shared-offset slider with its z-loss minimum. Keep the positive coefficient and squared-log-partition objective explicit without implying all logits become equal.",
       "readerCheck": "Why can z-loss change while softmax probabilities and target cross-entropy stay exactly the same under a common shift?"
     }
-  ]
+  ],
+  "editionReconciliation": {
+    "status": "implemented; production rendering and interactions qualified",
+    "registeredVisuals": 392,
+    "supplementalVisuals": 16,
+    "articleCount": 391,
+    "commonImprovements": [
+      "Editorial figure typography and responsive composition",
+      "A figure-specific inference question on every registered caption"
+    ],
+    "registeredRedraws": [
+      {
+        "visualId": "coding-interview-method-state",
+        "slug": "coding-interview-method",
+        "change": "The complement is a value; the saved map entry recovers its earlier index",
+        "readerInference": "Follow value 2 from the complement calculation to the saved index 1. Returning [1,2] uses two different positions. Query-before-store is the invariant, not a variable spelling."
+      },
+      {
+        "visualId": "pca-rank-one-projection",
+        "slug": "svd-and-pca",
+        "change": "The retained coordinate stays; the perpendicular coordinate becomes reconstruction error",
+        "readerInference": "Match each circle to its diamond without panning. The PC1 coordinate is unchanged; PC2 becomes zero. For (85,-20), squared reconstruction error is 400. These are illustrative coordinates, not measured data."
+      },
+      {
+        "visualId": "mf-missing-rating-dot-product",
+        "slug": "matrix-factorization-recsys",
+        "change": "One missing entry selects two matching rows, then sums their coordinate products",
+        "readerInference": "Keep user A and item 3 fixed through every stage. Their matching factor rows contribute 3 and 1. The predicted missing rating is 4, not a newly observed preference."
+      },
+      {
+        "visualId": "flashattention-standard-hbm-path",
+        "slug": "flashattention",
+        "change": "The avoided HBM round trips belong to intermediates, not every tensor",
+        "readerInference": "For these declared two-byte intermediates, four transfers total 8n^2 bytes in the baseline. Avoiding them does not eliminate all HBM traffic or quadratic arithmetic. Actual intermediate precision can differ."
+      },
+      {
+        "visualId": "regularization-diagnose-and-target",
+        "slug": "regularization",
+        "change": "A train/validation gap is evidence to investigate, not a diagnosis by itself",
+        "readerInference": "The dashed validation curve turns upward while train loss falls. Check split and mode before attributing the gap to capacity. The proposed held-out intervention has no invented result."
+      },
+      {
+        "visualId": "environment-grader-contract-handoff",
+        "slug": "rl-environments-and-graders",
+        "change": "A successful final state can still fail the declared process contract",
+        "readerInference": "Read actual events, not just the final task state. This declared grader rejects even the blocked unauthorized attempt. Other contracts may differ; quality cannot override this hard rule."
+      },
+      {
+        "visualId": "rlhf-dpo-training-paths",
+        "slug": "rlhf-and-dpo",
+        "change": "The stored preference pair enters different optimization machinery",
+        "readerInference": "Fresh policy rollouts occur only on the RLHF branch. DPO reuses the stored pair and fixed reference directly. Its reference-relative objective is not an unconstrained update."
+      },
+      {
+        "visualId": "oversight-control-assumption-test",
+        "slug": "scalable-oversight-and-ai-control",
+        "change": "Checking a hard answer and containing an intentional attacker need different evidence",
+        "readerInference": "Assistance tests whether the evaluator can judge difficult work. Containment tests a trusted boundary under the intentional-attacker assumption. Neither observation substitutes for the other."
+      },
+      {
+        "visualId": "two-tower-cross-encoder-fanout",
+        "slug": "two-tower-vs-cross-encoder",
+        "change": "Retrieve reusable vectors, then jointly encode only the surviving pairs",
+        "readerInference": "All six items can reuse offline vectors, but only the three retrieved IDs get joint token interaction here. The reranker cannot recover an item outside that candidate set."
+      },
+      {
+        "visualId": "cross-validation-fit-the-question",
+        "slug": "when-not-cross-validation",
+        "change": "A valid fold boundary follows the dependency and the deployment question",
+        "readerInference": "The corrected boundaries protect time direction and unseen entities. Model selection must also stay inside the evaluation boundary. Dependency-safe folds still do not guarantee deployment representativeness."
+      },
+      {
+        "visualId": "ambitious-project-three-evidence-test",
+        "slug": "most-ambitious-project",
+        "change": "The same decision must survive three changes of zoom",
+        "readerInference": "The shadow-test decision connects stakes, implementation, and ownership. The platform team's rollout is not the narrator's solo achievement. Size alone proves neither judgment nor seniority."
+      },
+      {
+        "visualId": "overrated-technique-claim-stress-test",
+        "slug": "most-overrated-technique",
+        "change": "A bounded critique leaves room for a reversing result",
+        "readerInference": "Question marks are unmeasured outcomes, not zero gains. Keep task slices separate and compare at matched budgets. A contrary result must be allowed to reverse the hypothesis."
+      },
+      {
+        "visualId": "people-also-bought-three-relations",
+        "slug": "people-also-bought",
+        "change": "An ink association becomes a complement only after product-fit verification",
+        "readerInference": "Each edge names a different relation to P1. Fifty baskets is a count, not a rate. Verify C7 fits P1 before treating it as a complementary purchase."
+      },
+      {
+        "visualId": "policy-gradient-advantage-sign",
+        "slug": "policy-gradient",
+        "change": "A positive return can still suppress the sampled action",
+        "readerInference": "Subtract the baseline before following the sign. Every stacked bar sums to one after the exact softmax step. Zero means this sample contributes nothing, not that an entire batch cannot update."
+      },
+      {
+        "visualId": "reward-model-distribution-shift",
+        "slug": "preference-data-and-reward-models",
+        "change": "Optimization can move responses beyond the proxy's validated coverage",
+        "readerInference": "R3 improves the proxy while failing the fresh rubric in this toy example. A score-range band is not full distributional coverage. Inspect on-policy outputs and revalidate; do not assume every run diverges."
+      },
+      {
+        "visualId": "legal-rag-claim-lineage",
+        "slug": "rag-for-legal-docs",
+        "change": "A resolvable citation can leave the claim unsupported",
+        "readerInference": "P-017 supplies C1's exact bound. P-042 does not establish approval, so C2 is removed or escalated. Support, applicability, and release authority remain separate. This is fictional, not legal advice."
+      },
+      {
+        "visualId": "rag-index-request-paths",
+        "slug": "rag-overview",
+        "change": "Follow one versioned chunk from the corpus into the answer",
+        "readerInference": "The same c1 identity survives offline indexing, retrieval, selection, and citation. The reranker removes c2 here. Preserve access and source version; a citation alone still does not prove support."
+      },
+      {
+        "visualId": "gqa-eight-queries-two-kv-groups",
+        "slug": "grouped-query-attention",
+        "change": "Share two K/V pairs without merging eight query heads",
+        "readerInference": "Follow each Q-to-O arrow separately. Brackets mean K/V reuse, not merged queries. Two cached pairs instead of eight use one-quarter of head-dependent cache, not one-quarter of all computation."
+      },
+      {
+        "visualId": "project-stop-forward-evidence-ledger",
+        "slug": "killed-ml-project",
+        "change": "Past spend cannot fill a future-value column",
+        "readerInference": "Compare equal future budgets, not historical investment. The ten-unit test must change a decision by day seven. All returns remain uncertain; continuation displaces the redirect."
+      },
+      {
+        "visualId": "judge-calibration-gates",
+        "slug": "llm-as-judge",
+        "change": "A hard failure and a position-sensitive judge remain separate failures",
+        "readerInference": "Neither high quality nor averaging repairs a missing required field. The swapped pair exposes a separate judge-instability problem. Preserve both outcomes and escalate the semantic disagreement."
+      },
+      {
+        "visualId": "llm-eval-chain-of-trust",
+        "slug": "llm-evals-the-hardest-part",
+        "change": "A proxy can improve while the omitted user contract fails",
+        "readerInference": "The broken link is the omitted permission criterion, not merely a low aggregate score. Fresh failures require case and rubric repair before trusting the proxy again."
+      },
+      {
+        "visualId": "long-context-three-bottlenecks",
+        "slug": "long-context-llms",
+        "change": "Fixing cache allocation does not flatten attention work",
+        "readerInference": "Compare horizontal context positions, not vertical units across tracks. Paging does not change logical KV growth. FlashAttention does not change dense quadratic arithmetic. Usable context must satisfy every constraint."
+      },
+      {
+        "visualId": "coding-assistant-evidence-ladder",
+        "slug": "evals-for-coding-assistant",
+        "change": "The same patch supports three different kinds of claim",
+        "readerInference": "Follow P17 through all three observations. Tests, maintainability, and lasting usefulness are different claims. A causal benefit still needs a controlled comparison."
+      },
+      {
+        "visualId": "independent-confirmation-vs-adaptive-reuse",
+        "slug": "evaluation-validity-benchmark-contamination",
+        "change": "A feedback arrow changes the benchmark's role",
+        "readerInference": "The loop on B makes it development feedback. The one-way H path confirms only the frozen system and tested scope. Further selection needs another independent evaluation."
+      },
+      {
+        "visualId": "bandit-three-selection-rules",
+        "slug": "exploration-vs-exploitation",
+        "change": "The same leader can lose to an uncertainty bonus or one posterior draw",
+        "readerInference": "Dots and whiskers show UCB means and bonuses, not confidence guarantees for this chosen coefficient. Thompson curves are explicit toy assumptions. Only the displayed draw selects B."
+      },
+      {
+        "visualId": "llm-adaptation-layers",
+        "slug": "fine-tune-vs-prompt-vs-rag",
+        "change": "Valid JSON can still apply the wrong policy",
+        "readerInference": "The day-14 marker lies beyond A and inside B. Syntax passes while current-policy evidence fails. Neither a schema nor fine-tuning supplies missing current authority."
+      },
+      {
+        "visualId": "fine-tuning-two-decisions",
+        "slug": "fine-tuning-deep",
+        "change": "Choose a training signal and an update scope, not one item from a mixed list",
+        "readerInference": "SFT tells you which loss and examples train the model. LoRA tells you where trainable updates live. Their highlighted intersection is one valid combination."
+      },
+      {
+        "visualId": "as-five-cross-cutting-signals",
+        "slug": "five-things-as-interview-tests",
+        "change": "One exchange can expose several skills and leave others unknown",
+        "readerInference": "The exchange provides overlapping evidence, not five separate rounds or personality scores. Unknown delivery and scientific evidence stays unknown. Choose the next drill from the observed gap."
+      },
+      {
+        "visualId": "interview-evidence-to-drill",
+        "slug": "frontier-lab-interview-processes-2026",
+        "change": "A confirmed constraint selects a drill; an unknown permission selects a question",
+        "readerInference": "Match confirmed environment and time to the drill. Unknown tool permission is not an invitation to guess. Ask the authorized contact before relying on that tool."
+      },
+      {
+        "visualId": "proof-of-work-three-checks",
+        "slug": "frontier-lab-proof-of-work-and-references",
+        "change": "Evidence can support a bounded contribution without proving a broader outcome",
+        "readerInference": "The diff and witness support the narrow implementation claim, not every surrounding story. Preserve unknown outcomes, team ownership, and confidentiality. Consistency alone does not establish truth."
+      },
+      {
+        "visualId": "adamw-decoupled-shrinkage",
+        "slug": "adam-and-adamw",
+        "change": "Equal weights, unequal coupled penalties",
+        "readerInference": "Compare arrows on one zoomed parameter scale. Coupled L2 is divided by the fixed adaptive scale. AdamW is not. Coupled penalties also affect moment buffers."
+      },
+      {
+        "visualId": "quality-speed-proportionate-path",
+        "slug": "advocated-quality-over-speed",
+        "change": "New evidence can change which users may be exposed",
+        "readerInference": "The protected path fails before exposure. A stage is not a permission exception. The named owner stops even the ordinary cohort on its first violation."
+      },
+      {
+        "visualId": "agent-review-control-loop",
+        "slug": "agentic-ml-codebase-interview",
+        "change": "A passing patch returns to an independent boundary test",
+        "readerInference": "The independent equality case breaks the proposed patch. Return it for revision without widening scope. The agent supplies evidence; the engineer retains acceptance authority."
+      },
+      {
+        "visualId": "product-metric-decision-authority",
+        "slug": "choose-ml-product-metrics",
+        "change": "Two passing metrics cannot cancel one latency veto",
+        "readerInference": "Use each row's units and declared inequality. Completion and cost pass; latency fails. Their conjunction holds full release. Diagnostics explain the failure but cannot override it."
+      },
+      {
+        "visualId": "dbscan-neighborhood-expansion",
+        "slug": "dbscan",
+        "change": "The same radius makes D core and E border",
+        "readerInference": "The shaded spans use the same distance scale and radius. D counts five, including itself. E counts two and cannot extend the cluster. F has no core neighbor."
+      },
+      {
+        "visualId": "coding-product-authority-boundary",
+        "slug": "design-ai-coding-product",
+        "change": "A shared context broker is not shared tool authority",
+        "readerInference": "The dashed boundary encloses tool execution, not final acceptance. The first three modes stop at generated outputs. A returned patch still needs the developer's decision."
+      },
+      {
+        "visualId": "domain-adaptation-shift-assumptions",
+        "slug": "domain-adaptation",
+        "change": "Which factor moved? Inspect the same joint-probability cells",
+        "readerInference": "Rows index X and columns index Y. Check the stated conditional against the cells. Identical target input marginals cannot identify which opposite label rule holds."
+      },
+      {
+        "visualId": "ecosystem-delayed-feedback-loop",
+        "slug": "annotated-ecosystem-strategy-mock",
+        "change": "Viewer response can arrive before creator supply changes",
+        "readerInference": "Viewer evidence can arrive within the experiment. Creator retention and production may not. The later direction is unknown; horizon spacing is schematic."
+      },
+      {
+        "visualId": "agent-governed-action-path",
+        "slug": "annotated-upper-ic-agent-platform-mock",
+        "change": "One call ID crosses permission, execution, and outcome evidence",
+        "readerInference": "The permission decision comes before credential issuance. A dispatch attempt is not an authoritative outcome; the tool receipt establishes the result."
+      },
+      {
+        "visualId": "coding-assistant-two-latency-paths",
+        "slug": "build-llm-coding-assistant",
+        "change": "A correct suggestion for yesterday's buffer is still stale",
+        "readerInference": "R1 cannot overwrite version 42, even when its code is correct. R2 still needs live version, deadline, and policy checks. Vertical spacing is schematic."
+      },
+      {
+        "visualId": "causal-confounding-dag",
+        "slug": "causal-inference-for-ml-decisions",
+        "change": "A shared cause can connect treatment and outcome without the treatment effect",
+        "readerInference": "Follow the two difficulty arrows as one backdoor route. The horizontal treatment arrow is a different path. Adjustment does not physically delete arrows."
+      },
+      {
+        "visualId": "fused-moe-triton-sram-roofline",
+        "slug": "chinchilla-moe-fused-triton",
+        "change": "Fusion removes the intermediate round trip, not every memory transfer",
+        "readerInference": "The avoided transfer is the same intermediate written and read once: 4tF bytes for two-byte elements. Other traffic and tile-fit constraints remain."
+      },
+      {
+        "visualId": "content-moderation-governed-decision-loop",
+        "slug": "content-moderation",
+        "change": "A score selects an action only through a declared policy",
+        "readerInference": "In this illustrative policy, 0.62 enters human review, not automatic action. Audits and appeals preserve policy and reviewer provenance. These thresholds are not universal."
+      },
+      {
+        "visualId": "paper-critique-prioritization-funnel",
+        "slug": "critique-ml-paper",
+        "change": "Four more accuracy points came with twice the compute",
+        "readerInference": "The report changes accuracy and compute together. Three paired, matched-compute runs test whether a useful gain survives. Their results are unknown, not implied by the drawing."
+      },
+      {
+        "visualId": "point-in-time-availability-boundary",
+        "slug": "data-leakage-point-in-time-correctness",
+        "change": "An earlier event can still be unavailable at prediction time",
+        "readerInference": "Payment B happened before noon but arrived on Wednesday. An event-time-only join leaks future availability. The layout encodes the cutoff, not proportional elapsed time."
+      },
+      {
+        "visualId": "frontier-training-divergence-zoom",
+        "slug": "debug-frontier-llm-training-run",
+        "change": "Find the first bad cell, then zoom into its cause",
+        "readerInference": "This fictional grid localizes the first failure; it does not prove its cause. Change one condition in replay. Recovery and diagnosis remain separate."
+      },
+      {
+        "visualId": "model-not-learning-diagnostic-path",
+        "slug": "debug-model-not-learning",
+        "change": "Separate a broken training path from a full-data generalization gap",
+        "readerInference": "First check whether the tiny batch has an attainable minimum. A widening full-data gap suggests hypotheses, not a unique cause. The curves are illustrative."
+      },
+      {
+        "visualId": "offline-online-gap-diagnostic-order",
+        "slug": "debug-offline-online-metric-gap",
+        "change": "The missing 100 users change which arm wins",
+        "readerInference": "The denominator is everyone assigned, including fallback users. B has 738 + 40 successes, so 77.8% loses to 80%. These counts are illustrative."
+      },
+      {
+        "visualId": "training-loop-persistent-state",
+        "slug": "debug-training-loop",
+        "change": "Gradients and train/eval mode persist independently",
+        "readerInference": "zero_grad clears gradient storage; train restores module mode. They repair different persistent states. The corrected batch-two gradient excludes stale g1."
+      },
+      {
+        "visualId": "work-prioritization-counterfactual-portfolio",
+        "slug": "decide-what-to-work-on",
+        "change": "Every attractive project spends the same remaining capacity",
+        "readerInference": "Reserve obligations before comparing portfolios. Under these toy assumptions, B + C beats A at equal capacity. Revisit when evidence changes the assumptions."
+      },
+      {
+        "visualId": "policy-label-observation-loop",
+        "slug": "delayed-labels-selective-labels-feedback-loops",
+        "change": "Pending, censored, and policy-unobserved are not negative labels",
+        "readerInference": "These schematic rows distinguish four observation states at one cutoff. An early positive may be known. Other eligibility depends on the declared maturity rule."
+      },
+      {
+        "visualId": "agent-safety-authority-loop",
+        "slug": "design-agent-safety-control-plane",
+        "change": "An impact limit must stop the next capability before execution",
+        "readerInference": "The proposed action would cross the illustrative limit. Freeze later capabilities before execution. A monitor alert alone cannot enforce the stop."
+      },
+      {
+        "visualId": "enterprise-agent-three-plane-boundary",
+        "slug": "design-enterprise-agent-platform",
+        "change": "Persist permission before dispatch; reconcile a lost reply instead of paying twice",
+        "readerInference": "The durable authorized record precedes dispatch. Denial or a failed write stops there. A lost reply triggers same-key reconciliation, not another logical credit."
+      },
+      {
+        "visualId": "distributed-recovery-consistency-gate",
+        "slug": "design-fault-tolerant-distributed-training",
+        "change": "A live rank is not proof of a coherent training state",
+        "readerInference": "A single-rank restart leaves the pictured mismatch. Restore and validate the consistency domain. Narrow recovery is valid only when its supported protocol proves coherence."
+      },
+      {
+        "visualId": "feature-store-two-time-contract",
+        "slug": "design-feature-store",
+        "change": "The historical join and the live lookup answer different time questions",
+        "readerInference": "At noon, version B is not available, despite its earlier event time. The later live lookup legitimately returns another version. Values are illustrative."
+      },
+      {
+        "visualId": "foundation-data-deletion-blast-radius",
+        "slug": "design-foundation-model-data-platform",
+        "change": "Removing a source from tomorrow's shards does not erase yesterday's model influence",
+        "readerInference": "Follow D7 through the historical lineage before excluding it from new shards. Existing model influence remains unresolved until separately addressed and validated."
+      },
+      {
+        "visualId": "adaptive-red-team-release-loop",
+        "slug": "design-llm-red-team-program",
+        "change": "One blocked path leaves untested paths open questions",
+        "readerInference": "This fictional grid distinguishes a reproduced repair from missing coverage. Question marks are unknown outcomes. One blocked path cannot certify the whole system."
+      },
+      {
+        "visualId": "ml-ab-test-launch-gates",
+        "slug": "design-ml-ab-test",
+        "change": "Statistically positive, worthwhile, and safe are three different tests",
+        "readerInference": "A positive interval can miss the worthwhile threshold. A worthwhile effect can fail safety. If assignment is invalid, do not interpret either effect."
+      },
+      {
+        "visualId": "ml-monitoring-observability-layers",
+        "slug": "design-ml-monitoring",
+        "change": "Freshness can fail now while outcome quality is still unknown",
+        "readerInference": "The stale snapshot breaches a contract immediately. Outcome quality needs mature labels and adequate joins. Score drift alone proves neither quality nor causal impact."
+      },
+      {
+        "visualId": "fixed-budget-ranking-funnel",
+        "slug": "design-ml-system-fixed-budget",
+        "change": "Spend expensive scoring only after shrinking the candidate set",
+        "readerInference": "The counts are illustrative, and funnel widths are schematic. Measure latency and cost for the whole request. Under overload, reduce work or use fallback."
+      },
+      {
+        "visualId": "multi-team-platform-contract-boundary",
+        "slug": "design-multi-team-ml-platform",
+        "change": "The first valid commit wins; a late worker cannot overwrite it",
+        "readerInference": "A advances the version before B arrives. B cannot replace the winning artifact. Deployment idempotency and writer authority remain separate contracts."
+      },
+      {
+        "visualId": "llm-inference-two-budget-scheduler",
+        "slug": "design-production-llm-inference-service",
+        "change": "Memory stays reserved while iteration work starts fresh",
+        "readerInference": "KV pages persist across iterations; token-work slots refresh each iteration. Stopping A releases its reservation for later admission. All units are illustrative."
+      },
+      {
+        "visualId": "multimodal-stale-frame-gate",
+        "slug": "design-real-time-multimodal-assistant",
+        "change": "Recent arrival cannot make an old screen fresh",
+        "readerInference": "Capture time determines the old frame's age. Arrival time hides the stall. A replacement snapshot needs its own clock bound, decision, and authorization checks."
+      },
+      {
+        "visualId": "reasoning-fixed-budget-reclaim",
+        "slug": "design-reasoning-model-fixed-budget",
+        "change": "A quarterly allocation is not the same as nodes available right now",
+        "readerInference": "The upper bar allocates quarter-hours. The separate toy node strip shows reclamation at one instant. Protected recovery is not discretionary experiment capacity."
+      },
+      {
+        "visualId": "ecosystem-experiment-interference",
+        "slug": "design-short-form-video-ecosystem",
+        "change": "Treatment and control can change the same future creator supply",
+        "readerInference": "Both cells influence the same creator pool. Its later response reaches both future cells. A short viewer experiment does not isolate an untouched ecosystem."
+      },
+      {
+        "visualId": "spotify-two-level-shelf-composition",
+        "slug": "design-spotify-homepage",
+        "change": "Two strong shelves can make a weaker page when they repeat the same song",
+        "readerInference": "Song 1 appears in both A and B. The declared overlap penalty makes A + C the best pair. Shelf order remains unresolved."
+      },
+      {
+        "visualId": "youtube-recommender-selective-feedback-loop",
+        "slug": "design-youtube-recommender",
+        "change": "Ranking 900 candidates does not reveal 900 outcomes",
+        "readerInference": "Ten displayed items produce exposure evidence. The other 890 eligible items remain unknown, not negative. Preserve policy and support when learning from this selection."
+      },
+      {
+        "visualId": "disagreement-evidence-commit-loop",
+        "slug": "disagreed-with-senior",
+        "change": "Change the decision when evidence changes the shared constraint",
+        "readerInference": "The shared constraint, not seniority, selects the feasible option in this fictional case. Record what evidence would reopen the choice. Required reviews remain."
+      },
+      {
+        "visualId": "encoder-once-decoder-loop",
+        "slug": "encoder-decoder-architectures",
+        "change": "Three growing prefixes share one fixed encoder memory",
+        "readerInference": "Each decode step reads the same encoded source. Only the output prefix and decoder-side cache grow. Fixed source K/V do not mean fixed decoder state."
+      },
+      {
+        "visualId": "agent-eval-diagnostic-flywheel",
+        "slug": "evaluate-an-agent",
+        "change": "A passing test step and a failing task outcome can coexist",
+        "readerInference": "Add the unauthorized-write slice to the suite. A production mismatch reopens coverage. Passing one test does not erase the same trial's safety failure."
+      },
+      {
+        "visualId": "search-ranker-evidence-flywheel",
+        "slug": "evaluate-search-ranker",
+        "change": "The better average still fails the tail floor",
+        "readerInference": "Traffic weighting improves B's average while its tail breaches the floor. Hold B and diagnose the slice. An aggregate improvement is not release permission."
+      },
+      {
+        "visualId": "foundation-data-curation-lineage",
+        "slug": "foundation-model-data-curation",
+        "change": "Being listed in a manifest is not proof that a sample was consumed",
+        "readerInference": "Rejected R18 retains its reason without entering a shard. Accepted R17 needs a consumption record, not just manifest membership, before linking it to C200."
+      },
+      {
+        "visualId": "gan-alternating-update-ownership",
+        "slug": "gans-overview",
+        "change": "Freezing discriminator parameters must not detach the generator's gradient path",
+        "readerInference": "The discriminator step detaches G's output. The generator step instead differentiates through frozen D. No parameter update and no gradient path are different operations."
+      },
+      {
+        "visualId": "lora-zero-impact-first-gradient",
+        "slug": "implement-lora-adapter",
+        "change": "A zero initial adapter output does not mean both factors have zero gradient",
+        "readerInference": "B = 0 makes the initial adapter output and A gradient zero. B can still receive a gradient. Frozen base weights do not detach inputs."
+      },
+      {
+        "visualId": "autograd-shared-node-accumulate-then-propagate",
+        "slug": "implement-reverse-mode-autograd",
+        "change": "Two branches add at the shared node before its gradient moves upstream",
+        "readerInference": "Solid arrows carry forward values. Dashed return paths contribute 12 and 2 to the same u. Accumulate 14, then propagate 14 x 3 once."
+      },
+      {
+        "visualId": "senior-principal-delegated-coherence",
+        "slug": "l5-vs-l6-faang-ml",
+        "change": "Delegate local choices; escalate changes that cross a shared contract",
+        "readerInference": "Local changes stay with domain owners. A shared-schema change crosses boundaries and requires joint review. New evidence can reopen the common doctrine."
+      },
+      {
+        "visualId": "healthcare-llm-clinician-gate",
+        "slug": "llm-deployment-healthcare",
+        "change": "The correct patient is not enough: the encounter and draft version must also match",
+        "readerInference": "Match patient, encounter, date, and claim. The review receipt binds the corrected draft version. Documentation authority does not permit autonomous clinical action."
+      },
+      {
+        "visualId": "llm-security-influence-authority-path",
+        "slug": "llm-security-threat-models",
+        "change": "Untrusted context can propose an action without acquiring authority to execute it",
+        "readerInference": "The proposed action cannot borrow authority from retrieved text. Its fields fail the verified scope. Blocking tools does not settle answer, cache, or log disclosure."
+      },
+      {
+        "visualId": "training-recipe-evidence-gates",
+        "slug": "neural-network-training-recipe",
+        "change": "A nonzero gradient is not proof that the intended parameters changed",
+        "readerInference": "The gradient exists, but the intended weights do not move. Inspect update wiring and repeat the same batch. This evidence does not uniquely identify a cause."
+      },
+      {
+        "visualId": "personalized-search-request-learning-loop",
+        "slug": "personalized-search-ranking",
+        "change": "Reranking cannot recover an exact result discarded by candidate fusion",
+        "readerInference": "A disappears before either reranker. An eligible exact-intent quota or supported larger merge must preserve it earlier. Protection does not override eligibility or policy."
+      },
+      {
+        "visualId": "personalization-three-feature-clocks",
+        "slug": "real-time-personalization",
+        "change": "A fast request can still assemble stale features",
+        "readerInference": "The stream value arrived recently but describes an older event. Enforce each feature's declared clock contract. Request latency is not source freshness."
+      },
+      {
+        "visualId": "inference-cost-measure-test-compound-loop",
+        "slug": "reduce-llm-inference-cost-10x",
+        "change": "Count only savings that survive the same quality gates",
+        "readerInference": "Keep change 1 and reject change 2. The accepted baseline is 8 units per successful request. Cost reduction is 1.25x, not a fictional 10x."
+      },
+      {
+        "visualId": "ambiguous-problem-scope-loop",
+        "slug": "scope-ambiguous-problem",
+        "change": "A complaint sample suggests a question; a bounded check decides the next scope",
+        "readerInference": "The selected complaints do not establish population prevalence. Resolve the named availability question within the agreed timebox. Its receipt changes scope or stops the proposal."
+      }
+    ],
+    "supplementalRedraws": [
+      {
+        "visualId": "ecosystem-serving-stages",
+        "slug": "annotated-ecosystem-strategy-mock",
+        "change": "Retrieved is not the same as displayed",
+        "readerInference": "Candidate counts cannot replace exposure counts. Only the displayed positions enter this request's exposure denominator. The counts are illustrative, not production measurements."
+      },
+      {
+        "visualId": "coding-product-mode-boundaries",
+        "slug": "design-ai-coding-product",
+        "change": "Shared context does not grant shared execution authority",
+        "readerInference": "The agent's scoped tool authority is separate from shared context access. Passing tests returns evidence, not permission to apply a patch automatically."
+      },
+      {
+        "visualId": "coding-product-task-lifecycle",
+        "slug": "design-ai-coding-product",
+        "change": "A cancellation request is not proof that the worker stopped",
+        "readerInference": "Stop issuing work when cancellation is requested. Wait for worker-stop evidence before declaring cancellation complete. Verification still does not apply the patch."
+      },
+      {
+        "visualId": "foundation-data-build-planes",
+        "slug": "design-foundation-model-data-platform",
+        "change": "Completed shards are only one input to publication",
+        "readerInference": "A completed build does not authorize use. Policy permission and checks must both pass before an immutable manifest is published."
+      },
+      {
+        "visualId": "multimodal-path-boundaries",
+        "slug": "design-real-time-multimodal-assistant",
+        "change": "A proposal is not permission",
+        "readerInference": "Authorize; verify device state."
+      },
+      {
+        "visualId": "multimodal-turn-lifecycle",
+        "slug": "design-real-time-multimodal-assistant",
+        "change": "Interruption must retire old output",
+        "readerInference": "Confirm playback stopped."
+      },
+      {
+        "visualId": "reasoning-admission-and-capacity",
+        "slug": "design-reasoning-model-fixed-budget",
+        "change": "A desired model route is not an admitted reservation",
+        "readerInference": "Free compute cannot substitute for missing KV pages. This request is not admitted. Reserve both resources before execution when both bounds fit."
+      },
+      {
+        "visualId": "video-ecosystem-delayed-effects",
+        "slug": "design-short-form-video-ecosystem",
+        "change": "The immediate viewer signal arrives before the full supply response",
+        "readerInference": "Viewer response and creator supply arrive on different horizons. Eligibility and funding may affect supply too. This drawing assumes neither a benefit nor a harm."
+      },
+      {
+        "visualId": "video-publication-evidence",
+        "slug": "design-short-form-video-ecosystem",
+        "change": "A release binds compatible versions, and rollback must bind them too",
+        "readerInference": "Deploy and roll back compatible versioned bundles. An older model file alone is insufficient. Exposure outcomes require their own records."
+      },
+      {
+        "visualId": "stairs-final-move-partition",
+        "slug": "climbing-stairs",
+        "change": "Eight paths split cleanly by their final move",
+        "readerInference": "Each row totals five steps. The highlighted final move places it in exactly one group. Five ending in +1 plus three ending in +2 gives eight."
+      },
+      {
+        "visualId": "course-prerequisite-fanout",
+        "slug": "course-schedule",
+        "change": "One finished prerequisite does not make course 3 ready",
+        "readerInference": "Course 3 has two incoming requirements. Its unmet count changes 2 -> 1 -> 0 as the parents finish. Ready is not the same as already completed."
+      },
+      {
+        "visualId": "robber-take-skip-boundaries",
+        "slug": "house-robber",
+        "change": "Taking house 3 can reuse only the optimum through house 1",
+        "readerInference": "The take branch stops its reusable prefix two houses back. The skip branch keeps eleven. Their maximum is eleven, without using adjacent houses."
+      },
+      {
+        "visualId": "lcs-conditional-parent-cells",
+        "slug": "longest-common-subsequence",
+        "change": "A match takes the diagonal; a mismatch compares the two shorter prefixes",
+        "readerInference": "At B = B, extend the diagonal value to two. At B != C, keep the larger shorter-prefix value, one. The parents solve different prefix questions."
+      },
+      {
+        "visualId": "subset-sum-old-snapshot",
+        "slug": "partition-equal-subset-sum",
+        "change": "Add the new item to the old snapshot, not to sums just created",
+        "readerInference": "New sums use only the old snapshot. Union happens afterward. Feeding new 5 back into this same update would incorrectly reuse the item."
+      },
+      {
+        "visualId": "dsu-edges-versus-parents",
+        "slug": "redundant-connection",
+        "change": "Path compression changes the bookkeeping, not the original graph",
+        "readerInference": "The top graph is unchanged. Only the parent pointer for 4 shortens after find. A DSU parent arrow is not an accepted problem-graph edge."
+      },
+      {
+        "visualId": "subsets-increasing-index-tree",
+        "slug": "subsets",
+        "change": "Increasing indices choose membership without emitting every ordering",
+        "readerInference": "Each extension uses a later index. The rejected [2,1] ordering represents membership already emitted as [1,2]. All eight distinct subsets remain."
+      }
+    ],
+    "manualRevisions": [
+      {
+        "visualId": "hierarchical-all-reduce-path",
+        "change": "Rank values 1,3 and 2,4 form local partials 4 and 6; the slow-boundary crossing produces 10 and all four ranks receive 10. This is a logical reduction, not a measured physical packet schedule."
+      },
+      {
+        "visualId": "bayes-positive-test-denominator",
+        "change": "The exact positive-test denominator has count-proportional 99 and 999 segments over 1098 positives; the posterior is about 9%, not the test sensitivity."
+      }
+    ],
+    "coding": {
+      "definitions": 106,
+      "checkpoints": 797,
+      "comparisonPolicy": "Selected values shown at consecutive authored checkpoints. The first is a snapshot; an absent field means not shown, not deletion. No intervening execution is invented.",
+      "mechanismSpecificRevisions": [
+        "3sum",
+        "construct-tree-from-preorder-and-inorder-traversal",
+        "palindromic-substrings",
+        "reverse-bits",
+        "two-sum"
+      ],
+      "histogramClarification": "The final view distinguishes unresolved positive heights from the actual stack, which still contains the zero sentinel."
+    },
+    "preservation": {
+      "headings": true,
+      "pythonFences": true,
+      "orderedVisualIds": true,
+      "authoredFrameIds": true,
+      "orderedMotionIds": true,
+      "protectedSources": true
+    },
+    "successfulGeometryPolicy": "Retain useful existing plots and explicit counterexamples rather than replacing them merely to increase the redraw count.",
+    "qualificationPolicy": "Source review, native rendering, contact-sheet review and individual native-image inspection are distinct. See docs/VISUAL_COMPREHENSION_REVIEW.md and the final evidence manifest for accepted coverage.",
+    "qualification": {
+      "status": "passed",
+      "candidateTree": "2403ceb51ee4f50979f06a5049a799c6de843bab",
+      "evidenceManifest": "/tmp/mlmentorship-illustration-edition-20261027-81b8a701/production-r5/production-qualified.json",
+      "evidenceManifestSha256": "65f6eccac269e471bf0f4ab90034813620f4b782f039e57ebaf2b54690e03463",
+      "normalCheckPassed": true,
+      "normalBuildPassed": true,
+      "registeredFigureCases": 1960,
+      "supplementalFigureCases": 80,
+      "authoredScreenFrameCaptures": 3188,
+      "hashedPngFiles": 7574,
+      "modes": [
+        "desktop-light",
+        "desktop-dark",
+        "mobile-light",
+        "mobile-dark",
+        "print"
+      ],
+      "interactionWidths": [
+        390,
+        1280
+      ],
+      "interactiveRoutesPerWidth": 106,
+      "interactiveFramesPerWidth": 797,
+      "reusedArticleCount": 300,
+      "freshArticleCount": 91,
+      "reusePolicy": "Fifteen completed batches are accepted only after exact source, built HTML, runtime-asset, renderer, report and PNG equality. Earlier failed attempts remain separate.",
+      "contactSheetsReviewed": 81,
+      "contactSheetScope": "Labelled mobile-light originals for all 392 registered and 16 supplemental figures; coding thumbnails show the initial authored state, not every checkpoint.",
+      "selectedNativeOriginalsInspected": true,
+      "everyNativeOriginalInspected": false,
+      "everyAuthoredStateIndividuallyInspected": false,
+      "preservedAuthoredFrames": 797,
+      "preservedOrderedMotionIdentities": 8739,
+      "preservedPublicFragments": true,
+      "worktreePolicy": "Qualification uses an isolated assistant-only tree. The user's generator removals, BST statement changes and global-style deletion remain outside the edition commit; the four existing BST statement failures are not repaired or counted as edition failures."
+    },
+    "measuredTenfoldImprovement": false,
+    "learnerStudy": false,
+    "pdfPaginationVerified": false,
+    "publicationPerformed": false
+  }
 }

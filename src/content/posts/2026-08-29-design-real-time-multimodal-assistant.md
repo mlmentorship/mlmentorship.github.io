@@ -54,32 +54,8 @@ Which interval measures interruption?
 
 ## Picture: Arrival Is Not Current State
 
-<p class="visual-title">A newly arrived frame can already be stale</p>
-
 <!-- visual:multimodal-stale-frame-gate -->
-```mermaid
-flowchart TB
-  accTitle: Capture time gates current-screen evidence
-  accDescr: The old frame is captured at 10 seconds and arrives at 14.2. At the 14.3-second question it is 4.3 seconds old, not 0.1 seconds old. Arrival ordering accepts obsolete UI; event-time ordering preserves it as history. A requested frame captured at 14.4 and received at 14.45 has conservative age 68 milliseconds, including 18 milliseconds of clock uncertainty. It passes the 500-millisecond freshness rule only with current source epoch and permission. Otherwise the assistant waits within its deadline or reports stale screen evidence.
-  Old["OLD SCREEN<br/>capture 10.00 s"] --> Stall["UPLINK STALL<br/>frame waits in transport"]
-  Question["CURRENT-SCREEN QUESTION<br/>14.30 s"] --> Clock
-  Stall --> Recovery["RECOVERY<br/>old frame arrives 14.20 s"]
-  Recovery --> Clock{"WHICH CLOCK<br/>selects evidence?"}
-  Clock -->|"arrival time"| Arrival["APPARENT AGE<br/>0.10 s"]
-  Arrival ==> Unsafe["WRONG STATE<br/>obsolete screen accepted"]
-  Clock -->|"mapped capture time + epoch"| Event["ACTUAL AGE<br/>4.30 s; keep as history"]
-  Event --> Watermark["SOURCE PROGRESS<br/>does not prove freshness"]
-  Watermark --> Gate{"FRESH, PERMITTED<br/>ACTIVE-EPOCH EVIDENCE?"}
-  Gate -->|"new capture 14.40; arrives 14.45"| Answer["AGE BOUND 0.068 s<br/>new snapshot; revalidate actions"]
-  Gate -.->|"deadline expires"| Abstain["VISIBLE FALLBACK<br/>screen view is stale"]
-  class Old,Question viz-input
-  class Recovery,Clock,Gate viz-focus
-  class Stall,Watermark viz-state
-  class Event,Answer viz-output
-  class Arrival,Unsafe,Abstain viz-warning
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> late arrival can repair history without advancing live state. Source progress is not proof that a screen remains current. Apply the request's freshness, epoch and permission rules before answering.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="multimodal-stale-frame-gate-edition-title"><p class="visual-title" id="multimodal-stale-frame-gate-edition-title">Recent arrival cannot make an old screen fresh</p><svg viewBox="0 0 360 480" role="img" aria-labelledby="multimodal-stale-frame-gate-edition-svg-title multimodal-stale-frame-gate-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="multimodal-stale-frame-gate-edition-svg-title">Recent arrival cannot make an old screen fresh</title><desc id="multimodal-stale-frame-gate-edition-svg-desc">On one mapped clock the screen is captured at 10.00 seconds, arrives at 14.20, and is considered at 14.30. Actual age is 4.30 seconds; arrival age is only 0.10. Their bars use a shared seconds-per-unit scale. A replacement snapshot belongs to a separate later decision with its own 0.068-second age bound and action revalidation.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">One mapped clock; the old frame keeps its</tspan><tspan x="180" dy="19">capture time</tspan></text><g data-editorial-node><rect x="25" y="55" width="310" height="52" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="76.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">capture 10.00 -&gt; arrival 14.20 -&gt;</tspan><tspan x="180" dy="19">question 14.30</tspan></text></g><text x="20" y="153" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">ACTUAL AGE: 14.30 - 10.00 = 4.30 s</tspan></text><rect x="25" y="173" width="310" height="25" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="20" y="240" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">ARRIVAL AGE: 14.30 - 14.20 = 0.10 s</tspan></text><rect x="25" y="260" width="7.209302325581396" height="25" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="320" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Same seconds-per-unit scale; arrival is not</tspan><tspan x="180" dy="19">capture.</tspan></text><g data-editorial-node><rect x="25" y="356" width="310" height="88" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="180" y="395.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Replacement snapshot: a NEW decision</tspan><tspan x="180" dy="19">age bound 0.068 s; revalidate action</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> Capture time determines the old frame's age. Arrival time hides the stall. A replacement snapshot needs its own clock bound, decision, and authorization checks. <span class="visual-reader-check" data-reader-check="multimodal-stale-frame-gate"><strong>Check:</strong> Why is a frame that arrived 0.10 seconds ago still 4.30 seconds stale?</span></figcaption></figure>
 
 ## Work the Two Traces
 
@@ -280,60 +256,7 @@ Use the twelve core invariants as test obligations across releases, not as model
 
 ## Separate the media, reasoning, and action paths
 
-<p class="visual-title" data-supplemental-visual="multimodal-path-boundaries">Policy precedes execution</p>
-
-```mermaid
-flowchart TB
-  accTitle: Separate live media, reasoning and action paths
-  accDescr: Device microphone, camera, selected window and typed input enter a local controller and regional edge. Timeline processing feeds speech and visual encoders plus context assembly. Fast and deeper model routes return through output and device playback. A separate tool path checks policy and confirmation before execution, then returns authoritative evidence. Versioned registries constrain routing, context and policy; joined event logs support observation and evaluation.
-  subgraph Device[Device capture]
-    Mic[Microphone]
-    Cam[Camera]
-    Scr[Window + UI]
-    Txt[Typed events]
-    Local[Local media<br/>controller]
-    Mic --> Local
-    Cam --> Local
-    Scr --> Local
-    Txt --> Local
-  end
-
-  Local --> Edge[Regional<br/>session edge]
-  Edge --> Time[Timeline +<br/>synchronization]
-  Time --> ASR[Streaming<br/>speech encoder]
-  Time --> Vision[Streaming<br/>visual encoders]
-  Time --> Context[Context<br/>assembler]
-  ASR --> Context
-  Vision --> Context
-  Context --> Router[Model router]
-  Router --> Fast[Fast response<br/>model]
-  Router --> Deep[Deeper multimodal<br/>model]
-  Fast --> Output[Streaming output<br/>coordinator]
-  Deep --> Output
-  Output --> Edge
-  Edge --> Play[Device audio +<br/>visual renderer]
-
-  Router --> Tools[Tool proposal<br/>gateway]
-  Tools --> Policy[Policy +<br/>confirmation]
-  Policy --> Exec[Controlled<br/>tool executor]
-  Exec --> Evidence[Authoritative<br/>action evidence]
-  Evidence --> Context
-
-  Time --> Events[Session<br/>event log]
-  Router --> Events
-  Output --> Events
-  Tools --> Events
-  Events --> Obs[Observability +<br/>evaluation]
-  Registry[Versioned model, policy,<br/>prompt + encoder registry] --> Router
-  Registry --> Context
-  Registry --> Policy
-  class Mic,Cam,Scr,Txt,Registry viz-input
-  class Local,Time,Context,Router,Policy viz-focus
-  class Edge,ASR,Vision,Fast,Deep,Tools,Events viz-state
-  class Output,Play,Exec,Evidence,Obs viz-output
-  class Registry viz-extra-wide
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> require authoritative evidence.</p>
+<figure class="learning-figure editorial-illustration" data-supplemental-visual="multimodal-path-boundaries" aria-labelledby="multimodal-path-boundaries-edition-title"><p class="visual-title" id="multimodal-path-boundaries-edition-title">A proposal is not permission</p><svg viewBox="0 0 360 409" role="img" aria-labelledby="multimodal-path-boundaries-edition-svg-title multimodal-path-boundaries-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="multimodal-path-boundaries-edition-svg-title">A proposal is not permission</title><desc id="multimodal-path-boundaries-edition-svg-desc">Toy T9 proposes muting room A. Separate identity, action, room, and active-epoch checks precede dispatch. Only an authoritative device receipt establishes whether mute occurred.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative T9: mute room A</tspan></text><g transform="translate(0 0)"><g data-editorial-node><rect x="30" y="43" width="300" height="58" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="58" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Recognized request + active turn</tspan><tspan x="180" dy="19">epoch</tspan><tspan x="180" dy="19">model proposes exact action</tspan></text></g><path d="M180 101L180 128" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,121.8569220667674L180,128L183.35597877022943,121.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="30" y="132" width="300" height="76" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="165.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Identity, room, action, and current</tspan><tspan x="180" dy="19">epoch permitted?</tspan></text></g><path d="M180 208L180 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L270 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L90 266" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M86.64402122977057,259.85692206676737L90,266L93.35597877022943,259.85692206676737" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M270 229L270 266" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M266.6440212297706,259.85692206676737L270,266L273.3559787702294,259.85692206676737" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="90" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-output-stroke);text-anchor:middle"><tspan x="90" dy="0">PASS</tspan></text><text x="270" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="270" dy="0">FAIL</tspan></text><g data-editorial-node><rect x="14" y="270" width="152" height="119" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="90" y="306" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">scoped dispatch</tspan><tspan x="90" dy="19">device receipt</tspan><tspan x="90" dy="19">report actual</tspan><tspan x="90" dy="19">state</tspan></text></g><g data-editorial-node><rect x="194" y="270" width="152" height="119" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="296.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">no dispatch</tspan><tspan x="270" dy="19">clarify or</tspan><tspan x="270" dy="19">decline</tspan><tspan x="270" dy="19">retain the</tspan><tspan x="270" dy="19">decision</tspan></text></g></g></svg><figcaption><strong>Read it this way:</strong> Authorize; verify device state.</figcaption></figure>
 
 ### Device media controller
 
@@ -432,26 +355,7 @@ Cancel/revoke controls bypass media queues through reserved processing paths.
 
 VAD detects speech; endpointing commits a turn boundary; barge-in stops output. Their errors have different costs.
 
-<p class="visual-title" data-supplemental-visual="multimodal-turn-lifecycle">Cancellation must stop playback</p>
-
-```mermaid
-stateDiagram-v2
-  accTitle: A resumed user turn can interrupt planning or require confirmed output stop
-  accDescr: Speech moves from listening to a possible endpoint, which returns to speaking if speech resumes before commitment. A committed turn enters planning and then assistant playback. New user speech can interrupt planning directly; during playback it first enters Cancelling and returns to user speaking only when output has stopped and input is active.
-  [*] --> Listening
-  Listening --> UserSpeaking: VAD onset
-  UserSpeaking --> PossibleEnd: short silence
-  PossibleEnd --> UserSpeaking: speech resumes
-  PossibleEnd --> TurnEnded: endpoint policy commits
-  TurnEnded --> AssistantPlanning
-  AssistantPlanning --> AssistantSpeaking: first audio chunk
-  AssistantSpeaking --> Cancelling: user speech or stop control
-  Cancelling --> UserSpeaking: output stopped and input active
-  AssistantSpeaking --> Listening: output completes
-  AssistantPlanning --> UserSpeaking: user resumes before output
-  class Listening viz-wide
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> stop playback.</p>
+<figure class="learning-figure editorial-illustration" data-supplemental-visual="multimodal-turn-lifecycle" aria-labelledby="multimodal-turn-lifecycle-edition-title"><p class="visual-title" id="multimodal-turn-lifecycle-edition-title">Interruption must retire old output</p><svg viewBox="0 0 360 454" role="img" aria-labelledby="multimodal-turn-lifecycle-edition-svg-title multimodal-turn-lifecycle-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="multimodal-turn-lifecycle-edition-svg-title">Interruption must retire old output</title><desc id="multimodal-turn-lifecycle-edition-svg-desc">Interruption advances active epoch seven to eight. Epoch-seven output is rejected immediately. Cancellation is requested separately; only playback-stop evidence proves silence. New output carries epoch eight.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative interruption: active epoch 7</tspan><tspan x="180" dy="19">-&gt; 8</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">CONTROL EVENT</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">OUTPUT STATE</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">User interrupts</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">activate epoch 8</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="154" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">reject epoch-7</tspan><tspan x="270" dy="19">output</tspan></text></g><path d="M15 207L345 207" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="227" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Cancel epoch 7 requested</tspan></text><g data-editorial-node><rect x="15" y="241" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="279.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">command sent</tspan></text></g><g data-editorial-node><rect x="195" y="241" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="270" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">not yet proof of</tspan><tspan x="270" dy="19">silence</tspan></text></g><path d="M15 323L345 323" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="343" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Playback-stop receipt</tspan></text><g data-editorial-node><rect x="15" y="357" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="386" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">old output</tspan><tspan x="90" dy="19">stopped</tspan></text></g><g data-editorial-node><rect x="195" y="357" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="386" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">new output uses</tspan><tspan x="270" dy="19">epoch 8</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> Confirm playback stopped.</figcaption></figure>
 
 ### Run fast VAD on the device
 

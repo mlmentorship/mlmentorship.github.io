@@ -31,28 +31,8 @@ Where should the next discriminating check focus?
 
 Keep assigned users in the product denominator while tracing delivery branches separately.
 
-<p class="visual-title">Separate assignment from successful model delivery</p>
-
 <!-- visual:offline-online-gap-diagnostic-order -->
-```mermaid
-flowchart TB
-	accTitle: Assigned users split into delivered-model and fallback outcomes
-	accDescr: This invented fixture assigns one thousand users to each arm. Arm A records eight hundred successes. In arm B, nine hundred users reach the new model and produce seven hundred thirty-eight successes; one hundred receive fallback and produce forty successes. Merging both branches gives seven hundred seventy-eight successes out of one thousand, or 77.8 percent, below A's 80 percent. The 82 percent delivered-model success rate is conditional on routing, not a randomized comparison against A. Inspect routing and delivery before attributing this aggregate loss to model quality.
-	A["A · 1,000 assigned"] --> AP["800 successes<br/>80% overall"]
-	B["B · 1,000 assigned"] --> M["900 delivered to model<br/>738 successes · 82%"]
-	B --> F["100 receive fallback<br/>40 successes · 40%"]
-	M --> BP["738 + 40 = 778 successes<br/>77.8% of all assigned B users"]
-	F --> BP
-	AP --> D["B − A = −2.2 percentage points<br/>inspect delivery; preserve assignment"]
-	BP --> D
-	class A,B viz-input
-	class M viz-focus
-	class F viz-warning
-	class AP,BP viz-state
-	class D viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> add branch successes before dividing by assigned users. The delivered subset's 82% success rate cannot replace B's 77.8% product outcome.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="offline-online-gap-diagnostic-order-edition-title"><p class="visual-title" id="offline-online-gap-diagnostic-order-edition-title">The missing 100 users change which arm wins</p><svg viewBox="0 0 360 430" role="img" aria-labelledby="offline-online-gap-diagnostic-order-edition-svg-title offline-online-gap-diagnostic-order-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="offline-online-gap-diagnostic-order-edition-svg-title">The missing 100 users change which arm wins</title><desc id="offline-online-gap-diagnostic-order-edition-svg-desc">Both illustrative arms contain 1,000 assigned users. A has 800 successes. B routes 900 users to the model, with 738 successes, and 100 to fallback, with 40 successes. The 900-to-100 strip is proportional. B therefore has 778 successes, 77.8 percent overall, despite 82 percent among model-delivered users.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative: 1,000 assigned users in each</tspan><tspan x="180" dy="19">arm</tspan></text><text x="20" y="61" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">A: 800 successes / 1,000 = 80%</tspan></text><rect x="25" y="82" width="310" height="29" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="102" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">all 1,000 assigned</tspan></text><text x="20" y="155" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">B: delivery is part of the treatment</tspan></text><rect x="25" y="177" width="279" height="29" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><rect x="304" y="177" width="31" height="29" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="154" y="197" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="154" dy="0">900 model</tspan></text><path d="M319 206L319 229" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="319" y="249" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="319" dy="0">100</tspan></text><text x="117" y="244" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="117" dy="0">738 successes</tspan></text><text x="275" y="278" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="275" dy="0">40 fallback successes</tspan></text><g data-editorial-node><rect x="30" y="305" width="300" height="58" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="339" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">(738 + 40) / 1,000 = 77.8%</tspan></text></g><text x="180" y="385" style="font-size:12px;font-weight:400;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="180" dy="0">82% model-only != 77.8% assigned-user</tspan><tspan x="180" dy="19">result</tspan></text></svg><figcaption><strong>Read it this way:</strong> The denominator is everyone assigned, including fallback users. B has 738 + 40 successes, so 77.8% loses to 80%. These counts are illustrative. <span class="visual-reader-check" data-reader-check="offline-online-gap-diagnostic-order"><strong>Check:</strong> How can B's model succeed at 82% while B's assigned-user outcome is worse than A's 80%?</span></figcaption></figure>
 
 ## Calculate, then test a cause
 

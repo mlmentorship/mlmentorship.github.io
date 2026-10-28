@@ -115,38 +115,8 @@ $$
 
 When expansion ratio $F > D$ and per-expert batch size $t$ is moderate, the intermediate activation $tF$ dominates memory traffic. Fusing the up-projection, activation, and down-projection into one tile program removes the $4tF$ HBM traffic term.
 
-<p class="visual-title">Fusion removes a round trip, not the weight-read floor</p>
-
 <!-- visual:fused-moe-triton-sram-roofline -->
-```mermaid
-flowchart TB
-	accTitle: Fused Triton MoE kernel eliminates intermediate HBM activation round trip
-	accDescr: In the unfused pipeline, up-projection writes intermediate activation tensor h to HBM, which is then read back by down-projection. In the fused Triton kernel, up-projection, SiLU activation, and down-projection happen inside GPU SRAM tiles, writing only the final output to HBM.
-	subgraph U["UNFUSED MOE FFN (TWO KERNELS)"]
-        direction TB
-		X1["Input x [t, D]"] -->|"Read HBM"| K1["Up-GEMM: x @ Wup"]
-		K1 -->|"Write 2tF bytes"| HBM["HBM Activation h [t, F]"]
-		HBM -->|"Read 2tF bytes"| K2["Down-GEMM: SiLU(h) @ Wdown"]
-		K2 -->|"Write HBM"| Y1["Output y [t, D]"]
-	end
-	subgraph F["FUSED TRITON KERNEL (ONE PASS)"]
-        direction TB
-		X2["Input x [t, D]"] -->|"Read HBM once"| SRAM["GPU SRAM TILE (Registers)"]
-		subgraph S["IN-SRAM BLOCK STREAMING"]
-            direction TB
-			SRAM -->|"Tile dot"| H_SRAM["h_tile = x_tile @ Wup_tile"]
-			H_SRAM -->|"Elementwise"| ACT["h_tile = SiLU(h_tile)"]
-			ACT -->|"Accumulate"| ACC["acc += h_tile @ Wdown_tile"]
-		end
-		ACC -->|"Write HBM once"| Y2["Output y [t, D]"]
-	end
-	class X1,X2 viz-input
-	class HBM,K1,K2 viz-warning
-	class SRAM,H_SRAM,ACT,ACC viz-focus
-	class Y1,Y2 viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> Unfused MoE execution writes and reads intermediate dimension F through HBM twice. Fused Triton kernels stream tiles of F inside GPU SRAM, eliminating HBM activation traffic when F exceeds D.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="fused-moe-triton-sram-roofline-edition-title"><p class="visual-title" id="fused-moe-triton-sram-roofline-edition-title">Fusion removes the intermediate round trip, not every memory transfer</p><svg viewBox="0 0 360 542" role="img" aria-labelledby="fused-moe-triton-sram-roofline-edition-svg-title fused-moe-triton-sram-roofline-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="fused-moe-triton-sram-roofline-edition-svg-title">Fusion removes the intermediate round trip, not every memory transfer</title><desc id="fused-moe-triton-sram-roofline-edition-svg-desc">Aligned unfused and fused paths keep the same intermediate h with shape t by F. For two-byte elements, the unfused path writes 2tF bytes then reads 2tF bytes. A fitting fused tile avoids that 4tF-byte intermediate round trip. Input, weight, and output traffic remain.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Two-byte elements; same intermediate h [t,</tspan><tspan x="180" dy="19">F]</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">TWO KERNELS</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">FUSED TILE</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Where h waits between GEMMs</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">HBM</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">SRAM / registers</tspan></text></g><path d="M15 207L345 207" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="227" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Intermediate round trip</tspan></text><g data-editorial-node><rect x="15" y="241" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="270" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">write 2tF</tspan><tspan x="90" dy="19">read 2tF bytes</tspan></text></g><g data-editorial-node><rect x="195" y="241" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="270" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">no HBM round</tspan><tspan x="270" dy="19">trip</tspan></text></g><path d="M15 323L345 323" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="343" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">What still moves</tspan></text><g data-editorial-node><rect x="15" y="357" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="386" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">inputs, weights,</tspan><tspan x="90" dy="19">output</tspan></text></g><g data-editorial-node><rect x="195" y="357" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="270" y="386" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">inputs, weights,</tspan><tspan x="270" dy="19">output</tspan></text></g><text x="180" y="466" style="font-size:14px;font-weight:700;fill:var(--viz-output-stroke);text-anchor:middle"><tspan x="180" dy="0">4tF intermediate bytes avoided</tspan></text><text x="180" y="496" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Tile fit and other traffic still limit</tspan><tspan x="180" dy="19">performance.</tspan></text></svg><figcaption><strong>Read it this way:</strong> The avoided transfer is the same intermediate written and read once: 4tF bytes for two-byte elements. Other traffic and tile-fit constraints remain. <span class="visual-reader-check" data-reader-check="fused-moe-triton-sram-roofline"><strong>Check:</strong> Which exact memory round trip disappears? Which other memory traffic still remains?</span></figcaption></figure>
 
 ### Triton fused kernel implementation
 

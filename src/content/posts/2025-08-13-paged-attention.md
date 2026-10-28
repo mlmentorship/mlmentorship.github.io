@@ -96,7 +96,7 @@ Private tails still waste four slots total; sharing reserves sixteen slots, not 
 		<text class="viz-node-value" x="278" y="368" text-anchor="middle">prefix</text>
 		<text class="viz-node-value" x="278" y="381" text-anchor="middle">refs = 2</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> logical order stays fixed while physical addresses jump. Both tables reference P7 and P1; each shared block has two owners. P5 and P3 are private tails. The original schematic follows <a href="https://arxiv.org/abs/2309.06180">Kwon et al.</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> logical order stays fixed while physical addresses jump. Both tables reference P7 and P1; each shared block has two owners. P5 and P3 are private tails. The original schematic follows <a href="https://arxiv.org/abs/2309.06180">Kwon et al.</a>. <span class="visual-reader-check" data-reader-check="paged-attention-block-table-indirection"><strong>Check:</strong> Why can request A read logical blocks in order even though their physical locations are 7, 1 and 5?</span></figcaption>
 </figure>
 
 ## Prefix sharing

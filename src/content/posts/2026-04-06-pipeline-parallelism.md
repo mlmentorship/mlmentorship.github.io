@@ -103,7 +103,7 @@ Bubble fraction $\approx (\text{stages} - 1) / (\text{stages} + \text{micro-batc
 			<text class="viz-axis-label" x="370" y="277" text-anchor="middle">bubble = 6 / 18 = 1 / 3 = (P &#8722; 1) / (M + P &#8722; 1)</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow F1 diagonally: each micro-batch must finish an earlier stage before entering the next, so later stages idle while the pipeline fills and earlier stages idle while it drains. Here 12 useful cells and 6 dotted idle cells occupy 18 stage-slots, making the bubble fraction 6/18 = 1/3. Increasing M extends the full middle without adding more fill or drain depth.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow F1 diagonally: each micro-batch must finish an earlier stage before entering the next, so later stages idle while the pipeline fills and earlier stages idle while it drains. Here 12 useful cells and 6 dotted idle cells occupy 18 stage-slots, making the bubble fraction 6/18 = 1/3. Increasing M extends the full middle without adding more fill or drain depth. <span class="visual-reader-check" data-reader-check="pipeline-fill-drain-bubble"><strong>Check:</strong> Why is the bubble six of eighteen stage-slots, not six extra elapsed slots?</span></figcaption>
 </figure>
 
 ## GPipe vs. 1F1B vs. interleaved

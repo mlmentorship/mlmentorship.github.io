@@ -99,7 +99,7 @@ For a transformer, the natural segment is one transformer block. PyTorch provide
 			<text class="viz-callout" x="350" y="317" text-anchor="middle">Balance L/K ≈ K  ⇒  K ≈ √L</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> at one backward step, the four diamond checkpoints remain live while four discarded activations are rebuilt inside the dashed segment. For this illustrative 16-layer chain, memory is 16/4 + 4 = 8 activation-sized units; shortening segments saves fewer temporary activations but keeps more boundaries, so the terms balance near K = √L.</figcaption>
+	<figcaption><strong>Read it this way:</strong> at one backward step, the four diamond checkpoints remain live while four discarded activations are rebuilt inside the dashed segment. For this illustrative 16-layer chain, memory is 16/4 + 4 = 8 activation-sized units; shortening segments saves fewer temporary activations but keeps more boundaries, so the terms balance near K = √L. <span class="visual-reader-check" data-reader-check="checkpoint-boundary-recompute-balance"><strong>Check:</strong> Why do both very small and very large segments increase this simplified peak-memory estimate?</span></figcaption>
 </figure>
 
 ## When to use

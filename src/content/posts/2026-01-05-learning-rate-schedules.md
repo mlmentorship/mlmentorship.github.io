@@ -61,7 +61,7 @@ Common practice: cosine to $\eta_{\min} = 0.1 \cdot \eta_{\max}$ over the full t
 		<text class="viz-axis-label" x="192" y="273" text-anchor="middle">training step →</text>
 		<text class="viz-axis-label" transform="translate(14 184) rotate(-90)">learning rate / ηmax</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the line to the circle at W, where warmup reaches the peak. Only then does the cosine fraction start: halfway from W to T, the diamond is at 0.1 + ½(1 − 0.1) = 0.55 of peak. At T, the square reaches the 0.10 floor. The three marker shapes and labels carry the meaning independently of color. Original normalized plot checked against the <a href="https://arxiv.org/abs/1608.03983">SGDR cosine equation</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html">PyTorch scheduler documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the line to the circle at W, where warmup reaches the peak. Only then does the cosine fraction start: halfway from W to T, the diamond is at 0.1 + ½(1 − 0.1) = 0.55 of peak. At T, the square reaches the 0.10 floor. The three marker shapes and labels carry the meaning independently of color. Original normalized plot checked against the <a href="https://arxiv.org/abs/1608.03983">SGDR cosine equation</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.CosineAnnealingLR.html">PyTorch scheduler documentation</a>. <span class="visual-reader-check" data-reader-check="warmup-cosine-three-checkpoints"><strong>Check:</strong> Why is the decay midpoint 0.55 of the peak instead of 0.50?</span></figcaption>
 </figure>
 
 ## How to set the peak LR

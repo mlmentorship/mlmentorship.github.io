@@ -103,7 +103,7 @@ That two-point check matches this quadratic's moments; it is not Gaussian sampli
 			<text class="viz-edge-label" x="180" y="433" style="font-size:11px">epsilon supplies a value; no derivative through its draw is needed</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> a detached draw supplies no ordinary local autodiff path. The lower graph holds base noise fixed and differentiates its deterministic Gaussian transform. It preserves the sampling distribution while changing the available gradient path. Original construction follows <a href="https://arxiv.org/abs/1312.6114">Kingma and Welling</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> a detached draw supplies no ordinary local autodiff path. The lower graph holds base noise fixed and differentiates its deterministic Gaussian transform. It preserves the sampling distribution while changing the available gradient path. Original construction follows <a href="https://arxiv.org/abs/1312.6114">Kingma and Welling</a>. <span class="visual-reader-check" data-reader-check="reparameterization-gradient-path"><strong>Check:</strong> Why can changing mu alter z while holding epsilon fixed, without taking a derivative through the random draw?</span></figcaption>
 </figure>
 
 ## Lower-variance gradients

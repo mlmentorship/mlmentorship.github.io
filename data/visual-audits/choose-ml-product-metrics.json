@@ -3,9 +3,9 @@
   "slug": "choose-ml-product-metrics",
   "article": "src/content/posts/2026-07-10-choose-ml-product-metrics.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Separate metrics that authorize or veto a product launch from metrics that only explain behavior or qualify a model for online testing.",
-  "mediumRationale": "A two-panel semantic decision card is the smallest medium that groups metrics by decision authority rather than presenting another undifferentiated dashboard.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart would overstate a temporal process when the lesson is a stable hierarchy of decision rights.",
     "svg": "Rejected: fixed drawing geometry adds no quantitative shape or relationship that semantic headings and grouped text cannot express more accessibly.",
@@ -97,6 +97,6 @@
     "visualIds": [
       "product-metric-decision-authority"
     ],
-    "accessibility": "The figure has a linked learning question and a labelled group containing two semantic sections. Every role is directly named in text—authorize, veto, explain, or qualify—and the AND condition is written explicitly, so no meaning depends on color, icons, or position alone. The established two-column primitive stacks into one column below 640 pixels, with ordinary wrapping text and no minimum width, making it readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print tokens provide a light high-contrast palette and avoid splitting the figure across pages."
+    "accessibility": "The completion gain lower bound 4.66 points exceeds its two-point floor, cost 1.97 dollars is below two dollars, but latency 2.1 seconds exceeds two seconds. Each metric has its own labelled scale and all three feed an AND gate. Diagnostics cannot authorize release. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

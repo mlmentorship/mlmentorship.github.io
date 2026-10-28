@@ -119,7 +119,7 @@ An IVF-HNSW index may use a graph over coarse centroids; inspect its actual impl
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> IVF selects lists; dashed lists are skipped. PQ sums the four selected lookup entries to 0.65 for each retained candidate. Candidate omission and distance distortion are separate failure paths.</figcaption>
+	<figcaption><strong>Read it this way:</strong> IVF selects lists; dashed lists are skipped. PQ sums the four selected lookup entries to 0.65 for each retained candidate. Candidate omission and distance distortion are separate failure paths. <span class="visual-reader-check" data-reader-check="ivf-pq-query-funnel"><strong>Check:</strong> Can a better PQ score recover a vector in an IVF partition that was never scanned?</span></figcaption>
 </figure>
 
 The lookup sum is $0.04+0.31+0.08+0.22=0.65$.

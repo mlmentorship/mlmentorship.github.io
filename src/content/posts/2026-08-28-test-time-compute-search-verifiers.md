@@ -78,7 +78,7 @@ Hold proposal coverage fixed: B exists in both panels.
 		<text class="viz-label" x="281" y="365" text-anchor="middle">return wrong answer</text>
 		<text class="viz-label" x="18" y="389">Sampling still found B; the proxy discarded it.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> sampling already found B. The three checks retain B; the proxy discards it for D, which passes only one check.</figcaption>
+	<figcaption><strong>Read it this way:</strong> sampling already found B. The three checks retain B; the proxy discards it for D, which passes only one check. <span class="visual-reader-check" data-reader-check="test-time-compute-verifier-bottleneck"><strong>Check:</strong> Was candidate generation the failure in the lower panel? What evidence caused the selector to discard the correct candidate?</span></figcaption>
 </figure>
 
 ## The verifier is the bottleneck

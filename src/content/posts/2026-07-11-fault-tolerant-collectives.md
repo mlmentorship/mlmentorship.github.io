@@ -105,7 +105,7 @@ The diagram's once-only result means one coherent intended transition under that
 		<path d="M170 464L178 470L170 476Z" style="fill:var(--viz-focus-stroke)"></path>
 		<text class="viz-label" x="22" y="463">cannot safely join</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> four ranks disagree about whether update <code>t</code> happened. The left path repeats work from mixed states; the right path restores one complete boundary first. Replay is coherent only under the stated state-restoration and membership protocol.</figcaption>
+	<figcaption><strong>Read it this way:</strong> four ranks disagree about whether update <code>t</code> happened. The left path repeats work from mixed states; the right path restores one complete boundary first. Replay is coherent only under the stated state-restoration and membership protocol. <span class="visual-reader-check" data-reader-check="collective-failure-commit-boundary"><strong>Check:</strong> Why must even already-updated ranks return to the same committed checkpoint before this retry?</span></figcaption>
 </figure>
 
 ## Change the recovery contract

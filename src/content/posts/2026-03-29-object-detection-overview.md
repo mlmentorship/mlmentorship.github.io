@@ -97,7 +97,7 @@ Original DETR emits slots without an NMS stage, but training incentives do not m
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the left lane resolves scored overlaps with inference-time NMS. The right lane assigns targets one-to-one during training and predicts a set at inference. That objective discourages duplicates; it does not guarantee perfect uniqueness.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the left lane resolves scored overlaps with inference-time NMS. The right lane assigns targets one-to-one during training and predicts a set at inference. That objective discourages duplicates; it does not guarantee perfect uniqueness. <span class="visual-reader-check" data-reader-check="detector-candidate-resolution"><strong>Check:</strong> Which duplicate-resolution operation is used during inference in each pictured pipeline? Which matching exists only in training?</span></figcaption>
 </figure>
 
 ## Work the assignment

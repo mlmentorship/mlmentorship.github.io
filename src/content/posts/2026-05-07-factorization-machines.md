@@ -81,7 +81,7 @@ The following vectors are chosen fixtures, not fitted outputs.
 			<tr><th scope="row">Half the difference</th><td>(6.12 − 2.20) / 2 = 1.96</td></tr>
 		</tbody>
 	</table>
-	<figcaption><strong>Read it this way:</strong> one reusable vector per feature supplies the unseen A-C coefficient 0.60. With all inputs active, explicit pair summation and the aggregate identity below both give 1.96. Neither calculation validates unseen-pair accuracy. Original example based on <a href="https://doi.org/10.1109/ICDM.2010.127">Rendle (2010)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> one reusable vector per feature supplies the unseen A-C coefficient 0.60. With all inputs active, explicit pair summation and the aggregate identity below both give 1.96. Neither calculation validates unseen-pair accuracy. Original example based on <a href="https://doi.org/10.1109/ICDM.2010.127">Rendle (2010)</a>. <span class="visual-reader-check" data-reader-check="fm-shared-embeddings-unseen-pair"><strong>Check:</strong> Which learned objects supply an A-C estimate when there is no dedicated A-C parameter?</span></figcaption>
 </figure>
 
 ## The mechanism

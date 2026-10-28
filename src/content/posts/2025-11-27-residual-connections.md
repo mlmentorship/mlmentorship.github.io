@@ -77,7 +77,7 @@ The input goes to both branches. Addition joins their values in the forward pass
 		<rect class="viz-node viz-node--output" x="55" y="576" width="250" height="34" rx="5"></rect>
 		<text class="viz-node-label" x="180" y="599">∂L/∂x = 2.2 + 0.22 = 2.42</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the forward branches add to 2.2. Backward copies the upstream 2.2 to both branches. The residual branch scales it by 0.1; the shortcut leaves it unchanged. Their contributions add to 2.42.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the forward branches add to 2.2. Backward copies the upstream 2.2 to both branches. The residual branch scales it by 0.1; the shortcut leaves it unchanged. Their contributions add to 2.42. <span class="visual-reader-check" data-reader-check="residual-add-gradient-split"><strong>Check:</strong> Why does the add node copy 2.2 into both branches? Why does the residual branch return only 0.22?</span></figcaption>
 </figure>
 <p class="diagram-source">References: <a href="https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html">Deep Residual Learning</a> and <a href="https://arxiv.org/abs/1603.05027">Identity Mappings in Deep Residual Networks</a>.</p>
 

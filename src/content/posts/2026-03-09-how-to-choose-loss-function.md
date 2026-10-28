@@ -57,7 +57,7 @@ Then ask whether changing action costs requires a different prediction model.
 			<text x="40" y="678" font-weight="650">Choose negative: 0.8 &lt; 1.8</text>
 		</g>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> lower bars win within each comparison, not across different losses. Squared distances favor 3; absolute distances favor 0. The separate action example chooses negative despite an unchanged positive probability of 0.8.</figcaption>
+	<figcaption><strong>Read it this way:</strong> lower bars win within each comparison, not across different losses. Squared distances favor 3; absolute distances favor 0. The separate action example chooses negative despite an unchanged positive probability of 0.8. <span class="visual-reader-check" data-reader-check="loss-estimation-vs-decision"><strong>Check:</strong> Why can probability 0.8 favor a negative action under these costs?</span></figcaption>
 </figure>
 <p class="diagram-source">References: <a href="https://doi.org/10.1198/016214506000001437">Gneiting and Raftery on proper scoring rules</a>, <a href="https://doi.org/10.1214/aoms/1177703732">Huber on robust location</a>, and <a href="https://scikit-learn.org/stable/modules/classification_threshold.html">scikit-learn's threshold guidance</a>.</p>
 

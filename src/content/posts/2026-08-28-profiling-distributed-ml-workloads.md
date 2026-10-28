@@ -62,7 +62,7 @@ The retained schematic also changes compute length; use the table, not that extr
 			<text class="viz-label" x="300" y="287" text-anchor="middle">step end</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the rounded network bars have equal duration. The upper collective finishes before compute; the lower collective extends completion. Compute lengths also differ here; the table isolates overlap with equal compute. This original schematic follows the <a href="https://docs.pytorch.org/docs/2.13/notes/ddp.html">DDP design note</a>, <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX profiling guide</a>, and <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">Nsight Systems guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the rounded network bars have equal duration. The upper collective finishes before compute; the lower collective extends completion. Compute lengths also differ here; the table isolates overlap with equal compute. This original schematic follows the <a href="https://docs.pytorch.org/docs/2.13/notes/ddp.html">DDP design note</a>, <a href="https://jax-ml.github.io/scaling-book/profiling/">JAX profiling guide</a>, and <a href="https://docs.nvidia.com/nsight-systems/AnalysisGuide/index.html">Nsight Systems guide</a>. <span class="visual-reader-check" data-reader-check="profiling-exposed-collective-tail"><strong>Check:</strong> Why can reducing equal-duration collectives have different effects on elapsed step time in the two traces?</span></figcaption>
 </figure>
 
 ## Read the trace from the outside in

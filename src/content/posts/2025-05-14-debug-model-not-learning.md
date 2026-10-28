@@ -42,32 +42,8 @@ For the real batch, record the hand-computed loss, reduction, gradient, and befo
 Keep a hypothesis/test/result ledger; change one supported cause, then repeat the same check.
 
 <p class="visual-kicker">Diagnostic path</p>
-<p class="visual-title">A fixed-batch check selects hypotheses; its symptoms do not identify one cause automatically.</p>
-
 <!-- visual:model-not-learning-diagnostic-path -->
-```mermaid
-flowchart TB
-	accTitle: A fastest-checks-first path for debugging a model that is not learning
-	accDescr: Establish an attainable fixed-batch loss, then inspect inputs, labels, loss, gradients, mode, and parameter updates. Full-training symptoms suggest hypotheses to test rather than uniquely identifying their causes.
-	A["Overfit one tiny fixed batch<br/>no regularization"] --> B{"Loss reaches its<br/>minimum?"}
-	B -->|"no"| C["Check minimum assumptions<br/>and training path"]
-	C --> D["Inspect exact inputs + labels<br/>verify loss by hand"]
-	D --> E["Check gradient flow, train mode,<br/>and the parameter update"]
-	E -. "fix, then repeat" .-> A
-	B ==>|"yes: escalate"| F["Run full training<br/>watch a fixed batch"]
-	F --> G{"What do predictions<br/>and loss do?"}
-	G -->|"stuck"| H["Recheck foundation;<br/>then LR, optimizer, batch"]
-	G -->|"chaotic"| I["Inspect numerics and updates;<br/>test LR hypothesis"]
-	G -->|"training improves"| J{"Validation follows<br/>training?"}
-	J -->|"no: gap grows"| K["Split, drift, objective,<br/>or overfitting?"]
-	J -->|"yes, both plateau"| L["Capacity, optimization,<br/>or task mismatch?"]
-	class A,F viz-input
-	class B,G,J viz-focus
-	class C,D,E,H,I viz-warning
-	class K,L viz-output
-	class A viz-wide
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> establish the batch's attainable minimum first. Check exact inputs, loss, gradients, and updates before escalating. Later symptoms select hypotheses, not unique diagnoses. Original synthesis follows <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's training recipe</a> and the <a href="https://cs231n.github.io/neural-networks-3/">CS231n learning notes</a>.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="model-not-learning-diagnostic-path-edition-title"><p class="visual-title" id="model-not-learning-diagnostic-path-edition-title">Separate a broken training path from a full-data generalization gap</p><svg viewBox="0 0 360 475" role="img" aria-labelledby="model-not-learning-diagnostic-path-edition-svg-title model-not-learning-diagnostic-path-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="model-not-learning-diagnostic-path-edition-svg-title">Separate a broken training path from a full-data generalization gap</title><desc id="model-not-learning-diagnostic-path-edition-svg-desc">Three illustrative loss plots share a zero-to-two vertical scale. One tiny fixed batch reaches an attainable minimum; another stays stuck and requires training-path checks. A full-data example improves training while validation diverges. The gap is diagnostic evidence, not proof of a particular cause.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative loss traces; same vertical</tspan><tspan x="180" dy="19">scale</tspan></text><text x="18" y="58" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Tiny fixed batch: reaches attainable minimum</tspan></text><path d="M45 78L45 149" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M45 149L325 149" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="32" y="85" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="32" dy="0">2</tspan></text><text x="32" y="153" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="32" dy="0">0</tspan></text><polyline points="45,83 115,102.80000000000001 185,129.2 255,142.4 325,149" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2.5"></polyline><text x="18" y="184" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Tiny batch stuck: inspect training</tspan></text><path d="M45 204L45 275" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M45 275L325 275" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="32" y="211" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="32" dy="0">2</tspan></text><text x="32" y="279" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="32" dy="0">0</tspan></text><polyline points="45,209 115,209 185,210.65 255,209 325,209" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2.5"></polyline><text x="18" y="310" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Full data: growing gap is a clue, not a cause</tspan></text><path d="M45 330L45 401" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M45 401L325 401" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="32" y="337" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="32" dy="0">2</tspan></text><text x="32" y="405" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="32" dy="0">0</tspan></text><polyline points="45,335 115,354.8 185,374.6 255,387.8 325,394.4" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:2.5"></polyline><polyline points="45,335 115,351.5 185,354.8 255,351.5 325,348.2" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2.5;stroke-dasharray:5 3"></polyline><text x="180" y="456" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">solid: training dashed: validation</tspan></text></svg><figcaption><strong>Read it this way:</strong> First check whether the tiny batch has an attainable minimum. A widening full-data gap suggests hypotheses, not a unique cause. The curves are illustrative. <span class="visual-reader-check" data-reader-check="model-not-learning-diagnostic-path"><strong>Check:</strong> If the tiny batch cannot reach its justified minimum, which investigation comes before generalization tuning?</span></figcaption></figure>
 
 ## What an L6 answer sounds like
 

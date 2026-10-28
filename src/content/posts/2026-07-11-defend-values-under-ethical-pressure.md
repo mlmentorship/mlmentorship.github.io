@@ -76,7 +76,7 @@ Does that validate its estimate, establish the other option's outcome or prove t
 		<text class="viz-label" x="194" y="381" text-anchor="middle">Update assumptions, controls, and thresholds</text>
 		<text class="viz-axis-label" x="194" y="399" text-anchor="middle">Do not rewrite what was knowable before</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> judge process using evidence available then. Judge the observed result separately. Use outcomes to update controls, not to rewrite the record.</figcaption>
+	<figcaption><strong>Read it this way:</strong> judge process using evidence available then. Judge the observed result separately. Use outcomes to update controls, not to rewrite the record. <span class="visual-reader-check" data-reader-check="ethical-decision-process-outcome"><strong>Check:</strong> Which facts may judge the original decision? Which arrived too late to have informed it?</span></figcaption>
 </figure>
 
 ## Work the Observation

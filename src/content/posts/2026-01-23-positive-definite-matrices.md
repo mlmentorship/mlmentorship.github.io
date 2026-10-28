@@ -92,7 +92,7 @@ For $A$ PD, the set $\{x : x^\top A x \le 1\}$ is a closed ellipsoid centered at
 			<text class="viz-callout" x="24" y="459">λ = (4, 0) → v is free → unbounded strip</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> diagonalize first, then inspect one eigendirection at a time. In the top panel, moving along either axis increases the quadratic form, so the threshold closes into an ellipse. In the bottom panel, moving along <var>v</var> adds nothing because its eigenvalue is zero; only <var>u</var> is bounded, and the strip continues forever.</figcaption>
+	<figcaption><strong>Read it this way:</strong> diagonalize first, then inspect one eigendirection at a time. In the top panel, moving along either axis increases the quadratic form, so the threshold closes into an ellipse. In the bottom panel, moving along <var>v</var> adds nothing because its eigenvalue is zero; only <var>u</var> is bounded, and the strip continues forever. <span class="visual-reader-check" data-reader-check="positive-definite-boundedness"><strong>Check:</strong> Why can v grow without cost for diag(4,0), but not for diag(4,1)?</span></figcaption>
 </figure>
 <p class="diagram-source">Original coordinate construction checked against <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-25-symmetric-matrices-and-positive-definiteness/">MIT OpenCourseWare 18.06</a> and Boyd and Vandenberghe's <a href="https://web.stanford.edu/~boyd/cvxbook/">Convex Optimization</a>.</p>
 

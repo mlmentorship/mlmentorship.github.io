@@ -100,7 +100,7 @@ Notice: the gradient is `(predicted - true) * input`. Same form as linear regres
 		<text class="viz-label" x="18" y="427">y=1: p-1 &lt; 0, raise z</text>
 		<text class="viz-label" x="342" y="427" text-anchor="end">y=0: p &gt; 0, lower z</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the two chain-rule factors. Differentiating the log loss introduces <code>1/p</code> and <code>1/(1-p)</code>; differentiating the sigmoid supplies <code>p(1-p)</code>. Those factors cancel, leaving the probability residual <code>p-y</code>. The remaining derivative of <code>w^T x</code> contributes <code>x</code>, so each example updates the weights by <code>(p-y)x</code>. Original derivation checked against the <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229 notes</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the two chain-rule factors. Differentiating the log loss introduces <code>1/p</code> and <code>1/(1-p)</code>; differentiating the sigmoid supplies <code>p(1-p)</code>. Those factors cancel, leaving the probability residual <code>p-y</code>. The remaining derivative of <code>w^T x</code> contributes <code>x</code>, so each example updates the weights by <code>(p-y)x</code>. Original derivation checked against the <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229 notes</a>. <span class="visual-reader-check" data-reader-check="logistic-gradient-cancellation"><strong>Check:</strong> Which factors cancel? Why is the weight gradient (p-y)x rather than just p-y?</span></figcaption>
 </figure>
 
 ## The L6 connections

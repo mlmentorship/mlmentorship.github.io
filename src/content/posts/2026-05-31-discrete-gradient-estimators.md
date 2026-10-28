@@ -72,7 +72,7 @@ We want $\nabla_\theta \mathbb{E}_{z \sim p_\theta(z)}[f(z)]$. The expectation i
 			<text class="viz-edge-label" x="277" y="548">deliberate mismatch → biased</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> solid arrows are what the model computes; dashed arrows are the training signal. REINFORCE jumps around the non-differentiable sample using its log probability, Gumbel-Softmax makes the whole path soft, and straight-through keeps the hard forward value while borrowing a soft backward path. The construction is original; definitions were checked against Williams (1992), Jang et al. (2017), Maddison et al. (2017), and Bengio et al. (2013).</figcaption>
+	<figcaption><strong>Read it this way:</strong> solid arrows are what the model computes; dashed arrows are the training signal. REINFORCE jumps around the non-differentiable sample using its log probability, Gumbel-Softmax makes the whole path soft, and straight-through keeps the hard forward value while borrowing a soft backward path. The construction is original; definitions were checked against Williams (1992), Jang et al. (2017), Maddison et al. (2017), and Bengio et al. (2013). <span class="visual-reader-check" data-reader-check="discrete-gradients-forward-backward-paths"><strong>Check:</strong> Why is the straight-through backward path not the derivative of its hard forward operation?</span></figcaption>
 </figure>
 
 ## 1. Score-function estimator (REINFORCE / likelihood ratio)

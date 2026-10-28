@@ -56,36 +56,8 @@ The order computes the low-rank path without constructing a full $d_{out} \times
 If both factors are random, attaching the adapter changes model behavior before training. If both are zero, both gradients begin at zero because each factor's gradient contains the other factor. Initializing $A$ randomly and $B$ to zero gives exact base behavior while allowing $B$ to receive a gradient on the first step. After $B$ moves, $A$ receives useful gradients.
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Follow the no-op forward pass and the asymmetric first backward pass</p>
-
 <!-- visual:lora-zero-impact-first-gradient -->
-```mermaid
-flowchart TB
-	accTitle: Random A and zero B preserve the base output while allowing B to learn first
-	accDescr: Input x follows two branches. The frozen base matrix W produces Wx. On the adapter branch, random A maps d-in features into rank r, then zero B maps rank r to d-out, so the scaled adapter update is exactly zero. Adding both branches gives y equals Wx at initialization. During the first backward pass, B generally receives a nonzero gradient because it depends on Ax, A receives zero gradient because its gradient contains B transposed, and frozen W is not updated. After B moves, gradients can reach A.
-	X["input x<br/>last dimension d_in"]
-	X --> W["frozen W<br/>d_out × d_in"]
-	W --> Base["base path<br/>Wx"]
-	X --> A["random A · trainable<br/>r × d_in"]
-	A --> H["rank-r bottleneck<br/>Ax"]
-	H --> B["zero B · trainable<br/>d_out × r"]
-	B --> U["scaled update<br/>(α/r)BAx = 0"]
-	Base --> Add(("add"))
-	U --> Add
-	Add --> Y["initial output<br/>y = Wx"]
-	G["first upstream gradient ∇y"] -. "∇B uses Ax: generally nonzero" .-> B
-	G -. "∇A uses Bᵀ: zero" .-> A
-	G -. "frozen: no parameter update" .-> W
-	class X viz-input
-	class W viz-state
-	class A,H viz-input
-	class B,U viz-focus
-	class Base,Add,G viz-neutral
-	class Y viz-output
-	class X viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid arrows first. The random projection <em>A</em> creates a usable rank-<em>r</em> signal, but zero <em>B</em> blocks it, so the residual update is exactly zero and the output matches the frozen base. Then follow the dashed arrows: <em>B</em>'s gradient can use the nonzero <em>Ax</em>, while <em>A</em>'s gradient contains <em>B</em><sup>T</sup> and is zero on the first step. Once <em>B</em> moves, both adapter factors can learn. Original synthesis based on <a href="https://arxiv.org/abs/2106.09685">Hu et al.'s LoRA formulation</a> and the <a href="https://huggingface.co/docs/peft/main/package_reference/lora">PEFT initialization reference</a>.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="lora-zero-impact-first-gradient-edition-title"><p class="visual-title" id="lora-zero-impact-first-gradient-edition-title">A zero initial adapter output does not mean both factors have zero gradient</p><svg viewBox="0 0 360 493" role="img" aria-labelledby="lora-zero-impact-first-gradient-edition-svg-title lora-zero-impact-first-gradient-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="lora-zero-impact-first-gradient-edition-svg-title">A zero initial adapter output does not mean both factors have zero gradient</title><desc id="lora-zero-impact-first-gradient-edition-svg-desc">At initialization A is random and B is zero, so the scaled adapter output sBAx is zero. For upstream gradient g, dL/dA equals s B-transpose g x-transpose and is zero. dL/dB equals s g (Ax)-transpose and is generally nonzero. Frozen W parameters do not block input gradients.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">At initialization: A random, B = 0; scale s</tspan><tspan x="180" dy="19">= alpha/r</tspan></text><g data-editorial-node><rect x="20" y="58" width="140" height="62" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="84.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">Frozen base W</tspan><tspan x="90" dy="19">Wx</tspan></text></g><g data-editorial-node><rect x="200" y="58" width="140" height="62" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="84.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">Adapter</tspan><tspan x="270" dy="19">sBAx = 0</tspan></text></g><path d="M90 120L145 163" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M138.09341813757402,161.86020748484273L145,163L142.22746022427023,156.57247923441733" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M270 120L215 163" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M217.77253977572977,156.57247923441733L215,163L221.90658186242598,161.86020748484273" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="80" y="167" width="200" height="53" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="180" y="198.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Initial y = Wx</tspan></text></g><text x="180" y="267" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">First backward pass; g = dL/dy</tspan></text><g data-editorial-node><rect x="20" y="291" width="320" height="55" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="180" y="323.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">dL/dA = s B^T g x^T = 0</tspan></text></g><g data-editorial-node><rect x="20" y="367" width="320" height="55" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="390" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">dL/dB = s g (Ax)^T</tspan><tspan x="180" dy="19">generally nonzero</tspan></text></g><text x="180" y="457" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">W is not updated; input gradients can still</tspan><tspan x="180" dy="19">flow.</tspan></text></svg><figcaption><strong>Read it this way:</strong> B = 0 makes the initial adapter output and A gradient zero. B can still receive a gradient. Frozen base weights do not detach inputs. <span class="visual-reader-check" data-reader-check="lora-zero-impact-first-gradient"><strong>Check:</strong> Why can B receive a nonzero first gradient even though the adapter initially adds zero to the output?</span></figcaption></figure>
 
 ## What an L4 answer sounds like
 

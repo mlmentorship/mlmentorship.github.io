@@ -54,37 +54,8 @@ An authorized reviewer inspects evidence and accepts an exact document version t
 Review permission does not itself grant every downstream clinical-action permission.
 
 <p class="visual-kicker">Patient, encounter and time</p>
-<p class="visual-title">A real source fails when its claim does not fit the requested encounter.</p>
-
 <!-- visual:healthcare-llm-clinician-gate -->
-```mermaid
-flowchart TB
-  accTitle: An authentic January source does not support a February encounter summary
-  accDescr: The requested task is a draft summary for patient P1, encounter E2. The draft cites E1's January negative statement. Patient, encounter, date and negation checks flag the temporal mismatch. A reviewer rejects or corrects the draft using E2's February procedure record. Only an authorized acceptance of the exact corrected version can enter the documentation workflow. Versioned evidence records the mismatch and review; no model output creates an autonomous clinical action.
-  Scope["Allowed task: draft only<br/>Patient P1, encounter E2"]
-  Evidence["E1: Jan 10, no prior procedure<br/>E2: Feb 10, PX1 on Feb 9"]
-  Draft["Draft cites E1:<br/>No prior procedure"]
-  Fit{"Patient, encounter,<br/>date and negation fit?"}
-  Stop["Mismatch: reject or correct<br/>E1 does not summarize E2"]
-  Correct["Correction cites E2:<br/>PX1 completed Feb 9"]
-  Review{"Reviewer verifies source<br/>and exact draft version"}
-  Workflow["Authorized documentation<br/>No autonomous clinical action"]
-  Trace[("Versioned evidence<br/>sources, model, review, outcome")]
-  Scope --> Evidence --> Draft --> Fit
-  Fit -->|"fails for E1"| Stop
-  Stop -->|"correct using E2"| Correct --> Review
-  Review -->|"accepted"| Workflow
-  Review -->|"reject or edit"| Stop
-  Draft -.-> Trace
-  Review -.-> Trace
-  Workflow -.-> Trace
-  class Fit,Review viz-focus
-  class Evidence viz-input
-  class Trace viz-state
-  class Correct,Workflow viz-output
-  class Stop viz-warning
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> solid arrows show the draft and review path. Dashed arrows retain evidence for controlled updates and incident review. Patient IDs and dates are fictional.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="healthcare-llm-clinician-gate-edition-title"><p class="visual-title" id="healthcare-llm-clinician-gate-edition-title">The correct patient is not enough: the encounter and draft version must also match</p><svg viewBox="0 0 360 454" role="img" aria-labelledby="healthcare-llm-clinician-gate-edition-svg-title healthcare-llm-clinician-gate-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="healthcare-llm-clinician-gate-edition-svg-title">The correct patient is not enough: the encounter and draft version must also match</title><desc id="healthcare-llm-clinician-gate-edition-svg-desc">Patient P1 has encounter E1 on January 10 without a prior procedure and E2 on February 10 with procedure PX1 on February 9. An E2 draft citing E1 is rejected. A corrected draft version v2 cites E2, and the reviewer receipt binds that exact version. Documentation permission does not grant clinical-action authority.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative P1; target encounter E2,</tspan><tspan x="180" dy="19">February 10</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">STALE DRAFT v1</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">CORRECTED v2</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Source encounter</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="90" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">E1: January 10</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">E2: February 10</tspan></text></g><path d="M15 207L345 207" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="227" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Procedure claim</tspan></text><g data-editorial-node><rect x="15" y="241" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="90" y="270" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">no prior</tspan><tspan x="90" dy="19">procedure</tspan></text></g><g data-editorial-node><rect x="195" y="241" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="270" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">PX1 on February</tspan><tspan x="270" dy="19">9</tspan></text></g><path d="M15 323L345 323" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="343" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Authorized documentation</tspan></text><g data-editorial-node><rect x="15" y="357" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="90" y="395.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">REJECT mismatch</tspan></text></g><g data-editorial-node><rect x="195" y="357" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="386" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">review receipt</tspan><tspan x="270" dy="19">binds v2</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> Match patient, encounter, date, and claim. The review receipt binds the corrected draft version. Documentation authority does not permit autonomous clinical action. <span class="visual-reader-check" data-reader-check="healthcare-llm-clinician-gate"><strong>Check:</strong> Why is the first cited draft invalid even though it refers to the same patient? Which exact corrected version was approved?</span></figcaption></figure>
 
 ## Specify the Boundary Before the Model
 

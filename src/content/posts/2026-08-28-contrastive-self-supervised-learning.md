@@ -82,7 +82,7 @@ The loss teaches the model to identify the positive among the candidates.
 			<text class="viz-callout" x="180" y="362" text-anchor="middle">positive rule chooses invariance · sampler chooses repulsion</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> for anchor <em>i</em>, only the second view of source A is positive <em>j</em> and enters the numerator; that view plus every sampled candidate enters the denominator. If source B is semantically a valid match, the batch still calls it negative and pushes it away; this is the false-negative risk hidden inside the sampling rule. Original schematic informed by <a href="https://proceedings.mlr.press/v119/chen20j.html">SimCLR</a>, <a href="https://arxiv.org/abs/1807.03748">CPC</a>, and <a href="https://arxiv.org/abs/2007.00224">Debiased Contrastive Learning</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> for anchor <em>i</em>, only the second view of source A is positive <em>j</em> and enters the numerator; that view plus every sampled candidate enters the denominator. If source B is semantically a valid match, the batch still calls it negative and pushes it away; this is the false-negative risk hidden inside the sampling rule. Original schematic informed by <a href="https://proceedings.mlr.press/v119/chen20j.html">SimCLR</a>, <a href="https://arxiv.org/abs/1807.03748">CPC</a>, and <a href="https://arxiv.org/abs/2007.00224">Debiased Contrastive Learning</a>. <span class="visual-reader-check" data-reader-check="infonce-positive-candidate-set"><strong>Check:</strong> Is the positive also in the denominator? Why is a same-class item still repelled?</span></figcaption>
 </figure>
 
 ## The positive pair defines the representation

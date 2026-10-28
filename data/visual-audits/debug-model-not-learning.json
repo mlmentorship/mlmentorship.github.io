@@ -3,9 +3,9 @@
   "slug": "debug-model-not-learning",
   "article": "src/content/posts/2025-05-14-debug-model-not-learning.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Use one tiny-batch memorization test to separate a broken training foundation from full-training optimization, overfitting, and underfitting problems, then choose the next check from the observed behavior.",
-  "mediumRationale": "A Mermaid decision path is the smallest medium that preserves the diagnostic ordering, the tiny-batch gate, and the later behavior-dependent branches without inventing quantitative thresholds. Its wide-canvas marker preserves readable labels for the full branch structure.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is an ordered qualitative procedure with a gate, feedback loop, and named branches, which the established wide, scrollable flowchart primitive expresses directly.",
     "svg": "Rejected: the article does not need quantitative geometry, and hand-positioning a fixed flowchart would duplicate Mermaid's relationship semantics.",
@@ -93,6 +93,6 @@
     "visualIds": [
       "model-not-learning-diagnostic-path"
     ],
-    "accessibility": "Mermaid receives a complete accessible title and description. Every decision edge names its observed result, the failed foundation loop is dashed, the successful escalation edge is thick, and every terminal diagnosis is directly labelled, so meaning survives grayscale. The wide flowchart uses horizontal scrolling at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width; shared Mermaid theme variables support dark mode and print."
+    "accessibility": "Three illustrative loss plots share a zero-to-two vertical scale. One tiny fixed batch reaches an attainable minimum; another stays stuck and requires training-path checks. A full-data example improves training while validation diverges. The gap is diagnostic evidence, not proof of a particular cause. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

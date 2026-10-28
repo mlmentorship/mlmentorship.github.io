@@ -3,9 +3,9 @@
   "slug": "long-context-llms",
   "article": "src/content/posts/2025-11-15-long-context-llms.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Map each long-context failure mode to the technique that actually addresses it, while distinguishing positional extrapolation, dense-attention execution, and persistent serving state.",
-  "mediumRationale": "A three-row semantic comparison is the smallest medium that lets readers scan from each independently growing constraint to its matching lever and explicit non-solution. Native table semantics preserve the row-wise mapping better than a routed architecture diagram.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is a parallel three-row classification rather than a causal or temporal graph. Automatic routing would imply a pipeline and make the important one-to-one comparison harder to scan.",
     "svg": "Rejected: fixed geometry adds no quantitative insight beyond the symbolic n and n-squared rates. Native text wrapping and table semantics are more robust at narrow widths.",
@@ -101,6 +101,6 @@
     "visualIds": [
       "long-context-three-bottlenecks"
     ],
-    "accessibility": "The figure uses a labelled semantic table with scoped column and row headers. Every bottleneck, growth rule, lever, and limitation is stated in text, so no meaning depends on color. The established three-column cm-grid uses compact wrapping text with no minimum width at 390 CSS pixels; shared theme variables preserve dark-mode contrast, and the existing print rules force a light high-contrast canvas and avoid page breaks inside the figure."
+    "accessibility": "Three tracks share relative context-length positions one, two, four, eight. A declared toy trained-position span ends at two, with unvalidated positions beyond it. Exact dense attention work scales one, four, sixteen, sixty-four; logical KV bytes scale one, two, four, eight. FlashAttention does not remove quadratic arithmetic, and paging alone does not reduce logical KV growth. No measured usable threshold is invented. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

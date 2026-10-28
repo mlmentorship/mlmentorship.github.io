@@ -3,9 +3,9 @@
   "slug": "frontier-lab-interview-processes-2026",
   "article": "src/content/posts/2026-07-11-frontier-lab-interview-processes-2026.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Turn recruiter-confirmed round constraints into targeted practice instead of inferring an interview loop from the company name.",
-  "mediumRationale": "A two-panel semantic-HTML routing card is the smallest medium that contrasts an unreliable logo-first shortcut with an evidence-first preparation path. Written inputs and outputs preserve the reasoning in ordinary reading order and stack cleanly on a narrow screen.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because a branching flowchart would overstate the stability of interview paths and imply that one answer determines one terminal drill.",
     "svg": "Rejected because the lesson is categorical routing rather than quantitative geometry; fixed vector labels would add accessibility and narrow-screen costs without adding meaning.",
@@ -113,6 +113,6 @@
     "visualIds": [
       "interview-evidence-to-drill"
     ],
-    "accessibility": "The figure uses a labelled heading, an explicit group label, semantic sections, and written inputs, decisions, and outcomes. The incorrect and preferred paths are named in text rather than distinguished by color. The established two-panel primitive has no minimum width, stacks below 640 CSS pixels for readability at 390 CSS pixels, uses theme tokens for dark mode, and applies a high-contrast light palette with page-break protection in print."
+    "accessibility": "A fictional round brief confirms an existing codebase and forty-five minutes, but tool permission is unknown. Practice therefore uses a repository defect and a bounded focused-test exercise. Tool permission returns to the authorized recruiting contact rather than being inferred from a company identity. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

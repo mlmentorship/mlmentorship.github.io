@@ -60,38 +60,8 @@ State authentication, modalities, defense knowledge, tool scope and data-poisoni
 | Residual assumption | All relevant paths reach correct enforcement; no bypass or hidden credential |
 
 <p class="visual-kicker">Influence is not authority</p>
-<p class="visual-title">A schema-valid cross-tenant proposal must stop before credentials and dispatch.</p>
-
 <!-- visual:llm-security-influence-authority-path -->
-```mermaid
-flowchart TB
-  accTitle: Tenant A authority cannot authorize a tenant B export
-  accDescr: An untrusted upload influences a proposed export of synthetic B7 to an external mock destination. The separate gate checks action, tenant, resource, destination and purpose against verified A1 internal-summary authority. This proposal fails and stops before credentials or dispatch. A permitted request can reach only a scoped executor. Answer, cache and log channels also need observation; denying one call does not establish complete security.
-  Attacker["Untrusted upload<br/>attacker controls text"]
-  Context["Context assembly<br/>source label retained"]
-  Model["Model proposes an action"]
-  Proposal["Export B7, tenant B<br/>external mock destination"]
-  Trusted["Verified authority<br/>A1, tenant A<br/>internal summary only"]
-  Gate{"Action, tenant, resource,<br/>destination and purpose fit?"}
-  Stop["Deny this proposal<br/>no credential or dispatch"]
-  Executor["Scoped executor<br/>only permitted actions"]
-  Asset["Protected records<br/>and downstream effects"]
-  Channels["Also inspect answer,<br/>cache and log disclosure"]
-  Attacker -.->|"influence"| Context --> Model --> Proposal --> Gate
-  Trusted ==> Gate
-  Gate -->|"no: B7 export"| Stop
-  Gate -->|"yes: within authority"| Executor --> Asset
-  Model -.-> Channels
-  class Attacker viz-warning
-  class Context,Model viz-neutral
-  class Proposal viz-focus
-  class Trusted viz-input
-  class Gate viz-state
-  class Stop viz-warning
-  class Executor,Asset viz-output
-```
-
-  <p class="diagram-caption"><strong>Read it this way:</strong> follow the proposal to the independent gate. The B7 export fails despite valid syntax. Dashed influence and disclosure paths are not permission grants.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="llm-security-influence-authority-path-edition-title"><p class="visual-title" id="llm-security-influence-authority-path-edition-title">Untrusted context can propose an action without acquiring authority to execute it</p><svg viewBox="0 0 360 390" role="img" aria-labelledby="llm-security-influence-authority-path-edition-svg-title llm-security-influence-authority-path-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="llm-security-influence-authority-path-edition-svg-title">Untrusted context can propose an action without acquiring authority to execute it</title><desc id="llm-security-influence-authority-path-edition-svg-desc">Untrusted context proposes export of B7 from tenant B to an external mock destination. Verified authority A1 permits only a tenant-A internal summary. Exact action, tenant, resource, destination, and purpose do not match, so the proposal ends before credentials or dispatch. Answer, cache, and log disclosure still need separate inspection.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Untrusted proposal != verified authority A1</tspan></text><g transform="translate(0 0)"><g data-editorial-node><rect x="30" y="43" width="300" height="58" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="67.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Proposal: export B7 / tenant B</tspan><tspan x="180" dy="19">external mock destination</tspan></text></g><path d="M180 101L180 128" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,121.8569220667674L180,128L183.35597877022943,121.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="30" y="132" width="300" height="76" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="156" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">A1 permits tenant A</tspan><tspan x="180" dy="19">internal summary only</tspan><tspan x="180" dy="19">exact fields do not match</tspan></text></g><path d="M180 208L180 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L270 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L90 266" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M86.64402122977057,259.85692206676737L90,266L93.35597877022943,259.85692206676737" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M270 229L270 266" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M266.6440212297706,259.85692206676737L270,266L273.3559787702294,259.85692206676737" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="90" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-output-stroke);text-anchor:middle"><tspan x="90" dy="0">MATCH REQUIRED</tspan></text><text x="270" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="270" dy="0">THIS PROPOSAL</tspan></text><g data-editorial-node><rect x="14" y="270" width="152" height="100" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="90" y="296.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">scope still</tspan><tspan x="90" dy="19">bounded</tspan><tspan x="90" dy="19">inspect answer,</tspan><tspan x="90" dy="19">cache, and logs</tspan></text></g><g data-editorial-node><rect x="194" y="270" width="152" height="100" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="306" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">DENY</tspan><tspan x="270" dy="19">no credential</tspan><tspan x="270" dy="19">no dispatch</tspan></text></g></g></svg><figcaption><strong>Read it this way:</strong> The proposed action cannot borrow authority from retrieved text. Its fields fail the verified scope. Blocking tools does not settle answer, cache, or log disclosure. <span class="visual-reader-check" data-reader-check="llm-security-influence-authority-path"><strong>Check:</strong> Why can text influence the model's proposal without granting permission to export B7?</span></figcaption></figure>
 
   ## Check the Proposed Scope
 

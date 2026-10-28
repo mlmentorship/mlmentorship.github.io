@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace how overlapping neighborhoods of core points expand one cluster, while a nearby non-core point becomes border and an isolated point remains noise.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can show the same epsilon radius around multiple points, overlap between core neighborhoods, and the spatial tests separating core, border, and noise. Fixed geometry makes the local count and expansion direction inspectable without runtime state.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart could restate the algorithm but cannot faithfully encode metric distance, equal-radius neighborhoods, overlap, or point density.",
     "svg": "Selected: exact circles and point positions reveal that cluster membership propagates through core points even though a border point joins without extending the cluster.",
@@ -63,6 +63,6 @@
     "visualIds": [
       "dbscan-neighborhood-expansion"
     ],
-    "accessibility": "The SVG has a linked title and detailed description. Core points are squares, the highlighted border point is a diamond, noise is an x, epsilon-neighborhoods are dashed circles, and all roles are directly labeled, so color is redundant. The 360-unit viewBox scales with the established plot-panel primitive and has no minimum width, preserving readability at 390 CSS pixels; existing theme tokens provide dark-mode contrast and shared print rules force a light high-contrast palette."
+    "accessibility": "On a shared one-dimensional distance scale, radius .31 around D=.2 includes A=-.1, B=0, C=.1, D, and E=.5. The same radius around E includes only D and E. MinPts four counts self. F=2 is 1.5 from its nearest point and is noise. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

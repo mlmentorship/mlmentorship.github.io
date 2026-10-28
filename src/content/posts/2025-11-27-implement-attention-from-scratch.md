@@ -80,7 +80,7 @@ def attention(Q, K, V, mask=None):
 			<p class="cm-equation">output for q3 = 0.25V1 + 0.61V2 + 0.14V3</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> choose one query row, replace every disallowed key score with negative infinity, then normalize left to right across key columns. For q3, k4 receives exactly zero weight even though its raw score was largest; the remaining weights sum to one and multiply the matching value rows. This is an original worked example checked against <a href="https://arxiv.org/abs/1706.03762">scaled dot-product attention</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">PyTorch's boolean-mask semantics</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> choose one query row, replace every disallowed key score with negative infinity, then normalize left to right across key columns. For q3, k4 receives exactly zero weight even though its raw score was largest; the remaining weights sum to one and multiply the matching value rows. This is an original worked example checked against <a href="https://arxiv.org/abs/1706.03762">scaled dot-product attention</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">PyTorch's boolean-mask semantics</a>. <span class="visual-reader-check" data-reader-check="attention-causal-mask-row"><strong>Check:</strong> Why does k4 contribute nothing despite having the largest raw score for q3?</span></figcaption>
 </figure>
 
 If this is all you write and you stop talking, you're at L4. The interviewer now wants to see you bring up the things they were planning to probe.

@@ -60,7 +60,7 @@ The running state is only `O(num_queries × k)`, and each score block is `O(num_
 			</tbody>
 		</table>
 	</div>
-	<figcaption><strong>Read it this way:</strong> move left to right within each row, then down. An item discarded from a block already has at least <em>k</em> items in that same block ranked ahead of it, so it cannot enter the global top-<em>k</em>. Only the previous 2 winners and the new 2 local winners reach the next merge; the full score row never exists. Original example based on the exact-selection semantics in <a href="https://numpy.org/doc/stable/reference/generated/numpy.argpartition.html">NumPy's <code>argpartition</code> documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> move left to right within each row, then down. An item discarded from a block already has at least <em>k</em> items in that same block ranked ahead of it, so it cannot enter the global top-<em>k</em>. Only the previous 2 winners and the new 2 local winners reach the next merge; the full score row never exists. Original example based on the exact-selection semantics in <a href="https://numpy.org/doc/stable/reference/generated/numpy.argpartition.html">NumPy's <code>argpartition</code> documentation</a>. <span class="visual-reader-check" data-reader-check="batched-top-k-running-invariant"><strong>Check:</strong> Which two items prove that candidate 5 cannot enter the global top two?</span></figcaption>
 </figure>
 
 ## Reference implementation sketch

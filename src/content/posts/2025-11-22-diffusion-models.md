@@ -83,7 +83,7 @@ We will compute its training error and clean estimate, then identify what a samp
 			<text class="viz-callout" x="380" y="389" text-anchor="middle">One shared time-conditioned network learns across noise levels; only generation chains its calls.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the arrows in the two lanes. Training knows clean data and sampled noise, so one marginal draw supplies a target. Generation knows neither target. Each noise prediction feeds a separate reverse update, whose result becomes the next input. Skipping levels requires compatible solver coefficients. Sources: <a href="https://arxiv.org/abs/2006.11239">DDPM</a> and <a href="https://arxiv.org/abs/2010.02502">DDIM</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the arrows in the two lanes. Training knows clean data and sampled noise, so one marginal draw supplies a target. Generation knows neither target. Each noise prediction feeds a separate reverse update, whose result becomes the next input. Skipping levels requires compatible solver coefficients. Sources: <a href="https://arxiv.org/abs/2006.11239">DDPM</a> and <a href="https://arxiv.org/abs/2010.02502">DDIM</a>. <span class="visual-reader-check" data-reader-check="diffusion-training-sampling-asymmetry"><strong>Check:</strong> Why does training need one sampled noise level while generation must wait for each preceding state?</span></figcaption>
 </figure>
 
 ## The forward process

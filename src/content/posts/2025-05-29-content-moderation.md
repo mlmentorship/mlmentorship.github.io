@@ -70,40 +70,8 @@ This is L5. Layered architecture with human-in-the-loop and feedback.
 >
 > **Explainability is a regulatory and trust issue.** When auto-actioning content, surface a reason ('flagged for hate speech against [protected category]'); helps user understanding and reduces disputes."
 
-<p class="visual-title">Policy and appeal outcomes govern the next decision</p>
-
 <!-- visual:content-moderation-governed-decision-loop -->
-```mermaid
-%%{init: {"flowchart": {"diagramPadding": 24}}}%%
-flowchart TB
-	accTitle: Policy governs a multi-policy moderation decision and correction loop
-	accDescr: Policy owners publish versioned definitions and actions. Those definitions determine training labels for per-policy models and set policy-specific routing thresholds. User content enters the models, which produce separate scores for policies such as hate speech, violence, and spam. The decision layer combines each score with its policy threshold and routes the item to allow, trained human review, or an automatic action with a reason. Human decisions and appealed automatic actions create corrected decision records. Those records feed evaluation and retraining, but do not let the model redefine policy.
-	Policy["Policy owners<br/>versioned definitions<br/>+ actions"]
-	Content["User content<br/>text · image · video"]
-	Models["Per-policy models<br/>hate · violence · spam · …"]
-	Decision{"Decision layer<br/>score × policy threshold"}
-	Allow["ALLOW<br/>random audit"]
-	Review["HUMAN REVIEW<br/>borderline score"]
-	Auto["AUTO-ACTION + REASON<br/>high-confidence score"]
-	Appeal["USER APPEAL<br/>senior review"]
-	Record[("Corrected decision record<br/>policy version + reviewer outcome")]
-	Policy -->|"defines labels"| Models
-	Policy -->|"sets each<br/>action rule"| Decision
-	Content --> Models
-	Models -->|"one score per policy"| Decision
-	Decision -->|"below low<br/>threshold"| Allow
-	Decision -->|"between thresholds"| Review
-	Decision -->|"above high threshold"| Auto
-	Review -->|"human decision"| Record
-	Auto --> Appeal
-	Appeal -->|"uphold or reverse"| Record
-	Record -. "evaluate by policy and slice<br/>then retrain" .-> Models
-	class Content viz-input
-	class Policy,Record viz-state
-	class Decision viz-focus
-	class Allow,Review,Auto,Appeal viz-output
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> follow one policy at a time. Its versioned definition shapes labels and action thresholds; its model emits a score; the decision layer routes that score to allow, human review, or explained auto-action. Review and appeal outcomes return as evidence for evaluation and retraining, but the feedback loop never gives the model authority to rewrite policy. Original schematic informed by <a href="https://doi.org/10.1177/2053951719897945">Gorwa, Binns, and Katzenbach</a>, the <a href="https://www.santaclaraprinciples.org/">Santa Clara Principles</a>, and the <a href="https://doi.org/10.6028/NIST.AI.100-1">NIST AI RMF</a>.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="content-moderation-governed-decision-loop-edition-title"><p class="visual-title" id="content-moderation-governed-decision-loop-edition-title">A score selects an action only through a declared policy</p><svg viewBox="0 0 360 345" role="img" aria-labelledby="content-moderation-governed-decision-loop-edition-svg-title content-moderation-governed-decision-loop-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="content-moderation-governed-decision-loop-edition-svg-title">A score selects an action only through a declared policy</title><desc id="content-moderation-governed-decision-loop-edition-svg-desc">Under explicitly illustrative policy P7, score 0.62 falls between review thresholds 0.40 and 0.80 and therefore enters human review. The corrected decision retains policy version and reviewer provenance. Allowed-item audits and appeals also contribute corrected records.</desc><text x="180" y="23" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative policy P7; not universal</tspan><tspan x="180" dy="19">thresholds</tspan></text><text x="180" y="65" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">One item receives score 0.62</tspan></text><rect x="25" y="98" width="124" height="27" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><rect x="149" y="98" width="124" height="27" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><rect x="273" y="98" width="62" height="27" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="25" y="146" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="25" dy="0">0</tspan></text><text x="149" y="146" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="149" dy="0">0.40</tspan></text><text x="273" y="146" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="273" dy="0">0.80</tspan></text><text x="335" y="146" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="335" dy="0">1</tspan></text><path d="M217.2 70L217.2 98" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75"></path><path d="M213.84402122977056,91.8569220667674L217.2,98L220.55597877022942,91.8569220667674" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75"></path><text x="180" y="183" style="font-size:13px;font-weight:700;fill:var(--viz-focus-stroke);text-anchor:middle"><tspan x="180" dy="0">0.40 &lt;= 0.62 &lt; 0.80: HUMAN REVIEW</tspan></text><g data-editorial-node><rect x="30" y="211" width="300" height="63" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="180" y="238" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Decision + policy P7 + reviewer</tspan><tspan x="180" dy="19">provenance</tspan></text></g><text x="180" y="307" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Allowed-item audits and appeals also update</tspan><tspan x="180" dy="19">the record.</tspan></text></svg><figcaption><strong>Read it this way:</strong> In this illustrative policy, 0.62 enters human review, not automatic action. Audits and appeals preserve policy and reviewer provenance. These thresholds are not universal. <span class="visual-reader-check" data-reader-check="content-moderation-governed-decision-loop"><strong>Check:</strong> How can a missed violation on the allow path become correction evidence?</span></figcaption></figure>
 
 ## Tells that get you a strong-hire vote
 

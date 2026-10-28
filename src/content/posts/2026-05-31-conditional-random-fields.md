@@ -71,7 +71,7 @@ is the **partition function**: a sum over all $|V|^T$ possible labelings. $Z$ co
 		<text class="viz-callout" x="180" y="303" text-anchor="middle">chosen: 2 + 3 + 1 = 6 · VALID BIO</text>
 		<text class="viz-gradient-label" x="180" y="327">rejected O → I-PER: 3 + 3 − 5 = 1</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the token emissions stay fixed. Softmax takes each column's maximum and cannot penalize the invalid <code>O → I-PER</code> pair. The CRF adds a learned score for each adjacent-label transition, compares complete paths, and selects <code>B-PER → I-PER</code> in this example. The forward algorithm sums the exponentiated scores of all paths to compute <var>Z</var>; Viterbi finds the highest-scoring path.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the token emissions stay fixed. Softmax takes each column's maximum and cannot penalize the invalid <code>O → I-PER</code> pair. The CRF adds a learned score for each adjacent-label transition, compares complete paths, and selects <code>B-PER → I-PER</code> in this example. The forward algorithm sums the exponentiated scores of all paths to compute <var>Z</var>; Viterbi finds the highest-scoring path. <span class="visual-reader-check" data-reader-check="crf-global-path-scoring"><strong>Check:</strong> Why does the locally preferred O-to-I-PER path lose after transition scoring?</span></figcaption>
 </figure>
 
 ## Training and inference

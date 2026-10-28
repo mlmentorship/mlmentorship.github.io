@@ -3,9 +3,9 @@
   "slug": "flashattention",
   "article": "src/content/posts/2026-04-10-flashattention.md",
   "status": "implemented",
-  "medium": "mixed",
+  "medium": "svg",
   "learningObjective": "Follow one query block as key and value blocks stream through SRAM tiles, updating softmax state without materializing the full score matrix.",
-  "mediumRationale": "The Mermaid flow makes the standard HBM round trip legible, while the authored SVG makes the tiled matrix and SRAM residency spatially legible.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "deckReview": {
     "pages": [
       {
@@ -32,7 +32,10 @@
     "summary": "Recommended retaining Mermaid for the standard dataflow, assigning stable roles to input, transformation, HBM state, and output, and pairing it with a deterministic tile visual for the SRAM loop."
   },
   "implementation": {
-    "visualIds": ["flashattention-sram-tile-stream", "flashattention-standard-hbm-path"],
-    "accessibility": "The Mermaid source includes an accessible title and detailed path description. The SVG includes a title, description, labels, arrows, matrix structure, and a direct reading caption; neither view relies on color alone."
+    "visualIds": [
+      "flashattention-sram-tile-stream",
+      "flashattention-standard-hbm-path"
+    ],
+    "accessibility": "A declared two-byte-intermediate toy compares a materialized attention baseline with exact tiled attention. Scores and probabilities each incur one n-squared-element write and read in the baseline. Tiling avoids those global intermediates but still moves inputs, weights as applicable, and final output and retains dense quadratic arithmetic. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

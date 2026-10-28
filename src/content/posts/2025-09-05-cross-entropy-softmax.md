@@ -64,7 +64,7 @@ Half squared error on the sigmoid probability introduces another derivative fact
 		<text class="viz-axis-label" x="60" y="17">logit-gradient magnitude |g|</text>
 		<text class="viz-axis-label" x="197.5" y="280" text-anchor="middle">true-class probability q · true label y = 1</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> move left toward confident error. Cross-entropy's gradient approaches minus one. Probability-MSE includes the saturating sigmoid derivative, so its magnitude approaches zero. The dashed curve describes this binary comparison, not every possible squared-error model.</figcaption>
+	<figcaption><strong>Read it this way:</strong> move left toward confident error. Cross-entropy's gradient approaches minus one. Probability-MSE includes the saturating sigmoid derivative, so its magnitude approaches zero. The dashed curve describes this binary comparison, not every possible squared-error model. <span class="visual-reader-check" data-reader-check="cross-entropy-confident-wrong-gradient"><strong>Check:</strong> Why is the cross-entropy logit gradient large where the probability-squared-error gradient nearly vanishes?</span></figcaption>
 </figure>
 
 ## What an interviewer expects you to say

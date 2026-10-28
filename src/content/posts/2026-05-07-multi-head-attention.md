@@ -95,7 +95,7 @@ Ignoring optional biases, total parameters are $4 d^2$ (the four $d \times d$ pr
 			<text class="viz-callout" x="180" y="502" text-anchor="middle">output · n × d</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> every head receives Q, K, and V for all n tokens; only the d-wide feature axis is split into dₕ = d/h slices. The h outputs concatenate back to n × d, then W<sub>O</sub> mixes information across heads.</figcaption>
+	<figcaption><strong>Read it this way:</strong> every head receives Q, K, and V for all n tokens; only the d-wide feature axis is split into dₕ = d/h slices. The h outputs concatenate back to n × d, then W<sub>O</sub> mixes information across heads. <span class="visual-reader-check" data-reader-check="multi-head-attention-split-recombine"><strong>Check:</strong> Does each head attend over all n tokens? Which dimension is split before concatenation?</span></figcaption>
 </figure>
 
 ## Why split the dimension

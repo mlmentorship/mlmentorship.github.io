@@ -86,7 +86,7 @@ The lower roof identifies a first-order limit, not every possible bottleneck.
 		<text class="viz-axis-label" x="15" y="224" transform="rotate(-90 15 224)">TFLOP/s (log scale)</text>
 		<text class="viz-label" x="192" y="312" text-anchor="middle">Ceilings only; measure actual kernel time.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> halving bytes doubles arithmetic intensity and its bandwidth ceiling. Both points remain below the compute roof. Doubling compute alone leaves their lower bandwidth roof unchanged.</figcaption>
+	<figcaption><strong>Read it this way:</strong> halving bytes doubles arithmetic intensity and its bandwidth ceiling. Both points remain below the compute roof. Doubling compute alone leaves their lower bandwidth roof unchanged. <span class="visual-reader-check" data-reader-check="gpu-roofline-batching-ridge"><strong>Check:</strong> Why does halving HBM traffic double this ceiling without proving a measured speedup?</span></figcaption>
 </figure>
 
 <p class="diagram-source">Model references: <a href="https://www2.eecs.berkeley.edu/Pubs/TechRpts/2008/EECS-2008-134.html">original Roofline report</a>, <a href="https://docs.nersc.gov/tools/performance/roofline/">NERSC Roofline documentation</a>, and <a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-matrix-multiplication/index.html">NVIDIA matrix-multiplication guide</a>.</p>

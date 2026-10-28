@@ -91,7 +91,7 @@ The worked example below is multiclass, so predicted-class confidence can be bel
 			<text class="viz-callout" x="14" y="287">ECE = 5 + 4 + 4 = 13 percentage points</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> multiply across each row, then add down the ECE column. Bin C has the largest gap, but only 10% of examples, so it contributes the same four points as the denser Bin B. This original example follows the ECE definition in <a href="https://doi.org/10.1609/aaai.v29i1.9602">Naeini et al. (2015)</a> and <a href="https://proceedings.mlr.press/v70/guo17a.html">Guo et al. (2017)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> multiply across each row, then add down the ECE column. Bin C has the largest gap, but only 10% of examples, so it contributes the same four points as the denser Bin B. This original example follows the ECE definition in <a href="https://doi.org/10.1609/aaai.v29i1.9602">Naeini et al. (2015)</a> and <a href="https://proceedings.mlr.press/v70/guo17a.html">Guo et al. (2017)</a>. <span class="visual-reader-check" data-reader-check="ece-weighted-bin-contributions"><strong>Check:</strong> Why does C's 40-point gap contribute the same four ECE points as B's ten-point gap?</span></figcaption>
 </figure>
 
 ## Reliability diagram

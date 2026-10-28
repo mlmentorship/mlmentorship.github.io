@@ -3,9 +3,9 @@
   "slug": "debug-offline-online-metric-gap",
   "article": "src/content/posts/2026-07-10-debug-offline-online-metric-gap.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Order the investigation so each check eliminates an entire layer of causes before forming a narrower model-quality hypothesis.",
-  "mediumRationale": "A wide Mermaid decision path is the smallest medium that makes diagnostic precedence explicit: experiment validity and treatment delivery are gates, while model-quality causes are later hypotheses that reconverge on a discriminating test without shrinking branch labels.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a qualitative decision path with two stop branches, one hypothesis fan-out, and a final convergence; the established wide, scrollable primitive preserves readable semantic labels, theme support, and print behavior.",
     "svg": "Rejected because the relationships are categorical rather than quantitative, and hand-positioned paths would duplicate Mermaid's graph semantics without adding explanatory geometry.",
@@ -99,6 +99,6 @@
     "visualIds": [
       "offline-online-gap-diagnostic-order"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description. Every gate, branch outcome, cause family, and test is directly labelled; heavy yes-path edges, ordinary stop branches, and dashed hypothesis branches preserve the structure without color. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width and shared Mermaid theme tokens provide dark-mode and print-compatible contrast."
+    "accessibility": "Both illustrative arms contain 1,000 assigned users. A has 800 successes. B routes 900 users to the model, with 738 successes, and 100 to fallback, with 40 successes. The 900-to-100 strip is proportional. B therefore has 778 successes, 77.8 percent overall, despite 82 percent among model-delivered users. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -86,7 +86,7 @@ Empirically GloVe and Word2Vec produce comparable embeddings. GloVe is sometimes
 			<text class="viz-axis-label" x="160" y="317" text-anchor="middle">TRANSLATE RELATION; FIND NEAREST WORD</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start with the arrow from <em>man</em> to <em>woman</em>, then move <em>king</em> by that same direction and distance. If the endpoint lands near <em>queen</em>, the two pairs encode a similar relation. This is an original 2D teaching construction, not measured coordinates: real embedding analogies are approximate, corpus-dependent, and do not imply reasoning.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start with the arrow from <em>man</em> to <em>woman</em>, then move <em>king</em> by that same direction and distance. If the endpoint lands near <em>queen</em>, the two pairs encode a similar relation. This is an original 2D teaching construction, not measured coordinates: real embedding analogies are approximate, corpus-dependent, and do not imply reasoning. <span class="visual-reader-check" data-reader-check="word-analogy-shared-displacement"><strong>Check:</strong> Which point is produced by vector arithmetic? What separate nearest-neighbor operation would choose an actual vocabulary word?</span></figcaption>
 </figure>
 
 ## What replaced them

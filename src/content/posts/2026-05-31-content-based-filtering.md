@@ -65,7 +65,7 @@ Learned encoders may still have used cross-user evidence during training.
 		<path d="M28 359H332" style="fill:none;stroke:var(--c-rule);stroke-width:1"></path>
 		<text class="viz-axis-label" x="180" y="378" text-anchor="middle">OTHER USERS' COUNTS ARE NOT INPUTS TO THIS SCORE</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> average the liked vectors, then score each candidate in the same feature space. The interaction counts are annotations, not score inputs. Original vectors and layout; mechanism checked against <a href="https://developers.google.com/machine-learning/recommendation/content-based/basics">Google's recommendation documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> average the liked vectors, then score each candidate in the same feature space. The interaction counts are annotations, not score inputs. Original vectors and layout; mechanism checked against <a href="https://developers.google.com/machine-learning/recommendation/content-based/basics">Google's recommendation documentation</a>. <span class="visual-reader-check" data-reader-check="content-profile-scores-new-item"><strong>Check:</strong> Why can the zero-interaction telescope item outrank the popular drama?</span></figcaption>
 </figure>
 
 ## Change the evidence or list policy

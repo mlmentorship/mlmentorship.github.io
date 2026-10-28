@@ -3,9 +3,9 @@
   "slug": "annotated-ecosystem-strategy-mock",
   "article": "src/content/posts/2026-08-29-annotated-ecosystem-strategy-mock.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how one ranking policy creates both an immediate viewer-feedback loop and a delayed creator-supply loop, so a short-term viewer win cannot settle the ecosystem decision.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest useful representation of two loops that leave and return to the same ranking policy on different time scales. Deterministic SVG would add manual geometry without quantitative shapes to preserve; semantic HTML would enumerate stages but obscure the return paths; interaction is unnecessary for a fixed causal sequence; source-figure reuse adds licensing and scope costs; and no visual leaves the central timing mismatch distributed across the ten-turn transcript.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: labelled directed edges make the immediate viewer loop and delayed creator-supply loop traceable around one shared policy, while the repository renderer supplies responsive, themed, and print-compatible output.",
     "svg": "Rejected: the lesson is relational rather than geometric or quantitative, so hand-positioned SVG would duplicate Mermaid's graph semantics and increase maintenance.",
@@ -83,6 +83,6 @@
     "visualIds": [
       "ecosystem-delayed-feedback-loop"
     ],
-    "accessibility": "The Mermaid source will include a specific accessible title and a full description of both return paths. Every edge carries a time-horizon and mechanism label, so direction and timing do not depend on color. A top-to-bottom layout avoids a wide minimum canvas at 390 CSS pixels, and the shared Mermaid renderer supplies dark-mode and print-compatible theming."
+    "accessibility": "A shared horizon separates the viewer response inside a short experiment from creator supply feedback arriving weeks later. The later direction is unknown, and the strip is ordered rather than proportional to elapsed time. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

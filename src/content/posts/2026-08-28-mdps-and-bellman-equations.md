@@ -113,7 +113,7 @@ Actual termination contributes no continuation, even if a stored terminal value 
 		<text class="viz-callout" x="180" y="344" text-anchor="middle">Qᵖⁱ(s,a) = 0.75(2) + 0.25(1)</text>
 		<text class="viz-callout" x="180" y="367" text-anchor="middle">= 1.75</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> first fix an available action. The resolved branch returns 2; follow-up returns −1 + 0.5 × 4 = 1. Weight those returns by 0.75 and 0.25, giving 1.75. An unweighted average gives 1.5; choosing the best random branch gives 2. Neither is this expectation. Original schematic checked against <a href="https://incompleteideas.net/book/the-book-2nd.html">Sutton and Barto (2018)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first fix an available action. The resolved branch returns 2; follow-up returns −1 + 0.5 × 4 = 1. Weight those returns by 0.75 and 0.25, giving 1.75. An unweighted average gives 1.5; choosing the best random branch gives 2. Neither is this expectation. Original schematic checked against <a href="https://incompleteideas.net/book/the-book-2nd.html">Sutton and Barto (2018)</a>. <span class="visual-reader-check" data-reader-check="bellman-stochastic-backup"><strong>Check:</strong> Why average branch returns as 0.75 times 2 plus 0.25 times 1, instead of taking their maximum?</span></figcaption>
 </figure>
 
 ## Bellman optimality

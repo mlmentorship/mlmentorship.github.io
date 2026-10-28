@@ -3,9 +3,9 @@
   "slug": "disagreed-with-senior",
   "article": "src/content/posts/2025-07-15-disagreed-with-senior.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how two defensible positions become a shared decision by exposing assumptions, gathering decision-relevant evidence, updating the options, and committing while preserving an evidence-based path to revisit.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that makes the article's resolution process visible as a sequence with a feedback loop: steelman both positions, isolate the uncertainty that could change the choice, gather evidence, update, decide, and commit while monitoring. The established renderer supplies responsive dark, light, mobile, and print behavior without article-specific styling.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a relationship-heavy decision flow with three evidence-dependent outcomes and one explicit revisit loop, which Mermaid expresses accessibly without hand-positioned geometry.",
     "svg": "Rejected: the article contains no quantitative geometry, and a manually positioned SVG would duplicate flowchart semantics while making narrow-screen maintenance harder.",
@@ -71,6 +71,6 @@
     "visualIds": [
       "disagreement-evidence-commit-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete title and description. Every stage, outcome, and feedback condition is directly labelled; position outcomes use explicit A, B, and C text, ordinary progress uses solid arrows, and reopening uses a dashed arrow, so color is supplementary. The compact top-to-bottom graph has short labels and no forced minimum width, while established Mermaid theme tokens provide dark-mode and print contrast."
+    "accessibility": "A fictional technical disagreement compares a faster high-memory cache with a smaller cache under a shared eight-gigabyte limit. A nine-gigabyte measured toy footprint rules out the first alternative under that constraint. The decision owner chooses the feasible option, records a memory-based revisit trigger, and retains required safety review. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

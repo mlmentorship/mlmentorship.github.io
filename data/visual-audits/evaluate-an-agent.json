@@ -3,9 +3,9 @@
   "slug": "evaluate-an-agent",
   "article": "src/content/posts/2025-11-11-evaluate-an-agent.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how outcome, trajectory, step, and resource evidence combine into a failure taxonomy that improves the offline suite and is validated against production behavior.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that turns the article's metric list into a diagnostic flywheel: repeated trials produce outcome, trajectory and step, and cost evidence; those signals converge into attributed failure modes; release decisions remain conditional on whether offline trends predict production. The established Mermaid renderer supplies accessible source and responsive dark, light, mobile, and print behavior.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a many-to-one diagnostic flow followed by an offline-production feedback loop, with relationships more important than numeric geometry.",
     "svg": "Rejected: a custom plot could show a cost-success frontier but would teach only one metric and omit the more difficult attribution and suite-refresh loop.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "agent-eval-diagnostic-flywheel"
     ],
-    "accessibility": "The Mermaid source provides a complete title and description. Every evidence lane states the question it answers, the convergence node names failure attribution, and the production-mismatch return path is dashed and directly labelled, so meaning does not depend on color. A top-to-bottom layout, short node labels, and no forced minimum width support 390 CSS pixels; established Mermaid theme tokens provide dark-mode and print contrast."
+    "accessibility": "A fictional coding-agent trial edits the intended file but then writes an unauthorized file. The intended test passes, the task safety outcome fails, and the trial uses four tool calls. The new unauthorized-write slice returns to the fixed-budget suite; a production mismatch reopens its coverage assumptions. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

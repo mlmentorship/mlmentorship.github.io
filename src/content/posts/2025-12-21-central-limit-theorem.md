@@ -62,7 +62,7 @@ This is convergence of distribution functions at continuity points, not exact fi
 		<path class="viz-roc-curve" d="M171 280C188 279 195 264 204 240C211 221 218 214 224 214C230 214 237 221 244 240C253 264 260 279 277 280"></path>
 		<text class="viz-label" x="224" y="301" text-anchor="middle">possible values of X or X̄</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare rows at the dashed mean. The top row describes unchanged individual observations. Each lower curve describes means across fresh independent samples. Their standard error is σ/√n. These are schematic curves, not exact finite-sample densities. The reference is <a href="https://openstax.org/books/introductory-statistics-2e/pages/7-1-the-central-limit-theorem-for-sample-means-averages">OpenStax Introductory Statistics</a>; the graphic is original.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare rows at the dashed mean. The top row describes unchanged individual observations. Each lower curve describes means across fresh independent samples. Their standard error is σ/√n. These are schematic curves, not exact finite-sample densities. The reference is <a href="https://openstax.org/books/introductory-statistics-2e/pages/7-1-the-central-limit-theorem-for-sample-means-averages">OpenStax Introductory Statistics</a>; the graphic is original. <span class="visual-reader-check" data-reader-check="clt-data-vs-sample-means"><strong>Check:</strong> Does averaging make the individual observations Gaussian, or only change the distribution of their mean?</span></figcaption>
 </figure>
 
 ## What "enough samples" means

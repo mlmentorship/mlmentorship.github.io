@@ -100,7 +100,7 @@ The separate right-hand example has first hit at rank three, so RR is $1/3$.
 			<p class="cm-equation">RR = 1 / first correct rank = 1 / 3 = 0.33</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the left table accumulates unnormalized DCG terms and precision at binary-relevant hits. Divide by IDCG or R under the stated conventions. The separate right example stops at its first useful answer. Original calculations follow the <a href="https://doi.org/10.1145/582415.582418">cumulative-gain paper</a>, <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">IR textbook</a>, and <a href="https://trec.nist.gov/pubs/trec8/papers/qa8.pdf">TREC-8 QA evaluation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the left table accumulates unnormalized DCG terms and precision at binary-relevant hits. Divide by IDCG or R under the stated conventions. The separate right example stops at its first useful answer. Original calculations follow the <a href="https://doi.org/10.1145/582415.582418">cumulative-gain paper</a>, <a href="https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-ranked-retrieval-results-1.html">IR textbook</a>, and <a href="https://trec.nist.gov/pubs/trec8/papers/qa8.pdf">TREC-8 QA evaluation</a>. <span class="visual-reader-check" data-reader-check="ranking-metrics-per-rank-credit"><strong>Check:</strong> Which metric keeps accumulating after the first relevant item? What extra averaging step produces MAP or MRR?</span></figcaption>
 </figure>
 
 ## Hit rate and recall@K

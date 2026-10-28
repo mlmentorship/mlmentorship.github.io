@@ -3,9 +3,9 @@
   "slug": "critique-ml-paper",
   "article": "src/content/posts/2026-07-10-critique-ml-paper.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Turn a paper's central claim and headline evidence into one prioritized alternative explanation and one experiment whose outcome would materially change belief in the claim.",
-  "mediumRationale": "A compact Mermaid funnel is the smallest medium that shows the key review motion: establish the claim-evidence link, branch into plausible threats, rank them by their ability to overturn the claim, then reconverge on one discriminating experiment.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a qualitative reasoning path with branches and convergence, and the established compact flowchart primitive provides accessible text, responsive layout, theme support, and print output.",
     "svg": "Rejected because the process contains no quantitative geometry and fixed hand-drawn paths would duplicate Mermaid's relationship semantics.",
@@ -71,6 +71,6 @@
     "visualIds": [
       "paper-critique-prioritization-funnel"
     ],
-    "accessibility": "The Mermaid source provides a complete title and description. Every stage and candidate threat is directly labelled, dashed branches distinguish alternatives from the solid main argument, and the caption states the convergence explicitly, so meaning does not rely on color. The established compact Mermaid class removes the mobile minimum width for a phone-width layout; shared Mermaid theme tokens support dark mode and print."
+    "accessibility": "The reported baseline uses 10 GPU-hours for 80 percent accuracy; the new recipe uses 20 for 84 percent. Separate zero-based common scales show accuracy and compute. Three proposed matched-compute paired runs have question marks because their outcomes are not known. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -102,7 +102,7 @@ Compute the right-hand contractions first: $K'^\top V$ is $r \times d$ and $K'^\
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the shapes, not the colors. Linformer reduces the token axis from <var>n</var> to <var>k</var> before queries meet keys, so its weight matrix is <var>n</var> × <var>k</var>. Performer keeps all <var>n</var> tokens but contracts transformed keys with values first, leaving an <var>r</var> × <var>d</var> summary and an <var>r</var> × 1 normalizer for each query to read. Both routes avoid <var>n</var> × <var>n</var>, but by compressing different axes. Original schematic based on <a href="https://arxiv.org/abs/2006.04768">Linformer</a> and <a href="https://arxiv.org/abs/2009.14794">Performer</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the shapes, not the colors. Linformer reduces the token axis from <var>n</var> to <var>k</var> before queries meet keys, so its weight matrix is <var>n</var> × <var>k</var>. Performer keeps all <var>n</var> tokens but contracts transformed keys with values first, leaving an <var>r</var> × <var>d</var> summary and an <var>r</var> × 1 normalizer for each query to read. Both routes avoid <var>n</var> × <var>n</var>, but by compressing different axes. Original schematic based on <a href="https://arxiv.org/abs/2006.04768">Linformer</a> and <a href="https://arxiv.org/abs/2009.14794">Performer</a>. <span class="visual-reader-check" data-reader-check="linear-attention-two-escape-routes"><strong>Check:</strong> Which route compresses token positions? Which reorders feature products while retaining an explicit normalizer?</span></figcaption>
 </figure>
 
 ## When to use linear attention in 2026

@@ -3,9 +3,9 @@
   "slug": "rlhf-and-dpo",
   "article": "src/content/posts/2025-12-28-rlhf-and-dpo.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Starting from the same preference pairs, trace which learned components and data-generation steps RLHF adds that DPO removes.",
-  "mediumRationale": "A shared-input, two-column semantic comparison is the smallest medium that exposes the operational difference hidden by the phrase preference optimization: RLHF first learns an explicit reward and then runs an on-policy RL loop, whereas DPO applies an offline pairwise loss directly to the policy. Numbered text stages preserve exact reading order and remain legible when stacked on a narrow screen.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: automatic graph layout could show two branches, but the essential lesson depends on concise stage-level qualifications such as explicit versus implicit reward, fresh versus stored responses, and what each path must maintain. Those labels become cramped in a 390 CSS-pixel flowchart.",
     "svg": "Rejected: the comparison requires no quantitative geometry, plotted values, or fixed spatial coordinates. SVG would reduce text reflow and magnification quality without adding technical precision.",
@@ -67,6 +67,6 @@
     "visualIds": [
       "rlhf-dpo-training-paths"
     ],
-    "accessibility": "The figure has a question-style accessible title, a semantic shared-input section, two separately labelled training-path sections, numbered stages, and a group label that states the complete contrast. Text labels, stage order, explicit versus implicit terminology, and maintenance summaries carry all meaning without color. The established two-column primitive stacks below 640 CSS pixels with no minimum width, including at 390 CSS pixels; theme variables provide dark-mode contrast and shared print rules preserve a high-contrast, break-resistant figure."
+    "accessibility": "Both branches use a fictional preference for current P2 over stale P1 with a fixed SFT reference. RLHF fits a reward model and draws fresh current-policy rollouts for reward-plus-KL RL updates. DPO directly updates the policy on the stored pair using the reference-relative likelihood-ratio margin; it needs no separate reward-model fit or rollout loop. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

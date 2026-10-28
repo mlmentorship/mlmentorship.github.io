@@ -3,9 +3,9 @@
   "slug": "agentic-ml-codebase-interview",
   "article": "src/content/posts/2026-07-11-agentic-ml-codebase-interview.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Separate the bounded implementation work delegated to a coding agent from the contract setting, independent verification, and acceptance authority retained by the engineer.",
-  "mediumRationale": "Two labelled semantic-HTML lanes make the ownership boundary explicit while preserving a readable ordered sequence in each lane. This is smaller and more accessible than a process diagram, and it reflows into one column without hiding the comparison.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart would imply one linear handoff and obscure that agent execution and reviewer control overlap throughout the change.",
     "svg": "Rejected: custom vector geometry adds fixed-width labels and accessibility work without conveying more than two ordered semantic lanes.",
@@ -60,7 +60,9 @@
     "summary": "Read the complete article, text-indexed all 214 deck pages and inspected pages 164-170, then checked official GitHub guidance and the original MapReduce publication. The review selected a static two-lane responsibility model rather than a generic agent flowchart."
   },
   "implementation": {
-    "visualIds": ["agent-review-control-loop"],
-    "accessibility": "The figure uses a labelled heading, a descriptive group label, semantic section headings, and ordered lists. Agent and reviewer ownership is written in every lane and stage rather than encoded by color. The existing two-panel primitive stacks into one column below 640 pixels for a 390 CSS-pixel viewport, uses theme tokens in dark mode, and switches to a high-contrast light palette with page-break protection in print."
+    "visualIds": [
+      "agent-review-control-loop"
+    ],
+    "accessibility": "A fictional auth.py patch must deny expired tokens. Agent execution returns a diff and passing focused tests. The engineer independently tests expiry exactly equal to now, finds a failure, and returns the same bounded patch for revision. Acceptance remains outside the agent lane. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

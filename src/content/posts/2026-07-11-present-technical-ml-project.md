@@ -64,7 +64,7 @@ Which component should you investigate first? What does this trace not establish
 			<text class="viz-label" x="270" y="161" text-anchor="middle">100 ms objective</text>
 		</svg>
 	</section>
-	<figcaption><strong>Read it this way:</strong> open the relevant decision, then its supporting trace. The join blocks this request; neither bar estimates the complete request's p99.</figcaption>
+	<figcaption><strong>Read it this way:</strong> open the relevant decision, then its supporting trace. The join blocks this request; neither bar estimates the complete request's p99. <span class="visual-reader-check" data-reader-check="technical-project-decision-spine"><strong>Check:</strong> Why can making the 45ms model faster not by itself bring this request below the 100ms objective?</span></figcaption>
 </figure>
 
 ## Investigate the Blocker Without Overclaiming

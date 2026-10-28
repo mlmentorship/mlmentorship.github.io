@@ -93,7 +93,7 @@ This split is the diagram's “sample ≤ 2” rule for these ordered features.
 		</g>
 		<text class="viz-label" x="180" y="497" text-anchor="middle">remaining residuals: −1.5 | +1.5; half as long</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> start at the flat prediction five. Under half-squared loss, target gaps are the next tree's negative-gradient labels. The stump predicts −3 and +3; shrinkage adds −1.5 and +1.5. Each remaining gap halves, while SSE falls from 36 to 9. Sources: <a href="https://www.jstor.org/stable/2699986">Friedman</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost tutorial</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at the flat prediction five. Under half-squared loss, target gaps are the next tree's negative-gradient labels. The stump predicts −3 and +3; shrinkage adds −1.5 and +1.5. Each remaining gap halves, while SSE falls from 36 to 9. Sources: <a href="https://www.jstor.org/stable/2699986">Friedman</a> and the <a href="https://xgboost.readthedocs.io/en/stable/tutorials/model.html">XGBoost tutorial</a>. <span class="visual-reader-check" data-reader-check="gradient-boosting-residual-update"><strong>Check:</strong> Why does the first tree predict -3 and +3 rather than the original targets 2 and 8?</span></figcaption>
 </figure>
 
 ### Change the step size

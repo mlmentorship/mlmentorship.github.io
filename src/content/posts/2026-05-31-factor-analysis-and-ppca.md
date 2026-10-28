@@ -75,7 +75,7 @@ $$
 		</svg>
 	</div>
 	<table><caption>Two-feature teaching fixture</caption><thead><tr><th>Shared WWᵀ</th><th>Noise Ψ</th><th>Total C</th></tr></thead><tbody><tr><td>[[4, 2], [2, 1]]</td><td>[[1, 0], [0, 4]]</td><td>[[5, 2], [2, 5]]</td></tr></tbody></table>
-	<figcaption><strong>Read it this way:</strong> shared factor paths create both variance and covariance; each noise path adds only its feature's variance. The table applies that decomposition to two features. PPCA ties noise variances, but its fitted principal subspace already matches PCA at finite noise. Deterministic projection is a separate zero-noise limit. The original drawing retains its Tipping-Bishop (1999) and Ghahramani-Hinton (1996) provenance.</figcaption>
+	<figcaption><strong>Read it this way:</strong> shared factor paths create both variance and covariance; each noise path adds only its feature's variance. The table applies that decomposition to two features. PPCA ties noise variances, but its fitted principal subspace already matches PCA at finite noise. Deterministic projection is a separate zero-noise limit. The original drawing retains its Tipping-Bishop (1999) and Ghahramani-Hinton (1996) provenance. <span class="visual-reader-check" data-reader-check="factor-model-covariance-decomposition"><strong>Check:</strong> Why can independent unique noise alter variances but not explain cross-feature covariance?</span></figcaption>
 </figure>
 
 ### Work the posterior

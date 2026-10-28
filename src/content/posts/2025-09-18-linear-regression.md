@@ -69,7 +69,7 @@ Residuals $(-1/6,1/3,-1/6)$ sum to zero, as does their dot product with $x$; SSE
 			<text class="viz-callout" x="265" y="257" text-anchor="middle">X^T r = 0</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> fitted responses lie in Col(X), an observation-space subspace. The closest fit leaves a perpendicular residual, giving X<sup>T</sup>r = 0. The picture is not a feature-scatter plot or advice to form an inverse. Use QR or SVD numerically. Original schematic follows <a href="https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/positive-definite-matrices-and-applications/orthogonal-projections-and-their-applications/">MIT's projection notes</a> and the <a href="https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm">NIST least-squares handbook</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> fitted responses lie in Col(X), an observation-space subspace. The closest fit leaves a perpendicular residual, giving X<sup>T</sup>r = 0. The picture is not a feature-scatter plot or advice to form an inverse. Use QR or SVD numerically. Original schematic follows <a href="https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/pages/positive-definite-matrices-and-applications/orthogonal-projections-and-their-applications/">MIT's projection notes</a> and the <a href="https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm">NIST least-squares handbook</a>. <span class="visual-reader-check" data-reader-check="ols-orthogonal-projection"><strong>Check:</strong> Why is the residual orthogonal to X even when the coefficient vector is not unique?</span></figcaption>
 </figure>
 
 The inverse expression identifies a solution; it is not the preferred numerical algorithm.

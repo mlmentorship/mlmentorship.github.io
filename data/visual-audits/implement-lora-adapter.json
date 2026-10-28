@@ -3,9 +3,9 @@
   "slug": "implement-lora-adapter",
   "article": "src/content/posts/2026-07-11-implement-lora-adapter.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how random A and zero B make a LoRA adapter an exact no-op at initialization while still giving B, but not A, a gradient on the first backward pass.",
-  "mediumRationale": "A compact top-to-bottom Mermaid dataflow is the smallest medium that can show the frozen base and low-rank residual branches together, then distinguish ordinary forward flow from first-step gradient flow. The graph exposes both the shape-changing bottleneck and the initialization asymmetry without quantitative geometry or interaction.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a directed forward-and-backward relationship among input, frozen base, low-rank factors, residual addition, and gradients.",
     "svg": "Rejected because fixed coordinates would add maintenance and mobile-label risk without encoding the branch and gradient relationships better than a responsive graph.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "lora-zero-impact-first-gradient"
     ],
-    "accessibility": "The Mermaid source provides a specific accessible title and a complete description of both branches and first-step gradients. Matrix names, shapes, initialization values, node shapes, solid forward arrows, and dashed backward arrows carry meaning without color. The established tall graph primitive removes the mobile minimum width at 390 CSS pixels, theme variables preserve dark-mode contrast, and print rules use a light high-contrast palette."
+    "accessibility": "At initialization A is random and B is zero, so the scaled adapter output sBAx is zero. For upstream gradient g, dL/dA equals s B-transpose g x-transpose and is zero. dL/dB equals s g (Ax)-transpose and is generally nonzero. Frozen W parameters do not block input gradients. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

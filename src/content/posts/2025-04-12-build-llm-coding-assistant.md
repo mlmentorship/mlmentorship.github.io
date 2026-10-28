@@ -30,46 +30,8 @@ R1's suggested code parses correctly. Which result may the editor display or acc
 Treat each response as a proposal for its captured document, cursor, context and policy, not as free-floating code.
 Cancellation can save work, but a late response still needs a validity check.
 
-<p class="visual-title">Late suggestions must still match the editor revision</p>
-
 <!-- visual:coding-assistant-two-latency-paths -->
-```mermaid
-flowchart TB
-  accTitle: An inline response must still match the current editor state
-  accDescr: Request R1 captures document version 41 and cursor 80. Authorized context and the buffer prefix and suffix form its bounded fill-in-the-middle prompt. Typing advances the current editor to version 42 and cursor 81 while R1 runs. R1 is discarded on return because its snapshot is stale. R2 may display only while its version, cursor, context, deadline and authorization remain valid; accepting it requires a version-aware editor transaction. A separate explicit task path grants scoped tools and evaluates patches with review and tests, never using an inline response as authorization.
-  Scope{"Inline suggestion<br/>or explicit coding task?"}
-  Trigger["R1 captures version 41<br/>cursor 80 · request identity"]
-  Policy["Check read + egress policy<br/>before retrieving or sending code"]
-  Index[("Authorized context<br/>buffer · symbols · imports · tests")]
-  Prompt["Bounded FIM snapshot<br/>prefix + suffix + context revision"]
-  Fast["Approved code model<br/>R1 in flight"]
-  Current["Typing advances editor<br/>version 42 · cursor 81"]
-  Valid{"Response still matches?<br/>state · deadline · authorization"}
-  Drop["R1: discard stale response<br/>never overwrite new text"]
-  Ghost["R2: show only while valid<br/>version-check acceptance · undo"]
-  InlineEval["Exposure funnel + retained edits<br/>language · task · latency"]
-  Deep["Explicit scoped task<br/>authorized tools · patch review"]
-  TaskEval["Task outcomes<br/>tests · regressions · safety"]
-  Scope -->|"inline"| Trigger
-  Trigger --> Policy --> Index
-  Index --> Prompt
-  Prompt --> Fast
-  Trigger -->|"user types"| Current
-  Fast --> Valid
-  Current --> Valid
-  Valid -->|"R1 mismatches"| Drop
-  Current -->|"new request R2"| Policy
-  Valid -->|"R2 matches"| Ghost
-  Ghost --> InlineEval
-  Scope -->|"task authorization"| Deep
-  Deep --> TaskEval
-  class Scope,Prompt,Valid viz-focus
-  class Trigger,Current viz-input
-  class Index,Policy viz-state
-  class Drop viz-warning
-  class Ghost,Deep viz-output
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> R1 can be syntactically correct but invalid for the current editor. R2 also needs a fresh check when displayed and accepted.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="coding-assistant-two-latency-paths-edition-title"><p class="visual-title" id="coding-assistant-two-latency-paths-edition-title">A correct suggestion for yesterday's buffer is still stale</p><svg viewBox="0 0 360 391" role="img" aria-labelledby="coding-assistant-two-latency-paths-edition-svg-title coding-assistant-two-latency-paths-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="coding-assistant-two-latency-paths-edition-svg-title">A correct suggestion for yesterday's buffer is still stale</title><desc id="coding-assistant-two-latency-paths-edition-svg-desc">Editor and server lanes share one ordered time direction. R1 captures version 41, typing advances the document to version 42, and R1 returns stale and is discarded. R2 targets version 42 but still needs current version, deadline, and policy checks before acceptance. Tool tasks require separate authorization.</desc><text x="90" y="25" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">EDITOR</tspan></text><text x="270" y="25" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">SERVER</tspan></text><path d="M90 45L90 340" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:1.75"></path><path d="M270 45L270 340" style="fill:none;stroke:var(--viz-state-stroke);stroke-width:1.75"></path><rect x="20" y="61" width="140" height="38" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="85" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">version 41</tspan></text><rect x="200" y="61" width="140" height="38" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="85" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">R1 captures v41</tspan></text><rect x="20" y="125" width="140" height="38" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="149" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">typing: v42</tspan></text><rect x="200" y="125" width="140" height="38" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="149" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">R1 still running</tspan></text><rect x="20" y="189" width="140" height="38" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="213" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">keep new text</tspan></text><rect x="200" y="189" width="140" height="38" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="213" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">R1 returns v41</tspan></text><rect x="20" y="270" width="140" height="38" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="294" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">current: v42</tspan></text><rect x="200" y="270" width="140" height="38" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="294" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">R2 returns v42</tspan></text><path d="M160 81L200 81" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M193.8569220667674,84.35597877022943L200,81L193.8569220667674,77.64402122977057" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M200 209L160 209" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M166.1430779332326,205.64402122977057L160,209L166.1430779332326,212.35597877022943" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="180" y="251" style="font-size:14px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="180" dy="0">41 != 42: DISCARD R1</tspan></text><path d="M200 290L160 290" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M166.1430779332326,286.6440212297706L160,290L166.1430779332326,293.3559787702294" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><text x="180" y="334" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">R2 still needs live version + policy checks</tspan></text><text x="180" y="374" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">A tool task needs separate authorization</tspan></text></svg><figcaption><strong>Read it this way:</strong> R1 cannot overwrite version 42, even when its code is correct. R2 still needs live version, deadline, and policy checks. Vertical spacing is schematic. <span class="visual-reader-check" data-reader-check="coding-assistant-two-latency-paths"><strong>Check:</strong> Why must R1 never be inserted even if its proposed code is correct?</span></figcaption></figure>
 <p class="diagram-source">References: <a href="https://arxiv.org/abs/2207.14255">FIM</a>, <a href="https://arxiv.org/abs/2303.12570">RepoCoder</a>, and <a href="https://docs.github.com/en/copilot/concepts/context/repository-indexing">repository indexing</a>.</p>
 
 ## Capture and check request identity

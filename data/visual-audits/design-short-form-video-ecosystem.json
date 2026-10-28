@@ -3,9 +3,9 @@
   "slug": "design-short-form-video-ecosystem",
   "article": "src/content/posts/2026-08-29-design-short-form-video-ecosystem.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how viewer-randomized treatment and control cells share creators, so exposure in both cells changes next-period creator production and contaminates the future inventory served to both cells.",
-  "mediumRationale": "A focused Mermaid flowchart is the smallest useful spatial explanation because experiment interference is a directed shared-resource problem: two randomized viewer cells draw from one creator supply, their exposure changes production, and the resulting inventory returns to both cells. Labelled branches and a dashed spillover path expose why an immediate viewer effect and a long-term ecosystem effect require different designs.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson depends on following two assignment branches into one shared creator response and then tracing next-period inventory back across both experimental cells. The established top-to-bottom Mermaid primitive keeps that causal structure explicit and themed.",
     "svg": "Rejected because no numeric axis, scale, or fixed geometry carries the lesson. Manually positioning the same graph would increase maintenance and small-screen risk without adding technical precision.",
@@ -89,6 +89,6 @@
     "visualIds": [
       "ecosystem-experiment-interference"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description that trace current shared inventory through the two randomized cells, shared creator opportunity and production, and next-period spillover into both future cells. Every cell, timescale, and interpretation is text-labelled; arrows and the dashed shared-supply path carry meaning without color. A compact top-to-bottom layout with the established viz-tall marker keeps labels readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, print uses the established light page-safe palette, and the direct caption preserves the inference if visual rendering is unavailable."
+    "accessibility": "Separate viewer treatment and control cells allocate opportunity in one shared creator pool. Creator response over weeks changes future supply that returns to both cells. The cross-cell dependence is explicit, but the direction of benefit or harm is not assumed. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -100,7 +100,7 @@ Choose a threshold in $(0,1]$; declare cutoff ties and renormalize ([Holtzman et
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> both panels use the same vertical probability scale. Solid top-k brackets retain three tokens with masses 0.90 and 0.61. Dashed top-p brackets retain two and five tokens, reaching at least 0.80 with masses 0.84 and 0.86. Divide by the retained mass before sampling; do not sample from the original probabilities without renormalizing.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both panels use the same vertical probability scale. Solid top-k brackets retain three tokens with masses 0.90 and 0.61. Dashed top-p brackets retain two and five tokens, reaching at least 0.80 with masses 0.84 and 0.86. Divide by the retained mass before sampling; do not sample from the original probabilities without renormalizing. <span class="visual-reader-check" data-reader-check="decoding-fixed-count-adaptive-mass"><strong>Check:</strong> Why does the uncertain distribution need five tokens rather than four to reach 80% mass?</span></figcaption>
 </figure>
 
 Confident top-k becomes $(0.8,2/15,1/15)$; confident top-p becomes $(6/7,1/7)$.

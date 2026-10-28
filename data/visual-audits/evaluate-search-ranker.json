@@ -3,9 +3,9 @@
   "slug": "evaluate-search-ranker",
   "article": "src/content/posts/2025-04-09-evaluate-search-ranker.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Route a ranker candidate through human-judgment calibration, fast offline screening, and randomized online validation without treating any one evidence layer as a substitute for the others.",
-  "mediumRationale": "A compact Mermaid feedback loop is the smallest medium that can show both the order of evaluation decisions and how production failures refresh the human-labeled set. It keeps each evidence layer attached to the question it can answer and makes randomized exposure a gate before clicks inform shipping.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a flow of evidence and decisions with a feedback loop, not quantitative geometry. Labelled edges can distinguish calibration, screening, and causal launch evidence.",
     "svg": "Rejected: a custom drawing would reproduce flowchart behavior with more markup and no additional spatial or numerical insight.",
@@ -91,6 +91,6 @@
     "visualIds": [
       "search-ranker-evidence-flywheel"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and detailed description. Node labels name each evidence source and its distinct question; numbered stage labels, explicit outcome edges, solid forward paths, and a dashed next-review path preserve all meaning without color. The established wide-diagram primitive preserves label size through horizontal scrolling at 390 CSS pixels, while print removes the width floor; shared theme tokens provide dark-mode and print contrast."
+    "accessibility": "Fixed illustrative head and tail scores are A 0.80 and 0.80, and B 0.90 and 0.70. Shared-scale bars show each matched slice. The 90-to-10 traffic mixture gives averages 0.80 and 0.88, but B fails the declared tail floor 0.78 and must hold. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

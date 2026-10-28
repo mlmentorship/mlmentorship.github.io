@@ -3,9 +3,9 @@
   "slug": "design-real-time-multimodal-assistant",
   "article": "src/content/posts/2026-08-29-design-real-time-multimodal-assistant.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace why a recovered screen frame that arrives last must remain historical, and how a request-specific freshness gate waits for a new keyframe or abstains instead of treating arrival order as current state.",
-  "mediumRationale": "A compact Mermaid comparison is the smallest useful spatial explanation because the lesson is a directed change in interpretation: the same delayed frame is unsafe when arrival order advances current state, but harmless when event time places it behind the screen watermark and a freshness gate requires new evidence. The article already establishes Mermaid as its relationship-diagram primitive, including responsive theme and print behavior.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because labelled edges and two outcome branches make the causal difference between arrival-order selection and event-time freshness gating explicit. A top-to-bottom compact flow remains readable without scaling a detailed time axis.",
     "svg": "Rejected because exact geometric scale and quantitative spacing are not part of the lesson. Hand-positioning two timelines would add maintenance cost and small-screen text constraints without improving the event-order invariant.",
@@ -93,6 +93,6 @@
     "visualIds": [
       "multimodal-stale-frame-gate"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description that narrate both outcomes. Every node names the frame's capture relation, arrival relation, freshness state, and response behavior; solid versus dashed edges and explicit safe or unsafe labels preserve meaning without color. The compact top-to-bottom layout uses the established viz-tall marker so labels fit at 390 CSS pixels without a wide minimum canvas. Existing theme tokens supply dark-mode contrast, and the established print rules remove height limits and use a light page-safe palette. The direct caption and adjacent incident prose preserve the lesson if Mermaid does not render."
+    "accessibility": "On one mapped clock the screen is captured at 10.00 seconds, arrives at 14.20, and is considered at 14.30. Actual age is 4.30 seconds; arrival age is only 0.10. Their bars use a shared seconds-per-unit scale. A replacement snapshot belongs to a separate later decision with its own 0.068-second age bound and action revalidation. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

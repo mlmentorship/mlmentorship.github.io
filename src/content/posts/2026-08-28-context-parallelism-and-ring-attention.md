@@ -135,7 +135,7 @@ At each step:
 			<text class="viz-label" x="20" y="338">Every device runs the same rotated trace concurrently; only K/V blocks move around the ring.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> scan left to right. Q₀ never leaves device 0; K/V₀, K/V₃, K/V₂, and K/V₁ visit in turn. Each visit rescales and merges into the same (m, z, u), so the final O₀ = u/z is one softmax over all visible blocks, not four local softmaxes. Every device performs the same rotated process concurrently. Original schematic based on the <a href="https://arxiv.org/abs/2310.01889">Ring Attention paper</a> and <a href="https://docs.nvidia.com/megatron-core/developer-guide/0.16.1/user-guide/features/context_parallel.html">Megatron Core context-parallel documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> scan left to right. Q₀ never leaves device 0; K/V₀, K/V₃, K/V₂, and K/V₁ visit in turn. Each visit rescales and merges into the same (m, z, u), so the final O₀ = u/z is one softmax over all visible blocks, not four local softmaxes. Every device performs the same rotated process concurrently. Original schematic based on the <a href="https://arxiv.org/abs/2310.01889">Ring Attention paper</a> and <a href="https://docs.nvidia.com/megatron-core/developer-guide/0.16.1/user-guide/features/context_parallel.html">Megatron Core context-parallel documentation</a>. <span class="visual-reader-check" data-reader-check="ring-attention-fixed-query-kv-cycle"><strong>Check:</strong> Why can independently normalized block outputs not simply be added?</span></figcaption>
 </figure>
 
 The output is exact apart from normal floating-point effects.

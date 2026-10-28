@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace one missing user-item rating through the matching user and item factor vectors and see their dot product become the predicted matrix entry.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can align one missing cell in the sparse ratings matrix with the corresponding row of U and row of V, then expose the elementwise products and sum that fill that cell. Mermaid can show flow but cannot reliably align matrix indices or arithmetic. Semantic HTML could render a table, but connecting one cell to two factor vectors would be less direct. Interaction adds no necessary state because the same index-selection rule applies to every cell. Reusing a paper or deck figure would add licensing risk and more detail than the objective needs. No visual would leave the article's hardest mental model—the path from two latent vectors to one previously missing rating—as prose and notation alone.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "deckReview": {
     "pages": [
       {
@@ -64,7 +64,9 @@
     "summary": "The complete article, the full deck index, six directly relevant or neighboring slides, and authoritative sources were reviewed. The hardest prose-only model is how selecting one user row and one item row in the factor matrices produces one missing entry, so the recommendation is one static worked dot-product trace."
   },
   "implementation": {
-    "visualIds": ["mf-missing-rating-dot-product"],
-    "accessibility": "The SVG has a programmatic title and detailed description. Matrix and vector names, matching A and 3 indices, solid connector paths, explicit multiplication signs, and the written arithmetic carry all meaning without color. The existing visual-scroll and visual-wide primitives preserve readable labels at 390 CSS pixels, theme variables support light and dark modes, and the established print override removes minimum width and forces high-contrast paper colors."
+    "visualIds": [
+      "mf-missing-rating-dot-product"
+    ],
+    "accessibility": "The original toy sparse ratings matrix highlights user A and item three. Matching factors u_A=[2,1] and v_3=[1.5,1] contribute three and one, totaling predicted rating four. The complete selection and calculation remain visible in a vertical phone-width composition. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

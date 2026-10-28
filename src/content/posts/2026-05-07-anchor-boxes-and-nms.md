@@ -103,7 +103,7 @@ Thus $\operatorname{IoU}=2/3>0.50$: keep A, suppress B, then keep disjoint C.
 			<text class="viz-label" x="150" y="83" text-anchor="middle">chain check: C moves to [4,0,14,10]</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> keep A, suppress B at IoU 2/3, then keep C. In the separate chain, A and C also survive; NMS is not one survivor per connected component.</figcaption>
+	<figcaption><strong>Read it this way:</strong> keep A, suppress B at IoU 2/3, then keep C. In the separate chain, A and C also survive; NMS is not one survivor per connected component. <span class="visual-reader-check" data-reader-check="nms-greedy-suppression"><strong>Check:</strong> Why does C survive the chain even though B overlaps both A and C?</span></figcaption>
 </figure>
 
 ## Change 1: Different Objects Overlap

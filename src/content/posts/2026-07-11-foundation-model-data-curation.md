@@ -18,46 +18,8 @@ Plan a 1000-token training budget with intended shares $0.6$ and $0.4$.
 How often is each source consumed, and can a restricted record be traced to affected checkpoints?
 
 <p class="visual-kicker">One record, explicit decisions</p>
-<p class="visual-title">Trace R17 through shard S1, manifest M1, run T1 and recorded checkpoint consumption.</p>
-
 <!-- visual:foundation-data-curation-lineage -->
-```mermaid
-flowchart TB
-	accTitle: Curation preserves a sample's lineage from source to checkpoint
-	accDescr: Hypothetical records R17 and R18 receive identifiers before parsing. R17 retains code structure and passes into shard S1. R18 is rejected for a synthetic secret-canary match, with a protected reason record. Manifest M1 fixes curated shards, transformations, tokenizer, source weights and exclusions. Run T1 uses M1. An actual-consumption record shows that R17 was drawn before checkpoint C200. An audit ledger links decisions and consumption; deleting the raw record does not erase the checkpoint.
-	Raw["RAW SAMPLE<br/>license · time · language"]
-	Identity["R17 AND R18<br/>IDs before transforms"]
-	Normalize["PARSE + NORMALIZE<br/>preserve structure"]
-	Gates{"VERSIONED GATES<br/>policy · quality<br/>dedup · contamination"}
-	Reject[("R18 REJECTED<br/>protected reason reference")]
-	Shard["SHARD S1<br/>R17 + decision evidence"]
-	Others["OTHER SOURCES<br/>with provenance"]
-	Weights["MIXTURE DESIGN<br/>weights + effective epochs"]
-	Manifest[("MANIFEST M1<br/>shards · tokenizer · weights")]
-	Run["RUN T1<br/>uses M1"]
-	Usage["CONSUMPTION LOG<br/>R17 drawn before step 200"]
-	Checkpoints[("CHECKPOINT C200<br/>recorded consumption")]
-	Audit[("AUDIT LEDGER<br/>decisions + lineage")]
-
-	Raw --> Identity --> Normalize --> Gates
-	Gates -->|"R18: CANARY MATCH"| Reject
-	Gates -->|"R17: RETAIN"| Shard
-	Shard --> Weights
-	Others --> Weights
-	Weights --> Manifest --> Run --> Usage --> Checkpoints
-	Reject -.->|"WHY ABSENT"| Audit
-	Manifest -.->|"WHAT ENTERED"| Audit
-	Checkpoints -.->|"WHERE CONSUMED"| Audit
-
-	class Raw,Identity,Others viz-input
-	class Normalize,Gates,Weights viz-focus
-	class Reject viz-warning
-	class Shard,Checkpoints viz-output
-	class Manifest,Run,Usage,Audit viz-state
-	class Raw viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> R17 retains its identity through each decision. R18 has a protected rejection record. A manifest describes eligible inputs; consumption logs establish which inputs were actually drawn before a checkpoint.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="foundation-data-curation-lineage-edition-title"><p class="visual-title" id="foundation-data-curation-lineage-edition-title">Being listed in a manifest is not proof that a sample was consumed</p><svg viewBox="0 0 360 460" role="img" aria-labelledby="foundation-data-curation-lineage-edition-svg-title foundation-data-curation-lineage-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="foundation-data-curation-lineage-edition-svg-title">Being listed in a manifest is not proof that a sample was consumed</title><desc id="foundation-data-curation-lineage-edition-svg-desc">Illustrative stable IDs separate accepted R17 from rejected R18. R18 keeps its policy-rejection reason and has no shard membership. R17 appears in S1 and M1, then has separate consumption evidence before checkpoint C200. Membership and consumption are different claims.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative stable IDs; rejection evidence</tspan><tspan x="180" dy="19">is retained</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">R17: ACCEPTED</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">R18: REJECTED</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Versioned gate</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">policy permits</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">policy denies</tspan></text></g><path d="M15 207L345 207" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="227" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Data manifest</tspan></text><g data-editorial-node><rect x="15" y="241" width="150" height="73" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="282.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">S1 -&gt; M1</tspan></text></g><g data-editorial-node><rect x="195" y="241" width="150" height="73" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="263.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">reason retained</tspan><tspan x="270" dy="19">no shard</tspan><tspan x="270" dy="19">membership</tspan></text></g><path d="M15 329L345 329" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="349" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Before checkpoint C200</tspan></text><g data-editorial-node><rect x="15" y="363" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="392" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">consumption log:</tspan><tspan x="90" dy="19">R17 read</tspan></text></g><g data-editorial-node><rect x="195" y="363" width="150" height="67" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="270" y="401.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">not consumed</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> Rejected R18 retains its reason without entering a shard. Accepted R17 needs a consumption record, not just manifest membership, before linking it to C200. <span class="visual-reader-check" data-reader-check="foundation-data-curation-lineage"><strong>Check:</strong> Which receipt proves R17 was consumed, rather than merely present in a manifest?</span></figcaption></figure>
 <p class="diagram-source">References: <a href="https://arxiv.org/abs/2406.11794">DataComp-LM</a>, <a href="https://aclanthology.org/2022.acl-long.577/">Lee et al. on deduplication</a>, <a href="https://arxiv.org/abs/2303.03915">ROOTS</a>, and <a href="https://arxiv.org/abs/2203.15556">Hoffmann et al.</a></p>
 
 ## Calculate realized exposure

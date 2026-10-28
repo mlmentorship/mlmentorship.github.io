@@ -70,7 +70,7 @@ With $f$ fraction bits, spacing within $[2^E,2^{E+1})$ is $2^{E-f}$.
 			<p class="cm-equation">Failure mode: updates can round away because adjacent values are farther apart.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> each row has the same width. BF16 allocates more bits to the exponent, leaving fewer fraction bits. Its broader range does not preserve the 0.003 change near one.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each row has the same width. BF16 allocates more bits to the exponent, leaving fewer fraction bits. Its broader range does not preserve the 0.003 change near one. <span class="visual-reader-check" data-reader-check="fp16-bf16-bit-budget"><strong>Check:</strong> Why can BF16 have broader range yet round away the 0.003 change retained by FP16?</span></figcaption>
 </figure>
 <p class="diagram-source">References: <a href="https://docs.nvidia.com/cuda/floating-point/index.html">NVIDIA's IEEE 754 overview</a>, <a href="https://cloud.google.com/tpu/docs/bfloat16">Google Cloud's BF16 documentation</a>, and the <a href="https://arxiv.org/abs/1905.12322">BFLOAT16 study</a>.</p>
 

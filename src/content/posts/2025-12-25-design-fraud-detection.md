@@ -94,7 +94,7 @@ It cannot observe their exact losses under an action that never occurred.
 		<text class="viz-callout" x="180" y="498" text-anchor="middle">TRAIN + EVALUATE</text>
 		<text class="viz-label" x="180" y="513" text-anchor="middle">retain label source and action</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the 1,000 attempts to their actions. Of 900 allowed payments, 800 matured and eight have confirmed reports. The 100 pending payments are not negative. The 100 declines have no realized allowed-payment outcome. Dashed paths sample both actions for independent review. Audit labels retain their source, not exact counterfactual losses.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the 1,000 attempts to their actions. Of 900 allowed payments, 800 matured and eight have confirmed reports. The 100 pending payments are not negative. The 100 declines have no realized allowed-payment outcome. Dashed paths sample both actions for independent review. Audit labels retain their source, not exact counterfactual losses. <span class="visual-reader-check" data-reader-check="fraud-policy-label-coverage"><strong>Check:</strong> Why must the 100 declined outcomes and 100 pending outcomes not become negative labels?</span></figcaption>
 </figure>
 
 <span id="what-an-l5-answer-sounds-like"></span>

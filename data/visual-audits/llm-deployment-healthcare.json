@@ -3,9 +3,9 @@
   "slug": "llm-deployment-healthcare",
   "article": "src/content/posts/2026-03-07-llm-deployment-healthcare.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how intended use bounds an LLM's role, why a clinician must independently verify its evidence before any clinical action, and how the resulting decision and outcome return through one auditable operations loop.",
-  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that keeps the evidence path, clinician authority boundary, no-action exit, provenance trace, and operational feedback connected. The lesson is about responsibility and sequence rather than quantitative geometry.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: labelled directed edges make the authority boundary, mutually exclusive review outcomes, audit evidence, and controlled feedback loop explicit. The established renderer supplies responsive sizing plus dark-mode and print themes.",
     "svg": "Rejected: no scale, measurement, or fixed geometry carries the lesson, so manually positioned SVG would add maintenance without increasing technical precision.",
@@ -87,6 +87,6 @@
     "visualIds": [
       "healthcare-llm-clinician-gate"
     ],
-    "accessibility": "The Mermaid source has a specific accessible title and a complete description of the intended-use boundary, evidence inputs, structured draft, clinician review outcomes, clinical workflow, audit record, and operations feedback. Every node and branch is directly labelled; solid, thick, and dashed arrows distinguish the primary decision path from provenance and feedback without relying on color. The top-to-bottom layout and established viz-tall marker remove the mobile minimum width and permit full-height rendering at 390 CSS pixels. Shared visual tokens provide dark-mode and print-safe contrast, and the caption preserves the core lesson if client-side rendering is unavailable."
+    "accessibility": "Patient P1 has encounter E1 on January 10 without a prior procedure and E2 on February 10 with procedure PX1 on February 9. An E2 draft citing E1 is rejected. A corrected draft version v2 cites E2, and the reviewer receipt binds that exact version. Documentation permission does not grant clinical-action authority. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

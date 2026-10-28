@@ -3,9 +3,9 @@
   "slug": "design-production-llm-inference-service",
   "article": "src/content/posts/2026-07-11-design-production-llm-inference-service.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how KV admission and the per-iteration token budget protect memory capacity and decode latency at the same time.",
-  "mediumRationale": "A focused Mermaid control flow is the smallest useful spatial explanation because the lesson is the dependency between two budgets rather than a quantitative curve: KV pages gate entry before work is queued, then each model iteration protects active decode and uses only the remaining token capacity for bounded prefill chunks.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because labelled decisions, queues, feedback, and the decode loop carry the lesson. The established Mermaid visual roles and wide-flow marker preserve legible feedback paths through contained narrow-screen scrolling, themed colors, and print rendering without introducing article-specific styling.",
     "svg": "Rejected because the article supplies no measured scale or geometry for a plot. Fixed coordinates would make a long control loop harder to maintain and would imply quantitative proportions that are not claimed.",
@@ -105,6 +105,6 @@
     "visualIds": [
       "llm-inference-two-budget-scheduler"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description naming both budgets, both admission outcomes, decode-first allocation, bounded prefill, continuing work, cancellation, and KV release. Labels, numbered scheduling stages, decision shapes, and arrow direction carry every distinction without color. The compact top-to-bottom flow and established wide-flow marker preserve readable labels through contained horizontal scrolling at 390 CSS pixels; theme tokens supply dark-mode contrast, print uses the existing light page-safe rendering, and the adjacent prose and direct caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "Toy KV memory has twelve pages: A reserves five, B reserves four, and three remain free. A separate eight-slot iteration protects three decode slots and uses five for bounded prefill. When A stops, its five pages are released, leaving eight free. These units are illustrative, not performance measurements. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

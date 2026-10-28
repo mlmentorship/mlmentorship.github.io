@@ -93,7 +93,7 @@ This is right at the slogan level. Each piece has problems. You've heard A/B tes
 			<text class="viz-callout" x="16" y="494">COHERENT EXPOSURE · outcome belongs to B</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow each row from the user turn to its assigned model. Re-randomizing requests produces an A–B–A conversation, so a conversation-level outcome mixes treatments. Assigning conversation 42 once keeps every turn on B and makes its outcome attributable to B.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow each row from the user turn to its assigned model. Re-randomizing requests produces an A–B–A conversation, so a conversation-level outcome mixes treatments. Assigning conversation 42 once keeps every turn on B and makes its outcome attributable to B. <span class="visual-reader-check" data-reader-check="chatbot-randomization-unit"><strong>Check:</strong> Which assignment lets one conversation-level outcome be attributed to one model?</span></figcaption>
 </figure>
 
 This is L5. You've named the three concrete problems and the typical fixes.

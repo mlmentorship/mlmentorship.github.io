@@ -3,9 +3,9 @@
   "slug": "design-ml-system-fixed-budget",
   "article": "src/content/posts/2026-07-10-design-ml-system-fixed-budget.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how a narrowing ranking funnel reserves expensive scoring for fewer candidates while every request remains inside one end-to-end latency ceiling and one unit-cost ceiling.",
-  "mediumRationale": "A compact top-to-bottom Mermaid funnel is the smallest useful spatial explanation: it connects traffic arithmetic to progressively narrower ranking stages, makes cost per request increase as candidate count falls, and keeps the shared latency, cost, and overload constraints visible without inventing a hardware-specific allocation.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a directed serving path with a narrowing candidate set, labelled changes in relative work per candidate, and a fallback branch. The established tall-flow primitive keeps this relationship readable at narrow widths and inherits themed screen and print rendering.",
     "svg": "Rejected because the article provides no measured candidate counts, stage timings, or cost shares from which to draw honest quantitative geometry. A bespoke funnel shape would suggest a scale the evidence does not support.",
@@ -123,6 +123,6 @@
     "visualIds": [
       "fixed-budget-ranking-funnel"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. Candidate-set changes, relative work, ceilings, and the overload branch are all expressed in text and line style, so color is not required. Combined tall-flow and wide-canvas markers prevent height compression and provide contained horizontal scrolling at 390 CSS pixels, while print removes the width floor and shared visual tokens supply light, dark, and print-safe rendering. The surrounding calculation and direct caption preserve the inference if client-side diagram rendering is unavailable."
+    "accessibility": "Explicitly illustrative candidate counts shrink from 10,000 to 1,000 to 100. Widths communicate ordered narrowing rather than a linear count scale. The separate request-level target remains p95 below 80 milliseconds and cost at most 0.08 dollars per 1,000 requests. Stage p95s are not added as if they were request p95. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

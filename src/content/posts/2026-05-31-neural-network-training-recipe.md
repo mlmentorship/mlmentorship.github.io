@@ -18,39 +18,8 @@ Suppose gradients are nonzero but parameters never change.
 Should you search architectures, or inspect the update path?
 
 <p class="visual-kicker">Return to the earliest failed check</p>
-<p class="visual-title">Nonzero gradients do not prove that an optimizer changed the model.</p>
-
 <!-- visual:training-recipe-evidence-gates -->
-```mermaid
-flowchart TB
-	accTitle: The neural-network training recipe as evidence gates
-	accDescr: Inspect data and establish a trustworthy baseline. The teaching fixture has 32 distinct inputs in four classes. Zero logits give mean cross-entropy log four. A backward pass produces gradients but leaves parameters unchanged until an optimizer step occurs. Check updates and an attainable fixed-batch fitting threshold before testing full-set fitting, generalization and budgeted tuning. A failed check returns to its supporting assumptions. Tiny-batch success does not establish validation quality, and failure need not imply a software bug if labels conflict or capacity is insufficient.
-	D["1 · Inspect data<br/>simple end-to-end baseline"] --> G1{"Trust labels, metrics,<br/>init loss, predictions?"}
-	G1 -->|"no"| R1["Repair data or evaluation<br/>then repeat the baseline"]
-	R1 -.-> D
-	G1 ==>|"yes"| T["2 · Known 32-example batch<br/>no regularization"]
-	T --> G2{"Weights change?<br/>Known fitting check passes?"}
-	G2 -->|"no"| R2["Repair inputs, loss, gradients,<br/>mode, or parameter updates"]
-	R2 -.-> T
-	G2 ==>|"yes"| F["3 · Fit the full training set<br/>simple known architecture"]
-	F --> G3{"Training loss<br/>low enough?"}
-	G3 -->|"no"| R3["Fix optimization or capacity<br/>change one thing"]
-	R3 -.-> F
-	G3 ==>|"yes"| V["4 · Add data + regularization<br/>measure validation behavior"]
-	V --> G4{"Generalization<br/>credible?"}
-	G4 -->|"no"| R4["Run error analysis<br/>revise data or regularization"]
-	R4 -.-> V
-	G4 ==>|"yes"| H["5 · Budgeted search<br/>record every trial"]
-	H --> S["6 · Squeeze<br/>longer training · ensemble · distill"]
-	class D,T,F,V viz-input
-	class G1,G2,G3,G4 viz-focus
-	class R1,R2,R3,R4 viz-warning
-	class H viz-state
-	class S viz-output
-	class D viz-wide
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> verify the update before tuning its hyperparameters. Each failed gate sends you back to the evidence needed for that stage, not to an unrelated architecture search.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="training-recipe-evidence-gates-edition-title"><p class="visual-title" id="training-recipe-evidence-gates-edition-title">A nonzero gradient is not proof that the intended parameters changed</p><svg viewBox="0 0 360 406" role="img" aria-labelledby="training-recipe-evidence-gates-edition-svg-title training-recipe-evidence-gates-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="training-recipe-evidence-gates-edition-svg-title">A nonzero gradient is not proof that the intended parameters changed</title><desc id="training-recipe-evidence-gates-edition-svg-desc">An illustrative known 32-example batch has flat loss 1.10, nonzero gradient norm 0.8, and zero maximum parameter change. The diagnostic checks the optimizer step, learning rate, and optimizer-bound parameter identities, then repeats the same fitting check before escalating to full data. The evidence narrows hypotheses without proving one cause.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative known 32-example fitting check</tspan></text><text x="18" y="67" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Loss stays at 1.10 across updates</tspan></text><path d="M35 136L325 136" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="180" y="167" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">same batch / no regularization</tspan></text><g data-editorial-node><rect x="18" y="205" width="150" height="68" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="93" y="234.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="93" dy="0">gradient norm</tspan><tspan x="93" dy="19">0.8: nonzero</tspan></text></g><g data-editorial-node><rect x="192" y="205" width="150" height="68" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="267" y="225" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="267" dy="0">max weight</tspan><tspan x="267" dy="19">change</tspan><tspan x="267" dy="19">0: unchanged</tspan></text></g><text x="180" y="318" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Inspect step, learning rate, and</tspan><tspan x="180" dy="19">optimizer-bound parameters.</tspan></text><text x="180" y="370" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Recheck the same batch before full-data</tspan><tspan x="180" dy="19">training.</tspan></text></svg><figcaption><strong>Read it this way:</strong> The gradient exists, but the intended weights do not move. Inspect update wiring and repeat the same batch. This evidence does not uniquely identify a cause. <span class="visual-reader-check" data-reader-check="training-recipe-evidence-gates"><strong>Check:</strong> Which observed check blocks progression beyond the known batch? What measurement distinguishes the proposed causes?</span></figcaption></figure>
 <p class="diagram-source">References: <a href="https://karpathy.github.io/2019/04/25/recipe/">Karpathy's recipe</a>, <a href="https://www.deeplearningbook.org/contents/guidelines.html">Deep Learning practical methodology</a>, and <a href="https://jmlr.org/papers/v13/bergstra12a.html">Bergstra and Bengio</a>.</p>
 
 ## Check the update, then fit the known batch

@@ -73,31 +73,8 @@ The cohort contrast above is not declared randomized; concurrent incentives, eli
 Separately, even viewer-randomized cells can share treatment-altered creator supply.
 
 <p class="visual-kicker">Why viewer randomization may not isolate long-run supply effects</p>
-<p class="visual-title">Treatment and control can consume the same inventory after creators respond to both policies.</p>
-
 <!-- visual:ecosystem-experiment-interference -->
-```mermaid
-flowchart TB
-  accTitle: Shared creator supply creates interference between viewer-randomized treatment and control cells
-  accDescr: Current creator inventory supplies viewer-randomized treatment and control cells. The cells compare immediate viewer outcomes while their ranking policies allocate different exposure to the same creators. Exposure from both cells changes creator learning, retention, and production over weeks. That response creates next-period shared inventory, which enters both future treatment and future control cells. An immediate comparison has a narrower estimand under its assumptions. Future control consumes an ecosystem partly changed by treatment and is not an untouched long-horizon counterfactual.
-  Inventory["CURRENT SHARED INVENTORY<br/>same creators supply both cells"]
-  Cells["VIEWER-RANDOMIZED CELLS<br/>treatment: new policy / control: current"]
-  Immediate["IMMEDIATE VIEWER COMPARISON<br/>watch / skip / satisfaction"]
-  Opportunity["SHARED CREATOR OPPORTUNITY<br/>both policies allocate reach"]
-  Response["CREATOR RESPONSE OVER WEEKS<br/>learning / retention / production"]
-  Next["NEXT-PERIOD SHARED INVENTORY<br/>supply responds to both cells"]
-  Future["FUTURE TREATMENT + CONTROL<br/>not an untouched ecosystem"]
-  Inventory ==> Cells
-  Cells -->|"before supply responds"| Immediate
-  Cells ==>|"different policies, same creators"| Opportunity
-  Opportunity ==> Response ==> Next
-  Next -.->|"shared supply returns to both cells"| Future
-  class Inventory viz-state
-  class Cells,Opportunity,Response viz-focus
-  class Immediate,Next viz-output
-  class Future viz-warning
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> follow reach into creator production, then back into both cells' inventory. A longer viewer test does not automatically restore an untreated ecosystem.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="ecosystem-experiment-interference-edition-title"><p class="visual-title" id="ecosystem-experiment-interference-edition-title">Treatment and control can change the same future creator supply</p><svg viewBox="0 0 360 412" role="img" aria-labelledby="ecosystem-experiment-interference-edition-svg-title ecosystem-experiment-interference-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="ecosystem-experiment-interference-edition-svg-title">Treatment and control can change the same future creator supply</title><desc id="ecosystem-experiment-interference-edition-svg-desc">Separate viewer treatment and control cells allocate opportunity in one shared creator pool. Creator response over weeks changes future supply that returns to both cells. The cross-cell dependence is explicit, but the direction of benefit or harm is not assumed.</desc><g data-editorial-node><rect x="15" y="25" width="150" height="65" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="43.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">TREATMENT</tspan><tspan x="90" dy="19">new ranking</tspan><tspan x="90" dy="19">policy</tspan></text></g><g data-editorial-node><rect x="195" y="25" width="150" height="65" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="53" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">CONTROL</tspan><tspan x="270" dy="19">current policy</tspan></text></g><path d="M90 90L135 141" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M128.41916679734294,138.6140757851921L135,141L133.45204664478217,134.17329944921636" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M270 90L225 141" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M226.54795335521783,134.17329944921636L225,141L231.58083320265706,138.6140757851921" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="45" y="145" width="270" height="65" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="173" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">ONE shared creator pool</tspan><tspan x="180" dy="19">both cells allocate opportunity</tspan></text></g><path d="M180 210L180 252" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,245.8569220667674L180,252L183.35597877022943,245.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="45" y="256" width="270" height="65" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="180" y="284" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Weeks later: changed supply</tspan><tspan x="180" dy="19">direction not assumed</tspan></text></g><path d="M135 321L90 372" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M91.54795335521783,365.17329944921636L90,372L96.58083320265705,369.61407578519214" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M225 321L270 372" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M263.41916679734294,369.61407578519214L270,372L268.4520466447822,365.17329944921636" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="90" y="395" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">future treatment</tspan></text><text x="270" y="395" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">future control</tspan></text></svg><figcaption><strong>Read it this way:</strong> Both cells influence the same creator pool. Its later response reaches both future cells. A short viewer experiment does not isolate an untouched ecosystem. <span class="visual-reader-check" data-reader-check="ecosystem-experiment-interference"><strong>Check:</strong> How can treatment change the future control experience despite randomized viewer assignment?</span></figcaption></figure>
 
 <span id="state-the-answer-before-drawing-the-system"></span>
 
@@ -198,31 +175,7 @@ Inspect qualified opportunity, participant outcomes, category supply, causal/mec
 
 The recommender allocates scarce attention. That allocation changes creator behavior, future inventory, advertiser demand, and the next training set.
 
-<p class="visual-title" data-supplemental-visual="video-ecosystem-delayed-effects">Today's exposure can change tomorrow's inventory</p>
-
-```mermaid
-flowchart TB
-  accTitle: Attention allocation changes creator supply, demand, revenue and later training
-  accDescr: Creators upload into moderated inventory. Retrieval and ranking allocate viewer exposure. Viewer responses affect future demand; creator reach and funding affect future production. Advertising and training logs also depend on this allocation. These coupled delayed paths can create interference rather than independent item outcomes.
-  C["Creator choices<br/>next uploads"] --> U["Upload<br/>moderation"]
-  U --> E["Eligible<br/>inventory"]
-  E --> R["Retrieval<br/>ranking"]
-  R --> X["Viewer<br/>exposure"]
-  X --> V["Viewer response<br/>satisfaction"]
-  X --> O["Creator reach<br/>feedback"]
-  O --> C
-  V --> D["Future viewer<br/>demand"]
-  D --> R
-  X --> A["Ad delivery<br/>brand safety"]
-  A --> B["Revenue<br/>creator funding"]
-  B --> C
-  X --> L["Training<br/>experiment logs"]
-  L --> R
-  class C,E viz-state
-  class R,X viz-focus
-  class V,O,A,L viz-output
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> trace exposure through creator reach and revenue back to future uploads. Immediate viewer response alone cannot settle that delayed effect.</p>
+<figure class="learning-figure editorial-illustration" data-supplemental-visual="video-ecosystem-delayed-effects" aria-labelledby="video-ecosystem-delayed-effects-edition-title"><p class="visual-title" id="video-ecosystem-delayed-effects-edition-title">The immediate viewer signal arrives before the full supply response</p><svg viewBox="0 0 360 342" role="img" aria-labelledby="video-ecosystem-delayed-effects-edition-svg-title video-ecosystem-delayed-effects-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="video-ecosystem-delayed-effects-edition-svg-title">The immediate viewer signal arrives before the full supply response</title><desc id="video-ecosystem-delayed-effects-edition-svg-desc">A shared schematic horizon separates viewer response observed inside a short experiment from creator retention and production observed weeks later. Eligibility and monetization can also affect supply, but no causal direction or effect size is invented.</desc><text x="180" y="24" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">A short experiment closes here</tspan></text><path d="M172 46L172 305" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><text x="82" y="64" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="82" dy="0">INSIDE WINDOW</tspan></text><text x="266" y="64" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="266" dy="0">NOT OBSERVED YET</tspan></text><text x="18" y="110" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Viewer response</tspan></text><path d="M26 137L326 137" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><rect x="26" y="126" width="118" height="22" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="86" y="173" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="86" dy="0">seconds to days</tspan></text><text x="18" y="219" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Creator supply response</tspan></text><path d="M26 249L326 249" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><rect x="204" y="238" width="122" height="22" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3;stroke-dasharray:5 3"></rect><text x="266" y="284" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="266" dy="0">weeks; direction</tspan><tspan x="266" dy="19">unknown</tspan></text><text x="180" y="325" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Ordered horizons, not a measured time scale</tspan></text></svg><figcaption><strong>Read it this way:</strong> Viewer response and creator supply arrive on different horizons. Eligibility and funding may affect supply too. This drawing assumes neither a benefit nor a harm.</figcaption></figure>
 
 Skips arrive quickly; viewer return, creator retention and supply response need longer, different windows.
 Attention, positions, creator tests, moderation, exploration, ads, compute and policy-review capacity are scarce.
@@ -620,42 +573,7 @@ Audit monetization incentives for length/repetition gaming rather than trusting 
 
 The architecture needs event-time correctness, versioned policy, and mature outcomes.
 
-<p class="visual-title" data-supplemental-visual="video-publication-evidence">Training snapshots and live serving need compatible versions</p>
-
-```mermaid
-flowchart TB
-  accTitle: Versioned exposure, catalog, training and deployment evidence connect the feed lifecycle
-  accDescr: Client and upload events enter streaming validation and an immutable event lake. Current eligibility and catalog state feed online features and fresh indexes. Point-in-time snapshots train and evaluate versioned models, calibrators and policy. Serving consumes compatible published state, while cohort and experiment evidence informs release governance.
-  Apps["Viewer/creator<br/>clients"] --> Events["Exposure/action<br/>upload/feedback"]
-  Upload["Upload<br/>pipeline"] --> Understand["Content<br/>understanding"]
-  Understand --> Moderate["Eligibility<br/>risk state"]
-  Moderate --> Catalog["Versioned<br/>video catalog"]
-
-  Events --> Stream["Streaming<br/>validation/features"]
-  Events --> Lake["Immutable<br/>event lake"]
-  Catalog --> Stream
-  Catalog --> Lake
-
-  Stream --> Online["Online<br/>feature store"]
-  Stream --> Index["Fresh candidate<br/>indexes"]
-  Lake --> Snapshots["Point-in-time<br/>training snapshots"]
-  Snapshots --> Train["Retrieval/ranking<br/>calibration/policy"]
-  Train --> Registry["Model/policy<br/>registry"]
-
-  Registry --> Serve["Feed serving<br/>stack"]
-  Online --> Serve
-  Index --> Serve
-  Catalog --> Serve
-  Serve --> Events
-
-  Lake --> Metrics["Cohort/experiment<br/>integrity/ecosystem"]
-  Metrics --> Release["Release<br/>governance"]
-  Registry --> Release
-  class Catalog,Lake,Registry viz-state
-  class Stream,Train,Serve viz-focus
-  class Online,Index,Metrics,Release viz-output
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> distinguish point-in-time training snapshots from live catalog and feature state. Published models still need compatible serving inputs and release evidence.</p>
+<figure class="learning-figure editorial-illustration" data-supplemental-visual="video-publication-evidence" aria-labelledby="video-publication-evidence-edition-title"><p class="visual-title" id="video-publication-evidence-edition-title">A release binds compatible versions, and rollback must bind them too</p><svg viewBox="0 0 360 441" role="img" aria-labelledby="video-publication-evidence-edition-svg-title video-publication-evidence-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="video-publication-evidence-edition-svg-title">A release binds compatible versions, and rollback must bind them too</title><desc id="video-publication-evidence-edition-svg-desc">Illustrative release R12 binds model M4, candidate index I8, feature schema F3, and policy P6 after current authorization and evaluation. Rollback restores a validated compatible bundle, not just an old model file. Artifact lineage and actual exposure records remain separate evidence.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative versioned release R12</tspan></text><text x="90" y="51" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">RELEASE BUNDLE</tspan></text><text x="270" y="51" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">ROLLBACK CONTRACT</tspan></text><path d="M15 72L345 72" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="92" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Model + retrieval index</tspan></text><g data-editorial-node><rect x="15" y="106" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="144.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">M4 + I8</tspan></text></g><g data-editorial-node><rect x="195" y="106" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="135" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">validated</tspan><tspan x="270" dy="19">compatible pair</tspan></text></g><path d="M15 188L345 188" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="208" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Feature schema + policy</tspan></text><g data-editorial-node><rect x="15" y="222" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="260.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">F3 + P6</tspan></text></g><g data-editorial-node><rect x="195" y="222" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="251" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">versions still</tspan><tspan x="270" dy="19">permitted</tspan></text></g><path d="M15 304L345 304" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="324" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Evidence</tspan></text><g data-editorial-node><rect x="15" y="338" width="150" height="73" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="370" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">evaluation +</tspan><tspan x="90" dy="19">authority</tspan></text></g><g data-editorial-node><rect x="195" y="338" width="150" height="73" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="360.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">retain lineage</tspan><tspan x="270" dy="19">check actual</tspan><tspan x="270" dy="19">exposures</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> Deploy and roll back compatible versioned bundles. An older model file alone is insufficient. Exposure outcomes require their own records.</figcaption></figure>
 
 ### Event schema
 

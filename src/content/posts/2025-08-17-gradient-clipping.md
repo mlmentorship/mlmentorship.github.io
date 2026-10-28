@@ -47,7 +47,7 @@ Ordinary SGD with learning rate $0.1$ moves by $(-0.3,-0.4)$, norm $0.5$.
 			<text class="viz-label" x="214" y="228">‖g′‖₂ = 5 · same ray</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the dashed gradient (6, 8) has norm ten. A common factor one-half places (3, 4) on the radius-five circle. The solid vector retains its direction. The optimizer still transforms it before changing parameters. Original schematic follows <a href="https://proceedings.mlr.press/v28/pascanu13.html">Pascanu, Mikolov, and Bengio (2013)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html">PyTorch global-norm definition</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the dashed gradient (6, 8) has norm ten. A common factor one-half places (3, 4) on the radius-five circle. The solid vector retains its direction. The optimizer still transforms it before changing parameters. Original schematic follows <a href="https://proceedings.mlr.press/v28/pascanu13.html">Pascanu, Mikolov, and Bengio (2013)</a> and the <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html">PyTorch global-norm definition</a>. <span class="visual-reader-check" data-reader-check="global-norm-clipping-radial-projection"><strong>Check:</strong> Why does global clipping produce (3,4), rather than independently truncating both coordinates to 5?</span></figcaption>
 </figure>
 
 Among vectors inside the radius-$c$ Euclidean ball, radial projection minimizes distance to $g$.

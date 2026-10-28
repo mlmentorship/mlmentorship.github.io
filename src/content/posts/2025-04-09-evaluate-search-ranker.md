@@ -49,35 +49,8 @@ B gains 0.08 in traffic-weighted NDCG but loses 0.10 on tail queries.
 It fails the declared 0.78 tail gate.
 Neither weighted average establishes causal user benefit.
 
-<p class="visual-title">A weighted gain cannot erase a failed tail guardrail</p>
-
 <!-- visual:search-ranker-evidence-flywheel -->
-```mermaid
-flowchart TB
-  accTitle: A weighted NDCG improvement does not override the tail guardrail
-  accDescr: Human judgments define a versioned relevance dataset. Fixed head and tail slices give A scores 0.80 and 0.80, and B scores 0.90 and 0.70. With 90 percent head traffic, traffic-weighted NDCG is 0.80 for A and 0.88 for B. B nevertheless fails the required tail score of at least 0.78 and returns for diagnosis. Candidates that pass declared screening can enter an appropriately randomized product experiment. Its estimand, uncertainty and guardrails determine a staged release decision. Production failures inform a separately versioned judging refresh rather than silently changing a running comparison.
-  Human["Human rubric + sampled candidates<br/>versioned relevance judgments"]
-  Slices["Fixed head / tail slices<br/>A: 0.80 / 0.80<br/>B: 0.90 / 0.70"]
-  Weights["Traffic weights: 0.90 / 0.10<br/>weighted A: 0.80<br/>weighted B: 0.88"]
-  Gate{"Tail at least 0.78?<br/>B: 0.70 fails"}
-  Hold["Hold B; diagnose tail failure<br/>average gain is not permission"]
-  Online["Passing candidate only:<br/>randomized product experiment<br/>estimand + uncertainty + guardrails"]
-  Release{"Release evidence sufficient?"}
-  Ship["Staged release<br/>monitor + compatible rollback"]
-  Refresh["Failure sampling + new judgments<br/>new dataset version"]
-  Human --> Slices --> Weights --> Gate
-  Gate -->|"B fails"| Hold
-  Gate -->|"candidate passes"| Online --> Release
-  Release -->|"yes"| Ship --> Refresh
-  Release -->|"no or uncertain"| Hold
-  Refresh -.-> Human
-  class Human,Slices,Refresh viz-state
-  class Weights,Gate,Online,Release viz-focus
-  class Hold viz-warning
-  class Ship viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> calculate the weighted average, then apply the tail constraint. Passing offline screening permits further evaluation; it does not prove product lift.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="search-ranker-evidence-flywheel-edition-title"><p class="visual-title" id="search-ranker-evidence-flywheel-edition-title">The better average still fails the tail floor</p><svg viewBox="0 0 360 445" role="img" aria-labelledby="search-ranker-evidence-flywheel-edition-svg-title search-ranker-evidence-flywheel-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="search-ranker-evidence-flywheel-edition-svg-title">The better average still fails the tail floor</title><desc id="search-ranker-evidence-flywheel-edition-svg-desc">Fixed illustrative head and tail scores are A 0.80 and 0.80, and B 0.90 and 0.70. Shared-scale bars show each matched slice. The 90-to-10 traffic mixture gives averages 0.80 and 0.88, but B fails the declared tail floor 0.78 and must hold.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative fixed slices; head/tail</tspan><tspan x="180" dy="19">weights 90% / 10%</tspan></text><text x="18" y="72" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">HEAD</tspan></text><text x="35" y="108" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="35" dy="0">A</tspan></text><rect x="60" y="89" width="208" height="26" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="330" y="108" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="330" dy="0">0.80</tspan></text><text x="35" y="145" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="35" dy="0">B</tspan></text><rect x="60" y="126" width="234" height="26" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="330" y="145" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="330" dy="0">0.90</tspan></text><text x="18" y="210" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">TAIL</tspan></text><text x="35" y="246" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="35" dy="0">A</tspan></text><rect x="60" y="227" width="208" height="26" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="330" y="246" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="330" dy="0">0.80</tspan></text><text x="35" y="283" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="35" dy="0">B</tspan></text><rect x="60" y="264" width="182" height="26" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="330" y="283" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="330" dy="0">0.70</tspan></text><path d="M262.8 220L262.8 294" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><text x="262.8" y="320" style="font-size:12px;font-weight:400;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="262.8" dy="0">floor 0.78</tspan></text><text x="180" y="377" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Weighted: A = 0.80; B = 0.88</tspan></text><text x="180" y="418" style="font-size:14px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="180" dy="0">B tail 0.70 &lt; 0.78 -&gt; HOLD</tspan></text></svg><figcaption><strong>Read it this way:</strong> Traffic weighting improves B's average while its tail breaches the floor. Hold B and diagnose the slice. An aggregate improvement is not release permission. <span class="visual-reader-check" data-reader-check="search-ranker-evidence-flywheel"><strong>Check:</strong> Why must B be held despite improving the weighted average from 0.80 to 0.88?</span></figcaption></figure>
 
 <span id="what-an-l4-answer-sounds-like"></span>
 <span id="what-an-l5-answer-sounds-like"></span>

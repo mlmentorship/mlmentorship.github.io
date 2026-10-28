@@ -32,39 +32,7 @@ Does the extra cost earn its place? What evidence is missing before recommending
 ## Picture: Replace a Verdict With a Testable Claim
 
 <!-- visual:overrated-technique-claim-stress-test -->
-<figure class="learning-figure" aria-labelledby="overrated-technique-stress-test-title">
-	<p class="visual-kicker">Bounded technical claim</p>
-	<p class="visual-title" id="overrated-technique-stress-test-title">What turns a hot take into a defensible technical judgment?</p>
-	<div class="visual-grid--two" role="group" aria-label="Side-by-side comparison of an unsupported hot take and a bounded, testable critique">
-		<section class="visual-panel" aria-labelledby="hot-take-title">
-			<h4 id="hot-take-title">Hot take: “CoT is overrated.”</h4>
-			<p>A verdict without a scope or mechanism gives the interviewer nothing technical to test.</p>
-			<table class="cm-grid" aria-label="Missing parts of the unsupported claim">
-				<tbody>
-					<tr><th scope="row">Target</th><td>Which use?</td></tr>
-					<tr><th scope="row">Mechanism</th><td>Why?</td></tr>
-					<tr><th scope="row">Boundary</th><td>When useful?</td></tr>
-					<tr><th scope="row">Evidence</th><td>What changed?</td></tr>
-				</tbody>
-			</table>
-			<p class="cm-equation">Result: contrarian preference</p>
-		</section>
-		<section class="visual-panel" aria-labelledby="bounded-critique-title">
-			<h4 id="bounded-critique-title">Bounded critique: generic CoT use</h4>
-			<p>Make the claim narrower and testable. Preserve the case where the technique earns its cost.</p>
-			<table class="cm-grid" aria-label="Four parts of a defensible critique">
-				<tbody>
-					<tr><th scope="row">Target</th><td class="cm-selected">Generic use on every task</td></tr>
-					<tr><th scope="row">Mechanism</th><td>Hypothesis: longer generation may leave missing source facts unresolved</td></tr>
-					<tr><th scope="row">Boundary</th><td>Test where intermediate computation is a demonstrated bottleneck</td></tr>
-					<tr><th scope="row">Evidence</th><td>Pin task/model/settings; compare matched quality, latency and billed cost</td></tr>
-				</tbody>
-			</table>
-			<p class="cm-equation">Result: a claim experience can update</p>
-		</section>
-	</div>
-	<figcaption><strong>Read it this way:</strong> name the target, proposed mechanism, useful boundary and reversing evidence. The mechanism is a hypothesis to test, not a universal result about reasoning.</figcaption>
-</figure>
+<figure class="learning-figure editorial-illustration" aria-labelledby="overrated-technique-claim-stress-test-edition-title"><span class="visual-fragment-anchor" id="overrated-technique-stress-test-title" aria-hidden="true"></span><span class="visual-fragment-anchor" id="hot-take-title" aria-hidden="true"></span><span class="visual-fragment-anchor" id="bounded-critique-title" aria-hidden="true"></span><p class="visual-title" id="overrated-technique-claim-stress-test-edition-title">A bounded critique leaves room for a reversing result</p><svg viewBox="0 0 360 491" role="img" aria-labelledby="overrated-technique-claim-stress-test-edition-svg-title overrated-technique-claim-stress-test-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="overrated-technique-claim-stress-test-edition-svg-title">A bounded critique leaves room for a reversing result</title><desc id="overrated-technique-claim-stress-test-edition-svg-desc">A proposed matched study pins model M, task inputs, sampling settings, and scoring. Source-fact and intermediate-computation bottlenecks are tested separately with direct versus reasoning-style prompts. Quality, latency, and cost are unmeasured. Equal-budget quality improvement on source-fact cases would reverse the narrow hypothesis that extra reasoning cannot help that bottleneck.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Proposed study; pin model M, inputs,</tspan><tspan x="180" dy="19">settings, and scorer</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">DIRECT</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">REASONING STYLE</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Missing source-fact slice</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="73" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="147.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">quality ?</tspan><tspan x="90" dy="19">latency ?; cost</tspan><tspan x="90" dy="19">?</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="73" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="147.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">quality ?</tspan><tspan x="270" dy="19">latency ?; cost</tspan><tspan x="270" dy="19">?</tspan></text></g><path d="M15 213L345 213" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="233" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Intermediate-computation slice</tspan></text><g data-editorial-node><rect x="15" y="247" width="150" height="73" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="269.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">quality ?</tspan><tspan x="90" dy="19">latency ?; cost</tspan><tspan x="90" dy="19">?</tspan></text></g><g data-editorial-node><rect x="195" y="247" width="150" height="73" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="270" y="269.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">quality ?</tspan><tspan x="270" dy="19">latency ?; cost</tspan><tspan x="270" dy="19">?</tspan></text></g><path d="M15 335L345 335" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="355" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">What reverses the critique?</tspan></text><g data-editorial-node><rect x="15" y="369" width="150" height="92" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="401" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">matched budget</tspan><tspan x="90" dy="19">independent</tspan><tspan x="90" dy="19">scoring</tspan></text></g><g data-editorial-node><rect x="195" y="369" width="150" height="92" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="270" y="391.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">source-fact</tspan><tspan x="270" dy="19">quality gain</tspan><tspan x="270" dy="19">without new</tspan><tspan x="270" dy="19">evidence</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> Question marks are unmeasured outcomes, not zero gains. Keep task slices separate and compare at matched budgets. A contrary result must be allowed to reverse the hypothesis. <span class="visual-reader-check" data-reader-check="overrated-technique-claim-stress-test"><strong>Check:</strong> What observed result would make the bounded critique fail rather than merely strengthen a preference?</span></figcaption></figure>
 
 ## Work the Trade-off
 

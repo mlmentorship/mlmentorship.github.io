@@ -86,7 +86,7 @@ This equals approximately $0.0009765615686774254$ and remains representable in F
 		</section>
 	</div>
 	<p class="cm-equation">Recovery is not guaranteed movement: at FP32 weight 1, subtracting this same 2<sup>−30</sup> rounds back to 1.</p>
-	<figcaption><strong>Read it this way:</strong> compare the FP16 backward rows. Without scaling, 2<sup>−30</sup> becomes zero. Scaling by 2<sup>20</sup> instead stores 2<sup>−10</sup>. Cast to FP32, then divide by the same scale before clipping or stepping. The original gradient survives this path. The ledger follows <a href="https://openreview.net/forum?id=r1gs9JgRZ">Micikevicius et al.</a> and the <a href="https://docs.pytorch.org/docs/stable/notes/amp_examples.html">PyTorch AMP sequence</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the FP16 backward rows. Without scaling, 2<sup>−30</sup> becomes zero. Scaling by 2<sup>20</sup> instead stores 2<sup>−10</sup>. Cast to FP32, then divide by the same scale before clipping or stepping. The original gradient survives this path. The ledger follows <a href="https://openreview.net/forum?id=r1gs9JgRZ">Micikevicius et al.</a> and the <a href="https://docs.pytorch.org/docs/stable/notes/amp_examples.html">PyTorch AMP sequence</a>. <span class="visual-reader-check" data-reader-check="fp16-loss-scaling-ledger"><strong>Check:</strong> Why can casting an already-zero FP16 gradient to FP32 not recover it, while casting the scaled nonzero gradient can?</span></figcaption>
 </figure>
 
 ### Change the Loss Scale

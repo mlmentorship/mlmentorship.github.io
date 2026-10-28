@@ -3,9 +3,9 @@
   "slug": "rag-overview",
   "article": "src/content/posts/2025-09-02-rag-overview.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Trace how the offline corpus-indexing path prepares lexical and dense indexes, then follow one online query through understanding, retrieval, fusion, reranking, and evidence-grounded generation.",
-  "mediumRationale": "A two-panel semantic path is the smallest medium that exposes the boundary hidden by the seven-component list: components 1-3 prepare reusable knowledge before traffic, while components 4-7 execute for each request and read from both indexes. Ordinary text wrapping and document order preserve the complete lesson without fixed-width drawing labels.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because automatic flowchart layout would add a wide crossing edge between two index stores and the request path, requiring horizontal scrolling or smaller labels at 390 CSS pixels for a distinction that two ordered panels express directly.",
     "svg": "Rejected because the lesson is lifecycle and responsibility rather than quantitative geometry. Fixed SVG text would be less adaptable at phone width, and a more detailed architecture drawing would duplicate the longer linked RAG essay.",
@@ -106,6 +106,6 @@
     "visualIds": [
       "rag-index-request-paths"
     ],
-    "accessibility": "The figure has a linked learning question and an explicitly labelled group containing two semantic sections. OFFLINE and ONLINE headings, numbered panels, direct stage names, and written transitions carry the full meaning without color. In source and assistive-technology reading order, the complete offline path precedes the complete online path. The established two-column primitive has no minimum width and stacks below 640 CSS pixels, so text wraps normally at 390 CSS pixels; existing theme tokens preserve dark-mode contrast and shared print rules force a light, high-contrast, page-break-safe rendering."
+    "accessibility": "Fictional document D version three has c1 stating thirty-day returns and c2 giving a support email. Lexical retrieval returns c1 and dense retrieval c1/c2. Fusion retains both; the optional reranker removes c2 from answer context. The answer cites D@v3:c1. Corpus refresh need not retrain model weights, and authorization and support still apply. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

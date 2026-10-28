@@ -82,7 +82,7 @@ Classifying over training speakers can learn embeddings, but metric losses align
 			<text class="viz-axis-label" x="180" y="324" text-anchor="middle">higher similarity score → stronger claimed-speaker match</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the same T and N trials in both rows. Moving the boundary left recovers one genuine target, but also admits one impostor. Choose the threshold from deployment costs and calibrated validation data, not from EER alone. Trial positions and counts are illustrative, not measured.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the same T and N trials in both rows. Moving the boundary left recovers one genuine target, but also admits one impostor. Choose the threshold from deployment costs and calibrated validation data, not from EER alone. Trial positions and counts are illustrative, not measured. <span class="visual-reader-check" data-reader-check="speaker-verification-threshold-tradeoff"><strong>Check:</strong> Which exact trials change decisions when the threshold moves? What cost tradeoff determines whether that change is desirable?</span></figcaption>
 </figure>
 
 - False accept and false reject rates

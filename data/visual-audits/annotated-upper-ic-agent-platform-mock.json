@@ -3,9 +3,9 @@
   "slug": "annotated-upper-ic-agent-platform-mock",
   "article": "src/content/posts/2026-08-29-annotated-upper-ic-agent-platform-mock.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace one consequential tool action from model proposal through policy enforcement and narrow execution to authoritative outcome evidence, while identifying which owner controls each boundary.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that connects the article's three planes to the governed action path and its ownership boundaries. The lesson is topological rather than quantitative: the model proposes, the control plane authorizes, the executor alone receives narrow authority, and the evidence plane records both the decision and final state.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the learning task is to follow entities and authority across plane and ownership boundaries. A top-to-bottom compact flow remains readable in a narrow column and uses the established theme and print treatment.",
     "svg": "Rejected because deterministic coordinates add maintenance cost without teaching geometry, magnitude, or a quantitative relation.",
@@ -83,6 +83,6 @@
     "visualIds": [
       "agent-governed-action-path"
     ],
-    "accessibility": "The Mermaid block provides an accessible title and a full path description. Step numbers, owner labels, node shapes, explicit permit and deny labels, solid action arrows, and dotted evidence arrows preserve meaning without color. A top-to-bottom layout and the established compact-node class avoid horizontal minimum width at 390 CSS pixels; shared Mermaid tokens supply dark-mode contrast and print forces a light, page-safe rendering."
+    "accessibility": "Illustrative call c17 requests report A. Identity, purpose, and scope are checked before any narrow credential is issued. A permitted call reaches the executor and receives a tool receipt. Denial means no credential and no dispatch. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

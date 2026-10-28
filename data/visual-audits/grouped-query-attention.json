@@ -3,9 +3,9 @@
   "slug": "grouped-query-attention",
   "article": "src/content/posts/2025-12-23-grouped-query-attention.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "For eight query heads and two key/value heads, identify which queries share each key/value pair and derive the fourfold KV-cache reduction while all eight query heads remain distinct.",
-  "mediumRationale": "Two aligned semantic tables are the smallest medium that can make head sharing and its memory consequence independently checkable. The first maps every query head to a named key/value pair; the second holds the query-head count fixed while comparing the number of cached key/value pairs in MHA, GQA, and MQA.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because the lesson is a discrete many-to-one head mapping and count comparison, not a process graph. Eight query nodes and repeated edges would add routing clutter while weakening the cache arithmetic.",
     "svg": "Rejected because fixed-position labels for eight query heads would be less adaptable at 390 CSS pixels. Real table cells preserve the same grouping geometry with native reflow, selectable text, and stronger assistive semantics.",
@@ -86,6 +86,6 @@
     "visualIds": [
       "gqa-eight-queries-two-kv-groups"
     ],
-    "accessibility": "The figure uses semantic sections and real tables with scoped headers. Every query-to-KV assignment, count, fraction, and reduction is written explicitly; group labels and repeated KV names carry the meaning without color. The established two-panel primitive stacks below 640 CSS pixels with no minimum width, so cells wrap at 390 CSS pixels. Existing theme variables provide dark-mode contrast, while shared print rules force a light high-contrast palette and avoid page breaks inside the figure."
+    "accessibility": "Eight query heads each retain their own output. A dashed bracket associates Q1 through Q4 with K1 and V1, and Q5 through Q8 with K2 and V2. Proportional head-dependent cache bars compare eight, two, and one KV heads for MHA, GQA, and MQA at fixed sequence length and head dimension. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

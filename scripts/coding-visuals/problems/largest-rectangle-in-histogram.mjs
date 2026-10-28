@@ -93,6 +93,8 @@ const draft = visual('Keep increasing (start,height) candidates; the first short
     best: '10',
   }), 'push-sentinel'),
   frame('Return the largest closed area', 'Every bar has now met its first shorter right boundary. The largest recorded rectangle has height 5, width 2, and area 10.', stackScene(6, [], {
+    stackLabel: 'unresolved positive heights',
+    actualStack: '[(0, 0)]: zero sentinel remains',
     area: { mode: 'bars', left: 2, right: 3, height: 5, label: 'winner: 5 x 2 = 10' },
     rectangle: 'indices [2..3], minimum height 5',
     arithmetic: '5 * 2 = 10',

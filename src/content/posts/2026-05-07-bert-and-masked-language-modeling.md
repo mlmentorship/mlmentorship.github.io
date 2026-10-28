@@ -88,7 +88,7 @@ The 10/10 random/keep split exists because at fine-tuning time there are no `[MA
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> first choose the 15 percent of positions where BERT must recover the original token. Only then choose what input replaces each selected token: `[MASK]`, a random token, or the unchanged token. All three paths predict the same original target; unselected positions provide context without their own MLM loss.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first choose the 15 percent of positions where BERT must recover the original token. Only then choose what input replaces each selected token: `[MASK]`, a random token, or the unchanged token. All three paths predict the same original target; unselected positions provide context without their own MLM loss. <span class="visual-reader-check" data-reader-check="bert-mlm-selection-and-corruption"><strong>Check:</strong> Does 80% masking mean 80% of all input positions, and do unchanged selected tokens still receive loss?</span></figcaption>
 </figure>
 
 ### Why bidirectional matters

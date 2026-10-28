@@ -3,9 +3,9 @@
   "slug": "fine-tuning-deep",
   "article": "src/content/posts/2025-06-27-fine-tuning-deep.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Separate the training objective (continued pretraining, supervised fine-tuning, or preference optimization) from the parameter-update scope (full weights or a parameter-efficient adapter such as LoRA).",
-  "mediumRationale": "A two-panel semantic comparison is the smallest useful spatial explanation: the first panel orders objectives by the signal they learn from, while the second makes parameter-update scope a separate choice that applies after selecting an objective.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because a single flowchart would falsely make LoRA a terminal stage after SFT or preference optimization; the learning task is to separate two axes, not follow one branching process.",
     "svg": "Rejected because the distinction is categorical rather than geometric or quantitative, and fixed SVG labels would wrap less naturally at a 390 CSS-pixel viewport.",
@@ -92,6 +92,6 @@
     "visualIds": [
       "fine-tuning-two-decisions"
     ],
-    "accessibility": "The figure uses a linked learning question and an explicitly labelled group of two semantic sections. Objectives, data signals, effects, and update scopes are all stated in text; numbered stages, headings, and written relationships carry the full lesson without color. The established two-column primitive stacks below 640 CSS pixels with normal text wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast and shared print rules produce a high-contrast light rendering."
+    "accessibility": "Three objective rows use domain text, prompt/ideal-response pairs, and preference triples. Each crosses full base-weight updates and LoRA adapter updates with the base frozen. The SFT-plus-LoRA cell is highlighted. The rows are alternatives, not a mandatory sequence. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -3,9 +3,9 @@
   "slug": "implement-reverse-mode-autograd",
   "article": "src/content/posts/2026-07-11-implement-reverse-mode-autograd.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Explain why a shared intermediate must receive and sum every downstream gradient contribution before its local backward function propagates upstream once.",
-  "mediumRationale": "A compact directed graph is the smallest medium that exposes the shared intermediate, its two downstream paths, their separate reverse contributions, and the dependency order that makes accumulation correct.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is graph topology and dependency order. A small diamond-shaped DAG makes the two paths into one shared node explicit, preserves labels during responsive reflow, and uses the established accessible flowchart primitive.",
     "svg": "Rejected because exact coordinates are unnecessary for a five-node dependency graph, and a custom SVG would duplicate Mermaid's accessible graph rendering without adding quantitative geometry.",
@@ -76,6 +76,6 @@
     "visualIds": [
       "autograd-shared-node-accumulate-then-propagate"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and a complete description with every forward value and reverse contribution. Node labels, edge direction, arithmetic, and the explicit words 'accumulate' and 'propagate once' carry the full lesson without color. The compact top-to-bottom graph uses no fixed pixel dimensions and the established Mermaid wrapper adapts at 390 CSS pixels. Existing visual roles provide dark-mode contrast, while shared print rules use a light high-contrast palette."
+    "accessibility": "The forward DAG has x equal to 2, shared u equal to 3x or 6, a equal to u squared or 36, b equal to 2u or 12, and L equal to 48. Dashed reverse edges contribute 12 and 2 at the same u. Their total 14 is multiplied by 3 once to yield x gradient 42. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

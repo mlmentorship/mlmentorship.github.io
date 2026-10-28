@@ -32,53 +32,7 @@ Judge the original decision using available evidence, not outcome luck alone.
 6. Learning: what would you change next time?
 
 <!-- visual:quality-speed-proportionate-path -->
-<figure class="learning-figure" aria-labelledby="quality-speed-path-title">
-	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="quality-speed-path-title">How does evidence lead to a proportionate launch decision?</p>
-	<div class="visual-panel plot-panel">
-		<svg viewBox="0 0 360 500" role="img" aria-labelledby="quality-speed-svg-title quality-speed-svg-desc" style="--viz-forward-marker:url(#quality-speed-arrow)">
-			<title id="quality-speed-svg-title">Evidence-to-mitigation decision path</title>
-			<desc id="quality-speed-svg-desc">A vertical path starts with evidence about concrete harm, affected users, likelihood and uncertainty, and reversibility. A targeted test reduces the key uncertainty. The path then asks whether a monitored, reversible release can keep harm within an explicit stop rule. A solid yes branch leads to a staged launch for a lower-risk segment with monitoring and rollback. A dashed no branch leads to reducing exposure through a scope cut, human review, or holding the affected path. Both outcomes require a decision owner, stop rule, and outcome metric.</desc>
-			<defs>
-				<marker id="quality-speed-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path class="viz-arrow-forward" d="M0,0 L8,4 L0,8 Z"></path></marker>
-			</defs>
-			<rect class="viz-plot-bg" x="4" y="4" width="352" height="492" rx="5"></rect>
-			<rect class="viz-node viz-node--input" x="24" y="22" width="312" height="92" rx="5"></rect>
-			<text class="viz-callout" x="40" y="46">1 · MAKE THE RISK CONCRETE</text>
-			<text class="viz-label" x="40" y="68">Harm · who is affected and how?</text>
-			<text class="viz-label" x="40" y="86">Exposure · how many users or decisions?</text>
-			<text class="viz-label" x="40" y="104">Likelihood · uncertainty · reversibility</text>
-			<path class="viz-forward" d="M180 114 V142"></path>
-			<rect class="viz-node viz-node--focus" x="24" y="142" width="312" height="62" rx="5"></rect>
-			<text class="viz-callout" x="40" y="166">2 · RUN THE SMALLEST DECISIVE TEST</text>
-			<text class="viz-label" x="40" y="187">Slice evaluation · red-team · shadow run</text>
-			<path class="viz-forward" d="M180 204 V232"></path>
-			<path class="viz-node viz-node--focus" d="M180 232 L332 282 L180 332 L28 282 Z"></path>
-			<text class="viz-callout" x="180" y="269" text-anchor="middle">CAN A MONITORED, REVERSIBLE</text>
-			<text class="viz-callout" x="180" y="285" text-anchor="middle">RELEASE KEEP HARM WITHIN</text>
-			<text class="viz-callout" x="180" y="301" text-anchor="middle">AN EXPLICIT STOP RULE?</text>
-			<path class="viz-forward" d="M88 312 V352"></path>
-			<text class="viz-axis-label" x="72" y="341">YES · solid path</text>
-			<path d="M272 312 V352" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4;marker-end:url(#quality-speed-arrow)"></path>
-			<text class="viz-axis-label" x="221" y="341">NO · dashed path</text>
-			<rect class="viz-node viz-node--output" x="18" y="352" width="152" height="92" rx="18"></rect>
-			<text class="viz-callout" x="94" y="377" text-anchor="middle">STAGE THE LAUNCH</text>
-			<text class="viz-label" x="94" y="398" text-anchor="middle">Lower-risk segment</text>
-			<text class="viz-label" x="94" y="416" text-anchor="middle">Monitor + rollback</text>
-			<text class="viz-label" x="94" y="434" text-anchor="middle">Protect the date</text>
-			<path d="M190 352 H342 V444 H190 Z" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></path>
-			<text class="viz-callout" x="266" y="377" text-anchor="middle">REDUCE EXPOSURE</text>
-			<text class="viz-label" x="266" y="398" text-anchor="middle">Cut affected scope</text>
-			<text class="viz-label" x="266" y="416" text-anchor="middle">Add human review</text>
-			<text class="viz-label" x="266" y="434" text-anchor="middle">Hold only if needed</text>
-			<path class="viz-forward" d="M94 444 V462 H180"></path>
-			<path d="M266 444 V462 H180" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2;stroke-dasharray:6 4"></path>
-			<rect class="viz-node" x="46" y="462" width="268" height="28" rx="4"></rect>
-			<text class="viz-node-value" x="180" y="480">Both: owner · stop rule · outcome metric</text>
-		</svg>
-	</div>
-	<figcaption><strong>Read it this way:</strong> follow the evidence through a targeted test to a permitted release decision. A stop rule needs an owner who can act. Monitoring and rollback cannot undo every harm or replace a required permission check.</figcaption>
-</figure>
+<figure class="learning-figure editorial-illustration" aria-labelledby="quality-speed-proportionate-path-edition-title"><span class="visual-fragment-anchor" id="quality-speed-path-title" aria-hidden="true"></span><span class="visual-fragment-anchor" id="quality-speed-svg-title" aria-hidden="true"></span><span class="visual-fragment-anchor" id="quality-speed-svg-desc" aria-hidden="true"></span><span class="visual-fragment-anchor" id="quality-speed-arrow" aria-hidden="true"></span><p class="visual-title" id="quality-speed-proportionate-path-edition-title">New evidence can change which users may be exposed</p><svg viewBox="0 0 360 447" role="img" aria-labelledby="quality-speed-proportionate-path-edition-svg-title quality-speed-proportionate-path-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="quality-speed-proportionate-path-edition-svg-title">New evidence can change which users may be exposed</title><desc id="quality-speed-proportionate-path-edition-svg-desc">A fictional staged export release has forty ordinary test cases and ten protected-record cases. Ordinary cases show zero permission violations, but two protected-record cases expose forbidden fields. The decision owner holds the protected path; a reversible ordinary cohort remains subject to authorization and a zero-violation stop rule.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Fictional export launch; security owner can</tspan><tspan x="180" dy="19">stop it</tspan></text><g transform="translate(0 19)"><g data-editorial-node><rect x="30" y="43" width="300" height="58" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="67.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Ordinary cases: 0 / 40 violations</tspan><tspan x="180" dy="19">protected cases: 2 / 10 violations</tspan></text></g><path d="M180 101L180 128" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,121.8569220667674L180,128L183.35597877022943,121.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="30" y="132" width="300" height="76" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="165.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Every exposed path authorized</tspan><tspan x="180" dy="19">AND zero permission violations?</tspan></text></g><path d="M180 208L180 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L270 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L90 266" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M86.64402122977057,259.85692206676737L90,266L93.35597877022943,259.85692206676737" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M270 229L270 266" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M266.6440212297706,259.85692206676737L270,266L273.3559787702294,259.85692206676737" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="90" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-output-stroke);text-anchor:middle"><tspan x="90" dy="0">PASS</tspan></text><text x="270" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="270" dy="0">FAIL</tspan></text><g data-editorial-node><rect x="14" y="270" width="152" height="138" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="90" y="296.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">ordinary cohort</tspan><tspan x="90" dy="19">only</tspan><tspan x="90" dy="19">1% reversible</tspan><tspan x="90" dy="19">stage</tspan><tspan x="90" dy="19">stop on first</tspan><tspan x="90" dy="19">violation</tspan></text></g><g data-editorial-node><rect x="194" y="270" width="152" height="138" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="296.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">protected path</tspan><tspan x="270" dy="19">HELD</tspan><tspan x="270" dy="19">repair field</tspan><tspan x="270" dy="19">filtering</tspan><tspan x="270" dy="19">independent</tspan><tspan x="270" dy="19">retest</tspan></text></g></g></svg><figcaption><strong>Read it this way:</strong> The protected path fails before exposure. A stage is not a permission exception. The named owner stops even the ordinary cohort on its first violation. <span class="visual-reader-check" data-reader-check="quality-speed-proportionate-path"><strong>Check:</strong> Which concrete observation changes this launch from a bounded release to a scope cut?</span></figcaption></figure>
 
 ## Work through a practice case
 
