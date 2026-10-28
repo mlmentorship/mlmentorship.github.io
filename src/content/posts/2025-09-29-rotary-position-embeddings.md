@@ -56,7 +56,7 @@ In code, RoPE is implemented as elementwise multiplies with precomputed `cos` an
 		<path class="viz-baseline" d="M25 267H335"></path>
 		<text class="viz-callout" x="180" y="287" text-anchor="middle">Q and K rotate before their dot product · V stays unchanged</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare the two circles. Adding three to both token positions turns <code>(1, 3)</code> into <code>(4, 6)</code> and rotates both vectors by the same extra angle. Their absolute directions change, but their <code>2θ</code> separation does not. Algebraically, <code>RₘᵀRₙ = Rₙ₋ₘ</code>, so this pair's contribution to the attention score depends on <code>n − m</code>. Solid Q and dashed K arrows keep the distinction visible without color. Original schematic, checked against the <a href="https://arxiv.org/abs/2104.09864">RoFormer paper</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the two circles. Adding three to both token positions turns <code>(1, 3)</code> into <code>(4, 6)</code> and rotates both vectors by the same extra angle. Their absolute directions change, but their <code>2θ</code> separation does not. Algebraically, <code>RₘᵀRₙ = Rₙ₋ₘ</code>, so this pair's contribution to the attention score depends on <code>n − m</code>. Solid Q and dashed K arrows keep the distinction visible without color. Original schematic, checked against the <a href="https://arxiv.org/abs/2104.09864">RoFormer paper</a>. <span class="visual-reader-check" data-reader-check="rope-relative-rotation"><strong>Check:</strong> Why does shifting both positions by three preserve this positional dot-product contribution without asserting identical whole-model outputs?</span></figcaption>
 </figure>
 
 ## Why it works

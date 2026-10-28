@@ -158,7 +158,7 @@ Generally, ring sent traffic is $2B(N-1)/N$ per rank over $2(N-1)$ steps.
 			<text class="viz-callout" x="380" y="339" text-anchor="middle">[3 reduce-scatter sends + 3 all-gather sends] × B/4 = 6B/4 = 3B/2</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> three receive-and-add steps build A*. Three forwarding steps distribute that completed chunk. All chunks follow the schedule concurrently. Each rank sends six chunks of size B/4, totaling 3B/2 bytes. This is sent traffic, not sent-plus-received traffic. Sources: <a href="https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/">Baidu ring explanation</a> and <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html">NCCL semantics</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> three receive-and-add steps build A*. Three forwarding steps distribute that completed chunk. All chunks follow the schedule concurrently. Each rank sends six chunks of size B/4, totaling 3B/2 bytes. This is sent traffic, not sent-plus-received traffic. Sources: <a href="https://andrew.gibiansky.com/blog/machine-learning/baidu-allreduce/">Baidu ring explanation</a> and <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html">NCCL semantics</a>. <span class="visual-reader-check" data-reader-check="ring-all-reduce-chunk-trace"><strong>Check:</strong> Where are the other chunks while A moves? Why does each rank send six chunks of size B/4?</span></figcaption>
 </figure>
 
 ## Change 1: The Consumer Needs Only Its Shard

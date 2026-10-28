@@ -85,7 +85,7 @@ The F1 score balances precision and recall via the harmonic mean. **Harmonic mea
 			<p class="cm-equation">2(0.90)(0.10) / (0.90 + 0.10) = 0.18</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> both pairs average to 0.50 arithmetically, but F1 drops to 0.18 when recall is only 0.10. A high precision score cannot compensate for weak recall (and vice versa).</figcaption>
+	<figcaption><strong>Read it this way:</strong> both pairs average to 0.50 arithmetically, but F1 drops to 0.18 when recall is only 0.10. A high precision score cannot compensate for weak recall (and vice versa). <span class="visual-reader-check" data-reader-check="precision-recall-f1-harmonic-penalty"><strong>Check:</strong> Why does precision 0.90 fail to compensate for recall 0.10 even though their arithmetic mean is 0.50?</span></figcaption>
 </figure>
 
 The **F-beta** generalization weights recall $\beta^2$ times more than precision:

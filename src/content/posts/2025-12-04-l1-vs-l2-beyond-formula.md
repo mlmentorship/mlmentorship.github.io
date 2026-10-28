@@ -95,7 +95,7 @@ For L2, $w-a+\lambda w=0$ gives $w=a/(1+\lambda)$.
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> expand a loss contour from the star until it touches the allowed region. A diamond corner can zero a coefficient; a smooth-circle contact can retain both. This schematic illustrates a tendency, not the numerical coordinates of our separate analytic fixture. Equivalent constrained budgets depend on the fitted optimum; equal numeric budgets across norms are not equivalent penalties. Sources: <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://hastie.su.domains/ElemStatLearn/"><cite>The Elements of Statistical Learning</cite></a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> expand a loss contour from the star until it touches the allowed region. A diamond corner can zero a coefficient; a smooth-circle contact can retain both. This schematic illustrates a tendency, not the numerical coordinates of our separate analytic fixture. Equivalent constrained budgets depend on the fitted optimum; equal numeric budgets across norms are not equivalent penalties. Sources: <a href="https://doi.org/10.1111/j.2517-6161.1996.tb02080.x">Tibshirani's lasso paper</a> and <a href="https://hastie.su.domains/ElemStatLearn/"><cite>The Elements of Statistical Learning</cite></a>. <span class="visual-reader-check" data-reader-check="l1-l2-first-contact-geometry"><strong>Check:</strong> What feature of the L1 boundary makes a zero coefficient possible at first contact?</span></figcaption>
 </figure>
 
 <span id="what-an-l6-answer-sounds-like"></span>

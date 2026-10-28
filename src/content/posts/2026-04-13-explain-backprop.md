@@ -84,7 +84,7 @@ Correct, but generic. You've memorized the textbook line, not internalized the a
 			<text class="viz-node-label" x="151" y="267">∂L/∂θ₁</text><text class="viz-node-value" x="151" y="284">accumulate at parameter</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the solid arrows once to compute the scalar loss and save a₁ and a₂. Then start at ∂L/∂L = 1 and follow the dashed arrows left: each local vector-Jacobian product reuses a saved value and emits that operation's parameter gradient. The reverse path is traversed once, not once per θ. Original schematic checked against the <a href="https://jmlr.org/papers/v18/17-468.html">automatic-differentiation survey</a> and <a href="https://docs.pytorch.org/docs/stable/notes/autograd.html">PyTorch autograd mechanics</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the solid arrows once to compute the scalar loss and save a₁ and a₂. Then start at ∂L/∂L = 1 and follow the dashed arrows left: each local vector-Jacobian product reuses a saved value and emits that operation's parameter gradient. The reverse path is traversed once, not once per θ. Original schematic checked against the <a href="https://jmlr.org/papers/v18/17-468.html">automatic-differentiation survey</a> and <a href="https://docs.pytorch.org/docs/stable/notes/autograd.html">PyTorch autograd mechanics</a>. <span class="visual-reader-check" data-reader-check="explain-backprop-one-loss-all-gradients"><strong>Check:</strong> Why does adding more parameters inside these operations not require another full reverse sweep per parameter?</span></figcaption>
 </figure>
 
 This is L5. You've explained it as auto-differentiation, mentioned the activation caching, and quantified the efficiency win.

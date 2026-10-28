@@ -3,9 +3,9 @@
   "slug": "chinchilla-moe-fused-triton",
   "article": "src/content/posts/2026-09-02-chinchilla-moe-fused-triton.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Compare HBM memory bandwidth traffic between unfused grouped GEMMs and a fused SRAM Triton kernel for MoE feed-forward layers.",
-  "mediumRationale": "A Mermaid flowchart clearly juxtaposes the two-pass HBM round trip against the single-pass SRAM fusion path across the up-projection, activation, and down-projection stages.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: directly contrasts the two-kernel HBM intermediate round-trip with the single-kernel SRAM streaming loop.",
     "svg": "Rejected: flowchart nodes and dataflow arrows provide a clearer spatial comparison at standard viewports than a custom geometric SVG.",
@@ -44,6 +44,6 @@
     "visualIds": [
       "fused-moe-triton-sram-roofline"
     ],
-    "accessibility": "Includes accTitle, accDescr, and a direct 'Read it this way' caption."
+    "accessibility": "Aligned unfused and fused paths keep the same intermediate h with shape t by F. For two-byte elements, the unfused path writes 2tF bytes then reads 2tF bytes. A fitting fused tile avoids that 4tF-byte intermediate round trip. Input, weight, and output traffic remain. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

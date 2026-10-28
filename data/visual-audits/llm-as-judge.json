@@ -3,9 +3,9 @@
   "slug": "llm-as-judge",
   "article": "src/content/posts/2026-08-28-llm-as-judge.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Distinguish an LLM judge's score from a validated evaluation decision by routing exact constraints to deterministic checks and uncertain semantic judgments through human calibration and review.",
-  "mediumRationale": "A two-lane semantic comparison is the smallest useful spatial explanation. It separates conditions code can prove from qualities that require a learned judge, then makes calibration, perturbation tests, abstention, and human escalation visible in the learned lane. Numbered text remains complete without a renderer and stacks naturally at narrow widths.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson needs two short, parallel evidence lanes rather than a relationship-heavy graph. Mermaid would add runtime rendering and make the compact labels harder to scan at phone width.",
     "svg": "Rejected: there is no quantitative geometry, plotted value, or fixed spatial scale to preserve, so custom coordinates would add maintenance without teaching more.",
@@ -97,6 +97,6 @@
     "visualIds": [
       "judge-calibration-gates"
     ],
-    "accessibility": "The figure is linked to a direct learning question, and its two semantic sections form a labelled group. Numbered steps, explicit pass-or-fail and abstain-or-escalate language, separate outcomes, and the caption preserve every distinction without color. The established two-column primitive stacks below 640 CSS pixels with normal text wrapping and no minimum width, including at 390 CSS pixels; theme tokens support dark mode and shared print rules force high-contrast paper colors."
+    "accessibility": "Fictional response B lacks a required id while receiving quality 4.8 out of five. That score cannot override the deterministic failure. In an independent order-swap probe, the same response pair yields A when ordered AB and B when ordered BA, revealing first-position sensitivity and requiring semantic review. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

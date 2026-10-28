@@ -65,7 +65,7 @@ This is invariant to tokenization and is the proper cross-tokenizer comparison m
 			</table>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> both rows encode the same six UTF-8 bytes with the same five bits of total surprisal. BPT changes from 2.50 to 1.67 only because each tokenizer chooses a different denominator; BPB divides by the fixed byte count and stays 0.83. Real models need not assign equal total surprisal, but byte normalization makes their reported unit comparable.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both rows encode the same six UTF-8 bytes with the same five bits of total surprisal. BPT changes from 2.50 to 1.67 only because each tokenizer chooses a different denominator; BPB divides by the fixed byte count and stays 0.83. Real models need not assign equal total surprisal, but byte normalization makes their reported unit comparable. <span class="visual-reader-check" data-reader-check="perplexity-tokenizer-denominator"><strong>Check:</strong> Why does 1.67 bits per token not establish a better model than 2.50 in the illustrated comparison?</span></figcaption>
 </figure>
 
 ## Typical numbers (for context)

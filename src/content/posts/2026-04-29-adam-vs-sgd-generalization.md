@@ -63,7 +63,7 @@ Does a sharper parameter-space curve imply different predictions?
 			<text class="viz-callout" x="180" y="322" text-anchor="middle">apparent sharpness changed; model behavior did not</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> coordinate curvature changes from one to one hundred. Both minima still predict one. These exact toy curves show coordinate dependence, not measured optimizer performance.</figcaption>
+	<figcaption><strong>Read it this way:</strong> coordinate curvature changes from one to one hundred. Both minima still predict one. These exact toy curves show coordinate dependence, not measured optimizer performance. <span class="visual-reader-check" data-reader-check="optimizer-sharpness-reparameterization"><strong>Check:</strong> Did predictions change when the plotted basin became sharper?</span></figcaption>
 </figure>
 <p class="diagram-source">Reparameterization caveat: <a href="https://arxiv.org/abs/1703.04933">Dinh et al. (2017)</a>. This scalar construction is calculated independently.</p>
 

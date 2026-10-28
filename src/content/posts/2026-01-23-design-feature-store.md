@@ -50,40 +50,8 @@ If you don't have these problems at scale, you don't need a feature store. Most 
 > Reference implementations: Feast (open source), Tecton (commercial), Hopsworks, Vertex AI Feature Store, Databricks Feature Store."
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Separate the two time contracts: reconstruct the past for training, retrieve the latest value for serving.</p>
-
 <!-- visual:feature-store-two-time-contract -->
-```mermaid
-flowchart TB
-	accTitle: One feature definition supports historical training retrieval and latest-value online serving
-	accDescr: A versioned feature definition feeds batch or stream computation. Computed timestamped values are retained in an offline history and materialized into an online key-value store that keeps the latest value per entity. In the training lane, examples supply entity keys and prediction timestamps to a point-in-time join, which selects the latest eligible historical value at or before each example time and produces a training dataset. In the serving lane, a live entity key triggers a low-latency lookup of the latest materialized online value and sends it to the model for a current prediction. The two paths share a definition but have different retrieval semantics and latency contracts.
-	D["Versioned feature definition<br/>entity · schema · transform · freshness"] --> C["Batch or stream computation<br/>timestamp every value"]
-	C --> H[("Offline history<br/>all timestamped values")]
-	C --> O[("Online key-value store<br/>latest value per entity")]
-
-	subgraph TRAIN["TRAINING · reconstruct each example's past"]
-		direction TB
-		E["Examples<br/>entity + prediction time"] --> J{"Point-in-time join<br/>latest eligible value<br/>at or before example time"}
-		H --> J
-		J --> T["Training dataset<br/>historically correct features"]
-	end
-
-	subgraph SERVE["SERVING · answer with current materialized state"]
-		direction TB
-		R["Live request<br/>entity key"] --> L["Low-latency lookup"]
-		O --> L
-		L --> P["Current model prediction<br/>latest available features"]
-	end
-
-	class E,R viz-input
-	class D,J viz-focus
-	class H,O viz-state
-	class T,P viz-output
-	class D viz-wide
-	class D viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> start from the shared definition, then choose a clock. Training scans offline history backward from each example's timestamp; serving reads the latest materialized value from the online store. Sharing a definition reduces skew, but the stores cannot be conflated because their retrieval and latency contracts differ. Original synthesis checked against the <a href="https://docs.feast.dev/getting-started/concepts/point-in-time-joins">Feast point-in-time join</a>, <a href="https://docs.feast.dev/getting-started/components/online-store">online-store</a>, and <a href="https://arxiv.org/abs/2305.20077">managed feature-store architecture</a> descriptions.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="feature-store-two-time-contract-edition-title"><p class="visual-title" id="feature-store-two-time-contract-edition-title">The historical join and the live lookup answer different time questions</p><svg viewBox="0 0 360 454" role="img" aria-labelledby="feature-store-two-time-contract-edition-svg-title feature-store-two-time-contract-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="feature-store-two-time-contract-edition-svg-title">The historical join and the live lookup answer different time questions</title><desc id="feature-store-two-time-contract-edition-svg-desc">For illustrative entity E, value 3 occurs at 11:00 and is available at 11:05. Value 7 occurs at 11:50 but is available at 12:10. A noon historical query must return 3. A live 12:15 lookup can return 7. Event time alone is insufficient for the historical contract.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative entity E; historical query at</tspan><tspan x="180" dy="19">noon</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">VERSION A</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">VERSION B</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Value and event time</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">3 at 11:00</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="270" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">7 at 11:50</tspan></text></g><path d="M15 207L345 207" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="227" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Actually available</tspan></text><g data-editorial-node><rect x="15" y="241" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="279.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">11:05</tspan></text></g><g data-editorial-node><rect x="195" y="241" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="279.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">12:10</tspan></text></g><path d="M15 323L345 323" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="343" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Historical noon / live 12:15</tspan></text><g data-editorial-node><rect x="15" y="357" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="395.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">noon returns 3</tspan></text></g><g data-editorial-node><rect x="195" y="357" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="395.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">12:15 returns 7</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> At noon, version B is not available, despite its earlier event time. The later live lookup legitimately returns another version. Values are illustrative. <span class="visual-reader-check" data-reader-check="feature-store-two-time-contract"><strong>Check:</strong> Why can a correct live lookup return a value that would leak into a historical training example?</span></figcaption></figure>
 
 This is L5. Components named, point-in-time correctness explicit, build-or-buy options listed.
 

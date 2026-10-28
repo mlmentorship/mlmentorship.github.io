@@ -78,7 +78,7 @@ A $k \times k$ system per user. Solve for all $m$ users in parallel. Then fix $U
 			<text class="viz-edge-label" x="380" y="355">repeat until the loss stops improving</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> hold every item vector fixed and no user solve depends on another user; then hold every user vector fixed and no item solve depends on another item. Those parallel row solves are why a jointly non-convex factorization becomes tractable one side at a time.</figcaption>
+	<figcaption><strong>Read it this way:</strong> hold every item vector fixed and no user solve depends on another user; then hold every user vector fixed and no item solve depends on another item. Those parallel row solves are why a jointly non-convex factorization becomes tractable one side at a time. <span class="visual-reader-check" data-reader-check="als-alternating-independent-solves"><strong>Check:</strong> Why can two user rows be solved independently while the item factors stay fixed?</span></figcaption>
 </figure>
 
 The objective is **biconvex**: convex in $U$ given $V$ and convex in $V$ given $U$, but not jointly convex. ALS finds a local minimum, which is empirically good on real recsys data.

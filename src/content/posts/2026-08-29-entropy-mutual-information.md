@@ -116,7 +116,7 @@ Independent fair bits would instead give $0.25$ in every cell.
 <text x="640" y="368" fill="var(--c-muted)" font-family="Lato, sans-serif" font-size="12">is the shared information.</text>
 </svg>
 </div>
-<figcaption><strong>Read it this way:</strong> the full bar is the input's one bit of uncertainty. Observing Y removes 0.531 bits and leaves 0.469 bits. The diagonal table entries explain the dependence despite fair marginals. The circles are a memory aid, not a proof or causal diagram.</figcaption>
+<figcaption><strong>Read it this way:</strong> the full bar is the input's one bit of uncertainty. Observing Y removes 0.531 bits and leaves 0.469 bits. The diagonal table entries explain the dependence despite fair marginals. The circles are a memory aid, not a proof or causal diagram. <span class="visual-reader-check" data-reader-check="mutual-information-noisy-channel-budget"><strong>Check:</strong> Why can both marginals be fair while observing Y removes about 0.531 bits of uncertainty about X?</span></figcaption>
 </figure>
 
 ## Conditional entropy

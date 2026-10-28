@@ -55,7 +55,7 @@ That is a result for the paper's configuration, not a speed guarantee for anothe
 			<text x="40" y="650" font-size="22">A fresh P draw is not this correction.</text>
 		</g>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the rejected A is replaced by C under the illustrated residual distribution q. Later drafts followed A, so they cannot survive that change. Accepted mass plus the rejection correction recovers the target law; the picture does not predict speedup.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the rejected A is replaced by C under the illustrated residual distribution q. Later drafts followed A, so they cannot survive that change. Accepted mass plus the rejection correction recovers the target law; the picture does not predict speedup. <span class="visual-reader-check" data-reader-check="speculative-decoding-first-rejection-boundary"><strong>Check:</strong> Why can draft positions four and five not be committed after position three is replaced? Which corrected distribution supplies that replacement?</span></figcaption>
 </figure>
 
 ## The mechanism

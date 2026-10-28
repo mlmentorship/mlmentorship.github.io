@@ -123,34 +123,40 @@ A large GPU cluster can reduce data in stages:
 
 **Learning objective:** Trace why only one partial result per fast local group needs to participate in the slower scale-out step.
 
-<p class="visual-title">Local reduction limits what crosses the slower network</p>
-
 <!-- visual:hierarchical-all-reduce-path -->
-```mermaid
-flowchart TB
-	accTitle: A hierarchical all-reduce crosses the slower network with one partial per local group
-	accDescr: In stage one, accelerators in fast local groups A and B each reduce their values to one group partial. In stage two, the two group partials enter a logical scale-out all-reduce over the slower inter-group network and produce the final reduced value. In stage three, that value is distributed over fast local links so every accelerator rank receives it.
-	subgraph A["FAST LOCAL GROUP A"]
-		direction TB
-		A1["accelerator values"] ==>|"1. fast local reduce"| AP["one A partial"]
-		AO["result on every A rank"]
-	end
-	subgraph B["FAST LOCAL GROUP B"]
-		direction TB
-		B1["accelerator values"] ==>|"1. fast local reduce"| BP["one B partial"]
-		BO["result on every B rank"]
-	end
-	AP ==>|"2. slower scale-out link"| G{{"all-reduce<br/>group partials"}}
-	BP ==>|"2. slower scale-out link"| G
-	G -->|"3. fast local distribute"| AO
-	G -->|"3. fast local distribute"| BO
-	class A1,B1 viz-input
-	class AP,BP,G viz-focus
-	class AO,BO viz-output
-	class G viz-compact
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> Reduce many accelerator values to one partial inside each fast local group first. Only those group partials cross the slower boundary; the completed result then fans out locally to every rank.</p>
+<figure class="learning-figure" aria-labelledby="hierarchical-sum-title">
+	<p class="visual-title" id="hierarchical-sum-title">Four inputs. One sum. The same answer on every rank.</p>
+	<svg viewBox="0 0 360 452" role="img" aria-labelledby="hierarchical-sum-svg-title hierarchical-sum-svg-desc" style="width:100%;max-width:32rem;display:block;margin:auto">
+		<title id="hierarchical-sum-svg-title">Four ranks receive the sum 10 through a hierarchical all-reduce</title>
+		<desc id="hierarchical-sum-svg-desc">Fast group A sums rank zero's 1 and rank one's 3 to get 4. Fast group B sums rank two's 2 and rank three's 4 to get 6. Only the two partials enter the slower inter-group stage, producing 10. Local distribution returns 10 to each of the original four ranks. This is a logical example, not a physical packet schedule.</desc>
+		<g style="font-family:var(--font-ui);font-size:14px;fill:var(--c-text);text-anchor:middle">
+			<text x="180" y="21" style="font-weight:700">1. SUM INSIDE EACH FAST GROUP</text>
+			<rect x="12" y="39" width="156" height="119" rx="4" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke)"></rect>
+			<rect x="192" y="39" width="156" height="119" rx="4" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke)"></rect>
+			<text x="90" y="62" style="font-weight:700">GROUP A</text>
+			<text x="270" y="62" style="font-weight:700">GROUP B</text>
+			<text x="90" y="89">rank 0: 1</text><text x="90" y="111">rank 1: 3</text>
+			<text x="270" y="89">rank 2: 2</text><text x="270" y="111">rank 3: 4</text>
+			<path d="M30 122H150M210 122H330" style="stroke:var(--viz-input-stroke)"></path>
+			<text x="90" y="145" style="font-weight:700">partial: 4</text><text x="270" y="145" style="font-weight:700">partial: 6</text>
+			<path d="M90 158V201L133 223M270 158V201L227 223" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+			<rect x="12" y="184" width="336" height="122" rx="4" style="fill:none;stroke:var(--viz-edge);stroke-dasharray:5 4"></rect>
+			<rect x="63" y="174" width="234" height="24" style="fill:var(--c-bg)"></rect>
+			<text x="180" y="191" style="font-weight:700">2. SLOWER NETWORK</text>
+			<rect x="100" y="223" width="160" height="59" rx="4" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></rect>
+			<text x="180" y="248" style="font-size:20px;font-weight:700">4 + 6 = 10</text>
+			<text x="180" y="269" style="font-size:13px">two group partials</text>
+			<path d="M180 282V322M180 322H90V368M180 322H270V368" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:2"></path>
+			<rect x="45" y="331" width="270" height="24" style="fill:var(--c-bg)"></rect>
+			<text x="180" y="348" style="font-weight:700">3. COPY THE COMPLETED SUM</text>
+			<rect x="12" y="368" width="156" height="72" rx="4" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke)"></rect>
+			<rect x="192" y="368" width="156" height="72" rx="4" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke)"></rect>
+			<text x="90" y="397">rank 0: <tspan style="font-weight:700">10</tspan></text><text x="90" y="422">rank 1: <tspan style="font-weight:700">10</tspan></text>
+			<text x="270" y="397">rank 2: <tspan style="font-weight:700">10</tspan></text><text x="270" y="422">rank 3: <tspan style="font-weight:700">10</tspan></text>
+		</g>
+	</svg>
+	<figcaption><strong>Read it this way:</strong> Group A contributes 4 and group B contributes 6 across the slower boundary. All four original ranks receive their sum, 10. Local distribution copies the completed sum, not the original inputs. This logical example does not specify a packet schedule or establish a measured traffic saving. <span class="visual-reader-check" data-reader-check="hierarchical-all-reduce-path"><strong>Check:</strong> What crosses the slow network? What identical result must every rank receive?</span></figcaption>
+</figure>
 
 This avoids sending every local copy through the slower network.
 

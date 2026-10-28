@@ -3,9 +3,9 @@
   "slug": "gans-overview",
   "article": "src/content/posts/2026-01-01-gans-overview.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace the two alternating GAN updates and identify which network changes, which network is frozen, and what target drives each phase.",
-  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest useful spatial explanation because the hard model is an alternating two-player process with shared sample paths but different update ownership: discriminator training uses real and generated examples, then generator training backpropagates through a frozen discriminator.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because labelled nodes and edges directly express the two sequential phases, the frozen network in each phase, and the return to another alternating step. The established tall-flow marker keeps the graph responsive and theme-safe.",
     "svg": "Rejected because the lesson needs qualitative data and gradient flow rather than quantitative geometry; fixed coordinates would add maintenance and less reliable text wrapping without improving the mechanism.",
@@ -87,6 +87,6 @@
     "visualIds": [
       "gan-alternating-update-ownership"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description naming both phases, each input, both targets, gradient flow, and update ownership. Every node directly says updated or frozen, edges name the targets, and phase numbers and topology carry the lesson without color. The tall top-to-bottom layout uses the established mobile exception so it has no forced wide canvas at 390 CSS pixels; existing theme tokens provide dark-mode contrast, and print removes responsive width constraints and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the inference if rendering is unavailable."
+    "accessibility": "The discriminator step detaches generated samples, updating D but not G. The generator step freezes D parameters while a dashed loss-gradient path passes through D back into G. The two panels distinguish no parameter update from no gradient path. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

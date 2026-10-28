@@ -84,7 +84,7 @@ The [MLE lesson](/concepts/maximum-likelihood-estimation/) distinguishes a likel
 			<text class="viz-node-label" x="180" y="322">S/n = Eη[T(X)] = p̂ = 4/6</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> first replace the six observations by the single count S = 4. In the sample log-likelihood, every parameter-dependent data term now passes through S. Differentiating gives S − n∇A(η); when an interior MLE exists, setting this to zero matches the empirical statistic S/n to the model moment Eη[T(X)]. For Bernoulli data, that gives p̂ = 4/6. Original schematic checked against <a href="https://www.stat.berkeley.edu/~wfithian/courses/stat210a/exponential-families.html">Berkeley Stat 210A notes</a> and <a href="https://www.stat.umn.edu/geyer/5421/notes/expfam.html">Minnesota Stat 5421 notes</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first replace the six observations by the single count S = 4. In the sample log-likelihood, every parameter-dependent data term now passes through S. Differentiating gives S − n∇A(η); when an interior MLE exists, setting this to zero matches the empirical statistic S/n to the model moment Eη[T(X)]. For Bernoulli data, that gives p̂ = 4/6. Original schematic checked against <a href="https://www.stat.berkeley.edu/~wfithian/courses/stat210a/exponential-families.html">Berkeley Stat 210A notes</a> and <a href="https://www.stat.umn.edu/geyer/5421/notes/expfam.html">Minnesota Stat 5421 notes</a>. <span class="visual-reader-check" data-reader-check="exponential-family-sufficient-stat-moment-match"><strong>Check:</strong> What must remain known alongside S if samples can have different lengths?</span></figcaption>
 </figure>
 
 ## Common members

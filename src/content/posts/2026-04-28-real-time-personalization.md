@@ -34,48 +34,8 @@ Preserve privacy and eligibility, handle event ordering and duplicate processing
 Each has very different infrastructure costs and use cases. Scope first.
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Assign each feature the least-fresh clock that meets its product need, then trace all three clocks into one online prediction.</p>
-
 <!-- visual:personalization-three-feature-clocks -->
-```mermaid
-flowchart TB
-	accTitle: Three feature clocks converge in one real-time personalization request
-	accDescr: A batch clock updates stable user history, item embeddings, and long-window counts every hour or day. A streaming clock aggregates recent clicks, session activity, and short-window counts within seconds or minutes. Both paths materialize reusable values in online feature state before a request arrives. A request clock computes the current query, device, location, and time only when the request arrives. The serving path performs a bounded lookup of stored state, combines it with current context, runs model inference, and returns a personalized ranking within the request latency budget. The assembled vector also reports feature timestamps to freshness monitoring. Real-time therefore describes the response, not a requirement that every feature use the fastest update path.
-
-	subgraph BATCH["BATCH CLOCK · HOURS TO DAYS"]
-		direction TB
-		B["Stable history<br/>item embeddings · long-window counts"] --> BC["Scheduled computation<br/>refresh only as quality requires"]
-	end
-
-	subgraph STREAM["STREAM CLOCK · SECONDS TO MINUTES"]
-		direction TB
-		S["Recent events<br/>clicks · session activity"] --> SC["Windowed aggregation<br/>event-time state"]
-	end
-
-	BC -->|"materialize versioned values"| O[("ONLINE FEATURE STATE<br/>latest batch + streaming values")]
-	SC -->|"push fresh values"| O
-
-	subgraph REQUEST["REQUEST CLOCK · NOW"]
-		direction TB
-		R["Live request<br/>query · device · location · time"] --> RC["Compute current context"]
-	end
-
-	O -->|"bounded lookup"| A{"ASSEMBLE ONE FEATURE VECTOR<br/>values + timestamps"}
-	RC ==> A
-	A ==> I["MODEL INFERENCE<br/>within request latency budget"]
-	I ==> P["PERSONALIZED RANKING"]
-	A -.->|"lag and null-rate signals"| M["FRESHNESS MONITOR<br/>alert before stale state is silent"]
-
-	class B,S,R viz-input
-	class BC,SC,I viz-neutral
-	class O viz-state
-	class A viz-focus
-	class P,M viz-output
-	class B viz-wide
-	class B viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the two left clocks into stored online state before following the request clock. Stable history can be hours old, session activity seconds old, and query context current; they become “real-time” together only when the bounded serving path assembles them for this request. Promote a feature to streaming only when measured quality needs that freshness, and carry timestamps so a delayed pipeline cannot fail silently. Original synthesis checked against <a href="https://developers.google.com/machine-learning/guides/rules-of-ml">Google's Rules of ML</a>, the <a href="https://docs.feast.dev/getting-started/architecture/model-inference">Feast serving contracts</a>, and <a href="https://nightlies.apache.org/flink/flink-docs-stable/docs/concepts/time/">Flink's time model</a>.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="personalization-three-feature-clocks-edition-title"><p class="visual-title" id="personalization-three-feature-clocks-edition-title">A fast request can still assemble stale features</p><svg viewBox="0 0 360 454" role="img" aria-labelledby="personalization-three-feature-clocks-edition-svg-title personalization-three-feature-clocks-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="personalization-three-feature-clocks-edition-svg-title">A fast request can still assemble stale features</title><desc id="personalization-three-feature-clocks-edition-svg-desc">A declared illustrative noon request uses an 08:00 batch snapshot with a 24-hour limit, a stream value whose event time is 11:57 and arrival 11:59 with a two-minute event-age limit, and current request context. The batch age is four hours and passes; stream event age is three minutes and fails despite one-minute arrival age. Request execution latency is separate.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative request at noon; declared age</tspan><tspan x="180" dy="19">contracts</tspan></text><text x="90" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">SOURCE CLOCK</tspan></text><text x="270" y="70" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">AGE / CONTRACT</tspan></text><path d="M15 91L345 91" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="111" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Batch snapshot</tspan></text><g data-editorial-node><rect x="15" y="125" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">08:00</tspan></text></g><g data-editorial-node><rect x="195" y="125" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="163.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">4 h &lt;= 24 h</tspan></text></g><path d="M15 207L345 207" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="227" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Stream event / arrival</tspan></text><g data-editorial-node><rect x="15" y="241" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="279.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">11:57 / 11:59</tspan></text></g><g data-editorial-node><rect x="195" y="241" width="150" height="67" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="279.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">3 min &gt; 2 min</tspan></text></g><path d="M15 323L345 323" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="343" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Live request context</tspan></text><g data-editorial-node><rect x="15" y="357" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="395.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">12:00</tspan></text></g><g data-editorial-node><rect x="195" y="357" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="395.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">current; age 0</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> The stream value arrived recently but describes an older event. Enforce each feature's declared clock contract. Request latency is not source freshness. <span class="visual-reader-check" data-reader-check="personalization-three-feature-clocks"><strong>Check:</strong> At this request, which value is fresh enough by its contract? Which stale value should trigger fallback or an alert?</span></figcaption></figure>
 
 ## What an L5 answer sounds like
 

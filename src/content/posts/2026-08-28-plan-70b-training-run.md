@@ -185,7 +185,7 @@ This may fit with activation checkpointing. If measured peak memory is safe, it 
 			</table>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> first form one eight-GPU tensor-parallel replica inside every node, then replicate that sharded model across 64 nodes. TP ranks cooperate on the same sequences, so the batch is <code>64 DP × 1 sequence × 8 accumulations × 8,192 tokens = 4,194,304</code>; multiplying by all 512 ranks would overcount it by eight.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first form one eight-GPU tensor-parallel replica inside every node, then replicate that sharded model across 64 nodes. TP ranks cooperate on the same sequences, so the batch is <code>64 DP × 1 sequence × 8 accumulations × 8,192 tokens = 4,194,304</code>; multiplying by all 512 ranks would overcount it by eight. <span class="visual-reader-check" data-reader-check="plan-70b-parallel-accounting"><strong>Check:</strong> Why does the token count multiply by DP 64 but not by all 512 ranks?</span></figcaption>
 </figure>
 
 If activations still do not fit:

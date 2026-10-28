@@ -72,7 +72,7 @@ Follow their order in the first two panels. Then compare their span in the last 
 			<text class="viz-label" x="238" y="536">not invertible</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> swapping the arrows changes their order but leaves the filled region unchanged. Only the determinant sign changes. In the last panel, both arrows lie on one line. There is no two-dimensional area.</figcaption>
+	<figcaption><strong>Read it this way:</strong> swapping the arrows changes their order but leaves the filled region unchanged. Only the determinant sign changes. In the last panel, both arrows lie on one line. There is no two-dimensional area. <span class="visual-reader-check" data-reader-check="determinant-signed-area-collapse"><strong>Check:</strong> Why does swapping columns change the determinant sign but not the transformed density?</span></figcaption>
 </figure>
 <p class="diagram-source">Original coordinate construction checked against <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-18-properties-of-determinants/">MIT OpenCourseWare 18.06</a>, the <a href="https://www.deeplearningbook.org/contents/linear_algebra.html">Deep Learning linear algebra chapter</a>, and the open <a href="https://math.libretexts.org/Bookshelves/Linear_Algebra/Interactive_Linear_Algebra_(Margalit_and_Rabinoff)/04%3A_Determinants/4.01%3A_Determinants-_Definition">Interactive Linear Algebra determinant text</a>.</p>
 

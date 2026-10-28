@@ -127,7 +127,7 @@ These are sample weight shares, not each sample's fraction of a general estimate
 		<text class="viz-callout" x="180" y="359" text-anchor="middle">nominal n = 5, but ESS = 10² / (1² + 1² + 1² + 1² + 6²)</text>
 		<text class="viz-node-label" x="180" y="375">= 2.5 effective samples</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> draw from q, then compute importance ratios. The fifth sample has 60% of total weight, not necessarily 60% of the final estimate. ESS is a concentration diagnostic, not a literal independent sample count. Original illustration follows <a href="https://artowen.su.domains/mc/Ch-var-is.pdf">Owen</a>, <a href="https://jmlr.org/papers/v25/19-556.html">Vehtari et al.</a>, and <a href="https://arxiv.org/abs/1809.04129">Elvira et al.</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> draw from q, then compute importance ratios. The fifth sample has 60% of total weight, not necessarily 60% of the final estimate. ESS is a concentration diagnostic, not a literal independent sample count. Original illustration follows <a href="https://artowen.su.domains/mc/Ch-var-is.pdf">Owen</a>, <a href="https://jmlr.org/papers/v25/19-556.html">Vehtari et al.</a>, and <a href="https://arxiv.org/abs/1809.04129">Elvira et al.</a>. <span class="visual-reader-check" data-reader-check="importance-weights-effective-sample-size"><strong>Check:</strong> Why are there five actual draws but only 2.5 effective samples?</span></figcaption>
 </figure>
 
 Equal weights give ESS n; one dominating weight pushes it toward one.

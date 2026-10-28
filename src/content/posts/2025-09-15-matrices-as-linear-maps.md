@@ -62,7 +62,7 @@ The second column is twice the first. Both point along one output line.
 			<text class="viz-label" x="211" y="415">x is in null(A)</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> use the input's weights on the column arrows. Twice the first column equals the second, so subtraction reaches zero. The input was nonzero; this map loses one direction.</figcaption>
+	<figcaption><strong>Read it this way:</strong> use the input's weights on the column arrows. Twice the first column equals the second, so subtraction reaches zero. The input was nonzero; this map loses one direction. <span class="visual-reader-check" data-reader-check="matrix-columns-define-map"><strong>Check:</strong> How can x be nonzero while 2a1-a2 is zero? What does that reveal about A?</span></figcaption>
 </figure>
 <p class="diagram-source">Original coordinate construction checked against <a href="https://math.mit.edu/~djk/18_022/chapter16/section01.html">MIT 18.022</a>, Peter Selinger's CC BY 4.0 <a href="https://www.mathstat.dal.ca/~selinger/linear-algebra/">Matrix Theory and Linear Algebra</a>, and Boyd and Vandenberghe's <a href="https://web.stanford.edu/~boyd/vmls/">Introduction to Applied Linear Algebra</a>.</p>
 

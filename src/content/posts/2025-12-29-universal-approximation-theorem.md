@@ -51,7 +51,7 @@ Can its largest error be below $\varepsilon=0.07$ everywhere, not just at chosen
 		<text class="viz-label" x="24" y="395">No generic width or finite-sample generalization bound</text>
 		<text class="viz-label" x="24" y="410">No constraint outside K</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> both curves meet at the three interpolation nodes. Their largest gap occurs between nodes and equals 0.0625, below the 0.07 band. This explicit construction is not a training result.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both curves meet at the three interpolation nodes. Their largest gap occurs between nodes and equals 0.0625, below the 0.07 band. This explicit construction is not a training result. <span class="visual-reader-check" data-reader-check="uat-existence-error-band"><strong>Check:</strong> What does the pictured error band establish on [0,1]? Which claims about training or generalization remain unsupported?</span></figcaption>
 </figure>
 <p class="diagram-source">The theorem's quantifiers follow <a href="https://hal.science/hal-03753170v1">Cybenko (1989)</a>. The plotted ReLU construction and its error are calculated below.</p>
 

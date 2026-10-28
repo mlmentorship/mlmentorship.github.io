@@ -82,7 +82,7 @@ All four idealized accounts predict `RED`, so another identical success does lit
 			<p class="cm-equation">Select a useful split within the query budget.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> change source, wording, risk cue or order while recording unavoidable serialization changes. A matched contrast tests a prediction; four samples do not establish a hidden mechanism.</figcaption>
+	<figcaption><strong>Read it this way:</strong> change source, wording, risk cue or order while recording unavoidable serialization changes. A matched contrast tests a prediction; four samples do not establish a hidden mechanism. <span class="visual-reader-check" data-reader-check="black-box-discriminating-probes"><strong>Check:</strong> Which proposed contrast separates H1 from its rivals? What remains unproven even if its predicted switch occurs?</span></figcaption>
 </figure>
 
 <p class="diagram-source">Method references: <a href="https://doi.org/10.1126/science.146.3642.347">Platt, Strong Inference</a> and <a href="https://aclanthology.org/2020.acl-main.442/">CheckList behavioral testing</a>.</p>

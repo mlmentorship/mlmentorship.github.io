@@ -119,7 +119,7 @@ Both directions matter during incidents. A team that can reproduce one model but
 		<path class="viz-operating-guide" d="M16 389H344" style="stroke-dasharray:6 4"></path>
 		<text class="viz-callout" x="16" y="410">FORWARD → start at transform @v2: what is affected?</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the arrows record creation dependencies, not merely pipeline order. To reproduce <code>production @31</code>, trace backward through its exact model, run, manifest, transform, and source snapshot. When <code>transform @v2</code> is found faulty, traverse forward through every branch: both models and both deployments are in scope. Stable IDs make both answers possible after jobs and mutable table names have changed.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the arrows record creation dependencies, not merely pipeline order. To reproduce <code>production @31</code>, trace backward through its exact model, run, manifest, transform, and source snapshot. When <code>transform @v2</code> is found faulty, traverse forward through every branch: both models and both deployments are in scope. Stable IDs make both answers possible after jobs and mutable table names have changed. <span class="visual-reader-check" data-reader-check="ml-lineage-two-way-incident-trace"><strong>Check:</strong> Starting from transform v2, which production and shadow artifacts are potentially affected? What further evidence proves actual impact?</span></figcaption>
 </figure>
 
 ## Point-in-time lineage

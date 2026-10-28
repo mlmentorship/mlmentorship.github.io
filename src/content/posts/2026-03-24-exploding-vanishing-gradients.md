@@ -64,7 +64,7 @@ Over 50 Jacobian multiplications, $\rho = 1.1$ gives a factor of ~$117$ (gradien
 			<text class="viz-label" x="49" y="16">relative gradient magnitude · log scale</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start where all three paths equal 1 at the loss, then move right as backpropagation crosses more layers. A repeated 10% gain or loss looks harmless once, but 50 multiplications separate the gradient by more than four orders of magnitude. Line position, direct labels, and the dashed stable path carry the comparison without color. Original schematic based on the Jacobian analysis in Glorot and Bengio (2010) and Pascanu, Mikolov, and Bengio (2013).</figcaption>
+	<figcaption><strong>Read it this way:</strong> start where all three paths equal 1 at the loss, then move right as backpropagation crosses more layers. A repeated 10% gain or loss looks harmless once, but 50 multiplications separate the gradient by more than four orders of magnitude. Line position, direct labels, and the dashed stable path carry the comparison without color. Original schematic based on the Jacobian analysis in Glorot and Bengio (2010) and Pascanu, Mikolov, and Bengio (2013). <span class="visual-reader-check" data-reader-check="gradient-magnitude-through-depth"><strong>Check:</strong> Why does a repeated 0.9 factor become about 0.005 after fifty multiplications?</span></figcaption>
 </figure>
 
 ## Where it shows up

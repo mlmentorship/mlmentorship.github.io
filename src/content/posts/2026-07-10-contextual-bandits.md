@@ -72,7 +72,7 @@ Formally, a contextual bandit sees context $x_t$, chooses action $a_t$, and rece
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start with the left panel: one decision logs one chosen action and one reward; the other rewards remain unknown counterfactuals. Then align the same action rows on the right. The target policy puts probability on C, but the logging policy never tried C in this context, so no propensity correction can recover its reward from these logs. Original synthetic example informed by <a href="https://arxiv.org/abs/1003.5956">Li et al. on unbiased offline evaluation</a> and <a href="https://arxiv.org/abs/1103.4601">Dudík et al. on doubly robust evaluation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start with the left panel: one decision logs one chosen action and one reward; the other rewards remain unknown counterfactuals. Then align the same action rows on the right. The target policy puts probability on C, but the logging policy never tried C in this context, so no propensity correction can recover its reward from these logs. Original synthetic example informed by <a href="https://arxiv.org/abs/1003.5956">Li et al. on unbiased offline evaluation</a> and <a href="https://arxiv.org/abs/1103.4601">Dudík et al. on doubly robust evaluation</a>. <span class="visual-reader-check" data-reader-check="contextual-bandit-partial-feedback-support"><strong>Check:</strong> Why is the target policy not identifiable when it assigns mass to C?</span></figcaption>
 </figure>
 
 ## Core approaches

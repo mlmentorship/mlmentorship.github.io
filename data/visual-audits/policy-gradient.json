@@ -3,9 +3,9 @@
   "slug": "policy-gradient",
   "article": "src/content/posts/2025-11-20-policy-gradient.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Given one sampled action and a baseline, use the sign of its advantage to determine whether a policy-gradient step raises, leaves unchanged, or lowers that action's log-probability.",
-  "mediumRationale": "A four-card semantic comparison is the smallest medium that can hold the sampled action fixed, define the baseline-relative advantage once, and show the three sign cases side by side. Direct equations and update directions avoid implying a quantitative probability curve or a particular policy architecture.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because the learning task is a three-case comparison around one update rule, not a multi-stage process. Automatic graph layout would add arrows and repeated nodes without sharpening the sign logic.",
     "svg": "Rejected because no fixed geometry or quantitative scale carries the claim. Hand-positioned equations would be less responsive and less directly accessible than semantic cards.",
@@ -93,6 +93,6 @@
     "visualIds": [
       "policy-gradient-advantage-sign"
     ],
-    "accessibility": "The figure uses a linked learning question, a labelled group, four semantic sections, and direct Return, Baseline, Advantage, and Update labels. Plus, zero, and minus signs and explicit increase/no-change/decrease wording carry the complete lesson without color. The established two-column card primitive has no fixed or minimum width and stacks below 640 pixels, preserving readable text at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+    "accessibility": "A declared three-action softmax starts with zero logits and uniform probabilities. After sampling A with action-independent baseline three, returns five, three, one give advantages two, zero, minus two. Exact logit gradient-ascent steps of size .1 produce normalized probabilities; A increases, stays fixed for this sample, or decreases despite positive absolute return. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

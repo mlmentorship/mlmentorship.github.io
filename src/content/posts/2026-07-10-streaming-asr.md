@@ -77,7 +77,7 @@ Does that compute ratio certify the live experience?
 		<text class="viz-node-label" x="160" y="330">play their song</text>
 		<text class="viz-callout" x="286" y="330">FINAL</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare partial, revised and final text, not geometric distances on this schematic clock. First text precedes speech end; finalization includes endpointing and remaining delivery.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare partial, revised and final text, not geometric distances on this schematic clock. First text precedes speech end; finalization includes endpointing and remaining delivery. <span class="visual-reader-check" data-reader-check="streaming-asr-provisional-to-final"><strong>Check:</strong> Why can play their song be visible before the system is allowed to mark it final?</span></figcaption>
 </figure>
 
 ## Calculate Distinct Delays

@@ -82,7 +82,7 @@ The two paradigms produce very different production tradeoffs:
 			<text class="viz-callout" x="380" y="375" text-anchor="middle">Both timelines are serial across calls; diffusion revises all positions within each illustrated call.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> scan each row from left to right. An ordinary autoregressive call appends one element. A diffusion call revises the provisional whole state. Both illustrated timelines depend on earlier calls. The original schematic follows <a href="https://arxiv.org/abs/1601.06759">PixelRNN</a> and <a href="https://arxiv.org/abs/2006.11239">DDPM</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> scan each row from left to right. An ordinary autoregressive call appends one element. A diffusion call revises the provisional whole state. Both illustrated timelines depend on earlier calls. The original schematic follows <a href="https://arxiv.org/abs/1601.06759">PixelRNN</a> and <a href="https://arxiv.org/abs/2006.11239">DDPM</a>. <span class="visual-reader-check" data-reader-check="autoregressive-diffusion-sampling-steps"><strong>Check:</strong> Which positions can change on the second call? Why are both illustrated timelines serial?</span></figcaption>
 </figure>
 
 ## Autoregressive

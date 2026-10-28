@@ -3,9 +3,9 @@
   "slug": "fine-tune-vs-prompt-vs-rag",
   "article": "src/content/posts/2025-05-21-fine-tune-vs-prompt-vs-rag.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Diagnose whether a failed evaluation needs changed request instructions, retrieved evidence, or model parameters, while recognizing that the three interventions can be combined.",
-  "mediumRationale": "A two-panel semantic decision card is the smallest medium that first routes an observed failure to the layer that owns it and then shows those layers composing in one production request. Direct headings and prose preserve the decision logic more clearly than decorative geometry.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because a branching flowchart would imply mutually exclusive terminal choices, contradicting the article's central point that prompting, retrieval, and tuning can be combined.",
     "svg": "Rejected because the lesson is categorical ownership and composition rather than quantitative geometry; fixed drawing text would also be less adaptable at phone width.",
@@ -92,6 +92,6 @@
     "visualIds": [
       "llm-adaptation-layers"
     ],
-    "accessibility": "The figure has a linked learning question and an explicitly labelled group of two semantic sections. Every decision is stated in text: the observed failure, the intervention, what that intervention changes, and how all three compose. Numbered panel headings and written transitions preserve order without color or icons. The established two-column primitive stacks below 640 CSS pixels with ordinary text wrapping and no minimum width, making it readable at 390 CSS pixels; existing theme tokens provide dark-mode contrast and shared print rules provide a light high-contrast rendering."
+    "accessibility": "Policy A permits seven days and applicable B thirty days on a shared day axis. Day fourteen exceeds A but fits B. A response falsely declaring ineligibility under A is structurally valid but fails the independent current-evidence check. Release is held. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

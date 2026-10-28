@@ -100,7 +100,7 @@ For example, a model could behave helpfully during ordinary evaluation but pursu
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> first compare the two matched lanes on the left: the declared trigger changes the target behavior while capability stays fixed. After mitigation, do not stop at the familiar trigger. The illustrative result on the right passes that test yet fails on a held-out trigger variant, so it supports cue suppression, not policy removal. Keep capability as a third, independent check. This original schematic is informed by the controlled backdoor and safety-training experiments in <a href="https://arxiv.org/abs/2401.05566">Hubinger et al.</a>; it reproduces no source figure, prompt, or result.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first compare the two matched lanes on the left: the declared trigger changes the target behavior while capability stays fixed. After mitigation, do not stop at the familiar trigger. The illustrative result on the right passes that test yet fails on a held-out trigger variant, so it supports cue suppression, not policy removal. Keep capability as a third, independent check. This original schematic is informed by the controlled backdoor and safety-training experiments in <a href="https://arxiv.org/abs/2401.05566">Hubinger et al.</a>; it reproduces no source figure, prompt, or result. <span class="visual-reader-check" data-reader-check="model-organism-policy-test"><strong>Check:</strong> Why is mitigation incomplete when the known trigger is suppressed and ordinary capability still passes?</span></figcaption>
 </figure>
 
 ## Construction methods

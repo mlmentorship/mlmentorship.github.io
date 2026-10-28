@@ -94,7 +94,7 @@ If a one-device baseline cannot fit, compare two valid cluster sizes. For exampl
 			<text class="viz-label" x="180" y="321" text-anchor="middle">Illustrative values · lower time can cost more.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> height falls because the run finishes sooner, but width grows with device count. Once efficiency falls, the rectangle’s area, and therefore accelerator-hours, grows. The normalized values are illustrative, not a hardware benchmark. Original construction informed by <a href="https://jax-ml.github.io/scaling-book/training/">Google DeepMind’s strong-scaling treatment</a>, <a href="https://arxiv.org/abs/2204.02311">PaLM’s MFU definition</a>, and <a href="https://dl.acm.org/doi/10.1145/1465482.1465560">Amdahl’s fixed-work scaling argument</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> height falls because the run finishes sooner, but width grows with device count. Once efficiency falls, the rectangle’s area, and therefore accelerator-hours, grows. The normalized values are illustrative, not a hardware benchmark. Original construction informed by <a href="https://jax-ml.github.io/scaling-book/training/">Google DeepMind’s strong-scaling treatment</a>, <a href="https://arxiv.org/abs/2204.02311">PaLM’s MFU definition</a>, and <a href="https://dl.acm.org/doi/10.1145/1465482.1465560">Amdahl’s fixed-work scaling argument</a>. <span class="visual-reader-check" data-reader-check="strong-scaling-wall-time-cost-knee"><strong>Check:</strong> Why can four devices finish sooner yet consume 180 cost units instead of the single device's 100?</span></figcaption>
 </figure>
 
 ## First check: what does not fit?

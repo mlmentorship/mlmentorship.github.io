@@ -3,9 +3,9 @@
   "slug": "design-youtube-recommender",
   "article": "src/content/posts/2025-10-20-design-youtube-recommender.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how a two-stage recommender narrows the catalog, then identify why its displayed slate—not the whole catalog—determines tomorrow's ordinary training labels.",
-  "mediumRationale": "A focused Mermaid funnel with a feedback edge is the smallest useful explanation because the lesson depends on both directed serving stages and a returning data path. It keeps candidate generation, ranking, composition, selective observation, and deliberate exploration connected without reproducing detailed model architectures or counterfactual-estimator mathematics covered elsewhere.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the learning task is a directed funnel plus a feedback loop. Labelled edges make selection and non-selection explicit, while the existing tall-flow treatment preserves readable labels and themed rendering at narrow widths.",
     "svg": "Rejected because no quantitative scale or fixed geometry carries the claim. Hand-positioning a flow graph would add maintenance cost and risk implying that box sizes represent catalog or candidate proportions.",
@@ -127,6 +127,6 @@
     "visualIds": [
       "youtube-recommender-selective-feedback-loop"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description that names both serving stages, the candidate sources, composition, displayed and unshown outcomes, exposure logging, retraining, and both feedback edges. Every distinction is encoded with direct labels, arrow direction, numbered stages, shapes, and solid versus dashed paths rather than color. The compact top-to-bottom flow and established tall-flow marker preserve readable labels at 390 CSS pixels; shared theme tokens support dark mode and print, and the adjacent prose and direct caption preserve the lesson without client-side rendering."
+    "accessibility": "An illustrative candidate pool contains 1,000 unique candidates, 900 eligible for ranking, and ten displayed positions. The other 890 eligible candidates remain unshown with unknown outcomes. Only exposure-linked mature outcomes enter this feedback path, with policy and selection metadata retained. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

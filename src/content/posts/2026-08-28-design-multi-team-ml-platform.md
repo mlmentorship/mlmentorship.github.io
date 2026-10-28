@@ -57,39 +57,8 @@ Do not advertise exactly-once execution; the property is one unambiguous publica
 Deduplication cannot repair missing evidence, incompatible schemas or wrong model semantics.
 
 <p class="visual-kicker">Execution identity versus publication authority</p>
-<p class="visual-title">A late attempt cannot replace the committed artifact.</p>
-
 <!-- visual:multi-team-platform-contract-boundary -->
-```mermaid
-flowchart TB
-  accTitle: Shared publication and promotion authority with replaceable executors
-  accDescr: Logical run R has private attempts A and B in existing training systems. A validates and commits artifact A against pending run version zero. B's late publication fails that expected-state check, leaving its evidence visible without overwriting A. Valid evidence and current authorization bind deployment key K to one operation D1. A retried K returns D1. A fenced controller applies the current approved desired state to existing serving. Metadata failure freezes unverifiable promotions while the last approved compatible serving state continues.
-  Run["Logical run R<br/>pending, version 0"]
-  AttemptA["Existing executor: attempt A<br/>private validated artifact"]
-  AttemptB["Existing executor: attempt B<br/>private validated artifact"]
-  Publish{"Commit against<br/>pending version 0?"}
-  Artifact["A wins: artifact A<br/>R version 1"]
-  Late["Late B cannot overwrite A<br/>attempt evidence retained"]
-  Evidence{"Evaluation, compatibility<br/>and current authority valid?"}
-  Deploy["Deployment K binds to D1<br/>retry K returns D1"]
-  Fence{"Current writer epoch<br/>and desired-state version?"}
-  Serving["Existing serving runtime<br/>last approved compatible state"]
-  Stop["Metadata unavailable:<br/>freeze unverifiable promotions"]
-  Run --> AttemptA --> Publish
-  Run --> AttemptB
-  Publish -->|"A commits"| Artifact
-  AttemptB -->|"late expected-state check fails"| Late
-  Artifact --> Evidence -->|"authorized"| Deploy --> Fence
-  Fence -->|"current controller"| Serving
-  Stop -.-> Evidence
-  class Run viz-input
-  class Publish,Evidence,Fence viz-focus
-  class Artifact,Deploy viz-state
-  class AttemptA,AttemptB viz-neutral
-  class Late,Stop viz-warning
-  class Serving viz-output
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> separate execution from authority. A wins publication; late B keeps evidence, not ownership. K identifies one deployment operation. Current authorization and controller fencing govern serving changes. Metadata failure does not authorize a new promotion.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="multi-team-platform-contract-boundary-edition-title"><p class="visual-title" id="multi-team-platform-contract-boundary-edition-title">The first valid commit wins; a late worker cannot overwrite it</p><svg viewBox="0 0 360 405" role="img" aria-labelledby="multi-team-platform-contract-boundary-edition-svg-title multi-team-platform-contract-boundary-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="multi-team-platform-contract-boundary-edition-svg-title">The first valid commit wins; a late worker cannot overwrite it</title><desc id="multi-team-platform-contract-boundary-edition-svg-desc">Attempts A and B share run R at expected version zero. A commits artifact A and advances the run to version one. B then fails its stale version-zero compare-and-swap and retains only attempt evidence. Deployment key K retries the same D1, while writer epochs remain separately checked.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">One run R, two attempts, expected version 0</tspan></text><g data-editorial-node><rect x="15" y="53" width="150" height="61" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="79" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">attempt A</tspan><tspan x="90" dy="19">artifact A</tspan></text></g><g data-editorial-node><rect x="195" y="53" width="150" height="61" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="270" y="79" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">attempt B</tspan><tspan x="270" dy="19">artifact B</tspan></text></g><path d="M90 114L90 148" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M86.64402122977057,141.8569220667674L90,148L93.35597877022943,141.8569220667674" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M270 114L270 210" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M266.6440212297706,203.8569220667674L270,210L273.3559787702294,203.8569220667674" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="15" y="152" width="150" height="61" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="90" y="168.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">A commits v0 -&gt;</tspan><tspan x="90" dy="19">v1</tspan><tspan x="90" dy="19">artifact A wins</tspan></text></g><g data-editorial-node><rect x="195" y="214" width="150" height="61" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="230.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">B expects v0</tspan><tspan x="270" dy="19">actual v1:</tspan><tspan x="270" dy="19">reject</tspan></text></g><text x="180" y="312" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">B cannot overwrite A</tspan><tspan x="180" dy="19">its attempt evidence remains</tspan></text><text x="180" y="367" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Retry deployment key K -&gt; same D1; recheck</tspan><tspan x="180" dy="19">writer epoch.</tspan></text></svg><figcaption><strong>Read it this way:</strong> A advances the version before B arrives. B cannot replace the winning artifact. Deployment idempotency and writer authority remain separate contracts. <span class="visual-reader-check" data-reader-check="multi-team-platform-contract-boundary"><strong>Check:</strong> Why can late attempt B not replace A? Why must retrying deployment key K return D1?</span></figcaption></figure>
 
 <span id="state-the-decision-before-drawing-boxes"></span>
 

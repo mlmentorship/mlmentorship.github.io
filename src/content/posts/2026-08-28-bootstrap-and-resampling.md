@@ -90,7 +90,7 @@ The replicate user mean is $(1-1+1)/3=1/3$.
 		<path d="M22 311L338 366M338 311L22 366" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:2.5"></path>
 		<text class="viz-callout" x="180" y="384" text-anchor="middle">breaks within-user dependence → uncertainty can look too small</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> draw a user and carry the entire cluster. U3 can repeat and U2 can be omitted. Keep both models' paired outcomes attached to every selected event. The original graphic follows <a href="https://doi.org/10.1214/aos/1176344552">Efron</a>, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html">SciPy</a>, and <a href="https://doi.org/10.1017/CBO9780511802843"><cite>Bootstrap Methods and Their Application</cite></a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> draw a user and carry the entire cluster. U3 can repeat and U2 can be omitted. Keep both models' paired outcomes attached to every selected event. The original graphic follows <a href="https://doi.org/10.1214/aos/1176344552">Efron</a>, <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bootstrap.html">SciPy</a>, and <a href="https://doi.org/10.1017/CBO9780511802843"><cite>Bootstrap Methods and Their Application</cite></a>. <span class="visual-reader-check" data-reader-check="bootstrap-resampling-unit"><strong>Check:</strong> Which records must travel together when U3 is drawn twice?</span></figcaption>
 </figure>
 
 ## Nonparametric bootstrap

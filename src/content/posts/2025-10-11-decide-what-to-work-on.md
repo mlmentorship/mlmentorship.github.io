@@ -33,38 +33,8 @@ Which portfolio fits? What could reverse the choice?
 
 ## Picture: Choosing One Uses Capacity Elsewhere
 
-<p class="visual-title">A chosen project consumes another project's capacity</p>
-
 <!-- visual:work-prioritization-counterfactual-portfolio -->
-```mermaid
-flowchart TB
-	accTitle: A counterfactual process for choosing a portfolio of work
-	accDescr: Protect mandatory obligations and deduct their capacity before comparing optional work. In the separate four-week exercise all projects are optional: A costs four weeks for 100 modeled units; B and C cost two weeks each for 60 and 55. Their feasible combined value is 115. Dependencies, ownership, uncertainty and strategy can change the choice. Record selected and declined alternatives, near and long-term capacity and revisit evidence without imposing a fixed allocation fraction.
-	A["Candidate projects<br/>outcome, cost, evidence, owner"] --> Obligation{"MANDATORY<br/>obligation?"}
-	Obligation -->|"yes"| Protect["Protect required work<br/>agree owner + capacity"]
-	Protect --> D
-	Obligation -->|"no"| B{"Advances user outcome<br/>and team strategy?"}
-	B -->|"no"| C["Decline now<br/>record the reason"]
-	B ==>|"yes"| D["Compare remaining capacity<br/>toy: A 100 vs B+C 115"]
-	D --> E["Evidence + value<br/>effort + risk"]
-	D --> F["Technical leverage<br/>team multiplier"]
-	D --> G["Ownership + skills<br/>engagement"]
-	E --> H{"Feasible portfolio<br/>under stated assumptions?"}
-	F --> H
-	G --> H
-	H -->|"no"| C
-	H ==>|"yes"| I["Select with manager<br/>and affected partners"]
-	I --> J["Near + long-term capacity<br/>no fixed fraction"]
-	I --> K["Record alternatives<br/>and revisit conditions"]
-	C -. "new evidence or strategy" .-> A
-	class A,D viz-input
-	class Obligation,B,H viz-focus
-	class C viz-warning
-	class Protect,I,J,K viz-output
-	class E,F,G viz-state
-	class A viz-wide
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> protect required work before optional scoring. Compare portfolios using the same remaining capacity, then record what would change the decision.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="work-prioritization-counterfactual-portfolio-edition-title"><p class="visual-title" id="work-prioritization-counterfactual-portfolio-edition-title">Every attractive project spends the same remaining capacity</p><svg viewBox="0 0 360 456" role="img" aria-labelledby="work-prioritization-counterfactual-portfolio-edition-svg-title work-prioritization-counterfactual-portfolio-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="work-prioritization-counterfactual-portfolio-edition-svg-title">Every attractive project spends the same remaining capacity</title><desc id="work-prioritization-counterfactual-portfolio-edition-svg-desc">A toy 100-unit capacity ledger reserves 20 mandatory units, leaving 80. Project A costs all 80 and has assumed value 100. Projects B and C cost 45 and 35 and have assumed combined value 115. The two portfolios occupy equal total capacity. Choosing B plus C displaces A, not mandatory work.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Toy planning ledger; values are assumptions</tspan></text><text x="20" y="61" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">100 capacity units</tspan></text><rect x="25" y="82" width="62" height="28" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><rect x="87" y="82" width="248" height="28" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="56" y="103" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="56" dy="0">20</tspan></text><text x="211" y="103" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="211" dy="0">80 available</tspan></text><text x="25" y="137" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="25" dy="0">Mandatory work is reserved first.</tspan></text><text x="20" y="184" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">A: capacity 80 / value 100</tspan></text><rect x="25" y="204" width="310" height="28" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="224" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">80</tspan></text><text x="20" y="284" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">B + C: capacity 80 / value 115</tspan></text><rect x="25" y="304" width="174.375" height="28" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="112.1875" y="324" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="112.1875" dy="0">45</tspan></text><rect x="199.375" y="304" width="135.625" height="28" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="267.1875" y="324" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="267.1875" dy="0">35</tspan></text><text x="180" y="378" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Choosing B + C displaces A, not the mandatory</tspan><tspan x="180" dy="19">work.</tspan></text><text x="180" y="420" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Revisit when value, risk, or capacity evidence</tspan><tspan x="180" dy="19">changes.</tspan></text></svg><figcaption><strong>Read it this way:</strong> Reserve obligations before comparing portfolios. Under these toy assumptions, B + C beats A at equal capacity. Revisit when evidence changes the assumptions. <span class="visual-reader-check" data-reader-check="work-prioritization-counterfactual-portfolio"><strong>Check:</strong> What other feasible work is forgone when project A is chosen?</span></figcaption></figure>
 
 ## Compare the Feasible Portfolios
 

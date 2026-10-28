@@ -53,10 +53,14 @@ const auditedEntries = slugs.map((slug) => {
   const category = article.match(/^---\n[\s\S]*?^category:\s*["']?([^"'\n]+)["']?\s*$[\s\S]*?^---$/m)?.[1]?.trim();
   if (!category) throw new Error(`Could not read category from ${audit.article}`);
   const supplementalIds = [];
+  const supplementalSvgIds = [];
   if (supplemental) {
     const visitHtml = (node) => {
       const id = node.attrs?.find((attribute) => attribute.name === 'data-supplemental-visual')?.value;
-      if (id) supplementalIds.push(id);
+      if (id) {
+        supplementalIds.push(id);
+        if (node.nodeName === 'figure') supplementalSvgIds.push(id);
+      }
       for (const child of node.childNodes ?? []) visitHtml(child);
     };
     const visitMarkdown = (node) => {
@@ -72,7 +76,7 @@ const auditedEntries = slugs.map((slug) => {
     slug,
     status: audit.status,
     category,
-    medium: supplemental ? 'mermaid' : audit.medium,
+    medium: supplemental ? supplementalSvgIds.length === supplementalIds.length ? 'svg' : 'mermaid' : audit.medium,
     visualIds: supplemental ? supplementalIds : audit.implementation.visualIds,
     article: basename(audit.article),
     supplemental,
@@ -119,7 +123,7 @@ class Cdp {
         const pending = this.pending.get(message.id);
         if (!pending) return;
         this.pending.delete(message.id);
-        if (message.error) pending.reject(new Error(message.error.message));
+        if (message.error) pending.reject(new Error(`${pending.method}: ${message.error.message}`));
         else pending.resolve(message.result);
         return;
       }
@@ -140,7 +144,7 @@ class Cdp {
   call(method, params = {}) {
     const id = this.nextId++;
     return new Promise((resolveCall, rejectCall) => {
-      this.pending.set(id, { resolve: resolveCall, reject: rejectCall });
+      this.pending.set(id, { method, resolve: resolveCall, reject: rejectCall });
       this.socket.send(JSON.stringify({ id, method, params }));
     });
   }
@@ -165,7 +169,8 @@ async function waitForVisualLayout(cdp, visualId, theme, label) {
       await document.fonts.ready;
       const locateVisual = () => {
         if (${JSON.stringify(supplemental)}) {
-          return document.querySelector(${JSON.stringify(`[data-supplemental-visual="${visualId}"]`)})?.nextElementSibling;
+          const anchor = document.querySelector(${JSON.stringify(`[data-supplemental-visual="${visualId}"]`)});
+          return anchor?.matches('figure.learning-figure') ? anchor : anchor?.nextElementSibling;
         }
         const comments = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT);
         let marker;
@@ -224,7 +229,7 @@ async function waitForVisualLayout(cdp, visualId, theme, label) {
 }
 
 const delay = (milliseconds) => new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
-const port = 9300 + (process.pid % 500);
+let port;
 const profileDir = join(tmpdir(), `mlmentorship-visual-review-${process.pid}`);
 rmSync(profileDir, { recursive: true, force: true });
 mkdirSync(profileDir, { recursive: true });
@@ -236,7 +241,7 @@ const browser = spawn(executable, [
   '--disable-gpu',
   '--no-first-run',
   '--no-default-browser-check',
-  `--remote-debugging-port=${port}`,
+  '--remote-debugging-port=0',
   `--user-data-dir=${profileDir}`,
   'about:blank',
 ], { stdio: ['ignore', 'ignore', 'pipe'] });
@@ -247,8 +252,11 @@ async function waitForBrowser() {
   for (let attempt = 0; attempt < 100; attempt += 1) {
     if (browser.exitCode !== null) throw new Error(`Browser exited early: ${browserErrors.slice(-1000)}`);
     try {
+      const [ownedPort, endpoint] = readFileSync(join(profileDir, 'DevToolsActivePort'), 'utf8').trim().split(/\r?\n/);
+      port = Number(ownedPort);
+      if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid owned debugging port');
       const response = await fetch(`http://127.0.0.1:${port}/json/version`);
-      if (response.ok) return;
+      if (response.ok && (await response.json()).webSocketDebuggerUrl.endsWith(endpoint)) return;
     } catch {
       // Chrome has not opened its debugging socket yet.
     }
@@ -279,6 +287,7 @@ async function stopBrowser() {
 
 const report = [];
 let cdp;
+let currentLabel = 'browser startup';
 try {
   await waitForBrowser();
   const targetResponse = await fetch(`http://127.0.0.1:${port}/json/new?about:blank`, { method: 'PUT' });
@@ -304,6 +313,7 @@ try {
     });
 
     for (const entry of entries) {
+      currentLabel = `${entry.slug}/${mode.name}/navigation`;
       const loaded = cdp.once('Page.loadEventFired');
       await cdp.call('Page.navigate', { url: `${baseUrl}/${entry.category}/${entry.slug}/` });
       await loaded;
@@ -321,6 +331,7 @@ try {
 
       for (const visualId of entry.visualIds) {
         const label = `${entry.slug}/${visualId}/${mode.name}`;
+        currentLabel = label;
         await waitForVisualLayout(cdp, visualId, mode.theme, label);
         const expression = `(() => new Promise((resolve) => {
           requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -336,7 +347,8 @@ try {
             const supplementalTitle = ${JSON.stringify(supplemental)}
               ? document.querySelector(${JSON.stringify(`[data-supplemental-visual="${visualId}"]`)})
               : null;
-            let visual = supplementalTitle?.nextElementSibling ?? marker?.nextElementSibling;
+            let visual = supplementalTitle?.matches('figure.learning-figure')
+              ? supplementalTitle : supplementalTitle?.nextElementSibling ?? marker?.nextElementSibling;
             while (visual && !visual.matches('figure.learning-figure, .mermaid')) visual = visual.nextElementSibling;
             if (!visual) throw new Error(${JSON.stringify(`${label}: visual not found`)});
             const visualHost = visual.closest('.visual-review-visual');
@@ -508,6 +520,22 @@ try {
               rawCaptionMath: captionText.split('$').length > 2 || captionText.includes(String.fromCharCode(92)),
               captionGlyphWidth: rangeWidth(caption),
               clippedText,
+              textOverlaps: visual.matches('.editorial-illustration') ? (() => {
+                const labels = [...visual.querySelectorAll('svg text')].filter((label) => label.textContent.trim()).map((label) => ({ text: label.textContent, box: label.getBoundingClientRect() }));
+                const overlaps = [];
+                for (let first = 0; first < labels.length; first++) for (let second = first + 1; second < labels.length; second++) {
+                  const left = labels[first];
+                  const right = labels[second];
+                  if (Math.min(left.box.right, right.box.right) - Math.max(left.box.left, right.box.left) > 1 && Math.min(left.box.bottom, right.box.bottom) - Math.max(left.box.top, right.box.top) > 1) overlaps.push([left.text, right.text]);
+                }
+                return overlaps;
+              })() : [],
+              nodeClipping: svgElements.flatMap((svg) => [...svg.querySelectorAll('[data-editorial-node]')].flatMap((node) => {
+                const bounds = node.querySelector('rect')?.getBBox();
+                const label = node.querySelector('text');
+                const textBounds = label?.getBBox();
+                return bounds && textBounds && (textBounds.x < bounds.x - .5 || textBounds.y < bounds.y - .5 || textBounds.x + textBounds.width > bounds.x + bounds.width + .5 || textBounds.y + textBounds.height > bounds.y + bounds.height + .5) ? [label.textContent] : [];
+              })),
               unresolvedSvgReferences,
               printMinWidths: svgElements.map((svg) => getComputedStyle(svg).minWidth),
             });
@@ -552,6 +580,8 @@ try {
             throw new Error(`${label} lost SVG accessibility markup`);
           }
           if (details.clippedText.length) throw new Error(`${label} has text outside its viewBox: ${details.clippedText.join(', ')}`);
+          if (details.textOverlaps.length) throw new Error(`${label} overlaps text: ${JSON.stringify(details.textOverlaps)}`);
+          if (details.nodeClipping.length) throw new Error(`${label} has text outside its node: ${details.nodeClipping.join(', ')}`);
           if (details.unresolvedSvgReferences.length) {
             throw new Error(`${label} has unresolved SVG references: ${details.unresolvedSvgReferences.join(', ')}`);
           }
@@ -628,6 +658,15 @@ try {
                   ).filter(Number.isFinite);
                 });
                 const motionKeys = [...visibleFrames[0].querySelectorAll('[data-motion-key]')].map((element) => element.dataset.motionKey);
+                const mechanismClipping = [...visibleFrames[0].querySelectorAll('.coding-mechanism svg')].flatMap((svg) => {
+                  const viewBox = svg.viewBox.baseVal;
+                  return [...svg.querySelectorAll('text')].flatMap((text) => {
+                    const box = text.getBBox();
+                    return box.x < viewBox.x - .5 || box.y < viewBox.y - .5 ||
+                      box.x + box.width > viewBox.x + viewBox.width + .5 ||
+                      box.y + box.height > viewBox.y + viewBox.height + .5 ? [text.textContent] : [];
+                  });
+                });
                 return {
                   activeFrame: Number(visual.dataset.activeFrame),
                   visibleFrames: visibleFrames.length,
@@ -636,6 +675,7 @@ try {
                   figureFitsViewport: rect.left >= -0.5 && rect.right <= innerWidth + 0.5,
                   minRenderedText: renderedTextSizes.length ? Math.min(...renderedTextSizes) : null,
                   duplicateMotionKeys: motionKeys.filter((key, index) => motionKeys.indexOf(key) !== index),
+                  mechanismClipping,
                   captureRect: { x: rect.left + scrollX, y: rect.top + scrollY, width: rect.width, height: rect.height },
                 };
               })()`,
@@ -650,6 +690,7 @@ try {
             if (frameDetails.pageWidth > frameDetails.innerWidth + 1 || !frameDetails.figureFitsViewport) throw new Error(`${frameLabel} creates horizontal overflow`);
             if (mode.mobile && frameDetails.minRenderedText !== null && frameDetails.minRenderedText < 8) throw new Error(`${frameLabel} renders text at ${frameDetails.minRenderedText.toFixed(2)}px`);
             if (frameDetails.duplicateMotionKeys.length > 0) throw new Error(`${frameLabel} duplicates motion keys: ${[...new Set(frameDetails.duplicateMotionKeys)].join(', ')}`);
+            if (frameDetails.mechanismClipping.length > 0) throw new Error(`${frameLabel} clips mechanism text: ${frameDetails.mechanismClipping.join(', ')}`);
             const frameScreenshot = await cdp.call('Page.captureScreenshot', {
               format: 'png',
               captureBeyondViewport: true,
@@ -756,6 +797,9 @@ try {
 
   writeFileSync(join(outputDir, 'report.json'), `${JSON.stringify({ renders: report, noVisualSlugs }, null, 2)}\n`);
   console.log(`Visual rendering passed: ${report.length} renders, ${noVisualSlugs.length} no-visual outcome(s); screenshots saved to ${outputDir}`);
+} catch (error) {
+  writeFileSync(join(outputDir, 'failure.json'), `${JSON.stringify({ label: currentLabel, error: error.stack, browserExitCode: browser.exitCode, browserStderr: browserErrors.slice(-4000) }, null, 2)}\n`);
+  throw error;
 } finally {
   cdp?.close();
   await stopBrowser();

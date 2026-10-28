@@ -52,7 +52,7 @@ The figure illustrates a soft-margin fit; its three highlighted points are not t
 		<text class="viz-callout" x="180" y="299" text-anchor="middle">decision(x) = sign(Σᵢ∈SV αᵢ yᵢ K(xᵢ, x) + b)</text>
 		<text class="viz-node-value" x="180" y="315">prediction sums over the 3 ringed points only</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare each point with its class-margin rail. The three rings identify positive dual coefficients in this schematic fit. Strictly outside the margin, coefficients are zero. A point on a rail can also have zero coefficient in a degenerate solution. Soft margin permits positive coefficients inside the rails. Sources: <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's tutorial</a> and the <a href="https://scikit-learn.org/stable/modules/svm.html">SVM formulation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare each point with its class-margin rail. The three rings identify positive dual coefficients in this schematic fit. Strictly outside the margin, coefficients are zero. A point on a rail can also have zero coefficient in a degenerate solution. Soft margin permits positive coefficients inside the rails. Sources: <a href="https://link.springer.com/article/10.1023/A:1009715923555">Burges's tutorial</a> and the <a href="https://scikit-learn.org/stable/modules/svm.html">SVM formulation</a>. <span class="visual-reader-check" data-reader-check="svm-support-vectors-set-boundary"><strong>Check:</strong> Which displayed points actually contribute to the decision sum? Why is lying on a margin alone not a universal proof of nonzero alpha?</span></figcaption>
 </figure>
 
 ## The hard-margin SVM (separable case)

@@ -96,7 +96,7 @@ The **collapse function** $\mathcal{B}$ does two things, in order:
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> CTC merges repeats before it removes blanks. <code>L L</code> merges immediately, but <code>L ∅ L</code> has no adjacent repeat at step 1; removing <code>∅</code> at step 2 leaves both Ls.</figcaption>
+	<figcaption><strong>Read it this way:</strong> CTC merges repeats before it removes blanks. <code>L L</code> merges immediately, but <code>L ∅ L</code> has no adjacent repeat at step 1; removing <code>∅</code> at step 2 leaves both Ls. <span class="visual-reader-check" data-reader-check="ctc-blank-preserves-repeat"><strong>Check:</strong> Why must repeated labels be merged before blanks are removed?</span></figcaption>
 </figure>
 
 The blank is what lets the model emit the same letter twice (`L L` in `HELLO`): insert a blank between them, `L ∅ L`, and the merge step won't collapse them.

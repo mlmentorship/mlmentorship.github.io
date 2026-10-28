@@ -1,6 +1,61 @@
 # Visual comprehension review
 
-## Current outcome
+## Editorial edition
+
+The new edition covers all 392 registered illustrations across 391 articles and all 16 supplemental illustrations.
+It adds 83 purpose-drawn registered SVGs and replaces all 16 supplemental diagrams with original SVG compositions.
+All-reduce and Bayes receive two additional manual numerical-geometry revisions.
+All 106 coding illustrations gain selected-state comparisons across their 797 existing checkpoints.
+Five traces add mechanism-specific drawings: indexed complement lookup, rejected 3Sum pairs, linked tree traversals, palindrome intervals and fixed-width bit destinations.
+The histogram distinguishes unresolved positive heights from its actual sentinel-bearing stack.
+Every registered figure has an individual inference question, with shared typography, caption hierarchy and responsive refinements.
+Successful quantitative plots are retained rather than replaced with generic stage boxes.
+
+The exact changes are recorded in `editionReconciliation` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+The original 392 assessments, 16 supplemental assessments and earlier reconciliation remain historical evidence.
+Shared improvements do not mean 408 structural redraws or that every original recommendation is resolved.
+There is no measured tenfold improvement, learner study, publication-standard certification or PDF-pagination claim.
+
+### Edition qualification
+
+Normal `npm run check` and `npm run build` pass on the isolated assistant-only edition tree.
+All 392 registered and 16 supplemental figures pass desktop light/dark, actual-390 phone light/dark and print-style checks: 2,040 figure cases.
+The campaign captures all 797 authored coding checkpoints in each of the four screen modes: 3,188 settled state captures.
+Native interaction checks pass all 106 coding routes and 797 checkpoints at both actual 1280px and 390px widths.
+They cover forward/backward and direct navigation, keyboard controls, playback, stable frame/control geometry, reduced motion and the no-JavaScript fallback.
+All 391 articles retain their headings, Python fences, ordered figure identities and public fragments; all 797 frame identities and 8,739 ordered motion identities are preserved.
+
+All 81 labelled mobile contact sheets were directly reviewed, covering all 408 figures.
+Those scaled coding thumbnails show initial states; they do not establish individual native-image inspection of every original or every authored state.
+Selected native originals were inspected separately, including numerical geometry, the five mechanism-specific coding additions and the repaired legal-RAG label layout.
+The accepted output inventories authenticate 7,574 PNG files; that is a file count, not the number of figure cases or a count of individually inspected images.
+Fifteen completed batches covering 300 unchanged articles are reused only after exact source, HTML, runtime-asset, renderer, report and PNG equality; the remaining 91 articles and all supplemental cases were freshly captured on the final rendering candidate.
+Failed and superseded attempts remain separate, including the legal-RAG node-fit failure and a Chromium startup failure when shared memory was full.
+The latter used an owned `--disable-dev-shm-usage` launcher on retry, without weakening product assertions or deleting unrelated work.
+
+The browser-qualified candidate tree is `2403ceb51ee4f50979f06a5049a799c6de843bab`.
+The sealed manifest is `/tmp/mlmentorship-illustration-edition-20261027-81b8a701/production-r5/production-qualified.json`, SHA-256 `65f6eccac269e471bf0f4ab90034813620f4b782f039e57ebaf2b54690e03463`.
+Final review-metadata changes are qualified separately against this tree's built article HTML and runtime assets.
+The editor worktree's four existing BST statement failures are not part of this edition.
+The user's generator, statement and global-style edits remain preserved outside the edition commit.
+
+Generation is reproducible with the existing dependencies:
+
+```sh
+node scripts/illustration-redraws.mjs
+node scripts/coding-visuals/state-transition.mjs
+node scripts/illustration-edition.mjs --self-test
+node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --capture
+node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-redraws
+node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-coding
+node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-reader-checks
+node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --verify
+```
+
+Capture once before further edits; the command refuses to overwrite an existing preservation baseline.
+Do not regenerate whole lessons merely to update figures or use a dirty generator to apply unrelated changes.
+
+## Previous outcome
 
 Expert review is complete for 392 registered visuals across 391 articles and 16 supplemental Mermaid diagrams.
 Eleven registered figures and seven supplemental diagrams received substantive revisions.
@@ -10,11 +65,11 @@ Nine supplemental diagrams retain further refinement recommendations.
 The original registered recommendations remain an improvement backlog, not a claim that every figure was redesigned.
 The lesson-authoring checkpoint remains 252 of 391; this review did not author the remaining lessons.
 
-Current verification passes 784 registered desktop/phone renders and 80 supplemental five-mode renders.
+At that checkpoint, verification passed 784 registered desktop/phone renders and 80 supplemental five-mode renders.
 The eleven revised registered figures also have 55 accepted five-mode cases, with all frames checked for the two changed coding traces.
 Native originals were inspected for all eighteen revised visuals, including selected miss/save/hit states, dark-theme views and a static print sequence.
 These are source, arithmetic, rendering and expert-composition checks, not observed learner outcomes or PDF-pagination verification.
-Changes remain local and uncommitted; no publication was performed.
+Those repairs were local at that checkpoint; no publication was performed.
 
 ## Review standard
 
@@ -33,7 +88,7 @@ Interaction must clarify a relationship; the static and print versions must also
 ## Coverage
 
 The registered inventory contains 392 visuals across 391 articles, including 106 coding definitions and 797 authored coding states.
-The corpus also contains 16 supplemental Mermaid diagrams outside registered markers; they are separately assessed, not added to the registered count.
+The corpus also contains 16 supplemental illustrations outside registered markers; they are separately assessed, not added to the registered count.
 There are no Markdown/HTML images, canvas or video elements, or unregistered figure wrappers in the source scan.
 All 392 registered visuals have individual assessments: originally 62 structural redesign and 330 retain-and-refine recommendations.
 Original priorities are 39 high, 217 medium and 136 low; these remain historical judgments, not current unresolved counts or comprehension scores.
@@ -53,7 +108,7 @@ Do not change the immutable baseline, completed coding guide or frozen planning 
 
 ## Render observations
 
-### Current qualification
+### Previous qualification
 
 All 391 current articles pass desktop-light and mobile-light checks at actual 1280/390 CSS-pixel widths: 784 registered-figure cases.
 The source, built HTML and preview response hashes are bound before and after each batch.
@@ -124,7 +179,12 @@ Seven supplemental diagrams now focus on a concrete relationship rather than a c
 The other nine supplemental diagrams received titles, accessible descriptions and captions, not structural-redesign claims.
 Their individual open refinements and reader questions are in the structured ledger.
 
-## Remaining priorities
+## Original priorities
+
+The following paragraphs retain the original recommendations, not the current unresolved backlog.
+The new edition implements the all-reduce values, PCA/factorization recomposition, histogram sentinel distinction, causal-mask wrapping and mechanism-specific coding examples described here.
+Architecture and authority redraws now follow concrete objects, evidence and consequences.
+Further density reduction and comparative reader testing remain opportunities; technical render coverage alone does not establish comprehension.
 
 ### Preserve exact state identity
 
@@ -195,7 +255,9 @@ Do not claim optimized understanding or measured improvement until reader eviden
 
 ## Evidence
 
-Current evidence root: `/tmp/mlmentorship-visual-comprehension-20261026/`.
+Previous qualification root: `/tmp/mlmentorship-visual-comprehension-20261026/`.
+Editorial-edition evidence root: `/tmp/mlmentorship-illustration-edition-20261027-81b8a701/`.
+Earlier receipt names below describe the previous qualification, not the new edition.
 
 - Current inventory: `inventory-illustration-final-r2-20261026.json`.
 - Final preservation, build/preview and capture seal: `illustration-final-qualified-r2.json`.
@@ -213,5 +275,5 @@ Their `/dev/shm` PNG targets are absent and have not been recreated or relabelle
 Failed and intermediate builds/captures remain separate from accepted current evidence.
 Current accepted PNGs are on disk under `/tmp`; they are not permanent repository assets.
 
-The production preview remains available at `http://127.0.0.1:4342/`.
+The editor development preview remains available at `http://127.0.0.1:4342/`.
 No learner study, whole-article factual qualification, every-state native inspection, PDF pagination or publication is claimed.

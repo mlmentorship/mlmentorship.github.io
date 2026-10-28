@@ -3,9 +3,9 @@
   "slug": "preference-data-and-reward-models",
   "article": "src/content/posts/2026-07-11-preference-data-and-reward-models.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Explain why reward-model validation on collected comparisons does not guarantee reliable rewards after the policy is optimized.",
-  "mediumRationale": "A semantic two-state comparison is the smallest medium that separates what validation establishes on sampled responses from what changes when a policy searches against the proxy. Numbered headings preserve the temporal order, while ordinary text makes the complete distinction available without JavaScript, fixed coordinates, or color.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is one before-and-after contrast rather than a relationship-heavy graph. A cycle diagram would make the refresh step prominent but would leave less room to distinguish the scope of validation from optimizer search at 390 CSS pixels.",
     "svg": "Rejected: no quantitative geometry, continuous scale, or plotted result is needed. Fixed coordinates would shrink explanatory text and add maintenance without increasing technical precision.",
@@ -67,6 +67,6 @@
     "visualIds": [
       "reward-model-distribution-shift"
     ],
-    "accessibility": "The figure has a direct learning question, two semantically labelled sections, numbered temporal headings, and an explicit group description. Each state and inference is written in text; order, labels, and the before-and-after structure carry the lesson without color. The established two-column primitive stacks below 640 CSS pixels with no minimum width, including at 390 CSS pixels; theme variables support dark mode and shared print rules force high-contrast paper colors and avoid splitting the figure."
+    "accessibility": "Fictional outputs R1 and R2 have proxy/human scores four/four and six/five. Optimized R3 has proxy nine and fresh human score one, outside the represented proxy-score band three to six. It is an illustrative possible shortcut, not an inevitable optimization result. New on-policy comparisons must revalidate the proxy. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -18,7 +18,7 @@
     "check:learning": "node scripts/sync-learning-mechanisms.mjs --check",
     "test:prep": "node --import tsx --test scripts/test-prep-planner.ts",
     "test:content": "node --test scripts/test-content-reasoning.mjs",
-    "check:visuals": "node scripts/check-visual-coverage.mjs && node scripts/check-coding-visual-architecture.mjs && node scripts/check-coding-visuals.mjs && node scripts/check-coding-visual-interactions.mjs",
+    "check:visuals": "node scripts/check-visual-coverage.mjs && node scripts/coding-visuals/state-transition.mjs && node scripts/illustration-redraws.mjs && node scripts/illustration-edition.mjs --self-test && node scripts/check-coding-visual-architecture.mjs && node scripts/check-coding-visuals.mjs && node scripts/check-coding-visual-interactions.mjs",
     "visuals:status": "node scripts/check-visual-coverage.mjs --next=20",
     "visuals:batch": "node scripts/create-visual-batch.mjs",
     "content:coding-book": "node scripts/generate-coding-question-book.mjs --force"

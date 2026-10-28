@@ -3,9 +3,9 @@
   "slug": "evaluation-validity-benchmark-contamination",
   "article": "src/content/posts/2026-08-28-evaluation-validity-benchmark-contamination.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Distinguish an evaluation that provides independent confirmation from one that has become part of development through repeated feedback.",
-  "mediumRationale": "A two-panel semantic comparison is the smallest medium that keeps both role transitions readable in the article column: an untouched hidden evaluation follows a one-way freeze-and-confirm sequence, while an adaptively reused benchmark loops its results back into system selection. Numbered text preserves the complete inference without runtime rendering.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected after cross-render review: the two subgraphs compressed their labels to 3.7 CSS pixels in the reading column, far below the campaign's readability threshold.",
     "svg": "Rejected: the lesson does not require precise geometry, scales, or plotted values, so custom coordinates would add maintenance without instructional value.",
@@ -97,6 +97,6 @@
     "visualIds": [
       "independent-confirmation-vs-adaptive-reuse"
     ],
-    "accessibility": "The figure is linked to a direct learning question and its two semantic sections sit in a labelled group. Numbered headings, the explicit repeat symbol and text, named outcomes, and the caption preserve all meaning without color. The established two-column primitive stacks below 640 CSS pixels with ordinary text wrapping and no minimum width; theme tokens support dark mode and shared print rules provide a high-contrast paper rendering."
+    "accessibility": "Public benchmark B feeds model selection and therefore becomes development evidence. In a separate lane, M2 freezes before hidden fresh set H is opened once. There is deliberately no return arrow from H into that already-selected model. Later selection would require new confirmation. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

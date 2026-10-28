@@ -72,7 +72,7 @@ For this illustration, each activity gets one primary time category; real activi
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the same activity across panels on the 0–100% scale. A longer bar means more allocated time only in this fictional schedule. Current team evidence, not these invented profiles, determines fit.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the same activity across panels on the 0–100% scale. A longer bar means more allocated time only in this fictional schedule. Current team evidence, not these invented profiles, determines fit. <span class="visual-reader-check" data-reader-check="ml-role-activity-profiles"><strong>Check:</strong> How much more engineering time does the fictional ML Engineer profile allocate than the Research Engineer profile?</span></figcaption>
 </figure>
 
 ## Work the Team Comparison

@@ -104,7 +104,7 @@ $$
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow one branch toward <var>x</var>: the factor multiplies its local compatibility by the incoming evidence and sums out <var>y</var>, leaving a two-entry function of <var>x</var>. At <var>x</var>, multiply matching entries from every branch, then normalize once to read the marginal. A message summarizes a branch; it is not itself a normalized probability.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow one branch toward <var>x</var>: the factor multiplies its local compatibility by the incoming evidence and sums out <var>y</var>, leaving a two-entry function of <var>x</var>. At <var>x</var>, multiply matching entries from every branch, then normalize once to read the marginal. A message summarizes a branch; it is not itself a normalized probability. <span class="visual-reader-check" data-reader-check="belief-propagation-branch-summary"><strong>Check:</strong> Which variable is summed out? Why is the final product normalized rather than each branch independently interpreted as a belief?</span></figcaption>
 </figure>
 
 Replace the inner $\sum$ with a $\max$ and you get **max-product** (a.k.a. max-sum in log space), which finds the MAP configuration, the general version of **Viterbi**.

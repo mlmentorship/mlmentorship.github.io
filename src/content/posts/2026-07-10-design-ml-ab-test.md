@@ -23,31 +23,8 @@ Offline relevance and statistical significance alone do not establish a practica
 
 **Learning objective:** Apply validity, practical-effect, and guardrail gates in order so a statistically significant result is not mistaken for a ship decision.
 
-<p class="visual-title">Validity, practical effect, and harm are separate gates</p>
-
 <!-- visual:ml-ab-test-launch-gates -->
-```mermaid
-flowchart TB
-	accTitle: An ML A/B test must pass three launch gates
-	accDescr: An offline model improvement is only a candidate for an online test. Before running, the team commits to the randomization unit, primary metric, minimum worthwhile effect, guardrails, duration, and analysis rule. Gate one checks assignment, exposure, logging, sample-ratio mismatch, and the planned analysis; a failure requires diagnosis and forbids treatment-effect interpretation. Gate two asks whether the effect estimate and confidence interval meet the precommitted worthwhile-effect rule; a statistically significant but too-small effect can fail here. Gate three checks guardrails and critical prespecified slices. A failure means stop, repair, or limit treatment to a justified safer segment. Passing all three gates permits only a staged rollout with monitoring and rollback.
-	O["Offline gain<br/>candidate, not launch evidence"] --> P["Precommit before exposure<br/>unit + primary metric + worthwhile effect<br/>guardrails + duration + analysis"]
-	P --> V{"GATE 1 - VALID?<br/>assignment + exposure + logging<br/>SRM + planned analysis"}
-	V -.->|"fail or unexplained"| D["Diagnose or rerun<br/>do not interpret the effect"]
-	V ==>|"pass"| E{"GATE 2 - WORTHWHILE?<br/>estimate + confidence interval meet<br/>the precommitted effect rule"}
-	E -.->|"no"| I["Iterate or stop<br/>p < 0.05 alone does not ship"]
-	E ==>|"yes"| G{"GATE 3 - SAFE?<br/>guardrails + critical<br/>prespecified slices pass"}
-	G -.->|"no"| H["Stop, repair, or justify<br/>a safer target segment"]
-	G ==>|"yes"| R["Stage rollout<br/>monitor + retain rollback"]
-	class O viz-input
-	class P viz-state
-	class V,E,G viz-focus
-	class D,I,H viz-warning
-	class R viz-output
-	class O viz-wide
-	class O viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the three numbered gates in order. Invalid assignment or telemetry blocks effect interpretation. Valid evidence must then clear the worthwhile-effect rule, not merely exclude zero, and any guardrail regression can still veto launch. Only the all-pass path reaches a monitored, reversible rollout.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="ml-ab-test-launch-gates-edition-title"><p class="visual-title" id="ml-ab-test-launch-gates-edition-title">Statistically positive, worthwhile, and safe are three different tests</p><svg viewBox="0 0 360 410" role="img" aria-labelledby="ml-ab-test-launch-gates-edition-svg-title ml-ab-test-launch-gates-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="ml-ab-test-launch-gates-edition-svg-title">Statistically positive, worthwhile, and safe are three different tests</title><desc id="ml-ab-test-launch-gates-edition-svg-desc">Under an illustrative precommitted one-point worthwhile threshold, interval 0.2 to 0.8 is positive but insufficient. Interval 1.1 to 1.8 is worthwhile but its two-percent error rate exceeds a one-percent guardrail. Both hold. If assignment validity fails, neither effect is interpretable.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative precommitted worthwhile</tspan><tspan x="180" dy="19">effect: +1 point</tspan></text><text x="18" y="72" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Significant, but too small</tspan></text><path d="M70 117L310 117" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M190 90L190 134" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><path d="M94 110L166 110" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:1.75"></path><circle cx="130" cy="110" r="4" style="fill:var(--viz-input-stroke)"></circle><text x="70" y="152" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="70" dy="0">0</tspan></text><text x="190" y="152" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="190" dy="0">+1</tspan></text><text x="310" y="152" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="310" dy="0">+2 points</tspan></text><text x="18" y="210" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Worthwhile, but unsafe</tspan></text><path d="M70 255L310 255" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M190 228L190 272" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><path d="M202 248L286 248" style="fill:none;stroke:var(--viz-input-stroke);stroke-width:1.75"></path><circle cx="238" cy="248" r="4" style="fill:var(--viz-input-stroke)"></circle><text x="70" y="290" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="70" dy="0">0</tspan></text><text x="190" y="290" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="190" dy="0">+1</tspan></text><text x="310" y="290" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="310" dy="0">+2 points</tspan></text><text x="180" y="332" style="font-size:13px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="180" dy="0">Second case: errors 2% &gt; 1% guardrail</tspan></text><text x="180" y="374" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Both HOLD. Invalid assignment? Interpret</tspan><tspan x="180" dy="19">neither.</tspan></text></svg><figcaption><strong>Read it this way:</strong> A positive interval can miss the worthwhile threshold. A worthwhile effect can fail safety. If assignment is invalid, do not interpret either effect. <span class="visual-reader-check" data-reader-check="ml-ab-test-launch-gates"><strong>Check:</strong> Why can a significant primary result still fail the launch decision?</span></figcaption></figure>
 
 ## Start with the decision
 

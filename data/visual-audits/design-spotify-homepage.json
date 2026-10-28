@@ -3,9 +3,9 @@
   "slug": "design-spotify-homepage",
   "article": "src/content/posts/2025-12-12-design-spotify-homepage.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace why independently completed shelves must become candidates for a second composition decision that optimizes the whole homepage rather than merging every item into one global ranking.",
-  "mediumRationale": "A compact hierarchical Mermaid is the smallest useful spatial explanation because the lesson depends on two distinct decision levels and their separate feedback: each learned or curated pipeline produces a coherent local list, then a composer selects and orders shelves under page-level context, diversity, editorial, and long-term constraints.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the mental model is a many-to-one hierarchy followed by an ordered page and two feedback paths. Labelled nodes and edges preserve which decisions happen inside shelves versus across shelves, while the established renderer supplies accessible metadata, responsive overflow, and theme-safe styling.",
     "svg": "Rejected because no quantitative scale or fixed screen geometry carries the lesson. Drawing a mock Spotify interface would add brand-specific decoration and maintenance cost without clarifying the optimization boundary.",
@@ -103,6 +103,6 @@
     "visualIds": [
       "spotify-two-level-shelf-composition"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description naming the local shelf decisions, whole-page composition decision, ordered output, and separate feedback signals. Layer headings, node shapes, direct labels, arrows, and solid versus dashed feedback paths carry the hierarchy without color. The established wide-canvas marker preserves readable labels through horizontal scrolling at 390 CSS pixels; existing theme tokens provide light and dark contrast, and print removes the width floor and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "Toy shelves A, B, and C contain song IDs one-two, one-three, and four-five, with local scores six, five, and four. Repeated song one creates the declared four-unit overlap penalty for A plus B, giving seven. A plus C gives ten and B plus C nine. Membership does not determine display order. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

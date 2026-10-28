@@ -3,9 +3,9 @@
   "slug": "neural-network-training-recipe",
   "article": "src/content/posts/2026-05-31-neural-network-training-recipe.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Use each training phase as an evidence gate, and return to the earliest failed assumption instead of tuning around an unverified pipeline.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that can show the recipe's ordered phases, the evidence required to advance, and the backward path when a gate fails. The task is procedural dependency rather than quantitative geometry, so labelled branches communicate the stop-and-repair discipline directly.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: a top-to-bottom decision flow makes prerequisite gates and repair loops explicit while reusing the site's accessible, responsive process-diagram grammar.",
     "svg": "Rejected: custom fixed geometry would duplicate Mermaid's existing flow and branch semantics without adding a quantitative shape or spatial relationship.",
@@ -91,6 +91,6 @@
     "visualIds": [
       "training-recipe-evidence-gates"
     ],
-    "accessibility": "The Mermaid diagram includes a concise accessible title and a full description of every phase, pass condition, and repair loop. Node text, gate shapes, labelled yes/no branches, line weight, and order carry the lesson without color. The established wide-diagram primitive preserves readable labels inside a keyboard-accessible horizontal scroller at 390 CSS pixels, while the direct caption states the full inference outside the scroller; shared Mermaid theme and print rules provide dark-mode contrast and remove the minimum width for a light printable layout."
+    "accessibility": "An illustrative known 32-example batch has flat loss 1.10, nonzero gradient norm 0.8, and zero maximum parameter change. The diagnostic checks the optimizer step, learning rate, and optimizer-bound parameter identities, then repeats the same fitting check before escalating to full data. The evidence narrows hypotheses without proving one cause. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

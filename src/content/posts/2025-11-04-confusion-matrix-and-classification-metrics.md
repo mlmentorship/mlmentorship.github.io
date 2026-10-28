@@ -53,7 +53,7 @@ Use mature labels and one fixed threshold for this example.
 			<p class="cm-equation">recall = 8 / (8 + 2) = 80%</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the same classifier has 80% recall and about 8.16% precision. The matrix shows many more false alarms than true alerts.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the same classifier has 80% recall and about 8.16% precision. The matrix shows many more false alarms than true alerts. <span class="visual-reader-check" data-reader-check="confusion-matrix-denominators"><strong>Check:</strong> How can the same eight true positives yield 80% recall but only about 8.16% precision?</span></figcaption>
 </figure>
 
 Read the diagram's positive prediction column: 90 false alerts plus eight true alerts.

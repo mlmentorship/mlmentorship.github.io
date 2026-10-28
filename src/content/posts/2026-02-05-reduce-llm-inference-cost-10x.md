@@ -24,37 +24,8 @@ Estimate combined savings without double-counting and explain what would make th
 Include retries, cache coverage, routing failures, output lengths, and operating costs; cheaper requests that fail more often may not save money.
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Measure, test, and compound cost reductions without hiding a quality regression</p>
-
 <!-- visual:inference-cost-measure-test-compound-loop -->
-```mermaid
-flowchart TB
-	accTitle: The measure, test, and compound loop for LLM inference cost
-	accDescr: First measure cost per successful request by feature, request type, user segment, and tail percentile while recording baseline quality. Diagnose the dominant layer: repeated prompt, retrieved context, agent steps, tail behavior, or model serving. Match that layer to a lever: cache or trim repeated prompts, rerank or compress retrieval, tier models or cap steps, enforce tail limits, and only then consider distillation or quantization. Run an A/B test against the baseline and ask whether cost fell while quality held on high-stakes and tail slices. If both pass, keep the change, update the baseline, and measure again so verified gains compound. If either fails, roll back and return to diagnosis.
-	A["1 · MEASURE THE BASELINE<br/>cost per successful request<br/>feature · request type · segment · p50/p95/p99<br/>plus quality by slice"]
-	B{"2 · WHERE DOES<br/>COST DOMINATE?"}
-	C["3 · MATCH THE LEVER TO THE LAYER<br/>prompt → cache or trim<br/>retrieval → rerank or compress<br/>agent steps → tier models or cap loops<br/>tail → hard limits<br/>model serving → distill or quantize last"]
-	D["4 · RUN A CONTROLLED A/B<br/>one change against the baseline"]
-	E{"COST DOWN<br/>AND QUALITY HOLDS<br/>ON IMPORTANT SLICES?"}
-	F["5 · KEEP + UPDATE BASELINE<br/>verified savings now compound"]
-	R["ROLL BACK<br/>inspect the failed slice<br/>choose a different lever"]
-	A --> B
-	B --> C
-	C --> D
-	D --> E
-	E ==>|"yes · both pass"| F
-	F ==>|"measure the next bottleneck"| A
-	E -. "no · either fails" .-> R
-	R -. "return to diagnosis" .-> B
-	class A viz-input
-	class B,C viz-focus
-	class D viz-state
-	class E,R viz-warning
-	class F viz-output
-	class A viz-tall
-	class C viz-wide
-```
-<p class="diagram-caption"><strong>Read it this way:</strong> follow the solid path from measurement to one layer-matched change. Savings count only when the same experiment lowers cost and preserves quality on important and tail slices; otherwise the dashed path rolls back. After a pass, update the baseline and measure again. The verified wins compound, not the untested techniques. Original synthesis informed by <a href="https://arxiv.org/abs/2406.18665">RouteLLM</a>, <a href="https://arxiv.org/abs/2305.05176">FrugalGPT</a>, <a href="https://developers.openai.com/api/docs/guides/prompt-caching">OpenAI prompt-caching documentation</a>, and <a href="https://developers.google.com/machine-learning/guides/rules-of-ml/">Google's Rules of ML</a>; no universal savings are implied.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="inference-cost-measure-test-compound-loop-edition-title"><p class="visual-title" id="inference-cost-measure-test-compound-loop-edition-title">Count only savings that survive the same quality gates</p><svg viewBox="0 0 360 430" role="img" aria-labelledby="inference-cost-measure-test-compound-loop-edition-svg-title inference-cost-measure-test-compound-loop-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="inference-cost-measure-test-compound-loop-edition-svg-title">Count only savings that survive the same quality gates</title><desc id="inference-cost-measure-test-compound-loop-edition-svg-desc">Toy fixed-mix cost per successful request starts at ten units. Change one reduces it to eight and passes required quality slices, so eight becomes the new baseline. Change two reaches six but fails a tail-quality gate and is rejected. Accepted reduction is ten over eight, 1.25-fold, not an unsupported tenfold claim.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Toy cost units per successful request;</tspan><tspan x="180" dy="19">fixed task mix</tspan></text><text x="20" y="66" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">BASELINE: 10 units</tspan></text><rect x="25" y="86" width="310" height="29" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="20" y="162" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">CHANGE 1: 8 units; quality gates pass</tspan></text><rect x="25" y="182" width="248" height="29" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="20" y="258" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">CHANGE 2: 6 units; tail quality fails</tspan></text><rect x="25" y="278" width="186" height="29" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3;stroke-dasharray:5 3"></rect><text x="180" y="340" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Reject change 2. Current baseline stays 8, not</tspan><tspan x="180" dy="19">6.</tspan></text><text x="180" y="387" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">10 / 8 = 1.25x cost reduction; no 10x claim.</tspan></text></svg><figcaption><strong>Read it this way:</strong> Keep change 1 and reject change 2. The accepted baseline is 8 units per successful request. Cost reduction is 1.25x, not a fictional 10x. <span class="visual-reader-check" data-reader-check="inference-cost-measure-test-compound-loop"><strong>Check:</strong> Which proposed saving is rejected? Why must the second accepted saving be calculated from the updated baseline?</span></figcaption></figure>
 
 ## What an L4 answer sounds like
 

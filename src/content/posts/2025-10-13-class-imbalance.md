@@ -117,7 +117,7 @@ This is L5. You've named the metric problem first, then sequenced the techniques
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> random oversampling can help training by making rare rows appear more often, but it also replaces the 1% deployment prior with a 50% sample prior. In this class-only sampling example, a raw 0.50 sample posterior corrects to 0.01 at deployment. Keep validation data at the natural prevalence and recalibrate before treating scores as probabilities.</figcaption>
+	<figcaption><strong>Read it this way:</strong> random oversampling can help training by making rare rows appear more often, but it also replaces the 1% deployment prior with a 50% sample prior. In this class-only sampling example, a raw 0.50 sample posterior corrects to 0.01 at deployment. Keep validation data at the natural prevalence and recalibrate before treating scores as probabilities. <span class="visual-reader-check" data-reader-check="class-imbalance-sampling-prior"><strong>Check:</strong> Does balancing the training rows change deployment prevalence to 50%?</span></figcaption>
 </figure>
 
 ## Tells that get you a strong-hire vote

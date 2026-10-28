@@ -68,7 +68,7 @@ No click does not distinguish an unexamined result from an examined rejection.
 			</table>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> hold relevance probability at 0.60 over 100 impressions. Examination rates 1 and 0.25 produce 60 and 15 expected clicks. Weights 1 and 4 restore expected signals of 60 under this model. These are hypothetical expectations, not measured clicks or a target-policy value estimate. Original example checked against <a href="https://arxiv.org/abs/1608.04468">Joachims, Swaminathan, and Schnabel</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> hold relevance probability at 0.60 over 100 impressions. Examination rates 1 and 0.25 produce 60 and 15 expected clicks. Weights 1 and 4 restore expected signals of 60 under this model. These are hypothetical expectations, not measured clicks or a target-policy value estimate. Original example checked against <a href="https://arxiv.org/abs/1608.04468">Joachims, Swaminathan, and Schnabel</a>. <span class="visual-reader-check" data-reader-check="position-bias-inverse-examination-weight"><strong>Check:</strong> Why do fifteen lower-position clicks contribute sixty units in expectation without becoming sixty actual clicks?</span></figcaption>
 </figure>
 
 ## Estimate propensities

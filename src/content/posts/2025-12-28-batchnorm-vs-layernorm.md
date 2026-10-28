@@ -76,7 +76,7 @@ Framework settings can disable affine parameters or choose a different normalize
 		</section>
 	</div>
 	<p>The numeric trace below uses rows [1, 3] and [5, 7]. The blocks illustrate grouping, not those four values.</p>
-	<figcaption><strong>Read it this way:</strong> BatchNorm shares statistics down a channel column and therefore couples examples. Transformer LayerNorm shares statistics across one token row and never mixes tokens or samples.</figcaption>
+	<figcaption><strong>Read it this way:</strong> BatchNorm shares statistics down a channel column and therefore couples examples. Transformer LayerNorm shares statistics across one token row and never mixes tokens or samples. <span class="visual-reader-check" data-reader-check="normalization-shared-statistics"><strong>Check:</strong> Which other sample can change a BatchNorm value's statistics but not a LayerNorm token's statistics?</span></figcaption>
 </figure>
 
 ### Normalize four values

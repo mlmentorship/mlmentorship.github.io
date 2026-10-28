@@ -77,7 +77,7 @@ Sparse attention was the dominant pre-2023 approach to long context. It is still
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> start at <code>q</code>. Solid links preserve nearby context; the dotted global hub gives distant information a two-layer route; BigBird's long-dashed random link adds another shortcut. Each query keeps only a fixed number of these links, so the mask grows as <em>n</em>, not <em>n²</em>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start at <code>q</code>. Solid links preserve nearby context; the dotted global hub gives distant information a two-layer route; BigBird's long-dashed random link adds another shortcut. Each query keeps only a fixed number of these links, so the mask grows as <em>n</em>, not <em>n²</em>. <span class="visual-reader-check" data-reader-check="sparse-attention-reach-patterns"><strong>Check:</strong> Why can token 7 influence q through G only after two layers in the illustrated relay?</span></figcaption>
 </figure>
 
 ### Longformer [(Beltagy et al., 2020)](https://arxiv.org/abs/2004.05150)

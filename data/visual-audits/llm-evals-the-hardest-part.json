@@ -3,9 +3,9 @@
   "slug": "llm-evals-the-hardest-part",
   "article": "src/content/posts/2026-05-05-llm-evals-the-hardest-part.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Trace how production evidence grounds human judgment, human judgment calibrates scalable checks, and production drift can invalidate the offline eval.",
-  "mediumRationale": "A semantic four-stage evidence chain is the smallest useful medium for showing that validity flows from production outcomes through human specifications into automated proxies, then must be tested against production again. Native headings and paragraphs keep every dependency and limitation readable without client-side rendering, fixed geometry, or horizontal scrolling.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the concept has one ordered descent and one stated return condition, so graph layout and arrows would add visual machinery without clarifying the evidence carried between stages.",
     "svg": "Rejected: there is no quantitative geometry to preserve, and fixed-position explanatory text would be less adaptable and accessible than native HTML.",
@@ -88,6 +88,6 @@
     "visualIds": [
       "llm-eval-chain-of-trust"
     ],
-    "accessibility": "The figure has a programmatically associated visible title and a labelled semantic list with four numbered stages in source order. Every evidence source, limitation, and repair action is written directly, so meaning does not depend on color or position alone. The single-column panel uses ordinary wrapping text with no fixed or minimum width, supporting readability at 390 CSS pixels; established theme variables provide dark-mode contrast, and shared print rules switch the figure to a high-contrast light palette with page-break protection."
+    "accessibility": "A fictional user needs cross-account records withheld. Case C17 is scored only for presence of a citation under incomplete rubric R1. The scorer rises from ninety to ninety-five percent, but a fresh restricted-account slice exposes unauthorized outputs in two of ten cases. The case coverage and rubric must encode the omitted permission contract before scorer recalibration. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

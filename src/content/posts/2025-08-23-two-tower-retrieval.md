@@ -74,7 +74,7 @@ Stored item features must not require query-specific joint computation under thi
 		<text class="viz-label" x="297" y="260" text-anchor="middle">to ranker</text>
 		<text class="viz-callout" x="18" y="287">No item-tower call occurs on this request path.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the dashed refresh path computes and stores catalog vectors. The request path computes a query and searches those compatible stored vectors. The original schematic follows <a href="https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/">Yi et al.</a>, <a href="https://www.tensorflow.org/recommenders/examples/basic_retrieval">TensorFlow Recommenders</a>, and <a href="https://cloud.google.com/architecture/implement-two-tower-retrieval-large-scale-candidate-generation">Google Cloud</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the dashed refresh path computes and stores catalog vectors. The request path computes a query and searches those compatible stored vectors. The original schematic follows <a href="https://research.google/pubs/sampling-bias-corrected-neural-modeling-for-large-corpus-item-recommendations/">Yi et al.</a>, <a href="https://www.tensorflow.org/recommenders/examples/basic_retrieval">TensorFlow Recommenders</a>, and <a href="https://cloud.google.com/architecture/implement-two-tower-retrieval-large-scale-candidate-generation">Google Cloud</a>. <span class="visual-reader-check" data-reader-check="two-tower-offline-online-split"><strong>Check:</strong> Which computation was already done before this request? What version change could require rebuilding its stored item vectors?</span></figcaption>
 </figure>
 
 ## Training

@@ -89,7 +89,7 @@ Correct support alone does not establish the model's assumptions.
 			<text class="viz-node-value" x="266" y="541">continuous duration</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> decide what one row records. One visit is Bernoulli; independent visits with the same probability give a binomial total. For independent constant-rate events, fixed-window counts are Poisson and next-event waits are exponential.</figcaption>
+	<figcaption><strong>Read it this way:</strong> decide what one row records. One visit is Bernoulli; independent visits with the same probability give a binomial total. For independent constant-rate events, fixed-window counts are Poisson and next-event waits are exponential. <span class="visual-reader-check" data-reader-check="distribution-observation-unit"><strong>Check:</strong> Why use Poisson for event counts but Exponential for waiting until the next event?</span></figcaption>
 </figure>
 <p class="diagram-source">Original process-and-observation construction checked against the open <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-3-binomial-distribution">OpenStax binomial</a>, <a href="https://openstax.org/books/introductory-statistics-2e/pages/4-6-poisson-distribution">Poisson</a>, and <a href="https://openstax.org/books/introductory-statistics-2e/pages/5-3-the-exponential-distribution">exponential</a> textbook sections and the <a href="https://www.itl.nist.gov/div898/handbook/eda/section3/eda366j.htm">NIST Poisson reference</a>.</p>
 

@@ -76,7 +76,7 @@ The number of tokens in one batch is $B T$.
 			</table>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> choose the ledger before multiplying. Training compute repeats active parameters over tokens, while training model-state memory stores total parameters plus gradients and optimizer moments. Inference drops those training-only states but adds one KV allocation per active sequence. Sequence length enters attention compute as <var>T</var><sup>2</sup> and KV memory as <var>T</var>; activations and temporary buffers must still be measured separately. Original accounting summary checked against the <a href="https://jax-ml.github.io/scaling-book/transformers/">JAX Scaling Book's Transformer derivation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> choose the ledger before multiplying. Training compute repeats active parameters over tokens, while training model-state memory stores total parameters plus gradients and optimizer moments. Inference drops those training-only states but adds one KV allocation per active sequence. Sequence length enters attention compute as <var>T</var><sup>2</sup> and KV memory as <var>T</var>; activations and temporary buffers must still be measured separately. Original accounting summary checked against the <a href="https://jax-ml.github.io/scaling-book/transformers/">JAX Scaling Book's Transformer derivation</a>. <span class="visual-reader-check" data-reader-check="transformer-training-inference-ledgers"><strong>Check:</strong> Why do inactive MoE experts still count toward stored weights while only active parameters enter the simplified token-matmul estimate?</span></figcaption>
 </figure>
 
 ## Parameter count

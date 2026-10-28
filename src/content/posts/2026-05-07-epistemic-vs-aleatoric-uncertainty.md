@@ -88,7 +88,7 @@ More representative data can change model uncertainty, but no universal monotoni
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> lines show qualitative conditional ranges; diamonds show conditional means. Compare range width with mean separation. Equal endpoint envelopes do not imply equal variances or coverage. These are schematic model draws, not measured posterior adequacy. Original construction based on total variance and Kendall and Gal (2017).</figcaption>
+	<figcaption><strong>Read it this way:</strong> lines show qualitative conditional ranges; diamonds show conditional means. Compare range width with mean separation. Equal endpoint envelopes do not imply equal variances or coverage. These are schematic model draws, not measured posterior adequacy. Original construction based on total variance and Kendall and Gal (2017). <span class="visual-reader-check" data-reader-check="uncertainty-within-between-models"><strong>Check:</strong> Which uncertainty term grows when model means separate while each model's predictive spread stays narrow?</span></figcaption>
 </figure>
 
 ## Change the information or output

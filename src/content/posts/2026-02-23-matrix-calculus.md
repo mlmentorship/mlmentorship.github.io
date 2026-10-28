@@ -99,7 +99,7 @@ For example, parameter two receives $(-1)(5)+(3)(-2)=-11$ through the two output
 		<text class="viz-callout" x="30" y="366">dL/dtheta2 = -1(5) + 3(-2) = -11</text>
 		<text class="viz-callout" x="30" y="393">dL/dtheta3 =  0(5) + 4(-2) =  -8</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> rows of <em>J</em> belong to outputs; columns belong to parameters. Transposition collects every output route into each parameter's gradient. The shapes are <code>(3 x 2)(2 x 1) = 3 x 1</code>. The example follows the <a href="https://docs.jax.dev/en/latest/_autosummary/jax.vjp.html">JAX vector-Jacobian product contract</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> rows of <em>J</em> belong to outputs; columns belong to parameters. Transposition collects every output route into each parameter's gradient. The shapes are <code>(3 x 2)(2 x 1) = 3 x 1</code>. The example follows the <a href="https://docs.jax.dev/en/latest/_autosummary/jax.vjp.html">JAX vector-Jacobian product contract</a>. <span class="visual-reader-check" data-reader-check="jacobian-transpose-pullback"><strong>Check:</strong> Why does theta2 receive -1 times 5 plus 3 times -2 rather than only one output's contribution?</span></figcaption>
 </figure>
 
 ## Change the Requirement

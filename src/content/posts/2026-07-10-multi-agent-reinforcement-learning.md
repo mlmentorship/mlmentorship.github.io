@@ -68,7 +68,7 @@ The drawing uses the simple observation-only case.
 			<path class="viz-forward" d="M495 312 H530"></path><path class="viz-forward" d="M635 312 H670"></path>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow each local observation into its action. Dashed training signals can use joint evidence; below the divider, no critic/global-state input reaches either actor.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow each local observation into its action. Dashed training signals can use joint evidence; below the divider, no critic/global-state input reaches either actor. <span class="visual-reader-check" data-reader-check="multi-agent-ctde-information-boundary"><strong>Check:</strong> At execution time, can policy 1 read global state or the centralized critic? What information shaped it only during training?</span></figcaption>
 </figure>
 
 ## Calculate Local Choices and Team Values

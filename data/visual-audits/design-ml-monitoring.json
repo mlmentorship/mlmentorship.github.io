@@ -3,9 +3,9 @@
   "slug": "design-ml-monitoring",
   "article": "src/content/posts/2025-03-17-design-ml-monitoring.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Locate the earliest monitoring layer that can detect a failure, and distinguish an early warning from delayed evidence that users were harmed.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest medium that preserves the live serving sequence and attaches each monitoring layer exactly where its evidence first exists. Solid serving edges and dashed observation taps make it clear why healthy service telemetry, early drift warnings, and delayed outcome evidence are related but not interchangeable.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is relational and temporal—a serving path with three observation taps—so a compact top-to-bottom graph directly expresses where each signal originates and reuses established responsive, themed primitives.",
     "svg": "Rejected: no quantitative geometry or fixed coordinates are required, and hand-positioning this categorical flow would duplicate Mermaid's graph semantics.",
@@ -77,6 +77,6 @@
     "visualIds": [
       "ml-monitoring-observability-layers"
     ],
-    "accessibility": "Mermaid receives a complete accessible title and description naming the healthy serving path, all three monitoring taps, their signals, and their evidence timing. Numbered layers, direct labels, solid serving edges, dashed observation edges, and explicit early-versus-delayed wording preserve the lesson without color. Every node uses the established viz-compact class so the graph has no forced minimum width at 390 CSS pixels; shared Mermaid theme tokens provide light, dark, and print contrast, and print resets graph minimum widths."
+    "accessibility": "At noon, an 11:40 snapshot is twenty minutes old and fails a two-minute freshness contract immediately. Outcome evidence matures after a seven-day window and requires request identity and join coverage. A changed score distribution does not establish changed quality or causal product impact. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

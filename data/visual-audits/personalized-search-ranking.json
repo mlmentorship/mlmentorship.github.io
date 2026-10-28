@@ -3,9 +3,9 @@
   "slug": "personalized-search-ranking",
   "article": "src/content/posts/2026-04-14-personalized-search-ranking.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace one personalized-search request into an exposure record and explain why that record, including the candidates and policy that produced it, is the necessary seam between serving, counterfactual evaluation, and retraining.",
-  "mediumRationale": "The article already contains a request-and-learning-loop graph at the exact point where the two paths are introduced. Upgrading that graph with explicit online and learning boundaries, accessible text, stable visual roles, and a direct caption is smaller and more coherent than adding a second visual to an already comprehensive guide.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a directed system path that closes into a learning loop. Labelled edges and grouped serving-versus-learning regions expose the key seam without implying quantitative scale.",
     "svg": "Rejected because no fixed geometry, plotted magnitude, or numerical relationship carries the claim; a hand-positioned SVG would duplicate a graph layout with substantially more markup.",
@@ -125,6 +125,6 @@
     "visualIds": [
       "personalized-search-request-learning-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. Explicit ONLINE REQUEST PATH and LEARNING PATH groups, numbered stage labels, direct edge labels, and a dashed publication path to the next versioned request preserve the inference without color. The established tall-flow marker keeps the compact top-to-bottom graph readable without horizontal scrolling at 390 CSS pixels, while shared Mermaid theme tokens provide dark-mode and print contrast. The adjacent prose and caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "Exact-title candidate A has lexical rank one and no semantic rank. Candidate B has lexical rank two and semantic rank one. At RRF offset sixty, their scores are 0.01639 and 0.03252. An unprotected cap of one removes A before later reranking. A protected eligible quota or supported larger merge is a distinct alternative. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

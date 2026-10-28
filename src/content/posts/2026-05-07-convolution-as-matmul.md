@@ -91,7 +91,7 @@ The patch matrix stores sixteen values from nine source values, ratio $16/9$.
 		<text class="viz-callout" x="284.5" y="461" text-anchor="middle">[-4, -4, -4, -4]</text>
 		<text class="viz-label" x="180" y="492" text-anchor="middle">reshape four outputs to 2 x 2</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> each patch becomes one column in output order. The center value 5 occurs in all four columns. Filter scores become four negative fours; forward only reshapes them. Explicit lowering stores the repeats. Original example checked against <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Unfold.html">PyTorch Unfold</a> and <a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-convolutional/index.html">NVIDIA's convolution guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each patch becomes one column in output order. The center value 5 occurs in all four columns. Filter scores become four negative fours; forward only reshapes them. Explicit lowering stores the repeats. Original example checked against <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Unfold.html">PyTorch Unfold</a> and <a href="https://docs.nvidia.com/deeplearning/performance/dl-performance-convolutional/index.html">NVIDIA's convolution guide</a>. <span class="visual-reader-check" data-reader-check="im2col-patches-become-columns"><strong>Check:</strong> Which input values produce the top-right output? Where do they appear in X_col?</span></figcaption>
 </figure>
 
 For one image with $C_{in}$ channels, let $D=C_{in}k_Hk_W$ and $P=H_{out}W_{out}$.

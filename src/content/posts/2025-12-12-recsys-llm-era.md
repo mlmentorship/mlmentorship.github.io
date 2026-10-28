@@ -69,7 +69,7 @@ Estimate its load, and assess a proposed 50-millisecond hard request deadline.
 <text x="415" y="800" text-anchor="middle" font-weight="700">HOLD / REJECT</text>
 </g>
 </svg>
-<figcaption><strong>Read it this way:</strong> the declared 100 ms call cannot finish before the 50 ms request deadline. Serve a catalog-valid fallback within the total request budget; timeout does not make work free. This example does not infer a percentile from mean service time. Offline features avoid per-request encoding, while a generated ID still needs current catalog resolution and permission.</figcaption>
+<figcaption><strong>Read it this way:</strong> the declared 100 ms call cannot finish before the 50 ms request deadline. Serve a catalog-valid fallback within the total request budget; timeout does not make work free. This example does not infer a percentile from mean service time. Offline features avoid per-request encoding, while a generated ID still needs current catalog resolution and permission. <span class="visual-reader-check" data-reader-check="recsys-llm-bounded-augmentation"><strong>Check:</strong> What serves the request when optional reranking misses its deadline? Why can a generated item ID not bypass the current catalog?</span></figcaption>
 </figure>
 
 ## Calculate the Routed Load

@@ -69,7 +69,7 @@ For top-label calibration instead, define confidence as the selected class's pro
 			<text class="viz-axis-label" transform="translate(14 194) rotate(-90)">observed positive fraction</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the diagonal marks probability-frequency agreement. Each invented bin has 100 cases, with positive counts 12, 28, 43, 60, and 72. All five points overestimate this event, not necessarily predicted-label correctness. At probability 0.8 versus positive frequency 0.6, the gap is 20 points.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the diagonal marks probability-frequency agreement. Each invented bin has 100 cases, with positive counts 12, 28, 43, 60, and 72. All five points overestimate this event, not necessarily predicted-label correctness. At probability 0.8 versus positive frequency 0.6, the gap is 20 points. <span class="visual-reader-check" data-reader-check="calibration-reliability-gap"><strong>Check:</strong> What observed count would make the 80% prediction bin calibrated?</span></figcaption>
 </figure>
 
 <span id="why-neural-networks-are-overconfident"></span>

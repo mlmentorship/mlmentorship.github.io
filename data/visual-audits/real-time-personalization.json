@@ -3,9 +3,9 @@
   "slug": "real-time-personalization",
   "article": "src/content/posts/2026-04-28-real-time-personalization.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Classify each feature by its required freshness and trace batch, streaming, and request-time values into one feature vector without forcing every signal onto the most expensive clock.",
-  "mediumRationale": "A compact three-lane Mermaid is the smallest useful explanation because the lesson is a convergence of differently timed dataflows, not a quantitative plot. It keeps the daily profile, seconds-old session state, and current request context separate until one bounded-latency assembly step, making the freshness-versus-cost decision visible without duplicating the feature-store article's historical-versus-latest retrieval diagram.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the mental model is a labelled many-to-one dataflow across three clocks. Distinct lane headings, direct freshness labels, storage shape, and arrows preserve the timing and convergence without relying on color, while established wide and tall markers support constrained screens, themes, and print.",
     "svg": "Rejected because no measured scale, plotted magnitude, or fixed geometry carries the lesson. Hand-positioning the same lanes and arrows would add maintenance cost without improving technical precision.",
@@ -154,6 +154,6 @@
     "visualIds": [
       "personalization-three-feature-clocks"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description naming all three feature clocks, their example signals, the stored versus request-time paths, and the bounded assembly step. Lane headings, direct freshness labels, a cylinder for persisted online state, and labelled arrows carry meaning without color. Established wide and tall markers preserve readable labels through horizontal scrolling at 390 CSS pixels, existing theme tokens provide light and dark contrast, and print removes the width floor and applies a light page-safe palette. The adjacent learning objective and direct caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "A declared illustrative noon request uses an 08:00 batch snapshot with a 24-hour limit, a stream value whose event time is 11:57 and arrival 11:59 with a two-minute event-age limit, and current request context. The batch age is four hours and passes; stream event age is three minutes and fails despite one-minute arrival age. Request execution latency is separate. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

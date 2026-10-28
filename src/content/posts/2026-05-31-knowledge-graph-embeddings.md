@@ -104,7 +104,7 @@ It permits this directed distinction; it does not guarantee learning the correct
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> swap Ada and Ben. DistMult only reorders real factors, forcing equal scores. ComplEx changes which entity is conjugated, permitting unequal scores. The worked scalar example gives 1 versus -1. Original schematic checked against <a href="https://proceedings.mlr.press/v48/trouillon16.html">ComplEx</a> and <a href="https://arxiv.org/abs/1902.10197">RotatE</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> swap Ada and Ben. DistMult only reorders real factors, forcing equal scores. ComplEx changes which entity is conjugated, permitting unequal scores. The worked scalar example gives 1 versus -1. Original schematic checked against <a href="https://proceedings.mlr.press/v48/trouillon16.html">ComplEx</a> and <a href="https://arxiv.org/abs/1902.10197">RotatE</a>. <span class="visual-reader-check" data-reader-check="kge-antisymmetry-score-swap"><strong>Check:</strong> Which algebraic operation allows the complex model's reversed edge to receive a different score?</span></figcaption>
 </figure>
 
 ### RotatE: rotation in complex space

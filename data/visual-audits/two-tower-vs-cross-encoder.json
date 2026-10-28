@@ -3,9 +3,9 @@
   "slug": "two-tower-vs-cross-encoder",
   "article": "src/content/posts/2025-06-24-two-tower-vs-cross-encoder.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "See why independent item encoding can search an entire catalog, while joint query-item encoding becomes affordable only after retrieval has reduced the number of pairs.",
-  "mediumRationale": "A paired semantic fan-out is the smallest medium that can align the two-tower's reusable item index with the cross-encoder's per-candidate joint work and make the N-to-K boundary explicit without duplicating a detailed model architecture.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because a generic left-to-right pipeline would show stage order but obscure the key contrast between one reusable catalog encoding and K fresh joint query-item evaluations.",
     "svg": "Rejected because exact geometric scale is not needed, and fixed SVG text would wrap less naturally than semantic panels at 390 CSS pixels.",
@@ -121,6 +121,6 @@
     "visualIds": [
       "two-tower-cross-encoder-fanout"
     ],
-    "accessibility": "The figure uses two semantic sections with direct headings and ordered text for offline work, per-query work, fan-out, and output. N, K, reusable, and fresh-pair labels carry the complete distinction without color. Existing two-panel styles stack below 640 CSS pixels and allow normal wrapping at a 390-pixel viewport; established theme variables support dark mode, and shared print rules force a light high-contrast palette with page-break protection."
+    "accessibility": "A toy six-item corpus has independently stored item vectors. One query vector retrieves IDs two, four, six, so only three query/item pairs receive fresh joint scoring. A token-level example pairs query red with red running shoes in I4. Missing item I3 cannot be restored by the reranker. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

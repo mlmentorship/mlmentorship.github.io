@@ -3,9 +3,9 @@
   "slug": "people-also-bought",
   "article": "src/content/posts/2026-02-13-people-also-bought.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Given one anchor product, distinguish the evidence and candidate produced by co-purchase, co-view, and attribute similarity, then select the signal that best serves a complementary “people also bought” shelf.",
-  "mediumRationale": "A four-card semantic comparison is the smallest medium that keeps one anchor product fixed while changing the evidence source, resulting candidate, and product purpose. Direct text labels make the key contrast inspectable without implying quantitative distances or a universal model architecture.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because the learning task compares three parallel meanings of “related,” not a long process or causal loop. A flowchart would repeat the anchor and add arrows without making the evidence-versus-purpose contrast clearer.",
     "svg": "Rejected because no quantitative geometry or fixed spatial relationship carries the claim. Hand-positioned text would be less responsive and less directly accessible than semantic cards.",
@@ -77,6 +77,6 @@
     "visualIds": [
       "people-also-bought-three-relations"
     ],
-    "accessibility": "The figure uses a linked learning question, a labelled group, four semantic sections, numbered signal labels, and direct Evidence, Candidate, Relationship, and Best use text. Meaning does not depend on color, and the recommended relation is explicitly named. The established two-column card primitive has no fixed or minimum width and stacks below 640 pixels, preserving readable text at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules force a light high-contrast palette and avoid splitting the figure."
+    "accessibility": "A toy printer P1 is the fixed purchase anchor. Co-purchase links ink C7 with a count of fifty baskets and no known denominator. Co-view links another printer P2; attributes link similar printer P3. Only verified C7-to-P1 compatibility can admit ink to the complementary shelf. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

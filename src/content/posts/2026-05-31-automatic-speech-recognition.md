@@ -119,7 +119,7 @@ Record padding, centering, normalization and encoder subsampling before interpre
 		<text class="viz-label" x="340" y="459" text-anchor="end">prior tokens</text>
 		<text class="viz-label" x="340" y="475" text-anchor="end">+ attended audio</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> compare frame, time/token and attention moves. CTC lacks explicit emitted-label conditioning; RNN-T and autoregressive attention use a prefix. Streaming still depends on available encoder context.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare frame, time/token and attention moves. CTC lacks explicit emitted-label conditioning; RNN-T and autoregressive attention use a prefix. Streaming still depends on available encoder context. <span class="visual-reader-check" data-reader-check="asr-alignment-decoder-choices"><strong>Check:</strong> Which decoder can advance its output position without advancing audio time?</span></figcaption>
 </figure>
 
 | Family | Alignment and output history | Streaming condition |

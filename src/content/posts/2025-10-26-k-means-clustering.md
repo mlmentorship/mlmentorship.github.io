@@ -89,7 +89,7 @@ Each group then contributes $500+400+500=1400$, so total SSE drops to $2800$.
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> assignment changes memberships while centers stay fixed. Updating then holds membership fixed and moves each center to its mean. The illustrated SSE decreases from 22,000 to 2,800. Original construction follows <a href="https://doi.org/10.1109/TIT.1982.1056489">Lloyd's paper</a> and the <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means">scikit-learn guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> assignment changes memberships while centers stay fixed. Updating then holds membership fixed and moves each center to its mean. The illustrated SSE decreases from 22,000 to 2,800. Original construction follows <a href="https://doi.org/10.1109/TIT.1982.1056489">Lloyd's paper</a> and the <a href="https://scikit-learn.org/stable/modules/clustering.html#k-means">scikit-learn guide</a>. <span class="visual-reader-check" data-reader-check="kmeans-assign-then-update"><strong>Check:</strong> What is held fixed while A moves to the mean of its three assigned samples?</span></figcaption>
 </figure>
 
 Dense assignment costs $O(nkd)$ per iteration; mean updates add $O(nd)$.

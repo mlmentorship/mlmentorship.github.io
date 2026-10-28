@@ -196,7 +196,7 @@ Recompute the plan with 64 accelerators, 20% maintenance loss, and 60B tokens. S
 			<rect x="40" y="432" width="22" height="22" fill="url(#fixed-budget-reserve-hatch)" stroke="var(--viz-edge)"/><text x="76" y="450">Recovery: 10% held fixed</text>
 		</g>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> both bars spend the same 100%. The proposed training increase costs half the post-training allocation, not unused capacity. Serving, evaluation and recovery stay fixed in this illustration. Evidence must justify that loss before approval.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both bars spend the same 100%. The proposed training increase costs half the post-training allocation, not unused capacity. Serving, evaluation and recovery stay fixed in this illustration. Evidence must justify that loss before approval. <span class="visual-reader-check" data-reader-check="fixed-capacity-portfolio-guardrails"><strong>Check:</strong> Which named allocation pays for extra training capacity without silently spending a protected reserve?</span></figcaption>
 </figure>
 
 ### Annotation

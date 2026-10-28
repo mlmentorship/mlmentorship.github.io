@@ -48,7 +48,7 @@ Training changes the segmentation; encoding later replays the learned priority w
 			<p><code>maps</code> → <strong><code>[maps]</code></strong> · common whole word<br /><code>cap</code> → <strong><code>[c] [ap]</code></strong> · shared learned ending<br /><code>traps</code> → <strong><code>[t] [r] [ap] [s]</code></strong> · rarer word, more pieces</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> recount after each training merge. At encoding time, replay the fixed learned ranks; do not choose pairs using the new word's frequencies.</figcaption>
+	<figcaption><strong>Read it this way:</strong> recount after each training merge. At encoding time, replay the fixed learned ranks; do not choose pairs using the new word's frequencies. <span class="visual-reader-check" data-reader-check="bpe-corpus-merge-trace"><strong>Check:</strong> Why does the second winning pair count become eight after the first merge? Why is the new word not used to relearn merge order?</span></figcaption>
 </figure>
 
 Initially, `a+p` occurs $5+3+2=10$ times.

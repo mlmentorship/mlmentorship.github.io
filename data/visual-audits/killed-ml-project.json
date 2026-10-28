@@ -3,9 +3,9 @@
   "slug": "killed-ml-project",
   "article": "src/content/posts/2026-07-10-killed-ml-project.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Decide whether to fund one more bounded experiment or stop and redirect by comparing only forward evidence, opportunity cost, and transition value rather than past spend.",
-  "mediumRationale": "A semantic decision ledger is the smallest medium that keeps the excluded sunk-cost argument above two forward-looking alternatives. It turns the article's checklist into a repeatable comparison without inventing numeric project economics.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is a side-by-side comparison under one rule, not a long process graph, and branches would make the decision look more mechanical than the evidence permits.",
     "svg": "Rejected: fixed drawing geometry adds no quantitative shape; semantic headings and grouped evidence express the comparison more readably and reflow safely at 390 CSS pixels.",
@@ -91,6 +91,6 @@
     "visualIds": [
       "project-stop-forward-evidence-ledger"
     ],
-    "accessibility": "The figure uses a linked learning question and a labelled group of native semantic sections. Past spend is explicitly labelled as context rather than decision evidence; both alternatives have textual conditions and actions; and the shared rule is written in the caption, so meaning does not depend on color or position. The established two-column primitive stacks to one column below 640 pixels with ordinary text wrapping and no minimum width, making it readable at 390 CSS pixels. Existing theme tokens provide dark-mode contrast, print switches to a light high-contrast palette, and the figure avoids JavaScript and external assets."
+    "accessibility": "Three fictional mutually exclusive options share a hundred future resource units. A bounded test spends ten, continued investment one hundred, and redirect one hundred. Past spend is excluded. The test stops on day seven and requires at least ninety-five of a hundred contract passes and zero leaks; passing triggers a new decision, not automatic renewal. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -70,7 +70,7 @@ The diagram rescales likelihood by its peak only to make the shape readable.
 		<text class="viz-axis-label" x="45" y="154">relative likelihood</text>
 		<text class="viz-axis-label" x="192.5" y="316" text-anchor="middle">candidate success probability p</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> keep the observations fixed while varying <code>p</code>. Seven successes contribute <code>p⁷</code>; three failures contribute <code>(1 − p)³</code>. Their product peaks at <code>0.7</code>. Relative likelihood is a parameter score, not a normalized parameter distribution.</figcaption>
+	<figcaption><strong>Read it this way:</strong> keep the observations fixed while varying <code>p</code>. Seven successes contribute <code>p⁷</code>; three failures contribute <code>(1 − p)³</code>. Their product peaks at <code>0.7</code>. Relative likelihood is a parameter score, not a normalized parameter distribution. <span class="visual-reader-check" data-reader-check="mle-bernoulli-parameter-sweep"><strong>Check:</strong> What changes as the marker moves along the curve? Why is the curve not by itself a posterior distribution over p?</span></figcaption>
 </figure>
 
 ## Properties

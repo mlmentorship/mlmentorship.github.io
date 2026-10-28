@@ -98,7 +98,7 @@ When can C use B's position without disturbing A's ordered state?
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> both schedules finish B after iteration 2. Continuous membership admits ready C at iteration 3; static membership waits for A to finish.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both schedules finish B after iteration 2. Continuous membership admits ready C at iteration 3; static membership waits for A to finish. <span class="visual-reader-check" data-reader-check="continuous-batching-reuses-finished-slot"><strong>Check:</strong> Which exact cells change from idle to C? When can C first start?</span></figcaption>
 </figure>
 
 Static membership uses $5+2=7$ of ten positions: 70% occupancy.

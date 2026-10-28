@@ -3,9 +3,9 @@
   "slug": "coding-interview-method",
   "article": "src/content/posts/2026-09-01-coding-interview-method.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Use the four-question rehearsal cue, state, invariant, and move to rebuild a solution instead of memorizing its code.",
-  "mediumRationale": "A compact loop of labeled questions makes the retrieval routine visible and gives the learner one stable mental scaffold for all 106 problem pages.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a process graph would show sequence but would not give each question a clear retrieval job.",
     "svg": "Rejected: the learning method is a set of readable prompts, not coordinate geometry.",
@@ -31,6 +31,6 @@
     "visualIds": [
       "coding-interview-method-state"
     ],
-    "accessibility": "The figure has a labelled title, a role=img with a complete description, visible question labels, a rebuild invariant, and a direct Read it this way caption."
+    "accessibility": "For toy input four, two, seven and target nine, current index two contains seven. Nine minus seven is two. The earlier-value map contains four to index zero and two to index one. Looking up two returns one, so indices one and two identify two plus seven. The current index is absent during the query; insertion happens only after a miss. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

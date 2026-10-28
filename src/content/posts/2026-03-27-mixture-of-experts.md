@@ -93,7 +93,7 @@ Attention layers are typically *not* MoE (shared across all tokens).
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> top-2 routing makes only E1 and E3 run for this token, and their normalized weights combine the two outputs. E2 and E4 do no work for this token, but their parameters still occupy memory because another token may select them.</figcaption>
+	<figcaption><strong>Read it this way:</strong> top-2 routing makes only E1 and E3 run for this token, and their normalized weights combine the two outputs. E2 and E4 do no work for this token, but their parameters still occupy memory because another token may select them. <span class="visual-reader-check" data-reader-check="moe-top-two-routing-accounting"><strong>Check:</strong> Why execute E1 and E3 while retaining stored weights for E2 and E4?</span></figcaption>
 </figure>
 
 ## Load balancing

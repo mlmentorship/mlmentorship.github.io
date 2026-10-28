@@ -96,7 +96,7 @@ Their normalized chord distances are approximately $0.218<0.711$.
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> raw dot product favors the longer A. Unit normalization preserves angles but discards length. Cosine, normalized dot product, and normalized chord distance then agree on B.</figcaption>
+	<figcaption><strong>Read it this way:</strong> raw dot product favors the longer A. Unit normalization preserves angles but discards length. Cosine, normalized dot product, and normalized chord distance then agree on B. <span class="visual-reader-check" data-reader-check="embedding-normalization-metric-equivalence"><strong>Check:</strong> Why does B win both normalized dot and nearest L2 even though A wins the raw dot product?</span></figcaption>
 </figure>
 
 Normalize stored candidates once when cosine is the intended objective.

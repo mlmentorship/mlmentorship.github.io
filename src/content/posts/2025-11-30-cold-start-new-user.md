@@ -75,7 +75,7 @@ Untried B keeps its own uncertainty; A's three observations do not establish B's
 			</g>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the solid curve shifts belief toward larger save probabilities without collapsing to one value. These are illustrative distributions under the stated reward assumptions, not a production user classifier.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the solid curve shifts belief toward larger save probabilities without collapsing to one value. These are illustrative distributions under the stated reward assumptions, not a production user classifier. <span class="visual-reader-check" data-reader-check="cold-start-signal-handoff"><strong>Check:</strong> Why do two successes and one failure yield Beta(3,2), not certainty about the save rate?</span></figcaption>
 </figure>
 
 <span id="what-an-l4-answer-sounds-like"></span>

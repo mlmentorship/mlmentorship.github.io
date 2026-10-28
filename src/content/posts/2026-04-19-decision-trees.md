@@ -69,7 +69,7 @@ This local choice need not produce the globally best tree.
 		<rect class="viz-node" x="278" y="405" width="76" height="30" rx="4"></rect>
 		<text class="viz-callout" x="316" y="425" text-anchor="middle">R2: P(△)=0</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the solid root split routes every point. The dashed child test cuts only the right region. Intersecting the path's predicates gives its leaf region and constant empirical class fraction. The highlighted point follows “no, then yes” to R1. Sources: <a href="https://scikit-learn.org/stable/modules/tree.html#mathematical-formulation">scikit-learn's formulation</a> and <a href="https://hastie.su.domains/ElemStatLearn/">The Elements of Statistical Learning</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the solid root split routes every point. The dashed child test cuts only the right region. Intersecting the path's predicates gives its leaf region and constant empirical class fraction. The highlighted point follows “no, then yes” to R1. Sources: <a href="https://scikit-learn.org/stable/modules/tree.html#mathematical-formulation">scikit-learn's formulation</a> and <a href="https://hastie.su.domains/ElemStatLearn/">The Elements of Statistical Learning</a>. <span class="visual-reader-check" data-reader-check="decision-tree-partitions-feature-space"><strong>Check:</strong> Why is the second split applied only on the right side of the root boundary?</span></figcaption>
 </figure>
 
 ## Split criteria

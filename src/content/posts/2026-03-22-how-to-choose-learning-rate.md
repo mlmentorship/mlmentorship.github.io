@@ -84,7 +84,7 @@ Which rates reduce the loss, and what changes when the intended run uses a sched
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the first plot proposes a rate before instability. The second assigns that candidate to a schedule. These qualitative curves are not measured results or proof of an optimal peak.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the first plot proposes a rate before instability. The second assigns that candidate to a schedule. These qualitative curves are not measured results or proof of an optimal peak. <span class="visual-reader-check" data-reader-check="learning-rate-range-to-schedule"><strong>Check:</strong> Which LR from the sweep becomes the schedule peak? Why is the unstable endpoint not the choice?</span></figcaption>
 </figure>
 <p class="diagram-source">Range-test references: <a href="https://arxiv.org/abs/1506.01186">Smith (2017)</a> and the <a href="https://docs.fast.ai/callback.schedule.html#lrfind">fastai learning-rate finder documentation</a>.</p>
 

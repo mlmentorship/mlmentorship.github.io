@@ -3,9 +3,9 @@
   "slug": "design-ai-coding-product",
   "article": "src/content/posts/2026-08-29-design-ai-coding-product.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Distinguish shared repository context from execution authority: inline, chat, and review can generate or advise, while only the asynchronous agent may use bounded tools in an isolated workspace, and the developer still controls acceptance.",
-  "mediumRationale": "A two-panel semantic comparison is the smallest useful spatial explanation of the product boundary. It groups three non-executing modes against the one bounded execution mode, keeps authority labels explicit, and stacks into a linear reading order on narrow screens.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the article already contains broad architecture and agent-state diagrams, while another graph would add routing detail around a simpler authority distinction.",
     "svg": "Rejected: the lesson depends on named permissions and outcomes rather than precise geometry, so fixed vector labels would add accessibility and responsive-layout work without more explanatory value.",
@@ -93,6 +93,6 @@
     "visualIds": [
       "coding-product-authority-boundary"
     ],
-    "accessibility": "The figure has a programmatically associated learning-objective title, a descriptive group label, native section headings, and ordered mode labels. Authority, environment, output, and acceptance are written in text rather than encoded by color. The established two-panel primitive stacks into one column below 640 pixels for a 390 CSS-pixel viewport, uses site theme tokens in dark mode, and switches to a high-contrast light palette with page-break protection in print."
+    "accessibility": "The permission-aware broker supplies four modes. Inline, chat, and review return generated output without executing tools. Only the bounded agent operates inside the dashed isolated workspace and returns a patch with evidence. The developer still applies, revises, or rejects it. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

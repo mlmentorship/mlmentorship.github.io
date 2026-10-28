@@ -3,9 +3,9 @@
   "slug": "rag-for-legal-docs",
   "article": "src/content/posts/2025-09-26-rag-for-legal-docs.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Trace every atomic claim in a legal RAG answer to an exact passage in a versioned legal source, and route missing or unsupported evidence to remediation, refusal, or attorney review before release.",
-  "mediumRationale": "A semantic claim-lineage ledger is the smallest medium that keeps source hierarchy and version, passage identity, claim-level support, release routing, and audit evidence visible together. Numbered native-text panels make the legal evidence contract inspectable without implying that one model confidence score proves correctness.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the repository already has a general hallucination release-gate flow. Another flowchart would duplicate that lesson while making the legal-specific source-version and claim-to-passage ledger harder to inspect.",
     "svg": "Rejected: the task is to read exact categorical records rather than quantitative geometry, and fixed embedded labels would wrap less reliably at 390 CSS pixels.",
@@ -87,6 +87,6 @@
     "visualIds": [
       "legal-rag-claim-lineage"
     ],
-    "accessibility": "The figure uses a linked learning question, four numbered native sections, explicit passage and claim identifiers, and a labelled group in source order. Supported, unsupported, refusal, and review outcomes are written directly rather than encoded by color or position. The established two-column primitive stacks below 640 pixels with ordinary wrapping and no minimum width for a 390 CSS-pixel viewport; theme tokens supply dark-mode contrast and shared print rules supply a high-contrast light rendering with page-break protection."
+    "accessibility": "Fictional jurisdiction J authority version 2026-08-15 section four contains P-017 requiring filing within ten days and P-042 saying the clerk records receipt. C1 repeats the ten-day deadline and is supported. C2 infers guaranteed approval from receipt and is held. Release separately requires current jurisdiction/time applicability and required attorney approval. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

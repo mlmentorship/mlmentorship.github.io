@@ -100,7 +100,7 @@ Both gradients flow on the same data. Many implementations share most of the bac
 			<text class="viz-edge-label" x="520" y="327">value loss updates φ and shared features</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow solid arrows to build both losses from the same rollout. Then follow dashed arrows backward: the policy loss updates the actor and shared trunk through log <var>&pi;</var><sub>&theta;</sub>, while the stop bar prevents that loss from using <var>A&#770;</var><sub>t</sub> to update the critic; the value loss trains the critic separately.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow solid arrows to build both losses from the same rollout. Then follow dashed arrows backward: the policy loss updates the actor and shared trunk through log <var>&pi;</var><sub>&theta;</sub>, while the stop bar prevents that loss from using <var>A&#770;</var><sub>t</sub> to update the critic; the value loss trains the critic separately. <span class="visual-reader-check" data-reader-check="actor-critic-two-objective-flow"><strong>Check:</strong> Can the policy loss update the critic through the advantage? Which losses update shared features?</span></figcaption>
 </figure>
 
 ## The taxonomy

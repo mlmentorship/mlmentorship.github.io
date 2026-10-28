@@ -3,9 +3,9 @@
   "slug": "design-llm-red-team-program",
   "article": "src/content/posts/2026-07-11-design-llm-red-team-program.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how an adaptive red-team finding becomes an owned mitigation, a residual-risk release decision, and a static regression test while production evidence updates the threat model.",
-  "mediumRationale": "A full-width Mermaid loop is the smallest medium that distinguishes adaptive discovery from static recurrence testing and connects both to mitigation, release gates, and production feedback without shrinking stage labels. The lesson is a lifecycle relationship rather than a quantity or geometry, so labelled paths and decision nodes carry more meaning than fixed coordinates.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because a flowchart makes the operating loop and its two distinct feedback paths explicit: failed retests return to adaptive attack, while sanitized findings enter the static regression suite.",
     "svg": "Rejected because deterministic coordinates would add maintenance cost without teaching shape, scale, or a quantitative relationship.",
@@ -127,6 +127,6 @@
     "visualIds": [
       "adaptive-red-team-release-loop"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and complete description. Numbered stages, decision diamonds, explicit branch labels, node boundaries, and solid versus dashed feedback paths preserve the lesson without color. Combined tall-flow and wide-canvas markers remove screen-height compression and allow horizontal scrolling at constrained widths, preserving readable labels at 390 CSS pixels; shared theme tokens support dark mode and print resets the width floor for a light page-safe palette."
+    "accessibility": "A fictional private read-only canary scenario compares three access paths before and after a mitigation. The reproduced direct-request failure becomes blocked. Quoted-text and tool-output paths remain question marks, not assumed successes. Adaptive coverage and residual-risk evidence still govern release. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

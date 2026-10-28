@@ -37,33 +37,8 @@ The reported four-percentage-point gain is a real strength within this hypotheti
 But routing and resource advantage changed together.
 Matched resources could distinguish a resource-only explanation from a gain that survives the comparison.
 
-<p class="visual-title">Does the gain survive matched compute?</p>
-
 <!-- visual:paper-critique-prioritization-funnel -->
-```mermaid
-flowchart TB
-	accTitle: Test whether the hypothetical four-point gain survives matched compute
-	accDescr: The claim is that routing improves accuracy efficiently. The table reports 84 versus 80 percent, but 20 versus 10 GPU-hours. Compute, leakage, variance and scope are candidate explanations. The immediate experiment matches hardware, data and total tuning/training budget. Three paired runs per recipe each receive ten GPU-hours, totaling sixty. A justified interval below a two-point useful threshold would narrow the efficiency claim; a supported retained gain would weaken the resource-only explanation without proving the routing mechanism.
-	C["CLAIM<br/>Routing improves accuracy efficiently"] --> E["TABLE<br/>84% vs 80%; 20 vs 10 GPU-hours"]
-	E --> H["3 · Generate plausible<br/>alternative explanations"]
-	H -.-> L["Leakage /<br/>selection"]
-	H -.-> F["Unfair compute<br/>or tuning"]
-	H -.-> V["Variance<br/>or weak baseline"]
-	H -.-> S["Scope /<br/>benchmark"]
-	L --> P["4 · Choose the one threat<br/>most able to overturn the claim"]
-	F --> P
-	V --> P
-	S --> P
-	P ==>|"selected threat: resource advantage"| X["MATCHED TEST<br/>3 paired runs × 2 recipes × 10 hours"]
-	X --> U["DECIDE<br/>Does a useful gain survive?<br/>Mechanism remains unresolved"]
-	class C viz-input
-	class E,H viz-state
-	class L,F,V,S viz-warning
-	class P,X viz-focus
-	class U viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> both method and resources changed in the table. Select resource advantage for the next test, rather than requesting every possible experiment.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="paper-critique-prioritization-funnel-edition-title"><p class="visual-title" id="paper-critique-prioritization-funnel-edition-title">Four more accuracy points came with twice the compute</p><svg viewBox="0 0 360 441" role="img" aria-labelledby="paper-critique-prioritization-funnel-edition-svg-title paper-critique-prioritization-funnel-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="paper-critique-prioritization-funnel-edition-svg-title">Four more accuracy points came with twice the compute</title><desc id="paper-critique-prioritization-funnel-edition-svg-desc">The reported baseline uses 10 GPU-hours for 80 percent accuracy; the new recipe uses 20 for 84 percent. Separate zero-based common scales show accuracy and compute. Three proposed matched-compute paired runs have question marks because their outcomes are not known.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Reported comparison; not matched compute</tspan></text><text x="15" y="60" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="15" dy="0">accuracy / 100%</tspan></text><text x="15" y="98" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="15" dy="0">base</tspan></text><rect x="62" y="84" width="176" height="20" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="332" y="99" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:end"><tspan x="332" dy="0">80%</tspan></text><text x="15" y="134" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="15" dy="0">new</tspan></text><rect x="62" y="120" width="184.8" height="20" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="332" y="135" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:end"><tspan x="332" dy="0">84%</tspan></text><text x="15" y="179" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="15" dy="0">GPU-hours / 20</tspan></text><text x="15" y="217" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="15" dy="0">base</tspan></text><rect x="62" y="203" width="110" height="20" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="332" y="218" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:end"><tspan x="332" dy="0">10h</tspan></text><text x="15" y="253" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="15" dy="0">new</tspan></text><rect x="62" y="239" width="220" height="20" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="332" y="254" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:end"><tspan x="332" dy="0">20h</tspan></text><text x="180" y="316" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Next: 3 paired runs at 10 hours per</tspan><tspan x="180" dy="19">recipe</tspan></text><text x="180" y="376" style="font-size:25px;font-weight:400;fill:var(--viz-state-stroke);text-anchor:middle"><tspan x="180" dy="0">? ? ?</tspan></text><text x="180" y="415" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Matched-compute gain is not known yet.</tspan></text></svg><figcaption><strong>Read it this way:</strong> The report changes accuracy and compute together. Three paired, matched-compute runs test whether a useful gain survives. Their results are unknown, not implied by the drawing. <span class="visual-reader-check" data-reader-check="paper-critique-prioritization-funnel"><strong>Check:</strong> What comparison could separate a routing benefit from the extra compute budget?</span></figcaption></figure>
 
 ## Write the decision record
 

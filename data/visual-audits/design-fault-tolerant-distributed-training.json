@@ -3,9 +3,9 @@
   "slug": "design-fault-tolerant-distributed-training",
   "article": "src/content/posts/2026-07-11-design-fault-tolerant-distributed-training.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Choose the narrowest safe recovery scope by testing whether ranks share one proven training state before retrying, rebuilding a group, or rolling back.",
-  "mediumRationale": "A full-width Mermaid decision flow is the smallest medium that separates failure detection from recovery authorization and makes the state-consistency gate control every safe path. Labelled branches preserve the conditional logic without implying quantitative relationships, while the tall-flow marker prevents screen-height compression.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a decision graph with explicit evidence gates, recovery branches, and a single return to training; automatic layout keeps that relational structure maintainable.",
     "svg": "Rejected: the learning task is conditional rather than geometric or quantitative, so hand-positioned paths would duplicate Mermaid graph semantics without adding explanatory value.",
@@ -89,6 +89,6 @@
     "visualIds": [
       "distributed-recovery-consistency-gate"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description. Decision diamonds, explicit yes/no edge labels, direct state labels, and solid versus dashed paths carry the logic without color. The full-width tall-flow marker removes the screen height cap without forcing horizontal scrolling, preserving readable labels at 390 CSS pixels, and inherits shared theme-aware print behavior."
+    "accessibility": "An explicitly illustrative comparison shows a mixed state with rank zero at step 100 and rank one at step 101. Restarting one rank alone leaves that mismatch. The contrasting rollback restores model, optimizer, RNG, and data position from committed checkpoint 98 across the consistency domain. Supported narrow recovery remains valid only when it proves the same state contract. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

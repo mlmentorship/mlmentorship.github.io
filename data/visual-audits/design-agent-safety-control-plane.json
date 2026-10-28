@@ -3,9 +3,9 @@
   "slug": "design-agent-safety-control-plane",
   "article": "src/content/posts/2026-08-29-design-agent-safety-control-plane.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how an already-authorized action can only retain or lose authority at the independent safety boundary, then see how authoritative outcomes and aggregate evidence can reduce authority for the next action.",
-  "mediumRationale": "A focused Mermaid authority loop is the smallest useful visual: it keeps the authorized envelope, pre-action evidence, two decision exits, bounded execution, post-action verification, and aggregate breaker feedback connected without reproducing the article's full component inventory or implying quantitative geometry.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson is a directed control loop with many-to-one evidence inputs, mutually exclusive decision exits, and post-action feedback. The existing Mermaid primitive preserves those labelled relationships and supports themed rendering and horizontal overflow at narrow widths.",
     "svg": "Rejected because no quantitative scale or fixed geometry carries the lesson; manually positioning this relationship graph would be less maintainable and would add no instructional precision.",
@@ -73,6 +73,6 @@
     "visualIds": [
       "agent-safety-authority-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete accessible title and description that traces the authorization ceiling, pre-action evidence bundle, both decision exits, bounded execution, authoritative verification, aggregate detection, and breaker feedback. Every relationship and outcome is directly labelled, so color is not required. The full-width tall-flow marker removes the screen height cap without forcing horizontal scrolling, preserving readable labels at 390 CSS pixels; theme tokens provide light, dark, and print-safe colors, and the surrounding prose preserves the lesson if client-side rendering is unavailable."
+    "accessibility": "An illustrative impact ledger already contains 60 units and receives a proposed 50-unit action. A 100-unit policy limit would be exceeded because 60 plus 50 equals 110. The failing branch freezes future capabilities before dispatch. The proposed action is not counted as an already committed effect. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

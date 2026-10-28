@@ -3,9 +3,9 @@
   "slug": "debug-training-loop",
   "article": "src/content/posts/2025-12-01-debug-training-loop.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace how uncleared parameter gradients and an unrestored evaluation mode persist into the next training batch as two independent state leaks.",
-  "mediumRationale": "A compact two-lane Mermaid flowchart is the smallest useful representation of state surviving across batch boundaries; the spatial continuity makes the consequences of the two omitted reset operations explicit.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the learning task is to follow two state transitions across time, and a compact labelled flowchart expresses that ordering without custom geometry.",
     "svg": "Rejected: deterministic SVG would duplicate Mermaid's node-and-arrow strengths while requiring hand-positioned text and more maintenance.",
@@ -73,6 +73,6 @@
     "visualIds": [
       "training-loop-persistent-state"
     ],
-    "accessibility": "The Mermaid block supplies an accessible title and a detailed description of both lanes. Every state and omitted reset is written directly in the nodes or on dashed missing-transition edges, so the lesson does not depend on color. The viz-compact marker opts out of the wide mobile minimum, allowing the top-to-bottom diagram to fit a 390 CSS-pixel viewport; established Mermaid theme variables provide dark-mode contrast, and shared print rules force a light high-contrast canvas with page-break avoidance."
+    "accessibility": "Aligned uncorrected and corrected checkpoints distinguish gradient storage from module mode. Without clearing, batch two adds g2 to stored g1. Explicit zero_grad clears that state first. Separately, eval mode persists until train is called. Clearing gradients does not restore training mode. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

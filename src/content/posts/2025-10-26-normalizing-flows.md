@@ -94,7 +94,7 @@ $$
 		<text class="viz-callout" x="180" y="578" text-anchor="middle">log pₓ = log p₀ − log 2 − log(3/2)</text>
 		<text class="viz-node-value" x="180" y="598" text-anchor="middle">= log p₀ − log 3</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> forward transforms stretch a local patch without changing its probability mass. Inverse density evaluation divides by the total volume multiplier. Here area multiplies by three and log density loses log three. Dots illustrate mass; they are not point-probability density values. Original construction follows <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">flows review</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> forward transforms stretch a local patch without changing its probability mass. Inverse density evaluation divides by the total volume multiplier. Here area multiplies by three and log density loses log three. Dots illustrate mass; they are not point-probability density values. Original construction follows <a href="https://arxiv.org/abs/1605.08803">Real NVP</a> and the <a href="https://jmlr.org/papers/v22/19-1028.html">flows review</a>. <span class="visual-reader-check" data-reader-check="flow-local-volume-density"><strong>Check:</strong> Why does tripling occupied volume divide density by three while leaving total probability mass unchanged?</span></figcaption>
 </figure>
 
 Inverting $(2,3)$ returns $(1,2)$; multiplying its transformed density by tripled local area recovers the same mass.

@@ -77,7 +77,7 @@ Equal score increments multiply odds equally, but do not add equal probability i
 			<text class="viz-label" x="313" y="276" text-anchor="middle">7.39</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> each unit score step multiplies odds by e. The five probability markers compress toward zero and one. The zero-score line marks p=0.5, appropriate for equal error costs under the stated probability model. Unequal costs can move the action threshold without refitting this sigmoid. Sources: <a href="https://www.statlearning.com/"><cite>An Introduction to Statistical Learning</cite></a> and <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each unit score step multiplies odds by e. The five probability markers compress toward zero and one. The zero-score line marks p=0.5, appropriate for equal error costs under the stated probability model. Unequal costs can move the action threshold without refitting this sigmoid. Sources: <a href="https://www.statlearning.com/"><cite>An Introduction to Statistical Learning</cite></a> and <a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf?forcedefault=true">Stanford CS229</a>. <span class="visual-reader-check" data-reader-check="logit-odds-probability-map"><strong>Check:</strong> Why does z increasing from 0 to 1 multiply odds by 2.72 rather than add fixed probability?</span></figcaption>
 </figure>
 
 ## Training

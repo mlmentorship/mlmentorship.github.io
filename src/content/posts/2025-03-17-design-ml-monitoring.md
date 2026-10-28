@@ -41,29 +41,8 @@ It might use approved rules or a model that does not require the stale feature.
 Do not replace missing values with zero unless that behavior was validated.
 Record affected versions, cohorts, actions and exposure so later outcomes remain interpretable.
 
-<p class="visual-title">Stale features fail now; quality labels arrive later</p>
-
 <!-- visual:ml-monitoring-observability-layers -->
-```mermaid
-flowchart TB
-	accTitle: Freshness fails now while quality evidence waits for mature labels
-	accDescr: Service latency and errors pass. A request at noon uses a snapshot covering data only through 11:40, violating the two-minute freshness limit. The data tap detects that breach immediately. A score-distribution tap shows changed behavior, not established accuracy loss. Product actions and exposure are recorded. Seven-day mature labels later join to prediction identities with coverage checks. Observed quality is distinct from causal impact, which requires a valid comparison.
-	S["Service SLOs pass<br/>latency and errors"] --> X["Request at 12:00<br/>snapshot as_of 11:40"]
-	X --> P["Score distribution changes"]
-	P --> A["Product action<br/>policy and exposure recorded"]
-	A --> Y["Seven-day outcome window<br/>mature labels joined by ID"]
-	X -.-> D["1. DATA<br/>20 minutes exceeds 2 minutes<br/>contract breach now"]
-	P -.-> M["2. MODEL BEHAVIOR<br/>distribution changed<br/>quality not established"]
-	Y -.-> O["3. OUTCOME<br/>quality and join coverage<br/>causal impact needs comparison"]
-	class S viz-warning
-	class X viz-input
-	class P,A viz-focus
-	class Y viz-state
-	class D,M,O viz-output
-	class S,X,P,A,Y,D,M,O viz-compact
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> solid arrows follow serving and later outcomes. Dashed taps show where each signal becomes available. Freshness establishes a contract violation now. Changed scores do not establish degraded quality; mature outcomes do not alone establish causal impact.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="ml-monitoring-observability-layers-edition-title"><p class="visual-title" id="ml-monitoring-observability-layers-edition-title">Freshness can fail now while outcome quality is still unknown</p><svg viewBox="0 0 360 425" role="img" aria-labelledby="ml-monitoring-observability-layers-edition-svg-title ml-monitoring-observability-layers-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="ml-monitoring-observability-layers-edition-svg-title">Freshness can fail now while outcome quality is still unknown</title><desc id="ml-monitoring-observability-layers-edition-svg-desc">At noon, an 11:40 snapshot is twenty minutes old and fails a two-minute freshness contract immediately. Outcome evidence matures after a seven-day window and requires request identity and join coverage. A changed score distribution does not establish changed quality or causal product impact.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Same request, different evidence clocks</tspan></text><text x="18" y="68" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">At 12:00: freshness can fail NOW</tspan></text><g data-editorial-node><rect x="25" y="90" width="310" height="64" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="180" y="117.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">snapshot 11:40</tspan><tspan x="180" dy="19">age 20 min &gt; 2 min limit</tspan></text></g><text x="18" y="204" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="18" dy="0">Later: outcome evidence must mature</tspan></text><path d="M35 245L325 245" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><rect x="35" y="233" width="290" height="24" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3;stroke-dasharray:5 3"></rect><text x="35" y="281" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="35" dy="0">day 0</tspan></text><text x="325" y="281" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:end"><tspan x="325" dy="0">day 7</tspan></text><text x="180" y="324" style="font-size:13px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Mature label + request ID + join coverage</tspan></text><text x="180" y="378" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Score drift alone does not establish a quality</tspan><tspan x="180" dy="19">change.</tspan></text></svg><figcaption><strong>Read it this way:</strong> The stale snapshot breaches a contract immediately. Outcome quality needs mature labels and adequate joins. Score drift alone proves neither quality nor causal impact. <span class="visual-reader-check" data-reader-check="ml-monitoring-observability-layers"><strong>Check:</strong> Which alert is justified immediately while model quality is still unknown?</span></figcaption></figure>
 
 <span id="what-an-l5-answer-sounds-like"></span>
 

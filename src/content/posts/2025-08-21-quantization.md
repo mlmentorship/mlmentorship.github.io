@@ -63,7 +63,7 @@ The high-range row keeps $s=8/7$ under either policy, restoring $[-8,-32/7,32/7,
 			<p><strong>Recovered detail:</strong> each row uses the full signed code range.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> compare the ordinary row across panels. Its shared-scale middle values collapse to zero; its separate scale preserves both signs. More scales add metadata and kernel requirements. This calculation is not a quality benchmark. Original example follows <a href="https://arxiv.org/abs/1712.05877">Jacob et al.</a> and <a href="https://arxiv.org/abs/2211.10438">SmoothQuant</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> compare the ordinary row across panels. Its shared-scale middle values collapse to zero; its separate scale preserves both signs. More scales add metadata and kernel requirements. This calculation is not a quality benchmark. Original example follows <a href="https://arxiv.org/abs/1712.05877">Jacob et al.</a> and <a href="https://arxiv.org/abs/2211.10438">SmoothQuant</a>. <span class="visual-reader-check" data-reader-check="quantization-scale-granularity"><strong>Check:</strong> Why does the shared scale collapse -0.5 and +0.5? Why does the channel-specific scale preserve their signs?</span></figcaption>
 </figure>
 
 ### Calibrate for a Larger Outlier

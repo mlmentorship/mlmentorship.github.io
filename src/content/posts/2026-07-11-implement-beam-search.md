@@ -87,7 +87,7 @@ At each step:
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> add each token's log probability, then route by state before pruning. Dashed <code>&lt;EOS&gt;</code> records leave the live frontier and are never expanded again; top-<var>k</var> compares only the four non-EOS candidates. Here it keeps <code>A x</code> and <code>B y</code>, while both completed records remain available for the final scoring rule. Original worked example checked against <a href="https://arxiv.org/abs/1609.08144">Wu et al. (2016)</a>, <a href="https://arxiv.org/abs/1808.10006">Murray and Chiang (2018)</a>, and the <a href="https://huggingface.co/docs/transformers/main/en/generation_strategies">Transformers generation documentation</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> add each token's log probability, then route by state before pruning. Dashed <code>&lt;EOS&gt;</code> records leave the live frontier and are never expanded again; top-<var>k</var> compares only the four non-EOS candidates. Here it keeps <code>A x</code> and <code>B y</code>, while both completed records remain available for the final scoring rule. Original worked example checked against <a href="https://arxiv.org/abs/1609.08144">Wu et al. (2016)</a>, <a href="https://arxiv.org/abs/1808.10006">Murray and Chiang (2018)</a>, and the <a href="https://huggingface.co/docs/transformers/main/en/generation_strategies">Transformers generation documentation</a>. <span class="visual-reader-check" data-reader-check="beam-search-live-finished-transition"><strong>Check:</strong> Which score ranks completed sequences at the end? Why does an EOS sequence never return to live expansion?</span></figcaption>
 </figure>
 
 The raw sequence score is:

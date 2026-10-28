@@ -42,7 +42,7 @@ Four layers therefore yield $1/16$, $1$, and $81/16$ from $q_0=1$.
 		</svg>
 	</div>
 	<p>Forward scaling counts four inputs; backward scaling counts eight outputs in the unequal-width example below.</p>
-	<figcaption><strong>Read it this way:</strong> start each path at second moment one. Independent symmetric weights give a ReLU multiplier of fan-in times weight variance divided by two. Circles end at 1/16, squares at one, and triangles at 81/16. The vertical axis uses shared logarithmic spacing. Marker shapes also distinguish paths. Sources are <a href="https://proceedings.mlr.press/v9/glorot10a.html">Glorot and Bengio (2010)</a> and <a href="https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">He et al. (2015)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> start each path at second moment one. Independent symmetric weights give a ReLU multiplier of fan-in times weight variance divided by two. Circles end at 1/16, squares at one, and triangles at 81/16. The vertical axis uses shared logarithmic spacing. Marker shapes also distinguish paths. Sources are <a href="https://proceedings.mlr.press/v9/glorot10a.html">Glorot and Bengio (2010)</a> and <a href="https://openaccess.thecvf.com/content_iccv_2015/html/He_Delving_Deep_into_ICCV_2015_paper.html">He et al. (2015)</a>. <span class="visual-reader-check" data-reader-check="relu-second-moment-through-depth"><strong>Check:</strong> Why does weight variance 2/fan-in preserve the illustrated ReLU second moment? What assumptions make that recurrence valid?</span></figcaption>
 </figure>
 
 ## The variance argument

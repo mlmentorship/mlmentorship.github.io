@@ -54,36 +54,8 @@ This symmetric utility determines membership, not relative position.
 Ordering needs a position-sensitive policy and exposure evidence.
 
 <p class="visual-kicker">Local scores versus whole-page utility</p>
-<p class="visual-title">A+C beats the locally strongest pair under the stated overlap penalty.</p>
-
 <!-- visual:spotify-two-level-shelf-composition -->
-```mermaid
-flowchart TB
-  accTitle: Three intact shelf candidates produce three distinct pair utilities
-  accDescr: Shelf A has familiar songs 1 and 2 and local score 6. Shelf B has repeat songs 1 and 3 and local score 5. Shelf C has discovery songs 4 and 5 and local score 4. A page composer compares eligible pairs with a stated penalty of four only for A plus B. A plus B has utility 7, A plus C has 10, and B plus C has 9. It selects intact shelves A and C. This symmetric example does not determine display order; position policy and local versus page outcomes require separate evidence.
-  Familiar["A: FAMILIAR<br/>songs 1, 2<br/>local score 6"]
-  Repeat["B: REPEAT<br/>songs 1, 3<br/>local score 5"]
-  Discovery["C: DISCOVERY<br/>songs 4, 5<br/>local score 4"]
-  Composer{"Eligible whole-page pairs<br/>shared toy utility units"}
-  PairAB["A+B: 6+5-4 = 7<br/>overlap penalty 4"]
-  PairAC["A+C: 6+4-0 = 10<br/>highest page utility"]
-  PairBC["B+C: 5+4-0 = 9"]
-  Select["SELECT INTACT A AND C<br/>display order remains unresolved"]
-  Evidence["Separate evidence:<br/>local shelf / page / long-term<br/>position and exposure retained"]
-  Familiar --> Composer
-  Repeat --> Composer
-  Discovery --> Composer
-  Composer --> PairAB
-  Composer --> PairAC
-  Composer --> PairBC
-  PairAC ==> Select --> Evidence
-  class Familiar,Repeat,Discovery viz-input
-  class Composer,PairAC viz-focus
-  class PairAB,PairBC viz-neutral
-  class Select,Evidence viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> compare intact pairs, not pooled songs. The penalty reverses the local-score choice; it is an explicit assumption, not a measured interaction effect.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="spotify-two-level-shelf-composition-edition-title"><p class="visual-title" id="spotify-two-level-shelf-composition-edition-title">Two strong shelves can make a weaker page when they repeat the same song</p><svg viewBox="0 0 360 448" role="img" aria-labelledby="spotify-two-level-shelf-composition-edition-svg-title spotify-two-level-shelf-composition-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="spotify-two-level-shelf-composition-edition-svg-title">Two strong shelves can make a weaker page when they repeat the same song</title><desc id="spotify-two-level-shelf-composition-edition-svg-desc">Toy shelves A, B, and C contain song IDs one-two, one-three, and four-five, with local scores six, five, and four. Repeated song one creates the declared four-unit overlap penalty for A plus B, giving seven. A plus C gives ten and B plus C nine. Membership does not determine display order.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Toy whole-page utility, not measured</tspan><tspan x="180" dy="19">listener value</tspan></text><rect x="22" y="61" width="316" height="61" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="47" y="97" style="font-size:18px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="47" dy="0">A</tspan></text><g data-editorial-node><rect x="80" y="73" width="72" height="36" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="116" y="96" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="116" dy="0">song 1</tspan></text></g><g data-editorial-node><rect x="165" y="73" width="72" height="36" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="201" y="96" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="201" dy="0">song 2</tspan></text></g><text x="286" y="97" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="286" dy="0">score 6</tspan></text><rect x="22" y="139" width="316" height="61" rx="3" style="fill:var(--viz-state-bg);stroke:var(--viz-state-stroke);stroke-width:1.3"></rect><text x="47" y="175" style="font-size:18px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="47" dy="0">B</tspan></text><g data-editorial-node><rect x="80" y="151" width="72" height="36" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="116" y="174" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="116" dy="0">song 1</tspan></text></g><g data-editorial-node><rect x="165" y="151" width="72" height="36" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="201" y="174" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="201" dy="0">song 3</tspan></text></g><text x="286" y="175" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="286" dy="0">score 5</tspan></text><rect x="22" y="217" width="316" height="61" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="47" y="253" style="font-size:18px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="47" dy="0">C</tspan></text><g data-editorial-node><rect x="80" y="229" width="72" height="36" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="116" y="252" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="116" dy="0">song 4</tspan></text></g><g data-editorial-node><rect x="165" y="229" width="72" height="36" rx="3" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:1.3"></rect><text x="201" y="252" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="201" dy="0">song 5</tspan></text></g><text x="286" y="253" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="286" dy="0">score 4</tspan></text><text x="180" y="326" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">A + B: 6 + 5 - 4 repeated-song penalty = 7</tspan></text><text x="180" y="370" style="font-size:14px;font-weight:700;fill:var(--viz-output-stroke);text-anchor:middle"><tspan x="180" dy="0">A + C = 10 &gt; B + C = 9</tspan></text><text x="180" y="412" style="font-size:12px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Choose intact A and C; display order is a</tspan><tspan x="180" dy="19">separate choice.</tspan></text></svg><figcaption><strong>Read it this way:</strong> Song 1 appears in both A and B. The declared overlap penalty makes A + C the best pair. Shelf order remains unresolved. <span class="visual-reader-check" data-reader-check="spotify-two-level-shelf-composition"><strong>Check:</strong> Why is shelf C selected over higher-scoring B when composing the whole page?</span></figcaption></figure>
 
 <span id="whats-distinctive-about-a-homepage"></span>
 <span id="what-an-l5-answer-sounds-like"></span>

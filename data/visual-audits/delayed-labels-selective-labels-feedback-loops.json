@@ -3,9 +3,9 @@
   "slug": "delayed-labels-selective-labels-feedback-loops",
   "article": "src/content/posts/2026-08-28-delayed-labels-selective-labels-feedback-loops.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Distinguish a mature negative from a pending, censored, or policy-unobserved outcome, then trace how only the observed subset shapes the next deployed policy.",
-  "mediumRationale": "A wide Mermaid flowchart is the smallest medium that can show both observation gates, preserve three distinct unknown states, and close the policy-to-data-to-policy feedback loop without shrinking branch labels or implying a quantitative relationship.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because labelled branches express the policy-selection gate, maturity gate, non-label outcomes, and retraining return path directly; the established wide, scrollable class supplies readable, themed, and print-compatible rendering.",
     "svg": "Rejected because the lesson is relational rather than geometric or quantitative, so fixed hand-positioned paths would duplicate Mermaid's graph semantics and be harder to maintain.",
@@ -81,6 +81,6 @@
     "visualIds": [
       "policy-label-observation-loop"
     ],
-    "accessibility": "The Mermaid source includes a complete accessible title and description. Every gate, status, branch condition, and feedback edge is directly labelled; solid versus dashed paths reinforce rather than carry meaning, and each unknown state explicitly says it is not negative. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels, while print resets the minimum width and shared Mermaid theme tokens provide dark-mode and print-compatible contrast."
+    "accessibility": "Aligned schematic timelines share an evaluation cutoff. They distinguish an early known positive, a selected action whose outcome window remains open, a selected action whose observation ends early, and an action never selected by the policy. A task-specific maturity rule controls eligibility; unknown outcomes do not become negatives. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

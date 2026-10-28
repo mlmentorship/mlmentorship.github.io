@@ -75,7 +75,7 @@ y = GeLU(x @ W_1) @ W_2
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> split <em>W₁</em> by output channels, so each GPU can apply GeLU to its own <em>h</em> shard. Feed each shard directly into the matching rows of <em>W₂</em>. Those second products are partial sums over the hidden dimension, so add them with one all-reduce to recover <em>y</em>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> split <em>W₁</em> by output channels, so each GPU can apply GeLU to its own <em>h</em> shard. Feed each shard directly into the matching rows of <em>W₂</em>. Those second products are partial sums over the hidden dimension, so add them with one all-reduce to recover <em>y</em>. <span class="visual-reader-check" data-reader-check="tensor-parallel-ffn-handoff"><strong>Check:</strong> Why are the second-layer results added rather than concatenated, while the first-layer channel shards need no collective here?</span></figcaption>
 </figure>
 
 - $W_1$ split column-wise: each GPU holds $W_1[:, c_i:c_{i+1}]$. Produces a partial output for its slice of channels. No communication needed up to the GeLU (elementwise).

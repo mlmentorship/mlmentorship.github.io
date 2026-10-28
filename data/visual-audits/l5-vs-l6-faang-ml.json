@@ -3,9 +3,9 @@
   "slug": "l5-vs-l6-faang-ml",
   "article": "src/content/posts/2026-04-23-l5-vs-l6-faang-ml.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Distinguish company-wide reach from senior-principal leverage by tracing which decisions principal owners make independently, which conflicts cross a shared interface, and which evidence reopens the doctrine.",
-  "mediumRationale": "A compact Mermaid topology is the smallest medium that contrasts two authority structures over the same broad scope. The first makes the candidate a fragile approval bottleneck; the second separates independent domain decisions, cross-boundary review, and doctrine-reopening evidence without implying that company levels form one universal numeric ladder.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the learning task is to follow authority, escalation, and evidence paths across ownership boundaries. A compact top-to-bottom graph preserves those relationships in source, mobile, dark mode, and print.",
     "svg": "Rejected: fixed coordinates would add maintenance and accessibility cost without teaching geometry, quantity, or a mathematically exact relation.",
@@ -73,6 +73,6 @@
     "visualIds": [
       "senior-principal-delegated-coherence"
     ],
-    "accessibility": "The Mermaid block provides an accessible title and a complete description of both authority structures. Node text explicitly names plural principal owners, independent choices, the central queue, interface review, and doctrine-reopening evidence; solid authority paths and dotted redesign, escalation, and reversal paths preserve meaning without color. The graph uses one top-to-bottom authority path and the established compact-node class to avoid a forced minimum width at 390 CSS pixels. Shared Mermaid tokens provide dark-mode contrast, and existing print rules force a light high-contrast, page-safe rendering."
+    "accessibility": "A fictional runtime, evaluation, and safety ownership example contrasts every routine change waiting for one approver with local changes inside domain contracts. A changed tool-result schema crosses runtime and evaluation ownership and therefore enters joint review. Evidence can reopen the shared doctrine. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -60,32 +60,8 @@ for epoch in range(10):
 `model.eval()` persists until the mode is changed again.
 Gradient recording is a third, separate setting: `no_grad()` does not restore training mode.
 
-<p class="visual-title">Gradients and module mode persist until explicitly reset</p>
-
 <!-- visual:training-loop-persistent-state -->
-```mermaid
-flowchart TB
-	accTitle: Missing resets let gradient and module-mode state leak into later training batches
-	accDescr: The diagram follows two independent pieces of persistent state. In the gradient lane, batch one backward sets parameter gradients to g one and the optimizer step uses them. Without zero grad, batch two backward adds g two to the old g one, so the next step uses both. In the module-mode lane, model eval switches the module to evaluation mode. Without a later model train call, the next training forward still uses evaluation behavior. No grad is a separate local setting and does not restore training mode.
-	subgraph G["PARAMETER .grad STATE"]
-		direction TB
-		G0["Start batch 1<br/>grad = None"] --> G1["backward()<br/>grad = g₁"]
-		G1 --> G2["step()<br/>update uses g₁"]
-		G2 -. "zero_grad() missing" .-> G3["Batch 2 backward()<br/>grad = g₁ + g₂"]
-		G3 --> G4["step()<br/>stale g₁ is reused"]
-	end
-	subgraph M["MODULE MODE STATE"]
-		direction TB
-		M0["Training forward<br/>mode = train"] --> M1["model.eval()<br/>mode = eval"]
-		M1 -. "model.train() missing" .-> M2["Next training forward<br/>still eval mode"]
-	end
-	class G0,M0 viz-input
-	class G1,G2,M1 viz-state
-	class G3,G4,M2 viz-warning
-	class G0 viz-compact
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> follow each lane into the next batch. A parameter update leaves gradient buffers intact. An evaluation-mode switch persists. A local no-grad context changes neither of those reset requirements.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="training-loop-persistent-state-edition-title"><p class="visual-title" id="training-loop-persistent-state-edition-title">Gradients and train/eval mode persist independently</p><svg viewBox="0 0 360 435" role="img" aria-labelledby="training-loop-persistent-state-edition-svg-title training-loop-persistent-state-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="training-loop-persistent-state-edition-svg-title">Gradients and train/eval mode persist independently</title><desc id="training-loop-persistent-state-edition-svg-desc">Aligned uncorrected and corrected checkpoints distinguish gradient storage from module mode. Without clearing, batch two adds g2 to stored g1. Explicit zero_grad clears that state first. Separately, eval mode persists until train is called. Clearing gradients does not restore training mode.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Two independent kinds of persistent state</tspan></text><text x="90" y="51" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">UNCORRECTED</tspan></text><text x="270" y="51" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">EXPLICIT RESET</tspan></text><path d="M15 72L345 72" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="92" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Before batch 2 backward</tspan></text><g data-editorial-node><rect x="15" y="106" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="144.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">.grad = g1</tspan></text></g><g data-editorial-node><rect x="195" y="106" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="135" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">zero_grad() -&gt;</tspan><tspan x="270" dy="19">None</tspan></text></g><path d="M15 188L345 188" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="208" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">After batch 2 backward</tspan></text><g data-editorial-node><rect x="15" y="222" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="260.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">.grad = g1 + g2</tspan></text></g><g data-editorial-node><rect x="195" y="222" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="260.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">.grad = g2</tspan></text></g><path d="M15 304L345 304" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><text x="180" y="324" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">After validation calls eval()</tspan></text><g data-editorial-node><rect x="15" y="338" width="150" height="67" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="90" y="376.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">still eval mode</tspan></text></g><g data-editorial-node><rect x="195" y="338" width="150" height="67" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="270" y="367" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">train() -&gt; train</tspan><tspan x="270" dy="19">mode</tspan></text></g></svg><figcaption><strong>Read it this way:</strong> zero_grad clears gradient storage; train restores module mode. They repair different persistent states. The corrected batch-two gradient excludes stale g1. <span class="visual-reader-check" data-reader-check="training-loop-persistent-state"><strong>Check:</strong> Does eval clear gradients? Which separate calls repair the two retained-state mistakes?</span></figcaption></figure>
 
 ## Calculate the stale-gradient effect
 

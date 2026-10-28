@@ -59,7 +59,7 @@ The cross-term vanishes because $\mathbb{E}[\hat\theta - \mathbb{E}\hat\theta] =
 			<text class="viz-callout" x="180" y="240" text-anchor="middle">MSE = variance + bias&#178;</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> Re-sample the data and the estimates wobble around their own center, E[&#952;&#770;]; that squared wobble is variance. The center itself can miss the true &#952;; that displacement is bias. Averaging squared distance all the way to &#952; gives variance plus bias squared.</figcaption>
+	<figcaption><strong>Read it this way:</strong> Re-sample the data and the estimates wobble around their own center, E[&#952;&#770;]; that squared wobble is variance. The center itself can miss the true &#952;; that displacement is bias. Averaging squared distance all the way to &#952; gives variance plus bias squared. <span class="visual-reader-check" data-reader-check="estimator-error-reference-points"><strong>Check:</strong> Around which point is variance measured, and around which point is total estimation error measured?</span></figcaption>
 </figure>
 
 ## Why biased estimators can be useful

@@ -3,9 +3,9 @@
   "slug": "most-overrated-technique",
   "article": "src/content/posts/2025-12-07-most-overrated-technique.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Convert a broad claim that a technique is overrated into a defensible judgment by naming the targeted use, failure mechanism, useful boundary, and evidence that could update the position.",
-  "mediumRationale": "A two-panel semantic HTML comparison is the smallest medium that can align an unsupported verdict with the four missing parts of a bounded critique. It keeps the reader focused on the structure of technical judgment rather than implying that the example techniques have a universal ranking.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because the lesson is a matched comparison, not a process with directional flow; arrows would falsely imply that every opinion is formed in one fixed sequence.",
     "svg": "Rejected because there is no quantitative geometry to draw, and SVG text would be less adaptable than native table semantics at 390 CSS pixels.",
@@ -105,6 +105,6 @@
     "visualIds": [
       "overrated-technique-claim-stress-test"
     ],
-    "accessibility": "The figure uses native headings, sections, tables, row headers, and explicit accessible labels. Missing questions and completed answers carry the comparison without color; the highlighted target cell is supplementary. The established two-panel grid stacks below 640 pixels, and short native text wraps at 390 CSS pixels without horizontal scrolling. Existing theme variables provide dark-mode contrast, established print rules force a light high-contrast palette and avoid splitting the figure, and the lesson remains available with CSS or JavaScript disabled."
+    "accessibility": "A proposed matched study pins model M, task inputs, sampling settings, and scoring. Source-fact and intermediate-computation bottlenecks are tested separately with direct versus reasoning-style prompts. Quality, latency, and cost are unmeasured. Equal-budget quality improvement on source-fact cases would reverse the narrow hypothesis that extra reasoning cannot help that bottleneck. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

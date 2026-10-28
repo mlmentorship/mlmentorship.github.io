@@ -71,7 +71,7 @@ Putting A1 into fitting and A2 into scoring fails this particular unseen-patient
 		<text class="viz-callout" x="301.5" y="372" text-anchor="middle">VAL t5</text>
 		<text class="viz-label" x="204" y="406" text-anchor="middle">time moves left to right; training history expands →</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> first identify what will be unseen. Stratification can preserve class proportions. Unseen-entity evaluation keeps each entity intact. Forecast evaluation respects information available before its cutoff. These constraints can need composition. The original diagram follows <a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn's cross-validation guide</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> first identify what will be unseen. Stratification can preserve class proportions. Unseen-entity evaluation keeps each entity intact. Forecast evaluation respects information available before its cutoff. These constraints can need composition. The original diagram follows <a href="https://scikit-learn.org/stable/modules/cross_validation.html">scikit-learn's cross-validation guide</a>. <span class="visual-reader-check" data-reader-check="cross-validation-preserve-structure"><strong>Check:</strong> What must stay separated when the same users generate events over time?</span></figcaption>
 </figure>
 
 ## Standard schemes

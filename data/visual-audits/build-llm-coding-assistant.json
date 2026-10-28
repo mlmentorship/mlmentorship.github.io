@@ -3,9 +3,9 @@
   "slug": "build-llm-coding-assistant",
   "article": "src/content/posts/2025-04-12-build-llm-coding-assistant.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace why latency-sensitive inline completion needs a cancelable FIM-and-retrieval fast path, while function, chat, and agentic work belongs on a separate seconds-budget path with task-level evaluation.",
-  "mediumRationale": "A compact top-to-bottom Mermaid flow is the smallest medium that preserves the request sequence, the convergence of current-buffer and repository context, and the split between two latency and evaluation contracts. The relationship is architectural rather than quantitative, so a graph communicates more directly than fixed geometry.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: labelled directed edges expose the request trigger, two context sources, bounded FIM prompt, model tier, output, and evaluation contract while the established renderer handles responsive layout and themes.",
     "svg": "Rejected: the lesson is a dependency and routing path rather than a precise geometric or quantitative shape, so hand-positioned SVG would add maintenance without more explanatory control.",
@@ -103,6 +103,6 @@
     "visualIds": [
       "coding-assistant-two-latency-paths"
     ],
-    "accessibility": "The Mermaid block includes a specific accessible title and a complete description of both paths. Node text and labelled edges name every product, latency, context, model, output, and evaluation distinction, so meaning does not depend on color. A top-to-bottom layout and the established viz-compact class remove the wide mobile minimum for readability at 390 CSS pixels; the shared Mermaid theme supplies dark-mode and print-compatible colors."
+    "accessibility": "Editor and server lanes share one ordered time direction. R1 captures version 41, typing advances the document to version 42, and R1 returns stale and is discarded. R2 targets version 42 but still needs current version, deadline, and policy checks before acceptance. Tool tasks require separate authorization. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

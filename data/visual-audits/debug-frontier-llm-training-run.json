@@ -3,9 +3,9 @@
   "slug": "debug-frontier-llm-training-run",
   "article": "src/content/posts/2026-07-11-debug-frontier-llm-training-run.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Given an aggregate loss spike or rank-local NaN, localize the first bad transition across step, rank, layer, and tensor or sample before testing one causal family, while treating recovery as separate from root-cause evidence.",
-  "mediumRationale": "A compact Mermaid flow is the smallest medium that makes the diagnostic zoom and the separate recovery track spatially explicit without inventing quantitative data.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the hardest mental model is an ordered relationship: move backward from an aggregate symptom through progressively finer evidence boundaries, then test one cause, while recovery proceeds on a distinct track.",
     "svg": "Rejected because there is no quantitative geometry, measured trajectory, or scale to encode; hand-positioned paths would duplicate Mermaid's relationship semantics and be harder to maintain responsively.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "frontier-training-divergence-zoom"
     ],
-    "accessibility": "The Mermaid source includes a complete title and description. Every boundary and relationship is directly labelled; thick arrows encode the diagnostic spine and dashed arrows encode the separate recovery track, so meaning does not depend on color. The viz-compact marker removes the mobile minimum width for a phone-width vertical layout at 390 CSS pixels. Established Mermaid theme tokens provide dark mode, and shared print rules force a light high-contrast palette and remove width constraints."
+    "accessibility": "A fictional four-step, four-rank grid first becomes non-finite at rank 2, step 3. That cell is traced to layer 6 and a gradient tensor. A one-condition replay tests a candidate explanation; recovery from a known-good checkpoint remains a separate task. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

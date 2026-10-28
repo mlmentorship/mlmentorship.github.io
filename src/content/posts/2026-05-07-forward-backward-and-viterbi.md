@@ -85,7 +85,7 @@ There are $K^T$ possible paths. Both algorithms factor through a $T \times K$ DP
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> use the same state lattice twice. Forward-backward sums every prefix arriving at a chosen state and every suffix leaving it, then combines those two summaries to answer “which state at this time?” Viterbi replaces each sum with a max, stores the winning predecessor, and backtracks to answer “which single path?” The thick path and arrowheads carry the distinction without relying on color. Original schematic checked against <a href="https://doi.org/10.1109/5.18626">Rabiner (1989)</a> and <a href="https://doi.org/10.1109/TIT.1967.1054010">Viterbi (1967)</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> use the same state lattice twice. Forward-backward sums every prefix arriving at a chosen state and every suffix leaving it, then combines those two summaries to answer “which state at this time?” Viterbi replaces each sum with a max, stores the winning predecessor, and backtracks to answer “which single path?” The thick path and arrowheads carry the distinction without relying on color. Original schematic checked against <a href="https://doi.org/10.1109/5.18626">Rabiner (1989)</a> and <a href="https://doi.org/10.1109/TIT.1967.1054010">Viterbi (1967)</a>. <span class="visual-reader-check" data-reader-check="forward-backward-viterbi-chain-objectives"><strong>Check:</strong> Why does a high marginal probability at one time not identify the highest-probability complete path?</span></figcaption>
 </figure>
 
 ## Forward algorithm

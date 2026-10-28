@@ -58,7 +58,7 @@ All numbers below are invented teaching values, not Marin measurements or recomm
 		<rect x="72" y="490" width="216" height="27" rx="4" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:2"></rect>
 		<text class="viz-callout" x="180" y="508" text-anchor="middle">reject under the task rule</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> both arms receive the same continuation budget. Compare both evaluation rows with control. Lower domain loss does not rescue a failed task criterion. These values are hypothetical.</figcaption>
+	<figcaption><strong>Read it this way:</strong> both arms receive the same continuation budget. Compare both evaluation rows with control. Lower domain loss does not rescue a failed task criterion. These values are hypothetical. <span class="visual-reader-check" data-reader-check="microannealing-controlled-fork"><strong>Check:</strong> Why is the candidate rejected when its matched-domain loss improves from 2.0 to 1.8?</span></figcaption>
 </figure>
 
 ## The procedure

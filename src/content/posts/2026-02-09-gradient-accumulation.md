@@ -80,7 +80,7 @@ The picture's equal quarters are therefore a special case.
 			<text class="viz-callout" x="380" y="347" text-anchor="middle">effective batch = 4 micro-batches · parameter updates = 1</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> the gradient buffer changes after each backward call; every forward still uses the same parameters. Only the completed mean crosses the optimizer boundary. Clear the buffer when beginning the next window. Four equal-sized micro-batches justify the displayed quarters; unequal sizes require target-count weighting.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the gradient buffer changes after each backward call; every forward still uses the same parameters. Only the completed mean crosses the optimizer boundary. Clear the buffer when beginning the next window. Four equal-sized micro-batches justify the displayed quarters; unequal sizes require target-count weighting. <span class="visual-reader-check" data-reader-check="gradient-accumulation-state-boundary"><strong>Check:</strong> After the third backward pass, what has changed? What still equals the initial parameter state?</span></figcaption>
 </figure>
 
 ### A complete weighted step

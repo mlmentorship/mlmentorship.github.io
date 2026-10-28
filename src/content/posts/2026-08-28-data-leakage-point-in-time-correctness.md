@@ -68,33 +68,8 @@ Two timestamps may matter:
 
 A transaction may occur on Monday but arrive on Wednesday. A Tuesday prediction cannot use it. Joining only on event time still leaks information.
 
-<p class="visual-title">An event is usable only after its arrival</p>
-
 <!-- visual:point-in-time-availability-boundary -->
-```mermaid
-flowchart TB
-	accTitle: Availability time determines which events may cross the prediction-time boundary
-	accDescr: Payment A occurred at 9 AM and was available at 9:05 AM, so it follows a solid valid path into the Monday noon prediction. Payment B occurred at 10 AM but was not available until Wednesday. A dashed leakage path reaches from the prediction into Payment B because an event-time-only join would incorrectly use it. The default label is observed after the prediction and belongs only to the outcome window.
-	subgraph KNOWN["KNOWN BY MONDAY NOON"]
-		direction TB
-		A["Payment A<br/>event: Mon 09:00<br/>available: Mon 09:05"]
-	end
-	C{{"PREDICTION-TIME BOUNDARY<br/>Monday 12:00"}}
-	subgraph FUTURE["NOT YET KNOWN AT NOON"]
-		direction TB
-		B["Payment B<br/>event: Mon 10:00<br/>available: Wednesday"]
-		Y["Default label<br/>observed later"]
-	end
-	A ==>|"VALID: available before cutoff"| C
-	C ==>|"starts the outcome window"| Y
-	C -. "LEAK: event-time-only join<br/>reaches beyond the cutoff" .-> B
-	class A viz-input
-	class C viz-focus
-	class B viz-warning
-	class Y viz-output
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> Payment B happened before Monday noon, but nobody could know it then because it arrived Wednesday. A join that checks only event time pulls that future knowledge backward across the prediction-time boundary.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="point-in-time-availability-boundary-edition-title"><p class="visual-title" id="point-in-time-availability-boundary-edition-title">An earlier event can still be unavailable at prediction time</p><svg viewBox="0 0 360 355" role="img" aria-labelledby="point-in-time-availability-boundary-edition-svg-title point-in-time-availability-boundary-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="point-in-time-availability-boundary-edition-svg-title">An earlier event can still be unavailable at prediction time</title><desc id="point-in-time-availability-boundary-edition-svg-desc">The Monday-noon cutoff divides knowable evidence from the future. Payment A occurs Monday at 09:00 and is available at 09:05. Payment B occurs at 10:00 but is unavailable until Wednesday. Its early event timestamp cannot authorize using its later-arriving information.</desc><text x="180" y="22" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Prediction cutoff: Monday 12:00</tspan></text><rect x="202" y="44" width="142" height="257" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3;stroke-dasharray:5 3"></rect><path d="M201 44L201 301" style="fill:none;stroke:var(--viz-focus-stroke);stroke-width:1.75;stroke-dasharray:5 4"></path><text x="105" y="69" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="105" dy="0">KNOWABLE</tspan></text><text x="272" y="69" style="font-size:12px;font-weight:700;fill:var(--c-text);text-anchor:middle"><tspan x="272" dy="0">FUTURE</tspan></text><text x="20" y="111" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">Payment A</tspan></text><text x="20" y="137" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">event Mon 09:00</tspan></text><g data-editorial-node><rect x="25" y="151" width="160" height="49" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="105" y="171" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="105" dy="0">available Mon</tspan><tspan x="105" dy="19">09:05</tspan></text></g><text x="20" y="236" style="font-size:14px;font-weight:700;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">Payment B</tspan></text><text x="20" y="262" style="font-size:13px;font-weight:400;fill:var(--c-text);text-anchor:start"><tspan x="20" dy="0">event Mon 10:00</tspan></text><g data-editorial-node><rect x="214" y="226" width="120" height="61" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="274" y="252" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="274" dy="0">available</tspan><tspan x="274" dy="19">Wednesday</tspan></text></g><path d="M138 269L211 260" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M205.31372515598005,264.0824353513884L211,260L204.49244169442863,257.4209139410269" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="180" y="330" style="font-size:14px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="180" dy="0">Earlier event != earlier availability</tspan></text></svg><figcaption><strong>Read it this way:</strong> Payment B happened before noon but arrived on Wednesday. An event-time-only join leaks future availability. The layout encodes the cutoff, not proportional elapsed time. <span class="visual-reader-check" data-reader-check="point-in-time-availability-boundary"><strong>Check:</strong> Why is Monday's 10:00 payment unavailable to a Monday-noon prediction?</span></figcaption></figure>
 
 A simplified rule is:
 

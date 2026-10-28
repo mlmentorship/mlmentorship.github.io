@@ -52,6 +52,8 @@ function browserExecutable() {
 const executable = browserExecutable();
 if (!executable) throw new Error('Chrome or Edge was not found; set CHROME_PATH or --browser');
 const baseUrl = baseUrlOption.replace(/\/$/, '');
+const viewportWidth = Number(option('width', '1280'));
+assert(Number.isInteger(viewportWidth) && viewportWidth >= 320, '--width must be an integer of at least 320 CSS pixels');
 const { codingQuestionVisuals } = await import('./coding-visuals/index.mjs');
 const requestedSlugs = option('slugs').split(',').map((slug) => slug.trim()).filter(Boolean);
 const slugs = requestedSlugs.length > 0 ? requestedSlugs : Object.keys(codingQuestionVisuals);
@@ -115,7 +117,7 @@ class Cdp {
 }
 
 const delay = (milliseconds) => new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
-const port = 9800 + (process.pid % 500);
+let port;
 const profileDir = join(tmpdir(), `mlmentorship-coding-interactions-${process.pid}`);
 rmSync(profileDir, { recursive: true, force: true });
 mkdirSync(profileDir, { recursive: true });
@@ -124,7 +126,7 @@ const browser = spawn(executable, [
 	'--disable-gpu',
 	'--no-first-run',
 	'--no-default-browser-check',
-	`--remote-debugging-port=${port}`,
+	'--remote-debugging-port=0',
 	`--user-data-dir=${profileDir}`,
 	'about:blank',
 ], { stdio: ['ignore', 'ignore', 'pipe'] });
@@ -135,8 +137,11 @@ async function waitForBrowser() {
 	for (let attempt = 0; attempt < 100; attempt += 1) {
 		if (browser.exitCode !== null) throw new Error(`Browser exited early: ${browserErrors.slice(-1000)}`);
 		try {
+			const [ownedPort, endpoint] = readFileSync(join(profileDir, 'DevToolsActivePort'), 'utf8').trim().split(/\r?\n/);
+			port = Number(ownedPort);
+			if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid owned debugging port');
 			const response = await fetch(`http://127.0.0.1:${port}/json/version`);
-			if (response.ok) return;
+			if (response.ok && (await response.json()).webSocketDebuggerUrl.endsWith(endpoint)) return;
 		} catch {
 			// Chrome has not opened its debugging socket yet.
 		}
@@ -200,6 +205,7 @@ const snapshotBody = `
 		}];
 	});
 	return {
+		innerWidth,
 		activeFrame: Number(visual.dataset.activeFrame),
 		activeKey: activeFrame.dataset.frameKey,
 		frameCount: visual.querySelectorAll('[data-coding-frame]').length,
@@ -235,13 +241,14 @@ try {
 	await cdp.ready();
 	await cdp.call('Page.enable');
 	await cdp.call('Runtime.enable');
-	await cdp.call('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+	await cdp.call('Emulation.setDeviceMetricsOverride', { width: viewportWidth, height: 900, deviceScaleFactor: 1, mobile: viewportWidth <= 640 });
 
 	for (const route of routes) {
 		await cdp.call('Emulation.setScriptExecutionDisabled', { value: false });
 		await cdp.call('Emulation.setEmulatedMedia', { media: 'screen', features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
 		await navigate(cdp, route.url);
 		const initial = await evaluate(cdp, `(() => { const visual = document.querySelector('[data-coding-visual]'); ${snapshotBody} })()`);
+		assert.equal(initial.innerWidth, viewportWidth, `${route.slug}: actual viewport width differs from the requested width`);
 		assert.equal(initial.enhanced, 'true', `${route.slug}: enhancement did not initialize`);
 		assert.equal(initial.activeFrame, 0, `${route.slug}: initial frame is not zero`);
 		let trackedAppearance = false;
@@ -331,8 +338,8 @@ try {
 
 	const output = resolve(root, option('output', 'scratch/coding-interaction-report.json'));
 	mkdirSync(resolve(output, '..'), { recursive: true });
-	writeFileSync(output, `${JSON.stringify({ routes: report }, null, 2)}\n`);
-	console.log(`Coding visual browser interactions passed: ${report.length} routes and ${report.reduce((sum, item) => sum + item.frames, 0)} authored frames.`);
+	writeFileSync(output, `${JSON.stringify({ viewportWidth, routes: report }, null, 2)}\n`);
+	console.log(`Coding visual browser interactions passed at ${viewportWidth}px: ${report.length} routes and ${report.reduce((sum, item) => sum + item.frames, 0)} authored frames.`);
 } finally {
 	cdp?.close();
 	await stopBrowser();

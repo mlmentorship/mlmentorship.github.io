@@ -77,7 +77,7 @@ These are the exact values and arrows in the diagram.
 			<text class="viz-node-gradient" x="540" y="93">seed = 1</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> each reverse arrow multiplies one upstream gradient by one local derivative. The graph is traversed once in each direction; no full Jacobian is built.</figcaption>
+	<figcaption><strong>Read it this way:</strong> each reverse arrow multiplies one upstream gradient by one local derivative. The graph is traversed once in each direction; no full Jacobian is built. <span class="visual-reader-check" data-reader-check="backprop-forward-reverse-trace"><strong>Check:</strong> Why does w receive gradient 28 while x receives 42?</span></figcaption>
 </figure>
 
 ## Vector-Jacobian products (VJPs)

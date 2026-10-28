@@ -41,7 +41,7 @@ Account for proposal probabilities, normalized correction, draft cost, acceptanc
 <p><strong>Conditional latency result</strong><br />More arithmetic, but near one decode step only while the pass remains memory-bound.</p>
 </section>
 </div>
-<figcaption><strong>Read it this way:</strong> speculative verification is not free computation. It amortizes one expensive target-weight read across several useful positions. The wall time can stay close to one target decode step while bandwidth remains the bottleneck; large <var>K</var>, batching, draft cost, and cache work can erase that advantage. Original cost ledger checked against <a href="https://arxiv.org/abs/2211.17192">Leviathan et al. (2023)</a> and <a href="https://arxiv.org/abs/2302.01318">Chen et al. (2023)</a>.</figcaption>
+<figcaption><strong>Read it this way:</strong> speculative verification is not free computation. It amortizes one expensive target-weight read across several useful positions. The wall time can stay close to one target decode step while bandwidth remains the bottleneck; large <var>K</var>, batching, draft cost, and cache work can erase that advantage. Original cost ledger checked against <a href="https://arxiv.org/abs/2211.17192">Leviathan et al. (2023)</a> and <a href="https://arxiv.org/abs/2302.01318">Chen et al. (2023)</a>. <span class="visual-reader-check" data-reader-check="speculative-decoding-weight-read-ledger"><strong>Check:</strong> Why can expensive drafting or a short accepted prefix erase verification savings?</span></figcaption>
 </figure>
 
 ## What an L4 answer sounds like

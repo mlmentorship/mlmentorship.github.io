@@ -118,7 +118,7 @@ This is L5. You've named the unrolling, the memory and gradient problems, and th
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the solid line first: the value of h₂ still initializes h₃ across the detach boundary. Then follow the dashed line backward: with K = 2, the loss updates the shared weights through h₄ and h₃, but cannot assign this update's credit through h₂ or h₁.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the solid line first: the value of h₂ still initializes h₃ across the detach boundary. Then follow the dashed line backward: with K = 2, the loss updates the shared weights through h₄ and h₃, but cannot assign this update's credit through h₂ or h₁. <span class="visual-reader-check" data-reader-check="bptt-detach-cuts-gradient-not-state"><strong>Check:</strong> Does detach reset the hidden state? Which contributions to the shared W gradient disappear?</span></figcaption>
 </figure>
 
 ## What an L6 answer sounds like

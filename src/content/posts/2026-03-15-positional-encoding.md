@@ -103,7 +103,7 @@ Forbidden scores still require a separate mask.
 		<text class="viz-axis-label" x="180" y="436" text-anchor="middle">content score − sₕ(i − j) → softmax</text>
 		<text class="viz-label" x="180" y="449" text-anchor="middle">each head h has its own fixed positive slope sₕ</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> shifting both upper positions by three preserves their angle gap for fixed content vectors. ALiBi instead subtracts distance penalties from content scores before softmax. At slope 0.25, the lower symbolic biases become −1, −0.5, and 0. These are different operations, despite their common relative-offset dependence. Sources: <a href="https://arxiv.org/abs/2104.09864">RoFormer</a> and <a href="https://arxiv.org/abs/2108.12409">ALiBi</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> shifting both upper positions by three preserves their angle gap for fixed content vectors. ALiBi instead subtracts distance penalties from content scores before softmax. At slope 0.25, the lower symbolic biases become −1, −0.5, and 0. These are different operations, despite their common relative-offset dependence. Sources: <a href="https://arxiv.org/abs/2104.09864">RoFormer</a> and <a href="https://arxiv.org/abs/2108.12409">ALiBi</a>. <span class="visual-reader-check" data-reader-check="positional-relative-mechanisms"><strong>Check:</strong> What is unchanged when both positions shift together in the RoPE example? What operation instead adds ALiBi's distance effect?</span></figcaption>
 </figure>
 
 ### Compute and change the row

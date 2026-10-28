@@ -80,7 +80,7 @@ The displayed distant mean misses the predicted useful effect; control validity 
 		<text class="viz-callout" x="26" y="477">Distant gain ≥ 2; short gain ≤ 0.5 points</text>
 		<text class="viz-label" x="180" y="521" text-anchor="middle">Hypothetical means; uncertainty is not supplied.</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the full model beats A by three points but beats matched C by only 0.2. These comparisons support different claims.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the full model beats A by three points but beats matched C by only 0.2. These comparisons support different claims. <span class="visual-reader-check" data-reader-check="ablation-rival-hypotheses"><strong>Check:</strong> Does a three-point baseline gain establish the mechanism when the matched-control gap is only 0.2 points?</span></figcaption>
 </figure>
 
 <p class="diagram-source">References: <a href="https://www.itl.nist.gov/div898/handbook/pri/section3/pri332.htm">NIST blocking guidance</a> and <a href="https://arxiv.org/abs/1707.05589">Melis et al.</a></p>

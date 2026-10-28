@@ -66,7 +66,7 @@ The graphs show activation output $g(h)$, not the complete network output $y$.
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> sigmoid loses slope in both tails. ReLU keeps unit slope for positive inputs and zero slope for negative inputs. Exact GELU has a smooth negative shoulder, but its derivative can still equal zero.</figcaption>
+	<figcaption><strong>Read it this way:</strong> sigmoid loses slope in both tails. ReLU keeps unit slope for positive inputs and zero slope for negative inputs. Exact GELU has a smooth negative shoulder, but its derivative can still equal zero. <span class="visual-reader-check" data-reader-check="activation-gradient-regions"><strong>Check:</strong> Where would an incoming gradient shrink or become zero? How is that different for GELU?</span></figcaption>
 </figure>
 
 ## Trace the two inputs

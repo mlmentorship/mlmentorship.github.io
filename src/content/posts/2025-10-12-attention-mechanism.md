@@ -87,7 +87,7 @@ Changing a value changes the mixture's payload without changing these query-key 
 			</svg>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> query-key scores determine weights summing to one. Those same weights mix the paired values into 2.5. Keys select the mixture; values supply its contents.</figcaption>
+	<figcaption><strong>Read it this way:</strong> query-key scores determine weights summing to one. Those same weights mix the paired values into 2.5. Keys select the mixture; values supply its contents. <span class="visual-reader-check" data-reader-check="attention-keys-choose-values-contribute"><strong>Check:</strong> Why does the value with weight 0.30 contribute more than the value with weight 0.60?</span></figcaption>
 </figure>
 
 If corresponding query-key coordinates are independent, zero-mean, and unit-variance, their summed dot product has variance $d$.

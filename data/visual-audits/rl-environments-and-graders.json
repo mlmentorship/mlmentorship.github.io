@@ -3,9 +3,9 @@
   "slug": "rl-environments-and-graders",
   "article": "src/content/posts/2026-07-11-rl-environments-and-graders.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Trace one agent episode across the environment and grader contracts, then explain why a hard policy failure must remain separate from quality scores.",
-  "mediumRationale": "A two-lane semantic handoff is the smallest useful spatial explanation. Numbered steps distinguish the environment's production of an evidence-bearing trajectory from the grader's conversion of that evidence into a gated, component-level training signal. Ordinary text preserves the complete lesson without a renderer and the established two-column primitive stacks naturally on narrow screens.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is a compact contract comparison with one ordered handoff, not a relationship-heavy graph. Mermaid would introduce runtime rendering and either a wide flowchart or smaller labels at phone width.",
     "svg": "Rejected: no quantitative geometry, scale, or branching calculation needs fixed coordinates. A custom diagram would make six short textual obligations harder to reflow and maintain without adding instructional value.",
@@ -77,6 +77,6 @@
     "visualIds": [
       "environment-grader-contract-handoff"
     ],
-    "accessibility": "The figure is linked to a direct learning question and contains a labelled group with two semantic sections. Six numbered steps, explicit contract outputs, and written failure consequences preserve every distinction without color. Source order remains meaningful when the established two-column primitive stacks below 640 CSS pixels, including at 390 CSS pixels; text wraps without a minimum width. Shared theme tokens provide dark-mode contrast, and the established print rules force a light high-contrast palette and avoid page breaks inside the figure."
+    "accessibility": "Fictional E17 closes owned order seventeen, then attempts a forbidden other-account read which is denied with no forbidden side effect. Immutable events reach a grader whose declared hard rule is zero unauthorized attempts. Task outcome passes but process fails, making the episode ineligible. Hidden grading evidence is not exposed to the policy. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

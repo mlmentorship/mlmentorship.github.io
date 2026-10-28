@@ -35,10 +35,10 @@ $$
 <figure class="learning-figure plot-panel" aria-labelledby="bayes-denominator-title">
 	<p class="visual-kicker">Learning objective</p>
 	<p class="visual-title" id="bayes-denominator-title">Why can 99% sensitivity and specificity still leave most positive results false?</p>
-	<svg viewBox="0 0 360 350" role="img" aria-labelledby="bayes-denominator-svg-title bayes-denominator-svg-desc">
+	<svg viewBox="0 0 360 412" role="img" aria-labelledby="bayes-denominator-svg-title bayes-denominator-svg-desc">
 		<title id="bayes-denominator-svg-title">Natural-frequency funnel for a rare disease test</title>
-		<desc id="bayes-denominator-svg-desc">Start with 100,000 people. At 0.1 percent prevalence, 100 have the disease and 99,900 are healthy. With 99 percent sensitivity, the diseased branch contributes 99 true-positive results. With 99 percent specificity, one percent of the healthy branch contributes 999 false-positive results. The branches merge into 1,098 positive results, of which only 99, or about 9 percent, indicate disease.</desc>
-		<rect class="viz-plot-bg" x="4" y="4" width="352" height="342" rx="6"></rect>
+		<desc id="bayes-denominator-svg-desc">Start with 100,000 people. At 0.1 percent prevalence, 100 have the disease and 99,900 are healthy. With 99 percent sensitivity, the diseased branch contributes 99 true-positive results. With 99 percent specificity, one percent of the healthy branch contributes 999 false-positive results. A proportional positive-result strip contains a narrow 99-person true-positive segment and a 999-person false-positive segment. Both enter the denominator 1,098. The true-positive share is 99 divided by 1,098, about 9 percent.</desc>
+		<rect class="viz-plot-bg" x="4" y="4" width="352" height="404" rx="6"></rect>
 		<rect class="viz-node viz-node--input" x="95" y="18" width="170" height="52" rx="5"></rect>
 		<text class="viz-node-label" x="180" y="41">100,000 people</text>
 		<text class="viz-node-value" x="180" y="58">before testing</text>
@@ -60,13 +60,16 @@ $$
 		<rect class="viz-node viz-node--focus" x="200" y="192" width="148" height="62" rx="5" style="stroke-dasharray:5 3"></rect>
 		<text class="viz-node-label" x="274" y="216">999 false positives</text>
 		<text class="viz-node-value" x="274" y="235">1% of 99,900</text>
-		<path d="M86 254V268H180V282M274 254V268H180" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
-		<path d="M174 278L180 286L186 278Z" style="fill:var(--viz-edge)"></path>
-		<rect class="viz-node viz-node--output" x="72" y="286" width="216" height="47" rx="23"></rect>
-		<text class="viz-node-label" x="180" y="307">99 / (99 + 999) = 9%</text>
-		<text class="viz-node-value" x="180" y="324">disease given a positive result</text>
+		<path d="M86 254V269H38V288M274 254V269H194V288" style="fill:none;stroke:var(--viz-edge);stroke-width:2"></path>
+		<rect x="24" y="290" width="28.131147541" height="24" data-count="99" style="fill:var(--viz-output-stroke)"></rect>
+		<rect x="52.131147541" y="290" width="283.868852459" height="24" data-count="999" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-dasharray:4 2"></rect>
+		<text x="194" y="306" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text);text-anchor:middle">999 false positives</text>
+		<text x="24" y="333" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text);text-anchor:start">99 true</text>
+		<path d="M24 339V345H336V339" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+		<text x="180" y="363" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text);text-anchor:middle">all 1,098 positive results</text>
+		<text x="180" y="389" style="font-family:var(--font-ui);font-size:17px;font-weight:700;fill:var(--c-text);text-anchor:middle">99 / (99 + 999) = 9%</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> the prior splits the population into 100 diseased and 99,900 healthy people. Both branches contribute to the positive-result denominator. The posterior is 99 divided by 1,098, not the test's sensitivity.</figcaption>
+	<figcaption><strong>Read it this way:</strong> the narrow solid piece is 99 true positives. The much wider dashed piece is 999 false positives. Their widths use the same people-per-unit scale. The denominator is the entire strip, not just the diseased branch: 99 divided by 1,098, about 9%. These are expected counts under the hypothetical test assumptions. <span class="visual-reader-check" data-reader-check="bayes-positive-test-denominator"><strong>Check:</strong> Why is a positive result only about 9% likely to indicate disease despite 99% sensitivity?</span></figcaption>
 </figure>
 
 The healthy posterior is $999/1098$; together the two posterior masses sum to one.

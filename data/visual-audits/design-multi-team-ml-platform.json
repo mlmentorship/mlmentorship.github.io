@@ -3,9 +3,9 @@
   "slug": "design-multi-team-ml-platform",
   "article": "src/content/posts/2026-08-28-design-multi-team-ml-platform.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Distinguish the lifecycle contracts that need one organization-wide authority from the workload execution that product teams can keep behind adapters during incremental adoption.",
-  "mediumRationale": "A compact two-boundary Mermaid is the smallest useful visual because the lesson depends on both direction and ownership: teams submit one lifecycle contract to shared authority, while that authority delegates execution through adapters and receives evidence back. It replaces a broad component inventory with the specific boundary readers must defend.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the mental model is a directed handoff across an organizational boundary, with one shared state spine, a replaceable adapter boundary, and an evidence return path. Labelled nodes and edges preserve ownership and direction while established rendering supplies responsive sizing and theme-safe tokens.",
     "svg": "Rejected because no quantitative scale or exact geometry carries the lesson. Manually positioned boxes would be less maintainable than the existing directed-flow primitive without adding technical precision.",
@@ -95,6 +95,6 @@
     "visualIds": [
       "multi-team-platform-contract-boundary"
     ],
-    "accessibility": "The Mermaid source provides an accessible title and a complete description of both ownership zones, the shared lifecycle spine, the adapter boundary, team execution systems, and the returning evidence path. Subgraph headings, direct node labels, edge labels, line styles, and arrow direction carry the distinction without color. The compact top-to-bottom flow uses the established tall-flow marker so labels remain readable without horizontal scrolling at 390 CSS pixels; theme tokens provide dark-mode contrast, and print removes height limits and uses a light page-safe palette. The adjacent objective and caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "Attempts A and B share run R at expected version zero. A commits artifact A and advances the run to version one. B then fails its stale version-zero compare-and-swap and retains only attempt evidence. Deployment key K retries the same D1, while writer epochs remain separately checked. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

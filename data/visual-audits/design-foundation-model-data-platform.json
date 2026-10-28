@@ -3,9 +3,9 @@
   "slug": "design-foundation-model-data-platform",
   "article": "src/content/posts/2026-08-29-design-foundation-model-data-platform.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace a source restriction through derived data, manifests, runs, checkpoints, and released models while distinguishing future-use exclusion, stored-artifact deletion, and model-level response.",
-  "mediumRationale": "A wide directed graph is the smallest medium that exposes both forward lineage and the point where deterministic data actions stop without shrinking the action and evidence labels. It keeps one restriction connected to every affected layer, then labels the distinct evidence claim available at each layer.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the lesson is a forward dependency and impact-analysis path with one explicit branch between data-plane remediation and model-level response; labelled nodes and edges preserve that sequence responsively.",
     "svg": "Rejected: no quantitative geometry or exact spatial measurement is needed, so hand-positioned vectors would add maintenance and fixed-label risk without adding meaning.",
@@ -83,6 +83,6 @@
     "visualIds": [
       "foundation-data-deletion-blast-radius"
     ],
-    "accessibility": "The Mermaid block provides a specific accessible title and a complete text description. Node text and edge labels state each artifact layer, action, evidence claim, and unresolved model-level decision, so meaning does not depend on color. The wide flowchart scrolls horizontally at constrained screen widths to preserve readable labels at 390 CSS pixels; shared Mermaid theme tokens provide dark-mode contrast, while print resets the minimum width for high-contrast page-safe output."
+    "accessibility": "An illustrative lineage connects source D7, shard S2, training R3, checkpoint C4, and released model M5. A new build can exclude D7 while M5 still has unresolved influence. Model intervention and its validation are separate from rewriting future data artifacts. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

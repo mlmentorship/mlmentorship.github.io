@@ -3,9 +3,9 @@
   "slug": "scalable-oversight-and-ai-control",
   "article": "src/content/posts/2026-07-11-scalable-oversight-and-ai-control.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Given a proposed safety technique, identify whether it improves judgment under a capability gap, limits harm under intentional subversion, or contributes evidence to both.",
-  "mediumRationale": "A shared-challenge panel followed by a two-column semantic comparison is the smallest medium that prevents readers from classifying techniques by name alone. Aligning threat assumption, intervention target, characteristic failure, and success test shows why a monitor or trusted model can participate in both fields while supporting different claims.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: the lesson is a controlled comparison of assumptions and evidence, not a single directed process. A flowchart would imply that oversight leads into control or that every method follows one fixed sequence.",
     "svg": "Rejected: no quantitative geometry, scale, or fixed coordinate relationship carries the distinction. Fixed SVG text would wrap and magnify less effectively than semantic content at 390 CSS pixels.",
@@ -85,6 +85,6 @@
     "visualIds": [
       "oversight-control-assumption-test"
     ],
-    "accessibility": "The figure has a question-style accessible title, a separately labelled shared-challenge section, two labelled comparison sections, and a group description that states both threat models. Repeated text headings align assumption, target, failure, and success evidence; no distinction depends on color, position alone, or symbols. The established two-column primitive stacks below 640 CSS pixels with no minimum width, including at 390 CSS pixels; theme variables provide dark-mode contrast and shared print rules preserve a high-contrast, break-resistant figure."
+    "accessibility": "The same fictional difficult code task is evaluated under two distinct scenarios. Without assuming attack, assisted decomposition exposes a boundary-case counterexample and tests evaluator correctness. With intentional untrusted action assumed, a trusted scoped boundary denies an unapproved action and records unchanged protected state, testing containment rather than answer quality. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

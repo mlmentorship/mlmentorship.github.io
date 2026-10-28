@@ -3,9 +3,9 @@
   "slug": "regularization",
   "article": "src/content/posts/2026-01-30-regularization.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Distinguish a train-validation overfitting gap from underfitting or adequate fit, then match the diagnosed failure to one targeted regularization lever.",
-  "mediumRationale": "A two-panel semantic decision card is the smallest medium that makes the prerequisite diagnosis adjacent to intervention selection. It avoids duplicating the geometry and arithmetic already taught by linked L1/L2, dropout, and AdamW articles while keeping every decision readable as ordinary responsive text.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because a branching flowchart would overstate a rigid sequence and produce a tall or horizontally scrolling graph for choices that are evidence-dependent and can overlap.",
     "svg": "Rejected because no quantitative curve or geometry is needed for the chosen objective. A fixed train-validation plot would show only one symptom and leave the mechanism-to-lever mapping in prose.",
@@ -120,6 +120,6 @@
     "visualIds": [
       "regularization-diagnose-and-target"
     ],
-    "accessibility": "The figure has a linked learning question and a labelled group of two semantic sections. Written train and validation states, numbered DIAGNOSE and TARGET headings, explicit mechanism-to-lever arrows, and direct consequences carry all meaning without color. The source order presents diagnosis before selection. The established two-column primitive has no minimum width and stacks below 640 CSS pixels for normal text wrapping at 390 CSS pixels; existing theme tokens preserve dark-mode contrast and shared print rules force a light, high-contrast, page-break-safe rendering."
+    "accessibility": "Illustrative same-task train losses .9,.65,.4,.25,.15 and validation losses .92,.7,.5,.55,.7 diverge after step three. Split validity and train/eval mode are checked before testing an early-stop checkpoint on independent held-out evidence. Poor-both and good-both alternatives remain explicit; the intervention result is unknown. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

@@ -48,7 +48,7 @@ How do four simultaneous rows differ from four serial one-row invocations?
 			<p><strong>Weight-only accounting:</strong> 8,388,608 FLOPs / 8,388,608 bytes = 1 FLOP/byte.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> four parallel rows reuse each loaded weight. Serial one-row calls repeat the stream under the stated residency assumption; actual traffic requires measurement.</figcaption>
+	<figcaption><strong>Read it this way:</strong> four parallel rows reuse each loaded weight. Serial one-row calls repeat the stream under the stated residency assumption; actual traffic requires measurement. <span class="visual-reader-check" data-reader-check="prefill-decode-weight-reuse"><strong>Check:</strong> Why is arithmetic identical while the illustrated serial path loads four times as many weight bytes?</span></figcaption>
 </figure>
 
 One row costs $2(1024)^2=2{,}097{,}152$ FLOPs, counting a multiply-add as two operations.

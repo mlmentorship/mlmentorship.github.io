@@ -3,9 +3,9 @@
   "slug": "encoder-decoder-architectures",
   "article": "src/content/posts/2025-09-06-encoder-decoder-architectures.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace why the encoder runs once while every autoregressive decoder step uses both the growing output prefix through causal self-attention and the fixed encoder memory through cross-attention.",
-  "mediumRationale": "A compact Mermaid flowchart is the smallest useful medium for separating three relationships that prose and the existing ASCII sketch blur: one encoder pass creates reusable memory, decoder self-attention reads only the generated prefix, and decoder queries repeatedly cross-attend to encoder keys and values. Mermaid preserves explicit edge labels and a generation loop while reusing established responsive dark, light, mobile, and print behavior.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected: the learning task is a directional dataflow with a repeated decoding cycle, two differently sourced attention paths, and no quantitative geometry.",
     "svg": "Rejected: hand-positioned geometry would duplicate flowchart semantics and require more maintenance without teaching an additional spatial or quantitative property.",
@@ -71,6 +71,6 @@
     "visualIds": [
       "encoder-once-decoder-loop"
     ],
-    "accessibility": "The Mermaid source provides a complete title and description. Nodes and edges explicitly state which sequence supplies Q, K, and V, the fixed memory is labelled 'encode once' and 'reuse every step,' and the autoregressive return edge is dashed and labelled as prefix growth, so the lesson does not depend on color. Short labels and a top-to-bottom layout avoid a forced minimum width; established Mermaid tokens provide dark-mode and print contrast."
+    "accessibility": "One encoder-memory block feeds three successive decoder iterations. Prefixes grow from start to start-A to start-A-B. Cross-attention source K/V remain fixed while the causal decoder prefix and its cache grow. The shared input lines distinguish reuse from re-encoding. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

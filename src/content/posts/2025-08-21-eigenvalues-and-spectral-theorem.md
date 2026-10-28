@@ -89,7 +89,7 @@ Repeat on that smaller symmetric subspace to construct the basis.
 			<text class="viz-label" x="24" y="521">Q(Λz) = QΛQᵀv = (5, 4)</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> <var>Q</var><sup>T</sup> changes coordinates without changing length. <var>Λ</var> triples the first coordinate and preserves the second. <var>Q</var> returns the result to the original axes: <var>Av</var> = (5, 4).</figcaption>
+	<figcaption><strong>Read it this way:</strong> <var>Q</var><sup>T</sup> changes coordinates without changing length. <var>Λ</var> triples the first coordinate and preserves the second. <var>Q</var> returns the result to the original axes: <var>Av</var> = (5, 4). <span class="visual-reader-check" data-reader-check="spectral-theorem-change-basis"><strong>Check:</strong> Which step changes only coordinates? Which step actually scales the eigenvector components?</span></figcaption>
 </figure>
 <p class="diagram-source">Original coordinate construction checked against <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/resources/lecture-25-symmetric-matrices-and-positive-definiteness/">MIT OpenCourseWare 18.06</a> and Sheldon Axler's open-access <a href="https://linear.axler.net/">Linear Algebra Done Right</a>.</p>
 

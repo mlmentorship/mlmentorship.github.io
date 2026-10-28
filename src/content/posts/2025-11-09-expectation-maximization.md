@@ -109,7 +109,7 @@ $$
 		<text class="viz-node-label" x="180" y="389">3 · Likelihood stays above its bound</text>
 		<text class="viz-node-value" x="180" y="404">log p(x; θ<tspan baseline-shift="sub" font-size="8">t+1</tspan>) ≥ F(q<tspan baseline-shift="sub" font-size="8">t</tspan>, θ<tspan baseline-shift="sub" font-size="8">t+1</tspan>)</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> exact E makes the dashed bound touch observed log likelihood at the current parameter. M improves that fixed bound. Likelihood remains above it, proving nondecrease under the stated assumptions. The next exact E-step closes the new gap.</figcaption>
+	<figcaption><strong>Read it this way:</strong> exact E makes the dashed bound touch observed log likelihood at the current parameter. M improves that fixed bound. Likelihood remains above it, proving nondecrease under the stated assumptions. The next exact E-step closes the new gap. <span class="visual-reader-check" data-reader-check="em-lower-bound-climb"><strong>Check:</strong> Which two inequalities ensure the new likelihood cannot fall after the bound is improved?</span></figcaption>
 </figure>
 
 ### Add a Parameter Prior

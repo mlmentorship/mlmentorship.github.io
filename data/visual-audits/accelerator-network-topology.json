@@ -3,9 +3,9 @@
   "slug": "accelerator-network-topology",
   "article": "src/content/posts/2026-08-28-accelerator-network-topology.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Trace why a hierarchical all-reduce combines values on fast local links before exchanging one partial result per group across the slower scale-out network.",
-  "mediumRationale": "The hardest prose-only mental model is the three-stage path of a hierarchical collective and the boundary between fast local and slower scale-out links. Mermaid is the smallest useful medium because this is a labelled flow and relationship problem, and the existing compact flowchart primitive supplies responsive theme and print behavior. Deterministic SVG would add hand-positioned geometry without teaching more; semantic HTML would make the cross-group flow harder to scan; interaction is unnecessary because there is no parameter to vary; reusing a paper or vendor figure would add licensing and vendor-specific detail; and no visual would leave the key spatial hierarchy implicit.",
+  "mediumRationale": "An original 360-unit-wide SVG keeps both fast groups, both numeric partials, the slower-network boundary, and all four final rank results simultaneously visible on a phone. A browser-reviewed Mermaid draft required panning and was rejected. Fixed, coordinated geometry makes the local-sum and final-distribution comparisons inspectable without interaction. No source artwork or measured performance is reused.",
   "deckReview": {
     "pages": [
       {
@@ -53,6 +53,6 @@
     "visualIds": [
       "hierarchical-all-reduce-path"
     ],
-    "accessibility": "Mermaid accTitle and accDescr narrate the three stages and link classes. Node text, numbered stages, group boundaries, and solid versus thick arrows preserve meaning without color. The viz-compact marker removes the mobile minimum width at 390 CSS pixels; shared Mermaid variables provide dark/light contrast and explicit print colors."
+    "accessibility": "A labelled SVG title and description give all four rank identities, local sums 4 and 6, and final sum 10 on every rank. Numbered stages, a dashed slower-network boundary, literal values, and repeated rank identities preserve meaning without color. A 360-unit viewBox keeps the whole comparison together at 390 CSS pixels. Shared theme tokens and a direct caption preserve dark, static, and print semantics without implying a measured saving."
   }
 }

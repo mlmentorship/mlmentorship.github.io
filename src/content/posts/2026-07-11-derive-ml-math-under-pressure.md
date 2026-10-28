@@ -74,7 +74,7 @@ Four independent products add variance; halving their sum multiplies variance by
 		<text class="viz-label" x="14" y="362">CHECK: d = 1 needs no scaling</text>
 		<text class="viz-label" x="14" y="380">SHARED SIGNS: Var(z) = 16; Var(z/2) = 4</text>
 	</svg>
-	<figcaption><strong>Read it this way:</strong> follow the random variable and its variance together. Scaling the variable by one half scales variance by one quarter, not one half.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the random variable and its variance together. Scaling the variable by one half scales variance by one quarter, not one half. <span class="visual-reader-check" data-reader-check="attention-scaling-variance-trace"><strong>Check:</strong> Why does dividing by 2 yield variance 1 for independent terms but variance 4 for shared terms?</span></figcaption>
 </figure>
 
 <p class="diagram-source">References: <a href="https://arxiv.org/abs/1706.03762">Vaswani et al.</a> and <a href="https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">PyTorch scaled-dot-product attention</a>.</p>

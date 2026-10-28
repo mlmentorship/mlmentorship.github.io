@@ -3,9 +3,9 @@
   "slug": "when-not-cross-validation",
   "article": "src/content/posts/2025-05-25-when-not-cross-validation.md",
   "status": "implemented",
-  "medium": "semantic-html",
+  "medium": "svg",
   "learningObjective": "Decide whether ordinary cross-validation answers the deployment question, and choose a structure-aware split, external evaluation, representative holdout, or nested evaluation when it does not.",
-  "mediumRationale": "A compact semantic decision sequence is the smallest medium that separates two often-confused questions: whether folds preserve the unit that must be unseen, and whether cross-validation measures the target deployment distribution at all. Ordered checks connect each failed assumption to its replacement without implying that one split is universally correct, and remain legible without horizontal scrolling at 390 CSS pixels.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected after pixel review: the branching graph required horizontal scrolling and made labels too small at an exact 390 CSS-pixel viewport.",
     "svg": "Rejected: fixed-coordinate split geometry would duplicate the site's dedicated cross-validation-strategies visual and add drawing complexity without improving this article's higher-level decision.",
@@ -63,6 +63,6 @@
     "visualIds": [
       "cross-validation-fit-the-question"
     ],
-    "accessibility": "The figure has a linked learning objective and an explicitly labelled semantic group. Four ordered checks name both the failed assumption and replacement evaluation, so no inference relies on color. The sequence uses ordinary wrapping text with no fixed width or horizontal scrolling at 390 CSS pixels; established theme tokens support dark mode, and existing print rules provide a light high-contrast rendering and keep the caption with the figure."
+    "accessibility": "A time example trains Monday and Tuesday and tests Wednesday and Thursday; random training on Thursday while testing Tuesday leaks future information. A new-entity example trains A1/A2 and tests B1/B2; splitting A1/A2 across train/test leaks the entity. Model selection remains inside an untouched outer evaluation boundary. These repairs do not solve distribution shift. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

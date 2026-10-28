@@ -140,7 +140,7 @@ With two devices, device 0 would compute the first row block with the first colu
 			<text class="viz-label" x="20" y="316">The dashed cells are absent work, not partial sums: there is nothing to reduce.</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> one mesh coordinate selects both a row shard and the same-index column shard, so local work lands only on the diagonal. The dashed off-diagonal blocks require cross-index input pairs that no device owns. Original schematic checked against the <a href="https://jax-ml.github.io/scaling-book/sharding/">Google DeepMind scaling book’s sharded-matmul cases</a> and the <a href="https://arxiv.org/abs/2105.04663">GSPMD paper</a>.</figcaption>
+	<figcaption><strong>Read it this way:</strong> one mesh coordinate selects both a row shard and the same-index column shard, so local work lands only on the diagonal. The dashed off-diagonal blocks require cross-index input pairs that no device owns. Original schematic checked against the <a href="https://jax-ml.github.io/scaling-book/sharding/">Google DeepMind scaling book’s sharded-matmul cases</a> and the <a href="https://arxiv.org/abs/2105.04663">GSPMD paper</a>. <span class="visual-reader-check" data-reader-check="same-mesh-axis-diagonal-gap"><strong>Check:</strong> Why can reducing the two computed diagonal blocks not create C0,1 or C1,0?</span></figcaption>
 </figure>
 
 All-gather or reshard one input before multiplying. Pick the smaller movement or the layout needed by the next operation.

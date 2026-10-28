@@ -77,7 +77,7 @@ The diagram uses different illustrative channel counts: thirty-two, then sixty-f
 			<text class="viz-axis-label" x="184" y="222" text-anchor="middle">channels and receptive field increase</text>
 		</svg>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the stated grid and channel dimensions from left to right. These illustrated layers preserve, then downsample, the grid while changing channel width. Global average pooling produces one value per channel. The spatial choices determine which locations remain distinguishable.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the stated grid and channel dimensions from left to right. These illustrated layers preserve, then downsample, the grid while changing channel width. Global average pooling produces one value per channel. The spatial choices determine which locations remain distinguishable. <span class="visual-reader-check" data-reader-check="cnn-spatial-channel-pyramid"><strong>Check:</strong> Why does spatial pooling produce 1x1x64 rather than one scalar for the entire image?</span></figcaption>
 </figure>
 
 ## Standard CNN ingredients

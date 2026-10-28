@@ -46,7 +46,7 @@ Trace each action path, then add epsilon-greedy behavior with $\epsilon=0.2$ and
 			<p>SAC combines a stochastic actor with off-policy Q learning, not an actor-equals-on-policy rule.</p>
 		</section>
 	</div>
-	<figcaption><strong>Read it this way:</strong> follow the action paths before the training path. Values plus a rule and a learned actor are different interfaces, not opposite definitions of randomness.</figcaption>
+	<figcaption><strong>Read it this way:</strong> follow the action paths before the training path. Values plus a rule and a learned actor are different interfaces, not opposite definitions of randomness. <span class="visual-reader-check" data-reader-check="value-policy-action-interface"><strong>Check:</strong> Why can a value-based agent act stochastically? What declared rule gives right probability 13/15?</span></figcaption>
 </figure>
 
 ## Check the Behavior Probabilities

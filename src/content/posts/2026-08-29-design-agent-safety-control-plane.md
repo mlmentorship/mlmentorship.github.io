@@ -299,42 +299,8 @@ The company safety floor is the subset no product can lower alone: controls cann
 ## Architecture
 
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title">Trace how an already-authorized action can only retain or lose authority, then see how observed outcomes can reduce authority for the next action.</p>
-
 <!-- visual:agent-safety-authority-loop -->
-```mermaid
-flowchart TB
-  accTitle: An independent safety control loop can only preserve or reduce action authority
-  accDescr: Existing authorization creates a signed action envelope and sets the maximum authority. Policy, provenance, monitors, cumulative impact, and active breaker state become pre-action evidence for an independent safety decision. That decision may preserve or narrow authority through confirmation and approval, or remove authority by blocking and freezing. A bounded executor performs an approved action, the authoritative external system reports the outcome, and post-action verification feeds aggregate detection. New evidence can activate a breaker that constrains the next action, but no safety check can expand the original authorization.
-  Envelope["AUTHORIZED ACTION ENVELOPE<br/>identity · scope · signed arguments"]
-  Checks["PRE-ACTION EVIDENCE<br/>policy · provenance · monitors · cumulative impact · breaker state"]
-  Decision{"SAFETY DECISION<br/>preserve, narrow, or remove authority"}
-  Approval["CONFIRM + APPROVE<br/>scoped capability"]
-  Breaker["BLOCK + FREEZE<br/>reduce later authority"]
-  Executor["BOUNDED EXECUTOR"]
-  Systems["AUTHORITATIVE OUTCOME"]
-  Verify["POST-ACTION VERIFICATION"]
-  Detect["EVIDENCE + AGGREGATE DETECTION<br/>rates · sequences · divergence"]
-  Envelope ==> Checks
-  Checks ==> Decision
-  Decision ==>|"allow or narrow"| Approval
-  Decision -->|"block or freeze"| Breaker
-  Approval ==> Executor
-  Executor ==> Systems
-  Systems ==> Verify
-  Verify ==> Detect
-  Detect -->|"activate when bounds cross"| Breaker
-  Breaker -.->|"constrains the next action"| Checks
-  class Envelope viz-input
-  class Checks,Decision viz-focus
-  class Approval,Detect viz-state
-  class Executor viz-neutral
-  class Systems,Verify viz-output
-  class Breaker viz-warning
-  class Envelope viz-tall
-```
-
-<p class="diagram-caption"><strong>Read it this way:</strong> authorization sets the ceiling; deterministic, semantic, and cumulative evidence can only preserve or lower it before execution. Authoritative outcomes and aggregate evidence feed breaker state, so the next action may have less authority than the last.</p>
+<figure class="learning-figure editorial-illustration" aria-labelledby="agent-safety-authority-loop-edition-title"><p class="visual-title" id="agent-safety-authority-loop-edition-title">An impact limit must stop the next capability before execution</p><svg viewBox="0 0 360 390" role="img" aria-labelledby="agent-safety-authority-loop-edition-svg-title agent-safety-authority-loop-edition-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="agent-safety-authority-loop-edition-svg-title">An impact limit must stop the next capability before execution</title><desc id="agent-safety-authority-loop-edition-svg-desc">An illustrative impact ledger already contains 60 units and receives a proposed 50-unit action. A 100-unit policy limit would be exceeded because 60 plus 50 equals 110. The failing branch freezes future capabilities before dispatch. The proposed action is not counted as an already committed effect.</desc><text x="180" y="22" style="font-size:12px;font-weight:400;fill:var(--c-text-soft);text-anchor:middle"><tspan x="180" dy="0">Illustrative impact policy; limit 100</tspan></text><g transform="translate(0 0)"><g data-editorial-node><rect x="30" y="43" width="300" height="58" rx="3" style="fill:var(--viz-input-bg);stroke:var(--viz-input-stroke);stroke-width:1.3"></rect><text x="180" y="67.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">Committed impact 60</tspan><tspan x="180" dy="19">proposed action +50</tspan></text></g><path d="M180 101L180 128" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M176.64402122977057,121.8569220667674L180,128L183.35597877022943,121.8569220667674" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><g data-editorial-node><rect x="30" y="132" width="300" height="76" rx="3" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:1.3"></rect><text x="180" y="165.5" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="180" dy="0">60 + 50 = 110 &gt; 100</tspan><tspan x="180" dy="19">aggregate limit is exceeded</tspan></text></g><path d="M180 208L180 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L270 229" style="fill:none;stroke:var(--viz-neutral-stroke);stroke-width:1.75"></path><path d="M90 229L90 266" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M86.64402122977057,259.85692206676737L90,266L93.35597877022943,259.85692206676737" style="fill:none;stroke:var(--viz-output-stroke);stroke-width:1.75"></path><path d="M270 229L270 266" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><path d="M266.6440212297706,259.85692206676737L270,266L273.3559787702294,259.85692206676737" style="fill:none;stroke:var(--viz-warning-stroke);stroke-width:1.75"></path><text x="90" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-output-stroke);text-anchor:middle"><tspan x="90" dy="0">WITHIN LIMIT</tspan></text><text x="270" y="253" style="font-size:12px;font-weight:700;fill:var(--viz-warning-stroke);text-anchor:middle"><tspan x="270" dy="0">THIS REQUEST</tspan></text><g data-editorial-node><rect x="14" y="270" width="152" height="100" rx="3" style="fill:var(--viz-output-bg);stroke:var(--viz-output-stroke);stroke-width:1.3"></rect><text x="90" y="306" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="90" dy="0">recheck authority</tspan><tspan x="90" dy="19">issue bounded</tspan><tspan x="90" dy="19">capability</tspan></text></g><g data-editorial-node><rect x="194" y="270" width="152" height="100" rx="3" style="fill:var(--viz-warning-bg);stroke:var(--viz-warning-stroke);stroke-width:1.3"></rect><text x="270" y="306" style="font-size:14px;font-weight:400;fill:var(--c-text);text-anchor:middle"><tspan x="270" dy="0">FREEZE authority</tspan><tspan x="270" dy="19">no capability</tspan><tspan x="270" dy="19">no dispatch</tspan></text></g></g></svg><figcaption><strong>Read it this way:</strong> The proposed action would cross the illustrative limit. Freeze later capabilities before execution. A monitor alert alone cannot enforce the stop. <span class="visual-reader-check" data-reader-check="agent-safety-authority-loop"><strong>Check:</strong> Why can a later individually valid proposal be blocked after aggregate impact crosses a bound?</span></figcaption></figure>
 <p class="diagram-source">Original synthesis informed by <a href="https://doi.org/10.6028/NIST.SP.800-207">NIST SP 800-207</a> on policy decision and enforcement points, <a href="https://doi.org/10.6028/NIST.AI.600-1">NIST AI 600-1</a> on continuous monitoring and incident handling, <a href="https://proceedings.mlr.press/v235/greenblatt24a.html">Greenblatt et al. on AI control protocols</a>, and the <a href="https://sre.google/sre-book/handling-overload/">Google SRE guidance on bounded degradation</a>.</p>
 
 ### Safety policy control plane

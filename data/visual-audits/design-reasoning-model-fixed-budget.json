@@ -3,9 +3,9 @@
   "slug": "design-reasoning-model-fixed-budget",
   "article": "src/content/posts/2026-08-29-design-reasoning-model-fixed-budget.md",
   "status": "implemented",
-  "medium": "mermaid",
+  "medium": "svg",
   "learningObjective": "Distinguish fixed quarterly budget fences from physical partitions, then trace how the capacity broker reclaims checkpointable offline work without spending the protected serving floor or recovery reserve twice.",
-  "mediumRationale": "A compact Mermaid allocation-and-reclaim flow is the smallest useful spatial explanation: it connects the arithmetic envelope, two protected claims, the reclaimable offline portfolio, observed pressure, and the checkpoint boundary without reproducing the article's serving architecture or implying that percentage fences are fixed hardware partitions.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Selected because the lesson combines a hierarchy of budget claims with a directed state transition under pressure. Labelled nodes and edges expose what is protected, what is reclaimable, and when offline nodes return to serving; the established wide-flow marker supports themed rendering and contained narrow-screen scrolling for the reclaim loop.",
     "svg": "Rejected because exact geometric scale is not the lesson and the shares are already precise in the adjacent table. Hand-positioning the same flow would add maintenance cost without improving technical accuracy.",
@@ -77,6 +77,6 @@
     "visualIds": [
       "reasoning-fixed-budget-reclaim"
     ],
-    "accessibility": "The Mermaid source has a complete accessible title and description that state all three claims, their exact shares, the normal admission path, the pressure-triggered checkpoint path, and the reserve restriction. Node shapes, direct labels, percentages, edge labels, and solid-versus-dashed paths carry the full meaning without color. The compact top-to-bottom flow and established wide-flow marker preserve readable labels through contained horizontal scrolling at 390 CSS pixels; shared Mermaid theme tokens provide dark-mode contrast and print-safe output. The adjacent allocation table and direct caption preserve the lesson if client-side rendering is unavailable."
+    "accessibility": "The usable quarterly envelope is 248,832 accelerator-hours, split into 65 percent protected and 35 percent reclaimable offline claims. A separately labeled instantaneous eight-node toy example moves two offline nodes back to serving after checkpoint and pause. The toy node ratio is not a conversion of the quarterly percentages. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }
