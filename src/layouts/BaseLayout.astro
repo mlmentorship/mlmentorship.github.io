@@ -63,6 +63,7 @@ const showLibrarySidebar = !immersive && (isArticleRoute || isLibraryRoute);
     grid-template-columns: 12rem minmax(0, 1fr);
   }
   .site-page { min-width: 0; }
+  .site-shell--with-library .site-page { container-type: inline-size; }
   .site-shell--immersive { display: block; width: 100%; padding: 0; }
 
   @media (max-width: 860px) {

@@ -87,7 +87,7 @@ const entryCount = chapters.reduce((total, item) => total + item.entries.length,
   .chapter h2 a:hover { color: var(--c-accent); text-decoration: underline; }
   .chapter header p { margin: 0; color: var(--c-muted); font-family: var(--font-reading); font-size: .8rem; line-height: 1.4; }
   .chapter-meta { display: flex; flex-wrap: wrap; gap: .35rem .8rem; margin: .55rem 0 0 2.85rem; }
-  .chapter-meta div { display: flex; gap: .35rem; }
+  .chapter-meta div { display: flex; flex-wrap: wrap; min-width: 0; gap: .35rem; }
   .chapter-meta dt { color: var(--c-muted); font-size: .62rem; }
   .chapter-meta dd { margin: 0; color: var(--c-text-soft); font-size: .66rem; }
   .chapter-link { margin: .45rem 0 0 2.85rem; font-size: .72rem; font-weight: 550; }

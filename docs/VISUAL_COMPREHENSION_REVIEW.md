@@ -55,6 +55,25 @@ node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --v
 Capture once before further edits; the command refuses to overwrite an existing preservation baseline.
 Do not regenerate whole lessons merely to update figures or use a dirty generator to apply unrelated changes.
 
+## Responsive follow-up
+
+Every article now promotes its original main illustration before the article body, rather than opting questions and pattern-first lessons out of the opening visual.
+Figure identities and authored content remain intact; the no-JavaScript fallback retains the original source placement.
+Questions keep closed-book practice ahead of the illustration, with the topic-neutral button label **Practice** and the existing problem-only prompt.
+
+Wide article illustrations use their available content column, including the expanded library sidebar, instead of the full viewport.
+Mobile graph and linked-topology canvases retain readable labels inside a contained horizontal scroller.
+Search keeps its close control visible while results scroll.
+Homepage edition metadata, chapter metadata, coding-frame headings and practice actions wrap at enlarged text sizes without widening the page.
+The homepage's primary action context label inherits the button's contrasting foreground.
+
+The responsive review uses actual 320, 390, 768, 1024, 1440 and 1920 CSS-pixel viewports in both themes.
+It exercises navigation, populated search, long-title practice, scoring and scratchpad reset, expanded contents, the review explanation and generated prep-map results.
+Text-resize cases use 200% root text at phone, tablet and desktop widths.
+All 391 main-figure openings are checked at 320, 768 and 1440px for placement, page bounds and the existing 8px SVG-label minimum.
+This floor is a technical check, not a claim that every figure is equally readable or a substitute for inspecting native captures.
+Failed observations remain separate from the corrected checks, including invalid drawer-state assumptions and tall-panel element captures that did not settle.
+
 ## Previous outcome
 
 Expert review is complete for 392 registered visuals across 391 articles and 16 supplemental Mermaid diagrams.

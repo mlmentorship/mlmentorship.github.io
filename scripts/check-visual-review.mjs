@@ -36,6 +36,7 @@ function elements(root) {
 }
 
 const attribute = (node, name) => node.attrs?.find((item) => item.name === name)?.value;
+const textContent = (node) => node.value ?? (node.childNodes ?? []).map(textContent).join('');
 
 for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.json'))) {
   const audit = JSON.parse(readFileSync(join(auditsDir, filename), 'utf8'));
@@ -62,13 +63,20 @@ for (const filename of readdirSync(auditsDir).filter((name) => name.endsWith('.j
   if (!html.includes(`/review/#${audit.slug}`)) failures.push(`${audit.slug}: library-wide visual-review link is missing`);
   if (!html.includes('href="#full-explanation"')) failures.push(`${audit.slug}: full-content jump is missing`);
   if (!html.includes('data-full-explanation')) failures.push(`${audit.slug}: full-content boundary is missing`);
+  const nodes = elements(parse(html));
+  const lead = nodes.find((node) => attribute(node, 'data-article-quick-review') !== undefined);
+  const answer = nodes.find((node) => attribute(node, 'id') === 'answer');
+  if (!lead || attribute(lead, 'hidden') === undefined || attribute(lead, 'data-inline-visual') !== undefined) {
+    failures.push(`${audit.slug}: the main illustration must have a top slot, hidden only until its figure is ready`);
+  }
+  if (!answer || nodes.indexOf(lead) >= nodes.indexOf(answer)) {
+    failures.push(`${audit.slug}: the main illustration slot must precede the article body`);
+  }
   if (category === 'questions') {
-    const nodes = elements(parse(html));
-    const lead = nodes.find((node) => attribute(node, 'data-article-quick-review') !== undefined);
-    if (!lead || attribute(lead, 'data-inline-visual') !== 'true' || attribute(lead, 'hidden') === undefined) {
-      failures.push(`${audit.slug}: question visuals must start hidden and retain authored placement after the statement`);
+    const practice = nodes.find((node) => attribute(node, 'data-practice-start') !== undefined);
+    if (practice && textContent(practice).trim() !== 'Practice') {
+      failures.push(`${audit.slug}: the practice command must use the topic-neutral label Practice`);
     }
-    const answer = nodes.find((node) => attribute(node, 'id') === 'answer');
     const body = answer ? elements(answer) : [];
     const firstSection = body.find((node) => node.tagName === 'h2');
     const lastField = body.findIndex((node) => node.tagName === 'strong' && ['Example.', 'Constraints.'].includes(node.childNodes?.map((child) => child.value ?? '').join('')));

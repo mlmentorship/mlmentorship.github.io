@@ -20,7 +20,7 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
     <p class="practice-last" data-practice-last hidden></p>
   </div>
   <div class="practice-actions">
-    <button class="practice-start" type="button" data-practice-start>Start {mode.label.toLowerCase()} practice</button>
+    <button class="practice-start" type="button" data-practice-start>Practice</button>
     <div class="practice-links">
       <a class="workbook-return" data-workbook-return href="/prep/#queue">Back to my workbook</a>
       <a href="/prep/#how-practice-works">How practice works</a>
@@ -217,7 +217,7 @@ const initialTimer = `${String(mode.minutes).padStart(2, '0')}:00`;
   .practice-launch p { margin: 0; color: var(--c-text-soft); font-size: .88rem; }
   .practice-eyebrow { margin: 0 0 .3rem !important; font-family: var(--font-mono); font-size: .66rem !important; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent) !important; }
   .practice-last { margin-top: .45rem !important; color: var(--c-muted) !important; }
-  .practice-actions { display: flex; flex-direction: column; align-items: flex-end; gap: .45rem; flex: 0 0 auto; }
+  .practice-actions { display: flex; flex-direction: column; align-items: flex-end; min-width: 0; gap: .45rem; flex: 0 1 auto; }
   .practice-links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .35rem .7rem; }
   .practice-actions a { font-size: .76rem; }
   .practice-actions .workbook-return { color: var(--c-accent); font-weight: 700; }

@@ -52,8 +52,10 @@
 }
 
 .coding-trace-frame-heading {
+  min-width: 0;
   padding: .5rem 0 .5rem .75rem;
   background: transparent;
+  overflow-wrap: anywhere;
 }
 
 .coding-trace-frame-heading strong {
@@ -228,6 +230,19 @@
 
   .coding-trace-array-item {
     min-width: 2.25rem;
+  }
+
+  .coding-trace-graph,
+  .coding-trace-linked-topology {
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .coding-trace-graph svg,
+  .coding-trace-linked-topology svg {
+    min-width: 22rem;
+    max-height: none;
   }
 }
 
