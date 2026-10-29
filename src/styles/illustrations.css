@@ -120,6 +120,27 @@
   letter-spacing: 0;
 }
 
+@media screen {
+  .coding-trace-tree:has(.coding-trace-tree-semantic) {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  .coding-trace-tree-semantic,
+  .coding-trace-tree-semantic ul {
+    min-width: max-content;
+  }
+
+  .coding-trace-tree-semantic li {
+    min-width: 7rem;
+  }
+
+  .coding-trace-tree-node {
+    width: 6.5rem;
+    overflow-wrap: normal;
+  }
+}
+
 .coding-trace-grid-cell > small {
   font-size: .6875rem;
   overflow-wrap: normal;

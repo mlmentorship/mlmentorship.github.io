@@ -21,6 +21,14 @@ export function retainedState(scene) {
     if (value !== undefined) entries.set(identity, { label, value: display(value), priority });
   };
   for (const pointer of Array.isArray(scene.marks) ? scene.marks : []) {
+    if (scene.type === 'tree') {
+      const nodes = scene.levels.flat();
+      const node = nodes[pointer.index];
+      const occurrence = nodes.slice(0, pointer.index).filter((value) => value === node).length;
+      const repeated = nodes.filter((value) => value === node).length > 1;
+      add(`tree-status:${display(node)}:${occurrence}`, `node ${display(node)}${repeated ? ` (${occurrence + 1})` : ''}`, pointer.label, 4);
+      continue;
+    }
     const identity = pointer.key ?? pointer.label?.split(/[=:]/)[0] ?? `${pointer.row}:${pointer.col}`;
     const position = pointer.index ?? (pointer.row === undefined ? undefined : `(${pointer.row}, ${pointer.col})`);
     add(`pointer:${identity}`, pointer.label?.split(/[=:]/)[0].trim() || pointer.key || 'position', position, 4);
@@ -224,6 +232,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   assert.match(renderStateTransition({ type: 'array', items: ['<script>'] }), /&lt;script&gt;/);
   assert.match(renderStateTransition({ type: 'attention', values: 'V0', rows: 'Q0' }), /V0/);
   assert.doesNotMatch(renderStateTransition({ type: 'graph', nodes: [{ id: 'A', x: 90, y: 80 }], width: 360 }), />360<|>90<|>80</);
+  const treeBefore = { type: 'tree', levels: [['1'], ['2', '5'], ['3', '-', '6', '7'], ['4']], marks: [{ index: 7, label: 'current' }] };
+  const treeAfter = { ...treeBefore, marks: [{ index: 7, label: 'return height 1' }] };
+  assert.deepEqual(checkpointChanges(treeAfter, treeBefore).map(({ label, before, after }) => ({ label, before, after })), [
+    { label: 'node 4', before: 'current', after: 'return height 1' },
+  ]);
+  assert.doesNotMatch(renderStateTransition(treeAfter, treeBefore), /class="coding-state-after">7</);
+  const repeatedTree = retainedState({ type: 'tree', levels: [['0'], ['1', '1']], marks: [{ index: 1, label: 'left visited' }, { index: 2, label: 'right pending' }] });
+  assert.equal(repeatedTree.get('tree-status:1:0').label, 'node 1 (1)');
+  assert.equal(repeatedTree.get('tree-status:1:1').value, 'right pending');
   assert.equal(JSON.stringify([before, after]), frozen);
   const { parseFragment } = await import('parse5');
   const elements = (source, name) => {
