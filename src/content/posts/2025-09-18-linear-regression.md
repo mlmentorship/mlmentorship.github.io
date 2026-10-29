@@ -36,7 +36,7 @@ Residuals $(-1/6,1/3,-1/6)$ sum to zero, as does their dot product with $x$; SSE
 <!-- visual:ols-orthogonal-projection -->
 <figure class="learning-figure" aria-labelledby="ols-projection-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ols-projection-title">See why the least-squares residual must be perpendicular to the feature space.</p>
+	<p class="visual-title" id="ols-projection-title">The residual is perpendicular to the fitted column space</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 285" role="img" aria-labelledby="ols-projection-svg-title ols-projection-svg-desc">
 			<title id="ols-projection-svg-title">Ordinary least squares as an orthogonal projection</title>

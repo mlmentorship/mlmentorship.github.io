@@ -35,7 +35,7 @@ Does that validate its estimate, establish the other option's outcome or prove t
 <!-- visual:ethical-decision-process-outcome -->
 <figure class="learning-figure plot-panel" aria-labelledby="ethical-decision-title">
 	<p class="visual-kicker">Process and outcome</p>
-	<p class="visual-title" id="ethical-decision-title">How should an outcome change your judgment of a values decision?</p>
+	<p class="visual-title" id="ethical-decision-title">Judge the original decision using only evidence available at that time</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="ethical-decision-svg-title ethical-decision-svg-desc">
 		<title id="ethical-decision-svg-title">Decision process and observed outcome are evaluated separately</title>
 		<desc id="ethical-decision-svg-desc">A two-by-two matrix crosses the quality of the decision process, weak or sound based on evidence available at the time, with the observed outcome, favorable or adverse. A weak process with a favorable outcome is labelled lucky result and should not be rewarded. A sound process with a favorable outcome is labelled supported result. A weak process with an adverse outcome is labelled exposed flaw and requires correcting the process. A sound process with an adverse outcome is labelled adverse result and should not be condemned using hindsight. An arrow from all outcomes leads to a separate box: use the outcome as new evidence to update assumptions, controls, and the next decision, not to rewrite what was knowable before.</desc>

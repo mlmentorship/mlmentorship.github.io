@@ -59,7 +59,7 @@ Empirically GloVe and Word2Vec produce comparable embeddings. GloVe is sometimes
 <!-- visual:word-analogy-shared-displacement -->
 <figure class="learning-figure" aria-labelledby="word-analogy-title">
 	<p class="visual-kicker">Relation geometry</p>
-	<p class="visual-title" id="word-analogy-title">An analogy asks whether two word pairs have approximately the same displacement.</p>
+	<p class="visual-title" id="word-analogy-title">Vector arithmetic creates a point; nearest-neighbor search selects a vocabulary word</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 320 350" role="img" aria-labelledby="word-analogy-svg-title word-analogy-svg-desc">
 			<title id="word-analogy-svg-title">Word analogy as a shared vector displacement</title>

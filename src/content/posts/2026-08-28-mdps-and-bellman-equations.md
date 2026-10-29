@@ -75,7 +75,7 @@ Actual termination contributes no continuation, even if a stored terminal value 
 <!-- visual:bellman-stochastic-backup -->
 <figure class="learning-figure plot-panel" aria-labelledby="bellman-backup-title">
 	<p class="visual-kicker">One Bellman backup</p>
-	<p class="visual-title" id="bellman-backup-title">Expectation combines every possible next-state return.</p>
+	<p class="visual-title" id="bellman-backup-title">Average branch returns by their probabilities rather than choosing the best outcome</p>
 	<p><strong>Action gate:</strong> choose only authorized actions before evaluating rewards; reward cannot grant permission.</p>
 	<svg viewBox="0 0 360 400" role="img" aria-labelledby="bellman-backup-svg-title bellman-backup-svg-desc">
 		<title id="bellman-backup-svg-title">A stochastic action-value Bellman backup</title>

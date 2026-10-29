@@ -21,7 +21,7 @@ How do four simultaneous rows differ from four serial one-row invocations?
 <!-- visual:prefill-decode-weight-reuse -->
 <figure class="learning-figure" aria-labelledby="prefill-decode-visual-title" aria-describedby="prefill-decode-visual-description">
 	<p class="visual-kicker">Same arithmetic; different ideal weight traffic</p>
-	<p class="visual-title" id="prefill-decode-visual-title">Four parallel rows share 2 MiB; four serial invocations stream 8 MiB.</p>
+	<p class="visual-title" id="prefill-decode-visual-title">Shared weight loads can serve the same arithmetic across several tokens</p>
 	<p id="prefill-decode-visual-description">W has shape 1024 by 1024. The serial calls represent four subsequent decode steps, not four total output tokens.</p>
 	<div class="visual-grid--two" role="group" aria-label="Prefill and decode weight-reuse comparison">
 		<section class="visual-panel" aria-labelledby="prefill-weight-reuse-title">

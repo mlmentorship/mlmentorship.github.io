@@ -43,7 +43,7 @@ This split is the diagram's “sample ≤ 2” rule for these ordered features.
 <!-- visual:gradient-boosting-residual-update -->
 <figure class="learning-figure plot-panel" aria-labelledby="gradient-boosting-update-title">
 	<p class="visual-kicker">One boosting round</p>
-	<p class="visual-title" id="gradient-boosting-update-title">The next tree predicts how to move the current ensemble.</p>
+	<p class="visual-title" id="gradient-boosting-update-title">Fit the remaining errors, not the original targets again</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="gradient-boosting-svg-title gradient-boosting-svg-desc">
 		<title id="gradient-boosting-svg-title">A squared-error gradient-boosting residual update</title>
 		<desc id="gradient-boosting-svg-desc">Four ordered samples have targets 2, 2, 8, and 8. The initial constant ensemble predicts 5 for every sample, producing residuals negative 3 for the first pair and positive 3 for the second pair. A decision stump splits after sample two and predicts those residual values. With learning rate one half, the stump contributes negative 1.5 on the left and positive 1.5 on the right. Adding that correction changes the predictions to 3.5, 3.5, 6.5, and 6.5, cutting every remaining target gap in half.</desc>

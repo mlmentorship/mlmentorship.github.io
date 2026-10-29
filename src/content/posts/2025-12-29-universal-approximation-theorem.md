@@ -19,7 +19,7 @@ Can its largest error be below $\varepsilon=0.07$ everywhere, not just at chosen
 <!-- visual:uat-existence-error-band -->
 <figure class="learning-figure plot-panel" aria-labelledby="uat-error-band-title">
 	<p class="visual-kicker">The quantifiers are the lesson</p>
-	<p class="visual-title" id="uat-error-band-title">Two straight segments stay within 0.07 of the quadratic.</p>
+	<p class="visual-title" id="uat-error-band-title">An explicit approximation inside the band proves existence here, not trainability or generalization</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="uat-error-band-svg-title uat-error-band-svg-desc">
 		<title id="uat-error-band-svg-title">An explicit two-ReLU approximation to x squared on zero to one</title>
 		<desc id="uat-error-band-svg-desc">The solid quadratic x squared is surrounded by a tolerance band of plus or minus 0.07. The dashed ReLU approximation connects its values at zero, one half and one. Its largest vertical error is 0.0625 at one quarter and three quarters. Coordinates use 250 drawing units per input unit and 180 per output unit. The band and both curves represent these numeric values, not schematic deviations.</desc>

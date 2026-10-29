@@ -20,7 +20,7 @@ Sparse attention was the dominant pre-2023 approach to long context. It is still
 <!-- visual:sparse-attention-reach-patterns -->
 <figure class="learning-figure" aria-labelledby="sparse-attention-reach-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="sparse-attention-reach-title">Trace how a sparse mask keeps distant tokens reachable without giving every token every edge.</p>
+	<p class="visual-title" id="sparse-attention-reach-title">An indirect global-token relay needs two layers to carry information</p>
 	<div class="visual-grid--two" role="group" aria-label="Longformer and BigBird sparse attention routes">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 230" role="img" aria-labelledby="longformer-route-title longformer-route-desc">

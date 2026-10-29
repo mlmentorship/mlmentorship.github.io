@@ -31,7 +31,7 @@ Classifying over training speakers can learn embeddings, but metric losses align
 <!-- visual:speaker-verification-threshold-tradeoff -->
 <figure class="learning-figure plot-panel" aria-labelledby="speaker-threshold-heading">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="speaker-threshold-heading">Why does a safer operating point reject more genuine speakers?</p>
+	<p class="visual-title" id="speaker-threshold-heading">Moving one threshold exchanges false rejections for false acceptances</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 330" role="img" aria-labelledby="speaker-threshold-title speaker-threshold-desc">
 			<title id="speaker-threshold-title">The false-reject and false-accept tradeoff from moving a speaker-verification threshold</title>

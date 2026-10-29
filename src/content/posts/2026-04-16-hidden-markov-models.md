@@ -38,7 +38,7 @@ $$
 <!-- visual:hmm-hidden-chain-local-emissions -->
 <figure class="learning-figure plot-panel" aria-labelledby="hmm-factorization-title">
 	<p class="visual-kicker">Hidden dynamics, local evidence</p>
-	<p class="visual-title" id="hmm-factorization-title">Only the latent chain carries memory across time.</p>
+	<p class="visual-title" id="hmm-factorization-title">Hidden states connect observations that have no direct edge</p>
 	<svg viewBox="0 0 360 360" role="img" aria-labelledby="hmm-factorization-svg-title hmm-factorization-svg-desc">
 		<title id="hmm-factorization-svg-title">A four-timestep hidden Markov model factorization</title>
 		<desc id="hmm-factorization-svg-desc">Four circular hidden states z one through z four form a directed horizontal chain. The initial distribution pi points to z one, and each transition arrow is labelled A. Each hidden state points down through an emission arrow labelled p of x t given z t to one rounded rectangular observation x at the same timestep. There are no arrows between observations. State z two has a double ring: conditioning on it separates the past variables z one, x one, and x two from the future variables z three, z four, x three, and x four. A factor strip spells out the initial and emission factor at time one followed by the product of one transition and one local emission at later times.</desc>

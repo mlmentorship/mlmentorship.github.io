@@ -65,7 +65,7 @@ This is the form used by FAISS's flat index. Order-of-magnitude faster than the 
 <!-- visual:knn-index-decision-funnel -->
 <figure class="learning-figure plot-panel" aria-labelledby="knn-index-funnel-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="knn-index-funnel-title">Which constraint should change the KNN index?</p>
+	<p class="visual-title" id="knn-index-funnel-title">IVF scans fewer vectors; PQ stores fewer bytes per vector</p>
 	<svg viewBox="0 0 360 478" role="img" aria-labelledby="knn-index-funnel-svg-title knn-index-funnel-svg-desc">
 		<title id="knn-index-funnel-svg-title">A constraint-driven decision funnel for exact and approximate nearest-neighbor indexes</title>
 		<desc id="knn-index-funnel-svg-desc">Start with a flat exact scan over all N vectors and batch it on the available hardware. Only if measured latency misses its target and approximation is allowed, choose a way to visit fewer vectors: KD or ball trees for low-dimensional data where partitions prune well, HNSW graph navigation for high-recall low-latency search when graph memory is acceptable, or IVF cluster probing when scan budget is controlled by nprobe. Product quantization is a separate optional lossy compression layer when vector memory or read bandwidth is the bottleneck. Every approximate path ends by measuring recall at k against flat ground truth together with latency, memory, build time, and update cost.</desc>

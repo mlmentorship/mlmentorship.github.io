@@ -53,7 +53,7 @@ Outputs above the group average get positive advantage. Outputs below it get neg
 <!-- visual:grpo-group-relative-signal -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="grpo-group-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="grpo-group-title">When does a group of verified outputs create a learning direction?</p>
+	<p class="visual-title" id="grpo-group-title">Equal rewards give no within-group preference, even when every output passes</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 390" role="img" aria-labelledby="grpo-group-svg-title grpo-group-svg-desc">
 			<title id="grpo-group-svg-title">GRPO relative advantages for a mixed-reward group and an equal-reward group</title>

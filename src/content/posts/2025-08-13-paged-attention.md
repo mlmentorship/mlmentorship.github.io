@@ -33,7 +33,7 @@ Private tails still waste four slots total; sharing reserves sixteen slots, not 
 <!-- visual:paged-attention-block-table-indirection -->
 <figure class="learning-figure plot-panel" aria-labelledby="paged-attention-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="paged-attention-visual-title">Trace two logical KV caches through their block tables to scattered and shared physical blocks.</p>
+	<p class="visual-title" id="paged-attention-visual-title">A block table preserves logical order across scattered physical storage</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="paged-attention-svg-title paged-attention-svg-desc">
 		<title id="paged-attention-svg-title">Two sequence block tables share prefix blocks in a non-contiguous physical pool</title>
 		<desc id="paged-attention-svg-desc">Request A maps logical blocks zero, one, and two to physical blocks seven, one, and five. Request B maps the same logical prefix blocks zero and one to physical blocks seven and one, then maps its private logical block two to physical block three. Physical blocks seven and one each have reference count two. The remaining private blocks have reference count one, and unused physical blocks are free.</desc>

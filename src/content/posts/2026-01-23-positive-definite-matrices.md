@@ -58,7 +58,7 @@ For $A$ PD, the set $\{x : x^\top A x \le 1\}$ is a closed ellipsoid centered at
 <!-- visual:positive-definite-boundedness -->
 <figure class="learning-figure" aria-labelledby="pd-boundedness-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="pd-boundedness-title">Predict whether a quadratic sublevel set is bounded by checking whether every eigenvalue penalizes its eigenvector direction.</p>
+	<p class="visual-title" id="pd-boundedness-title">A zero-curvature direction lets a quadratic sublevel set extend without bound</p>
 	<div class="visual-panel">
 		<svg viewBox="0 0 360 480" role="img" aria-labelledby="pd-boundedness-svg-title pd-boundedness-svg-desc">
 			<title id="pd-boundedness-svg-title">Positive definite ellipse compared with a singular positive semidefinite strip</title>

@@ -16,7 +16,7 @@ Formally, a contextual bandit sees context $x_t$, chooses action $a_t$, and rece
 <!-- visual:contextual-bandit-partial-feedback-support -->
 <figure class="learning-figure" aria-labelledby="bandit-support-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="bandit-support-title">Why can a logged bandit event evaluate some target policies but not others?</p>
+	<p class="visual-title" id="bandit-support-title">Zero logging probability leaves action C's reward unidentified</p>
 	<div class="visual-grid--two" role="group" aria-label="A logged contextual-bandit event followed by an off-policy support check">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 230" role="img" aria-labelledby="bandit-log-title bandit-log-desc">

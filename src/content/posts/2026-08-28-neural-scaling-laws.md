@@ -45,7 +45,7 @@ For a dense transformer, training compute is roughly proportional to $N D$. This
 <!-- visual:scaling-fixed-compute-allocation -->
 <figure class="learning-figure plot-panel" aria-labelledby="scaling-allocation-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="scaling-allocation-title">Why does one fixed compute budget have an interior best allocation?</p>
+	<p class="visual-title" id="scaling-allocation-title">At fixed compute, more parameters leave fewer training tokens</p>
 	<svg viewBox="0 0 360 300" role="img" aria-labelledby="scaling-allocation-svg-title scaling-allocation-svg-desc">
 		<title id="scaling-allocation-svg-title">Validation loss across parameter and token allocations at fixed compute</title>
 		<desc id="scaling-allocation-svg-desc">A U-shaped qualitative curve shows validation loss falling as allocation moves away from a small capacity-limited model trained on many tokens, reaching a compute-optimal allocation in the middle, then rising when a large model receives too few training tokens and is undertrained. The horizontal axis keeps compute approximately equal to a constant times parameters times tokens.</desc>

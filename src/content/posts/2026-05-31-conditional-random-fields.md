@@ -38,7 +38,7 @@ is the **partition function**: a sum over all $|V|^T$ possible labelings. $Z$ co
 <!-- visual:crf-global-path-scoring -->
 <figure class="learning-figure plot-panel" aria-labelledby="crf-path-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="crf-path-visual-title">How can the same emission scores produce a different label sequence?</p>
+	<p class="visual-title" id="crf-path-visual-title">Transition scores can overturn the locally best labels</p>
 	<svg viewBox="0 0 360 350" role="img" aria-labelledby="crf-path-svg-title crf-path-svg-desc">
 		<title id="crf-path-svg-title">Independent emissions compared with CRF whole-path scoring</title>
 		<desc id="crf-path-svg-desc">For the two tokens Ada Lovelace, independent selection picks O with emission 3 and I-PER with emission 3, totaling 6 but forming an incoherent BIO sequence. In the CRF example, the O to I-PER transition has score minus 5, so that complete path scores 1. The B-PER to I-PER path combines emissions 2 and 3 with transition score plus 1, scores 6, and is selected as coherent. These are illustrative learned scores rather than universal hard constraints.</desc>

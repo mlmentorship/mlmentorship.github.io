@@ -70,7 +70,7 @@ The separate right-hand example has first hit at rank three, so RR is $1/3$.
 <!-- visual:ranking-metrics-per-rank-credit -->
 <figure class="learning-figure" aria-labelledby="ranking-metrics-credit-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ranking-metrics-credit-title">Trace what each metric counts as credit while scanning from rank 1 downward.</p>
+	<p class="visual-title" id="ranking-metrics-credit-title">Average precision accumulates relevant hits; reciprocal rank stops at the first</p>
 	<div class="visual-grid--two" role="group" aria-label="Worked per-rank comparison of NDCG and average precision beside a reciprocal-rank stopping example">
 		<section class="visual-panel">
 			<h4>Many relevant items: graded or binary?</h4>

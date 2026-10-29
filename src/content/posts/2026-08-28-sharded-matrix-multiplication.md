@@ -102,7 +102,7 @@ With two devices, device 0 would compute the first row block with the first colu
 <!-- visual:same-mesh-axis-diagonal-gap -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="same-axis-gap-heading">
 	<p class="visual-kicker">Two devices, one mesh axis</p>
-	<p class="visual-title" id="same-axis-gap-heading">Matching shard indices cover only the diagonal of the output.</p>
+	<p class="visual-title" id="same-axis-gap-heading">Adding diagonal blocks cannot create cross-block products that were never computed</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 340" role="img" aria-labelledby="same-axis-gap-title same-axis-gap-desc">
 			<title id="same-axis-gap-title">Same-axis input shards leave two output blocks uncomputed</title>

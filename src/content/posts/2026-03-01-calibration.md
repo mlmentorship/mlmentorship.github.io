@@ -36,7 +36,7 @@ For top-label calibration instead, define confidence as the selected class's pro
 <!-- visual:calibration-reliability-gap -->
 <figure class="learning-figure plot-panel" aria-labelledby="calibration-visual-title">
 	<p class="visual-kicker">Spatial intuition</p>
-	<p class="visual-title" id="calibration-visual-title">Compare positive-event frequency with its predicted probability.</p>
+	<p class="visual-title" id="calibration-visual-title">An 80% forecast bin needs an 80% observed positive rate</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 310" role="img" aria-labelledby="calibration-svg-title calibration-svg-desc">
 			<title id="calibration-svg-title">Illustrative reliability diagram for positive-event probability</title>

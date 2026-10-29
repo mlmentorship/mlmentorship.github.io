@@ -31,7 +31,7 @@ The latent $z$ is what makes GMM a soft-clustering algorithm: posterior $p(z = k
 <!-- visual:gmm-soft-responsibility -->
 <figure class="learning-figure plot-panel" aria-labelledby="gmm-responsibility-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="gmm-responsibility-title">See how one observation updates more than one Gaussian</p>
+	<p class="visual-title" id="gmm-responsibility-title">One point updates both components with weights summing to one</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="gmm-responsibility-svg-title gmm-responsibility-svg-desc">
 		<title id="gmm-responsibility-svg-title">An overlap point receives soft responsibility from two Gaussian components</title>
 		<desc id="gmm-responsibility-svg-desc">Two Gaussian density contours overlap around an observation x. Component one uses a solid contour and component two uses a dashed contour. Each component forms an unnormalized score by multiplying its prior mixture weight by its density at x. Normalizing the two scores produces posterior responsibilities r one and r two, which sum to one. The same observation then contributes weight r one to component one's effective count, mean, and covariance updates and weight r two to component two's updates. Neither responsibility is a hard zero or one assignment.</desc>

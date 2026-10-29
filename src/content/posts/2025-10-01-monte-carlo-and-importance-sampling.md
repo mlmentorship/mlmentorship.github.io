@@ -77,7 +77,7 @@ These are sample weight shares, not each sample's fraction of a general estimate
 <!-- visual:importance-weights-effective-sample-size -->
 <figure class="learning-figure plot-panel" aria-labelledby="importance-weights-title">
 	<p class="visual-kicker">Importance weights</p>
-	<p class="visual-title" id="importance-weights-title">Five proposal draws can carry much less than five draws' worth of information.</p>
+	<p class="visual-title" id="importance-weights-title">Five draws remain five draws even when unequal weights yield ESS 2.5</p>
 	<svg viewBox="0 0 360 390" role="img" aria-labelledby="importance-weights-svg-title importance-weights-svg-desc">
 		<title id="importance-weights-svg-title">Five proposal samples become unequal weighted contributions</title>
 		<desc id="importance-weights-svg-desc">Five samples drawn from proposal q initially count once each. Their p over q importance ratios are 1, 1, 1, 1, and 6. After normalization, the first four samples each contribute 10 percent and the fifth contributes 60 percent. The effective sample size is 10 squared divided by 40, or 2.5, despite a nominal sample count of five.</desc>

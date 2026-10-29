@@ -40,7 +40,7 @@ The replicate user mean is $(1-1+1)/3=1/3$.
 <!-- visual:bootstrap-resampling-unit -->
 <figure class="learning-figure plot-panel" aria-labelledby="bootstrap-unit-title">
 	<p class="visual-kicker">Resampling unit</p>
-	<p class="visual-title" id="bootstrap-unit-title">If users are independent, draw users, not detached event rows.</p>
+	<p class="visual-title" id="bootstrap-unit-title">Resample users with all their paired events, not isolated rows</p>
 	<svg viewBox="0 0 360 408" role="img" aria-labelledby="bootstrap-unit-svg-title bootstrap-unit-svg-desc">
 		<title id="bootstrap-unit-svg-title">Valid user-level bootstrap compared with invalid event-row bootstrap</title>
 		<desc id="bootstrap-unit-svg-desc">The source dataset contains users U1, U2, and U3, each enclosing two event rows with paired model A and B outcomes. A valid bootstrap replicate draws U3, U1, and U3, carrying both events and both model outcomes whenever a user is selected. An invalid replicate samples detached event rows from across users and is crossed out because it breaks within-user dependence.</desc>

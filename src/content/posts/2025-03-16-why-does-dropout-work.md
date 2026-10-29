@@ -27,7 +27,7 @@ State the keep-probability and scaling convention. Approximate ensemble or Bayes
 <!-- visual:why-dropout-shared-subnetworks -->
 <figure class="learning-figure plot-panel" aria-labelledby="why-dropout-visual-title">
 	<p class="visual-kicker">One network, many masks</p>
-	<p class="visual-title" id="why-dropout-visual-title">The subnetworks change; the learned weights are shared.</p>
+	<p class="visual-title" id="why-dropout-visual-title">Masks share weights; prediction variation alone is not calibrated uncertainty</p>
 	<svg viewBox="0 0 360 444" role="img" aria-labelledby="why-dropout-svg-title why-dropout-svg-desc">
 		<title id="why-dropout-svg-title">Dropout masks create weight-sharing subnetworks with two test-time interpretations</title>
 		<desc id="why-dropout-svg-desc">One parameter set W feeds many training passes. Mask A keeps units one and three while mask B keeps units two and three, producing different thinned subnetworks that both update the same W. This discourages units from depending on one fixed partner and acts like training many weight-sharing models. At standard test time, dropout is off and one deterministic full-network prediction approximates averaging the subnetworks. For Monte Carlo dropout, dropout stays on for repeated predictions; their distribution provides an approximate Bayesian uncertainty signal.</desc>

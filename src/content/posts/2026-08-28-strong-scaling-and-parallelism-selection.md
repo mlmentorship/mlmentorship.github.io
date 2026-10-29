@@ -60,7 +60,7 @@ If a one-device baseline cannot fit, compare two valid cluster sizes. For exampl
 <!-- visual:strong-scaling-wall-time-cost-knee -->
 <figure class="learning-figure plot-panel" aria-labelledby="strong-scaling-cost-title">
 	<p class="visual-kicker">Fixed-work scaling</p>
-	<p class="visual-title" id="strong-scaling-cost-title">Shorter rectangles can still have more total area.</p>
+	<p class="visual-title" id="strong-scaling-cost-title">A shorter run can still consume more total accelerator-hours</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 330" role="img" aria-labelledby="strong-scaling-cost-svg-title strong-scaling-cost-svg-desc">
 			<title id="strong-scaling-cost-svg-title">Wall time falls while accelerator-hours rise as strong-scaling efficiency drops</title>

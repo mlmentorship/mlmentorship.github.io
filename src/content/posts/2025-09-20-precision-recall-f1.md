@@ -56,7 +56,7 @@ The F1 score balances precision and recall via the harmonic mean. **Harmonic mea
 <!-- visual:precision-recall-f1-harmonic-penalty -->
 <figure class="learning-figure" aria-labelledby="f1-harmonic-penalty-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="f1-harmonic-penalty-title">See why F1 falls toward the smaller metric instead of rewarding the arithmetic average.</p>
+	<p class="visual-title" id="f1-harmonic-penalty-title">High precision cannot hide low recall in the harmonic mean</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel" aria-labelledby="f1-balanced-title">
 			<h4 id="f1-balanced-title">Balanced pair</h4>

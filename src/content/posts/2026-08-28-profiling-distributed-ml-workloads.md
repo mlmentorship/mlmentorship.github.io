@@ -28,7 +28,7 @@ The retained schematic also changes compute length; use the table, not that extr
 <!-- visual:profiling-exposed-collective-tail -->
 <figure class="learning-figure plot-panel" aria-labelledby="profiling-overlap-title">
 	<p class="visual-kicker">Critical-path accounting</p>
-	<p class="visual-title" id="profiling-overlap-title">The same collective duration can have a different step-time cost.</p>
+	<p class="visual-title" id="profiling-overlap-title">Only the collective time exposed beyond useful computation extends the step</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 300" role="img" aria-labelledby="profiling-overlap-svg-title profiling-overlap-svg-desc">
 			<title id="profiling-overlap-svg-title">Two step traces with the same collective duration but different exposed time</title>

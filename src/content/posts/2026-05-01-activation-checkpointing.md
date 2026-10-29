@@ -40,7 +40,7 @@ For a transformer, the natural segment is one transformer block. PyTorch provide
 <!-- visual:checkpoint-boundary-recompute-balance -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="checkpoint-balance-title">
 	<p class="visual-kicker">Memory at one backward step</p>
-	<p class="visual-title" id="checkpoint-balance-title">Saved boundaries and one rebuilt segment coexist in memory.</p>
+	<p class="visual-title" id="checkpoint-balance-title">Four-layer segments balance saved and rebuilt states in this model</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 700 330" role="img" aria-labelledby="checkpoint-balance-svg-title checkpoint-balance-svg-desc">
 			<title id="checkpoint-balance-svg-title">Activation checkpoint memory for a sixteen-layer chain split into four-layer segments</title>

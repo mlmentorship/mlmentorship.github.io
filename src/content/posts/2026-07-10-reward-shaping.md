@@ -26,7 +26,7 @@ This shifts value estimates while preserving the set of optimal policies under s
 <!-- visual:potential-shaping-cancels-backtracking -->
 <figure class="learning-figure plot-panel" aria-labelledby="potential-shaping-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="potential-shaping-title">Why can one progress signal preserve the task while another creates a reward loop?</p>
+	<p class="visual-title" id="potential-shaping-title">Potential differences cancel this undiscounted loop; entry bonuses accumulate</p>
 	<svg viewBox="0 0 360 530" role="img" aria-labelledby="potential-shaping-svg-title potential-shaping-svg-desc">
 		<title id="potential-shaping-svg-title">Potential differences cancel on backtracking, but event bonuses accumulate</title>
 		<desc id="potential-shaping-svg-desc">Two panels use the same finite episodic path with discount gamma equal to 1. In the safe panel, start, waypoint, and terminal goal have potentials negative 2, negative 1, and 0. Potential shaping gives plus 1 from start to waypoint, plus 1 from waypoint to goal, and negative 1 when backtracking from waypoint to start. A backtrack followed by another advance therefore adds 0. The original goal-path return is 10 and the shaped return is 12, a fixed plus 2 boundary shift from this start. In the unsafe panel, entering the waypoint pays an arbitrary plus 1 event bonus, but leaving pays 0. Every loop through the waypoint earns another plus 1 without completing the goal, so the proxy can change the preferred behavior.</desc>

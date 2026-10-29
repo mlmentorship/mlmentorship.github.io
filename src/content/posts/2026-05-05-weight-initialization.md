@@ -20,7 +20,7 @@ Four layers therefore yield $1/16$, $1$, and $81/16$ from $q_0=1$.
 <!-- visual:relu-second-moment-through-depth -->
 <figure class="learning-figure" aria-labelledby="relu-init-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="relu-init-title">See why ReLU needs the factor of 2</p>
+	<p class="visual-title" id="relu-init-title">Under these assumptions, variance 2/fan-in preserves the ReLU second moment</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 270" role="img" aria-labelledby="relu-init-svg-title relu-init-svg-desc">
 			<title id="relu-init-svg-title">Activation second moment through four ReLU layers at three initialization scales</title>

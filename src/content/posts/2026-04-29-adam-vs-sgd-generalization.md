@@ -32,7 +32,7 @@ Does a sharper parameter-space curve imply different predictions?
 <!-- visual:optimizer-sharpness-reparameterization -->
 <figure class="learning-figure plot-panel" aria-labelledby="optimizer-sharpness-visual-title">
 	<p class="visual-kicker">The sharpness caveat</p>
-	<p class="visual-title" id="optimizer-sharpness-visual-title">One predictor can look flat or sharp under different parameterizations.</p>
+	<p class="visual-title" id="optimizer-sharpness-visual-title">The basin gets sharper without changing the model's predictions</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 326" role="img" aria-labelledby="optimizer-sharpness-svg-title optimizer-sharpness-svg-desc">
 			<title id="optimizer-sharpness-svg-title">Exact quadratic profiles under w equals ten times phi</title>

@@ -23,7 +23,7 @@ export function retainedState(scene) {
   for (const pointer of Array.isArray(scene.marks) ? scene.marks : []) {
     const identity = pointer.key ?? pointer.label?.split(/[=:]/)[0] ?? `${pointer.row}:${pointer.col}`;
     const position = pointer.index ?? (pointer.row === undefined ? undefined : `(${pointer.row}, ${pointer.col})`);
-    add(`pointer:${identity}`, pointer.key ?? pointer.label ?? 'position', position, 4);
+    add(`pointer:${identity}`, pointer.label?.split(/[=:]/)[0].trim() || pointer.key || 'position', position, 4);
   }
   for (const [key, value] of Array.isArray(scene.map) ? scene.map : []) add(`map:${key}`, `key ${key}`, value, 5);
   const values = Array.isArray(scene.items) ? scene.items : Array.isArray(scene.values) ? scene.values : [];
@@ -69,7 +69,7 @@ export function checkpointChanges(scene, previous) {
   }).sort((left, right) => right.priority - left.priority);
 }
 
-function mechanism(scene) {
+function mechanism(scene, previous) {
   const label = (horizontal, vertical, value, tone = 'c-text', size = 14) => `<text x="${horizontal}" y="${vertical}" style="font: ${size}px var(--font-mono);text-anchor:middle;fill:var(--${tone})">${escapeHtml(value)}</text>`;
   const line = (fromX, fromY, toX, toY, tone = 'viz-neutral-stroke', dashed = false) => `<path d="M${fromX} ${fromY}L${toX} ${toY}" style="fill:none;stroke:var(--${tone});stroke-width:1.75${dashed ? ';stroke-dasharray:4 3' : ''}"></path>`;
   const cell = (horizontal, vertical, width, value, tone = 'neutral') => `<rect x="${horizontal}" y="${vertical}" width="${width}" height="33" rx="2" style="fill:var(--viz-${tone}-bg);stroke:var(--viz-${tone}-stroke)"></rect>${label(horizontal + width / 2, vertical + 22, value)}`;
@@ -162,13 +162,39 @@ function mechanism(scene) {
       + label(180, 231, `current: ${spaced(scene.answerBits ?? scene.answer)}`, 'c-text', 12)
       + label(180, 269, processed >= 26 && processed < 32 ? `Input is zero; ${32 - processed} required shifts remain.` : 'Zero bits need output positions too.', 'c-text-soft', 12);
     height = 294;
+  } else if (scene.target !== undefined && Array.isArray(scene.items) && scene.marks?.some((mark) => mark.key === 'pointer-left') && scene.marks.some((mark) => mark.key === 'pointer-right')) {
+    const position = (state, key) => state?.marks?.find((mark) => mark.key === key)?.index;
+    const first = position(scene, 'pointer-left');
+    const last = position(scene, 'pointer-right');
+    const priorFirst = position(previous, 'pointer-left');
+    const priorLast = position(previous, 'pointer-right');
+    const hasPrior = Number.isInteger(priorFirst) && Number.isInteger(priorLast);
+    const columnWidth = 262 / scene.items.length;
+    const coordinate = (index) => 74 + index * columnWidth;
+    const band = (left, right, vertical, current) => `<rect x="${coordinate(left)}" y="${vertical}" width="${(right - left + 1) * columnWidth - 2}" height="22" rx="2" data-candidate-band="${current ? 'current' : 'previous'}" style="fill:var(--viz-${current ? 'focus' : 'neutral'}-bg);stroke:var(--viz-${current ? 'focus' : 'neutral'}-stroke);stroke-width:1.75${current ? '' : ';stroke-dasharray:4 3'}"></rect>`;
+    description = `Candidate indices for target ${scene.target}: ${first} through ${last}. ${hasPrior ? `The preceding checkpoint showed ${priorFirst} through ${priorLast}. Both ranges use the same numbered index scale.` : 'This is the initial candidate range; no earlier state is assumed.'}`;
+    body = label(180, 23, `Candidate indices; target ${scene.target}`, 'c-text', 14);
+    for (let index = 0; index < scene.items.length; index++) body += label(coordinate(index) + columnWidth / 2 - 1, 53, index, 'c-text-soft', 12);
+    if (hasPrior) {
+      body += label(29, 81, 'Before', 'c-text-soft', 12) + band(priorFirst, priorLast, 65, false)
+        + line(coordinate(priorFirst), 87, coordinate(first), 119, 'viz-focus-stroke', true)
+        + line(coordinate(priorLast + 1) - 2, 87, coordinate(last + 1) - 2, 119, 'viz-focus-stroke', true)
+        + label(29, 135, 'Now', 'c-text-soft', 12) + band(first, last, 119, true)
+        + label(180, 178, `now [${first},${last}]; earlier [${priorFirst},${priorLast}]`, 'c-text', 12)
+        + label(180, 207, 'Excluded indices need no further comparison.', 'c-text-soft', 12);
+      height = 228;
+    } else {
+      body += label(29, 81, 'Start', 'c-text-soft', 12) + band(first, last, 65, true)
+        + label(180, 124, scene.comparison ?? `candidate indices [${first},${last}]`, 'c-text', 14);
+      height = 149;
+    }
   } else return '';
   return `<div class="coding-mechanism"><svg viewBox="0 0 360 ${height}" role="img" aria-label="${escapeHtml(description)}" style="display:block;width:100%;max-width:34rem;margin:auto"><title>${escapeHtml(description)}</title>${body}</svg></div>`;
 }
 
 export function renderStateTransition(scene, previous) {
   const changes = checkpointChanges(scene, previous);
-  const diagram = mechanism(scene);
+  const diagram = mechanism(scene, previous);
   if (!changes.length) return diagram;
   const selected = changes.slice(0, 3);
   const rows = selected.map((change) => {
@@ -186,7 +212,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const frozen = JSON.stringify([before, after]);
   assert.deepEqual(checkpointChanges(after, before).map(({ label, before, after }) => ({ label, before, after })), [
     { label: 'key 3', before: undefined, after: '0' },
-    { label: 'scan', before: '0', after: '1' },
+    { label: 'i', before: '0', after: '1' },
   ]);
   assert.match(renderStateTransition(after, before), /key 3/);
   assert.match(renderStateTransition(after, before), /not shown/);
@@ -238,6 +264,17 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   assert.doesNotMatch(mechanism(pairScene), /\(2,3\)/);
   assert.match(mechanism({ ...pairScene, items: [-1, 0, 2, 3], total: '2' }), /\(1,3\) \(2,3\)/);
   const { codingQuestionVisuals } = await import('../coding-question-visuals.mjs');
+  const binarySearch = codingQuestionVisuals['binary-search'];
+  for (const [index, item] of binarySearch.frames.entries()) {
+    const drawing = mechanism(item.scene, binarySearch.frames[index - 1]?.scene);
+    const first = item.scene.marks.find((mark) => mark.key === 'pointer-left').index;
+    const last = item.scene.marks.find((mark) => mark.key === 'pointer-right').index;
+    const currentBand = elements(drawing, 'rect').find(({ attributes }) => attributes['data-candidate-band'] === 'current');
+    const columnWidth = 262 / item.scene.items.length;
+    assert.equal(Number(currentBand.attributes.x), 74 + first * columnWidth);
+    assert.equal(Number(currentBand.attributes.width), (last - first + 1) * columnWidth - 2);
+    assert.equal(elements(drawing, 'rect').filter(({ attributes }) => attributes['data-candidate-band'] === 'previous').length, index ? 1 : 0);
+  }
   let compared = 0;
   for (const definition of Object.values(codingQuestionVisuals)) {
     const original = JSON.stringify(definition);

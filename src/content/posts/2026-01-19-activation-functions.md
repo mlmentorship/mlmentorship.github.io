@@ -19,7 +19,7 @@ The graphs show activation output $g(h)$, not the complete network output $y$.
 <!-- visual:activation-gradient-regions -->
 <figure class="learning-figure" aria-labelledby="activation-regions-title">
 	<p class="visual-kicker">Optimization intuition</p>
-	<p class="visual-title" id="activation-regions-title">Output shape determines where backpropagated gradients shrink or stop.</p>
+	<p class="visual-title" id="activation-regions-title">Flat activation regions weaken the gradient travelling backward</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel plot-panel" aria-labelledby="sigmoid-panel-heading">
 			<h4 id="sigmoid-panel-heading">Sigmoid: two saturating tails</h4>

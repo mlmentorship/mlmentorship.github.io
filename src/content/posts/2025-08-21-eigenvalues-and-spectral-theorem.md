@@ -47,7 +47,7 @@ Repeat on that smaller symmetric subspace to construct the basis.
 <!-- visual:spectral-theorem-change-basis -->
 <figure class="learning-figure" aria-labelledby="spectral-change-basis-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="spectral-change-basis-title">Read the spectral theorem as rotate into the eigenbasis, scale each coordinate, then rotate back.</p>
+	<p class="visual-title" id="spectral-change-basis-title">Change coordinates, scale eigenvector components, then change coordinates back</p>
 	<div class="visual-panel">
 		<svg viewBox="0 0 360 540" role="img" aria-labelledby="spectral-svg-title spectral-svg-desc">
 			<title id="spectral-svg-title">Three-stage action of a symmetric matrix in its eigenbasis</title>

@@ -23,7 +23,7 @@ Follow their order in the first two panels. Then compare their span in the last 
 <!-- visual:determinant-signed-area-collapse -->
 <figure class="learning-figure" aria-labelledby="determinant-area-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="determinant-area-title">The same area can have either orientation. Parallel columns lose a dimension.</p>
+	<p class="visual-title" id="determinant-area-title">Swapping columns reverses orientation without changing absolute area</p>
 	<div class="visual-panel">
 		<svg viewBox="0 0 360 560" role="img" aria-labelledby="determinant-area-svg-title determinant-area-svg-desc">
 			<title id="determinant-area-svg-title">Three ordered column pairs with positive, negative, and zero determinant</title>

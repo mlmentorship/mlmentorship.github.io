@@ -39,7 +39,7 @@ $$
 <!-- visual:gp-conditioning-local-uncertainty -->
 <figure class="learning-figure" aria-labelledby="gp-conditioning-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="gp-conditioning-title">See how kernel similarity makes observations reshape both the posterior mean and uncertainty.</p>
+	<p class="visual-title" id="gp-conditioning-title">Conditioning narrows uncertainty where observed points are informative</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 270" role="img" aria-labelledby="gp-posterior-title gp-posterior-desc">
 			<title id="gp-posterior-title">Gaussian process posterior mean and uncertainty around three observations</title>

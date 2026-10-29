@@ -40,7 +40,7 @@ Represent modalities as discrete or continuous tokens and train one model over m
 <!-- visual:multimodal-architectures-meeting-point -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="multimodal-patterns-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="multimodal-patterns-title">Locate where image and text information first meet in each architecture pattern.</p>
+	<p class="visual-title" id="multimodal-patterns-title">The meeting point determines when image and text can influence each other</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 470" role="img" aria-labelledby="multimodal-patterns-svg-title multimodal-patterns-svg-desc">
 			<title id="multimodal-patterns-svg-title">Three multimodal architecture patterns compared by meeting point</title>

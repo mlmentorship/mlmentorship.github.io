@@ -55,7 +55,7 @@ The lower roof identifies a first-order limit, not every possible bottleneck.
 <!-- visual:gpu-roofline-batching-ridge -->
 <figure class="learning-figure plot-panel" aria-labelledby="gpu-roofline-title">
 	<p class="visual-kicker">Same operation, two resource limits</p>
-	<p class="visual-title" id="gpu-roofline-title">Half the traffic moves intensity from 10 to 20 FLOPs/byte.</p>
+	<p class="visual-title" id="gpu-roofline-title">Halving memory traffic raises this example's ceiling from 1 to 2 TFLOP/s</p>
 	<svg viewBox="0 0 360 320" role="img" aria-labelledby="gpu-roofline-svg-title gpu-roofline-svg-desc">
 		<title id="gpu-roofline-svg-title">Exact log-scale roofline for the hypothetical 20 TFLOP/s and 100 GB/s device</title>
 		<desc id="gpu-roofline-svg-desc">The horizontal coordinate is 54 plus 86 times log10 of arithmetic intensity. The vertical coordinate is 236 minus 62 times log10 of throughput divided by 0.1 TFLOP/s. The original operation is at intensity 10 and bandwidth ceiling 1 TFLOP/s. Halving its bytes gives intensity 20 and ceiling 2 TFLOP/s. The ridge is at intensity 200 and throughput 20 TFLOP/s. These are upper bounds, not observed speeds.</desc>

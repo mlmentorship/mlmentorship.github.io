@@ -36,7 +36,7 @@ The picture's equal quarters are therefore a special case.
 <!-- visual:gradient-accumulation-state-boundary -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="gradient-accumulation-title">
 	<p class="visual-kicker">One accumulation window · K = 4</p>
-	<p class="visual-title" id="gradient-accumulation-title">The gradient buffer changes four times; the parameters change once.</p>
+	<p class="visual-title" id="gradient-accumulation-title">Four backwards add gradients while the parameters remain fixed</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 354" role="img" aria-labelledby="gradient-accumulation-svg-title gradient-accumulation-svg-desc">
 			<title id="gradient-accumulation-svg-title">Gradient and parameter state across four accumulated micro-batches</title>

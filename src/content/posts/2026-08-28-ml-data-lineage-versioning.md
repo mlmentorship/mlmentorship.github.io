@@ -88,7 +88,7 @@ Both directions matter during incidents. A team that can reproduce one model but
 <!-- visual:ml-lineage-two-way-incident-trace -->
 <figure class="learning-figure plot-panel" aria-labelledby="lineage-trace-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="lineage-trace-title">Use one immutable graph for backward reconstruction and forward blast-radius tracing</p>
+	<p class="visual-title" id="lineage-trace-title">Lineage finds potentially affected descendants; evidence establishes actual impact</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="lineage-trace-svg-title lineage-trace-svg-desc">
 		<title id="lineage-trace-svg-title">Two directions through one versioned ML lineage graph</title>
 		<desc id="lineage-trace-svg-desc">An original lineage graph begins with raw source payments at snapshot 42, then currency transform version 2, then training manifest 88. The manifest branches to training runs 501 and 502, which produce model A version 17 and model B version 9. Model A version 17 reaches production deployment 31, while model B version 9 reaches shadow deployment 12. A dashed backward trace starts at production deployment 31 and follows model A, training run 501, manifest 88, transform version 2, and snapshot 42 to reconstruct its inputs. Solid forward traces start at the bad currency transform version 2 and reach both models and both deployments, exposing the complete blast radius.</desc>

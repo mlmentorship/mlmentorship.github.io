@@ -31,7 +31,7 @@ This local choice need not produce the globally best tree.
 <!-- visual:decision-tree-partitions-feature-space -->
 <figure class="learning-figure plot-panel" aria-labelledby="decision-tree-partition-title">
 	<p class="visual-kicker">Rules become regions</p>
-	<p class="visual-title" id="decision-tree-partition-title">A child split cuts only the region that reaches it.</p>
+	<p class="visual-title" id="decision-tree-partition-title">The second split affects only the root's right-hand region</p>
 	<svg viewBox="0 0 360 440" role="img" aria-labelledby="decision-tree-svg-title decision-tree-svg-desc">
 		<title id="decision-tree-svg-title">A decision tree and its matching feature-space partition</title>
 		<desc id="decision-tree-svg-desc">The upper plot contains four circle samples and four triangle samples. A full-height vertical root split at feature one equal to four sends four points left and four right. Only the right region receives a horizontal child split at feature two equal to three. The matching tree below has a root test feature one less than or equal to four. Its yes branch ends at a leaf with triangle probability one quarter. Its no branch tests feature two less than or equal to three, producing a pure triangle leaf below and a pure circle leaf above. A highlighted new point follows the no then yes path to the triangle leaf.</desc>

@@ -159,7 +159,7 @@ This may fit with activation checkpointing. If measured peak memory is safe, it 
 <!-- visual:plan-70b-parallel-accounting -->
 <figure class="learning-figure" aria-labelledby="plan-70b-parallel-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="plan-70b-parallel-title">Which parallel axis divides model state, and which one multiplies the batch?</p>
+	<p class="visual-title" id="plan-70b-parallel-title">Count distinct token batches across data replicas, not every model shard</p>
 	<div class="visual-grid--two" role="group" aria-label="A 512-GPU layout with tensor parallel degree eight inside each of 64 nodes and data parallel degree 64 across nodes, followed by its memory and batch accounting">
 		<section class="visual-panel" aria-labelledby="plan-70b-ranks-title">
 			<h4 id="plan-70b-ranks-title">512 ranks = TP 8 × DP 64</h4>

@@ -50,7 +50,7 @@ An IVF-HNSW index may use a graph over coarse centroids; inspect its actual impl
 <!-- visual:ivf-pq-query-funnel -->
 <figure class="learning-figure" aria-labelledby="ivf-pq-funnel-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ivf-pq-funnel-title">How do IVF and PQ remove different parts of the search cost?</p>
+	<p class="visual-title" id="ivf-pq-funnel-title">Unscanned partitions stay unreachable, however good the distance estimate</p>
 	<div class="visual-grid--two" role="group" aria-label="Two-stage IVF and product-quantization query funnel">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 220" role="img" aria-labelledby="ivf-route-title ivf-route-desc">

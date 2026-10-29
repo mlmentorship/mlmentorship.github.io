@@ -47,7 +47,7 @@ The number of tokens in one batch is $B T$.
 <!-- visual:transformer-training-inference-ledgers -->
 <figure class="learning-figure" aria-labelledby="transformer-ledgers-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="transformer-ledgers-title">Which dimensions and multiplicities belong in each transformer budget?</p>
+	<p class="visual-title" id="transformer-ledgers-title">Stored experts and active token computation belong in different cost ledgers</p>
 	<div class="visual-grid--two" role="group" aria-label="Training and inference accounting ledgers that separate compute from persistent and temporary memory">
 		<section class="visual-panel" aria-labelledby="training-ledger-title">
 			<h4 id="training-ledger-title">Training ledger</h4>

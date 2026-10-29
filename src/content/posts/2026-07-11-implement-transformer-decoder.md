@@ -39,7 +39,7 @@ $$
 <!-- visual:pre-norm-decoder-residual-stream -->
 <figure class="learning-figure plot-panel" aria-labelledby="pre-norm-decoder-title">
 	<p class="visual-kicker">Pre-norm block topology</p>
-	<p class="visual-title" id="pre-norm-decoder-title">Normalize the update branches, not the identity stream.</p>
+	<p class="visual-title" id="pre-norm-decoder-title">Normalize each learned branch without replacing the identity stream</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="pre-norm-decoder-svg-title pre-norm-decoder-svg-desc">
 		<title id="pre-norm-decoder-svg-title">Residual stream through a pre-norm Transformer decoder block</title>
 		<desc id="pre-norm-decoder-svg-desc">A vertical solid identity rail carries input h with shape batch by time by model dimension through two additions. At stage one, a dashed branch copies h through LayerNorm and causal self-attention, then rejoins the rail at a plus node to produce h prime. At stage two, another dashed branch copies h prime through LayerNorm and the position-wise MLP, then rejoins at a second plus node to produce output y. LayerNorm appears only on the branches, so the raw residual states bypass both normalization and sublayers.</desc>

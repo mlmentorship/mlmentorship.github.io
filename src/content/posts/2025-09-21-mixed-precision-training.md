@@ -56,7 +56,7 @@ This equals approximately $0.0009765615686774254$ and remains representable in F
 <!-- visual:fp16-loss-scaling-ledger -->
 <figure class="learning-figure" aria-labelledby="fp16-loss-scaling-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="fp16-loss-scaling-title">Follow one tiny gradient through scaling, FP16 backward, and FP32 unscaling.</p>
+	<p class="visual-title" id="fp16-loss-scaling-title">Scaling can preserve a small gradient before rounding destroys it</p>
 	<p class="cm-equation">One plain SGD step, learning rate 1. Initial FP32 master weight: 2<sup>−10</sup>; no momentum or decay.</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of the same gradient without loss scaling and with loss scaling">
 		<section class="visual-panel" aria-labelledby="unscaled-gradient-title">

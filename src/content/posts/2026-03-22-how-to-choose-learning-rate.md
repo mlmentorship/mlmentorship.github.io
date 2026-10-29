@@ -30,7 +30,7 @@ Which rates reduce the loss, and what changes when the intended run uses a sched
 <!-- visual:learning-rate-range-to-schedule -->
 <figure class="learning-figure" aria-labelledby="learning-rate-procedure-title">
 	<p class="visual-kicker">Candidate first, controlled run second</p>
-	<p class="visual-title" id="learning-rate-procedure-title">Turn a range test into a peak learning rate, then schedule around it</p>
+	<p class="visual-title" id="learning-rate-procedure-title">Choose the useful descent region, not the unstable end of the sweep</p>
 	<div class="visual-grid--two" role="group" aria-label="Two-stage learning-rate selection procedure">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 238" role="img" aria-labelledby="lr-range-title lr-range-desc">

@@ -1,11 +1,82 @@
 {
   "schemaVersion": 1,
   "status": "review-complete",
-  "implementationStatus": "Editorial edition implemented; see editionReconciliation for scope and qualification. Original assessments and previous qualification remain historical.",
+  "implementationStatus": "Second editorial pass implemented; see secondPassReconciliation for current scope and qualification. Original assessments and earlier edition qualification remain historical.",
   "expectedArticles": 391,
   "expectedVisuals": 392,
   "authoredCodingStates": 797,
   "assessment": "Expert illustration review; no learner study or measured comprehension improvement is claimed.",
+  "secondPassReconciliation": {
+    "status": "implemented and locally qualified",
+    "baseCommit": "be21ddb6c2dc892d8ea593a6277a662f29fbfb25",
+    "registeredVisualsReviewed": 392,
+    "supplementalVisualsReviewed": 16,
+    "takeawayCatalog": "scripts/illustration-takeaways.mjs",
+    "takeaways": 408,
+    "takeawayPolicy": "State the particular inference visible in each figure, preserving strong existing wording and qualifying illustrative or conditional claims. This is not a count of structural redraws or newly rewritten titles.",
+    "sharedTitleRepair": "The primary review surface displays figure takeaways instead of hiding them in one-pixel screen-reader boxes; native rendering rejects hidden, clipped, transparent, or horizontally overflowing titles.",
+    "geometricRevisions": [
+      {
+        "visualId": "bayes-positive-test-denominator",
+        "change": "Show 100,000 people as 1,000 equal groups of 100, with one diseased group and 999 healthy groups; retain exact 99/999 positive-result strip proportions."
+      },
+      {
+        "visualId": "actor-critic-two-objective-flow",
+        "change": "Compose shared features, actor, critic, advantage and two losses at phone width. Separate the forward advantage value from its stopped reverse gradient; both losses still update shared features."
+      }
+    ],
+    "coding": {
+      "definitions": 106,
+      "checkpoints": 797,
+      "readablePointerLabelFigures": 79,
+      "candidateBandFigures": ["binary-search-state", "search-in-rotated-sorted-array-state"],
+      "candidateBandPolicy": "Show prior and current candidate intervals on the same numbered scale. Initialization has only its actual current interval; no prior checkpoint is invented."
+    },
+    "generation": "The coding generator and original SVG models use the same takeaway catalog. Source checks require exact 392+16 coverage and title ownership.",
+    "qualification": {
+      "status": "passed",
+      "normalGates": ["npm run check", "npm run build"],
+      "figureCases": 2040,
+      "settledRegisteredScreenStateCaptures": 3188,
+      "authenticatedPngFiles": 7920,
+      "modes": ["desktop-light", "desktop-dark", "mobile-light", "mobile-dark", "print"],
+      "interactions": [
+        { "viewportWidth": 1280, "routes": 106, "checkpoints": 797, "report": "interactions-1280-r3.json" },
+        { "viewportWidth": 390, "routes": 106, "checkpoints": 797, "report": "interactions-390-r4.json" }
+      ],
+      "interactionScope": "Navigation, direct selection, keyboard controls, real playback, stable frame/control/page geometry, reduced motion and no-JavaScript fallback.",
+      "manualInspection": {
+        "contactSheets": 68,
+        "initialPhoneViews": 408,
+        "supplementalNativePhoneOriginals": 16,
+        "registeredNativeScope": "Selected originals, including Bayes, actor-critic, binary search and rotated target search; not every native original or authored checkpoint.",
+        "contactPolicy": "Scaled initial-state composition review, separate from native-image inspection and automated every-state coverage.",
+        "retainedLimitation": "Some wide drawings require contained horizontal panning; the technical text-size floor is not a comprehension score."
+      },
+      "preservation": {
+        "articles": 391,
+        "nonFigureLessonBodiesByteExact": true,
+        "headingsAndPythonFencesExact": true,
+        "registeredAndSupplementalIdentityOrderExact": true,
+        "publicFragmentsRetained": true,
+        "frameIdentities": 797,
+        "orderedMotionIdentities": 8739,
+        "unownedDirtyWorktreesPreserved": true
+      },
+      "evidenceDirectory": "/tmp/mlmentorship-illustrations-second-pass-20261028-81b8a701-evidence",
+      "renderManifest": "render-qualified-r1.json",
+      "sourceFreeze": "candidate-source-freeze-r1.json",
+      "sourceBinding": "Only the bounded, progress-reporting interaction observer and final review records may differ from the rendering freeze. Final article HTML and runtime assets are compared separately after the final build.",
+      "observerRepair": "Bound CDP waits and log route/stage progress. Observe actual playback after a driver-side delay, without fake timers or weakened product assertions.",
+      "rejectedAttempts": "Retain the interrupted desktop r1, page-side observer timeout in desktop r2, and wrong-CWD phone r3 separately; none counts as a pass.",
+      "nativeImageStorage": "Owned /dev/shm directory, volatile across host restart; PNG hashes, reports and contact sheets remain on disk."
+    },
+    "measuredTenfoldImprovement": false,
+    "learnerStudy": false,
+    "publicationStandardCertified": false,
+    "pdfPaginationVerified": false,
+    "publicationPerformed": false
+  },
   "currentReconciliation": {
     "reviewedAt": "2026-10-27",
     "registeredVisuals": 392,

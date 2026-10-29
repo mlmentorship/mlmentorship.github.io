@@ -22,7 +22,7 @@ Putting A1 into fitting and A2 into scoring fails this particular unseen-patient
 <!-- visual:cross-validation-preserve-structure -->
 <figure class="learning-figure plot-panel" aria-labelledby="cv-structure-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="cv-structure-title">Choose the split that preserves the dependency in your data.</p>
+	<p class="visual-title" id="cv-structure-title">Choose splits that preserve users, time, and the evaluation claim</p>
 	<svg viewBox="0 0 360 440" role="img" aria-labelledby="cv-structure-svg-title cv-structure-svg-desc">
 		<title id="cv-structure-svg-title">Three cross-validation splitting constraints</title>
 		<desc id="cv-structure-svg-desc">Three panels compare validation rules. For independent classification rows, two folds each contain four negative examples and two positive examples, preserving class proportions. For grouped rows, all examples from groups A and B remain in training while every example from group C is held out for validation. For time-ordered rows, two successive folds use an expanding prefix for training and only later observations for validation. Every region is labelled train or validate, so meaning does not depend on color.</desc>

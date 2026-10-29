@@ -51,7 +51,7 @@ All four idealized accounts predict `RED`, so another identical success does lit
 <!-- visual:black-box-discriminating-probes -->
 <figure class="learning-figure" aria-labelledby="black-box-probes-title">
 	<p class="visual-kicker">Predictions before observations</p>
-	<p class="visual-title" id="black-box-probes-title">One RED response fits four accounts; choose a matched contrast.</p>
+	<p class="visual-title" id="black-box-probes-title">A predicted output switch tests a hypothesis without proving the hidden mechanism</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of an ambiguous observation and four matched discriminating probes">
 		<section class="visual-panel" aria-labelledby="black-box-ambiguous-title">
 			<h4 id="black-box-ambiguous-title">One observation fits every story</h4>

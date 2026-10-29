@@ -28,7 +28,7 @@ Attention layers are typically *not* MoE (shared across all tokens).
 <!-- visual:moe-top-two-routing-accounting -->
 <figure class="learning-figure" aria-labelledby="moe-routing-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="moe-routing-title">How can one token use only two experts while the model stores all four?</p>
+	<p class="visual-title" id="moe-routing-title">Two experts execute, but all four experts still occupy storage</p>
 	<div class="visual-grid--two" role="group" aria-label="Top-2 expert routing and resource accounting">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 280" role="img" aria-labelledby="moe-route-svg-title moe-route-svg-desc">

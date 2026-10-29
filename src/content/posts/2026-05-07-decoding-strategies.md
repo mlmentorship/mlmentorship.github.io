@@ -53,7 +53,7 @@ Choose a threshold in $(0,1]$; declare cutoff ties and renormalize ([Holtzman et
 <!-- visual:decoding-fixed-count-adaptive-mass -->
 <figure class="learning-figure" aria-labelledby="decoding-support-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="decoding-support-title">Why does top-p adapt while top-k does not?</p>
+	<p class="visual-title" id="decoding-support-title">Top-k fixes a count; top-p changes the count to reach a probability mass</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of top-k and top-p candidate supports for confident and uncertain next-token distributions">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 266" role="img" aria-labelledby="decoding-confident-title decoding-confident-desc">

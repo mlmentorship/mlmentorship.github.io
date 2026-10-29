@@ -40,7 +40,7 @@ The diagram uses different illustrative channel counts: thirty-two, then sixty-f
 <!-- visual:cnn-spatial-channel-pyramid -->
 <figure class="learning-figure" aria-labelledby="cnn-pyramid-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="cnn-pyramid-title">Track what changes through a CNN: spatial grids shrink, channels grow, and context widens.</p>
+	<p class="visual-title" id="cnn-pyramid-title">Pooling collapses space while keeping one output per channel</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 242" role="img" aria-labelledby="cnn-pyramid-svg-title cnn-pyramid-svg-desc">
 			<title id="cnn-pyramid-svg-title">CNN spatial and channel feature pyramid</title>

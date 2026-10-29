@@ -25,7 +25,7 @@ The drawing uses the simple observation-only case.
 <!-- visual:multi-agent-ctde-information-boundary -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="ctde-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ctde-visual-title">Separate information used to learn coordinated policies from information each policy can use when acting.</p>
+	<p class="visual-title" id="ctde-visual-title">The centralized critic trains local policies but is absent during execution</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 360" style="min-width: 760px;" role="img" aria-labelledby="ctde-svg-title ctde-svg-desc">
 			<title id="ctde-svg-title">Centralized training and decentralized execution information paths</title>

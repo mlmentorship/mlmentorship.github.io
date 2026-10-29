@@ -30,7 +30,7 @@ Hold proposal coverage fixed: B exists in both panels.
 <!-- visual:test-time-compute-verifier-bottleneck -->
 <figure class="learning-figure" aria-labelledby="test-time-verifier-heading">
 	<p class="visual-kicker">Same candidates; different selection evidence</p>
-	<p class="visual-title" id="test-time-verifier-heading">B passes all three checks; the plausibility proxy selects constant-answer D.</p>
+	<p class="visual-title" id="test-time-verifier-heading">Generating a correct candidate is insufficient when the verifier discards it</p>
 	<svg viewBox="0 0 360 410" role="img" aria-labelledby="test-time-verifier-title test-time-verifier-desc">
 		<title id="test-time-verifier-title">The same candidate set succeeds with a direct checker and fails with a weak proxy verifier</title>
 		<desc id="test-time-verifier-desc">Two panels contain the same four sampled candidates: A has wrong arithmetic, B is correct, C is incomplete, and D is a polished shortcut with a wrong answer. In the upper panel, protected tests directly check the task and select candidate B, so the returned answer is correct. In the lower panel, a weak model judge rewards plausibility and selects candidate D, so the returned answer is wrong even though candidate B was available. Candidate letters, truth labels, verifier labels, selection text, and solid versus dashed arrows communicate the result without color.</desc>

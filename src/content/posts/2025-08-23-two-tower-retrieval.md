@@ -28,7 +28,7 @@ Stored item features must not require query-specific joint computation under thi
 <!-- visual:two-tower-offline-online-split -->
 <figure class="learning-figure plot-panel" aria-labelledby="two-tower-serving-heading">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="two-tower-serving-heading">Precompute the catalog side; run only the query side per request.</p>
+	<p class="visual-title" id="two-tower-serving-heading">Encode items before the request; encode the query during it</p>
 	<svg viewBox="0 0 360 300" role="img" aria-labelledby="two-tower-serving-title two-tower-serving-desc">
 		<title id="two-tower-serving-title">Offline item encoding feeds the index used by online query retrieval</title>
 		<desc id="two-tower-serving-desc">The upper offline lane sends every catalog item through the item tower and writes the resulting item vectors to an approximate nearest-neighbor index during a batch refresh. The lower online lane sends one incoming query through the query tower to produce vector q. The index compares q with its stored item vectors and returns top-K candidate IDs. Text labels and a dashed batch-refresh path distinguish the two lifecycles without relying on color.</desc>

@@ -19,7 +19,7 @@ The figure illustrates a soft-margin fit; its three highlighted points are not t
 <!-- visual:svm-support-vectors-set-boundary -->
 <figure class="learning-figure plot-panel" aria-labelledby="svm-support-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="svm-support-title">Which training points survive in the SVM decision function?</p>
+	<p class="visual-title" id="svm-support-title">Only nonzero dual weights contribute to the SVM decision sum</p>
 	<svg viewBox="0 0 360 340" role="img" aria-labelledby="svm-support-svg-title svm-support-svg-desc">
 		<title id="svm-support-svg-title">Support vectors on or inside two SVM margin rails</title>
 		<desc id="svm-support-svg-desc">A vertical decision boundary lies between dashed negative-one and positive-one margin rails. Negative-class circles appear on the left and positive-class diamonds on the right. Three points on or inside the rails have prominent outer rings and labels saying alpha i is greater than zero, so they are support vectors. Four correctly classified points beyond the rails have no rings and labels saying alpha i equals zero. A note states that prediction sums only over the three ringed support vectors.</desc>

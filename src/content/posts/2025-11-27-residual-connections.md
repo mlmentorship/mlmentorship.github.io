@@ -28,7 +28,7 @@ The input goes to both branches. Addition joins their values in the forward pass
 <!-- visual:residual-add-gradient-split -->
 <figure class="learning-figure plot-panel" aria-labelledby="residual-gradient-title">
 	<p class="visual-kicker">One input, two contributions</p>
-	<p class="visual-title" id="residual-gradient-title">Add branch values, then add branch gradient contributions.</p>
+	<p class="visual-title" id="residual-gradient-title">Addition copies the upstream gradient; each branch then applies its own derivative</p>
 	<svg viewBox="0 0 360 620" role="img" aria-labelledby="residual-gradient-svg-title residual-gradient-svg-desc">
 		<title id="residual-gradient-svg-title">Forward and backward paths through one residual addition</title>
 		<desc id="residual-gradient-svg-desc">The specified function is f(x)=0.1x, so its derivative is 0.1. Input two splits into f(2)=0.2 and unchanged x=2. Addition gives y=2.2 and loss y squared over two gives upstream gradient 2.2. Backward, the residual branch contributes 0.1 times 2.2, or 0.22. The identity contributes 2.2. Their sum is 2.42.</desc>

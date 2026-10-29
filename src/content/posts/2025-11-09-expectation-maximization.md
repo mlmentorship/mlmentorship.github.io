@@ -73,7 +73,7 @@ $$
 <!-- visual:em-lower-bound-climb -->
 <figure class="learning-figure plot-panel" aria-labelledby="em-bound-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="em-bound-title">Why can an EM iteration not lower the observed-data likelihood?</p>
+	<p class="visual-title" id="em-bound-title">Raise a touching lower bound to prevent the likelihood from falling</p>
 	<svg viewBox="0 0 360 420" role="img" aria-labelledby="em-bound-svg-title em-bound-svg-desc">
 		<title id="em-bound-svg-title">EM climbs a lower bound on the observed-data log-likelihood</title>
 		<desc id="em-bound-svg-desc">A solid curve is the observed-data log-likelihood. A dashed lower-bound curve touches it at the current parameter theta t because the E-step sets q t to the exact posterior and makes the KL gap zero. Holding q t fixed, the M-step moves right to theta t plus 1, where the lower bound is higher. The solid likelihood at the new parameter is at least as high as that bound. The next E-step closes the remaining gap.</desc>

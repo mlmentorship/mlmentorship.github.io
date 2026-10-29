@@ -364,6 +364,8 @@ try {
             const visualTitle = visual.matches('figure')
               ? visual.querySelector('.visual-title')
               : supplementalTitle ?? (marker?.previousElementSibling?.matches('.visual-title') ? marker.previousElementSibling : null);
+            const titleRect = visualTitle?.getBoundingClientRect();
+            const titleStyle = visualTitle ? getComputedStyle(visualTitle) : null;
             const visualKicker = visual.matches('.mermaid') && visualTitle?.previousElementSibling?.matches('.visual-kicker')
               ? visualTitle.previousElementSibling
               : null;
@@ -516,6 +518,16 @@ try {
               minRenderedText: renderedTextSizes.length ? Math.min(...renderedTextSizes) : null,
               visualTitle: visualTitle?.textContent.trim() ?? '',
               visualTitleGlyphWidth: rangeWidth(visualTitle),
+              visualTitleVisibility: visualTitle ? {
+                width: titleRect.width,
+                height: titleRect.height,
+                clientWidth: visualTitle.clientWidth,
+                scrollWidth: visualTitle.scrollWidth,
+                visibility: titleStyle.visibility,
+                opacity: Number(titleStyle.opacity),
+                clip: titleStyle.clip,
+                clipPath: titleStyle.clipPath,
+              } : null,
               caption: captionText,
               rawCaptionMath: captionText.split('$').length > 2 || captionText.includes(String.fromCharCode(92)),
               captionGlyphWidth: rangeWidth(caption),
@@ -566,6 +578,13 @@ try {
         }
         if (!details.visualTitle || details.visualTitleGlyphWidth < 1) {
           throw new Error(`${label} lost its rendered learning title`);
+        }
+        const titleVisibility = details.visualTitleVisibility;
+        if (!titleVisibility || titleVisibility.width <= 1 || titleVisibility.height < 8 ||
+          titleVisibility.visibility !== 'visible' || titleVisibility.opacity <= 0 ||
+          titleVisibility.clip !== 'auto' || titleVisibility.clipPath !== 'none' ||
+          titleVisibility.scrollWidth > titleVisibility.clientWidth + 1) {
+          throw new Error(`${label} hides or clips its learning title: ${JSON.stringify(titleVisibility)}`);
         }
         if (details.rawCaptionMath) throw new Error(`${label} retains raw math delimiters in its caption`);
         if (details.mermaid && (details.svgCount === 0 || details.minRenderedText === null ||

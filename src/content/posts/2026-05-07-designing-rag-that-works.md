@@ -44,7 +44,7 @@ Skipping components 4-6 is the single most common failure.
 
 <!-- visual:rag-recall-precision-funnel -->
 <figure class="learning-figure plot-panel" aria-labelledby="rag-funnel-heading">
-	<h3 id="rag-funnel-heading" class="visual-title">Recall first, precision second</h3>
+	<h3 id="rag-funnel-heading" class="visual-title">Preserve both evidence passages before reranking their relevance</h3>
 	<svg viewBox="0 0 360 526" role="img" aria-labelledby="rag-funnel-title rag-funnel-desc">
 		<title id="rag-funnel-title">Hybrid retrieval and reranking candidate funnel</title>
 		<desc id="rag-funnel-desc">For the synthetic query ERR-42 after rotating a token, lexical retrieval ranks evidence A, the exact ERR-42 runbook, first but misses evidence B, the semantically relevant rotated-access recovery guide. Dense retrieval ranks evidence B first but misses evidence A. Reciprocal rank fusion combines rank evidence into a broad candidate pool containing both A and B plus lower-priority candidates. A cross-encoder then jointly scores the query with each candidate and selects B then A as the small context passed to the generator. Retrieval protects recall; reranking improves precision.</desc>

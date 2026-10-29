@@ -34,11 +34,28 @@ $$
 <!-- visual:bayes-positive-test-denominator -->
 <figure class="learning-figure plot-panel" aria-labelledby="bayes-denominator-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="bayes-denominator-title">Why can 99% sensitivity and specificity still leave most positive results false?</p>
-	<svg viewBox="0 0 360 412" role="img" aria-labelledby="bayes-denominator-svg-title bayes-denominator-svg-desc">
+	<p class="visual-title" id="bayes-denominator-title">Only 99 of 1,098 positive results come from the diseased group</p>
+	<svg viewBox="0 0 360 672" role="img" aria-labelledby="bayes-denominator-svg-title bayes-denominator-svg-desc">
 		<title id="bayes-denominator-svg-title">Natural-frequency funnel for a rare disease test</title>
-		<desc id="bayes-denominator-svg-desc">Start with 100,000 people. At 0.1 percent prevalence, 100 have the disease and 99,900 are healthy. With 99 percent sensitivity, the diseased branch contributes 99 true-positive results. With 99 percent specificity, one percent of the healthy branch contributes 999 false-positive results. A proportional positive-result strip contains a narrow 99-person true-positive segment and a 999-person false-positive segment. Both enter the denominator 1,098. The true-positive share is 99 divided by 1,098, about 9 percent.</desc>
-		<rect class="viz-plot-bg" x="4" y="4" width="352" height="404" rx="6"></rect>
+		<desc id="bayes-denominator-svg-desc">The population grid has 1,000 equal squares, each representing 100 people. Only the solid top-left square represents people with disease; the other 999 outlined squares represent healthy people. Start with 100,000 people. At 0.1 percent prevalence, 100 have the disease and 99,900 are healthy. With 99 percent sensitivity, the diseased branch contributes 99 true-positive results. With 99 percent specificity, one percent of the healthy branch contributes 999 false-positive results. A proportional positive-result strip contains a narrow 99-person true-positive segment and a 999-person false-positive segment. Both enter the denominator 1,098. The true-positive share is 99 divided by 1,098, about 9 percent.</desc>
+		<defs>
+			<pattern id="bayes-population-hundred" width="8" height="6" patternUnits="userSpaceOnUse" patternTransform="translate(20 60)">
+				<rect width="6" height="4" rx="0.5" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:0.6"></rect>
+			</pattern>
+		</defs>
+		<rect class="viz-plot-bg" x="4" y="4" width="352" height="664" rx="6"></rect>
+		<g data-population-grid data-columns="40" data-rows="25" data-people-per-group="100" data-diseased-groups="1">
+			<text x="180" y="27" style="font-family:var(--font-ui);font-size:15px;font-weight:700;fill:var(--c-text);text-anchor:middle">Before testing: 1 in 1,000 groups</text>
+			<text x="180" y="47" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text);text-anchor:middle">Each square represents 100 people.</text>
+			<rect x="20" y="60" width="320" height="150" fill="url(#bayes-population-hundred)"></rect>
+			<rect x="20" y="60" width="6" height="4" rx="0.5" data-diseased-group style="fill:var(--viz-output-stroke);stroke:var(--c-text);stroke-width:0.8"></rect>
+			<rect x="20" y="225" width="9" height="9" style="fill:var(--viz-output-stroke);stroke:var(--c-text);stroke-width:0.8"></rect>
+			<text x="35" y="234" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text)">1 group: disease</text>
+			<rect x="185" y="225" width="9" height="9" style="fill:var(--viz-neutral-bg);stroke:var(--viz-neutral-stroke);stroke-width:0.8"></rect>
+			<text x="200" y="234" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text)">999 groups: healthy</text>
+			<path d="M180 244V268M175 264L180 271L185 264" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
+		</g>
+		<g transform="translate(0 260)">
 		<rect class="viz-node viz-node--input" x="95" y="18" width="170" height="52" rx="5"></rect>
 		<text class="viz-node-label" x="180" y="41">100,000 people</text>
 		<text class="viz-node-value" x="180" y="58">before testing</text>
@@ -68,6 +85,7 @@ $$
 		<path d="M24 339V345H336V339" style="fill:none;stroke:var(--viz-edge);stroke-width:1.5"></path>
 		<text x="180" y="363" style="font-family:var(--font-ui);font-size:12px;fill:var(--c-text);text-anchor:middle">all 1,098 positive results</text>
 		<text x="180" y="389" style="font-family:var(--font-ui);font-size:17px;font-weight:700;fill:var(--c-text);text-anchor:middle">99 / (99 + 999) = 9%</text>
+		</g>
 	</svg>
 	<figcaption><strong>Read it this way:</strong> the narrow solid piece is 99 true positives. The much wider dashed piece is 999 false positives. Their widths use the same people-per-unit scale. The denominator is the entire strip, not just the diseased branch: 99 divided by 1,098, about 9%. These are expected counts under the hypothetical test assumptions. <span class="visual-reader-check" data-reader-check="bayes-positive-test-denominator"><strong>Check:</strong> Why is a positive result only about 9% likely to indicate disease despite 99% sensitivity?</span></figcaption>
 </figure>

@@ -35,7 +35,7 @@ For example, a model could behave helpfully during ordinary evaluation but pursu
 <!-- visual:model-organism-policy-test -->
 <figure class="learning-figure" aria-labelledby="model-organism-policy-title">
 	<p class="visual-kicker">Controlled behavior is the instrument</p>
-	<p class="visual-title" id="model-organism-policy-title">A mitigation passes only if the policy disappears beyond the known trigger and useful capability remains.</p>
+	<p class="visual-title" id="model-organism-policy-title">Suppressing one known trigger does not establish removal of the behavior</p>
 	<div class="visual-grid--two" role="group" aria-label="Model organism before intervention and an illustrative incomplete mitigation afterward">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 320" role="img" aria-labelledby="organism-before-title organism-before-desc">

@@ -104,8 +104,7 @@ const {
     max-width: 100% !important;
     margin: .75rem 0 0 !important;
   }
-  .visual-review-visual :global(.learning-figure > .visual-kicker),
-  .visual-review-visual :global(.learning-figure > .visual-title) {
+  .visual-review-visual :global(.learning-figure > .visual-kicker) {
     position: absolute !important;
     width: 1px !important;
     height: 1px !important;
@@ -115,6 +114,13 @@ const {
     clip: rect(0, 0, 0, 0) !important;
     white-space: nowrap !important;
     border: 0 !important;
+  }
+  .visual-review-visual :global(.learning-figure > .visual-title) {
+    margin: 0 0 .85rem;
+    font-size: 1.04rem;
+    line-height: 1.35;
+    letter-spacing: 0;
+    text-wrap: pretty;
   }
   .visual-review-loading {
     min-height: 14rem;

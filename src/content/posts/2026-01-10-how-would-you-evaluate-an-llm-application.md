@@ -36,7 +36,7 @@ Five answers pass citation validation alone, one passes support alone, and one p
 
 <!-- visual:llm-eval-calibration-loop -->
 <figure class="learning-figure" aria-labelledby="joint-eval-visual-title">
-	<h3 class="visual-title" id="joint-eval-visual-title">The same answer must pass both checks</h3>
+	<h3 class="visual-title" id="joint-eval-visual-title">Thirteen joint passes out of twenty miss the 70% release floor</h3>
 	<svg viewBox="0 0 600 540" role="img" aria-labelledby="joint-eval-chart-title joint-eval-chart-desc" style="width: 100%; min-width: 0; height: auto;">
 		<title id="joint-eval-chart-title">Thirteen joint passes fail the seventy-percent release floor</title>
 		<desc id="joint-eval-chart-desc">Each of twenty tiles represents one hypothetical answer, grouped in one possible ordering. Thirteen tiles marked VS pass citation validity and support. Five marked V pass citation validity only, one marked S passes support only, and one dash passes neither. Thus eighteen pass validity, fourteen pass support, but only thirteen of twenty, or 65%, pass both. The joint-rate bar stops before the required 70% marker. Hold this candidate; the existing production version remains unchanged. Repair on development cases and use fresh independent confirmation.</desc>

@@ -39,7 +39,7 @@ At each step:
 <!-- visual:beam-search-live-finished-transition -->
 <figure class="learning-figure" aria-labelledby="beam-pools-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="beam-pools-title">When does an EOS hypothesis leave the expandable beam?</p>
+	<p class="visual-title" id="beam-pools-title">Finished beams stop expanding even while they remain final candidates</p>
 	<div class="visual-grid--two" role="group" aria-label="One beam-search step routes EOS candidates to a finished pool before pruning only the live candidates">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 250" role="img" aria-labelledby="beam-expand-title beam-expand-desc">

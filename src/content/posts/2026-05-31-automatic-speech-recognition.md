@@ -38,7 +38,7 @@ Record padding, centering, normalization and encoder subsampling before interpre
 <!-- visual:asr-alignment-decoder-choices -->
 <figure class="learning-figure plot-panel" aria-labelledby="asr-alignment-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="asr-alignment-title">What advances when each ASR model emits a token?</p>
+	<p class="visual-title" id="asr-alignment-title">RNN-T can emit another token without advancing the audio frame</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="asr-alignment-svg-title asr-alignment-svg-desc">
 		<title id="asr-alignment-svg-title">Comparison of CTC, RNN-T, and attention alignment paths</title>
 		<desc id="asr-alignment-svg-desc">Three illustrative panels produce CAT. CTC uses six frames, one label-or-blank decision per frame and collapse without explicit emitted-label conditioning. The RNN-T schematic shows five blank time moves and three token moves with prefix conditioning. Offline attention uses prior tokens and weighted context over six available encoded frames. These paths are schematic, not outputs of a trained model on the worked waveform.</desc>

@@ -30,7 +30,7 @@ Multiply each point's horizontal and vertical deviations, then average those pro
 <!-- visual:covariance-centered-product-signs -->
 <figure class="learning-figure plot-panel" aria-labelledby="covariance-signs-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="covariance-signs-title">Multiply deviations from both means, then average the four products.</p>
+	<p class="visual-title" id="covariance-signs-title">A value at its mean contributes zero to covariance</p>
 	<svg viewBox="0 0 480 330" role="img" aria-labelledby="covariance-signs-svg-title covariance-signs-svg-desc">
 		<title id="covariance-signs-svg-title">Signs of centered-product contributions to covariance</title>
 		<desc id="covariance-signs-svg-desc">Four equally likely outcomes have X mean zero and Y mean one. Points (-1, -1) and (1, 3) each contribute a centered product of two. Points (-1, 1) and (1, 1) lie on the Y-mean line and contribute zero. Their average product is one. Empty quadrants show where opposite-sign deviations would contribute negatively.</desc>

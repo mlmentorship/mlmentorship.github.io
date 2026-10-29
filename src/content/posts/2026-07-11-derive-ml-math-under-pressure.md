@@ -32,7 +32,7 @@ Four independent products add variance; halving their sum multiplies variance by
 <!-- visual:attention-scaling-variance-trace -->
 <figure class="learning-figure plot-panel" aria-labelledby="attention-scaling-variance-title">
 	<p class="visual-kicker">An exact four-coordinate distribution</p>
-	<p class="visual-title" id="attention-scaling-variance-title">Four unit variances become four; halving the sum restores one.</p>
+	<p class="visual-title" id="attention-scaling-variance-title">Square-root scaling stabilizes variance only under the stated dependence assumptions</p>
 	<svg viewBox="0 0 360 390" role="img" aria-labelledby="attention-scaling-variance-svg-title attention-scaling-variance-svg-desc">
 		<title id="attention-scaling-variance-svg-title">Parallel trace of an attention logit and its variance</title>
 		<desc id="attention-scaling-variance-svg-desc">Four query and four key coordinates are independent signs with equal positive and negative probabilities. Each product has variance one. The top row follows four products into their sum z and then z divided by two. The aligned bottom row follows variance one per product, total variance four, and scaled variance one. The scale is squared when computing variance. Sharing one query sign and one key sign across coordinates instead gives raw variance sixteen and scaled variance four.</desc>

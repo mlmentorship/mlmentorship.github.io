@@ -47,7 +47,7 @@ Untried B keeps its own uncertainty; A's three observations do not establish B's
 <!-- visual:cold-start-signal-handoff -->
 <figure class="learning-figure" aria-labelledby="cold-start-handoff-title">
 	<p class="visual-kicker">Three mature observations, still uncertain</p>
-	<p class="visual-title" id="cold-start-handoff-title">A's mean moves from 0.50 to 0.60, not to certainty.</p>
+	<p class="visual-title" id="cold-start-handoff-title">Three observations reshape uncertainty; they do not prove a fixed success rate</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 270" role="img" aria-labelledby="cold-start-beta-title cold-start-beta-desc" style="width:400px;min-width:400px">
 			<title id="cold-start-beta-title">Uniform Beta prior and the posterior after two successes and one failure</title>

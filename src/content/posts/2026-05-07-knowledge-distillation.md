@@ -30,7 +30,7 @@ $$
 <!-- visual:distillation-temperature-dark-knowledge -->
 <figure class="learning-figure plot-panel" aria-labelledby="distillation-temperature-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="distillation-temperature-title">What does temperature reveal that a hard label hides?</p>
+	<p class="visual-title" id="distillation-temperature-title">Higher temperature exposes alternatives without changing the winning class</p>
 	<svg viewBox="0 0 360 350" role="img" aria-labelledby="distillation-temperature-svg-title distillation-temperature-svg-desc">
 		<title id="distillation-temperature-svg-title">Hard and soft targets for a teacher classifying a handwritten seven</title>
 		<desc id="distillation-temperature-svg-desc">Three aligned horizontal bar groups compare probabilities for classes 7, 1, and 9. The hard label is 100, 0, and 0 percent. Teacher logits 5, 2, and 1 produce 93.6, 4.7, and 1.7 percent at temperature 1. The same logits at temperature 3 produce 61.3, 22.5, and 16.2 percent. Raising temperature preserves the ordering 7 above 1 above 9 while exposing the teacher's relative preference for the two wrong classes. The student is trained to match this softened distribution.</desc>

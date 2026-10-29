@@ -125,7 +125,7 @@ A large GPU cluster can reduce data in stages:
 
 <!-- visual:hierarchical-all-reduce-path -->
 <figure class="learning-figure" aria-labelledby="hierarchical-sum-title">
-	<p class="visual-title" id="hierarchical-sum-title">Four inputs. One sum. The same answer on every rank.</p>
+	<p class="visual-title" id="hierarchical-sum-title">Sum locally, combine the partials, return 10 to every rank</p>
 	<svg viewBox="0 0 360 452" role="img" aria-labelledby="hierarchical-sum-svg-title hierarchical-sum-svg-desc" style="width:100%;max-width:32rem;display:block;margin:auto">
 		<title id="hierarchical-sum-svg-title">Four ranks receive the sum 10 through a hierarchical all-reduce</title>
 		<desc id="hierarchical-sum-svg-desc">Fast group A sums rank zero's 1 and rank one's 3 to get 4. Fast group B sums rank two's 2 and rank three's 4 to get 6. Only the two partials enter the slower inter-group stage, producing 10. Local distribution returns 10 to each of the original four ranks. This is a logical example, not a physical packet schedule.</desc>

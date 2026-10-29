@@ -34,7 +34,7 @@ These are the exact values and arrows in the diagram.
 <!-- visual:backprop-forward-reverse-trace -->
 <figure class="learning-figure backprop-visual" aria-labelledby="backprop-visual-title">
 	<p class="visual-kicker">Spatial intuition</p>
-	<p class="visual-title" id="backprop-visual-title">Values move forward once. Gradients move backward once and reuse the saved values.</p>
+	<p class="visual-title" id="backprop-visual-title">The same upstream gradient meets different cached multipliers</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 700 300" overflow="hidden" role="img" aria-labelledby="backprop-svg-title backprop-svg-desc">
 			<title id="backprop-svg-title">Forward and backward passes through a scalar computation graph</title>

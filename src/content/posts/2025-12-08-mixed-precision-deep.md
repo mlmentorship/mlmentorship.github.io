@@ -54,7 +54,7 @@ This is L5. You've described the full recipe with the stability ops named.
 <!-- visual:fp16-safe-update-order -->
 <figure class="learning-figure plot-panel" aria-labelledby="fp16-update-title">
 	<p class="visual-kicker">One FP16 training step</p>
-	<p class="visual-title" id="fp16-update-title">Low-precision compute is temporary; the guarded update is FP32.</p>
+	<p class="visual-title" id="fp16-update-title">Unscale before clipping; skip nonfinite parameter updates</p>
 	<svg viewBox="0 0 360 530" role="img" aria-labelledby="fp16-update-svg-title fp16-update-svg-desc">
 		<title id="fp16-update-svg-title">Safe operation order for one FP16 mixed-precision training step</title>
 		<desc id="fp16-update-svg-desc">Persistent FP32 parameters feed an autocast forward pass in which eligible operations use FP16 and sensitive operations use FP32. The FP32 loss is multiplied by scale S before backward so small FP16 gradients survive. Gradients are converted to FP32 and divided by S before gradient clipping. A finite-value check then branches: non-finite gradients skip the optimizer update and reduce S, while finite unscaled gradients update the FP32 parameters and may eventually allow S to grow. The next step begins from the updated FP32 parameters.</desc>

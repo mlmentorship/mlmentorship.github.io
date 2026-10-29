@@ -39,7 +39,7 @@ Attention also contains feature projections: the picture distinguishes primary c
 <!-- visual:transformer-two-mixing-axes -->
 <figure class="learning-figure plot-panel" aria-labelledby="transformer-mixing-title">
 	<p class="visual-kicker">One tensor, two dependency patterns</p>
-	<p class="visual-title" id="transformer-mixing-title">Which dimension does each transformer sublayer connect?</p>
+	<p class="visual-title" id="transformer-mixing-title">Attention mixes token positions; the feed-forward layer transforms each position independently</p>
 	<svg viewBox="0 0 360 420" role="img" aria-labelledby="transformer-mixing-svg-title transformer-mixing-svg-desc">
 		<title id="transformer-mixing-svg-title">Attention connects token positions while the feed-forward network transforms each token independently</title>
 		<desc id="transformer-mixing-svg-desc">The input is a token-by-feature tensor with three token rows and four feature columns. In the unmasked encoder example in stage one, arrows from token rows one, two, and three converge on the updated representation of token two, showing that self-attention can gather information across positions allowed by its mask. In stage two, three separate horizontal paths apply the same feed-forward network to each token row, with no path between rows, showing independent feature transformation at every position. Both sublayers preserve the token-by-feature shape and add their updates through pre-norm residual connections.</desc>

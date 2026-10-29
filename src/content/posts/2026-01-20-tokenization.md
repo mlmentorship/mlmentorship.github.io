@@ -26,7 +26,7 @@ Training changes the segmentation; encoding later replays the learned priority w
 <!-- visual:bpe-corpus-merge-trace -->
 <figure class="learning-figure" aria-labelledby="bpe-merge-trace-title">
 	<p class="visual-kicker">Weighted training counts; ranked encoding</p>
-	<p class="visual-title" id="bpe-merge-trace-title">The three winning pair counts are 10, then 8, then 3.</p>
+	<p class="visual-title" id="bpe-merge-trace-title">Learn the merge order from the corpus, then reuse it on new words</p>
 	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="list" aria-label="Three ranked BPE merge rounds followed by tokenization of three words">
 		<section class="visual-panel" role="listitem">
 			<h4>START · COUNT ADJACENT PAIRS ACROSS ALL OCCURRENCES</h4>

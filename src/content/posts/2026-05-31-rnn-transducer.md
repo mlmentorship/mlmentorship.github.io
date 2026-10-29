@@ -45,7 +45,7 @@ A path from bottom-left to top-right is one alignment. The training loss sums ov
 <!-- visual:rnnt-two-axis-alignment-lattice -->
 <figure class="learning-figure" aria-labelledby="rnnt-lattice-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="rnnt-lattice-title">How can different RNN-T paths emit the same transcript?</p>
+	<p class="visual-title" id="rnnt-lattice-title">Blank edges advance time; token edges advance the output sequence</p>
 	<div class="visual-grid--two" role="group" aria-label="Two RNN-T lattice paths that both emit A then B">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 245" role="img" aria-labelledby="rnnt-early-title rnnt-early-desc">

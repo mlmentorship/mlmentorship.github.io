@@ -35,7 +35,7 @@ The high-range row keeps $s=8/7$ under either policy, restoring $[-8,-32/7,32/7,
 <!-- visual:quantization-scale-granularity -->
 <figure class="learning-figure" aria-labelledby="quantization-scale-title" aria-describedby="quantization-scale-description">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="quantization-scale-title">See how one high-range channel can waste low-bit levels for another channel.</p>
+	<p class="visual-title" id="quantization-scale-title">One outlier can erase small values under a shared quantization scale</p>
 	<p id="quantization-scale-description">An original symmetric INT4 example compares one scale shared by two channels with a separate scale for each channel. Values are rounded to integer codes from negative seven through seven and then dequantized.</p>
 	<div class="visual-grid--two" role="group" aria-label="Shared-scale and per-channel symmetric INT4 quantization comparison">
 		<section class="visual-panel" aria-labelledby="shared-quantization-title">

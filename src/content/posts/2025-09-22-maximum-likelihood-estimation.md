@@ -35,7 +35,7 @@ The diagram rescales likelihood by its peak only to make the shape readable.
 <!-- visual:mle-bernoulli-parameter-sweep -->
 <figure class="learning-figure plot-panel" aria-labelledby="mle-sweep-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="mle-sweep-title">Read likelihood as a score over candidate parameters, not as a probability distribution over them</p>
+	<p class="visual-title" id="mle-sweep-title">Hold the observations fixed while comparing candidate probabilities</p>
 	<svg viewBox="0 0 360 330" role="img" aria-labelledby="mle-sweep-svg-title mle-sweep-svg-desc">
 		<title id="mle-sweep-svg-title">Bernoulli likelihood across candidate success probabilities</title>
 		<desc id="mle-sweep-svg-desc">An original diagram starts with ten fixed Bernoulli observations: seven ones and three zeros. For each candidate success probability p, the likelihood is p to the seventh power times one minus p to the third power. A solid relative-likelihood curve rises from zero, reaches its unique maximum at p equals seven tenths, the observed fraction of successes, then returns to zero. A vertical guide and labelled point identify the maximum likelihood estimate. The curve is a score as p varies and is not a probability distribution over p.</desc>

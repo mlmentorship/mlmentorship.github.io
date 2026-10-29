@@ -43,7 +43,7 @@ where `sigma` is the metric's standard deviation and `N` is the sample size **pe
 <!-- visual:ab-test-mde-sample-size -->
 <figure class="learning-figure plot-panel" aria-labelledby="ab-test-mde-visual-title">
 	<p class="visual-kicker">Power intuition</p>
-	<p class="visual-title" id="ab-test-mde-visual-title">Four times the users halves MDE; twice the noise doubles it.</p>
+	<p class="visual-title" id="ab-test-mde-visual-title">Twice the noise needs four times the sample here</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 290" role="img" aria-labelledby="ab-test-mde-svg-title ab-test-mde-svg-desc">
 			<title id="ab-test-mde-svg-title">Minimum detectable effect by per-arm sample size for two levels of metric noise</title>

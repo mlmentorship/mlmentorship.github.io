@@ -24,7 +24,7 @@ The second column is twice the first. Both point along one output line.
 <!-- visual:matrix-columns-define-map -->
 <figure class="learning-figure" aria-labelledby="matrix-columns-map-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="matrix-columns-map-title">Trace how the columns determine every output, including a direction that collapses to zero.</p>
+	<p class="visual-title" id="matrix-columns-map-title">A nonzero input can collapse to zero when matrix columns are dependent</p>
 	<div class="visual-panel">
 		<svg viewBox="0 0 360 450" role="img" aria-labelledby="matrix-columns-svg-title matrix-columns-svg-desc">
 			<title id="matrix-columns-svg-title">A rank-one matrix maps basis vectors to its columns and collapses a nonzero input</title>

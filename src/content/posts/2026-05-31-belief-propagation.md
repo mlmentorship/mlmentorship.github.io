@@ -54,7 +54,7 @@ $$
 <!-- visual:belief-propagation-branch-summary -->
 <figure class="learning-figure" aria-labelledby="belief-propagation-branch-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="belief-propagation-branch-title">How does a whole branch become one local message?</p>
+	<p class="visual-title" id="belief-propagation-branch-title">Sum over the hidden branch, then normalize the combined evidence</p>
 	<div class="visual-grid--two" role="group" aria-label="Two-step binary belief-propagation example">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 230" role="img" aria-labelledby="bp-collapse-title bp-collapse-desc">

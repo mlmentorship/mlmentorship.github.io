@@ -30,7 +30,7 @@ For this illustration, each activity gets one primary time category; real activi
 <!-- visual:ml-role-activity-profiles -->
 <figure class="learning-figure" aria-labelledby="ml-role-profiles-title">
 	<p class="visual-kicker">Fictional activity allocations</p>
-	<p class="visual-title" id="ml-role-profiles-title">Compare invented profiles on the same scale, not as a ranking.</p>
+	<p class="visual-title" id="ml-role-profiles-title">The same scale exposes different time budgets in these fictional roles</p>
 	<div class="visual-grid--two" role="group" aria-label="Three hypothetical profiles comparing research, modeling, engineering and product allocations">
 		<section class="visual-panel plot-panel">
 			<h4>Applied Scientist example</h4>

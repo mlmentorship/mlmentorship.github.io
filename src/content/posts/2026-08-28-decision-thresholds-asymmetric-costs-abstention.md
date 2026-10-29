@@ -80,7 +80,7 @@ The queue can prioritize expected harm, model uncertainty, user impact, or infor
 <!-- visual:decision-threshold-action-regions -->
 <figure class="learning-figure plot-panel" aria-labelledby="decision-policy-visual-title">
 	<p class="visual-kicker">Spatial intuition</p>
-	<p class="visual-title" id="decision-policy-visual-title">Two thresholds turn one calibrated risk score into three actions.</p>
+	<p class="visual-title" id="decision-policy-visual-title">Declared costs and review limits turn risk scores into different actions</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 292" role="img" aria-labelledby="decision-policy-svg-title decision-policy-svg-desc">
 			<title id="decision-policy-svg-title">Allow, review, and block regions on a calibrated fraud-risk score</title>

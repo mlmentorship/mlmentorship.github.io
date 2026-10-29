@@ -53,7 +53,7 @@ It permits this directed distinction; it does not guarantee learning the correct
 <!-- visual:kge-antisymmetry-score-swap -->
 <figure class="learning-figure" aria-labelledby="kge-antisymmetry-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="kge-antisymmetry-title">Why can no amount of width make DistMult represent an antisymmetric relation?</p>
+	<p class="visual-title" id="kge-antisymmetry-title">Complex conjugation lets the reversed relation receive a different score</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel plot-panel" aria-labelledby="distmult-swap-title">
 			<h4 id="distmult-swap-title">DistMult: swapping is invisible</h4>

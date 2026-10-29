@@ -52,7 +52,7 @@ you've read about hallucinations in tutorials but haven't fought them in product
 <!-- visual:hallucination-claim-release-gates -->
 <figure class="learning-figure" data-visual-id="hallucination-claim-release-gates" aria-labelledby="claim-release-heading">
 <p class="visual-kicker">Learning objective</p>
-<p class="visual-title" id="claim-release-heading">A citation can support a claim without authorizing its release</p>
+<p class="visual-title" id="claim-release-heading">A supported claim can still require a separate release decision</p>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-labelledby="claim-gates-title claim-gates-desc" style="width:100%; min-width:0; height:auto; font-family:var(--font-ui); font-size:24px; fill:var(--c-text)">
 <title id="claim-gates-title">Claim support and release permission are separate gates</title>
 <desc id="claim-gates-desc">An invented authorized source says applications are reviewed within five days and approval is not guaranteed. The claim that review takes at most five days is supported. The claim that the applicant will be approved within five days is not, despite citing the same passage. Unsupported claims are held for correction, abstention, or escalation, not released with a warning. A supported claim still needs current evidence and a separate policy, permission, and consequence check; consequential decisions require authorized review. Automated support checks remain fallible.</desc>

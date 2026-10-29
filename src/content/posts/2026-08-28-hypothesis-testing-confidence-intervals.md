@@ -60,7 +60,7 @@ This is not a 95% posterior probability statement about the realized interval.
 <!-- visual:model-gain-evidence-decision -->
 <figure class="learning-figure plot-panel" aria-labelledby="model-gain-decision-title">
 	<p class="visual-kicker">Evidence versus decision</p>
-	<p class="visual-title" id="model-gain-decision-title">Compare every interval with zero and the minimum useful gain.</p>
+	<p class="visual-title" id="model-gain-decision-title">An interval can exclude zero without establishing a worthwhile gain</p>
 	<svg viewBox="0 0 360 338" role="img" aria-labelledby="model-gain-decision-svg-title model-gain-decision-svg-desc">
 		<title id="model-gain-decision-svg-title">Three model-gain confidence intervals compared with zero and a minimum useful gain</title>
 		<desc id="model-gain-decision-svg-desc">An original plot of three synthetic 95 percent confidence intervals in percentage points. The first interval runs from minus 0.3 to 1.9 and crosses zero, so the direction is uncertain. The second runs from 0.1 to 1.5; it excludes zero but crosses the predeclared minimum useful gain of 1.0, so there is evidence of a positive effect but practical value remains unresolved. The third runs from 1.2 to 2.0 and lies entirely above the minimum useful gain, supporting a decision-relevant gain under the assumptions.</desc>

@@ -99,7 +99,7 @@ TP, FP, TN, and FN are additive sufficient statistics for metrics at a fixed thr
 <!-- visual:streaming-metrics-counts-before-f1 -->
 <figure class="learning-figure" aria-labelledby="streaming-counts-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="streaming-counts-title">What should workers merge: confusion counts or finished F1 scores?</p>
+	<p class="visual-title" id="streaming-counts-title">Add confusion counts across shards before computing the combined F1</p>
 	<div class="visual-grid--two" role="group" aria-label="Two shards merge confusion counts before computing one global F1 score">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 245" role="img" aria-labelledby="count-merge-title count-merge-desc">

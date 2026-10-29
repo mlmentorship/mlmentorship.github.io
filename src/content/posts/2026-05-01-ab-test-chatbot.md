@@ -45,7 +45,7 @@ This is right at the slogan level. Each piece has problems. You've heard A/B tes
 <!-- visual:chatbot-randomization-unit -->
 <figure class="learning-figure" aria-labelledby="chatbot-randomization-title">
 	<p class="visual-kicker">Unit of randomization</p>
-	<p class="visual-title" id="chatbot-randomization-title">Assign once per conversation, not again at every turn.</p>
+	<p class="visual-title" id="chatbot-randomization-title">Keep one conversation on one model to compare its outcome</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 520" role="img" aria-labelledby="chatbot-randomization-svg-title chatbot-randomization-svg-desc">
 			<title id="chatbot-randomization-svg-title">Per-request versus per-conversation chatbot assignment</title>

@@ -20,7 +20,7 @@ When can C use B's position without disturbing A's ordered state?
 <!-- visual:continuous-batching-reuses-finished-slot -->
 <figure class="learning-figure" aria-labelledby="continuous-batching-slot-title">
 	<p class="visual-kicker">B ends after iteration 2; C is ready</p>
-	<p class="visual-title" id="continuous-batching-slot-title">Rebuilding membership fills three otherwise idle decode positions.</p>
+	<p class="visual-title" id="continuous-batching-slot-title">Refill B's finished slot with C on the next iteration</p>
 	<div class="visual-grid--two" role="group" aria-label="Static and continuous schedules for the same five decode steps">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 210" role="img" aria-labelledby="static-batch-title static-batch-desc">

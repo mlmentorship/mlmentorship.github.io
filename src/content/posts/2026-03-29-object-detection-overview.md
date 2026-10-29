@@ -40,7 +40,7 @@ Original DETR emits slots without an NMS stage, but training incentives do not m
 <!-- visual:detector-candidate-resolution -->
 <figure class="learning-figure" aria-labelledby="detector-resolution-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="detector-resolution-title">Where does each detector family resolve duplicate predictions?</p>
+	<p class="visual-title" id="detector-resolution-title">Training-time matching and inference-time duplicate removal are different operations</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of inference-time non-maximum suppression and DETR's training-time one-to-one assignment">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 264" role="img" aria-labelledby="detector-nms-title detector-nms-desc">

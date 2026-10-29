@@ -41,7 +41,7 @@ No click does not distinguish an unexamined result from an examined rejection.
 <!-- visual:position-bias-inverse-examination-weight -->
 <figure class="learning-figure" aria-labelledby="position-bias-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="position-bias-visual-title">Separate relevance from exposure, then trace how inverse examination weighting restores equal expected signal.</p>
+	<p class="visual-title" id="position-bias-visual-title">Importance weights change estimated contribution, not the observed click count</p>
 	<div class="visual-grid--two" role="group" aria-label="The same illustrative relevance rate shown at a fully examined first position and a less frequently examined fourth position">
 		<section class="visual-panel">
 			<h4>Position 1 · usually examined</h4>

@@ -49,7 +49,7 @@ def attention(Q, K, V, mask=None):
 <!-- visual:attention-causal-mask-row -->
 <figure class="learning-figure" aria-labelledby="attention-causal-mask-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="attention-causal-mask-title">For one query, which axis does softmax normalize after causal masking?</p>
+	<p class="visual-title" id="attention-causal-mask-title">The mask zeroes future weight before the weighted value sum</p>
 	<div class="visual-grid--two" role="group" aria-label="Causal attention mask and a worked softmax row">
 		<section class="visual-panel" aria-labelledby="attention-mask-grid-title">
 			<h4 id="attention-mask-grid-title">Rows are queries; columns are keys</h4>

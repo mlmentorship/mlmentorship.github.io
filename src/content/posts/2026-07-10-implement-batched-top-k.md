@@ -49,7 +49,7 @@ The running state is only `O(num_queries × k)`, and each score block is `O(num_
 <!-- visual:batched-top-k-running-invariant -->
 <figure class="learning-figure" aria-labelledby="batched-top-k-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="batched-top-k-title">Why is it exact to keep only 2 candidates after every block?</p>
+	<p class="visual-title" id="batched-top-k-title">A candidate below the running top two cannot re-enter later</p>
 	<div class="visual-panel">
 		<table class="cm-grid" aria-label="Worked top-2 retrieval trace for one query across three item blocks">
 			<thead><tr><th scope="col">Pass</th><th scope="col">Score this block</th><th scope="col">Local top-2</th><th scope="col">Running top-2</th></tr></thead>

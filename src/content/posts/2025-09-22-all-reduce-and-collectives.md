@@ -104,7 +104,7 @@ Generally, ring sent traffic is $2B(N-1)/N$ per rank over $2(N-1)$ steps.
 <!-- visual:ring-all-reduce-chunk-trace -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="ring-trace-title">
 	<p class="visual-kicker">One chunk, four ranks</p>
-	<p class="visual-title" id="ring-trace-title">Reduction moves the partial sum; gathering moves the finished chunk.</p>
+	<p class="visual-title" id="ring-trace-title">Reduce each chunk on the ring, then circulate its completed sum</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 370" style="min-width: 800px" role="img" aria-labelledby="ring-trace-svg-title ring-trace-svg-desc">
 			<title id="ring-trace-svg-title">One chunk traced through a four-rank ring all-reduce</title>

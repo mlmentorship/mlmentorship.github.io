@@ -49,7 +49,7 @@ Their normalized chord distances are approximately $0.218<0.711$.
 <!-- visual:embedding-normalization-metric-equivalence -->
 <figure class="learning-figure" aria-labelledby="embedding-normalization-title">
 	<p class="visual-kicker">Metric geometry</p>
-	<p class="visual-title" id="embedding-normalization-title">What changes when every embedding is projected onto the unit circle?</p>
+	<p class="visual-title" id="embedding-normalization-title">Normalization removes the length advantage that made A win the raw dot product</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel plot-panel" aria-labelledby="raw-embedding-panel-title">
 			<h4 id="raw-embedding-panel-title">Before: magnitude can win</h4>

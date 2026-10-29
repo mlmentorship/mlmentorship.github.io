@@ -26,7 +26,7 @@ y = GeLU(x @ W_1) @ W_2
 <!-- visual:tensor-parallel-ffn-handoff -->
 <figure class="learning-figure" aria-labelledby="tensor-parallel-ffn-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="tensor-parallel-ffn-title">Follow two matching channel shards through an FFN and identify the first point that requires communication.</p>
+	<p class="visual-title" id="tensor-parallel-ffn-title">Channel shards stay separate first; their second-layer contributions must add</p>
 	<div class="visual-grid--two" role="group" aria-label="Column-parallel first projection followed by row-parallel second projection">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 245" role="img" aria-labelledby="tp-column-title tp-column-desc">

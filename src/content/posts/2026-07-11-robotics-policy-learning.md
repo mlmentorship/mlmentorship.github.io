@@ -43,7 +43,7 @@ DAgger-style data collection asks an expert to label states visited by the learn
 <!-- visual:robotics-policy-dagger-recovery -->
 <figure class="learning-figure" aria-labelledby="robotics-dagger-heading">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="robotics-dagger-heading">Why can one imitation error compound, and what does DAgger change?</p>
+	<p class="visual-title" id="robotics-dagger-heading">Label the states the learner actually visits, not just expert-path states</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="robotics-dagger-title robotics-dagger-desc">
 		<title id="robotics-dagger-title">Behavior cloning can leave demonstrated states, while DAgger adds labels from states the learner visits</title>
 		<desc id="robotics-dagger-desc">In the upper panel, a solid expert path passes through four demonstrated states. A dashed learned-policy path initially follows it, then a small action error sends the robot to two states absent from the demonstrations, where later errors can compound. In the lower panel, DAgger repeatedly runs the current policy, asks the expert to label the visited states, aggregates those state-action pairs with earlier data, and retrains the policy.</desc>

@@ -29,7 +29,7 @@ Can text-side preferences change the winner without changing acoustic weights?
 <!-- visual:asr-adaptation-boundaries -->
 <figure class="learning-figure plot-panel" aria-labelledby="asr-boundaries-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="asr-boundaries-title">See which ASR knowledge sources can change without retraining the acoustic core.</p>
+	<p class="visual-title" id="asr-boundaries-title">A separate lexicon can change without retraining the acoustic core</p>
 	<svg viewBox="0 0 360 468" role="img" aria-labelledby="asr-boundaries-svg-title asr-boundaries-svg-desc">
 		<title id="asr-boundaries-svg-title">Hybrid and end-to-end ASR adaptation boundaries</title>
 		<desc id="asr-boundaries-svg-desc">A hybrid path passes acoustic scores into HMM, lexicon and language-model decoding. Compatible pronunciation/text updates can change those sources without retraining acoustic weights, while graph rebuilding and regression checks may still be required. A jointly trained audio-to-token core can also use external LM, contextual bias and endpoint controls. The bottom strip contrasts explicit updates with core adaptation and allows blends; neither data volume nor an architecture label determines quality.</desc>

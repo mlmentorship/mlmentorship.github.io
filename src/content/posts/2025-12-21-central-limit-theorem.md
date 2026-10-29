@@ -36,7 +36,7 @@ This is convergence of distribution functions at continuity points, not exact fi
 <!-- visual:clt-data-vs-sample-means -->
 <figure class="learning-figure plot-panel" aria-labelledby="clt-sampling-title">
 	<p class="visual-kicker">What becomes Gaussian?</p>
-	<p class="visual-title" id="clt-sampling-title">Repeated sample means change shape; the original observations do not.</p>
+	<p class="visual-title" id="clt-sampling-title">Averaging changes the mean's distribution, not the original observations</p>
 	<svg viewBox="0 0 360 310" role="img" aria-labelledby="clt-sampling-svg-title clt-sampling-svg-desc">
 		<title id="clt-sampling-svg-title">A skewed population compared with sampling distributions of its mean</title>
 		<desc id="clt-sampling-svg-desc">Three aligned schematic density plots share the same population mean. The top row shows a right-skewed distribution for one observation X. The middle row shows the less skewed distribution across means of repeated samples of size four. The bottom row shows an approximately Gaussian and narrower distribution across means of repeated samples of size twenty-five. A vertical dashed line marks the unchanged mean mu, while the row labels state that standard error shrinks as sigma divided by the square root of n.</desc>

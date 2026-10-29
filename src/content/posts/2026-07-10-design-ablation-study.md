@@ -45,7 +45,7 @@ The displayed distant mean misses the predicted useful effect; control validity 
 <!-- visual:ablation-rival-hypotheses -->
 <figure class="learning-figure plot-panel" aria-labelledby="ablation-rival-title">
 	<p class="visual-kicker">Hypothetical controlled comparison</p>
-	<p class="visual-title" id="ablation-rival-title">Separate the headline gain from the content-routing contrast.</p>
+	<p class="visual-title" id="ablation-rival-title">The matched-control gap is 0.2 points, not the three-point headline</p>
 	<svg viewBox="0 0 360 530" role="img" aria-labelledby="ablation-rival-svg-title ablation-rival-svg-desc">
 		<title id="ablation-rival-svg-title">Three-point headline improvement versus a 0.2-point controlled gap</title>
 		<desc id="ablation-rival-svg-desc">Hypothetical distant-evidence accuracy is 80 percent for original baseline A, 82.8 for matched position-only control C and 83 for content router F. The axis is deliberately restricted to 80 through 84 percent, with x equal to 60 plus 64 times accuracy minus 80. The full versus original gain spans three points; the full versus control gap is only 0.2. A second regime has controlled gap 0.1, so the difference of gaps is 0.1. The predeclared prediction requires distant gain at least two points and short gain at most 0.5. Means alone do not provide uncertainty.</desc>

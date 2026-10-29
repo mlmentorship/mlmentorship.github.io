@@ -39,7 +39,7 @@ Equal score increments multiply odds equally, but do not add equal probability i
 <!-- visual:logit-odds-probability-map -->
 <figure class="learning-figure" aria-labelledby="logit-map-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="logit-map-title">See how a linear score becomes multiplicative odds and a saturating probability.</p>
+	<p class="visual-title" id="logit-map-title">Equal logit steps multiply odds rather than add fixed probability</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 290" role="img" aria-labelledby="logit-map-svg-title logit-map-svg-desc">
 			<title id="logit-map-svg-title">Linear logits mapped to odds and sigmoid probabilities</title>

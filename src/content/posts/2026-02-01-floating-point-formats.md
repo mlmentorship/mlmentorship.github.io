@@ -24,7 +24,7 @@ With $f$ fraction bits, spacing within $[2^E,2^{E+1})$ is $2^{E-f}$.
 <!-- visual:fp16-bf16-bit-budget -->
 <figure class="learning-figure" aria-labelledby="fp16-bf16-budget-title">
 	<p class="visual-kicker">Same storage, different rounded value</p>
-	<p class="visual-title" id="fp16-bf16-budget-title">FP16 retains most of the 0.003 change. BF16 rounds it away.</p>
+	<p class="visual-title" id="fp16-bf16-budget-title">A broader numeric range leaves fewer bits for nearby distinctions</p>
 	<svg viewBox="0 0 360 144" role="img" aria-labelledby="fp-rounding-bits-title fp-rounding-bits-desc">
 		<title id="fp-rounding-bits-title">Actual rounded bit fields for 1.003</title>
 		<desc id="fp-rounding-bits-desc">Both rows use sixteen bits. FP16 has sign zero, biased exponent 01111 and fraction 0000000011, encoding 1.0029296875. BF16 has sign zero, biased exponent 01111111 and fraction 0000000, encoding exactly one. Field widths are proportional to their bit counts.</desc>

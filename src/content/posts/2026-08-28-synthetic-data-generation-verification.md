@@ -49,7 +49,7 @@ The goal determines the generator, verifier, filters, and held-out test.
 <!-- visual:synthetic-data-two-independent-evidence-gates -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="synthetic-evidence-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="synthetic-evidence-visual-title">Separate evidence that selects training rows from evidence that confirms the learned capability.</p>
+	<p class="visual-title" id="synthetic-evidence-visual-title">Training-row filtering and final evaluation require independent evidence</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 390" role="img" aria-labelledby="synthetic-evidence-svg-title synthetic-evidence-svg-desc">
 			<title id="synthetic-evidence-svg-title">Two independent evidence gates for synthetic training data</title>

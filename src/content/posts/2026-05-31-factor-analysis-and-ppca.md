@@ -36,7 +36,7 @@ $$
 <!-- visual:factor-model-covariance-decomposition -->
 <figure class="learning-figure" aria-labelledby="factor-covariance-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="factor-covariance-title">Separate covariance shared through the factors from noise unique to each feature</p>
+	<p class="visual-title" id="factor-covariance-title">Shared factors explain covariance; independent noise adds only diagonal variance</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 500" role="img" aria-labelledby="factor-covariance-svg-title factor-covariance-svg-desc">
 			<title id="factor-covariance-svg-title">Factor-model graph and covariance decomposition</title>

@@ -48,7 +48,7 @@ It cannot observe their exact losses under an action that never occurred.
 <!-- visual:fraud-policy-label-coverage -->
 <figure class="learning-figure plot-panel" aria-labelledby="fraud-policy-label-title">
 	<p class="visual-kicker">One cohort, three observation states</p>
-	<p class="visual-title" id="fraud-policy-label-title">Policy P1 selects which outcomes can become reports.</p>
+	<p class="visual-title" id="fraud-policy-label-title">Declined and pending payments do not supply observed negative outcomes</p>
 	<svg viewBox="0 0 360 530" role="img" aria-labelledby="fraud-policy-label-svg-title fraud-policy-label-svg-desc">
 		<title id="fraud-policy-label-svg-title">Fraud actions create different label coverage</title>
 		<desc id="fraud-policy-label-svg-desc">Policy P1 allows 900 of 1,000 attempted payments and declines 100. Among allowed payments, 800 are mature: eight have confirmed reports and 792 have no report under the noisy reporting definition. Another 100 remain pending, not negative. Declined payments have no realized allowed-payment outcome. Dashed paths sample both actions for independent adjudication. Audit labels retain their source and do not reveal exact counterfactual payment losses.</desc>

@@ -35,7 +35,7 @@ Which component should you investigate first? What does this trace not establish
 <!-- visual:technical-project-decision-spine -->
 <figure class="learning-figure" aria-labelledby="technical-project-decision-spine-title">
 	<p class="visual-kicker">Decision records</p>
-	<p class="visual-title" id="technical-project-decision-spine-title">How does a decision spine keep a project presentation coherent under questions?</p>
+	<p class="visual-title" id="technical-project-decision-spine-title">A faster model cannot bypass the slower dependency that the response awaits</p>
 	<div class="visual-grid--two" role="group" aria-label="Chronological project tour compared with three self-contained decision records">
 		<section class="visual-panel">
 			<h4>Chronology alone</h4>

@@ -34,7 +34,7 @@ The figure traces one fully sharded unit; box widths distinguish ownership from 
 <!-- visual:fsdp-wrapped-unit-lifecycle -->
 <figure class="learning-figure plot-panel" aria-labelledby="fsdp-lifecycle-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="fsdp-lifecycle-visual-title">Separate persistent shards from the temporary full unit needed for compute.</p>
+	<p class="visual-title" id="fsdp-lifecycle-visual-title">Sharded storage still temporarily gathers the full current unit</p>
 	<svg viewBox="0 0 360 520" role="img" aria-labelledby="fsdp-lifecycle-svg-title fsdp-lifecycle-svg-desc">
 		<title id="fsdp-lifecycle-svg-title">Lifecycle of one wrapped unit on one rank under FSDP full sharding</title>
 		<desc id="fsdp-lifecycle-svg-desc">At rest, rank i stores only parameter shard P i, a slot for gradient shard G i, and optimizer shard O i. Before forward, an all-gather reconstructs the current wrapped unit's full parameters P zero through P three temporarily. Forward compute runs, then the full parameters are freed while P i remains. Before backward, another all-gather reconstructs the full unit. Backward compute produces gradients, and reduce-scatter leaves gradient shard G i on this rank. The local optimizer shard O i uses G i to update P i. Activations and communication buffers are additional memory and are not shown.</desc>

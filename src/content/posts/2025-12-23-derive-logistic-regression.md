@@ -68,7 +68,7 @@ Notice: the gradient is `(predicted - true) * input`. Same form as linear regres
 <!-- visual:logistic-gradient-cancellation -->
 <figure class="learning-figure plot-panel" aria-labelledby="logistic-gradient-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="logistic-gradient-title">Trace why sigmoid plus Bernoulli NLL reduces to the residual <code>p - y</code>.</p>
+	<p class="visual-title" id="logistic-gradient-title">The probability factors cancel; the input still scales the weight gradient</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="logistic-gradient-svg-title logistic-gradient-svg-desc">
 		<title id="logistic-gradient-svg-title">Chain-rule derivation of the logistic-regression gradient</title>
 		<desc id="logistic-gradient-svg-desc">Starting with logit z equal to w transpose x and probability p equal to sigmoid z, the Bernoulli negative log-likelihood is differentiated by the chain rule. Its probability derivative, negative y over p plus one minus y over one minus p, multiplies the sigmoid derivative p times one minus p. The denominators cancel to negative y times one minus p plus one minus y times p, which collects to p minus y. Multiplying by dz over dw equal to x gives dL over dw equal to p minus y times x. For label one the negative residual raises the logit under gradient descent; for label zero the positive residual lowers it.</desc>

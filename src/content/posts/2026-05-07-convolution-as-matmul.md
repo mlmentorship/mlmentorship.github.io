@@ -33,7 +33,7 @@ The patch matrix stores sixteen values from nine source values, ratio $16/9$.
 <!-- visual:im2col-patches-become-columns -->
 <figure class="learning-figure plot-panel" aria-labelledby="im2col-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="im2col-title">Where do the columns in im2col come from?</p>
+	<p class="visual-title" id="im2col-title">Each local patch becomes one column in the matrix product</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="im2col-svg-title im2col-svg-desc">
 		<title id="im2col-svg-title">A convolution unfolded into matrix multiplication</title>
 		<desc id="im2col-svg-desc">A three by three single-channel input is covered by four overlapping two by two patches at stride one. Flattening each patch creates one column of a four by four im2col matrix. The flattened filter one, zero, zero, negative one multiplies all four columns at once, producing four negative fours that reshape to a two by two output. Repeated values in overlapping columns show the memory cost of explicit im2col.</desc>

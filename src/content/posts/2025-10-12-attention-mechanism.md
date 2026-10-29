@@ -37,7 +37,7 @@ Changing a value changes the mixture's payload without changing these query-key 
 <!-- visual:attention-keys-choose-values-contribute -->
 <figure class="learning-figure" aria-labelledby="attention-routing-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="attention-routing-title">How do keys choose what to retrieve while values supply the result?</p>
+	<p class="visual-title" id="attention-routing-title">A larger value can outweigh a smaller attention weight</p>
 	<div class="visual-grid--two" role="group" aria-label="Two-stage single-query attention example">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 220" role="img" aria-labelledby="attention-weights-title attention-weights-desc">

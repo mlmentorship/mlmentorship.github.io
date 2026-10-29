@@ -20,7 +20,7 @@ Ordinary SGD with learning rate $0.1$ moves by $(-0.3,-0.4)$, norm $0.5$.
 <!-- visual:global-norm-clipping-radial-projection -->
 <figure class="learning-figure" aria-labelledby="gradient-clipping-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="gradient-clipping-title">See why global-norm clipping shortens a gradient without turning it</p>
+	<p class="visual-title" id="gradient-clipping-title">Shorten the whole gradient vector without changing its direction</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 250" role="img" aria-labelledby="gradient-clipping-svg-title gradient-clipping-svg-desc">
 			<title id="gradient-clipping-svg-title">Global-norm clipping as a radial projection</title>

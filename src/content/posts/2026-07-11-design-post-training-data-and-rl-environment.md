@@ -55,7 +55,7 @@ Some violations are gates, not tradeable penalties. Unauthorized access cannot b
 
 <!-- visual:post-training-policy-gate -->
 <figure class="learning-figure plot-panel" aria-labelledby="post-training-policy-gate-heading">
-	<h3 id="post-training-policy-gate-heading" class="visual-title">Why safety is a gate, not a negative reward</h3>
+	<h3 id="post-training-policy-gate-heading" class="visual-title">Task success cannot excuse unauthorized account access</h3>
 	<svg viewBox="0 0 360 476" role="img" aria-labelledby="post-training-policy-gate-title post-training-policy-gate-desc">
 		<title id="post-training-policy-gate-title">Two successful support trajectories receive different training eligibility</title>
 		<desc id="post-training-policy-gate-desc">Both trajectories resolve the ticket. The safe path reads only the requesting user's authorized account, so the policy gate passes and task success, process quality, and communication quality may be aggregated into a training signal. The unsafe path reads another user's unauthorized account, so the policy gate fails, a stop barrier terminates the path, and no quality score or positive training signal is produced. Successful resolution cannot compensate for unauthorized access.</desc>

@@ -8,6 +8,7 @@ import { codingQuestionVisuals } from './coding-question-visuals.mjs';
 import { renderStateTransition } from './coding-visuals/state-transition.mjs';
 import { redraws, supplementalRedraws, renderRedraw } from './illustration-redraws.mjs';
 import { checkPreservation } from './sync-learning-mechanisms.mjs';
+import { figureTakeaways } from './illustration-takeaways.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const evidence = path.resolve(process.argv.find((argument) => argument.startsWith('--evidence-dir='))?.slice('--evidence-dir='.length) ?? path.join(root, 'scratch/illustration-edition'));
@@ -103,7 +104,7 @@ function capture() {
   const protectedFiles = Object.fromEntries(protectedPaths.filter((file) => fs.existsSync(path.resolve(root, file)))
     .map((file) => [file, hash(fs.readFileSync(path.resolve(root, file)))]));
   fs.mkdirSync(evidence, { recursive: true });
-  fs.writeFileSync(baselinePath, `${JSON.stringify({ note: 'Captured after the isolated all-reduce pilot; includes preexisting user edits.', files, protectedFiles }, null, 2)}\n`, { flag: 'wx' });
+  fs.writeFileSync(baselinePath, `${JSON.stringify({ note: 'Captured before edition generation; current source bytes and protected identities are retained.', files, protectedFiles }, null, 2)}\n`, { flag: 'wx' });
   console.log(`Preservation baseline: ${Object.keys(files).length} articles; protected source hashes recorded.`);
 }
 
@@ -209,8 +210,54 @@ function reviewBatch(start, count) {
       const text = (element) => element.nodeName === '#text' ? element.value : (element.childNodes ?? []).map(text).join('');
       return text(node);
     });
+    if (process.argv.includes('--compact')) {
+      console.log(JSON.stringify({ index: start++, id: item.visualId, check: item.readerCheck, marks: svgLabels.join(' | ').slice(0, 180) }));
+      continue;
+    }
     console.log(JSON.stringify({ index: start++, id: item.visualId, medium: audit.medium, keep: item.keep, improve: item.improvement, check: item.readerCheck, labels: svgLabels.join(' | ').slice(0, 1700) }));
   }
+}
+
+function applyTakeaways() {
+  assert(fs.existsSync(baselinePath), 'Capture preservation evidence before changing figure titles');
+  const found = new Set();
+  let changed = 0;
+  const escape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+  for (const audit of audits) {
+    const file = path.join(root, audit.article);
+    const source = fs.readFileSync(file, 'utf8');
+    const html = htmlNodes(source);
+    const targets = audit.implementation.visualIds.map((identity) => {
+      const marker = source.indexOf(`<!-- visual:${identity} -->`);
+      return { identity, figure: html.find(({ node, offset }) => node.nodeName === 'figure' && offset + node.sourceCodeLocation.startOffset > marker) };
+    });
+    for (const figure of html.filter(({ node, attributes }) => node.nodeName === 'figure' && attributes['data-supplemental-visual'])) {
+      targets.push({ identity: figure.attributes['data-supplemental-visual'], figure });
+    }
+    const replacements = [];
+    for (const { identity, figure } of targets) {
+      const takeaway = figureTakeaways[identity];
+      if (!takeaway) continue;
+      assert(figure, `${identity}: title must belong to a figure`);
+      const start = figure.offset + figure.node.sourceCodeLocation.startOffset;
+      const end = figure.offset + figure.node.sourceCodeLocation.endOffset;
+      const title = html.find(({ node, attributes, offset }) => (attributes.class ?? '').split(' ').includes('visual-title') && offset + node.sourceCodeLocation.startOffset >= start && offset + node.sourceCodeLocation.endOffset <= end);
+      assert(title, `${identity}: missing visible figure title`);
+      const contentStart = title.offset + title.node.sourceCodeLocation.startTag.endOffset;
+      const contentEnd = title.offset + title.node.sourceCodeLocation.endTag.startOffset;
+      const value = escape(takeaway);
+      if (source.slice(contentStart, contentEnd) !== value) replacements.push({ start: contentStart, end: contentEnd, value });
+      assert(!found.has(identity), `${identity}: duplicate takeaway ownership`);
+      found.add(identity);
+    }
+    if (replacements.length) {
+      fs.writeFileSync(file, replaceRanges(source, replacements));
+      changed += replacements.length;
+    }
+  }
+  assert.deepEqual(found, new Set(Object.keys(figureTakeaways)), 'Every authored takeaway must reach its exact figure');
+  console.log(`Evidence-led figure titles applied: ${changed} changes; ${found.size} individually authored takeaways.`);
+  verify();
 }
 
 function applyReaderChecks() {
@@ -343,6 +390,7 @@ function applyRedraws() {
 if (process.argv.includes('--capture')) capture();
 else if (process.argv.includes('--apply-coding')) applyCoding();
 else if (process.argv.includes('--apply-redraws')) applyRedraws();
+else if (process.argv.includes('--apply-takeaways')) applyTakeaways();
 else if (process.argv.includes('--apply-reader-checks')) applyReaderChecks();
 else if (process.argv.includes('--verify')) verify();
 else if (process.argv.includes('--reconcile')) reconcile();
@@ -361,12 +409,33 @@ else if (process.argv.some((argument) => argument.startsWith('--review='))) {
   assert.equal(preserveFragments(retained, 0, retained.length, '<figure><p id="new-title">New</p></figure>'), retained);
   assert.equal(owners.size, review.expectedVisuals);
   assert.equal(review.reviews.length, owners.size);
+  assert.deepEqual(new Set(Object.keys(figureTakeaways)), new Set([...owners.keys(), ...Object.keys(supplementalRedraws)]), 'Every registered and supplemental figure needs one reviewed takeaway');
+  for (const [identity, takeaway] of Object.entries(figureTakeaways)) {
+    assert(owners.has(identity) || Object.hasOwn(supplementalRedraws, identity), `${identity}: takeaway needs an existing figure`);
+    assert(takeaway.length <= 120 && takeaway.split(/\s+/).length <= 20, `${identity}: keep the visible inference concise`);
+    assert(!takeaway.includes('?') && !takeaway.includes('\n'), `${identity}: state one concrete inference`);
+  }
   for (const audit of audits) {
     const source = fs.readFileSync(path.join(root, audit.article), 'utf8');
-    const questions = htmlNodes(source).filter(({ attributes }) => attributes['data-reader-check']);
+    const html = htmlNodes(source);
+    const questions = html.filter(({ attributes }) => attributes['data-reader-check']);
     const questionIds = questions.map(({ attributes }) => attributes['data-reader-check']);
     assert.deepEqual(questionIds, identities(source).visuals, `${audit.slug}: reader questions must follow their figures`);
     assert.deepEqual(new Set(questionIds), new Set(audit.implementation.visualIds), `${audit.slug}: each registered figure needs its own reader question`);
+    const figureTargets = audit.implementation.visualIds.map((identity) => {
+      const marker = source.indexOf(`<!-- visual:${identity} -->`);
+      assert(marker >= 0, `${identity}: registered marker is missing`);
+      return { identity, figure: html.find(({ node, offset }) => node.nodeName === 'figure' && offset + node.sourceCodeLocation.startOffset > marker) };
+    });
+    for (const figure of html.filter(({ node, attributes }) => node.nodeName === 'figure' && attributes['data-supplemental-visual'])) {
+      figureTargets.push({ identity: figure.attributes['data-supplemental-visual'], figure });
+    }
+    for (const { identity, figure } of figureTargets) {
+      assert(figure, `${identity}: missing owning figure`);
+      const title = figure.node.childNodes.find((node) => node.attrs?.some((attribute) => attribute.name === 'class' && attribute.value.split(' ').includes('visual-title')));
+      assert(title, `${identity}: missing direct figure title`);
+      assert.equal(title.childNodes.map((node) => node.value ?? '').join(''), figureTakeaways[identity], `${identity}: applied takeaway must match its catalog entry`);
+    }
   }
   for (const [identity, model] of Object.entries({ ...redraws, ...supplementalRedraws })) {
     const audit = owners.get(identity) ?? audits.find((entry) => entry.slug === model.slug);
@@ -379,6 +448,19 @@ else if (process.argv.some((argument) => argument.startsWith('--review='))) {
     assert.equal(source.slice(current.offset + current.node.sourceCodeLocation.startOffset, current.offset + current.node.sourceCodeLocation.endOffset), generated.slice(expected.offset + expected.node.sourceCodeLocation.startOffset, expected.offset + expected.node.sourceCodeLocation.endOffset), `${identity}: generated drawing is out of sync`);
   }
   const bayes = fs.readFileSync(path.join(root, owners.get('bayes-positive-test-denominator').article), 'utf8');
+  const populationGrid = htmlNodes(bayes).find(({ attributes }) => 'data-population-grid' in attributes);
+  assert(populationGrid, 'Bayes must show the population before selecting positive results');
+  const groups = Number(populationGrid.attributes['data-columns']) * Number(populationGrid.attributes['data-rows']);
+  const peoplePerGroup = Number(populationGrid.attributes['data-people-per-group']);
+  assert.equal(groups, 1000);
+  assert.equal(groups * peoplePerGroup, 100000);
+  assert.equal(Number(populationGrid.attributes['data-diseased-groups']) * peoplePerGroup, 100);
+  const gridPattern = htmlNodes(bayes).find(({ attributes }) => attributes.id === 'bayes-population-hundred');
+  assert(gridPattern);
+  const gridArea = htmlNodes(bayes).find(({ attributes }) => attributes.fill === 'url(#bayes-population-hundred)');
+  assert.equal(Number(gridArea.attributes.width) / Number(gridPattern.attributes.width), Number(populationGrid.attributes['data-columns']));
+  assert.equal(Number(gridArea.attributes.height) / Number(gridPattern.attributes.height), Number(populationGrid.attributes['data-rows']));
+  assert.equal(htmlNodes(bayes).filter(({ attributes }) => 'data-diseased-group' in attributes).length, 1);
   const positiveSegments = htmlNodes(bayes).filter(({ attributes }) => attributes['data-count']);
   assert.equal(positiveSegments.length, 2);
   const population = positiveSegments.reduce((sum, { attributes }) => sum + Number(attributes['data-count']), 0);
@@ -388,7 +470,7 @@ else if (process.argv.some((argument) => argument.startsWith('--review='))) {
   for (const { attributes } of positiveSegments) {
     assert(Math.abs(Number(attributes.width) / stripWidth - Number(attributes['data-count']) / population) < 1e-10, 'Bayes strip must draw the stated proportions');
   }
-  console.log(`Edition tooling passed: structured HTML edits, preservation identities, ${owners.size} owned reader questions, and ${Object.keys(redraws).length + Object.keys(supplementalRedraws).length} synchronized drawings.`);
+  console.log(`Edition tooling passed: structured HTML edits, preservation identities, ${owners.size} owned reader questions, ${Object.keys(figureTakeaways).length} exact figure takeaways, and ${Object.keys(redraws).length + Object.keys(supplementalRedraws).length} synchronized drawings.`);
 } else {
-  console.log('Use --self-test, --capture, --apply-coding, --apply-redraws, --apply-reader-checks, --verify, --reconcile, or --review=START:COUNT. Generation and preservation use --evidence-dir=PATH.');
+  console.log('Use --self-test, --capture, --apply-coding, --apply-redraws, --apply-takeaways, --apply-reader-checks, --verify, --reconcile, or --review=START:COUNT [--compact]. Generation and preservation use --evidence-dir=PATH.');
 }

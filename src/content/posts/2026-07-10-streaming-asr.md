@@ -33,7 +33,7 @@ Does that compute ratio certify the live experience?
 <!-- visual:streaming-asr-provisional-to-final -->
 <figure class="learning-figure plot-panel" aria-labelledby="streaming-asr-timeline-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="streaming-asr-timeline-title">How can streaming ASR respond early without committing early?</p>
+	<p class="visual-title" id="streaming-asr-timeline-title">Visible partial words remain revisable until the finalization rule permits commitment</p>
 	<svg viewBox="0 0 360 352" role="img" aria-labelledby="streaming-asr-svg-title streaming-asr-svg-desc">
 		<title id="streaming-asr-svg-title">A streaming transcript changes from provisional to final as audio arrives</title>
 		<desc id="streaming-asr-svg-desc">Audio arrives from left to right as the words play, their, and song, followed by a pause. After a bounded chunk and right-context wait, the recognizer emits the provisional words play the. Once the word song arrives, the recognizer revises the to their and adds song. Only after an endpointing wait during the pause does it mark play their song final. Thus first-token latency ends before speech ends, while finalization latency includes endpointing.</desc>

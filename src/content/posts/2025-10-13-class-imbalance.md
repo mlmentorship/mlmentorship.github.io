@@ -59,7 +59,7 @@ This is L5. You've named the metric problem first, then sequenced the techniques
 <!-- visual:class-imbalance-sampling-prior -->
 <figure class="learning-figure" aria-labelledby="imbalance-prior-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="imbalance-prior-title">What did balancing the training sample actually change?</p>
+	<p class="visual-title" id="imbalance-prior-title">Balanced training rows do not make real-world positives equally common</p>
 	<div class="visual-grid--two" role="group" aria-label="Two-stage example of random oversampling and prior correction">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 228" role="img" aria-labelledby="imbalance-sample-title imbalance-sample-desc">

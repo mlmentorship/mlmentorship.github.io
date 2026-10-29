@@ -79,7 +79,7 @@ Track per-task validation metrics before and after adding each task.
 <!-- visual:multitask-gradient-diagnosis -->
 <figure class="learning-figure" aria-labelledby="multitask-gradient-title">
 	<p class="visual-kicker">Two diagnostics, two problems</p>
-	<p class="visual-title" id="multitask-gradient-title">Gradient size asks who dominates; the dot product asks whether the tasks disagree.</p>
+	<p class="visual-title" id="multitask-gradient-title">Equal gradient lengths do not resolve opposing directions</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of task-gradient magnitude imbalance and directional conflict">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 330" role="img" aria-labelledby="gradient-scale-title gradient-scale-desc">

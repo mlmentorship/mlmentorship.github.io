@@ -54,7 +54,7 @@ That two-point check matches this quadratic's moments; it is not Gaussian sampli
 <!-- visual:reparameterization-gradient-path -->
 <figure class="learning-figure" aria-labelledby="reparameterization-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="reparameterization-visual-title">Move randomness outside the parameterized path so ordinary backpropagation can reach the encoder.</p>
+	<p class="visual-title" id="reparameterization-visual-title">Hold the random draw fixed while gradients pass through its parameterized transformation</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 450" role="img" aria-labelledby="reparameterization-svg-title reparameterization-svg-desc">
 			<title id="reparameterization-svg-title">Naive sampling compared with a reparameterized Gaussian sample</title>

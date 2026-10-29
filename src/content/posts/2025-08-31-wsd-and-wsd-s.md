@@ -22,7 +22,7 @@ WSD removes the dependency. You hold the LR flat for as long as you want and dec
 <!-- visual:wsd-checkpoint-lineage -->
 <figure class="learning-figure plot-panel" aria-labelledby="wsd-lineage-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="wsd-lineage-title">Which weights continue after an intermediate cooldown?</p>
+	<p class="visual-title" id="wsd-lineage-title">A cooldown branch need not replace the hot mainline</p>
 	<svg viewBox="0 0 360 378" role="img" aria-labelledby="wsd-lineage-svg-title wsd-lineage-svg-desc">
 		<title id="wsd-lineage-svg-title">Checkpoint lineage under WSD and WSD-S</title>
 		<desc id="wsd-lineage-svg-desc">Two normalized learning-rate traces compare checkpoint lineage. In WSD, a dashed cooldown branch creates a cooled copy while the hot main branch remains at peak learning rate and continues toward a later final decay. In WSD-S, one path decays to cooled checkpoint one, returns the learning rate to peak while retaining those weights, then repeats for checkpoint two before the final decay. Labels, square cooled checkpoints, a circular hot checkpoint, and solid versus dashed paths carry the distinction without color.</desc>

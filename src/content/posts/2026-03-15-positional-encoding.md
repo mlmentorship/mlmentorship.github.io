@@ -70,7 +70,7 @@ Forbidden scores still require a separate mask.
 <!-- visual:positional-relative-mechanisms -->
 <figure class="learning-figure plot-panel" aria-labelledby="positional-relative-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="positional-relative-title">How can RoPE and ALiBi both encode relative position?</p>
+	<p class="visual-title" id="positional-relative-title">RoPE rotates vectors; ALiBi subtracts distance from attention scores</p>
 	<svg viewBox="0 0 360 460" role="img" aria-labelledby="positional-relative-svg-title positional-relative-svg-desc">
 		<title id="positional-relative-svg-title">RoPE changes query and key angles while ALiBi subtracts distance from attention scores</title>
 		<desc id="positional-relative-svg-desc">The upper panel uses identical unit content vectors and one rotary frequency. At positions one and three, query and key are rotated to angles theta and three theta, leaving a two-theta gap. Shifting both to positions four and six rotates both vectors together and preserves the same two-theta gap and dot product cosine of two theta. The lower panel keeps content vectors unchanged. For a causal query at position six, keys at positions two, four, and six have distances four, two, and zero, so ALiBi adds score biases negative four s sub h, negative two s sub h, and zero before softmax.</desc>

@@ -21,7 +21,7 @@ The limitation is equally important. Visible reasoning is not guaranteed to be a
 <!-- visual:cot-signal-is-not-faithfulness -->
 <figure class="learning-figure" aria-labelledby="cot-monitorability-title">
 	<p class="visual-kicker">Signal is not faithfulness</p>
-	<p class="visual-title" id="cot-monitorability-title">A trace can help a monitor, then become sanitized while the behavior remains.</p>
+	<p class="visual-title" id="cot-monitorability-title">Less alarming reasoning is not evidence of safer behaviour</p>
 	<div class="visual-grid--two" role="group" aria-label="Reasoning trace monitoring before and after direct optimization pressure">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 290" role="img" aria-labelledby="cot-natural-title cot-natural-desc">

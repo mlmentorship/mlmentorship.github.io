@@ -23,7 +23,7 @@ These are prescribed inputs, not gradients reevaluated along two measured optimi
 <!-- visual:momentum-alternating-components -->
 <figure class="learning-figure" aria-labelledby="momentum-components-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="momentum-components-title">What does momentum do to consistent and alternating gradient components?</p>
+	<p class="visual-title" id="momentum-components-title">In this recurrence, momentum reinforces persistent motion and damps alternating motion</p>
 	<div class="visual-grid--two" role="group" aria-label="Raw SGD and momentum trajectories on the same coordinate scale">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 235" role="img" aria-labelledby="momentum-raw-title momentum-raw-desc">

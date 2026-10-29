@@ -45,7 +45,7 @@ $$
 <!-- visual:shap-all-orderings-credit -->
 <figure class="learning-figure plot-panel" aria-labelledby="shap-orderings-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="shap-orderings-visual-title">See why one “with versus without” comparison is not yet a SHAP value.</p>
+	<p class="visual-title" id="shap-orderings-visual-title">Average marginal credit across orderings, including repeated predecessor sets</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="shap-orderings-svg-title shap-orderings-svg-desc">
 		<title id="shap-orderings-svg-title">Feature B's Shapley value across every ordering of three features</title>
 		<desc id="shap-orderings-svg-desc">For a toy model with features A, B, and C, all six feature orderings are listed. Feature B is outlined and labelled in every row. Its marginal contribution is measured when it joins the features before it: after A; after A and C; before both features in two orderings; after C and A; and after C. Feature B's Shapley value is the average of those six context-dependent differences. Repeating this calculation for A and C produces attributions whose sum equals the prediction minus the baseline.</desc>

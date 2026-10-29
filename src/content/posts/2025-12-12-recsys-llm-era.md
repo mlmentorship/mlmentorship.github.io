@@ -31,7 +31,7 @@ Estimate its load, and assess a proposed 50-millisecond hard request deadline.
 <!-- visual:recsys-llm-bounded-augmentation -->
 <figure class="learning-figure" data-visual-id="recsys-llm-bounded-augmentation" aria-labelledby="recsys-budget-heading">
 <p class="visual-kicker">Choose placement, not a universal replacement</p>
-<p class="visual-title" id="recsys-budget-heading">Optional inference cannot make a late or invalid result eligible for display.</p>
+<p class="visual-title" id="recsys-budget-heading">Deadline fallback and catalog checks bound optional generated recommendations</p>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 850" role="img" aria-labelledby="recsys-budget-title recsys-budget-desc" style="width:100%; min-width:0; height:auto; font-family:var(--font-ui); font-size:24px; fill:var(--c-text)">
 <title id="recsys-budget-title">A deadline fallback and a catalog check bound optional LLM work</title>
 <desc id="recsys-budget-desc">One declared counterexample has fast candidates A and B ready at five milliseconds and an optional LLM call taking one hundred milliseconds. A shared time ruler places the hard fifty-millisecond deadline halfway through that call. Serve a valid fast fallback by the deadline; the late LLM result cannot replace the completed reply. This is a declared call, not a tail-latency estimate from a mean. Every displayed item must pass current catalog and permission checks. The stated workload implies one hundred routed calls per second, ten mean calls in flight, and two hundred thousand billed input tokens per second. Offline content features are computed before requests. A separately generated ID Z missing from the catalog is rejected rather than displayed.</desc>

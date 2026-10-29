@@ -39,7 +39,7 @@ Equivalent view: the optimal $p_c$ for label smoothing is $1 - \varepsilon + \va
 <!-- visual:label-smoothing-finite-confidence-optimum -->
 <figure class="learning-figure plot-panel" aria-labelledby="label-smoothing-optimum-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="label-smoothing-optimum-title">Why does smoothing stop the correct logit from growing forever?</p>
+	<p class="visual-title" id="label-smoothing-optimum-title">Uniform mixing leaves target mass 0.92, not 0.90</p>
 	<svg viewBox="0 0 360 315" role="img" aria-labelledby="label-smoothing-optimum-svg-title label-smoothing-optimum-svg-desc">
 		<title id="label-smoothing-optimum-svg-title">One-hot and label-smoothed cross-entropy near complete confidence</title>
 		<desc id="label-smoothing-optimum-svg-desc">An original loss plot for five classes and epsilon 0.1. The horizontal axis shows predicted probability for the correct class from 0.80 to 0.999; the remaining probability is divided equally among four wrong classes. One-hot cross-entropy is a solid curve that keeps falling toward zero as correct-class probability approaches one. Label-smoothed cross-entropy is a dashed curve with a diamond minimum at correct-class probability 0.92, matching the target probabilities 0.92, 0.02, 0.02, 0.02, and 0.02. Beyond 0.92 the smoothed loss rises; at probability 0.99, one-hot loss is 0.010 and smoothed loss is 0.489.</desc>

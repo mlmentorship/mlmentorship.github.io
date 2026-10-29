@@ -50,7 +50,7 @@ For L2, $w-a+\lambda w=0$ gives $w=a/(1+\lambda)$.
 <!-- visual:l1-l2-first-contact-geometry -->
 <figure class="learning-figure" aria-labelledby="regularization-contact-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="regularization-contact-title">Where does the first loss contour touch the penalty boundary?</p>
+	<p class="visual-title" id="regularization-contact-title">An L1 corner can touch the loss at an exactly zero coefficient</p>
 	<div class="visual-grid--two" role="group" aria-label="Matched coefficient-space comparison of L1 and L2 constrained optima">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 270" role="img" aria-labelledby="l1-contact-panel-title l1-contact-panel-desc">

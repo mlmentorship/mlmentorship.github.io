@@ -40,7 +40,7 @@ Correct, but generic. You've memorized the textbook line, not internalized the a
 <!-- visual:explain-backprop-one-loss-all-gradients -->
 <figure class="learning-figure backprop-visual" aria-labelledby="explain-backprop-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="explain-backprop-title">How does one scalar loss produce a gradient for every parameter?</p>
+	<p class="visual-title" id="explain-backprop-title">One reverse sweep computes all parameter gradients for this scalar loss</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 700 320" role="img" aria-labelledby="explain-backprop-svg-title explain-backprop-svg-desc">
 			<title id="explain-backprop-svg-title">One forward pass and one reverse sweep through a three-operation graph</title>

@@ -28,7 +28,7 @@ Read the training lane and generation lane as different computations.
 <!-- visual:vae-training-and-generation-paths -->
 <figure class="learning-figure plot-panel" aria-labelledby="vae-paths-title">
 	<p class="visual-kicker">One model, two execution paths</p>
-	<p class="visual-title" id="vae-paths-title">When does a VAE use the encoder, and when does it sample the prior?</p>
+	<p class="visual-title" id="vae-paths-title">Generation samples the prior without an observed input or encoder</p>
 	<svg viewBox="0 0 360 490" role="img" aria-labelledby="vae-paths-svg-title vae-paths-svg-desc">
 		<title id="vae-paths-svg-title">VAE training and generation paths</title>
 		<desc id="vae-paths-svg-desc">In the upper training panel, observed x enters the encoder, which produces approximate posterior q phi. A reparameterized latent z flows into the decoder and the reconstruction term. Beside that path, the KL term compares q phi with prior p of z. In the lower generation panel, a dashed path samples z directly from the prior, passes it through the decoder, and produces a distribution for a new observation. The encoder and training input do not participate in generation.</desc>

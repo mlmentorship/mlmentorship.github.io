@@ -55,7 +55,7 @@ The math is more involved (it involves Riemannian metrics and category theory in
 <!-- visual:nonlinear-embedding-local-vs-global -->
 <figure class="learning-figure" aria-labelledby="nonlinear-embedding-title">
 	<p class="visual-kicker">Read neighborhoods, not geography</p>
-	<p class="visual-title" id="nonlinear-embedding-title">What can stay true when the 2D map changes shape?</p>
+	<p class="visual-title" id="nonlinear-embedding-title">Changed gaps on the page do not establish changed high-dimensional distances</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel plot-panel" aria-labelledby="embedding-layout-one-title">
 			<h4 id="embedding-layout-one-title">Plausible layout 1</h4>

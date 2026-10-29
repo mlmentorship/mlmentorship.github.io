@@ -20,7 +20,7 @@ All numbers below are invented teaching values, not Marin measurements or recomm
 <!-- visual:microannealing-controlled-fork -->
 <figure class="learning-figure plot-panel" aria-labelledby="microannealing-fork-title">
 	<p class="visual-kicker">Hypothetical controlled comparison</p>
-	<p class="visual-title" id="microannealing-fork-title">The candidate improves domain loss but fails the task rule.</p>
+	<p class="visual-title" id="microannealing-fork-title">A better domain loss cannot override a failed preservation check</p>
 	<svg viewBox="0 0 360 520" role="img" aria-labelledby="microannealing-fork-svg-title microannealing-fork-svg-desc">
 		<title id="microannealing-fork-svg-title">A controlled microannealing fork with conflicting evaluation signals</title>
 		<desc id="microannealing-fork-svg-desc">Hypothetical teaching data, not Marin measurements. One saved checkpoint forks into matched 1000-token cooldowns. Control uses 1000 base tokens and obtains domain loss 2.0 and task score 0.60. Candidate uses 700 base and 300 candidate tokens and obtains loss 1.8 and task score 0.58. The candidate fails the prespecified task rule despite its lower domain loss.</desc>

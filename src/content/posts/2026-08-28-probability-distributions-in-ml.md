@@ -32,7 +32,7 @@ Correct support alone does not establish the model's assumptions.
 <!-- visual:distribution-observation-unit -->
 <figure class="learning-figure" aria-labelledby="distribution-unit-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="distribution-unit-title">Choose among Bernoulli, binomial, Poisson, and exponential models by defining what one observation records.</p>
+	<p class="visual-title" id="distribution-unit-title">Counting events and waiting for the next event require different random variables</p>
 	<div class="visual-panel">
 		<svg viewBox="0 0 360 590" role="img" aria-labelledby="distribution-unit-svg-title distribution-unit-svg-desc">
 			<title id="distribution-unit-svg-title">Observation units select different distributions for trial and time processes</title>

@@ -44,7 +44,7 @@ Compute the right-hand contractions first: $K'^\top V$ is $r \times d$ and $K'^\
 <!-- visual:linear-attention-two-escape-routes -->
 <figure class="learning-figure" aria-labelledby="linear-attention-routes-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="linear-attention-routes-title">Where does each method remove the n × n matrix?</p>
+	<p class="visual-title" id="linear-attention-routes-title">Compress token positions, or reorder feature products with a normalizer</p>
 	<div class="visual-grid--two" role="group" aria-label="Two ways linear attention avoids all query-key pairs">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 320 275" role="img" aria-labelledby="linformer-route-title linformer-route-desc">

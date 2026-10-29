@@ -32,7 +32,7 @@ Over 50 Jacobian multiplications, $\rho = 1.1$ gives a factor of ~$117$ (gradien
 <!-- visual:gradient-magnitude-through-depth -->
 <figure class="learning-figure" aria-labelledby="gradient-depth-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="gradient-depth-title">See how a small per-layer scale error compounds through depth</p>
+	<p class="visual-title" id="gradient-depth-title">Repeated small multipliers erase gradients; large ones amplify them</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 280" role="img" aria-labelledby="gradient-depth-svg-title gradient-depth-svg-desc">
 			<title id="gradient-depth-svg-title">Gradient magnitude after repeated Jacobian multiplication</title>

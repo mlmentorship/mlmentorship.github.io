@@ -50,7 +50,7 @@ The diagram's once-only result means one coherent intended transition under that
 <!-- visual:collective-failure-commit-boundary -->
 <figure class="learning-figure plot-panel" aria-labelledby="collective-commit-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="collective-commit-title">Why is retrying the collective unsafe after a partial optimizer commit?</p>
+	<p class="visual-title" id="collective-commit-title">Restore every rank to the committed checkpoint before retrying</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="collective-commit-svg-title collective-commit-svg-desc">
 		<title id="collective-commit-svg-title">Unsafe collective replay compared with consistent checkpoint recovery</title>
 		<desc id="collective-commit-svg-desc">All four ranks start step t from the same committed checkpoint at step t minus one. During the failed attempt, ranks zero and one apply optimizer step t, rank two fails, and rank three has not applied it. Retrying only the collective from those mixed states can make ranks zero and one apply the update twice while rank three applies it once, so the job diverges. The safe path aborts the old group, restores model, optimizer, scheduler, scaler, RNG, and data position for every rank from the same committed checkpoint, creates a new group, and replays the whole step once.</desc>

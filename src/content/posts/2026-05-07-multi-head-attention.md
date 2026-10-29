@@ -32,7 +32,7 @@ Ignoring optional biases, total parameters are $4 d^2$ (the four $d \times d$ pr
 <!-- visual:multi-head-attention-split-recombine -->
 <figure class="learning-figure plot-panel" aria-labelledby="multi-head-visual-title">
 	<p class="visual-kicker">Tensor flow</p>
-	<p class="visual-title" id="multi-head-visual-title">Heads split the feature axis, not the token sequence.</p>
+	<p class="visual-title" id="multi-head-visual-title">Split features into heads; every head still sees all tokens</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 510" role="img" aria-labelledby="multi-head-svg-title multi-head-svg-desc">
 			<title id="multi-head-svg-title">Q, K, and V projection into parallel attention heads and recombination</title>

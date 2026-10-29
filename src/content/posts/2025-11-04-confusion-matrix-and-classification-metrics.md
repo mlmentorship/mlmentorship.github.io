@@ -26,7 +26,7 @@ Use mature labels and one fixed threshold for this example.
 <!-- visual:confusion-matrix-denominators -->
 <figure class="learning-figure" aria-labelledby="cm-denominators-title">
 	<p class="visual-kicker">Spatial intuition</p>
-	<p class="visual-title" id="cm-denominators-title">Precision reads a prediction column. Recall reads an actual-class row.</p>
+	<p class="visual-title" id="cm-denominators-title">Eight hits can mean high recall and low precision</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel" aria-labelledby="precision-panel-title">
 			<h4 id="precision-panel-title">Precision: trust a positive prediction</h4>

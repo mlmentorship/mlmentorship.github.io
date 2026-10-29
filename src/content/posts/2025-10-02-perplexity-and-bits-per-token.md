@@ -46,7 +46,7 @@ This is invariant to tokenization and is the proper cross-tokenizer comparison m
 <!-- visual:perplexity-tokenizer-denominator -->
 <figure class="learning-figure" aria-labelledby="perplexity-denominator-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="perplexity-denominator-title">How can the same encoded text have different bits per token?</p>
+	<p class="visual-title" id="perplexity-denominator-title">Bits per token cannot compare models fairly when token units differ</p>
 	<div class="visual-grid--two" role="group" aria-label="Two tokenizations of the six-byte ASCII string sunset, each assigned five total bits of surprisal">
 		<section class="visual-panel" aria-labelledby="perplexity-two-token-title">
 			<h4 id="perplexity-two-token-title">Tokenizer A: 2 tokens</h4>

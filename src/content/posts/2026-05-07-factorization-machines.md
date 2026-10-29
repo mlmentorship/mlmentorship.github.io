@@ -28,7 +28,7 @@ The following vectors are chosen fixtures, not fitted outputs.
 <!-- visual:fm-shared-embeddings-unseen-pair -->
 <figure class="learning-figure plot-panel" aria-labelledby="fm-sharing-visual-title">
 	<p class="visual-kicker">Parameter sharing</p>
-	<p class="visual-title" id="fm-sharing-visual-title">An unseen pair has no pair-specific weight, but it still has a factorized coefficient.</p>
+	<p class="visual-title" id="fm-sharing-visual-title">Shared embeddings estimate an unseen pair without a dedicated pair weight</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 430" role="img" aria-labelledby="fm-sharing-svg-title fm-sharing-svg-desc">
 			<title id="fm-sharing-svg-title">Pair-specific weights compared with shared feature embeddings for an unseen interaction</title>

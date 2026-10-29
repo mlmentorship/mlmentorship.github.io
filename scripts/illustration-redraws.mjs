@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { parseFragment } from 'parse5';
+import { figureTakeaways } from './illustration-takeaways.mjs';
 
 const escape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const ink = (tone) => `var(--${tone === 'text' ? 'c-text' : tone === 'soft' ? 'c-text-soft' : `viz-${tone}-stroke`})`;
@@ -77,6 +78,43 @@ function comparison(model) {
     vertical += labelOffset + rowHeight + 49;
   }
   return { height: vertical + 12, body };
+}
+
+function actorCriticPaths() {
+  return { height: 456, body:
+    node(125, 12, 110, 40, 'state s', 'input')
+    + arrow(180, 52, 180, 84)
+    + node(90, 88, 180, 50, 'shared features', 'state')
+    + rule(180, 138, 180, 158) + rule(90, 158, 270, 158)
+    + arrow(90, 158, 90, 172) + arrow(270, 158, 270, 172)
+    + node(15, 172, 150, 58, 'actor\nlog pi(a|s)', 'input')
+    + node(195, 172, 150, 58, 'critic\nV(s)', 'focus')
+    + arrow(90, 230, 90, 340) + arrow(270, 230, 270, 340)
+    + text(180, 253, 'fixed target y', { size: 12, width: 120 })
+    + node(120, 263, 120, 42, 'Ahat = y - V', 'neutral')
+    + arrow(270, 280, 240, 280)
+    + arrow(120, 305, 102, 340)
+    + node(15, 340, 150, 62, 'policy loss\n-log pi x Ahat', 'input')
+    + node(195, 340, 150, 62, 'value loss\n(V - y)^2', 'focus')
+    + rule(165, 370, 180, 370, 'warning', true)
+    + rule(180, 370, 180, 320, 'warning', true)
+    + arrow(180, 320, 180, 305, 'warning')
+    + rule(240, 293, 258, 293, 'warning', true)
+    + rule(258, 286, 258, 300, 'warning')
+    + text(240, 319, 'STOP', { size: 12, width: 58, tone: 'warning', weight: 700 })
+    + rule(15, 370, 8, 370, 'warning', true)
+    + rule(8, 370, 8, 201, 'warning', true)
+    + arrow(8, 201, 15, 201, 'warning')
+    + rule(345, 370, 352, 370, 'warning', true)
+    + rule(352, 370, 352, 201, 'warning', true)
+    + arrow(352, 201, 345, 201, 'warning')
+    + rule(75, 172, 75, 150, 'warning', true)
+    + rule(75, 150, 140, 150, 'warning', true)
+    + arrow(140, 150, 140, 138, 'warning')
+    + rule(285, 172, 285, 150, 'warning', true)
+    + rule(285, 150, 220, 150, 'warning', true)
+    + arrow(220, 150, 220, 138, 'warning')
+    + text(180, 435, 'solid: values | dashed: loss gradients', { size: 12, width: 330 }) };
 }
 
 function feedback() {
@@ -1278,6 +1316,12 @@ function queryBeforeStore() {
 }
 
 export const redraws = {
+  'actor-critic-two-objective-flow': {
+    title: 'The advantage stops gradients; both heads still train shared features',
+    description: 'One state enters shared features and then actor and critic heads. The policy loss uses log action probability and advantage y minus V. A stop mark on the V-to-advantage path blocks policy-loss gradients into the critic. The value loss is an illustrative squared error against fixed target y. Separate dashed paths return each loss through its own head into the shared features. Solid lines construct the losses; dashed lines indicate parameter-gradient ownership.',
+    layout: actorCriticPaths,
+    caption: 'The advantage value reaches the policy loss, but its stop mark blocks the return gradient into V. Each loss still updates its own head and the shared features. The squared value loss and fixed target y are illustrative.',
+  },
   'coding-interview-method-state': {
     title: 'The complement is a value; the saved map entry recovers its earlier index',
     description: 'For toy input four, two, seven and target nine, current index two contains seven. Nine minus seven is two. The earlier-value map contains four to index zero and two to index one. Looking up two returns one, so indices one and two identify two plus seven. The current index is absent during the query; insertion happens only after a miss.',
@@ -1994,7 +2038,7 @@ export function renderRedraw(identity, model = redraws[identity] ?? supplemental
   assert(Number.isFinite(height) && height > 0);
   const supplementalAttribute = Object.hasOwn(supplementalRedraws, identity) ? ` data-supplemental-visual="${identity}"` : '';
   const legacyAnchors = (model.legacyFragmentIds ?? []).map((id) => `<span class="visual-fragment-anchor" id="${escape(id)}" aria-hidden="true"></span>`).join('');
-  return `<figure class="learning-figure editorial-illustration"${supplementalAttribute} aria-labelledby="${prefix}-title">${legacyAnchors}<p class="visual-title" id="${prefix}-title">${escape(model.title)}</p><svg viewBox="0 0 360 ${height}" role="img" aria-labelledby="${prefix}-svg-title ${prefix}-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="${prefix}-svg-title">${escape(model.title)}</title><desc id="${prefix}-svg-desc">${escape(model.description)}</desc>${body}</svg><figcaption><strong>Read it this way:</strong> ${escape(model.caption)}</figcaption></figure>`;
+  return `<figure class="learning-figure editorial-illustration"${supplementalAttribute} aria-labelledby="${prefix}-title">${legacyAnchors}<p class="visual-title" id="${prefix}-title">${escape(figureTakeaways[identity] ?? model.title)}</p><svg viewBox="0 0 360 ${height}" role="img" aria-labelledby="${prefix}-svg-title ${prefix}-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="${prefix}-svg-title">${escape(model.title)}</title><desc id="${prefix}-svg-desc">${escape(model.description)}</desc>${body}</svg><figcaption><strong>Read it this way:</strong> ${escape(model.caption)}</figcaption></figure>`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

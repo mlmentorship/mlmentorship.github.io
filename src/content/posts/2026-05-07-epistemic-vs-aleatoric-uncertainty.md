@@ -45,7 +45,7 @@ More representative data can change model uncertainty, but no universal monotoni
 <!-- visual:uncertainty-within-between-models -->
 <figure class="learning-figure" aria-labelledby="uncertainty-decomposition-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="uncertainty-decomposition-title">Does predictive spread live within models or between them?</p>
+	<p class="visual-title" id="uncertainty-decomposition-title">Separated model means add uncertainty even when each model is confident</p>
 	<div class="visual-grid--two" role="group" aria-label="Comparison of aleatoric and epistemic predictive spread across three posterior model draws">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 250" role="img" aria-labelledby="aleatoric-panel-title aleatoric-panel-desc">

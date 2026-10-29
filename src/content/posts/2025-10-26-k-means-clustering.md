@@ -40,7 +40,7 @@ Each group then contributes $500+400+500=1400$, so total SSE drops to $2800$.
 <!-- visual:kmeans-assign-then-update -->
 <figure class="learning-figure" aria-labelledby="kmeans-iteration-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="kmeans-iteration-title">What stays fixed in each half of a Lloyd iteration?</p>
+	<p class="visual-title" id="kmeans-iteration-title">Fix assignments before moving each centroid to its assigned mean</p>
 	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="group" aria-label="Nearest-centroid assignment followed by centroid mean update">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 340 250" role="img" aria-labelledby="kmeans-assign-title kmeans-assign-desc">

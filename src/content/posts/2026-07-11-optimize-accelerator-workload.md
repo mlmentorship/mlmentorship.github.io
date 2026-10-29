@@ -54,7 +54,7 @@ State one hypothesis and predicted direction before changing code. "Vectorize" i
 <!-- visual:accelerator-critical-path-trace -->
 <figure class="learning-figure plot-panel" aria-labelledby="accelerator-trace-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="accelerator-trace-title">Which optimization actually shortens the dependent chain?</p>
+	<p class="visual-title" id="accelerator-trace-title">Less work saves time only when it shortens the critical path</p>
 	<svg viewBox="0 0 360 390" role="img" aria-labelledby="accelerator-trace-svg-title accelerator-trace-svg-desc">
 		<title id="accelerator-trace-svg-title">Three accelerator traces compare removing off-path work with shortening the critical path</title>
 		<desc id="accelerator-trace-svg-desc">All rows use the same zero-to-twelve-cycle scale. In the baseline, a four-cycle load, four-cycle dependent compute operation, and four-cycle dependent store form a solid critical chain ending at cycle twelve. A dashed three-cycle helper overlaps the load and is not on that chain. Experiment A removes the helper, reducing instruction work but retaining the same twelve-cycle critical chain. Experiment B retains the helper but shortens the exposed load to two cycles, so dependent compute runs from cycles two to six and the store from six to ten, ending two cycles earlier.</desc>

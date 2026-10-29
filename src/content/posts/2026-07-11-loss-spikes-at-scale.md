@@ -38,7 +38,7 @@ The training state is healthy but logging, evaluation preprocessing, or a specif
 <!-- visual:loss-spike-trace-taxonomy -->
 <figure class="learning-figure plot-panel" aria-labelledby="loss-spike-taxonomy-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="loss-spike-taxonomy-title">What does the trace establish, and what remains unknown?</p>
+	<p class="visual-title" id="loss-spike-taxonomy-title">An evaluation-only jump does not establish a training failure</p>
 	<svg viewBox="0 0 360 400" role="img" aria-labelledby="loss-spike-taxonomy-svg-title loss-spike-taxonomy-svg-desc">
 		<title id="loss-spike-taxonomy-svg-title">Four qualitative signatures of a training loss event</title>
 		<desc id="loss-spike-taxonomy-svg-desc">Four aligned plots run left to right in time. A transient spike rises sharply and returns to its prior trend. A persistent spike rises and settles at a worse plateau. A divergent trace rises and then accelerates toward failure. In the metric-only panel, a solid training-loss trace stays level while a dashed evaluation-metric trace jumps. The shapes classify symptoms but do not identify whether data, numerics, optimization, distributed state, software, or hardware caused them.</desc>

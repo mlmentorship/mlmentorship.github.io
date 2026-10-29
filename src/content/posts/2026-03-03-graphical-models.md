@@ -60,7 +60,7 @@ An open path permits association; it does not guarantee association for every ch
 <!-- visual:d-separation-conditioning-switch -->
 <figure class="learning-figure" aria-labelledby="d-separation-conditioning-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="d-separation-conditioning-title">Predict whether conditioning blocks or opens a path</p>
+	<p class="visual-title" id="d-separation-conditioning-title">Conditioning can close a chain while opening a collider</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 388" role="img" aria-labelledby="d-separation-svg-title d-separation-svg-desc">
 			<title id="d-separation-svg-title">Conditioning closes a chain path but opens a collider path</title>

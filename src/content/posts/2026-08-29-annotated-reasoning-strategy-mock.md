@@ -160,7 +160,7 @@ Recompute the plan with 64 accelerators, 20% maintenance loss, and 60B tokens. S
 <!-- visual:fixed-capacity-portfolio-guardrails -->
 <figure class="learning-figure" aria-labelledby="fixed-capacity-portfolio-title">
 	<p class="visual-kicker">One cluster · 100% allocated</p>
-	<h3 class="visual-title" id="fixed-capacity-portfolio-title">More training must displace something</h3>
+	<h3 class="visual-title" id="fixed-capacity-portfolio-title">Extra training takes six points from post-training, not protected reserves</h3>
 	<svg viewBox="0 0 600 480" role="img" aria-labelledby="fixed-budget-chart-title fixed-budget-chart-desc" style="width: 100%; min-width: 0; height: auto;">
 		<title id="fixed-budget-chart-title">Two allocations of the same usable capacity</title>
 		<desc id="fixed-budget-chart-desc">Initial allocation: serving 55%, continued training 14%, post-training 12%, evaluation 9%, recovery 10%. An illustrative proposal transfers six percentage points from post-training to continued training: 55%, 20%, 6%, 9%, 10%. Both bars total 100%. The serving, evaluation and hatched recovery segments do not move. This is a proposed trade-off, not an approved change or extra capacity.</desc>

@@ -48,7 +48,7 @@ $$
 <!-- visual:flow-local-volume-density -->
 <figure class="learning-figure plot-panel" aria-labelledby="flow-volume-visual-title">
 	<p class="visual-kicker">Change of variables</p>
-	<p class="visual-title" id="flow-volume-visual-title">The same local probability mass spreads over more area, so its density falls.</p>
+	<p class="visual-title" id="flow-volume-visual-title">Expanding volume lowers density while preserving probability mass</p>
 	<svg viewBox="0 0 360 630" role="img" aria-labelledby="flow-volume-svg-title flow-volume-svg-desc">
 		<title id="flow-volume-svg-title">Local volume and density through two invertible flow layers</title>
 		<desc id="flow-volume-svg-desc">A small patch around z zero has relative area A, probability mass m, and density p zero. The first invertible layer stretches the patch horizontally by two, so its Jacobian determinant is two, its area is 2A, and its density is p zero divided by two. The second layer stretches vertically by three halves, so the total area is 3A and the final density is p zero divided by three. Solid downward arrows mark forward sampling. Dashed upward arrows mark inverse density evaluation. The log-density ledger subtracts log two and log three halves, which equals subtracting log three.</desc>

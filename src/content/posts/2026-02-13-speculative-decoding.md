@@ -26,7 +26,7 @@ That is a result for the paper's configuration, not a speed guarantee for anothe
 <!-- visual:speculative-decoding-first-rejection-boundary -->
 <figure class="learning-figure" aria-labelledby="speculative-rejection-visual-title">
 	<p class="visual-kicker">Learning objective · one cycle with K = 5</p>
-	<p class="visual-title" id="speculative-rejection-visual-title">Keep the accepted prefix; correct the first rejection</p>
+	<p class="visual-title" id="speculative-rejection-visual-title">The first rejected draft invalidates its suffix and requires a corrected replacement</p>
 	<svg viewBox="0 0 600 680" role="img" aria-labelledby="speculative-rejection-svg-title speculative-rejection-svg-desc" style="width: 100%; min-width: 0; height: auto;">
 		<title id="speculative-rejection-svg-title">First rejection and its exact residual sampling correction</title>
 		<desc id="speculative-rejection-svg-desc">One target pass scores five serial draft positions. The first two drafts are accepted; draft token A at position three is rejected, invalidating drafts four and five. At that position, conditional on the accepted prefix, the illustrative target distribution P over A,B,C is 0.2,0.3,0.5 and draft distribution D is 0.5,0.3,0.2. Accept proposed x with probability min(1,P(x)/D(x)). The positive part of P minus D is 0,0,0.3. Its normalized residual q is 0,0,1, so replacement is C, not an ordinary new draw from P. Commit the first two drafts and C, then restart from that changed prefix. Exactness assumes the stated sampling rule and compatible conditional distributions; no speedup is inferred.</desc>

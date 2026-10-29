@@ -5,6 +5,7 @@ import { fromMarkdown } from 'mdast-util-from-markdown';
 import { parseFragment } from 'parse5';
 import yaml from 'js-yaml';
 import { renderStateTransition } from './coding-visuals/state-transition.mjs';
+import { figureTakeaways } from './illustration-takeaways.mjs';
 
 const root = process.cwd();
 const argumentsList = process.argv.slice(2);
@@ -514,13 +515,14 @@ function renderVisual(problem) {
   if (!definition) throw new Error(`Missing visual definition for ${problem.slug}`);
   const visualId = `${problem.slug}-state`;
   const titleId = `${visualId}-title`;
+  const takeaway = figureTakeaways[visualId] ?? `${problem.title}: ${definition.objective}`;
   const frames = definition.frames.map((item, index) => `<div class="coding-trace-frame" data-coding-frame="${index}" data-frame-key="${escapeHtml(item.key)}"${index > 0 ? ' hidden' : ''} role="group" aria-label="${escapeHtml(item.label)}"><div class="coding-trace-frame-heading"><span>${escapeHtml(item.label)}</span><strong>${escapeHtml(item.note)}</strong></div>${renderScene(item.scene)}${renderStateTransition(item.scene, definition.frames[index - 1]?.scene)}</div>`).join('');
   const buttons = definition.frames.map((item, index) => `<button type="button" data-coding-frame-button="${index}"${index === 0 ? ' aria-current="step"' : ''}><span>${index + 1}</span><strong>${escapeHtml(item.label)}</strong></button>`).join('');
   const controls = `<div class="coding-trace-controls" data-coding-controls hidden><div class="coding-trace-control-buttons"><button type="button" data-coding-previous disabled><span aria-hidden="true">&larr;</span><span>Previous</span></button><button type="button" data-coding-play><span aria-hidden="true">&#9654;</span><span data-coding-play-label>Play trace</span></button><button type="button" data-coding-next><span>Next</span><span aria-hidden="true">&rarr;</span></button></div><output data-coding-progress>Step 1 of ${definition.frames.length}</output></div><div class="coding-trace-timeline" data-coding-timeline hidden role="group" aria-label="Trace steps">${buttons}</div><p class="coding-trace-status sr-only" data-coding-status aria-live="polite"></p>`;
   const lessons = `<dl class="coding-visual-lessons" aria-label="Pattern recognition and transfer"><div class="coding-visual-lesson"><dt>Recognize it</dt><dd data-coding-review="recognitionCue">${escapeHtml(definition.review.recognitionCue)}</dd></div><div class="coding-visual-lesson"><dt>Keep true</dt><dd data-coding-review="invariant">${escapeHtml(definition.review.invariant)}</dd></div><div class="coding-visual-lesson"><dt>Reuse it</dt><dd data-coding-review="transferLesson">${escapeHtml(definition.review.transferLesson)}</dd></div></dl>`;
   return {
     visualId,
-    source: `<!-- visual:${visualId} -->\n<figure class="learning-figure coding-visual-figure" aria-labelledby="${titleId}"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="${titleId}">${escapeHtml(problem.title)}: ${escapeHtml(definition.objective)}</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="${problem.slug}" role="group" tabindex="0" aria-label="${escapeHtml(`${problem.title}: ${definition.objective}`)}"><div class="coding-visual-example"><span>Input and goal</span><strong>${escapeHtml(problem.task)}</strong></div><div class="coding-trace" data-coding-trace>${frames}${controls}</div>${lessons}</div><figcaption><strong>Read it this way:</strong> ${escapeHtml(definition.frames[0].note)} Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>`,
+    source: `<!-- visual:${visualId} -->\n<figure class="learning-figure coding-visual-figure" aria-labelledby="${titleId}"><p class="visual-kicker">Problem trace</p><p class="visual-title" id="${titleId}">${escapeHtml(takeaway)}</p><div class="coding-visual" data-coding-visual data-coding-mode="trace" data-coding-slug="${problem.slug}" role="group" tabindex="0" aria-label="${escapeHtml(`${problem.title}: ${definition.objective}`)}"><div class="coding-visual-example"><span>Input and goal</span><strong>${escapeHtml(problem.task)}</strong></div><div class="coding-trace" data-coding-trace>${frames}${controls}</div>${lessons}</div><figcaption><strong>Read it this way:</strong> ${escapeHtml(definition.frames[0].note)} Step through the frames to watch the state change. The last frame shows the answer or the stopping condition.</figcaption></figure>`,
     audit: {
       schemaVersion: 1,
       slug: problem.slug,

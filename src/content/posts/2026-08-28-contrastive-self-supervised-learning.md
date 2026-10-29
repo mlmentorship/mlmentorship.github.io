@@ -47,7 +47,7 @@ The loss teaches the model to identify the positive among the candidates.
 <!-- visual:infonce-positive-candidate-set -->
 <figure class="learning-figure plot-panel" aria-labelledby="infonce-candidates-visual-title">
 	<p class="visual-kicker">Candidate-set intuition</p>
-	<p class="visual-title" id="infonce-candidates-visual-title">InfoNCE rewards one declared positive while every other candidate competes with it.</p>
+	<p class="visual-title" id="infonce-candidates-visual-title">The declared positive enters the denominator; an undeclared positive remains a negative</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 370" role="img" aria-labelledby="infonce-candidates-svg-title infonce-candidates-svg-desc">
 			<title id="infonce-candidates-svg-title">One anchor, one declared positive, and three candidate negatives in InfoNCE</title>

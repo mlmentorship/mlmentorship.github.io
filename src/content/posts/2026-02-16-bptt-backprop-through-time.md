@@ -49,7 +49,7 @@ This is L5. You've named the unrolling, the memory and gradient problems, and th
 <!-- visual:bptt-detach-cuts-gradient-not-state -->
 <figure class="learning-figure" aria-labelledby="bptt-boundary-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="bptt-boundary-title">What does truncated BPTT detach: the recurrent state or the gradient path?</p>
+	<p class="visual-title" id="bptt-boundary-title">Detaching keeps the hidden value but cuts earlier gradient paths</p>
 	<div class="visual-grid--two" style="grid-template-columns: 1fr;" role="group" aria-label="Full and truncated backpropagation through time compared">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 340 200" role="img" aria-labelledby="bptt-full-title bptt-full-desc" style="--viz-backward-marker:url(#bptt-full-backward-head)">

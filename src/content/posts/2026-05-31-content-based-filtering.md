@@ -31,7 +31,7 @@ Learned encoders may still have used cross-user evidence during training.
 <!-- visual:content-profile-scores-new-item -->
 <figure class="learning-figure plot-panel" aria-labelledby="content-profile-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="content-profile-title">Why can a content model rank a brand-new item?</p>
+	<p class="visual-title" id="content-profile-title">Shared content features let an unseen item match a user's interests</p>
 	<svg viewBox="0 0 360 390" role="img" aria-labelledby="content-profile-svg-title content-profile-svg-desc">
 		<title id="content-profile-svg-title">Building a user profile and scoring a new item in the same feature space</title>
 		<desc id="content-profile-svg-desc">Two liked items have binary vectors over science, drama, and short features. Averaging them gives the user profile one, one half, one half. A brand-new telescope guide has zero interactions but a cosine similarity of 0.87 to that profile, so it ranks above a popular drama with 12,000 interactions and a similarity of 0.41. The content score never uses other users' interaction counts.</desc>

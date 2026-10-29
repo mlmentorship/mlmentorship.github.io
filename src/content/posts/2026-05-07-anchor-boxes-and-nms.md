@@ -53,7 +53,7 @@ Thus $\operatorname{IoU}=2/3>0.50$: keep A, suppress B, then keep disjoint C.
 <!-- visual:nms-greedy-suppression -->
 <figure class="learning-figure" aria-labelledby="nms-greedy-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="nms-greedy-title">Which detections survive score-ordered NMS at τ = 0.50?</p>
+	<p class="visual-title" id="nms-greedy-title">A suppressed box cannot suppress its neighbours</p>
 	<div class="visual-grid--two" role="group" aria-label="Before-and-after comparison of greedy non-maximum suppression">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 210" role="img" aria-labelledby="nms-candidates-title nms-candidates-desc">

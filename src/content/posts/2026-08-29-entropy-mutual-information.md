@@ -68,7 +68,7 @@ Independent fair bits would instead give $0.25$ in every cell.
 <!-- visual:mutual-information-noisy-channel-budget -->
 <figure class="learning-figure" aria-labelledby="mutual-information-budget-title" aria-describedby="mutual-information-budget-description">
 <p class="visual-kicker">Worked uncertainty budget</p>
-<p class="visual-title" id="mutual-information-budget-title">Observing Y removes the shared part of X's uncertainty.</p>
+<p class="visual-title" id="mutual-information-budget-title">Fair marginals can still share 0.531 bits of information</p>
 <p id="mutual-information-budget-description">One bit splits into 0.531 bits removed by Y and 0.469 bits still uncertain.</p>
 <div class="visual-scroll" tabindex="0" role="region" aria-label="Noisy-channel joint table and uncertainty budget">
 <svg class="information-budget-visual" viewBox="0 0 900 420" role="img" aria-labelledby="mutual-information-svg-title mutual-information-svg-description" width="900" height="420">

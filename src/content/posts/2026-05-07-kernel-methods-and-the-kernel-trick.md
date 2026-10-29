@@ -37,7 +37,7 @@ In $d$ dimensions, explicit degree-two features number $\binom{d+2}{2}$; one ker
 <!-- visual:kernel-trick-exact-shortcut -->
 <figure class="learning-figure plot-panel" aria-labelledby="kernel-shortcut-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="kernel-shortcut-title">Which work does the kernel trick skip?</p>
+	<p class="visual-title" id="kernel-shortcut-title">The kernel reaches 36 without constructing either feature vector</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="kernel-shortcut-svg-title kernel-shortcut-svg-desc">
 		<title id="kernel-shortcut-svg-title">Two exact routes to the same degree-two polynomial-kernel value</title>
 		<desc id="kernel-shortcut-svg-desc">For x equals 2 comma 1 and x prime equals 1 comma 3, the explicit route constructs two six-dimensional feature vectors and dots them to get 4 plus 12 plus 9 plus 4 plus 6 plus 1 equals 36. The kernel shortcut stays in two dimensions: x dot x prime equals 5, so open parenthesis 5 plus 1 close parenthesis squared also equals 36. The shortcut returns exactly the same scalar without materializing either feature vector.</desc>

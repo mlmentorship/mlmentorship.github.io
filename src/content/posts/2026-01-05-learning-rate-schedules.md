@@ -32,7 +32,7 @@ Common practice: cosine to $\eta_{\min} = 0.1 \cdot \eta_{\max}$ over the full t
 <!-- visual:warmup-cosine-three-checkpoints -->
 <figure class="learning-figure plot-panel" aria-labelledby="warmup-cosine-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="warmup-cosine-title">Where are the three defining checkpoints of warmup plus cosine decay?</p>
+	<p class="visual-title" id="warmup-cosine-title">A nonzero decay floor shifts the midpoint above half the peak</p>
 	<svg viewBox="0 0 360 286" role="img" aria-labelledby="warmup-cosine-svg-title warmup-cosine-svg-desc">
 		<title id="warmup-cosine-svg-title">Linear warmup followed by cosine decay to ten percent of peak</title>
 		<desc id="warmup-cosine-svg-desc">A normalized learning-rate plot rises linearly from zero to the peak at warmup end W. It then follows a cosine curve over the separate interval from W to training end T. A circle marks one hundred percent of peak at W, a diamond marks fifty-five percent halfway between W and T, and a square marks the ten-percent floor at T. Labels, marker shapes, and guide lines identify every checkpoint without relying on color.</desc>

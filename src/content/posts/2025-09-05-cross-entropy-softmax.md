@@ -36,7 +36,7 @@ Half squared error on the sigmoid probability introduces another derivative fact
 <!-- visual:cross-entropy-confident-wrong-gradient -->
 <figure class="learning-figure plot-panel" aria-labelledby="ce-gradient-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ce-gradient-visual-title">Why does cross-entropy keep correcting a confident wrong prediction?</p>
+	<p class="visual-title" id="ce-gradient-visual-title">Cross-entropy keeps a strong gradient for a confident wrong answer</p>
 	<svg viewBox="0 0 360 300" role="img" aria-labelledby="ce-gradient-svg-title ce-gradient-svg-desc">
 		<title id="ce-gradient-svg-title">Cross-entropy and squared-error logit gradients as true-class probability changes</title>
 		<desc id="ce-gradient-svg-desc">An original plot for a binary output with true label one. The horizontal axis is true-class probability q from zero to one, and the vertical axis is absolute gradient with respect to its logit. Cross-entropy is a solid straight line with magnitude one minus q, so at q equals 0.01 its gradient is 0.99. Half squared error on the probability is a dashed low curve with magnitude q times one minus q squared, so at q equals 0.01 its gradient is about 0.0098. The extra sigmoid derivative makes squared error nearly stop when the prediction is confidently wrong.</desc>

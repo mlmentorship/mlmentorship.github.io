@@ -60,7 +60,7 @@ This shows: you know the textbook, you know its limits, and you know what change
 <!-- visual:capacity-regimes-double-descent -->
 <figure class="learning-figure plot-panel" aria-labelledby="capacity-regimes-title">
 	<p class="visual-kicker">Capacity regimes</p>
-	<p class="visual-title" id="capacity-regimes-title">The classical sweet spot is not necessarily the end of the curve.</p>
+	<p class="visual-title" id="capacity-regimes-title">This possible test-error curve improves again after the interpolation peak</p>
 	<svg viewBox="0 0 360 284" role="img" aria-labelledby="capacity-regimes-svg-title capacity-regimes-svg-desc">
 		<title id="capacity-regimes-svg-title">Schematic capacity-wise double-descent curve</title>
 		<desc id="capacity-regimes-svg-desc">A schematic plot of expected error against effective model capacity. Solid test error falls to a classical minimum, rises toward the interpolation threshold where training error first reaches zero, then falls again in the overparameterized regime. Dashed training error decreases monotonically and stays near zero after the threshold. Exact curve shapes are model- and training-dependent.</desc>

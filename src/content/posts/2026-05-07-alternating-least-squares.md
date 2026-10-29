@@ -36,7 +36,7 @@ A $k \times k$ system per user. Solve for all $m$ users in parallel. Then fix $U
 <!-- visual:als-alternating-independent-solves -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="als-visual-title">
 	<p class="visual-kicker">Spatial intuition</p>
-	<p class="visual-title" id="als-visual-title">Freezing one dense factor separates the other factor into independent row solves.</p>
+	<p class="visual-title" id="als-visual-title">Hold one factor matrix still while solving rows of the other</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 380" role="img" aria-labelledby="als-svg-title als-svg-desc">
 			<title id="als-svg-title">Alternating independent least-squares updates for matrix factorization</title>

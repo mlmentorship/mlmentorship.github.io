@@ -30,7 +30,7 @@ The cross-term vanishes because $\mathbb{E}[\hat\theta - \mathbb{E}\hat\theta] =
 <!-- visual:estimator-error-reference-points -->
 <figure class="learning-figure" aria-labelledby="estimator-error-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="estimator-error-title">See that variance and bias measure error from different reference points.</p>
+	<p class="visual-title" id="estimator-error-title">Spread is measured from the mean, bias from the truth</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 250" role="img" aria-labelledby="estimator-error-svg-title estimator-error-svg-desc">
 			<title id="estimator-error-svg-title">Bias and variance use different reference points</title>

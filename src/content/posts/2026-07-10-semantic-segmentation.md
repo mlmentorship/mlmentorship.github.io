@@ -32,7 +32,7 @@ A learned prior may infer plausible detail; a skip supplies additional evidence 
 <!-- visual:semantic-segmentation-boundary-fusion -->
 <figure class="learning-figure" aria-labelledby="segmentation-boundary-heading">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="segmentation-boundary-heading">Why does a decoder need fine features, not only more pixels?</p>
+	<p class="visual-title" id="segmentation-boundary-heading">Enlarging a coarse grid cannot recover an edge location that downsampling lost</p>
 	<svg viewBox="0 0 360 448" role="img" aria-labelledby="segmentation-boundary-title segmentation-boundary-desc">
 		<title id="segmentation-boundary-title">Downsampling loses exact boundary location, while an encoder skip supplies fine evidence to the decoder</title>
 		<desc id="segmentation-boundary-desc">A fine eight-column input feature grid contains an object edge between columns five and six. Encoding and downsampling produce a coarse four-column semantic grid where the edge occupies an uncertain cell. Upsampling that coarse grid creates a larger mask but leaves a wide dashed uncertain boundary. A dashed skip path carries same-scale fine encoder features around the bottleneck; fusing those features with coarse semantics places a sharp solid boundary between columns five and six.</desc>

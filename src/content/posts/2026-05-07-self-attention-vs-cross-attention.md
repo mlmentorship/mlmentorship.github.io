@@ -52,7 +52,7 @@ Used wherever the model needs to "look up" information from a different source:
 <!-- visual:attention-source-routing -->
 <figure class="learning-figure plot-panel" aria-labelledby="attention-source-routing-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="attention-source-routing-title">Which sequence supplies Q, K, and V?</p>
+	<p class="visual-title" id="attention-source-routing-title">Queries determine output rows even when keys and values come from another sequence</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="attention-source-routing-svg-title attention-source-routing-svg-desc">
 		<title id="attention-source-routing-svg-title">Self-attention uses one source while cross-attention routes queries and key-values from different sources</title>
 		<desc id="attention-source-routing-svg-desc">The upper panel shows one three-token sequence X supplying query, key, and value projections, producing a square three-by-three attention matrix whose rows and columns both refer to X. The lower panel shows a two-token sequence X supplying queries while a three-token sequence Y supplies keys and values, producing a rectangular two-by-three matrix. In both panels the same scaled dot-product attention kernel maps one output row to each query token.</desc>

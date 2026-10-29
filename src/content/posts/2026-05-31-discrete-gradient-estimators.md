@@ -20,7 +20,7 @@ We want $\nabla_\theta \mathbb{E}_{z \sim p_\theta(z)}[f(z)]$. The expectation i
 <!-- visual:discrete-gradients-forward-backward-paths -->
 <figure class="learning-figure" aria-labelledby="discrete-gradient-paths-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="discrete-gradient-paths-title">Where does each estimator send the backward signal?</p>
+	<p class="visual-title" id="discrete-gradient-paths-title">A straight-through backward rule is not the hard operation's derivative</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 570" role="img" aria-labelledby="discrete-gradient-svg-title discrete-gradient-svg-desc">
 			<title id="discrete-gradient-svg-title">Forward and backward paths for three discrete gradient estimators</title>

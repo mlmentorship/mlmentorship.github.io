@@ -23,7 +23,7 @@ Trace each action path, then add epsilon-greedy behavior with $\epsilon=0.2$ and
 <!-- visual:value-policy-action-interface -->
 <figure class="learning-figure" aria-labelledby="value-policy-interface-title">
 	<p class="visual-kicker">One state, two action interfaces</p>
-	<p class="visual-title" id="value-policy-interface-title">What learned object sits directly upstream of the action?</p>
+	<p class="visual-title" id="value-policy-interface-title">Values need an action-selection rule; that rule can still be stochastic</p>
 	<div class="visual-grid--two" role="group" aria-label="Value-based control derives an action through a selector over learned action values; policy-based control obtains an action directly from a learned policy; actor-critic uses an actor for action choice and a critic for a training signal">
 		<section class="visual-panel" aria-labelledby="value-interface-title">
 			<h4 id="value-interface-title">Value: scores then a rule</h4>

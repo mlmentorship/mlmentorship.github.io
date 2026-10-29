@@ -48,7 +48,7 @@ This is L5. You've explained both, given examples, and noted when each is the ri
 <!-- visual:intervals-two-randomness-models -->
 <figure class="learning-figure plot-panel" aria-labelledby="intervals-randomness-title">
 	<p class="visual-kicker">Interval intuition</p>
-	<p class="visual-title" id="intervals-randomness-title">The same 95% label answers two different probability questions.</p>
+	<p class="visual-title" id="intervals-randomness-title">New samples move confidence intervals; a posterior conditions on this sample</p>
 	<svg viewBox="0 0 360 458" role="img" aria-labelledby="intervals-randomness-svg-title intervals-randomness-svg-desc">
 		<title id="intervals-randomness-svg-title">Frequentist confidence coverage compared with Bayesian posterior credibility</title>
 		<desc id="intervals-randomness-svg-desc">The upper panel shows five illustrative confidence intervals produced by repeating one sampling procedure while the true parameter remains fixed. Four solid intervals cross the true parameter line and one dashed interval misses it; the small set illustrates coverage but is not a 95 percent simulation. The lower panel shows one posterior distribution conditional on observed data and a bracketed credible interval containing 95 percent of its probability mass. Text equations state the two different probability claims.</desc>

@@ -22,7 +22,7 @@ Projected gradient descent iterates gradient steps and projects back into the al
 <!-- visual:adversarial-threat-set-boundary -->
 <figure class="learning-figure plot-panel" aria-labelledby="adversarial-visual-title">
 	<p class="visual-kicker">Threat-model geometry</p>
-	<p class="visual-title" id="adversarial-visual-title">A small allowed move can contain a misclassified point.</p>
+	<p class="visual-title" id="adversarial-visual-title">An allowed small move can still cross the decision boundary</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 300" role="img" aria-labelledby="adversarial-svg-title adversarial-svg-desc">
 			<title id="adversarial-svg-title">An adversarial perturbation crossing a decision boundary inside an L-infinity threat set</title>

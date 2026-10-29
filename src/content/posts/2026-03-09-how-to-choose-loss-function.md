@@ -33,7 +33,7 @@ Then ask whether changing action costs requires a different prediction model.
 
 <!-- visual:loss-estimation-vs-decision -->
 <figure class="learning-figure" aria-labelledby="loss-comparison-title">
-	<h3 class="visual-title" id="loss-comparison-title">A better estimate and a cheaper action are different questions</h3>
+	<h3 class="visual-title" id="loss-comparison-title">A probability of 0.8 does not pick an action without its costs</h3>
 	<svg viewBox="0 0 600 700" role="img" aria-labelledby="loss-chart-title loss-chart-desc" style="width: 100%; min-width: 0; height: auto;">
 		<title id="loss-chart-title">Loss changes the preferred constant; action costs change the preferred action</title>
 		<desc id="loss-chart-desc">For the same outcomes zero, zero and nine, constant zero has absolute residuals zero, zero and nine; constant three has residual magnitudes three, three and six. Squaring then averaging gives MSE 27 versus 18, favoring three. Averaging the distances gives MAE 3 versus 4, favoring zero. Each pair of bars shares a zero baseline and scale; MSE and MAE have different units. In a separate binary task with calibrated positive probability 0.8, false-positive cost 9 and false-negative cost 1, positive action costs 1.8 and negative action costs 0.8. The lower-cost action is negative without changing the probability estimate.</desc>

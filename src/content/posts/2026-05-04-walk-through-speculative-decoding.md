@@ -26,7 +26,7 @@ Account for proposal probabilities, normalized correction, draft cost, acceptanc
 <!-- visual:speculative-decoding-weight-read-ledger -->
 <figure class="learning-figure" aria-labelledby="speculative-cost-title">
 <p class="visual-kicker">Learning objective</p>
-<h3 class="visual-title" id="speculative-cost-title">How can one target pass verify several drafted positions?</h3>
+<h3 class="visual-title" id="speculative-cost-title">Accepted prefix length determines whether draft and verification work pays off</h3>
 <div class="visual-grid--two" role="group" aria-label="Cost comparison: ordinary low-batch decode reads the target model weights once to score one next position, while speculative verification reads the same target weights once to score K drafted positions in parallel; latency stays similar only while both operations are limited by weight bandwidth rather than compute">
 <section class="visual-panel">
 <h4>ORDINARY DECODE &#183; 1 POSITION</h4>

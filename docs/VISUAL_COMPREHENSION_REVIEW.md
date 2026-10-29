@@ -1,5 +1,54 @@
 # Visual comprehension review
 
+## Second editorial pass
+
+This pass reviews all 392 registered figures and all 16 supplemental drawings individually.
+Each has an evidence-led takeaway in [scripts/illustration-takeaways.mjs](../scripts/illustration-takeaways.mjs), stating the inference visible in that particular figure rather than repeating its topic.
+The catalog retains strong existing wording where appropriate; 408 reviewed takeaways does not mean 408 newly rewritten titles or structural redraws.
+The review surface now displays those titles instead of reducing them to one-pixel screen-reader boxes.
+The native renderer rejects hidden, clipped, transparent and horizontally overflowing titles.
+
+Bayes gains a countable 1,000-cell population grid: one diseased group and 999 healthy groups, each representing 100 people.
+Its existing 99-versus-999 positive-result strip retains exact count-proportional geometry.
+Actor-critic gains a phone-width composition that separates the forward advantage value from the stopped return gradient while preserving both losses' updates to shared features.
+Binary search and rotated target search gain previous/current candidate bands on a shared index scale, without inventing a prior state at initialization.
+Human-readable pointer labels replace internal pointer keys in the selected-state comparisons of 79 coding figures.
+All 106 coding definitions and all 797 authored checkpoints remain intact.
+
+The exact catalog, applied-title ownership, synchronized drawing models and coding generator pass their focused source checks.
+The structured record is `secondPassReconciliation` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+There is no measured tenfold improvement, learner study, publication-standard certification or claim that all figures were structurally redrawn.
+
+### Second-pass qualification
+
+Normal `npm run check` and `npm run build` pass on the isolated second-pass tree.
+All 408 figures pass desktop light/dark, actual-390 phone light/dark and print-style checks: 2,040 figure cases.
+All 797 authored coding checkpoints are captured in each of the four screen modes: 3,188 required settled state captures.
+The accepted render inventory authenticates 7,920 PNG files, including repeated primary-figure captures on supplemental routes and horizontal-scroll endpoints.
+This file count is neither a count of unique figures nor a claim of individual manual inspection.
+Native interaction checks pass all 106 coding routes and 797 checkpoints at each actual 1280px and 390px width.
+They cover forward/backward and direct navigation, keyboard controls, real playback, stable frame/control/page geometry, reduced motion and the no-JavaScript fallback.
+
+All 68 labelled contact sheets were directly reviewed, covering all 408 initial phone views.
+All 16 supplemental phone originals and selected registered native originals were inspected separately, including Bayes, actor-critic and the two candidate-band traces.
+The contact sheets are scaled composition reviews, not native inspection of every image or every authored checkpoint.
+Some retained wide drawings require contained horizontal panning; passing the technical text-size floor does not establish effortless comprehension.
+The primary review surface also passes a dedicated visible-title/navigation smoke check; a deliberately one-pixel-clipped control is rejected by the new visibility criteria.
+
+Every non-figure lesson body remains byte-for-byte identical to base commit `be21ddb6c2dc892d8ea593a6277a662f29fbfb25`.
+All 391 articles retain their headings, Python fences, ordered registered/supplemental identities and public fragments.
+All 797 frame identities and 8,739 ordered motion identities are preserved.
+Both pre-existing dirty worktrees are outside this isolated revision and remain preserved.
+
+Evidence is under `/tmp/mlmentorship-illustrations-second-pass-20261028-81b8a701-evidence`.
+The original `candidate-source-freeze-r1.json` and `render-qualified-r1.json` remain unchanged.
+Final reconciliation allows only the interaction observer and these review records to differ from the rendered source candidate; article/runtime equality is checked separately after the final build.
+The observer now bounds CDP waits, reports the current route/stage and observes real playback from the driver instead of awaiting a page-side timer.
+Accepted interaction reports are `interactions-1280-r3.json` and `interactions-390-r4.json`.
+The interrupted desktop run, the localized observer timeout and the wrong-working-directory phone invocation remain separate, rejected attempts.
+Native PNGs are in an owned `/dev/shm` directory and are volatile across host restart; their hashes, reports and contact sheets are retained on disk.
+No push, publication, learner experiment or PDF-pagination verification is included in this pass.
+
 ## Editorial edition
 
 The new edition covers all 392 registered illustrations across 391 articles and all 16 supplemental illustrations.
@@ -49,6 +98,7 @@ node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --c
 node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-redraws
 node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-coding
 node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-reader-checks
+node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --apply-takeaways
 node scripts/illustration-edition.mjs --evidence-dir=/path/to/owned/evidence --verify
 ```
 

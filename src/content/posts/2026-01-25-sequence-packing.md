@@ -37,7 +37,7 @@ The block-diagonal mask provides attention isolation; position handling must sep
 <!-- visual:packed-sequence-mask-boundaries -->
 <figure class="learning-figure" aria-labelledby="packed-sequence-mask-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="packed-sequence-mask-title">How can one token row still behave like three separate examples?</p>
+	<p class="visual-title" id="packed-sequence-mask-title">Earlier physical position does not grant attention across example boundaries</p>
 	<div class="visual-grid--two" role="group" aria-label="A six-token packed row and its six-by-six causal block-diagonal attention mask">
 		<section class="visual-panel" aria-labelledby="packed-row-title">
 			<h4 id="packed-row-title">1 · PACK TOKENS, KEEP BOUNDARIES</h4>

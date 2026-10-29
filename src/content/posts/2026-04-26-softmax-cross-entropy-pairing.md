@@ -63,7 +63,7 @@ The full gradient is `p - y` (predicted probabilities minus the one-hot true lab
 <!-- visual:softmax-ce-logit-update -->
 <figure class="learning-figure" aria-labelledby="softmax-ce-update-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="softmax-ce-update-title">What does <code>p - y</code> make gradient descent do to each logit?</p>
+	<p class="visual-title" id="softmax-ce-update-title">Gradient descent subtracts the gradient, raising the underpredicted true-class logit</p>
 	<svg viewBox="0 0 360 300" role="img" aria-labelledby="softmax-ce-update-svg-title softmax-ce-update-svg-desc">
 		<title id="softmax-ce-update-svg-title">A three-class softmax cross-entropy gradient and its opposite-signed logit update</title>
 		<desc id="softmax-ce-update-svg-desc">For predicted probabilities A 0.70, B 0.20, and C 0.10 with B as the true class, subtracting the one-hot target gives gradient components positive 0.70, negative 0.80, and positive 0.10. A gradient-descent step moves in the opposite direction: A left by 0.70 eta, B right by 0.80 eta, and C left by 0.10 eta. The two competitor logits decrease, the true-class logit increases, and all three changes sum to zero.</desc>

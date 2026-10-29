@@ -64,7 +64,7 @@ For pure classification accuracy, NB is competitive. For calibrated probabilitie
 <!-- visual:naive-bayes-evidence-ledger -->
 <figure class="learning-figure" aria-labelledby="naive-bayes-ledger-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="naive-bayes-ledger-title">How can naive Bayes choose the right class but be too confident?</p>
+	<p class="visual-title" id="naive-bayes-ledger-title">Multiplying evidence ratios requires conditional independence within each class</p>
 	<div class="visual-grid--two" role="group" aria-label="An illustrative Naive Bayes evidence ledger beside the conditional-independence caveat">
 		<section class="visual-panel" aria-labelledby="nb-score-title">
 			<h4 id="nb-score-title">Model score: count every token separately</h4>

@@ -45,7 +45,7 @@ $$
 <!-- visual:random-forest-correlation-floor -->
 <figure class="learning-figure" aria-labelledby="random-forest-variance-title">
 	<p class="visual-kicker">Why decorrelation matters</p>
-	<p class="visual-title" id="random-forest-variance-title">More trees shrink only the uncorrelated share of variance.</p>
+	<p class="visual-title" id="random-forest-variance-title">In this model, correlated tree variation leaves a nonzero variance floor</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 330" role="img" aria-labelledby="random-forest-variance-svg-title random-forest-variance-svg-desc">
 			<title id="random-forest-variance-svg-title">Random forest variance at one, four, and infinitely many trees</title>

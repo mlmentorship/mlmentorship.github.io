@@ -43,7 +43,7 @@ Hold the target and both candidates fixed while changing only the sampling weigh
 <!-- visual:kl-direction-candidate-ranking -->
 <figure class="learning-figure plot-panel" aria-labelledby="kl-direction-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="kl-direction-title">Why can swapping the KL arguments change which approximation wins?</p>
+	<p class="visual-title" id="kl-direction-title">Changing which distribution does the averaging reverses this candidate ranking</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="kl-direction-svg-title kl-direction-svg-desc">
 		<title id="kl-direction-svg-title">Forward and reverse KL rank two approximations differently</title>
 		<desc id="kl-direction-svg-desc">A three-outcome target distribution p has probabilities 0.49, 0.02, and 0.49, forming two modes. A broad candidate q cover has probabilities 0.34, 0.32, and 0.34. A one-mode candidate q left has probabilities 0.96, 0.02, and 0.02. Forward KL from p to q is 0.30 nats for the broad candidate and 1.24 for the one-mode candidate, so it selects broad coverage. Reverse KL from q to p is 0.64 nats for the broad candidate and 0.58 for the one-mode candidate, so it selects one mode. The example compares only these fixed candidates.</desc>

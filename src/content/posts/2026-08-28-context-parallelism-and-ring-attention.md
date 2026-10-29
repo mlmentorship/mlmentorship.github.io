@@ -55,7 +55,7 @@ At each step:
 <!-- visual:ring-attention-fixed-query-kv-cycle -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="ring-attention-cycle-title">
 	<p class="visual-kicker">One device · four ring steps</p>
-	<p class="visual-title" id="ring-attention-cycle-title">Queries stay put while every key/value block visits.</p>
+	<p class="visual-title" id="ring-attention-cycle-title">Rotate key/value blocks; merge their normalization, not separately normalized answers</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 820 350" role="img" aria-labelledby="ring-attention-cycle-svg-title ring-attention-cycle-svg-desc">
 			<title id="ring-attention-cycle-svg-title">Device zero processes every key/value block in a four-device ring</title>

@@ -42,7 +42,7 @@ No causal mask is needed when the query is the newest token and the cache contai
 <!-- visual:kv-cache-newest-row-equivalence -->
 <figure class="learning-figure" aria-labelledby="kv-equivalence-title" aria-describedby="kv-equivalence-description">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="kv-equivalence-title">Why does cached decoding produce the same newest-token output?</p>
+	<p class="visual-title" id="kv-equivalence-title">Reuse old key/value projections; compute only the newest query row</p>
 	<p id="kv-equivalence-description">At prefix length four, compare the projection work in a full causal pass with a cached step. Both compute the fourth output from the same newest query, four keys, and four values.</p>
 	<div class="visual-grid--two" role="group" aria-label="Full-prefix and cached attention at prefix length four">
 		<section class="visual-panel" aria-labelledby="kv-full-title">

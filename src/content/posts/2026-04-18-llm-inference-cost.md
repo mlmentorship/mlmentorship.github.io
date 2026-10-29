@@ -40,7 +40,7 @@ The 80% cached-token discount does not apply to the entire request.
 <!-- visual:llm-cost-compounds-across-agent-calls -->
 <figure class="learning-figure" aria-labelledby="llm-cost-compounding-title">
 	<p class="visual-kicker">Input tokens, not currency</p>
-	<p class="visual-title" id="llm-cost-compounding-title">The same prefix recurs, while other input grows.</p>
+	<p class="visual-title" id="llm-cost-compounding-title">Caching discounts repeated input, not newly generated output</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 470" style="width: 400px; min-width: 400px" role="img" aria-labelledby="llm-cost-svg-title llm-cost-svg-desc">
 			<title id="llm-cost-svg-title">Three input bars show 1,200, 1,400 and 1,600 tokens</title>

@@ -45,7 +45,7 @@ The [MLE lesson](/concepts/maximum-likelihood-estimation/) distinguishes a likel
 <!-- visual:exponential-family-sufficient-stat-moment-match -->
 <figure class="learning-figure" aria-labelledby="expfam-moment-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="expfam-moment-title">Why do sufficient statistics and moment matching come from the same factorization?</p>
+	<p class="visual-title" id="expfam-moment-title">Keep the success count and sample size; their ratio estimates the mean</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 350" role="img" aria-labelledby="expfam-moment-svg-title expfam-moment-svg-desc">
 			<title id="expfam-moment-svg-title">Six Bernoulli observations collapse to one sufficient statistic and one moment equation</title>

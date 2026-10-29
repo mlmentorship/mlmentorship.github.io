@@ -32,7 +32,7 @@ In code, RoPE is implemented as elementwise multiplies with precomputed `cos` an
 <!-- visual:rope-relative-rotation -->
 <figure class="learning-figure plot-panel" aria-labelledby="rope-relative-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="rope-relative-title">Why do absolute rotations produce a relative attention score?</p>
+	<p class="visual-title" id="rope-relative-title">A shared position shift preserves the relative rotary angle, not every model output</p>
 	<svg viewBox="0 0 360 308" role="img" aria-labelledby="rope-relative-svg-title rope-relative-svg-desc">
 		<title id="rope-relative-svg-title">A common position shift preserves the angle between rotary query and key vectors</title>
 		<desc id="rope-relative-svg-desc">Two coordinate circles compare one query-key dimension pair at positions one and three with the same pair shifted to positions four and six. In the first circle, the query is rotated by theta and the key by three theta, leaving a two-theta angle gap. In the second, both positions increase by three, so the query and key rotate together and retain the same two-theta gap. The identity R sub m transpose R sub n equals R sub n minus m explains why the dot product depends on relative offset. Values are not rotated.</desc>

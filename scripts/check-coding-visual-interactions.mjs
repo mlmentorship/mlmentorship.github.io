@@ -65,6 +65,22 @@ const routes = slugs.map((slug) => {
 	return { slug, url: `${baseUrl}/${category}/${slug}/` };
 });
 
+let currentStage = 'browser startup';
+
+async function withTimeout(promise, operation) {
+	let timer;
+	try {
+		return await Promise.race([
+			promise,
+			new Promise((resolveTimeout, rejectTimeout) => {
+				timer = setTimeout(() => rejectTimeout(new Error(`${currentStage}: ${operation} exceeded 30000ms`)), 30000);
+			}),
+		]);
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
 class Cdp {
 	constructor(url) {
 		this.socket = new WebSocket(url);
@@ -89,18 +105,18 @@ class Cdp {
 
 	async ready() {
 		if (this.socket.readyState === WebSocket.OPEN) return;
-		await new Promise((resolveReady, rejectReady) => {
+		await withTimeout(new Promise((resolveReady, rejectReady) => {
 			this.socket.onopen = resolveReady;
 			this.socket.onerror = rejectReady;
-		});
+		}), 'CDP connection');
 	}
 
 	call(method, params = {}) {
 		const id = this.nextId++;
-		return new Promise((resolveCall, rejectCall) => {
+		return withTimeout(new Promise((resolveCall, rejectCall) => {
 			this.pending.set(id, { method, resolve: resolveCall, reject: rejectCall });
 			this.socket.send(JSON.stringify({ id, method, params }));
-		});
+		}), method);
 	}
 
 	once(method) {
@@ -180,7 +196,7 @@ async function evaluate(cdp, expression, awaitPromise = false) {
 async function navigate(cdp, url) {
 	const loaded = cdp.once('Page.loadEventFired');
 	await cdp.call('Page.navigate', { url });
-	await loaded;
+	await withTimeout(loaded, 'page load');
 	for (let attempt = 0; attempt < 30; attempt += 1) {
 		await delay(50);
 		const ready = await evaluate(cdp, `document.readyState === 'complete' && document.fonts.status === 'loaded'`);
@@ -244,6 +260,7 @@ try {
 	await cdp.call('Emulation.setDeviceMetricsOverride', { width: viewportWidth, height: 900, deviceScaleFactor: 1, mobile: viewportWidth <= 640 });
 
 	for (const route of routes) {
+		currentStage = `${route.slug}/normal-motion`;
 		await cdp.call('Emulation.setScriptExecutionDisabled', { value: false });
 		await cdp.call('Emulation.setEmulatedMedia', { media: 'screen', features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
 		await navigate(cdp, route.url);
@@ -256,6 +273,7 @@ try {
 		let animationObserved = false;
 		let previous = initial;
 		for (let frameIndex = 1; frameIndex < initial.frameCount; frameIndex += 1) {
+			currentStage = `${route.slug}/frame-${frameIndex}`;
 			const transition = await evaluate(cdp, `(async () => {
 				const visual = document.querySelector('[data-coding-visual]');
 				visual.querySelector('[data-coding-next]').click();
@@ -278,6 +296,7 @@ try {
 		assert.ok(trackedAppearance || trackedPosition, `${route.slug}: no keyed state changed across its frames`);
 		if (trackedPosition) assert.ok(animationObserved, `${route.slug}: keyed positions changed without a live transition`);
 
+		currentStage = `${route.slug}/controls`;
 		const previousIndex = await evaluate(cdp, `(() => { const visual = document.querySelector('[data-coding-visual]'); visual.querySelector('[data-coding-previous]').click(); return Number(visual.dataset.activeFrame); })()`);
 		assert.equal(previousIndex, initial.frameCount - 2, `${route.slug}: Previous did not move exactly one frame`);
 		const directIndex = Math.min(2, initial.frameCount - 1);
@@ -289,17 +308,25 @@ try {
 			return { home: press('Home'), right: press('ArrowRight'), end: press('End'), left: press('ArrowLeft') };
 		})()`);
 		assert.deepEqual(keyResults, { home: 0, right: 1, end: initial.frameCount - 1, left: initial.frameCount - 2 }, `${route.slug}: keyboard navigation skipped frames`);
-		const playResult = await evaluate(cdp, `(async () => {
+		const playStarted = await evaluate(cdp, `(() => {
 			const visual = document.querySelector('[data-coding-visual]');
 			visual.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
 			visual.querySelector('[data-coding-play]').click();
-			await new Promise((resolve) => setTimeout(resolve, 980));
+			return { visibility: document.visibilityState, playing: visual.dataset.codingPlaying };
+		})()`);
+		assert.equal(playStarted.visibility, 'visible', `${route.slug}: playback needs a visible browser target`);
+		assert.equal(playStarted.playing, 'true', `${route.slug}: Play did not start playback`);
+		currentStage = `${route.slug}/playback`;
+		await delay(980);
+		const playResult = await evaluate(cdp, `(() => {
+			const visual = document.querySelector('[data-coding-visual]');
 			const result = { activeFrame: Number(visual.dataset.activeFrame), playing: visual.dataset.codingPlaying };
 			if (visual.dataset.codingPlaying === 'true') visual.querySelector('[data-coding-play]').click();
 			return result;
-		})()`, true);
+		})()`);
 		assert.ok(playResult.activeFrame >= 1, `${route.slug}: Play did not visibly advance`);
 
+		currentStage = `${route.slug}/reduced-motion`;
 		await cdp.call('Emulation.setEmulatedMedia', { media: 'screen', features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
 		await navigate(cdp, route.url);
 		const reduced = await evaluate(cdp, `(() => {
@@ -314,6 +341,7 @@ try {
 		})()`);
 		assert.deepEqual(reduced, { activeFrame: 1, playing: 'false', playLabel: 'Next step', animations: 0 }, `${route.slug}: reduced motion must step once without autoplay`);
 
+		currentStage = `${route.slug}/no-js`;
 		await cdp.call('Emulation.setScriptExecutionDisabled', { value: true });
 		await navigate(cdp, route.url);
 		const noJs = await evaluate(cdp, `(() => {
@@ -334,6 +362,7 @@ try {
 		assert.equal(noJs.lessonLengths.length, 3, `${route.slug}: no-JS learning cues are missing`);
 		assert.ok(noJs.lessonLengths.every((length) => length > 20) && noJs.firstFrameText > 20, `${route.slug}: no-JS content is not understandable`);
 		report.push({ slug: route.slug, frames: initial.frameCount, trackedAppearance, trackedPosition, animationObserved });
+		console.log(`Coding interaction passed: ${route.slug}, ${initial.frameCount} frames at ${viewportWidth}px.`);
 	}
 
 	const output = resolve(root, option('output', 'scratch/coding-interaction-report.json'));

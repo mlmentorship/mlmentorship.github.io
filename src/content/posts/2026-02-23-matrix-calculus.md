@@ -61,7 +61,7 @@ For example, parameter two receives $(-1)(5)+(3)(-2)=-11$ through the two output
 <!-- visual:jacobian-transpose-pullback -->
 <figure class="learning-figure plot-panel" aria-labelledby="jacobian-pullback-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="jacobian-pullback-title">Use shapes to see how the transposed Jacobian pulls two output gradients back to three parameters.</p>
+	<p class="visual-title" id="jacobian-pullback-title">Each parameter receives contributions from every output it influences</p>
 	<svg viewBox="0 0 360 430" role="img" aria-labelledby="jacobian-pullback-svg-title jacobian-pullback-svg-desc">
 		<title id="jacobian-pullback-svg-title">A numeric vector-to-vector chain rule using a transposed Jacobian</title>
 		<desc id="jacobian-pullback-svg-desc">A function maps three parameters to two outputs, so its Jacobian has two rows and three columns. The upstream loss gradient is the two-vector 5, negative 2. Transposing the Jacobian produces a three-by-two matrix. Multiplication gives the three parameter gradients 8, negative 11, and negative 8. Each parameter gradient combines that parameter's sensitivity through both outputs.</desc>

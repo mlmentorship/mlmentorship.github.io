@@ -25,7 +25,7 @@ The two paradigms produce very different production tradeoffs:
 <!-- visual:autoregressive-diffusion-sampling-steps -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="ar-diffusion-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ar-diffusion-visual-title">At one serial sampling step, which parts of the state can change?</p>
+	<p class="visual-title" id="ar-diffusion-visual-title">Append one new position or revise the whole provisional sample</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 410" role="img" aria-labelledby="ar-diffusion-svg-title ar-diffusion-svg-desc">
 			<title id="ar-diffusion-svg-title">Autoregressive appending versus diffusion whole-state revision</title>

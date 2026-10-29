@@ -41,7 +41,7 @@ Results depend on the corruption, metric, patch location, and distribution shift
 <!-- visual:activation-patching-controlled-contrast -->
 <figure class="learning-figure plot-panel" aria-labelledby="activation-patching-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="activation-patching-visual-title">Trace one same-site state transfer, then limit the causal claim to that intervention.</p>
+	<p class="visual-title" id="activation-patching-visual-title">Restore one activation while keeping the corrupted run otherwise fixed</p>
 	<svg viewBox="0 0 360 500" role="img" aria-labelledby="activation-patching-svg-title activation-patching-svg-desc">
 		<title id="activation-patching-svg-title">Activation patching as a controlled three-run comparison</title>
 		<desc id="activation-patching-svg-desc">In the clean baseline, a clean input produces activation a clean at site s and a high target metric. In the corrupted baseline, a matched corrupted input produces activation a corrupted at the same site and a low target metric. In the patched run, the corrupted input is used again, but activation a clean replaces a corrupted only at site s. The target metric recovers. This makes site s causally relevant for this contrast under this intervention, but does not by itself establish a complete circuit, necessity, sufficiency, or a natural model computation.</desc>

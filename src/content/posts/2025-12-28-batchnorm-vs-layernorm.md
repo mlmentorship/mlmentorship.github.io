@@ -46,7 +46,7 @@ Framework settings can disable affine parameters or choose a different normalize
 <!-- visual:normalization-shared-statistics -->
 <figure class="learning-figure" aria-labelledby="normalization-axes-title">
 	<p class="visual-kicker">Spatial intuition</p>
-	<p class="visual-title" id="normalization-axes-title">Color groups values that share one mean and variance.</p>
+	<p class="visual-title" id="normalization-axes-title">BatchNorm shares statistics across samples; LayerNorm keeps each token separate</p>
 	<div class="visual-grid--two">
 		<section class="visual-panel" aria-labelledby="batchnorm-panel-title">
 			<h4 id="batchnorm-panel-title">BatchNorm on (N, C, H, W)</h4>

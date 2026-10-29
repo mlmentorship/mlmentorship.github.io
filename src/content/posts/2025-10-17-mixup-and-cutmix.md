@@ -51,7 +51,7 @@ The actual synthetic input differs: pasted regions are not pixelwise blends.
 <!-- visual:mixup-cutmix-input-target-coupling -->
 <figure class="learning-figure plot-panel" aria-labelledby="mixup-cutmix-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="mixup-cutmix-visual-title">Match each input-mixing operation to the same weights in its soft target.</p>
+	<p class="visual-title" id="mixup-cutmix-visual-title">The realized patch area determines the mixed target weights</p>
 	<svg viewBox="0 0 360 550" role="img" aria-labelledby="mixup-cutmix-svg-title mixup-cutmix-svg-desc">
 		<title id="mixup-cutmix-svg-title">Mixup and CutMix input-target coupling with lambda equal to 0.75</title>
 		<desc id="mixup-cutmix-svg-desc">Source A is represented by horizontal stripes and class label y A. Source B is represented by dots and class label y B. For Mixup, every input location contains 75 percent A and 25 percent B, and the soft target is 0.75 y A plus 0.25 y B. For CutMix, a 2 by 2 dotted B patch replaces part of a 4 by 4 striped A grid. Twelve of sixteen cells remain A and four of sixteen are B, so the realized retained-area lambda is 12 over 16, or 0.75, and the soft target is again 0.75 y A plus 0.25 y B.</desc>

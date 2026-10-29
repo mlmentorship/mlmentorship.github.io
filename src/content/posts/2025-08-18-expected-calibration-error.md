@@ -41,7 +41,7 @@ The worked example below is multiclass, so predicted-class confidence can be bel
 <!-- visual:ece-weighted-bin-contributions -->
 <figure class="learning-figure plot-panel" aria-labelledby="ece-aggregation-visual-title">
 	<p class="visual-kicker">Worked aggregation</p>
-	<p class="visual-title" id="ece-aggregation-visual-title">A bin's ECE contribution depends on both its population and its calibration gap.</p>
+	<p class="visual-title" id="ece-aggregation-visual-title">A big error in a small bin can match a small error in a large bin</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 360 300" role="img" aria-labelledby="ece-aggregation-svg-title ece-aggregation-svg-desc">
 			<title id="ece-aggregation-svg-title">Three confidence bins contributing to a 13-point expected calibration error</title>

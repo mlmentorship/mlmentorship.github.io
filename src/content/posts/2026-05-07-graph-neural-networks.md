@@ -36,7 +36,7 @@ After $L$ layers, each node has aggregated information from its $L$-hop neighbor
 <!-- visual:gcn-neighborhood-to-matrix-row -->
 <figure class="learning-figure plot-panel" aria-labelledby="gcn-row-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="gcn-row-title">Connect one node's neighborhood to one row of A-hat H W.</p>
+	<p class="visual-title" id="gcn-row-title">Only B and its neighbours contribute to B's current update</p>
 	<svg viewBox="0 0 360 440" role="img" aria-labelledby="gcn-row-svg-title gcn-row-svg-desc">
 		<title id="gcn-row-svg-title">One GCN update shown as a graph neighborhood and a matrix row</title>
 		<desc id="gcn-row-svg-desc">Four nodes form a cycle. Target node B is connected to A and C, while D is not its neighbor. Self-loops give every node degree three, so row B of normalized adjacency is one third, one third, one third, zero in A, B, C, D order. Multiplying by scalar node features three, zero, six, nine aggregates three at B. Multiplying by weights two and negative one gives six and negative three, and ReLU produces B's new two-feature vector six, zero.</desc>

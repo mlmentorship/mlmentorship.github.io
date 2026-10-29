@@ -50,7 +50,7 @@ For small finite state-action spaces, store $Q$ as a table. Sample transitions $
 <!-- visual:q-learning-off-policy-backup -->
 <figure class="learning-figure plot-panel" aria-labelledby="q-learning-backup-title">
 	<p class="visual-kicker">One off-policy backup</p>
-	<p class="visual-title" id="q-learning-backup-title">The trajectory can explore while the target looks ahead greedily.</p>
+	<p class="visual-title" id="q-learning-backup-title">The backup uses the best next action, not the action behavior sampled</p>
 	<svg viewBox="0 0 360 440" role="img" aria-labelledby="q-learning-backup-svg-title q-learning-backup-svg-desc">
 		<title id="q-learning-backup-svg-title">Q-learning separates behavior from the greedy backup target</title>
 		<desc id="q-learning-backup-svg-desc">A sampled transition moves from state s with action a and current value 4 to next state s prime with reward 2. At s prime, three possible next actions have Q-values: up 2, right 6, and down 1. The behavior policy samples down to keep exploring, but that sampled next action is not used in this update. The target policy selects the maximum value 6 from right. With discount one half, the target is 2 plus one half times 6, which equals 5. The temporal-difference error is 5 minus 4, or 1. With learning rate one quarter, the updated current Q-value is 4.25.</desc>

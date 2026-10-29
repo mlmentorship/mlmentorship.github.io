@@ -27,7 +27,7 @@ Keep a failed run in its row with its status.
 <!-- visual:fair-comparison-evidence-ledger -->
 <figure class="learning-figure" aria-labelledby="fair-comparison-ledger-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="fair-comparison-ledger-title">Distinguish a lucky leaderboard win from evidence that estimates a method effect.</p>
+	<p class="visual-title" id="fair-comparison-ledger-title">Unequal tuning opportunities prevent the best observed scores from isolating method effects</p>
 	<div class="visual-grid--two" role="group" aria-label="Side-by-side comparison of an unfair best-run leaderboard and a fair complete experiment ledger">
 		<section class="visual-panel" aria-labelledby="best-run-ledger-title">
 			<h4 id="best-run-ledger-title">Best-run leaderboard</h4>

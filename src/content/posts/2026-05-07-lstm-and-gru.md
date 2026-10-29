@@ -45,7 +45,7 @@ The forget gate controls what fraction of the previous cell state survives. The 
 <!-- visual:lstm-coordinate-gated-state-update -->
 <figure class="learning-figure" aria-labelledby="lstm-coordinate-title">
 	<p class="visual-kicker">Worked state update</p>
-	<p class="visual-title" id="lstm-coordinate-title">Each gate scales matching coordinates; it does not mix them.</p>
+	<p class="visual-title" id="lstm-coordinate-title">Forget and input gates scale separate contributions before they add</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 430" role="img" aria-labelledby="lstm-coordinate-svg-title lstm-coordinate-svg-desc">
 			<title id="lstm-coordinate-svg-title">Three-coordinate LSTM cell-state update and direct gradient path</title>

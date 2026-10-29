@@ -50,7 +50,7 @@ A single backward pass over the trajectory.
 <!-- visual:gae-residual-weight-trace -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="gae-residual-visual-title">
 	<p class="visual-kicker">Temporal credit assignment</p>
-	<p class="visual-title" id="gae-residual-visual-title">One advantage estimate gathers every later TD residual, one extra <var>&gamma;&lambda;</var> factor per step.</p>
+	<p class="visual-title" id="gae-residual-visual-title">One backward scan adds the same decaying residuals</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 350" role="img" aria-labelledby="gae-residual-svg-title gae-residual-svg-desc">
 			<title id="gae-residual-svg-title">GAE as a weighted residual trace and reverse scan</title>

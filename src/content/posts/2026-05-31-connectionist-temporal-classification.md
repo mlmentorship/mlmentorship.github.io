@@ -42,7 +42,7 @@ The **collapse function** $\mathcal{B}$ does two things, in order:
 <!-- visual:ctc-blank-preserves-repeat -->
 <figure class="learning-figure" aria-labelledby="ctc-blank-repeat-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="ctc-blank-repeat-title">Why does a blank let CTC emit the same label twice?</p>
+	<p class="visual-title" id="ctc-blank-repeat-title">A blank separates repeated letters so both survive CTC collapse</p>
 	<div class="visual-grid--two" role="group" aria-label="Two CTC paths traced through merge repeats and remove blanks">
 		<section class="visual-panel plot-panel">
 			<svg viewBox="0 0 300 215" role="img" aria-labelledby="ctc-adjacent-title ctc-adjacent-desc">

@@ -32,7 +32,7 @@ Random negatives are easy to push apart; the model trivially scores them low and
 <!-- visual:negative-hardness-label-gate -->
 <figure class="learning-figure plot-panel" aria-labelledby="negative-gate-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="negative-gate-visual-title">Separate “hard for the model” from “safe to label negative.”</p>
+	<p class="visual-title" id="negative-gate-visual-title">High similarity does not make a relevant answer a valid negative</p>
 	<svg viewBox="0 0 360 460" role="img" aria-labelledby="negative-gate-svg-title negative-gate-svg-desc">
 		<title id="negative-gate-svg-title">Three negative candidates with different hardness and label validity</title>
 		<desc id="negative-gate-svg-desc">For the query capital of Australia, a random passage about photosynthesis has low model similarity and is a verified nonmatch, so pushing its score down is correct but gives a weak gradient. A mined passage saying Sydney is Australia's largest city has high similarity but does not answer the query, so pushing it down gives a useful strong gradient. A mined passage saying Canberra is Australia's capital has the highest similarity and is actually relevant despite lacking a label. Treating it as negative would push a valid answer down, so it must be excluded or reviewed. The diagram concludes that mining selects by model confusion while a separate relevance gate authorizes the negative label.</desc>

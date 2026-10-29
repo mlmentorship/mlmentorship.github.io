@@ -108,7 +108,7 @@ Lambda methods align updates with a ranking metric, but they still optimize a su
 <!-- visual:lambdarank-swap-impact-weight -->
 <figure class="learning-figure" aria-labelledby="lambdarank-swap-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="lambdarank-swap-title">Why does LambdaRank push harder on the same ordering error near the top?</p>
+	<p class="visual-title" id="lambdarank-swap-title">The same pair error matters more when its swap changes NDCG more</p>
 	<div class="visual-panel plot-panel">
 		<svg viewBox="0 0 360 500" role="img" aria-labelledby="lambdarank-swap-svg-title lambdarank-swap-svg-desc">
 			<title id="lambdarank-swap-svg-title">The same pairwise error receives different LambdaRank weights at different ranks</title>

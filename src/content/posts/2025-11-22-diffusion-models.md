@@ -19,7 +19,7 @@ We will compute its training error and clean estimate, then identify what a samp
 <!-- visual:diffusion-training-sampling-asymmetry -->
 <figure class="learning-figure visual-wide plot-panel" aria-labelledby="diffusion-asymmetry-visual-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="diffusion-asymmetry-visual-title">Why can training jump to one noise level while sampling must walk backward?</p>
+	<p class="visual-title" id="diffusion-asymmetry-visual-title">Train at one sampled noise level; generate through a dependent chain</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 760 410" role="img" aria-labelledby="diffusion-asymmetry-svg-title diffusion-asymmetry-svg-desc">
 			<title id="diffusion-asymmetry-svg-title">Diffusion training uses one sampled timestep while generation chains reverse steps</title>

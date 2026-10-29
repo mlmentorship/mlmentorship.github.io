@@ -38,7 +38,7 @@ Bubble fraction $\approx (\text{stages} - 1) / (\text{stages} + \text{micro-batc
 <!-- visual:pipeline-fill-drain-bubble -->
 <figure class="learning-figure plot-panel visual-wide" aria-labelledby="pipeline-bubble-title">
 	<p class="visual-kicker">Learning objective · P = 3 stages · M = 4 micro-batches</p>
-	<p class="visual-title" id="pipeline-bubble-title">Count the idle slots forced by filling and draining the pipeline.</p>
+	<p class="visual-title" id="pipeline-bubble-title">Idle stage-slots measure unused capacity, not extra elapsed time</p>
 	<div class="visual-scroll">
 		<svg viewBox="0 0 680 302" role="img" aria-labelledby="pipeline-bubble-svg-title pipeline-bubble-svg-desc">
 			<title id="pipeline-bubble-svg-title">Three-stage pipeline schedule for four micro-batches</title>

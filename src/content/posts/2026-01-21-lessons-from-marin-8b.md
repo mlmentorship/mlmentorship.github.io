@@ -31,7 +31,7 @@ The prerequisite is observability. You can only react if you can see. Marin had 
 <!-- visual:reactive-pretraining-evidence-loop -->
 <figure class="learning-figure plot-panel" aria-labelledby="reactive-pretraining-title">
 	<p class="visual-kicker">Learning objective</p>
-	<p class="visual-title" id="reactive-pretraining-title">What makes reactive pretraining controlled rather than improvised?</p>
+	<p class="visual-title" id="reactive-pretraining-title">Compare a bounded probe before replacing the recoverable mainline</p>
 	<svg viewBox="0 0 360 560" role="img" aria-labelledby="reactive-pretraining-svg-title reactive-pretraining-svg-desc">
 		<title id="reactive-pretraining-svg-title">A checkpoint, probe, evidence, and decision loop for reactive pretraining</title>
 		<desc id="reactive-pretraining-svg-desc">A solid mainline reaches a recoverable checkpoint. Two dashed side branches start from that same checkpoint: a control cooldown with the current mix and a candidate cooldown changing one factor. Their per-domain losses, downstream task evaluations, and parameter norms feed one evidence bundle. A decision gate can continue unchanged, change one factor in the next phase, or restore the checkpoint. Only continue or an evidence-backed change advances the solid mainline; rollback loops back to the saved checkpoint.</desc>

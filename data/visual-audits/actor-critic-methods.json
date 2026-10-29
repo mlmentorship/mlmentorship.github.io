@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace one shared state representation into the actor and critic objectives, and identify where the advantage must be treated as a fixed signal during the actor update.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can align the shared trunk, two forward branches, two losses, parameter-update paths, and an explicit stop-gradient boundary. Mermaid can show topology but cannot place the detachment boundary and mathematical labels reliably; semantic HTML would make the converging and diverging paths harder to trace; interaction adds no necessary state; paper reuse adds licensing risk without improving this general mechanism; and no visual leaves the article's hardest spatial model unresolved.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "deckReview": {
     "pages": [
       {
@@ -42,7 +42,9 @@
     "summary": "Independent review identified the split from shared state features into actor and critic objectives as the hardest prose-only model. The final design makes the fixed advantage signal and separate parameter updates explicit without implying that shared trunk parameters receive only one loss."
   },
   "implementation": {
-    "visualIds": ["actor-critic-two-objective-flow"],
-    "accessibility": "The SVG has a programmatic title and full description. Every node and path is directly labeled; solid forward arrows, dashed update arrows, distinct node shapes, and a labeled stop bar preserve the lesson without color. The established visual-scroll wrapper keeps labels at a readable size at 390 CSS pixels, while theme variables and print overrides support dark mode and paper."
+    "visualIds": [
+      "actor-critic-two-objective-flow"
+    ],
+    "accessibility": "One state enters shared features and then actor and critic heads. The policy loss uses log action probability and advantage y minus V. A stop mark on the V-to-advantage path blocks policy-loss gradients into the critic. The value loss is an illustrative squared error against fixed target y. Separate dashed paths return each loss through its own head into the shared features. Solid lines construct the losses; dashed lines indicate parameter-gradient ownership. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }
