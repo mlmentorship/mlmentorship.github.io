@@ -1,11 +1,62 @@
 {
   "schemaVersion": 1,
   "status": "review-complete",
-  "implementationStatus": "Second editorial pass implemented; see secondPassReconciliation for current scope and qualification. Original assessments and earlier edition qualification remain historical.",
+  "implementationStatus": "Second editorial edition plus four qualified mechanism improvements; see mechanismFollowUp for the latest bounded changes. Original assessments and earlier qualification remain historical.",
   "expectedArticles": 391,
   "expectedVisuals": 392,
   "authoredCodingStates": 797,
   "assessment": "Expert illustration review; no learner study or measured comprehension improvement is claimed.",
+  "mechanismFollowUp": {
+    "status": "implemented and locally qualified",
+    "baseCommit": "260aa69b596173c15679a7ba661483e60406542d",
+    "scope": "Four targeted improvements based on the existing 392 registered and 16 supplemental individual assessments. Retained drawings keep their prior assessments; this is not 408 new redraws or a fresh manual inspection of every retained original.",
+    "revisions": [
+      {
+        "visualId": "infonce-positive-candidate-set",
+        "problem": "The positive's denominator membership was explained in prose but not enclosed with the other candidates.",
+        "change": "Nest the positive numerator row inside one denominator enclosure. Equal units show weights 4,3,2,1 and positive probability 4/10.",
+        "readerCheck": "Is the positive also in the denominator, and why is a same-class item still repelled?"
+      },
+      {
+        "visualId": "ring-all-reduce-chunk-trace",
+        "problem": "The isolated wide chunk trace required panning and left concurrent chunk traffic to prose.",
+        "change": "Draw all four simultaneous ring sends, a separate numerical accumulation/forwarding trace, and six equal sent-byte units.",
+        "readerCheck": "Where are the other chunks while A moves, and why does each rank send six chunks of size B/4?"
+      },
+      {
+        "visualId": "same-mesh-axis-diagonal-gap",
+        "problem": "Operand ownership and missing cross-index output blocks were separated in a wide composition.",
+        "change": "Use explicit toy factors and same-scale before/after grids. Gathered inputs create new products 22 and 43, not reduced replacements for existing 19 and 50.",
+        "readerCheck": "Why can reducing the two computed diagonal blocks not create C0,1 or C1,0?"
+      },
+      {
+        "visualId": "pca-rank-one-projection",
+        "problem": "The scalar score and reconstructed vector were distinguished mainly by prose.",
+        "change": "Highlight the same sample, perpendicular residual and reconstruction, then draw all six scalar scores on a separate one-dimensional axis.",
+        "readerCheck": "Which object is the one-dimensional coordinate, and how does it reconstruct the point on the PC1 line?"
+      }
+    ],
+    "qualification": {
+      "normalGates": ["npm run check", "npm run build"],
+      "freshFigureModeCases": 20,
+      "freshActual390PhoneOriginalsInspected": 4,
+      "freshDesktopDarkOriginalsInspected": 4,
+      "finalScreenCaptureEqualityChecks": 16,
+      "freshActualPdfRoutes": 4,
+      "freshActualPdfPages": 30,
+      "completePdfFigurePagesInspected": 4,
+      "printComposition": "Only four opt-in figures use dedicated height-bounded print pages. Each title and both boundary labels of its full drawing must occur uniquely on one physical PDF page.",
+      "rejectedComposition": "Initial text-only PDF checks passed but raster review found title/drawing separation. Final PDFs are separately qualified with new same-page assertions.",
+      "exactReusedArticles": 387,
+      "reusePolicy": "Exact source and built article bytes after substituting only parsed stylesheet-link filenames; zero new print-selector matches; all other CSS AST nodes and existing non-CSS runtime assets unchanged.",
+      "preservation": "Non-figure lesson bytes, headings, Python, registered/supplemental identities, 797 checkpoints and 8739 motion identities retained. Both other worktrees remain unchanged.",
+      "evidence": "/tmp/mlmentorship-illustrations-third-pass-20261029-81b8a701-evidence"
+    },
+    "measuredTenfoldImprovement": false,
+    "learnerStudy": false,
+    "publicationStandardCertified": false,
+    "publicationPerformed": false
+  },
   "secondPassReconciliation": {
     "status": "implemented and locally qualified",
     "baseCommit": "be21ddb6c2dc892d8ea593a6277a662f29fbfb25",

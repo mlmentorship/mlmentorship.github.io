@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace one tensor chunk through the three reduce-scatter hops of a four-rank ring, then connect both three-step phases to the per-rank traffic formula.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can align rank-local contributions, hop-by-hop accumulation, the distinct copy-only all-gather phase, and the traffic arithmetic. The diagram traces one chunk while explicitly stating that all four chunks move concurrently.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because automatic graph layout can show the ring topology but cannot reliably align three accumulation states with the per-step byte calculation.",
     "svg": "Selected for deterministic rank and step geometry, explicit text alternatives, responsive horizontal scrolling, theme variables, and print-safe vector output.",
@@ -71,6 +71,6 @@
     "visualIds": [
       "ring-all-reduce-chunk-trace"
     ],
-    "accessibility": "The SVG has a linked title and description that narrate every state in the four-rank example. Rank labels, contribution terms, plus signs, step numbers, solid reduce arrows, and a dashed copy-only phase distinguish meaning without color. A horizontally scrollable 38rem canvas preserves labels at 390 CSS pixels; shared theme variables provide dark-mode contrast, and shared print rules remove the minimum width and force a light high-contrast palette."
+    "accessibility": "Four ranks form a directed ring. At one concurrent send step ranks zero, one, two, and three send chunks A, B, C, and D respectively to the next rank. Every message has size B over four. A separate trace follows one coordinate of chunk A with local values one, two, three, and four: three receives and additions produce three, six, then ten at rank three. Three all-gather hops copy ten unchanged to ranks zero, one, and two. Six equal sent-chunk cells give three B over two sent bytes per rank, not sent-plus-received traffic. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

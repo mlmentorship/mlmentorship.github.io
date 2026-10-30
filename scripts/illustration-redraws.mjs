@@ -1247,6 +1247,101 @@ function evaluationBoundaries() {
   return { height: 621, body };
 }
 
+function contrastiveMembership() {
+  const candidates = [
+    ['positive', 'positive j', 'same source A', 4, 'input'],
+    ['false-negative', 'sampler-negative', 'source B; same class', 3, 'warning'],
+    ['negative-1', 'negative k1', 'different source', 2, 'neutral'],
+    ['negative-2', 'negative k2', 'different source', 1, 'state'],
+  ];
+  let body = text(180, 22, 'Toy exp(similarity / temperature) weights', { size: 12, tone: 'soft', width: 335 })
+    + `<circle cx="70" cy="82" r="23" style="fill:var(--viz-input-bg);stroke:${ink('input')};stroke-width:2"></circle>`
+    + text(70, 87, 'i', { weight: 700 })
+    + `<circle cx="290" cy="82" r="23" style="fill:var(--viz-input-bg);stroke:${ink('input')};stroke-width:2"></circle>`
+    + text(290, 87, 'j', { weight: 700 })
+    + arrow(100, 82, 260, 82, 'input')
+    + text(180, 65, 'same item A', { size: 12 })
+    + text(70, 124, 'anchor crop', { size: 12, width: 110 })
+    + text(290, 124, 'positive crop', { size: 12, width: 110 })
+    + text(180, 158, 'DENOMINATOR: ALL FOUR CANDIDATES', { size: 12, weight: 700, width: 335 })
+    + `<g data-infonce-denominator>${box(12, 174, 336, 343, 'neutral')}`;
+  for (const [index, [identity, label, source, weight, tone]] of candidates.entries()) {
+    const top = 187 + index * 80;
+    body += `<g data-infonce-candidate="${identity}" data-weight="${weight}"${index === 0 ? ' data-infonce-numerator' : ''}>`
+      + (index === 0 ? box(21, top - 4, 318, 68, 'focus') : '')
+      + text(33, top + 16, label, { size: 13, anchor: 'start', width: 170, weight: 700 })
+      + text(33, top + 40, source, { size: 12, anchor: 'start', width: 170 });
+    for (let unit = 0; unit < weight; unit++) body += `<rect data-infonce-unit x="${218 + unit * 25}" y="${top + 8}" width="23" height="24" style="fill:var(--viz-${tone}-bg);stroke:${ink(tone)}"></rect>`;
+    body += text(273, top + 53, `${weight}${index === 0 ? ' in numerator' : ''}`, { size: 12, width: 120 }) + '</g>';
+  }
+  body += '</g>'
+    + text(180, 554, 'Denominator = 4 + 3 + 2 + 1 = 10', { size: 14, weight: 700, width: 335 })
+    + text(180, 598, 'Positive probability = 4 / 10 = 0.4', { size: 14, weight: 700, width: 335 });
+  for (let unit = 0; unit < 10; unit++) body += `<rect data-infonce-probability-unit="${unit}" x="${30 + unit * 30}" y="623" width="28" height="30" style="fill:var(--viz-${unit < 4 ? 'input' : 'neutral'}-bg);stroke:${ink(unit < 4 ? 'input' : 'neutral')}"></rect>`;
+  body += text(180, 686, 'Four of ten equal units belong to the positive.', { size: 12, width: 335 })
+    + text(180, 733, 'Same-class B stays in the denominator: the loss still repels it.', { size: 13, width: 335, tone: 'warning' });
+  return { height: 774, body };
+}
+
+function concurrentRing() {
+  const ranks = [[90, 110], [270, 110], [270, 270], [90, 270]];
+  const sends = [[114, 110, 246, 110], [270, 134, 270, 246], [246, 270, 114, 270], [90, 246, 90, 134]];
+  const labels = [[180, 87], [323, 184], [180, 309], [37, 184]];
+  const tones = ['focus', 'input', 'state', 'output'];
+  let body = text(180, 22, 'Four ranks; four equal chunks A, B, C, D', { size: 12, tone: 'soft', width: 335 })
+    + text(180, 50, 'ONE CONCURRENT SEND STEP', { size: 12, weight: 700 });
+  for (const [rank, [horizontal, vertical]] of ranks.entries()) body += `<circle cx="${horizontal}" cy="${vertical}" r="23" style="fill:var(--viz-neutral-bg);stroke:${ink('neutral')};stroke-width:1.75"></circle>`
+    + text(horizontal, vertical + 5, `r${rank}`, { size: 14, weight: 700 });
+  for (const [rank, endpoints] of sends.entries()) body += `<g data-ring-chunk="${'ABCD'[rank]}" data-sender="${rank}" data-receiver="${(rank + 1) % 4}" data-chunk-bytes="B/4">${arrow(...endpoints, tones[rank])}${text(...labels[rank], `${'ABCD'[rank]}: B/4`, { size: 12, width: rank % 2 ? 48 : 130, tone: tones[rank], weight: 700 })}</g>`;
+  body += text(180, 357, 'FOLLOW ONE COORDINATE IN CHUNK A', { size: 12, width: 335, weight: 700 })
+    + text(180, 395, 'Local contributions at r0..r3: 1, 2, 3, 4', { size: 12, width: 335 })
+    + text(180, 428, 'REDUCE-SCATTER: receive, then add', { size: 12, weight: 700, tone: 'focus' });
+  for (const [index, [incoming, local, result]] of [[1, 2, 3], [3, 3, 6], [6, 4, 10]].entries()) {
+    const vertical = 466 + index * 52;
+    body += `<g data-ring-phase="reduce-scatter" data-step="${index + 1}" data-incoming="${incoming}" data-local="${local}" data-result="${result}">${text(20, vertical, `r${index} -> r${index + 1}`, { size: 13, anchor: 'start' })}${text(235, vertical, `${incoming} + ${local} = ${result}`, { size: 17, weight: 700, tone: 'focus' })}</g>`;
+  }
+  body += text(180, 610, 'ALL-GATHER: forward the same finished value', { size: 12, width: 335, weight: 700, tone: 'output' });
+  for (const [index, [sender, receiver]] of [[3, 0], [0, 1], [1, 2]].entries()) {
+    const vertical = 650 + index * 44;
+    body += `<g data-ring-phase="all-gather" data-step="${index + 1}" data-incoming="10" data-result="10">${text(20, vertical, `r${sender} -> r${receiver}`, { size: 13, anchor: 'start' })}${text(235, vertical, '10 -> 10', { size: 17, weight: 700, tone: 'output' })}</g>`;
+  }
+  body += text(180, 789, 'EACH RANK SENDS SIX B/4 CHUNKS', { size: 12, weight: 700 });
+  for (let step = 0; step < 6; step++) body += `<g data-ring-sent-chunk="${step}" data-phase="${step < 3 ? 'reduce-scatter' : 'all-gather'}">${box(15 + step * 55, 813, 55, 35, step < 3 ? 'focus' : 'output')}${text(42.5 + step * 55, 836, 'B/4', { size: 12 })}</g>`;
+  body += text(180, 885, '(3 + 3) * B/4 = 3B/2 sent; not sent + received.', { size: 12, width: 335 });
+  return { height: 924, body };
+}
+
+function missingMatmulProducts() {
+  const left = [[1, 2], [3, 4]];
+  const right = [[5, 6], [7, 8]];
+  const products = left.map((row) => [0, 1].map((column) => row.reduce((sum, value, inner) => sum + value * right[inner][column], 0)));
+  let body = text(180, 22, 'Toy 2x2 matrices; each output block is one number', { size: 12, tone: 'soft', width: 335 })
+    + node(15, 65, 150, 110, 'D0 owns\nA row 0 [1,2]\nB col 0 [5,7]', 'input')
+    + node(195, 65, 150, 110, 'D1 owns\nA row 1 [3,4]\nB col 1 [6,8]', 'output');
+  for (const [phase, top] of [['before', 235], ['after', 710]]) {
+    body += text(180, top - 43, phase === 'before' ? 'LOCAL WORK: TWO MISSING PRODUCTS' : 'NEW PAIRS: ALL FOUR PRODUCTS EXIST', { size: 12, weight: 700, width: 335 });
+    for (let column = 0; column < 2; column++) body += text(120 + column * 120, top - 17, `col ${column}`, { size: 12 });
+    for (let row = 0; row < 2; row++) {
+      body += text(35, top + row * 78 + 44, `r${row}`, { size: 12 });
+      for (let column = 0; column < 2; column++) {
+        const available = phase === 'after' || row === column;
+        const horizontal = 60 + column * 120;
+        const vertical = top + row * 78;
+        const tone = row === column ? row === 0 ? 'input' : 'output' : available ? 'focus' : 'neutral';
+        body += `<g data-matmul-phase="${phase}" data-row="${row}" data-column="${column}" data-value="${available ? products[row][column] : 'missing'}">${box(horizontal, vertical, 120, 78, tone, !available)}${text(horizontal + 60, vertical + 32, available ? products[row][column] : '?', { size: 22, weight: 700, tone: available ? tone : 'soft' })}${text(horizontal + 60, vertical + 58, available ? `D${row}` : 'not computed', { size: 12, width: 110 })}</g>`;
+      }
+    }
+  }
+  body += text(180, 430, 'ALL-REDUCE ADDS; IT CANNOT CREATE THE ? CELLS', { size: 12, weight: 700, width: 335, tone: 'warning' })
+    + rule(20, 473, 340, 473)
+    + text(180, 504, 'REPAIR: GATHER B, THEN MULTIPLY', { size: 13, weight: 700, width: 335 })
+    + text(180, 545, 'D0 gains [6,8]; D1 gains [5,7].', { size: 13, width: 335 })
+    + text(180, 593, 'D0: [1,2] dot [6,8] = 6 + 16 = 22', { size: 13, width: 335, tone: 'focus' })
+    + text(180, 635, 'D1: [3,4] dot [5,7] = 15 + 28 = 43', { size: 13, width: 335, tone: 'focus' })
+    + text(180, 913, 'Gather inputs first. New multiplication, not reduction, fills the gaps.', { size: 13, width: 335, weight: 700 });
+  return { height: 960, body };
+}
+
 function pcaProjection() {
   const cosine = Math.sqrt(3) / 2;
   const scale = .85;
@@ -1262,14 +1357,30 @@ function pcaProjection() {
   for (const [along, residual] of samples) {
     const [sampleX, sampleY] = point(along, residual);
     const [projectionX, projectionY] = point(along, 0);
-    body += `<g data-pca-along="${along}" data-pca-residual="${residual}">${rule(sampleX, sampleY, projectionX, projectionY, 'focus', true)}<circle cx="${sampleX}" cy="${sampleY}" r="5" style="fill:var(--viz-input-bg);stroke:${ink('input')};stroke-width:1.75"></circle><path d="M${projectionX} ${projectionY - 5}L${projectionX + 5} ${projectionY}L${projectionX} ${projectionY + 5}L${projectionX - 5} ${projectionY}Z" style="fill:var(--viz-output-bg);stroke:${ink('output')};stroke-width:1.75"></path></g>`;
+    body += `<g data-pca-along="${along}" data-pca-residual="${residual}"${along === 85 ? ' data-pca-selected' : ''}>${rule(sampleX, sampleY, projectionX, projectionY, 'focus', true)}<circle cx="${sampleX}" cy="${sampleY}" r="${along === 85 ? 7 : 5}" style="fill:var(--viz-input-bg);stroke:${ink('input')};stroke-width:${along === 85 ? 3 : 1.75}"></circle><path d="M${projectionX} ${projectionY - 5}L${projectionX + 5} ${projectionY}L${projectionX} ${projectionY + 5}L${projectionX - 5} ${projectionY}Z" style="fill:var(--viz-output-bg);stroke:${ink('output')};stroke-width:1.75"></path></g>`;
+    if (along === 85) {
+      const corner = [point(along - 8, 0), point(along - 8, -8), point(along, -8)];
+      body += `<path data-pca-right-angle d="${corner.map(([horizontal, vertical], index) => `${index ? 'L' : 'M'}${horizontal} ${vertical}`).join('')}" style="fill:none;stroke:${ink('focus')};stroke-width:1.5"></path>`
+        + text(sampleX - 12, sampleY - 15, 'x', { size: 14, weight: 700 })
+        + text(projectionX + 32, projectionY + 20, '85 v1', { size: 12, tone: 'output' });
+    }
   }
   body += text(273, 120, 'PC1: retain', { size: 12, tone: 'input' })
     + text(112, 145, 'PC2: discard', { size: 12, tone: 'state' })
-    + text(180, 340, 'Dashed short segments are perpendicular residuals.', { size: 12, width: 330 })
-    + node(20, 383, 320, 86, 'Example in PC coordinates: x=(85,-20)\nprojection=(85,0); error^2=20^2=400\nall six squared errors sum to 1200', 'focus')
-    + text(180, 512, 'Projection changes coordinates, not sample identity.', { size: 13, weight: 700, width: 335 });
-  return { height: 542, body };
+    + text(180, 243, '0', { size: 12, tone: 'soft' })
+    + text(180, 340, 'THE SAME PC1 COORDINATES, ON ONE AXIS', { size: 12, width: 335, weight: 700 })
+    + rule(40, 400, 320, 400, 'input');
+  for (const [along] of samples) {
+    const horizontal = 180 + scale * along;
+    body += `<circle data-pca-score="${along}" cx="${horizontal}" cy="400" r="${along === 85 ? 6 : 3}" style="fill:${ink(along === 85 ? 'focus' : 'input')}"></circle>`;
+    if (along === 85) body += text(horizontal, 378, 'z = 85', { size: 14, weight: 700, tone: 'focus' });
+  }
+  for (const value of [-150, 0, 150]) body += rule(180 + scale * value, 395, 180 + scale * value, 405)
+    + text(180 + scale * value, 430, value, { size: 12 });
+  body += text(180, 470, 'z is one number; 85 v1 is a reconstructed vector.', { size: 13, weight: 700, width: 335 })
+    + text(180, 524, 'x = 85 v1 - 20 v2; discard only the perpendicular part.', { size: 12, width: 335 })
+    + text(180, 578, 'This error: 20^2 = 400. All six errors: 1200.', { size: 12, width: 335 });
+  return { height: 607, body };
 }
 
 function factorizationEntry() {
@@ -1316,6 +1427,27 @@ function queryBeforeStore() {
 }
 
 export const redraws = {
+  'infonce-positive-candidate-set': {
+    title: 'The positive belongs to both numerator and denominator; a false negative stays in the denominator',
+    description: 'A toy InfoNCE example uses unnormalized exponentiated similarity weights four, three, two, and one. One denominator enclosure contains all four candidates. Its positive row has a smaller numerator enclosure and four equal units. The same-class different-source item is still a sampler-negative with three units. The denominator totals ten and the positive probability is four tenths, drawn with ten equal units. Weights are illustrative, not observed similarities.',
+    printPage: true,
+    layout: contrastiveMembership,
+    caption: 'The nested positive row belongs to both enclosures. Its four units are part of the denominator total of ten. Source B is semantically similar but remains a sampler-negative, so the loss still pushes it away. The weights are illustrative.',
+  },
+  'ring-all-reduce-chunk-trace': {
+    title: 'All four chunks move concurrently; reduction adds, while all-gather only copies',
+    description: 'Four ranks form a directed ring. At one concurrent send step ranks zero, one, two, and three send chunks A, B, C, and D respectively to the next rank. Every message has size B over four. A separate trace follows one coordinate of chunk A with local values one, two, three, and four: three receives and additions produce three, six, then ten at rank three. Three all-gather hops copy ten unchanged to ranks zero, one, and two. Six equal sent-chunk cells give three B over two sent bytes per rank, not sent-plus-received traffic.',
+    printPage: true,
+    layout: concurrentRing,
+    caption: 'The ring inset is one simultaneous step, not the whole schedule. Follow A separately: 1 becomes 3, then 6, then 10; all-gather preserves 10. Every rank sends one B/4 chunk in each of six steps, for 3B/2 sent bytes.',
+  },
+  'same-mesh-axis-diagonal-gap': {
+    title: 'A reduction cannot invent the two products that no device computed',
+    description: 'In a declared two-by-two toy, A has rows one-two and three-four, and B has columns five-seven and six-eight. Device zero initially owns only A row zero and B column zero, producing nineteen. Device one owns only A row one and B column one, producing fifty. The same-scale output grid leaves off-diagonal cells uncomputed, not zero. All-gather of B columns gives each device the missing input. New local dot products produce twenty-two and forty-three; a second grid fills those exact gaps while retaining nineteen and fifty.',
+    printPage: true,
+    layout: missingMatmulProducts,
+    caption: 'Compare the same output positions before and after the gather. The new input pairs produce 22 and 43; the existing 19 and 50 do not change. All-reduce alone cannot manufacture the absent cross-index multiplications.',
+  },
   'actor-critic-two-objective-flow': {
     title: 'The advantage stops gradients; both heads still train shared features',
     description: 'One state enters shared features and then actor and critic heads. The policy loss uses log action probability and advantage y minus V. A stop mark on the V-to-advantage path blocks policy-loss gradients into the critic. The value loss is an illustrative squared error against fixed target y. Separate dashed paths return each loss through its own head into the shared features. Solid lines construct the losses; dashed lines indicate parameter-gradient ownership.',
@@ -1330,9 +1462,10 @@ export const redraws = {
   },
   'pca-rank-one-projection': {
     title: 'The retained coordinate stays; the perpendicular coordinate becomes reconstruction error',
-    description: 'The original six centered toy samples are drawn at PC coordinates (130,10), (-130,-10), (85,-20), (-85,20), (40,10), and (-40,-10). Orthogonal PC axes are rotated thirty degrees. Each circle connects perpendicularly to its diamond projection. Cross-covariance is zero and PC1 variance is larger. Squared discarded coordinates sum to twelve hundred.',
+    description: 'The original six centered toy samples are drawn at PC coordinates (130,10), (-130,-10), (85,-20), (-85,20), (40,10), and (-40,-10). Orthogonal PC axes are rotated thirty degrees. Each circle connects perpendicularly to its diamond projection. The selected sample x equals 85 v1 minus 20 v2; a right-angle marker identifies the discarded residual. A separate one-dimensional axis draws all six PC1 scores and highlights the same scalar z=85, distinct from the reconstructed vector 85 v1. Cross-covariance is zero and PC1 variance is larger. Squared discarded coordinates sum to twelve hundred.',
+    printPage: true,
     layout: pcaProjection,
-    caption: 'Match each circle to its diamond without panning. The PC1 coordinate is unchanged; PC2 becomes zero. For (85,-20), squared reconstruction error is 400. These are illustrative coordinates, not measured data.',
+    caption: 'Follow the highlighted sample to scalar score z=85. Reconstruct the diamond at 85 v1. The perpendicular -20 v2 is discarded, giving squared error 400. These are illustrative coordinates, not measured data.',
   },
   'mf-missing-rating-dot-product': {
     title: 'One missing entry selects two matching rows, then sums their coordinate products',
@@ -2037,15 +2170,36 @@ export function renderRedraw(identity, model = redraws[identity] ?? supplemental
   const prefix = `${identity}-edition`;
   assert(Number.isFinite(height) && height > 0);
   const supplementalAttribute = Object.hasOwn(supplementalRedraws, identity) ? ` data-supplemental-visual="${identity}"` : '';
+  const printPageAttribute = model.printPage ? ' data-illustration-print-page' : '';
   const legacyAnchors = (model.legacyFragmentIds ?? []).map((id) => `<span class="visual-fragment-anchor" id="${escape(id)}" aria-hidden="true"></span>`).join('');
-  return `<figure class="learning-figure editorial-illustration"${supplementalAttribute} aria-labelledby="${prefix}-title">${legacyAnchors}<p class="visual-title" id="${prefix}-title">${escape(figureTakeaways[identity] ?? model.title)}</p><svg viewBox="0 0 360 ${height}" role="img" aria-labelledby="${prefix}-svg-title ${prefix}-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="${prefix}-svg-title">${escape(model.title)}</title><desc id="${prefix}-svg-desc">${escape(model.description)}</desc>${body}</svg><figcaption><strong>Read it this way:</strong> ${escape(model.caption)}</figcaption></figure>`;
+  return `<figure class="learning-figure editorial-illustration"${supplementalAttribute}${printPageAttribute} aria-labelledby="${prefix}-title">${legacyAnchors}<p class="visual-title" id="${prefix}-title">${escape(figureTakeaways[identity] ?? model.title)}</p><svg viewBox="0 0 360 ${height}" role="img" aria-labelledby="${prefix}-svg-title ${prefix}-svg-desc" style="width:100%;max-width:34rem;display:block;margin:auto;font-family:var(--font-ui)"><title id="${prefix}-svg-title">${escape(model.title)}</title><desc id="${prefix}-svg-desc">${escape(model.description)}</desc>${body}</svg><figcaption><strong>Read it this way:</strong> ${escape(model.caption)}</figcaption></figure>`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const projection = parseFragment(`<svg>${pcaProjection().body}</svg>`);
   const samples = [];
+  const scores = [];
+  let selectedSamples = 0;
+  let rightAngles = 0;
   function checkProjection(node) {
     const attributes = Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
+    if (attributes['data-pca-score'] !== undefined) {
+      const score = Number(attributes['data-pca-score']);
+      assert(Math.abs((Number(attributes.cx) - 180) / .85 - score) < 1e-10, 'PCA score must use the declared one-dimensional coordinate scale');
+      assert.equal(Number(attributes.cy), 400);
+      scores.push(score);
+    }
+    if (attributes['data-pca-selected'] !== undefined) {
+      assert.equal(attributes['data-pca-along'], '85');
+      assert.equal(attributes['data-pca-residual'], '-20');
+      selectedSamples++;
+    }
+    if (attributes['data-pca-right-angle'] !== undefined) {
+      const [firstX, firstY, cornerX, cornerY, lastX, lastY] = attributes.d.match(/-?\d+(?:\.\d+)?/g).map(Number);
+      assert(Math.abs((firstX - cornerX) * (lastX - cornerX) + (firstY - cornerY) * (lastY - cornerY)) < 1e-10, 'PCA angle marker must draw a right angle');
+      assert(Math.hypot(firstX - cornerX, firstY - cornerY) > 6, 'PCA angle marker must not collapse');
+      rightAngles++;
+    }
     if (attributes['data-pca-along']) {
       const along = Number(attributes['data-pca-along']);
       const residual = Number(attributes['data-pca-residual']);
@@ -2065,15 +2219,69 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   checkProjection(projection);
   assert.equal(samples.length, 6);
+  assert.deepEqual(scores, samples.map(([along]) => along));
+  assert.equal(selectedSamples, 1);
+  assert.equal(rightAngles, 1);
   assert.equal(samples.reduce((sum, [along, residual]) => sum + along * residual, 0), 0);
   assert.equal(samples.reduce((sum, [, residual]) => sum + residual ** 2, 0), 1200);
   assert(samples.reduce((sum, [along]) => sum + along ** 2, 0) > 1200);
+  const attributesOf = (node) => Object.fromEntries((node.attrs ?? []).map((attribute) => [attribute.name, attribute.value]));
+  const drawingNodes = (drawing) => {
+    const nodes = [];
+    function collect(node) {
+      nodes.push(node);
+      for (const child of node.childNodes ?? []) collect(child);
+    }
+    collect(parseFragment(`<svg>${drawing.body}</svg>`));
+    return nodes;
+  };
+  const contrastive = drawingNodes(contrastiveMembership());
+  const denominator = contrastive.find((node) => attributesOf(node)['data-infonce-denominator'] !== undefined);
+  const candidates = contrastive.filter((node) => attributesOf(node)['data-infonce-candidate'] !== undefined);
+  assert.equal(candidates.length, 4);
+  assert(candidates.every((node) => node.parentNode === denominator), 'Every candidate, including the positive, belongs to the denominator');
+  const numerator = candidates.filter((node) => attributesOf(node)['data-infonce-numerator'] !== undefined);
+  assert.equal(numerator.length, 1);
+  assert.equal(attributesOf(numerator[0])['data-infonce-candidate'], 'positive');
+  assert.equal(candidates.reduce((sum, node) => sum + Number(attributesOf(node)['data-weight']), 0), 10);
+  for (const candidate of candidates) assert.equal(candidate.childNodes.filter((node) => attributesOf(node)['data-infonce-unit'] !== undefined).length, Number(attributesOf(candidate)['data-weight']));
+  const probabilityUnits = contrastive.filter((node) => attributesOf(node)['data-infonce-probability-unit'] !== undefined);
+  assert.equal(probabilityUnits.length, 10);
+  assert.equal(probabilityUnits.filter((node) => attributesOf(node).style.includes('--viz-input-bg')).length, 4);
+  const ring = drawingNodes(concurrentRing());
+  const messages = ring.filter((node) => attributesOf(node)['data-ring-chunk'] !== undefined).map(attributesOf);
+  assert.deepEqual(messages.map((message) => message['data-ring-chunk']), ['A', 'B', 'C', 'D']);
+  for (const [rank, message] of messages.entries()) {
+    assert.equal(Number(message['data-sender']), rank);
+    assert.equal(Number(message['data-receiver']), (rank + 1) % 4);
+    assert.equal(message['data-chunk-bytes'], 'B/4');
+  }
+  for (const phase of ['reduce-scatter', 'all-gather']) {
+    const steps = ring.filter((node) => attributesOf(node)['data-ring-phase'] === phase).map(attributesOf);
+    assert.equal(steps.length, 3);
+    for (const step of steps) assert.equal(Number(step['data-result']), Number(step['data-incoming']) + Number(step['data-local'] ?? 0));
+    assert.equal(Number(steps.at(-1)['data-result']), 10);
+  }
+  assert.equal(ring.filter((node) => attributesOf(node)['data-ring-sent-chunk'] !== undefined).length, 6);
+  const matmul = drawingNodes(missingMatmulProducts());
+  const expectedProducts = [[19, 22], [43, 50]];
+  for (const phase of ['before', 'after']) {
+    const cells = matmul.filter((node) => attributesOf(node)['data-matmul-phase'] === phase).map(attributesOf);
+    assert.equal(cells.length, 4);
+    assert.equal(new Set(cells.map((cell) => `${cell['data-row']}:${cell['data-column']}`)).size, 4);
+    for (const cell of cells) {
+      const row = Number(cell['data-row']);
+      const column = Number(cell['data-column']);
+      assert.equal(cell['data-value'], phase === 'before' && row !== column ? 'missing' : String(expectedProducts[row][column]));
+    }
+  }
   const factorization = factorizationEntry().body;
   assert(factorization.includes('2 * 1.5 = 3') && factorization.includes('1 * 1 = 1') && factorization.includes('3 + 1 = 4'));
   const lookup = queryBeforeStore().body;
   assert(lookup.includes('9 - 7 = 2') && lookup.includes('Return [1, 2]: 2 + 7 = 9'));
   for (const [identity, model] of Object.entries({ ...redraws, ...supplementalRedraws })) {
     const source = renderRedraw(identity, model);
+    assert.equal(source.includes('data-illustration-print-page'), model.printPage === true, `${identity}: print-page scope must follow the drawing model`);
     const ids = new Set();
     const references = [];
     function walk(node) {

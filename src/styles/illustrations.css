@@ -277,6 +277,25 @@
     min-width: 0 !important;
   }
 
+  [data-illustration-print-page] {
+    break-before: page;
+    break-inside: avoid-page;
+    margin-block: 0;
+  }
+
+  [data-illustration-print-page] > svg {
+    max-height: 220mm;
+  }
+
+  [data-illustration-print-page] > .visual-title {
+    break-after: avoid-page;
+  }
+
+  [data-illustration-print-page] > figcaption {
+    font-size: 9pt;
+    line-height: 1.35;
+  }
+
   .visual-grid--two {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

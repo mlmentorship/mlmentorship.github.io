@@ -1,5 +1,36 @@
 # Visual comprehension review
 
+## Mechanism follow-up
+
+This follow-up builds on the existing individual assessments of 392 registered figures and 16 supplemental drawings.
+It adds four targeted improvements, not another 408 redraws or another manual inspection of every retained original.
+The structured record is `mechanismFollowUp` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+
+| Figure | Drawn improvement | Reader inference |
+| --- | --- | --- |
+| InfoNCE | One denominator enclosure contains all four candidates; its nested positive row has four of ten equal weight units. | The positive belongs to both numerator and denominator; semantic similarity does not override the sampler. |
+| Ring all-reduce | A four-rank inset shows all four chunks moving concurrently; one coordinate accumulates 1, 3, 6, 10, then remains 10 during forwarding. | All-gather copies rather than adds; six equal sent chunks account for 3B/2 sent bytes per rank. |
+| Sharded matmul | Same-scale grids retain 19 and 50 while showing missing cells before the operand gather and newly computed 22 and 43 afterward. | Uncomputed products are not zero-valued partial sums; gathering inputs enables new multiplication. |
+| PCA | The same selected sample has a marked perpendicular residual, a reconstructed vector, and scalar score 85 on a separate shared-scale axis. | The one-number coordinate and reconstructed vector are different objects. |
+
+Normal `npm run check` and `npm run build` pass.
+All four revised figures pass five native modes: desktop light/dark, actual-390 phone light/dark, and print-style rendering, totaling 20 cases.
+All four phone-light originals and desktop-dark originals were directly inspected.
+Final screen PNGs are byte-identical to those inspected before the print-only refinement.
+Four actual tagged Chromium PDFs pass physical-page bounds, figure-word completeness, and nonblank-page checks across 30 pages.
+Their four complete figure pages were directly viewed; this is not manual inspection of every PDF page.
+
+The first PDF samples exposed titles separated from drawings despite passing text-completeness checks.
+Only these four figures now opt into dedicated print pages with height-bounded SVGs.
+New assertions require the title, first drawn label, and final drawn label to occur on the same physical page.
+The earlier text-only results remain distinct from the final composition-qualified PDFs.
+
+The other 387 article sources remain exact to the preceding qualified tree.
+Their built HTML reproduces the previous whole-page hashes after substituting only parsed stylesheet-link filenames.
+None matches the new print selectors; all other CSS rules and non-CSS runtime assets are unchanged.
+Non-figure lesson content, headings, Python, figure identities, all 797 checkpoints, and 8,739 motion identities remain preserved.
+No learner study, measured tenfold improvement, publication-standard certification, push, or publication is claimed.
+
 ## Second editorial pass
 
 This pass reviews all 392 registered figures and all 16 supplemental drawings individually.

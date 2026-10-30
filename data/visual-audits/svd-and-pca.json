@@ -67,6 +67,6 @@
     "visualIds": [
       "pca-rank-one-projection"
     ],
-    "accessibility": "The original six centered toy samples are drawn at PC coordinates (130,10), (-130,-10), (85,-20), (-85,20), (40,10), and (-40,-10). Orthogonal PC axes are rotated thirty degrees. Each circle connects perpendicularly to its diamond projection. Cross-covariance is zero and PC1 variance is larger. Squared discarded coordinates sum to twelve hundred. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
+    "accessibility": "The original six centered toy samples are drawn at PC coordinates (130,10), (-130,-10), (85,-20), (-85,20), (40,10), and (-40,-10). Orthogonal PC axes are rotated thirty degrees. Each circle connects perpendicularly to its diamond projection. The selected sample x equals 85 v1 minus 20 v2; a right-angle marker identifies the discarded residual. A separate one-dimensional axis draws all six PC1 scores and highlights the same scalar z=85, distinct from the reconstructed vector 85 v1. Cross-covariance is zero and PC1 variance is larger. Squared discarded coordinates sum to twelve hundred. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

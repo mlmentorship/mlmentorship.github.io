@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "See why sharding both non-contracting output axes over the same two-device mesh axis computes only C[0,0] and C[1,1], and why an input must be gathered or resharded before the missing cross-index blocks can be formed.",
-  "mediumRationale": "A deterministic SVG is the smallest medium that can align each device's owned input pair with its exact destination in a two-by-two output block matrix. The fixed geometry exposes missing work rather than merely labeling the layout invalid.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected because automatic graph layout can connect devices to outputs but cannot reliably preserve the row-and-column geometry that makes the diagonal-only failure self-evident.",
     "svg": "Selected for deterministic block geometry, explicit device equations, dashed missing cells, a responsive horizontal scroll container, shared theme variables, and print-safe vector output.",
@@ -63,6 +63,6 @@
     "visualIds": [
       "same-mesh-axis-diagonal-gap"
     ],
-    "accessibility": "The SVG has a linked title and description that enumerate both computed and both missing output blocks. Device labels, explicit local equations, row and column coordinates, dashed missing-cell borders, and the word 'missing' preserve meaning without color. The shared visual-wide scroll primitive keeps labels at their authored size at 390 CSS pixels, shared theme variables support dark and light modes, and shared print rules remove the minimum width and force a high-contrast light palette."
+    "accessibility": "In a declared two-by-two toy, A has rows one-two and three-four, and B has columns five-seven and six-eight. Device zero initially owns only A row zero and B column zero, producing nineteen. Device one owns only A row one and B column one, producing fifty. The same-scale output grid leaves off-diagonal cells uncomputed, not zero. All-gather of B columns gives each device the missing input. New local dot products produce twenty-two and forty-three; a second grid fills those exact gaps while retaining nineteen and fifty. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

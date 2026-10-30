@@ -5,7 +5,7 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "See that InfoNCE asks an anchor to identify one declared positive among all candidates, so positive and negative sampling choices determine both the learned invariance and false-negative pressure.",
-  "mediumRationale": "A deterministic SVG candidate map is the smallest medium that can align an anchor, its two-view positive, ordinary negatives, and a nearby false negative with the numerator and denominator of InfoNCE. Fixed geometry makes the data-contract error spatially apparent without simulating training.",
+  "mediumRationale": "An original, phone-width explanatory drawing keeps the complete comparison visible without panning. A topic-specific timeline, quantity, evidence gate, or state relation replaces the component inventory. Geometry, direct labels, accessible descriptions, theme tokens, and static output carry the explanation without interaction.",
   "mediumComparison": {
     "mermaid": "Rejected: a flowchart can show augmentation and encoding stages but cannot make one positive competing against a spatial candidate set or the nearby false-negative conflict legible.",
     "svg": "Selected: fixed coordinates, direct labels, line styles, and shape differences expose which candidate enters the numerator, which candidates enter the denominator, and why a semantically related in-batch item can receive the wrong gradient.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "infonce-positive-candidate-set"
     ],
-    "accessibility": "The SVG has a linked title and long description. Direct role labels, distinct circle and diamond shapes, a solid positive connector, dashed negative connectors, and an explicit warning callout carry the full lesson without color. Its 360-pixel viewBox scales to the reading column without a minimum width for readability at 390 CSS pixels; existing theme variables provide dark-mode and print-compatible contrast."
+    "accessibility": "A toy InfoNCE example uses unnormalized exponentiated similarity weights four, three, two, and one. One denominator enclosure contains all four candidates. Its positive row has a smaller numerator enclosure and four equal units. The same-class different-source item is still a sampler-negative with three units. The denominator totals ten and the positive probability is four tenths, drawn with ten equal units. Weights are illustrative, not observed similarities. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }
