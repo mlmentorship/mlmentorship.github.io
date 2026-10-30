@@ -80,6 +80,210 @@ function comparison(model) {
   return { height: vertical + 12, body };
 }
 
+function impactLimit() {
+  const scale = 2.7;
+  const start = 24;
+  const limit = start + 100 * scale;
+  let body = text(180, 22, 'ILLUSTRATIVE AGGREGATE LIMIT: 100', { size: 12, weight: 700, width: 335 })
+    + text(start + 30 * scale, 79, '60 committed', { size: 13, weight: 700 })
+    + text(start + 85 * scale, 105, '+50 proposed', { size: 13, width: 150, tone: 'warning' })
+    + `<g data-impact-part="committed" data-value="60">${box(start, 129, 60 * scale, 44, 'input')}</g>`
+    + `<g data-impact-part="proposed" data-value="50">${box(start + 60 * scale, 129, 50 * scale, 44, 'warning', true)}</g>`
+    + `<g data-impact-part="overflow" data-value="10">${box(limit, 129, 10 * scale, 44, 'warning', true)}</g>`
+    + `<path data-impact-limit="100" d="M${limit} 115V205" style="stroke:${ink('warning')};stroke-width:2.5"></path>`
+    + text(start, 202, '0', { size: 12 }) + text(limit, 227, '100 limit', { size: 12, tone: 'warning', weight: 700 })
+    + text(180, 270, '110 total: the last 10 cross the same boundary.', { size: 13, width: 335, weight: 700 })
+    + arrow(180, 292, 180, 323, 'warning')
+    + node(20, 328, 320, 79, 'FREEZE FUTURE AUTHORITY\nno capability -> no dispatch', 'warning')
+    + text(180, 448, 'The dashed proposal is not an already committed effect.', { size: 12, width: 335 });
+  for (let offset = 0; offset < 4; offset++) body += rule(limit + offset * 7, 169, Math.min(limit + offset * 7 + 10, start + 110 * scale), 133, 'warning');
+  return { height: 490, body };
+}
+
+function cacheConstraint() {
+  const origin = 30;
+  const scale = 30;
+  let body = text(180, 22, 'FICTIONAL COMPARISON; ONE SHARED GB SCALE', { size: 12, width: 335, tone: 'soft' });
+  for (const [index, [name, value, tone]] of [['A: faster', 9, 'warning'], ['B: smaller', 6, 'output']].entries()) {
+    const vertical = 90 + index * 105;
+    body += text(origin, vertical - 22, name, { size: 14, anchor: 'start', weight: 700 })
+      + `<rect data-cache-option="${name[0]}" data-gigabytes="${value}" x="${origin}" y="${vertical}" width="${value * scale}" height="35" style="fill:var(--viz-${tone}-bg);stroke:${ink(tone)}"></rect>`
+      + text(origin + value * scale, vertical + 61, `${value} GB`, { size: 13, tone, weight: 700 });
+  }
+  body += `<path data-cache-limit="8" d="M${origin + 8 * scale} 72V264" style="stroke:${ink('warning')};stroke-width:2;stroke-dasharray:5 4"></path>`
+    + text(origin + 8 * scale, 293, '8 GB limit', { size: 13, tone: 'warning', weight: 700 })
+    + text(180, 340, 'A crosses the limit. B fits the same constraint.', { size: 13, width: 335, weight: 700 })
+    + node(20, 377, 320, 77, 'Owner selects feasible B.\nRequired reviews remain.', 'output')
+    + text(180, 493, 'Reopen A only when evidence shows it fits within 8 GB.', { size: 13, width: 335 })
+    + text(180, 548, 'The constraint rejects an option, not its advocate.', { size: 12, width: 335, tone: 'soft' });
+  return { height: 582, body };
+}
+
+function exposureMembership() {
+  let body = text(180, 22, 'ONE REQUEST: 100 RETRIEVED CANDIDATES', { size: 12, weight: 700, width: 335 })
+    + text(180, 57, 'One square = one candidate; only five are displayed.', { size: 12, width: 335 });
+  for (let candidate = 0; candidate < 100; candidate++) {
+    const horizontal = 42 + (candidate % 10) * 28;
+    const vertical = 90 + Math.floor(candidate / 10) * 28;
+    const eligible = candidate < 20;
+    const displayed = candidate < 5;
+    body += `<g data-exposure-candidate="${candidate}" data-eligible="${eligible}" data-displayed="${displayed}">`
+      + box(horizontal, vertical, 22, 22, displayed ? 'output' : eligible ? 'input' : 'neutral', !eligible);
+    if (displayed) body += `<circle cx="${horizontal + 11}" cy="${vertical + 11}" r="5" style="fill:${ink('output')}"></circle>`;
+    if (!eligible) body += rule(horizontal + 6, vertical + 6, horizontal + 16, vertical + 16, 'soft');
+    body += '</g>';
+  }
+  body += text(180, 401, '5 filled dots: displayed, with exposure records', { size: 13, width: 335, weight: 700, tone: 'output' })
+    + text(180, 447, '15 more eligible: not displayed, no exposure', { size: 13, width: 335 })
+    + text(180, 492, '80 crossed squares: removed by eligibility/policy', { size: 12, width: 335, tone: 'soft' })
+    + text(180, 530, 'ONLY THE FIVE DOTTED ITEMS', { size: 12, weight: 700, width: 335, tone: 'output' });
+  for (let record = 0; record < 5; record++) body += `<g data-exposure-record="${record}">${node(20 + record * 65, 551, 60, 42, `e${record + 1}`, 'output')}</g>`;
+  body += text(180, 631, '100 retrieved != 20 eligible != 5 exposures', { size: 13, weight: 700, width: 335 });
+  return { height: 670, body };
+}
+
+function oldSnapshotFlow() {
+  const old = [0, 1];
+  const created = old.map((value) => value + 5);
+  const union = [...new Set([...old, ...created])];
+  let body = text(180, 22, 'ONE NEW ITEM 5; READ ONLY THE OLD SNAPSHOT', { size: 12, weight: 700, width: 335 })
+    + text(65, 67, 'OLD', { size: 13, weight: 700 }) + text(295, 67, 'NEW SUM', { size: 13, weight: 700 });
+  for (const [index, value] of old.entries()) {
+    const top = 88 + index * 95;
+    body += `<g data-subset-old="${value}" data-subset-new="${created[index]}">`
+      + node(25, top, 80, 52, value, 'input')
+      + arrow(106, top + 26, 254, top + 26, 'focus')
+      + text(180, top + 13, '+ 5 once', { size: 13, width: 130, weight: 700 })
+      + node(255, top, 80, 52, created[index], 'focus') + '</g>';
+  }
+  body += text(180, 292, 'ONLY NOW UNION OLD AND NEW', { size: 12, weight: 700, width: 335 });
+  for (const [index, value] of union.entries()) body += `<g data-subset-union="${value}">${node(20 + index * 84, 317, 70, 52, value, index < 2 ? 'input' : 'focus')}</g>`;
+  body += text(180, 416, 'FORBIDDEN: FEED A NEW SUM BACK INTO THIS ITEM', { size: 12, width: 335, weight: 700, tone: 'warning' })
+    + node(25, 452, 80, 52, 'new 5', 'focus')
+    + arrow(106, 478, 254, 478, 'warning')
+    + text(180, 466, '+ 5 again', { size: 13, width: 130, tone: 'warning' })
+    + node(255, 452, 80, 52, '10', 'warning')
+    + rule(258, 455, 332, 501, 'warning') + rule(332, 455, 258, 501, 'warning')
+    + text(180, 548, '10 is absent: the current item cannot use itself twice.', { size: 13, width: 335, weight: 700 });
+  return { height: 590, body };
+}
+
+function cancellationEvidence() {
+  return {
+    height: 651,
+    body: text(180, 22, 'EVENT ORDER ONLY; NO DURATION IS IMPLIED', { size: 12, width: 335, weight: 700 })
+      + text(60, 59, 'Cancel\nrequest', { size: 13, width: 110, weight: 700 })
+      + text(260, 59, 'Worker-stop\nreceipt', { size: 13, width: 130, weight: 700 })
+      + arrow(24, 111, 338, 111)
+      + `<path data-cancellation-event="request" d="M60 94V329" style="stroke:${ink('warning')};stroke-width:2;stroke-dasharray:4 4"></path>`
+      + `<path data-cancellation-event="receipt" d="M260 94V238" style="stroke:${ink('output')};stroke-width:2"></path>`
+      + text(180, 142, 'WORKER STATE', { size: 12, weight: 700 })
+      + `<g data-cancellation-state="stopping">${node(60, 159, 200, 66, 'may still be\nstopping', 'warning')}</g>`
+      + `<g data-cancellation-state="cancelled">${node(260, 159, 80, 66, 'stopped', 'output')}</g>`
+      + text(180, 264, 'DISPATCH AUTHORITY', { size: 12, weight: 700 })
+      + node(60, 281, 280, 54, 'NO new dispatch after the request', 'warning')
+      + rule(20, 373, 340, 373)
+      + text(180, 400, 'SEPARATE SUCCESS PATH', { size: 12, weight: 700 })
+      + node(20, 419, 320, 52, 'VERIFICATION PASSES', 'input')
+      + arrow(180, 472, 180, 501)
+      + node(20, 506, 320, 70, 'Reviewable patch\nawaits user decision', 'focus')
+      + text(180, 616, 'Neither a cancel command nor passing tests applies a patch.', { size: 12, width: 335 }),
+  };
+}
+
+function epochRetirement() {
+  let body = text(180, 22, 'INTERRUPTION CHANGES ACTIVE EPOCH 7 -> 8', { size: 12, width: 335, weight: 700 })
+    + text(90, 72, 'epoch 7', { size: 13, weight: 700 }) + text(270, 72, 'epoch 8', { size: 13, weight: 700 })
+    + arrow(24, 100, 338, 100)
+    + `<path data-active-epoch="8" d="M180 87V366" style="stroke:${ink('focus')};stroke-width:2;stroke-dasharray:5 4"></path>`
+    + text(180, 72, 'interrupt', { size: 12, weight: 700, width: 90 })
+    + text(94, 170, 'old output', { size: 12, width: 140 })
+    + text(280, 170, 'late old output', { size: 12, width: 145, tone: 'warning' });
+  for (const [horizontal, accepted] of [[35, true], [100, true], [255, false]]) {
+    body += `<g data-output-epoch="7" data-accepted="${accepted}">${node(horizontal, 186, 55, 48, '7', accepted ? 'input' : 'warning')}`;
+    if (!accepted) body += rule(horizontal + 3, 189, horizontal + 52, 231, 'warning') + rule(horizontal + 52, 189, horizontal + 3, 231, 'warning');
+    body += '</g>';
+  }
+  body += text(280, 263, 'REJECT', { size: 12, tone: 'warning', weight: 700 })
+    + `<g data-output-epoch="8" data-accepted="true">${node(255, 292, 55, 48, '8', 'output')}</g>`
+    + text(280, 364, 'new output', { size: 12, width: 135, tone: 'output' })
+    + text(180, 410, 'Reject old-epoch packets immediately.\nThat alone does not prove playback is silent.', { size: 13, width: 335, weight: 700 })
+    + node(20, 469, 320, 55, 'Cancellation requested', 'warning')
+    + arrow(180, 525, 180, 554)
+    + node(20, 559, 320, 77, 'Playback-stop receipt\nold playback confirmed stopped', 'output')
+    + text(180, 676, 'Event order is schematic, not a latency measurement.', { size: 12, width: 335, tone: 'soft' });
+  return { height: 713, body };
+}
+
+function beamPools() {
+  const parents = [
+    { prefix: 'A', probability: .6, children: [['x', .5], ['EOS', .3], ['z', .2]] },
+    { prefix: 'B', probability: .4, children: [['y', .6], ['x', .25], ['EOS', .15]] },
+  ];
+  const children = parents.flatMap((parent) => parent.children.map(([token, probability]) => ({ prefix: parent.prefix, token, probability, score: Math.log(parent.probability) + Math.log(probability) })));
+  let body = text(180, 22, 'NORMALIZED TOY PROBABILITIES; BEAM WIDTH 2', { size: 12, weight: 700, width: 335 })
+    + text(180, 54, 'Child score = parent log score + log token probability', { size: 12, width: 335 });
+  for (const [index, parent] of parents.entries()) {
+    const top = 88 + index * 159;
+    body += text(18, top, `${parent.prefix}: p = ${parent.probability}; log p = ${Math.log(parent.probability).toFixed(3)}`, { size: 13, anchor: 'start', weight: 700, width: 330 })
+      + text(210, top + 26, 'token p', { size: 12 }) + text(302, top + 26, 'log total', { size: 12 });
+    for (const [offset, child] of children.filter((item) => item.prefix === parent.prefix).entries()) {
+      const vertical = top + 54 + offset * 34;
+      body += `<g data-beam-parent="${child.prefix}" data-beam-token="${child.token}" data-token-probability="${child.probability}" data-parent-probability="${parent.probability}" data-log-score="${child.score}">`
+        + text(24, vertical, `${child.prefix} ${child.token}`, { size: 14, anchor: 'start', weight: 700, tone: child.token === 'EOS' ? 'state' : 'input' })
+        + text(210, vertical, child.probability, { size: 14 })
+        + text(302, vertical, child.score.toFixed(3), { size: 14 }) + '</g>';
+    }
+  }
+  body += rule(20, 395, 340, 395)
+    + text(180, 425, 'EOS LEAVES THE FRONTIER: NEVER EXPAND IT', { size: 12, weight: 700, width: 335, tone: 'state' })
+    + box(20, 444, 320, 86, 'state', true);
+  for (const [index, child] of children.filter((item) => item.token === 'EOS').entries()) body += text(180, 473 + index * 34, `${child.prefix} EOS: ${child.score.toFixed(3)}; finished`, { size: 14, width: 300, tone: 'state' });
+  const live = children.filter((item) => item.token !== 'EOS').sort((first, second) => second.score - first.score);
+  body += text(180, 568, 'PRUNE ONLY LIVE CANDIDATES: KEEP TWO', { size: 12, weight: 700, width: 335 });
+  for (const [index, child] of live.entries()) body += `<g data-beam-live="${child.prefix} ${child.token}" data-kept="${index < 2}">`
+    + text(180, 604 + index * 30, `${index < 2 ? 'KEEP' : 'drop'} ${child.prefix} ${child.token}: ${child.score.toFixed(3)}`, { size: 14, width: 320, tone: index < 2 ? 'output' : 'soft', weight: index < 2 ? 700 : 400 }) + '</g>';
+  body += rule(20, 716, 340, 716)
+    + text(180, 750, 'LATER: p(EOS | A x) = 0.5', { size: 13, weight: 700, width: 335 })
+    + text(180, 783, 'Final score = log p / length; alpha = 1', { size: 13, width: 335 })
+    + text(180, 812, 'Length includes EOS, excludes BOS.', { size: 12, width: 335 })
+    + text(210, 845, 'raw', { size: 12 }) + text(302, 845, 'final', { size: 12 });
+  for (const [index, [sequence, probability, length]] of [['A EOS', .18, 2], ['A x EOS', .15, 3]].entries()) {
+    const score = Math.log(probability);
+    const final = score / length;
+    body += `<g data-beam-completion="${sequence}" data-probability="${probability}" data-length="${length}" data-log-score="${score}" data-final-score="${final}">`
+      + text(20, 879 + index * 38, `${sequence}; n=${length}`, { size: 13, anchor: 'start', width: 165 })
+      + text(210, 879 + index * 38, score.toFixed(3), { size: 14 })
+      + text(302, 879 + index * 38, final.toFixed(3), { size: 14, tone: index ? 'output' : 'soft', weight: index ? 700 : 400 }) + '</g>';
+  }
+  body += text(180, 958, 'Raw prefers A EOS; this final rule prefers A x EOS.', { size: 13, width: 335, weight: 700 })
+    + text(180, 1005, 'Only if no completion exists, rank remaining live beams.', { size: 12, width: 335 });
+  return { height: 1040, body };
+}
+
+function admissionResources() {
+  let body = text(180, 22, 'ONE REQUEST MUST FIT BOTH RESOURCES', { size: 12, weight: 700, width: 335 });
+  for (const [resource, available, required, top] of [['compute', 6, 4, 66], ['KV pages', 5, 6, 254]]) {
+    body += text(18, top, resource === 'compute' ? 'COMPUTE SLOTS: 4 needed, 6 available' : 'KV PAGES: 6 needed, only 5 available', { size: 12, anchor: 'start', width: 330, weight: 700 })
+      + text(18, top + 39, 'free', { size: 12, anchor: 'start' })
+      + text(18, top + 89, 'need', { size: 12, anchor: 'start' });
+    for (let unit = 0; unit < 6; unit++) {
+      const horizontal = 91 + unit * 41;
+      body += `<g data-admission-resource="${resource}" data-unit="${unit}" data-available="${unit < available}" data-required="${unit < required}">`
+        + box(horizontal, top + 17, 33, 32, unit < available ? 'input' : 'warning', unit >= available);
+      if (unit < required) body += box(horizontal, top + 67, 33, 32, unit < available ? 'output' : 'warning', unit >= available);
+      if (unit >= available) body += rule(horizontal + 6, top + 73, horizontal + 27, top + 93, 'warning') + rule(horizontal + 27, top + 73, horizontal + 6, top + 93, 'warning');
+      body += '</g>';
+    }
+    body += text(180, top + 132, available >= required ? '4 of 6: compute fits' : 'The sixth required page has no free match.', { size: 13, weight: 700, width: 335, tone: available >= required ? 'output' : 'warning' });
+  }
+  body += rule(20, 422, 340, 422)
+    + text(180, 460, 'SPARE COMPUTE CANNOT BECOME A KV PAGE', { size: 12, weight: 700, width: 335 })
+    + node(20, 493, 320, 78, 'NOT ADMITTED\nno resource reservation', 'warning')
+    + text(180, 608, 'Queue within deadline, reduce a supported bound, or decline.', { size: 13, width: 335 });
+  return { height: 649, body };
+}
+
 function actorCriticPaths() {
   return { height: 456, body:
     node(125, 12, 110, 40, 'state s', 'input')
@@ -1427,6 +1631,13 @@ function queryBeforeStore() {
 }
 
 export const redraws = {
+  'beam-search-live-finished-transition': {
+    title: 'Route EOS out of live search, then compare completions with the declared length rule',
+    description: 'A normalized toy starts A with probability 0.6 and B with 0.4. A has next-token probabilities 0.5, 0.3, 0.2 for x, EOS, z. B has 0.6, 0.25, 0.15 for y, x, EOS. Log totals are computed from those probabilities. EOS candidates enter a separate finished enclosure and never expand. Live pruning retains A x and B y. At a later step A x emits EOS with probability 0.5. Final comparison includes EOS and excludes BOS, using alpha one: A EOS has probability 0.18, length two and final score about -0.857; A x EOS has probability 0.15, length three and final score about -0.632. The longer completion wins only under this declared normalization.',
+    printPage: true,
+    layout: beamPools,
+    caption: 'Each parent distributes total token probability one. EOS candidates leave live search before pruning. The later final comparison divides log probability by the declared length. It can prefer a longer completion despite its lower raw probability.',
+  },
   'infonce-positive-candidate-set': {
     title: 'The positive belongs to both numerator and denominator; a false negative stays in the denominator',
     description: 'A toy InfoNCE example uses unnormalized exponentiated similarity weights four, three, two, and one. One denominator enclosure contains all four candidates. Its positive row has a smaller numerator enclosure and four equal units. The same-class different-source item is still a sampler-negative with three units. The denominator totals ten and the positive probability is four tenths, drawn with ten equal units. Weights are illustrative, not observed similarities.',
@@ -1800,8 +2011,9 @@ export const redraws = {
   },
   'agent-safety-authority-loop': {
     title: 'An impact limit must stop the next capability before execution',
-    description: 'An illustrative impact ledger already contains 60 units and receives a proposed 50-unit action. A 100-unit policy limit would be exceeded because 60 plus 50 equals 110. The failing branch freezes future capabilities before dispatch. The proposed action is not counted as an already committed effect.',
-    layout: () => gate({ example: 'Illustrative impact policy; limit 100', input: 'Committed impact 60\nproposed action +50', test: '60 + 50 = 110 > 100\naggregate limit is exceeded', yesLabel: 'WITHIN LIMIT', noLabel: 'THIS REQUEST', yes: 'recheck authority\nissue bounded capability', no: 'FREEZE authority\nno capability\nno dispatch' }),
+    description: 'One common-scale bar stacks 60 committed impact units and a dashed proposed 50-unit action. The 100-unit limit crosses that bar before its end at 110; the ten-unit overflow is hatched. The dashed proposal is not an already committed effect. Crossing the bound freezes future capabilities before dispatch.',
+    printPage: true,
+    layout: impactLimit,
     caption: 'The proposed action would cross the illustrative limit. Freeze later capabilities before execution. A monitor alert alone cannot enforce the stop.',
   },
   'enterprise-agent-three-plane-boundary': {
@@ -1900,8 +2112,9 @@ export const redraws = {
   },
   'disagreement-evidence-commit-loop': {
     title: 'Change the decision when evidence changes the shared constraint',
-    description: 'A fictional technical disagreement compares a faster high-memory cache with a smaller cache under a shared eight-gigabyte limit. A nine-gigabyte measured toy footprint rules out the first alternative under that constraint. The decision owner chooses the feasible option, records a memory-based revisit trigger, and retains required safety review.',
-    layout: () => gate({ example: 'Fictional cache discussion; shared limit 8 GB', input: 'A: faster cache, 9 GB\nB: smaller cache, 6 GB', test: 'Does the candidate meet the shared memory constraint?', yesLabel: 'B: 6 <= 8', noLabel: 'A: 9 > 8', yes: 'owner selects B\nrevisit if A fits\nrequired reviews stay', no: 'reject A for now\nnot a judgment\nof its advocate' }),
+    description: 'Two zero-based bars share the same gigabyte scale. Fictional faster cache A occupies nine units and crosses the eight-gigabyte limit. Smaller cache B occupies six and fits. The decision owner chooses feasible B, retains required reviews, and can reopen A only when evidence shows it fits within the shared limit. The constraint rejects an option rather than its advocate.',
+    printPage: true,
+    layout: cacheConstraint,
     caption: 'The shared constraint, not seniority, selects the feasible option in this fictional case. Record what evidence would reopen the choice. Required reviews remain.',
   },
   'encoder-once-decoder-loop': {
@@ -2016,12 +2229,9 @@ export const supplementalRedraws = {
   'ecosystem-serving-stages': {
     slug: 'annotated-ecosystem-strategy-mock',
     title: 'Retrieved is not the same as displayed',
-    description: 'An illustrative request retrieves one hundred unique candidates, retains twenty after eligibility and policy checks, and displays five. Only those five positions produce exposure records. Fresh-supply sources join retrieval without bypassing eligibility, and experiment denominators use actual exposure.',
-    layout: () => comparison({ example: 'Illustrative one-request counts; policy applies throughout', left: 'CANDIDATE STATE', right: 'WHAT IS OBSERVED', rows: [
-      { label: 'Retrieve + merge fresh sources', left: '100 unique candidates', right: 'not exposures', rightTone: 'neutral' },
-      { label: 'Eligibility + policy', left: '20 eligible', right: 'still not exposures', rightTone: 'neutral' },
-      { label: 'Compose + display', left: '5 displayed positions', right: '5 exposure records' },
-    ] }),
+    description: 'A ten-by-ten grid contains exactly one hundred retrieved candidates for one illustrative request. Twenty have eligible outlines; the first five also contain solid dots for display. Fifteen eligible but unshown candidates have no dot. Eighty crossed squares fail eligibility or policy. Five separate exposure-record boxes correspond only to the five displayed positions. Retrieval and eligibility counts are not exposure denominators.',
+    printPage: true,
+    layout: exposureMembership,
     caption: 'Candidate counts cannot replace exposure counts. Only the displayed positions enter this request\'s exposure denominator. The counts are illustrative, not production measurements.',
   },
   'coding-product-mode-boundaries': {
@@ -2038,12 +2248,9 @@ export const supplementalRedraws = {
   'coding-product-task-lifecycle': {
     slug: 'design-ai-coding-product',
     title: 'A cancellation request is not proof that the worker stopped',
-    description: 'A cancellation request removes permission for new dispatch, but the worker may still be stopping. Confirmed worker-stop evidence establishes the terminal cancellation state. Separately, passing verification leaves a patch waiting for the user decision rather than applied automatically.',
-    layout: () => comparison({ example: 'Commands and observed terminal states are different', left: 'REQUEST / CHECK', right: 'REQUIRED EVIDENCE', rows: [
-      { label: 'Cancel requested', left: 'stop new dispatch', right: 'worker may be stopping', rightTone: 'warning' },
-      { label: 'Worker confirms stop', left: 'stop receipt arrives', right: 'cancelled terminal state' },
-      { label: 'Verification passes', left: 'tests + diff available', right: 'still awaits user decision', rightTone: 'focus' },
-    ] }),
+    description: 'Two ordered event markers separate cancellation request from worker-stop receipt without asserting a duration. Between them the worker may still be stopping; only after the receipt is its state stopped. A separate authority band forbids new dispatch starting at the request. Below a divider, verification passes leads to a reviewable patch awaiting the user decision, not automatic application.',
+    printPage: true,
+    layout: cancellationEvidence,
     caption: 'Stop issuing work when cancellation is requested. Wait for worker-stop evidence before declaring cancellation complete. Verification still does not apply the patch.',
   },
   'foundation-data-build-planes': {
@@ -2063,19 +2270,17 @@ export const supplementalRedraws = {
   'multimodal-turn-lifecycle': {
     slug: 'design-real-time-multimodal-assistant',
     title: 'Interruption must retire old output',
-    description: 'Interruption advances active epoch seven to eight. Epoch-seven output is rejected immediately. Cancellation is requested separately; only playback-stop evidence proves silence. New output carries epoch eight.',
-    layout: () => comparison({ example: 'Illustrative interruption: active epoch 7 -> 8', left: 'CONTROL EVENT', right: 'OUTPUT STATE', rows: [
-      { label: 'User interrupts', left: 'activate epoch 8', right: 'reject epoch-7 output', rightTone: 'warning' },
-      { label: 'Cancel epoch 7 requested', left: 'command sent', right: 'not yet proof of silence', rightTone: 'warning' },
-      { label: 'Playback-stop receipt', left: 'old output stopped', right: 'new output uses epoch 8' },
-    ] }),
+    description: 'A schematic event-order axis changes active epoch from seven to eight at an interruption boundary. Epoch-seven packets before the boundary are accepted; a late epoch-seven packet after it is crossed out and rejected. A new epoch-eight packet is accepted. A separate cancellation-to-playback-stop-receipt path establishes actual silence; rejecting old packets is not by itself proof that playback stopped.',
+    printPage: true,
+    layout: epochRetirement,
     caption: 'Confirm playback stopped.',
   },
   'reasoning-admission-and-capacity': {
     slug: 'design-reasoning-model-fixed-budget',
     title: 'A desired model route is not an admitted reservation',
-    description: 'A declared toy reasoning request needs four compute slots and six KV pages. Six compute slots are free, but only five KV pages are available. The conjunction fails and the request queues within its deadline, reduces its supported bound, or declines without reservation. Passing requests reserve both resources before execution.',
-    layout: () => gate({ example: 'Toy request needs compute 4 AND KV pages 6', input: 'Available: compute 6\nKV pages 5', test: '4 <= 6 is true\n6 <= 5 is false\nboth resources required', yesLabel: 'BOTH FIT', noLabel: 'THIS REQUEST', yes: 'reserve compute + KV\nthen execute\nbounded work', no: 'queue within deadline\nreduce or decline\nno phantom reservation' }),
+    description: 'Two aligned countable resource strips compare the same toy request against available capacity. Four needed compute cells fit under six available cells. Six needed KV-page cells align with only five available cells; the unmatched sixth page has a dashed outline and cross. Resource types cannot substitute for each other. The request is not admitted and makes no reservation. It queues within its deadline, reduces a supported bound, or declines.',
+    printPage: true,
+    layout: admissionResources,
     caption: 'Free compute cannot substitute for missing KV pages. This request is not admitted. Reserve both resources before execution when both bounds fit.',
   },
   'video-ecosystem-delayed-effects': {
@@ -2127,12 +2332,9 @@ export const supplementalRedraws = {
   'subset-sum-old-snapshot': {
     slug: 'partition-equal-subset-sum',
     title: 'Add the new item to the old snapshot, not to sums just created',
-    description: 'The old reachable set zero-one adds the new item five exactly once, creating five-six. Only after that computation does union produce zero-one-five-six. Ten is absent because the newly created five is not fed back into the same item update.',
-    layout: () => comparison({ example: 'New item 5; one-use update', left: 'OLD SNAPSHOT', right: 'ADD 5 ONCE', rows: [
-      { label: 'Each source sum', left: '0\n1', right: '5\n6' },
-      { label: 'Union after computation', left: 'retain {0, 1}', right: '{0, 1, 5, 6}' },
-      { label: 'Forbidden feedback', left: 'do not reuse new 5', right: '10 is NOT created', rightTone: 'warning' },
-    ] }),
+    description: 'Two source boxes hold only the old reachable sums zero and one. Separate plus-five arrows create five and six. Only afterward, four union boxes retain zero, one, five, six. A separate crossed-out feedback arrow would add the same current item five to the newly created five and incorrectly create ten. No such feedback enters the actual update.',
+    printPage: true,
+    layout: oldSnapshotFlow,
     caption: 'New sums use only the old snapshot. Union happens afterward. Feeding new 5 back into this same update would incorrectly reuse the item.',
   },
   'dsu-edges-versus-parents': {
@@ -2276,6 +2478,65 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     }
   }
   const factorization = factorizationEntry().body;
+  const impact = drawingNodes(impactLimit());
+  for (const [part, expected] of [['committed', 60], ['proposed', 50], ['overflow', 10]]) {
+    const group = impact.find((node) => attributesOf(node)['data-impact-part'] === part);
+    assert.equal(Number(attributesOf(group)['data-value']), expected);
+    assert.equal(Number(attributesOf(group.childNodes[0]).width), expected * 2.7);
+  }
+  assert.equal(attributesOf(impact.find((node) => attributesOf(node)['data-impact-limit'] !== undefined)).d, 'M294 115V205');
+  const caches = drawingNodes(cacheConstraint()).filter((node) => attributesOf(node)['data-cache-option'] !== undefined).map(attributesOf);
+  assert.deepEqual(caches.map((item) => Number(item['data-gigabytes'])), [9, 6]);
+  for (const cache of caches) assert.equal(Number(cache.width), Number(cache['data-gigabytes']) * 30);
+  const exposureCandidates = drawingNodes(exposureMembership()).filter((node) => attributesOf(node)['data-exposure-candidate'] !== undefined).map(attributesOf);
+  assert.equal(exposureCandidates.length, 100);
+  assert.equal(new Set(exposureCandidates.map((candidate) => candidate['data-exposure-candidate'])).size, 100);
+  assert.equal(exposureCandidates.filter((candidate) => candidate['data-eligible'] === 'true').length, 20);
+  assert.equal(exposureCandidates.filter((candidate) => candidate['data-displayed'] === 'true').length, 5);
+  assert(exposureCandidates.filter((candidate) => candidate['data-displayed'] === 'true').every((candidate) => candidate['data-eligible'] === 'true'));
+  const snapshot = drawingNodes(oldSnapshotFlow());
+  const added = snapshot.filter((node) => attributesOf(node)['data-subset-old'] !== undefined).map(attributesOf);
+  for (const row of added) assert.equal(Number(row['data-subset-new']), Number(row['data-subset-old']) + 5);
+  assert.deepEqual(snapshot.filter((node) => attributesOf(node)['data-subset-union'] !== undefined).map((node) => Number(attributesOf(node)['data-subset-union'])), [0, 1, 5, 6]);
+  const cancellation = drawingNodes(cancellationEvidence());
+  assert.deepEqual(cancellation.filter((node) => attributesOf(node)['data-cancellation-event'] !== undefined).map((node) => attributesOf(node)['data-cancellation-event']), ['request', 'receipt']);
+  const cancellationStates = cancellation.filter((node) => attributesOf(node)['data-cancellation-state'] !== undefined);
+  const stoppingRect = attributesOf(cancellationStates[0].childNodes[0].childNodes[0]);
+  const stoppedRect = attributesOf(cancellationStates[1].childNodes[0].childNodes[0]);
+  assert.equal(Number(stoppingRect.x), 60);
+  assert.equal(Number(stoppingRect.x) + Number(stoppingRect.width), Number(stoppedRect.x));
+  assert.equal(Number(stoppedRect.x), 260);
+  const packets = drawingNodes(epochRetirement()).filter((node) => attributesOf(node)['data-output-epoch'] !== undefined);
+  assert.equal(packets.length, 4);
+  for (const packet of packets) {
+    const position = Number(attributesOf(packet.childNodes[0].childNodes[0]).x);
+    const attributes = attributesOf(packet);
+    assert.equal(attributes['data-accepted'], String(position < 180 || attributes['data-output-epoch'] === '8'));
+    if (attributes['data-accepted'] === 'false') assert.equal(packet.childNodes.filter((node) => node.nodeName === 'path').length, 2);
+  }
+  const beam = drawingNodes(beamPools());
+  const continuations = beam.filter((node) => attributesOf(node)['data-beam-parent'] !== undefined).map(attributesOf);
+  for (const prefix of ['A', 'B']) {
+    const choices = continuations.filter((choice) => choice['data-beam-parent'] === prefix);
+    assert.equal(choices.length, 3);
+    assert(Math.abs(choices.reduce((sum, choice) => sum + Number(choice['data-token-probability']), 0) - 1) < 1e-12);
+    for (const choice of choices) assert(Math.abs(Number(choice['data-log-score']) - Math.log(Number(choice['data-parent-probability']) * Number(choice['data-token-probability']))) < 1e-12);
+  }
+  const kept = beam.filter((node) => attributesOf(node)['data-kept'] === 'true').map((node) => attributesOf(node)['data-beam-live']);
+  assert.deepEqual(kept, ['A x', 'B y']);
+  const completions = beam.filter((node) => attributesOf(node)['data-beam-completion'] !== undefined).map(attributesOf);
+  assert.equal(completions.length, 2);
+  for (const completion of completions) assert.equal(Number(completion['data-final-score']), Math.log(Number(completion['data-probability'])) / Number(completion['data-length']));
+  assert(Number(completions[0]['data-log-score']) > Number(completions[1]['data-log-score']));
+  assert(Number(completions[0]['data-final-score']) < Number(completions[1]['data-final-score']));
+  const resources = drawingNodes(admissionResources()).filter((node) => attributesOf(node)['data-admission-resource'] !== undefined).map(attributesOf);
+  for (const [resource, available, required] of [['compute', 6, 4], ['KV pages', 5, 6]]) {
+    const units = resources.filter((unit) => unit['data-admission-resource'] === resource);
+    assert.equal(units.length, 6);
+    assert.equal(units.filter((unit) => unit['data-available'] === 'true').length, available);
+    assert.equal(units.filter((unit) => unit['data-required'] === 'true').length, required);
+    assert.equal(units.filter((unit) => unit['data-available'] === 'false' && unit['data-required'] === 'true').length, resource === 'compute' ? 0 : 1);
+  }
   assert(factorization.includes('2 * 1.5 = 3') && factorization.includes('1 * 1 = 1') && factorization.includes('3 + 1 = 4'));
   const lookup = queryBeforeStore().body;
   assert(lookup.includes('9 - 7 = 2') && lookup.includes('Return [1, 2]: 2 + 7 = 9'));

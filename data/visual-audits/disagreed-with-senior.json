@@ -71,6 +71,6 @@
     "visualIds": [
       "disagreement-evidence-commit-loop"
     ],
-    "accessibility": "A fictional technical disagreement compares a faster high-memory cache with a smaller cache under a shared eight-gigabyte limit. A nine-gigabyte measured toy footprint rules out the first alternative under that constraint. The decision owner chooses the feasible option, records a memory-based revisit trigger, and retains required safety review. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
+    "accessibility": "Two zero-based bars share the same gigabyte scale. Fictional faster cache A occupies nine units and crosses the eight-gigabyte limit. Smaller cache B occupies six and fits. The decision owner chooses feasible B, retains required reviews, and can reopen A only when evidence shows it fits within the shared limit. The constraint rejects an option rather than its advocate. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

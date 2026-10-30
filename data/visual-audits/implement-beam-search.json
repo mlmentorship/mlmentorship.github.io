@@ -5,10 +5,10 @@
   "status": "implemented",
   "medium": "svg",
   "learningObjective": "Trace one beam-search expansion and explain why EOS hypotheses leave the live frontier before top-k pruning while remaining eligible for final ranking.",
-  "mediumRationale": "A deterministic two-panel SVG is the smallest medium that can preserve hypothesis identity across expansion, EOS routing, and live-only pruning. The first panel shows where candidates come from; the second makes the live and finished pools spatially disjoint so the no-expansion invariant is immediately inspectable.",
+  "mediumRationale": "A deterministic phone-width SVG keeps normalized parent and continuation probabilities, cumulative log scores, separate finished hypotheses, live-only pruning, and a worked final ranking visible together. The final comparison makes the declared length rule inspectable without requiring interaction or inferring numbers from prose.",
   "mediumComparison": {
     "mermaid": "Rejected because automatic flow layout would emphasize generic control flow while making cumulative scores and the correspondence between parent hypotheses and candidates harder to compare.",
-    "svg": "Selected because fixed rows, branch lines, cumulative log scores, and distinct solid versus dashed containers can show one exact transition without runtime code.",
+    "svg": "Selected because fixed probability rows, cumulative log scores, a separate finished enclosure, live-only retention, and a worked length-normalized ranking preserve numeric relationships in deterministic static output.",
     "semanticHtml": "Rejected because a table can list live and finished records but cannot as directly preserve the branching relationship from each parent to its candidate continuations.",
     "interaction": "Rejected because changing beam width, token probabilities, or length penalty would add controls and mutable state without improving the core invariant that EOS exits the expandable frontier before pruning.",
     "paperReuse": "Rejected because the reviewed papers explain beam scoring and length treatment in broader translation systems, not this live-versus-finished state transition. No source figure has both the narrow teaching scope and verified figure-reuse permission, so no source geometry, wording, or data is copied.",
@@ -75,6 +75,6 @@
     "visualIds": [
       "beam-search-live-finished-transition"
     ],
-    "accessibility": "Each panel has a linked title and complete description containing the hypothesis scores and transition result. Direct LIVE, EOS, FINISHED, KEEP, and PRUNE labels, arrow direction, dashed finished boundaries, crossed prune marks, and the absence of outgoing finished edges carry meaning without color. The established two-panel primitive stacks below 640 CSS pixels; each compact 300-unit SVG has no minimum width and keeps labels readable at 390 CSS pixels. Existing theme variables provide dark-mode contrast, and shared print tokens produce a light, high-contrast figure that stays together."
+    "accessibility": "A normalized toy starts A with probability 0.6 and B with 0.4. A has next-token probabilities 0.5, 0.3, 0.2 for x, EOS, z. B has 0.6, 0.25, 0.15 for y, x, EOS. Log totals are computed from those probabilities. EOS candidates enter a separate finished enclosure and never expand. Live pruning retains A x and B y. At a later step A x emits EOS with probability 0.5. Final comparison includes EOS and excludes BOS, using alpha one: A EOS has probability 0.18, length two and final score about -0.857; A x EOS has probability 0.15, length three and final score about -0.632. The longer completion wins only under this declared normalization. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

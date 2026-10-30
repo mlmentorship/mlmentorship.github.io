@@ -73,6 +73,6 @@
     "visualIds": [
       "agent-safety-authority-loop"
     ],
-    "accessibility": "An illustrative impact ledger already contains 60 units and receives a proposed 50-unit action. A 100-unit policy limit would be exceeded because 60 plus 50 equals 110. The failing branch freezes future capabilities before dispatch. The proposed action is not counted as an already committed effect. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
+    "accessibility": "One common-scale bar stacks 60 committed impact units and a dashed proposed 50-unit action. The 100-unit limit crosses that bar before its end at 110; the ten-unit overflow is hatched. The dashed proposal is not an already committed effect. Crossing the bound freezes future capabilities before dispatch. All labels use at least 12 viewBox units in a 360-unit-wide composition. Meaning is also encoded by positions, words, line styles, and numbers, not color alone."
   }
 }

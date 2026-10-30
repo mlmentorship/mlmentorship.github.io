@@ -1,11 +1,95 @@
 {
   "schemaVersion": 1,
   "status": "review-complete",
-  "implementationStatus": "Second editorial edition plus four qualified mechanism improvements; see mechanismFollowUp for the latest bounded changes. Original assessments and earlier qualification remain historical.",
+  "implementationStatus": "Complete current-inventory source reconciliation plus eight qualified mechanism improvements; see completeInventoryReconciliation. Original assessments and earlier qualification remain historical.",
   "expectedArticles": 391,
   "expectedVisuals": 392,
   "authoredCodingStates": 797,
   "assessment": "Expert illustration review; no learner study or measured comprehension improvement is claimed.",
+  "completeInventoryReconciliation": {
+    "status": "implemented and locally qualified",
+    "baseCommit": "cc5b838bf03a808575831e43438944f051f366fd",
+    "registeredVisualsReviewed": 392,
+    "supplementalVisualsReviewed": 16,
+    "individualDecisions": 408,
+    "sourceReviewBasis": "Each current figure's title, inference question and structured source evidence was reconciled with its original assessment. Sixty HTML-only or multi-panel cases received full text/panel evidence rather than a first-SVG summary. Prior all-checkpoint qualification is reused for exact unchanged coding figures, not claimed as a fresh manual review of all 797 states.",
+    "decisionRule": "The eight identities in revisions are improve-mechanism. Every other identity in reviews and supplementalReviews is retain-current-mechanism; all 400 retained figure spans are exact to the committed parent. Successful quantitative plots and useful state tables are not replaced solely to impose a uniform style. Historical recommendations are not automatically current defects or a resolved universal backlog.",
+    "individualEvidence": "/tmp/mlmentorship-illustrations-complete-review-20261029-81b8a701-evidence/individual-decisions-r2.json",
+    "revisions": [
+      {
+        "visualId": "beam-search-live-finished-transition",
+        "problem": "The original A continuations implied sibling probability mass 2.180223504898774, and the final length-normalized comparison was absent.",
+        "change": "Use normalized parent and continuation distributions with computed natural-log totals, separate completed hypotheses from live pruning, and compare raw versus length-normalized scores with alpha one, EOS included and BOS excluded.",
+        "readerCheck": "Which score ranks completed sequences at the end, and why does an EOS sequence never return to live expansion?"
+      },
+      {
+        "visualId": "agent-safety-authority-loop",
+        "problem": "Aggregate overflow was carried by arithmetic rather than drawn scale.",
+        "change": "Stack committed 60 and dashed proposed 50 on one scale. Draw the 100-unit limit through the bar and hatch the ten-unit overflow; withhold future capability before dispatch.",
+        "readerCheck": "Why can a later individually valid proposal be blocked after aggregate impact crosses a bound?"
+      },
+      {
+        "visualId": "disagreement-evidence-commit-loop",
+        "problem": "The memory constraint was a textual comparison.",
+        "change": "Draw zero-based nine-GB and six-GB bars on one common scale with an eight-GB boundary. Preserve the owner, required reviews and evidence-based revisit trigger.",
+        "readerCheck": "Which observation would change the preferred option, and who owns the final bounded decision?"
+      },
+      {
+        "visualId": "ecosystem-serving-stages",
+        "problem": "Retrieved, eligible and displayed counts were explained in a stage table without visible membership.",
+        "change": "Show 100 countable candidates, 20 eligible outlines, five display dots and exactly five exposure records. Eligible-but-unshown items and rejected items remain distinct from actual exposure.",
+        "readerCheck": "Why can retrieved candidates not be counted as actual displayed exposure?"
+      },
+      {
+        "visualId": "coding-product-task-lifecycle",
+        "problem": "A request/evidence table did not spatially expose the unconfirmed stopping interval.",
+        "change": "Separate worker state and dispatch authority across request and receipt markers. Stop new dispatch at the request; confirm terminal worker state only at the receipt. Verification still leads to a user decision, not automatic patch application.",
+        "readerCheck": "Can passing checks apply a patch, or can requesting cancellation prove the worker stopped?"
+      },
+      {
+        "visualId": "multimodal-turn-lifecycle",
+        "problem": "Old-output retirement was described without showing an actual late packet crossing the epoch boundary.",
+        "change": "Draw accepted epoch-seven packets, crossed late epoch-seven output after epoch eight activates, and accepted new epoch-eight output. Keep playback-stop evidence separate and do not invent duration.",
+        "readerCheck": "What must stop after interruption, and which event confirms that stale output cannot continue?"
+      },
+      {
+        "visualId": "reasoning-admission-and-capacity",
+        "problem": "The unavailable sixth KV page was a number in prose rather than a missing resource.",
+        "change": "Align countable available and required units: four compute slots fit within six, but the sixth required KV page has no free match. Mark no admission and no reservation.",
+        "readerCheck": "Why does selecting a reasoning model not imply that it can execute now?"
+      },
+      {
+        "visualId": "subset-sum-old-snapshot",
+        "problem": "A state table left the forbidden same-item feedback mainly in prose.",
+        "change": "Draw old sums zero and one feeding separate plus-five arrows, then union zero, one, five, six. Cross out feedback from newly created five to ten.",
+        "readerCheck": "Why does the current 5 create 5 and 6, but not 10 in the same pass?"
+      }
+    ],
+    "qualification": {
+      "normalGates": ["npm run check", "npm run build"],
+      "synchronizedDrawingModels": { "registered": 88, "supplemental": 16 },
+      "acceptedFigureModeCases": 50,
+      "changedFigureModeCases": 40,
+      "neighborFigureModeCases": 10,
+      "actual390PhoneOriginalsInspected": 8,
+      "desktopDarkOriginalsInspected": 8,
+      "actualPdfRoutes": 8,
+      "actualPdfArticlePages": 218,
+      "completePdfFigurePagesInspected": 8,
+      "exactReusedArticles": 383,
+      "exactRetainedFigures": 400,
+      "reusePolicy": "Unchanged article source and built HTML are byte-identical to the prior qualified tree. All CSS, JavaScript, fonts and other Astro runtime assets are exact. Earlier accepted captures on seven changed routes retain exact whole-page HTML; final exposure captures are separate. Unchanged supplemental captures also match their earlier inspected PNG bytes.",
+      "sourceBuildParity": "All eight built SVG trees match their current deterministic drawing models exactly. A stale incremental-content build failed this check; only the owned Astro cache was replaced before final capture.",
+      "pdfPolicy": "Actual tagged A4 PDFs pass physical-page word bounds, visible-figure-word completeness and nonblank-page checks. Every changed title and both drawing boundary labels occur uniquely on one physical page; all eight complete figure-page rasters were viewed. This is not manual review of every PDF page.",
+      "rejectedAttempts": "Keep the non-executable archived launcher, worksheet coding overcount, duplicate test variable, SVG-line concatenation and stale exposure build/captures distinct from final evidence; no product assertion was relaxed.",
+      "preservation": "All 391 nonfigure lesson bodies, headings, Python and ordered figure identities remain unchanged. All 106 coding definitions, 797 checkpoints and 8739 ordered motion identities remain intact. Both other worktrees remain unchanged.",
+      "evidence": "/tmp/mlmentorship-illustrations-complete-review-20261029-81b8a701-evidence"
+    },
+    "measuredTenfoldImprovement": false,
+    "learnerStudy": false,
+    "publicationStandardCertified": false,
+    "publicationPerformed": false
+  },
   "mechanismFollowUp": {
     "status": "implemented and locally qualified",
     "baseCommit": "260aa69b596173c15679a7ba661483e60406542d",

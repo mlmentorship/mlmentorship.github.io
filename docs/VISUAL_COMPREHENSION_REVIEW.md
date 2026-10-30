@@ -1,5 +1,54 @@
 # Visual comprehension review
 
+## Complete inventory reconciliation
+
+This pass revisits all 392 registered figures and all 16 supplemental drawings against their current source evidence and original assessments.
+It records 408 individual decisions: eight further mechanism improvements and 400 retained figures whose exact figure bytes match parent `cc5b838bf03a808575831e43438944f051f366fd`.
+Retaining a useful plot or state table is an editorial decision, not a claim that it was newly redrawn.
+The structured record is `completeInventoryReconciliation` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+The complete individual evidence is retained with the compact qualification archive under `/tmp/mlmentorship-illustrations-complete-review-20261029-81b8a701-evidence`.
+
+| Figure | Concrete improvement | Reader inference |
+| --- | --- | --- |
+| Beam search | Replace impossible sibling probability mass with normalized distributions and computed log totals; work a raw-versus-length-normalized final comparison. | Live pruning and final scoring are different rules; EOS hypotheses stop expanding. |
+| Agent impact limit | Stack committed 60 and proposed 50 on one scale, crossing a visible 100-unit boundary. | The proposed ten-unit overflow must stop capability issuance before execution. |
+| Technical disagreement | Compare nine-GB and six-GB bars against the same eight-GB line. | A shared constraint rejects an option, not its advocate. |
+| Serving exposure | Draw 100 candidates, 20 eligible outlines, five display dots and five exposure records. | Retrieval and eligibility counts cannot become exposure denominators. |
+| Coding cancellation | Separate dispatch authority and observed worker state across request and receipt markers. | Cancellation request stops new dispatch but does not prove the worker stopped. |
+| Multimodal interruption | Cross out late epoch-seven output after epoch eight activates. | Packet retirement and confirmed playback stop require different evidence. |
+| Resource admission | Align available and required resource cells; cross out the unmatched sixth KV page. | Spare compute cannot replace missing KV capacity. |
+| Subset-sum snapshot | Draw old-snapshot inputs, plus-five transformations, later union, and crossed-out feedback. | A newly created sum cannot reuse the same current item. |
+
+Source review includes each current title, inference question and structured SVG/HTML evidence.
+Sixty HTML-only or multi-panel cases were read with full text/panel evidence instead of a first-SVG summary.
+The 106 coding traces retain exact source and their prior full-checkpoint qualification; this is not a fresh manual inspection of all 797 states.
+Historical assessments remain historical: an old redesign recommendation is not automatically an unresolved defect in today's drawing.
+
+Normal `npm run check` and `npm run build` pass.
+The drawing catalog now has 88 registered and 16 supplemental synchronized models.
+Accepted native evidence contains 50 five-mode cases: 40 for the eight changed figures and 10 for two neighboring supplemental figures.
+The modes are desktop light/dark, actual-390 phone light/dark, and print-style rendering.
+All eight changed phone-light originals and desktop-dark originals were directly inspected.
+Earlier accepted captures on seven changed routes are reused only with exact whole-page HTML and runtime assets; the final exposure composition has separate captures.
+Unchanged supplemental captures also match the earlier inspected PNG bytes.
+
+Eight actual tagged A4 PDFs pass page bounds, visible-figure-word completeness and nonblank-page checks across 218 article pages.
+Each changed title and both drawing boundary labels occur uniquely on one physical page.
+All eight complete figure-page rasters were directly viewed, not every PDF page.
+The existing opt-in print-page treatment keeps these drawings together without changing shared CSS.
+
+Raster review caught an incremental build retaining the old exposure arrow after its source changed.
+The stale captures and PDF remain rejected evidence.
+A new exact generated-SVG-to-built-SVG check rejects that mismatch, and a fresh owned content cache produces the final source-matched output.
+The non-executable historical launcher and SVG line-concatenation observer failure also remain separate; no product assertion was weakened.
+
+The other 383 article sources and built HTML are byte-identical to the prior qualified tree.
+All CSS, JavaScript, fonts and other Astro runtime assets remain exact.
+All nonfigure lesson bodies, headings, Python, figure identities, 797 checkpoints and 8,739 ordered motion identities remain preserved.
+Both pre-existing dirty worktrees are unchanged.
+There is no measured tenfold improvement, learner study, publication-standard certification, push or publication claim.
+The sections below describe earlier frozen candidates; their old raw paths and preview statements are historical.
+
 ## Mechanism follow-up
 
 This follow-up builds on the existing individual assessments of 392 registered figures and 16 supplemental drawings.
