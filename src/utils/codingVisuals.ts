@@ -33,6 +33,7 @@ function reserveLargestFrame(trace: HTMLElement, frames: HTMLElement[]): void {
   trace.style.removeProperty('--coding-frame-height');
   const measure = document.createElement('div');
   measure.className = 'coding-trace-frame-measure';
+  measure.style.width = `${width}px`;
   measure.setAttribute('aria-hidden', 'true');
   trace.append(measure);
   let largestHeight = 0;

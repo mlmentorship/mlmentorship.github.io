@@ -200,6 +200,37 @@ function mechanism(scene, previous) {
   return `<div class="coding-mechanism"><svg viewBox="0 0 360 ${height}" role="img" aria-label="${escapeHtml(description)}" style="display:block;width:100%;max-width:34rem;margin:auto"><title>${escapeHtml(description)}</title>${body}</svg></div>`;
 }
 
+export function renderNumericTransition(scene, previous) {
+  if (!previous) return '';
+  const numeric = checkpointChanges(scene, previous).filter((change) => /^-?\d+(?:\.\d+)?$/.test(change.before ?? '') && /^-?\d+(?:\.\d+)?$/.test(change.after ?? ''));
+  if (!numeric.length) return '';
+  const rows = numeric.slice(0, 3);
+  const text = (horizontal, vertical, value, anchor = 'start', tone = 'c-text') => `<text x="${horizontal}" y="${vertical}" style="font:12px var(--font-mono);text-anchor:${anchor};fill:var(--${tone})">${escapeHtml(value)}</text>`;
+  let body = text(16, 20, 'SHOWN CHECKPOINTS', 'start', 'c-text-soft')
+    + text(344, 20, 'circle: before / square: now', 'end', 'c-text-soft');
+  for (const [index, change] of rows.entries()) {
+    const before = Number(change.before);
+    const after = Number(change.after);
+    const minimum = Math.min(0, before, after);
+    const maximum = Math.max(0, before, after);
+    const coordinate = (value) => 28 + (value - minimum) / (maximum - minimum) * 304;
+    const top = 45 + index * 108;
+    body += `<g data-numeric-transition="${escapeHtml(change.identity)}" data-before="${before}" data-after="${after}" data-minimum="${minimum}" data-maximum="${maximum}">`
+      + text(16, top, change.label)
+      + text(344, top, `${before} -> ${after}`, 'end')
+      + `<path d="M28 ${top + 51}H332" style="stroke:var(--c-rule);fill:none"></path>`
+      + `<path d="M${coordinate(0)} ${top + 20}V${top + 66}" style="stroke:var(--c-text-soft);stroke-dasharray:3 3;fill:none"></path>`
+      + `<path d="M${coordinate(before)} ${top + 24}L${coordinate(after)} ${top + 51}" style="stroke:var(--viz-focus-stroke);stroke-width:2;fill:none"></path>`
+      + `<circle data-checkpoint-before cx="${coordinate(before)}" cy="${top + 24}" r="5" style="fill:var(--c-bg);stroke:var(--c-text-soft);stroke-width:2"></circle>`
+      + `<rect data-checkpoint-after x="${coordinate(after) - 5}" y="${top + 46}" width="10" height="10" style="fill:var(--viz-focus-bg);stroke:var(--viz-focus-stroke);stroke-width:2"></rect>`
+      + text(28, top + 83, minimum)
+      + text(332, top + 83, maximum, 'end') + '</g>';
+  }
+  const height = 50 + rows.length * 108;
+  const description = rows.map((change) => `${change.label}: ${change.before} before, ${change.after} at the next shown checkpoint.`).join(' ');
+  return `<div class="coding-numeric-transition"><svg viewBox="0 0 360 ${height}" role="img" aria-label="${escapeHtml(description)}" style="display:block;width:100%;max-width:34rem;margin:auto"><title>${escapeHtml(description)}</title><desc>Each row has its own zero-inclusive numerical scale. Circles mark the preceding authored checkpoint and squares the current checkpoint. Connecting segments compare these shown values, not an invented path of execution.</desc>${body}</svg></div>`;
+}
+
 export function renderStateTransition(scene, previous) {
   const changes = checkpointChanges(scene, previous);
   const diagram = mechanism(scene, previous);
@@ -211,7 +242,7 @@ export function renderStateTransition(scene, previous) {
     const prior = previous ? `<span class="coding-state-before">${before}</span><span class="coding-state-arrow" role="img" aria-label="shown next as">&rarr;</span>` : '';
     return `<div class="coding-state-change"><dt>${escapeHtml(change.label)}</dt><dd>${prior}<strong class="coding-state-after">${after}</strong></dd></div>`;
   }).join('');
-  return `${diagram}<div class="coding-state-comparison" role="group" aria-label="${previous ? 'Selected values shown at consecutive authored checkpoints' : 'Selected values shown at the first checkpoint'}"><dl>${rows}</dl></div>`;
+  return `${diagram}<div class="coding-state-comparison" role="group" aria-label="${previous ? 'Selected values shown at consecutive authored checkpoints' : 'Selected values shown at the first checkpoint'}"><dl>${rows}</dl>${renderNumericTransition(scene, previous)}</div>`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -243,6 +274,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   assert.equal(repeatedTree.get('tree-status:1:1').value, 'right pending');
   assert.equal(JSON.stringify([before, after]), frozen);
   const { parseFragment } = await import('parse5');
+  const numericBefore = { type: 'array', items: [-4, 2], running: -3 };
+  const numericAfter = { ...numericBefore, items: [6, 2], running: 5 };
+  const numericOutput = renderNumericTransition(numericAfter, numericBefore);
+  assert.match(numericOutput, /data-before="-4" data-after="6" data-minimum="-4" data-maximum="6"/);
+  assert.match(numericOutput, /data-checkpoint-before cx="28"/);
+  assert.match(numericOutput, /data-checkpoint-after x="327"/);
+  assert.equal(renderNumericTransition(numericAfter), '');
+  assert.equal(renderNumericTransition(numericBefore, numericBefore), '');
+  assert.equal(renderNumericTransition({ type: 'array', items: ['unknown'] }, numericBefore), '');
   const elements = (source, name) => {
     const found = [];
     function walk(node) {

@@ -1,5 +1,55 @@
 # Visual comprehension review
 
+## Full-library proof-first edition
+
+The new mandate replaces the preceding retain-most strategy with a new primary composition for every illustration.
+All 408 figures now open with an individually authored visual argument: 392 registered figures and 16 supplemental drawings across 391 articles.
+The catalog is [scripts/illustration-arguments.mjs](../scripts/illustration-arguments.mjs); the per-figure rationale and intended inference are recorded under `ambitiousFullLibraryEdition` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+The earlier sections below describe frozen historical editions, not the current redesign scope.
+
+The drawings use shared-scale comparisons, proportional parts and areas, countable populations, numeric curves, matrices, coordinate geometry, event sequences, dependency routes, and state ledgers.
+The visual form is chosen for the inference rather than applying a new title or decoration to the old diagram.
+Examples include 1,098 individual positive-test outcomes, an explicit Jacobian-transpose calculation, a direction-preserving clipped gradient, and a critical-path comparison.
+All 106 coding figures gain worked counterexamples or invariant proofs, including stale heap entries, repeated-character demand, sentinel state, ancestor bounds, and invalid self-reuse.
+
+Original detailed drawings remain available under Derivation, and all interactive coding traces stay open under Execution trace.
+The original trace-specific comprehension questions stay beside their original examples; they are not attached to new examples using different values.
+Captions are visually adjacent to the new primary drawings.
+Labels are at least 14 SVG units, with a stricter 12px native screen floor for the new compositions.
+Data cells grow to fit labels, row-label gutters preserve whole words, and annotations cannot overlap other text.
+
+Source gates require exact coverage and generated markup for all 408 figures, numeric axis bounds, finite quantities, and selected-cell validity.
+Independent arithmetic checks cover effective sample size, clipping, Jacobian pullback, answer-space search predicates, fixed-width carry passes, prefix/suffix products, and dynamic-programming dependencies.
+All 391 lesson bodies, headings, Python, public figure identities, 797 checkpoints, and 8,739 ordered motion identities remain preserved.
+Normal `npm run check` and `npm run build` pass; generated proofs must match both article source and built SVG output.
+
+Final production qualification passes all 408 figures in desktop light/dark, actual-390 phone light/dark, and print-style rendering: 2,040 freshly captured figure/mode cases.
+The accepted inventory authenticates 4,148 PNG files, not 4,148 different figures or individually inspected images.
+Every final phone-light primary proof was individually reviewed in complete, original-scale four-figure sheets.
+The initial 102 sheets cover all 408 compositions; after editorial repair, 28 replacement sheets were directly reviewed for 111 changed proofs.
+The other 297 final proof PNGs are byte-identical to their individually reviewed originals.
+Ten correctly framed native desktop-dark proofs, one of each drawing grammar, were also directly inspected.
+
+Native interaction sweeps pass all 106 coding routes and all 797 authored checkpoints at each actual 1280px and 390px width.
+They exercise forward, backward and direct selection, keyboard navigation, playback, stable frame/control/page geometry, reduced motion and the no-JavaScript fallback.
+This is not a claim that every authored execution state or every theme image was manually inspected again.
+
+All 391 actual tagged A4 PDFs pass physical bounds, visible primary-proof word completeness and nonblank-page checks across 3,713 article pages.
+Every primary proof, its figure title and its caption occur together on one physical page; retained execution traces and derivations may continue afterward.
+Ten complete physical figure-page rasters, covering every drawing grammar, were directly viewed, not every PDF page.
+
+Individual review replaced a density parts strip with two equal-scale areas holding the same four mass dots, and a merely asymmetric KL example with a true candidate-ranking reversal on identical scales.
+It also repaired stationary weighted flow, the retained middle candidate in rotated minimum search, peak versus final meeting-room demand, matrix word wrapping and a fractional axis label.
+Native interaction testing exposed an off-screen frame-measurement clone whose temporary scrollbar narrowed its percentage width; measuring at the actual trace width fixes the cause without padding or relaxed stability assertions.
+The evidence harness separately reserves a stable scrollbar gutter for the selected dark crops, preventing capture-induced reflow without changing article CSS.
+
+The final qualification and compact archive are under `/tmp/mlmentorship-illustrations-ambitious-edition-20261029-81b8a701-evidence`.
+The archive retains all 408 accepted phone proof originals, all native reports and hash inventories, the reviewed sheets, ten complete final PDFs and their figure-page rasters, ten stable dark proofs, gate logs and selected rejected samples.
+Other bulk captures, PDFs, caches and generated builds are removed only after authentication; the committed source, shared dependencies, previous sealed evidence and other worktrees are preserved.
+
+The design target is an order-of-magnitude improvement, not another small repair pass.
+A measured tenfold comprehension gain still requires reader testing; no learner study, publication-standard certification, push, or publication is claimed.
+
 ## Complete inventory reconciliation
 
 This pass revisits all 392 registered figures and all 16 supplemental drawings against their current source evidence and original assessments.

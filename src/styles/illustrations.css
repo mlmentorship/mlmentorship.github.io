@@ -6,6 +6,111 @@
   background: var(--c-bg);
 }
 
+.learning-figure:has(> .visual-argument) {
+  display: flex;
+  flex-direction: column;
+}
+
+.visual-argument {
+  min-width: 0;
+  padding-block: .25rem 1rem;
+}
+
+.visual-argument-premise {
+  max-width: 42rem;
+  margin: 0 0 .75rem;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.visual-argument > svg {
+  display: block;
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 34rem;
+  margin-inline: auto;
+  overflow: visible;
+}
+
+.learning-figure:has(> .visual-argument) > figcaption {
+  order: 1;
+  max-width: 42rem;
+  margin: .75rem 0 0;
+  padding-inline-start: .85rem;
+  border-inline-start: 3px solid var(--viz-focus-stroke);
+  font-size: .9375rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.visual-derivation {
+  order: 2;
+  min-width: 0;
+  max-width: 100%;
+  margin: .25rem 0 1rem;
+  padding-block: .5rem;
+  border-block: 1px solid var(--c-rule);
+}
+
+.visual-derivation > summary {
+  width: fit-content;
+  padding: .35rem .25rem;
+  color: var(--c-text-soft);
+  font-size: .8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.visual-derivation > summary:focus-visible {
+  outline: 2px solid var(--viz-focus-stroke);
+  outline-offset: 3px;
+}
+
+.visual-derivation-content {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-block: 1rem .5rem;
+}
+
+.coding-numeric-transition {
+  margin-top: .75rem;
+}
+
+@media print {
+  .visual-derivation::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+
+  .visual-argument > svg {
+    max-height: 140mm;
+  }
+
+  .visual-argument,
+  .learning-figure:has(> .visual-argument) > figcaption {
+    break-inside: avoid-page;
+  }
+
+  .learning-figure:has(> .visual-argument) > .visual-title {
+    break-after: avoid-page;
+  }
+
+  .visual-derivation {
+    break-before: auto;
+  }
+
+  .visual-derivation-content {
+    overflow: visible;
+  }
+
+  .visual-derivation-content svg {
+    max-height: 190mm;
+  }
+}
+
 .visual-kicker,
 .coding-trace-frame-heading > span {
   font-size: .6875rem;
@@ -294,6 +399,11 @@
   [data-illustration-print-page] > figcaption {
     font-size: 9pt;
     line-height: 1.35;
+  }
+
+  .learning-figure:has(> .visual-argument) {
+    break-before: page;
+    break-inside: auto;
   }
 
   .visual-grid--two {

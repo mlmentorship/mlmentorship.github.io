@@ -9,6 +9,7 @@ import { renderStateTransition } from './coding-visuals/state-transition.mjs';
 import { redraws, supplementalRedraws, renderRedraw } from './illustration-redraws.mjs';
 import { checkPreservation } from './sync-learning-mechanisms.mjs';
 import { figureTakeaways } from './illustration-takeaways.mjs';
+import { visualArguments, renderVisualArgument, renderArgumentCaption } from './illustration-arguments.mjs';
 
 const root = path.resolve(import.meta.dirname, '..');
 const evidence = path.resolve(process.argv.find((argument) => argument.startsWith('--evidence-dir='))?.slice('--evidence-dir='.length) ?? path.join(root, 'scratch/illustration-edition'));
@@ -164,6 +165,56 @@ function applyCoding() {
   verify();
 }
 
+function applyArguments() {
+  assert(fs.existsSync(baselinePath), 'Capture preservation evidence before generation');
+  let changed = 0;
+  for (const [identity] of Object.entries(visualArguments)) {
+    const audit = owners.get(identity) ?? audits.find((item) => item.slug === supplementalRedraws[identity]?.slug);
+    assert(audit, `${identity}: owner required`);
+    const file = path.join(root, audit.article);
+    const source = fs.readFileSync(file, 'utf8');
+    const html = htmlNodes(source);
+    const marker = source.indexOf(`<!-- visual:${identity} -->`);
+    const figure = html.find(({ node, attributes, offset }) => node.nodeName === 'figure' && (attributes['data-supplemental-visual'] === identity || marker >= 0 && offset + node.sourceCodeLocation.startOffset > marker));
+    assert(figure, `${identity}: figure required`);
+    const children = figure.node.childNodes ?? [];
+    const caption = children.find((node) => node.nodeName === 'figcaption');
+    assert(caption, `${identity}: direct caption required`);
+    const readerCheck = caption.childNodes.find((node) => node.attrs?.some((attribute) => attribute.name === 'data-reader-check'));
+    const captionStart = figure.offset + caption.sourceCodeLocation.startTag.endOffset;
+    const captionEnd = figure.offset + caption.sourceCodeLocation.endTag.startOffset;
+    const question = readerCheck ? source.slice(figure.offset + readerCheck.sourceCodeLocation.startOffset, figure.offset + readerCheck.sourceCodeLocation.endOffset) : '';
+    const proofCaption = caption.childNodes.find((node) => node.attrs?.some((attribute) => attribute.name === 'data-proof-caption'));
+    const previousProof = proofCaption ? source.slice(figure.offset + proofCaption.sourceCodeLocation.startOffset, figure.offset + proofCaption.sourceCodeLocation.endOffset) : '';
+    const captionBody = source.slice(captionStart, captionEnd).replace(question, '').replace(previousProof, '').replace('<strong>Read it this way:</strong>', '').trim();
+    const existing = children.find((node) => node.attrs?.some((attribute) => attribute.name === 'data-visual-argument' && attribute.value === identity));
+    const generated = renderVisualArgument(identity);
+    let replacements;
+    if (existing) {
+      replacements = [{ start: figure.offset + existing.sourceCodeLocation.startOffset, end: figure.offset + existing.sourceCodeLocation.endOffset, value: generated }];
+      if (captionBody || question) {
+        const derivation = html.find(({ attributes, offset, node }) => (attributes.class ?? '').split(' ').includes('visual-derivation-content') && offset + node.sourceCodeLocation.startOffset > figure.offset + figure.node.sourceCodeLocation.startOffset && offset + node.sourceCodeLocation.endOffset < figure.offset + figure.node.sourceCodeLocation.endOffset);
+        assert(derivation, `${identity}: derivation required`);
+        const end = derivation.offset + derivation.node.sourceCodeLocation.endTag.startOffset;
+        replacements.push({ start: end, end, value: `<div class="visual-derivation-caption">${captionBody}${question ? ` ${question}` : ''}</div>` });
+      }
+    } else {
+      const title = children.find((node) => node.attrs?.some((attribute) => attribute.name === 'class' && attribute.value.split(' ').includes('visual-title')));
+      assert(title && caption, `${identity}: direct title and caption required`);
+      const start = figure.offset + title.sourceCodeLocation.endOffset;
+      const end = figure.offset + caption.sourceCodeLocation.startOffset;
+      const derivation = source.slice(start, end);
+      const coding = visualArguments[identity].coding;
+      replacements = [{ start, end, value: `${generated}<details class="visual-derivation"${coding ? ' open' : ''}><summary>${coding ? 'Execution trace' : 'Derivation'}</summary><div class="visual-derivation-content">${derivation}<div class="visual-derivation-caption">${captionBody}${question ? ` ${question}` : ''}</div></div></details>` }];
+    }
+    replacements.push({ start: captionStart, end: captionEnd, value: renderArgumentCaption(identity) });
+    const updated = replaceRanges(source, replacements);
+    if (updated !== source) { fs.writeFileSync(file, updated); changed++; }
+  }
+  console.log(`Proof-first figure compositions applied: ${changed}/${Object.keys(visualArguments).length}. Detailed models and existing identities retained.`);
+  verify();
+}
+
 function reconcile() {
   const definitions = Object.values(codingQuestionVisuals);
   review.implementationStatus = 'Editorial edition implemented; see editionReconciliation for scope and qualification. Original assessments and previous qualification remain historical.';
@@ -196,6 +247,45 @@ function reconcile() {
   };
   fs.writeFileSync(path.join(root, 'data/visual-comprehension-review.json'), `${JSON.stringify(review, null, 2)}\n`);
   console.log(`Edition reconciliation recorded: ${owners.size} registered, ${Object.keys(redraws).length} registered redraws, ${Object.keys(supplementalRedraws).length} supplemental redraws, ${definitions.length} coding traces.`);
+}
+
+function reconcileArguments() {
+  assert.deepEqual(new Set(Object.keys(visualArguments)), new Set([...owners.keys(), ...Object.keys(supplementalRedraws)]));
+  const qualificationPath = process.argv.find(argument => argument.startsWith('--qualification='))?.slice('--qualification='.length);
+  const qualification = qualificationPath ? JSON.parse(fs.readFileSync(qualificationPath, 'utf8')) : null;
+  if (qualification) {
+    assert.equal(qualification.status, 'passed');
+    assert.equal(qualification.figures, 408);
+    assert.equal(qualification.catalogSha256, hash(fs.readFileSync(path.join(root, 'scripts/illustration-arguments.mjs'))));
+  }
+  review.implementationStatus = 'Full-library proof-first edition implemented; previous assessments and edition qualifications below remain historical.';
+  review.ambitiousFullLibraryEdition = {
+    status: qualification ? 'implemented and qualified within the recorded scope' : 'implemented; final native and print qualification pending',
+    parentCommit: '1db58d40133b89fc9e23faf8e3d9b4d81c29cd83',
+    target: 'An order-of-magnitude editorial improvement in every visualization, not a measured comprehension multiplier.',
+    inventory: { articles: audits.length, registered: owners.size, supplemental: Object.keys(supplementalRedraws).length, total: Object.keys(visualArguments).length, coding: Object.values(visualArguments).filter(model => model.coding).length },
+    compositionPolicy: 'Every figure opens with a newly authored topic-specific visual proof, counterexample, quantity comparison, or dependency. Exact original detailed models remain in Derivation; interactive coding traces remain open. Original example-specific questions stay with those models, not with a different worked example.',
+    representationPolicy: 'Drawn lengths use shared zero-inclusive scales; parts have proportional widths; populations contain one countable mark per declared observation; numeric curves use declared coordinates; matrices preserve cell and axis identity; vector diagrams use equal coordinate scales.',
+    sourceCatalog: 'scripts/illustration-arguments.mjs',
+    catalogSha256: hash(fs.readFileSync(path.join(root, 'scripts/illustration-arguments.mjs'))),
+    figures: Object.entries(visualArguments).map(([visualId, model]) => ({
+      visualId,
+      slug: owners.get(visualId)?.slug ?? supplementalRedraws[visualId].slug,
+      change: 'New primary proof composition; original detailed representation preserved',
+      representation: model.kind,
+      premise: model.premise,
+      readerInference: model.conclusion,
+      codingExample: model.coding === true,
+    })),
+    preservation: { lessonBodies: true, headings: true, pythonFences: true, orderedVisualIds: true, checkpoints: 797, orderedMotionIdentities: 8739, protectedSources: true },
+    qualification,
+    measuredTenfoldImprovement: false,
+    learnerStudy: false,
+    publicationStandardCertification: false,
+    publicationPerformed: false,
+  };
+  fs.writeFileSync(path.join(root, 'data/visual-comprehension-review.json'), `${JSON.stringify(review, null, 2)}\n`);
+  console.log(`Full-library proof reconciliation: ${Object.keys(visualArguments).length} individual compositions, no blanket retention decisions.`);
 }
 
 function reviewBatch(start, count) {
@@ -389,10 +479,12 @@ function applyRedraws() {
 
 if (process.argv.includes('--capture')) capture();
 else if (process.argv.includes('--apply-coding')) applyCoding();
+else if (process.argv.includes('--apply-arguments')) applyArguments();
 else if (process.argv.includes('--apply-redraws')) applyRedraws();
 else if (process.argv.includes('--apply-takeaways')) applyTakeaways();
 else if (process.argv.includes('--apply-reader-checks')) applyReaderChecks();
 else if (process.argv.includes('--verify')) verify();
+else if (process.argv.includes('--reconcile-arguments')) reconcileArguments();
 else if (process.argv.includes('--reconcile')) reconcile();
 else if (process.argv.some((argument) => argument.startsWith('--review='))) {
   const [start, count = 10] = process.argv.find((argument) => argument.startsWith('--review=')).slice(9).split(':').map(Number);
@@ -435,6 +527,11 @@ else if (process.argv.some((argument) => argument.startsWith('--review='))) {
       const title = figure.node.childNodes.find((node) => node.attrs?.some((attribute) => attribute.name === 'class' && attribute.value.split(' ').includes('visual-title')));
       assert(title, `${identity}: missing direct figure title`);
       assert.equal(title.childNodes.map((node) => node.value ?? '').join(''), figureTakeaways[identity], `${identity}: applied takeaway must match its catalog entry`);
+      const proof = figure.node.childNodes.find(node => node.attrs?.some(attribute => attribute.name === 'data-visual-argument' && attribute.value === identity));
+      assert(proof, `${identity}: missing direct proof composition`);
+      assert.equal(source.slice(figure.offset + proof.sourceCodeLocation.startOffset, figure.offset + proof.sourceCodeLocation.endOffset), renderVisualArgument(identity), `${identity}: generated proof is out of sync`);
+      const caption = figure.node.childNodes.find(node => node.nodeName === 'figcaption');
+      assert.equal(source.slice(figure.offset + caption.sourceCodeLocation.startTag.endOffset, figure.offset + caption.sourceCodeLocation.endTag.startOffset), renderArgumentCaption(identity), `${identity}: proof caption must describe this exact worked example`);
     }
   }
   for (const [identity, model] of Object.entries({ ...redraws, ...supplementalRedraws })) {

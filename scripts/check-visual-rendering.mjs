@@ -4,7 +4,8 @@ import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import process from 'node:process';
 import { fromMarkdown } from 'mdast-util-from-markdown';
-import { parseFragment } from 'parse5';
+import { parseFragment, serialize } from 'parse5';
+import { renderVisualArgument } from './illustration-arguments.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -38,6 +39,7 @@ if (slugs.length === 0 || new Set(slugs).size !== slugs.length) {
 const baseUrl = option('base-url', 'http://127.0.0.1:8123').replace(/\/$/, '');
 const outputDir = resolve(root, option('output', 'scratch/visual-render-review'));
 const allFrames = process.argv.includes('--all-frames');
+const proofCaptures = process.argv.includes('--proof-captures');
 const supplemental = process.argv.includes('--supplemental');
 const auditsDir = join(root, 'data', 'visual-audits');
 const auditedEntries = slugs.map((slug) => {
@@ -532,6 +534,45 @@ try {
               rawCaptionMath: captionText.split('$').length > 2 || captionText.includes(String.fromCharCode(92)),
               captionGlyphWidth: rangeWidth(caption),
               clippedText,
+              proof: (() => {
+                const argument = visual.querySelector(':scope > .visual-argument');
+                if (!argument) return null;
+                const svg = argument.querySelector('svg');
+                const box = svg.getBoundingClientRect();
+                const labels = [...svg.querySelectorAll('text')].filter((label) => label.textContent.trim()).map((label) => ({ text: label.textContent, box: label.getBoundingClientRect() }));
+                const overlaps = [];
+                for (let first = 0; first < labels.length; first++) for (let second = first + 1; second < labels.length; second++) {
+                  const left = labels[first];
+                  const right = labels[second];
+                  if (Math.min(left.box.right, right.box.right) - Math.max(left.box.left, right.box.left) > 1 && Math.min(left.box.bottom, right.box.bottom) - Math.max(left.box.top, right.box.top) > 1) overlaps.push([left.text, right.text]);
+                }
+                const nodeClipping = [...svg.querySelectorAll('[data-proof-token], [data-proof-cell]')].flatMap((node) => {
+                  const label = node.nextElementSibling;
+                  if (label?.tagName !== 'text') return ['missing cell label'];
+                  const bounds = node.getBBox();
+                  const textBounds = label.getBBox();
+                  return textBounds.x < bounds.x - .5 || textBounds.y < bounds.y - .5 || textBounds.x + textBounds.width > bounds.x + bounds.width + .5 || textBounds.y + textBounds.height > bounds.y + bounds.height + .5 ? [label.textContent] : [];
+                });
+                const derivation = visual.querySelector(':scope > .visual-derivation');
+                const argumentRect = argument.getBoundingClientRect();
+                const boxes = [titleRect, argumentRect, captionRect];
+                return {
+                  identity: argument.dataset.visualArgument,
+                  markup: argument.outerHTML,
+                  minText: Math.min(...[...svg.querySelectorAll('text')].map((label) => parseFloat(getComputedStyle(label).fontSize) * box.width / svg.viewBox.baseVal.width)),
+                  width: box.width,
+                  height: box.height,
+                  captureRect: {
+                    x: Math.min(...boxes.map(bounds => bounds.left)) + scrollX,
+                    y: Math.min(...boxes.map(bounds => bounds.top)) + scrollY,
+                    width: Math.max(...boxes.map(bounds => bounds.right)) - Math.min(...boxes.map(bounds => bounds.left)),
+                    height: Math.max(...boxes.map(bounds => bounds.bottom)) - Math.min(...boxes.map(bounds => bounds.top)),
+                  },
+                  overlaps,
+                  nodeClipping,
+                  captionBeforeDerivation: !derivation || captionRect.bottom <= derivation.getBoundingClientRect().top + 1,
+                };
+              })(),
               textOverlaps: visual.matches('.editorial-illustration') ? (() => {
                 const labels = [...visual.querySelectorAll('svg text')].filter((label) => label.textContent.trim()).map((label) => ({ text: label.textContent, box: label.getBoundingClientRect() }));
                 const overlaps = [];
@@ -562,6 +603,14 @@ try {
           throw new Error(evaluation.exceptionDetails.exception?.description ?? evaluation.exceptionDetails.text);
         }
         const details = evaluation.result.value;
+        if (!details.proof || details.proof.identity !== visualId) throw new Error(`${label} lost its proof composition`);
+        if (serialize(parseFragment(details.proof.markup)) !== serialize(parseFragment(renderVisualArgument(visualId)))) throw new Error(`${label} serves a stale proof composition`);
+        if (details.proof.width < 1 || details.proof.height < 1) throw new Error(`${label} hides its proof composition`);
+        if (mode.media !== 'print' && details.proof.minText < 12) throw new Error(`${label} proof text is smaller than 12px: ${details.proof.minText}`);
+        if (details.proof.overlaps.length) throw new Error(`${label} proof text overlaps: ${JSON.stringify(details.proof.overlaps)}`);
+        if (details.proof.nodeClipping.length) throw new Error(`${label} proof text escapes a cell: ${details.proof.nodeClipping.join(', ')}`);
+        if (!details.proof.captionBeforeDerivation) throw new Error(`${label} detaches its proof caption from the drawing`);
+        delete details.proof.markup;
         if (mode.mobile && details.innerWidth !== 390) throw new Error(`${label} reported innerWidth ${details.innerWidth}`);
         if (details.pageWidth > details.innerWidth + 1) throw new Error(`${label} creates page overflow (${details.pageWidth} > ${details.innerWidth})`);
         if (!details.figureFitsViewport) throw new Error(`${label} exceeds the viewport`);
@@ -620,6 +669,10 @@ try {
         });
         const prefix = `${mode.name}--${entry.slug}--${visualId}`;
         writeFileSync(join(outputDir, `${prefix}.png`), Buffer.from(screenshot.data, 'base64'));
+        if (proofCaptures) {
+          const proofScreenshot = await cdp.call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip: { ...details.proof.captureRect, scale: 1 } });
+          writeFileSync(join(outputDir, `${prefix}--proof.png`), Buffer.from(proofScreenshot.data, 'base64'));
+        }
 
         if (allFrames && mode.media === 'screen') {
           const frameCountEvaluation = await cdp.call('Runtime.evaluate', {
@@ -810,6 +863,10 @@ try {
           writeFileSync(join(outputDir, `${prefix}--scroll-end.png`), Buffer.from(endScreenshot.data, 'base64'));
         }
         report.push({ mode: mode.name, ...entry, visualId, ...details });
+        if (report.length % 20 === 0) {
+          writeFileSync(join(outputDir, 'progress.json'), `${JSON.stringify({ renders: report, complete: false }, null, 2)}\n`);
+          console.log(`Native visual progress: ${report.length} cases; latest ${label}`);
+        }
       }
     }
   }
