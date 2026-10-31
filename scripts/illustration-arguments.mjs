@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
 import { figureTakeaways } from './illustration-takeaways.mjs';
 import { codingQuestionVisuals } from './coding-question-visuals.mjs';
+import { mentalPictures, renderMentalPicture } from './illustration-mental-models.mjs';
 
 const escape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const color = (tone) => `var(--${tone === 'text' ? 'c-text' : tone === 'soft' ? 'c-text-soft' : `viz-${tone}-stroke`})`;
@@ -554,7 +555,30 @@ function topology(model) {
   return { body, height: 326 };
 }
 
-const renderers = { bars, parts, population, matrix, curve, timeline, connections, ledger, areas, geometry, intervals, suppression, topology };
+function shrinkage(model) {
+  let body = text(20, 26, `Same data; penalty strength ${number(model.strength)}`, { width: 320, weight: 700 });
+  for (const [phase, penalty] of ['L1', 'L2'].entries()) {
+    const top = 72 + phase * 238;
+    const tone = phase ? 'output' : 'focus';
+    body += text(20, top, phase ? 'L2: scale toward zero' : 'L1: subtract; stop at zero', { width: 320, size: 18, weight: 700, tone });
+    for (const [coordinate, before] of model.target.entries()) {
+      const after = phase ? before / (1 + model.strength) : Math.max(0, before - model.strength);
+      const maximum = coordinate ? 2.4 : .24;
+      const position = (value) => 36 + value / maximum * 288;
+      const vertical = top + 44 + coordinate * 88;
+      const result = phase ? coordinate ? '5/3' : '1/12' : number(after);
+      body += text(20, vertical, coordinate ? 'Large coefficient' : 'Small; x10 view', { width: 170, weight: 700 })
+        + text(340, vertical, `${number(before)} to ${result}`, { width: 145, anchor: 'end', weight: 700, tone });
+      const baseline = vertical + 28;
+      body += `<g data-proof-shrink="${penalty},${coordinate}" data-proof-before="${before}" data-proof-after="${after}" data-proof-scale="${288 / maximum}"><rect x="36" y="${baseline - 6}" width="${position(before) - 36}" height="12" style="fill:${fill('neutral')};stroke:${color('neutral')};stroke-width:1.5;stroke-dasharray:3 3"></rect><rect x="36" y="${baseline - 6}" width="${position(after) - 36}" height="12" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>${line(36, baseline + 10, 324, baseline + 10)}${circle(position(before), baseline, 5, 'neutral')}${circle(position(after), baseline, 6, tone, true)}<path d="M${position(before)} ${baseline - 17}H${position(after)}m6-4-6 4 6 4" style="fill:none;stroke:${color(tone)};stroke-width:1.75"></path></g>`
+        + text(36, baseline + 31, '0', { size: 12, tone: 'soft' })
+        + text(324, baseline + 31, maximum, { size: 12, anchor: 'end', tone: 'soft' });
+    }
+  }
+  return { body, height: 506 };
+}
+
+const renderers = { bars, parts, population, matrix, curve, timeline, connections, ledger, areas, geometry, intervals, suppression, topology, shrinkage };
 const sampledOperations = new WeakMap();
 const sample = (operation, minimum, maximum, count = 65) => {
   const points = Array.from({ length: count }, (_, index) => {
@@ -852,7 +876,7 @@ define('rag-index-request-paths', 'ledger', 'Keep the answer connected to one ve
 define('personalization-three-feature-clocks', 'timeline', 'A fast request can still use an old feature snapshot', 'The request completes quickly after reading a much earlier snapshot. Request latency and feature freshness use different timestamp differences.', { events: [['Feature snapshot materialized', 0, 'warning'], ['Request starts', 9.9, 'input'], ['Response returns', 10, 'output']], unit: 'shared illustrative clock units' });
 define('recsys-llm-bounded-augmentation', 'matrix', 'A generated recommendation must satisfy deadline and catalog gates', 'A timely suggestion for an unknown item fails the catalog gate. A valid but late suggestion also falls back to the bounded baseline.', { values: [['yes', 'NO', 'fallback'], ['NO', 'yes', 'fallback'], ['yes', 'yes', 'eligible']], columns: ['on time', 'catalog', 'result'], labels: ['case A', 'case B', 'case C'], selected: [[2, 2]], blocked: [[0, 1], [1, 0]] });
 define('inference-cost-measure-test-compound-loop', 'bars', 'Rejected savings do not become the next baseline', 'The 8-unit change passes quality and replaces the 10-unit baseline. The 6-unit change fails tail quality, so the accepted baseline stays 8.', { rows: [['Original accepted baseline', 10, 'input'], ['Change 1: quality passes', 8, 'output'], ['Change 2: quality fails; reject', 6, 'warning']], unit: ' toy cost units' });
-define('regularization-diagnose-and-target', 'matrix', 'An observed gap does not identify a unique cause', 'The same train/validation gap can accompany leakage, distribution shift, or overfitting. A discriminating check precedes the choice of regularizer.', { values: [['gap', '?'], ['gap', '?'], ['gap', '?']], columns: ['observed', 'cause known'], labels: ['leakage', 'shift', 'overfit'], blocked: [[0, 1], [1, 1], [2, 1]] });
+define('regularization-diagnose-and-target', 'shrinkage', 'Subtracting and scaling reshape the same coefficients differently', 'L1 can remove a small coefficient entirely. Here, strength 0.2 gives [0,1.8]. L2 divides both coefficients by 1.2, giving [1/12,5/3]. Small-coefficient rulers magnify distances tenfold. These exact optima assume the stated unit-curvature quadratic.', { target: [.1, 2], strength: .2 });
 define('fair-comparison-evidence-ledger', 'matrix', 'Unequal tuning opportunities confound the method comparison', 'Method B received ten times the search trials. Its best score cannot isolate the method effect without a matched tuning comparison.', { values: [[10, 'best A'], [100, 'best B']], columns: ['trials', 'reported'], labels: ['method A', 'method B'], blocked: [[1, 0]] });
 define('environment-grader-contract-handoff', 'matrix', 'A successful final state can fail the required process', 'The environment reaches the goal while violating an allowed-tool constraint. The grader must retain both outcome and process evidence.', { values: [['yes', 'NO', 'FAIL']], columns: ['goal', 'process', 'trial'], labels: ['run'], selected: [[0, 0]], blocked: [[0, 1], [0, 2]] });
 define('rlhf-dpo-training-paths', 'matrix', 'DPO reuses preference pairs without a separate reward-model rollout loop', 'Both routes use preference information. DPO directly optimizes on pairs; the illustrated RLHF route adds reward-model fitting and policy rollouts.', { values: [['yes', 'yes', 'yes'], ['yes', 'no', 'no']], columns: ['pairs', 'reward fit', 'rollouts'], labels: ['RLHF', 'DPO'], selected: [[0, 0], [1, 0]] });
@@ -1182,19 +1206,23 @@ for (const [identity, model] of Object.entries(visualArguments)) {
   else if (identity === 'ml-role-activity-profiles') model.composition = 'budget-rows';
   else if (identity === 'fixed-capacity-portfolio-guardrails') model.composition = 'budget-transfer';
   else if (['confusion-matrix-denominators', 'binary-precision-and-recall-state', 'roc-pr-same-operating-point'].includes(identity)) model.composition = 'denominators';
-  else model.composition = { bars: 'endpoint', parts: 'whole-and-share', population: 'counted-cohorts', matrix: 'cells', timeline: 'shared-clock', connections: 'directed-routes', areas: 'conserved-mass', intervals: 'repeat-versus-condition', suppression: 'overlapping-candidates', topology: 'counterexample-graph' }[model.kind];
+  else model.composition = { bars: 'endpoint', parts: 'whole-and-share', population: 'counted-cohorts', matrix: 'cells', timeline: 'shared-clock', connections: 'directed-routes', areas: 'conserved-mass', intervals: 'repeat-versus-condition', suppression: 'overlapping-candidates', topology: 'counterexample-graph', shrinkage: 'threshold-versus-scale' }[model.kind];
 }
 
 export function renderVisualArgument(identity) {
   const model = visualArguments[identity];
   assert(model, `No visual argument for ${identity}`);
-  const drawing = renderers[model.kind](model);
+  const drawing = renderMentalPicture(identity, model, { text, line, circle, color, fill, number, escape }) ?? renderers[model.kind](model);
   assert(drawing.height > 0 && !/NaN|undefined|Infinity/.test(drawing.body), identity);
-  return `<div class="visual-argument" data-visual-argument="${identity}" data-argument-kind="${model.kind}" data-argument-composition="${model.composition}"><svg viewBox="0 0 360 ${drawing.height}" role="img" aria-label="${escape(`${model.premise}. ${model.conclusion}`)}"><title>${escape(model.premise)}</title><desc>${escape(model.conclusion)}</desc>${drawing.body}</svg></div>`;
+  const premise = mentalPictures[identity]?.headline ?? model.premise;
+  const conclusion = mentalPictures[identity]?.caption ?? model.conclusion;
+  return `<div class="visual-argument" data-visual-argument="${identity}" data-argument-kind="${model.kind}" data-argument-composition="${drawing.composition ?? model.composition}"><svg viewBox="0 0 360 ${drawing.height}" role="img" aria-label="${escape(`${premise}. ${conclusion}`)}"><title>${escape(premise)}</title><desc>${escape(conclusion)}</desc>${drawing.body}</svg></div>`;
 }
 
 export function renderArgumentCaption(identity) {
-  return `<strong>Read it this way:</strong> <span data-proof-caption="${identity}">${escape(visualArguments[identity].conclusion)}</span>`;
+  const picture = mentalPictures[identity];
+  const prediction = picture ? ` <br><strong>${escape(picture.prediction)}</strong>` : '';
+  return `<strong>Read it this way:</strong> <span data-proof-caption="${identity}">${escape(picture?.caption ?? visualArguments[identity].conclusion)}${prediction}</span>`;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -1215,6 +1243,26 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     assert.equal(nodes.filter((node) => node.nodeName === 'svg').length, 1);
     assert(nodes.some((node) => node.nodeName === 'title'));
     assert(nodes.some((node) => node.nodeName === 'desc'));
+    if (mentalPictures[identity]) {
+      const legacy = renderers[model.kind](model);
+      nodes.length = 0;
+      walk(parseFragment(`<svg><title>${escape(model.premise)}</title><desc>${escape(model.conclusion)}</desc>${legacy.body}</svg>`));
+    }
+    if (model.kind === 'shrinkage') {
+      const changes = nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-shrink'));
+      assert.equal(changes.length, 4);
+      for (const node of changes) {
+        const attributes = Object.fromEntries(node.attrs.map(attribute => [attribute.name, attribute.value]));
+        const [penalty, coordinate] = attributes['data-proof-shrink'].split(',');
+        const before = model.target[Number(coordinate)];
+        const after = Number(attributes['data-proof-after']);
+        assert.equal(Number(attributes['data-proof-before']), before);
+        if (penalty === 'L1') assert(after === 0 ? Math.abs(before) <= model.strength : Math.abs(after - before + model.strength) < 1e-12);
+        else assert(Math.abs(after - before + model.strength * after) < 1e-12);
+        const result = node.childNodes.filter(child => child.nodeName === 'rect')[1];
+        assert(Math.abs(Number(result.attrs.find(attribute => attribute.name === 'width').value) - after * Number(attributes['data-proof-scale'])) < 1e-12);
+      }
+    }
     if (identity === 'checkpoint-boundary-recompute-balance') assert.deepEqual(nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-observation')).map(node => Number(node.attrs.find(attribute => attribute.name === 'data-proof-y').value)), [8, 4, 4], 'The drawn checkpoint values must be exactly eight total, four saved, and four rebuilt');
     if (model.composition === 'budget-transfer') {
       assert.equal(model.rows.reduce((sum, row) => sum + row[1], 0), 100);

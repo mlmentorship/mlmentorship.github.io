@@ -1,3 +1,5 @@
+import { mentalPictures } from './illustration-mental-models.mjs';
+
 export const figureTakeaways = {
   '3sum-state': 'Sorted order rules out a whole row of pairs',
   'chatbot-randomization-unit': 'Keep one conversation on one model to compare its outcome',
@@ -312,7 +314,7 @@ export const figureTakeaways = {
   'recsys-llm-bounded-augmentation': 'Deadline fallback and catalog checks bound optional generated recommendations',
   'inference-cost-measure-test-compound-loop': 'Accept savings only after quality gates, then update the cost baseline',
   'redundant-connection-state': 'An edge is redundant when its endpoints already share a graph path',
-  'regularization-diagnose-and-target': 'A train/validation gap is evidence to investigate, not a diagnosis',
+  'regularization-diagnose-and-target': 'L1 can erase a coefficient; L2 shrinks both toward zero',
   'remove-nth-node-from-end-state': 'A fixed pointer gap places left immediately before the node to remove',
   'reorder-list-state': 'Split and terminate before reversing and weaving the two halves',
   'reparameterization-gradient-path': 'Hold the random draw fixed while gradients pass through its parameterized transformation',
@@ -408,3 +410,7 @@ export const figureTakeaways = {
   'dsu-edges-versus-parents': 'Path compression changes the bookkeeping, not the original graph',
   'subsets-increasing-index-tree': 'Increasing indices choose membership without emitting every ordering',
 };
+
+for (const [identity, picture] of Object.entries(mentalPictures)) {
+  if (picture.headline) figureTakeaways[identity] = picture.headline;
+}

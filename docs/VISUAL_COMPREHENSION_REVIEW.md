@@ -1,5 +1,47 @@
 # Visual comprehension review
 
+## Mental-picture edition
+
+All 408 primary illustrations have been individually authored, reviewed and revised across 391 articles: 392 registered figures and 16 supplemental drawings, including all 106 coding primaries.
+The current catalog is [scripts/illustration-mental-models.mjs](../scripts/illustration-mental-models.mjs), dispatched through [scripts/illustration-arguments.mjs](../scripts/illustration-arguments.mjs).
+Its 296 drawing operations express the particular mechanism through conditioned populations, constrained fitting, repeated samples, geometric transformations, retained identities, state transitions, resource limits and counterexamples.
+Every record has an authored rationale and a prediction question grounded in its illustrated fixture.
+The complete current inventory, actual visual observations, artwork hashes, accepted phone images and authenticated inspection receipts are recorded under `mentalPictureEdition` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+All sections below describe frozen historical editions.
+
+Bayes now starts from the original population, selects positive results and renormalizes only that selected group.
+The capacity example pins two members of one function family to the same three observations while their between-point predictions differ.
+Regularization shows exact L1 zeroing and L2 proportional shrinkage under explicitly stated unit-curvature quadratic assumptions, rather than only naming the penalties.
+Other mechanisms retain their actual objects and boundaries: selected attention sources, backward returns, rejected speculative suffixes, frozen subset-sum snapshots, queue ownership, ancestor bounds and distinct stored versus executed experts.
+The 14-unit SVG type floor is preserved; narrow label budgets and connector collisions are repaired locally rather than shrinking words.
+The lowest measured primary-label size across the final native screen matrix is 14.1166px.
+
+All 408 final phone-light primary proofs are individually reviewed through 105 original-width sheets and 12 authenticated receipts.
+Four hundred final PNGs are byte-identical to their earlier inspected originals; eight changed shared-drawer neighbors were directly re-inspected from the final build.
+Earlier catalog snapshots are not relabeled as current: final reuse requires actual per-figure artwork equality and exact inspected-PNG equality.
+The complete unchanged-build matrix passes all five modes: desktop light/dark, actual-390 phone light/dark and print-style rendering, totaling 2,040 fresh figure/mode cases.
+The 4,148 raw PNG files are hash-authenticated evidence files, not a count of individually inspected images or a claim that every crop was manually checked.
+Nine desktop-dark samples have separate complete, geometry-stable captures and direct inspection; their earlier unstabilized crops remain separate evidence.
+
+Native interaction sweeps pass all 106 coding routes and all 797 checkpoints at each actual 1280px and 390px width.
+They cover forward/back/direct selection, keyboard navigation, playback, stable frame/control/page geometry, reduced motion and no-JavaScript fallback.
+All 391 actual tagged A4 PDFs pass physical bounds, primary-proof word completeness and nonblank-page checks across 3,752 article pages.
+Every primary title, premise, drawing labels and caption stays together on one physical page; retained traces and derivations may continue afterward.
+Nine complete physical figure pages were directly inspected, covering the flagship mechanisms, tall layouts and final repairs, not every PDF page.
+
+All 391 nonfigure lesson bodies are byte-identical to parent `09fbdf77d59598d72733f520a67b542bb56eb96f`.
+Headings, Python, public identities, 797 checkpoints and 8,739 ordered motion identities remain preserved, with full lessons, original derivations and open interactive execution traces retained.
+Source-generated, built and live proof parity is explicit; all 549 article HTML and runtime-asset responses match the native candidate.
+The normal `npm run check` and `npm run build` gates are required before the local commit, and their exact logs are bound by the final seal.
+New drawers have local numeric and identity assertions; inherited legacy arithmetic checks exercise retained original bodies and do not independently certify every new drawing.
+Both pre-existing dirty worktrees remain outside this commit and unchanged.
+
+Evidence remains under `/tmp/mlmentorship-mental-pictures-20261031-evidence`, including all failed and superseded captures, builds and clearance checks.
+The dark capture harness reserves a scrollbar gutter only for evidence and uses a viewport containing the full crop, requiring exact body/proof geometry across both viewport extension and capture.
+A measured-stability attempt was correctly rejected when beyond-viewport capture changed KaTeX table rows outside the proof; the native counterfactual and both failures are retained, without changing product CSS or weakening assertions.
+The requested fiftyfold improvement is an editorial ambition, not a measured learner outcome.
+There is no learner study, publication-standard certification or new push/publication claim.
+
 ## Picture-story edition
 
 All 408 primary illustrations have been individually reviewed and revised across 391 articles: 392 registered figures and 16 supplemental drawings.
