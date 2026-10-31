@@ -1,5 +1,39 @@
 # Visual comprehension review
 
+## Picture-story edition
+
+All 408 primary illustrations have been individually reviewed and revised across 391 articles: 392 registered figures and 16 supplemental drawings.
+The thirteen drawing grammars now express actual mechanisms through endpoint comparisons, countable cohorts, proportional allocation, explicit state symbols, geometric residuals, changing intervals, literal overlapping boxes, graph counterexamples, and purpose-specific ledgers.
+Every figure has its concrete premise, intended inference, composition, artwork hash, accepted phone image and individual review under `pictureStoryEdition` in [data/visual-comprehension-review.json](../data/visual-comprehension-review.json).
+All sections below describe frozen historical editions.
+
+The changes include precision/recall bars with different actual denominators; an exact 8 = 4 + 4 checkpointing optimum; a protected 100-point budget transfer; observed numbers distinct from missing or rejected states; a posterior conditioned on one sample beside changing illustrative confidence intervals; a removed NMS box that cannot suppress its neighbor; and an actual cycle plus isolated vertex that defeats edge-count-only tree validation.
+InfoNCE keeps its numerator physically inside the denominator, logical KV pages map to scattered physical pages, arithmetic is unboxed, and free capacity retains visible empty slots.
+Every curve has a deliberately selected numerical landmark. Labels remain whole or wrap at meaningful word boundaries without reducing type.
+Original detailed models remain under Derivation, and all 106 interactive traces remain open under Execution trace.
+
+Native production checks pass all five modes: desktop light/dark, actual-390 phone light/dark, and print-style rendering, totaling 2,040 fresh figure/mode cases.
+The accepted inventory authenticates 4,148 PNG files; this is a file count, not a count of manually inspected images.
+Every final phone-light primary proof is byte-identical to its individually inspected original, covered by 104 original-width sheets across 12 inspection receipts.
+The other 407 final PNGs exactly match earlier inspected originals; one final capture was directly re-inspected in a separate replacement sheet after a 41-channel raster mismatch. The rejected byte-reuse observation is retained.
+Thirteen stable native desktop-dark proofs, one per drawing grammar, were directly inspected.
+The containment observer accepts two valid controls and rejects four deliberately malformed native SVG cases using its exact production predicate.
+
+Native interaction sweeps pass all 106 routes and all 797 checkpoints at each actual 1280px and 390px width.
+They cover forward/back/direct selection, keyboard navigation, playback, stable frame/control/page geometry, reduced motion and no-JavaScript fallback.
+All 391 actual tagged A4 PDFs pass physical bounds, visible-proof word completeness and nonblank-page checks across 3,717 article pages.
+Every primary title, drawing and caption stays together on one physical page; retained traces and derivations may continue afterward.
+Thirteen complete physical figure-page rasters were directly viewed, not every PDF page or every authored execution state.
+
+Normal `npm run check` and `npm run build` are required final gates.
+All 391 nonfigure lesson bodies, headings, Python, public figure identities, 797 checkpoints and 8,739 ordered motion identities remain preserved.
+Both pre-existing dirty worktrees are outside this commit and remain unchanged.
+Current source/build parity is explicit; earlier stale builds, awkward-label samples, overlap failures and observer-only failures remain separate from accepted evidence.
+Current evidence is retained under `/tmp/mlmentorship-picture-stories-20261030-evidence`.
+
+The mandate is an ambitious editorial redesign, not a measured fiftyfold result.
+There is no learner study, publication-standard certification, push or publication claim.
+
 ## Full-library proof-first edition
 
 The new mandate replaces the preceding retain-most strategy with a new primary composition for every illustration.

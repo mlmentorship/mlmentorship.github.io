@@ -5,7 +5,7 @@ import { codingQuestionVisuals } from './coding-question-visuals.mjs';
 
 const escape = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 const color = (tone) => `var(--${tone === 'text' ? 'c-text' : tone === 'soft' ? 'c-text-soft' : `viz-${tone}-stroke`})`;
-const fill = (tone) => `var(--viz-${tone}-bg)`;
+const fill = (tone) => `var(--viz-${tone === 'text' || tone === 'soft' ? 'neutral' : tone}-bg)`;
 const number = (value) => new Intl.NumberFormat('en', { maximumSignificantDigits: 4, useGrouping: false }).format(value);
 const line = (fromX, fromY, toX, toY, tone = 'neutral', dashed = false) => `<path d="M${fromX} ${fromY}L${toX} ${toY}" style="fill:none;stroke:${color(tone)};stroke-width:1.75${dashed ? ';stroke-dasharray:4 4' : ''}"></path>`;
 const circle = (horizontal, vertical, radius, tone = 'focus', solid = false) => `<circle cx="${horizontal}" cy="${vertical}" r="${radius}" style="fill:${solid ? color(tone) : fill(tone)};stroke:${color(tone)};stroke-width:1.75"></circle>`;
@@ -57,61 +57,161 @@ function bars(model, offset = 0) {
     vertical += labelLines * 18 + 5;
     body += line(28, vertical + 18, 332, vertical + 18)
       + `<rect data-proof-value="${value}" data-proof-min="${minimum}" data-proof-max="${maximum}" data-proof-zero="${coordinate(0)}" x="${Math.min(coordinate(0), coordinate(value))}" y="${vertical}" width="${Math.abs(coordinate(value) - coordinate(0))}" height="35" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`;
+    body += circle(coordinate(value), vertical + 17.5, 4, tone, true);
+    if (limit !== undefined && value > limit) {
+      body += `<path data-proof-overflow="${value - limit}" d="M${coordinate(limit)} ${vertical + 8}H${coordinate(value)}M${coordinate(limit)} ${vertical + 17.5}H${coordinate(value)}M${coordinate(limit)} ${vertical + 27}H${coordinate(value)}" style="fill:none;stroke:${color('warning')};stroke-width:2"></path>`;
+    }
     if (limit !== undefined) body += line(coordinate(limit), vertical - 6, coordinate(limit), vertical + 43, 'warning', true);
     const labelOffset = model.compact ? 50 : 60;
-    body += text(28, vertical + labelOffset, `${number(value)}${unit}`, { weight: 700, tone });
-    if (limit !== undefined) body += text(332, vertical + labelOffset, `${model.limitLabel ?? 'limit'} ${limit}${unit}`, { anchor: 'end', width: 170, tone: 'warning', size: 12 });
-    vertical += model.compact ? 76 : 94;
+    const valueLabel = `${number(value)}${unit}`;
+    const endpoint = coordinate(value);
+    const labelWidth = Math.min(290, Math.max(70, valueLabel.length * 9));
+    const labelX = Math.max(28 + labelWidth / 2, Math.min(332 - labelWidth / 2, endpoint));
+    body += line(endpoint, vertical + 23, endpoint, vertical + labelOffset - 20, tone)
+      + text(labelX, vertical + labelOffset, valueLabel, { anchor: 'middle', width: labelWidth, weight: 700, tone });
+    if (limit !== undefined) body += text(28, vertical + labelOffset + 25, `${model.limitLabel ?? 'limit'} ${limit}${unit}`, { width: 304, tone: 'warning', size: 12 });
+    vertical += (model.compact ? 76 : 94) + (limit !== undefined ? 25 : 0);
   }
   body += text(28, vertical, minimum, { size: 12, tone: 'soft' }) + text(332, vertical, maximum, { anchor: 'end', size: 12, tone: 'soft' });
   return { body, height: vertical + 20 - offset };
 }
 
 function parts(model) {
+  if (model.composition === 'budget-transfer') {
+    const changed = model.rows.map((row, index) => [row[0], row[1] + (index === model.transfer.to ? model.transfer.value : index === model.transfer.from ? -model.transfer.value : 0), row[2]]);
+    let body = text(20, 28, '100 points; fixed budget', { size: 20, weight: 700 });
+    for (const [phase, rows] of [model.rows, changed].entries()) {
+      const vertical = phase ? 218 : 70;
+      body += text(20, vertical - 12, phase ? 'After transfer' : 'Before transfer', { weight: 700 });
+      let horizontal = 20;
+      for (const [, value, tone] of rows) {
+        const width = value / 100 * 320;
+        body += `<rect data-proof-budget="${phase}" data-proof-value="${value}" x="${horizontal}" y="${vertical}" width="${width}" height="44" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+          + text(horizontal + width / 2, vertical + 27, value, { width: width - 4, anchor: 'middle', weight: 700, tone });
+        horizontal += width;
+      }
+    }
+    body += `<path data-proof-transfer="6" d="M212 116V151H199V187" style="fill:none;stroke:${color('focus')};stroke-width:2"></path>`
+      + line(194, 180, 199, 187, 'focus') + line(204, 180, 199, 187, 'focus')
+      + text(20, 155, 'Move 6 points', { width: 170, weight: 700, tone: 'focus' });
+    let vertical = 310;
+    for (const [index, [name, value, tone]] of model.rows.entries()) {
+      const protectedValue = model.transfer.protected.includes(index);
+      body += text(20, vertical, name, { width: 190, weight: 700, tone })
+        + text(340, vertical, protectedValue ? `${value}; protected` : `${value} to ${changed[index][1]}`, { width: 145, anchor: 'end', tone });
+      vertical += 40;
+    }
+    return { body, height: vertical + 8 };
+  }
   const total = model.rows.reduce((sum, row) => sum + row[1], 0);
   assert(total > 0);
-  const heading = `${number(total)}${model.unit ?? ''} total`;
-  const top = 32 + lines(heading, 320, 18).length * 23;
+  const heading = `${number(total)}${model.unit ?? ''}`;
+  const top = 38 + lines(heading, 320, 22).length * 28;
   let horizontal = 20;
-  let body = text(20, 32, heading, { size: 18, weight: 700 });
+  let body = text(20, 30, heading, { size: 22, weight: 700 });
   for (const [index, [name, value, tone = index ? 'warning' : 'output']] of model.rows.entries()) {
     const width = value / total * 320;
-    body += `<rect data-proof-part="${escape(name)}" data-proof-value="${value}" x="${horizontal}" y="${top}" width="${width}" height="50" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.5"></rect>`;
+    body += `<rect data-proof-part="${escape(name)}" data-proof-value="${value}" data-proof-total="${total}" x="${horizontal}" y="${top}" width="${width}" height="44" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`;
+    const units = Number.isInteger(total) && total <= 32 ? total : 0;
+    for (let unit = 1; unit < units; unit++) {
+      const position = 20 + unit / total * 320;
+      if (position > horizontal && position < horizontal + width) body += line(position, top + 4, position, top + 40, tone);
+    }
     horizontal += width;
   }
-  let vertical = top + 92;
+  let vertical = top + 82;
+  let preceding = 0;
   for (const [index, [name, value, tone = index ? 'warning' : 'output']] of model.rows.entries()) {
-    body += circle(27, vertical - 4, 5, tone, true)
-      + text(45, vertical, `${number(value)}: ${name}`, { width: 285, weight: 700 })
-      + text(45, vertical + lines(`${number(value)}: ${name}`, 285).length * 18 + 5, `${number(value)} / ${number(total)} = ${(100 * value / total).toFixed(model.digits ?? 1)}%`, { tone, size: 14 });
-    vertical += lines(`${number(value)}: ${name}`, 285).length * 18 + 40;
+    body += text(20, vertical, name, { width: 230, weight: 700 })
+      + text(340, vertical, `${(100 * value / total).toFixed(model.digits ?? 1)}%`, { anchor: 'end', width: 90, size: 18, weight: 700, tone });
+    vertical += lines(name, 230).length * 18 + 10;
+    body += `<rect x="20" y="${vertical}" width="320" height="12" style="fill:none;stroke:${color('neutral')};stroke-width:1"></rect><rect x="${20 + preceding / total * 320}" y="${vertical}" width="${value / total * 320}" height="12" style="fill:${color(tone)}"></rect>`;
+    vertical += 36;
+    body += text(20, vertical, `${number(value)} of ${number(total)}${model.unit ?? ''}`, { width: 320, tone: 'soft' });
+    vertical += lines(`${number(value)} of ${number(total)}${model.unit ?? ''}`, 320).length * 18 + 24;
+    preceding += value;
   }
-  return { body, height: vertical + 3 };
+  return { body, height: vertical };
 }
 
 function population(model) {
   const count = model.rows.reduce((sum, row) => sum + row[1], 0);
   assert(count <= 1200 && count > 0 && Number.isInteger(count));
-  const columns = 40;
-  let body = text(20, 25, `One mark = ${model.unit ?? 'one observation'}`, { size: 12, tone: 'soft' });
-  let cursor = 0;
+  const columns = count > 400 ? 40 : count > 80 ? 20 : 10;
+  const spacing = 320 / columns;
+  const radius = Math.min(7, spacing * .3);
+  let body = text(20, 24, `Each mark: ${model.unit ?? 'one observation'}`, { tone: 'soft' });
+  let vertical = 38 + lines(`Each mark: ${model.unit ?? 'one observation'}`, 320).length * 18;
   for (const [group, [name, total, tone = group ? 'warning' : 'output']] of model.rows.entries()) {
-    for (let index = 0; index < total; index++, cursor++) {
-      const horizontal = 24 + cursor % columns * 8;
-      const vertical = 53 + Math.floor(cursor / columns) * 8;
-      body += `<g data-proof-population="${escape(name)}">${group % 2 ? `<path d="M${horizontal - 2} ${vertical - 2}l4 4m-4 0l4 -4" style="stroke:${color(tone)};stroke-width:1.2"></path>` : circle(horizontal, vertical, 2, tone, true)}</g>`;
+    body += text(20, vertical + 20, total, { size: 26, width: 78, weight: 700, tone })
+      + text(108, vertical + 10, name, { width: 230, weight: 700 });
+    vertical += Math.max(34, lines(name, 230).length * 18 + 8) + 10;
+    for (let index = 0; index < total; index++) {
+      const horizontal = 20 + (index % columns + .5) * spacing;
+      const position = vertical + (Math.floor(index / columns) + .5) * spacing;
+      body += `<g data-proof-population="${escape(name)}">${group === 0 ? circle(horizontal, position, radius, tone, true) : `<rect x="${horizontal - radius}" y="${position - radius}" width="${radius * 2}" height="${radius * 2}" rx="${radius * .3}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.2"></rect>`}</g>`;
     }
+    vertical += Math.ceil(total / columns) * spacing + 28;
   }
-  let vertical = 88 + Math.ceil(count / columns) * 8;
-  for (const [index, [name, total, tone = index ? 'warning' : 'output']] of model.rows.entries()) {
-    body += text(20, vertical, `${total} ${name}`, { width: 320, tone, weight: 700 });
-    vertical += lines(`${total} ${name}`, 320).length * 18 + 17;
-  }
-  body += text(20, vertical + 6, `${model.rows[0][1]} / ${count} = ${(100 * model.rows[0][1] / count).toFixed(1)}%`, { size: 22, weight: 700 });
-  return { body, height: vertical + 38 };
+  const finding = `${model.rows[0][1]} / ${count} = ${(100 * model.rows[0][1] / count).toFixed(1)}%`;
+  body += line(20, vertical - 7, 340, vertical - 7)
+    + text(20, vertical + 27, finding, { size: 24, weight: 700, tone: 'output' });
+  return { body, height: vertical + 42 + (lines(finding, 320, 24).length - 1) * 30 };
+}
+
+function stateMark(horizontal, vertical, value, tone) {
+  const word = String(value).toLowerCase();
+  const status = /^(yes|true|pass|on)$/.test(word) ? 'present'
+    : /^(no|false|off|absent|none)$/.test(word) ? 'absent'
+      : /^(stop|reject|skip|fail)$/.test(word) ? 'stopped'
+        : /^(\?|unknown|not yet)$/.test(word) ? 'unknown' : 'value';
+  let mark = '';
+  if (status === 'present') mark = `<path d="M${horizontal - 7} ${vertical}l5 5 10-12" style="fill:none;stroke:${color(tone)};stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"></path>`;
+  if (status === 'absent') mark = circle(horizontal, vertical, 9, tone) + line(horizontal - 5, vertical, horizontal + 5, vertical, tone);
+  if (status === 'stopped') mark = `<path d="M${horizontal - 8} ${vertical - 8}l16 16m0-16l-16 16" style="fill:none;stroke:${color(tone)};stroke-width:2.5"></path>`;
+  if (status === 'unknown') mark = `<circle cx="${horizontal}" cy="${vertical}" r="10" style="fill:none;stroke:${color(tone)};stroke-width:1.75;stroke-dasharray:2 3"></circle>`;
+  return { status, mark };
 }
 
 function matrix(model) {
+  if (model.composition === 'budget-rows') {
+    let body = text(20, 26, 'Fictional activity budgets: 100% each', { width: 320, weight: 700 });
+    let vertical = 80;
+    for (const [index, values] of model.values.entries()) {
+      body += text(20, vertical, model.labels[index], { width: 320, size: 20, weight: 700 });
+      vertical += 18;
+      let horizontal = 20;
+      for (const [column, value] of values.entries()) {
+        const width = value / 100 * 320;
+        const tone = ['input', 'output', 'state'][column];
+        body += `<rect data-proof-activity="${index},${column}" data-proof-value="${value}" x="${horizontal}" y="${vertical}" width="${width}" height="46" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`
+          + text(horizontal + width / 2, vertical + 28, value, { width: width - 4, anchor: 'middle', weight: 700, tone });
+        horizontal += width;
+      }
+      vertical += 95;
+    }
+    for (const [index, name] of model.columns.entries()) {
+      const tone = ['input', 'output', 'state'][index];
+      body += circle(27, vertical - 4, 5, tone, true) + text(44, vertical, name, { width: 290 });
+      vertical += 32;
+    }
+    return { body, height: vertical + 6 };
+  }
+  if (model.composition === 'denominators') {
+    const drawing = matrix({ ...model, composition: 'cells' });
+    const [[hits, misses], [alarms]] = model.values;
+    let vertical = drawing.height + 24;
+    let body = drawing.body;
+    for (const [label, denominator, tone] of [['Recall: actual positives', hits + misses, 'input'], ['Precision: predicted positives', hits + alarms, 'output']]) {
+      body += text(20, vertical, label, { width: 320, weight: 700 });
+      vertical += lines(label, 320).length * 18 + 14;
+      body += `<rect x="20" y="${vertical}" width="320" height="30" style="fill:${fill('neutral')};stroke:${color('neutral')}"></rect><rect data-proof-denominator="${denominator}" data-proof-numerator="${hits}" x="20" y="${vertical}" width="${320 * hits / denominator}" height="30" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`;
+      vertical += 61;
+      body += text(20, vertical, `${hits} / ${denominator} = ${number(100 * hits / denominator)}%`, { size: 22, weight: 700, tone });
+      vertical += 48;
+    }
+    return { body, height: vertical };
+  }
   const rows = model.values;
   const columns = rows[0].length;
   assert(rows.every((row) => row.length === columns));
@@ -123,14 +223,21 @@ function matrix(model) {
   for (let column = 0; column < columns; column++) body += text(start + (column + .5) * width, 18, model.columns?.[column] ?? column, { anchor: 'middle', width: width - 2, size: 12, tone: 'soft' });
   let vertical = 18 + headerLines * 18;
   for (const [row, values] of rows.entries()) {
-    const height = Math.max(47, lines(model.labels?.[row] ?? row, labelWidth, 12).length * 18 + 14, ...values.map(value => lines(value, width - 8, 12).length * 18 + 14));
+    const height = Math.max(64, lines(model.labels?.[row] ?? row, labelWidth, 12).length * 18 + 20, ...values.map(value => lines(value, width - 14, 14).length * 18 + 38));
     body += text(start - 12, vertical + 18, model.labels?.[row] ?? row, { anchor: 'end', width: labelWidth, size: 12, tone: 'soft' });
     for (const [column, value] of values.entries()) {
       const tone = model.blocked?.some(([blockedRow, blockedColumn]) => blockedRow === row && blockedColumn === column) ? 'warning' : model.selected?.some(([selectedRow, selectedColumn]) => selectedRow === row && selectedColumn === column) ? 'focus' : 'neutral';
       const horizontal = start + column * width;
-      body += `<rect data-proof-cell="${row},${column}" x="${horizontal}" y="${vertical}" width="${width - 3}" height="${height - 3}" style="fill:${fill(tone)};stroke:${color(tone)}"></rect>`
-        + text(horizontal + (width - 3) / 2, vertical + (height - lines(value, width - 8, 12).length * 18) / 2 + 13, value, { anchor: 'middle', width: width - 8, size: 12, tone: tone === 'warning' ? 'warning' : 'text', weight: tone === 'focus' ? 700 : 400 });
-      if (tone === 'warning') body += line(horizontal + 4, vertical + height - 7, horizontal + width - 7, vertical + 4, 'warning');
+      const center = horizontal + (width - 5) / 2;
+      const glyph = stateMark(center, vertical + 18, value, tone === 'neutral' ? 'text' : tone);
+      const numeric = typeof value === 'number';
+      const size = numeric && String(value).length <= 5 && width > 64 ? 22 : 14;
+      const baseline = glyph.status === 'value' ? vertical + (height - lines(value, width - 14, size).length * Math.ceil(size * 1.25)) / 2 + size - 2 : vertical + 46;
+      body += `<g data-proof-status="${glyph.status}"><rect data-proof-cell="${row},${column}" x="${horizontal}" y="${vertical}" width="${width - 5}" height="${height - 5}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:${tone === 'focus' ? 2 : 1}"></rect>${glyph.mark}`
+        + text(center, baseline, value, { anchor: 'middle', width: width - 14, size, tone: tone === 'warning' ? 'warning' : 'text', weight: tone === 'focus' || numeric ? 700 : 400 });
+      if (tone === 'warning') body += `<path data-proof-warning="${row},${column}" d="M${horizontal + 4} ${vertical + 8}v${height - 21}" style="stroke:${color(tone)};stroke-width:3;stroke-dasharray:3 3"></path>`;
+      if (tone === 'focus') body += line(horizontal + 5, vertical + height - 11, horizontal + width - 10, vertical + height - 11, 'focus');
+      body += '</g>';
     }
     vertical += height;
   }
@@ -142,20 +249,36 @@ function curve(model) {
   const left = Math.max(48, Math.ceil(Math.max(...range.map(value => number(value).length)) * 14 * .61 + 12));
   const horizontal = (value) => left + (value - domain[0]) / (domain[1] - domain[0]) * (330 - left);
   const vertical = (value) => 220 - (value - range[0]) / (range[1] - range[0]) * 170;
-  let body = line(left, 40, left, 220) + line(left, 220, 334, 220)
+  let body = '';
+  for (let division = 1; division < 4; division++) body += `<g opacity=".35">${line(left, 220 - division * 42.5, 330, 220 - division * 42.5, 'neutral', true)}</g>`;
+  body += line(left, 40, left, 220) + line(left, 220, 334, 220)
     + text(left, 245, domain[0], { size: 12, tone: 'soft' }) + text(330, 245, domain[1], { size: 12, anchor: 'end', tone: 'soft' })
     + text(left - 8, 54, range[1], { size: 12, anchor: 'end', width: left - 12, tone: 'soft' }) + text(left - 8, 220, range[0], { size: 12, anchor: 'end', width: left - 12, tone: 'soft' });
+  const checkpoint = model.landmark ?? (domain[0] + domain[1]) / 2;
+  body += `<path data-proof-landmark="${checkpoint}" d="M${horizontal(checkpoint)} 40V220" style="stroke:${color('focus')};stroke-width:1.5;stroke-dasharray:2 4"></path>`;
+  if (horizontal(checkpoint) - left > 46 && 330 - horizontal(checkpoint) > 46) body += text(horizontal(checkpoint), 245, number(checkpoint), { anchor: 'middle', size: 12, width: 60, tone: 'focus' });
   if (model.threshold !== undefined) body += line(horizontal(model.threshold), 40, horizontal(model.threshold), 220, 'warning', true);
+  const observations = [];
   for (const [index, [name, points, tone = index ? 'output' : 'input']] of series.entries()) {
     assert(points.every(([horizontalValue, verticalValue]) => Number.isFinite(horizontalValue) && Number.isFinite(verticalValue)));
-    body += `<path data-proof-series="${escape(name)}" d="${points.map(([horizontalValue, verticalValue], point) => `${point ? 'L' : 'M'}${horizontal(horizontalValue)} ${vertical(verticalValue)}`).join('')}" style="fill:none;stroke:${color(tone)};stroke-width:2.5${index ? ';stroke-dasharray:6 3' : ''}"></path>`;
+    body += `<path data-proof-series="${escape(name)}" d="${points.map(([horizontalValue, verticalValue], point) => `${point ? 'L' : 'M'}${horizontal(horizontalValue)} ${vertical(verticalValue)}`).join('')}" style="fill:none;stroke:${color(tone)};stroke-width:3${index ? ';stroke-dasharray:7 4' : ''}"></path>`;
+    const before = points.findLast(point => point[0] <= checkpoint);
+    const after = points.find(point => point[0] >= checkpoint);
+    const value = before && after ? before[0] === after[0] ? before[1] : before[1] + (after[1] - before[1]) * (checkpoint - before[0]) / (after[0] - before[0]) : null;
+    observations.push(value);
+    if (value !== null) body += `<g data-proof-observation="${index}" data-proof-x="${checkpoint}" data-proof-y="${value}">${circle(horizontal(checkpoint), vertical(value), 5, tone, index === 0)}</g>`;
   }
   body += text(190, 273, model.xLabel, { anchor: 'middle', size: 12, width: 280, tone: 'soft' })
     + text(20, 20, model.yLabel, { size: 12, tone: 'soft' });
   let top = 310;
   for (const [index, [name, , tone = index ? 'output' : 'input']] of series.entries()) {
     body += line(20, top - 4, 48, top - 4, tone, Boolean(index)) + text(60, top, name, { width: 280 });
-    top += lines(name, 280).length * 18 + 12;
+    top += lines(name, 280).length * 18 + 5;
+    if (observations[index] !== null) {
+      body += text(60, top, `${number(observations[index])} at ${number(checkpoint)}`, { size: 18, width: 280, weight: 700, tone });
+      top += lines(`${number(observations[index])} at ${number(checkpoint)}`, 280, 18).length * 23;
+    }
+    top += 16;
   }
   if (model.threshold !== undefined) {
     body += line(20, top - 4, 48, top - 4, 'warning', true) + text(60, top, `Decision threshold = ${model.threshold}`, { width: 280, tone: 'warning' });
@@ -175,14 +298,16 @@ function timeline(model) {
   for (const [index, [name, value, tone = index === events.length - 1 ? 'output' : 'input']] of events.entries()) {
     body += text(20, vertical, name, { width: 320, weight: 700 });
     vertical += lines(name, 320).length * 18 + 12;
-    body += line(30, vertical + 8, 330, vertical + 8)
-      + circle(coordinate(value), vertical + 8, 5, tone, index === events.length - 1)
-      + text(coordinate(value), vertical + 37, Number(value.toFixed(3)), { anchor: 'middle', width: 90, size: 12, tone });
+    body += line(30, vertical + 8, 330, vertical + 8, 'neutral', true)
+      + circle(coordinate(value), vertical + 8, 7, tone, index === events.length - 1)
+      + text(Math.max(53, Math.min(307, coordinate(value))), vertical + 39, Number(value.toFixed(3)), { anchor: 'middle', width: 90, size: 18, weight: 700, tone });
     if (model.boundary !== undefined) body += line(coordinate(model.boundary), vertical - 5, coordinate(model.boundary), vertical + 24, 'warning', true);
     vertical += 67;
   }
-  body += text(180, vertical, unit, { anchor: 'middle', width: 320, size: 12, tone: 'soft' });
-  return { body, height: vertical + lines(unit, 320, 12).length * 18 + 8 };
+  if (model.boundary !== undefined) body = `<path data-proof-boundary="${model.boundary}" d="M${coordinate(model.boundary)} 8V${vertical - 25}" style="fill:none;stroke:${color('warning')};stroke-width:1.25;stroke-dasharray:2 5;opacity:.5"></path>${body}`;
+  body += line(30, vertical - 9, 330, vertical - 9) + line(323, vertical - 14, 330, vertical - 9) + line(323, vertical - 4, 330, vertical - 9)
+    + text(180, vertical + 17, unit, { anchor: 'middle', width: 320, size: 12, tone: 'soft' });
+  return { body, height: vertical + lines(unit, 320, 12).length * 18 + 28 };
 }
 
 function connections(model) {
@@ -201,7 +326,9 @@ function connections(model) {
     const toY = end.vertical - direction * 18;
     const approach = end.vertical - (direction > 0 ? 28 : -22);
     const tone = blocked ? 'warning' : 'focus';
-    const path = start.vertical === end.vertical
+    const path = start.horizontal === end.horizontal
+      ? `M${start.horizontal} ${start.vertical + direction * 18}V${toY}`
+      : start.vertical === end.vertical
       ? `M${start.horizontal} ${start.vertical - 17}V${start.vertical - 28}H${end.horizontal}V${toY}`
       : `M${fromX} ${start.vertical}H${route}V${approach}H${end.horizontal}V${toY}`;
     body += `<path data-proof-edge="${from},${to}" d="${path}" style="fill:none;stroke:${color(tone)};stroke-width:1.75${blocked ? ';stroke-dasharray:4 4' : ''}"></path>`
@@ -215,32 +342,89 @@ function connections(model) {
   }
   for (const [index, [name, , , tone = 'input']] of nodes.entries()) {
     const position = positions[index];
-    body += circle(position.horizontal, position.vertical, 16, tone)
+    const shape = tone === 'state' ? `<path d="M${position.horizontal} ${position.vertical - 17}l17 17-17 17-17-17Z" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></path>` : circle(position.horizontal, position.vertical, 16, tone);
+    const labelHeight = lines(name, 155).length * 18;
+    body += `<g data-proof-node="${index}">${shape}${tone === 'output' ? circle(position.horizontal, position.vertical, 12, tone) : ''}`
       + text(position.horizontal, position.vertical + 4, index + 1, { size: 12, anchor: 'middle', width: 30, weight: 700 })
+      + `<rect x="${position.horizontal - 79}" y="${position.vertical + 24}" width="158" height="${labelHeight + 8}" style="fill:var(--c-bg)"></rect>`
       + text(position.horizontal, position.vertical + 39, name, { anchor: 'middle', width: 155, weight: 700 });
+    body += '</g>';
   }
   return { body, height: levels * spacing + 6 };
 }
 
 function ledger(model) {
+  if (model.composition === 'physical-map') {
+    const pages = model.rows[1][1].map(Number);
+    const locations = [pages[1], pages[2], pages[0]];
+    let body = text(20, 25, 'Logical sequence', { weight: 700 });
+    for (const [index, page] of pages.entries()) {
+      const horizontal = 30 + index * 110;
+      const target = 55 + locations.indexOf(page) * 110;
+      const tone = ['input', 'state', 'output'][index];
+      body += `<rect x="${horizontal}" y="48" width="80" height="52" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`
+        + text(horizontal + 40, 80, index, { anchor: 'middle', size: 22, width: 60, weight: 700, tone })
+        + `<path data-proof-page-map="${index},${page}" d="M${horizontal + 40} 100V${126 + index * 22}H${target}V238" style="fill:none;stroke:${color(tone)};stroke-width:2${index === 1 ? ';stroke-dasharray:6 3' : ''}"></path>`
+        + line(target - 5, 231, target, 238, tone) + line(target + 5, 231, target, 238, tone);
+    }
+    body += text(20, 219, 'Physical pages: different order', { weight: 700, width: 320 });
+    for (const [index, page] of locations.entries()) {
+      const horizontal = 20 + index * 110;
+      const tone = ['input', 'state', 'output'][pages.indexOf(page)];
+      body += `<rect x="${horizontal}" y="245" width="90" height="70" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>`
+        + text(horizontal + 45, 271, `page ${page}`, { anchor: 'middle', width: 80, weight: 700 })
+        + text(horizontal + 45, 299, `block ${pages.indexOf(page)}`, { anchor: 'middle', width: 80, tone });
+    }
+    return { body, height: 335 };
+  }
+  if (model.composition === 'nested') {
+    const candidates = model.rows[1][1];
+    const height = 94 + candidates.length * 76;
+    let body = text(20, 25, 'Denominator: the whole set', { weight: 700 })
+      + `<path data-proof-candidate-enclosure d="M34 48H326V${height - 16}H34Z" style="fill:${fill('input')};stroke:${color('input')};stroke-width:2"></path>`;
+    for (const [index, candidate] of candidates.entries()) {
+      const vertical = 75 + index * 76;
+      const positive = model.rows[0][1].includes(candidate);
+      if (positive) body += `<path data-proof-nested-positive d="M48 ${vertical - 10}H312V${vertical + 49}H48Z" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2"></path>`;
+      body += circle(72, vertical + 18, 8, positive ? 'output' : 'input', positive)
+        + text(94, vertical + 22, candidate, { width: 200, weight: 700 });
+      if (positive) body += text(94, vertical + 42, 'also the numerator', { width: 200, tone: 'output' });
+    }
+    return { body, height };
+  }
   let body = '';
   let vertical = 28;
   for (const [index, [name, tokens, tone = index ? 'output' : 'input']] of model.rows.entries()) {
-    body += text(20, vertical, name, { weight: 700 });
-    vertical += lines(name, 320).length * 18 + 12;
-    const columns = Math.min(tokens.length || 1, 8);
-    const width = 320 / columns;
+    const rowStart = vertical;
+    const inset = model.composition === 'transform' ? 44 : 20;
+    if (model.composition === 'transform') body += circle(23, vertical - 4, 10, tone) + text(23, vertical, index + 1, { anchor: 'middle', width: 24, weight: 700 });
+    body += text(inset, vertical, name, { width: 340 - inset, weight: 700 });
+    vertical += lines(name, 340 - inset).length * 18 + 14;
+    const columns = Math.min(tokens.length || 1, model.composition === 'arithmetic' ? 5 : 8);
+    const width = (340 - inset) / columns;
+    const labelWidth = width - (model.labelPadding ?? 12);
     for (let start = 0; start < tokens.length; start += columns) {
       const row = tokens.slice(start, start + columns);
-      const height = Math.max(34, ...row.map(value => lines(value, width - 8, 12).length * 18 + 14));
+      const height = Math.max(48, ...row.map(value => lines(value, labelWidth, 14).length * 18 + 20));
       for (const [token, value] of row.entries()) {
-        const horizontal = 20 + token * width;
-        body += `<rect data-proof-token="${escape(value)}" x="${horizontal}" y="${vertical}" width="${width - 4}" height="${height}" style="fill:${fill(tone)};stroke:${color(tone)}"></rect>`
-          + text(horizontal + (width - 4) / 2, vertical + (height - lines(value, width - 8, 12).length * 18) / 2 + 13, value, { anchor: 'middle', width: width - 8, size: 12 });
+        const horizontal = inset + token * width;
+        const center = horizontal + (width - 6) / 2;
+        const operator = /^(\+|-|x|=|:|\/|->)$/.test(String(value));
+        const final = index === model.rows.length - 1 && (model.composition === 'arithmetic' ? token === tokens.length - 1 : tokens.length === 1 || model.composition === 'transform');
+        const plain = (operator && !(model.emptySlots && value === '-')) || model.composition === 'arithmetic';
+        const empty = /^(out|none|free|spare|\?|-)$/i.test(String(value));
+        const size = final && String(value).length < 7 && width > 70 ? 20 : 14;
+        body += `<g data-proof-token="${escape(value)}" data-proof-row="${index}" data-proof-position="${start + token}" data-proof-box="${horizontal},${vertical},${width - 6},${height}">`;
+        if (!plain) body += `<rect x="${horizontal}" y="${vertical}" width="${width - 6}" height="${height}" rx="${model.composition === 'set' ? Math.min(18, (width - 6) / 2) : 0}" style="fill:${empty ? 'none' : fill(tone)};stroke:${color(tone)};stroke-width:${final ? 2 : 1.5}${empty ? ';stroke-dasharray:3 4' : ''}"></rect>`;
+        body += text(center, vertical + (height - lines(value, labelWidth, size).length * Math.ceil(size * 1.25)) / 2 + size - 2, value, { anchor: 'middle', width: labelWidth, size, weight: final || operator ? 700 : 400, tone: empty ? 'soft' : 'text' });
+        if (plain && final) body += line(horizontal + 4, vertical + height - 3, horizontal + width - 10, vertical + height - 3, tone);
+        body += '</g>';
+        if (model.composition === 'sequence' && token < row.length - 1) body += line(horizontal + width - 3, vertical + height / 2, horizontal + width + 1, vertical + height / 2, tone);
       }
       vertical += height + 8;
     }
-    vertical += 26;
+    if (model.composition === 'transform' && index < model.rows.length - 1) body += line(23, rowStart + 13, 23, vertical + 2, 'neutral', true) + line(19, vertical - 4, 23, vertical + 2) + line(27, vertical - 4, 23, vertical + 2);
+    vertical += 28;
   }
   return { body, height: vertical };
 }
@@ -259,7 +443,9 @@ function areas(model) {
     body += text(20, vertical, region.label, { weight: 700 });
     vertical += lines(region.label, 320).length * 18 + 14;
     body += `<g data-proof-region="${index}" data-proof-mass="${region.mass}"><rect data-proof-area="${volume}" data-proof-scale="${scale}" x="20" y="${vertical}" width="${region.width * scale}" height="${region.height * scale}" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:1.75"></rect>`;
-    for (let mark = 0; mark < marks; mark++) body += circle(20 + (mark % columns + .5) / columns * region.width * scale, vertical + (Math.floor(mark / columns) + .5) / rows * region.height * scale, 4, tone, true);
+    for (let column = 1; column < columns; column++) body += line(20 + column / columns * region.width * scale, vertical, 20 + column / columns * region.width * scale, vertical + region.height * scale, tone, true);
+    for (let row = 1; row < rows; row++) body += line(20, vertical + row / rows * region.height * scale, 20 + region.width * scale, vertical + row / rows * region.height * scale, tone, true);
+    for (let mark = 0; mark < marks; mark++) body += circle(20 + (mark % columns + .5) / columns * region.width * scale, vertical + (Math.floor(mark / columns) + .5) / rows * region.height * scale, 7, tone, true);
     body += '</g>';
     vertical += region.height * scale + 26;
     body += text(20, vertical, `Volume ${number(volume)}; density ${number(region.mass / volume)}`, { weight: 700, tone });
@@ -276,34 +462,108 @@ function geometry(model) {
   const originX = coordinate(0);
   const originY = vertical(0);
   let body = line(32, originY, 330, originY) + line(originX, 26, originX, 322)
-    + text(328, originY + 19, 'x', { anchor: 'end', width: 15, size: 12, tone: 'soft' })
+    + text(328, originY - 11, 'x', { anchor: 'end', width: 15, size: 12, tone: 'soft' })
     + text(originX + 10, 25, 'y', { width: 15, size: 12, tone: 'soft' });
+  for (let tick = Math.ceil(minimum); tick <= Math.floor(maximum); tick++) {
+    if (tick === 0) continue;
+    body = `<g opacity=".3">${line(coordinate(tick), 36, coordinate(tick), 312, 'neutral', true)}${line(42, vertical(tick), 318, vertical(tick), 'neutral', true)}</g>` + body;
+    body += line(coordinate(tick), originY - 3, coordinate(tick), originY + 3)
+      + text(coordinate(tick), originY + 20, tick, { anchor: 'middle', width: 32, tone: 'soft' });
+  }
   if (model.polygon) body += `<polygon data-proof-polygon points="${model.polygon.map(([horizontalValue, verticalValue]) => `${coordinate(horizontalValue)},${vertical(verticalValue)}`).join(' ')}" style="fill:${fill('state')};stroke:${color('state')};stroke-width:1.75"></polygon>`;
   for (const [center, radius, tone = 'output'] of model.circles ?? []) body += `<circle cx="${coordinate(center[0])}" cy="${vertical(center[1])}" r="${radius / (maximum - minimum) * 276}" style="fill:none;stroke:${color(tone)};stroke-width:1.75;stroke-dasharray:5 3"></circle>`;
   for (const [index, [name, [horizontalValue, verticalValue], tone = index ? 'output' : 'input']] of model.vectors.entries()) {
     const endX = coordinate(horizontalValue);
     const endY = vertical(verticalValue);
     const angle = Math.atan2(endY - originY, endX - originX);
-    body += line(originX, originY, endX, endY, tone)
+    if (model.composition !== 'points') body += `<path d="M${originX} ${originY}L${endX} ${endY}" style="fill:none;stroke:${color(tone)};stroke-width:${index ? 2.5 : 3.5}${index ? ';stroke-dasharray:7 3' : ''}"></path>`
       + line(endX - 9 * Math.cos(angle - .45), endY - 9 * Math.sin(angle - .45), endX, endY, tone)
-      + line(endX - 9 * Math.cos(angle + .45), endY - 9 * Math.sin(angle + .45), endX, endY, tone)
-      + circle(endX, endY, 3, tone, true);
+      + line(endX - 9 * Math.cos(angle + .45), endY - 9 * Math.sin(angle + .45), endX, endY, tone);
+    body += `<g data-proof-vector="${index}" data-proof-x="${horizontalValue}" data-proof-y="${verticalValue}">${index % 2 ? `<rect x="${endX - 4}" y="${endY - 4}" width="8" height="8" style="fill:${fill(tone)};stroke:${color(tone)};stroke-width:2"></rect>` : circle(endX, endY, 4, tone, true)}</g>`;
   }
   for (const [[fromX, fromY], [toX, toY]] of model.guides ?? []) body += line(coordinate(fromX), vertical(fromY), coordinate(toX), vertical(toY), 'warning', true);
+  if (model.composition === 'projection') {
+    const [[, point], [, projected]] = model.vectors;
+    const direction = point[1] > projected[1] ? -1 : 1;
+    body += `<path data-proof-right-angle d="M${coordinate(projected[0]) - 11} ${vertical(projected[1])}v${direction * 11}h11" style="fill:none;stroke:${color('warning')};stroke-width:1.75"></path>`;
+  }
   let top = 353;
   for (const [index, [name, values, tone = index ? 'output' : 'input']] of model.vectors.entries()) {
     const label = `${name}: (${values.map(number).join(', ')})`;
-    body += line(20, top - 4, 45, top - 4, tone) + text(57, top, label, { width: 285 });
+    body += line(20, top - 4, 45, top - 4, tone, Boolean(index)) + (index % 2 ? `<rect x="28" y="${top - 8}" width="8" height="8" style="fill:${fill(tone)};stroke:${color(tone)}"></rect>` : circle(32, top - 4, 4, tone, true)) + text(57, top, label, { width: 285 });
     top += lines(label, 285).length * 18 + 14;
   }
   return { body, height: top + 8 };
 }
 
-const renderers = { bars, parts, population, matrix, curve, timeline, connections, ledger, areas, geometry };
-const sample = (operation, minimum, maximum, count = 65) => Array.from({ length: count }, (_, index) => {
-  const value = minimum + (maximum - minimum) * index / (count - 1);
-  return [value, operation(value)];
-});
+function intervals(model) {
+  const horizontal = (value) => 38 + value * 280;
+  let body = text(20, 25, 'New sample, new interval', { weight: 700, size: 18 })
+    + text(20, 53, 'One fixed probability = 0.5', { tone: 'soft' })
+    + `<path data-proof-fixed-parameter="0.5" d="M${horizontal(.5)} 74V284" style="stroke:${color('focus')};stroke-width:2;stroke-dasharray:3 4"></path>`;
+  for (const [index, [lower, upper]] of model.intervals.entries()) {
+    const vertical = 86 + index * 19;
+    const covers = lower <= .5 && upper >= .5;
+    const tone = covers ? 'input' : 'warning';
+    body += `<g data-proof-interval="${lower},${upper}" data-proof-covers="${covers}">${line(horizontal(lower), vertical, horizontal(upper), vertical, tone)}${line(horizontal(lower), vertical - 5, horizontal(lower), vertical + 5, tone)}${line(horizontal(upper), vertical - 5, horizontal(upper), vertical + 5, tone)}</g>`;
+  }
+  body += text(20, 313, 'Same truth; changing data', { width: 320, tone: 'soft' })
+    + line(20, 336, 340, 336)
+    + text(20, 371, 'One sample, one posterior', { weight: 700, size: 18 })
+    + text(20, 402, '3 successes, 2 failures; uniform prior', { width: 320, tone: 'soft' });
+  const points = Array.from({ length: 81 }, (_, index) => {
+    const value = index / 80;
+    return [horizontal(value), 560 - 60 * value ** 3 * (1 - value) ** 2 * 60];
+  });
+  body += `<path data-proof-posterior="Beta(4,3)" d="M38 560${points.map(([horizontalValue, verticalValue]) => `L${horizontalValue} ${verticalValue}`).join('')}L318 560Z" style="fill:${fill('output')};stroke:${color('output')};stroke-width:2.5"></path>`
+    + line(38, 560, 318, 560)
+    + text(38, 586, '0', { tone: 'soft' }) + text(318, 586, '1', { anchor: 'end', tone: 'soft' })
+    + text(178, 614, 'Candidate probability', { anchor: 'middle', width: 280, tone: 'soft' });
+  return { body, height: 637 };
+}
+
+function suppression(model) {
+  let body = text(20, 25, 'Score order: A > B > C', { size: 18, weight: 700 });
+  for (const [index, box] of model.boxes.entries()) {
+    const tone = ['input', 'warning', 'output'][index];
+    body += `<rect data-proof-box-identity="${box.name}" x="${box.left}" y="70" width="${box.width}" height="104" style="fill:none;stroke:${color(tone)};stroke-width:2.5${index === 1 ? ';stroke-dasharray:5 4' : ''}"></rect>`
+      + text(box.left + 18, 59, box.name, { width: 30, size: 22, weight: 700, tone });
+  }
+  body += text(20, 208, 'A overlaps B. B overlaps C.', { width: 320, weight: 700 })
+    + text(20, 235, 'A and C do not overlap.', { width: 320, tone: 'soft' });
+  for (const [index, [label, result, tone]] of [['Keep A', 'A removes B', 'input'], ['Skip removed B', 'B cannot remove C', 'warning'], ['Keep C', 'A and C survive', 'output']].entries()) {
+    const vertical = 278 + index * 86;
+    body += circle(31, vertical - 4, 10, tone) + text(31, vertical, index + 1, { anchor: 'middle', width: 25, weight: 700 })
+      + text(54, vertical, label, { width: 270, weight: 700 })
+      + text(54, vertical + 27, result, { width: 270, tone });
+    if (index < 2) body += line(31, vertical + 10, 31, vertical + 68, 'neutral', true);
+  }
+  return { body, height: 510 };
+}
+
+function topology(model) {
+  let body = '';
+  for (const [from, to] of model.edges) {
+    const start = model.nodes[from];
+    const end = model.nodes[to];
+    body += `<path data-proof-topology-edge="${from},${to}" d="M${start[1]} ${start[2]}L${end[1]} ${end[2]}" style="stroke:${color('input')};stroke-width:2.5"></path>`;
+  }
+  for (const [index, [name, horizontal, vertical]] of model.nodes.entries()) body += `<g data-proof-topology-node="${index}">${circle(horizontal, vertical, 19, index === 3 ? 'warning' : 'input')}${text(horizontal, vertical + 5, name, { anchor: 'middle', width: 30, weight: 700 })}</g>`;
+  body += text(20, 259, '4 nodes; 3 edges = n - 1', { width: 320, size: 20, weight: 700 })
+    + text(20, 298, 'A cycle and an isolated node', { width: 320, tone: 'warning' });
+  return { body, height: 326 };
+}
+
+const renderers = { bars, parts, population, matrix, curve, timeline, connections, ledger, areas, geometry, intervals, suppression, topology };
+const sampledOperations = new WeakMap();
+const sample = (operation, minimum, maximum, count = 65) => {
+  const points = Array.from({ length: count }, (_, index) => {
+    const value = minimum + (maximum - minimum) * index / (count - 1);
+    return [value, operation(value)];
+  });
+  sampledOperations.set(points, operation);
+  return points;
+};
 const gaussian = (value, mean = 0, deviation = 1) => Math.exp(-.5 * ((value - mean) / deviation) ** 2) / (deviation * Math.sqrt(2 * Math.PI));
 const divergence = (first, second) => first.reduce((sum, value, index) => sum + value * Math.log(value / second[index]), 0);
 export const visualArguments = {};
@@ -329,12 +589,12 @@ define('contextual-bandit-partial-feedback-support', 'ledger', 'Action C has no 
 define('continuous-batching-reuses-finished-slot', 'ledger', 'A finished request frees a slot, not the whole batch', 'The next iteration keeps A and replaces B with C. It does not wait for A to finish.', { rows: [['Iteration t', ['A', 'B'], 'input'], ['B finishes', ['A', 'free'], 'warning'], ['Iteration t + 1', ['A', 'C'], 'output']] });
 define('point-in-time-availability-boundary', 'timeline', 'An early event can still be unavailable at prediction', 'The 11:50 event arrives at 12:10. A noon prediction cannot use it, even though its event timestamp is earlier.', { events: [['Event occurs', 11 + 50 / 60], ['Prediction boundary', 12, 'warning'], ['Event becomes available', 12 + 10 / 60, 'output']], boundary: 12, unit: 'hour on the same clock' });
 define('decision-threshold-action-regions', 'ledger', 'The same score can lead to different permitted actions', 'Scores do not carry a universal action. These illustrative policy regions require costs, thresholds, and review capacity.', { rows: [['Illustrative score regions', ['0-.2', '.2-.8', '.8-1'], 'input'], ['Declared actions', ['allow', 'review', 'block'], 'output']] });
-define('fixed-capacity-portfolio-guardrails', 'parts', 'A fixed budget makes the tradeoff visible', 'This illustrative 100-point allocation protects serving and recovery. Increasing training must take capacity from another unprotected category.', { rows: [['training', 50, 'input'], ['post-training', 20, 'focus'], ['serving', 20, 'output'], ['recovery', 10, 'neutral']], unit: ' budget points' });
+define('fixed-capacity-portfolio-guardrails', 'parts', 'A fixed budget makes the tradeoff visible', 'Training grows from 50 to 56 by taking six points from post-training, which falls from 20 to 14. Protected serving and recovery stay at 20 and 10; the total remains 100.', { rows: [['training', 50, 'input'], ['post-training', 20, 'focus'], ['serving', 20, 'output'], ['recovery', 10, 'neutral']], unit: ' budget points', transfer: { from: 1, to: 0, value: 6, protected: [2, 3] } });
 define('fixed-budget-ranking-funnel', 'bars', 'Spend expensive scoring only after narrowing', 'A true count scale makes the 10,000-to-100 reduction visible. Stage widths are not latency measurements.', { rows: [['Retrieved candidates', 10000, 'input'], ['Pre-ranked candidates', 1000, 'state'], ['Final scoring candidates', 100, 'output']], unit: ' candidates' });
 define('agent-safety-authority-loop', 'bars', 'The next proposal crosses a limit already partly spent', '60 committed plus 50 proposed is 110. The ten-unit overflow blocks new authority; it does not undo committed effects.', { rows: [['Already committed', 60, 'input'], ['Committed plus proposed', 110, 'warning']], limit: 100, unit: ' impact units' });
 define('disagreement-evidence-commit-loop', 'bars', 'The memory limit rejects an option, not its advocate', 'On one shared scale, faster cache A breaches 8 GB. Cache B fits; reopening A needs new evidence of feasibility.', { rows: [['A: faster cache', 9, 'warning'], ['B: smaller cache', 6, 'output']], limit: 8, unit: ' GB' });
 define('multimodal-stale-frame-gate', 'bars', 'Recent arrival can hide stale content', 'Capture age is 4.30 seconds; arrival age is 0.10. Arrival does not refresh the frame.', { rows: [['Question minus capture', 4.3, 'warning'], ['Question minus arrival', .1, 'input']], unit: ' s' });
-define('reasoning-admission-and-capacity', 'ledger', 'A compute surplus cannot pay a KV-page deficit', 'Both resource conditions must hold. Six required pages do not fit into five available pages, despite spare compute.', { rows: [['Compute: 4 required, 6 available', ['yes', 'yes', 'yes', 'yes', 'spare', 'spare'], 'output'], ['KV pages: 6 required, 5 available', ['yes', 'yes', 'yes', 'yes', 'yes', 'NO'], 'warning']] });
+define('reasoning-admission-and-capacity', 'ledger', 'A compute surplus cannot pay a KV-page deficit', 'Both resource conditions must hold. Six required pages do not fit into five available pages, despite spare compute.', { rows: [['Compute: 4 required, 6 available', ['yes', 'yes', 'yes', 'yes', 'free', 'free'], 'output'], ['KV pages: 6 required, 5 available', ['yes', 'yes', 'yes', 'yes', 'yes', 'NO'], 'warning']] });
 define('ecosystem-serving-stages', 'population', 'Eligibility is not exposure', 'Only five displayed candidates create exposure records. Fifteen other eligible candidates are unshown, not negative outcomes.', { rows: [['displayed', 5, 'output'], ['eligible but unshown', 15, 'input'], ['ineligible', 80, 'warning']], unit: 'one retrieved candidate' });
 define('video-ecosystem-delayed-effects', 'timeline', 'The fast readout arrives before the supply response', 'This is event order, not a duration estimate. A viewer experiment can end before creator supply has had time to respond.', { events: [['Ranking policy changes', 0], ['Immediate viewer response', 1], ['Short experiment ends', 2, 'warning'], ['Creator response becomes observable', 3, 'output']] });
 
@@ -408,7 +668,7 @@ define('checkpoint-boundary-recompute-balance', 'curve', 'Saving less requires r
 define('actor-critic-two-objective-flow', 'matrix', 'The advantage is evidence for the actor, not an actor gradient route', 'Both losses can update shared features. The actor loss must not differentiate through the advantage target.', { values: [['yes', 'yes'], ['yes', 'no'], ['no', 'yes'], ['STOP', 'target']], columns: ['actor', 'critic'], labels: ['shared', 'policy', 'value', 'adv.'], selected: [[0, 0], [0, 1], [1, 0], [2, 1]], blocked: [[3, 0]] });
 define('gae-residual-weight-trace', 'ledger', 'A backward recurrence equals a weighted residual sum', 'With gamma times lambda equal to 0.8, residuals (1,2,-1) give advantage 1.96. The backward scan gives the same answer.', { rows: [['Residuals from current time', ['1', '2', '-1'], 'input'], ['Decaying weights', ['1', '.8', '.64'], 'state'], ['Weighted sum', ['1', '+1.6', '-.64', '=', '1.96'], 'output']] });
 define('normalization-shared-statistics', 'matrix', 'The axes reveal which values share statistics', 'BatchNorm uses column means 3 and 5 across these samples. LayerNorm uses row means 2 and 6 within each sample.', { values: [[1, 3, 2], [5, 7, 6], [3, 5, '-']], columns: ['feat 1', 'feat 2', 'LN'], labels: ['sample A', 'sample B', 'BN'], selected: [[0, 2], [1, 2], [2, 0], [2, 1]] });
-define('intervals-two-randomness-models', 'connections', 'Repeat the data, or condition on these data', 'Confidence coverage concerns intervals from repeated samples. A posterior conditions on the observed sample and the declared prior.', { nodes: [['Repeated samples', 0, 0], ['This observed sample', 1, 0], ['Moving confidence intervals', 0, 1, 'input'], ['Conditional posterior', 1, 1, 'output']], edges: [[0, 2], [1, 3]] });
+define('intervals-two-randomness-models', 'intervals', 'Repeat the data, or condition on these data', 'Repeated samples move the interval while the true probability stays fixed. Below, three successes and two failures with a uniform prior give Beta(4,3), conditioned on one observed sample. The ten intervals are illustrative, not a measured coverage rate.', { intervals: [[.15, .65], [.3, .72], [.23, .6], [.42, .84], [.55, .91], [.2, .56], [.33, .77], [.14, .52], [.38, .82], [.26, .67]] });
 define('belief-propagation-branch-summary', 'ledger', 'Sum out the hidden branch before combining messages', 'Hidden states contribute 0.3x2 and 0.7x0.5. Their message sum is 0.95; normalization follows evidence combination.', { rows: [['Hidden-state weighted terms', ['.3x2', '.7x.5'], 'input'], ['Marginal message', ['.6', '+', '.35', '=', '.95'], 'output']] });
 define('bert-mlm-selection-and-corruption', 'population', 'Selected for prediction does not always mean replaced by MASK', 'For 1,000 tokens, 150 are prediction targets. The 80/10/10 corruption rule gives 120 masks, 15 random replacements, and 15 unchanged targets.', { rows: [['masked targets', 120, 'focus'], ['randomly replaced targets', 15, 'warning'], ['unchanged targets', 15, 'output'], ['unselected tokens', 850, 'neutral']], unit: 'one input token' });
 define('bootstrap-resampling-unit', 'ledger', 'Repeated users bring their paired events with them', 'Sampling users preserves within-user event pairing. Resampling isolated rows would answer a different uncertainty question.', { rows: [['Original user clusters', ['A: a1,a2', 'B: b1,b2', 'C: c1,c2'], 'input'], ['One bootstrap user sample', ['A: a1,a2', 'C: c1,c2', 'A: a1,a2'], 'output']] });
@@ -487,7 +747,7 @@ define('hierarchical-all-reduce-path', 'ledger', 'Combine local partials, then r
 define('quality-speed-proportionate-path', 'matrix', 'A protected slice can veto an apparently successful launch', 'Ordinary checks pass while protected-record handling fails. The failed requirement remains a blocker; speed does not substitute for it.', { values: [['pass', 'pass'], ['pass', 'FAIL']], columns: ['speed', 'record rule'], labels: ['ordinary', 'protected'], selected: [[0, 0], [0, 1], [1, 0]], blocked: [[1, 1]] });
 define('agent-review-control-loop', 'timeline', 'The equality case distinguishes two nearly identical patches', 'Expiry equal to now must be rejected under this contract. A patch tested only before and after the boundary can miss it.', { events: [['expiry < now: reject', -1, 'output'], ['expiry = now: must also reject', 0, 'warning'], ['expiry > now: allow', 1, 'input']], boundary: 0, unit: 'expiry minus now; illustrative clock units' });
 define('ring-all-reduce-chunk-trace', 'ledger', 'Reduce a chunk, then circulate its completed sum', 'For one illustrative chunk, rank values 1,2,3,4 reduce to 10. All-gather distributes that completed chunk; it does not add the sum again.', { rows: [['Local values of one chunk', ['1', '2', '3', '4'], 'input'], ['Reduction partials along the ring', ['1', '3', '6', '10'], 'state'], ['Completed chunk distributed to ranks', ['10', '10', '10', '10'], 'output']] });
-define('nms-greedy-suppression', 'matrix', 'A removed box cannot suppress its neighbor', 'Scores order A before B before C. If only A-B and B-C overlap above threshold, A removes B and C survives.', { values: [['keep', 'remove', 'keep'], ['A', 'A', 'C']], columns: ['A', 'B', 'C'], labels: ['decision', 'keeper'], selected: [[0, 0], [0, 2]], blocked: [[0, 1]] });
+define('nms-greedy-suppression', 'suppression', 'A removed box cannot suppress its neighbor', 'Scores order A before B before C. The equal-height boxes have adjacent IoU 1/3, above the illustrative 0.30 threshold. A removes B; removed B cannot suppress C, so A and C survive.', { boxes: [{ name: 'A', left: 20, width: 160 }, { name: 'B', left: 100, width: 160 }, { name: 'C', left: 180, width: 160 }], threshold: .3 });
 define('ecosystem-delayed-feedback-loop', 'timeline', 'An experiment clock can stop before the ecosystem responds', 'The creator response follows changed allocation and incentives. A short-run viewer readout does not yet measure the full supply response.', { events: [['Ranking allocation changes', 0], ['Viewer response observed', 1], ['Short-run analysis completed', 2, 'warning'], ['Creator supply response observed', 3, 'output']] });
 define('agent-governed-action-path', 'connections', 'Permission and outcome evidence bracket execution', 'A proposal alone cannot dispatch a tool. Authorization must precede execution, and a receipt is needed before claiming its outcome.', { nodes: [['Proposed action', 2, 0, 'input'], ['Exact authorization', 2, 1, 'state'], ['Tool execution', 2, 2, 'focus'], ['Outcome receipt', 2, 3, 'output']], edges: [[0, 1], [1, 2], [2, 3]] });
 define('ivf-pq-query-funnel', 'matrix', 'Accurate distance within the wrong partitions still misses a neighbor', 'The true neighbor in partition C stays unreachable when only A and B are scanned. PQ changes distance representation, not this membership decision.', { values: [['yes', 'yes', 'no'], ['near', 'far', 'TRUE']], columns: ['part A', 'part B', 'part C'], labels: ['scanned', 'neighbor'], selected: [[0, 0], [0, 1]], blocked: [[0, 2], [1, 2]] });
@@ -510,7 +770,7 @@ define('training-loop-persistent-state', 'matrix', 'Clearing gradients does not 
 define('work-prioritization-counterfactual-portfolio', 'bars', 'The alternative portfolio is the opportunity cost', 'In this illustrative fixed-capacity choice, A yields 8 while compatible B and C yield 11. Past effort on A does not change the forward comparison.', { rows: [['Choose A alone', 8, 'input'], ['Choose B plus C', 11, 'output']], unit: ' assumed value units' });
 define('decision-tree-partitions-feature-space', 'matrix', 'The second split affects only one root branch', 'The root sends every x<=0 point to A. Splitting y on the right branch changes only the x>0 region.', { values: [['A', 'C'], ['A', 'B']], columns: ['x<=0', 'x>0'], labels: ['y>1', 'y<=1'], selected: [[0, 1], [1, 1]] });
 define('ethical-decision-process-outcome', 'timeline', 'Do not let later luck rewrite what was known at decision time', 'The original choice used the evidence available before its boundary. A favorable later outcome does not prove that the original process was sound.', { events: [['Evidence available to decision maker', 0, 'input'], ['Decision committed', 1, 'state'], ['Unexpected outcome observed', 2, 'warning']], boundary: 1 });
-define('policy-label-observation-loop', 'ledger', 'Missing outcomes are not negative outcomes', 'Only observed mature outcomes supply this label. Pending, censored, and unobserved cases retain their distinct missingness states.', { rows: [['Outcome states', ['mature +', 'mature -', 'pending', 'censored'], 'input'], ['Training labels', ['1', '0', '?', '?'], 'output']] });
+define('policy-label-observation-loop', 'ledger', 'Missing outcomes are not negative outcomes', 'Only observed mature outcomes supply this label. Pending, censored, and unobserved cases retain their distinct missingness states.', { labelPadding: 6, rows: [['Outcome states', ['mature +', 'mature -', 'pending', 'censored'], 'input'], ['Training labels', ['1', '0', '?', '?'], 'output']] });
 define('ablation-rival-hypotheses', 'bars', 'A matched control separates the component from the extra resources', 'The baseline scores 80; the resource-matched control scores 82.8; the claimed method scores 83. The isolated matched gap is 0.2 points, not 3.', { rows: [['Original baseline', 80, 'neutral'], ['Resource-matched control', 82.8, 'input'], ['Claimed method', 83, 'output']], unit: ' score points' });
 define('coding-product-authority-boundary', 'matrix', 'Shared context does not imply shared execution authority', 'Inline, chat, and review can share repository context. Only an authorized isolated agent may use the declared edit and execution tools.', { values: [['yes', 'no'], ['yes', 'no'], ['yes', 'no'], ['yes', 'scoped']], columns: ['context', 'execute'], labels: ['inline', 'chat', 'review', 'agent'], selected: [[3, 1]], blocked: [[0, 1], [1, 1], [2, 1]] });
 define('enterprise-agent-three-plane-boundary', 'timeline', 'Persist authority before dispatch; reconcile a lost reply', 'The payment commits once under an idempotency key. A lost reply requires reconciliation, not a second payment.', { events: [['Exact payment authorization persisted', 0, 'input'], ['Idempotent dispatch', 1, 'state'], ['Account commits; reply lost', 2, 'warning'], ['Same key returns original receipt', 3, 'output']] });
@@ -523,7 +783,7 @@ define('ml-ab-test-launch-gates', 'matrix', 'Significance, practical value, and 
 define('ml-monitoring-observability-layers', 'timeline', 'A freshness violation can be known before quality labels mature', 'A stale snapshot breaches its current contract immediately. Quality inference still waits for mature outcomes and valid joins.', { events: [['Snapshot becomes stale', 0, 'warning'], ['Request served; freshness failure known', 1, 'warning'], ['Outcome maturation window', 2, 'state'], ['Quality labels can be evaluated', 3, 'output']] });
 define('multi-team-platform-contract-boundary', 'matrix', 'Only the first valid compare-and-swap owns the result', 'A commits version 0 to 1. B still expects version 0, so its later write is rejected rather than overwriting A.', { values: [['0', '0', 'v1'], ['0', '1', 'REJECT']], columns: ['expected', 'actual', 'result'], labels: ['attempt A', 'attempt B'], selected: [[0, 2]], blocked: [[1, 2]] });
 define('post-training-policy-gate', 'matrix', 'A successful task can still fail the authorization requirement', 'Completion and policy compliance are independent checks. Unauthorized account access vetoes the otherwise successful trial.', { values: [['yes', 'yes', 'pass'], ['yes', 'NO', 'FAIL']], columns: ['task', 'authority', 'trial'], labels: ['allowed', 'violation'], selected: [[0, 2]], blocked: [[1, 1], [1, 2]] });
-define('llm-inference-two-budget-scheduler', 'ledger', 'Persistent pages and refreshing work slots are different ledgers', 'A and B reserve nine of twelve KV pages. The eight token-work slots refresh each iteration; free slots do not erase persistent page reservations.', { rows: [['Persistent KV pool; twelve pages', ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', '-', '-', '-'], 'input'], ['One iteration; eight work slots', ['D', 'D', 'D', 'P', 'P', 'P', 'P', 'P'], 'state']] });
+define('llm-inference-two-budget-scheduler', 'ledger', 'Persistent pages and refreshing work slots are different ledgers', 'A and B reserve nine of twelve KV pages. The eight token-work slots refresh each iteration; free slots do not erase persistent page reservations.', { emptySlots: true, rows: [['Persistent KV pool; twelve pages', ['A', 'A', 'A', 'A', 'A', 'B', 'B', 'B', 'B', '-', '-', '-'], 'input'], ['One iteration; eight work slots', ['D', 'D', 'D', 'P', 'P', 'P', 'P', 'P'], 'state']] });
 define('reasoning-fixed-budget-reclaim', 'ledger', 'Quarterly hours do not describe the nodes free right now', 'Six serving nodes and two offline nodes fill this instantaneous eight-node pool. Serving pressure reclaims the two offline nodes; protected reserves remain protected.', { rows: [['Before serving pressure', ['S', 'S', 'S', 'S', 'S', 'S', 'O', 'O'], 'input'], ['After checkpoint and offline pause', ['S', 'S', 'S', 'S', 'S', 'S', 'S', 'S'], 'output']] });
 define('ecosystem-experiment-interference', 'connections', 'Treatment can change supply that later reaches control', 'Both cells share one creator pool. Changed supply can return to both cells, breaking a simple no-interference interpretation.', { nodes: [['Treatment allocation', 0, 0, 'input'], ['Control allocation', 1, 0, 'state'], ['Shared creator supply', 2, 1, 'focus'], ['Future treatment', 0, 2, 'input'], ['Future control', 1, 2, 'warning']], edges: [[0, 2], [1, 2], [2, 3], [2, 4]] });
 define('spotify-two-level-shelf-composition', 'bars', 'A lower-scoring shelf can improve the whole page', 'Shelf scores are A=6, B=5, C=4. A+B repeats a song and pays penalty 4; A+C wins at 10.', { rows: [['A + B - duplicate penalty', 7, 'warning'], ['A + C', 10, 'output'], ['B + C', 9, 'input']], unit: ' toy utility' });
@@ -573,7 +833,7 @@ define('ambitious-project-three-evidence-test', 'matrix', 'Separate the decision
 define('overrated-technique-claim-stress-test', 'matrix', 'A bounded critique declares the result that would overturn it', 'The claim concerns a specific task and matched budget. A contrary matched result would update it; a different task alone would not test the same claim.', { values: [['same', 'same', 'compare'], ['other', 'higher', 'unclear']], columns: ['task', 'budget', 'test'], labels: ['matched', 'unmatched'], selected: [[0, 2]], blocked: [[1, 2]] });
 define('multi-agent-ctde-information-boundary', 'matrix', 'Training can see joint information that execution cannot', 'The centralized critic uses joint state during training. Each deployed actor must act from its allowed local observation without that critic.', { values: [['joint', 'local'], ['absent', 'local']], columns: ['critic', 'actor'], labels: ['train', 'execute'], selected: [[0, 0], [0, 1], [1, 1]], blocked: [[1, 0]] });
 define('multimodal-architectures-meeting-point', 'matrix', 'The meeting point determines when modalities can interact', 'Early fusion mixes modalities before shared processing. Late fusion keeps representations separate until their scores or decisions meet.', { values: [['joint', 'joint'], ['image', 'text'], ['merge', 'merge']], columns: ['image path', 'text path'], labels: ['early', 'late pre', 'late end'], selected: [[0, 0], [0, 1], [2, 0], [2, 1]] });
-define('negative-hardness-label-gate', 'matrix', 'A similar relevant item is not a valid hard negative', 'High similarity establishes hardness, not irrelevance. The label gate must reject a relevant answer before negative training uses it.', { values: [['high', 'yes', 'NO'], ['high', 'no', 'yes']], columns: ['similarity', 'relevant', 'negative'], labels: ['answer', 'distractor'], selected: [[1, 2]], blocked: [[0, 2]] });
+define('negative-hardness-label-gate', 'matrix', 'A similar relevant item is not a valid hard negative', 'High similarity establishes hardness, not irrelevance. The label gate must reject a relevant answer before negative training uses it.', { values: [['high', 'yes', 'NO'], ['high', 'no', 'yes']], columns: ['sim. score', 'relevant', 'negative'], labels: ['answer', 'distractor'], selected: [[1, 2]], blocked: [[0, 2]] });
 define('training-recipe-evidence-gates', 'matrix', 'A nonzero gradient does not prove that the intended weights changed', 'The recipe produces gradient 0.8 but observed parameter change zero. Check the actual optimizer-bound parameters and step receipt.', { values: [[.8, 0, 'FAIL']], columns: ['gradient', 'delta W', 'update'], labels: ['probe'], selected: [[0, 0]], blocked: [[0, 1], [0, 2]] });
 define('detector-candidate-resolution', 'matrix', 'Training assignment and inference suppression solve different problems', 'Training matches predictions to ground-truth supervision. Inference removes redundant predicted boxes without access to ground truth.', { values: [['yes', 'match'], ['no', 'suppress']], columns: ['truth used', 'operation'], labels: ['training', 'inference'], selected: [[0, 1], [1, 1]] });
 
@@ -615,7 +875,7 @@ define('cross-validation-fit-the-question', 'matrix', 'A split is valid only for
 define('wsd-checkpoint-lineage', 'connections', 'A cooldown branch does not have to replace the hot mainline', 'A checkpoint forks into a continued hot run and a cooldown evaluation branch. Their lineage is shared; promotion remains a separate decision.', { nodes: [['Shared checkpoint', 2, 0, 'input'], ['Hot continuation', 0, 1, 'input'], ['Cooldown branch', 1, 1, 'state'], ['Branch evidence', 1, 2, 'output']], edges: [[0, 1], [0, 2], [2, 3]] });
 define('coding-product-mode-boundaries', 'matrix', 'The modes share context, not tool permission', 'Inline, chat, and review remain nonexecuting modes. The isolated agent receives only its explicitly scoped tool authority.', { values: [['yes', 'no'], ['yes', 'no'], ['yes', 'no'], ['yes', 'scoped']], columns: ['context', 'tools'], labels: ['inline', 'chat', 'review', 'agent'], selected: [[3, 1]], blocked: [[0, 1], [1, 1], [2, 1]] });
 define('coding-product-task-lifecycle', 'timeline', 'Cancellation withdraws authority before it proves worker termination', 'The request cancels future dispatch immediately. A later worker-stop receipt establishes termination; neither event means the patch was successfully verified.', { events: [['Cancel request; future dispatch ends', 0, 'warning'], ['Worker may still be stopping', 1, 'warning'], ['Worker-stop receipt arrives', 2, 'output']] });
-define('foundation-data-build-planes', 'matrix', 'Completed shards still need permission and validation before publication', 'Artifact completion alone does not authorize use. Policy permission and passing validation must both join the completed artifact before release.', { values: [['yes', 'yes', 'NO', 'hold'], ['yes', 'NO', 'yes', 'hold'], ['yes', 'yes', 'yes', 'release']], columns: ['built', 'policy', 'validated', 'publish'], labels: ['case A', 'case B', 'case C'], selected: [[2, 3]], blocked: [[0, 2], [1, 1]] });
+define('foundation-data-build-planes', 'matrix', 'Completed shards still need permission and validation before publication', 'Artifact completion alone does not authorize use. Policy permission and passing validation must both join the completed artifact before release.', { values: [['yes', 'yes', 'NO', 'hold'], ['yes', 'NO', 'yes', 'hold'], ['yes', 'yes', 'yes', 'ready']], columns: ['built', 'policy', 'valid', 'publish'], labels: ['case A', 'case B', 'case C'], selected: [[2, 3]], blocked: [[0, 2], [1, 1]] });
 define('multimodal-path-boundaries', 'timeline', 'Permission is not an occurrence receipt', 'Correlated receipt confirms occurrence.', { compact: true, events: [['Exact action authorized', 0, 'input'], ['Command dispatched', 1, 'state'], ['Device receipt confirms effect', 2, 'output']] });
 define('multimodal-turn-lifecycle', 'matrix', 'Old-epoch packets stay invalid', 'Retired-epoch packets stay rejected.', { compact: true, values: [[7, 7, 'accept'], [8, 7, 'REJECT'], [8, 8, 'accept']], columns: ['active', 'packet', 'output'], labels: ['before', 'late', 'new'], selected: [[0, 2], [2, 2]], blocked: [[1, 2]] });
 define('video-publication-evidence', 'matrix', 'Rollback restores a compatible bundle, not just an old model', 'Model version 1 cannot be paired blindly with version-2 features and policy. Restore the verified compatible model-feature-policy bundle.', { values: [['v1', 'v2', 'v2'], ['v1', 'v1', 'v1']], columns: ['model', 'features', 'policy'], labels: ['unsafe', 'bundle'], blocked: [[0, 1], [0, 2]], selected: [[1, 0], [1, 1], [1, 2]] });
@@ -657,7 +917,7 @@ coding('edit-distance', 'ledger', 'a mismatch pays one edit; a match inherits th
 coding('encode-and-decode-strings', 'ledger', 'length, not delimiter appearance, determines the payload boundary', 'Encoding a#b as 3#a#b preserves its internal #. Read exactly three payload characters after the length delimiter.', { rows: [['Length prefix and delimiter', ['3', '#'], 'input'], ['Exactly three payload characters', ['a', '#', 'b'], 'state'], ['Decoded single string', ['a#b'], 'output']] });
 coding('find-median-from-data-stream', 'matrix', 'balanced heap sizes still need the ordering invariant', 'Heaps (5) and (1) have equal sizes but reversed ordering. Swapping their tops restores max(left)<=min(right) before reading the median.', { values: [[5, 1, 'NO'], [1, 5, 'yes']], columns: ['left max', 'right min', 'ordered'], labels: ['before', 'after'], selected: [[1, 2]], blocked: [[0, 2]] });
 coding('find-minimum-in-rotated-sorted-array', 'ledger', 'the middle remains a candidate when it lies on the low side', 'For (3,4,1,2), first discard middle 4 and its left side. Next, middle 1 is below rightmost 2: set right=mid, keeping that middle as the minimum candidate.', { rows: [['Initial rotated values', ['3', '4', '1', '2'], 'input'], ['Middle 4 > right 2: discard middle 4', ['out', 'out', '1', '2'], 'state'], ['Middle 1 < right 2: retain middle 1', ['out', 'out', '1', 'out'], 'output']] });
-coding('graph-valid-tree', 'matrix', 'the edge count alone cannot rule out a cycle plus isolation', 'A triangle on three nodes plus one isolated node has n-1 edges for n=4. It is not a tree because connectivity fails.', { values: [[4, 3, 'NO']], columns: ['nodes', 'edges', 'connected'], labels: ['graph'], blocked: [[0, 2]] });
+coding('graph-valid-tree', 'topology', 'the edge count alone cannot rule out a cycle plus isolation', 'A triangle on three nodes plus one isolated node has n-1 edges for n=4. It is not a tree because connectivity fails.', { nodes: [['A', 60, 65], ['B', 190, 65], ['C', 125, 185], ['D', 300, 150]], edges: [[0, 1], [1, 2], [2, 0]] });
 coding('group-anagrams', 'ledger', 'equal lengths do not imply equal character counts', 'Both ab and ba count one a and one b. By contrast, aa counts two a characters.', { rows: [['Words', ['ab', 'ba', 'aa'], 'input'], ['Character-count signatures', ['a1 b1', 'a1 b1', 'a2 b0'], 'state'], ['Groups', ['{ab,ba}', '{aa}'], 'output']] });
 coding('house-robber-ii', 'matrix', 'two linear cases prevent taking both circular endpoints', 'For a circle, solve once without the last house and once without the first. Every valid solution belongs to at least one of these cases.', { values: [['yes', 'yes', 'no'], ['no', 'yes', 'yes']], columns: ['first', 'middle', 'last'], labels: ['case A', 'case B'], selected: [[0, 0], [1, 2]], blocked: [[0, 2], [1, 0]] });
 coding('house-robber', 'bars', 'taking the current house can reuse only the earlier nonadjacent optimum', 'At index 3 of (2,7,9,3), skip gives 11. Taking the current value gives best-through-index-1 plus 3, or 10.', { rows: [['Skip current: keep 11', 11, 'output'], ['Take current: 7 + 3', 10, 'input']], unit: ' value' });
@@ -675,7 +935,7 @@ coding('longest-consecutive-sequence', 'ledger', 'start a run only where no pred
 coding('longest-increasing-path-in-a-matrix', 'ledger', 'a cached suffix can serve more than one starting point', 'Paths starting at 1 and 2 can both enter suffix (3,4). The suffix length is solved once and reused; the path still follows strictly increasing values.', { rows: [['First start', ['1', '3', '4'], 'input'], ['Second start reuses the same suffix', ['2', '3', '4'], 'state'], ['Memoized length at value 3', ['2'], 'output']] });
 coding('longest-increasing-subsequence', 'ledger', 'a smaller tail preserves length but is not the saved subsequence', 'Processing (3,5,7,2) changes the length-one tail to 2. Tails (2,5,7) are extension bounds, not a subsequence of that processed input.', { rows: [['Processed values', ['3', '5', '7', '2'], 'input'], ['Tails before final value', ['3', '5', '7'], 'state'], ['Tails after final value', ['2', '5', '7'], 'output']] });
 coding('longest-palindromic-substring', 'bars', 'a shorter new palindrome cannot replace the saved best', 'A saved palindrome of length 5 remains best when a later center finds length 3. Update only when the new length is strictly larger under this tie rule.', { rows: [['Saved best length', 5, 'output'], ['Later center palindrome length', 3, 'input']], unit: ' characters' });
-coding('longest-repeating-character-replacement', 'ledger', 'the saved best need not describe the final shown window', 'AABA needs one replacement and has length 4. A later ABBA window needs two; it does not invalidate the earlier saved optimum of 4.', { rows: [['Earlier valid witness; k=1', ['AABA', '1 replacement', 'length 4'], 'output'], ['Later window', ['ABBA', '2 replacements', 'not witness'], 'warning']] });
+coding('longest-repeating-character-replacement', 'ledger', 'the saved best need not describe the final shown window', 'AABA needs one replacement and has length 4. A later ABBA window needs two; it does not invalidate the earlier saved optimum of 4.', { rows: [['Earlier valid witness; k=1', ['AABA', '1 edit', 'length 4'], 'output'], ['Later window', ['ABBA', '2 edits', 'not witness'], 'warning']] });
 coding('longest-substring-without-repeating-characters', 'timeline', 'an old duplicate cannot move the left boundary backward', 'In abba, the last a was at index 0 while left already equals 2. Set left=max(2,0+1)=2 rather than reopening the duplicate b.', { events: [['Previous a index', 0, 'input'], ['Candidate last[a]+1', 1, 'warning'], ['Current and retained left bound', 2, 'output']], unit: 'string index on one shared scale' });
 coding('lowest-common-ancestor-in-a-bst', 'matrix', 'stop when the targets split or one equals the current node', 'At node 6 with targets 2 and 8, their search directions split. If one target is 6 itself, that same node is already the ancestor.', { values: [['left', 'right', 'STOP'], ['equal', 'right', 'STOP']], columns: ['target 1', 'target 2', 'decision'], labels: ['split', 'equal'], selected: [[0, 2], [1, 2]] });
 coding('lru-cache', 'ledger', 'a read changes the victim of the next eviction', 'With key 1 older than key 2, reading 1 moves it to most-recent position. Inserting key 3 then evicts key 2.', { rows: [['Oldest to newest before read', ['1', '2'], 'input'], ['After get(1)', ['2', '1'], 'state'], ['After inserting 3 at capacity 2', ['1', '3'], 'output']] });
@@ -734,12 +994,203 @@ coding('word-break', 'matrix', 'a tempting longest prefix can leave an impossibl
 coding('word-search-ii', 'matrix', 'a terminal trie node may still have another word below it', 'Emit a at its terminal node, then keep exploring. For adjacent cells a,b and words (a,ab), continuing finds ab.', { values: [['a', 'yes', 'b'], ['ab', 'yes', 'none']], columns: ['prefix', 'emit', 'child'], labels: ['step 1', 'step 2'], selected: [[0, 1], [1, 1]] });
 coding('word-search', 'ledger', 'a matching letter cannot reuse a cell already on this path', 'On a two-cell board A,B, target ABA would require cell 0 twice. The final A matches in value but is unavailable on the active path.', { rows: [['Requested cell sequence', ['0:A', '1:B', '0:A'], 'input'], ['Availability within this path', ['new', 'new', 'REJECT'], 'warning']] });
 
+const ledgerCompositions = {
+  'contextual-bandit-partial-feedback-support': 'compare',
+  'continuous-batching-reuses-finished-slot': 'transform',
+  'decision-threshold-action-regions': 'compare',
+  'reasoning-admission-and-capacity': 'compare',
+  'backprop-forward-reverse-trace': 'arithmetic',
+  'cnn-spatial-channel-pyramid': 'transform',
+  'logistic-gradient-cancellation': 'arithmetic',
+  'dropout-inverted-expectation': 'arithmetic',
+  'spectral-theorem-change-basis': 'transform',
+  'exponential-family-sufficient-stat-moment-match': 'arithmetic',
+  'fm-shared-embeddings-unseen-pair': 'arithmetic',
+  'gradient-accumulation-state-boundary': 'transform',
+  'gradient-boosting-residual-update': 'arithmetic',
+  'logit-odds-probability-map': 'compare',
+  'kernel-trick-exact-shortcut': 'arithmetic',
+  'lstm-coordinate-gated-state-update': 'arithmetic',
+  'mf-missing-rating-dot-product': 'arithmetic',
+  'importance-weights-effective-sample-size': 'arithmetic',
+  'naive-bayes-evidence-ledger': 'arithmetic',
+  'perplexity-tokenizer-denominator': 'sequence',
+  'position-bias-inverse-examination-weight': 'arithmetic',
+  'distribution-observation-unit': 'compare',
+  'residual-add-gradient-split': 'arithmetic',
+  'potential-shaping-cancels-backtracking': 'arithmetic',
+  'z-loss-anchors-common-offset': 'transform',
+  'gae-residual-weight-trace': 'arithmetic',
+  'belief-propagation-branch-summary': 'arithmetic',
+  'bootstrap-resampling-unit': 'set',
+  'ctc-blank-preserves-repeat': 'sequence',
+  'content-profile-scores-new-item': 'arithmetic',
+  'ring-attention-fixed-query-kv-cycle': 'arithmetic',
+  'infonce-positive-candidate-set': 'nested',
+  'diffusion-training-sampling-asymmetry': 'compare',
+  'bandit-three-selection-rules': 'compare',
+  'gqa-eight-queries-two-kv-groups': 'compare',
+  'lora-zero-impact-first-gradient': 'arithmetic',
+  'autograd-shared-node-accumulate-then-propagate': 'arithmetic',
+  'kmeans-assign-then-update': 'transform',
+  'kge-antisymmetry-score-swap': 'arithmetic',
+  'forward-backward-viterbi-chain-objectives': 'compare',
+  'batched-top-k-running-invariant': 'transform',
+  'linear-attention-two-escape-routes': 'compare',
+  'fp16-loss-scaling-ledger': 'compare',
+  'shap-all-orderings-credit': 'compare',
+  'positional-relative-mechanisms': 'compare',
+  'q-learning-off-policy-backup': 'arithmetic',
+  'quantization-scale-granularity': 'transform',
+  'ranking-metrics-per-rank-credit': 'compare',
+  'reparameterization-gradient-path': 'arithmetic',
+  'resnet-shortcut-shape-contract': 'compare',
+  'grpo-group-relative-signal': 'transform',
+  'semantic-segmentation-boundary-fusion': 'compare',
+  'softmax-ce-logit-update': 'transform',
+  'svm-support-vectors-set-boundary': 'compare',
+  'bpe-corpus-merge-trace': 'sequence',
+  'nonlinear-embedding-local-vs-global': 'compare',
+  'vision-patches-to-positioned-tokens': 'sequence',
+  'chatbot-randomization-unit': 'compare',
+  'hierarchical-all-reduce-path': 'transform',
+  'ring-all-reduce-chunk-trace': 'transform',
+  'asr-alignment-decoder-choices': 'transform',
+  'autoregressive-diffusion-sampling-steps': 'compare',
+  'fused-moe-triton-sram-roofline': 'compare',
+  'coding-interview-method-state': 'arithmetic',
+  'content-moderation-governed-decision-loop': 'compare',
+  'paper-critique-prioritization-funnel': 'compare',
+  'policy-label-observation-loop': 'compare',
+  'llm-inference-two-budget-scheduler': 'compare',
+  'reasoning-fixed-budget-reclaim': 'transform',
+  'flashattention-sram-tile-stream': 'transform',
+  'flashattention-standard-hbm-path': 'compare',
+  'fsdp-wrapped-unit-lifecycle': 'transform',
+  'llm-cost-compounds-across-agent-calls': 'arithmetic',
+  'paged-attention-block-table-indirection': 'physical-map',
+  'plan-70b-parallel-accounting': 'arithmetic',
+  'prefill-decode-weight-reuse': 'compare',
+  'rag-index-request-paths': 'transform',
+  'speculative-decoding-first-rejection-boundary': 'transform',
+  'streaming-asr-provisional-to-final': 'transform',
+  'tensor-parallel-ffn-handoff': 'arithmetic',
+  'course-prerequisite-fanout': 'transform',
+  'subset-sum-old-snapshot': 'transform',
+  'subsets-increasing-index-tree': 'compare',
+  'balanced-binary-tree-state': 'transform',
+  'best-time-to-buy-and-sell-stock-state': 'compare',
+  'binary-search-state': 'transform',
+  'binary-tree-level-order-traversal-state': 'transform',
+  'binary-tree-maximum-path-sum-state': 'compare',
+  'coin-change-state': 'compare',
+  'combination-sum-state': 'compare',
+  'construct-tree-from-preorder-and-inorder-traversal-state': 'compare',
+  'container-with-most-water-state': 'arithmetic',
+  'contains-duplicate-state': 'set',
+  'counting-bits-state': 'arithmetic',
+  'course-schedule-ii-state': 'transform',
+  'cross-entropy-from-logits-state': 'arithmetic',
+  'daily-temperatures-state': 'compare',
+  'decode-string-state': 'sequence',
+  'edit-distance-state': 'compare',
+  'encode-and-decode-strings-state': 'sequence',
+  'find-minimum-in-rotated-sorted-array-state': 'transform',
+  'group-anagrams-state': 'set',
+  'insert-interval-state': 'transform',
+  'jump-game-state': 'compare',
+  'kth-largest-element-state': 'set',
+  'kth-smallest-element-in-a-bst-state': 'compare',
+  'largest-rectangle-in-histogram-state': 'compare',
+  'longest-consecutive-sequence-state': 'set',
+  'longest-increasing-path-in-a-matrix-state': 'compare',
+  'longest-increasing-subsequence-state': 'transform',
+  'longest-repeating-character-replacement-state': 'compare',
+  'lru-cache-state': 'sequence',
+  'maximum-depth-of-binary-tree-state': 'arithmetic',
+  'maximum-product-subarray-state': 'arithmetic',
+  'maximum-subarray-state': 'compare',
+  'merge-intervals-state': 'transform',
+  'merge-k-sorted-lists-state': 'transform',
+  'merge-two-sorted-lists-state': 'sequence',
+  'min-stack-state': 'transform',
+  'mini-batches-state': 'sequence',
+  'missing-number-state': 'set',
+  'number-of-1-bits-state': 'transform',
+  'number-of-connected-components-state': 'transform',
+  'pairwise-squared-distances-state': 'arithmetic',
+  'permutations-state': 'set',
+  'product-of-array-except-self-state': 'compare',
+  'redundant-connection-state': 'set',
+  'remove-nth-node-from-end-state': 'sequence',
+  'reorder-list-state': 'sequence',
+  'reverse-bits-state': 'sequence',
+  'reverse-linked-list-state': 'sequence',
+  'search-in-rotated-sorted-array-state': 'transform',
+  'serialize-and-deserialize-binary-tree-state': 'sequence',
+  'spiral-matrix-state': 'transform',
+  'subarray-sum-equals-k-state': 'transform',
+  'top-k-frequent-elements-state': 'set',
+  'top-k-scores-state': 'transform',
+  'two-sum-state': 'transform',
+  'valid-palindrome-state': 'sequence',
+  'valid-parentheses-state': 'compare',
+  'word-search-state': 'sequence',
+};
+
+const curveLandmarks = {
+  'activation-gradient-regions': -3,
+  'optimizer-sharpness-reparameterization': .5,
+  'capacity-regimes-double-descent': 4,
+  'clt-data-vs-sample-means': 1,
+  'cold-start-signal-handoff': .6,
+  'cross-entropy-confident-wrong-gradient': .05,
+  'discrete-gradients-forward-backward-paths': -1,
+  'gradient-magnitude-through-depth': 10,
+  'warmup-cosine-three-checkpoints': 6,
+  'mle-bernoulli-parameter-sweep': .6,
+  'scaling-fixed-compute-allocation': 2,
+  'positive-definite-boundedness': 2,
+  'random-forest-correlation-floor': 100,
+  'bm25-saturation-length-penalty': 2,
+  'relu-second-moment-through-depth': 8,
+  'checkpoint-boundary-recompute-balance': 4,
+  'em-lower-bound-climb': .5,
+  'gp-conditioning-local-uncertainty': 0,
+  'learning-rate-range-to-schedule': 3,
+  'ppo-clipped-surrogate-plateaus': 1.5,
+  'momentum-alternating-components': 4,
+  'speaker-verification-threshold-tradeoff': .2,
+  'uat-existence-error-band': .125,
+};
+
+const pointCompositions = new Set(['adversarial-threat-set-boundary', 'estimator-error-reference-points', 'uncertainty-within-between-models', 'l1-l2-first-contact-geometry', 'word-analogy-shared-displacement']);
+for (const [identity, model] of Object.entries(visualArguments)) {
+  if (model.kind === 'ledger') model.composition = ledgerCompositions[identity];
+  else if (model.kind === 'curve') {
+    model.composition = 'landmark';
+    model.landmark = curveLandmarks[identity];
+    for (const [, points] of model.series) {
+      const operation = sampledOperations.get(points);
+      if (operation && model.landmark >= points[0][0] && model.landmark <= points.at(-1)[0] && !points.some(([value]) => Math.abs(value - model.landmark) < 1e-12)) {
+        points.push([model.landmark, operation(model.landmark)]);
+        points.sort((left, right) => left[0] - right[0]);
+      }
+    }
+  }
+  else if (model.kind === 'geometry') model.composition = ['ols-orthogonal-projection', 'pca-rank-one-projection'].includes(identity) ? 'projection' : pointCompositions.has(identity) ? 'points' : 'vectors';
+  else if (identity === 'ml-role-activity-profiles') model.composition = 'budget-rows';
+  else if (identity === 'fixed-capacity-portfolio-guardrails') model.composition = 'budget-transfer';
+  else if (['confusion-matrix-denominators', 'binary-precision-and-recall-state', 'roc-pr-same-operating-point'].includes(identity)) model.composition = 'denominators';
+  else model.composition = { bars: 'endpoint', parts: 'whole-and-share', population: 'counted-cohorts', matrix: 'cells', timeline: 'shared-clock', connections: 'directed-routes', areas: 'conserved-mass', intervals: 'repeat-versus-condition', suppression: 'overlapping-candidates', topology: 'counterexample-graph' }[model.kind];
+}
+
 export function renderVisualArgument(identity) {
   const model = visualArguments[identity];
   assert(model, `No visual argument for ${identity}`);
   const drawing = renderers[model.kind](model);
   assert(drawing.height > 0 && !/NaN|undefined|Infinity/.test(drawing.body), identity);
-  return `<div class="visual-argument" data-visual-argument="${identity}" data-argument-kind="${model.kind}">${model.compact ? '' : `<p class="visual-argument-premise">${escape(model.premise)}</p>`}<svg viewBox="0 0 360 ${drawing.height}" role="img" aria-label="${escape(`${model.premise}. ${model.conclusion}`)}"><title>${escape(model.premise)}</title><desc>${escape(model.conclusion)}</desc>${drawing.body}</svg></div>`;
+  return `<div class="visual-argument" data-visual-argument="${identity}" data-argument-kind="${model.kind}" data-argument-composition="${model.composition}"><svg viewBox="0 0 360 ${drawing.height}" role="img" aria-label="${escape(`${model.premise}. ${model.conclusion}`)}"><title>${escape(model.premise)}</title><desc>${escape(model.conclusion)}</desc>${drawing.body}</svg></div>`;
 }
 
 export function renderArgumentCaption(identity) {
@@ -751,7 +1202,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   assert.deepEqual(Object.keys(visualArguments).sort(), Object.keys(figureTakeaways).sort(), 'Every exact illustration identity needs an authored composition');
   assert.equal(Object.keys(visualArguments).length, 408);
   assert.equal(Object.values(visualArguments).filter(model => model.coding).length, Object.keys(codingQuestionVisuals).length);
+  assert.deepEqual(Object.keys(ledgerCompositions).sort(), Object.keys(visualArguments).filter(identity => visualArguments[identity].kind === 'ledger').sort(), 'Every ledger needs an individually selected composition');
+  assert.deepEqual(Object.keys(curveLandmarks).sort(), Object.keys(visualArguments).filter(identity => visualArguments[identity].kind === 'curve').sort(), 'Every curve needs an individually selected observation');
   for (const [identity, model] of Object.entries(visualArguments)) {
+    assert(model.composition, `${identity}: explicit visual composition required`);
     const rendered = renderVisualArgument(identity);
     assert.equal(rendered, renderVisualArgument(identity), `${identity}: nondeterminism`);
     assert(!/data-frame-key|data-motion-key|<script/.test(rendered));
@@ -761,6 +1215,46 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     assert.equal(nodes.filter((node) => node.nodeName === 'svg').length, 1);
     assert(nodes.some((node) => node.nodeName === 'title'));
     assert(nodes.some((node) => node.nodeName === 'desc'));
+    if (identity === 'checkpoint-boundary-recompute-balance') assert.deepEqual(nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-observation')).map(node => Number(node.attrs.find(attribute => attribute.name === 'data-proof-y').value)), [8, 4, 4], 'The drawn checkpoint values must be exactly eight total, four saved, and four rebuilt');
+    if (model.composition === 'budget-transfer') {
+      assert.equal(model.rows.reduce((sum, row) => sum + row[1], 0), 100);
+      assert.deepEqual(model.transfer, { from: 1, to: 0, value: 6, protected: [2, 3] });
+      assert(model.rows[model.transfer.from][1] >= model.transfer.value);
+    }
+    if (model.composition === 'budget-rows') for (const row of model.values) assert.equal(row.reduce((sum, value) => sum + value, 0), 100);
+    if (model.kind === 'suppression') {
+      const overlap = (first, second) => Math.max(0, Math.min(first.left + first.width, second.left + second.width) - Math.max(first.left, second.left));
+      const iou = (first, second) => overlap(first, second) / (first.width + second.width - overlap(first, second));
+      assert(iou(model.boxes[0], model.boxes[1]) > model.threshold && iou(model.boxes[1], model.boxes[2]) > model.threshold && iou(model.boxes[0], model.boxes[2]) <= model.threshold, 'The actual drawn boxes must realize the non-transitive suppression example');
+    }
+    if (model.kind === 'intervals') {
+      assert.equal(model.intervals.filter(([lower, upper]) => lower <= .5 && upper >= .5).length, 9);
+      assert(model.intervals.every(([lower, upper]) => lower >= 0 && upper <= 1 && lower < upper));
+      assert.equal(nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-interval')).length, 10);
+    }
+    if (model.kind === 'topology') {
+      assert.equal(model.edges.length, model.nodes.length - 1);
+      assert(model.edges.every(edge => !edge.includes(3)));
+      assert.equal(nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-topology-edge')).length, model.edges.length);
+    }
+    if (model.emptySlots) {
+      const empty = nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-token' && attribute.value === '-'));
+      assert.equal(empty.length, model.rows.flatMap(row => row[1]).filter(value => value === '-').length);
+      assert(empty.every(node => node.childNodes.some(child => child.nodeName === 'rect' && child.attrs.some(attribute => attribute.name === 'style' && attribute.value.includes('stroke-dasharray')))), `${identity}: free capacity must retain its visible slot boundaries`);
+    }
+    if (identity === 'policy-label-observation-loop') {
+      const label = nodes.find(node => node.attrs?.some(attribute => attribute.name === 'data-proof-token' && attribute.value === 'censored'));
+      assert.equal(label.childNodes.find(node => node.nodeName === 'text').childNodes.length, 1, 'The censored state must remain an intact word');
+    }
+    for (const node of nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-cell'))) {
+      const attributes = Object.fromEntries(node.attrs.map(attribute => [attribute.name, attribute.value]));
+      const [row, column] = attributes['data-proof-cell'].split(',').map(Number);
+      if (typeof model.values[row][column] === 'number') assert.equal(node.parentNode.attrs.find(attribute => attribute.name === 'data-proof-status').value, 'value', `${identity}: a real observed number must never be shown as rejected or missing`);
+    }
+    for (const node of nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-denominator'))) {
+      const attributes = Object.fromEntries(node.attrs.map(attribute => [attribute.name, attribute.value]));
+      assert.equal(Number(attributes.width), 320 * Number(attributes['data-proof-numerator']) / Number(attributes['data-proof-denominator']), `${identity}: denominator changes the drawn share`);
+    }
     if (model.kind === 'population') assert.equal(nodes.filter((node) => node.attrs?.some((attribute) => attribute.name === 'data-proof-population')).length, model.rows.reduce((sum, row) => sum + row[1], 0));
     if (model.kind === 'connections') {
       const edges = nodes.filter(node => node.attrs?.some(attribute => attribute.name === 'data-proof-edge'));

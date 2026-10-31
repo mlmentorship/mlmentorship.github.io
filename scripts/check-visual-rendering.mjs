@@ -547,9 +547,11 @@ try {
                   if (Math.min(left.box.right, right.box.right) - Math.max(left.box.left, right.box.left) > 1 && Math.min(left.box.bottom, right.box.bottom) - Math.max(left.box.top, right.box.top) > 1) overlaps.push([left.text, right.text]);
                 }
                 const nodeClipping = [...svg.querySelectorAll('[data-proof-token], [data-proof-cell]')].flatMap((node) => {
-                  const label = node.nextElementSibling;
+                  const label = node.tagName === 'g' ? node.querySelector(':scope > text') : node.parentElement.querySelector(':scope > text');
                   if (label?.tagName !== 'text') return ['missing cell label'];
-                  const bounds = node.getBBox();
+                  const declared = node.getAttribute('data-proof-box')?.split(',').map(Number);
+                  if (node.tagName === 'g' && (!declared || declared.length !== 4 || declared.some(value => !Number.isFinite(value)))) return ['missing explicit cell bounds'];
+                  const bounds = declared ? { x: declared[0], y: declared[1], width: declared[2], height: declared[3] } : node.getBBox();
                   const textBounds = label.getBBox();
                   return textBounds.x < bounds.x - .5 || textBounds.y < bounds.y - .5 || textBounds.x + textBounds.width > bounds.x + bounds.width + .5 || textBounds.y + textBounds.height > bounds.y + bounds.height + .5 ? [label.textContent] : [];
                 });
