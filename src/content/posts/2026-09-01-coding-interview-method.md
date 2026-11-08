@@ -127,10 +127,6 @@ Start with the numbered problems. Use their related problems to practice a simil
 
 The snippets show the main steps, not complete solutions. Work out the missing setup before using them.
 
-#### Group 1: Hash Maps, Prefix Sums & Weighted Sampling
-
-**Idea:** Save earlier values or running totals. Weighted sampling uses running totals as bucket boundaries.
-
 <details>
 <summary>1. Subarray Sum Equals K</summary>
 
@@ -208,10 +204,6 @@ for n in nums:
 
 </details>
 </details>
-
-#### Group 2: Two Pointers & Sliding Windows
-
-**Idea:** Move two pointers toward each other, or expand and shrink a window while keeping its rule true.
 
 <details>
 <summary>2. Minimum Window Substring</summary>
@@ -305,10 +297,6 @@ for i, a in enumerate(nums):
 </details>
 </details>
 
-#### Group 3: Binary Search & Search Space
-
-**Idea:** Search sorted positions or possible answers. Each comparison must show which half cannot contain the answer.
-
 <details>
 <summary>4. Koko Eating Bananas</summary>
 
@@ -352,10 +340,6 @@ while l <= r:
 
 </details>
 </details>
-
-#### Group 4: Monotonic Stacks & String Parsing
-
-**Idea:** A stack holds unfinished work. Waiting indices, unmatched brackets and arithmetic terms need different rules.
 
 <details>
 <summary>5. Daily Temperatures</summary>
@@ -425,10 +409,6 @@ for i, t in enumerate(temperatures):
 
 </details>
 </details>
-
-#### Group 5: Intervals, Heaps & Greedy
-
-**Idea:** Sort intervals, keep useful values in a heap, or track how far earlier choices can reach.
 
 <details>
 <summary>6. Merge Intervals</summary>
@@ -524,10 +504,6 @@ for i, n in enumerate(nums):
 
 </details>
 
-#### Group 6: Linked Lists & Caching
-
-**Idea:** Save pointers before changing links. A map and doubly linked list make recent items easy to find and move.
-
 <details>
 <summary>9. Reverse Linked List</summary>
 
@@ -602,10 +578,6 @@ while curr:
 ```
 
 </details>
-
-#### Group 7: Trees, BSTs & Tries
-
-**Idea:** Combine child results, process one tree level at a time, or pass value bounds down to children.
 
 <details>
 <summary>11. Diameter of Binary Tree</summary>
@@ -706,10 +678,6 @@ node["$"] = True
 ```
 
 </details>
-
-#### Group 8: Graphs, Matrices, Shortest Paths & Coloring
-
-**Idea:** Track connected cells, remaining prerequisites, group roots or travel times. Choose the rule that matches the task.
 
 <details>
 <summary>13. Rotting Oranges</summary>
@@ -862,10 +830,6 @@ return all(is_bipartite(node, 0) for node in range(len(adj)) if node not in colo
 
 </details>
 
-#### Group 9: Dynamic Programming & String Alignment
-
-**Idea:** Save answers for smaller problems. Define what each entry means before writing the update rule.
-
 <details>
 <summary>18. Coin Change</summary>
 
@@ -936,10 +900,6 @@ dp[i][0], dp[0][j] = i, j
 ```
 
 </details>
-
-#### Group 10: Backtracking & Bit Manipulation
-
-**Idea:** Choose, explore and undo to build possible answers. XOR solves a different task by canceling paired values.
 
 <details>
 <summary>20. Combination Sum</summary>
