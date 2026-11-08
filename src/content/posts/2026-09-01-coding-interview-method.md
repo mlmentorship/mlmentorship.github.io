@@ -13,8 +13,7 @@ aliases: ["coding interview practice", "coding questions phone guide"]
 prerequisites: []
 ---
 
-Two values must add to a target, and their positions must differ.
-Each new value determines a missing partner. Query earlier values before saving the current value.
+Start with one problem. Work out what each step needs, then choose what to store.
 
 ## Problem
 
@@ -37,23 +36,23 @@ Do not sort or reuse one position. Assume integer inputs.
 
 ### Cue
 
-A missing partner suggests replacing repeated scans; the clue alone is not a proof.
+A missing partner suggests a lookup instead of scanning the array again.
 
 ### State
 
-`seen` retains one earlier index per value. Any such index suffices for one witness, but not for counting every pair.
+Save one earlier index per value in `seen`. To count pairs, store frequencies instead.
 
 ### Invariant
 
-Before each query, `seen` represents all earlier values, with an earlier index for each.
+An invariant is a rule that stays true. Here, `seen` contains only values from earlier positions.
 
 ### Move
 
-Query, then store. A hit is valid; otherwise saving the current value preserves the invariant for the next index.
+Look up the partner first, then save the current value. This prevents using one position twice.
 
 ## Code
 
-This is the literal [Two Sum owner](/questions/two-sum/) implementation:
+The [Two Sum solution](/questions/two-sum/):
 
 ```python
 def two_sum(nums: list[int], target: int) -> list[int]:
@@ -66,16 +65,12 @@ def two_sum(nums: list[int], target: int) -> list[int]:
    return []
 ```
 
-Under usual dictionary and unit-cost arithmetic assumptions, time is expected $O(n)$ and auxiliary space is $O(n)$.
+Expected time is $O(n)$, with $O(n)$ extra space.
 Check `[3]`, target 6: no earlier partner, so `[]`. Check `[3, 3]`: the second query returns `[0, 1]`.
 
 ## Change 1: Count Every Index Pair
 
-**New task.** Return the number of distinct index pairs, not one witness.
-
-**Picture and change.** Keep prior frequencies rather than one index. Add matches before incrementing the current frequency.
-
-**Code.**
+Count pairs of distinct indices. Store prior counts, not one index. Count matches before adding the current value.
 
 ```python
 def count_pairs(nums, target):
@@ -89,15 +84,11 @@ def count_pairs(nums, target):
 
 **Check.** `[3, 3, 3]`, target 6, adds 0, 1, then 2: total 3. `[3]` gives 0.
 
-**Use when.** The output asks how many witnesses exist.
-
 ## Change 2: Count Signed Zero-Sum Ranges
 
-**New task.** Without a pattern heading, count contiguous zero-sum ranges in `[1, -1, 1]`.
-
-**Picture and change.** Equal prefix totals mark range boundaries. Store boundary multiplicity, including the initial zero boundary.
-
-**Code.**
+Count contiguous zero-sum ranges in `[1, -1, 1]`.
+A prefix sum is the total up to a boundary. Equal prefix sums mean the values between them sum to zero.
+Count matching prefixes, including the initial zero.
 
 ```python
 def count_zero_ranges(nums):
@@ -110,13 +101,11 @@ def count_zero_ranges(nums):
 	return answer
 ```
 
-**Check.** Prefixes `0, 1, 0, 1` contain two equal-boundary pairs, so the answer is 2. Empty input gives 0.
-
-**Use when.** Signed sums lack the monotonicity needed for a simple shrinking window.
+**Check.** `[1, -1, 1]` has two zero-sum ranges: `[1, -1]` and `[-1, 1]`. Empty input gives 0.
 
 ## Failure: Remembering Only "Hash Map"
 
-A family name cannot explain query order, state multiplicity or the assumptions behind a safe move.
+Knowing "hash map" is not enough. Explain what the map stores and why lookup comes before insertion.
 
 ## Transfer Check
 
@@ -124,7 +113,8 @@ Why does a contiguous range not always imply a sliding window?
 
 ### Reasoned Answer
 
-Adding a negative value can decrease a sum. Without the needed repair monotonicity, derive the prefix relation instead.
+Adding a negative value can lower the sum. A window that shrinks whenever the sum is too large may discard a valid answer.
+Prefix sums avoid that assumption.
 
 <!-- learning:core-end -->
 <div class="learning-extension" data-learning-extension>
@@ -133,13 +123,13 @@ Adding a negative value can decrease a sum. Without the needed repair monotonici
 
 ### First pass: learn one anchor per pattern
 
-Use 20 main anchors across these same ten groups. All 35 original problems remain as anchors, variations or contrasts. Added anchors cover minimum windows, subtree summaries and constrained choices.
+Start with the numbered problems. Use their related problems to practice a similar idea or compare a different method.
 
-These are review fragments, not runnable solutions. Setup, imports and node definitions are assumed. Numbering counts main anchors only. Review the rule, then rebuild the omitted setup yourself. A contrast uses a different rule; it is not an interchangeable algorithm.
+The snippets show the main steps, not complete solutions. Work out the missing setup before using them.
 
 #### Group 1: Hash Maps, Prefix Sums & Weighted Sampling
 
-**Mental model:** Store earlier values or prefix summaries. Weighted sampling adds a search over cumulative bucket boundaries.
+**Idea:** Save earlier values or running totals. Weighted sampling uses running totals as bucket boundaries.
 
 <details>
 <summary>1. Subarray Sum Equals K</summary>
@@ -157,9 +147,7 @@ for n in nums:
     seen_sums[curr_sum] = seen_sums.get(curr_sum, 0) + 1
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Two Sum</summary>
 
 - **Change:** Return one pair, not a range count. Keep one earlier index per value.
@@ -179,10 +167,10 @@ for n in nums:
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Random Pick with Weight</summary>
 
-- **Contrast:** Cumulative totals now bound weighted buckets, rather than count earlier boundaries.
+- **Contrast:** Running totals mark weighted buckets instead of counting earlier matches.
 
   ```python
   prefix_sums = list(accumulate(weights))
@@ -197,7 +185,7 @@ for n in nums:
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Product of Array Except Self</summary>
 
 - **Contrast:** Combine contributions on either side of each index, without division. First store the product strictly to its left.
@@ -223,7 +211,7 @@ for n in nums:
 
 #### Group 2: Two Pointers & Sliding Windows
 
-**Mental model:** Move converging boundaries, or repair a growing window. The window's rule decides when its left boundary can move.
+**Idea:** Move two pointers toward each other, or expand and shrink a window while keeping its rule true.
 
 <details>
 <summary>2. Minimum Window Substring</summary>
@@ -245,12 +233,10 @@ for right, c in enumerate(s):
         left += 1
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Longest Substring Without Repeating Characters</summary>
 
-- **Change:** Require uniqueness, not coverage. Store each character's most recent position.
+- **Change:** Keep characters unique instead of covering required characters. Store each character's most recent position.
 
   ```python
   left = max_len = 0
@@ -297,9 +283,7 @@ for i, a in enumerate(nums):
             r -= 1
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Valid Palindrome II</summary>
 
 - **Contrast:** Compare string ends instead of numeric totals. Allow at most one deletion.
@@ -323,14 +307,14 @@ for i, a in enumerate(nums):
 
 #### Group 3: Binary Search & Search Space
 
-**Mental model:** Halve an ordered range of positions or answers. The comparison or feasibility rule must justify the discarded half.
+**Idea:** Search sorted positions or possible answers. Each comparison must show which half cannot contain the answer.
 
 <details>
 <summary>4. Koko Eating Bananas</summary>
 
-- Search speeds, not pile positions. A feasible speed makes every faster speed feasible.
+- Search speeds, not pile positions. If a speed finishes in time, every faster speed does too.
 - Use ceiling division to count each pile's hours.
-- Keep a feasible speed, then try slower ones. Assume positive piles and enough hours for one visit per pile.
+- Keep a working speed, then try slower ones. Assume positive piles and enough hours for one visit per pile.
 
 ```python
 l, r = 1, max(piles)
@@ -344,12 +328,10 @@ while l <= r:
         l = mid + 1
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Binary Search</summary>
 
-- **Change:** Search sorted positions for an exact target, rather than the smallest feasible answer.
+- **Change:** Find an exact value in a sorted array, rather than the smallest working speed.
 
   ```python
   l, r = 0, len(arr) - 1
@@ -373,14 +355,14 @@ while l <= r:
 
 #### Group 4: Monotonic Stacks & String Parsing
 
-**Mental model:** A stack holds unfinished work. Waiting indices, unmatched symbols and precedence terms obey different stack rules.
+**Idea:** A stack holds unfinished work. Waiting indices, unmatched brackets and arithmetic terms need different rules.
 
 <details>
 <summary>5. Daily Temperatures</summary>
 
 - Store indices waiting for their first warmer day.
-- Keep waiting temperatures nonincreasing. A warmer day resolves colder entries at the top.
-- Pop the waiting index before subtracting it; unresolved days stay zero.
+- Waiting temperatures stay the same or decrease from bottom to top. A warmer day resolves colder entries at the top.
+- Pop the waiting index before subtracting it; days without a warmer day stay zero.
 
 ```python
 ans, stack = [0] * len(temperatures), []
@@ -391,9 +373,7 @@ for i, t in enumerate(temperatures):
     stack.append(i)
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Valid Parentheses</summary>
 
 - **Contrast:** Nested brackets close in reverse order; no temperature ordering is involved.
@@ -416,7 +396,7 @@ for i, t in enumerate(temperatures):
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Basic Calculator II</summary>
 
 - **Contrast:** Parse a valid expression without parentheses. Store signed terms, but resolve multiplication and division immediately.
@@ -448,7 +428,7 @@ for i, t in enumerate(temperatures):
 
 #### Group 5: Intervals, Heaps & Greedy
 
-**Mental model:** Sort boundaries or keep useful extremes in a heap. A reachable bound can summarize earlier greedy choices.
+**Idea:** Sort intervals, keep useful values in a heap, or track how far earlier choices can reach.
 
 <details>
 <summary>6. Merge Intervals</summary>
@@ -467,9 +447,7 @@ for curr in intervals[1:]:
         merged.append(curr)
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Meeting Rooms II</summary>
 
 - **Contrast:** Count allocated rooms instead of merging ranges. Keep one ending time per room in a min-heap.
@@ -506,9 +484,7 @@ for n in nums:
         heapq.heappop(min_heap)
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Merge k Sorted Lists</summary>
 
 - **Contrast:** Keep one candidate head per sorted list, rather than the largest values. The source index breaks equal-value ties.
@@ -550,7 +526,7 @@ for i, n in enumerate(nums):
 
 #### Group 6: Linked Lists & Caching
 
-**Mental model:** Preserve pointers before rewiring. Dummy anchors simplify endpoints; a map and doubly linked list support fast recency updates.
+**Idea:** Save pointers before changing links. A map and doubly linked list make recent items easy to find and move.
 
 <details>
 <summary>9. Reverse Linked List</summary>
@@ -567,9 +543,7 @@ while curr:
     prev, curr = curr, nxt
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Merge Two Sorted Lists</summary>
 
 - **Change:** Reuse nodes in sorted order instead of reversing them. A dummy head anchors the output.
@@ -592,7 +566,7 @@ while curr:
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Linked List Cycle</summary>
 
 - **Contrast:** Detect repeated node identity without changing links. Start a slow and a fast pointer together.
@@ -631,7 +605,7 @@ while curr:
 
 #### Group 7: Trees, BSTs & Tries
 
-**Mental model:** Use recursion for subtrees and queue snapshots for levels. Track inherited bounds in BSTs and shared prefix paths in tries.
+**Idea:** Combine child results, process one tree level at a time, or pass value bounds down to children.
 
 <details>
 <summary>11. Diameter of Binary Tree</summary>
@@ -650,9 +624,7 @@ def depth(node):
     return 1 + max(l, r)
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Maximum Depth of Binary Tree</summary>
 
 - **Change:** Return only the longest downward path. Empty subtrees contribute zero.
@@ -662,7 +634,7 @@ def depth(node):
       return 0
   ```
 
-- **Move:** Add one node to the deeper child path; no separate diameter accumulator is needed.
+- **Move:** Add one node to the deeper child path. No separate diameter total is needed.
 
   ```python
   def maxDepth(root):
@@ -672,7 +644,7 @@ def depth(node):
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Binary Tree Level Order Traversal</summary>
 
 - **Contrast:** Group nodes by distance from the root. A queue represents one level at each outer iteration.
@@ -696,10 +668,10 @@ def depth(node):
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Validate Binary Search Tree</summary>
 
-- **Contrast:** Pass ancestor bounds downward instead of combining child depths upward.
+- **Contrast:** Pass allowed value bounds down to children instead of combining child depths.
 
   ```python
   low, high = -float("inf"), float("inf")
@@ -737,7 +709,7 @@ node["$"] = True
 
 #### Group 8: Graphs, Matrices, Shortest Paths & Coloring
 
-**Mental model:** Follow grid neighbors, remove zero-in-degree nodes, or join components. Expand cheapest weighted frontiers, transform coordinates, or color edge endpoints oppositely.
+**Idea:** Track connected cells, remaining prerequisites, group roots or travel times. Choose the rule that matches the task.
 
 <details>
 <summary>13. Rotting Oranges</summary>
@@ -760,12 +732,10 @@ while queue and fresh:
     minutes += 1
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Number of Islands</summary>
 
-- **Change:** Count connected land components, not elapsed minutes. Each unvisited land cell starts one flood fill.
+- **Change:** Count connected groups of land, not minutes. Each unvisited land cell starts one flood fill.
 
   ```python
   if grid[r][c] == "1":
@@ -785,10 +755,10 @@ while queue and fresh:
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Rotate Image</summary>
 
-- **Contrast:** Rotate a square matrix by changing coordinates, not traversing connections. First transpose across the diagonal.
+- **Contrast:** Change cell positions, not connections. First transpose: swap entries across the main diagonal.
 
   ```python
   n = len(matrix)
@@ -811,7 +781,7 @@ while queue and fresh:
 <summary>14. Course Schedule</summary>
 
 - Direct each edge from prerequisite to course.
-- Zero in-degree means ready. Removing a ready course releases its outgoing dependencies.
+- In-degree counts remaining prerequisites. A zero count means ready; finishing that course reduces its neighbors' counts.
 - If fewer than `numCourses` courses are processed, a cycle remains.
 
 ```python
@@ -829,7 +799,7 @@ queue = deque(i for i in range(numCourses) if in_degree[i] == 0)
 <details>
 <summary>15. Redundant Connection</summary>
 
-- Union-find represents connected components by roots.
+- Union-find tracks connected groups by their roots.
 - An edge between equal roots closes a cycle; different roots can be joined.
 - Use path compression and union by size when filling in the omitted setup.
 
@@ -855,7 +825,7 @@ for u, v in edges:
 <summary>16. Network Delay Time</summary>
 
 - With nonnegative weights, expand the smallest known arrival time first.
-- Relax improved distances; skip heap entries superseded by a cheaper route.
+- Update distances when a faster route is found. Skip older heap entries with worse times.
 - The latest shortest arrival is the answer. Any unreachable node makes delivery impossible.
 
 ```python
@@ -875,9 +845,9 @@ while heap:
 <details>
 <summary>17. Is Graph Bipartite?</summary>
 
-- Each edge requires opposite colors at its endpoints.
-- Revisiting a colored node must agree with its assigned color.
-- Start in every component; an odd cycle creates a conflict.
+- Connected nodes need different colors.
+- A later visit must match a node's existing color.
+- Check every separate part of the graph. An odd cycle causes a color conflict.
 
 ```python
 color = {}
@@ -894,14 +864,14 @@ return all(is_bipartite(node, 0) for node in range(len(adj)) if node not in colo
 
 #### Group 9: Dynamic Programming & String Alignment
 
-**Mental model:** Store smaller-state answers. Changing the task changes what each cell means and which earlier states it can use.
+**Idea:** Save answers for smaller problems. Define what each entry means before writing the update rule.
 
 <details>
 <summary>18. Coin Change</summary>
 
-- The remaining amount identifies a subproblem; try each positive coin that fits.
-- Cache the minimum count for each remainder.
-- Zero needs no coins. Infinity marks an unreachable remainder, including when no coin fits.
+- Use the remaining amount as the state. Try each positive coin that fits.
+- Cache the fewest coins needed for each amount.
+- Zero needs no coins. Infinity means no combination fits.
 
 ```python
 @lru_cache(None)
@@ -912,9 +882,7 @@ def dfs(rem):
                default=float("inf"))
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>House Robber</summary>
 
 - **Contrast:** Maximize money without taking adjacent houses. This array reminder assumes at least two houses.
@@ -933,17 +901,17 @@ def dfs(rem):
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Word Break</summary>
 
-- **Change:** Track prefix feasibility, not minimum coin count. The empty prefix is reachable.
+- **Change:** Track which string prefixes can be made from dictionary words. Start with the empty prefix.
 
   ```python
   words = set(words)
   dp = [True] + [False] * len(s)
   ```
 
-- **Move:** A reachable boundary plus one dictionary word reaches a new prefix. `"cars"` can use `"ca"` and `"rs"`.
+- **Move:** Extend any valid prefix with a dictionary word. `"cars"` can use `"ca"` then `"rs"`.
 
   ```python
   for i in range(1, len(s) + 1):
@@ -971,7 +939,7 @@ dp[i][0], dp[0][j] = i, j
 
 #### Group 10: Backtracking & Bit Manipulation
 
-**Mental model:** Choose, explore and undo when enumerating possibilities. XOR cancellation is a separate rule for paired duplicates.
+**Idea:** Choose, explore and undo to build possible answers. XOR solves a different task by canceling paired values.
 
 <details>
 <summary>20. Combination Sum</summary>
@@ -994,9 +962,7 @@ def backtrack(start, rem, path):
         path.pop()
 ```
 
-**Variations and contrasts**
-
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Subsets</summary>
 
 - **Change:** Every partial path is a valid answer, including the empty path. Remove the target-sum condition.
@@ -1018,7 +984,7 @@ def backtrack(start, rem, path):
 
 </details>
 
-<details>
+<details style="margin-inline-start:1.25rem">
 <summary>Single Number</summary>
 
 - **Contrast:** Every value appears twice except one. XOR cancels paired values without exploring possibilities.
@@ -1037,42 +1003,35 @@ def backtrack(start, rem, path):
 </details>
 </details>
 
-Read the problem first; hide the code, draw the state, explain the invariant, then implement and test. Recognizing a group is the start of the explanation, not proof that its usual move is safe.
-
 ### Second pass: study nearby variations
 
-Change the output, admissible inputs or state requirements; re-prove the move. A surface resemblance does not establish correctness.
+Open a related problem and note what changes. Explain why its steps work, then solve it without the snippet.
 
 ### Mixed pass: choose the pattern yourself
 
 Hide the pattern heading and ask:
 
-1. What is the brute-force method?
-2. What work does it repeat?
-3. Which state removes that repeated work?
-4. What rule stays true?
-5. Why is the next move safe?
-6. What are the time and space costs?
+1. What does a simple solution do repeatedly?
+2. What data would avoid that repeated work?
+3. Why is each step correct, and what are the time and space costs?
 
-An optional 15-minute attempt can precede a limited hint. Hide the hint and rebuild; adjust timing to observed needs.
+Try first, then take a small hint if needed. Hide the hint and try again.
 
 ## Review schedule
 
-Optional retry delays are 1, 3, 7 and 14 days; adapt them to performance, not a learning guarantee.
-Record six miss types:
+Try the problem again after 1, 3, 7 and 14 days. Adjust the gaps if it is too easy or difficult.
+Record what went wrong:
 
-- Recognition.
-- Wrong state.
-- Unsafe move.
-- Implementation.
-- Edge case.
-- Complexity.
-
-Use a card for retrieval and the full lesson to repair the explanation.
+- Choosing the method.
+- What to store.
+- Why the step works.
+- Writing the code.
+- Edge cases.
+- Time and space costs.
 
 ## Quick pattern map
 
-| Prompt shape | State to draw first | Likely family |
+| Prompt clue | What to track | Method |
 | --- | --- | --- |
 | Pair/duplicate | Prior values/counts | Map/set |
 | Contiguous range | Boundaries/prefixes | Window/prefix |
