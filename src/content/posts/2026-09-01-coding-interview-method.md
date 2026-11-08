@@ -181,7 +181,7 @@ def subarray_sum(nums, target):
 </details>
 
 <details>
-<summary>34. Random Pick with Weight</summary>
+<summary>3. Random Pick with Weight</summary>
 
 - Integer weights give each index that many tickets. With `[1, 3]`, index 0 owns ticket 1 and index 1 owns tickets 2 through 4.
 - Build cumulative totals once. Draw an integer from 1 through the total, then find the first boundary at least as large as that ticket.
@@ -227,7 +227,7 @@ def longest_substring(s):
 </details>
 
 <details>
-<summary>3. 3Sum</summary>
+<summary>5. 3Sum</summary>
 
 - Sort the values and fix one number. The remaining task is to find a pair whose sum cancels it.
 - A total below zero needs a larger left value; a total above zero needs a smaller right value. Skip duplicate choices to avoid repeated triples.
@@ -258,7 +258,7 @@ def three_sum(nums):
 </details>
 
 <details>
-<summary>30. Valid Palindrome II</summary>
+<summary>6. Valid Palindrome II</summary>
 
 - Compare the two ends until they disagree. Before that mismatch, no deletion is needed.
 - At the first mismatch, the only useful choices are to skip the left character or the right character. The remaining range must be a palindrome with no more deletions.
@@ -284,7 +284,7 @@ def valid_palindrome_ii(s):
 **Mental model:** Halve an ordered search space. That space can contain array positions or candidate answers with a monotone feasibility rule.
 
 <details>
-<summary>5. Binary Search</summary>
+<summary>7. Binary Search</summary>
 
 - In a sorted array, the middle value tells you which half cannot contain the target.
 - Keep the target's possible positions inside `[l, r]`. Remove `mid` with `mid + 1` or `mid - 1` after a miss.
@@ -307,7 +307,7 @@ def binary_search(arr, target):
 </details>
 
 <details>
-<summary>31. Koko Eating Bananas</summary>
+<summary>8. Koko Eating Bananas</summary>
 
 - Search eating speeds, not pile positions. If a speed finishes within `h` hours, every faster speed also works.
 - A feasible middle speed may not be the slowest one, so keep it as an answer and search lower. Use integer ceiling division for each pile.
@@ -334,7 +334,7 @@ def min_eating_speed(piles, h):
 **Mental model:** A stack holds unfinished work: unmatched symbols, indices awaiting a larger value, or terms awaiting an operator.
 
 <details>
-<summary>6. Valid Parentheses</summary>
+<summary>9. Valid Parentheses</summary>
 
 - An opening bracket waits for a matching closing bracket. Nested pairs must close in reverse order.
 - Each closing bracket must match the stack's top. An empty stack or wrong opener fails immediately.
@@ -355,7 +355,7 @@ def valid_parentheses(s):
 </details>
 
 <details>
-<summary>7. Daily Temperatures</summary>
+<summary>10. Daily Temperatures</summary>
 
 - Each day waits for its first warmer day. Store waiting indices whose temperatures are nonincreasing.
 - A warmer temperature resolves every colder index at the top. Pop the waiting index first, then subtract it from today's index.
@@ -375,7 +375,7 @@ def daily_temperatures(temperatures):
 </details>
 
 <details>
-<summary>33. Basic Calculator II</summary>
+<summary>11. Basic Calculator II</summary>
 
 - Read a valid expression of nonnegative integers and `+`, `-`, `*`, `/`, with no parentheses. Build a number until the next operator arrives.
 - Save addition and subtraction as signed terms. Apply multiplication and division to the last term immediately, before the final sum.
@@ -409,7 +409,7 @@ def calculate(s):
 **Mental model:** Sort boundaries or keep useful extremes in a heap. A reachable bound can summarize earlier greedy choices.
 
 <details>
-<summary>15. Merge Intervals</summary>
+<summary>12. Merge Intervals</summary>
 
 - Sort by start time. Then an interval can overlap only the last merged range, not an earlier finished range.
 - If its start is at most the last end, extend that end. Otherwise, start a new range.
@@ -432,7 +432,7 @@ def merge_intervals(intervals):
 </details>
 
 <details>
-<summary>27. Meeting Rooms II</summary>
+<summary>13. Meeting Rooms II</summary>
 
 - Process meetings by start time. A min-heap keeps one end time per allocated room.
 - Reuse the earliest-ending room when its end is at most the new start. Otherwise, allocate another room; each new meeting can reuse only one.
@@ -454,7 +454,7 @@ def meeting_rooms(intervals):
 </details>
 
 <details>
-<summary>9. Kth Largest Element</summary>
+<summary>14. Kth Largest Element</summary>
 
 - Keep only the largest `k` values seen so far. Their smallest value is the current cutoff.
 - Push each new value into a min-heap, then remove the smallest whenever the heap grows beyond `k`.
@@ -475,7 +475,7 @@ def kth_largest(nums, k):
 </details>
 
 <details>
-<summary>16. Jump Game</summary>
+<summary>15. Jump Game</summary>
 
 - Each nonnegative value sets the farthest jump from its position. Track the farthest index reachable from any earlier reachable position.
 - If the current index lies beyond that bound, no earlier jump can reach it. Otherwise, extend the bound with `i + n`.
@@ -498,7 +498,7 @@ def can_jump(nums):
 **Mental model:** Use dummy anchors to simplify endpoints. Preserve the next pointer before rewiring. A map plus a doubly linked list makes lookup and recency updates fast.
 
 <details>
-<summary>19. Reverse Linked List</summary>
+<summary>16. Reverse Linked List</summary>
 
 - Split the list into a reversed prefix and an untouched suffix. `prev` heads the prefix; `curr` heads the suffix.
 - Save `curr.next` before reversing the link. Without that saved pointer, the remaining nodes become unreachable.
@@ -517,7 +517,7 @@ def reverse_list(head):
 </details>
 
 <details>
-<summary>21. Merge Two Sorted Lists</summary>
+<summary>17. Merge Two Sorted Lists</summary>
 
 - The smaller current head is the next output node, because neither sorted list hides a smaller value farther ahead.
 - A dummy head gives the first node the same attachment rule as every later node. Advance only the list that supplied the node.
@@ -539,7 +539,7 @@ def merge_two_lists(l1, l2):
 </details>
 
 <details>
-<summary>28. LRU Cache</summary>
+<summary>18. LRU Cache</summary>
 
 - Use a positive capacity. Keep cached values, and evict the least recently used key when adding a key exceeds capacity.
 - A map finds each node; a doubly linked list orders use from oldest to newest. Every read or write moves its node just before the tail.
@@ -590,7 +590,7 @@ class LRUCache:
 **Mental model:** Use recursion for subtrees and queue snapshots for levels. Track inherited bounds in BSTs and shared prefix paths in tries.
 
 <details>
-<summary>12. Maximum Depth of Binary Tree</summary>
+<summary>19. Maximum Depth of Binary Tree</summary>
 
 - An empty subtree has depth 0. A nonempty subtree adds its root to the deeper child path.
 - Ask each child for the same quantity, then combine the answers with `1 + max(...)`.
@@ -605,7 +605,7 @@ def max_depth(root):
 </details>
 
 <details>
-<summary>22. Binary Tree Level Order Traversal</summary>
+<summary>20. Binary Tree Level Order Traversal</summary>
 
 - A queue visits parents before their children. At the start of each outer loop, it contains exactly one level.
 - Save that level's values and process only its initial queue length. Newly added children belong to the next level.
@@ -630,7 +630,7 @@ def level_order(root):
 </details>
 
 <details>
-<summary>23. Validate Binary Search Tree</summary>
+<summary>21. Validate Binary Search Tree</summary>
 
 - A BST node must satisfy every ancestor's bounds, not just compare correctly with its parent.
 - Going left tightens the upper bound; going right tightens the lower bound. Use strict bounds to reject duplicate values.
@@ -647,7 +647,7 @@ def validate(node, low=-float("inf"), high=float("inf")):
 </details>
 
 <details>
-<summary>20. Implement Trie</summary>
+<summary>22. Implement Trie</summary>
 
 - Lowercase words with the same prefix share the same path of character nodes.
 - Mark the end of a complete word separately. After inserting `"apple"`, `"app"` is a prefix but not yet a stored word.
@@ -687,7 +687,7 @@ class Trie:
 **Mental model:** Follow grid neighbors, remove zero-in-degree nodes, or join components. Expand cheapest weighted frontiers, transform coordinates, or color edge endpoints oppositely.
 
 <details>
-<summary>11. Number of Islands</summary>
+<summary>23. Number of Islands</summary>
 
 - One island is one connected component of land cells using the four grid neighbors, not diagonals.
 - When you find unvisited land, count one island and flood-fill its entire component. Mark a cell before visiting its neighbors to stop revisits.
@@ -717,7 +717,7 @@ def num_islands(grid):
 </details>
 
 <details>
-<summary>8. Rotting Oranges</summary>
+<summary>24. Rotting Oranges</summary>
 
 - Every initially rotten orange starts spreading at minute 0. Put all of them in the same BFS queue.
 - One queue layer is one minute. Mark fresh neighbors rotten when you enqueue them, so two sources cannot count the same orange twice.
@@ -748,7 +748,7 @@ def oranges_rotting(grid):
 </details>
 
 <details>
-<summary>17. Course Schedule</summary>
+<summary>25. Course Schedule</summary>
 
 - Direct each edge from a prerequisite to its course. A course with zero incoming edges has no unfinished prerequisite.
 - Remove such a course, decrease its neighbors' in-degrees, and enqueue each neighbor when its count reaches zero.
@@ -777,7 +777,7 @@ def can_finish(num_courses, prerequisites):
 </details>
 
 <details>
-<summary>18. Redundant Connection</summary>
+<summary>26. Redundant Connection</summary>
 
 - In a tree with one added undirected edge, that extra edge joins nodes already connected by another path.
 - Union-find stores a representative for each component. Equal representatives reveal the cycle; otherwise, join the smaller component to the larger one.
@@ -808,7 +808,7 @@ def redundant_connection(edges):
 </details>
 
 <details>
-<summary>10. Network Delay Time</summary>
+<summary>27. Network Delay Time</summary>
 
 - With nonnegative edge weights, Dijkstra's algorithm expands the smallest known arrival time first. A FIFO queue would minimize edge count, not travel time.
 - Relax each outgoing edge when it improves a distance. Skip heap entries whose arrival times have already been improved.
@@ -841,7 +841,7 @@ def network_delay_time(times, node_count, source):
 </details>
 
 <details>
-<summary>29. Rotate Image</summary>
+<summary>28. Rotate Image</summary>
 
 - Rotate a square matrix 90 degrees clockwise: position `(row, col)` moves to `(col, n - 1 - row)`.
 - Transpose across the main diagonal, then reverse each row. Those two moves produce the required coordinate change.
@@ -860,7 +860,7 @@ def rotate(matrix):
 </details>
 
 <details>
-<summary>32. Is Graph Bipartite?</summary>
+<summary>29. Is Graph Bipartite?</summary>
 
 - Every edge must connect nodes with opposite colors. Once a node has a color, a later visit must agree with it.
 - Color an unvisited node, then require the opposite color at every neighbor. Propagate a failed recursive check instead of accepting a node just because it was colored.
@@ -886,7 +886,7 @@ def is_bipartite(graph):
 **Mental model:** Store answers for smaller states. A transition must use enough state to make the remaining decision independent of how you reached it.
 
 <details>
-<summary>14. House Robber</summary>
+<summary>30. House Robber</summary>
 
 - At each house, either skip it or take its money. Taking it also needs the best total two houses back.
 - Only those two earlier totals matter, so keep two rolling values instead of the full DP array.
@@ -903,7 +903,7 @@ def rob(nums):
 </details>
 
 <details>
-<summary>24. Coin Change</summary>
+<summary>31. Coin Change</summary>
 
 - The remaining amount fully identifies a subproblem. Try each positive coin that fits, then ask for the fewest coins for the remainder.
 - Cache each remainder's answer. Keep an unreachable remainder at infinity, including when no coin fits; convert the final infinity to `-1`.
@@ -927,7 +927,7 @@ def coin_change(coins, amount):
 </details>
 
 <details>
-<summary>25. Word Break</summary>
+<summary>32. Word Break</summary>
 
 - Ask which string prefixes can be formed from dictionary words. Start with the empty prefix reachable.
 - From a reachable boundary, match a whole dictionary word and mark its ending boundary. A locally longest word is not always the right choice.
@@ -948,7 +948,7 @@ def word_break(s, words):
 </details>
 
 <details>
-<summary>35. Edit Distance</summary>
+<summary>33. Edit Distance</summary>
 
 - `dp[i][j]` aligns the first `i` characters of one word with the first `j` of the other. Store the fewest edits for that alignment.
 - Matching characters need no new edit. Otherwise, add one to the best deletion, insertion or replacement state.
@@ -977,7 +977,7 @@ def edit_distance(w1, w2):
 **Mental model:** Enumerate choices with choose-explore-unchoose, or use XOR when duplicate values must cancel rather than be stored.
 
 <details>
-<summary>13. Subsets</summary>
+<summary>34. Subsets</summary>
 
 - Every current path is a valid subset, including the empty path. Copy it into the result before adding more choices.
 - Choose a value, explore only later indices, then undo the choice. Increasing indices avoid generating different orders of the same subset.
@@ -1001,7 +1001,7 @@ def subsets(nums):
 </details>
 
 <details>
-<summary>26. Single Number</summary>
+<summary>35. Single Number</summary>
 
 - This rule needs every value to appear twice except one. XOR makes two equal values cancel: `x ^ x == 0`.
 - XOR all values together. Order does not matter, and `0 ^ x == x`, so the unpaired value remains.
