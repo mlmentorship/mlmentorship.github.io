@@ -13,8 +13,7 @@ aliases: ["coding interview practice", "coding questions phone guide"]
 prerequisites: []
 ---
 
-Two values must add to a target, and their positions must differ.
-Each new value determines a missing partner. Query earlier values before saving the current value.
+Start with one problem. Work out what each step needs, then choose what to store.
 
 ## Problem
 
@@ -37,23 +36,23 @@ Do not sort or reuse one position. Assume integer inputs.
 
 ### Cue
 
-A missing partner suggests replacing repeated scans; the clue alone is not a proof.
+A missing partner suggests a lookup instead of scanning the array again.
 
 ### State
 
-`seen` retains one earlier index per value. Any such index suffices for one witness, but not for counting every pair.
+Save one earlier index per value in `seen`. To count pairs, store frequencies instead.
 
 ### Invariant
 
-Before each query, `seen` represents all earlier values, with an earlier index for each.
+An invariant is a rule that stays true. Here, `seen` contains only values from earlier positions.
 
 ### Move
 
-Query, then store. A hit is valid; otherwise saving the current value preserves the invariant for the next index.
+Look up the partner first, then save the current value. This prevents using one position twice.
 
 ## Code
 
-This is the literal [Two Sum owner](/questions/two-sum/) implementation:
+The [Two Sum solution](/questions/two-sum/):
 
 ```python
 def two_sum(nums: list[int], target: int) -> list[int]:
@@ -66,16 +65,12 @@ def two_sum(nums: list[int], target: int) -> list[int]:
    return []
 ```
 
-Under usual dictionary and unit-cost arithmetic assumptions, time is expected $O(n)$ and auxiliary space is $O(n)$.
+Expected time is $O(n)$, with $O(n)$ extra space.
 Check `[3]`, target 6: no earlier partner, so `[]`. Check `[3, 3]`: the second query returns `[0, 1]`.
 
 ## Change 1: Count Every Index Pair
 
-**New task.** Return the number of distinct index pairs, not one witness.
-
-**Picture and change.** Keep prior frequencies rather than one index. Add matches before incrementing the current frequency.
-
-**Code.**
+Count pairs of distinct indices. Store prior counts, not one index. Count matches before adding the current value.
 
 ```python
 def count_pairs(nums, target):
@@ -89,15 +84,11 @@ def count_pairs(nums, target):
 
 **Check.** `[3, 3, 3]`, target 6, adds 0, 1, then 2: total 3. `[3]` gives 0.
 
-**Use when.** The output asks how many witnesses exist.
-
 ## Change 2: Count Signed Zero-Sum Ranges
 
-**New task.** Without a pattern heading, count contiguous zero-sum ranges in `[1, -1, 1]`.
-
-**Picture and change.** Equal prefix totals mark range boundaries. Store boundary multiplicity, including the initial zero boundary.
-
-**Code.**
+Count contiguous zero-sum ranges in `[1, -1, 1]`.
+A prefix sum is the total up to a boundary. Equal prefix sums mean the values between them sum to zero.
+Count matching prefixes, including the initial zero.
 
 ```python
 def count_zero_ranges(nums):
@@ -110,13 +101,11 @@ def count_zero_ranges(nums):
 	return answer
 ```
 
-**Check.** Prefixes `0, 1, 0, 1` contain two equal-boundary pairs, so the answer is 2. Empty input gives 0.
-
-**Use when.** Signed sums lack the monotonicity needed for a simple shrinking window.
+**Check.** `[1, -1, 1]` has two zero-sum ranges: `[1, -1]` and `[-1, 1]`. Empty input gives 0.
 
 ## Failure: Remembering Only "Hash Map"
 
-A family name cannot explain query order, state multiplicity or the assumptions behind a safe move.
+Knowing "hash map" is not enough. Explain what the map stores and why lookup comes before insertion.
 
 ## Transfer Check
 
@@ -124,7 +113,8 @@ Why does a contiguous range not always imply a sliding window?
 
 ### Reasoned Answer
 
-Adding a negative value can decrease a sum. Without the needed repair monotonicity, derive the prefix relation instead.
+Adding a negative value can lower the sum. A window that shrinks whenever the sum is too large may discard a valid answer.
+Prefix sums avoid that assumption.
 
 <!-- learning:core-end -->
 <div class="learning-extension" data-learning-extension>
@@ -133,65 +123,916 @@ Adding a negative value can decrease a sum. Without the needed repair monotonici
 
 ### First pass: learn one anchor per pattern
 
-These 20 anchors form one suggested sequence, not a universal optimum:
+Start with the numbered problems. Use their related problems to practice a similar idea or compare a different method.
 
-1. Two Sum
-2. Subarray Sum Equals K
-3. 3Sum
-4. Longest Substring Without Repeating Characters
-5. Binary Search
-6. Valid Parentheses
-7. Daily Temperatures
-8. Rotting Oranges
-9. Kth Largest Element
-10. Network Delay Time
-11. Number of Islands
-12. Maximum Depth of Binary Tree
-13. Subsets
-14. House Robber
-15. Merge Intervals
-16. Jump Game
-17. Course Schedule
-18. Redundant Connection
-19. Reverse Linked List
-20. Implement Trie
+The snippets show the main steps, not complete solutions. Work out the missing setup before using them.
 
-Read the problem first; hide code, inspect the picture, explain the invariant, then implement and test.
+<details>
+<summary>1. Subarray Sum Equals K</summary>
+
+- **Problem:** Given an integer array and a target, count nonempty contiguous subarrays with that sum.
+- A range sum is the difference between two prefix totals.
+- Count earlier totals equal to `curr_sum - target`; frequencies preserve multiple matching boundaries.
+- Seed one zero prefix. Count before storing, so only earlier boundaries contribute.
+
+```python
+seen_sums = {0: 1}
+curr_sum = count = 0
+for n in nums:
+    curr_sum += n
+    count += seen_sums.get(curr_sum - target, 0)
+    seen_sums[curr_sum] = seen_sums.get(curr_sum, 0) + 1
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Two Sum</summary>
+
+- **Problem:** Return two distinct indices in `nums` whose values sum to `target`, or `[]` if none exist.
+- **Change:** Return one pair, not a range count. Keep one earlier index per value.
+
+  ```python
+  seen = {}  # value -> earlier index
+  ```
+
+- **Move:** Query before storing. `[3, 3]`, target 6, returns `[0, 1]` without reusing an index.
+
+  ```python
+  for i, n in enumerate(nums):
+      if target - n in seen:
+          return [seen[target - n], i]
+      seen[n] = i
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Random Pick with Weight</summary>
+
+- **Problem:** Given positive weights, choose an index randomly with probability proportional to its weight.
+- **Contrast:** Running totals mark weighted buckets instead of counting earlier matches.
+
+  ```python
+  prefix_sums = list(accumulate(weights))
+  ```
+
+- **Move:** Draw an integer ticket and find its first enclosing boundary. `[1, 3]` gives index 1 three tickets.
+
+  ```python
+  ticket = random.randint(1, prefix_sums[-1])
+  return bisect_left(prefix_sums, ticket)
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Product of Array Except Self</summary>
+
+- **Problem:** For each position in `nums`, return the product of all other values without using division.
+- **Contrast:** Combine contributions on either side of each index, without division. First store the product strictly to its left.
+
+  ```python
+  res, prefix = [1] * len(nums), 1
+  for i, n in enumerate(nums):
+      res[i] = prefix
+      prefix *= n
+  ```
+
+- **Move:** Multiply by the product strictly to the right. `[1, 2, 3, 4]` produces `[24, 12, 8, 6]`.
+
+  ```python
+  suffix = 1
+  for i in range(len(nums) - 1, -1, -1):
+      res[i] *= suffix
+      suffix *= nums[i]
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>2. Minimum Window Substring</summary>
+
+- **Problem:** Return the shortest substring of `s` containing every character in `t`, including repeats, or `""` if none exists.
+- Cover every required character, including repeats; assume `t` is nonempty.
+- Expand until the window covers `t`, then shrink while coverage holds.
+- Removing a required occurrence creates a deficit. Keep the shortest valid window seen.
+
+```python
+need, missing = Counter(t), len(t)
+left = 0
+for right, c in enumerate(s):
+    missing -= need[c] > 0
+    need[c] -= 1
+    while missing == 0:
+        # Save the shortest window [left, right].
+        need[s[left]] += 1
+        missing += need[s[left]] > 0
+        left += 1
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Longest Substring Without Repeating Characters</summary>
+
+- **Problem:** Given a string, return the length of its longest substring without repeated characters.
+- **Change:** Keep characters unique instead of covering required characters. Store each character's most recent position.
+
+  ```python
+  left = max_len = 0
+  char_map = {}
+  ```
+
+- **Move:** Jump past repeats inside the current window, never backward. `"abba"` has maximum length 2.
+
+  ```python
+  for right, c in enumerate(s):
+      if c in char_map and char_map[c] >= left:
+          left = char_map[c] + 1
+      char_map[c] = right
+      max_len = max(max_len, right - left + 1)
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>3. 3Sum</summary>
+
+- **Problem:** Find all unique triples in `nums` that sum to zero, using three distinct indices.
+- Sort, then fix one value and seek a pair that cancels it.
+- A low total needs a larger left value; a high total needs a smaller right value.
+- Skip repeated anchor and left values to avoid duplicate triples.
+
+```python
+nums.sort()
+res = []
+for i, a in enumerate(nums):
+    if i > 0 and a == nums[i - 1]:
+        continue
+    l, r = i + 1, len(nums) - 1
+    while l < r:
+        total = a + nums[l] + nums[r]
+        if total == 0:
+            res.append([a, nums[l], nums[r]])
+            l += 1
+            while l < r and nums[l] == nums[l - 1]:
+                l += 1
+        elif total < 0:
+            l += 1
+        else:
+            r -= 1
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Valid Palindrome II</summary>
+
+- **Problem:** Given a string, check whether deleting at most one character can make it a palindrome.
+- **Contrast:** Compare string ends instead of numeric totals. Allow at most one deletion.
+
+  ```python
+  l, r = 0, len(s) - 1
+  ```
+
+- **Move:** At the first mismatch, skip either end and check the remainder. `"abca"` succeeds; `"abc"` fails.
+
+  ```python
+  while l < r:
+      if s[l] != s[r]:
+          skip_l, skip_r = s[l + 1:r + 1], s[l:r]
+          return skip_l == skip_l[::-1] or skip_r == skip_r[::-1]
+      l, r = l + 1, r - 1
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>4. Koko Eating Bananas</summary>
+
+- **Problem:** Find the smallest integer speed, in bananas per hour, that finishes all piles within `h` hours. Use one pile per hour.
+- Search speeds, not pile positions. If a speed finishes in time, every faster speed does too.
+- Use ceiling division to count each pile's hours.
+- Keep a working speed, then try slower ones. Assume positive piles and enough hours for one visit per pile.
+
+```python
+l, r = 1, max(piles)
+ans = r
+while l <= r:
+    mid = (l + r) // 2
+    hours = sum((p + mid - 1) // mid for p in piles)
+    if hours <= h:
+        ans, r = mid, mid - 1
+    else:
+        l = mid + 1
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Binary Search</summary>
+
+- **Problem:** Given an ascending sorted array, return the index of `target`, or `-1` if it is absent.
+- **Change:** Find an exact value in a sorted array, rather than the smallest working speed.
+
+  ```python
+  l, r = 0, len(arr) - 1
+  ```
+
+- **Move:** Discard `mid` after a miss. In `[1, 3, 5]`, target 3 is at index 1.
+
+  ```python
+  while l <= r:
+      mid = (l + r) // 2
+      if arr[mid] == target:
+          return mid
+      elif arr[mid] < target:
+          l = mid + 1
+      else:
+          r = mid - 1
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>5. Daily Temperatures</summary>
+
+- **Problem:** For each day's temperature, return the days until a warmer day; use zero if none follows.
+- Store indices waiting for their first warmer day.
+- Waiting temperatures stay the same or decrease from bottom to top. A warmer day resolves colder entries at the top.
+- Pop the waiting index before subtracting it; days without a warmer day stay zero.
+
+```python
+ans, stack = [0] * len(temperatures), []
+for i, t in enumerate(temperatures):
+    while stack and t > temperatures[stack[-1]]:
+        waiting = stack.pop()
+        ans[waiting] = i - waiting
+    stack.append(i)
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Valid Parentheses</summary>
+
+- **Problem:** Given only `()`, `[]` and `{}` brackets, check whether each opener closes in the correct order.
+- **Contrast:** Nested brackets close in reverse order; no temperature ordering is involved.
+
+  ```python
+  stack, mapping = [], {")": "(", "}": "{", "]": "["}
+  ```
+
+- **Move:** Match each closer with the latest opener, then require an empty stack. `"([)]"` fails.
+
+  ```python
+  for c in s:
+      if c in mapping:
+          if not stack or stack.pop() != mapping[c]:
+              return False
+      else:
+          stack.append(c)
+  return not stack
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Basic Calculator II</summary>
+
+- **Problem:** Evaluate an expression of nonnegative integers using `+`, `-`, `*` and `/`, without parentheses. Division truncates toward zero.
+- **Contrast:** Parse a valid expression without parentheses. Store signed terms, but resolve multiplication and division immediately.
+
+  ```python
+  stack, num, sign = [], 0, "+"
+  ```
+
+- **Move:** A final operator flushes the last number. `"3+2*2"` gives 7; division truncates toward zero.
+
+  ```python
+  for c in s + "+":
+      if c.isdigit():
+          num = num * 10 + int(c)
+      elif c in "+-*/":
+          if sign == "+":
+              stack.append(num)
+          elif sign == "-":
+              stack.append(-num)
+          elif sign == "*":
+              stack.append(stack.pop() * num)
+          elif sign == "/":
+              stack.append(int(stack.pop() / num))
+          sign, num = c, 0
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>6. Merge Intervals</summary>
+
+- **Problem:** Given intervals, merge overlapping ranges and return the nonoverlapping result; touching endpoints count as overlap.
+- Sort by start time; only the last merged range can overlap the next interval.
+- Extend that range's end, or start a new range.
+- Touching endpoints merge. This fragment assumes a nonempty interval list.
+
+```python
+intervals.sort(key=lambda x: x[0])
+merged = [intervals[0]]
+for curr in intervals[1:]:
+    if curr[0] <= merged[-1][1]:
+        merged[-1][1] = max(merged[-1][1], curr[1])
+    else:
+        merged.append(curr)
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Meeting Rooms II</summary>
+
+- **Problem:** Return the minimum rooms needed for meeting intervals. A room is free when its previous meeting ends.
+- **Contrast:** Count allocated rooms instead of merging ranges. Keep one ending time per room in a min-heap.
+
+  ```python
+  intervals.sort(key=lambda x: x[0])
+  min_heap = []
+  ```
+
+- **Move:** Reuse the earliest-ending room when possible. The final heap size gives the required room count.
+
+  ```python
+  for start, end in intervals:
+      if min_heap and min_heap[0] <= start:
+          heapq.heappop(min_heap)
+      heapq.heappush(min_heap, end)
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>7. Kth Largest Element</summary>
+
+- **Problem:** Return the kth largest value in `nums`, counting duplicates as separate entries.
+- Keep the largest `k` values seen; the smallest retained value is the cutoff.
+- Push each value, then pop when the heap exceeds `k` entries.
+- With `1 <= k <= len(nums)`, the final heap root is the answer. Duplicates count separately.
+
+```python
+min_heap = []
+for n in nums:
+    heapq.heappush(min_heap, n)
+    if len(min_heap) > k:
+        heapq.heappop(min_heap)
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Merge k Sorted Lists</summary>
+
+- **Problem:** Given `k` sorted linked lists, merge their nodes into one sorted linked list.
+- **Contrast:** Keep one candidate head per sorted list, rather than the largest values. The source index breaks equal-value ties.
+
+  ```python
+  heap = [(node.val, i, node) for i, node in enumerate(lists) if node]
+  heapq.heapify(heap)
+  ```
+
+- **Move:** Emit the smallest candidate, then advance only its source list. `[1, 4]` and `[2, 3]` merge in order.
+
+  ```python
+  while heap:
+      _, i, node = heapq.heappop(heap)
+      # Append node to the output before advancing its source.
+      if node.next:
+          heapq.heappush(heap, (node.next.val, i, node.next))
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>8. Jump Game</summary>
+
+- **Problem:** Given maximum jump lengths in `nums`, decide whether the last index is reachable from index 0.
+- Track the farthest position reachable from earlier reachable indices.
+- An index beyond that bound cannot be reached; otherwise extend the bound with `i + n`.
+- Reachability needs one bound, not a chosen jump path. Values are nonnegative.
+
+```python
+furthest = 0
+for i, n in enumerate(nums):
+    if i > furthest:
+        return False
+    furthest = max(furthest, i + n)
+```
+
+</details>
+
+<details>
+<summary>9. Reverse Linked List</summary>
+
+- **Problem:** Given the head of a singly linked list, reverse its links and return the new head.
+- `prev` heads the reversed prefix; `curr` heads the untouched suffix.
+- Save the next pointer before reversing the current link.
+- Once `curr` is empty, `prev` is the new head.
+
+```python
+prev, curr = None, head
+while curr:
+    nxt = curr.next
+    curr.next = prev
+    prev, curr = curr, nxt
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Merge Two Sorted Lists</summary>
+
+- **Problem:** Merge two sorted singly linked lists into one sorted list by reusing their nodes.
+- **Change:** Reuse nodes in sorted order instead of reversing them. A dummy head anchors the output.
+
+  ```python
+  dummy = curr = ListNode(0)
+  ```
+
+- **Move:** Attach the smaller head and advance its source. Attach the remaining suffix when one source ends.
+
+  ```python
+  while l1 and l2:
+      if l1.val < l2.val:
+          curr.next, l1 = l1, l1.next
+      else:
+          curr.next, l2 = l2, l2.next
+      curr = curr.next
+  curr.next = l1 if l1 else l2
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Linked List Cycle</summary>
+
+- **Problem:** Given a linked list, check whether following `next` links can revisit the same node.
+- **Contrast:** Detect repeated node identity without changing links. Start a slow and a fast pointer together.
+
+  ```python
+  slow = fast = head
+  ```
+
+- **Move:** Advance one pointer twice as fast. Meeting means a cycle; reaching the end means no cycle.
+
+  ```python
+  while fast and fast.next:
+      slow, fast = slow.next, fast.next.next
+      if slow is fast:
+          return True
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>10. LRU Cache</summary>
+
+- **Problem:** Implement a cache with $O(1)$ `get` and `put`, evicting the least recently used key when capacity is exceeded.
+- A map finds each node; a doubly linked list orders keys from oldest to newest use.
+- Each read or update moves its node to the newest end.
+- On overflow, evict the oldest node from both structures. Dummy endpoints keep rewiring uniform.
+
+```python
+# self.cache = {}  (key -> node)
+# self.head.next = self.tail; self.tail.prev = self.head
+# self._remove(node); self._add_to_end(node)
+# overflow: evict self.head.next from the list and map
+```
+
+</details>
+
+<details>
+<summary>11. Diameter of Binary Tree</summary>
+
+- **Problem:** Given a binary tree, return its longest path length between any two nodes, measured in edges.
+- Each child returns its depth. A path through this node uses both depths.
+- Return one branch upward, but keep the best cross-node path separately.
+- Measure diameter in edges: a one-node tree has diameter 0.
+
+```python
+self.diameter = 0
+def depth(node):
+    if not node:
+        return 0
+    l, r = depth(node.left), depth(node.right)
+    self.diameter = max(self.diameter, l + r)
+    return 1 + max(l, r)
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Maximum Depth of Binary Tree</summary>
+
+- **Problem:** Return the number of nodes on the longest root-to-leaf path in a binary tree.
+- **Change:** Return only the longest downward path. Empty subtrees contribute zero.
+
+  ```python
+  if not root:
+      return 0
+  ```
+
+- **Move:** Add one node to the deeper child path. No separate diameter total is needed.
+
+  ```python
+  def maxDepth(root):
+      return (1 + max(maxDepth(root.left), maxDepth(root.right))
+              if root else 0)
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Binary Tree Level Order Traversal</summary>
+
+- **Problem:** Return a binary tree's values level by level, from top to bottom and left to right.
+- **Contrast:** Group nodes by distance from the root. A queue represents one level at each outer iteration.
+
+  ```python
+  queue, res = deque([root] if root else []), []
+  ```
+
+- **Move:** Process only the initial queue length. Newly queued children belong to the next level.
+
+  ```python
+  while queue:
+      res.append([node.val for node in queue])
+      for _ in range(len(queue)):
+          node = queue.popleft()
+          if node.left:
+              queue.append(node.left)
+          if node.right:
+              queue.append(node.right)
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Validate Binary Search Tree</summary>
+
+- **Problem:** Check BST ordering in a binary tree: every node's left descendants must be smaller and right descendants larger.
+- **Contrast:** Pass allowed value bounds down to children instead of combining child depths.
+
+  ```python
+  low, high = -float("inf"), float("inf")
+  ```
+
+- **Move:** Tighten the upper bound on the left and lower bound on the right. Strict bounds reject duplicates.
+
+  ```python
+  def validate(node, low=-float("inf"), high=float("inf")):
+      return (not node or low < node.val < high
+              and validate(node.left, low, node.val)
+              and validate(node.right, node.val, high))
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>12. Implement Trie</summary>
+
+- **Problem:** Store lowercase words. Support insertion, whole-word lookup and checking whether any word starts with a given prefix.
+- Lowercase words with a shared prefix reuse the same character path.
+- A terminal marker distinguishes a complete word from a prefix.
+- After inserting `"apple"`, `"app"` is a prefix, not yet a stored word.
+
+```python
+node = self.root
+for c in word:
+    node = node.setdefault(c, {})
+node["$"] = True
+# search: follow existing edges and require "$" at the end
+# startsWith: follow existing edges without the terminal test
+```
+
+</details>
+
+<details>
+<summary>13. Rotting Oranges</summary>
+
+- **Problem:** In a grid, rot spreads to four-way neighbors each minute. Return minutes until all oranges rot, or `-1` if impossible.
+- Start with all rotten cells; `fresh` counts the remaining fresh oranges.
+- One queue layer is one minute. Mark neighbors when enqueuing them to prevent duplicate infection.
+- Fresh cells left after the queue empties are unreachable.
+
+```python
+queue, minutes = deque(rotten_cells), 0
+while queue and fresh:
+    for _ in range(len(queue)):
+        r, c = queue.popleft()
+        for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 1:
+                grid[nr][nc] = 2
+                fresh -= 1
+                queue.append((nr, nc))
+    minutes += 1
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Number of Islands</summary>
+
+- **Problem:** Given a grid of land and water, count islands connected horizontally or vertically, not diagonally.
+- **Change:** Count connected groups of land, not minutes. Each unvisited land cell starts one flood fill.
+
+  ```python
+  if grid[r][c] == "1":
+      count += 1
+      dfs(r, c)
+  ```
+
+- **Move:** Mark before visiting the four neighbors. Diagonal land cells remain separate islands.
+
+  ```python
+  def dfs(r, c):
+      if 0 <= r < len(grid) and 0 <= c < len(grid[0]) and grid[r][c] == "1":
+          grid[r][c] = "0"
+          for dr, dc in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+              dfs(r + dr, c + dc)
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Rotate Image</summary>
+
+- **Problem:** Rotate a square matrix 90 degrees clockwise in place, without using another matrix.
+- **Contrast:** Change cell positions, not connections. First transpose: swap entries across the main diagonal.
+
+  ```python
+  n = len(matrix)
+  for r in range(n):
+      for c in range(r + 1, n):
+          matrix[r][c], matrix[c][r] = matrix[c][r], matrix[r][c]
+  ```
+
+- **Move:** Reverse each transposed row. `[[1, 2], [3, 4]]` becomes `[[3, 1], [4, 2]]` clockwise.
+
+  ```python
+  for row in matrix:
+      row.reverse()
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>14. Course Schedule</summary>
+
+- **Problem:** Given courses and prerequisite pairs, decide whether all courses can be completed.
+- Direct each edge from prerequisite to course.
+- In-degree counts remaining prerequisites. A zero count means ready; finishing that course reduces its neighbors' counts.
+- If fewer than `numCourses` courses are processed, a cycle remains.
+
+```python
+in_degree, adj = [0] * numCourses, defaultdict(list)
+for c, p in prerequisites:
+    adj[p].append(c)
+    in_degree[c] += 1
+queue = deque(i for i in range(numCourses) if in_degree[i] == 0)
+# Pop ready courses and decrement each outgoing neighbor's in-degree.
+# Enqueue a neighbor exactly when its in-degree reaches zero.
+```
+
+</details>
+
+<details>
+<summary>15. Redundant Connection</summary>
+
+- **Problem:** Given a tree plus one undirected edge, return the last input edge whose removal restores a tree.
+- Union-find tracks connected groups by their roots.
+- An edge between equal roots closes a cycle; different roots can be joined.
+- Use path compression and union by size when filling in the omitted setup.
+
+```python
+def find(node):
+    if node != parent[node]:
+        parent[node] = find(parent[node])
+    return parent[node]
+
+for u, v in edges:
+    ru, rv = find(u), find(v)
+    if ru == rv:
+        return [u, v]
+    if size[ru] < size[rv]:
+        ru, rv = rv, ru
+    parent[rv] = ru
+    size[ru] += size[rv]
+```
+
+</details>
+
+<details>
+<summary>16. Network Delay Time</summary>
+
+- **Problem:** Given directed edges with nonnegative travel times, return the time to reach all nodes from `k`, or `-1`.
+- With nonnegative weights, expand the smallest known arrival time first.
+- Update distances when a faster route is found. Skip older heap entries with worse times.
+- The latest shortest arrival is the answer. Any unreachable node makes delivery impossible.
+
+```python
+dist[k], heap = 0, [(0, k)]
+while heap:
+    t, u = heapq.heappop(heap)
+    if t != dist[u]:
+        continue
+    for v, w in adj[u]:
+        if t + w < dist[v]:
+            dist[v] = t + w
+            heapq.heappush(heap, (dist[v], v))
+```
+
+</details>
+
+<details>
+<summary>17. Is Graph Bipartite?</summary>
+
+- **Problem:** Can an undirected graph's nodes form two groups such that every edge connects nodes from different groups?
+- Connected nodes need different colors.
+- A later visit must match a node's existing color.
+- Check every separate part of the graph. An odd cycle causes a color conflict.
+
+```python
+color = {}
+def is_bipartite(node, c):
+    if node in color:
+        return color[node] == c
+    color[node] = c
+    return all(is_bipartite(nei, 1 - c) for nei in adj[node])
+
+return all(is_bipartite(node, 0) for node in range(len(adj)) if node not in color)
+```
+
+</details>
+
+<details>
+<summary>18. Coin Change</summary>
+
+- **Problem:** Given positive coin values, find the fewest coins totaling `amount`, with unlimited reuse. Return `-1` if impossible.
+- Use the remaining amount as the state. Try each positive coin that fits.
+- Cache the fewest coins needed for each amount.
+- Zero needs no coins. Infinity means no combination fits.
+
+```python
+@lru_cache(None)
+def dfs(rem):
+    if rem == 0:
+        return 0
+    return min((dfs(rem - c) + 1 for c in coins if c <= rem),
+               default=float("inf"))
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>House Robber</summary>
+
+- **Problem:** Given house values, return the most money you can take without taking from adjacent houses.
+- **Contrast:** Maximize money without taking adjacent houses. This array reminder assumes at least two houses.
+
+  ```python
+  dp = [0] * len(nums)
+  dp[0], dp[1] = nums[0], max(nums[0], nums[1])
+  ```
+
+- **Move:** Skip this house, or take it after the best total two houses back. `[2, 7, 9, 3, 1]` gives 12.
+
+  ```python
+  for i in range(2, len(nums)):
+      dp[i] = max(dp[i - 1], dp[i - 2] + nums[i])
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Word Break</summary>
+
+- **Problem:** Given a string and dictionary, decide whether the string can be split into dictionary words; words may be reused.
+- **Change:** Track which string prefixes can be made from dictionary words. Start with the empty prefix.
+
+  ```python
+  words = set(words)
+  dp = [True] + [False] * len(s)
+  ```
+
+- **Move:** Extend any valid prefix with a dictionary word. `"cars"` can use `"ca"` then `"rs"`.
+
+  ```python
+  for i in range(1, len(s) + 1):
+      dp[i] = any(dp[j] and s[j:i] in words for j in range(i))
+  ```
+
+</details>
+</details>
+
+<details>
+<summary>19. Edit Distance</summary>
+
+- **Problem:** Return the fewest character insertions, deletions and replacements needed to turn one given string into another.
+- Each cell aligns two prefixes and stores their minimum edit count.
+- Matching characters use the diagonal unchanged; otherwise choose deletion, insertion or replacement.
+- Empty-prefix borders cost the other prefix's length.
+
+```python
+dp[i][0], dp[0][j] = i, j
+# dp[i][j] = dp[i-1][j-1] when w1[i-1] == w2[j-1]
+# else 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+#                  delete       insert        replace
+```
+
+</details>
+
+<details>
+<summary>20. Combination Sum</summary>
+
+- **Problem:** Given distinct positive candidates, find all combinations that sum to `target`. Each candidate may be used repeatedly.
+- Build all combinations of positive, distinct candidates that total the target.
+- Choose a value, explore its remainder, then undo the choice.
+- Reusing index `i` allows repeated values; increasing indices avoid different orders of the same combination.
+
+```python
+res = []
+def backtrack(start, rem, path):
+    if rem == 0:
+        res.append(list(path))
+        return
+    for i in range(start, len(candidates)):
+        if candidates[i] > rem:
+            continue
+        path.append(candidates[i])
+        backtrack(i, rem - candidates[i], path)
+        path.pop()
+```
+
+<details style="margin-inline-start:1.25rem">
+<summary>Subsets</summary>
+
+- **Problem:** Given distinct integers, return every subset, including the empty subset.
+- **Change:** Every partial path is a valid answer, including the empty path. Remove the target-sum condition.
+
+  ```python
+  res = []
+  ```
+
+- **Move:** Copy each path, then explore later indices only. Advancing to `i + 1` prevents reusing the chosen position.
+
+  ```python
+  def backtrack(start, path):
+      res.append(list(path))
+      for i in range(start, len(nums)):
+          path.append(nums[i])
+          backtrack(i + 1, path)
+          path.pop()
+  ```
+
+</details>
+
+<details style="margin-inline-start:1.25rem">
+<summary>Single Number</summary>
+
+- **Problem:** Given integers where every value appears twice except one, return the unpaired value.
+- **Contrast:** Every value appears twice except one. XOR cancels paired values without exploring possibilities.
+
+  ```python
+  ans = 0
+  ```
+
+- **Move:** XOR all values together; order does not matter. `[2, 1, 2]` leaves 1.
+
+  ```python
+  for n in nums:
+      ans ^= n
+  ```
+
+</details>
+</details>
 
 ### Second pass: study nearby variations
 
-Change the output, admissible inputs or state requirements; re-prove the move. A surface resemblance does not establish correctness.
+Open a related problem and note what changes. Explain why its steps work, then solve it without the snippet.
 
 ### Mixed pass: choose the pattern yourself
 
 Hide the pattern heading and ask:
 
-1. What is the brute-force method?
-2. What work does it repeat?
-3. Which state removes that repeated work?
-4. What rule stays true?
-5. Why is the next move safe?
-6. What are the time and space costs?
+1. What does a simple solution do repeatedly?
+2. What data would avoid that repeated work?
+3. Why is each step correct, and what are the time and space costs?
 
-An optional 15-minute attempt can precede a limited hint. Hide the hint and rebuild; adjust timing to observed needs.
+Try first, then take a small hint if needed. Hide the hint and try again.
 
 ## Review schedule
 
-Optional retry delays are 1, 3, 7 and 14 days; adapt them to performance, not a learning guarantee.
-Record six miss types:
+Try the problem again after 1, 3, 7 and 14 days. Adjust the gaps if it is too easy or difficult.
+Record what went wrong:
 
-- Recognition.
-- Wrong state.
-- Unsafe move.
-- Implementation.
-- Edge case.
-- Complexity.
-
-Use a card for retrieval and the full lesson to repair the explanation.
+- Choosing the method.
+- What to store.
+- Why the step works.
+- Writing the code.
+- Edge cases.
+- Time and space costs.
 
 ## Quick pattern map
 
-| Prompt shape | State to draw first | Likely family |
+| Prompt clue | What to track | Method |
 | --- | --- | --- |
 | Pair/duplicate | Prior values/counts | Map/set |
 | Contiguous range | Boundaries/prefixes | Window/prefix |
